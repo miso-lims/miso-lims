@@ -612,9 +612,6 @@ public class EditLibraryController {
     if (library == null) {
       throw new SecurityException("No such Library.");
     }
-    if (!library.userCanRead(user)) {
-      throw new SecurityException("Permission denied.");
-    }
 
     model.put("formObj", library);
     model.put("library", library);

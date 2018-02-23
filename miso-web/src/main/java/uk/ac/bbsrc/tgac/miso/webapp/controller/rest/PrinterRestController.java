@@ -107,7 +107,7 @@ public class PrinterRestController extends RestController {
     for (long id : printerIds) {
       Printer printer = printerService.get(id);
       if (printer != null) {
-        printerService.remove(printer);
+        printerService.delete(printer);
       }
     }
   }

@@ -124,14 +124,6 @@ public class HibernatePrinterDao implements PrinterStore, HibernatePaginatedData
   }
 
   @Override
-  public boolean remove(Printer printer) throws IOException {
-    if (!printer.isDeletable())
-      return false;
-    currentSession().delete(printer);
-    return true;
-  }
-
-  @Override
   public long save(Printer t) throws IOException {
     if (t.getId() == Printer.UNSAVED_ID) {
       return (Long) currentSession().save(t);

@@ -155,16 +155,6 @@ public class HibernateStudyDaoTest extends AbstractDAOTest {
     assertTrue(hasCancerGenomics);
   }
 
-  @Test
-  public void testRemove() throws Exception {
-    int count = dao.count();
-    Study study = dao.get(6);
-
-    assertTrue(dao.remove(study));
-    assertNull(dao.get(6));
-    assertEquals(count - 1, dao.count());
-  }
-
   private Study makeStudy() {
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
     User user = new UserImpl();
@@ -173,7 +163,8 @@ public class HibernateStudyDaoTest extends AbstractDAOTest {
     project.setId(1L);
     StudyType studyType = new StudyType();
     studyType.setId(1L);
-    Study s = new StudyImpl(project, user);
+    Study s = new StudyImpl();
+    s.setSecurityProfile(project.getSecurityProfile());
     s.setName("STU999");
     s.setStudyType(studyType);
     s.setDescription("foo");

@@ -13,6 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -36,11 +37,8 @@ public class DefaultStudyService implements StudyService, AuthorizedPaginatedDat
   @Autowired
   private StudyStore studyStore;
 
-  @Override
-  public void delete(Study study) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    studyStore.remove(study);
-  }
+  @Autowired
+  private DeletionStore deletionStore;
 
   @Override
   public Study get(long studyId) throws IOException {
@@ -140,6 +138,11 @@ public class DefaultStudyService implements StudyService, AuthorizedPaginatedDat
   @Override
   public PaginatedDataSource<Study> getBackingPaginationSource() {
     return studyStore;
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
   }
 
 }

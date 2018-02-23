@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PrinterStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
@@ -22,6 +23,9 @@ public class DefaultPrinterService implements PrinterService {
 
   @Autowired
   private PrinterStore printerStore;
+
+  @Autowired
+  private DeletionStore deletionStore;
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -50,16 +54,6 @@ public class DefaultPrinterService implements PrinterService {
   }
 
   @Override
-  public void remove(Printer printer) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    Printer original = printerStore.get(printer.getId());
-    if (original == null) {
-      return;
-    }
-    printerStore.remove(original);
-  }
-
-  @Override
   public long update(Printer printer) throws IOException {
     authorizationManager.throwIfNotInternal();
     Printer original = printerStore.get(printer.getId());
@@ -84,6 +78,16 @@ public class DefaultPrinterService implements PrinterService {
     } else {
       return Collections.emptyList();
     }
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
   }
 
 }

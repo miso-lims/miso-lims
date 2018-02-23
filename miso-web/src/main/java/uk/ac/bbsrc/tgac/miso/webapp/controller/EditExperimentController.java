@@ -76,22 +76,10 @@ public class EditExperimentController {
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("experiment") Experiment experiment, ModelMap model, SessionStatus session)
       throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!experiment.userCanWrite(user)) {
-        throw new SecurityException("Permission denied.");
-      }
-      experiment.setLastModifier(user);
-      experimentService.save(experiment);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/experiment/" + experiment.getId();
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save Experiment", ex);
-      }
-      throw ex;
-    }
+    experimentService.save(experiment);
+    session.setComplete();
+    model.clear();
+    return "redirect:/miso/experiment/" + experiment.getId();
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
@@ -104,9 +92,6 @@ public class EditExperimentController {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     if (experiment == null) {
       throw new SecurityException("No such Experiment");
-    }
-    if (!experiment.userCanRead(user)) {
-      throw new SecurityException("Permission denied.");
     }
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode consumableConfig = mapper.createObjectNode();

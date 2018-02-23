@@ -160,12 +160,6 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, N
   @Column(nullable = false)
   private String title;
 
-  /**
-   * Construct a new Experiment with a default empty SecurityProfile
-   */
-  public Experiment() {
-  }
-
   @CoverageIgnore
   public void addKit(Kit kit) {
     this.kits.add(kit);
@@ -359,16 +353,4 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, N
     this.title = title;
   }
 
-  @Override
-  @CoverageIgnore
-  public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
-  }
-
-  @Override
-  @CoverageIgnore
-
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
-  }
 }

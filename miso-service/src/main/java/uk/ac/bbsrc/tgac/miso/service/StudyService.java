@@ -8,9 +8,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface StudyService extends PaginatedDataSource<Study> {
-  public void delete(Study study) throws IOException;
+public interface StudyService extends PaginatedDataSource<Study>, DeleterService<Study> {
 
+  @Override
   public Study get(long studyId) throws IOException;
 
   public Map<String, Integer> getColumnSizes() throws IOException;

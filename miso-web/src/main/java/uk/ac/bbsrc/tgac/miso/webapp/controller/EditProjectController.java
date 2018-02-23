@@ -271,10 +271,6 @@ public class EditProjectController {
       if (project == null) {
         throw new SecurityException("No such Project");
       }
-
-      if (!project.userCanRead(user)) {
-        throw new SecurityException("Permission denied.");
-      }
       model.put("referenceGenome", referenceGenomeService.listAllReferenceGenomeTypes());
       model.put("formObj", project);
       model.put("project", project);
@@ -305,10 +301,6 @@ public class EditProjectController {
   public String processSubmit(@ModelAttribute("project") Project project, ModelMap model, SessionStatus session, HttpServletRequest request)
       throws IOException {
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!project.userCanWrite(user)) {
-        throw new SecurityException("Permission denied.");
-      }
       projectService.saveProject(project);
       for (ProjectOverview overview : project.getOverviews()) {
         projectService.saveProjectOverview(overview);

@@ -75,39 +75,6 @@ public class HibernateServiceRecordDao implements ServiceRecordStore {
   }
 
   @Override
-  public boolean remove(ServiceRecord ssr) throws IOException {
-    if (ssr.isDeletable()) {
-      currentSession().delete(ssr);
-      ServiceRecord testIfExists = get(ssr.getId());
-      if (testIfExists != null) return false;
-      removeAttachments(ssr.getId());
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * Attempts to delete all attachments associated with a service record. This method does not throw an exception upon failure to
-   * delete a file, but will log any failures
-   * 
-   * @param recordId ID of service record to delete attachments from
-   */
-  private void removeAttachments(long recordId) {
-    try {
-      for (String filename : misoFilesManager.getFileNames(ServiceRecord.class, String.valueOf(recordId))) {
-        try {
-          misoFilesManager.deleteFile(ServiceRecord.class, String.valueOf(recordId), filename);
-        } catch (IOException e) {
-          log.error("Deleted service record " + recordId + ", but failed to delete attachment: " + filename, e);
-        }
-      }
-    } catch (IOException e) {
-      log.error("Deleted service record " + recordId + ", but failed to delete attachments", e);
-    }
-  }
-
-  @Override
   public List<ServiceRecord> listByInstrumentId(long instrumentId) {
     Criteria criteria = currentSession().createCriteria(ServiceRecord.class);
     criteria.add(Restrictions.eq("instrument.id", instrumentId));

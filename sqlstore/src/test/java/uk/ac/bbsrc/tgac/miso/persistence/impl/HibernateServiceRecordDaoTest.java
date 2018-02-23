@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -157,31 +156,6 @@ public class HibernateServiceRecordDaoTest extends AbstractDAOTest {
   public void testListByInstrumentIdNone() {
     List<ServiceRecord> list = dao.listByInstrumentId(100L);
     assertEquals(0, list.size());
-  }
-
-  @Test
-  public void testRemove() throws IOException {
-    ServiceRecord rec = dao.get(1L);
-    assertNotNull(rec);
-    assertTrue(dao.remove(rec));
-    assertNull(dao.get(1L));
-  }
-  
-  @Test
-  public void testRemoveNotExisting() throws IOException {
-    assertFalse(dao.remove(new ServiceRecord()));
-  }
-  
-  @Test
-  public void testRemoveWithAttachments() throws IOException {
-    ServiceRecord rec = dao.get(1L);
-    assertNotNull(rec);
-    
-    Mockito.when(misoFilesManager.getFileNames(ServiceRecord.class, "1")).thenReturn(Arrays.asList("file"));
-    
-    assertTrue(dao.remove(rec));
-    assertNull(dao.get(1L));
-    Mockito.verify(misoFilesManager, Mockito.times(1)).deleteFile(ServiceRecord.class, "1", "file");
   }
 
 }

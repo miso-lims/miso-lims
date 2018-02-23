@@ -33,7 +33,6 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 
 /**
@@ -66,26 +65,6 @@ public class SampleImpl extends AbstractSample {
    */
   public SampleImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
-  }
-
-  /**
-   * If the given User can read the parent Project, construct a new Sample with a SecurityProfile inherited from the parent Project. If not,
-   * construct a new Sample with a SecurityProfile owned by the given User
-   * 
-   * @param project
-   *          of type Project
-   * @param user
-   *          of type User
-   */
-  public SampleImpl(Project project, User user) {
-    if (project.userCanRead(user)) {
-      setProject(project);
-      setSecurityProfile(project.getSecurityProfile());
-    } else {
-      log.error(String.format("User %s does not have permission to read Project %s. Unable to create Sample.", user.getFullName(),
-          project.getAlias()));
-      setSecurityProfile(new SecurityProfile(user));
-    }
   }
 
   @Override

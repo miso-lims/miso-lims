@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.security;
 
-import com.eaglegenomics.simlims.core.Securable;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
 /**
@@ -32,7 +31,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface SecurableByProfile extends Securable {
+public interface SecurableByProfile {
   /**
    * Returns the securityProfile of this SecurableByProfile object.
    * 
@@ -57,4 +56,5 @@ public interface SecurableByProfile extends Securable {
    *           when the parent SecurityProfile could not be inherited
    */
   void inheritPermissions(SecurableByProfile parent) throws SecurityException;
+
 }

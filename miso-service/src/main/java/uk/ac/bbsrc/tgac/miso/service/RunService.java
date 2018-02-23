@@ -13,7 +13,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 
 public interface RunService extends PaginatedDataSource<Run> {
 
@@ -40,7 +39,7 @@ public interface RunService extends PaginatedDataSource<Run> {
    * @return
    * @throws IOException
    */
-  Run get(long runId) throws IOException, AuthorizationException;
+  Run get(long runId) throws IOException;
 
   /**
    * Throws AuthorizationException if user is not authorized to read the retrieved run.
@@ -49,7 +48,7 @@ public interface RunService extends PaginatedDataSource<Run> {
    * @return
    * @throws IOException
    */
-  Run getRunByAlias(String alias) throws IOException, AuthorizationException;
+  Run getRunByAlias(String alias) throws IOException;
 
   /**
    * Throws AuthorizationException if user is not authorized to read the retrieved run.
@@ -58,7 +57,7 @@ public interface RunService extends PaginatedDataSource<Run> {
    * @return
    * @throws IOException
    */
-  Run getLatestRunBySequencerPartitionContainerId(long containerId) throws IOException, AuthorizationException;
+  Run getLatestRunBySequencerPartitionContainerId(long containerId) throws IOException;
 
   void addRunWatcher(Run run, User watcher) throws IOException;
 

@@ -21,28 +21,43 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.core.store;
-
-import java.io.IOException;
-
-import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
-
-/**
- * Defines a contract whereby an implementing class is able to remove a given object T from a store
- * 
- * @author Rob Davey
- * @date 09-May-2011
- * @since 0.0.3
- */
-public interface Remover<T extends Deletable> {
-  /**
-   * Remove object of given type T
-   * 
-   * @param t
-   *          of type T
-   * @return boolean true if removed successfully
-   * @throws java.io.IOException
-   *           when the object cannot be removed
-   */
-  public boolean remove(T t) throws IOException;
-}
+ListTarget.deletion = {
+  name: "Deletions",
+  createUrl: function(config, projectId) {
+    return '/miso/rest/deletions/dt';
+  },
+  createBulkActions: function(config, projectId) {
+    return [];
+  },
+  createStaticActions: function(config, projectId) {
+    return [];
+  },
+  createColumns: function(config, projectId) {
+    return [{
+      sTitle: 'Type',
+      mData: 'targetType',
+      include: true,
+      iSortPriority: 0
+    }, {
+      sTitle: 'ID',
+      mData: 'targetId',
+      include: true,
+      iSortPriority: 0
+    }, {
+      sTitle: 'Description',
+      mData: 'description',
+      include: true,
+      iSortPriority: 0
+    }, {
+      sTitle: 'Deleted By',
+      mData: 'userName',
+      include: true,
+      iSortPriority: 0
+    }, {
+      sTitle: 'Time',
+      mData: 'changeTime',
+      include: true,
+      iSortPriority: 1
+    }];
+  }
+};

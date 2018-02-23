@@ -49,7 +49,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.Fetch;
@@ -300,24 +299,6 @@ public class ProjectImpl implements Project {
   @Override
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     // projects have no parents
-  }
-
-  @Override
-  public boolean userCanRead(User user) {
-    try {
-      Boolean bool = false;
-      if (BooleanUtils.isTrue(securityProfile.userCanRead(user))) {
-        bool = true;
-      }
-      return bool;
-    } catch (NullPointerException e) {
-      return false;
-    }
-  }
-
-  @Override
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
   }
 
   public void addStudy(Study s) {

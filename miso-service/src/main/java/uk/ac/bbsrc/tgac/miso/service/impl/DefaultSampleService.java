@@ -74,6 +74,8 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   private static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
+  private static final String ERR_MISSING_PARENT_ID = "Detailed sample is missing parent identifier";
+
   public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, Sample parent, Sample child) {
     if (parent == null && !isDetailedSample(child)) {
       return true; // Simple sample has no relationships.
@@ -224,7 +226,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       DetailedSample detailed = (DetailedSample) sample;
       if (!isIdentitySample(sample)) {
         if (detailed.getParent() == null) {
-          throw new IllegalArgumentException("Detailed sample is missing parent identifier");
+          throw new IllegalArgumentException(ERR_MISSING_PARENT_ID);
         }
         if (detailed.getParent().getId() != SampleImpl.UNSAVED_ID) {
           detailed.setParent((DetailedSample) get(detailed.getParent().getId()));
@@ -407,7 +409,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
    */
   private DetailedSample findOrCreateParent(DetailedSample sample) throws IOException, MisoNamingException, ConstraintViolationException {
     if (sample.getParent() == null) {
-      throw new IllegalArgumentException("Detailed sample is missing parent identifier");
+      throw new IllegalArgumentException(ERR_MISSING_PARENT_ID);
     }
     DetailedSample tempParent = sample.getParent();
     if (tempParent.getId() != Sample.UNSAVED_ID) {
@@ -449,7 +451,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   private void setIdentity(DetailedSample descendant) throws IOException, MisoNamingException {
     if (descendant.getParent() == null) {
-      throw new IllegalArgumentException("Detailed sample is missing parent identifier");
+      throw new IllegalArgumentException(ERR_MISSING_PARENT_ID);
     }
     DetailedSample child = descendant;
     DetailedSample parent = descendant.getParent();

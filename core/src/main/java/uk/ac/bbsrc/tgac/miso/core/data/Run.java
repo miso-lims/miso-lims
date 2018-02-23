@@ -456,16 +456,6 @@ public abstract class Run
   }
 
   @Override
-  public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
-  }
-
-  @Override
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
-  }
-
-  @Override
   public Collection<ChangeLog> getChangeLog() {
     return changeLogs;
   }

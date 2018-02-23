@@ -189,9 +189,6 @@ public class EditPoolController {
       if (pool == null) {
         throw new SecurityException("No such Pool");
       }
-      if (!pool.userCanRead(user)) {
-        throw new SecurityException("Permission denied.");
-      }
 
       model.put("formObj", pool);
       model.put("pool", pool);
@@ -283,10 +280,6 @@ public class EditPoolController {
   public String processSubmit(@ModelAttribute("pool") Pool pool, ModelMap model, SessionStatus session)
       throws IOException {
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!pool.userCanWrite(user)) {
-        throw new SecurityException("Permission denied.");
-      }
       // The pooled elements may have been modified asynchronously while the form was being edited. Since they can't be edited by form,
       // update them to avoid reverting the state.
       if (pool.getId() != PoolImpl.UNSAVED_ID) {
@@ -294,7 +287,6 @@ public class EditPoolController {
         pool.setPoolableElementViews(original.getPoolableElementViews());
       }
 
-      pool.setLastModifier(user);
       poolService.save(pool);
       session.setComplete();
       model.clear();

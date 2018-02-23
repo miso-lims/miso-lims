@@ -48,7 +48,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
@@ -184,9 +183,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     User managedWatcher = securityManager.getUserById(watcher.getUserId());
     Run managedRun = runDao.get(run.getId());
     authorizationManager.throwIfNotReadable(managedRun);
-    if (!managedRun.userCanRead(managedWatcher)) {
-      throw new AuthorizationIOException("User " + watcher.getLoginName() + " cannot see this run.");
-    }
+    authorizationManager.throwIfNotReadable(managedRun, managedWatcher);
     runDao.addWatcher(managedRun, watcher);
   }
 

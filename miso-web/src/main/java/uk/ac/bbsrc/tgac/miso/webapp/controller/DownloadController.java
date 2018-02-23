@@ -33,13 +33,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -53,8 +51,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -71,6 +70,9 @@ public class DownloadController {
 
   @Autowired
   private SecurityManager securityManager;
+
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   @Autowired
   private ProjectService projectService;
@@ -102,13 +104,8 @@ public class DownloadController {
 
   @RequestMapping(value = "/project/{id}/{hashcode}", method = RequestMethod.GET)
   protected void downloadProjectFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response) throws Exception {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    Project project = projectService.getProjectById(id);
-    if (project.userCanRead(user)) {
-      lookupAndRetrieveFile(Project.class, id.toString(), hashcode, response);
-    } else {
-      throw new SecurityException("Access denied");
-    }
+    projectService.getProjectById(id); // service invoked for permission check only
+    lookupAndRetrieveFile(Project.class, id.toString(), hashcode, response);
   }
 
   @RequestMapping(value = "/servicerecord/{id}/{hashcode}", method = RequestMethod.GET)
@@ -135,26 +132,16 @@ public class DownloadController {
 
   @RequestMapping(value = "/libraryqc/{id}/{hashcode}", method = RequestMethod.GET)
   protected void downloadLibraryQcFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
-      throws Exception {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    Library library = libraryService.get(id);
-    if (library.userCanRead(user)) {
-      lookupAndRetrieveFile(LibraryQC.class, id.toString(), hashcode, response);
-    } else {
-      throw new SecurityException("Access denied");
-    }
+      throws IOException {
+    libraryService.get(id); // service invoked for permission check only
+    lookupAndRetrieveFile(LibraryQC.class, id.toString(), hashcode, response);
   }
 
   @RequestMapping(value = "/sampleqc/{id}/{hashcode}", method = RequestMethod.GET)
   protected void downloadSampleQcFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
       throws Exception {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    SampleQC qc = (SampleQC) qcService.get(QcTarget.Sample, id);
-    if (qc.getSample().userCanRead(user)) {
-      lookupAndRetrieveFile(SampleQC.class, id.toString(), hashcode, response);
-    } else {
-      throw new SecurityException("Access denied");
-    }
+    qcService.get(QcTarget.Sample, id); // service invoked for permission check only
+    lookupAndRetrieveFile(SampleQC.class, id.toString(), hashcode, response);
   }
 
   @RequestMapping(value = "/box/forms/{hashcode}", method = RequestMethod.GET)
@@ -162,7 +149,7 @@ public class DownloadController {
     lookupAndRetrieveFile(Box.class, "forms", hashcode, response);
   }
 
-  private void lookupAndRetrieveFile(Class cl, String id, Integer hashcode, HttpServletResponse response) throws IOException {
+  private void lookupAndRetrieveFile(Class<?> cl, String id, Integer hashcode, HttpServletResponse response) throws IOException {
     // lookup
     String filename = null;
     for (String s : filesManager.getFileNames(cl, id)) {

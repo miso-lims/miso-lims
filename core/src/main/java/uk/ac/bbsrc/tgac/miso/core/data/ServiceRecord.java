@@ -14,6 +14,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 
 @Entity
@@ -54,6 +56,7 @@ public class ServiceRecord implements Serializable, Deletable {
     this.recordId = id;
   }
 
+  @Override
   public long getId() {
     return recordId;
   }
@@ -123,7 +126,19 @@ public class ServiceRecord implements Serializable, Deletable {
   }
 
   @Override
-  public boolean isDeletable() {
-    return getId() != AbstractInstrument.UNSAVED_ID;
+  public String getDeleteType() {
+    return "Service Record";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getInstrument().getName() + " "
+        + (getReferenceNumber() == null ? "" : "RE " + getReferenceNumber() + ": ")
+        + getTitle();
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    return null;
   }
 }

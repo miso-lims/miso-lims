@@ -29,15 +29,11 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface PrinterService extends PaginatedDataSource<Printer> {
+public interface PrinterService extends PaginatedDataSource<Printer>, DeleterService<Printer> {
 
   public long create(Printer printer) throws IOException;
 
-  public Printer get(long printerId) throws IOException;
-
   public List<Printer> getEnabled() throws IOException;
-
-  public void remove(Printer printer) throws IOException;
 
   public long update(Printer printer) throws IOException;
 
