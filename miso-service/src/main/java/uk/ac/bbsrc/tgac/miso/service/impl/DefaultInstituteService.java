@@ -13,8 +13,11 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.persistence.InstituteDao;
 import uk.ac.bbsrc.tgac.miso.service.InstituteService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional(rollbackFor = Exception.class)
@@ -27,10 +30,13 @@ public class DefaultInstituteService implements InstituteService {
   private InstituteDao instituteDao;
   
   @Autowired
+  private DeletionStore deletionStore;
+
+  @Autowired
   private AuthorizationManager authorizationManager;
 
   @Override
-  public Institute get(Long id) throws IOException {
+  public Institute get(long id) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return instituteDao.getInstitute(id);
   }
@@ -61,10 +67,26 @@ public class DefaultInstituteService implements InstituteService {
   }
 
   @Override
-  public void delete(Long instituteId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    Institute institute = get(instituteId);
-    instituteDao.deleteInstitute(institute);
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public ValidationResult validateDeletion(Institute object) {
+    ValidationResult result = new ValidationResult();
+
+    long usage = instituteDao.getUsage(object);
+    if (usage > 0L) {
+      result.addError(new ValidationError(usage + " lab" + (usage > 1L ? "s are" : " is") + " associated with institute '"
+          + object.getAlias() + "'"));
+    }
+
+    return result;
   }
 
 }

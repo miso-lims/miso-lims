@@ -7,7 +7,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,19 +90,13 @@ public class InstituteController extends RestController {
   }
   
   @RequestMapping(value = "/institute/{id}", method = RequestMethod.DELETE)
-  @ResponseStatus(code = HttpStatus.OK)
-  public void deleteInstitute(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    try {
-      instituteService.delete(id);
-    } catch (IOException e) {
-      if (e.getCause().getClass() == ConstraintViolationException.class) {
-        String instituteAlias = instituteService.get(id).getAlias();
-        throw new RestException(
-            "You must delete Labs that reference Institute " + instituteAlias + " before deleting " + instituteAlias, Status.INTERNAL_SERVER_ERROR);
-      } else {
-        throw e;
-      }
+  @ResponseStatus(code = HttpStatus.NO_CONTENT)
+  public void deleteInstitute(@PathVariable(name = "id", required = true) long id, HttpServletResponse response) throws IOException {
+    Institute institute = instituteService.get(id);
+    if (institute == null) {
+      throw new RestException("Institute " + id + " not found", Status.NOT_FOUND);
     }
+    instituteService.delete(institute);
   }
   
 }

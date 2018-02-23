@@ -28,17 +28,18 @@ public interface InstituteDao {
   Long addInstitute(Institute institute);
   
   /**
-   * Delete an Institute
-   * 
-   * @param institute the Institute to delete
-   */
-  void deleteInstitute(Institute institute);
-  
-  /**
    * Save a modified Institute
    * 
    * @param institute the Institute to save
    */
   void update(Institute institute);
   
+  /**
+   * Check how many Labs reference this Institute
+   * 
+   * @param institute the Institute to check usage of
+   * @return the number of Labs which belong to this Institute
+   */
+  public long getUsage(Institute institute);
+
 }

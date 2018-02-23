@@ -29,6 +29,7 @@ HotTarget.institute = {
         var deleteNext = function(index) {
           if (index == items.length) {
             window.location = window.location.origin + '/miso/institute/list';
+            return;
           }
           Utils.ajaxWithDialog('Deleting ' + items[index].alias, 'DELETE', '/miso/rest/institute/' + items[index].id, null, function() {
             deleteNext(index + 1);
