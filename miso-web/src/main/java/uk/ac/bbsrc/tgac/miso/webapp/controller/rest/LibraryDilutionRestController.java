@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,6 +12,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +22,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -28,6 +39,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
@@ -142,9 +155,58 @@ public class LibraryDilutionRestController extends RestController {
 
   @RequestMapping(value = "query", method = RequestMethod.POST, produces = { "application/json" })
   @ResponseBody
-  public List<DilutionDto> getLibraryDilutionsInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
+  public List<DilutionDto> getLibraryDilutionsInBulk(@RequestBody List<String> names, HttpServletRequest request,
+      HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
     return PaginationFilter.bulkSearch(names, dilutionService, Dtos::asDto, message -> new RestException(message, Status.BAD_REQUEST));
+  }
+
+  private static Sample getSample(LibraryDilution dilution) {
+    return dilution.getLibrary().getSample();
+  }
+  private final ParentFinder<LibraryDilution> parentFinder = (new ParentFinder<LibraryDilution>() {
+
+    @Override
+    protected LibraryDilution fetch(long id) throws IOException {
+      return dilutionService.get(id);
+    }
+  })//
+      .add(new ParentFinder.SampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, LibraryDilutionRestController::getSample))//
+      .add(new ParentFinder.SampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, LibraryDilutionRestController::getSample))//
+      .add(new ParentFinder.SampleAdapter<>(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class,
+          LibraryDilutionRestController::getSample))//
+      .add(new ParentFinder.SampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class, LibraryDilutionRestController::getSample))//
+      .add(new ParentFinder.SampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class, LibraryDilutionRestController::getSample))//
+      .add(new ParentFinder.ParentAdapter<LibraryDilution, Sample, SampleDto>("Sample") {
+
+        @Override
+        public SampleDto asDto(Sample model) {
+          return Dtos.asDto(model);
+        }
+
+        @Override
+        public Sample find(LibraryDilution model, Consumer<String> emitError) {
+          return model.getLibrary().getSample();
+        }
+      })//
+      .add(new ParentFinder.ParentAdapter<LibraryDilution, Library, LibraryDto>("Library") {
+
+        @Override
+        public LibraryDto asDto(Library model) {
+          return Dtos.asDto(model);
+        }
+
+        @Override
+        public Library find(LibraryDilution model, Consumer<String> emitError) {
+          return model.getLibrary();
+        }
+      });
+
+  @RequestMapping(value = "/parents/{category}", method = RequestMethod.POST)
+  @ResponseBody
+  public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
+    return parentFinder.list(ids, category);
   }
 
 }

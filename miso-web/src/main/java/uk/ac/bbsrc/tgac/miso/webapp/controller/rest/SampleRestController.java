@@ -53,7 +53,8 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -63,10 +64,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -301,47 +300,24 @@ public class SampleRestController extends RestController {
     return MisoWebUtils.generateSpreadsheet(sampleService::get, SampleSpreadSheets::valueOf, request, response);
   }
 
+  private final ParentFinder<Sample> parentFinder = (new ParentFinder<Sample>() {
+
+    @Override
+    protected Sample fetch(long id) throws IOException {
+      return sampleService.get(id);
+    }
+  })//
+      .add(ParentFinder.parent(SampleIdentity.CATEGORY_NAME, SampleIdentity.class))//
+      .add(ParentFinder.parent(SampleTissue.CATEGORY_NAME, SampleTissue.class))//
+      .add(ParentFinder.parent(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class))//
+      .add(ParentFinder.parent(SampleStock.CATEGORY_NAME, SampleStock.class))//
+      .add(ParentFinder.parent(SampleAliquot.CATEGORY_NAME, SampleAliquot.class));
+
   @RequestMapping(value = "/parents/{category}", method = RequestMethod.POST)
   @ResponseBody
-  public List<SampleDto> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder) {
-    Class<? extends DetailedSample> targetClass;
-    switch (category) {
-    case SampleIdentity.CATEGORY_NAME:
-      targetClass = SampleIdentity.class;
-      break;
-    case SampleTissue.CATEGORY_NAME:
-      targetClass = SampleTissue.class;
-      break;
-    case SampleTissueProcessing.CATEGORY_NAME:
-      targetClass = SampleTissueProcessing.class;
-      break;
-    case SampleStock.CATEGORY_NAME:
-      targetClass = SampleStock.class;
-      break;
-    case SampleAliquot.CATEGORY_NAME:
-      targetClass = SampleAliquot.class;
-      break;
-    default:
-      throw new RestException(String.format("No such category %s.", category), Status.NOT_FOUND);
-    }
-    return ids.stream()//
-        .map(WhineyFunction.rethrow(sampleService::get)).map(sample -> {
-          if (sample instanceof DetailedSample) {
-            DetailedSample parent = LimsUtils.getParent(targetClass, (DetailedSample) sample);
-            if (parent == null) {
-              throw new RestException(String.format("%s (%s) has no %s.", sample.getName(), sample.getAlias(), category),
-                  Status.BAD_REQUEST);
-            }
-            return parent;
-          } else {
-            return null;
-          }
-        })//
-        .collect(Collectors.groupingBy(Sample::getId)).values().stream()//
-        .map(l -> l.get(0))//
-        .map(Dtos::asDto)//
-        .collect(Collectors.toList());
+  public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
+    return parentFinder.list(ids, category);
   }
 
   @RequestMapping(value = "/bulk-delete", method = RequestMethod.POST)

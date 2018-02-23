@@ -672,45 +672,8 @@ HotTarget.sample = (function() {
               });
             }
           }, HotUtils.printAction('sample'), HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets),
-          Constants.isDetailedSample ? {
-            name: "Parents",
-            action: function(samples) {
-              Utils.showWizardDialog('Sample Parents', Constants.sampleCategories.map(function(category) {
-                return {
-                  "name": category,
-                  "handler": function() {
-                    Utils.ajaxWithDialog('Searching', 'POST', '/miso/rest/sample/parents/' + category, samples.map(function(s) {
-                      return s.id;
-                    }), function(parents) {
-                      var selectedActions = HotTarget.sample.getBulkActions({}).filter(function(bulkAction) {
-                        return !!bulkAction;
-                      }).map(function(bulkAction) {
-                        return {
-                          "name": bulkAction.name,
-                          "handler": function() {
-                            bulkAction.action(parents);
-                          }
-                        };
-                      });
-                      selectedActions.unshift({
-                        "name": "View Selected",
-                        "handler": function() {
-                          Utils.showOkDialog(category + ' Parents', parents.map(function(parent) {
-                            return parent.name + ' (' + parent.alias + ')';
-                          }), showActionDialog);
-                        }
-                      });
-                      var showActionDialog = function() {
-                        Utils.showWizardDialog(category + ' Actions', selectedActions);
-                      };
-                      showActionDialog();
-                    });
-                  }
-                };
-              }));
-
-            }
-          } : null, ].concat(HotUtils.makeQcActions("Sample"));
+          Constants.isDetailedSample ? HotUtils.makeParents('sample', HotUtils.parentCategoriesForDetailed()) : null, ].concat(HotUtils
+          .makeQcActions("Sample"));
     },
 
     getCustomActions: function(table) {
