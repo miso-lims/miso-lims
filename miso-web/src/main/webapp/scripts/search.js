@@ -49,10 +49,6 @@ var Search = Search || {
     var self = this;
     self.dashboardSearch(jQuery('#searchProject'), true);
     self.dashboardSearch(jQuery('#searchRun'), true);
-    self.dashboardSearch(jQuery('#searchLibrary'), true);
-    self.dashboardSearch(jQuery('#searchSample'), true);
-    self.dashboardSearch(jQuery('#searchLibraryDilution'), true);
-    self.dashboardSearch(jQuery('#searchPool'), true);
   },
 
   insertResult: function(id, v) {

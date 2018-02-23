@@ -57,48 +57,6 @@
                 <div id="searchRunresult"></div>
             </div>
         </div>
-
-        <div class="dashboard_widget">
-
-            <div class="widget_title ui-corner-top">
-                Sample <input type="text" size="20" id="searchSample" name="searchSample"/>
-            </div>
-            <div class="widget ui-corner-bottom">
-                <div id="searchSampleresult">
-                </div>
-            </div>
-        </div>
-
-        <div class="dashboard_widget">
-
-            <div class="widget_title ui-corner-top">
-                Library <input type="text" size="20" id="searchLibrary" name="searchLibrary"/>
-            </div>
-            <div class="widget ui-corner-bottom">
-                <div id="searchLibraryresult">
-                </div>
-            </div>
-        </div>
-        <div class="dashboard_widget">
-
-            <div class="widget_title ui-corner-top">
-                Pool <input type="text" size="20" id="searchPool" name="searchPool"/>
-            </div>
-            <div class="widget ui-corner-bottom">
-                <div id="searchPoolresult">
-                </div>
-            </div>
-        </div>
-        <div class="dashboard_widget">
-
-            <div class="widget_title ui-corner-top">
-                Library Dilution<input type="text" size="20" id="searchLibraryDilution" name="searchLibraryDilution"/>
-            </div>
-            <div class="widget ui-corner-bottom">
-                <div id="searchLibraryDilutionresult">
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 <script type="text/javascript">
@@ -110,18 +68,6 @@
     }, 300, 2);
     Utils.timer.typewatchFunc(jQuery('#searchRun'), function () {
         Search.dashboardSearch(jQuery('#searchRun'))
-    }, 300, 2);
-    Utils.timer.typewatchFunc(jQuery('#searchSample'), function () {
-        Search.dashboardSearch(jQuery('#searchSample'))
-    }, 300, 2);
-    Utils.timer.typewatchFunc(jQuery('#searchLibrary'), function () {
-        Search.dashboardSearch(jQuery('#searchLibrary'))
-    }, 300, 2);
-    Utils.timer.typewatchFunc(jQuery('#searchLibraryDilution'), function () {
-        Search.dashboardSearch(jQuery('#searchLibraryDilution'))
-    }, 300, 2);
-    Utils.timer.typewatchFunc(jQuery('#searchPool'), function () {
-      Search.dashboardSearch(jQuery('#searchPool'))
     }, 300, 2);
   });
 </script>
