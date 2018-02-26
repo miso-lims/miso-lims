@@ -43,7 +43,7 @@ public class DefaultTissueOriginService implements TissueOriginService {
 
   @Override
   public Long create(TissueOrigin tissueOrigin) throws IOException {
-    authorizationManager.throwIfNotInternal();
+    authorizationManager.throwIfNonAdmin();
     setChangeDetails(tissueOrigin);
     validateChange(tissueOrigin, null);
     return tissueOriginDao.addTissueOrigin(tissueOrigin);
