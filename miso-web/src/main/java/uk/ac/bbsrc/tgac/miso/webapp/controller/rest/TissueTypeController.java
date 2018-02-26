@@ -119,11 +119,4 @@ public class TissueTypeController extends RestController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/tissuetype/{id}", method = RequestMethod.DELETE)
-  @ResponseBody
-  public ResponseEntity<?> deleteTissueType(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    tissueTypeService.delete(id);
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
-
 }
