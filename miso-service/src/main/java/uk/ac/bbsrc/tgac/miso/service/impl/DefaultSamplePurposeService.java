@@ -13,8 +13,11 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional(rollbackFor = Exception.class)
@@ -27,10 +30,13 @@ public class DefaultSamplePurposeService implements SamplePurposeService {
   private SamplePurposeDao samplePurposeDao;
 
   @Autowired
+  private DeletionStore deletionStore;
+
+  @Autowired
   private AuthorizationManager authorizationManager;
 
   @Override
-  public SamplePurpose get(Long samplePurposeId) throws IOException {
+  public SamplePurpose get(long samplePurposeId) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return samplePurposeDao.getSamplePurpose(samplePurposeId);
   }
@@ -61,10 +67,25 @@ public class DefaultSamplePurposeService implements SamplePurposeService {
   }
 
   @Override
-  public void delete(Long samplePurposeId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    SamplePurpose samplePurpose = get(samplePurposeId);
-    samplePurposeDao.deleteSamplePurpose(samplePurpose);
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public ValidationResult validateDeletion(SamplePurpose object) {
+    ValidationResult result = new ValidationResult();
+
+    long usage = samplePurposeDao.getUsage(object);
+    if (usage > 0L) {
+      result.addError(new ValidationError("Sample Purpose '" + object.getAlias() + "' is used by " + usage + " samples"));
+    }
+
+    return result;
   }
 
 }

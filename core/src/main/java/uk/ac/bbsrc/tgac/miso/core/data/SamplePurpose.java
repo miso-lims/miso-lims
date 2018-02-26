@@ -5,7 +5,7 @@ import java.util.Date;
 
 import com.eaglegenomics.simlims.core.User;
 
-public interface SamplePurpose extends Serializable, Aliasable {
+public interface SamplePurpose extends Serializable, Aliasable, Deletable {
 
   void setId(long samplePurposeId);
 
