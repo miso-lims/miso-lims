@@ -121,11 +121,4 @@ public class SampleNumberPerProjectController extends RestController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/samplenumberperproject/{id}", method = RequestMethod.DELETE)
-  @ResponseBody
-  public ResponseEntity<?> deleteSampleNumberPerProject(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    sampleNumberPerProjectService.delete(id);
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
-
 }

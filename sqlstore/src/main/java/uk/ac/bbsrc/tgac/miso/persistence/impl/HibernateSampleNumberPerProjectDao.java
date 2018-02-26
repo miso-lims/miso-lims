@@ -59,12 +59,6 @@ public class HibernateSampleNumberPerProjectDao implements SampleNumberPerProjec
   }
 
   @Override
-  public void deleteSampleNumberPerProject(SampleNumberPerProject sampleNumberPerProject) {
-    currentSession().delete(sampleNumberPerProject);
-
-  }
-
-  @Override
   public void update(SampleNumberPerProject sampleNumberPerProject) {
     Date now = new Date();
     sampleNumberPerProject.setLastUpdated(now);
