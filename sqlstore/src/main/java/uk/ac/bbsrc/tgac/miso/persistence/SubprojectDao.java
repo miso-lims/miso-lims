@@ -16,4 +16,6 @@ public interface SubprojectDao {
 
   void update(Subproject subproject);
 
+  public long getUsage(Subproject subproject);
+
 }

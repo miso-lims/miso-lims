@@ -14,6 +14,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -160,5 +161,24 @@ public class SubprojectImpl implements Subproject {
   @Override
   public void setReferenceGenomeId(Long referenceGenomeId) {
     this.referenceGenomeId = referenceGenomeId;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Subproject";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    Project p = getParentProject();
+    return (p.getShortName() == null ? p.getAlias() : p.getShortName())
+        + " - "
+        + getAlias()
+        + (getAlias().equals(getDescription()) ? "" : " (" + getDescription() + ")");
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    return null;
   }
 }
