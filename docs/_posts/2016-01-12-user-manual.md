@@ -13,7 +13,7 @@ order: 1
 
 MISO has been developed by the [Davey group](http://www.earlham.ac.uk/davey-group) at Earlham Institute since February 2010. The first version of MISO was released internally to Earlham staff on 19th Sept 2011. The first beta community release of MISO was 0.1.6, released May 31st, 2012. Since then, a small dedicated software team has provided the fixes and patches needed to support the institute.
 
-In 2015, the [Genome Sequence Informatics](http://labs.oicr.on.ca/genome-sequence-informatics/) team at OICR chose MISO as their new LIMS system. OICR did not want to fork MISO entirely, so together the team at Earlham and OICR worked out a development plan to better support multiple institutes with the same code base. 
+In 2015, the [Genome Sequence Informatics](http://labs.oicr.on.ca/genome-sequence-informatics/) team at OICR chose MISO as their new LIMS system. OICR did not want to fork MISO entirely, so together the team at Earlham and OICR worked out a development plan to better support multiple institutes with the same code base.
 
 Presently, MISO has three part-time developers between the two institutions. All active work is visible on Github and undergoes thorough code reviews and testing before being integrated into the mainline branches. Releases are pushed weekly to Github.
 
@@ -46,8 +46,8 @@ The simplest way to get MISO up and running quickly is to use [Docker](https://w
 
 To use it:
 
-1. [Install Docker 1.9.1+](https://www.docker.com/products/docker) 
-1. ```docker pull misolims/miso-lims``` 
+1. [Install Docker 1.9.1+](https://www.docker.com/products/docker)
+1. ```docker pull misolims/miso-lims```
 1. ```docker run -p 8090:8080 -d -t misolims/miso-lims```
 
 Navigate to [http://localhost:8090](http://localhost:8090) to login to miso with the credentials **admin/admin**.
@@ -120,7 +120,7 @@ A library dilution is a diluted portion of a library ready to be added to a pool
 
 * Click the _My Project_ tab and select the appropriate project from the list
 * Open the _Libraries_ section and then select _Add Library Dilutions_ from the _Options_ menu (see image above)
-* Click individual rows under the _select_ header to select the libraries to be used to create library dilutions. Clicking the _Select_ heading will select all the rows. 
+* Click individual rows under the _select_ header to select the libraries to be used to create library dilutions. Clicking the _Select_ heading will select all the rows.
 * Select the date of the dilution from the first selected row and choose it from the calendar. If all the dates are the same you can choose the down arrow beside the Dilution Date header to fill in the rest of the rows with the same date value.
 * Fill in the concentration files one at a time
 * Click _Save Dilutions_ in the upper right hand corner.
@@ -132,7 +132,7 @@ A pool is one or more diluted libraries inside a tube that is loaded onto a sequ
 * Open the _Library Dilutions_ section and select _Create Pools_ from the Options menu.
 * Add in a Pool alias and final concentration
 * To facilitate making multiple pools at the same time, select _Remove selected dilutions_ to the dilutions already used from the list. This doesn't affect the dilution in the database, it just removes it from the list as a convenience so the same dilution wont be selected again.
-* Select _Create New Pool_. The newly created pool shows up on the right. 
+* Select _Create New Pool_. The newly created pool shows up on the right.
 * Click on the pool to fill in more information:
   * Check the Ready to Run checkbox if this Pool is ready to be run on a sequencer, i.e. no more dilutions need to be added.
   * Add QCs

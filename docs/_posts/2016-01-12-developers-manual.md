@@ -3,6 +3,7 @@ layout: page
 title: "Developer's Manual"
 category: dev
 date: 2016-01-12 13:38:53
+order: 1
 ---
 
 This manual is intended to be an overview of all MISO's major development areas. If you feel that anything is missing, please
@@ -42,7 +43,7 @@ applications.
 |[Deletable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Deletable.java)|Defines whether an implementing object is deletable by the system. The isDeletable() method defines a contract for ascertaining whether the object has any dependencies that prevent it from being removed, e.g. child members.|
 |[Identifiable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Identifiable.java)|Defines objects which have an unique ID field. This ID is used as the database primary key|
 |[Locatable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Locatable.java)|Defines whether an implementing object is able to be located by a barcode string, e.g. a freezer shelf barcode.|
-|[Nameable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java)|Defines whether an implementing object is able to be identified by a unique long and named by a string. This name may or may not be unique depending on the given [MisoNamingScheme](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/MisoNamingScheme.java) applied (see [Naming Schemes](#DeveloperManual-NamingSchemes)). This interface is heavily used in MISO for all persistable objects.|
+|[Nameable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java)|Defines whether an implementing object is able to be identified by a unique long and named by a string. This name may or may not be unique depending on the given [NamingScheme](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/NamingScheme.java) applied (see [Naming Schemes](#naming-schemes)). This interface is heavily used in MISO for all persistable objects.|
 |[Securable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/com/eaglegenomics/simlims/core/Securable.java)|Defines whether an object can be read from or written to, given a User.|
 |[SecurableByProfile](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/security/SecurableByProfile.java)|An extension of Securable, defines objects that are Secured via [SecurityProfile](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/com/eaglegenomics/simlims/core/SecurityProfile.java)|
 |[Watchable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Watchable.java)|Defines whether an implementing object can be assigned watchers that will receive alerts upon the occurrence of defined events.|
@@ -52,7 +53,7 @@ applications.
 These interfaces represent the objects that store state inherent to the MISO model, and are a superset of the
 [EBI SRA domain model schema](http://www.ebi.ac.uk/ena/about/sra_format). This means that as object fields are inputted by
 technicians/auxiliary tools using MISO, the submission schema for the SRA is being populated behind-the-scenes. Decorators are then used
-to wrap up the synonymous objects so that SRA XMLs can be generated (see [ENA Decorators](#DeveloperManual-ENADecorators)).
+to wrap up the synonymous objects so that SRA XMLs can be generated.
 
 |Object|Description|
 |------|-----------|
@@ -104,6 +105,8 @@ management of types that may be institute-specific. Another is that some of thes
 * LibraryType
 * QcType
 
+
+<a name="naming-schemes"/>
 ## Naming Schemes
 
 All [Nameable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java) entities
@@ -127,7 +130,7 @@ Library can also be generated and/or validated by the naming scheme.
 API access to the underlying filesystem is made available through implementors of the
 [FilesManager](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/FilesManager.java)
 interface. This interface defines a contract to, based on a properties-supplied base directory (see
-[Web Application Configuration](#DeveloperManual-Configuration) and
+[Web Application Configuration](#configuration) and
 [Installation Readme](https://documentation.tgac.ac.uk/pages/viewpage.action?pageId=950282#Installation&AdministrationManual-Settingupmiso.propertiesfile)),
 generate temporary files, store files and retrieve files from disk, and list files within a given storage directory. The default file
 storage path is:
@@ -176,12 +179,6 @@ details from the tracker's API. Currently the only default supported implementat
 [JiraIssueManager](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/java/uk/ac/bbsrc/tgac/miso/webapp/service/integration/jira/JiraIssueManager.java)
 class.
 
-### Submissions
-
-API access to the submission workflow is made available through implementors of the
-[SubmissionManager](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/SubmissionManager.java)
-interface.
-
 # Database and Schema
 
 The MISO database is created and updated using [Flyway](https://flywaydb.org/) migrations.
@@ -206,7 +203,7 @@ The MISO database is created and updated using [Flyway](https://flywaydb.org/) m
         flyway.user=misouser
         flyway.password=password
         flyway.url=jdbc:mysql://localhost:3306/miso
-        
+
     This file is gitignored, so you don't have to worry about your credentials ending up on Github
 5. If you have an existing database that you'd like to clear and rebuild, run Flyway Clean to wipe it out
 
@@ -264,6 +261,7 @@ DAOs directly. Beyond data storage and retrieval via the DAO's, the Service laye
 * Updating timestamps and userId fields such as creationDate and lastModifier
 * Ensuring that only fields which should be modifiable can be modified
 
+<a name="configuration"/>
 # Web Application
 
 The main MISO web application is powered by the [Spring framework](http://www.springsource.org/), notably
@@ -281,7 +279,7 @@ A great deal of MISO can be configured at the Spring XML level, making it easy f
 |[applicationContext.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/applicationContext.xml)|Configures the central application miso.properties location and pulls in the configuration files below|
 |[miso-servlet.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/miso-servlet.xml)|Defines low-level MISO webapp-centric elements. Very little configuration should go in here|
 |[miso-config.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/miso-config.xml)|High-level user-space MISO bean configuration|
-|[db-config.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/resources/sql/db-config.xml)|Configures access to the underlying datasource|
+|[db-config.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/db-config.xml)|Configures access to the underlying datasource|
 |[jdbc-security-config.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/jdbc-security-config.xml) / [ldap-security-config.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/ldap-security-config.xml)|Database and LDAP specific configuration, respectively. JDBC configuration is the initial default, and is the simplest mechanism to get started. If you would like more fine-grained access to a directory-style authentication and role assignment mechanism, then LDAP support is also available|
 |[integration-config.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/integration-config.xml)|Configures elements in the integration layer, e.g. analysis server|
 
@@ -350,7 +348,7 @@ will run the schema translator.
 ### Test Data
 
 Test data is populated via Flyway from the script
-[V9000__miso_test_data.test.sql](https://github.com/TGAC/miso-lims/blob/develop/sqlstore/src/test/resources/db/test_migration/V9000__miso_test_data.test.sql)
+[test_data.sql](https://github.com/TGAC/miso-lims/blob/develop/sqlstore/src/test/resources/db/test_migration/test_data.sql)
 
 Flyway is configured to look for any files in the migration directory ending with .test.sql. They must include version numbers higher than
 the production schema versions so that they are run after the tables are created.
@@ -364,20 +362,20 @@ database. You can also create mocks for the DAO's other dependencies using Mocki
 
 ```
 public class SQLRunDAOTest extends AbstractDAOTest {
- 
+
   @Autowired
   private JdbcTemplate jdbcTemplate;
- 
+
   @Mock private Store<SecurityProfile> securityProfileDAO;
- 
+
   @InjectMocks private SQLRunDAO dao;
- 
+
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
   }
- 
+
 }
 ```
 
@@ -396,31 +394,30 @@ To spin up an instance of Tomcat populated with the IT test data, use:
 
     mvn -P external clean verify -DskipITs=false -DcargoInitGoal=run
 
-This will cause Tomcat to start but will not run any tests. You can access this Tomcat at 
-[http://localhost:$PORT](http://localhost:$PORT), where $PORT is the port listed in the console 
-output once the Tomcat has finished starting up. As Tomcat is not running tests, it will have to be killed 
+This will cause Tomcat to start but will not run any tests. You can access this Tomcat at
+`http://localhost:$PORT`, where $PORT is the port listed in the console
+output once the Tomcat has finished starting up. As Tomcat is not running tests, it will have to be killed
 with `Ctrl-C` and the MySQL Docker container will have to be manually cleaned up.
 
 ## Building the Docker image (after building a release)
 
-If you are a MISO maintainer and you have created the latest release, you will need to create a 
+If you are a MISO maintainer and you have created the latest release, you will need to create a
 Docker image for it and send it to DockerHub.
 
 Pull the tag or snapshot that you want to build and package it:
 
     export version="0.2.35-SNAPSHOT"
     git checkout "tags/${version}"
-    mvn -P external clean install package 
+    mvn -P external clean install package
     docker build -t "misolims/miso-lims:${version}" --build-arg version="${version}" --no-cache .
 
 Once the build completes, test it by launching it:
 
     docker run -p 8090:8080 --name "miso${version}" -t "misolims/miso-lims:${version}"
 
-Navigate to http://localhost:8090 and login with the credentials admin:admin.
+Navigate to `http://localhost:8090` and login with the credentials admin:admin.
 
 Once satisfied, push the image to Docker Hub. Note that only members of the [misolims](https://hub.docker.com/u/misolims/) organisation can push:
 
     docker login
     docker push "misolims/miso-lims:${version}"
-
