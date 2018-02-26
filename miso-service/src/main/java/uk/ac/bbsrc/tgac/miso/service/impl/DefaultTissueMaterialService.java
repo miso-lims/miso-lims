@@ -13,8 +13,11 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional(rollbackFor = Exception.class)
@@ -27,10 +30,13 @@ public class DefaultTissueMaterialService implements TissueMaterialService {
   private TissueMaterialDao tissueMaterialDao;
 
   @Autowired
+  private DeletionStore deletionStore;
+
+  @Autowired
   private AuthorizationManager authorizationManager;
 
   @Override
-  public TissueMaterial get(Long tissueMaterialId) throws IOException {
+  public TissueMaterial get(long tissueMaterialId) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return tissueMaterialDao.getTissueMaterial(tissueMaterialId);
   }
@@ -61,10 +67,25 @@ public class DefaultTissueMaterialService implements TissueMaterialService {
   }
 
   @Override
-  public void delete(Long tissueMaterialId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    TissueMaterial tissueMaterial = get(tissueMaterialId);
-    tissueMaterialDao.deleteTissueMaterial(tissueMaterial);
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public ValidationResult validateDeletion(TissueMaterial object) {
+    ValidationResult result = new ValidationResult();
+
+    long usage = tissueMaterialDao.getUsage(object);
+    if (usage > 0L) {
+      result.addError(new ValidationError("Tissue Material '" + object.getAlias() + "' is used by " + usage + " samples"));
+    }
+
+    return result;
   }
 
 }

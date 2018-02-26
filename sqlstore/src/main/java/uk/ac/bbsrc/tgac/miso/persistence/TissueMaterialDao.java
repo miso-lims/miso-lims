@@ -16,4 +16,6 @@ public interface TissueMaterialDao {
 
   void update(TissueMaterial tissueMaterial);
 
+  public long getUsage(TissueMaterial tissueMaterial);
+
 }
