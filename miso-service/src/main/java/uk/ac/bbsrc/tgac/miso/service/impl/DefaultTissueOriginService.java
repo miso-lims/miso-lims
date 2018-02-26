@@ -16,11 +16,13 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional(rollbackFor = Exception.class)
@@ -33,10 +35,13 @@ public class DefaultTissueOriginService implements TissueOriginService {
   private TissueOriginDao tissueOriginDao;
 
   @Autowired
+  private DeletionStore deletionStore;
+
+  @Autowired
   private AuthorizationManager authorizationManager;
 
   @Override
-  public TissueOrigin get(Long tissueOriginId) throws IOException {
+  public TissueOrigin get(long tissueOriginId) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return tissueOriginDao.getTissueOrigin(tissueOriginId);
   }
@@ -114,24 +119,25 @@ public class DefaultTissueOriginService implements TissueOriginService {
   }
 
   @Override
-  public void delete(Long tissueOriginId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    TissueOrigin tissueOrigin = get(tissueOriginId);
-    validateDelete(tissueOrigin);
-    tissueOriginDao.deleteTissueOrigin(tissueOrigin);
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
   }
 
-  private void validateDelete(TissueOrigin tissueOrigin) {
-    List<ValidationError> errors = new ArrayList<>();
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
 
-    int usage = tissueOriginDao.getUsageCount(tissueOrigin.getId());
-    if (usage > 0) {
-      errors.add(new ValidationError("Tissue Origin '" + tissueOrigin.getAlias() + "' is used by " + usage + " samples"));
+  @Override
+  public ValidationResult validateDeletion(TissueOrigin object) {
+    ValidationResult result = new ValidationResult();
+
+    long usage = tissueOriginDao.getUsage(object);
+    if (usage > 0L) {
+      result.addError(new ValidationError("Tissue Origin '" + object.getAlias() + "' is used by " + usage + " samples"));
     }
 
-    if (!errors.isEmpty()) {
-      throw new ValidationException(errors);
-    }
+    return result;
   }
 
 }
