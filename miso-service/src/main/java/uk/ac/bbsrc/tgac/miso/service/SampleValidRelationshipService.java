@@ -15,6 +15,4 @@ public interface SampleValidRelationshipService {
 
   Set<SampleValidRelationship> getAll() throws IOException;
 
-  void delete(Long sampleValidRelationshipId) throws IOException;
-
 }

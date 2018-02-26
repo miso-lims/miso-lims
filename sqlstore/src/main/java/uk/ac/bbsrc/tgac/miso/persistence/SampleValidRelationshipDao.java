@@ -12,8 +12,6 @@ public interface SampleValidRelationshipDao {
 
   Long addSampleValidRelationship(SampleValidRelationship sampleValidRelationship);
 
-  void deleteSampleValidRelationship(SampleValidRelationship sampleValidRelationship);
-
   void update(SampleValidRelationship sampleValidRelationship);
 
 }

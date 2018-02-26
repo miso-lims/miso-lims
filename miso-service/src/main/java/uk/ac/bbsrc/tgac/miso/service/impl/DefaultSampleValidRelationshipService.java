@@ -86,11 +86,4 @@ public class DefaultSampleValidRelationshipService implements SampleValidRelatio
     return Sets.newHashSet(sampleValidRelationshipDao.getSampleValidRelationship());
   }
 
-  @Override
-  public void delete(Long sampleValidRelationshipId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    SampleValidRelationship sampleValidRelationship = get(sampleValidRelationshipId);
-    sampleValidRelationshipDao.deleteSampleValidRelationship(sampleValidRelationship);
-  }
-
 }

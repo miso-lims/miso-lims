@@ -110,11 +110,4 @@ public class SampleValidRelationshipController extends RestController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/samplevalidrelationship/{id}", method = RequestMethod.DELETE)
-  @ResponseBody
-  public ResponseEntity<?> deleteSampleValidRelationship(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    sampleValidRelationshipService.delete(id);
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
-
 }
