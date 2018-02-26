@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.runscanner.processors;
 
-import io.prometheus.client.Counter;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -42,6 +40,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 import uk.ac.bbsrc.tgac.miso.runscanner.RunProcessor;
+
+import io.prometheus.client.Counter;
 
 /**
  * Scan an Illumina sequener's output using the Illumina Interop C++ library.
@@ -179,8 +179,10 @@ public final class DefaultIllumina extends RunProcessor {
     // The Illumina library can't distinguish between a failed run and one that either finished or is still going. Scan the logs, if
     // available to determine if the run failed.
     File rtaLogDir = new File(runDirectory, "/Data/RTALogs");
-    LocalDateTime failedDate = Arrays
-        .stream(rtaLogDir.listFiles(file -> file.getName().endsWith("Log.txt") || file.getName().endsWith("Log_00.txt")))
+    LocalDateTime failedDate = Optional
+        .ofNullable(rtaLogDir.listFiles(file -> file.getName().endsWith("Log.txt") || file.getName().endsWith("Log_00.txt")))//
+        .map(Arrays::stream)//
+        .orElseGet(Stream::empty)
         .map(file -> {
           try (Scanner scanner = new Scanner(file)) {
             String failMessage = scanner.findWithinHorizon(FAILED_MESSAGE, 0);
@@ -198,7 +200,7 @@ public final class DefaultIllumina extends RunProcessor {
         .sorted(LocalDateTime::compareTo)
         .findFirst()
         .orElse(null);
-    
+
     if (failedDate != null) {
       dto.setHealthType(HealthType.Failed);
       dto.setCompletionDate(failedDate);
