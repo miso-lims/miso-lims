@@ -57,11 +57,6 @@ public class HibernateSequencingParametersDao implements SequencingParametersDao
   }
 
   @Override
-  public void deleteSequencingParameters(SequencingParameters sequencingParameters) {
-    currentSession().delete(sequencingParameters);
-  }
-
-  @Override
   public void update(SequencingParameters sequencingParameters) {
     Date now = new Date();
     sequencingParameters.setLastUpdated(now);

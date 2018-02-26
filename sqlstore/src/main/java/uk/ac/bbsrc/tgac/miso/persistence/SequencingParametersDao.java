@@ -13,8 +13,6 @@ public interface SequencingParametersDao extends SequencingParametersCollection 
 
   Long addSequencingParameters(SequencingParameters sequencingParameters);
 
-  void deleteSequencingParameters(SequencingParameters sequencingParameters);
-
   void update(SequencingParameters sequencingParameters);
 
 }
