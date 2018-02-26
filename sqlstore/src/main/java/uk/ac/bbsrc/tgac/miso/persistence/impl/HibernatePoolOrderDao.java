@@ -52,11 +52,6 @@ public class HibernatePoolOrderDao implements PoolOrderDao {
   }
 
   @Override
-  public void deletePoolOrder(PoolOrder poolOrder) {
-    currentSession().delete(poolOrder);
-  }
-
-  @Override
   public void update(PoolOrder poolOrder) {
     Date now = new Date();
     poolOrder.setLastUpdated(now);

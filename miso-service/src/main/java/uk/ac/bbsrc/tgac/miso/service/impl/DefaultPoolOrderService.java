@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
@@ -27,6 +28,9 @@ public class DefaultPoolOrderService implements PoolOrderService {
   private PoolOrderDao poolOrderDao;
 
   @Autowired
+  private DeletionStore deletionStore;
+
+  @Autowired
   SequencingParametersService sequencingParametersService;
 
   @Autowired
@@ -36,7 +40,7 @@ public class DefaultPoolOrderService implements PoolOrderService {
   private AuthorizationManager authorizationManager;
 
   @Override
-  public PoolOrder get(Long poolOrderId) throws IOException {
+  public PoolOrder get(long poolOrderId) throws IOException {
     return poolOrderDao.getPoolOrder(poolOrderId);
   }
 
@@ -73,16 +77,6 @@ public class DefaultPoolOrderService implements PoolOrderService {
   }
 
   @Override
-  public void delete(Long poolOrderId) throws IOException {
-    PoolOrder poolOrder = poolOrderDao.getPoolOrder(poolOrderId);
-    Pool pool = poolService.get(poolOrder.getPoolId());
-    authorizationManager.throwIfNotWritable(pool);
-    pool.setLastModifier(authorizationManager.getCurrentUser());
-    poolService.save(pool);
-    if (poolOrder != null) poolOrderDao.deletePoolOrder(poolOrder);
-  }
-
-  @Override
   public Set<PoolOrder> getByPool(Long id) throws AuthorizationException, IOException {
     Pool pool = poolService.get(id);
     authorizationManager.throwIfNotReadable(pool);
@@ -103,6 +97,29 @@ public class DefaultPoolOrderService implements PoolOrderService {
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public void beforeDelete(PoolOrder object) throws IOException {
+    Pool pool = poolService.get(object.getPoolId());
+    pool.setLastModifier(authorizationManager.getCurrentUser());
+    poolService.save(pool);
+  }
+
+  @Override
+  public void authorizeDeletion(PoolOrder object) throws IOException {
+    Pool pool = poolService.get(object.getPoolId());
+    authorizationManager.throwIfNotWritable(pool);
   }
 
 }
