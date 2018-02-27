@@ -20,6 +20,4 @@ public interface SampleGroupService {
 
   Set<SampleGroupId> getAllForSubproject(Long subprojectId) throws AuthorizationException, IOException;
 
-  void delete(Long sampleGroupId) throws IOException;
-
 }

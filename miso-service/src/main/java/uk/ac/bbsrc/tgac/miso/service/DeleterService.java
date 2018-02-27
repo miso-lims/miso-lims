@@ -45,12 +45,22 @@ public interface DeleterService<T extends Deletable> {
   }
 
   /**
+   * Perform any pre-delete actions, such as updating lastModifier and timestamps of related entities which would be used for
+   * database-generated changelog entries. Default implementation does nothing
+   * 
+   * @param object item that is to be deleted
+   */
+  public default void beforeDelete(T object) throws IOException {
+    // do nothing
+  }
+
+  /**
    * Perform any additional delete actions, such as deleting attachments, after the main entity has been deleted. Default implementation
    * does nothing
    * 
    * @param object item that has been deleted
    */
-  public default void afterDelete(T object) {
+  public default void afterDelete(T object) throws IOException {
     // do nothing
   }
 

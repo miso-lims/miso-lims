@@ -12,8 +12,6 @@ public interface DetailedQcStatusDao {
 
   Long addDetailedQcStatus(DetailedQcStatus detailedQcStatus);
 
-  void deleteDetailedQcStatus(DetailedQcStatus detailedQcStatus);
-
   void update(DetailedQcStatus detailedQcStatus);
 
 }

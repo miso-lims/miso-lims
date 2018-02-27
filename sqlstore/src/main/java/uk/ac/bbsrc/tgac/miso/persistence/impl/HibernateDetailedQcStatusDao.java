@@ -55,12 +55,6 @@ public class HibernateDetailedQcStatusDao implements DetailedQcStatusDao {
   }
 
   @Override
-  public void deleteDetailedQcStatus(DetailedQcStatus detailedQcStatus) {
-    currentSession().delete(detailedQcStatus);
-
-  }
-
-  @Override
   public void update(DetailedQcStatus detailedQcStatus) {
     Date now = new Date();
     detailedQcStatus.setLastUpdated(now);

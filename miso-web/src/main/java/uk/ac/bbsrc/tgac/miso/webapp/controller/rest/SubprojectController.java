@@ -125,8 +125,12 @@ public class SubprojectController extends RestController {
 
   @RequestMapping(value = "/subproject/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(code = HttpStatus.OK)
-  public void deleteSubproject(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    subprojectService.delete(id);
+  public void deleteSubproject(@PathVariable(name = "id", required = true) long id, HttpServletResponse response) throws IOException {
+    Subproject subproject = subprojectService.get(id);
+    if (subproject == null) {
+      throw new RestException("Subproject " + id + " not found", Status.NOT_FOUND);
+    }
+    subprojectService.delete(subproject);
   }
 
   @RequestMapping(value = "/subproject/{id}/groups", method = RequestMethod.GET, produces = { "application/json" })

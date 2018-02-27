@@ -61,11 +61,4 @@ public class DefaultTissueTypeService implements TissueTypeService {
     return Sets.newHashSet(tissueTypeDao.getTissueType());
   }
 
-  @Override
-  public void delete(Long tissueTypeId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    TissueType tissueType = get(tissueTypeId);
-    tissueTypeDao.deleteTissueType(tissueType);
-  }
-
 }

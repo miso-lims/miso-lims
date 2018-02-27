@@ -6,6 +6,8 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 
@@ -65,6 +68,13 @@ public class HibernateTissueMaterialDao implements TissueMaterialDao {
     Date now = new Date();
     tissueMaterial.setLastUpdated(now);
     currentSession().update(tissueMaterial);
+  }
+
+  @Override
+  public long getUsage(TissueMaterial tissueMaterial) {
+    return (long) currentSession().createCriteria(SampleTissueImpl.class)
+        .add(Restrictions.eqOrIsNull("tissueMaterial", tissueMaterial))
+        .setProjection(Projections.rowCount()).uniqueResult();
   }
 
 }

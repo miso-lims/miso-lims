@@ -89,11 +89,9 @@ public class HibernateLabDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testDeleteLab() {
-    Lab l = dao.getLab(1L);
-    assertNotNull(l);
-    dao.deleteLab(l);
-    assertNull(dao.getLab(1L));
+  public void testGetUsage() {
+    Lab lab = dao.getLab(2L);
+    assertEquals(1L, dao.getUsage(lab));
   }
 
 }

@@ -4,8 +4,7 @@ import java.util.Date;
 
 import com.eaglegenomics.simlims.core.User;
 
-public interface PoolOrder {
-  public Long getId();
+public interface PoolOrder extends Deletable {
 
   public void setId(Long id);
 

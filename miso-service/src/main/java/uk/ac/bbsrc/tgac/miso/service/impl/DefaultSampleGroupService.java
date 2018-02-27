@@ -80,13 +80,6 @@ public class DefaultSampleGroupService implements SampleGroupService {
   }
 
   @Override
-  public void delete(Long sampleGroupId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    SampleGroupId sampleGroup = get(sampleGroupId);
-    sampleGroupDao.deleteSampleGroup(sampleGroup);
-  }
-
-  @Override
   public Set<SampleGroupId> getAllForProject(Long projectId) throws AuthorizationException, IOException {
     authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(sampleGroupDao.getSampleGroupsForProject(projectId));

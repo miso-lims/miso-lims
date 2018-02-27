@@ -62,11 +62,4 @@ public class DefaultDetailedQcStatusService implements DetailedQcStatusService {
     return Sets.newHashSet(detailedQcStatusDao.getDetailedQcStatus());
   }
 
-  @Override
-  public void delete(Long detailedQcStatusId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    DetailedQcStatus detailedQcStatus = get(detailedQcStatusId);
-    detailedQcStatusDao.deleteDetailedQcStatus(detailedQcStatus);
-  }
-
 }

@@ -116,9 +116,13 @@ public class SamplePurposeController extends RestController {
   }
 
   @RequestMapping(value = "/samplepurpose/{id}", method = RequestMethod.DELETE)
-  @ResponseStatus(code = HttpStatus.OK)
-  public void deleteSamplePurpose(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    samplePurposeService.delete(id);
+  @ResponseStatus(code = HttpStatus.NO_CONTENT)
+  public void deleteSamplePurpose(@PathVariable(name = "id", required = true) long id, HttpServletResponse response) throws IOException {
+    SamplePurpose samplePurpose = samplePurposeService.get(id);
+    if (samplePurpose == null) {
+      throw new RestException("Sample Purpose " + id + " not found", Status.NOT_FOUND);
+    }
+    samplePurposeService.delete(samplePurpose);
   }
 
 }

@@ -15,5 +15,4 @@ public interface TissueTypeService {
 
   public void update(TissueType tissueType) throws IOException;
 
-  public void delete(Long tissueTypeId) throws IOException;
 }

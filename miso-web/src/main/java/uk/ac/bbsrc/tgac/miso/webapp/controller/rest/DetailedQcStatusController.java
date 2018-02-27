@@ -106,12 +106,5 @@ public class DetailedQcStatusController extends RestController {
     detailedQcStatusService.update(detailedQcStatus);
     return new ResponseEntity<>(HttpStatus.OK);
   }
-
-  @RequestMapping(value = "/detailedqcstatus/{id}", method = RequestMethod.DELETE)
-  @ResponseBody
-  public ResponseEntity<?> deleteDetailedQcStatus(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    detailedQcStatusService.delete(id);
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
   
 }

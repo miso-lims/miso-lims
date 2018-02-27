@@ -16,8 +16,6 @@ public interface SampleClassService {
 
   Set<SampleClass> getAll() throws IOException;
 
-  void delete(Long sampleClassId) throws IOException;
-
   public SampleClass inferParentFromChild(long childClassId, String childCategory, String parentCategory);
 
   List<SampleClass> listByCategory(String sampleCategory) throws IOException;

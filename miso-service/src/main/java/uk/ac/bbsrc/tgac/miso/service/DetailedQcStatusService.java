@@ -15,6 +15,4 @@ public interface DetailedQcStatusService {
 
   Set<DetailedQcStatus> getAll() throws IOException;
 
-  void delete(Long detailedQcStatus) throws IOException;
-
 }

@@ -18,6 +18,6 @@ public interface TissueOriginDao {
 
   public void update(TissueOrigin tissueOrigin);
 
-  public int getUsageCount(Long id);
+  public long getUsage(TissueOrigin tissueOrigin);
 
 }

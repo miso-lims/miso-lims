@@ -12,8 +12,8 @@ public interface SamplePurposeDao {
 
   Long addSamplePurpose(SamplePurpose samplePurpose);
 
-  void deleteSamplePurpose(SamplePurpose samplePurpose);
-
   void update(SamplePurpose samplePurpose);
+
+  public long getUsage(SamplePurpose samplePurpose);
 
 }

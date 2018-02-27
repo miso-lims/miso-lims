@@ -92,9 +92,13 @@ public class LabController extends RestController {
   }
 
   @RequestMapping(value = "/lab/{id}", method = RequestMethod.DELETE)
-  @ResponseStatus(code = HttpStatus.OK)
-  public void deleteSamplePurpose(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    labService.delete(id);
+  @ResponseStatus(code = HttpStatus.NO_CONTENT)
+  public void deleteLab(@PathVariable(name = "id", required = true) long id, HttpServletResponse response) throws IOException {
+    Lab lab = labService.get(id);
+    if (lab == null) {
+      throw new RestException("Lab " + id + " not found", Status.NOT_FOUND);
+    }
+    labService.delete(lab);
   }
 
 }

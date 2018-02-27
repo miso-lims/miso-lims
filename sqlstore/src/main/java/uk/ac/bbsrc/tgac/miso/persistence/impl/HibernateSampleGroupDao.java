@@ -55,12 +55,6 @@ public class HibernateSampleGroupDao implements SampleGroupDao {
   }
 
   @Override
-  public void deleteSampleGroup(SampleGroupId sampleGroup) {
-    currentSession().delete(sampleGroup);
-
-  }
-
-  @Override
   public void update(SampleGroupId sampleGroup) {
     Date now = new Date();
     sampleGroup.setLastUpdated(now);

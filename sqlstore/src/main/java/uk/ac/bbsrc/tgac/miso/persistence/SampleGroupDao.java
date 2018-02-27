@@ -12,8 +12,6 @@ public interface SampleGroupDao {
 
   Long addSampleGroup(SampleGroupId sampleGroup);
 
-  void deleteSampleGroup(SampleGroupId sampleGroup);
-
   void update(SampleGroupId sampleGroup);
 
   List<SampleGroupId> getSampleGroupsForProject(Long projectId);

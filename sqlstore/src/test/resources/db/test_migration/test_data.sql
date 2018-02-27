@@ -643,16 +643,6 @@ DELETE FROM `TissueType`;
 INSERT INTO `TissueType`(`tissueTypeId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
 
-INSERT INTO SampleTissue(sampleId, tissueOriginId, tissueTypeId, timesReceived, tubeNumber)
-VALUES (16, 1, 1, 1, 1),
-(17, 1, 1, 1, 2);
-
-INSERT INTO SampleStock (sampleId) VALUES
-(18);
-
-INSERT INTO SampleAliquot (sampleId) VALUES
-(19);
-
 DELETE FROM `Institute`;
 INSERT INTO `Institute`(`instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Institute A',1,'2016-01-28 14:32:00',1,'2016-01-28 14:32:00'),(2,'Institute B',1,'2016-01-29 09:32:00',1,'2016-01-29 09:32:00');
@@ -661,6 +651,16 @@ DELETE FROM `Lab`;
 INSERT INTO `Lab`(`labId`, `instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,1,'Lab A1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),(2,1,'Lab A2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),
 (3,1,'Lab B1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),(4,1,'Lab B2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00');
+
+INSERT INTO SampleTissue(sampleId, tissueOriginId, tissueTypeId, timesReceived, tubeNumber, labId)
+VALUES (16, 1, 1, 1, 1, 2),
+(17, 1, 1, 1, 2, NULL);
+
+INSERT INTO SampleStock (sampleId) VALUES
+(18);
+
+INSERT INTO SampleAliquot (sampleId) VALUES
+(19);
 
 INSERT INTO `SampleNumberPerProject`
 (`sampleNumberPerProjectId`, `projectId`, `highestSampleNumber`, `padding`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)

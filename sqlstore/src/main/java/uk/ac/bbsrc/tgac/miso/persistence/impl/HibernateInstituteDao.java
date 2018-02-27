@@ -6,6 +6,8 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.InstituteDao;
 
 @Repository
@@ -51,11 +54,6 @@ public class HibernateInstituteDao implements InstituteDao {
   }
 
   @Override
-  public void deleteInstitute(Institute institute) {
-    currentSession().delete(institute);
-  }
-
-  @Override
   public void update(Institute institute) {
     Date now = new Date();
     institute.setLastUpdated(now);
@@ -68,6 +66,14 @@ public class HibernateInstituteDao implements InstituteDao {
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
+  }
+
+  @Override
+  public long getUsage(Institute institute) {
+    return (long) currentSession().createCriteria(LabImpl.class)
+        .add(Restrictions.eq("institute", institute))
+        .setProjection(Projections.rowCount())
+        .uniqueResult();
   }
 
 }
