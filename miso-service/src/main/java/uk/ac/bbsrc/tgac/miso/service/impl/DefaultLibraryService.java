@@ -42,7 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -53,6 +53,8 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
@@ -64,6 +66,8 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
 
   @Autowired
   private LibraryStore libraryDao;
+  @Autowired
+  private DeletionStore deletionStore;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -537,7 +541,8 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   private void validateAliasOrThrow(Library library) throws IOException {
     validateAliasUniqueness(library);
     if (!isDetailedLibrary(library) || !((DetailedLibrary) library).hasNonStandardAlias()) {
-      ValidationResult aliasValidation = namingScheme.validateLibraryAlias(library.getAlias());
+      uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation = namingScheme.validateLibraryAlias(library
+          .getAlias());
       if (!aliasValidation.isValid()) {
         throw new IllegalArgumentException("Invalid library alias: '" + library.getAlias() + "' - " + aliasValidation.getMessage());
       }
@@ -630,6 +635,28 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public void authorizeDeletion(Library object) throws IOException {
+    authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
+  @Override
+  public ValidationResult validateDeletion(Library object) {
+    ValidationResult result = new ValidationResult();
+
+    if (object.getLibraryDilutions() != null && !object.getLibraryDilutions().isEmpty()) {
+      result.addError(new ValidationError(object.getName() + " has " + object.getLibraryDilutions().size() + " dilution"
+          + (object.getLibraryDilutions().size() > 1 ? "s" : "")));
+    }
+
+    return result;
   }
 
 }

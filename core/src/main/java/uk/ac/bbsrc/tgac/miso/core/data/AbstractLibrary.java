@@ -127,7 +127,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @OneToMany(targetEntity = LibraryDilution.class, mappedBy = "library", cascade = CascadeType.ALL)
   private final Collection<LibraryDilution> libraryDilutions = new HashSet<>();
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
@@ -661,6 +661,21 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   public String getBarcodeSizeInfo() {
     return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getInitialConcentration(),
         getPlatformType().getLibraryConcentrationUnits());
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Library";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName() + (getAlias() == null ? "" : " (" + getAlias() + ")");
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    return getSecurityProfile();
   }
 
 }
