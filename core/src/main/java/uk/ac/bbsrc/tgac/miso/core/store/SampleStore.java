@@ -168,4 +168,6 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
    */
   public SampleTissue getMatchingGhostTissue(SampleTissue tissue) throws IOException;
 
+  public long getChildSampleCount(Sample sample);
+
 }

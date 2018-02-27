@@ -376,4 +376,12 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     return SEARCH_PROPERTIES;
   }
 
+  @Override
+  public long getChildSampleCount(Sample sample) {
+    return (long) currentSession().createCriteria(DetailedSampleImpl.class)
+        .add(Restrictions.eqOrIsNull("parent", sample))
+        .setProjection(Projections.rowCount())
+        .uniqueResult();
+  }
+
 }

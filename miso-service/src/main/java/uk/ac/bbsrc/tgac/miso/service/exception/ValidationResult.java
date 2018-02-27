@@ -33,4 +33,14 @@ public class ValidationResult {
     }
   }
 
+  /**
+   * Merges all of other's errors into this ValidationResult. If merging results from multiple entities, be sure that the entity is
+   * identified in the message of each ValidationError
+   * 
+   * @param other the other ValidationResult to merge into this one
+   */
+  public void merge(ValidationResult other) {
+    errors.addAll(other.errors);
+  }
+
 }

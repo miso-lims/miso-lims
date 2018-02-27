@@ -437,7 +437,10 @@ var Utils = Utils
                 lines.push(responseObj.detail);
                 if (responseObj.dataFormat === 'validation') {
                   jQuery.each(responseObj.data, function(key, val) {
-                    lines.push(key === 'GENERAL' ? val : (key + ": " + val));
+                    var errors = val.split('\n');
+                    jQuery.each(errors, function(index, error) {
+                      lines.push('* ' + (key === 'GENERAL' ? error : (key + ": " + error)));
+                    });
                   });
                 }
               }

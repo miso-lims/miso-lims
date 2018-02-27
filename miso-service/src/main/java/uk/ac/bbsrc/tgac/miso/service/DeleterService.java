@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -61,6 +62,22 @@ public interface DeleterService<T extends Deletable> extends ProviderService<T> 
    */
   public default void afterDelete(T object) throws IOException {
     // do nothing
+  }
+
+  public default void bulkDelete(Collection<T> objects) throws IOException {
+    for (T object : objects) {
+      authorizeDeletion(object);
+    }
+    ValidationResult result = new ValidationResult();
+    for (T object : objects) {
+      result.merge(validateDeletion(object));
+    }
+    result.throwIfInvalid();
+    for (T object : objects) {
+      beforeDelete(object);
+      delete(object);
+      afterDelete(object);
+    }
   }
 
 }
