@@ -13,7 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface PoolService extends PaginatedDataSource<Pool>, BarcodableService {
+public interface PoolService extends PaginatedDataSource<Pool>, BarcodableService<Pool> {
   @Override
   default EntityType getEntityType() {
     return EntityType.POOL;
@@ -40,9 +40,6 @@ public interface PoolService extends PaginatedDataSource<Pool>, BarcodableServic
   public long save(Pool pool) throws IOException;
 
   public void saveNote(Pool pool, Note note) throws IOException;
-
-  @Override
-  public Pool get(long poolId) throws IOException;
 
   public Pool getByBarcode(String barcode) throws IOException;
 

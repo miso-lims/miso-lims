@@ -8,9 +8,7 @@ import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
-public interface DeleterService<T extends Deletable> {
-
-  public T get(long id) throws IOException;
+public interface DeleterService<T extends Deletable> extends ProviderService<T> {
 
   /**
    * Check if the current user is authorized to delete the provided item. Should throw {@link AuthorizationException} if the user is not
@@ -40,6 +38,7 @@ public interface DeleterService<T extends Deletable> {
     T managed = get(object.getId());
     authorizeDeletion(managed);
     validateDeletion(managed).throwIfInvalid();
+    beforeDelete(managed);
     getDeletionStore().delete(managed, getAuthorizationManager().getCurrentUser());
     afterDelete(managed);
   }

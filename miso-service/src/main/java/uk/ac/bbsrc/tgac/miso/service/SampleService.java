@@ -14,14 +14,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface SampleService extends PaginatedDataSource<Sample>, BarcodableService {
+public interface SampleService extends PaginatedDataSource<Sample>, BarcodableService<Sample> {
   @Override
   default EntityType getEntityType() {
     return EntityType.SAMPLE;
   }
-
-  @Override
-  Sample get(long sampleId) throws IOException;
 
   Long create(Sample sample) throws IOException;
 

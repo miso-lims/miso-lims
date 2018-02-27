@@ -14,7 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface BoxService extends PaginatedDataSource<Box>, BarcodableService {
+public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<Box> {
   @Override
   public default EntityType getEntityType() {
     return EntityType.BOX;
@@ -23,9 +23,6 @@ public interface BoxService extends PaginatedDataSource<Box>, BarcodableService 
   public void discardAllTubes(Box box) throws IOException;
 
   public void discardSingleTube(Box box, String position) throws IOException;
-
-  @Override
-  public Box get(long boxId) throws IOException;
 
   public Box getByAlias(String alias) throws IOException;
 
