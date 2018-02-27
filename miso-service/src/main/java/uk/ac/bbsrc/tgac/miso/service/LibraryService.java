@@ -16,14 +16,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface LibraryService extends PaginatedDataSource<Library>, BarcodableService {
+public interface LibraryService extends PaginatedDataSource<Library>, BarcodableService<Library> {
   @Override
   default EntityType getEntityType() {
     return EntityType.LIBRARY;
   }
-
-  @Override
-  Library get(long libraryId) throws IOException;
 
   Long create(Library library) throws IOException;
 

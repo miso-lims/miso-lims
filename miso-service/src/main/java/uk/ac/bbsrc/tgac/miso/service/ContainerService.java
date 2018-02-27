@@ -10,18 +10,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 
-public interface ContainerService extends PaginatedDataSource<SequencerPartitionContainer>, BarcodableService {
+public interface ContainerService extends PaginatedDataSource<SequencerPartitionContainer>, BarcodableService<SequencerPartitionContainer> {
   @Override
   default EntityType getEntityType() {
     return EntityType.CONTAINER;
   }
 
   void applyChanges(SequencerPartitionContainer source, SequencerPartitionContainer managed) throws IOException;
-
-  @Override
-  SequencerPartitionContainer get(long containerId) throws IOException, AuthorizationException;
 
   List<SequencerPartitionContainer> list() throws IOException;
 
