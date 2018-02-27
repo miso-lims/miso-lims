@@ -14,7 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface SampleService extends PaginatedDataSource<Sample>, BarcodableService<Sample> {
+public interface SampleService extends PaginatedDataSource<Sample>, BarcodableService<Sample>, DeleterService<Sample> {
   @Override
   default EntityType getEntityType() {
     return EntityType.SAMPLE;

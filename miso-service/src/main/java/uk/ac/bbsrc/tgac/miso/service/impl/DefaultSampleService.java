@@ -47,7 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.TissueOriginDao;
@@ -65,6 +65,8 @@ import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
@@ -119,6 +121,8 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   private SamplePurposeDao samplePurposeDao;
   @Autowired
   private TissueMaterialDao tissueMaterialDao;
+  @Autowired
+  private DeletionStore deletionStore;
   @Autowired
   private LabService labService;
   @Autowired
@@ -339,7 +343,8 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
    */
   private void validateAlias(Sample sample) {
     if (!isDetailedSample(sample) || !((DetailedSample) sample).hasNonStandardAlias()) {
-      ValidationResult aliasValidation = namingScheme.validateSampleAlias(sample.getAlias());
+      uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation = namingScheme.validateSampleAlias(sample
+          .getAlias());
       if (!aliasValidation.isValid()) {
         throw new IllegalArgumentException("Invalid sample alias: '" + sample.getAlias() + "' - " + aliasValidation.getMessage());
       }
@@ -838,6 +843,34 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public void authorizeDeletion(Sample object) throws IOException {
+    authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
+  @Override
+  public ValidationResult validateDeletion(Sample object) {
+    ValidationResult result = new ValidationResult();
+
+    if (isDetailedSample(object)) {
+      long childCount = sampleStore.getChildSampleCount(object);
+      if (childCount > 0L) {
+        result.addError(new ValidationError(object.getName() + " has " + childCount + " child sample" + (childCount > 1 ? "s" : "")));
+      }
+    }
+    if (object.getLibraries() != null && !object.getLibraries().isEmpty()) {
+      result.addError(new ValidationError(object.getName() + " has " + object.getLibraries().size() + " librar"
+          + (object.getLibraries().size() > 1 ? "ies" : "y")));
+    }
+
+    return result;
   }
 
 }

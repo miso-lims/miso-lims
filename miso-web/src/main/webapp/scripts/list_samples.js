@@ -37,6 +37,24 @@ ListTarget.sample = {
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.sample.getBulkActions(config);
 
+    actions.push({
+      name: "Delete",
+      action: function(items) {
+        var lines = ['Are you sure you wish to delete the following samples? This cannot be undone.',
+            'Note: a Sample may only be deleted by its creator or an admin.'];
+        var ids = [];
+        jQuery.each(items, function(index, sample) {
+          lines.push('* ' + sample.name + ' (' + sample.alias + ')');
+          ids.push(sample.id);
+        });
+        Utils.showConfirmDialog('Delete Samples', 'Delete', lines, function() {
+          Utils.ajaxWithDialog('Deleting Samples', 'POST', '/miso/rest/sample/bulk-delete', ids, function() {
+            window.location = window.location.origin + '/miso/samples';
+          });
+        });
+      }
+    });
+
     if (projectId) {
       actions = actions.concat([{
         name: "Get Form",
@@ -62,7 +80,7 @@ ListTarget.sample = {
         action: function(items) {
           Project.ui.receiveSelectedSamples(items.map(Utils.array.getId));
         }
-      }, ]);
+      }]);
     }
     return actions;
 

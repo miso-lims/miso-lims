@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -341,6 +342,24 @@ public class SampleRestController extends RestController {
         .map(l -> l.get(0))//
         .map(Dtos::asDto)//
         .collect(Collectors.toList());
+  }
+
+  @RequestMapping(value = "/bulk-delete", method = RequestMethod.POST)
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    List<Sample> samples = new ArrayList<>();
+    for (Long id : ids) {
+      if (id == null) {
+        throw new RestException("Cannot delete null sample", Status.BAD_REQUEST);
+      }
+      Sample sample = sampleService.get(id);
+      if (sample == null) {
+        throw new RestException("Sample " + id + " not found", Status.BAD_REQUEST);
+      }
+      samples.add(sample);
+    }
+    sampleService.bulkDelete(samples);
   }
 
 }
