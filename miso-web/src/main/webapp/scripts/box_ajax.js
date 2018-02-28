@@ -540,11 +540,16 @@ Box.ui = {
     jQuery('#resultSelect').empty();
     jQuery('#warningMessages').html('');
 
+    var focusSelector = null;
     if (!results || !results.length) {
       jQuery('#resultSelect').append('<option value="-1" selected="selected">No results</option>');
+      focusSelector = '#searchField';
     } else {
       if (results.length > 1) {
         jQuery('#resultSelect').append('<option value="-1" selected="selected">SELECT</option>');
+        focusSelector = '#resultSelect';
+      } else {
+        focusSelector = '#updateSelected';
       }
       jQuery.each(results, function(index, result) {
         var opt = jQuery('<option>');
@@ -558,5 +563,6 @@ Box.ui = {
     jQuery('#ajaxLoader').addClass('hidden');
     jQuery('#searchField, #search, #resultSelect').prop('disabled', false).removeClass('disabled');
     Box.visual.setDisabled(false);
+    jQuery(focusSelector).focus();
   },
 };
