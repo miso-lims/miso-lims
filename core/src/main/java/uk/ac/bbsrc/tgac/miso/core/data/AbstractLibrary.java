@@ -67,7 +67,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -468,15 +467,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public SecurityProfile getSecurityProfile() {
     return securityProfile;
-  }
-
-  @Override
-  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    if (parent.getSecurityProfile().getOwner() != null) {
-      setSecurityProfile(parent.getSecurityProfile());
-    } else {
-      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
-    }
   }
 
   @CoverageIgnore

@@ -55,6 +55,12 @@ public interface SecurableByProfile {
    * @throws SecurityException
    *           when the parent SecurityProfile could not be inherited
    */
-  void inheritPermissions(SecurableByProfile parent) throws SecurityException;
+  public default void inheritPermissions(SecurableByProfile parent) throws SecurityException {
+    if (parent.getSecurityProfile().getOwner() != null) {
+      setSecurityProfile(parent.getSecurityProfile());
+    } else {
+      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
+    }
+  }
 
 }

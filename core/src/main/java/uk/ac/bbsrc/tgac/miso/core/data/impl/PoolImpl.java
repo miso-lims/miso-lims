@@ -77,7 +77,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
@@ -395,15 +394,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   public int hashCode() {
     return new HashCodeBuilder(23, 47).appendSuper(super.hashCode()).append(description).append(pooledElementViews)
         .append(concentration).append(identificationBarcode).append(qcPassed).toHashCode();
-  }
-
-  @Override
-  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    if (parent.getSecurityProfile().getOwner() != null) {
-      setSecurityProfile(parent.getSecurityProfile());
-    } else {
-      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
-    }
   }
 
   @Override

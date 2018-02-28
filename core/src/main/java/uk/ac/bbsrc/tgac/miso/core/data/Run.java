@@ -363,15 +363,6 @@ public abstract class Run
     }
   }
 
-  @Override
-  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    if (parent.getSecurityProfile().getOwner() != null) {
-      setSecurityProfile(parent.getSecurityProfile());
-    } else {
-      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
-    }
-  }
-
   public boolean isFull() {
     return containers.size() >= sequencer.getPlatform().getNumContainers();
   }

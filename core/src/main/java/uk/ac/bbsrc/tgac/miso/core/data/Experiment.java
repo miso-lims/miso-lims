@@ -291,15 +291,6 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, N
     }
   }
 
-  @Override
-  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    if (parent.getSecurityProfile().getOwner() != null) {
-      setSecurityProfile(parent.getSecurityProfile());
-    } else {
-      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
-    }
-  }
-
   public void setAccession(String accession) {
     this.accession = accession;
   }

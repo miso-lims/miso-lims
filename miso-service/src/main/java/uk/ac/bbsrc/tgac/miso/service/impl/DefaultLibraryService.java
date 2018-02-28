@@ -172,15 +172,15 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
 
   @Override
   public void update(Library library) throws IOException {
-    Library updatedLibrary = get(library.getId());
-    List<Index> originalIndices = new ArrayList<>(updatedLibrary.getIndices());
-    authorizationManager.throwIfNotWritable(updatedLibrary);
-    boolean validateAliasUniqueness = !updatedLibrary.getAlias().equals(library.getAlias());
-    applyChanges(updatedLibrary, library);
-    setChangeDetails(updatedLibrary);
-    loadChildEntities(updatedLibrary);
-    makeChangeLogForIndices(originalIndices, updatedLibrary.getIndices(), updatedLibrary);
-    save(updatedLibrary, validateAliasUniqueness);
+    Library managed = get(library.getId());
+    List<Index> originalIndices = new ArrayList<>(managed.getIndices());
+    authorizationManager.throwIfNotWritable(managed);
+    boolean validateAliasUniqueness = !managed.getAlias().equals(library.getAlias());
+    applyChanges(managed, library);
+    setChangeDetails(managed);
+    loadChildEntities(managed);
+    makeChangeLogForIndices(originalIndices, managed.getIndices(), managed);
+    save(managed, validateAliasUniqueness);
     boxService.updateBoxableLocation(library);
   }
 
