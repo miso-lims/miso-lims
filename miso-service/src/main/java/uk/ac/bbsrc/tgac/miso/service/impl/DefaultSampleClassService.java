@@ -85,13 +85,6 @@ public class DefaultSampleClassService implements SampleClassService {
   }
 
   @Override
-  public void delete(Long sampleClassId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    SampleClass sampleClass = get(sampleClassId);
-    sampleClassDao.deleteSampleClass(sampleClass);
-  }
-
-  @Override
   public SampleClass inferParentFromChild(long childClassId, String childCategory, String parentCategory) {
     SampleClass childClass = sampleClassDao.getSampleClass(childClassId);
     if (childClass == null) {

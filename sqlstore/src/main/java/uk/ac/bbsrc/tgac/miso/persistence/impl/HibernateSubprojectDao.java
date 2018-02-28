@@ -6,6 +6,8 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 
@@ -65,6 +68,14 @@ public class HibernateSubprojectDao implements SubprojectDao {
     Date now = new Date();
     subproject.setLastUpdated(now);
     currentSession().update(subproject);
+  }
+
+  @Override
+  public long getUsage(Subproject subproject) {
+    return (long) currentSession().createCriteria(DetailedSampleImpl.class)
+        .add(Restrictions.eq("subproject", subproject))
+        .setProjection(Projections.rowCount())
+        .uniqueResult();
   }
 
 }

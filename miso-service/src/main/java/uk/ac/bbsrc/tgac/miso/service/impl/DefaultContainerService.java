@@ -217,13 +217,6 @@ public class DefaultContainerService
   }
 
   @Override
-  public void delete(Long containerId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    SequencerPartitionContainer container = get(containerId);
-    containerDao.remove(container);
-  }
-
-  @Override
   public Partition getPartition(long partitionId) throws IOException {
     Partition partition = containerDao.getPartitionById(partitionId);
     authorizationManager.throwIfNotReadable(partition.getSequencerPartitionContainer());

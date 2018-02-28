@@ -48,8 +48,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @since 0.0.2
  */
 public interface Sample
-    extends SecurableByProfile, Locatable, Comparable<Sample>, Deletable, Boxable, ChangeLoggable, Aliasable, Serializable,
-    QualityControllable<SampleQC> {
+    extends SecurableByProfile, Locatable, Comparable<Sample>, Boxable, ChangeLoggable, Aliasable, Serializable,
+    QualityControllable<SampleQC>, Deletable {
 
   /** Field UNSAVED_ID */
   public static final long UNSAVED_ID = 0L;

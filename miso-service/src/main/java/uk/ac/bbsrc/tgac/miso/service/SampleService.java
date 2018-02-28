@@ -9,13 +9,16 @@ import org.hibernate.exception.ConstraintViolationException;
 
 import com.eaglegenomics.simlims.core.Note;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface SampleService extends PaginatedDataSource<Sample> {
-
-  Sample get(Long sampleId) throws IOException;
+public interface SampleService extends PaginatedDataSource<Sample>, BarcodableService<Sample>, DeleterService<Sample> {
+  @Override
+  default EntityType getEntityType() {
+    return EntityType.SAMPLE;
+  }
 
   Long create(Sample sample) throws IOException;
 
@@ -24,8 +27,6 @@ public interface SampleService extends PaginatedDataSource<Sample> {
   List<Sample> list() throws IOException;
 
   List<Sample> getByAlias(String alias) throws IOException;
-
-  void delete(Long sampleId) throws IOException;
 
   Long countAll() throws IOException;
 

@@ -40,13 +40,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSampleDao implements SampleDao, HibernatePaginatedBoxableSource<Sample> {
+public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxableSource<Sample> {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleDao.class);
 
@@ -134,7 +134,7 @@ public class HibernateSampleDao implements SampleDao, HibernatePaginatedBoxableS
   }
 
   @Override
-  public Sample getSample(Long id) throws IOException {
+  public Sample getSample(long id) throws IOException {
     return (Sample) currentSession().get(SampleImpl.class, id);
   }
 
@@ -208,12 +208,6 @@ public class HibernateSampleDao implements SampleDao, HibernatePaginatedBoxableS
     criteria.createAlias("lab", "lab");
     criteria.createAlias("lab.institute", "institute");
     criteria.add(DbUtils.searchRestrictions(name, false, "lab.alias", "institute.alias"));
-  }
-
-  @Override
-  public boolean remove(Sample t) throws IOException {
-    deleteSample(t);
-    return true;
   }
 
   @Override
@@ -380,6 +374,14 @@ public class HibernateSampleDao implements SampleDao, HibernatePaginatedBoxableS
   @Override
   public String[] getSearchProperties() {
     return SEARCH_PROPERTIES;
+  }
+
+  @Override
+  public long getChildSampleCount(Sample sample) {
+    return (long) currentSession().createCriteria(DetailedSampleImpl.class)
+        .add(Restrictions.eqOrIsNull("parent", sample))
+        .setProjection(Projections.rowCount())
+        .uniqueResult();
   }
 
 }

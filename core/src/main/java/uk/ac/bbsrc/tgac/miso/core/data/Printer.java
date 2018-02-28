@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.base.Charsets;
 
@@ -29,12 +30,16 @@ public class Printer implements Deletable, Serializable {
   private Backend backend;
 
   private String configuration;
+
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
   private Driver driver;
+
   private boolean enabled;
+
   @Column(nullable = false)
   private String name;
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long printerId = UNSAVED_ID;
@@ -51,17 +56,13 @@ public class Printer implements Deletable, Serializable {
     return driver;
   }
 
+  @Override
   public long getId() {
     return printerId;
   }
 
   public String getName() {
     return name;
-  }
-
-  @Override
-  public boolean isDeletable() {
-    return printerId != UNSAVED_ID;
   }
 
   public boolean isEnabled() {
@@ -94,6 +95,21 @@ public class Printer implements Deletable, Serializable {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Printer";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName() + " (" + getDriver().name() + "/" + getBackend().name() + ")";
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    return null;
   }
 
 }

@@ -108,19 +108,6 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public boolean remove(Run run) throws IOException {
-    if (run.isDeletable()) {
-      Long runId = run.getId();
-      currentSession().delete(run);
-
-      Run testIfExists = get(runId);
-      return testIfExists == null;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public Run getLatestStartDateRunBySequencerPartitionContainerId(long containerId) throws IOException {
     // flush here because if Hibernate has not persisted recent changes to container-run relationships, unexpected associations may
     // show up

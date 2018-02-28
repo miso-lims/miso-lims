@@ -31,6 +31,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -67,6 +69,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -186,8 +189,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public EntityType getEntityType() {
-    return EntityType.POOL;
+  public Boxable.EntityType getEntityType() {
+    return Boxable.EntityType.POOL;
   }
 
   @Override
@@ -406,11 +409,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public boolean isDeletable() {
-    return getId() != PoolImpl.UNSAVED_ID && getPoolableElementViews().isEmpty();
-  }
-
-  @Override
   public void removeWatcher(User user) {
     watchUsers.remove(user);
   }
@@ -502,16 +500,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
-  }
-
-  @Override
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
-  }
-
-  @Override
   public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
     PoolChangeLog changeLog = new PoolChangeLog();
     changeLog.setPool(this);
@@ -576,9 +564,18 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public int getLongestIndex() {
-    return pooledElementViews.stream().flatMap(element -> element.getIndices().stream()).mapToInt(index -> index.getSequence().length())
-        .max().orElse(0);
+  public String getLongestIndex() {
+    Map<Integer, Integer> lengths = pooledElementViews.stream()
+        .flatMap(element -> element.getIndices().stream())
+        .collect(Collectors.toMap(Index::getPosition, index -> index.getSequence().length(), Integer::max));
+    if (lengths.isEmpty()) {
+      return "0";
+    }
+    return lengths.entrySet().stream()
+        .sorted((a, b) -> a.getKey().compareTo(b.getKey()))
+        .map(Entry<Integer, Integer>::getValue)
+        .map(length -> length.toString())
+        .collect(Collectors.joining(","));
   }
 
   @Override

@@ -12,8 +12,6 @@ public interface PoolOrderDao {
 
   Long addPoolOrder(PoolOrder poolOrder);
 
-  void deletePoolOrder(PoolOrder poolOrder);
-
   void update(PoolOrder poolOrder);
 
   List<PoolOrder> getByPool(Long id);

@@ -80,13 +80,6 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
   }
 
   @Override
-  public void delete(Long sampleNumberPerProjectId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    SampleNumberPerProject sampleNumberPerProject = get(sampleNumberPerProjectId);
-    sampleNumberPerProjectDao.deleteSampleNumberPerProject(sampleNumberPerProject);
-  }
-
-  @Override
   public String nextNumber(Project project, String partialAlias) throws IOException {
     User user = authorizationManager.getCurrentUser();
     return sampleNumberPerProjectDao.nextNumber(project, user, partialAlias);

@@ -29,8 +29,8 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
@@ -39,8 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * @author Rob Davey
  * @since 0.1.6
  */
-public interface SequencerPartitionContainerStore extends Remover<SequencerPartitionContainer>,
-    PaginatedDataSource<SequencerPartitionContainer> {
+public interface SequencerPartitionContainerStore extends PaginatedDataSource<SequencerPartitionContainer> {
 
   public SequencerPartitionContainer save(SequencerPartitionContainer container) throws IOException;
 

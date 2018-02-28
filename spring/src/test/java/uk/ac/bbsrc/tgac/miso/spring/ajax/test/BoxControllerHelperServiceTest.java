@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax.test;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -22,7 +21,6 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONArray;
-import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -94,33 +92,6 @@ public class BoxControllerHelperServiceTest {
     mockUser = new UserImpl();
     mockUser.setUserId(1L);
     when(authorizationManager.getCurrentUser()).thenReturn(mockUser);
-  }
-
-  @Test
-  public final void testDeleteBox() throws Exception {
-    final long id = 1L;
-    when(boxService.get(anyLong())).thenReturn(mockBox);
-    final JSONObject json = new JSONObject();
-    json.put("boxId", id);
-    final JSONObject response = boxControllerHelperService.deleteBox(null, json);
-
-    verify(boxService).deleteBox(boxService.get(id));
-
-    assertEquals("Box+deleted", response.get("response"));
-  }
-
-  @Test
-  public final void testDeleteBoxBadJson() throws Exception {
-    when(boxService.get(anyLong())).thenReturn(mockBox);
-    final JSONObject json = new JSONObject();
-
-    final JSONObject response1 = boxControllerHelperService.deleteBox(null, json);
-    assertTrue(response1.has("error"));
-    assertFalse(response1.has("response"));
-
-    json.put("boxId", "box");
-    exception.expect(JSONException.class);
-    boxControllerHelperService.deleteBox(null, json);
   }
 
   @Test

@@ -91,13 +91,6 @@ public class SequencingParametersRestController extends RestController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/sequencingparameters/{id}", method = RequestMethod.DELETE)
-  @ResponseBody
-  public ResponseEntity<?> deleteSequencingParameters(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    sequencingParametersService.delete(id);
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
-
   private static SequencingParametersDto writeUrls(SequencingParametersDto sequencingParametersDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
     sequencingParametersDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sequencingparameters/{id}")

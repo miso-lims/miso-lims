@@ -54,7 +54,9 @@ public class DefaultQualityControlService implements QualityControlService {
 
   @Override
   public QC get(QcTarget target, Long id) throws IOException {
-    return getHandler(target).get(id);
+    QC qc = getHandler(target).get(id);
+    authorizationManager.throwIfNotReadable(qc.getEntity());
+    return qc;
   }
 
   @Override
@@ -81,7 +83,8 @@ public class DefaultQualityControlService implements QualityControlService {
 
   @Override
   public Collection<? extends QC> listQCsFor(QcTarget target, long ownerId) throws IOException {
-    return getHandler(target).listForEntity(ownerId);
+    Collection<? extends QC> unfiltered = getHandler(target).listForEntity(ownerId);
+    return authorizationManager.filterUnreadable(unfiltered, QC::getEntity);
   }
 
   @Override

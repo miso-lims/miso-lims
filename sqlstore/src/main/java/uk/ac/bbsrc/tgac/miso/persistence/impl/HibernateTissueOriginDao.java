@@ -79,11 +79,10 @@ public class HibernateTissueOriginDao implements TissueOriginDao {
   }
 
   @Override
-  public int getUsageCount(Long id) {
-    long c = (Long) currentSession().createCriteria(SampleTissueImpl.class)
-        .add(Restrictions.eqOrIsNull("tissueOrigin.id", id))
+  public long getUsage(TissueOrigin tissueOrigin) {
+    return (long) currentSession().createCriteria(SampleTissueImpl.class)
+        .add(Restrictions.eqOrIsNull("tissueOrigin", tissueOrigin))
         .setProjection(Projections.rowCount()).uniqueResult();
-    return (int) c;
   }
 
 }

@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * This interface defines a DAO for storing Boxes
  * 
  */
-public interface BoxStore extends Store<Box>, Remover<Box>, PaginatedDataSource<Box> {
+public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
 
   /**
    * Retrieve a Box that is disconnected from Hibernate, with its lazy-loading relationships initialized. This is to prevent Hibernate

@@ -383,11 +383,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public boolean isDeletable() {
-    return getId() != AbstractSample.UNSAVED_ID && getLibraries().isEmpty() && getNotes().isEmpty() && getQCs().isEmpty();
-  }
-
-  @Override
   public SecurityProfile getSecurityProfile() {
     return securityProfile;
   }
@@ -404,16 +399,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }
-
-  @Override
-  public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
-  }
-
-  @Override
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
   }
 
   @Override
@@ -503,6 +488,22 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public String getBarcodeSizeInfo() {
     return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), null, null);
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Sample";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName()
+        + (getAlias() == null ? "" : " (" + getAlias() + ")");
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    return getSecurityProfile();
   }
 
 }

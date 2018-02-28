@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.eaglegenomics.simlims.core.Note;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -15,15 +16,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface LibraryService extends PaginatedDataSource<Library> {
-
-  Library get(long libraryId) throws IOException;
+public interface LibraryService extends PaginatedDataSource<Library>, BarcodableService<Library> {
+  @Override
+  default EntityType getEntityType() {
+    return EntityType.LIBRARY;
+  }
 
   Long create(Library library) throws IOException;
 
   void update(Library library) throws IOException;
-
-  boolean delete(Library library) throws IOException;
 
   int count() throws IOException;
 

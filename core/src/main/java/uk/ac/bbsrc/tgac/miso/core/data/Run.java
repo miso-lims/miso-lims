@@ -78,7 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @Table(name = "Run")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Run
-    implements SecurableByProfile, Comparable<Run>, Watchable, Deletable, Nameable, ChangeLoggable, Aliasable,
+    implements SecurableByProfile, Comparable<Run>, Watchable, Nameable, ChangeLoggable, Aliasable,
     Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -372,11 +372,6 @@ public abstract class Run
     }
   }
 
-  @Override
-  public boolean isDeletable() {
-    return getId() != Run.UNSAVED_ID;
-  }
-
   public boolean isFull() {
     return containers.size() >= sequencer.getPlatform().getNumContainers();
   }
@@ -458,16 +453,6 @@ public abstract class Run
 
   public void setWatchUsers(Set<User> watchUsers) {
     this.watchUsers = watchUsers;
-  }
-
-  @Override
-  public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
-  }
-
-  @Override
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
   }
 
   @Override

@@ -5,9 +5,7 @@ import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 
-public interface TissueOriginService {
-
-  public TissueOrigin get(Long tissueOriginId) throws IOException;
+public interface TissueOriginService extends DeleterService<TissueOrigin> {
 
   public Set<TissueOrigin> getAll() throws IOException;
 
@@ -15,5 +13,4 @@ public interface TissueOriginService {
 
   public void update(TissueOrigin tissueOrigin) throws IOException;
 
-  public void delete(Long tissueOriginId) throws IOException;
 }

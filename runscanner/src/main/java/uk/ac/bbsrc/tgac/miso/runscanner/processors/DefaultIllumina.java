@@ -6,12 +6,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -51,7 +55,9 @@ public final class DefaultIllumina extends RunProcessor {
   private static final Counter completness_method_success = Counter.build("runscanner_illumina_completness_check",
       "The number of times a method was used to determine a run's completeness after sequencing").labelNames("method").register();
 
-  private static final Pattern FAILED_MESSAGE = Pattern.compile("Application\\sexited\\sbefore\\scompletion");
+  private static final Pattern FAILED_MESSAGE = Pattern
+      .compile("(\\d{1,2}/\\d{1,2}/\\d{4},\\d{2}:\\d{2}:\\d{2}).*Application\\sexited\\sbefore\\scompletion.*");
+  private static final DateTimeFormatter FAILED_MESSAGE_DATE_FORMATTER = DateTimeFormatter.ofPattern("M/d/yyyy,HH:mm:ss");
 
   private static final Logger log = LoggerFactory.getLogger(DefaultIllumina.class);
 
@@ -173,20 +179,31 @@ public final class DefaultIllumina extends RunProcessor {
     // The Illumina library can't distinguish between a failed run and one that either finished or is still going. Scan the logs, if
     // available to determine if the run failed.
     File rtaLogDir = new File(runDirectory, "/Data/RTALogs");
-    boolean failed = Optional
-        .ofNullable(rtaLogDir.listFiles(file -> file.getName().endsWith("Log.txt") || file.getName().endsWith("Log_00.txt")))
-        .map(files -> Arrays.stream(files)
-            .anyMatch(file -> {
-              try (Scanner scanner = new Scanner(file)) {
-                return scanner.findWithinHorizon(FAILED_MESSAGE, 0) != null;
-              } catch (FileNotFoundException e) {
-                log.error("RTA file vanished before reading", e);
-                return false;
-              }
-            }))
-        .orElse(false);
-    if (failed) {
+    LocalDateTime failedDate = Optional
+        .ofNullable(rtaLogDir.listFiles(file -> file.getName().endsWith("Log.txt") || file.getName().endsWith("Log_00.txt")))//
+        .map(Arrays::stream)//
+        .orElseGet(Stream::empty)
+        .map(file -> {
+          try (Scanner scanner = new Scanner(file)) {
+            String failMessage = scanner.findWithinHorizon(FAILED_MESSAGE, 0);
+            if (failMessage == null) {
+              return null;
+            }
+            Matcher m = FAILED_MESSAGE.matcher(failMessage);
+            return LocalDateTime.parse(m.group(1), FAILED_MESSAGE_DATE_FORMATTER);
+          } catch (FileNotFoundException e) {
+            log.error("RTA file vanished before reading", e);
+            return null;
+          }
+        })
+        .filter(Objects::nonNull)
+        .sorted(LocalDateTime::compareTo)
+        .findFirst()
+        .orElse(null);
+
+    if (failedDate != null) {
       dto.setHealthType(HealthType.Failed);
+      dto.setCompletionDate(failedDate);
     }
 
     // This run claims to be complete, but is it really?

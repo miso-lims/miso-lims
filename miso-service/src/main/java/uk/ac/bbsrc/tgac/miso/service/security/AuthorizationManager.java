@@ -72,14 +72,30 @@ public interface AuthorizationManager {
   public boolean readCheck(SecurableByProfile resource) throws IOException;
   
   /**
+   * Checks whether the provided user has read permission on a resource
+   * 
+   * @param resource the object on which to check permission
+   * @param user the User for whom to check permission
+   * @return true if the user has permission to view this object, or if object is null; false otherwise
+   */
+  public boolean readCheck(SecurableByProfile resource, User user);
+
+  /**
    * Verifies that the current user has permission to view a resource and throws an AuthorizationException if not
    * 
    * @param resource the object to check permissions for
    * @throws AuthorizationException if the current user does not have read permission to the resource
-   * @throws IOException if there is an error while looking up the current user. This does not indicate whether 
-   * the user exists or is authenticated, but represents other errors occurring while checking these conditions
    */
   public void throwIfNotReadable(SecurableByProfile resource) throws IOException, AuthorizationException;
+
+  /**
+   * Verifies that the provided user has permission to view a resource and throws an AuthorizationException if not
+   * 
+   * @param resource the object on which to check permissions
+   * @param user the User for whom to check permission
+   * @throws AuthorizationException if the current user does not have read permission to the resource
+   */
+  public void throwIfNotReadable(SecurableByProfile resource, User user) throws AuthorizationException;
   
   /**
    * Checks whether the current user has write permission on a resource
@@ -93,15 +109,34 @@ public interface AuthorizationManager {
   public boolean writeCheck(SecurableByProfile resource) throws IOException;
   
   /**
+   * Checks whether the provided user has write permission on a resource
+   * 
+   * @param resource the object on which to check permissions
+   * @param user the User for whom to check permission
+   * @return true if the user has permission to modify this object; false otherwise
+   * @throws NullPointerException if resource is null
+   */
+  public boolean writeCheck(SecurableByProfile resource, User user);
+
+  /**
    * Verifies that the current user has permission to modify a resource and throws an AuthorizationException if not
    * 
    * @param resource the object to check permissions for
    * @throws AuthorizationException if the current user does not have write permission to the resource
-   * @throws IOException if there is an error while looking up the current user. This does not indicate whether 
-   * the user exists or is authenticated, but represents other errors occurring while checking these conditions
+   * @throws IOException if there is an error while looking up the current user. This does not indicate whether
+   *           the user exists or is authenticated, but represents other errors occurring while checking these conditions
    */
   public void throwIfNotWritable(SecurableByProfile resource) throws IOException, AuthorizationException;
   
+  /**
+   * Verifies that the provided user has permission to modify a resource and throws an AuthorizationException if not
+   * 
+   * @param resource the object on which to check permissions
+   * @param user the User for whom to check permissions
+   * @throws AuthorizationException if the current user does not have write permission to the resource
+   */
+  public void throwIfNotWritable(SecurableByProfile resource, User user) throws AuthorizationException;
+
   /**
    * Verifies that the current user is either an admin, or the specified owner of a supposed resource
    * 

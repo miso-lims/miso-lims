@@ -119,6 +119,14 @@
         </c:choose>
       </span></td>
     </tr>
+    <tr>
+      <td colspan="2">
+        <c:if test="${!empty warning}">
+          <span style="float:right;"><img src="/styles/images/fail.png"/></span>
+          <p class="big-warning">${warning}</p>
+        </c:if>
+      </td>
+    </tr>
     <c:if test="${detailedSample && sample.isSynthetic()}"><tr><td colspan="2" style="font-size: 200%; font-weight:bold;">This entity does not exist except for sample tracking purposes!</td></tr></c:if>
     <tr>
       <td>Project:*</td>
@@ -325,6 +333,18 @@
                     ${sample.donorSex}
                   </c:otherwise>
                 </c:choose>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Consent:</td>
+              <td>
+                <form:select id="consentLevel" path="consentLevel">
+                  <c:forEach var="consentLevelOption" items="${consentLevelOptions}">
+                    <option value="${consentLevelOption}" <c:if test="${sample.consentLevel == consentLevelOption}">selected="selected"</c:if>>
+                      ${consentLevelOption.label}
+                    </option>
+                  </c:forEach>
+                </form:select>
               </td>
             </tr>
           </table>

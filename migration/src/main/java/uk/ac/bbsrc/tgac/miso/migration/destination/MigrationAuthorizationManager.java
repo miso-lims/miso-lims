@@ -112,4 +112,26 @@ public class MigrationAuthorizationManager implements AuthorizationManager {
     return new ArrayList<>(unfiltered);
   }
 
+  @Override
+  public boolean readCheck(SecurableByProfile resource, User user) {
+    // auth disabled in this manager; allow all access
+    return true;
+  }
+
+  @Override
+  public void throwIfNotReadable(SecurableByProfile resource, User user) throws AuthorizationException {
+    // auth disabled in this manager; do nothing
+  }
+
+  @Override
+  public boolean writeCheck(SecurableByProfile resource, User user) {
+    // auth disabled in this manager; allow all access
+    return true;
+  }
+
+  @Override
+  public void throwIfNotWritable(SecurableByProfile resource, User user) throws AuthorizationException {
+    // auth disabled in this manager; do nothing
+  }
+
 }

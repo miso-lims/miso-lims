@@ -107,11 +107,4 @@ public class SampleGroupController extends RestController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/samplegroup/{id}", method = RequestMethod.DELETE)
-  @ResponseBody
-  public ResponseEntity<?> deleteSampleGroup(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    sampleGroupService.delete(id);
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
-
 }

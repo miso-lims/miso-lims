@@ -37,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * @since 0.0.2
  */
 public interface LibraryDilutionStore
-    extends Store<LibraryDilution>, Remover<LibraryDilution>, PaginatedDataSource<LibraryDilution> {
+    extends Store<LibraryDilution>, PaginatedDataSource<LibraryDilution> {
   /**
    * List all LibraryDilutions by a given parent library ID
    *

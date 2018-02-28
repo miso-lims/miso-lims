@@ -28,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
@@ -39,7 +40,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
       SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.DISCARDED,
       SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX,
-      SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.QC_STATUS,
+      SamColumns.CONSENT, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.QC_STATUS,
       SamColumns.QC_NOTE);
 
   // columns for creating Tissue and everything downstream of it
@@ -1087,6 +1088,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     identity.put(SamColumns.PROJECT, "PRO2"); // different project so as not to mess with the SampleNumberPerProject generator
     identity.put(SamColumns.EXTERNAL_NAME, "ext2001"); // increment
     identity.put(SamColumns.DONOR_SEX, "Female");
+    identity.put(SamColumns.DONOR_SEX, ConsentLevel.ALL_PROJECTS.getLabel());
     identity.put(SamColumns.GROUP_ID, "");
     identity.put(SamColumns.GROUP_DESCRIPTION, "");
     identity.put(SamColumns.QC_STATUS, "Ready");

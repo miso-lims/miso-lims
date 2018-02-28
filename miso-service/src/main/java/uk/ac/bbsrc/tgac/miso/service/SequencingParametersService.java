@@ -9,8 +9,6 @@ public interface SequencingParametersService {
 
   Long create(SequencingParameters sequencingParameters) throws IOException;
 
-  void delete(Long sequencingParametersId) throws IOException;
-
   SequencingParameters get(Long sequencingParametersId) throws IOException;
 
   Collection<SequencingParameters> getAll() throws IOException;

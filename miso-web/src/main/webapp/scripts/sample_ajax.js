@@ -43,216 +43,207 @@ window.Parsley.addValidator('sampleAlias', {
   }
 });
 
-var Sample = Sample || {
-  deleteSample: function(sampleId, successfunc) {
-    if (confirm("Are you sure you really want to delete SAM" + sampleId + "? This operation is permanent!")) {
-      Fluxion.doAjax('sampleControllerHelperService', 'deleteSample', {
-        'sampleId': sampleId,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': function(json) {
-          successfunc();
+var Sample = Sample
+    || {
+
+      removeSampleFromOverview: function(sampleId, overviewId, successfunc) {
+        Utils.showConfirmDialog("Confirm Remove", "OK", ["Are you sure you really want to remove SAM" + sampleId + " from overview?"],
+            function() {
+              Fluxion.doAjax('sampleControllerHelperService', 'removeSampleFromOverview', {
+                'sampleId': sampleId,
+                'overviewId': overviewId,
+                'url': ajaxurl
+              }, {
+                'doOnSuccess': function(json) {
+                  successfunc();
+                }
+              });
+            });
+      },
+
+      validateSample: function(isDetailedSample, skipAliasValidation, isNewSample) {
+        Validate.cleanFields('#sample-form');
+        jQuery('#sample-form').parsley().destroy();
+
+        // Alias input field validation
+        // 'data-parsley-required' attribute is set in JSP based on whether alias generation is enabled
+        jQuery('#alias').attr('class', 'form-control');
+        jQuery('#alias').attr('data-parsley-maxlength', '100');
+        jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+        if (skipAliasValidation) {
+          jQuery('#alias').attr('data-parsley-required', 'true');
+        } else {
+          jQuery('#alias').attr('data-parsley-sample-alias', '');
+          jQuery('#alias').attr('data-parsley-debounce', '500');
         }
-      });
-    }
-  },
 
-  removeSampleFromOverview: function(sampleId, overviewId, successfunc) {
-    if (confirm("Are you sure you really want to remove SAM" + sampleId + " from overview?")) {
-      Fluxion.doAjax('sampleControllerHelperService', 'removeSampleFromOverview', {
-        'sampleId': sampleId,
-        'overviewId': overviewId,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': function(json) {
-          successfunc();
+        // Description input field validation
+        jQuery('#description').attr('class', 'form-control');
+        jQuery('#description').attr('data-parsley-maxlength', '255');
+        jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+        // Project validation
+        jQuery('#project').attr('class', 'form-control');
+        jQuery('#project').attr('data-parsley-required', 'true');
+        jQuery('#project').attr('data-parsley-error-message', 'You must select a project.');
+
+        // Date of Receipt validation: ensure date is of correct form
+        jQuery('#receiveddatepicker').attr('class', 'form-control');
+        jQuery('#receiveddatepicker').attr('data-date-format', 'YYYY-MM-DD');
+        jQuery('#receiveddatepicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
+        jQuery('#receiveddatepicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+
+        // Sample Type validation
+        jQuery('#sampleTypes').attr('class', 'form-control');
+        jQuery('#sampleTypes').attr('required', 'true');
+        jQuery('#sampleTypes').attr('data-parsley-error-message', 'You must select a Sample Type');
+        jQuery('#sampleTypes').attr('data-parsley-errors-container', '#sampleTypesError');
+
+        // Scientific Name validation
+        jQuery('#scientificName').attr('class', 'form-control');
+        jQuery('#scientificName').attr('data-parsley-required', 'true');
+        jQuery('#scientificName').attr('data-parsley-maxlength', '100');
+        jQuery('#scientificName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+        // Volume validation
+        jQuery('#volume').attr('class', 'form-control');
+        jQuery('#volume').attr('data-parsley-maxlength', '10');
+        jQuery('#volume').attr('data-parsley-type', 'number');
+
+        if (isDetailedSample) {
+
+          if (isNewSample) {
+            // External Name validation
+            jQuery('#externalName').attr('class', 'form-control');
+            jQuery('#externalName').attr('data-parsley-required', 'true');
+            jQuery('#externalName').attr('data-parsley-maxlength', '255');
+            jQuery('#externalName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+          }
+
+          // SampleClass validation
+          jQuery('#sampleClass').attr('class', 'form-control');
+          jQuery('#sampleClass').attr('data-parsley-required', 'true');
+
+          // Concentration validation
+          jQuery('#concentration').attr('class', 'form-control');
+          jQuery('#concentration').attr('data-parsley-type', 'number');
+
+          // Group ID validation
+          jQuery('#groupId').attr('class', 'form-control');
+          jQuery('#groupId').attr('data-parsley-type', 'alphanum');
+          jQuery('#groupId').attr('data-parsley-maxlength', '10');
+
+          // Group Description validation
+          jQuery('#groupDescription').attr('class', 'form-control');
+          jQuery('#groupDescription').attr('data-parsley-maxlength', '255');
+          jQuery('#groupDescription').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+          // Tissue Class validation
+          jQuery('#tissueClass').attr('class', 'form-control');
+          jQuery('#tissueClass').attr('data-parsley-required', 'true');
+
+          // TissueOrigin validation
+          jQuery('#tissueOrigin').attr('class', 'form-control');
+          jQuery('#tissueOrigin').attr('data-parsley-required', 'true');
+
+          // TissueType validation
+          jQuery('#tissueType').attr('class', 'form-control');
+          jQuery('#tissueType').attr('data-parsley-required', 'true');
+
+          // Secondary Identifier validation
+          jQuery('#secondaryIdentifier').attr('class', 'form-control');
+          jQuery('#secondaryIdentifier').attr('data-parsley-maxlength', '255');
+          jQuery('#secondaryIdentifier').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+          // Region validation
+          jQuery('#region').attr('class', 'form-control');
+          jQuery('#region').attr('data-parsley-maxlength', '255');
+          jQuery('#region').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+          // PassageNumber validation
+          jQuery('#passageNumber').attr('class', 'form-control');
+          jQuery('#passageNumber').attr('data-parsley-type', 'integer');
+
+          // TimesReceived validation
+          jQuery('#timesReceived').attr('class', 'form-control');
+          jQuery('#timesReceived').attr('data-parsley-required', 'true');
+          jQuery('#timesReceived').attr('data-parsley-type', 'integer');
+
+          // TubeNumber validation
+          jQuery('#tubeNumber').attr('class', 'form-control');
+          jQuery('#tubeNumber').attr('data-parsley-required', 'true');
+          jQuery('#tubeNumber').attr('data-parsley-type', 'integer');
+
+          if (jQuery('#detailedQcStatusNote').is(':visible')) {
+            jQuery('#detailedQcStatusNote').attr('class', 'form-control');
+            jQuery('#detailedQcStatusNote').attr('data-parsley-required', 'true');
+            jQuery('#detailedQcStatusNote').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+          }
+
+          var selectedId = jQuery('#sampleClass').is('select') ? jQuery('#sampleClass option:selected').val() : jQuery('#sampleClass')
+              .val();
+          var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
+          // assign sample class alias based on whether text or dropdown menu are present
+          var sampleClassAlias = '';
+          if (jQuery('#sampleClass').is('select')) {
+            sampleClassAlias = jQuery('#sampleClass option:selected').text();
+          } else {
+            sampleClassAlias = jQuery('#sampleClassAlias').text();
+          }
+          switch (sampleCategory) {
+          case 'Tissue Processing':
+            switch (sampleClassAlias) {
+            case 'Slide':
+              // Cuts validation
+              jQuery('#cuts').attr('class', 'form-control');
+              jQuery('#cuts').attr('data-parsley-type', 'digits');
+              jQuery('#cuts').attr('data-parsley-required', 'true');
+
+              // Discards validation
+              jQuery('#discards').attr('class', 'form-control');
+              jQuery('#discards').attr('data-parsley-type', 'digits');
+              jQuery('#discards').attr('data-parsley-required', 'true');
+
+              // Thickness validation
+              jQuery('#thickness').attr('class', 'form-control');
+              jQuery('#thickness').attr('data-parsley-type', 'number');
+              break;
+            case 'LCM Tube':
+              jQuery('#slidesConsumed').attr('class', 'form-control');
+              jQuery('#slidesConsumed').attr('data-parsley-type', 'digits');
+              jQuery('#slidesConsumed').attr('data-parsley-required', 'true');
+              break;
+            }
+            break;
+          case 'Stock':
+            // fall-though to aliquot case (identical restrictions)
+          case 'Aliquot':
+            // TissueClass validation
+            jQuery('#tissueClass').attr('class', 'form-control');
+            jQuery('#tissueClass').attr('data-parsley-required', 'true');
+            break;
+          }
         }
-      });
-    }
-  },
 
-  validateSample: function(isDetailedSample, skipAliasValidation, isNewSample) {
-    Validate.cleanFields('#sample-form');
-    jQuery('#sample-form').parsley().destroy();
+        jQuery('#sample-form').parsley();
+        jQuery('#sample-form').parsley().validate();
 
-    // Alias input field validation
-    // 'data-parsley-required' attribute is set in JSP based on whether alias generation is enabled
-    jQuery('#alias').attr('class', 'form-control');
-    jQuery('#alias').attr('data-parsley-maxlength', '100');
-    jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    if (skipAliasValidation) {
-      jQuery('#alias').attr('data-parsley-required', 'true');
-    } else {
-      jQuery('#alias').attr('data-parsley-sample-alias', '');
-      jQuery('#alias').attr('data-parsley-debounce', '500');
-    }
+        Validate.updateWarningOrSubmit('#sample-form');
+      },
 
-    // Description input field validation
-    jQuery('#description').attr('class', 'form-control');
-    jQuery('#description').attr('data-parsley-maxlength', '255');
-    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
-    // Project validation
-    jQuery('#project').attr('class', 'form-control');
-    jQuery('#project').attr('data-parsley-required', 'true');
-    jQuery('#project').attr('data-parsley-error-message', 'You must select a project.');
-
-    // Date of Receipt validation: ensure date is of correct form
-    jQuery('#receiveddatepicker').attr('class', 'form-control');
-    jQuery('#receiveddatepicker').attr('data-date-format', 'YYYY-MM-DD');
-    jQuery('#receiveddatepicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
-    jQuery('#receiveddatepicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
-
-    // Sample Type validation
-    jQuery('#sampleTypes').attr('class', 'form-control');
-    jQuery('#sampleTypes').attr('required', 'true');
-    jQuery('#sampleTypes').attr('data-parsley-error-message', 'You must select a Sample Type');
-    jQuery('#sampleTypes').attr('data-parsley-errors-container', '#sampleTypesError');
-
-    // Scientific Name validation
-    jQuery('#scientificName').attr('class', 'form-control');
-    jQuery('#scientificName').attr('data-parsley-required', 'true');
-    jQuery('#scientificName').attr('data-parsley-maxlength', '100');
-    jQuery('#scientificName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
-    // Volume validation
-    jQuery('#volume').attr('class', 'form-control');
-    jQuery('#volume').attr('data-parsley-maxlength', '10');
-    jQuery('#volume').attr('data-parsley-type', 'number');
-
-    if (isDetailedSample) {
-
-      if (isNewSample) {
-        // External Name validation
-        jQuery('#externalName').attr('class', 'form-control');
-        jQuery('#externalName').attr('data-parsley-required', 'true');
-        jQuery('#externalName').attr('data-parsley-maxlength', '255');
-        jQuery('#externalName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+      validateNCBITaxon: function() {
+        Fluxion.doAjax('sampleControllerHelperService', 'lookupNCBIScientificName', {
+          'scientificName': jQuery('#scientificName').val(),
+          'url': ajaxurl
+        }, {
+          'doOnSuccess': jQuery('#scientificName').removeClass().addClass("ok"),
+          'doOnError': function(json) {
+            jQuery('#scientificName').removeClass().addClass("error");
+            alert(json.error);
+          }
+        });
       }
-
-      // SampleClass validation
-      jQuery('#sampleClass').attr('class', 'form-control');
-      jQuery('#sampleClass').attr('data-parsley-required', 'true');
-
-      // Concentration validation
-      jQuery('#concentration').attr('class', 'form-control');
-      jQuery('#concentration').attr('data-parsley-type', 'number');
-
-      // Group ID validation
-      jQuery('#groupId').attr('class', 'form-control');
-      jQuery('#groupId').attr('data-parsley-type', 'alphanum');
-      jQuery('#groupId').attr('data-parsley-maxlength', '10');
-
-      // Group Description validation
-      jQuery('#groupDescription').attr('class', 'form-control');
-      jQuery('#groupDescription').attr('data-parsley-maxlength', '255');
-      jQuery('#groupDescription').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
-      // Tissue Class validation
-      jQuery('#tissueClass').attr('class', 'form-control');
-      jQuery('#tissueClass').attr('data-parsley-required', 'true');
-
-      // TissueOrigin validation
-      jQuery('#tissueOrigin').attr('class', 'form-control');
-      jQuery('#tissueOrigin').attr('data-parsley-required', 'true');
-
-      // TissueType validation
-      jQuery('#tissueType').attr('class', 'form-control');
-      jQuery('#tissueType').attr('data-parsley-required', 'true');
-
-      // Secondary Identifier validation
-      jQuery('#secondaryIdentifier').attr('class', 'form-control');
-      jQuery('#secondaryIdentifier').attr('data-parsley-maxlength', '255');
-      jQuery('#secondaryIdentifier').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
-      // Region validation
-      jQuery('#region').attr('class', 'form-control');
-      jQuery('#region').attr('data-parsley-maxlength', '255');
-      jQuery('#region').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
-      // PassageNumber validation
-      jQuery('#passageNumber').attr('class', 'form-control');
-      jQuery('#passageNumber').attr('data-parsley-type', 'integer');
-
-      // TimesReceived validation
-      jQuery('#timesReceived').attr('class', 'form-control');
-      jQuery('#timesReceived').attr('data-parsley-required', 'true');
-      jQuery('#timesReceived').attr('data-parsley-type', 'integer');
-
-      // TubeNumber validation
-      jQuery('#tubeNumber').attr('class', 'form-control');
-      jQuery('#tubeNumber').attr('data-parsley-required', 'true');
-      jQuery('#tubeNumber').attr('data-parsley-type', 'integer');
-
-      if (jQuery('#detailedQcStatusNote').is(':visible')) {
-        jQuery('#detailedQcStatusNote').attr('class', 'form-control');
-        jQuery('#detailedQcStatusNote').attr('data-parsley-required', 'true');
-        jQuery('#detailedQcStatusNote').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-      }
-
-      var selectedId = jQuery('#sampleClass').is('select') ? jQuery('#sampleClass option:selected').val() : jQuery('#sampleClass').val();
-      var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
-      // assign sample class alias based on whether text or dropdown menu are present
-      var sampleClassAlias = '';
-      if (jQuery('#sampleClass').is('select')) {
-        sampleClassAlias = jQuery('#sampleClass option:selected').text();
-      } else {
-        sampleClassAlias = jQuery('#sampleClassAlias').text();
-      }
-      switch (sampleCategory) {
-      case 'Tissue Processing':
-        switch (sampleClassAlias) {
-        case 'Slide':
-          // Cuts validation
-          jQuery('#cuts').attr('class', 'form-control');
-          jQuery('#cuts').attr('data-parsley-type', 'digits');
-          jQuery('#cuts').attr('data-parsley-required', 'true');
-
-          // Discards validation
-          jQuery('#discards').attr('class', 'form-control');
-          jQuery('#discards').attr('data-parsley-type', 'digits');
-          jQuery('#discards').attr('data-parsley-required', 'true');
-
-          // Thickness validation
-          jQuery('#thickness').attr('class', 'form-control');
-          jQuery('#thickness').attr('data-parsley-type', 'number');
-          break;
-        case 'LCM Tube':
-          jQuery('#slidesConsumed').attr('class', 'form-control');
-          jQuery('#slidesConsumed').attr('data-parsley-type', 'digits');
-          jQuery('#slidesConsumed').attr('data-parsley-required', 'true');
-          break;
-        }
-        break;
-      case 'Stock':
-        // fall-though to aliquot case (identical restrictions)
-      case 'Aliquot':
-        // TissueClass validation
-        jQuery('#tissueClass').attr('class', 'form-control');
-        jQuery('#tissueClass').attr('data-parsley-required', 'true');
-        break;
-      }
-    }
-
-    jQuery('#sample-form').parsley();
-    jQuery('#sample-form').parsley().validate();
-
-    Validate.updateWarningOrSubmit('#sample-form');
-  },
-
-  validateNCBITaxon: function() {
-    Fluxion.doAjax('sampleControllerHelperService', 'lookupNCBIScientificName', {
-      'scientificName': jQuery('#scientificName').val(),
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': jQuery('#scientificName').removeClass().addClass("ok"),
-      'doOnError': function(json) {
-        jQuery('#scientificName').removeClass().addClass("error");
-        alert(json.error);
-      }
-    });
-  }
-};
+    };
 
 Sample.library = {
   processBulkLibraryQcTable: function(tableName, json) {

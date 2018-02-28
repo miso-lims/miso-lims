@@ -116,7 +116,11 @@ public class TissueOriginController extends RestController {
   @RequestMapping(value = "/tissueorigin/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteTissueOrigin(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    tissueOriginService.delete(id);
+    TissueOrigin origin = tissueOriginService.get(id);
+    if (origin == null) {
+      throw new RestException("Tissue Origin " + id + " not found", Status.NOT_FOUND);
+    }
+    tissueOriginService.delete(origin);
   }
 
 }

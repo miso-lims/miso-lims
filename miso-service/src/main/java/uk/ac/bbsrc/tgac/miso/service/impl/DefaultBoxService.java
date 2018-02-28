@@ -84,14 +84,6 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   }
 
   @Override
-  public void deleteBox(Box box) throws IOException {
-    authorizationManager.throwIfNotWritable(box);
-    if (!boxStore.remove(box)) {
-      throw new IOException("Unable to delete box.");
-    }
-  }
-
-  @Override
   public void discardAllTubes(Box box) throws IOException {
     authorizationManager.throwIfNotWritable(box);
     User currentUser = authorizationManager.getCurrentUser();

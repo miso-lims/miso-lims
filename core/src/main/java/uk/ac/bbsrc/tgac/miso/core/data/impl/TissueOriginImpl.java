@@ -14,6 +14,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -132,6 +133,21 @@ public class TissueOriginImpl implements TissueOrigin {
   public String toString() {
     return "TissueOriginImpl [tissueOriginId=" + tissueOriginId + ", alias=" + alias + ", description=" + description + ", createdBy="
         + createdBy + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + "]";
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Tissue Origin";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getItemLabel();
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    return null;
   }
 
 }

@@ -66,12 +66,6 @@ public class HibernateSampleClassDao implements SampleClassDao {
   }
 
   @Override
-  public void deleteSampleClass(SampleClass sampleClass) {
-    currentSession().delete(sampleClass);
-
-  }
-
-  @Override
   public void update(SampleClass sampleClass) {
     Date now = new Date();
     sampleClass.setLastUpdated(now);

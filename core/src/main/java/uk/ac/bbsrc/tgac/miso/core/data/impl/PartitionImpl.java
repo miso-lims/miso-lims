@@ -111,11 +111,6 @@ public class PartitionImpl implements Partition {
   }
 
   @Override
-  public boolean isDeletable() {
-    return getId() != UNSAVED_ID;
-  }
-
-  @Override
   public Pool getPool() {
     return pool;
   }

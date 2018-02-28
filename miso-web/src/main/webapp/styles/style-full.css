@@ -698,11 +698,11 @@ div.checklist {
     font-weight: bold;
 }
 
-/*
+
 .widget_title input[type="text"] {
- float: right;
+    margin-left: 5px;
 }
-*/
+
 .widget {
     border: 1px solid lightgray;
     padding-top: 0px;
@@ -1871,6 +1871,13 @@ img.center {
   color: #b23115;
 }
 
+.big-warning {
+  font-size:200%;
+  font-weight:bold;
+  color:#a93232;
+  margin-top:0px
+}
+
 button.disabled {
   opacity: .4;
 }
@@ -1999,7 +2006,6 @@ button.disabled {
     opacity: 1;
 }
 
-/* Outer */
 .popup {
     width: 100%;
     height: 100%;
@@ -2010,7 +2016,6 @@ button.disabled {
     background: rgba(0, 0, 0, 0.75);
 }
 
-/* Inner */
 .popup-inner {
     max-width: 700px;
     width: 90%;
@@ -2024,7 +2029,6 @@ button.disabled {
     border-radius: 3px;
     background: #fff;
     text-align: left;
-    /*font-size: 10px;*/
 }
 
 .popup-close {
@@ -2037,11 +2041,9 @@ button.disabled {
     transition: ease 0.25s all;
     transform: translate(50%, -50%);
     border-radius: 1000px;
-    /*background:black;*/
     background: #F1EDFF;
     font-size: 20px;
     text-align: center;
-    /*color:white !important;*/
     color: black;
     text-decoration: none;
 }

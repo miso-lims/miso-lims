@@ -48,12 +48,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.core.store.TissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
-import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
@@ -70,7 +70,7 @@ public class DefaultSampleServiceTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @Mock
-  private SampleDao sampleDao;
+  private SampleStore sampleStore;
 
   @Mock
   private AuthorizationManager authorizationManager;
@@ -174,11 +174,11 @@ public class DefaultSampleServiceTest {
     String expectedName = "generated_name";
     Mockito.when(namingScheme.generateNameFor((Sample) Mockito.any())).thenReturn(expectedName);
     Mockito.when(namingScheme.generateSampleAlias((Sample) Mockito.any())).thenReturn("bad");
-    Mockito.when(sampleDao.getSample(Mockito.anyLong())).thenReturn(sample);
+    Mockito.when(sampleStore.getSample(Mockito.anyLong())).thenReturn(sample);
     sut.create(sample);
 
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleDao).addSample(createdCapture.capture());
+    Mockito.verify(sampleStore).addSample(createdCapture.capture());
     Sample created = createdCapture.getValue();
     assertEquals("shell project should be replaced by real project", expectedProject.getAlias(), created.getProject().getAlias());
     assertNotNull("modification details should be added", created.getLastModifier());
@@ -187,7 +187,7 @@ public class DefaultSampleServiceTest {
 
     // name generators get called after initial save
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleDao).update(updatedCapture.capture());
+    Mockito.verify(sampleStore).update(updatedCapture.capture());
     Sample updated = updatedCapture.getValue();
     assertEquals("name should be generated", expectedName, updated.getName());
     assertEquals("alias should not be generated", expectedAlias, updated.getAlias());
@@ -202,11 +202,11 @@ public class DefaultSampleServiceTest {
     String expectedAlias = "generated_alias";
     Mockito.when(namingScheme.hasSampleAliasGenerator()).thenReturn(true);
     Mockito.when(namingScheme.generateSampleAlias((Sample) Mockito.any())).thenReturn(expectedAlias);
-    Mockito.when(sampleDao.getSample(Mockito.anyLong())).thenReturn(sample);
+    Mockito.when(sampleStore.getSample(Mockito.anyLong())).thenReturn(sample);
     sut.create(sample);
 
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleDao).update(updatedCapture.capture());
+    Mockito.verify(sampleStore).update(updatedCapture.capture());
     Sample updated = updatedCapture.getValue();
     assertEquals("alias should be generated", expectedAlias, updated.getAlias());
   }
@@ -218,11 +218,11 @@ public class DefaultSampleServiceTest {
     mockShellProjectWithRealLookup(sample);
     assertNull("identificationBarcode should be null before save for test", sample.getIdentificationBarcode());
     sut.setAutoGenerateIdBarcodes(true);
-    Mockito.when(sampleDao.getSample(Mockito.anyLong())).thenReturn(sample);
+    Mockito.when(sampleStore.getSample(Mockito.anyLong())).thenReturn(sample);
     sut.create(sample);
 
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleDao).update(updatedCapture.capture());
+    Mockito.verify(sampleStore).update(updatedCapture.capture());
     Sample updated = updatedCapture.getValue();
     assertNotNull("identificationBarcode should be generated", updated.getIdentificationBarcode());
   }
@@ -239,14 +239,14 @@ public class DefaultSampleServiceTest {
     postSave.setId(newId);
     postSave.setParent(parent);
 
-    Mockito.when(sampleDao.addSample(Mockito.any(Sample.class))).thenReturn(newId);
-    Mockito.when(sampleDao.getSample(newId)).thenReturn(postSave);
+    Mockito.when(sampleStore.addSample(Mockito.any(Sample.class))).thenReturn(newId);
+    Mockito.when(sampleStore.getSample(newId)).thenReturn(postSave);
     mockValidRelationship(parent.getSampleClass(), child.getSampleClass());
 
     sut.create(child);
 
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleDao).addSample(createdCapture.capture());
+    Mockito.verify(sampleStore).addSample(createdCapture.capture());
     Sample created = createdCapture.getValue();
     assertTrue("Expected a TissueSample", LimsUtils.isTissueSample(created));
     assertNotNull("Child sample should have parent", ((SampleTissue) created).getParent());
@@ -271,15 +271,15 @@ public class DefaultSampleServiceTest {
     postSave.setId(newId);
     postSave.setParent(parent);
 
-    Mockito.when(sampleDao.addSample(Mockito.any(Sample.class))).thenReturn(newId);
-    Mockito.when(sampleDao.getSample(newId)).thenReturn(postSave);
-    Mockito.when(sampleDao.getSample(shellParentId)).thenReturn(parent);
+    Mockito.when(sampleStore.addSample(Mockito.any(Sample.class))).thenReturn(newId);
+    Mockito.when(sampleStore.getSample(newId)).thenReturn(postSave);
+    Mockito.when(sampleStore.getSample(shellParentId)).thenReturn(parent);
     mockValidRelationship(parent.getSampleClass(), child.getSampleClass());
 
     sut.create(child);
 
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleDao).addSample(createdCapture.capture());
+    Mockito.verify(sampleStore).addSample(createdCapture.capture());
     Sample created = createdCapture.getValue();
     assertTrue("Expected a TissueSample", LimsUtils.isTissueSample(created));
     assertNotNull("Child sample should have parent", ((SampleTissue) created).getParent());
@@ -311,17 +311,17 @@ public class DefaultSampleServiceTest {
     // because of mocked dao, we can't actually continue with the same parent sample that should be created, but the partial
     // parent sample that gets created is caught and examined below
     SampleIdentity parent = makeParentIdentityWithLookup();
-    Mockito.when(sampleDao.addSample(Mockito.any(Sample.class))).thenReturn(parent.getId());
+    Mockito.when(sampleStore.addSample(Mockito.any(Sample.class))).thenReturn(parent.getId());
     mockValidRelationship(parent.getSampleClass(), sample.getSampleClass());
 
     Long newId = 31L;
-    Mockito.when(sampleDao.addSample(sample)).thenReturn(newId);
-    Mockito.when(sampleDao.getSample(newId)).thenReturn(sample);
+    Mockito.when(sampleStore.addSample(sample)).thenReturn(newId);
+    Mockito.when(sampleStore.getSample(newId)).thenReturn(sample);
 
     sut.create(sample);
 
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleDao, Mockito.times(2)).addSample(createdCapture.capture());
+    Mockito.verify(sampleStore, Mockito.times(2)).addSample(createdCapture.capture());
     Sample partialParent = createdCapture.getAllValues().get(0);
     assertTrue(LimsUtils.isIdentitySample(partialParent));
 
@@ -329,7 +329,7 @@ public class DefaultSampleServiceTest {
     assertTrue(LimsUtils.isTissueSample(partialChild));
 
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleDao, Mockito.times(2)).update(updatedCapture.capture());
+    Mockito.verify(sampleStore, Mockito.times(2)).update(updatedCapture.capture());
     // note: finalParent is not actually derived from partialParent because of mocked dao (above), but it should be the parent
     // linked to finalChild
     Sample finalParent = updatedCapture.getAllValues().get(0);
@@ -351,16 +351,16 @@ public class DefaultSampleServiceTest {
     SampleStock analyte = makeUnsavedChildStock();
     analyte.setParent(tissue);
 
-    Mockito.when(sampleDao.addSample(tissue)).thenReturn(94L);
-    Mockito.when(sampleDao.getSample(94L)).thenReturn(tissue);
-    Mockito.when(sampleDao.addSample(analyte)).thenReturn(12L);
-    Mockito.when(sampleDao.getSample(12L)).thenReturn(analyte);
+    Mockito.when(sampleStore.addSample(tissue)).thenReturn(94L);
+    Mockito.when(sampleStore.getSample(94L)).thenReturn(tissue);
+    Mockito.when(sampleStore.addSample(analyte)).thenReturn(12L);
+    Mockito.when(sampleStore.getSample(12L)).thenReturn(analyte);
 
     mockValidRelationship(identity.getSampleClass(), tissue.getSampleClass());
     mockValidRelationship(tissue.getSampleClass(), analyte.getSampleClass());
     sut.create(analyte);
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleDao, Mockito.times(2)).update(updatedCapture.capture());
+    Mockito.verify(sampleStore, Mockito.times(2)).update(updatedCapture.capture());
     Sample createdTissue = updatedCapture.getAllValues().get(0);
     assertTrue(LimsUtils.isTissueSample(createdTissue));
     Sample createdAnalyte = updatedCapture.getAllValues().get(1);
@@ -383,18 +383,18 @@ public class DefaultSampleServiceTest {
 
     SampleIdentity identityPostCreate = makeUnsavedParentIdentity();
     identityPostCreate.setId(39L);
-    Mockito.when(sampleDao.addSample(Mockito.any(Sample.class))).thenReturn(identityPostCreate.getId());
-    Mockito.when(sampleDao.getSample(39L)).thenReturn(identityPostCreate);
-    Mockito.when(sampleDao.addSample(tissue)).thenReturn(94L);
-    Mockito.when(sampleDao.getSample(94L)).thenReturn(tissue);
-    Mockito.when(sampleDao.addSample(analyte)).thenReturn(12L);
-    Mockito.when(sampleDao.getSample(12L)).thenReturn(analyte);
+    Mockito.when(sampleStore.addSample(Mockito.any(Sample.class))).thenReturn(identityPostCreate.getId());
+    Mockito.when(sampleStore.getSample(39L)).thenReturn(identityPostCreate);
+    Mockito.when(sampleStore.addSample(tissue)).thenReturn(94L);
+    Mockito.when(sampleStore.getSample(94L)).thenReturn(tissue);
+    Mockito.when(sampleStore.addSample(analyte)).thenReturn(12L);
+    Mockito.when(sampleStore.getSample(12L)).thenReturn(analyte);
 
     mockValidRelationship(identity.getSampleClass(), tissue.getSampleClass());
     mockValidRelationship(tissue.getSampleClass(), analyte.getSampleClass());
     sut.create(analyte);
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleDao, Mockito.times(3)).update(updatedCapture.capture());
+    Mockito.verify(sampleStore, Mockito.times(3)).update(updatedCapture.capture());
     Sample createdIdentity = updatedCapture.getAllValues().get(0);
     assertTrue(LimsUtils.isIdentitySample(createdIdentity));
     Sample createdTissue = updatedCapture.getAllValues().get(1);
@@ -406,7 +406,7 @@ public class DefaultSampleServiceTest {
   @Test
   public void testUpdatePlainSample() throws Exception {
     Sample old = makePlainSample();
-    Mockito.when(sampleDao.getSample(old.getId())).thenReturn(old);
+    Mockito.when(sampleStore.getSample(old.getId())).thenReturn(old);
 
     Sample updated = makePlainSample();
     // modifiable attributes
@@ -426,7 +426,7 @@ public class DefaultSampleServiceTest {
     sut.update(updated);
 
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleDao).update(updatedCapture.capture());
+    Mockito.verify(sampleStore).update(updatedCapture.capture());
     Sample result = updatedCapture.getValue();
     assertEquals("Sample sampleType should be modifiable", updated.getSampleType(), result.getSampleType());
     assertEquals("Sample description should be modifiable", updated.getDescription(), result.getDescription());
@@ -509,13 +509,13 @@ public class DefaultSampleServiceTest {
     Sample dbSample = new SampleImpl();
     dbSample.setId(paramSample.getId());
     dbSample.setAlias("persistedSample");
-    Mockito.when(sampleDao.get(paramSample.getId())).thenReturn(dbSample);
+    Mockito.when(sampleStore.get(paramSample.getId())).thenReturn(dbSample);
     
     sut.addNote(paramSample, note);
     
     Mockito.verify(authorizationManager).throwIfNotWritable(dbSample);
     ArgumentCaptor<Sample> capture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleDao).save(capture.capture());
+    Mockito.verify(sampleStore).save(capture.capture());
     Sample savedSample = capture.getValue();
     assertEquals(1, savedSample.getNotes().size());
   }
@@ -535,13 +535,13 @@ public class DefaultSampleServiceTest {
     owner.setUserId(5L);
     note.setOwner(owner);
     dbSample.addNote(note);
-    Mockito.when(sampleDao.get(paramSample.getId())).thenReturn(dbSample);
+    Mockito.when(sampleStore.get(paramSample.getId())).thenReturn(dbSample);
 
     sut.deleteNote(paramSample, note.getNoteId());
 
     Mockito.verify(authorizationManager).throwIfNonAdminOrMatchingOwner(owner);
     ArgumentCaptor<Sample> capture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleDao).save(capture.capture());
+    Mockito.verify(sampleStore).save(capture.capture());
     Sample savedSample = capture.getValue();
     assertTrue(savedSample.getNotes().isEmpty());
   }
@@ -556,7 +556,7 @@ public class DefaultSampleServiceTest {
 
   private SampleIdentity makeParentIdentityWithLookup() throws IOException {
     SampleIdentity sample = makeUnsavedParentIdentity();
-    Mockito.when(sampleDao.getSample(sample.getId())).thenReturn(sample);
+    Mockito.when(sampleStore.getSample(sample.getId())).thenReturn(sample);
     Mockito.when(sampleClassService.listByCategory(Mockito.eq(SampleIdentity.CATEGORY_NAME)))
         .thenReturn(Lists.newArrayList(sample.getSampleClass()));
     return sample;

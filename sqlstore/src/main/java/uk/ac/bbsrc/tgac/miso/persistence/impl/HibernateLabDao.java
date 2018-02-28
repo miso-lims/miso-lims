@@ -6,6 +6,8 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.LabDao;
 
 @Repository
@@ -51,11 +54,6 @@ public class HibernateLabDao implements LabDao {
   }
 
   @Override
-  public void deleteLab(Lab lab) {
-    currentSession().delete(lab);
-  }
-
-  @Override
   public void update(Lab lab) {
     Date now = new Date();
     lab.setLastUpdated(now);
@@ -68,6 +66,14 @@ public class HibernateLabDao implements LabDao {
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
+  }
+
+  @Override
+  public long getUsage(Lab lab) {
+    return (long) currentSession().createCriteria(SampleTissueImpl.class)
+        .add(Restrictions.eq("lab", lab))
+        .setProjection(Projections.rowCount())
+        .uniqueResult();
   }
 
 }

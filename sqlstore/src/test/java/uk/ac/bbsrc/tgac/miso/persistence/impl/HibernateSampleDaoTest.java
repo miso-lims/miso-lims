@@ -63,7 +63,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   public void testListAll() throws IOException {
     Collection<Sample> samples = dao.listAll();
     samples.iterator().next().getScientificName().equals("Homo sapiens");
-    assertEquals(19, samples.size());
+    assertEquals(20, samples.size());
   }
 
   @Test
@@ -103,7 +103,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     sample.setSecurityProfile(profile);
 
     Project project = new ProjectImpl();
-    project.setProjectId(2L);
+    project.setId(2L);
     sample.setProject(project);
 
     String sampleName = "updatedSample";
@@ -140,17 +140,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   @Test
   public void testCount() throws Exception {
     int total = dao.count();
-    assertEquals(19, total);
-  }
-
-  @Test
-  public void testRemove() throws Exception {
-
-    Sample sample = dao.get(7);
-
-    assertTrue(dao.remove(sample));
-    assertNull(dao.get(7));
-
+    assertEquals(20, total);
   }
 
   @Test
@@ -234,21 +224,21 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   public void getSamplesOffsetZeroWithTwoSamplesPerPageTest() throws Exception {
     List<Sample> samples = dao.list(0, 2, false, "id");
     assertEquals(2, samples.size());
-    assertEquals(19L, samples.get(0).getId());
+    assertEquals(20L, samples.get(0).getId());
   }
 
   @Test
   public void getSamplesOffsetThreeWithThreeSamplesPerPageTest() throws Exception {
     List<Sample> samples = dao.list(3, 3, false, "id");
     assertEquals(3, samples.size());
-    assertEquals(16L, samples.get(0).getId());
+    assertEquals(17L, samples.get(0).getId());
   }
 
   @Test
   public void getSamplesOffsetTwoWithTwoSamplesPerPageOrderLastModTest() throws Exception {
     List<Sample> samples = dao.list(2, 2, false, "lastModified");
     assertEquals(2, samples.size());
-    assertEquals(17L, samples.get(0).getId());
+    assertEquals(18L, samples.get(0).getId());
   }
 
   @Test
@@ -280,7 +270,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   @Test
   public void countSamplesByEmptySearch() throws IOException {
     Long numSamples = dao.count(PaginationFilter.query(""));
-    assertEquals(Long.valueOf(19L), numSamples);
+    assertEquals(Long.valueOf(20L), numSamples);
   }
 
   @Test

@@ -47,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
 
 @Controller
 @RequestMapping("/instrument")
@@ -59,6 +60,9 @@ public class EditInstrumentController {
   @Autowired
   private InstrumentService instrumentService;
 
+  @Autowired
+  private ServiceRecordService serviceRecordService;
+
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
@@ -69,14 +73,14 @@ public class EditInstrumentController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return instrumentService.getInstrumentColumnSizes();
+    return instrumentService.getColumnSizes();
   }
 
   @RequestMapping("/{instrumentId}")
   public ModelAndView viewInstrument(@PathVariable(value = "instrumentId") Long instrumentId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Instrument sr = instrumentService.get(instrumentId);
-    Collection<ServiceRecord> serviceRecords = instrumentService.listServiceRecordsByInstrument(instrumentId);
+    Collection<ServiceRecord> serviceRecords = serviceRecordService.listByInstrument(instrumentId);
 
     if (sr == null) {
       throw new IOException("Cannot retrieve the requested instrument");

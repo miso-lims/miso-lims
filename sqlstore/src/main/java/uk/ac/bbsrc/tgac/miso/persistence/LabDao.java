@@ -28,17 +28,18 @@ public interface LabDao {
   Long addLab(Lab lab);
   
   /**
-   * Delete an existing Lab
-   * 
-   * @param lab the Lab to delete
-   */
-  void deleteLab(Lab lab);
-  
-  /**
    * Save a modified Lab
    * 
    * @param lab the Lab to save
    */
   void update(Lab lab);
   
+  /**
+   * Check how many Samples (DetailedSample Tissues only) reference this lab
+   * 
+   * @param lab the Lab to check usage of
+   * @return the number of Samples referencing the Lab
+   */
+  public long getUsage(Lab lab);
+
 }

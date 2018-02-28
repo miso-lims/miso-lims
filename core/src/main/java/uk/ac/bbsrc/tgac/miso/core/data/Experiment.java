@@ -61,7 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  */
 @Entity
 @Table(name = "Experiment")
-public class Experiment implements SecurableByProfile, Comparable<Experiment>, Deletable, Nameable, ChangeLoggable, Serializable {
+public class Experiment implements SecurableByProfile, Comparable<Experiment>, Nameable, ChangeLoggable, Serializable {
   @Entity
   @Embeddable
   @Table(name = "Experiment_Run_Partition")
@@ -159,12 +159,6 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, D
   private Study study;
   @Column(nullable = false)
   private String title;
-
-  /**
-   * Construct a new Experiment with a default empty SecurityProfile
-   */
-  public Experiment() {
-  }
 
   @CoverageIgnore
   public void addKit(Kit kit) {
@@ -306,12 +300,6 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, D
     }
   }
 
-  @Override
-  @CoverageIgnore
-  public boolean isDeletable() {
-    return getId() != UNSAVED_ID;
-  }
-
   public void setAccession(String accession) {
     this.accession = accession;
   }
@@ -365,16 +353,4 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, D
     this.title = title;
   }
 
-  @Override
-  @CoverageIgnore
-  public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
-  }
-
-  @Override
-  @CoverageIgnore
-
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
-  }
 }

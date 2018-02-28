@@ -55,12 +55,6 @@ public class HibernateSampleValidRelationshipDao implements SampleValidRelations
   }
 
   @Override
-  public void deleteSampleValidRelationship(SampleValidRelationship sampleValidRelationship) {
-    currentSession().delete(sampleValidRelationship);
-
-  }
-
-  @Override
   public void update(SampleValidRelationship sampleValidRelationship) {
     Date now = new Date();
     sampleValidRelationship.setLastUpdated(now);

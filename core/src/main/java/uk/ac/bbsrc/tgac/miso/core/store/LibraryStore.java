@@ -43,7 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface LibraryStore extends Store<Library>, Remover<Library>, PaginatedDataSource<Library> {
+public interface LibraryStore extends Store<Library>, PaginatedDataSource<Library> {
 
   /**
    * Get a Library given a ID barcode

@@ -134,15 +134,6 @@ public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSour
   }
 
   @Override
-  public boolean remove(Study study) throws IOException {
-    if (study.isDeletable()) {
-      currentSession().delete(study);
-      return true;
-    }
-    return false;
-  }
-
-  @Override
   public Study get(long studyId) throws IOException {
     return (Study) currentSession().get(StudyImpl.class, studyId);
   }

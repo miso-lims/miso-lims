@@ -18,7 +18,5 @@ public interface SampleNumberPerProjectService {
 
   Set<SampleNumberPerProject> getAll() throws IOException;
 
-  void delete(Long sampleNumberPerProjectId) throws IOException;
-
   String nextNumber(Project project, String partialAlias) throws IOException;
 }

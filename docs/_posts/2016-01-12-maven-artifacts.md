@@ -3,6 +3,7 @@ layout: page
 title: "Maven artifacts"
 category: dev
 date: 2016-01-12 13:47:32
+order: 2
 ---
 
 
@@ -17,13 +18,13 @@ You can use the following configuration to grab any MISO artifacts from our TGAC
   <name>TGAC Maven Repository</name>
   <url>https://repos.tgac.ac.uk/maven/repo</url>
 </repository>
- 
+
 <repository>
   <id>tgac-snapshots-repo</id>
   <name>TGAC Maven Snapshots Repository</name>
   <url>https://repos.tgac.ac.uk/maven/miso/snapshots</url>
 </repository>
- 
+
 <repository>
   <id>tgac-releases-repo</id>
   <name>TGAC Maven Releases Repository</name>

@@ -11,10 +11,11 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
@@ -28,6 +29,9 @@ public class SampleIdentityImpl extends DetailedSampleImpl implements SampleIden
 
   @Enumerated(EnumType.STRING)
   private DonorSex donorSex = DonorSex.UNKNOWN;
+
+  @Enumerated(EnumType.STRING)
+  private ConsentLevel consentLevel;
 
   @Override
   public String getExternalName() {
@@ -91,6 +95,7 @@ public class SampleIdentityImpl extends DetailedSampleImpl implements SampleIden
 
     private String externalName;
     private DonorSex donorSex;
+    private ConsentLevel consentLevel;
 
     public IdentityBuilder rootSampleClass(SampleClass rootSampleClass) {
       this.rootSampleClass = rootSampleClass;
@@ -142,6 +147,11 @@ public class SampleIdentityImpl extends DetailedSampleImpl implements SampleIden
       return this;
     }
 
+    public IdentityBuilder consentLevel(ConsentLevel consentLevel) {
+      this.consentLevel = consentLevel;
+      return this;
+    }
+
     public Sample build() {
       checkArgument(project != null, "A Project must be provided to create a Sample.");
       checkArgument(!LimsUtils.isStringEmptyOrNull(sampleType), "Must provide a sampleType to create a Sample");
@@ -160,11 +170,22 @@ public class SampleIdentityImpl extends DetailedSampleImpl implements SampleIden
       i.setScientificName(scientificName);
       i.setExternalName(externalName);
       i.setDonorSex(donorSex);
+      i.setConsentLevel(consentLevel);
       i.inheritPermissions(project);
 
       return i;
     }
 
+  }
+
+  @Override
+  public ConsentLevel getConsentLevel() {
+    return consentLevel;
+  }
+
+  @Override
+  public void setConsentLevel(ConsentLevel consentLevel) {
+    this.consentLevel = consentLevel;
   }
 
 }

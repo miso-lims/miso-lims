@@ -30,6 +30,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,20 +55,25 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import net.sf.json.JSONArray;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
@@ -182,9 +189,6 @@ public class EditPoolController {
       if (pool == null) {
         throw new SecurityException("No such Pool");
       }
-      if (!pool.userCanRead(user)) {
-        throw new SecurityException("Permission denied.");
-      }
 
       model.put("formObj", pool);
       model.put("pool", pool);
@@ -197,16 +201,44 @@ public class EditPoolController {
       model.put("orders",
           poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asPoolOrderDtos(poolOrderService.getByPool(poolId)));
 
-      ObjectMapper mapper = new ObjectMapper();
-      model.put("duplicateIndicesSequences", mapper.writeValueAsString(pool.getDuplicateIndicesSequences()));
-      model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(pool.getNearDuplicateIndicesSequences()));
-
+      addWarnings(pool, model);
       return new ModelAndView("/pages/editPool.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show pool", ex);
       }
       throw ex;
+    }
+  }
+
+  private void addWarnings(Pool pool, ModelMap model) throws JsonProcessingException {
+    ObjectMapper mapper = new ObjectMapper();
+    Set<String> duplicates = pool.getDuplicateIndicesSequences();
+    Set<String> nearDuplicates = pool.getNearDuplicateIndicesSequences();
+    model.put("duplicateIndicesSequences", mapper.writeValueAsString(duplicates));
+    model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(nearDuplicates));
+    List<String> warnings = new ArrayList<>();
+    if (!duplicates.isEmpty()) {
+      warnings.add("This pool contains duplicate indices!");
+    } else if (!nearDuplicates.isEmpty()) {
+      warnings.add("This pool contains near-duplicate indices!");
+    }
+    addConsentWarning(pool, warnings);
+    model.addAttribute("warnings", warnings);
+  }
+
+  private void addConsentWarning(Pool pool, List<String> warnings) {
+    List<String> consentRevokedNames = pool.getPoolableElementViews()
+        .stream()
+        .filter(ldi -> {
+          Sample sam = ldi.getSample();
+          return LimsUtils.isDetailedSample(sam) && LimsUtils.getIdentityConsentLevel((DetailedSample) sam) == ConsentLevel.REVOKED;
+        })
+        .map(PoolableElementView::getDilutionName)
+        .collect(Collectors.toList());
+    if (!consentRevokedNames.isEmpty()) {
+      warnings.add("Donor has revoked consent for "
+          + String.join(", ", consentRevokedNames));
     }
   }
 
@@ -248,10 +280,6 @@ public class EditPoolController {
   public String processSubmit(@ModelAttribute("pool") Pool pool, ModelMap model, SessionStatus session)
       throws IOException {
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!pool.userCanWrite(user)) {
-        throw new SecurityException("Permission denied.");
-      }
       // The pooled elements may have been modified asynchronously while the form was being edited. Since they can't be edited by form,
       // update them to avoid reverting the state.
       if (pool.getId() != PoolImpl.UNSAVED_ID) {
@@ -259,7 +287,6 @@ public class EditPoolController {
         pool.setPoolableElementViews(original.getPoolableElementViews());
       }
 
-      pool.setLastModifier(user);
       poolService.save(pool);
       session.setComplete();
       model.clear();

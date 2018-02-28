@@ -3,6 +3,7 @@ layout: page
 title: "Configuring the external webapp"
 category: adm
 date: 2016-01-12 13:51:46
+order: 3
 ---
 
 The external MISO web application can give project- and run-level read-only access to collaborators who need to access this data from outside the institute. It is identical to the information that external users see when they log into the root MISO web application, but it could be run on a separate server that links to an internally-hosted MISO LIMS, without exposing that MISO instance beyond the institute's network.

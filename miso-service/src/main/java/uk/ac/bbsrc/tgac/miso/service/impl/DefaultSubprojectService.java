@@ -14,9 +14,12 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional(rollbackFor = Exception.class)
@@ -29,12 +32,14 @@ public class DefaultSubprojectService implements SubprojectService {
   private ProjectStore projectStore;
   @Autowired
   private SubprojectDao subprojectDao;
+  @Autowired
+  private DeletionStore deletionStore;
 
   @Autowired
   private AuthorizationManager authorizationManager;
 
   @Override
-  public Subproject get(Long subprojectId) throws IOException {
+  public Subproject get(long subprojectId) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return subprojectDao.getSubproject(subprojectId);
   }
@@ -70,10 +75,26 @@ public class DefaultSubprojectService implements SubprojectService {
   }
 
   @Override
-  public void delete(Long subprojectId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    Subproject subproject = get(subprojectId);
-    subprojectDao.deleteSubproject(subproject);
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public ValidationResult validateDeletion(Subproject object) {
+    ValidationResult result = new ValidationResult();
+
+    long usage = subprojectDao.getUsage(object);
+    if (usage > 1L) {
+      result.addError(new ValidationError(usage + " sample" + (usage > 1L ? "s are" : " is") + " associated with subproject '"
+          + object.getAlias() + "'"));
+    }
+
+    return result;
   }
 
 }

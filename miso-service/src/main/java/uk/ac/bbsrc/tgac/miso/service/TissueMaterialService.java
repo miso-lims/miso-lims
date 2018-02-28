@@ -5,16 +5,12 @@ import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 
-public interface TissueMaterialService {
-
-  TissueMaterial get(Long tissueMaterialId) throws IOException;
+public interface TissueMaterialService extends DeleterService<TissueMaterial> {
 
   Long create(TissueMaterial tissueMaterial) throws IOException;
 
   void update(TissueMaterial tissueMaterial) throws IOException;
 
   Set<TissueMaterial> getAll() throws IOException;
-
-  void delete(Long tissueMaterialId) throws IOException;
 
 }

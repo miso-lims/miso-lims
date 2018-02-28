@@ -216,6 +216,7 @@ FOR EACH ROW
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
     CASE WHEN NEW.donorSex <> OLD.donorSex THEN CONCAT('donor sex: ', OLD.donorSex, ' → ', NEW.donorSex) END,
+    CASE WHEN NEW.consentLevel <> OLD.consentLevel THEN CONCAT('consent level: ', OLD.consentLevel, ' → ', NEW.consentLevel) END,
     CASE WHEN NEW.externalName <> OLD.externalName THEN CONCAT('externalName: ', OLD.externalName, ' → ', NEW.externalName) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
@@ -223,6 +224,7 @@ FOR EACH ROW
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN NEW.donorSex <> OLD.donorSex THEN 'donorSex' END,
+        CASE WHEN NEW.consentLevel <> OLD.consentLevel THEN 'consentLevel' END,
         CASE WHEN NEW.externalName <> OLD.externalName THEN 'externalName' END
       ), ''),
       lastModifier,

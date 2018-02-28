@@ -3,12 +3,15 @@ package uk.ac.bbsrc.tgac.miso.service;
 import java.io.IOException;
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface LibraryDilutionService extends PaginatedDataSource<LibraryDilution> {
-
-  LibraryDilution get(long dilutionId) throws IOException;
+public interface LibraryDilutionService extends PaginatedDataSource<LibraryDilution>, BarcodableService<LibraryDilution> {
+  @Override
+  default EntityType getEntityType() {
+    return EntityType.DILUTION;
+  }
 
   Long create(LibraryDilution dilution) throws IOException;
 
@@ -23,7 +26,5 @@ public interface LibraryDilutionService extends PaginatedDataSource<LibraryDilut
   List<LibraryDilution> list() throws IOException;
 
   LibraryDilution getByBarcode(String barcode) throws IOException;
-
-  boolean delete(LibraryDilution dilution) throws IOException;
 
 }

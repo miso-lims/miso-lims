@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
+
 public interface SampleIdentity extends DetailedSample {
   
   public static final String CATEGORY_NAME = "Identity";
@@ -32,6 +34,10 @@ public interface SampleIdentity extends DetailedSample {
    * @throws IllegalArgumentException if no DonorSex with the requested label exists
    */
   public void setDonorSex(String donorSex);
+
+  public ConsentLevel getConsentLevel();
+
+  public void setConsentLevel(ConsentLevel consentLevel);
 
   /**
    * Possible sexes for donors

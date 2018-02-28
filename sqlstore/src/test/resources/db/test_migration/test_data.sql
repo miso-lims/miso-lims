@@ -182,7 +182,8 @@ VALUES (1,NULL,'SAM1','Inherited from TEST_0001',1,'SAM1::TEST_0001_Bn_P_nn_1-1_
 (16,NULL,'SAM16','tissue1',1,'SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15'),
 (17,NULL,'SAM17','tissue2',1,'SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17'),
 (18,NULL,'SAM18','stock1',1,'SAM18::TEST_0001_STOCK_1','Freezer1_1','GENOMIC',NULL,'true','TEST_0001_STOCK_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:19',1,'2016-07-07 13:31:19'),
-(19,NULL,'SAM19','aliquot1',1,'SAM19::TEST_0001_ALIQUOT_1','Freezer1_1','GENOMIC',NULL,'true','TEST_0001_ALIQUOT_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:21',1,'2016-07-07 13:31:21');
+(19,NULL,'SAM19','aliquot1',1,'SAM19::TEST_0001_ALIQUOT_1','Freezer1_1','GENOMIC',NULL,'true','TEST_0001_ALIQUOT_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:21',1,'2016-07-07 13:31:21'),
+(20,NULL,'SAM20','identity2',1,'SAM20::TEST_0002_IDENTITY_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0002_IDENTITY_2',1,'Homo sapiens',NULL,1,'2018-02-22 14:34:00',1,'2018-02-22 14:34:00');
 
 DELETE FROM `SampleQC`;
 INSERT INTO `SampleQC`(`sample_sampleId`, `creator`, `date`, `type`, `results`) 
@@ -263,7 +264,8 @@ VALUES (1,'LIB1','Inherited from TEST_0001',NULL,1,1,'LIB1::TEST_0001_Bn_P_PE_30
 (11,'LIB11','Inherited from TEST_0006',NULL,1,11,'LIB11::TEST_0006_Bn_P_PE_300_WG','LIBRARY_INBOX_B01',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:09',1,'2016-07-07 13:31:09', NULL),
 (12,'LIB12','Inherited from TEST_0006',NULL,1,12,'LIB12::TEST_0006_Bn_R_PE_300_WG','LIBRARY_INBOX_B02',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11', NULL),
 (13,'LIB13','Inherited from TEST_0007',NULL,1,13,'LIB13::TEST_0007_Bn_P_PE_300_WG','LIBRARY_INBOX_B03',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13', NULL),
-(14,'LIB14','Inherited from TEST_0007',NULL,1,14,'LIB14::TEST_0007_Bn_R_PE_300_WG','LIBRARY_INBOX_B04',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15', NULL);
+(14,'LIB14','Inherited from TEST_0007',NULL,1,14,'LIB14::TEST_0007_Bn_R_PE_300_WG','LIBRARY_INBOX_B04',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15', NULL),
+(15,'LIB15',NULL,NULL,1,19,'LIB15::TEST_0001_ALIQUOT_1_PE_300_WG',NULL,3,0,'2018-02-15','ILLUMINA','TEST_0001_ALIQUOT_1_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15', NULL);
 
 DELETE FROM LibraryChangeLog;
 INSERT INTO `LibraryChangeLog`(`libraryId`, `columnsChanged`, `userId`, `message`, `changeTime`)
@@ -313,7 +315,8 @@ VALUES (1,2,1,'LDI1::TEST_0001_Bn_P_PE_300_WG','2015-08-27','admin','LDI1',1),
 (11,2,11,'LDI11::TEST_0006_Bn_P_PE_300_WG','2015-08-27','admin','LDI11',1),
 (12,2,12,'LDI12::TEST_0006_Bn_R_PE_300_WG','2015-08-27','admin','LDI12',1),
 (13,2,13,'LDI13::TEST_0007_Bn_P_PE_300_WG','2015-08-27','admin','LDI13',1),
-(14,2,14,'LDI14::TEST_0007_Bn_R_PE_300_WG','2015-08-27','admin','LDI14',1);
+(14,2,14,'LDI14::TEST_0007_Bn_R_PE_300_WG','2015-08-27','admin','LDI14',1),
+(15,2,15,'LDI15::TEST_0001_ALIQUOT_1_PE_300_WG','2018-02-15','admin','LDI15',1);
 
 DELETE FROM `LibraryQC`;
 INSERT INTO `LibraryQC`(`qcId`, `library_libraryId`, `creator`, `date`, `type`, `results`) VALUES
@@ -619,16 +622,18 @@ INSERT INTO `LibraryDesign`(`libraryDesignId`, `name`, `sampleClassId`, `library
 VALUES (1, 'DESIGN1', 1, 1, 1, 1), 
 (2, 'DESIGN2', 2, 1, 1, 1);
 
-INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic)
-VALUES (15,1,0,NULL,NULL,NULL,0),
+INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic) VALUES
+(15,1,0,NULL,NULL,NULL,0),
 (16,2,0,15,1,NULL,1),
 (17,2,0,15,2,1,0),
 (18,3,0,17,1,NULL,0),
-(19,4,0,18,1,NULL,0);
+(19,4,0,18,1,NULL,0),
+(20,1,0,NULL,NULL,NULL,0);
 
-DELETE FROM `Identity`;
-INSERT INTO `Identity` (`sampleId`, `externalName`,`donorSex`)
-VALUES (15, '15_EXT15,EXT15','UNKNOWN');
+DELETE FROM Identity;
+INSERT INTO Identity (sampleId, externalName, donorSex) VALUES
+(15, '15_EXT15,EXT15','UNKNOWN'),
+(20, '20_EXT20,EXT20','UNKNOWN');
 
 DELETE FROM `TissueOrigin`;
 INSERT INTO `TissueOrigin`(`tissueOriginId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
@@ -638,16 +643,6 @@ DELETE FROM `TissueType`;
 INSERT INTO `TissueType`(`tissueTypeId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
 
-INSERT INTO SampleTissue(sampleId, tissueOriginId, tissueTypeId, timesReceived, tubeNumber)
-VALUES (16, 1, 1, 1, 1),
-(17, 1, 1, 1, 2);
-
-INSERT INTO SampleStock (sampleId) VALUES
-(18);
-
-INSERT INTO SampleAliquot (sampleId) VALUES
-(19);
-
 DELETE FROM `Institute`;
 INSERT INTO `Institute`(`instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Institute A',1,'2016-01-28 14:32:00',1,'2016-01-28 14:32:00'),(2,'Institute B',1,'2016-01-29 09:32:00',1,'2016-01-29 09:32:00');
@@ -656,6 +651,16 @@ DELETE FROM `Lab`;
 INSERT INTO `Lab`(`labId`, `instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,1,'Lab A1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),(2,1,'Lab A2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),
 (3,1,'Lab B1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),(4,1,'Lab B2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00');
+
+INSERT INTO SampleTissue(sampleId, tissueOriginId, tissueTypeId, timesReceived, tubeNumber, labId)
+VALUES (16, 1, 1, 1, 1, 2),
+(17, 1, 1, 1, 2, NULL);
+
+INSERT INTO SampleStock (sampleId) VALUES
+(18);
+
+INSERT INTO SampleAliquot (sampleId) VALUES
+(19);
 
 INSERT INTO `SampleNumberPerProject`
 (`sampleNumberPerProjectId`, `projectId`, `highestSampleNumber`, `padding`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)

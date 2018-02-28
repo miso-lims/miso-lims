@@ -52,7 +52,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -72,7 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @Entity
 @Table(name = "LibraryDilution")
 public class LibraryDilution extends AbstractBoxable
-    implements SecurableByProfile, Barcodable, Comparable<LibraryDilution>, Deletable, Nameable, Boxable, Serializable {
+    implements SecurableByProfile, Barcodable, Comparable<LibraryDilution>, Nameable, Boxable, Serializable {
 
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
@@ -144,8 +143,8 @@ public class LibraryDilution extends AbstractBoxable
   }
 
   @Override
-  public EntityType getEntityType() {
-    return EntityType.DILUTION;
+  public Boxable.EntityType getEntityType() {
+    return Boxable.EntityType.DILUTION;
   }
 
   public Library getLibrary() {
@@ -269,24 +268,6 @@ public class LibraryDilution extends AbstractBoxable
     } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }
-
-  @CoverageIgnore
-  @Override
-  public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
-  }
-
-  @CoverageIgnore
-  @Override
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
-  }
-
-  @CoverageIgnore
-  @Override
-  public boolean isDeletable() {
-    return getId() != LibraryDilution.UNSAVED_ID;
   }
 
   @Override

@@ -39,13 +39,6 @@ public class DefaultSequencingParametersService implements SequencingParametersS
   }
 
   @Override
-  public void delete(Long sequencingParametersId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    SequencingParameters sequencingParameters = sequencingParametersDao.getSequencingParameters(sequencingParametersId);
-    sequencingParametersDao.deleteSequencingParameters(sequencingParameters);
-  }
-
-  @Override
   public SequencingParameters get(Long sequencingParametersId) throws IOException {
     return sequencingParametersDao.getSequencingParameters(sequencingParametersId);
   }

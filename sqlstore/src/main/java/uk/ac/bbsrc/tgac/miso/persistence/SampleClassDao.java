@@ -14,8 +14,6 @@ public interface SampleClassDao {
 
   Long addSampleClass(SampleClass sampleClass);
 
-  void deleteSampleClass(SampleClass sampleClass);
-
   void update(SampleClass sampleClass);
 
 }

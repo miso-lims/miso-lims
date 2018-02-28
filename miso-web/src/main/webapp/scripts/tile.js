@@ -21,116 +21,67 @@
  * *********************************************************************
  */
 
-TileTarget = {};
-
-Tile = (function() {
-  var showPane = function(elementId, target, inner) {
-    var div = document.getElementById(elementId);
-    div.setAttribute("class", "dashboard_widget");
-    while (div.hasChildNodes()) {
-      div.removeChild(div.lastChild);
-    }
+var Tile = {
+  title: function(label) {
     var title = document.createElement("DIV");
-    title.setAttribute("class", "widget_title ui-corner-top");
-    title.innerText = target.name;
-    div.appendChild(title);
 
-    var content = document.createElement("DIV");
-    content.setAttribute("class", "widget ui-corner-bottom");
-    content.appendChild(inner);
-    div.appendChild(content);
-  };
+    title.setAttribute("class", "name");
+    title.setAttribute("style", "font-weight:bold");
+    title.innerText = label;
 
-  return {
-    title: function(label, status) {
-      var title = document.createElement("DIV");
-      title.setAttribute("class", "name");
-      title.setAttribute("style", "font-weight:bold");
-      title.innerText = label;
-      title.appendChild(status);
-      return title;
-    },
-    error: function(message) {
-      var errorP = document.createElement("P");
-      errorP.setAttribute("class", "parsley-error");
-      errorP.innerText = "⚠ " + message;
-      return errorP;
-    },
-    lines: function(lines, special) {
-      var p = document.createElement("P");
-      if (special) {
-        p.setAttribute("style", "font-style:italic");
-      }
+    return title;
+  },
+  titleAndStatus: function(label, status) {
+    var title = this.title(label);
 
-      lines.filter(function(line) {
-        return !!line;
-      }).forEach(function(line, index, arr) {
-        p.appendChild(document.createTextNode(line));
-        if (index < arr.length - 1) {
-          p.appendChild(document.createElement("BR"));
-        }
-      });
-      return p;
-    },
-    statusOk: function() {
-      var status = document.createElement("IMG");
-      status.setAttribute("src", "/styles/images/tile-ok.svg");
-      return status;
-    },
-    statusBad: function() {
-      var status = document.createElement("IMG");
-      status.setAttribute("src", "/styles/images/tile-bad.svg");
-      return status;
-    },
-    statusBusy: function() {
-      var status = document.createElement("IMG");
-      status.setAttribute("src", "/styles/images/tile-busy.svg");
-      return status;
-    },
-    make: function(tileparts, clickHandler) {
-      var div = document.createElement("DIV");
-      div.setAttribute("class", "tile");
-      tileparts.forEach(function(part) {
-        div.appendChild(part);
-      })
-      div.onclick = clickHandler;
-      return div;
-    },
-    createPane: function(elementId, target, items) {
-      var innerContent = document.createElement("DIV");
-      items.map(target.transform).forEach(function(item) {
-        if (item) {
-          innerContent.appendChild(item);
-        }
-      });
-      showPane(elementId, target, innerContent);
-    },
-    createPaneAjax: function(elementId, target, url) {
-      var loader = document.createElement("IMG");
-      loader.src = "/styles/images/ajax-loader.gif";
-      showPane(elementId, target, loader);
+    title.append(status);
 
-      jQuery.ajax({
-        'dataType': 'json',
-        'type': 'GET',
-        'url': url,
-        'contentType': 'application/json; charset=utf8',
-        'success': function(data, textStatus, xhr) {
-          Tile.createPane(elementId, target, data);
-        },
-        'error': function(xhr, textStatus, errorThrown) {
-          var errorMessage = document.createElement("P");
-          try {
-            var responseObj = JSON.parse(xhr.responseText);
-            if (responseObj.detail) {
-              errorMessage.innerText = responseObj.detail;
-            }
-          } catch (e) {
-            errorMessage.innerText = errorThrown;
-          }
-          showPane(elementId, target, errorMessage);
-        }
-      });
+    return title;
+  },
+  error: function(message) {
+    var errorP = document.createElement("P");
+    errorP.setAttribute("class", "parsley-custom-error-message");
+    errorP.innerText = "⚠ " + message;
+    return errorP;
+  },
+  lines: function(lines, special) {
+    var p = document.createElement("P");
+    if (special) {
+      p.setAttribute("style", "font-style:italic");
     }
-  };
-})();
+
+    lines.filter(function(line) {
+      return !!line;
+    }).forEach(function(line, index, arr) {
+      p.appendChild(document.createTextNode(line));
+      if (index < arr.length - 1) {
+        p.appendChild(document.createElement("BR"));
+      }
+    });
+    return p;
+  },
+  statusOk: function() {
+    var status = document.createElement("IMG");
+    status.setAttribute("src", "/styles/images/tile-ok.svg");
+    return status;
+  },
+  statusBad: function() {
+    var status = document.createElement("IMG");
+    status.setAttribute("src", "/styles/images/tile-bad.svg");
+    return status;
+  },
+  statusBusy: function() {
+    var status = document.createElement("IMG");
+    status.setAttribute("src", "/styles/images/tile-busy.svg");
+    return status;
+  },
+  make: function(tileparts, clickHandler) {
+    var div = document.createElement("DIV");
+    div.setAttribute("class", "tile");
+    tileparts.forEach(function(part) {
+      div.appendChild(part);
+    });
+    div.onclick = clickHandler;
+    return div;
+  },
+};

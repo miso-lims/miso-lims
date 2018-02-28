@@ -41,10 +41,11 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @Repository
 public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<Box> {
 
-  public static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode", "locationBarcode" };
+  private static final String FIELD_ALIAS = "alias";
 
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("lastModifier",
-      "creator", "size", "use");
+  protected static final String[] SEARCH_PROPERTIES = new String[] { "name", FIELD_ALIAS, "identificationBarcode", "locationBarcode" };
+
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator", "size", "use");
 
   private static final Logger log = LoggerFactory.getLogger(HibernateBoxDao.class);
 
@@ -127,7 +128,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   @Override
   public Box getBoxByAlias(String alias) throws IOException {
     Criteria criteria = currentSession().createCriteria(BoxImpl.class);
-    criteria.add(Restrictions.eq("alias", alias));
+    criteria.add(Restrictions.eq(FIELD_ALIAS, alias));
     return (Box) criteria.uniqueResult();
   }
 
@@ -174,7 +175,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     criteria.add(Restrictions.or(
         Restrictions.eq("identificationBarcode", search),
         Restrictions.eq("name", search),
-        Restrictions.eq("alias", search)
+        Restrictions.eq(FIELD_ALIAS, search)
         ));
     @SuppressWarnings("unchecked")
     List<Box> results = criteria.list();
@@ -204,16 +205,6 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
       results.add(use.getAlias());
     }
     return results;
-  }
-
-  @Override
-  public boolean remove(Box box) throws IOException {
-    if (box.getId() != AbstractBox.UNSAVED_ID) {
-      Box persisted = (Box) currentSession().merge(box);
-      currentSession().delete(persisted);
-      return true;
-    }
-    return false;
   }
 
   @Override
@@ -292,7 +283,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     criteria.add(Restrictions.or(
         Restrictions.eq("identificationBarcode", search),
         Restrictions.eq("name", search),
-        Restrictions.eq("alias", search)
+        Restrictions.eq(FIELD_ALIAS, search)
         ));
     criteria.add(Restrictions.eq("discarded", false));
     @SuppressWarnings("unchecked")

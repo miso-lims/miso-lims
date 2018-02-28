@@ -36,7 +36,6 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 
 /**
@@ -71,15 +70,6 @@ public class LibraryImpl extends AbstractLibrary {
    */
   public LibraryImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
-  }
-
-  public LibraryImpl(Sample sample, User user) {
-    if (sample.userCanRead(user)) {
-      setSample(sample);
-      setSecurityProfile(sample.getSecurityProfile());
-    } else {
-      setSecurityProfile(new SecurityProfile(user));
-    }
   }
 
   @Override

@@ -1,11 +1,29 @@
+# 0.2.110
+
+Changes:
+
+ * Show longest index per position on orders page in case of dual indices
+ * Changed control focus depending on boxable search results
+ * Removed Sample, Library, Pool, and Library Dilution widgets
+ * Added new search widget to homepage
+ * Add parent selection button to libraries and dilutions
+ * Allow users to delete Samples
+ * Fixed colouring of error messages during pool selection
+ * Allow only admins to add Tissue Origins
+ * Added Deletions list to show log of deleted items
+ * Fixed RunScanner setting completionDate on failed runs
+ * Corrected user in Partition QC changelogs
+ * Save run_bases_mask
+ * Added Identity consentLevel field
+
 # 0.2.109
 
 Changes:
 
  * Support multiple bulk barcode scanners
- * Allow selecting sample parents by category (Detailed Sample only)
+ * Allow acting on the sample parents (of a single sample class) for selected samples (Detailed Sample only)
  * Enforce integer increments on cycles graph
- * Allow admins to manage Tissue Origins (Detailed Sample only)
+ * Allow users to add and admins to add, edit, and delete new Tissue Origins (Detailed Sample only)
  * Export run bases mask
 
 # 0.2.108

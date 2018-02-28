@@ -39,7 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface RunStore extends Store<Run>, Remover<Run>, PaginatedDataSource<Run> {
+public interface RunStore extends Store<Run>, PaginatedDataSource<Run> {
   /**
    * Gets the latest Run, by start date, that is associated with the given container
    *

@@ -87,6 +87,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
@@ -124,10 +125,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -208,7 +211,7 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setPriority(from.getPriority());
-    dto.setParentProjectId(from.getParentProject().getProjectId());
+    dto.setParentProjectId(from.getParentProject().getId());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -299,7 +302,9 @@ public class Dtos {
     copySampleFields(from, dto, false);
 
     if (isDetailedSample(from)) {
-      dto.setSampleClassId(((DetailedSample) from).getSampleClass().getId());
+      DetailedSample detailed = (DetailedSample) from;
+      dto.setSampleClassId(detailed.getSampleClass().getId());
+      dto.setIdentityConsentLevel(getIdentityConsentLevelString(detailed));
     }
     return dto;
   }
@@ -322,7 +327,7 @@ public class Dtos {
       dto.setQcPassed(from.getQcPassed());
     }
     dto.setAlias(from.getAlias());
-    dto.setProjectId(from.getProject().getProjectId());
+    dto.setProjectId(from.getProject().getId());
     dto.setScientificName(from.getScientificName());
     dto.setTaxonIdentifier(from.getTaxonIdentifier());
     if (from.getVolume() != null) {
@@ -361,6 +366,7 @@ public class Dtos {
       dto.setParentId(from.getParent().getId());
       dto.setParentAlias(from.getParent().getAlias());
       dto.setParentTissueSampleClassId(from.getParent().getSampleClass().getId());
+      dto.setIdentityConsentLevel(getIdentityConsentLevelString(from));
     }
     if (from.getGroupId() != null) {
       dto.setGroupId(from.getGroupId());
@@ -425,7 +431,7 @@ public class Dtos {
 
   /**
    * Extracts parent details from the DTO, according to these possible cases:
-   * 
+   *
    * <ol>
    * <li>parent ID is provided. This implies that the parent exists, so no other parent information will be required</li>
    * <li>identity information and parentTissueSampleClassId are provided. This implies that a tissue parent should be created, and that the
@@ -433,7 +439,7 @@ public class Dtos {
    * provided to indicate a second aliquot level in the hierarchy</li>
    * <li>identity information is provided, but no parentTissueSampleClassId. You must be creating a tissue in this case.</li>
    * </ol>
-   * 
+   *
    * @param childDto
    *          the DTO to take parent details from
    * @return the parent details from the DTO, or null if there are none. A returned sample will also include its own parent if applicable.
@@ -652,7 +658,7 @@ public class Dtos {
     to.setDiscarded(from.isDiscarded());
     if (from.getProjectId() != null) {
       to.setProject(new ProjectImpl());
-      to.getProject().setProjectId(from.getProjectId());
+      to.getProject().setId(from.getProjectId());
     }
     to.setBoxPosition((SampleBoxPosition) makeBoxablePosition(from, (SampleImpl) to));
     return to;
@@ -672,6 +678,11 @@ public class Dtos {
     SampleIdentityDto dto = new SampleIdentityDto();
     dto.setExternalName(from.getExternalName());
     dto.setDonorSex(from.getDonorSex().getLabel());
+    if (from.getConsentLevel() != null) {
+      dto.setConsentLevel(from.getConsentLevel().getLabel());
+      // set here too, so it can be checked consistently for all DetailedSampleDtos
+      dto.setIdentityConsentLevel(from.getConsentLevel().getLabel());
+    }
     return dto;
   }
 
@@ -681,13 +692,16 @@ public class Dtos {
     if (from.getDonorSex() != null) {
       to.setDonorSex(from.getDonorSex());
     }
+    if (from.getConsentLevel() != null) {
+      to.setConsentLevel(ConsentLevel.getByLabel(from.getConsentLevel()));
+    }
     return to;
   }
 
   public static SampleNumberPerProjectDto asDto(SampleNumberPerProject from) {
     SampleNumberPerProjectDto dto = new SampleNumberPerProjectDto();
     dto.setId(from.getId());
-    dto.setProjectId(from.getProject().getProjectId());
+    dto.setProjectId(from.getProject().getId());
     dto.setHighestSampleNumber(from.getHighestSampleNumber());
     dto.setPadding(from.getPadding());
     dto.setCreatedById(from.getCreatedBy().getUserId());
@@ -973,7 +987,15 @@ public class Dtos {
     if (from.getGroupDescription() != null) {
       dto.setGroupDescription(from.getGroupDescription());
     }
+    if (from.getSample() != null) {
+      dto.setIdentityConsentLevel(getIdentityConsentLevelString((DetailedSample) from.getSample()));
+    }
     return dto;
+  }
+
+  private static String getIdentityConsentLevelString(DetailedSample sample) {
+    ConsentLevel level = getIdentityConsentLevel(sample);
+    return level == null ? null : level.getLabel();
   }
 
   public static DetailedLibrary toDetailedLibrary(DetailedLibraryDto from) {
@@ -1367,6 +1389,11 @@ public class Dtos {
       ldto.setPlatformType(from.getPlatformType().getKey());
     }
     dto.setLibrary(ldto);
+
+    Sample sample = from.getSample();
+    if (isDetailedSample(sample)) {
+      dto.setIdentityConsentLevel(getIdentityConsentLevelString((DetailedSample) sample));
+    }
     return dto;
   }
 
@@ -1743,6 +1770,7 @@ public class Dtos {
     to.setImgCycle(from.getImgCycle());
     to.setCallCycle(from.getCallCycle());
     to.setScoreCycle(from.getScoreCycle());
+    to.setRunBasesMask(from.getRunBasesMask());
   }
 
   private static void setCommonRunValues(NotificationDto from, Run to) {
@@ -2217,6 +2245,27 @@ public class Dtos {
     SpreadsheetDto dto = new SpreadsheetDto();
     dto.setDescription(from.description());
     dto.setName(from.name());
+    return dto;
+  }
+
+  public static DeletionDto asDto(Deletion from) {
+    DeletionDto dto = new DeletionDto();
+    dto.setId(from.getId());
+    dto.setTargetType(from.getTargetType());
+    dto.setTargetId(from.getTargetId());
+    dto.setDescription(from.getDescription());
+    dto.setUserName(from.getUser().getFullName());
+    dto.setChangeTime(formatDateTime(from.getChangeTime()));
+    return dto;
+  }
+
+  public static BarcodableDto asDto(BarcodableView from) {
+    BarcodableDto dto = new BarcodableDto();
+    dto.setId(from.getId().getTargetId());
+    dto.setEntityType(from.getId().getTargetType().toString());
+    dto.setAlias(from.getAlias());
+    dto.setName(from.getName());
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
     return dto;
   }
 }

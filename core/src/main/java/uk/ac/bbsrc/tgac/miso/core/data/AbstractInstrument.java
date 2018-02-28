@@ -180,11 +180,6 @@ public abstract class AbstractInstrument implements Instrument {
   }
 
   @Override
-  public boolean isDeletable() {
-    return getId() != AbstractInstrument.UNSAVED_ID;
-  }
-
-  @Override
   public String toString() {
     return "AbstractInstrument [id=" + id
         + ", name=" + name

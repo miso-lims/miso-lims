@@ -167,17 +167,6 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testRemove() throws Exception {
-    Collection<Box> boxesBefore = dao.listAll();
-    assertEquals(2, boxesBefore.size());
-    Box box = dao.get(1);
-    boolean remove = dao.remove(box);
-    assertTrue(remove);
-    Collection<Box> boxes = dao.listAll();
-    assertEquals(1, boxes.size());
-  }
-
-  @Test
   public void testEmptyAllTubes() throws Exception {
     Box box = dao.get(1);
     User user = (User) sessionFactory.getCurrentSession().get(UserImpl.class, 1L);

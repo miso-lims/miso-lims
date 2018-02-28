@@ -1,5 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.support.ConfigurableWebBindingInitializer;
@@ -8,6 +14,8 @@ import org.springframework.web.bind.support.WebBindingInitializer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
+import uk.ac.bbsrc.tgac.miso.service.BarcodableService;
 import uk.ac.bbsrc.tgac.miso.spring.LimsBindingInitializer;
 import uk.ac.bbsrc.tgac.miso.webapp.util.SessionConversationAttributeStore;
 
@@ -43,5 +51,13 @@ public class WebConfig extends WebMvcConfigurationSupport {
     RequestMappingHandlerAdapter adapter = super.requestMappingHandlerAdapter();
     adapter.setWebBindingInitializer(bindingInitializer());
     return adapter;
+  }
+
+  @Autowired
+  private List<BarcodableService> barcodableServices;
+
+  @Bean
+  public Map<EntityType, BarcodableService> barcodableServicesMap() {
+    return barcodableServices.stream().collect(Collectors.toMap(BarcodableService::getEntityType, Function.identity()));
   }
 }

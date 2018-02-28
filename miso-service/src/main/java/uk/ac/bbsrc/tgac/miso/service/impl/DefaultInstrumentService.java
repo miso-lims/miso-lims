@@ -6,14 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.InstrumentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ServiceRecordStore;
@@ -46,11 +43,6 @@ public class DefaultInstrumentService implements InstrumentService {
   }
 
   @Override
-  public Collection<ServiceRecord> listServiceRecordsByInstrument(long instrumentId) throws IOException {
-    return serviceRecordDao.listByInstrumentId(instrumentId);
-  }
-
-  @Override
   public Instrument get(long instrumentId) throws IOException {
     return instrumentDao.get(instrumentId);
   }
@@ -63,11 +55,6 @@ public class DefaultInstrumentService implements InstrumentService {
   @Override
   public Instrument getByUpgradedInstrumentId(long instrumentId) throws IOException {
     return instrumentDao.getByUpgradedInstrument(instrumentId);
-  }
-
-  @Override
-  public ServiceRecord getServiceRecord(long recordId) throws IOException {
-    return serviceRecordDao.get(recordId);
   }
 
   @Override
@@ -109,63 +96,12 @@ public class DefaultInstrumentService implements InstrumentService {
   }
 
   @Override
-  public long createServiceRecord(ServiceRecord record) throws IOException {
-    record.setInstrument(get(record.getInstrument().getId()));
-    return serviceRecordDao.save(record);
-  }
-
-  @Override
-  public void updateServiceRecord(ServiceRecord record) throws IOException {
-    ServiceRecord managed = getServiceRecord(record.getId());
-    applyRecordChanges(managed, record);
-    record.setInstrument(get(managed.getInstrument().getId()));
-    serviceRecordDao.save(managed);
-  }
-
-  private void applyRecordChanges(ServiceRecord target, ServiceRecord source) {
-    target.setTitle(source.getTitle());
-    target.setDetails(source.getDetails());
-    target.setServicedByName(source.getServicedByName());
-    target.setReferenceNumber(source.getReferenceNumber());
-    target.setServiceDate(source.getServiceDate());
-    target.setShutdownTime(source.getShutdownTime());
-    target.setRestoredTime(source.getRestoredTime());
-  }
-
-  @Override
-  public Map<String, Integer> getInstrumentColumnSizes() throws IOException {
+  public Map<String, Integer> getColumnSizes() throws IOException {
     return instrumentDao.getInstrumentColumnSizes();
-  }
-
-  @Override
-  public Map<String, Integer> getServiceRecordColumnSizes() throws IOException {
-    return serviceRecordDao.getServiceRecordColumnSizes();
-  }
-
-  @Override
-  public void deleteServiceRecord(long recordId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    serviceRecordDao.remove(getServiceRecord(recordId));
-  }
-
-  @Override
-  public void delete(long instrumentId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    Collection<Run> attachedRuns = runService.listByInstrumentId(instrumentId);
-    if (attachedRuns.isEmpty()) {
-      instrumentDao.remove(get(instrumentId));
-    } else {
-      throw new ConstraintViolationException("Cannot delete sequencer since runs are still associated.", null,
-          "sequencer");
-    }
   }
 
   public void setInstrumentDao(InstrumentStore instrumentDao) {
     this.instrumentDao = instrumentDao;
-  }
-
-  public void setServiceRecordDao(ServiceRecordStore serviceRecordDao) {
-    this.serviceRecordDao = serviceRecordDao;
   }
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {

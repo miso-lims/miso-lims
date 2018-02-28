@@ -17,8 +17,6 @@ public interface SampleNumberPerProjectDao {
 
   Long addSampleNumberPerProject(SampleNumberPerProject sampleNumberPerProject);
 
-  void deleteSampleNumberPerProject(SampleNumberPerProject sampleNumberPerProject);
-
   void update(SampleNumberPerProject sampleNumberPerProject);
 
   String nextNumber(Project project, User user, String partialAlias);

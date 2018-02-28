@@ -413,12 +413,15 @@ HotTarget.library = (function() {
       }, {
         name: 'Make dilutions',
         action: function(items) {
-          window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate?' + jQuery.param({
-            ids: items.map(Utils.array.getId).join(',')
+          HotUtils.warnIfConsentRevoked(items, function() {
+            window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate?' + jQuery.param({
+              ids: items.map(Utils.array.getId).join(',')
+            });
           });
         }
-      }, HotUtils.printAction('library'), ].concat(HotUtils.makeQcActions("Library"));
-    }
+      }, HotUtils.printAction('library'),
 
+      HotUtils.makeParents('library', HotUtils.parentCategoriesForDetailed()), ].concat(HotUtils.makeQcActions("Library"));
+    }
   };
 })();

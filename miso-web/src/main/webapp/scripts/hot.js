@@ -883,6 +883,77 @@ var HotUtils = {
       }
     }, ];
   },
+  makeParents: function(slug, parentCategories) {
+
+    return {
+      name: "Parents",
+      action: function(items) {
+        Utils.showWizardDialog('Parents', parentCategories.map(function(category) {
+          return {
+            "name": category.name,
+            "handler": function() {
+              Utils.ajaxWithDialog('Searching', 'POST', '/miso/rest/' + slug + '/parents/' + category.name, items.map(function(s) {
+                return s.id;
+              }), function(parents) {
+                var selectedActions = category.target.getBulkActions(category.config).filter(function(bulkAction) {
+                  return !!bulkAction;
+                }).map(function(bulkAction) {
+                  return {
+                    "name": bulkAction.name,
+                    "handler": function() {
+                      bulkAction.action(parents);
+                    }
+                  };
+                });
+                selectedActions.unshift({
+                  "name": "View Selected",
+                  "handler": function() {
+                    Utils.showOkDialog(category.name + ' Parents', parents.map(function(parent) {
+                      return parent.name + ' (' + parent.alias + ')';
+                    }), showActionDialog);
+                  }
+                });
+                var showActionDialog = function() {
+                  Utils.showWizardDialog(category.name + ' Actions', selectedActions);
+                };
+                showActionDialog();
+              });
+            }
+          };
+        }));
+      }
+    };
+  },
+
+  parentCategoriesForDetailed: function() {
+    return Constants.isDetailedSample ? Constants.sampleCategories.map(function(category) {
+      return {
+        "name": category,
+        "target": HotTarget.sample,
+        "config": {}
+      };
+    }) : [{
+      "name": "Sample",
+      "target": HotTarget.sample,
+      "config": {}
+    }];
+  },
+
+  warnIfConsentRevoked: function(items, callback, getLabel) {
+    var consentRevoked = items.filter(function(item) {
+      return item.identityConsentLevel === 'Revoked';
+    })
+
+    if (consentRevoked.length) {
+      var lines = ['Donor has revoked consent for the following item' + (consentRevoked.length > 1 ? 's' : '') + '.'];
+      jQuery.each(consentRevoked, function(index, item) {
+        lines.push('* ' + (typeof getLabel === 'function' ? getLabel(item) : item.name + ' (' + item.alias + ')'));
+      });
+      Utils.showConfirmDialog('Warning', 'Proceed anyway', lines, callback);
+    } else {
+      callback();
+    }
+  }
 };
 
 HotTarget = {};

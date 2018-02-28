@@ -93,7 +93,7 @@ public class ExternalSectionControllerHelperService {
 
       for (Project p : projectCollection) {
         if (p.getSecurityProfile() == null) {
-          log.info("Null project SP: " + p.getProjectId() + " -> " + p.toString());
+          log.info("Null project SP: " + p.getId() + " -> " + p.toString());
         }
       }
 
@@ -103,7 +103,8 @@ public class ExternalSectionControllerHelperService {
         List<Project> projects = new ArrayList<>(projectCollection);
         Collections.sort(projects);
         for (Project p : projects) {
-          b.append("<a class=\"dashboardresult\" onclick=\"showProjectStatus(" + p.getProjectId()
+          b.append("<a class=\"dashboardresult\" onclick=\"showProjectStatus("
+              + p.getId()
               + ");\" href=\"javascript:void(0);\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           b.append("Name: <b>" + p.getName() + "</b><br/>");
           b.append("Alias: <b>" + p.getAlias() + "</b><br/>");

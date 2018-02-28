@@ -32,6 +32,7 @@ HotTarget.lab = {
         var deleteNext = function(index) {
           if (index == items.length) {
             window.location = window.location.origin + '/miso/lab/list';
+            return;
           }
           Utils.ajaxWithDialog('Deleting ' + items[index].alias, 'DELETE', '/miso/rest/lab/' + items[index].id, null, function() {
             deleteNext(index + 1);

@@ -23,7 +23,7 @@ import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.spring.ajax.ServiceRecordControllerHelperService;
 
 public class ServiceRecordControllerHelperServiceTest {
@@ -33,7 +33,7 @@ public class ServiceRecordControllerHelperServiceTest {
   @Mock
   private ProjectService projectService;
   @Mock
-  private InstrumentService instrumentService;
+  private ServiceRecordService serviceRecordService;
   @Mock
   private MisoFilesManager misoFileManager;
   
@@ -83,7 +83,8 @@ public class ServiceRecordControllerHelperServiceTest {
     JSONObject request = new JSONObject();
     request.put("recordId", 1L);
     
-    Mockito.doThrow(new IOException()).when(instrumentService).deleteServiceRecord(Mockito.anyLong());
+    Mockito.doThrow(new IOException()).when(serviceRecordService).get(Mockito.anyLong());
+    Mockito.doThrow(new IOException()).when(serviceRecordService).delete(Mockito.any());
     
     JSONObject result = chs.deleteServiceRecord(null, request);
     assertNotNull(result.get("error"));

@@ -202,15 +202,8 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
-  public boolean remove(Pool t) throws IOException {
-    boolean exists = currentSession().get(PoolImpl.class, t.getId()) != null;
-    currentSession().delete(t);
-    return exists;
-  }
-
-  @Override
   public void removeWatcher(Pool pool, User watcher) {
-    log.debug("Removing watcher " + watcher.getLoginName() + " from " + pool.getWatchableIdentifier());
+    log.debug(String.format("Removing watcher %s from %s", watcher.getLoginName(), pool.getWatchableIdentifier()));
     pool.removeWatcher(watcher);
     currentSession().update(pool);
 

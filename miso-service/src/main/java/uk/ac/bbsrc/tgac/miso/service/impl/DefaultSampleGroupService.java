@@ -52,7 +52,7 @@ public class DefaultSampleGroupService implements SampleGroupService {
     User user = authorizationManager.getCurrentUser();
     Project project = projectStore.get(projectId);
     Subproject subproject = subprojectId == null ? null : subprojectDAO.getSubproject(subprojectId);
-    if (subproject != null && subproject.getParentProject().getProjectId() != projectId) {
+    if (subproject != null && subproject.getParentProject().getId() != projectId) {
       throw new IllegalArgumentException("Subproject specified is not part of project.");
     }
     sampleGroup.setCreatedBy(user);
@@ -77,13 +77,6 @@ public class DefaultSampleGroupService implements SampleGroupService {
   public Set<SampleGroupId> getAll() throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(sampleGroupDao.getSampleGroups());
-  }
-
-  @Override
-  public void delete(Long sampleGroupId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    SampleGroupId sampleGroup = get(sampleGroupId);
-    sampleGroupDao.deleteSampleGroup(sampleGroup);
   }
 
   @Override

@@ -123,7 +123,7 @@ public class DashboardHelperService {
         Collections.sort(projects);
         Collections.reverse(projects);
         for (Project p : projects) {
-          generateDashboardCell(b, "project", p.getProjectId(), p.getName(), p.getAlias());
+          generateDashboardCell(b, "project", p.getId(), p.getName(), p.getAlias());
         }
       } else {
         b.append("No matches");

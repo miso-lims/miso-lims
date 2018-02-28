@@ -88,9 +88,9 @@ public class ProjectD3GraphController {
       projectJSON.put("show", "PROJECT");
       projectJSON.put("description", p.getAlias());
       JSONArray projectChildrenArray = new JSONArray();
-      Collection<Sample> samples = sampleService.listByProjectId(p.getProjectId());
-      Collection<Run> runs = runService.listByProjectId(p.getProjectId());
-      Collection<Study> studies = studyService.listByProjectId(p.getProjectId());
+      Collection<Sample> samples = sampleService.listByProjectId(p.getId());
+      Collection<Run> runs = runService.listByProjectId(p.getId());
+      Collection<Study> studies = studyService.listByProjectId(p.getId());
 
       JSONObject runJSON = new JSONObject();
       JSONArray runsArray = new JSONArray();
@@ -207,7 +207,7 @@ public class ProjectD3GraphController {
       JSONArray projectsArray = new JSONArray();
       for (Project p : projects) {
 
-        JSONObject projectJSON = d3graphRest(p.getProjectId());
+        JSONObject projectJSON = d3graphRest(p.getId());
         JSONArray projectChildrenArray = (JSONArray) projectJSON.get("children");
         if (projectChildrenArray.size() > 0) {
           projectsArray.add(projectJSON);
