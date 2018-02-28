@@ -1,3 +1,21 @@
+# 0.2.110
+
+Changes:
+
+ * Show longest index per position on orders page in case of dual indices
+ * Changed control focus depending on boxable search results
+ * Removed Sample, Library, Pool, and Library Dilution widgets
+ * Added new search widget to homepage
+ * Add parent selection button to libraries and dilutions
+ * Allow users to delete Samples
+ * Fixed colouring of error messages during pool selection
+ * Allow only admins to add Tissue Origins
+ * Added Deletions list to show log of deleted items
+ * Fixed RunScanner setting completionDate on failed runs
+ * Corrected user in Partition QC changelogs
+ * Save run_bases_mask
+ * Added Identity consentLevel field
+
 # 0.2.109
 
 Changes:
