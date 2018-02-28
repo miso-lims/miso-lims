@@ -27,7 +27,7 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
   private String description;
   private String volume;
   private String platformType;
-  private int longestIndex;
+  private String longestIndex;
   private boolean hasLowQualityLibraries;
   private int dilutionCount;
   private Double insertSize;
@@ -195,11 +195,11 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
     this.platformType = platformType;
   }
 
-  public int getLongestIndex() {
+  public String getLongestIndex() {
     return longestIndex;
   }
 
-  public void setLongestIndex(int longestIndex) {
+  public void setLongestIndex(String longestIndex) {
     this.longestIndex = longestIndex;
   }
 
