@@ -31,6 +31,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -562,9 +564,18 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public int getLongestIndex() {
-    return pooledElementViews.stream().flatMap(element -> element.getIndices().stream()).mapToInt(index -> index.getSequence().length())
-        .max().orElse(0);
+  public String getLongestIndex() {
+    Map<Integer, Integer> lengths = pooledElementViews.stream()
+        .flatMap(element -> element.getIndices().stream())
+        .collect(Collectors.toMap(Index::getPosition, index -> index.getSequence().length(), Integer::max));
+    if (lengths.isEmpty()) {
+      return "0";
+    }
+    return lengths.entrySet().stream()
+        .sorted((a, b) -> a.getKey().compareTo(b.getKey()))
+        .map(Entry<Integer, Integer>::getValue)
+        .map(length -> length.toString())
+        .collect(Collectors.joining(","));
   }
 
   @Override

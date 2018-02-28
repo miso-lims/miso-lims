@@ -242,6 +242,6 @@ public interface Pool
    */
   public void setCreationTime(Date creationTime);
 
-  int getLongestIndex();
+  public String getLongestIndex();
 
 }
