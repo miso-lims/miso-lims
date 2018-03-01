@@ -56,14 +56,6 @@ public class ExperimentTest {
     assertNotNull(ae.getSecurityProfile());
   }
 
-  @Test(expected = SecurityException.class)
-  public void testInheritPermissionsException() {
-    final SecurableByProfile parent = Mockito.mock(SecurableByProfile.class);
-    final SecurityProfile mockSecurityProfile = Mockito.mock(SecurityProfile.class);
-    when(parent.getSecurityProfile()).thenReturn(mockSecurityProfile);
-    ae.inheritPermissions(parent);
-  }
-
   // Utility methods.
   private static final void assertKitListEqual(Collection<Kit> expected, Collection<Kit> actual) {
     assertEquals(expected.size(), actual.size());

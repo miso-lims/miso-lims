@@ -28,9 +28,29 @@ ListTarget.dilution = {
   },
   queryUrl: "/miso/rest/librarydilution/query",
   createBulkActions: function(config, projectId) {
-    return config.library ? HotTarget.dilution.getBulkActions(config).filter(function(action) {
+    var actions = config.library ? HotTarget.dilution.getBulkActions(config).filter(function(action) {
       return action.allowOnLibraryPage;
     }) : HotTarget.dilution.getBulkActions(config);
+
+    actions.push({
+      name: "Delete",
+      action: function(items) {
+        var lines = ['Are you sure you wish to delete the following library dilutions? This cannot be undone.',
+            'Note: a dilution may only be deleted by its creator or an admin.'];
+        var ids = [];
+        jQuery.each(items, function(index, dilution) {
+          lines.push('* ' + dilution.name + ' (' + dilution.library.alias + ')');
+          ids.push(dilution.id);
+        });
+        Utils.showConfirmDialog('Delete Library Dilutions', 'Delete', lines, function() {
+          Utils.ajaxWithDialog('Deleting Library Dilutions', 'POST', '/miso/rest/librarydilution/bulk-delete', ids, function() {
+            window.location = window.location.origin + '/miso/dilutions';
+          });
+        });
+      }
+    });
+
+    return actions;
   },
   createStaticActions: function(config, projectId) {
     return config.library ? [{

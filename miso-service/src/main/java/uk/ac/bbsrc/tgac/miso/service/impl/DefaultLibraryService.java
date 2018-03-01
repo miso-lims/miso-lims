@@ -60,7 +60,7 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultLibraryService implements LibraryService, AuthorizedPaginatedDataSource<Library>, BoxableDeleterService<Library> {
+public class DefaultLibraryService implements LibraryService, AuthorizedPaginatedDataSource<Library> {
 
   protected static final Logger log = LoggerFactory.getLogger(DefaultLibraryService.class);
 

@@ -15,8 +15,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.service.impl.BoxableDeleterService;
 
-public interface LibraryService extends PaginatedDataSource<Library>, BarcodableService<Library>, DeleterService<Library> {
+public interface LibraryService extends PaginatedDataSource<Library>, BarcodableService<Library>, BoxableDeleterService<Library> {
+
   @Override
   default EntityType getEntityType() {
     return EntityType.LIBRARY;

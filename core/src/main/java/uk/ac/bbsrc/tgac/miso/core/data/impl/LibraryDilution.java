@@ -29,7 +29,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -52,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -71,7 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @Entity
 @Table(name = "LibraryDilution")
 public class LibraryDilution extends AbstractBoxable
-    implements SecurableByProfile, Barcodable, Comparable<LibraryDilution>, Nameable, Boxable, Serializable {
+    implements SecurableByProfile, Barcodable, Comparable<LibraryDilution>, Nameable, Boxable, Deletable, Serializable {
 
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
@@ -96,7 +96,7 @@ public class LibraryDilution extends AbstractBoxable
   @JoinColumn(name = "library_libraryId")
   private Library library;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne
   private SecurityProfile securityProfile;
 
   @ManyToOne
@@ -124,23 +124,6 @@ public class LibraryDilution extends AbstractBoxable
   @OneToOne(optional = true)
   @PrimaryKeyJoinColumn
   private DilutionBoxPosition boxPosition;
-
-  /**
-   * Construct a new LibraryDilution with a default empty SecurityProfile
-   */
-  public LibraryDilution() {
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  /**
-   * Construct a new LibraryDilution with a SecurityProfile owned by the given User
-   * 
-   * @param user
-   *          of type User
-   */
-  public LibraryDilution(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-  }
 
   @Override
   public Boxable.EntityType getEntityType() {
@@ -413,6 +396,21 @@ public class LibraryDilution extends AbstractBoxable
   @Override
   public String getBarcodeSizeInfo() {
     return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getUnits());
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Library Dilution";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName() + (getLibrary() == null || getLibrary().getAlias() == null ? "" : " (" + getLibrary().getAlias() + ")");
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    return getSecurityProfile();
   }
 
 }
