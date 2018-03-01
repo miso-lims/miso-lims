@@ -156,8 +156,12 @@ var RunGraph = (function() {
               title: {
                 text: title
               },
-              xAxis: {},
+              xAxis: {
+                allowDecimals: false,
+                floor: 0,
+              },
               yAxis: {
+                floor: 0,
                 title: {
                   text: yLabel
                 }
@@ -260,7 +264,8 @@ var RunGraph = (function() {
             text: title
           },
           xAxis: {
-            tickInterval: 1,
+            allowDecimals: false,
+            floor: 0,
           },
           yAxis: {
             min: 1,
