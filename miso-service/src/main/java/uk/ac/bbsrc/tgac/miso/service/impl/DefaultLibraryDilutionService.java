@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -15,22 +16,31 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
 import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
@@ -44,6 +54,12 @@ public class DefaultLibraryDilutionService
   @Autowired
   private LibraryDilutionStore dilutionDao;
   @Autowired
+  private SecurityStore securityStore;
+  @Autowired
+  private SecurityProfileStore securityProfileStore;
+  @Autowired
+  private DeletionStore deletionStore;
+  @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
   private NamingScheme namingScheme;
@@ -53,6 +69,8 @@ public class DefaultLibraryDilutionService
   private TargetedSequencingService targetedSequencingService;
   @Autowired
   private BoxService boxService;
+  @Autowired
+  private ChangeLogService changeLogService;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
@@ -196,6 +214,9 @@ public class DefaultLibraryDilutionService
     if (dilution.getTargetedSequencing() != null) {
       dilution.setTargetedSequencing(targetedSequencingService.get(dilution.getTargetedSequencing().getId()));
     }
+    if (dilution.getSecurityProfile() != null && dilution.getSecurityProfile().getProfileId() != SecurityProfile.UNSAVED_ID) {
+      dilution.setSecurityProfile(securityProfileStore.get(dilution.getSecurityProfile().getProfileId()));
+    }
   }
 
   /**
@@ -256,4 +277,44 @@ public class DefaultLibraryDilutionService
     return authorizationManager.filterUnreadable(dilutions);
 
   }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public void authorizeDeletion(LibraryDilution object) throws IOException {
+    User creator = securityStore.getUserByFullName(object.getDilutionCreator());
+    authorizationManager.throwIfNonAdminOrMatchingOwner(creator);
+  }
+
+  @Override
+  public ValidationResult validateDeletion(LibraryDilution object) {
+    ValidationResult result = new ValidationResult();
+
+    if (object.getPools() != null && !object.getPools().isEmpty()) {
+      result.addError(new ValidationError(object.getName() + " is included in " + object.getPools().size() + " pool"
+          + (object.getPools().size() > 1 ? "s" : "")));
+    }
+
+    return result;
+  }
+
+  @Override
+  public void afterDelete(LibraryDilution object) throws IOException {
+    LibraryChangeLog changeLog = new LibraryChangeLog();
+    changeLog.setLibrary(object.getLibrary());
+    changeLog.setColumnsChanged(object.getName());
+    changeLog.setSummary("Deleted dilution " + object.getName() + ".");
+    changeLog.setTime(new Date());
+    changeLog.setUser(authorizationManager.getCurrentUser());
+    changeLogService.create(changeLog);
+  }
+
+  @Override
+  public BoxService getBoxService() {
+    return boxService;
+  }
+
 }

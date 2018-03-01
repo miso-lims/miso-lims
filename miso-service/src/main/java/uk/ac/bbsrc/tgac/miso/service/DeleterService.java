@@ -1,7 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -65,17 +67,22 @@ public interface DeleterService<T extends Deletable> extends ProviderService<T> 
   }
 
   public default void bulkDelete(Collection<T> objects) throws IOException {
+    List<T> managedObjects = new ArrayList<>();
     for (T object : objects) {
+      managedObjects.add(get(object.getId()));
+    }
+
+    for (T object : managedObjects) {
       authorizeDeletion(object);
     }
     ValidationResult result = new ValidationResult();
-    for (T object : objects) {
+    for (T object : managedObjects) {
       result.merge(validateDeletion(object));
     }
     result.throwIfInvalid();
-    for (T object : objects) {
+    for (T object : managedObjects) {
       beforeDelete(object);
-      delete(object);
+      getDeletionStore().delete(object, getAuthorizationManager().getCurrentUser());
       afterDelete(object);
     }
   }
