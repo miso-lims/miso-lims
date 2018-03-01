@@ -21,8 +21,6 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
 @MappedSuperclass
 public abstract class AbstractBox implements Box {
@@ -139,16 +137,6 @@ public abstract class AbstractBox implements Box {
   @Override
   public void setSecurityProfile(SecurityProfile securityProfile) {
     this.securityProfile = securityProfile;
-  }
-
-  @CoverageIgnore
-  @Override
-  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    if (parent.getSecurityProfile().getOwner() != null) {
-      setSecurityProfile(parent.getSecurityProfile());
-    } else {
-      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
-    }
   }
 
   @Override

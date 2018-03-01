@@ -44,7 +44,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 public class DetailedSampleBuilder
     implements DetailedSample, SampleAliquot, SampleStock, SampleTissue, SampleTissueProcessing, SampleSlide, SampleLCMTube, SampleIdentity {
@@ -655,15 +654,6 @@ public class DetailedSampleBuilder
   @Override
   public Collection<ChangeLog> getChangeLog() {
     return changeLog;
-  }
-
-  @Override
-  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    if (parent.getSecurityProfile().getOwner() != null) {
-      setSecurityProfile(parent.getSecurityProfile());
-    } else {
-      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
-    }
   }
 
   @Override

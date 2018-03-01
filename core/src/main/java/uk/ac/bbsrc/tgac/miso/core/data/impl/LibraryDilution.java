@@ -262,15 +262,6 @@ public class LibraryDilution extends AbstractBoxable
   }
 
   @Override
-  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    if (parent.getSecurityProfile().getOwner() != null) {
-      setSecurityProfile(parent.getSecurityProfile());
-    } else {
-      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
-    }
-  }
-
-  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(getId());

@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -228,4 +229,23 @@ public class LibraryRestController extends RestController {
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
     return parentFinder.list(ids, category);
   }
+
+  @RequestMapping(value = "/bulk-delete", method = RequestMethod.POST)
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    List<Library> libraries = new ArrayList<>();
+    for (Long id : ids) {
+      if (id == null) {
+        throw new RestException("Cannot delete null library", Status.BAD_REQUEST);
+      }
+      Library library = libraryService.get(id);
+      if (library == null) {
+        throw new RestException("Library " + id + " not found", Status.BAD_REQUEST);
+      }
+      libraries.add(library);
+    }
+    libraryService.bulkDelete(libraries);
+  }
+
 }

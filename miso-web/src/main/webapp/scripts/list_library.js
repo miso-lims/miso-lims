@@ -28,7 +28,24 @@ ListTarget.library = {
   },
   queryUrl: "/miso/rest/library/query",
   createBulkActions: function(config, projectId) {
-    return HotTarget.library.getBulkActions(config);
+    return HotTarget.library.getBulkActions(config).concat(
+        [{
+          name: "Delete",
+          action: function(items) {
+            var lines = ['Are you sure you wish to delete the following libraries? This cannot be undone.',
+                'Note: a Library may only be deleted by its creator or an admin.'];
+            var ids = [];
+            jQuery.each(items, function(index, library) {
+              lines.push('* ' + library.name + ' (' + library.alias + ')');
+              ids.push(library.id);
+            });
+            Utils.showConfirmDialog('Delete Libraries', 'Delete', lines, function() {
+              Utils.ajaxWithDialog('Deleting Libraries', 'POST', '/miso/rest/library/bulk-delete', ids, function() {
+                window.location = window.location.origin + '/miso/libraries';
+              });
+            });
+          }
+        }]);
   },
   createStaticActions: function(config, projectId) {
     return [{
