@@ -60,7 +60,7 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultLibraryService implements LibraryService, AuthorizedPaginatedDataSource<Library> {
+public class DefaultLibraryService implements LibraryService, AuthorizedPaginatedDataSource<Library>, BoxableDeleterService<Library> {
 
   protected static final Logger log = LoggerFactory.getLogger(DefaultLibraryService.class);
 
@@ -645,6 +645,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   @Override
   public void authorizeDeletion(Library object) throws IOException {
     authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+
   }
 
   @Override
@@ -655,8 +656,12 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       result.addError(new ValidationError(object.getName() + " has " + object.getLibraryDilutions().size() + " dilution"
           + (object.getLibraryDilutions().size() > 1 ? "s" : "")));
     }
-
     return result;
+  }
+
+  @Override
+  public BoxService getBoxService() {
+    return boxService;
   }
 
 }
