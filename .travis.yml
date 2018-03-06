@@ -39,7 +39,7 @@ before_script:
   - sudo apt-add-repository -y ppa:likemartinma/devel
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update
-  - sudo apt-get install -y pkg-config cmake libjsoncpp-dev autoconf libtool build-essential gcc-5 g++-5
+  - sudo apt-get install -y pkg-config cmake libjsoncpp-dev autoconf libtool build-essential gcc-5 g++-5 google-chrome-stable
 
 script: ./travis_jobs.sh
 

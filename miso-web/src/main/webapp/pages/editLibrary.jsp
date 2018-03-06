@@ -421,7 +421,7 @@
 
 <c:choose>
   <c:when
-      test="${!empty library.sample and library.securityProfile.profileId eq library.sample.project.securityProfile.profileId}">
+      test="${!empty library.sample and library.securityProfile.profileId eq library.sample.securityProfile.profileId}">
     <table class="in">
     <tr>
       <td>Permissions</td>

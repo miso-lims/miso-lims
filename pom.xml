@@ -63,7 +63,7 @@
         <role>Administrator</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>tdebat</id>
@@ -75,7 +75,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>amasella</id>
@@ -87,7 +87,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>dcooke</id>
@@ -99,7 +99,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>harmstrong</id>
@@ -111,7 +111,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
   </developers>
   <modules>
@@ -461,7 +461,7 @@
       <dependency>
         <groupId>io.github.bonigarcia</groupId>
         <artifactId>webdrivermanager</artifactId>
-        <version>1.7.2</version>
+        <version>2.1.0</version>
       </dependency>
       <dependency>
         <groupId>org.flywaydb</groupId>

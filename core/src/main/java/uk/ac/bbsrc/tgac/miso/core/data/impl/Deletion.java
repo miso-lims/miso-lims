@@ -100,9 +100,4 @@ public class Deletion implements SecurableByProfile {
     this.securityProfile = profile;
   }
 
-  @Override
-  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    this.securityProfile = parent.getSecurityProfile();
-  }
-
 }

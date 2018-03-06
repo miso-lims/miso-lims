@@ -50,7 +50,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.StudyChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * Concrete implementation of a Study
@@ -221,15 +220,6 @@ public class StudyImpl implements Study {
       if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
       if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
       return hashcode;
-    }
-  }
-
-  @Override
-  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    if (parent.getSecurityProfile().getOwner() != null) {
-      setSecurityProfile(parent.getSecurityProfile());
-    } else {
-      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
   }
 

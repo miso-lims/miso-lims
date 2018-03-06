@@ -371,10 +371,10 @@ var HotUtils = {
         }
         table.sort(sortColIndex);
       }
-      var button = document.createElement('input');
-      button.type = 'button';
+      var button = document.createElement('SPAN');
+      button.setAttribute('class', 'ui-button ui-state-default');
       button.id = 'sort' + sortOption.sortTarget;
-      button.value = sortOption.buttonText;
+      button.innerText = sortOption.buttonText;
       button.addEventListener('click', sortListener);
       return button;
     };
@@ -499,6 +499,9 @@ var HotUtils = {
                           successMessageDiv.innerHTML = 'Saved ' + numSaved + ' items.';
                           if (allSaved) {
                             var bulkActionsDiv = document.getElementById('bulkactions');
+                            while (bulkActionsDiv.children.length > 0) {
+                              bulkActionsDiv.removeChild(bulkActionsDiv.lastChild);
+                            }
                             target.getBulkActions(config).forEach(function(bulkAction) {
                               var button;
                               if (bulkAction) {
@@ -582,9 +585,9 @@ var HotUtils = {
 
     if (target.hasOwnProperty('getCustomActions')) {
       target.getCustomActions(table).forEach(function(action) {
-        var button = document.createElement('input');
-        button.type = 'button';
-        button.value = action.buttonText;
+        var button = document.createElement('SPAN');
+        button.setAttribute('class', 'ui-button ui-state-default');
+        button.innerText = action.buttonText;
         button.addEventListener('click', action.eventHandler);
         document.getElementById('bulkactions').appendChild(button);
       });

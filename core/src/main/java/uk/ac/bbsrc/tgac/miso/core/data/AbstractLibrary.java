@@ -67,7 +67,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -127,7 +126,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @OneToMany(targetEntity = LibraryDilution.class, mappedBy = "library", cascade = CascadeType.ALL)
   private final Collection<LibraryDilution> libraryDilutions = new HashSet<>();
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
@@ -470,15 +469,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     return securityProfile;
   }
 
-  @Override
-  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    if (parent.getSecurityProfile().getOwner() != null) {
-      setSecurityProfile(parent.getSecurityProfile());
-    } else {
-      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
-    }
-  }
-
   @CoverageIgnore
   @Override
   public int compareTo(Library l) {
@@ -661,6 +651,21 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   public String getBarcodeSizeInfo() {
     return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getInitialConcentration(),
         getPlatformType().getLibraryConcentrationUnits());
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Library";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName() + (getAlias() == null ? "" : " (" + getAlias() + ")");
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    return getSecurityProfile();
   }
 
 }

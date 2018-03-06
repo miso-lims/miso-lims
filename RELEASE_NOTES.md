@@ -1,3 +1,11 @@
+# 0.2.111
+
+Changes:
+
+ * Remove items from a box before deletion
+ * Improve UI consistency in bulk HoT pages
+ * Change tick marks on per-cycle graphs
+
 # 0.2.110
 
 Changes:
