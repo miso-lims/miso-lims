@@ -654,6 +654,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     isMutated |= updateField(source.getNumCycles(), target.getNumCycles(), target::setNumCycles);
     isMutated |= updateField(source.getScoreCycle(), target.getScoreCycle(), target::setScoreCycle);
     isMutated |= updateField(source.getPairedEnd(), target.getPairedEnd(), target::setPairedEnd);
+    isMutated |= updateField(source.getRunBasesMask(), target.getRunBasesMask(), target::setRunBasesMask);
     return isMutated;
   }
 
