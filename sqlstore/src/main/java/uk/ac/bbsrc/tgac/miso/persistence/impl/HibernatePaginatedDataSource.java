@@ -52,7 +52,7 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     for (PaginationFilter filter : filters) {
       filter.apply(this, criteria, errorHandler);
     }
-    criteria.setProjection(Projections.rowCount());
+    criteria.setProjection(Projections.countDistinct("id"));
     return (Long) criteria.uniqueResult();
   }
 
