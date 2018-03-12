@@ -664,7 +664,7 @@
         position: [jQuery(window).width() / 2 - Box.dialogWidth / 2, 50],
         buttons: {
           "Retry": function() {
-            Box.initScan();
+            Box.initScan(scannerName);
           },
           "Cancel": function() {
             jQuery('#dialogDialog').dialog('close');
