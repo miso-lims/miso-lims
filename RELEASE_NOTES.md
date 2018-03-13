@@ -1,3 +1,11 @@
+# 0.2.112
+
+Changes:
+
+ * Allow users to delete Dilutions
+ * Fix error where box scanner retry failed
+ * Fix counts in some tables
+
 # 0.2.111
 
 Changes:
