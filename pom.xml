@@ -124,6 +124,7 @@
     <module>miso-dto</module>
     <module>runscanner</module>
     <module>miso-external-web</module>
+    <module>pinery-miso</module>
   </modules>
   <!-- SVN connection -->
   <scm>
