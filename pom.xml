@@ -140,16 +140,15 @@
   <!-- Maven repository deploy -->
   <distributionManagement>
     <repository>
-      <id>miso-releases</id>
-      <name>MISO repository</name>
-      <url>scp://repos.tgac.ac.uk/storage/html/maven/miso/releases</url>
+      <id>deploy.artifacts.oicr</id>
+      <name>OICR - MISO Releases</name>
+      <url>https://artifacts.oicr.on.ca/artifactory/miso-release</url>
     </repository>
     <snapshotRepository>
-      <id>miso-snapshots</id>
-      <name>MISO snapshot repository</name>
-      <url>scp://repos.tgac.ac.uk/storage/html/maven/miso/snapshots</url>
+      <id>deploy.artifacts.oicr</id>
+      <name>OICR - MISO Snapshots</name>
+      <url>https://artifacts.oicr.on.ca/artifactory/miso-snapshot</url>
     </snapshotRepository>
-    <downloadUrl>http://repos.tgac.ac.uk/maven/repo</downloadUrl>
   </distributionManagement>
   <properties>
     <skipUTs>${skipTests}</skipUTs>
@@ -174,11 +173,6 @@
         <groupId>aopalliance</groupId>
         <artifactId>aopalliance</artifactId>
         <version>1.0</version>
-      </dependency>
-      <dependency>
-        <groupId>ca.on.oicr.gsi</groupId>
-        <artifactId>metrix</artifactId>
-        <version>1.2-2016</version>
       </dependency>
       <dependency>
         <groupId>ca.on.oicr.gsi</groupId>
@@ -254,7 +248,7 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.1</version>
+        <version>2.5</version>
       </dependency>
       <dependency>
         <groupId>commons-lang</groupId>
@@ -857,6 +851,19 @@
       <id>dependencies.gsi</id>
       <name>OICR GSI Dependencies repository</name>
       <url>https://artifacts.oicr.on.ca/artifactory/gsi-dependencies</url>
+    </repository>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+      <id>GSI Release</id>
+      <name>OICR GSI Release repository</name>
+      <url>https://artifacts.oicr.on.ca/artifactory/gsi-release</url>
     </repository>
     <repository>
       <id>sonatype-sourceforge-snapshots</id>
