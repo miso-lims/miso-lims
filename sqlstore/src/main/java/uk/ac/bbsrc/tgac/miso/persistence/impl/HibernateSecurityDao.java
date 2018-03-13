@@ -126,6 +126,13 @@ public class HibernateSecurityDao implements SecurityStore {
   }
 
   @Override
+  public User getUserByFullName(String fullName) throws IOException {
+    Criteria criteria = currentSession().createCriteria(UserImpl.class);
+    criteria.add(Restrictions.eq("fullName", fullName));
+    return (User) criteria.uniqueResult();
+  }
+
+  @Override
   public Map<String, Integer> getUserColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, USER_TABLE_NAME);
   }

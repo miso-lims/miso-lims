@@ -46,11 +46,4 @@ public class AbstractLibraryTest {
     assertNotNull(al.getSecurityProfile());
   }
 
-  @Test(expected = SecurityException.class)
-  public void testInheritPermissionsException() {
-    final SecurableByProfile parent = Mockito.mock(SecurableByProfile.class);
-    final SecurityProfile mockSecurityProfile = Mockito.mock(SecurityProfile.class);
-    when(parent.getSecurityProfile()).thenReturn(mockSecurityProfile);
-    al.inheritPermissions(parent);
-  }
 }
