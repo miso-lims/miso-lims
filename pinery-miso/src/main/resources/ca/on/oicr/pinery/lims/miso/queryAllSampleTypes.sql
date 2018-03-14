@@ -6,8 +6,9 @@ SELECT sc.alias NAME
         ,COUNT(CASE WHEN sai.archived = true THEN sai.archived END) archivedCount 
         ,MIN(scl.creationDate) earliest 
         ,MAX(scl.lastUpdated) latest 
-FROM DetailedSample sai 
-JOIN SampleClass sc ON sc.sampleClassId = sai.sampleClassId 
+FROM Sample s
+LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId 
+LEFT JOIN SampleClass sc ON sc.sampleClassId = sai.sampleClassId 
 LEFT JOIN ( 
         SELECT sampleId, MAX(changeTime) lastUpdated, MIN(changeTime) creationDate  
         FROM SampleChangeLog GROUP BY sampleId 
@@ -25,8 +26,8 @@ SELECT NULL NAME
         ,MIN(l.creationDate) earliest 
         ,MAX(lcl.lastUpdated) latest 
 FROM Library l 
-JOIN DetailedLibrary lai ON lai.libraryId = l.libraryId 
-JOIN LibraryType lt ON lt.libraryTypeId = l.libraryType 
+LEFT JOIN DetailedLibrary lai ON lai.libraryId = l.libraryId 
+INNER JOIN LibraryType lt ON lt.libraryTypeId = l.libraryType 
 LEFT JOIN ( 
         SELECT libraryId, MAX(changeTime) lastUpdated 
         FROM LibraryChangeLog GROUP BY libraryId 
@@ -44,6 +45,6 @@ SELECT NULL NAME
         ,MIN(d.creationDate) earliest 
         ,MAX(d.lastUpdated) latest 
 FROM LibraryDilution d 
-LEFT JOIN Library l ON l.libraryId = d.library_libraryId 
-JOIN LibraryType lt ON lt.libraryTypeId = l.libraryType 
+INNER JOIN Library l ON l.libraryId = d.library_libraryId 
+INNER JOIN LibraryType lt ON lt.libraryTypeId = l.libraryType 
 GROUP BY l.libraryType

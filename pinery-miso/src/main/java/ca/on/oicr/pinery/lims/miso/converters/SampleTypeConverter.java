@@ -20,7 +20,7 @@ public class SampleTypeConverter {
   private static final String LIBRARY_TYPE_MATE_PAIR = "Mate Pair";
   private static final String LIBRARY_TYPE_TOTAL_RNA = "Total RNA";
 
-  private static enum IlluminaSampleType {
+  private enum IlluminaSampleType {
 
     SE("Illumina SE Library", "Illumina SE Library Seq"),
     PE("Illumina PE Library", "Illumina PE Library Seq"),
@@ -49,6 +49,10 @@ public class SampleTypeConverter {
 
   private static final String SAMPLE_TYPE_UNKNOWN = "Unknown";
 
+  private SampleTypeConverter() {
+    throw new IllegalStateException("Static utility class not intended for instantiation");
+  }
+
   /**
    * Translates a MISO Sample Class to a Pinery Sample Type
    * 
@@ -56,6 +60,9 @@ public class SampleTypeConverter {
    * @return the corresponding Pinery Sample Type String
    */
   public static String getSampleType(String misoSampleClass) {
+    if (misoSampleClass == null) {
+      return "Sample";
+    }
     return misoSampleClass
         .replace(" (stock)", "")
         .replace(" (aliquot)", "")
@@ -76,8 +83,7 @@ public class SampleTypeConverter {
       return SAMPLE_TYPE_UNKNOWN;
     }
 
-    switch (platformName) {
-    case PLATFORM_ILLUMINA:
+    if (PLATFORM_ILLUMINA.equals(platformName)) {
       IlluminaSampleType sType = null;
       if (libraryType == null) {
         log.debug("Cannot determine SampleType due to null libraryType");
@@ -107,7 +113,7 @@ public class SampleTypeConverter {
         sType = IlluminaSampleType.TOTAL_RNA;
         break;
       default:
-        log.debug("Unexpected LibraryType: " + libraryType + ", Cannot determine Sample Type");
+        log.debug("Unexpected LibraryType: {}, Cannot determine Sample Type", libraryType);
         return SAMPLE_TYPE_UNKNOWN;
       }
 
@@ -117,11 +123,11 @@ public class SampleTypeConverter {
       case MISO_TYPE_DILUTION:
         return sType.getDilutionType();
       default:
-        log.debug("Unexpected MISO type: " + misoType + ". Cannot determine Sample Type");
+        log.debug("Unexpected MISO type: {}. Cannot determine Sample Type", misoType);
         return SAMPLE_TYPE_UNKNOWN;
       }
-    default:
-      log.debug("Unknown platform: " + platformName + ". Cannot determine Sample Type");
+    } else {
+      log.debug("Unknown platform: {}. Cannot determine Sample Type", platformName);
       return SAMPLE_TYPE_UNKNOWN;
     }
   }
