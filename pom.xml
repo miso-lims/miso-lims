@@ -124,6 +124,7 @@
     <module>miso-dto</module>
     <module>runscanner</module>
     <module>miso-external-web</module>
+    <module>pinery-miso</module>
   </modules>
   <!-- SVN connection -->
   <scm>
@@ -857,6 +858,19 @@
       <id>dependencies.gsi</id>
       <name>OICR GSI Dependencies repository</name>
       <url>https://artifacts.oicr.on.ca/artifactory/gsi-dependencies</url>
+    </repository>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+      <id>releases.gsi</id>
+      <name>OICR GSI Releases repository</name>
+      <url>https://artifacts.oicr.on.ca/artifactory/gsi-release</url>
     </repository>
     <repository>
       <id>sonatype-sourceforge-snapshots</id>
