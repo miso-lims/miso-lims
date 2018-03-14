@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import ca.on.oicr.pinery.lims.miso.converters.SampleTypeConverter;
+
 public class NonSampleTypeConverterTest {
 
   @Test
