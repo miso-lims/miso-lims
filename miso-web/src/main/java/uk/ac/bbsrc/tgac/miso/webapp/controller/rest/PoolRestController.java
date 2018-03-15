@@ -289,4 +289,22 @@ public class PoolRestController extends RestController {
         message -> new RestException(message, Status.BAD_REQUEST));
   }
 
+  @RequestMapping(value = "/bulk-delete", method = RequestMethod.POST)
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    List<Pool> pools = new ArrayList<>();
+    for (Long id : ids) {
+      if (id == null) {
+        throw new RestException("Cannot delete null pool", Status.BAD_REQUEST);
+      }
+      Pool pool = poolService.get(id);
+      if (pool == null) {
+        throw new RestException("Pool " + id + " not found", Status.BAD_REQUEST);
+      }
+      pools.add(pool);
+    }
+    poolService.bulkDelete(pools);
+  }
+
 }

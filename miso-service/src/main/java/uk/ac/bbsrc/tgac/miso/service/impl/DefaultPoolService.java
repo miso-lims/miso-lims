@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
@@ -28,13 +29,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
@@ -49,6 +54,10 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   private AuthorizationManager authorizationManager;
   @Autowired
   private PoolStore poolStore;
+  @Autowired
+  private SecurityProfileStore securityProfileStore;
+  @Autowired
+  private DeletionStore deletionStore;
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
@@ -170,6 +179,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     long savedId;
     if (pool.getId() == PoolImpl.UNSAVED_ID) {
       pool.setName(generateTemporaryName());
+      loadSecurityProfile(pool);
       loadPooledElements(pool.getPoolableElementViews(), pool);
       setChangeDetails(pool);
       poolStore.save(pool);
@@ -225,6 +235,16 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     }
     boxService.updateBoxableLocation(pool);
     return savedId;
+  }
+
+  private void loadSecurityProfile(Pool pool) throws IOException {
+    if (pool.getSecurityProfile() == null) {
+      pool.setSecurityProfile(new SecurityProfile(authorizationManager.getCurrentUser()));
+    }
+    if (pool.getSecurityProfile().getProfileId() == SecurityProfile.UNSAVED_ID) {
+      pool.getSecurityProfile().setProfileId(securityProfileStore.save(pool.getSecurityProfile()));
+    }
+    pool.setSecurityProfile(securityProfileStore.get(pool.getSecurityProfile().getProfileId()));
   }
 
   /**
@@ -325,6 +345,33 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   @Override
   public Collection<Pool> listByIdList(List<Long> poolIds) throws IOException {
     return authorizationManager.filterUnreadable(poolStore.listPoolsById(poolIds));
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public BoxService getBoxService() {
+    return boxService;
+  }
+
+  @Override
+  public void authorizeDeletion(Pool object) throws IOException {
+    authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
+  @Override
+  public ValidationResult validateDeletion(Pool object) {
+    ValidationResult result = new ValidationResult();
+
+    long usage = poolStore.getPartitionCount(object);
+    if (usage > 0L) {
+      result.addError(new ValidationError("Pool '" + object.getName() + "' has been added to " + usage + " partitions"));
+    }
+
+    return result;
   }
 
 }

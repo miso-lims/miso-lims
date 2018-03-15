@@ -32,7 +32,25 @@ ListTarget.pool = {
   },
   queryUrl: "/miso/rest/pool/query",
   createBulkActions: function(config, projectId) {
-    return HotTarget.pool.getBulkActions(config);
+    var actions = HotTarget.pool.getBulkActions(config);
+    actions.push({
+      name: "Delete",
+      action: function(items) {
+        var lines = ['Are you sure you wish to delete the following pools? This cannot be undone.',
+            'Note: a pool may only be deleted by its creator or an admin.'];
+        var ids = [];
+        jQuery.each(items, function(index, pool) {
+          lines.push('* ' + pool.name + ' (' + pool.alias + ')');
+          ids.push(pool.id);
+        });
+        Utils.showConfirmDialog('Delete Pools', 'Delete', lines, function() {
+          Utils.ajaxWithDialog('Deleting Pools', 'POST', '/miso/rest/pool/bulk-delete', ids, function() {
+            window.location = window.location.origin + '/miso/pools';
+          });
+        });
+      }
+    });
+    return actions;
   },
   createStaticActions: function(config, prodjectId) {
     return [{

@@ -110,4 +110,7 @@ public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
   void addWatcher(Pool pool, User watcher);
 
   Collection<Pool> listPoolsById(List<Long> poolIds);
+
+  public long getPartitionCount(Pool pool);
+
 }
