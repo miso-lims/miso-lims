@@ -37,7 +37,7 @@ ListTarget.pool = {
       name: "Delete",
       action: function(items) {
         var lines = ['Are you sure you wish to delete the following pools? This cannot be undone.',
-            'Note: a pool may only be deleted by its creator or an admin.'];
+            'Any associated orders will also be deleted.', 'Note: a pool may only be deleted by its creator or an admin.'];
         var ids = [];
         jQuery.each(items, function(index, pool) {
           lines.push('* ' + pool.name + ' (' + pool.alias + ')');

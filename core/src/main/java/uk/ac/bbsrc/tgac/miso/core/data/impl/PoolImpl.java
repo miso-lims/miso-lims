@@ -154,7 +154,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long poolId = PoolImpl.UNSAVED_ID;
 
-  @OneToMany(targetEntity = PoolQC.class, mappedBy = "pool")
+  @OneToMany(targetEntity = PoolQC.class, mappedBy = "pool", cascade = CascadeType.REMOVE)
   private final Collection<PoolQC> poolQCs = new TreeSet<>();
 
   @OneToOne(optional = true)

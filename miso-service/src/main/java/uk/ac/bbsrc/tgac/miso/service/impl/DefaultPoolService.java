@@ -22,6 +22,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
@@ -36,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -68,6 +70,8 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   private SecurityManager securityManager;
   @Autowired
   private PoolableElementViewService poolableElementViewService;
+  @Autowired
+  private PoolOrderService poolOrderService;
 
   public void setAutoGenerateIdBarcodes(boolean autoGenerateIdBarcodes) {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
@@ -360,6 +364,13 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   @Override
   public void authorizeDeletion(Pool object) throws IOException {
     authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
+  @Override
+  public void beforeDelete(Pool object) throws IOException {
+    Set<PoolOrder> orders = poolOrderService.getByPool(object.getId());
+    poolOrderService.bulkDelete(orders);
+    PoolService.super.beforeDelete(object);
   }
 
   @Override
