@@ -65,10 +65,10 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RunDto;
-import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
@@ -151,10 +151,19 @@ public class RunRestController extends RestController {
     return Dtos.asDto(r);
   }
 
+  @RequestMapping(value = "{runId}/full", method = RequestMethod.GET, produces = "application/json")
+  public @ResponseBody RunDto getRunByIdFull(@PathVariable Long runId) throws IOException {
+    Run r = runService.get(runId);
+    if (r == null) {
+      throw new RestException("No run found with ID: " + runId, Status.NOT_FOUND);
+    }
+    return Dtos.asDto(r, true, true, true);
+  }
+
   @RequestMapping(value = "{runId}/containers", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody List<ContainerDto> getContainersByRunId(@PathVariable Long runId) throws IOException {
     Collection<SequencerPartitionContainer> cc = containerService.listByRunId(runId);
-    return Dtos.asContainerDtos(cc);
+    return Dtos.asContainerDtos(cc, true, true);
   }
 
   @RequestMapping(value = "/alias/{runAlias}", method = RequestMethod.GET, produces = "application/json")
