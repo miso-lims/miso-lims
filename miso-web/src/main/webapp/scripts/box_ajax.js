@@ -488,19 +488,13 @@ Box.ui = {
   },
 
   discardEntireBox: function(boxId) {
-
+    var url = "/miso/rest/box/" + boxId + "/discard-all";
     var discardBox = function() {
-      Fluxion.doAjax('boxControllerHelperService', 'discardEntireBox', {
-        'boxId': boxId,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': Utils.page.pageReload,
-        'doOnError': function(json) {
-          Utils.showOkDialog('Error discarding box', [json.error]);
-        }
+      Utils.ajaxWithDialog('Discard All Tubes', 'POST', url, null, function() {
+        Utils.page.pageReload();
       });
     };
-    Utils.showConfirmDialog('Discard Entire Box', 'Discard', ["Are you sure you wish to discard all tubes in this box?"], discardBox);
+    Utils.showConfirmDialog("Discard All Tubes", "Discard", ["Are you sure you wish to discard all tubes in this box?"], discardBox);
   },
 
   searchBoxables: function() {

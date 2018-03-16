@@ -173,33 +173,6 @@ public class BoxControllerHelperServiceTest {
     verify(boxService).discardSingleTube(box, "A01");
   }
 
-  @Test
-  public void testEmptyEntireBox() throws Exception {
-    Box box = makeEmptyBox();
-    BoxableView sample = makeSampleView();
-    box.setBoxable("A01", sample);
-    BoxableView library = makeLibraryView();
-    box.setBoxable("A02", library);
-    assertEquals(2, box.getTubeCount());
-    assertFalse(sample.isDiscarded());
-    assertFalse(library.isDiscarded());
-    when(boxService.get(box.getId())).thenReturn(box);
-
-    JSONObject json = new JSONObject();
-    json.put("boxId", box.getId());
-
-    User user = new UserImpl();
-    user.setAdmin(true);
-    when(authorizationManager.getCurrentUser()).thenReturn(user);
-
-    JSONObject response = boxControllerHelperService.discardEntireBox(null, json);
-    System.out.println(response.toString(2));
-    assertFalse(response.has("error"));
-    assertTrue(response.has("boxJSON"));
-    verify(boxService).discardAllTubes(box);
-    // box DAO is responsible for actually emptying and removing the tubes
-  }
-
   private static Sample makeSample() {
     Sample sample = new SampleImpl();
     sample.setId(1L);

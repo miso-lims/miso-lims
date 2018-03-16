@@ -106,8 +106,8 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   private void applyChanges(BoxableView from, Boxable to, User currentUser) {
-    to.setDiscarded(from.isDiscarded());
     to.setVolume(from.getVolume());
+    to.setDiscarded(from.isDiscarded());
     to.setLastModified(new Date());
     to.setLastModifier(currentUser);
   }
