@@ -593,7 +593,7 @@ public class BoxRestController extends RestController {
     if (box == null) {
       throw new RestException("Box " + boxId + " not found", Status.NOT_FOUND);
     }
-    boxService.discardAllTubes(box);
+    boxService.discardAllContents(box);
   }
 
 }

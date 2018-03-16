@@ -63,9 +63,9 @@ public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
 
   Collection<BoxSize> listAllBoxSizes() throws IOException;
 
-  void discardSingleTube(Box box, String position, User currentUser) throws IOException;
+  void discardSingleItem(Box box, String position, User currentUser) throws IOException;
 
-  void discardAllTubes(Box box, User currentUser) throws IOException;
+  void discardAllContents(Box box, User currentUser) throws IOException;
   
   void removeBoxableFromBox(Boxable boxable) throws IOException;
 

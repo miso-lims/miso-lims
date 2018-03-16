@@ -194,7 +194,7 @@ public class BoxControllerHelperService {
    *          </p>
    * @return JSONObject message indicating failure or success
    */
-  public JSONObject removeTubeFromBox(HttpSession session, JSONObject json) {
+  public JSONObject removeItemFromBox(HttpSession session, JSONObject json) {
     if (!json.has("boxId") || !json.has("position")) {
       return JSONUtils.SimpleJSONError("Invalid boxId or position given.");
     }
@@ -238,7 +238,7 @@ public class BoxControllerHelperService {
    *          session, JSONObject json
    * @returns JSONObject message indicating failure or success
    */
-  public JSONObject discardSingleTube(HttpSession session, JSONObject json) {
+  public JSONObject discardSingleItem(HttpSession session, JSONObject json) {
     User user;
     Box box;
     JSONObject response = new JSONObject();
@@ -268,7 +268,7 @@ public class BoxControllerHelperService {
         }
 
         try {
-          boxService.discardSingleTube(box, position);
+          boxService.discardSingleItem(box, position);
           box = boxService.get(boxId);
           ObjectMapper mapper = new ObjectMapper();
           response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()), true)));

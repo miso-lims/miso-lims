@@ -144,7 +144,7 @@ public class BoxControllerHelperServiceTest {
 
     assertNotNull(box.getBoxable("A01"));
 
-    JSONObject response = boxControllerHelperService.removeTubeFromBox(null, json);
+    JSONObject response = boxControllerHelperService.removeItemFromBox(null, json);
     assertFalse(response.has("error"));
     assertTrue(response.has("boxJSON"));
 
@@ -167,10 +167,10 @@ public class BoxControllerHelperServiceTest {
     assertNotNull(box.getBoxable("A01"));
     assertFalse(sample.isDiscarded());
 
-    JSONObject response = boxControllerHelperService.discardSingleTube(null, json);
+    JSONObject response = boxControllerHelperService.discardSingleItem(null, json);
     assertFalse(response.has("error"));
     assertTrue(response.has("boxJSON"));
-    verify(boxService).discardSingleTube(box, "A01");
+    verify(boxService).discardSingleItem(box, "A01");
   }
 
   private static Sample makeSample() {

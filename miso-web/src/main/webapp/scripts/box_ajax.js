@@ -11,7 +11,7 @@ var Box = Box
         jQuery('#dialogInfoBelow').html('');
         jQuery('#dialogInfoAbove')
             .html(
-                '<p>Please enter the prefix for your bacodes (e.g., MYBOX for MYBOXA01, MYBOXA02, ...). Existing tubes with barcodes matching this pattern will be added to the box in positions depending on the suffix.</p>');
+                '<p>Please enter the prefix for your bacodes (e.g., MYBOX for MYBOXA01, MYBOXA02, ...). Existing items with barcodes matching this pattern will be added to the box in positions depending on the suffix.</p>');
         jQuery('#dialogVisual')
             .html(
                 '<p>Prefix: <input id="prefix" type="text"/></p><p>Suffix: <input type="radio" name="suffix" id="standardSuffix" value="standard"/><label for="standardSuffix"> Standard (A01, A02, ... as row letter/column number)</label> <input type="radio" name="suffix" id="numericSuffix" value="numeric"/><label for="numericSuffix"> Numeric (001, 002, ... moving in rows)</label></p>');
@@ -284,11 +284,11 @@ Box.ui = {
     if (entityTypes.length > 1) {
       if (positionStrings) {
         // heterogenous items are selected
-        addToolbarMemo("Selection contains multiple types of tubes. Select tubes of the same type to see bulk actions.");
+        addToolbarMemo("Selection contains multiple types of items. Select items of the same type to see bulk actions.");
         return;
       } else {
         // no items are selected, but box contains heterogenous items
-        addToolbarMemo("Box contains multiple types of tubes. Select tubes of same type to see bulk actions.");
+        addToolbarMemo("Box contains multiple types of items. Select items of same type to see bulk actions.");
         return;
       }
     }
@@ -431,7 +431,7 @@ Box.ui = {
 
   removeOneItem: function() {
     if (Box.visual.selectedItems.length !== 1) {
-      Utils.showOkDialog('Too many tubes selected', ['Select a single tube to remove.']);
+      Utils.showOkDialog('Too many items selected', ['Select a single item to remove.']);
       return;
     }
     var selectedPosition = Box.utils.getPositionString(Box.visual.selectedItems[0].row, Box.visual.selectedItems[0].col);
@@ -441,7 +441,7 @@ Box.ui = {
       jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
       jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
 
-      Fluxion.doAjax('boxControllerHelperService', 'removeTubeFromBox', {
+      Fluxion.doAjax('boxControllerHelperService', 'removeItemFromBox', {
         'boxId': Box.boxId,
         'position': selectedPosition,
         'url': ajaxurl
@@ -461,7 +461,7 @@ Box.ui = {
 
   discardOneItem: function() {
     if (Box.visual.selectedItems.length !== 1) {
-      Utils.showOkDialog('Too many tubes selected', ['Select a single tube to discard']);
+      Utils.showOkDialog('Too many items selected', ['Select a single item to discard']);
       return;
     }
 
@@ -471,30 +471,30 @@ Box.ui = {
       jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
       jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
 
-      Fluxion.doAjax('boxControllerHelperService', 'discardSingleTube', {
+      Fluxion.doAjax('boxControllerHelperService', 'discardSingleItem', {
         'boxId': Box.boxId,
         'position': selectedPosition,
         'url': ajaxurl
       }, {
         'doOnSuccess': Utils.page.pageReload,
         'doOnError': function(json) {
-          Utils.showOkDialog('Error discarding tube', [json.error]);
+          Utils.showOkDialog('Error discarding item', [json.error]);
           jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
         }
       });
     }
 
-    Utils.showConfirmDialog('Discard Item', 'Discard', ["Are you sure you wish to discard this tube?"], discardIt);
+    Utils.showConfirmDialog('Discard Item', 'Discard', ["Are you sure you wish to discard this item?"], discardIt);
   },
 
-  discardEntireBox: function(boxId) {
+  discardAllContents: function(boxId) {
     var url = "/miso/rest/box/" + boxId + "/discard-all";
     var discardBox = function() {
-      Utils.ajaxWithDialog('Discard All Tubes', 'POST', url, null, function() {
+      Utils.ajaxWithDialog('Discard All Contents', 'POST', url, null, function() {
         Utils.page.pageReload();
       });
     };
-    Utils.showConfirmDialog("Discard All Tubes", "Discard", ["Are you sure you wish to discard all tubes in this box?"], discardBox);
+    Utils.showConfirmDialog("Discard All Contents", "Discard", ["Are you sure you wish to discard all contents of this box?"], discardBox);
   },
 
   searchBoxables: function() {
