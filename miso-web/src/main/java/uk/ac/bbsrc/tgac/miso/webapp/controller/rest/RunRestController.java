@@ -54,7 +54,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
@@ -69,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RunDto;
+import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
@@ -121,6 +121,8 @@ public class RunRestController extends RestController {
   @Autowired
   private RunService runService;
   @Autowired
+  private ContainerService containerService;
+  @Autowired
   private PartitionQCService partitionQCService;
 
   private final JQueryDataTableBackend<Run, RunDto> jQueryBackend = new JQueryDataTableBackend<Run, RunDto>() {
@@ -135,31 +137,33 @@ public class RunRestController extends RestController {
       return runService;
     }
   };
-  @Autowired
-  private ContainerService containerService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
 
   @RequestMapping(value = "{runId}", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody String getRunById(@PathVariable Long runId) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
+  public @ResponseBody RunDto getRunById(@PathVariable Long runId) throws IOException {
     Run r = runService.get(runId);
     if (r == null) {
       throw new RestException("No run found with ID: " + runId, Status.NOT_FOUND);
     }
-    return mapper.writeValueAsString(r);
+    return Dtos.asDto(r);
+  }
+
+  @RequestMapping(value = "{runId}/containers", method = RequestMethod.GET, produces = "application/json")
+  public @ResponseBody List<ContainerDto> getContainersByRunId(@PathVariable Long runId) throws IOException {
+    Collection<SequencerPartitionContainer> cc = containerService.listByRunId(runId);
+    return Dtos.asContainerDtos(cc);
   }
 
   @RequestMapping(value = "/alias/{runAlias}", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody String getRunByAlias(@PathVariable String runAlias) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
+  public @ResponseBody RunDto getRunByAlias(@PathVariable String runAlias) throws IOException {
     Run r = runService.getRunByAlias(runAlias);
     if (r == null) {
       throw new RestException("No run found with alias: " + runAlias, Status.NOT_FOUND);
     }
-    return mapper.writeValueAsString(r);
+    return Dtos.asDto(r);
   }
 
   @RequestMapping(value = "/{runId}/samplesheet", method = RequestMethod.GET)
@@ -205,10 +209,9 @@ public class RunRestController extends RestController {
   }
 
   @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody String listAllRuns() throws IOException {
+  public @ResponseBody List<RunDto> listAllRuns() throws IOException {
     Collection<Run> lr = runService.list();
-    ObjectMapper mapper = new ObjectMapper();
-    return mapper.writeValueAsString(lr);
+    return Dtos.asRunDtos(lr);
   }
 
   @RequestMapping(value = "/dt", method = RequestMethod.GET, produces = "application/json")
