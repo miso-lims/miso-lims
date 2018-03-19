@@ -476,6 +476,11 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     } else {
       library.setLastModified(now);
     }
+
+    // if receivedDate exists, creationDate (non-nullable) will be hidden from the user so we set it here
+    if (library.getReceivedDate() != null) {
+      library.setCreationDate(library.getReceivedDate());
+    }
   }
 
   /**
