@@ -198,9 +198,135 @@ Box.scan = {
 }
 
 Box.ui = {
+
+  onSelectionChanged: function(items, singleBoxable) {
+    jQuery('#singlePositionControls').hide();
+    jQuery('#bulkPositionControls').hide();
+
+    var positions = items.map(function(item) {
+      return Box.utils.getPositionString(item.row, item.col);
+    });
+    Box.ui.filterTableByBoxPositions(positions);
+    Box.ui.clearBoxableSearchResults();
+
+    if (singleBoxable) {
+      // filled position selected
+      jQuery('#singlePositionControls').show();
+      jQuery('#selectedPosition').text(positions[0]);
+      jQuery('#selectedName').text(singleBoxable.name);
+      if (singleBoxable.identificationBarcode) {
+        jQuery('#selectedBarcode').text(singleBoxable.identificationBarcode);
+      } else {
+        jQuery('#selectedBarcode').empty();
+      }
+      jQuery('#selectedAlias').html(Box.utils.hyperlinkifyBoxable(singleBoxable.name, singleBoxable.id, singleBoxable.alias));
+      jQuery('#selectedName').html(Box.utils.hyperlinkifyBoxable(singleBoxable.name, singleBoxable.id, singleBoxable.name));
+      jQuery('#removeSelected, #emptySelected, #searchField, #search').prop('disabled', false).removeClass('disabled');
+    } else {
+      // empty position, no positions, or multiple positions selected
+      if (positions.length > 1) {
+        Box.ui.showBulkUpdateTable(positions);
+      } else if (positions.length === 1) {
+        jQuery('#singlePositionControls').show();
+        jQuery('#selectedPosition').text(positions[0]);
+      } else {
+        jQuery('#selectedPosition').empty();
+        jQuery('#search, #searchField, #resultSelect, #updateSelected').prop('disabled', true).addClass('disabled');
+      }
+      jQuery('#selectedName').empty();
+      jQuery('#selectedAlias').empty();
+      jQuery('#selectedBarcode').empty();
+      jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
+    }
+    jQuery('#warningMessages').html('');
+    jQuery('#searchField').val('');
+    jQuery('#searchField').select().focus();
+  },
+
+  showBulkUpdateTable: function(positions) {
+    jQuery('#bulkUpdateTable tbody').empty();
+    jQuery('#bulkPositionControls').show();
+
+    for (var i = 0; i < positions.length; i++) {
+      var pos = positions[i];
+      var tr = jQuery('<tr>');
+      tr.append(jQuery('<td>' + pos + '</td>'));
+      var td = jQuery('<td>');
+      var input = jQuery('<input type="text" class="bulkUpdateInput"/>')
+      input.data('position', pos);
+      if (i < positions.length - 1) {
+        input.keyup((function(event) {
+          var index = i;
+          return function(event) {
+            if (event.which == "13") {
+              jQuery('#bulkUpdateTable tbody input:eq(' + (index + 1) + ')').focus();
+            }
+          };
+        })());
+        input.on('paste', (function(e) {
+          var index = i;
+          return function(e) {
+            window.setTimeout(function() {
+              jQuery('#bulkUpdateTable tbody input:eq(' + (index + 1) + ')').focus();
+            }, 100);
+          }
+        })());
+      } else {
+        input.keyup(function(event) {
+          if (event.which == "13") {
+            jQuery('#bulkUpdate').click();
+          }
+        });
+      }
+      td.append(input);
+      tr.append(td);
+      jQuery('#bulkUpdateTable tbody').append(tr);
+      if (i === 0) {
+        input.focus();
+      }
+    }
+    jQuery('#bulkUpdateInput').click(function() {
+      $(this).select();
+    });
+  },
+
   changeBoxListing: function(alias) {
     var table = jQuery('#listingBoxesTable').dataTable();
     table.fnFilter(alias, 5);
+  },
+
+  bulkUpdatePositions: function() {
+    var data = [];
+    var inputs = jQuery('#bulkUpdateTable tbody input');
+    inputs.each(function(index, input) {
+      data.push({
+        position: jQuery(input).data('position'),
+        searchString: jQuery(input).val()
+      })
+    });
+    var positions = data.map(function(item) {
+      return item.position;
+    });
+    var currentOccupants = Box.boxJSON.items.filter(function(boxable) {
+      return positions.indexOf(boxable.coordinates) >= 0;
+    });
+    var doUpdate = function() {
+      var url = '/miso/rest/box/' + Box.boxJSON.id + '/bulk-update';
+      Utils.ajaxWithDialog('Update Positions', 'POST', url, data, function(responseData) {
+        Box.boxJSON = responseData;
+        Box.update();
+      });
+    };
+    if (currentOccupants.length) {
+      var lines = ['Some of these positions already contain other items:'];
+      currentOccupants.forEach(function(item) {
+        lines.push('* ' + item.coordinates + ': ' + item.name + ' (' + item.alias + ')');
+      });
+      lines.push('Are you sure you wish to replace them?');
+      Utils.showConfirmDialog('Replace Items', 'Replace', lines, doUpdate);
+    } else {
+      doUpdate();
+    }
   },
 
   // creates the table of the box contents
