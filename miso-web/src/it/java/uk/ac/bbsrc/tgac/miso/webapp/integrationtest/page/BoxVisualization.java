@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,6 +11,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.slf4j.Logger;
@@ -53,6 +55,16 @@ public class BoxVisualization extends AbstractElement {
   public void selectPosition(String position) {
     WebElement selected = getPosition(getRowLabel(position), getColLabel(position));
     selected.click();
+  }
+
+  public void selectPositions(Collection<String> positions) {
+    Actions actions = new Actions(getDriver());
+    actions.keyDown(Keys.LEFT_CONTROL);
+    positions.stream()
+        .map(pos -> getPosition(getRowLabel(pos), getColLabel(pos)))
+        .forEach(element -> actions.click(element));
+    actions.keyUp(Keys.LEFT_CONTROL);
+    actions.build().perform();
   }
 
   public boolean isEmptyPosition(String position) {

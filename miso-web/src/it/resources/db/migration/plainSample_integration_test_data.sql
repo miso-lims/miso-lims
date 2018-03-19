@@ -1,50 +1,6 @@
--- fixes BeforeInsertPool trigger created in V0004
-DROP TRIGGER IF EXISTS BeforeInsertPool;
-
-DELETE FROM `ReferenceGenome`;
-DELETE FROM SampleValidRelationship;
-DELETE FROM LibraryDesign;
-DELETE FROM SampleClass;
-DELETE FROM TissueMaterial;
-DELETE FROM TissueOrigin;
-DELETE FROM TissueType;
-DELETE FROM Lab;
-DELETE FROM Institute;
-DELETE FROM Stain;
-DELETE FROM SamplePurpose;
-DELETE FROM DetailedQcStatus;
-DELETE FROM QCType;
-DELETE FROM LibraryType;
-DELETE FROM LibrarySelectionType;
-DELETE FROM LibraryStrategyType;
-DELETE FROM LibraryDesignCode;
-DELETE FROM TargetedSequencing_KitDescriptor;
-DELETE FROM TargetedSequencing;
-DELETE FROM KitDescriptorChangeLog;
-DELETE FROM KitDescriptor;
-DELETE FROM BoxUse;
-DELETE FROM BoxSize;
-DELETE FROM `_Group`;
-DELETE FROM `SecurityProfile`;
-DELETE FROM `SecurityProfile_ReadGroup`;
-DELETE FROM `SecurityProfile_WriteGroup`;
-DELETE FROM `SecurityProfile_ReadUser`;
-DELETE FROM `SecurityProfile_WriteUser`;
-DELETE FROM Indices;
-DELETE FROM IndexFamily;
-DELETE FROM SequencingParameters;
-DELETE FROM PlatformSizes;
-DELETE FROM Instrument WHERE upgradedInstrumentId IS NOT NULL;
-DELETE FROM Instrument;
-DELETE FROM Platform;
-DELETE FROM ProjectOverview;
-DELETE FROM Project;
-DELETE FROM Note;
-DELETE FROM Library_Note;
-DELETE FROM Pool_Note;
-
-INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `password`, `email`)
-VALUES (3,1,0,0,'user',1,'user','user','user@user.user');
+INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `roles`, `password`, `email`) VALUES
+(1,1,1,0,'admin',1,'admin','ROLE_ADMIN,ROLE_INTERNAL','d033e22ae348aeb5660fc2140aec35850c4da997','admin@admin'),
+(3,1,0,0,'user',1,'user','ROLE_INTERNAL','user','user@user.user');
 
 INSERT INTO `_Group` (description, name) VALUES
 ('TestGroup1', 'TestGroup1'), ('TestGroup2', 'TestGroup2');

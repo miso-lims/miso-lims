@@ -54,6 +54,11 @@ public class PlainSampleITs extends AbstractIT {
     loginAdmin();
   }
 
+  @Override
+  protected boolean isDetailedSampleMode() {
+    return false;
+  }
+
   @Test
   public void testCreatePlainSampleSetup() {
     // Goal: ensure all expected fields are present and no extra, and that dropdowns appear as expected
