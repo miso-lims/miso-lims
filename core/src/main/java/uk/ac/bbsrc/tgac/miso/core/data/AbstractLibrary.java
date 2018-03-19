@@ -94,6 +94,9 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Column(nullable = false)
   @Temporal(TemporalType.DATE)
+  /**
+   * Displayed to user as "propagation date" if receivedDate is null; hidden otherwise
+   */
   private Date creationDate = new Date();
 
   private String identificationBarcode;

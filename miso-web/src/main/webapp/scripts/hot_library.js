@@ -217,6 +217,30 @@ HotTarget.library = (function() {
               lib.receivedDate = flat.receivedDate;
             }
           },
+          {
+            header: 'Date of propagation',
+            data: 'creationDate',
+            type: 'date',
+            dateFormat: 'YYYY-MM-DD',
+            datePickerConfig: {
+              firstDay: 0,
+              numberOfMonths: 1
+            },
+            allowEmpty: false,
+            include: !config.isLibraryReceipt,
+            unpack: function(lib, flat, setCellMeta) {
+              if (lib.receivedDate) {
+                // no way of knowing if given libraries have propagation or received dates, so need to set this on a per-library basis
+                setCellMeta('readOnly', true);
+                setCellMeta('allowEmpty', true);
+              } else {
+                flat.creationDate = Utils.valOrNull(lib.creationDate);
+              }
+            },
+            pack: function(lib, flat, errorHandler) {
+              lib.creationDate = flat.creationDate;
+            }
+          },
           HotUtils.makeColumnForText('Group ID', Constants.isDetailedSample, 'groupId', {
             validator: HotUtils.validator.optionalTextAlphanumeric
           }),

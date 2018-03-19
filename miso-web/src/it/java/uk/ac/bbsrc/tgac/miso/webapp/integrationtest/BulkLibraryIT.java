@@ -41,9 +41,11 @@ public class BulkLibraryIT extends AbstractIT {
       LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2,
       LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.VOLUME, LibColumns.CONCENTRATION);
 
-  private static final Set<String> editColumns = Sets.newHashSet(LibColumns.RECEIVE_DATE, LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION);
+  private static final Set<String> editColumns = Sets.newHashSet(LibColumns.RECEIVE_DATE, LibColumns.SAMPLE_ALIAS,
+      LibColumns.SAMPLE_LOCATION, LibColumns.PROPAGATE_DATE, LibColumns.RECEIVE_DATE);
 
-  private static final Set<String> propagateColumns = Sets.newHashSet(LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION);
+  private static final Set<String> propagateColumns = Sets.newHashSet(LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
+      LibColumns.PROPAGATE_DATE);
 
   private static final Set<String> receiptColumns = Sets.newHashSet(SamColumns.SAMPLE_TYPE,
       SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.EXTERNAL_NAME,
@@ -294,6 +296,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
     attrs.put(LibColumns.SIZE, "205");
     attrs.put(LibColumns.QC_PASSED, "Unknown");
+    attrs.put(LibColumns.PROPAGATE_DATE, "2018-03-19");
 
     fillRow(table, 0, attrs);
     fillRow(table, 1, attrs);
@@ -343,6 +346,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.SIZE, "251");
     attrs.put(LibColumns.VOLUME, "2.5");
     attrs.put(LibColumns.CONCENTRATION, "10.0");
+    attrs.put(LibColumns.PROPAGATE_DATE, "2017-07-24");
     assertColumnValues(table, 0, attrs, "loaded");
 
     Map<String, String> changes = Maps.newLinkedHashMap();
@@ -358,12 +362,14 @@ public class BulkLibraryIT extends AbstractIT {
     changes.put(LibColumns.SIZE, "241");
     changes.put(LibColumns.VOLUME, "1.88");
     changes.put(LibColumns.CONCENTRATION, "12.34");
+    attrs.put(LibColumns.PROPAGATE_DATE, "2017-07-22");
     fillRow(table, 0, changes);
 
     // unchanged
     changes.put(LibColumns.NAME, "LIB100001");
     changes.put(LibColumns.SAMPLE_ALIAS, "LIBT_0001_Ly_P_1-1_D1");
     changes.put(LibColumns.PLATFORM, "Illumina");
+    attrs.put(LibColumns.PROPAGATE_DATE, "2017-07-24");
 
     // set based on other changes
     changes.put(LibColumns.CODE, "EX");
@@ -404,6 +410,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.SIZE, "252");
     attrs.put(LibColumns.VOLUME, "4.0");
     attrs.put(LibColumns.CONCENTRATION, "6.3");
+    attrs.put(LibColumns.PROPAGATE_DATE, "2017-07-24");
     assertColumnValues(table, 0, attrs, "loaded");
 
     // make changes
@@ -464,6 +471,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.SIZE, null);
     attrs.put(LibColumns.VOLUME, null);
     attrs.put(LibColumns.CONCENTRATION, null);
+    attrs.put(LibColumns.PROPAGATE_DATE, "2017-07-24");
     assertColumnValues(table, 0, attrs, "loaded");
 
     Map<String, String> changes = Maps.newLinkedHashMap();
@@ -562,6 +570,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
     attrs.put(LibColumns.SIZE, "207");
     attrs.put(LibColumns.QC_PASSED, "Unknown");
+    attrs.put(LibColumns.PROPAGATE_DATE, "2017-07-24");
     fillRow(table, 0, attrs);
     assertColumnValues(table, 0, attrs, "pre-save");
 

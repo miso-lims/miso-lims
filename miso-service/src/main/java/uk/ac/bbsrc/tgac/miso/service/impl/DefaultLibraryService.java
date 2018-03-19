@@ -518,6 +518,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       target.setKitDescriptor(null);
     }
     target.setReceivedDate(source.getReceivedDate());
+    target.setCreationDate(source.getCreationDate());
 
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;
