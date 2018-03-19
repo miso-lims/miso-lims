@@ -270,7 +270,7 @@ public class BoxPageIT extends AbstractIT {
 
     LibraryDilution boxable = (LibraryDilution) getSession().get(LibraryDilution.class, 504L);
     assertTrue("check that boxable is discarded", boxable.isDiscarded());
-    assertTrue("check that boxable volume is null", boxable.getVolume() == null);
+    assertTrue("check that boxable volume is null", boxable.getVolume().equals(Double.valueOf(0D)));
     assertEquals("check that boxable location is empty", "EMPTY", BoxUtils.makeLocationLabel(boxable));
   }
 

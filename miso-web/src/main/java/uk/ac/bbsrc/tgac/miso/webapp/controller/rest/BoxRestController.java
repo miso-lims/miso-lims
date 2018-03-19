@@ -59,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
 @Controller
@@ -69,6 +70,9 @@ public class BoxRestController extends RestController {
 
   @Autowired
   private MisoFilesManager misoFileManager;
+
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   @Autowired
   private SampleService sampleService;
@@ -580,6 +584,16 @@ public class BoxRestController extends RestController {
 
   private static boolean isRealBarcode(BoxScan scan, String barcode) {
     return !barcode.equals(scan.getNoTubeLabel()) && !barcode.equals(scan.getNoReadLabel());
+  }
+
+  @RequestMapping(value = "/box/{boxId}/discard-all")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void discardEntireBox(@PathVariable long boxId) throws IOException {
+    Box box = boxService.get(boxId);
+    if (box == null) {
+      throw new RestException("Box " + boxId + " not found", Status.NOT_FOUND);
+    }
+    boxService.discardAllContents(box);
   }
 
 }
