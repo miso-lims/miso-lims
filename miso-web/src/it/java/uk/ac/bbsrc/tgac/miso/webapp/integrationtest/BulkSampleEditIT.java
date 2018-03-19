@@ -187,7 +187,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     editable.put(SamColumns.PASSAGE_NUMBER, "1300");
     editable.put(SamColumns.TIMES_RECEIVED, "200");
     editable.put(SamColumns.TUBE_NUMBER, "200");
-    editable.put(SamColumns.LAB, "Pathology (University Health Network)");
+    editable.put(SamColumns.LAB, "BioBank (University Health Network)");
     editable.put(SamColumns.SECONDARY_ID, "changed");
     editable.put(SamColumns.TISSUE_MATERIAL, "Blood");
     editable.put(SamColumns.REGION, "changed");
