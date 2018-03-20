@@ -162,7 +162,7 @@
 </div>
 <div id="boxContentsDiagram">
   <div id="boxContentsTable" class="unselectable" style="float:left;"></div>
-  <div style="float:left;padding:20px;">
+  <div id="singlePositionControls" style="float:left;padding:20px;">
     <table id="selectedPositionInfo">
 	    <tr>
 	      <td>Selected Position:</td><td><span id="selectedPosition"></span></td>
@@ -200,13 +200,37 @@
         </tr>
     </table>
     <p class="warning" id="warningMessages"></p>
-    <p>Hold down Control (Windows, Linux) or Command (Mac) to select multiple positions.<br/>
-       Click row or column header to select entire row or column.</p>
   </div>
+  <div id="bulkPositionControls" style="float:left;padding:20px;">
+    <table id="bulkUpdateTable">
+      <thead>
+        <tr>
+          <th>Position</th>
+          <th>Search</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- contents added via js -->
+      </tbody>
+      <tfoot>
+        <tr>
+          <td></td>
+          <td>
+            <button id="bulkUpdate" class="ui-state-default" onclick="Box.ui.bulkUpdatePositions();">Update</button>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <p style="clear: both;">
+    Hold down Control (Windows, Linux) or Command (Mac) to select multiple positions.<br/>
+    Click row or column header to select entire row or column.
+  </p>
+  <br/>
 </div>
 
 <script type="text/javascript">
-  Box.visual = new Box.Visual();
+  Box.visual = new Box.Visual(Box.ui.onSelectionChanged);
   jQuery(document).ready(function() {
     Box.boxJSON = ${boxJSON};
     Box.boxId = ${box.id};

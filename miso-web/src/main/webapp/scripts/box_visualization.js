@@ -113,6 +113,18 @@
       self.selectedItems = [];
     };
 
+    var callSelectionChanged = function(items) {
+      var singleBoxable = null;
+      if (items && items.length === 1) {
+        var pos = self.getPositionString(items[0].row, items[0].col);
+        var boxables = self.data.filter(function(item) {
+          return item.coordinates === pos;
+        });
+        singleBoxable = boxables[0];
+      }
+      self.onSelectionChanged(items, singleBoxable);
+    };
+
     self.select = function(item, skipCallback) {
       if (disabled) {
         return;
@@ -120,7 +132,7 @@
       item.select();
       self.selectedItems.push(item);
       if (!skipCallback) {
-        self.onSelectionChanged(self.selectedItems);
+        callSelectionChanged(self.selectedItems);
       }
     };
 
@@ -133,7 +145,7 @@
         return selectedItem !== item
       });
       if (!skipCallback) {
-        self.onSelectionChanged(self.selectedItems);
+        callSelectionChanged(self.selectedItems);
       }
     };
 
@@ -203,9 +215,8 @@
         tBody.append(tRow);
       }
       jQuery(self.table).append(tBody);
-      jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
       self.clearSelection();
-      self.onSelectionChanged(self.selectedItems);
+      callSelectionChanged(self.selectedItems);
     };
 
     var toggleGroupSelection = function(event, items) {
@@ -224,7 +235,7 @@
           self.unselect(items[i], true);
         }
       }
-      self.onSelectionChanged(self.selectedItems);
+      callSelectionChanged(self.selectedItems);
     };
 
     self.selectRow = function(event) {
@@ -265,7 +276,7 @@
       return new BoxPosition(opts);
     };
 
-    self.onSelectionChanged = function(items) {
+    self.onSelectionChanged = function(items, singleBoxable) {
     };
 
     self.setDisabled = function(disable) {
@@ -347,7 +358,7 @@
     return self;
   };
 
-  Box.Visual = function() {
+  Box.Visual = function(selectionChangedCallback) {
     var self = new BoxVisual();
 
     // @Override
@@ -372,48 +383,8 @@
       }
     };
 
-    self.onSelectionChanged = function(items) {
-      var positions = items.map(function(item) {
-        return self.getPositionString(item.row, item.col);
-      });
-      Box.ui.filterTableByBoxPositions(positions);
-
-      var boxables = null;
-      if (positions.length === 1) {
-        boxables = self.data.filter(function(item) {
-          return item.coordinates === positions[0]
-        });
-      }
-
-      Box.ui.clearBoxableSearchResults();
-      if (boxables && boxables.length > 0) {
-        // filled position selected
-        jQuery('#selectedPosition').text(positions[0]);
-        jQuery('#selectedName').text(boxables[0].name);
-        if (boxables[0].identificationBarcode) {
-          jQuery('#selectedBarcode').text(boxables[0].identificationBarcode);
-        } else {
-          jQuery('#selectedBarcode').empty();
-        }
-        jQuery('#selectedAlias').html(Box.utils.hyperlinkifyBoxable(boxables[0].name, boxables[0].id, boxables[0].alias));
-        jQuery('#selectedName').html(Box.utils.hyperlinkifyBoxable(boxables[0].name, boxables[0].id, boxables[0].name));
-        jQuery('#removeSelected, #emptySelected, #searchField, #search').prop('disabled', false).removeClass('disabled');
-      } else {
-        // empty position, no positions, or multiple positions selected
-        if (positions.length === 1) {
-          jQuery('#selectedPosition').text(positions[0]);
-        } else {
-          jQuery('#selectedPosition').empty();
-          jQuery('#search, #searchField, #resultSelect, #updateSelected').prop('disabled', true).addClass('disabled');
-        }
-        jQuery('#selectedName').empty();
-        jQuery('#selectedAlias').empty();
-        jQuery('#selectedBarcode').empty();
-        jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
-      }
-      jQuery('#warningMessages').html('');
-      jQuery('#searchField').val('');
-      jQuery('#searchField').select().focus();
+    self.onSelectionChanged = selectionChangedCallback || function(items, singleBoxable) {
+      // default does nothing
     };
 
     return self;
