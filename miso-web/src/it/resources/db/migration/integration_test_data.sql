@@ -698,8 +698,17 @@ INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, securityProfile_profil
 (100001, 1, 1, 'BOX100001', 'Bulk Boxables Test', 1, 1, 1, '2017-12-19 15:04:00', '2017-12-19 15:04:00');
 
 INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
-(1, 1, 'LIBRARY', 'A01'), (1, 1, 'DILUTION', 'B02'), (1, 1, 'POOL', 'C03'), (1, 2, 'SAMPLE', 'D04'), (1, 3, 'SAMPLE', 'E05'), (1, 4, 'SAMPLE', 'F06'), (1, 7, 'SAMPLE', 'G07'), (1, 8, 'SAMPLE', 'H08'),
-(1, 204, 'SAMPLE', 'C06'), (1, 205, 'SAMPLE', 'A07'), (1, 206, 'SAMPLE', 'B05'),
+(1, 1,   'LIBRARY',  'A01'),
+(1, 205, 'SAMPLE',   'A07'),
+(1, 1,   'DILUTION', 'B02'),
+(1, 206, 'SAMPLE',   'B05'),
+(1, 1,   'POOL',     'C03'),
+(1, 204, 'SAMPLE',   'C06'),
+(1, 2,   'SAMPLE',   'D04'),
+(1, 3,   'SAMPLE',   'E05'),
+(1, 4,   'SAMPLE',   'F06'),
+(1, 7,   'SAMPLE',   'G07'),
+(1, 8,   'SAMPLE',   'H08'),
 (500, 502, 'SAMPLE', 'A01'), (500, 504, 'LIBRARY', 'B01'), (500, 504, 'DILUTION', 'C01'), (500, 501, 'POOL', 'D01'), (500, 505, 'LIBRARY', 'F10'),
 (100001, 100006, 'LIBRARY', 'A02'), (100001, 100007, 'LIBRARY', 'A03'); 
 

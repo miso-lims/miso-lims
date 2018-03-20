@@ -5,6 +5,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -247,7 +248,9 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
         message.append(String.format("Removed %s (%s)", oldItem.getAlias(), oldItem.getName()));
       }
 
-      original.setBoxables(box.getBoxables());
+      // Needs to be a new map to force Hibernate to delete all associations before inserting
+      // (prevent violation of unique constraint when position-swapping two items)
+      original.setBoxables(new HashMap<String, BoxableView>(box.getBoxables()));
 
       if (message.length() > 0) {
         addBoxContentsChangeLog(original, message.toString());

@@ -5,6 +5,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
@@ -27,7 +28,6 @@ public class BoxVisualization extends AbstractElement {
   private static final By tdSelector = By.cssSelector("tbody tr td");
   private static final By thSelector = By.cssSelector("tbody tr th");
 
-  private final List<WebElement> visRows;
   private final List<String> colHeaders;
 
   @FindBy(id = "boxContentsTableVisualization")
@@ -42,11 +42,12 @@ public class BoxVisualization extends AbstractElement {
   private WebElement removeTubeButton;
   @FindBy(id = "emptySelected")
   private WebElement discardTubeButton;
+  @FindBy(id = "bulkUpdate")
+  private WebElement bulkUpdateButton;
 
   public BoxVisualization(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
-    this.visRows = boxVisualization.findElements(rowSelector);
     this.colHeaders = boxVisualization.findElements(thSelector).stream()
         .map(element -> element.getText().trim())
         .collect(Collectors.toList());
@@ -55,16 +56,6 @@ public class BoxVisualization extends AbstractElement {
   public void selectPosition(String position) {
     WebElement selected = getPosition(getRowLabel(position), getColLabel(position));
     selected.click();
-  }
-
-  public void selectPositions(Collection<String> positions) {
-    Actions actions = new Actions(getDriver());
-    actions.keyDown(Keys.LEFT_CONTROL);
-    positions.stream()
-        .map(pos -> getPosition(getRowLabel(pos), getColLabel(pos)))
-        .forEach(element -> actions.click(element));
-    actions.keyUp(Keys.LEFT_CONTROL);
-    actions.build().perform();
   }
 
   public boolean isEmptyPosition(String position) {
@@ -90,7 +81,8 @@ public class BoxVisualization extends AbstractElement {
   }
 
   protected WebElement getPosition(String rowLabel, int column) {
-    List<List<WebElement>> trs = visRows.stream().map(row -> row.findElements(tdSelector)).collect(Collectors.toList());
+    List<WebElement> rows = boxVisualization.findElements(rowSelector);
+    List<List<WebElement>> trs = rows.stream().map(row -> row.findElements(tdSelector)).collect(Collectors.toList());
     if (rowLabel == null || isStringEmptyOrNull(rowLabel)) throw new IllegalArgumentException("Row selector cannot be empty");
     if (colHeaders.size() < column)
       throw new IllegalArgumentException("Column selector " + column + " is larger than table size (" + colHeaders.size() + " columns)");
@@ -130,6 +122,36 @@ public class BoxVisualization extends AbstractElement {
     } else {
       throw new IllegalStateException("updatePositionButton is not clickable");
     }
+  }
+
+  public void updatePositions(Map<String, String> searchStringsByPosition, boolean requireConfirmation) {
+    selectPositions(searchStringsByPosition.keySet());
+    List<WebElement> inputRows = getDriver().findElements(By.cssSelector("#bulkUpdateTable tbody tr"));
+    for (WebElement inputRow : inputRows) {
+      List<WebElement> cells = inputRow.findElements(By.cssSelector("td"));
+      String inputPos = cells.get(0).getText();
+      WebElement input = cells.get(1).findElement(By.cssSelector("input"));
+      input.click();
+      input.clear();
+      input.sendKeys(searchStringsByPosition.get(inputPos));
+    }
+    bulkUpdateButton.click();
+    if (requireConfirmation) {
+      WebElement okButton = getDriver().findElement(By.id("ok"));
+      okButton.click();
+      waitUntil(invisibilityOf(okButton));
+    }
+    waitUntil(invisibilityOfElementLocated(By.id("bulkUpdateTable")));
+  }
+
+  private void selectPositions(Collection<String> positions) {
+    Actions actions = new Actions(getDriver());
+    actions.keyDown(Keys.LEFT_CONTROL);
+    positions.stream()
+        .map(pos -> getPosition(getRowLabel(pos), getColLabel(pos)))
+        .forEach(actions::click);
+    actions.keyUp(Keys.LEFT_CONTROL);
+    actions.build().perform();
   }
 
   public void removeTube() {
