@@ -476,6 +476,11 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     } else {
       library.setLastModified(now);
     }
+
+    // if receivedDate exists, creationDate (non-nullable) will be hidden from the user so we set it here
+    if (library.getReceivedDate() != null) {
+      library.setCreationDate(library.getReceivedDate());
+    }
   }
 
   /**
@@ -513,6 +518,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       target.setKitDescriptor(null);
     }
     target.setReceivedDate(source.getReceivedDate());
+    target.setCreationDate(source.getCreationDate());
 
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;

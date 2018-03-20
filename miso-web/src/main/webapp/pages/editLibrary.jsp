@@ -191,19 +191,28 @@
     <td><form:input id="identificationBarcode" path="identificationBarcode" name="identificationBarcode"/></td>
   </tr>
 </c:if>
-<tr>
-  <td>Date of receipt:</td>
-  <td>
-    <form:input path="receivedDate" id="receiveddatepicker" placeholder="YYYY-MM-DD"/>
-    <script type="text/javascript">
-      Utils.ui.addDatePicker("receiveddatepicker");
-    </script>
-  </td>
-</tr>
-<tr>
-  <td class="h">Creation date:</td>
-  <td id="creationDate"><fmt:formatDate pattern="yyyy-MM-dd" type="date" value="${library.creationDate}"/></td>
-</tr>
+<c:if test="${not empty library.receivedDate}">
+  <tr>
+    <td>Date of receipt:</td>
+    <td>
+      <form:input path="receivedDate" id="receiveddatepicker" placeholder="YYYY-MM-DD"/>
+      <script type="text/javascript">
+        Utils.ui.addDatePicker("receiveddatepicker");
+      </script>
+    </td>
+  </tr>
+</c:if>
+<c:if test="${empty library.receivedDate}">
+  <tr>
+    <td class="h">Date of propagation:</td>
+    <td id="creationDate">
+      <form:input path="creationDate" id="creationDatePicker" placeholder="YYYY-MM-DD"/>
+      <script type="text/javascript">
+        Utils.ui.addDatePicker("creationDatePicker");
+      </script>  
+    </td>
+  </tr>
+</c:if>
 <c:if test="${not empty library.accession}">
   <tr>
     <td class="h">Accession:</td>

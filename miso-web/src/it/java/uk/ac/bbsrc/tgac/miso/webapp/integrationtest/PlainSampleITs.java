@@ -43,7 +43,7 @@ public class PlainSampleITs extends AbstractIT {
   private static final Set<String> libraryColumns = Sets.newHashSet(LibColumns.NAME, LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
       LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED, LibColumns.PLATFORM,
       LibColumns.LIBRARY_TYPE, LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2,
-      LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.CONCENTRATION);
+      LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.CONCENTRATION, LibColumns.PROPAGATE_DATE);
 
   private static final Set<String> dilutionColumns = Sets.newHashSet(DilColumns.NAME, DilColumns.LIBRARY_ALIAS, DilColumns.BOX_SEARCH,
       DilColumns.BOX_ALIAS, DilColumns.BOX_POSITION, DilColumns.DISCARDED, DilColumns.CONCENTRATION, DilColumns.VOLUME,
@@ -137,6 +137,7 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
     attrs.put(LibColumns.QC_PASSED, "True");
     attrs.put(LibColumns.SIZE, "321");
+    attrs.put(LibColumns.PROPAGATE_DATE, "2018-03-20");
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
     HandsOnTableSaveResult result = table.save();
