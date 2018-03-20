@@ -5,6 +5,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,17 +85,18 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   }
 
   @Override
-  public void discardAllTubes(Box box) throws IOException {
-    authorizationManager.throwIfNotWritable(box);
+  public void discardAllContents(Box box) throws IOException {
+    Box managed = get(box.getId());
+    authorizationManager.throwIfNotWritable(managed);
     User currentUser = authorizationManager.getCurrentUser();
-    boxStore.discardAllTubes(box, currentUser);
+    boxStore.discardAllContents(managed, currentUser);
   }
 
   @Override
-  public void discardSingleTube(Box box, String position) throws IOException {
+  public void discardSingleItem(Box box, String position) throws IOException {
     authorizationManager.throwIfNotWritable(box);
     User currentUser = authorizationManager.getCurrentUser();
-    boxStore.discardSingleTube(box, position, currentUser);
+    boxStore.discardSingleItem(box, position, currentUser);
   }
 
   @Override
@@ -246,7 +248,9 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
         message.append(String.format("Removed %s (%s)", oldItem.getAlias(), oldItem.getName()));
       }
 
-      original.setBoxables(box.getBoxables());
+      // Needs to be a new map to force Hibernate to delete all associations before inserting
+      // (prevent violation of unique constraint when position-swapping two items)
+      original.setBoxables(new HashMap<String, BoxableView>(box.getBoxables()));
 
       if (message.length() > 0) {
         addBoxContentsChangeLog(original, message.toString());

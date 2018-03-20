@@ -154,7 +154,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long poolId = PoolImpl.UNSAVED_ID;
 
-  @OneToMany(targetEntity = PoolQC.class, mappedBy = "pool")
+  @OneToMany(targetEntity = PoolQC.class, mappedBy = "pool", cascade = CascadeType.REMOVE)
   private final Collection<PoolQC> poolQCs = new TreeSet<>();
 
   @OneToOne(optional = true)
@@ -163,7 +163,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   private Boolean qcPassed;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
@@ -586,6 +586,21 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public String getBarcodeSizeInfo() {
     return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getUnits());
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Pool";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName() + (getAlias() == null ? "" : " (" + getAlias() + ")");
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    return getSecurityProfile();
   }
 
 }

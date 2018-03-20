@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +22,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import ca.on.oicr.pinery.api.Attribute;
 import ca.on.oicr.pinery.api.AttributeName;
@@ -59,65 +61,63 @@ import ca.on.oicr.pinery.lims.miso.converters.SampleTypeConverter;
 
 public class MisoClient implements Lims {
 
-  private static final String MISO_SAMPLE_ID_PREFIX = "SAM";
-  private static final String MISO_LIBRARY_ID_PREFIX = "LIB";
-  private static final String MISO_DILUTION_ID_PREFIX = "LDI";
+  private static final Set<String> MISO_SAMPLE_ID_PREFIXES = Collections.unmodifiableSet(Sets.newHashSet("SAM", "LIB", "LDI"));
 
   // @formatter:off
   // InstrumentModel queries
-  private static final String queryAllModels = "SELECT p.platformId, p.instrumentModel " + "FROM Platform as p";
-  private static final String queryModelById = queryAllModels + " WHERE p.platformId = ?";
+  private static final String QUERY_ALL_MODELS = "SELECT p.platformId, p.instrumentModel " + "FROM Platform as p";
+  private static final String QUERY_MODEL_BY_ID = QUERY_ALL_MODELS + " WHERE p.platformId = ?";
 
   // Instrument queries
-  private static final String queryAllInstruments = "SELECT i.instrumentId, i.name, i.platformId " + "FROM Instrument AS i";
-  private static final String queryInstrumentById = queryAllInstruments + " WHERE i.instrumentId = ?";
-  private static final String queryInstrumentsByModelId = queryAllInstruments + " WHERE i.platformId = ?";
+  private static final String QUERY_ALL_INSTRUMENTS = "SELECT i.instrumentId, i.name, i.platformId " + "FROM Instrument AS i";
+  private static final String QUERY_INSTRUMENT_BY_ID = QUERY_ALL_INSTRUMENTS + " WHERE i.instrumentId = ?";
+  private static final String QUERY_INSTRUMENTS_BY_MODEL_ID = QUERY_ALL_INSTRUMENTS + " WHERE i.platformId = ?";
 
   // Order queries
-  private static final String queryAllOrders = getResourceAsString("queryAllOrders.sql");
-  private static final String queryOrderById = queryAllOrders + " WHERE poolOrderId = ?";
-  private static final String queryAllOrderSamples = getResourceAsString("queryAllOrderSamples.sql");
-  private static final String queryOrderSamplesByOrderId = queryAllOrderSamples + " WHERE poolOrderId = ?";
+  private static final String QUERY_ALL_ORDERS = getResourceAsString("queryAllOrders.sql");
+  private static final String QUERY_ORDER_BY_ID = QUERY_ALL_ORDERS + " WHERE poolOrderId = ?";
+  private static final String QUERY_ALL_ORDER_SAMPLES = getResourceAsString("queryAllOrderSamples.sql");
+  private static final String QUERY_ORDER_SAMPLES_BY_ORDER_ID = QUERY_ALL_ORDER_SAMPLES + " WHERE poolOrderId = ?";
 
   // User queries
-  private static final String queryAllUsers = "SELECT u.userId, u.fullname, u.email, u.active " + "FROM User AS u";
-  private static final String queryUserById = queryAllUsers + " WHERE u.userId = ?";
+  private static final String QUERY_ALL_USERS = "SELECT u.userId, u.fullname, u.email, u.active " + "FROM User AS u";
+  private static final String QUERY_USER_BY_ID = QUERY_ALL_USERS + " WHERE u.userId = ?";
 
   // Run queries
-  private static final String queryAllRuns = getResourceAsString("queryAllRuns.sql");
-  private static final String queryRunById = queryAllRuns + " AND r.runId = ?";
-  private static final String queryRunByName = queryAllRuns + " AND r.alias = ?";
+  private static final String QUERY_ALL_RUNS = getResourceAsString("queryAllRuns.sql");
+  private static final String QUERY_RUN_BY_ID = QUERY_ALL_RUNS + " AND r.runId = ?";
+  private static final String QUERY_RUN_BY_NAME = QUERY_ALL_RUNS + " AND r.alias = ?";
 
   // RunPosition queries
-  private static final String queryAllRunPositions = getResourceAsString("queryAllRunPositions.sql");
-  private static final String queryRunPositionsByRunId = queryAllRunPositions + " WHERE r_spc.Run_runId = ?";
+  private static final String QUERY_ALL_RUN_POSITIONS = getResourceAsString("queryAllRunPositions.sql");
+  private static final String QUERY_RUN_POSITIONS_BY_RUN_ID = QUERY_ALL_RUN_POSITIONS + " WHERE r_spc.Run_runId = ?";
 
   // RunSample queries
-  private static final String queryAllRunSamples = getResourceAsString("queryAllRunSamples.sql");
-  private static final String queryRunSamplesByRunId = queryAllRunSamples
+  private static final String QUERY_ALL_RUN_SAMPLES = getResourceAsString("queryAllRunSamples.sql");
+  private static final String QUERY_RUN_SAMPLES_BY_RUN_ID = QUERY_ALL_RUN_SAMPLES
       + " JOIN SequencerPartitionContainer_Partition spcp ON spcp.partitions_partitionId = part.partitionId"
       + " JOIN SequencerPartitionContainer spc ON spc.containerId = spcp.container_containerId"
       + " JOIN Run_SequencerPartitionContainer rcpc ON rcpc.containers_containerId = spc.containerId" + " WHERE rcpc.Run_runId = ?";
 
   // Sample queries
-  private static final String queryAllSamples = getResourceAsString("queryAllSamples.sql");
-  private static final String querySampleById = "SELECT * FROM (" + queryAllSamples + ") combined " + "WHERE id = ?";
+  private static final String QUERY_ALL_SAMPLES = getResourceAsString("queryAllSamples.sql");
+  private static final String QUERY_SAMPLE_BY_ID = "SELECT * FROM (" + QUERY_ALL_SAMPLES + ") combined " + "WHERE id = ?";
 
-  private static final String querySampleChildIdsBySampleId = getResourceAsString("querySampleChildIdsBySampleId.sql");
+  private static final String QUERY_SAMPLE_CHILD_IDS_BY_SAMPLE_ID = getResourceAsString("querySampleChildIdsBySampleId.sql");
 
   // SampleType (MISO SampleClass and Library) queries
-  private static final String queryAllSampleTypes = getResourceAsString("queryAllSampleTypes.sql");
+  private static final String QUERY_ALL_SAMPLE_TYPES = getResourceAsString("queryAllSampleTypes.sql");
 
   // SampleProject queries
-  private static final String queryAllSampleProjects = getResourceAsString("queryAllSampleProjects.sql");
+  private static final String QUERY_ALL_SAMPLE_PROJECTS = getResourceAsString("queryAllSampleProjects.sql");
 
   // SampleChangeLog queries
-  private static final String queryAllSampleChangeLogs = getResourceAsString("queryAllSampleChangeLogs.sql");
-  private static final String querySampleChangeLogById = "SELECT * FROM (" + queryAllSampleChangeLogs + ") combined "
+  private static final String QUERY_ALL_SAMPLE_CHANGELOGS = getResourceAsString("queryAllSampleChangeLogs.sql");
+  private static final String QUERY_SAMPLE_CHANGELOG_BY_ID = "SELECT * FROM (" + QUERY_ALL_SAMPLE_CHANGELOGS + ") combined "
       + "WHERE sampleId = ?";
   
   // Box queries
-  private static final String queryAllBoxes = getResourceAsString("queryAllBoxes.sql");
+  private static final String QUERY_ALL_BOXES = getResourceAsString("queryAllBoxes.sql");
   // @formatter:on
 
   private final RowMapper<Instrument> instrumentMapper = new InstrumentMapper();
@@ -155,7 +155,7 @@ public class MisoClient implements Lims {
   @Override
   public Sample getSample(String id) {
     validateSampleId(id);
-    List<Sample> samples = template.query(querySampleById, new Object[] { id }, sampleMapper);
+    List<Sample> samples = template.query(QUERY_SAMPLE_BY_ID, new Object[] { id }, sampleMapper);
     return samples.size() == 1 ? addChildren(samples.get(0)) : null;
   }
 
@@ -163,10 +163,7 @@ public class MisoClient implements Lims {
     if (id != null && id.length() > 3) {
       try {
         Integer.parseInt(id.substring(3, id.length()));
-        switch (id.substring(0, 3)) {
-        case MISO_SAMPLE_ID_PREFIX:
-        case MISO_LIBRARY_ID_PREFIX:
-        case MISO_DILUTION_ID_PREFIX:
+        if (MISO_SAMPLE_ID_PREFIXES.contains(id.substring(0, 3))) {
           return;
         }
       } catch (NumberFormatException e) {
@@ -178,12 +175,12 @@ public class MisoClient implements Lims {
 
   @Override
   public List<SampleProject> getSampleProjects() {
-    return template.query(queryAllSampleProjects, sampleProjectMapper);
+    return template.query(QUERY_ALL_SAMPLE_PROJECTS, sampleProjectMapper);
   }
 
   @Override
   public List<Sample> getSamples(Boolean archived, Set<String> projects, Set<String> types, ZonedDateTime before, ZonedDateTime after) {
-    List<Sample> samples = template.query(queryAllSamples, sampleMapper);
+    List<Sample> samples = template.query(QUERY_ALL_SAMPLES, sampleMapper);
     mapChildren(samples);
     if (archived == null && (projects == null || projects.isEmpty()) && (types == null || types.isEmpty()) && before == null
         && after == null) {
@@ -255,8 +252,8 @@ public class MisoClient implements Lims {
   }
 
   private Sample addChildren(Sample parent) {
-    List<String> children = template.query(querySampleChildIdsBySampleId, new Object[] { parent.getId(), parent.getId() }, idListMapper);
-    if (children.size() > 0) {
+    List<String> children = template.query(QUERY_SAMPLE_CHILD_IDS_BY_SAMPLE_ID, new Object[] { parent.getId(), parent.getId() }, idListMapper);
+    if (!children.isEmpty()) {
       parent.setChildren(new HashSet<>(children));
     }
     return parent;
@@ -283,18 +280,18 @@ public class MisoClient implements Lims {
 
   @Override
   public List<User> getUsers() {
-    return template.query(queryAllUsers, userMapper);
+    return template.query(QUERY_ALL_USERS, userMapper);
   }
 
   @Override
   public User getUser(Integer id) {
-    List<User> users = template.query(queryUserById, new Object[] { id }, userMapper);
+    List<User> users = template.query(QUERY_USER_BY_ID, new Object[] { id }, userMapper);
     return users.size() == 1 ? users.get(0) : null;
   }
 
   @Override
   public List<Order> getOrders() {
-    List<Order> orders = template.query(queryAllOrders, orderMapper);
+    List<Order> orders = template.query(QUERY_ALL_ORDERS, orderMapper);
     List<MisoOrderSample> samples = getOrderSamples();
     mapSamplesToOrders(orders, samples);
     return orders;
@@ -302,7 +299,7 @@ public class MisoClient implements Lims {
 
   @Override
   public Order getOrder(Integer id) {
-    List<Order> orders = template.query(queryOrderById, new Object[] { id }, orderMapper);
+    List<Order> orders = template.query(QUERY_ORDER_BY_ID, new Object[] { id }, orderMapper);
     if (orders.size() != 1) return null;
     Order order = orders.get(0);
     Set<OrderSample> os = new HashSet<>();
@@ -312,11 +309,11 @@ public class MisoClient implements Lims {
   }
 
   private List<MisoOrderSample> getOrderSamples() {
-    return template.query(queryAllOrderSamples, orderSampleMapper);
+    return template.query(QUERY_ALL_ORDER_SAMPLES, orderSampleMapper);
   }
 
   private List<MisoOrderSample> getOrderSamples(Integer orderId) {
-    return template.query(queryOrderSamplesByOrderId, new Object[] { orderId }, orderSampleMapper);
+    return template.query(QUERY_ORDER_SAMPLES_BY_ORDER_ID, new Object[] { orderId }, orderSampleMapper);
   }
 
   private List<Order> mapSamplesToOrders(List<Order> orders, List<MisoOrderSample> samples) {
@@ -340,7 +337,7 @@ public class MisoClient implements Lims {
 
   @Override
   public List<Run> getRuns() {
-    List<Run> runs = template.query(queryAllRuns, runMapper);
+    List<Run> runs = template.query(QUERY_ALL_RUNS, runMapper);
     List<MisoRunPosition> positions = getRunPositions();
     Map<Integer, Run> map = new HashMap<>();
     for (Run r : runs) {
@@ -362,12 +359,12 @@ public class MisoClient implements Lims {
 
   @Override
   public Run getRun(Integer id) {
-    return getSingleRun(queryRunById, new Object[] { id });
+    return getSingleRun(QUERY_RUN_BY_ID, new Object[] { id });
   }
 
   @Override
   public Run getRun(String runName) {
-    return getSingleRun(queryRunByName, new Object[] { runName });
+    return getSingleRun(QUERY_RUN_BY_NAME, new Object[] { runName });
   }
 
   private Run getSingleRun(String query, Object[] params) {
@@ -381,13 +378,13 @@ public class MisoClient implements Lims {
   }
 
   private List<MisoRunPosition> getRunPositions() {
-    List<MisoRunPosition> positions = template.query(queryAllRunPositions, runPositionMapper);
+    List<MisoRunPosition> positions = template.query(QUERY_ALL_RUN_POSITIONS, runPositionMapper);
     List<MisoRunSample> samples = getRunSamples();
     return mapSamplesToPositions(positions, samples);
   }
 
   private List<MisoRunPosition> getRunPositions(Integer runId) {
-    List<MisoRunPosition> positions = template.query(queryRunPositionsByRunId, new Object[] { runId }, runPositionMapper);
+    List<MisoRunPosition> positions = template.query(QUERY_RUN_POSITIONS_BY_RUN_ID, new Object[] { runId }, runPositionMapper);
     List<MisoRunSample> samples = getRunSamples(runId);
     return mapSamplesToPositions(positions, samples);
   }
@@ -417,16 +414,16 @@ public class MisoClient implements Lims {
   }
 
   private List<MisoRunSample> getRunSamples() {
-    return template.query(queryAllRunSamples, runSampleMapper);
+    return template.query(QUERY_ALL_RUN_SAMPLES, runSampleMapper);
   }
 
   private List<MisoRunSample> getRunSamples(Integer runId) {
-    return template.query(queryRunSamplesByRunId, new Object[] { runId }, runSampleMapper);
+    return template.query(QUERY_RUN_SAMPLES_BY_RUN_ID, new Object[] { runId }, runSampleMapper);
   }
 
   @Override
   public List<Type> getTypes() {
-    return template.query(queryAllSampleTypes, typeMapper);
+    return template.query(QUERY_ALL_SAMPLE_TYPES, typeMapper);
   }
 
   @Override
@@ -461,13 +458,13 @@ public class MisoClient implements Lims {
 
   @Override
   public List<ChangeLog> getChangeLogs() {
-    return mapChangesToChangeLogs(template.query(queryAllSampleChangeLogs, changeMapper));
+    return mapChangesToChangeLogs(template.query(QUERY_ALL_SAMPLE_CHANGELOGS, changeMapper));
   }
 
   @Override
   public ChangeLog getChangeLog(String id) {
     validateSampleId(id);
-    List<ChangeLog> changes = mapChangesToChangeLogs(template.query(querySampleChangeLogById, new Object[] { id }, changeMapper));
+    List<ChangeLog> changes = mapChangesToChangeLogs(template.query(QUERY_SAMPLE_CHANGELOG_BY_ID, new Object[] { id }, changeMapper));
     return changes.size() == 1 ? changes.get(0) : null;
   }
 
@@ -492,34 +489,34 @@ public class MisoClient implements Lims {
 
   @Override
   public List<InstrumentModel> getInstrumentModels() {
-    return template.query(queryAllModels, modelMapper);
+    return template.query(QUERY_ALL_MODELS, modelMapper);
   }
 
   @Override
   public InstrumentModel getInstrumentModel(Integer id) {
-    List<InstrumentModel> models = template.query(queryModelById, new Object[] { id }, modelMapper);
+    List<InstrumentModel> models = template.query(QUERY_MODEL_BY_ID, new Object[] { id }, modelMapper);
     return models.size() == 1 ? models.get(0) : null;
   }
 
   @Override
   public List<Instrument> getInstruments() {
-    return template.query(queryAllInstruments, instrumentMapper);
+    return template.query(QUERY_ALL_INSTRUMENTS, instrumentMapper);
   }
 
   @Override
   public Instrument getInstrument(Integer instrumentId) {
-    List<Instrument> instruments = template.query(queryInstrumentById, new Object[] { instrumentId }, instrumentMapper);
+    List<Instrument> instruments = template.query(QUERY_INSTRUMENT_BY_ID, new Object[] { instrumentId }, instrumentMapper);
     return instruments.size() == 1 ? instruments.get(0) : null;
   }
 
   @Override
   public List<Instrument> getInstrumentModelInstrument(Integer id) {
-    return template.query(queryInstrumentsByModelId, new Object[] { id }, instrumentMapper);
+    return template.query(QUERY_INSTRUMENTS_BY_MODEL_ID, new Object[] { id }, instrumentMapper);
   }
 
   @Override
   public List<Box> getBoxes() {
-    List<MisoBoxPosition> temps = template.query(queryAllBoxes, boxPositionRowMapper);
+    List<MisoBoxPosition> temps = template.query(QUERY_ALL_BOXES, boxPositionRowMapper);
     Map<Long, Box> boxes = new HashMap<>();
     for (MisoBoxPosition temp : temps) {
       Box box = boxes.get(temp.getId());
@@ -589,8 +586,8 @@ public class MisoClient implements Lims {
 
       String fullname = rs.getString("fullname");
       if (fullname.contains(" ")) {
-        u.setFirstname(fullname.substring(0, fullname.lastIndexOf(" ")));
-        u.setLastname(fullname.substring(fullname.lastIndexOf(" ") + 1));
+        u.setFirstname(fullname.substring(0, fullname.lastIndexOf(' ')));
+        u.setLastname(fullname.substring(fullname.lastIndexOf(' ') + 1));
       } else {
         u.setFirstname(fullname);
         u.setLastname(fullname);
@@ -668,11 +665,11 @@ public class MisoClient implements Lims {
         parents.add(parentId);
         s.setParents(parents);
       }
-      ;
-      if (rs.getString("sampleType") != null) {
+      String misoType = rs.getString("miso_type");
+      if ("Sample".equals(misoType)) {
         s.setSampleType(SampleTypeConverter.getSampleType(rs.getString("sampleType")));
       } else {
-        s.setSampleType(SampleTypeConverter.getNonSampleSampleType(rs.getString("miso_type"), rs.getString("sampleType_platform"),
+        s.setSampleType(SampleTypeConverter.getNonSampleSampleType(misoType, rs.getString("sampleType_platform"),
             rs.getString("sampleType_description")));
       }
       s.setTissueType(rs.getString("tissueType"));
@@ -701,7 +698,7 @@ public class MisoClient implements Lims {
           atts.add(att);
         }
       }
-      if (atts.size() > 0) {
+      if (!atts.isEmpty()) {
         s.setAttributes(atts);
       }
       Boolean qcPassed = rs.getBoolean("qcPassed");
@@ -737,15 +734,10 @@ public class MisoClient implements Lims {
       return sb.toString();
     }
 
-    public static char toRowChar(int row) throws IllegalArgumentException {
-      if (row < 0 || row > 25) throw new RuntimeException("Box row number must be between 0 and 25");
-      return (char) (row + 'A');
-    }
-
     /**
      * Enum used to pull Attributes from a ResultSet, formatting values correctly and mapping them to the correct keys
      */
-    public static enum AttributeKey {
+    public enum AttributeKey {
 
       SAMPLE_CATEGORY("sample_category", "Sample Category"),
       RECEIVE_DATE("receive_date", "Receive Date") {
@@ -846,7 +838,7 @@ public class MisoClient implements Lims {
       public Attribute extractAttributeFrom(ResultSet rs) throws SQLException {
         String val = extractStringValueFrom(rs);
         return val == null ? null : makeAttribute(getAttributeKey(), extractStringValueFrom(rs));
-      };
+      }
 
       /**
        * Extracts the value belonging to this AttributeKey from a ResultSet
@@ -867,7 +859,7 @@ public class MisoClient implements Lims {
         return att;
       }
 
-      private static enum StrStatus {
+      private enum StrStatus {
         NOT_SUBMITTED("Not Submitted"), SUBMITTED("Submitted"), PASS("Pass"), FAIL("Fail");
 
         private final String value;
@@ -929,7 +921,7 @@ public class MisoClient implements Lims {
           atts.add(att);
         }
       }
-      if (atts.size() > 0) {
+      if (!atts.isEmpty()) {
         s.setAttributes(atts);
       }
 
@@ -944,9 +936,11 @@ public class MisoClient implements Lims {
     public Type mapRow(ResultSet rs, int rowNum) throws SQLException {
       Type t = new DefaultType();
 
-      t.setName(rs.getString("name"));
-      if (t.getName() == null) {
-        t.setName(SampleTypeConverter.getNonSampleSampleType(rs.getString("miso_type"), rs.getString("sampleType_platform"),
+      String misoType = rs.getString("miso_type");
+      if ("Sample".equals(misoType)) {
+        t.setName(SampleTypeConverter.getSampleType(rs.getString("name")));
+      } else {
+        t.setName(SampleTypeConverter.getNonSampleSampleType(misoType, rs.getString("sampleType_platform"),
             rs.getString("sampleType_description")));
       }
       t.setCount(rs.getInt("count"));
@@ -1023,7 +1017,7 @@ public class MisoClient implements Lims {
     try {
       return IOUtils.toString(MisoClient.class.getResourceAsStream(resourceName), "UTF-8");
     } catch (IOException ioe) {
-      throw new RuntimeException(ioe);
+      throw new IllegalStateException("Failed to load resource: " + resourceName, ioe);
     }
   }
 }

@@ -477,7 +477,6 @@
 	                  <artifactId>sqlstore</artifactId>
 	                  <outputDirectory>target/test-classes/sqlstore</outputDirectory>
 	                  <includes>db/**</includes>
-	                  <excludes>db/migration/V9000__integration-test_plain_data.test-plain.sql</excludes>
 	                </artifactItem>
 	              </artifactItems>
 	            </configuration>
@@ -741,7 +740,6 @@
 	                  <artifactId>sqlstore</artifactId>
 	                  <outputDirectory>target/test-classes/sqlstore</outputDirectory>
 	                  <includes>db/**</includes>
-	                  <excludes>db/migration/V9000_integration-test_data.test.sql</excludes>
 	                </artifactItem>
 	              </artifactItems>
 	            </configuration>
@@ -760,7 +758,7 @@
 	              <goal>execute</goal>
 	            </goals>
 	            <configuration>
-	              <source>${project.basedir}/src/it/resources/db/scripts/schema_translator_plain.groovy</source>
+	              <source>${project.basedir}/src/it/resources/db/scripts/schema_translator.groovy</source>
 	            </configuration>
 	          </execution>
 	        </executions>
@@ -831,7 +829,7 @@
                 <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
                 <location>classpath:db/migration</location>
               </locations>
-	          <sqlMigrationSuffix>.test-plain.sql</sqlMigrationSuffix>
+	          <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
 	        </configuration>
 	      </plugin>
 	      <plugin>

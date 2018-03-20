@@ -27,6 +27,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
@@ -342,6 +343,13 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
     @SuppressWarnings("unchecked")
     List<Pool> pools = criteria.list();
     return pools;
+  }
+
+  @Override
+  public long getPartitionCount(Pool pool) {
+    return (long) currentSession().createCriteria(PartitionImpl.class)
+        .add(Restrictions.eq("pool", pool))
+        .setProjection(Projections.rowCount()).uniqueResult();
   }
 
 }

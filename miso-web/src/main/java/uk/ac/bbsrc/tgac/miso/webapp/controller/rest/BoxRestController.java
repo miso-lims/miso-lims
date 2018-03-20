@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
@@ -59,6 +61,9 @@ import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
 @Controller
@@ -69,6 +74,9 @@ public class BoxRestController extends RestController {
 
   @Autowired
   private MisoFilesManager misoFileManager;
+
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   @Autowired
   private SampleService sampleService;
@@ -580,6 +588,77 @@ public class BoxRestController extends RestController {
 
   private static boolean isRealBarcode(BoxScan scan, String barcode) {
     return !barcode.equals(scan.getNoTubeLabel()) && !barcode.equals(scan.getNoReadLabel());
+  }
+
+  @RequestMapping(value = "/box/{boxId}/discard-all")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void discardEntireBox(@PathVariable long boxId) throws IOException {
+    Box box = boxService.get(boxId);
+    if (box == null) {
+      throw new RestException("Box " + boxId + " not found", Status.NOT_FOUND);
+    }
+    boxService.discardAllContents(box);
+  }
+  
+  public static class BulkUpdateRequestItem {
+    private String position;
+    private String searchString;
+    
+    public String getPosition() {
+      return position;
+    }
+
+    public void setPosition(String position) {
+      this.position = position;
+    }
+
+    public String getSearchString() {
+      return searchString;
+    }
+    
+    public void setSearchString(String searchString) {
+      this.searchString = searchString;
+    }
+
+  }
+  
+  @RequestMapping(value = "/box/{boxId}/bulk-update", method = RequestMethod.POST)
+  public @ResponseBody BoxDto bulkUpdatePositions(@PathVariable long boxId, @RequestBody List<BulkUpdateRequestItem> items) throws IOException {
+    Box box = boxService.get(boxId);
+    if (box == null) {
+      throw new RestException("Box " + boxId + " not found", Status.NOT_FOUND);
+    }
+    ValidationResult validation = new ValidationResult();
+    Map<String, BoxableView> updates = new HashMap<>();
+    for (BulkUpdateRequestItem item : items) {
+      if (!box.isValidPosition(item.getPosition())) {
+        validation.addError(new ValidationError("Invalid position given: " + item.getPosition()));
+      }
+      List<BoxableView> searchResults = boxService.getBoxableViewsBySearch(item.getSearchString());
+      if (searchResults == null || searchResults.isEmpty()) {
+        validation.addError(
+            new ValidationError("No item found by searching '" + item.getSearchString() + "' for position " + item.getPosition()));
+      } else if (searchResults.size() > 1) {
+        validation.addError(
+            new ValidationError("Multiple items matched search '" + item.getSearchString() + "' for position " + item.getPosition()));
+      } else {
+        BoxableView boxable = searchResults.get(0);
+        // if the selected item is already in the box, remove it here and add it to the correct position in next step
+        if (Long.valueOf(box.getId()).equals(boxable.getBoxId())) {
+          box.removeBoxable(boxable.getBoxPosition());
+        }
+        updates.put(item.getPosition(), boxable);
+      }
+    }
+    for (Entry<String, BoxableView> entry : updates.entrySet()) {
+      // if an item already exists at this position, its location will be set to unknown.
+      box.setBoxable(entry.getKey(), entry.getValue());
+    }
+
+    validation.throwIfInvalid();
+    boxService.save(box);
+    Box updated = boxService.get(boxId);
+    return Dtos.asDto(updated, true);
   }
 
 }

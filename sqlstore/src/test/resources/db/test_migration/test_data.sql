@@ -687,3 +687,19 @@ INSERT INTO ArrayPosition(arrayId, position, sampleId) VALUES
 
 INSERT INTO ArrayRun(arrayRunId, alias, instrumentId, arrayId, health, startDate, creator, created, lastModifier, lastModified) VALUES
 (1, 'ArrayRun_1', 3, 1, 'Running', '2018-02-02', 1, '2018-02-02 15:40:00', 1, '2018-02-02 15:40:00');
+
+INSERT INTO WorkflowProgress(workflowProgressId, workflowName, userId) VALUES
+(1, 'LOADSEQUENCER', 3),
+(2, 'LOADSEQUENCER', 3);
+
+INSERT INTO WorkflowProgressStep(workflowProgressId, stepNumber) VALUES
+(1, 1),
+(2, 1),
+(2, 2);
+
+INSERT INTO StepSample(workflowProgressId, stepNumber, sampleId) VALUES
+(1, 1, 1),
+(2, 1, 2);
+
+INSERT INTO StepPool(workflowProgressId, stepNumber, poolId) VALUES
+(2, 2, 1);

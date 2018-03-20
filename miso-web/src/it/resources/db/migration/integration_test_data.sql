@@ -1,53 +1,6 @@
--- fixes BeforeInsertPool trigger created in V0004
-DROP TRIGGER IF EXISTS BeforeInsertPool;
-
-DELETE FROM `ReferenceGenome`;
-DELETE FROM SampleValidRelationship;
-DELETE FROM LibraryDesign;
-DELETE FROM SampleClass;
-DELETE FROM TissueMaterial;
-DELETE FROM TissueOrigin;
-DELETE FROM TissueType;
-DELETE FROM Lab;
-DELETE FROM Institute;
-DELETE FROM Stain;
-DELETE FROM SamplePurpose;
-DELETE FROM DetailedQcStatus;
-DELETE FROM QCType;
-DELETE FROM LibraryType;
-DELETE FROM LibrarySelectionType;
-DELETE FROM LibraryStrategyType;
-DELETE FROM LibraryDesignCode;
-DELETE FROM TargetedSequencing_KitDescriptor;
-DELETE FROM TargetedSequencing;
-DELETE FROM KitDescriptorChangeLog;
-DELETE FROM KitDescriptor;
-DELETE FROM BoxUse;
-DELETE FROM BoxSize;
-DELETE FROM `_Group`;
-DELETE FROM `SecurityProfile`;
-DELETE FROM `SecurityProfile_ReadGroup`;
-DELETE FROM `SecurityProfile_WriteGroup`;
-DELETE FROM `SecurityProfile_ReadUser`;
-DELETE FROM `SecurityProfile_WriteUser`;
-DELETE FROM Indices;
-DELETE FROM IndexFamily;
-DELETE FROM SequencingParameters;
-DELETE FROM PlatformSizes;
-DELETE FROM Instrument WHERE upgradedInstrumentId IS NOT NULL;
-DELETE FROM Instrument;
-DELETE FROM Platform;
-DELETE FROM ProjectOverview;
-DELETE FROM Project;
-DELETE FROM Note;
-DELETE FROM Library_Note;
-DELETE FROM Pool_Note;
-DELETE FROM ArrayPosition;
-DELETE FROM Array;
-DELETE FROM ArrayModel;
-
-INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `password`, `email`)
-VALUES (3,1,0,0,'user',1,'user','user','user@user.user');
+INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `roles`, `password`, `email`) VALUES
+(1,1,1,0,'admin',1,'admin','ROLE_ADMIN,ROLE_INTERNAL','d033e22ae348aeb5660fc2140aec35850c4da997','admin@admin'),
+(3,1,0,0,'user',1,'user','ROLE_INTERNAL','user','user@user.user');
 
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Human hg19 random');
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (2, 'Human hg19');
@@ -738,15 +691,24 @@ INSERT INTO PoolOrder (poolOrderId, poolId, partitions, parametersId, createdBy,
 (4, 5104, 2, 2, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00');
 
 INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, securityProfile_profileId, lastModifier, creator, created, lastModified) VALUES
-(1, 1, 1, 'BOX1', 'First Box', 1, 1, 2, '2017-07-20 13:01:01', '2017-07-20 13:01:01'),
+(1, 1, 1, 'BOX1', 'First Box', 1, 1, 1, '2017-07-20 13:01:01', '2017-07-20 13:01:01'),
 (500, 1, 1, 'BOX500', 'Tubes In Boxes Test', 1, 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00'),
 (501, 1, 1, 'BOX501', 'Second box for Tubes in Boxes test', 1, 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
 (502, 1, 1, 'BOX502', 'Editable box', 1, 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
 (100001, 1, 1, 'BOX100001', 'Bulk Boxables Test', 1, 1, 1, '2017-12-19 15:04:00', '2017-12-19 15:04:00');
 
 INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
-(1, 1, 'LIBRARY', 'A01'), (1, 1, 'DILUTION', 'B02'), (1, 1, 'POOL', 'C03'), (1, 2, 'SAMPLE', 'D04'), (1, 3, 'SAMPLE', 'E05'), (1, 4, 'SAMPLE', 'F06'), (1, 7, 'SAMPLE', 'G07'), (1, 8, 'SAMPLE', 'H08'),
-(1, 204, 'SAMPLE', 'C06'), (1, 205, 'SAMPLE', 'A07'), (1, 206, 'SAMPLE', 'B05'),
+(1, 1,   'LIBRARY',  'A01'),
+(1, 205, 'SAMPLE',   'A07'),
+(1, 1,   'DILUTION', 'B02'),
+(1, 206, 'SAMPLE',   'B05'),
+(1, 1,   'POOL',     'C03'),
+(1, 204, 'SAMPLE',   'C06'),
+(1, 2,   'SAMPLE',   'D04'),
+(1, 3,   'SAMPLE',   'E05'),
+(1, 4,   'SAMPLE',   'F06'),
+(1, 7,   'SAMPLE',   'G07'),
+(1, 8,   'SAMPLE',   'H08'),
 (500, 502, 'SAMPLE', 'A01'), (500, 504, 'LIBRARY', 'B01'), (500, 504, 'DILUTION', 'C01'), (500, 501, 'POOL', 'D01'), (500, 505, 'LIBRARY', 'F10'),
 (100001, 100006, 'LIBRARY', 'A02'), (100001, 100007, 'LIBRARY', 'A03'); 
 

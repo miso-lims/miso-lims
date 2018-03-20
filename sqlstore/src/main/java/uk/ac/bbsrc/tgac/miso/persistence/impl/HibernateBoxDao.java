@@ -69,7 +69,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public void discardAllTubes(Box box, User currentUser) throws IOException {
+  public void discardAllContents(Box box, User currentUser) throws IOException {
     List<BoxableView> originalContents = new ArrayList<>(box.getBoxables().values());
     try {
       box.removeAllBoxables();
@@ -86,7 +86,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public void discardSingleTube(Box box, String position, User currentUser) throws IOException {
+  public void discardSingleItem(Box box, String position, User currentUser) throws IOException {
     BoxableView target = box.getBoxable(position);
     target.setDiscarded(true);
     box.removeBoxable(position);
@@ -106,8 +106,8 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   private void applyChanges(BoxableView from, Boxable to, User currentUser) {
-    to.setDiscarded(from.isDiscarded());
     to.setVolume(from.getVolume());
+    to.setDiscarded(from.isDiscarded());
     to.setLastModified(new Date());
     to.setLastModifier(currentUser);
   }

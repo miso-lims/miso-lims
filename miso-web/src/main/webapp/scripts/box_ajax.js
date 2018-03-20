@@ -11,7 +11,7 @@ var Box = Box
         jQuery('#dialogInfoBelow').html('');
         jQuery('#dialogInfoAbove')
             .html(
-                '<p>Please enter the prefix for your bacodes (e.g., MYBOX for MYBOXA01, MYBOXA02, ...). Existing tubes with barcodes matching this pattern will be added to the box in positions depending on the suffix.</p>');
+                '<p>Please enter the prefix for your bacodes (e.g., MYBOX for MYBOXA01, MYBOXA02, ...). Existing items with barcodes matching this pattern will be added to the box in positions depending on the suffix.</p>');
         jQuery('#dialogVisual')
             .html(
                 '<p>Prefix: <input id="prefix" type="text"/></p><p>Suffix: <input type="radio" name="suffix" id="standardSuffix" value="standard"/><label for="standardSuffix"> Standard (A01, A02, ... as row letter/column number)</label> <input type="radio" name="suffix" id="numericSuffix" value="numeric"/><label for="numericSuffix"> Numeric (001, 002, ... moving in rows)</label></p>');
@@ -198,9 +198,135 @@ Box.scan = {
 }
 
 Box.ui = {
+
+  onSelectionChanged: function(items, singleBoxable) {
+    jQuery('#singlePositionControls').hide();
+    jQuery('#bulkPositionControls').hide();
+
+    var positions = items.map(function(item) {
+      return Box.utils.getPositionString(item.row, item.col);
+    });
+    Box.ui.filterTableByBoxPositions(positions);
+    Box.ui.clearBoxableSearchResults();
+
+    if (singleBoxable) {
+      // filled position selected
+      jQuery('#singlePositionControls').show();
+      jQuery('#selectedPosition').text(positions[0]);
+      jQuery('#selectedName').text(singleBoxable.name);
+      if (singleBoxable.identificationBarcode) {
+        jQuery('#selectedBarcode').text(singleBoxable.identificationBarcode);
+      } else {
+        jQuery('#selectedBarcode').empty();
+      }
+      jQuery('#selectedAlias').html(Box.utils.hyperlinkifyBoxable(singleBoxable.name, singleBoxable.id, singleBoxable.alias));
+      jQuery('#selectedName').html(Box.utils.hyperlinkifyBoxable(singleBoxable.name, singleBoxable.id, singleBoxable.name));
+      jQuery('#removeSelected, #emptySelected, #searchField, #search').prop('disabled', false).removeClass('disabled');
+    } else {
+      // empty position, no positions, or multiple positions selected
+      if (positions.length > 1) {
+        Box.ui.showBulkUpdateTable(positions);
+      } else if (positions.length === 1) {
+        jQuery('#singlePositionControls').show();
+        jQuery('#selectedPosition').text(positions[0]);
+      } else {
+        jQuery('#selectedPosition').empty();
+        jQuery('#search, #searchField, #resultSelect, #updateSelected').prop('disabled', true).addClass('disabled');
+      }
+      jQuery('#selectedName').empty();
+      jQuery('#selectedAlias').empty();
+      jQuery('#selectedBarcode').empty();
+      jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
+    }
+    jQuery('#warningMessages').html('');
+    jQuery('#searchField').val('');
+    jQuery('#searchField').select().focus();
+  },
+
+  showBulkUpdateTable: function(positions) {
+    jQuery('#bulkUpdateTable tbody').empty();
+    jQuery('#bulkPositionControls').show();
+
+    for (var i = 0; i < positions.length; i++) {
+      var pos = positions[i];
+      var tr = jQuery('<tr>');
+      tr.append(jQuery('<td>' + pos + '</td>'));
+      var td = jQuery('<td>');
+      var input = jQuery('<input type="text" class="bulkUpdateInput"/>')
+      input.data('position', pos);
+      if (i < positions.length - 1) {
+        input.keyup((function(event) {
+          var index = i;
+          return function(event) {
+            if (event.which == "13") {
+              jQuery('#bulkUpdateTable tbody input:eq(' + (index + 1) + ')').focus();
+            }
+          };
+        })());
+        input.on('paste', (function(e) {
+          var index = i;
+          return function(e) {
+            window.setTimeout(function() {
+              jQuery('#bulkUpdateTable tbody input:eq(' + (index + 1) + ')').focus();
+            }, 100);
+          }
+        })());
+      } else {
+        input.keyup(function(event) {
+          if (event.which == "13") {
+            jQuery('#bulkUpdate').click();
+          }
+        });
+      }
+      td.append(input);
+      tr.append(td);
+      jQuery('#bulkUpdateTable tbody').append(tr);
+      if (i === 0) {
+        input.focus();
+      }
+    }
+    jQuery('#bulkUpdateInput').click(function() {
+      $(this).select();
+    });
+  },
+
   changeBoxListing: function(alias) {
     var table = jQuery('#listingBoxesTable').dataTable();
     table.fnFilter(alias, 5);
+  },
+
+  bulkUpdatePositions: function() {
+    var data = [];
+    var inputs = jQuery('#bulkUpdateTable tbody input');
+    inputs.each(function(index, input) {
+      data.push({
+        position: jQuery(input).data('position'),
+        searchString: jQuery(input).val()
+      })
+    });
+    var positions = data.map(function(item) {
+      return item.position;
+    });
+    var currentOccupants = Box.boxJSON.items.filter(function(boxable) {
+      return positions.indexOf(boxable.coordinates) >= 0;
+    });
+    var doUpdate = function() {
+      var url = '/miso/rest/box/' + Box.boxJSON.id + '/bulk-update';
+      Utils.ajaxWithDialog('Update Positions', 'POST', url, data, function(responseData) {
+        Box.boxJSON = responseData;
+        Box.update();
+      });
+    };
+    if (currentOccupants.length) {
+      var lines = ['Some of these positions already contain other items:'];
+      currentOccupants.forEach(function(item) {
+        lines.push('* ' + item.coordinates + ': ' + item.name + ' (' + item.alias + ')');
+      });
+      lines.push('Are you sure you wish to replace them?');
+      Utils.showConfirmDialog('Replace Items', 'Replace', lines, doUpdate);
+    } else {
+      doUpdate();
+    }
   },
 
   // creates the table of the box contents
@@ -284,11 +410,11 @@ Box.ui = {
     if (entityTypes.length > 1) {
       if (positionStrings) {
         // heterogenous items are selected
-        addToolbarMemo("Selection contains multiple types of tubes. Select tubes of the same type to see bulk actions.");
+        addToolbarMemo("Selection contains multiple types of items. Select items of the same type to see bulk actions.");
         return;
       } else {
         // no items are selected, but box contains heterogenous items
-        addToolbarMemo("Box contains multiple types of tubes. Select tubes of same type to see bulk actions.");
+        addToolbarMemo("Box contains multiple types of items. Select items of same type to see bulk actions.");
         return;
       }
     }
@@ -431,7 +557,7 @@ Box.ui = {
 
   removeOneItem: function() {
     if (Box.visual.selectedItems.length !== 1) {
-      Utils.showOkDialog('Too many tubes selected', ['Select a single tube to remove.']);
+      Utils.showOkDialog('Too many items selected', ['Select a single item to remove.']);
       return;
     }
     var selectedPosition = Box.utils.getPositionString(Box.visual.selectedItems[0].row, Box.visual.selectedItems[0].col);
@@ -441,7 +567,7 @@ Box.ui = {
       jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
       jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
 
-      Fluxion.doAjax('boxControllerHelperService', 'removeTubeFromBox', {
+      Fluxion.doAjax('boxControllerHelperService', 'removeItemFromBox', {
         'boxId': Box.boxId,
         'position': selectedPosition,
         'url': ajaxurl
@@ -461,7 +587,7 @@ Box.ui = {
 
   discardOneItem: function() {
     if (Box.visual.selectedItems.length !== 1) {
-      Utils.showOkDialog('Too many tubes selected', ['Select a single tube to discard']);
+      Utils.showOkDialog('Too many items selected', ['Select a single item to discard']);
       return;
     }
 
@@ -471,36 +597,30 @@ Box.ui = {
       jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
       jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
 
-      Fluxion.doAjax('boxControllerHelperService', 'discardSingleTube', {
+      Fluxion.doAjax('boxControllerHelperService', 'discardSingleItem', {
         'boxId': Box.boxId,
         'position': selectedPosition,
         'url': ajaxurl
       }, {
         'doOnSuccess': Utils.page.pageReload,
         'doOnError': function(json) {
-          Utils.showOkDialog('Error discarding tube', [json.error]);
+          Utils.showOkDialog('Error discarding item', [json.error]);
           jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
         }
       });
     }
 
-    Utils.showConfirmDialog('Discard Item', 'Discard', ["Are you sure you wish to discard this tube?"], discardIt);
+    Utils.showConfirmDialog('Discard Item', 'Discard', ["Are you sure you wish to discard this item?"], discardIt);
   },
 
-  discardEntireBox: function(boxId) {
-
+  discardAllContents: function(boxId) {
+    var url = "/miso/rest/box/" + boxId + "/discard-all";
     var discardBox = function() {
-      Fluxion.doAjax('boxControllerHelperService', 'discardEntireBox', {
-        'boxId': boxId,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': Utils.page.pageReload,
-        'doOnError': function(json) {
-          Utils.showOkDialog('Error discarding box', [json.error]);
-        }
+      Utils.ajaxWithDialog('Discard All Contents', 'POST', url, null, function() {
+        Utils.page.pageReload();
       });
     };
-    Utils.showConfirmDialog('Discard Entire Box', 'Discard', ["Are you sure you wish to discard all tubes in this box?"], discardBox);
+    Utils.showConfirmDialog("Discard All Contents", "Discard", ["Are you sure you wish to discard all contents of this box?"], discardBox);
   },
 
   searchBoxables: function() {

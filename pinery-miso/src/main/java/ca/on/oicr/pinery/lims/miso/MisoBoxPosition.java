@@ -81,4 +81,28 @@ public class MisoBoxPosition extends DefaultBox implements BoxPosition {
     return pos;
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((position == null) ? 0 : position.hashCode());
+    result = prime * result + ((sampleId == null) ? 0 : sampleId.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (!super.equals(obj)) return false;
+    if (getClass() != obj.getClass()) return false;
+    MisoBoxPosition other = (MisoBoxPosition) obj;
+    if (position == null) {
+      if (other.position != null) return false;
+    } else if (!position.equals(other.position)) return false;
+    if (sampleId == null) {
+      if (other.sampleId != null) return false;
+    } else if (!sampleId.equals(other.sampleId)) return false;
+    return true;
+  }
+
 }

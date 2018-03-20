@@ -169,6 +169,7 @@ public class BoxableView implements Serializable {
   }
 
   public void setDiscarded(boolean discarded) {
+    if (discarded) setVolume(0D);
     this.discarded = discarded;
   }
 

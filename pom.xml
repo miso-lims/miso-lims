@@ -63,7 +63,7 @@
         <role>Administrator</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>tdebat</id>
@@ -75,7 +75,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>amasella</id>
@@ -87,7 +87,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>dcooke</id>
@@ -99,7 +99,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>harmstrong</id>
@@ -111,7 +111,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
   </developers>
   <modules>
@@ -862,8 +862,8 @@
         <enabled>false</enabled>
         <updatePolicy>always</updatePolicy>
       </snapshots>
-      <id>GSI Release</id>
-      <name>OICR GSI Release repository</name>
+      <id>releases.gsi</id>
+      <name>OICR GSI Releases repository</name>
       <url>https://artifacts.oicr.on.ca/artifactory/gsi-release</url>
     </repository>
     <repository>

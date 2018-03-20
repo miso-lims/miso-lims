@@ -10,8 +10,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BoxPage;
@@ -270,7 +275,7 @@ public class BoxPageIT extends AbstractIT {
 
     LibraryDilution boxable = (LibraryDilution) getSession().get(LibraryDilution.class, 504L);
     assertTrue("check that boxable is discarded", boxable.isDiscarded());
-    assertTrue("check that boxable volume is null", boxable.getVolume() == null);
+    assertTrue("check that boxable volume is null", boxable.getVolume().equals(Double.valueOf(0D)));
     assertEquals("check that boxable location is empty", "EMPTY", BoxUtils.makeLocationLabel(boxable));
   }
 
@@ -300,6 +305,137 @@ public class BoxPageIT extends AbstractIT {
 
     Box box = (Box) getSession().get(BoxImpl.class, 500L);
     assertTrue("check that D01 now contains dilution", box.getBoxable(position).getName().startsWith("LDI"));
+  }
+
+  @Test
+  public void testAddMultipleTubes() {
+    Library lib1 = (Library) getSession().get(LibraryImpl.class, 100001L);
+    Library lib2 = (Library) getSession().get(LibraryImpl.class, 100002L);
+    Library lib3 = (Library) getSession().get(LibraryImpl.class, 100003L);
+
+    BoxPage page = getBoxPage(1L);
+    BoxVisualization visualization = page.getVisualization();
+
+    assertNull(lib1.getBox());
+    assertNull(lib2.getBox());
+    assertNull(lib3.getBox());
+
+    assertTrue(visualization.isEmptyPosition("H10"));
+    assertTrue(visualization.isEmptyPosition("H11"));
+    assertTrue(visualization.isEmptyPosition("H12"));
+
+    Map<String, String> updates = new HashMap<>();
+    updates.put("H10", lib1.getName());
+    updates.put("H11", lib2.getName());
+    updates.put("H12", lib3.getName());
+    visualization.updatePositions(updates, false);
+
+    Box box = (Box) getSession().get(BoxImpl.class, 1L);
+    assertTrue(visualization.getPositionTitle("H10").contains(lib1.getAlias()));
+    assertEquals(new BoxableView.BoxableId(EntityType.LIBRARY, lib1.getId()), box.getBoxable("H10").getId());
+    assertTrue(visualization.getPositionTitle("H11").contains(lib2.getAlias()));
+    assertEquals(new BoxableView.BoxableId(EntityType.LIBRARY, lib2.getId()), box.getBoxable("H11").getId());
+    assertTrue(visualization.getPositionTitle("H12").contains(lib3.getAlias()));
+    assertEquals(new BoxableView.BoxableId(EntityType.LIBRARY, lib3.getId()), box.getBoxable("H12").getId());
+  }
+
+  @Test
+  public void testMoveMultipleTubes() {
+    Sample sam1 = (Sample) getSession().get(SampleImpl.class, 4L);
+    Sample sam2 = (Sample) getSession().get(SampleImpl.class, 7L);
+    Sample sam3 = (Sample) getSession().get(SampleImpl.class, 8L);
+
+    BoxPage page = getBoxPage(1L);
+    BoxVisualization visualization = page.getVisualization();
+
+    assertTrue(visualization.getPositionTitle("F06").contains(sam1.getAlias()));
+    assertTrue(visualization.getPositionTitle("G07").contains(sam2.getAlias()));
+    assertTrue(visualization.getPositionTitle("H08").contains(sam3.getAlias()));
+
+    assertTrue(visualization.isEmptyPosition("H10"));
+    assertTrue(visualization.isEmptyPosition("H11"));
+    assertTrue(visualization.isEmptyPosition("H12"));
+
+    Map<String, String> updates = new HashMap<>();
+    updates.put("H10", sam1.getIdentificationBarcode());
+    updates.put("H11", sam2.getIdentificationBarcode());
+    updates.put("H12", sam3.getIdentificationBarcode());
+    visualization.updatePositions(updates, false);
+
+    Box box = (Box) getSession().get(BoxImpl.class, 1L);
+    assertTrue(visualization.isEmptyPosition("F06"));
+    assertNull(box.getBoxable("F06"));
+    assertTrue(visualization.isEmptyPosition("G07"));
+    assertNull(box.getBoxable("G07"));
+    assertTrue(visualization.isEmptyPosition("H08"));
+    assertNull(box.getBoxable("H08"));
+
+    assertTrue(visualization.getPositionTitle("H10").contains(sam1.getAlias()));
+    assertEquals(new BoxableView.BoxableId(EntityType.SAMPLE, sam1.getId()), box.getBoxable("H10").getId());
+    assertTrue(visualization.getPositionTitle("H11").contains(sam2.getAlias()));
+    assertEquals(new BoxableView.BoxableId(EntityType.SAMPLE, sam2.getId()), box.getBoxable("H11").getId());
+    assertTrue(visualization.getPositionTitle("H12").contains(sam3.getAlias()));
+    assertEquals(new BoxableView.BoxableId(EntityType.SAMPLE, sam3.getId()), box.getBoxable("H12").getId());
+  }
+
+  @Test
+  public void replaceMultipleTubes() {
+    Library lib1 = (Library) getSession().get(LibraryImpl.class, 100001L);
+    Library lib2 = (Library) getSession().get(LibraryImpl.class, 100002L);
+    Library lib3 = (Library) getSession().get(LibraryImpl.class, 100003L);
+
+    BoxPage page = getBoxPage(1L);
+    BoxVisualization visualization = page.getVisualization();
+
+    assertNull(lib1.getBox());
+    assertNull(lib2.getBox());
+    assertNull(lib3.getBox());
+
+    assertFalse(visualization.isEmptyPosition("F06"));
+    assertFalse(visualization.isEmptyPosition("G07"));
+    assertFalse(visualization.isEmptyPosition("H08"));
+
+    Map<String, String> updates = new HashMap<>();
+    updates.put("F06", lib1.getName());
+    updates.put("G07", lib2.getName());
+    updates.put("H08", lib3.getName());
+    visualization.updatePositions(updates, true);
+
+    Box box = (Box) getSession().get(BoxImpl.class, 1L);
+    assertTrue(visualization.getPositionTitle("F06").contains(lib1.getAlias()));
+    assertEquals(new BoxableView.BoxableId(EntityType.LIBRARY, lib1.getId()), box.getBoxable("F06").getId());
+    assertTrue(visualization.getPositionTitle("G07").contains(lib2.getAlias()));
+    assertEquals(new BoxableView.BoxableId(EntityType.LIBRARY, lib2.getId()), box.getBoxable("G07").getId());
+    assertTrue(visualization.getPositionTitle("H08").contains(lib3.getAlias()));
+    assertEquals(new BoxableView.BoxableId(EntityType.LIBRARY, lib3.getId()), box.getBoxable("H08").getId());
+  }
+
+  @Test
+  public void rearrangeMultipleTubes() {
+    Sample sam1 = (Sample) getSession().get(SampleImpl.class, 4L);
+    Sample sam2 = (Sample) getSession().get(SampleImpl.class, 7L);
+    Sample sam3 = (Sample) getSession().get(SampleImpl.class, 8L);
+
+    BoxPage page = getBoxPage(1L);
+    BoxVisualization visualization = page.getVisualization();
+
+    assertTrue(visualization.getPositionTitle("F06").contains(sam1.getAlias()));
+    assertTrue(visualization.getPositionTitle("G07").contains(sam2.getAlias()));
+    assertTrue(visualization.getPositionTitle("H08").contains(sam3.getAlias()));
+
+    Map<String, String> updates = new HashMap<>();
+    updates.put("G07", sam1.getIdentificationBarcode());
+    updates.put("H08", sam2.getIdentificationBarcode());
+    updates.put("F06", sam3.getIdentificationBarcode());
+    visualization.updatePositions(updates, true);
+
+    Box box = (Box) getSession().get(BoxImpl.class, 1L);
+    assertTrue(visualization.getPositionTitle("G07").contains(sam1.getAlias()));
+    assertEquals(new BoxableView.BoxableId(EntityType.SAMPLE, sam1.getId()), box.getBoxable("G07").getId());
+    assertTrue(visualization.getPositionTitle("H08").contains(sam2.getAlias()));
+    assertEquals(new BoxableView.BoxableId(EntityType.SAMPLE, sam2.getId()), box.getBoxable("H08").getId());
+    assertTrue(visualization.getPositionTitle("F06").contains(sam3.getAlias()));
+    assertEquals(new BoxableView.BoxableId(EntityType.SAMPLE, sam3.getId()), box.getBoxable("F06").getId());
   }
 
 }

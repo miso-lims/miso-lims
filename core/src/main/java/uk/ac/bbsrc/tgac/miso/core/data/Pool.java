@@ -52,7 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  */
 public interface Pool
     extends SecurableByProfile, Comparable<Pool>, Barcodable, Watchable, Boxable, Nameable, ChangeLoggable,
-    Serializable, Aliasable, QualityControllable<PoolQC> {
+    Serializable, Aliasable, QualityControllable<PoolQC>, Deletable {
 
   /**
    * Sets the ID of this Pool object.

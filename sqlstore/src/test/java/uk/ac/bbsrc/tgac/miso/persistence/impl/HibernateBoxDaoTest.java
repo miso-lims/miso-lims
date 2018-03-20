@@ -171,7 +171,7 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     Box box = dao.get(1);
     User user = (User) sessionFactory.getCurrentSession().get(UserImpl.class, 1L);
     assertTrue("precondition failed", box.getBoxables().size() > 0);
-    dao.discardAllTubes(box, user);
+    dao.discardAllContents(box, user);
     assertTrue(box.getBoxables().size() == 0);
 
   }
@@ -185,7 +185,7 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
 
     assertTrue("precondition failed", box.getBoxables().size() > 0);
     assertTrue(box.getBoxables().containsKey("B02"));
-    dao.discardSingleTube(box, "B02", user);
+    dao.discardSingleItem(box, "B02", user);
     Box fetchedBox = dao.get(1);
     assertEquals(count - 1, fetchedBox.getBoxables().size());
 

@@ -12,8 +12,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.service.impl.BoxableDeleterService;
 
-public interface PoolService extends PaginatedDataSource<Pool>, BarcodableService<Pool> {
+public interface PoolService extends PaginatedDataSource<Pool>, BarcodableService<Pool>, BoxableDeleterService<Pool> {
   @Override
   default EntityType getEntityType() {
     return EntityType.POOL;

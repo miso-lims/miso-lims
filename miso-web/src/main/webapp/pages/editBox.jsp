@@ -149,7 +149,7 @@
       </a>
       <div id="actionsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
         <a onclick="Box.ui.exportBox(${box.id});" href="javascript:void(0);" class="add">Export Box to Excel</a>
-        <a onclick="Box.ui.discardEntireBox(${box.id});" href="javascript:void(0);" class="add">Discard All Tubes</a>
+        <a onclick="Box.ui.discardAllContents(${box.id});" href="javascript:void(0);" class="add">Discard All Contents</a>
         <c:if test="${(scannerEnabled) && (box.size.scannable)}">
           <c:forEach items="${scannerNames}" var="scannerName">
             <a onclick="Box.initScan('${scannerName}');" href="javascript:void(0);">Scan with ${scannerName}</a>
@@ -162,7 +162,7 @@
 </div>
 <div id="boxContentsDiagram">
   <div id="boxContentsTable" class="unselectable" style="float:left;"></div>
-  <div style="float:left;padding:20px;">
+  <div id="singlePositionControls" style="float:left;padding:20px;">
     <table id="selectedPositionInfo">
 	    <tr>
 	      <td>Selected Position:</td><td><span id="selectedPosition"></span></td>
@@ -179,8 +179,8 @@
         <tr>
           <td></td>
           <td>
-            <button id="removeSelected" class="ui-state-default" onclick="Box.ui.removeOneItem()">Remove Tube</button>
-            <button id="emptySelected"  class="ui-state-default" onclick="Box.ui.discardOneItem();">Discard Tube</button>
+            <button id="removeSelected" class="ui-state-default" onclick="Box.ui.removeOneItem()">Remove Item</button>
+            <button id="emptySelected"  class="ui-state-default" onclick="Box.ui.discardOneItem();">Discard Item</button>
           </td>
         </tr>
         <tr>
@@ -200,13 +200,37 @@
         </tr>
     </table>
     <p class="warning" id="warningMessages"></p>
-    <p>Hold down Control (Windows, Linux) or Command (Mac) to select multiple positions.<br/>
-       Click row or column header to select entire row or column.</p>
   </div>
+  <div id="bulkPositionControls" style="float:left;padding:20px;">
+    <table id="bulkUpdateTable">
+      <thead>
+        <tr>
+          <th>Position</th>
+          <th>Search</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- contents added via js -->
+      </tbody>
+      <tfoot>
+        <tr>
+          <td></td>
+          <td>
+            <button id="bulkUpdate" class="ui-state-default" onclick="Box.ui.bulkUpdatePositions();">Update</button>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <p style="clear: both;">
+    Hold down Control (Windows, Linux) or Command (Mac) to select multiple positions.<br/>
+    Click row or column header to select entire row or column.
+  </p>
+  <br/>
 </div>
 
 <script type="text/javascript">
-  Box.visual = new Box.Visual();
+  Box.visual = new Box.Visual(Box.ui.onSelectionChanged);
   jQuery(document).ready(function() {
     Box.boxJSON = ${boxJSON};
     Box.boxId = ${box.id};

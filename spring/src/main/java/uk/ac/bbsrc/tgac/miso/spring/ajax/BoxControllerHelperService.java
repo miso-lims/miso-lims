@@ -194,7 +194,7 @@ public class BoxControllerHelperService {
    *          </p>
    * @return JSONObject message indicating failure or success
    */
-  public JSONObject removeTubeFromBox(HttpSession session, JSONObject json) {
+  public JSONObject removeItemFromBox(HttpSession session, JSONObject json) {
     if (!json.has("boxId") || !json.has("position")) {
       return JSONUtils.SimpleJSONError("Invalid boxId or position given.");
     }
@@ -238,7 +238,7 @@ public class BoxControllerHelperService {
    *          session, JSONObject json
    * @returns JSONObject message indicating failure or success
    */
-  public JSONObject discardSingleTube(HttpSession session, JSONObject json) {
+  public JSONObject discardSingleItem(HttpSession session, JSONObject json) {
     User user;
     Box box;
     JSONObject response = new JSONObject();
@@ -268,7 +268,7 @@ public class BoxControllerHelperService {
         }
 
         try {
-          boxService.discardSingleTube(box, position);
+          boxService.discardSingleItem(box, position);
           box = boxService.get(boxId);
           ObjectMapper mapper = new ObjectMapper();
           response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()), true)));
@@ -284,52 +284,4 @@ public class BoxControllerHelperService {
     return response;
   }
 
-  /**
-   * Modifies all Boxable elements to be thrown in the trash. For each boxable element, boxable.volume is set to 0, boxable.discarded to
-   * true,
-   * and all boxable elements are removed from the box. Note: json must contain the key-value pair of "boxId" : boxId
-   *
-   * @param session
-   * @param json
-   *          must contain a "boxId" field
-   * @returns JSONObject message indicating failure or success
-   */
-  public JSONObject discardEntireBox(HttpSession session, JSONObject json) {
-    User user;
-    Box box;
-    JSONObject response = new JSONObject();
-    try {
-      user = authorizationManager.getCurrentUser();
-    } catch (IOException e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
-    }
-
-    if (user != null && user.isAdmin()) {
-      if (json.has("boxId")) {
-        Long boxId = json.getLong("boxId");
-        try {
-          box = boxService.get(boxId);
-        } catch (IOException e) {
-          log.debug("Error", e);
-          return JSONUtils.SimpleJSONError("Error getting box: " + e.getMessage());
-        }
-
-        try {
-          boxService.discardAllTubes(box); // box save is performed as part of this method
-          box = boxService.get(boxId);
-          ObjectMapper mapper = new ObjectMapper();
-          response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()), true)));
-          return response;
-        } catch (IOException e) {
-          log.debug("Error discarding box", e);
-          return JSONUtils.SimpleJSONError("Error discarding box: " + e.getMessage());
-        }
-      } else {
-        return JSONUtils.SimpleJSONError("No box specified to discard.");
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("Only logged-in admins can discard boxes.");
-    }
-  }
 }
