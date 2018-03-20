@@ -1,3 +1,12 @@
+# 0.2.113
+
+Changes:
+
+ * Bulk update box positions (#1380)
+ * Adjustments to 'Discard All Tubes' box command (#1377)
+ * Allow users to delete pools (#1375)
+ * Added `pinery-miso`
+
 # 0.2.112
 
 Changes:
