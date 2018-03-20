@@ -46,7 +46,7 @@ public class LibraryPageIT extends AbstractIT {
     fields.put(Field.ALIAS, "1LIB_0001_Ly_P_PE_251_WG");
     fields.put(Field.BARCODE, "libbar110001");
     fields.put(Field.DESCRIPTION, "libdesc110001");
-    fields.put(Field.CREATION_DATE, "2017-07-24");
+    fields.put(Field.PROPAGATE_DATE, "2017-07-24");
     fields.put(Field.PLATFORM, "Illumina");
     fields.put(Field.LIBRARY_TYPE, "Paired End");
     fields.put(Field.DESIGN, "(None)");
@@ -115,7 +115,7 @@ public class LibraryPageIT extends AbstractIT {
     fields.put(Field.ALIAS, "1LIB_0001_Ly_P_PE_252_WG");
     fields.put(Field.BARCODE, "libbar110002");
     fields.put(Field.DESCRIPTION, "libdesc110002");
-    fields.put(Field.CREATION_DATE, "2017-07-24");
+    fields.put(Field.PROPAGATE_DATE, "2017-07-24");
     fields.put(Field.PLATFORM, "Illumina");
     fields.put(Field.LIBRARY_TYPE, "Paired End");
     fields.put(Field.DESIGN, "WG");
@@ -179,7 +179,7 @@ public class LibraryPageIT extends AbstractIT {
     fields.put(Field.ALIAS, "1LIB_0001_Ly_P_PE_253_WG");
     fields.put(Field.BARCODE, null);
     fields.put(Field.DESCRIPTION, null);
-    fields.put(Field.CREATION_DATE, "2017-07-24");
+    fields.put(Field.PROPAGATE_DATE, "2017-07-24");
     fields.put(Field.PLATFORM, "Illumina");
     fields.put(Field.LIBRARY_TYPE, "Paired End");
     fields.put(Field.DESIGN, "(None)");
@@ -376,7 +376,7 @@ public class LibraryPageIT extends AbstractIT {
     assertAttribute(Field.ALIAS, expectedValues, lib.getAlias());
     assertAttribute(Field.BARCODE, expectedValues, lib.getIdentificationBarcode());
     assertAttribute(Field.DESCRIPTION, expectedValues, lib.getDescription());
-    assertAttribute(Field.CREATION_DATE, expectedValues, dateFormatter.print(lib.getCreationDate().getTime()));
+    assertAttribute(Field.PROPAGATE_DATE, expectedValues, dateFormatter.print(lib.getCreationDate().getTime()));
     assertAttribute(Field.PLATFORM, expectedValues, lib.getPlatformType().getKey());
     assertAttribute(Field.LIBRARY_TYPE, expectedValues, lib.getLibraryType().getDescription());
     assertAttribute(Field.DESIGN, expectedValues, nullValueOrGet(lib.getLibraryDesign(), LibraryDesign::getName, "(None)"));

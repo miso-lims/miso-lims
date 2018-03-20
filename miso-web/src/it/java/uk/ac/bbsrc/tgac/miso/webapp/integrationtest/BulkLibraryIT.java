@@ -263,6 +263,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.SIZE, "123");
     attrs.put(LibColumns.VOLUME, "6.66");
     attrs.put(LibColumns.CONCENTRATION, "12.57");
+    attrs.put(LibColumns.PROPAGATE_DATE, "2018-03-20");
 
     fillRow(table, 0, attrs);
 

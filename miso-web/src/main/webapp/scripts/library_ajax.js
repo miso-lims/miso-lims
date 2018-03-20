@@ -64,11 +64,18 @@ var Library = Library || {
     jQuery('#description').attr('data-parsley-maxlength', '255');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
-    // Date of Receipt validation: ensure date is of correct form
-    jQuery('#receiveddatepicker').attr('class', 'form-control');
-    jQuery('#receiveddatepicker').attr('data-date-format', 'YYYY-MM-DD');
-    jQuery('#receiveddatepicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
-    jQuery('#receiveddatepicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+    // Date of Receipt/Propagation validation: ensure date is of correct form
+    if (jQuery('#receiveddatepicker').length > 0) {
+      jQuery('#receiveddatepicker').attr('class', 'form-control');
+      jQuery('#receiveddatepicker').attr('data-date-format', 'YYYY-MM-DD');
+      jQuery('#receiveddatepicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
+      jQuery('#receiveddatepicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+    } else {
+      jQuery('#creationDatePicker').attr('class', 'form-control');
+      jQuery('#creationDatePicker').attr('data-date-format', 'YYYY-MM-DD');
+      jQuery('#creationDatePicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
+      jQuery('#creationDatePicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');      
+    }
 
     // Library size validation
     jQuery('#dnaSize').attr('class', 'form-control');
