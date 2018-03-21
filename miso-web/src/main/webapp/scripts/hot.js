@@ -402,182 +402,187 @@ var HotUtils = {
         .addEventListener(
             'click',
             function() {
-              // reset server error messages
-              HotUtils.serverErrors = [];
-              // We are now saving the contents of the table. This can be called
-              // multiple times if the save was unsuccessful
-              var failed = [];
-              var okToSave = true;
-              // This is called when there might be errors to display on the
-              // page.
-              function renderErrors() {
-                var errorClasses = document.getElementById('errors').classList;
+              jQuery
+                  .when(target.hasOwnProperty('confirmSave') ? target.confirmSave(flatObjects, create) : null)
+                  .done(
+                      function() {
+                        // reset server error messages
+                        HotUtils.serverErrors = [];
+                        // We are now saving the contents of the table. This can be called
+                        // multiple times if the save was unsuccessful
+                        var failed = [];
+                        var okToSave = true;
+                        // This is called when there might be errors to display on the
+                        // page.
+                        function renderErrors() {
+                          var errorClasses = document.getElementById('errors').classList;
 
-                if (failed.length) {
+                          if (failed.length) {
 
-                  var saveErrorMessages = document.getElementById('saveErrors');
-                  if (!document.getElementById('failedToSave')) {
-                    // add "failed to save" if not already present
-                    var failedToSave = document.createElement('P');
-                    failedToSave.id = 'failedToSave';
-                    failedToSave.innerText = 'The following rows failed to save:';
-                    saveErrorMessages.parentNode.insertBefore(failedToSave, saveErrorMessages);
-                  }
-                  saveErrorMessages.innerHTML = '<ul>' + failed.map(function(msg) {
-                    return '<li>' + msg + '</li>';
-                  }).join('') + '</ul>';
-                  errorClasses.remove('hidden');
-                } else {
-                  if (!errorClasses.contains('hidden')) {
-                    errorClasses.add('hidden');
-                  }
-                }
-              }
-
-              function updateFlatObjAfterSave(flatObj, item) {
-                columns.forEach(function(c, colIndex) {
-                  if (c.unpackAfterSave) {
-                    c.unpack(item, flatObj, function(key, val) {
-                      // Do nothing. We're unpacking only - not setting cell
-                      // meta
-                    });
-                  }
-                });
-              }
-
-              setSaveDisabled(true);
-              var ajaxLoader = document.getElementById('ajaxLoader');
-              ajaxLoader.classList.remove('hidden');
-              // Check if the table is valid and all of the converters are happy
-              // with their column values
-              anyInvalidCells = false;
-              table
-                  .validateCells(function() {
-                    if (anyInvalidCells) {
-                      failed.push('Please fix highlighted cells.');
-                      renderErrors();
-                      setSaveDisabled(false);
-                      ajaxLoader.classList.add('hidden');
-                      return;
-                    }
-                    for (var i = 0; i < data.length; i++) {
-                      var errorHandler = function(errorMessage) {
-                        okToSave = false;
-                        failed.push('Row ' + i + ': ' + errorMessage);
-                      };
-                      columns.forEach(function(c) {
-                        c.pack(data[i], flatObjects[i], function(errorMessage) {
-                          table.setCellMeta(i, c.hotIndex, 'valid', false);
-                          errorHandler(errorMessage);
-                        });
-                      });
-                      target.fixUp(data[i], errorHandler);
-                    }
-                    if (!okToSave) {
-                      if (failed.length == 0) {
-                        failed.push('It looks like some cells are not yet valid. Please fix them before saving.');
-                      }
-                      renderErrors();
-                      table.render();
-                      setSaveDisabled(false);
-                      ajaxLoader.classList.add('hidden');
-                      return;
-                    }
-
-                    // Save and item, then repeat for the next item.
-                    var invokeNext = function(index) {
-                      // We have (attempted) to save all the items.
-                      if (index >= data.length) {
-                        var numSaved = flatObjects.reduce(function(acc, item) {
-                          return acc + (item.saved ? 1 : 0);
-                        }, 0);
-
-                        var allSaved = numSaved == data.length;
-                        var saveSuccessesClasses = document.getElementById('saveSuccesses').classList;
-                        if (numSaved > 0) {
-                          var successMessageDiv = document.getElementById('successMessages');
-                          successMessageDiv.innerHTML = 'Saved ' + numSaved + ' items.';
-                          if (allSaved) {
-                            var bulkActionsDiv = document.getElementById('bulkactions');
-                            while (bulkActionsDiv.children.length > 0) {
-                              bulkActionsDiv.removeChild(bulkActionsDiv.lastChild);
+                            var saveErrorMessages = document.getElementById('saveErrors');
+                            if (!document.getElementById('failedToSave')) {
+                              // add "failed to save" if not already present
+                              var failedToSave = document.createElement('P');
+                              failedToSave.id = 'failedToSave';
+                              failedToSave.innerText = 'The following rows failed to save:';
+                              saveErrorMessages.parentNode.insertBefore(failedToSave, saveErrorMessages);
                             }
-                            target.getBulkActions(config).forEach(function(bulkAction) {
-                              var button;
-                              if (bulkAction) {
-                                button = document.createElement('A');
-                                button.href = '#';
-                                button.setAttribute('class', 'ui-button ui-state-default');
-                                button.setAttribute('title', bulkAction.title || '');
-                                button.onclick = function() {
-                                  bulkAction.action(data);
-                                };
-                                button.appendChild(document.createTextNode(bulkAction.name));
-                              } else {
-                                button = document.createElement('SPAN');
-                                button.setAttribute('class', 'ui-state-default');
-                              }
-                              bulkActionsDiv.appendChild(button);
-                            });
-                          }
-                          saveSuccessesClasses.remove('hidden');
-                        } else {
-                          saveSuccessesClasses.add('hidden');
-                        }
-                        renderErrors();
-                        table.render();
-                        setSaveDisabled(allSaved);
-                        ajaxLoader.classList.add('hidden');
-                        return;
-                      }
-                      // If this item was previously saved, continue along.
-                      if (flatObjects[index].saved) {
-                        invokeNext(index + 1);
-                        return;
-                      }
-                      // This item must be saved. Send it to the server.
-                      var xhr = new XMLHttpRequest();
-                      xhr.onreadystatechange = function() {
-                        if (xhr.readyState === XMLHttpRequest.DONE) {
-                          if (xhr.status === 200 || xhr.status === 201) {
-                            data[index] = JSON.parse(xhr.response);
-                            updateFlatObjAfterSave(flatObjects[index], data[index]);
-                            flatObjects[index].saved = true;
+                            saveErrorMessages.innerHTML = '<ul>' + failed.map(function(msg) {
+                              return '<li>' + msg + '</li>';
+                            }).join('') + '</ul>';
+                            errorClasses.remove('hidden');
                           } else {
-                            try {
-                              var response = JSON.parse(xhr.responseText);
-                              var messageHtml = '<b>Row ' + (index + 1) + ': ';
-                              if (response.detail) {
-                                messageHtml += response.detail;
-                                if (response.dataFormat === 'validation' && response.data) {
-                                  messageHtml += '<ul>';
-                                  jQuery.each(response.data, function(key, value) {
-                                    messageHtml += '<li>' + key + ': ' + value + '</li>';
-                                  });
-                                  messageHtml += '</ul>';
-                                }
-                              } else {
-                                messageHtml += 'Something went terribly wrong. Please file a ticket with a screenshot or copy-paste of the data that you were trying to save.';
-                              }
-                              messageHtml += '</b>';
-                              failed.push(messageHtml);
-                            } catch (e) {
-                              failed
-                                  .push('<b>Row '
-                                      + (index + 1)
-                                      + ': The server is talking nonsense again. Please file a ticket with a screenshot or copy-paste of the data that you were trying to save.</b>');
+                            if (!errorClasses.contains('hidden')) {
+                              errorClasses.add('hidden');
                             }
                           }
-                          invokeNext(index + 1);
                         }
-                      };
-                      xhr.open(create ? 'POST' : 'PUT', create ? target.createUrl : (target.updateUrl + data[index].id));
-                      xhr.setRequestHeader('Content-Type', 'application/json');
-                      xhr.setRequestHeader('Accept', 'application/json');
-                      xhr.send(JSON.stringify(data[index]));
-                    };
-                    invokeNext(0);
-                  });
+
+                        function updateFlatObjAfterSave(flatObj, item) {
+                          columns.forEach(function(c, colIndex) {
+                            if (c.unpackAfterSave) {
+                              c.unpack(item, flatObj, function(key, val) {
+                                // Do nothing. We're unpacking only - not setting cell
+                                // meta
+                              });
+                            }
+                          });
+                        }
+
+                        setSaveDisabled(true);
+                        var ajaxLoader = document.getElementById('ajaxLoader');
+                        ajaxLoader.classList.remove('hidden');
+                        // Check if the table is valid and all of the converters are happy
+                        // with their column values
+                        anyInvalidCells = false;
+                        table
+                            .validateCells(function() {
+                              if (anyInvalidCells) {
+                                failed.push('Please fix highlighted cells.');
+                                renderErrors();
+                                setSaveDisabled(false);
+                                ajaxLoader.classList.add('hidden');
+                                return;
+                              }
+                              for (var i = 0; i < data.length; i++) {
+                                var errorHandler = function(errorMessage) {
+                                  okToSave = false;
+                                  failed.push('Row ' + i + ': ' + errorMessage);
+                                };
+                                columns.forEach(function(c) {
+                                  c.pack(data[i], flatObjects[i], function(errorMessage) {
+                                    table.setCellMeta(i, c.hotIndex, 'valid', false);
+                                    errorHandler(errorMessage);
+                                  });
+                                });
+                                target.fixUp(data[i], errorHandler);
+                              }
+                              if (!okToSave) {
+                                if (failed.length == 0) {
+                                  failed.push('It looks like some cells are not yet valid. Please fix them before saving.');
+                                }
+                                renderErrors();
+                                table.render();
+                                setSaveDisabled(false);
+                                ajaxLoader.classList.add('hidden');
+                                return;
+                              }
+
+                              // Save and item, then repeat for the next item.
+                              var invokeNext = function(index) {
+                                // We have (attempted) to save all the items.
+                                if (index >= data.length) {
+                                  var numSaved = flatObjects.reduce(function(acc, item) {
+                                    return acc + (item.saved ? 1 : 0);
+                                  }, 0);
+
+                                  var allSaved = numSaved == data.length;
+                                  var saveSuccessesClasses = document.getElementById('saveSuccesses').classList;
+                                  if (numSaved > 0) {
+                                    var successMessageDiv = document.getElementById('successMessages');
+                                    successMessageDiv.innerHTML = 'Saved ' + numSaved + ' items.';
+                                    if (allSaved) {
+                                      var bulkActionsDiv = document.getElementById('bulkactions');
+                                      while (bulkActionsDiv.children.length > 0) {
+                                        bulkActionsDiv.removeChild(bulkActionsDiv.lastChild);
+                                      }
+                                      target.getBulkActions(config).forEach(function(bulkAction) {
+                                        var button;
+                                        if (bulkAction) {
+                                          button = document.createElement('A');
+                                          button.href = '#';
+                                          button.setAttribute('class', 'ui-button ui-state-default');
+                                          button.setAttribute('title', bulkAction.title || '');
+                                          button.onclick = function() {
+                                            bulkAction.action(data);
+                                          };
+                                          button.appendChild(document.createTextNode(bulkAction.name));
+                                        } else {
+                                          button = document.createElement('SPAN');
+                                          button.setAttribute('class', 'ui-state-default');
+                                        }
+                                        bulkActionsDiv.appendChild(button);
+                                      });
+                                    }
+                                    saveSuccessesClasses.remove('hidden');
+                                  } else {
+                                    saveSuccessesClasses.add('hidden');
+                                  }
+                                  renderErrors();
+                                  table.render();
+                                  setSaveDisabled(allSaved);
+                                  ajaxLoader.classList.add('hidden');
+                                  return;
+                                }
+                                // If this item was previously saved, continue along.
+                                if (flatObjects[index].saved) {
+                                  invokeNext(index + 1);
+                                  return;
+                                }
+                                // This item must be saved. Send it to the server.
+                                var xhr = new XMLHttpRequest();
+                                xhr.onreadystatechange = function() {
+                                  if (xhr.readyState === XMLHttpRequest.DONE) {
+                                    if (xhr.status === 200 || xhr.status === 201) {
+                                      data[index] = JSON.parse(xhr.response);
+                                      updateFlatObjAfterSave(flatObjects[index], data[index]);
+                                      flatObjects[index].saved = true;
+                                    } else {
+                                      try {
+                                        var response = JSON.parse(xhr.responseText);
+                                        var messageHtml = '<b>Row ' + (index + 1) + ': ';
+                                        if (response.detail) {
+                                          messageHtml += response.detail;
+                                          if (response.dataFormat === 'validation' && response.data) {
+                                            messageHtml += '<ul>';
+                                            jQuery.each(response.data, function(key, value) {
+                                              messageHtml += '<li>' + key + ': ' + value + '</li>';
+                                            });
+                                            messageHtml += '</ul>';
+                                          }
+                                        } else {
+                                          messageHtml += 'Something went terribly wrong. Please file a ticket with a screenshot or copy-paste of the data that you were trying to save.';
+                                        }
+                                        messageHtml += '</b>';
+                                        failed.push(messageHtml);
+                                      } catch (e) {
+                                        failed
+                                            .push('<b>Row '
+                                                + (index + 1)
+                                                + ': The server is talking nonsense again. Please file a ticket with a screenshot or copy-paste of the data that you were trying to save.</b>');
+                                      }
+                                    }
+                                    invokeNext(index + 1);
+                                  }
+                                };
+                                xhr.open(create ? 'POST' : 'PUT', create ? target.createUrl : (target.updateUrl + data[index].id));
+                                xhr.setRequestHeader('Content-Type', 'application/json');
+                                xhr.setRequestHeader('Accept', 'application/json');
+                                xhr.send(JSON.stringify(data[index]));
+                              };
+                              invokeNext(0);
+                            });
+                      });
             });
     table.validateCells(function() {
       table.render();

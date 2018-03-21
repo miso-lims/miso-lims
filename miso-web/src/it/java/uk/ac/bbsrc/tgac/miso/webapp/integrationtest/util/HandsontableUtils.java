@@ -36,7 +36,11 @@ public class HandsontableUtils {
   }
 
   public static void saveAndAssertSuccess(HandsOnTable table) {
-    HandsOnTableSaveResult result = table.save();
+    saveAndAssertSuccess(table, false);
+  }
+
+  public static void saveAndAssertSuccess(HandsOnTable table, boolean confirmRequired) {
+    HandsOnTableSaveResult result = table.save(confirmRequired);
 
     if (result.getItemsSaved() != table.getRowCount()) {
       log.error(result.printSummary());
