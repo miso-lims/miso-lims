@@ -146,7 +146,7 @@ HotTarget.pool = {
     var missingBarcodesCount = flatObjects.filter(function(item) {
       return !item.identificationBarcode;
     }).length;
-    if (!isCreate || !missingBarcodesCount) {
+    if (!isCreate || Constants.automaticBarcodes || !missingBarcodesCount) {
       deferred.resolve();
     } else {
       Utils.showConfirmDialog('Missing Barcodes', 'Save', ['Pools should usually have barcodes. Are you sure you wish to save '
