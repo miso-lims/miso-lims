@@ -1,14 +1,18 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.AbstractWorkflow;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowExecutor;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
 
@@ -20,7 +24,10 @@ public class TestWorkflow extends AbstractWorkflow {
   // Use null for WorkflowName since we can't create an Enum value for a test workflow
   private static final WorkflowName WORKFLOW_NAME = null;
 
-  private List<WorkflowStep> steps = Arrays.asList(new IntegerWorkflowStep("Input an integer."), new PoolWorkflowStep("Input a pool."));
+  private IntegerWorkflowStep step0 = new IntegerWorkflowStep("Input a concentration as an integer.");
+  private PoolWorkflowStep step1 = new PoolWorkflowStep("Scan a Pool to modify its concentration.");
+  private List<WorkflowStep> steps = Arrays.asList(step0, step1);
+
   private int nextStepNumber = 0;
 
   @Override
@@ -45,19 +52,19 @@ public class TestWorkflow extends AbstractWorkflow {
 
   @Override
   public boolean isComplete() {
-    return steps.get(0).getProgressStep() != null && steps.get(1).getProgressStep() != null;
+    return steps.stream().map(WorkflowStep::getProgressStep).noneMatch(Objects::isNull);
   }
 
   @Override
-  public void processInput(ProgressStep step) {
-    processInput(nextStepNumber, step);
+  public void processInput(ProgressStep progressStep) {
+    processInput(nextStepNumber, progressStep);
   }
 
   @Override
-  public void processInput(int stepNumber, ProgressStep step) {
+  public void processInput(int stepNumber, ProgressStep progressStep) {
     if (!validStepNumber(stepNumber)) throw new IllegalArgumentException("Invalid step number");
 
-    step.accept(steps.get(stepNumber));
+    progressStep.accept(steps.get(stepNumber));
     if (stepNumber == nextStepNumber) nextStepNumber++;
   }
 
@@ -67,6 +74,16 @@ public class TestWorkflow extends AbstractWorkflow {
       steps.get(currentStepNumber()).cancelInput();
       nextStepNumber--;
     }
+  }
+
+  @Override
+  public void execute(WorkflowExecutor workflowExecutor) throws IOException {
+    if (!isComplete()) throw new IllegalStateException("Workflow is not complete");
+
+    Pool pool = step1.getInput();
+    pool.setConcentration((double) step0.getInput());
+
+    workflowExecutor.save(pool);
   }
 
   private int currentStepNumber() {
@@ -85,7 +102,7 @@ public class TestWorkflow extends AbstractWorkflow {
 
   private static class PoolWorkflowStep implements WorkflowStep {
     private final String message;
-    private PoolProgressStep progressStep;
+    private PoolProgressStep poolProgressStep;
 
     PoolWorkflowStep(String message) {
       this.message = message;
@@ -98,28 +115,33 @@ public class TestWorkflow extends AbstractWorkflow {
 
     @Override
     public String getLogMessage() {
-      return String.format("Processed Pool with id %d", progressStep.getInput().getId());
+      Pool pool = poolProgressStep.getInput();
+      return String.format("Selected Pool %s (%s)", pool.getAlias(), pool.getName());
     }
 
     @Override
     public ProgressStep getProgressStep() {
-      return progressStep;
+      return poolProgressStep;
+    }
+
+    Pool getInput() {
+      return poolProgressStep.getInput();
     }
 
     @Override
     public void processInput(PoolProgressStep step) {
-      this.progressStep = step;
+      this.poolProgressStep = step;
     }
 
     @Override
     public void cancelInput() {
-      this.progressStep = null;
+      this.poolProgressStep = null;
     }
   }
 
   private static class IntegerWorkflowStep implements WorkflowStep {
     private final String message;
-    private IntegerProgressStep progressStep;
+    private IntegerProgressStep integerProgressStep;
 
     IntegerWorkflowStep(String message) {
       this.message = message;
@@ -132,22 +154,26 @@ public class TestWorkflow extends AbstractWorkflow {
 
     @Override
     public String getLogMessage() {
-      return String.format("Processed integer %d", progressStep.getInput());
+      return String.format("Entered concentration value: %d", integerProgressStep.getInput());
     }
 
     @Override
     public ProgressStep getProgressStep() {
-      return progressStep;
+      return integerProgressStep;
+    }
+
+    int getInput() {
+      return integerProgressStep.getInput();
     }
 
     @Override
     public void processInput(IntegerProgressStep step) {
-      this.progressStep = step;
+      this.integerProgressStep = step;
     }
 
     @Override
     public void cancelInput() {
-      this.progressStep = null;
+      this.integerProgressStep = null;
     }
   }
 }

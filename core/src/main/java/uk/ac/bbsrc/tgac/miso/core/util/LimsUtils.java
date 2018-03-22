@@ -31,9 +31,12 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -430,5 +433,21 @@ public class LimsUtils {
       return String.format("%.0f%s", concentration, concentrationUnits);
     }
     return null;
+  }
+
+  public static String joinWithConjunction(Collection<String> words, String conjunction) {
+    switch (words.size()) {
+    case 0:
+      throw new IllegalArgumentException("No words provided");
+    case 1:
+      return words.iterator().next();
+    case 2:
+      Iterator<String> iterator = words.iterator();
+      return iterator.next() + " " + conjunction + " " + iterator.next();
+    default:
+      List<String> wordsCopy = new ArrayList<>(words);
+      wordsCopy.set(wordsCopy.size() - 1, conjunction + " " + wordsCopy.get(wordsCopy.size() - 1));
+      return String.join(", ", wordsCopy);
+    }
   }
 }

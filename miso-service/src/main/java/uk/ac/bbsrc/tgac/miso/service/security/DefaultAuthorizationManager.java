@@ -182,4 +182,10 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
     return filterUnreadable(unfiltered, x -> x);
   }
 
+  @Override
+  public void throwIfNotOwner(User owner) throws IOException {
+    if (!getCurrentUser().getUserId().equals(owner.getUserId())) {
+      throw new AuthorizationException("Current user is not owner");
+    }
+  }
 }

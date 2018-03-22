@@ -21,7 +21,7 @@ public abstract class AbstractWorkflow implements Workflow {
     if (this.progress != null) throw new IllegalStateException("Progress is already set");
     validateProgress(progress);
 
-    processInputs(new ArrayList<>(progress.getSteps()));
+    if (progress.getSteps() != null) processInputs(new ArrayList<>(progress.getSteps()));
     this.progress = progress;
   }
 

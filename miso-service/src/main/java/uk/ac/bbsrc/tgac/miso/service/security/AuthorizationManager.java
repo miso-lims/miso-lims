@@ -171,4 +171,5 @@ public interface AuthorizationManager {
   public <T, P extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered, Function<T, P> getOwner)
       throws IOException, AuthorizationException;
 
+  public void throwIfNotOwner(User owner) throws IOException;
 }

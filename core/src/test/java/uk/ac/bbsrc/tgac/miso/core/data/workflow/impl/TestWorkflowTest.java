@@ -2,8 +2,9 @@ package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName.LOADSEQUENCER;
+import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName.LOAD_SEQUENCER;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +28,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
 public class TestWorkflowTest {
   private static final int INT_1 = 3;
   private static final int INT_2 = 4;
-  private static final long POOL_ID = 5;
+  private static final String POOL_ALIAS = "pool_alias";
+  private static final String POOL_NAME = "pool_name";
 
   // Use null for WorkflowName since we can't create an Enum value for a test workflow
   private static final WorkflowName WORKFLOW_NAME = null;
@@ -46,9 +48,9 @@ public class TestWorkflowTest {
   }
 
   private void assertNoInput(Workflow workflow) {
-    assertThrows(IllegalArgumentException.class, () -> workflow.processInput(2, makePoolStep(POOL_ID)));
+    assertThrows(IllegalArgumentException.class, () -> workflow.processInput(2, makePoolStep(POOL_ALIAS, POOL_NAME)));
 
-    assertEquivalent(makeProgress(), workflow.getProgress());
+    assertEquivalent(makeProgress(WORKFLOW_NAME, new ProgressStep[] {}), workflow.getProgress());
     assertIntegerPrompt(workflow.getNextStep());
     assertIntegerPrompt(workflow.getStep(0));
     assertThrows(IllegalArgumentException.class, () -> workflow.getStep(1));
@@ -70,21 +72,28 @@ public class TestWorkflowTest {
   @Test
   public void testSetProgressTwiceThrowsError() {
     workflow = new TestWorkflow();
-    workflow.setProgress(makeProgress());
+    workflow.setProgress(makeProgress(WORKFLOW_NAME));
 
-    assertThrows(IllegalStateException.class, () -> workflow.setProgress(makeProgress()));
+    assertThrows(IllegalStateException.class, () -> workflow.setProgress(makeProgress(WORKFLOW_NAME)));
   }
 
   @Test
   public void testCreateNewWorkflowWithIncorrectWorkflowName() {
     workflow = new TestWorkflow();
-    assertThrows(IllegalArgumentException.class, () -> workflow.setProgress(makeProgress(LOADSEQUENCER)));
+    assertThrows(IllegalArgumentException.class, () -> workflow.setProgress(makeProgress(LOAD_SEQUENCER)));
+  }
+
+  @Test
+  public void testSetProgressWithoutSteps() {
+    workflow = new TestWorkflow();
+    workflow.setProgress(makeProgress(WORKFLOW_NAME));
+    assertNoInput(workflow);
   }
 
   @Test
   public void testProcessInvalidInput() {
     workflow = makeNewWorkflow();
-    assertThrows(IllegalArgumentException.class, () -> workflow.processInput(makePoolStep(POOL_ID)));
+    assertThrows(IllegalArgumentException.class, () -> workflow.processInput(makePoolStep(POOL_ALIAS, POOL_NAME)));
   }
 
   @Test
@@ -95,15 +104,15 @@ public class TestWorkflowTest {
   }
 
   private void assertReceivedOneInput(Workflow workflow, int input) {
-    assertThrows(IllegalArgumentException.class, () -> workflow.processInput(2, makePoolStep(POOL_ID)));
+    assertThrows(IllegalArgumentException.class, () -> workflow.processInput(2, makePoolStep(POOL_ALIAS, POOL_NAME)));
 
-    assertEquivalent(makeProgress(makeIntegerStep(input, 0)), workflow.getProgress());
+    assertEquivalent(makeProgress(WORKFLOW_NAME, makeIntegerStep(input, 0)), workflow.getProgress());
     assertPoolPrompt(workflow.getNextStep());
     assertIntegerPrompt(workflow.getStep(0));
     assertPoolPrompt(workflow.getStep(1));
     assertThrows(IllegalArgumentException.class, () -> workflow.getStep(2));
     assertFalse(workflow.isComplete());
-    assertEquals(Collections.singletonList(String.format("Processed integer %d", input)), workflow.getLog());
+    assertEquals(Collections.singletonList(String.format("Entered concentration value: %d", input)), workflow.getLog());
   }
 
   @Test
@@ -125,27 +134,28 @@ public class TestWorkflowTest {
 
   private Workflow makeExistingWorkflow(ProgressStep... steps) {
     Workflow workflow = new TestWorkflow();
-    workflow.setProgress(makeProgress(steps));
+    workflow.setProgress(makeProgress(WORKFLOW_NAME, steps));
     return workflow;
   }
 
   @Test
   public void testProcessInputAfterLoadingInput() {
     workflow = makeExistingWorkflow(makeIntegerStep(INT_1));
-    workflow.processInput(makePoolStep(POOL_ID));
-    assertReceivedTwoInputs(workflow, INT_1, POOL_ID);
+    workflow.processInput(makePoolStep(POOL_ALIAS, POOL_NAME));
+    assertReceivedTwoInputs(workflow, INT_1, POOL_ALIAS, POOL_NAME);
   }
 
-  private void assertReceivedTwoInputs(Workflow workflow, int input1, long input2Id) {
-    assertThrows(IllegalArgumentException.class, () -> workflow.processInput(2, makePoolStep(POOL_ID)));
+  private void assertReceivedTwoInputs(Workflow workflow, int intInput, String poolAlias, String poolName) {
+    assertThrows(IllegalArgumentException.class, () -> workflow.processInput(2, makePoolStep(POOL_ALIAS, POOL_NAME)));
 
-    assertEquivalent(makeProgress(makeIntegerStep(input1, 0), makePoolStep(input2Id, 1)), workflow.getProgress());
+    assertEquivalent(makeProgress(WORKFLOW_NAME, makeIntegerStep(intInput, 0), makePoolStep(poolAlias, poolName, 1)), workflow.getProgress());
     assertThrows(IllegalArgumentException.class, workflow::getNextStep);
     assertIntegerPrompt(workflow.getStep(0));
     assertPoolPrompt(workflow.getStep(1));
     assertThrows(IllegalArgumentException.class, () -> workflow.getStep(2));
     assertTrue(workflow.isComplete());
-    assertEquals(Arrays.asList(String.format("Processed integer %d", input1), String.format("Processed Pool with id %d", input2Id)),
+    assertEquals(
+        Arrays.asList(String.format("Entered concentration value: %d", intInput), String.format("Selected Pool %s (%s)", poolAlias, poolName)),
         workflow.getLog());
   }
 
@@ -165,7 +175,7 @@ public class TestWorkflowTest {
 
   @Test
   public void testProcessInputAtPreviousStep() {
-    workflow = makeExistingWorkflow(makeIntegerStep(INT_1), makePoolStep(POOL_ID));
+    workflow = makeExistingWorkflow(makeIntegerStep(INT_1), makePoolStep(POOL_ALIAS, POOL_NAME));
     workflow.processInput(0, makeIntegerStep(INT_2));
     assertReceivedOneInput(workflow, INT_2);
   }
@@ -182,20 +192,21 @@ public class TestWorkflowTest {
 
   private Workflow makeNewWorkflow() {
     Workflow workflow = new TestWorkflow();
-    workflow.setProgress(makeProgress());
+    workflow.setProgress(makeProgress(WORKFLOW_NAME));
     return workflow;
   }
 
-  private PoolProgressStep makePoolStep(long poolId, int stepNumber) {
-    PoolProgressStep step = makePoolStep(poolId);
+  private PoolProgressStep makePoolStep(String alias, String name, int stepNumber) {
+    PoolProgressStep step = makePoolStep(alias, name);
     step.setStepNumber(stepNumber);
     return step;
   }
 
-  private PoolProgressStep makePoolStep(long poolId) {
+  private PoolProgressStep makePoolStep(String alias, String name) {
     PoolProgressStep step = new PoolProgressStep();
     Pool pool = new PoolImpl();
-    pool.setId(poolId);
+    pool.setAlias(alias);
+    pool.setName(name);
     step.setInput(pool);
     return step;
   }
@@ -214,12 +225,12 @@ public class TestWorkflowTest {
 
   private void assertIntegerPrompt(WorkflowStepPrompt prompt) {
     assertEquals(Sets.newHashSet(InputType.INTEGER), prompt.getDataTypes());
-    assertEquals("Input an integer.", prompt.getMessage());
+    assertEquals("Input a concentration as an integer.", prompt.getMessage());
   }
 
   private void assertPoolPrompt(WorkflowStepPrompt prompt) {
     assertEquals(Sets.newHashSet(InputType.POOL), prompt.getDataTypes());
-    assertEquals("Input a pool.", prompt.getMessage());
+    assertEquals("Scan a Pool to modify its concentration.", prompt.getMessage());
   }
 
   /**
@@ -228,29 +239,33 @@ public class TestWorkflowTest {
   private void assertEquivalent(Progress expectedProgress, Progress actualProgress) {
     assertEquals(expectedProgress.getWorkflowName(), actualProgress.getWorkflowName());
 
-    List<ProgressStep> expectedSteps = new ArrayList<>(expectedProgress.getSteps());
-    List<ProgressStep> actualSteps = new ArrayList<>(actualProgress.getSteps());
-    assertEquals(expectedSteps.size(), actualSteps.size());
-    for (int i = 0; i < expectedSteps.size(); ++i) {
-      assertEquals(expectedSteps.get(i).getStepNumber(), actualSteps.get(i).getStepNumber());
-      if (expectedSteps.get(i) instanceof IntegerProgressStep) {
-        assertEquals(((IntegerProgressStep) expectedSteps.get(i)).getInput(), ((IntegerProgressStep) actualSteps.get(i)).getInput());
-      } else {
-        assertEquals(((PoolProgressStep) expectedSteps.get(i)).getInput(), ((PoolProgressStep) actualSteps.get(i)).getInput());
+    if (expectedProgress.getSteps() == null) {
+      assertNull(actualProgress.getSteps());
+    } else {
+      List<ProgressStep> expectedSteps = new ArrayList<>(expectedProgress.getSteps());
+      List<ProgressStep> actualSteps = new ArrayList<>(actualProgress.getSteps());
+      assertEquals(expectedSteps.size(), actualSteps.size());
+      for (int i = 0; i < expectedSteps.size(); ++i) {
+        assertEquals(expectedSteps.get(i).getStepNumber(), actualSteps.get(i).getStepNumber());
+        if (expectedSteps.get(i) instanceof IntegerProgressStep) {
+          assertEquals(((IntegerProgressStep) expectedSteps.get(i)).getInput(), ((IntegerProgressStep) actualSteps.get(i)).getInput());
+        } else {
+          assertEquals(((PoolProgressStep) expectedSteps.get(i)).getInput(), ((PoolProgressStep) actualSteps.get(i)).getInput());
+        }
       }
     }
   }
 
-  private Progress makeProgress(ProgressStep... steps) {
-    return makeProgress(WORKFLOW_NAME, steps);
-  }
-
   private Progress makeProgress(WorkflowName workflowName, ProgressStep... steps) {
-    Progress progress = new ProgressImpl();
-
-    progress.setWorkflowName(workflowName);
+    Progress progress = makeProgress(workflowName);
     progress.setSteps(Arrays.asList(steps));
 
+    return progress;
+  }
+
+  private Progress makeProgress(WorkflowName workflowName) {
+    Progress progress = new ProgressImpl();
+    progress.setWorkflowName(workflowName);
     return progress;
   }
 }

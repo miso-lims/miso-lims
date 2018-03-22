@@ -147,7 +147,6 @@ public class ProgressImpl implements Progress {
       if (other.user != null) return false;
     } else if (!user.equals(other.user)) return false;
     if (workflowProgressId != other.workflowProgressId) return false;
-    if (workflowName != other.workflowName) return false;
-    return true;
+    return workflowName == other.workflowName;
   }
 }
