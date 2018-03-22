@@ -196,7 +196,7 @@ var Utils = Utils
         });
       },
 
-      showConfirmDialog: function(title, okButton, fields, callback) {
+      showConfirmDialog: function(title, okButton, fields, callback, cancelCallback) {
         var dialogArea = document.getElementById('dialog');
         while (dialogArea.hasChildNodes()) {
           dialogArea.removeChild(dialogArea.lastChild);
@@ -222,6 +222,9 @@ var Utils = Utils
           text: 'Cancel',
           click: function() {
             dialog.dialog("close");
+            if (typeof cancelCallback == 'function') {
+              cancelCallback();
+            }
           }
         };
         var dialog = jQuery('#dialog').dialog({

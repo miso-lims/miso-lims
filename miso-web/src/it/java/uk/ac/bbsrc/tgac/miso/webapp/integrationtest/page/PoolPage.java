@@ -83,9 +83,14 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     return new PoolPage(driver);
   }
 
-  public PoolPage save() {
+  public PoolPage save(boolean confirmMissingBarcode) {
     WebElement html = getHtmlElement();
     saveButton.click();
+    if (confirmMissingBarcode) {
+      WebElement okButton = getDriver().findElement(By.id("ok"));
+      okButton.click();
+      waitUntil(invisibilityOf(okButton));
+    }
     waitForPageRefresh(html);
     return new PoolPage(getDriver());
   }
