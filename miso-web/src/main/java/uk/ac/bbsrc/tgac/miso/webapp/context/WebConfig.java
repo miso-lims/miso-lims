@@ -15,7 +15,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.service.BarcodableService;
+import uk.ac.bbsrc.tgac.miso.service.workflow.factory.ProgressStepFactory;
 import uk.ac.bbsrc.tgac.miso.spring.LimsBindingInitializer;
 import uk.ac.bbsrc.tgac.miso.webapp.util.SessionConversationAttributeStore;
 
@@ -59,5 +61,13 @@ public class WebConfig extends WebMvcConfigurationSupport {
   @Bean
   public Map<EntityType, BarcodableService> barcodableServicesMap() {
     return barcodableServices.stream().collect(Collectors.toMap(BarcodableService::getEntityType, Function.identity()));
+  }
+
+  @Autowired
+  private List<ProgressStepFactory> progressStepFactories;
+
+  @Bean
+  public Map<ProgressStep.FactoryType, ProgressStepFactory> progressStepFactoryMap() {
+    return progressStepFactories.stream().collect(Collectors.toMap(ProgressStepFactory::getFactoryType, Function.identity()));
   }
 }

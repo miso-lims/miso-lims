@@ -134,4 +134,8 @@ public class MigrationAuthorizationManager implements AuthorizationManager {
     // auth disabled in this manager; do nothing
   }
 
+  @Override
+  public void throwIfNotOwner(User owner) throws IOException {
+    // auth disabled in this manager; do nothing
+  }
 }

@@ -689,8 +689,8 @@ INSERT INTO ArrayRun(arrayRunId, alias, instrumentId, arrayId, health, startDate
 (1, 'ArrayRun_1', 3, 1, 'Running', '2018-02-02', 1, '2018-02-02 15:40:00', 1, '2018-02-02 15:40:00');
 
 INSERT INTO WorkflowProgress(workflowProgressId, workflowName, userId) VALUES
-(1, 'LOADSEQUENCER', 3),
-(2, 'LOADSEQUENCER', 3);
+(1, 'LOAD_SEQUENCER', 3),
+(2, 'LOAD_SEQUENCER', 3);
 
 INSERT INTO WorkflowProgressStep(workflowProgressId, stepNumber) VALUES
 (1, 1),

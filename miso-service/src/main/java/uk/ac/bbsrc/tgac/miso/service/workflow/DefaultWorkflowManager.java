@@ -1,0 +1,141 @@
+package uk.ac.bbsrc.tgac.miso.service.workflow;
+
+import static uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.FactoryType;
+import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.annotations.VisibleForTesting;
+
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.Progress;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowExecutor;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.ProgressImpl;
+import uk.ac.bbsrc.tgac.miso.core.store.ProgressStore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.service.workflow.factory.ProgressStepFactory;
+
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class DefaultWorkflowManager implements WorkflowManager {
+  @Autowired
+  private AuthorizationManager authorizationManager;
+
+  @Autowired
+  private ProgressStore progressStore;
+
+  @Autowired
+  private WorkflowExecutor workflowExecutor;
+
+  @Resource()
+  private Map<FactoryType, ProgressStepFactory> progressStepFactoryMap;
+
+  @Override
+  public Workflow beginWorkflow(String workflowNameString) throws IOException {
+    WorkflowName workflowName = WorkflowName.valueOf(workflowNameString);
+
+    Progress progress = new ProgressImpl();
+    progress.setWorkflowName(workflowName);
+
+    saveProgress(progress);
+    return workflowName.createWorkflow(progress);
+  }
+
+  @Override
+  public Workflow processInput(Workflow workflow, String input) throws IOException {
+    workflow.processInput(makeProgressStep(input, workflow.getNextStep().getDataTypes()));
+    saveProgress(workflow.getProgress());
+    return workflow;
+  }
+
+  @Override
+  public Workflow processInput(Workflow workflow, int stepNumber, String input) throws IOException {
+    workflow.processInput(stepNumber, makeProgressStep(input, workflow.getNextStep().getDataTypes()));
+    saveProgress(workflow.getProgress());
+    return workflow;
+  }
+
+  @VisibleForTesting
+  protected ProgressStep makeProgressStep(String input, Set<InputType> inputTypes) throws IOException {
+    for (FactoryType factoryType : getFactoryTypes(inputTypes)) {
+      ProgressStep step = progressStepFactoryMap.get(factoryType).create(input, inputTypes);
+      if (step != null) {
+        return step;
+      }
+    }
+
+    throw new ValidationException(Collections.singletonList(
+        new ValidationError(String.format("No %s found matching '%s'", LimsUtils.joinWithConjunction(getNames(inputTypes), "or"), input))));
+  }
+
+  private List<String> getNames(Set<InputType> inputTypes) {
+    return inputTypes.stream().sorted().map(InputType::getName).collect(Collectors.toList());
+  }
+
+  /**
+   * @return sorted, de-duplicated list of FactoryTypes
+   */
+  private List<FactoryType> getFactoryTypes(Set<InputType> inputTypes) {
+    return inputTypes.stream().map(InputType::getFactoryType).distinct().sorted().collect(Collectors.toList());
+  }
+
+  @Override
+  public Workflow cancelInput(Workflow workflow) throws IOException {
+    workflow.cancelInput();
+    saveProgress(workflow.getProgress());
+    return workflow;
+  }
+
+  private void saveProgress(Progress progress) throws IOException {
+    if (progress.getUser() != null) authorizationManager.throwIfNotOwner(progress.getUser());
+    progress.setUser(authorizationManager.getCurrentUser());
+
+    Date now = new Date();
+    if (progress.getCreationTime() == null) {
+      progress.setCreationTime(now);
+    }
+    progress.setLastModified(now);
+
+    progressStore.save(progress);
+  }
+
+  @Override
+  public Workflow loadWorkflow(long progressId) throws IOException {
+    Progress progress = progressStore.get(progressId);
+    if (progress == null) return null;
+
+    authorizationManager.throwIfNotOwner(progress.getUser());
+    return progress.getWorkflowName().createWorkflow(progress);
+  }
+
+  @Override
+  public List<Workflow> listUserWorkflows() throws IOException {
+    return progressStore.listByUserId(authorizationManager.getCurrentUser().getUserId()).stream()
+        .map(progress -> progress.getWorkflowName().createWorkflow(progress)).collect(Collectors.toList());
+  }
+
+  @Override
+  public void execute(Workflow workflow) throws IOException {
+    if (!workflow.isComplete()) throw new IllegalArgumentException("Workflow is not complete");
+
+    workflow.execute(workflowExecutor);
+    progressStore.delete(workflow.getProgress());
+  }
+}
