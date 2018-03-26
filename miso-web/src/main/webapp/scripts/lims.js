@@ -416,7 +416,11 @@ var Utils = Utils
           width: 350,
           title: title,
           modal: true,
-          buttons: {}
+          buttons: {},
+          closeOnEscape: false,
+          open: function(event, ui) {
+            jQuery(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+          }
         });
         jQuery.ajax({
           'dataType': 'json',
