@@ -67,7 +67,7 @@ public final class DefaultIllumina extends RunProcessor {
 
   private static final Predicate<String> BCL_FILENAME = Pattern.compile("^s_[0-9]*_[0-9]*\\.bcl(\\.gz)?").asPredicate();
 
-  private static final Predicate<String> BCL_BGZF_FILENAME = Pattern.compile("^[0-9]*\\.bcl\\.bgzf").asPredicate();
+  private static final Predicate<String> BCL_BGZF_FILENAME = Pattern.compile("^[0-9]*\\.(bcl\\.bgzf|cbcl)").asPredicate();
 
   public static DefaultIllumina create(Builder builder, ObjectNode parameters) {
     return new DefaultIllumina(builder,
@@ -219,18 +219,24 @@ public final class DefaultIllumina extends RunProcessor {
       }
 
       if (!updatedHealth.isPresent() && dto.getNumReads() > 0) {
-        // Well, that didn't work. Maybe there are netcopy files.
-        long netCopyFiles = IntStream.rangeClosed(1, dto.getNumReads())//
-            .mapToObj(read -> String.format("Basecalling_Netcopy_complete_Read%d.txt", read))//
-            .map(fileName -> new File(runDirectory, fileName))//
-            .filter(File::exists)//
-            .count();
-        if (netCopyFiles == 0 && !new File(runDirectory, "CopyComplete.txt").exists()) {
-          // This might mean incomplete or it might mean the sequencer never wrote the files
+        if (new File(runDirectory, "CopyComplete.txt").exists()) {
+          // It's allegedly done.
+          updatedHealth = Optional.of(HealthType.Completed);
+          completness_method_success.labels("complete.txt").inc();
         } else {
-          // If we see some net copy files, then it's still running; if they're all here, assume it's done.
-          updatedHealth = Optional.of(netCopyFiles < dto.getNumReads() ? HealthType.Running : HealthType.Completed);
-          completness_method_success.labels("netcopy").inc();
+          // Well, that didn't work. Maybe there are netcopy files.
+          long netCopyFiles = IntStream.rangeClosed(1, dto.getNumReads())//
+              .mapToObj(read -> String.format("Basecalling_Netcopy_complete_Read%d.txt", read))//
+              .map(fileName -> new File(runDirectory, fileName))//
+              .filter(File::exists)//
+              .count();
+          if (netCopyFiles == 0) {
+            // This might mean incomplete or it might mean the sequencer never wrote the files
+          } else {
+            // If we see some net copy files, then it's still running; if they're all here, assume it's done.
+            updatedHealth = Optional.of(netCopyFiles < dto.getNumReads() ? HealthType.Running : HealthType.Completed);
+            completness_method_success.labels("netcopy").inc();
+          }
         }
       }
 

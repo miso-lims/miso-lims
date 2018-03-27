@@ -139,6 +139,24 @@ HotTarget.pool = {
     },
 
     HotUtils.printAction('pool'), ].concat(HotUtils.makeQcActions("Pool"));
+  },
+
+  confirmSave: function(flatObjects, isCreate) {
+    var deferred = jQuery.Deferred();
+    var missingBarcodesCount = flatObjects.filter(function(item) {
+      return !item.identificationBarcode;
+    }).length;
+    if (!isCreate || Constants.automaticBarcodes || !missingBarcodesCount) {
+      deferred.resolve();
+    } else {
+      Utils.showConfirmDialog('Missing Barcodes', 'Save', ['Pools should usually have barcodes. Are you sure you wish to save '
+          + missingBarcodesCount + (missingBarcodesCount > 1 ? ' pools without barcodes' : ' pool without one') + '?'], function() {
+        deferred.resolve();
+      }, function() {
+        deferred.reject();
+      });
+    }
+    return deferred.promise();
   }
 
 };

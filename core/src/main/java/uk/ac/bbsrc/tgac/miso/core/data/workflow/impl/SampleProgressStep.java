@@ -8,6 +8,7 @@ import javax.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.AbstractProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStep;
 
 @Entity
 @Table(name = "StepSample")
@@ -44,5 +45,10 @@ public class SampleProgressStep extends AbstractProgressStep {
       if (other.input != null) return false;
     } else if (!input.equals(other.input)) return false;
     return true;
+  }
+
+  @Override
+  public void accept(WorkflowStep visitor) {
+    visitor.processInput(this);
   }
 }

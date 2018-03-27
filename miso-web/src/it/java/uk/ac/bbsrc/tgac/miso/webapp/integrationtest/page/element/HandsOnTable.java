@@ -209,7 +209,16 @@ public class HandsOnTable extends AbstractElement {
   }
 
   public HandsOnTableSaveResult save() {
+    return save(false);
+  }
+
+  public HandsOnTableSaveResult save(boolean confirmRequired) {
     saveButton.click();
+    if (confirmRequired) {
+      WebElement okButton = getDriver().findElement(By.id("ok"));
+      okButton.click();
+      waitUntil(invisibilityOf(okButton));
+    }
     waitUntil(invisibilityOf(ajaxLoader));
     return new HandsOnTableSaveResult(getDriver(), this);
   }

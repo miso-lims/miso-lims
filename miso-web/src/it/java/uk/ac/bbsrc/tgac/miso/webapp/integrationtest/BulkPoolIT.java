@@ -255,7 +255,7 @@ public class BulkPoolIT extends AbstractIT {
     // enter pool data
     attrs.remove(Columns.NAME);
     attrs.put(Columns.ALIAS, "IPOT_POOL_TOGETHER");
-    attrs.put(Columns.BARCODE, "ipotpooltogetherbar");
+    attrs.put(Columns.BARCODE, null);
     attrs.put(Columns.CREATE_DATE, "2017-08-01");
     attrs.put(Columns.CONCENTRATION, "1.23");
     attrs.put(Columns.VOLUME, "4.56");
@@ -263,7 +263,7 @@ public class BulkPoolIT extends AbstractIT {
     fillRow(table, 0, attrs);
     assertColumnValues(table, 0, attrs, "changes pre-save");
 
-    saveAndAssertSuccess(table);
+    saveAndAssertSuccess(table, true);
     assertColumnValues(table, 0, attrs, "post-save");
 
     String savedName = assertAndGetSavedName(table, 0);

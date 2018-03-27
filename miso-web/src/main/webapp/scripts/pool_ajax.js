@@ -21,7 +21,17 @@
  * *********************************************************************
  */
 
-var Pool = Pool || {
+var Pool = {
+
+  savePool: function() {
+    if (jQuery('#poolId').text().indexOf('Unsaved') > -1 && !Constants.automaticBarcodes && !jQuery('#identificationBarcode').val().length) {
+      Utils.showConfirmDialog("Missing Barcode", "Save",
+          ["Pools should usually have barcodes. Are you sure you wish to save without one?"], Pool.validatePool);
+    } else {
+      Pool.validatePool();
+    }
+  },
+
   validatePool: function() {
     Validate.cleanFields('#pool-form');
     jQuery('#pool-form').parsley().destroy();

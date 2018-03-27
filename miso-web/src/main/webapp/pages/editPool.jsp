@@ -39,7 +39,7 @@
 <sessionConversation:insertSessionConversationId attributeName="pool"/>
 <h1><c:choose><c:when
     test="${pool.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose> Pool
-  <button id="save" type="button" onclick="return Pool.validatePool();" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <button id="save" type="button" onclick="return Pool.savePool();" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
   <c:if test="${pool.id != 0 && not empty pool.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('pool', [${pool.id}]);">Print Barcode</span></c:if>

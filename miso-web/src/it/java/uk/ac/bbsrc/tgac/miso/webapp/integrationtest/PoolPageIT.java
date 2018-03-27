@@ -57,7 +57,7 @@ public class PoolPageIT extends AbstractIT {
     fields.putAll(changes);
     assertFieldValues("pre-save", fields, page1);
 
-    PoolPage page2 = page1.save();
+    PoolPage page2 = page1.save(true);
     fields.remove(Field.ID);
     fields.remove(Field.NAME);
     assertFieldValues("post-save", fields, page2);
@@ -98,7 +98,7 @@ public class PoolPageIT extends AbstractIT {
     fields.putAll(changes);
     assertFieldValues("changes pre-save", fields, page1);
 
-    PoolPage page2 = page1.save();
+    PoolPage page2 = page1.save(false);
     assertFieldValues("post-save", fields, page2);
     Pool savedPool = (Pool) getSession().get(PoolImpl.class, 120001L);
     assertPoolAttributes(fields, savedPool);
@@ -134,7 +134,7 @@ public class PoolPageIT extends AbstractIT {
     fields.putAll(changes);
     assertFieldValues("changes pre-save", fields, page1);
 
-    PoolPage page2 = page1.save();
+    PoolPage page2 = page1.save(false);
     assertFieldValues("post-save", fields, page2);
     Pool savedPool = (Pool) getSession().get(PoolImpl.class, 120002L);
     assertPoolAttributes(fields, savedPool);
@@ -170,7 +170,7 @@ public class PoolPageIT extends AbstractIT {
     fields.putAll(changes);
     assertFieldValues("changes pre-save", fields, page1);
 
-    PoolPage page2 = page1.save();
+    PoolPage page2 = page1.save(false);
     assertFieldValues("post-save", fields, page2);
     Pool savedPool = (Pool) getSession().get(PoolImpl.class, 120003L);
     assertPoolAttributes(fields, savedPool);
@@ -190,7 +190,7 @@ public class PoolPageIT extends AbstractIT {
     page1.setField(Field.DISCARDED, "true");
     assertFalse(page1.isEditable(Field.VOLUME));
 
-    PoolPage page2 = page1.save();
+    PoolPage page2 = page1.save(false);
     Map<Field, String> changes = Maps.newLinkedHashMap();
     changes.put(Field.DISCARDED, "true");
     changes.put(Field.VOLUME, "0.0");

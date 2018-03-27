@@ -196,7 +196,7 @@ var Utils = Utils
         });
       },
 
-      showConfirmDialog: function(title, okButton, fields, callback) {
+      showConfirmDialog: function(title, okButton, fields, callback, cancelCallback) {
         var dialogArea = document.getElementById('dialog');
         while (dialogArea.hasChildNodes()) {
           dialogArea.removeChild(dialogArea.lastChild);
@@ -222,6 +222,9 @@ var Utils = Utils
           text: 'Cancel',
           click: function() {
             dialog.dialog("close");
+            if (typeof cancelCallback == 'function') {
+              cancelCallback();
+            }
           }
         };
         var dialog = jQuery('#dialog').dialog({
@@ -416,7 +419,11 @@ var Utils = Utils
           width: 350,
           title: title,
           modal: true,
-          buttons: {}
+          buttons: {},
+          closeOnEscape: false,
+          open: function(event, ui) {
+            jQuery(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+          }
         });
         jQuery.ajax({
           'dataType': 'json',
