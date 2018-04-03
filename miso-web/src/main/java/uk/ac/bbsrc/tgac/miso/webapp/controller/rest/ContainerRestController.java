@@ -102,6 +102,7 @@ public class ContainerRestController extends RestController {
     if (platformType == null) {
       throw new RestException("Invalid platform.", Status.BAD_REQUEST);
     }
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(platformType));
+    DataTablesResponseDto<ContainerDto> dto = jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(platformType));
+    return dto;
   }
 }

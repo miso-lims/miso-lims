@@ -1004,7 +1004,6 @@ public class ValueTypeLookup {
     run.setSequencer(sequencer);
     if (run.getSequencerPartitionContainers() != null) {
       for (SequencerPartitionContainer flowcell : run.getSequencerPartitionContainers()) {
-        if (flowcell.getPlatform() == null) flowcell.setPlatform(platform);
         if (flowcell.getPartitions() != null) {
           for (Partition lane : flowcell.getPartitions()) {
             if (lane.getPool() != null && lane.getPool().getPlatformType() == null) {

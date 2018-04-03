@@ -40,7 +40,7 @@
     <c:choose>
       <c:when test="${container.id != 0}">Edit</c:when>
       <c:otherwise>Create</c:otherwise>
-    </c:choose> ${container.platform.platformType.containerName}
+    </c:choose> ${container.model.platformType.containerName}
     <button type="button" id="save" class="fg-button ui-state-default ui-corner-all"
           onclick="return Container.validateContainer();">Save</button>
   </h1>
@@ -67,14 +67,9 @@
       <td>Serial Number:*</td>
       <td><form:input id="identificationBarcode" path="identificationBarcode"/> </td>
     </tr>
-
     <tr>
-      <td>Platform:</td>
-      <td><span id="platform">${container.platform.platformType.key}</span></td>
-    </tr>
-    <tr>
-      <td>Sequencer Model:</td>
-      <td><span id="model">${container.platform.instrumentModel}</span></td>
+      <td>Container Model:</td>
+      <td><span id="model">${container.model.alias}</span></td>
     </tr>
     <tr>
       <td>Clustering Kit:</td>
@@ -113,7 +108,7 @@
 
   <c:if test="${container.id != 0}">
     <miso:qcs id="list_qcs" item="${container}"/>
-    <miso:list-section id="list_partition" name="${container.platform.platformType.partitionName}" target="partition" items="${containerPartitions}" config="{ 'platformType' : '${container.platform.platformType.name()}', 'showContainer' : false }"/>
+    <miso:list-section id="list_partition" name="${container.model.platformType.partitionName}" target="partition" items="${containerPartitions}" config="{ 'platformType' : '${container.model.platformType.name()}', 'showContainer' : false }"/>
   </c:if>
   <miso:list-section id="list_run" name="Runs" target="run" items="${containerRuns}"/>
   <miso:changelog item="${container}"/>

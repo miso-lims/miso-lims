@@ -114,6 +114,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
@@ -1524,7 +1525,7 @@ public class Dtos {
     ContainerDto dto = new ContainerDto();
     dto.setId(from.getId());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    dto.setPlatform(from.getPlatform().getPlatformType().getKey());
+    dto.setModel(asDto(from.getModel()));
     Run lastRun = from.getLastRun();
     if (lastRun != null) {
       dto.setLastRunAlias(lastRun.getAlias());
@@ -1550,6 +1551,21 @@ public class Dtos {
       dtoList.add(asDto(container));
     }
     return dtoList;
+  }
+
+  public static ContainerModelDto asDto(SequencingContainerModel from) {
+    ContainerModelDto dto = new ContainerModelDto();
+    dto.setId(from.getId());
+    dto.setAlias(from.getAlias());
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    dto.setPlatformType(from.getPlatformType().name());
+    dto.setPartitionCount(from.getPartitionCount());
+    dto.setArchived(from.isArchived());
+    return dto;
+  }
+
+  public static List<ContainerModelDto> asDtos(Collection<SequencingContainerModel> models) {
+    return models.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
   public static QcTypeDto asDto(QcType from) {
@@ -1628,7 +1644,6 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setInstrumentModel(from.getInstrumentModel());
     dto.setNumContainers(from.getNumContainers());
-    dto.setPartitionSizes(from.getPartitionSizes());
     dto.setInstrumentType(from.getInstrumentType().name());
     return dto;
   }

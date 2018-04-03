@@ -24,18 +24,14 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
-import java.util.Set;
 
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
@@ -70,11 +66,6 @@ public class Platform implements Comparable<Platform>, Serializable {
   private String instrumentModel;
 
   private int numContainers;
-
-  @ElementCollection
-  @CollectionTable(name = "PlatformSizes", joinColumns = { @JoinColumn(name = "platform_platformId") })
-  @Column(name = "partitionSize")
-  private Set<Integer> partitionSizes;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -122,14 +113,6 @@ public class Platform implements Comparable<Platform>, Serializable {
 
   public void setNumContainers(int numContainers) {
     this.numContainers = numContainers;
-  }
-
-  public Set<Integer> getPartitionSizes() {
-    return partitionSizes;
-  }
-
-  public void setPartitionSizes(Set<Integer> partitionSizes) {
-    this.partitionSizes = partitionSizes;
   }
 
   public InstrumentType getInstrumentType() {

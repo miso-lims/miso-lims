@@ -33,6 +33,7 @@ public abstract class NotificationDto implements Predicate<SequencingParameters>
   private String sequencerFolderPath;
   private String sequencerName;
   private String containerSerialNumber;
+  private String containerModel;
   private int laneCount;
   private HealthType healthType;
   private LocalDateTime startDate;
@@ -84,10 +85,22 @@ public abstract class NotificationDto implements Predicate<SequencingParameters>
   }
 
   /**
-   * Get the number of partitions in this run.
+   * @return the part number OR model name of the container
+   */
+  public String getContainerModel() {
+    return containerModel;
+  }
+
+  public void setContainerModel(String containerModel) {
+    this.containerModel = containerModel;
+  }
+
+  /**
+   * If container model is not provided, the lane count will be used to determine an appropriate container model in MISO. If MISO has to
+   * create a new container for this run, it will be pre-sized to this number of lanes. If, at a later time, the run scanner reports a
+   * different container size, any update from Run Scanner will be ignored by MISO.
    * 
-   * If MISO has to create a new container for this run, it will be pre-sized to this number of lanes. If, at a later time, the run scanner
-   * reports a different container size, any update from Run Scanner will be ignored by MISO.
+   * @return the number of partitions in this run.
    */
   public int getLaneCount() {
     return laneCount;

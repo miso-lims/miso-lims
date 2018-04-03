@@ -77,74 +77,43 @@ ListTarget.container = {
     return [{
       "name": "Add " + platformType.containerName,
       "handler": function() {
-        var models = Constants.platforms.filter(function(p) {
-          return p.platformType == config.platformType && p.active;
-        }).sort(Utils.sorting.standardSort('instrumentModel')).map(function(platform) {
+        var models = Constants.containerModels.filter(function(m) {
+          return m.platformType == config.platformType && !m.archived;
+        }).sort(Utils.sorting.standardSort('alias')).map(function(model) {
           return {
-            name: platform.instrumentModel,
+            name: model.alias,
             handler: function() {
-              var sizes = platform.partitionSizes.map(function(size) {
-
-                return {
-                  name: size + " " + (size == 1 ? platformType.partitionName : platformType.pluralPartitionName),
-                  handler: function() {
-                    window.location = "/miso/container/new/" + platform.id + "?count=" + size;
-                  }
-                };
-
-              });
-              if (sizes.length == 1) {
-                sizes[0].handler();
-              } else {
-                Utils.showWizardDialog("Add " + platform.instrumentModel + " " + platformType.containerName, sizes);
-              }
-
+              window.location = "/miso/container/new/" + model.id;
             }
-          };
+          }
         });
-        if (models.length == 1) {
-          models[0].handler();
-        } else {
-          Utils.showWizardDialog("Add " + platformType.containerName, models);
-        }
+        Utils.showWizardDialog("Add " + platformType.containerName, models);
 
       }
     }, ];
   },
   createColumns: function(config, projectId) {
-    return [
-      ListUtils.labelHyperlinkColumn("ID", "container", Utils.array.getId, "id", 1, true),
-      ListUtils.labelHyperlinkColumn("Serial Number", "container", Utils.array.getId, "identificationBarcode", 1, true),
-      {
-        "sTitle": "Platform",
-        "mData": "platform",
-        "include": !config.platformType,
-        "iSortPriority": 0
-      },
-      ListUtils.idHyperlinkColumn("Last Run Name", "run", "lastRunId", function(container) {
-        return "RUN" + container.lastRunId;
-      }, -1, true),
-      ListUtils.labelHyperlinkColumn("Last Run Alias", "run", function(container) {
-        return container.lastRunId;
-      }, "lastRunAlias", -1, true),
-      ListUtils.labelHyperlinkColumn("Last Sequencer Used", "sequencer", function(container) {
-        return container.lastSequencerId;
-      }, "lastSequencerName", -1, true),
-      {
-        "sTitle": "Last Modified",
-        "mData": "lastModified",
-        "include": true,
-        "iSortPriority": 2
-      }];
+    return [ListUtils.labelHyperlinkColumn("ID", "container", Utils.array.getId, "id", 1, true),
+        ListUtils.labelHyperlinkColumn("Serial Number", "container", Utils.array.getId, "identificationBarcode", 1, true), {
+          "sTitle": "Platform",
+          "mData": "platform",
+          "include": !config.platformType,
+          "iSortPriority": 0
+        }, ListUtils.idHyperlinkColumn("Last Run Name", "run", "lastRunId", function(container) {
+          return "RUN" + container.lastRunId;
+        }, -1, true), ListUtils.labelHyperlinkColumn("Last Run Alias", "run", function(container) {
+          return container.lastRunId;
+        }, "lastRunAlias", -1, true), ListUtils.labelHyperlinkColumn("Last Sequencer Used", "sequencer", function(container) {
+          return container.lastSequencerId;
+        }, "lastSequencerName", -1, true), {
+          "sTitle": "Last Modified",
+          "mData": "lastModified",
+          "include": true,
+          "iSortPriority": 2
+        }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['created'],
-      searchTerms['changed'],
-      searchTerms['creator'],
-      searchTerms['changedby'],
-      searchTerms['platform'],
-      searchTerms['index_name'],
-      searchTerms['index_seq']
-    ]
+    return [searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'],
+        searchTerms['index_name'], searchTerms['index_seq']]
   }
 };

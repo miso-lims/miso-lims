@@ -45,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -512,7 +513,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   @Override
-  public boolean processNotification(Run source, int laneCount, String containerSerialNumber, String sequencerName,
+  public boolean processNotification(Run source, int laneCount, String containerModel, String containerSerialNumber, String sequencerName,
       Predicate<SequencingParameters> filterParameters, GetLaneContents getLaneContents)
       throws IOException, MisoNamingException {
     final Date now = new Date();
@@ -551,11 +552,12 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     }
     target.setSequencer(sequencer);
 
-    if (!sequencer.getPlatform().getPartitionSizes().contains(laneCount)) {
-      throw new IllegalArgumentException("Invalid number of partitions: " + laneCount);
+    SequencingContainerModel model = containerService.findModel(sequencer.getPlatform(), containerModel, laneCount);
+    if (model == null) {
+      throw new IllegalArgumentException("Invalid container parameters: model=" + containerModel + ", lanes=" + laneCount);
     }
 
-    isMutated |= updateContainerFromNotification(target, user, laneCount, containerSerialNumber, sequencer, getLaneContents);
+    isMutated |= updateContainerFromNotification(target, user, model, containerSerialNumber, sequencer, getLaneContents);
     isMutated |= updateHealthFromNotification(source, target, user);
 
     switch (source.getPlatformType()) {
@@ -675,13 +677,14 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     return false;
   }
 
-  private boolean updateContainerFromNotification(final Run target, User user, int laneCount, String containerSerialNumber,
-      final Instrument sequencer, final GetLaneContents getLaneContents) throws IOException {
+  private boolean updateContainerFromNotification(final Run target, User user, SequencingContainerModel containerModel,
+      String containerSerialNumber, final Instrument sequencer, final GetLaneContents getLaneContents) throws IOException {
     final Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(containerSerialNumber);
+    int laneCount = containerModel.getPartitionCount();
     switch (containers.size()) {
     case 0:
       SequencerPartitionContainer newContainer = new SequencerPartitionContainerImpl(user);
-      newContainer.setPlatform(sequencer.getPlatform());
+      newContainer.setModel(containerModel);
       newContainer.setCreator(user);
       newContainer.setIdentificationBarcode(containerSerialNumber);
       newContainer.setPartitionLimit(laneCount);

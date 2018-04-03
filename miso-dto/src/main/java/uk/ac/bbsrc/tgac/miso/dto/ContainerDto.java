@@ -7,7 +7,7 @@ public class ContainerDto implements WritableUrls {
   // identificationBarcode is displayed as "serial number" to the user
   private String identificationBarcode;
   private String url;
-  private String platform;
+  private ContainerModelDto model;
   private String lastRunAlias;
   private Long lastRunId;
   private String lastSequencerName;
@@ -40,12 +40,12 @@ public class ContainerDto implements WritableUrls {
     this.url = url;
   }
 
-  public String getPlatform() {
-    return platform;
+  public ContainerModelDto getModel() {
+    return model;
   }
 
-  public void setPlatform(String platform) {
-    this.platform = platform;
+  public void setModel(ContainerModelDto model) {
+    this.model = model;
   }
 
   public String getLastRunAlias() {

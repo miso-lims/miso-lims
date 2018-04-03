@@ -439,15 +439,10 @@ VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07');
 
 DELETE FROM SequencingParameters;
-DELETE FROM PlatformSizes;
 DELETE FROM Platform;
 INSERT INTO Platform(platformId, name, instrumentModel, description, numContainers, instrumentType) VALUES
 (16, 'ILLUMINA', 'Illumina HiSeq 2000', '4-channel flowgram', 1, 'SEQUENCER'),
 (30, 'ILLUMINA', 'Illumina iScan', NULL, 1, 'ARRAY_SCANNER');
-
-INSERT INTO PlatformSizes(platform_platformId, partitionSize) VALUES
-(16, 2),
-(16, 8);
 
 DELETE FROM `Instrument`;
 INSERT INTO `Instrument`(`instrumentId`, `name`, `ip`, `platformId`)
@@ -514,11 +509,23 @@ VALUES (1,1,1),
 (32,8,NULL);
 
 DELETE FROM `SequencerPartitionContainer`;
-INSERT INTO `SequencerPartitionContainer`(`containerId`, `securityProfile_profileId`, `identificationBarcode`, `platform`, `lastModifier`, `lastModified`, `creator`, `created`) 
-VALUES (1,12,'C0JHTACXX',16,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47'),
-(2,13,'D0VJ9ACXX',16,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
-(3,14,'C075RACXX',16,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
-(4,15,'C0KY7ACXX',16,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53');
+DELETE FROM SequencingContainerModel_Platform;
+DELETE FROM SequencingContainerModel;
+INSERT INTO SequencingContainerModel (sequencingContainerModelId, alias, identificationBarcode, partitionCount, platformType, fallback) VALUES
+(1, 'Generic 8-Lane Illumina Flow Cell', NULL, 8, 'ILLUMINA', 1),
+(2, 'Generic 2-Lane Illumina Flow Cell', NULL, 2, 'ILLUMINA', 1),
+(3, 'HiSeq PE Flow Cell v4', '12345678', 8, 'ILLUMINA', 0);
+
+INSERT INTO SequencingContainerModel_Platform (sequencingContainerModelId, platformId) VALUES
+(1, 16),
+(2, 16),
+(3, 16);
+
+INSERT INTO `SequencerPartitionContainer`(`containerId`, `securityProfile_profileId`, `identificationBarcode`, sequencingContainerModelId, `lastModifier`, `lastModified`, `creator`, `created`) 
+VALUES (1,12,'C0JHTACXX',1,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47'),
+(2,13,'D0VJ9ACXX',1,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
+(3,14,'C075RACXX',1,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
+(4,15,'C0KY7ACXX',1,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53');
 
 INSERT INTO `SequencerPartitionContainerChangeLog`(`containerId`, `columnsChanged`, `userId`, `message`, `changeTime`)
 VALUES (1, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:47'),

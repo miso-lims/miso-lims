@@ -80,7 +80,7 @@ public interface RunService extends PaginatedDataSource<Run> {
    * @return true if the run is new, false if it already existed
    * @throws MisoNamingException
    */
-  boolean processNotification(Run run, int laneCount, String containerSerialNumber, String instrumentName,
+  boolean processNotification(Run run, int laneCount, String containerModel, String containerSerialNumber, String instrumentName,
       Predicate<SequencingParameters> filterParameters, GetLaneContents laneContents) throws IOException, MisoNamingException;
 
 }

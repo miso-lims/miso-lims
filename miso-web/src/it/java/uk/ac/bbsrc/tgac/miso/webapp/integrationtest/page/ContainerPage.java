@@ -13,7 +13,6 @@ public class ContainerPage extends FormPage<ContainerPage.Field> {
   public static enum Field implements FormPage.FieldElement {
     ID(By.id("containerId"), FieldType.LABEL), //
     SERIAL_NUMBER(By.id("identificationBarcode"), FieldType.TEXT), //
-    PLATFORM(By.id("platform"), FieldType.LABEL), //
     MODEL(By.id("model"), FieldType.LABEL), //
     CLUSTERING_KIT(By.id("clusteringKit"), FieldType.DROPDOWN), //
     MULTIPLEXING_KIT(By.id("multiplexingKit"), FieldType.DROPDOWN);
@@ -46,9 +45,8 @@ public class ContainerPage extends FormPage<ContainerPage.Field> {
     waitWithTimeout().until(or(titleContains("Flow Cell "), titleContains("8Pac ")));
   }
 
-  public static ContainerPage getForCreate(WebDriver driver, String baseUrl, Long sequencerModelId,
-      int numPartitions) {
-    driver.get(baseUrl + "miso/container/new/" + sequencerModelId.toString() + "?count=" + numPartitions);
+  public static ContainerPage getForCreate(WebDriver driver, String baseUrl, long containerModelId) {
+    driver.get(baseUrl + "miso/container/new/" + containerModelId);
     return new ContainerPage(driver);
   }
 
