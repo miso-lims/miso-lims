@@ -7,6 +7,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
 
 public interface WorkflowManager {
   /**
+   * Create an empty workflow and persist it.
    * @param workflowNameString String representation of a WorkflowName
    */
   Workflow beginWorkflow(String workflowNameString) throws IOException;
@@ -18,7 +19,8 @@ public interface WorkflowManager {
 
   /**
    * Interpret input as part of the step identified by stepNumber.
-   * Delegate input processing to workflow
+   * Delegate input processing to Workflow.
+   * Persist the updated Workflow.
    * @param input user input
    * @param stepNumber 0-based index into workflow steps
    * @return updated Workflow
@@ -26,12 +28,16 @@ public interface WorkflowManager {
   Workflow processInput(Workflow workflow, int stepNumber, String input) throws IOException;
 
   /**
-   * Remove the latest step from workflow and any effects it caused
-   * @return update Workflow
+   * Remove the latest step from workflow and any effects it caused.
+   * Persist the updated Workflow.
+   * @return updated Workflow
    */
   Workflow cancelInput(Workflow workflow) throws IOException;
 
-  Workflow loadWorkflow(long progressId) throws IOException;
+  /**
+   * @return null if Workflow does not exist
+   */
+  Workflow loadWorkflow(long id) throws IOException;
 
   /**
    * @return Workflows owned by the current User
@@ -40,7 +46,7 @@ public interface WorkflowManager {
 
   /**
    * Make all changes associated with workflow.
-   * After completion, workflow's associated Progress will be deleted.
+   * After completion, this Workflow will be deleted.
    */
   void execute(Workflow workflow) throws IOException;
 }
