@@ -705,13 +705,13 @@ INSERT INTO WorkflowProgress(workflowProgressId, workflowName, userId) VALUES
 (2, 'LOAD_SEQUENCER', 3);
 
 INSERT INTO WorkflowProgressStep(workflowProgressId, stepNumber) VALUES
-(1, 1),
-(2, 1),
-(2, 2);
+(1, 0),
+(2, 0),
+(2, 1);
 
 INSERT INTO StepSample(workflowProgressId, stepNumber, sampleId) VALUES
-(1, 1, 1),
-(2, 1, 2);
+(1, 0, 1),
+(2, 0, 2);
 
 INSERT INTO StepPool(workflowProgressId, stepNumber, poolId) VALUES
-(2, 2, 1);
+(2, 1, 1);

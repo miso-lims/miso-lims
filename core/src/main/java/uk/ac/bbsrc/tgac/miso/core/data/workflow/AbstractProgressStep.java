@@ -27,6 +27,7 @@ public abstract class AbstractProgressStep implements ProgressStep {
     this.id = new ProgressStepId();
   }
 
+  @Override
   public ProgressStepId getId() {
     return id;
   }
@@ -96,19 +97,28 @@ public abstract class AbstractProgressStep implements ProgressStep {
     @Column(nullable = false)
     private int stepNumber;
 
-    Progress getProgress() {
+    public ProgressStepId() {
+
+    }
+
+    public ProgressStepId(Progress progress, int stepNumber) {
+      this.progress = progress;
+      this.stepNumber = stepNumber;
+    }
+
+    public Progress getProgress() {
       return progress;
     }
 
-    void setProgress(Progress progress) {
+    public void setProgress(Progress progress) {
       this.progress = progress;
     }
 
-    int getStepNumber() {
+    public int getStepNumber() {
       return stepNumber;
     }
 
-    void setStepNumber(int stepNumber) {
+    public void setStepNumber(int stepNumber) {
       this.stepNumber = stepNumber;
     }
 

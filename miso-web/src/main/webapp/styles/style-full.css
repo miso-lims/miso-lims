@@ -2113,3 +2113,34 @@ button.disabled {
     border: none;
   }
 }
+
+#workflowDisplay * {
+    font-size: 20px;
+    margin: 5px;
+}
+
+.workflowLogTable {
+    border-top: 1px solid black;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-collapse: collapse;
+}
+
+.workflowLogTable td {
+    min-width: 40px;
+    border-bottom: 1px solid black;
+}
+
+.redoStep {
+    width: 20px;
+    height: 20px;
+}
+
+div#inputError {
+    color: red;
+}
+
+.logIcon {
+    width: 30px;
+    height: 30px;
+}

@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow;
 
+import static uk.ac.bbsrc.tgac.miso.core.data.workflow.AbstractProgressStep.ProgressStepId;
+
 import java.io.Serializable;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
@@ -8,6 +10,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
  * Holds the data for a single workflow step.  Each input should have its own step.
  */
 public interface ProgressStep extends Serializable, Comparable<ProgressStep> {
+  ProgressStepId getId();
+
   Progress getProgress();
 
   void setProgress(Progress progress);

@@ -21,8 +21,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
  * remain valid.
  */
 public class TestWorkflow extends AbstractWorkflow {
-  // Use null for WorkflowName since we can't create an Enum value for a test workflow
-  private static final WorkflowName WORKFLOW_NAME = null;
 
   private IntegerWorkflowStep step0 = new IntegerWorkflowStep("Input a concentration as an integer.");
   private PoolWorkflowStep step1 = new PoolWorkflowStep("Scan a Pool to modify its concentration.");
@@ -77,6 +75,12 @@ public class TestWorkflow extends AbstractWorkflow {
   }
 
   @Override
+  public String getConfirmMessage() {
+    return String.format("Pool %s (%s) will be modified to have concentration %d.", step1.getInput().getAlias(), step1.getInput().getName(),
+        step0.getInput());
+  }
+
+  @Override
   public void execute(WorkflowExecutor workflowExecutor) throws IOException {
     if (!isComplete()) throw new IllegalStateException("Workflow is not complete");
 
@@ -84,6 +88,11 @@ public class TestWorkflow extends AbstractWorkflow {
     pool.setConcentration((double) step0.getInput());
 
     workflowExecutor.save(pool);
+  }
+
+  @Override
+  public String getName() {
+    return "Test Workflow";
   }
 
   private int currentStepNumber() {
@@ -97,7 +106,7 @@ public class TestWorkflow extends AbstractWorkflow {
 
   @Override
   protected WorkflowName getWorkflowName() {
-    return WORKFLOW_NAME;
+    return null;
   }
 
   private static class PoolWorkflowStep implements WorkflowStep {
