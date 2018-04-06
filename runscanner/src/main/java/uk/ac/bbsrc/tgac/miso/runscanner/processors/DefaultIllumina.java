@@ -77,7 +77,7 @@ public final class DefaultIllumina extends RunProcessor {
   private static final Set<XPathExpression> CONTAINER_PARTNUMBER_XPATHS;
 
   private static final XPathExpression FLOWCELL;
-  private static final Pattern FLOWCELL_PATTERN = Pattern.compile("^([a-zA-Z]+ (?:Rapid)?) (Flow Cell v\\d)$");
+  private static final Pattern FLOWCELL_PATTERN = Pattern.compile("^([a-zA-Z]+(?: Rapid)?) (Flow Cell v\\d)$");
   private static final XPathExpression FLOWCELL_PAIRED;
 
   static {
