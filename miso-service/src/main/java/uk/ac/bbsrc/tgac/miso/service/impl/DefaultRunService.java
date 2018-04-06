@@ -557,7 +557,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       throw new IllegalArgumentException("Invalid container parameters: model=" + containerModel + ", lanes=" + laneCount);
     }
 
-    isMutated |= updateContainerFromNotification(target, user, model, containerSerialNumber, sequencer, getLaneContents);
+    isMutated |= updateContainerFromNotification(target, user, model, containerSerialNumber, getLaneContents);
     isMutated |= updateHealthFromNotification(source, target, user);
 
     switch (source.getPlatformType()) {
@@ -678,7 +678,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   private boolean updateContainerFromNotification(final Run target, User user, SequencingContainerModel containerModel,
-      String containerSerialNumber, final Instrument sequencer, final GetLaneContents getLaneContents) throws IOException {
+      String containerSerialNumber, final GetLaneContents getLaneContents) throws IOException {
     final Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(containerSerialNumber);
     int laneCount = containerModel.getPartitionCount();
     switch (containers.size()) {

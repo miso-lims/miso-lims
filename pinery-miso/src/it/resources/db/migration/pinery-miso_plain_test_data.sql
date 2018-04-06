@@ -9,6 +9,8 @@ DELETE FROM _Partition;
 DELETE FROM Run_SequencerPartitionContainer;
 DELETE FROM SequencerPartitionContainerChangeLog;
 DELETE FROM SequencerPartitionContainer;
+DELETE FROM SequencingContainerModel_Platform;
+DELETE FROM SequencingContainerModel;
 DELETE FROM RunIllumina;
 DELETE FROM RunIonTorrent;
 DELETE FROM RunLS454;
@@ -63,7 +65,6 @@ DELETE FROM BoxSize;
 DELETE FROM Indices;
 DELETE FROM IndexFamily;
 DELETE FROM SequencingParameters;
-DELETE FROM PlatformSizes;
 DELETE FROM Instrument WHERE upgradedInstrumentId IS NOT NULL;
 DELETE FROM Instrument;
 DELETE FROM Platform;
@@ -110,26 +111,11 @@ INSERT INTO SequencingParameters (parametersId, name, platformId, readLength, pa
   (3, '1x151', 1, 151, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V4'),
   (4, 'Micro 2x151', 2, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V3');
 
-INSERT INTO PlatformSizes(platform_platformId, partitionSize) VALUES
-  (1, 4),
-  (1, 8),
-  (2, 1),
-  (3, 1),
-  (3, 2),
-  (3, 3),
-  (3, 4),
-  (3, 5),
-  (3, 6),
-  (3, 7),
-  (3, 8),
-  (3, 9),
-  (3, 10),
-  (3, 11),
-  (3, 12),
-  (3, 13),
-  (3, 14),
-  (3, 15),
-  (3, 16);
+INSERT INTO SequencingContainerModel (sequencingContainerModelId, alias, identificationBarcode, partitionCount, platformType, fallback) VALUES
+(1, 'Generic 1-Lane Illumina Flow Cell', NULL, 1, 'ILLUMINA', 1);
+
+INSERT INTO SequencingContainerModel_Platform (sequencingContainerModelId, platformId) VALUES
+(1, 2);
 
 INSERT INTO Instrument (instrumentId, name, platformId, ip) VALUES
   (1, 'T2000', 1, '127.0.0.1'),
@@ -296,8 +282,8 @@ INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
 (1, 7, 'SAMPLE', 'G07'),
 (1, 8, 'SAMPLE', 'H08');
 
-INSERT INTO SequencerPartitionContainer (containerId, securityProfile_profileId, identificationBarcode, platform, lastModifier, creator, created, lastModified) VALUES
-(1, 1, 'MISEQXX', 2, 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01');
+INSERT INTO SequencerPartitionContainer (containerId, securityProfile_profileId, identificationBarcode, sequencingContainerModelId, lastModifier, creator, created, lastModified) VALUES
+(1, 1, 'MISEQXX', 1, 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01');
 
 INSERT INTO `_Partition` (partitionId, partitionNumber, pool_poolId) VALUES 
 (1, 1, 1);

@@ -37,7 +37,9 @@ public class HibernateSequencerPartitionContainerDao
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSequencerPartitionContainerDao.class);
 
-  private final static String[] SEARCH_PROPERTIES = new String[] { "identificationBarcode" };
+  private static final String[] SEARCH_PROPERTIES = new String[] { "identificationBarcode" };
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator", "model");
+
   @Autowired
   private SessionFactory sessionFactory;
 
@@ -142,8 +144,6 @@ public class HibernateSequencerPartitionContainerDao
     this.sessionFactory = sessionFactory;
   }
 
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator", "model");
-
   @Override
   public String getProjectColumn() {
     return null;
@@ -244,7 +244,8 @@ public class HibernateSequencerPartitionContainerDao
   @Override
   public SequencingContainerModel findModel(Platform platform, String search, int partitionCount) {
     Criteria criteria = currentSession().createCriteria(SequencingContainerModel.class);
-    criteria.add(Restrictions.eq("platforms", platform));
+    criteria.createAlias("platforms", "platform");
+    criteria.add(Restrictions.eq("platform.id", platform.getId()));
     criteria.add(Restrictions.eq("partitionCount", partitionCount));
     if (LimsUtils.isStringEmptyOrNull(search)) {
       criteria.add(Restrictions.eq("fallback", true));

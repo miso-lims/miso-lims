@@ -187,8 +187,8 @@ public final class DefaultIllumina extends RunProcessor {
         .filter(file -> file.exists() && file.canRead()).findAny().flatMap(RunProcessor::parseXml).orElse(null);
     if (runParams != null) {
       // See if we can figure out the chemistry
-      Arrays.stream(IlluminaChemistry.values()).filter(chemistry -> chemistry.test(runParams)).findFirst()
-          .orElse(IlluminaChemistry.UNKNOWN);
+      dto.setChemistry(Arrays.stream(IlluminaChemistry.values()).filter(chemistry -> chemistry.test(runParams)).findFirst()
+          .orElse(IlluminaChemistry.UNKNOWN));
 
       dto.setContainerModel(findContainerModel(runParams));
     }
