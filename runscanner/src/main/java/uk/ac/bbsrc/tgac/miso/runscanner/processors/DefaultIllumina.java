@@ -183,15 +183,17 @@ public final class DefaultIllumina extends RunProcessor {
       throw new IOException(e);
     }
 
-    Document runParams = Stream.of("runParameters.xml", "RunParameters.xml").map(f -> new File(runDirectory, f))
-        .filter(file -> file.exists() && file.canRead()).findAny().flatMap(RunProcessor::parseXml).orElse(null);
-    if (runParams != null) {
-      // See if we can figure out the chemistry
-      dto.setChemistry(Arrays.stream(IlluminaChemistry.values()).filter(chemistry -> chemistry.test(runParams)).findFirst()
-          .orElse(IlluminaChemistry.UNKNOWN));
-
-      dto.setContainerModel(findContainerModel(runParams));
-    }
+    Stream.of("runParameters.xml", "RunParameters.xml")
+        .map(f -> new File(runDirectory, f))
+        .filter(file -> file.exists() && file.canRead())
+        .findAny()
+        .flatMap(RunProcessor::parseXml)
+        .ifPresent(runParams -> {
+          // See if we can figure out the chemistry
+            dto.setChemistry(Arrays.stream(IlluminaChemistry.values()).filter(chemistry -> chemistry.test(runParams)).findFirst()
+                .orElse(IlluminaChemistry.UNKNOWN));
+            dto.setContainerModel(findContainerModel(runParams));
+          });
 
     // See if we can figure out a sample sheet
     dto.setPoolNames(Optional.of(new File(runDirectory, "SampleSheet.csv"))//
