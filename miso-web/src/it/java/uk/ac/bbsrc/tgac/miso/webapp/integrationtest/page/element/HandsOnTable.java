@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element;
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.MoreExpectedConditions.textDoesNotContain;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -147,7 +146,7 @@ public class HandsOnTable extends AbstractElement {
     }
   }
 
-  public List<String> getDropdownOptions(String columnHeading, int rowNum) {
+  public Set<String> getDropdownOptions(String columnHeading, int rowNum) {
     WebElement cell = getCell(columnHeading, rowNum);
     cancelEditing();
     WebElement dropdownArrow = cell.findElement(dropdownArrowSelector);
@@ -156,45 +155,25 @@ public class HandsOnTable extends AbstractElement {
 
     // HOT may not render all options if there are too many; scroll through and collect all values
     // (options near top may be removed as you scroll down as well)
+    // Results may also come out of order as cells are not always rendered in order
     Action down = new Actions(getDriver()).sendKeys(Keys.DOWN).build();
-    List<WebElement> optionRows = Collections.emptyList();
     List<WebElement> newOptionRows = dropdown.findElements(dropdownOptionRowsSelector);
-    List<String> options = Lists.newArrayList();
+    Set<String> options = Sets.newHashSet();
+    boolean hadNew;
     do {
-      optionRows = newOptionRows;
-      boolean newValues = options.isEmpty();
+      hadNew = false;
       for (int i = 0; i < newOptionRows.size(); i++) {
         String option = getOptionLabelFromMenuRow(newOptionRows.get(i));
-        if (newValues) {
-          if (options.contains(option)) {
-            throw new IllegalStateException("Unexpected duplicate values in dropdown");
-          }
-          options.add(option);
-        } else {
-          // Assumes that duplicates are not allowed (asserted by exception above)
-          if (options.get(options.size() - 1).equals(option)) {
-            newValues = true;
-          }
+        if (options.add(option)) {
+          hadNew = true;
         }
         down.perform();
       }
       newOptionRows = dropdown.findElements(dropdownOptionRowsSelector);
-    } while (haveDifferentOptions(optionRows, newOptionRows));
+    } while (hadNew);
 
     cancelEditing();
     return options;
-  }
-
-  private boolean haveDifferentOptions(List<WebElement> tracked, List<WebElement> updated) {
-    if (updated.size() > tracked.size()) {
-      return true;
-    }
-    if (updated.isEmpty()) {
-      return false;
-    }
-    String finalTrackedOption = getOptionLabelFromMenuRow(tracked.get(tracked.size() - 1));
-    String finalUpdatedOption = getOptionLabelFromMenuRow(updated.get(updated.size() - 1));
-    return !finalUpdatedOption.equals(finalTrackedOption);
   }
 
   private String getOptionLabelFromMenuRow(WebElement menuRow) {

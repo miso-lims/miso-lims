@@ -226,7 +226,7 @@ HotTarget.library = (function() {
             data: 'libraryDesignAlias',
             type: 'dropdown',
             trimDropdown: false,
-            validator: Handsontable.AutocompleteValidator,
+            validator: Handsontable.validators.AutocompleteValidator,
             source: [''],
             include: Constants.isDetailedSample,
             unpack: function(lib, flat, setCellMeta) {
