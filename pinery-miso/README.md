@@ -2,7 +2,15 @@
 
 Pinery is a webservice for reading LIMS data. Pinery-MISO is a Pinery webservice implementation
 that reads data from MISO by connecting directly to the MISO database. The Pinery API is maintained
-in the [Pinery project](https://github.com/oicr-gsi/pinery). 
+in the [Pinery project](https://github.com/oicr-gsi/pinery).
+
+Pinery is meant to be used as a data source for downstream applications such as reporting and
+analysis pipeline automation. The main advantage to using Pinery instead of reading directly from
+the MISO database is to avoid tightly coupling your other applications with MISO. If you write
+applications to use MISO data, then you would have to rewrite all of those applications if you ever
+want to use a different data source. If you instead write your applications to use Pinery data, then
+you only need to write a new Pinery implementation (or use an existing one) and all of your other
+applications remain functional.
 
 The Pinery project contains some other useful modules for working with Pinery-MISO
 
