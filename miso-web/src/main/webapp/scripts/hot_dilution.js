@@ -66,19 +66,23 @@ HotTarget.dilution = {
           source: [],
           include: Constants.isDetailedSample,
           unpack: function(dil, flat, setCellMeta) {
-            flat.targetedSequencingAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
-                .idPredicate(dil.targetedSequencingId), Constants.targetedSequencings), 'alias')
-                || '(None)';
-
+            var missingValueString;
             // whether targeted sequencing is required depends on library's design code
             var designCode = Utils.array.findFirstOrNull(function(code) {
               return dil.library.libraryDesignCodeId == code.id;
             }, Constants.libraryDesignCodes);
             if (Utils.array.maybeGetProperty(designCode, 'targetedSequencingRequired')) {
               setCellMeta('validator', HotUtils.validator.requiredAutocompleteWithNullValue('(None)'));
+              missingValueString = '';
             } else {
               setCellMeta('validator', HotUtils.validator.permitEmptyDropdown);
+              missingValueString = '(None)';
             }
+
+            flat.targetedSequencingAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
+                .idPredicate(dil.targetedSequencingId), Constants.targetedSequencings), 'alias')
+                || missingValueString;
+
           },
           pack: function(dil, flat, errorHandler) {
             dil.targetedSequencingId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(tarSeq) {
@@ -88,8 +92,17 @@ HotTarget.dilution = {
           depends: '*start', // This is a dummy value that gets this run on
           // table creation only
           update: function(dil, flat, value, setReadOnly, setOptions, setData) {
+            var baseOptionList;
+            var designCode = Utils.array.findFirstOrNull(function(code) {
+              return dil.library.libraryDesignCodeId == code.id;
+            }, Constants.libraryDesignCodes);
+            if (Utils.array.maybeGetProperty(designCode, 'targetedSequencingRequired')) {
+              baseOptionList = [];
+            } else {
+              baseOptionList = ['(None)'];
+            }
             setOptions({
-              source: ['(None)'].concat(Constants.targetedSequencings.filter(function(targetedSequencing) {
+              source: baseOptionList.concat(Constants.targetedSequencings.filter(function(targetedSequencing) {
                 return targetedSequencing.kitDescriptorIds.indexOf(dil.library.kitDescriptorId) != -1;
               }).map(Utils.array.getAlias).sort())
             });
