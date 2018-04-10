@@ -83,6 +83,7 @@ ALTER TABLE SequencerPartitionContainer ADD CONSTRAINT fk_SequencerPartitionCont
 ALTER TABLE SequencerPartitionContainer DROP COLUMN platform;
 DROP TABLE PlatformSizes;
 
+-- StartNoTest
 INSERT INTO SequencingContainerModel(alias, identificationBarcode, partitionCount, platformType) VALUES
 ('S2 Flow Cell', '20015845', 2, 'ILLUMINA'),
 ('S4 Flow Cell', '20015843', 4, 'ILLUMINA'),
@@ -118,3 +119,4 @@ INSERT INTO SequencingContainerModel_Platform (sequencingContainerModelId, platf
 ((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'Mid Output Flow Cell Cartridge V2'), (SELECT platformId FROM Platform WHERE instrumentModel LIKE '%NextSeq 500')),
 ((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'High Output Flow Cell Cartridge V2'), (SELECT platformId FROM Platform WHERE instrumentModel LIKE '%NextSeq 550')),
 ((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'Mid Output Flow Cell Cartridge V2'), (SELECT platformId FROM Platform WHERE instrumentModel LIKE '%NextSeq 550'));
+-- EndNoTest
