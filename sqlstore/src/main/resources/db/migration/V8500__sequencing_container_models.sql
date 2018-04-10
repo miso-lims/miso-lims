@@ -82,3 +82,39 @@ ALTER TABLE SequencerPartitionContainer ADD CONSTRAINT fk_SequencerPartitionCont
 
 ALTER TABLE SequencerPartitionContainer DROP COLUMN platform;
 DROP TABLE PlatformSizes;
+
+INSERT INTO SequencingContainerModel(alias, identificationBarcode, partitionCount, platformType) VALUES
+('S2 Flow Cell', '20015845', 2, 'ILLUMINA'),
+('S4 Flow Cell', '20015843', 4, 'ILLUMINA'),
+('HiSeq PE Flow Cell v4', '15049346', 8, 'ILLUMINA'),
+('HiSeq SR Flow Cell v4', '15052255', 8, 'ILLUMINA'),
+('HiSeq PE Flow Cell v3', '15022186', 8, 'ILLUMINA'),
+('HiSeq SR Flow Cell v3', NULL, 8, 'ILLUMINA'),
+('HiSeq Rapid PE Flow Cell v2', '15053059', 2, 'ILLUMINA'),
+('HiSeq Rapid SR Flow Cell v2', '15053060', 2, 'ILLUMINA'),
+('HiSeq Rapid PE Flow Cell', '15034173', 2, 'ILLUMINA'),
+('HiSeq Rapid SR Flow Cell', '15034244', 2, 'ILLUMINA'),
+('PE MiSeq Flow Cell', '15028382', 1, 'ILLUMINA'),
+('PE-Micro MiSeq Flow Cell', '15035218', 1, 'ILLUMINA'),
+('PE-Nano MiSeq Flow Cell', '15035217', 1, 'ILLUMINA'),
+('High Output Flow Cell Cartridge V2', '15065973', 1, 'ILLUMINA'),
+('Mid Output Flow Cell Cartridge V2', '15065974', 1, 'ILLUMINA');
+
+INSERT INTO SequencingContainerModel_Platform (sequencingContainerModelId, platformId) VALUES
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'S2 Flow Cell'), (SELECT platformId FROM Platform WHERE instrumentModel = 'Illumina NovaSeq 6000')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'S4 Flow Cell'), (SELECT platformId FROM Platform WHERE instrumentModel = 'Illumina NovaSeq 6000')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'HiSeq PE Flow Cell v4'), (SELECT platformId FROM Platform WHERE instrumentModel = 'Illumina HiSeq 2500')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'HiSeq SR Flow Cell v4'), (SELECT platformId FROM Platform WHERE instrumentModel = 'Illumina HiSeq 2500')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'HiSeq PE Flow Cell v3'), (SELECT platformId FROM Platform WHERE instrumentModel = 'Illumina HiSeq 2500')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'HiSeq SR Flow Cell v3'), (SELECT platformId FROM Platform WHERE instrumentModel = 'Illumina HiSeq 2500')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'HiSeq Rapid PE Flow Cell v2'), (SELECT platformId FROM Platform WHERE instrumentModel = 'Illumina HiSeq 2500')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'HiSeq Rapid SR Flow Cell v2'), (SELECT platformId FROM Platform WHERE instrumentModel = 'Illumina HiSeq 2500')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'HiSeq Rapid PE Flow Cell'), (SELECT platformId FROM Platform WHERE instrumentModel = 'Illumina HiSeq 2500')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'HiSeq Rapid SR Flow Cell'), (SELECT platformId FROM Platform WHERE instrumentModel = 'Illumina HiSeq 2500')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'PE MiSeq Flow Cell'), (SELECT platformId FROM Platform WHERE instrumentModel = 'Illumina MiSeq')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'PE-Micro MiSeq Flow Cell'), (SELECT platformId FROM Platform WHERE instrumentModel = 'Illumina MiSeq')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'PE-Nano MiSeq Flow Cell'), (SELECT platformId FROM Platform WHERE instrumentModel = 'Illumina MiSeq')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'High Output Flow Cell Cartridge V2'), (SELECT platformId FROM Platform WHERE instrumentModel LIKE '%NextSeq 500')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'Mid Output Flow Cell Cartridge V2'), (SELECT platformId FROM Platform WHERE instrumentModel LIKE '%NextSeq 500')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'High Output Flow Cell Cartridge V2'), (SELECT platformId FROM Platform WHERE instrumentModel LIKE '%NextSeq 550')),
+((SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = 'Mid Output Flow Cell Cartridge V2'), (SELECT platformId FROM Platform WHERE instrumentModel LIKE '%NextSeq 550'));
