@@ -26,9 +26,9 @@ DROP PROCEDURE IF EXISTS tempMakeModels;
 DELIMITER //
 CREATE PROCEDURE tempMakeModels() BEGIN
   INSERT INTO SequencingContainerModel (alias, partitionCount, platformType, fallback)
-  SELECT DISTINCT CONCAT('Generic ', ps.partitionSize, '-',
+  SELECT DISTINCT CONCAT('Unknown ', ps.partitionSize, '-',
     CASE
-      WHEN p.name = 'PACBIO' THEN 'SMRT Cell'
+      WHEN p.name = 'PACBIO' THEN 'SMRT-Cell'
       ELSE 'Lane'
     END,
     ' ',
