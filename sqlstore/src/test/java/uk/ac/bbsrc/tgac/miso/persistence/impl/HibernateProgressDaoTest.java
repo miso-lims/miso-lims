@@ -3,7 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName.LOADSEQUENCER;
+import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName.LOAD_SEQUENCER;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -156,7 +156,7 @@ public class HibernateProgressDaoTest extends AbstractDAOTest {
   }
 
   private Progress createProgress1() {
-    Progress progress = makeProgress(LOADSEQUENCER, getDefaultUser(), new Date(), new Date(),
+    Progress progress = makeProgress(LOAD_SEQUENCER, getDefaultUser(), new Date(), new Date(),
         Collections.singletonList(makeSampleProgressStep(1)));
     progress.setId(WORKFLOW_PROGRESS_ID_1);
 
@@ -164,7 +164,7 @@ public class HibernateProgressDaoTest extends AbstractDAOTest {
   }
 
   private Progress createProgress2() {
-    Progress progress = makeProgress(LOADSEQUENCER, getDefaultUser(), new Date(), new Date(),
+    Progress progress = makeProgress(LOAD_SEQUENCER, getDefaultUser(), new Date(), new Date(),
         Arrays.asList(makeSampleProgressStep(1), makePoolProgressStep(2)));
     progress.setId(WORKFLOW_PROGRESS_ID_2);
 
@@ -172,16 +172,16 @@ public class HibernateProgressDaoTest extends AbstractDAOTest {
   }
 
   private Progress createProgressWithoutSteps() {
-    return makeProgress(LOADSEQUENCER, getDefaultUser(), new Date(0), new Date(1), Collections.emptyList());
+    return makeProgress(LOAD_SEQUENCER, getDefaultUser(), new Date(0), new Date(1), Collections.emptyList());
   }
 
   private Progress createProgressWithOrderedSteps() {
-    return makeProgress(LOADSEQUENCER, getDefaultUser(), new Date(0), new Date(1),
+    return makeProgress(LOAD_SEQUENCER, getDefaultUser(), new Date(0), new Date(1),
         Arrays.asList(makeSampleProgressStep(1), makePoolProgressStep(2)));
   }
 
   private Progress createProgressWithUnorderedSteps() {
-    return makeProgress(LOADSEQUENCER, getDefaultUser(), new Date(0), new Date(1),
+    return makeProgress(LOAD_SEQUENCER, getDefaultUser(), new Date(0), new Date(1),
         Arrays.asList(makePoolProgressStep(2), makeSampleProgressStep(1)));
   }
 

@@ -23,16 +23,21 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
+import java.beans.PropertyEditor;
+import java.beans.PropertyEditorSupport;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
@@ -80,6 +85,36 @@ public class EditServiceRecordController {
   private ServiceRecordService serviceRecordService;
   @Autowired
   private FilesManager filesManager;
+
+  @Value("${miso.timeCorrection.uiZone:}")
+  private String uiZone;
+
+  PropertyEditor timestampEditor = new PropertyEditorSupport() {
+    @Override
+    public void setAsText(String text) {
+      if (LimsUtils.isStringEmptyOrNull(text)) {
+        setValue(null);
+      } else {
+        // Set UI timezone so that Hibernate can save correctly in the DB timezone
+        DateFormat format = LimsUtils.getDateTimeFormat();
+        if (!LimsUtils.isStringEmptyOrNull(uiZone)) {
+          format.setTimeZone(TimeZone.getTimeZone(uiZone));
+        }
+        try {
+          setValue(format.parse(text));
+        } catch (ParseException e) {
+          throw new IllegalArgumentException("Invalid datetime string");
+        }
+      }
+    }
+
+    @Override
+    public String getAsText() {
+      Date value = (Date) getValue();
+      // TimeShiftingInterceptor will have already shifted to UI time
+      return value == null ? "" : LimsUtils.formatDateTime(value);
+    }
+  };
 
   public void setFilesManager(FilesManager filesManager) {
     this.filesManager = filesManager;
@@ -144,10 +179,8 @@ public class EditServiceRecordController {
   
   @InitBinder
   public void initBinder(WebDataBinder binder) {
-    // set format for datetime data bindings
-    CustomDateEditor dateEditor = new CustomDateEditor(LimsUtils.getDateTimeFormat(), true);
-    binder.registerCustomEditor(Date.class, "shutdownTime", dateEditor);
-    binder.registerCustomEditor(Date.class, "restoredTime", dateEditor);
+    binder.registerCustomEditor(Date.class, "shutdownTime", timestampEditor);
+    binder.registerCustomEditor(Date.class, "restoredTime", timestampEditor);
   }
 
 }

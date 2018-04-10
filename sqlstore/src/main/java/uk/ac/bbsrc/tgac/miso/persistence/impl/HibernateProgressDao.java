@@ -47,4 +47,9 @@ public class HibernateProgressDao implements ProgressStore {
 
     return progress;
   }
+
+  @Override
+  public void delete(Progress progress) {
+    currentSession().delete(progress);
+  }
 }

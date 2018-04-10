@@ -55,7 +55,7 @@ DROP PROCEDURE IF EXISTS addLibraryType//
 CREATE PROCEDURE addLibraryType(
   iDescription varchar(255),
   iPlatformType varchar(50),
-  archived tinyint(1)
+  iArchived tinyint(1)
 ) BEGIN
   IF NOT EXISTS (SELECT 1 FROM LibraryType WHERE description = iDescription AND platformType = iPlatformType) THEN
     INSERT INTO LibraryType(description, platformType, archived)

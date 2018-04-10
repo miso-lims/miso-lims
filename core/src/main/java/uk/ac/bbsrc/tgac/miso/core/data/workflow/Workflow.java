@@ -1,6 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow;
 
+import java.io.IOException;
 import java.util.List;
+
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.LoadSequencerWorkflow;
 
 public interface Workflow {
   Progress getProgress();
@@ -41,7 +44,25 @@ public interface Workflow {
    */
   void cancelInput();
 
+  void execute(WorkflowExecutor workflowExecutor) throws IOException;
+
+  /**
+   * Represents a type of Workflow.  Should have a one-to-one correspondence with every implementation of Workflow
+   */
   enum WorkflowName {
-    LOADSEQUENCER
+    LOAD_SEQUENCER {
+      @Override
+      public Workflow createWorkflow() {
+        return new LoadSequencerWorkflow();
+      }
+    };
+
+    public Workflow createWorkflow(Progress progress) {
+      Workflow workflow = createWorkflow();
+      workflow.setProgress(progress);
+      return workflow;
+    }
+
+    protected abstract Workflow createWorkflow();
   }
 }

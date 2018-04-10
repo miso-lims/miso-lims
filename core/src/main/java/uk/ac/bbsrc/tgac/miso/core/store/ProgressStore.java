@@ -10,4 +10,6 @@ public interface ProgressStore {
   List<Progress> listByUserId(long id);
 
   Progress save(Progress progress);
+
+  void delete(Progress progress);
 }

@@ -34,7 +34,7 @@ HotTarget.library = (function() {
           return family.name == flat.indexFamilyName;
         });
         lib['index' + n + 'Id'] = families.length == 0 ? null : Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(index) {
-          return index.label == label;
+          return index.label == label && index.position == n;
         }, families[0].indices), 'id');
       },
       depends: 'indexFamilyName',
