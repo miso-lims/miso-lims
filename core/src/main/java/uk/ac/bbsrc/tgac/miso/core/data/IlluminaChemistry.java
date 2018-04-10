@@ -17,6 +17,7 @@ public enum IlluminaChemistry implements Predicate<Document> {
   RAPID_RUN("starts-with(//Flowcell, \"HiSeq Rapid Flow Cell\")"), //
   NS_MID("//Chemistry=\"NextSeq Mid\""), //
   NS_HIGH("//Chemistry=\"NextSeq High\""), //
+  HISEQ_X("//Flowcell=\"HiSeq X\""), //
   UNKNOWN("false");
   private XPathExpression expr;
 
