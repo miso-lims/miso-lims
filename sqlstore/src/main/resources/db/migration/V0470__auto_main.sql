@@ -1,3 +1,5 @@
+-- consistent_timestamps
+
 ALTER TABLE DetailedQcStatus MODIFY COLUMN creationDate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE Institute MODIFY COLUMN creationDate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE Lab MODIFY COLUMN creationDate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
@@ -33,3 +35,5 @@ ALTER TABLE TissueType MODIFY COLUMN lastUpdated timestamp NOT NULL DEFAULT CURR
 
 ALTER TABLE ServiceRecord MODIFY COLUMN shutdownTime timestamp NULL DEFAULT NULL;
 ALTER TABLE ServiceRecord MODIFY COLUMN restoredTime timestamp NULL DEFAULT NULL;
+
+

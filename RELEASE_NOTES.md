@@ -1,3 +1,12 @@
+# 0.2.115
+
+Changes:
+
+ * Fix problems with indices with duplicate names
+ * Ensure consistent timezone handling
+ * Don't put '(None)' in the targeted sequencing list if not allowed
+ * Fix addLibraryType stored procedure
+
 # 0.2.114
 
 Changes:
