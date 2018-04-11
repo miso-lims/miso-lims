@@ -115,7 +115,7 @@ WHERE m.alias = 'HiSeq PE Flow Cell v4' AND p.instrumentModel = 'Illumina HiSeq 
 
 INSERT INTO SequencingContainerModel_Platform (sequencingContainerModelId, platformId)
 SELECT m.sequencingContainerModelId, p.platformId FROM SequencingContainerModel m JOIN Platform p
-WHERE m.alias = 'HiSeq PE Flow Cell v4' AND p.instrumentModel = 'Illumina HiSeq 2500';
+WHERE m.alias = 'HiSeq SR Flow Cell v4' AND p.instrumentModel = 'Illumina HiSeq 2500';
 
 INSERT INTO SequencingContainerModel_Platform (sequencingContainerModelId, platformId)
 SELECT m.sequencingContainerModelId, p.platformId FROM SequencingContainerModel m JOIN Platform p
@@ -123,7 +123,7 @@ WHERE m.alias = 'HiSeq PE Flow Cell v3' AND p.instrumentModel = 'Illumina HiSeq 
 
 INSERT INTO SequencingContainerModel_Platform (sequencingContainerModelId, platformId)
 SELECT m.sequencingContainerModelId, p.platformId FROM SequencingContainerModel m JOIN Platform p
-WHERE m.alias = 'HiSeq PE Flow Cell v3' AND p.instrumentModel = 'Illumina HiSeq 2500';
+WHERE m.alias = 'HiSeq SR Flow Cell v3' AND p.instrumentModel = 'Illumina HiSeq 2500';
 
 INSERT INTO SequencingContainerModel_Platform (sequencingContainerModelId, platformId)
 SELECT m.sequencingContainerModelId, p.platformId FROM SequencingContainerModel m JOIN Platform p
