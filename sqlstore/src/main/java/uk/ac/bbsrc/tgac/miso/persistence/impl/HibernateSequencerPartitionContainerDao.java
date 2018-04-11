@@ -18,14 +18,17 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -34,7 +37,9 @@ public class HibernateSequencerPartitionContainerDao
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSequencerPartitionContainerDao.class);
 
-  private final static String[] SEARCH_PROPERTIES = new String[] { "identificationBarcode" };
+  private static final String[] SEARCH_PROPERTIES = new String[] { "identificationBarcode" };
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator", "model");
+
   @Autowired
   private SessionFactory sessionFactory;
 
@@ -139,8 +144,6 @@ public class HibernateSequencerPartitionContainerDao
     this.sessionFactory = sessionFactory;
   }
 
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator", "platform");
-
   @Override
   public String getProjectColumn() {
     return null;
@@ -185,7 +188,7 @@ public class HibernateSequencerPartitionContainerDao
 
   @Override
   public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("platform.platformType", platformType));
+    criteria.add(Restrictions.eq("model.platformType", platformType));
   }
 
   @Override
@@ -232,4 +235,33 @@ public class HibernateSequencerPartitionContainerDao
     List<PoreVersion> results = criteria.list();
     return results;
   }
+
+  @Override
+  public SequencingContainerModel getModel(long id) {
+    return (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, id);
+  }
+
+  @Override
+  public SequencingContainerModel findModel(Platform platform, String search, int partitionCount) {
+    Criteria criteria = currentSession().createCriteria(SequencingContainerModel.class);
+    criteria.createAlias("platforms", "platform");
+    criteria.add(Restrictions.eq("platform.id", platform.getId()));
+    criteria.add(Restrictions.eq("partitionCount", partitionCount));
+    if (LimsUtils.isStringEmptyOrNull(search)) {
+      criteria.add(Restrictions.eq("fallback", true));
+    } else {
+      criteria.add(Restrictions.or(Restrictions.eq("alias", search), Restrictions.eq("identificationBarcode", search)));
+    }
+    criteria.add(Restrictions.eq("archived", false));
+    return (SequencingContainerModel) criteria.uniqueResult();
+  }
+
+  @Override
+  public List<SequencingContainerModel> listModels() {
+    Criteria criteria = currentSession().createCriteria(SequencingContainerModel.class);
+    @SuppressWarnings("unchecked")
+    List<SequencingContainerModel> results = criteria.list();
+    return results;
+  }
+
 }

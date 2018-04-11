@@ -41,18 +41,17 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -148,30 +147,28 @@ public class EditSequencerPartitionContainerController {
     this.securityManager = securityManager;
   }
 
-  @RequestMapping(value = "/new/{platformId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable("platformId") Long platformId, @RequestParam("count") int partitionCount, ModelMap model)
+  @RequestMapping(value = "/new/{modelId}", method = RequestMethod.GET)
+  public ModelAndView setupNewForm(@PathVariable("modelId") Long modelId, ModelMap model)
       throws IOException {
-    Platform platform = platformService.get(platformId);
-    if (platform == null) {
-      throw new IllegalArgumentException("Invalid platform id");
+    SequencingContainerModel containerModel = containerService.getModel(modelId);
+    if (containerModel == null) {
+      throw new IllegalArgumentException("Invalid model id");
     }
-    SequencerPartitionContainer container = platform.getPlatformType().createContainer();
-    container.setPlatform(platform);
+    SequencerPartitionContainer container = containerModel.getPlatformType().createContainer();
+    container.setModel(containerModel);
 
-    model.put("title", "New " + container.getPlatform().getPlatformType().getContainerName());
+    model.put("title", "New " + containerModel.getPlatformType().getContainerName());
 
-    if (!container.getPlatform().getPartitionSizes().contains(partitionCount)) {
-      throw new IllegalArgumentException("Invalid number of partitions: " + partitionCount);
-    }
     container.setPartitions(
-        IntStream.range(0, partitionCount).mapToObj(number -> new PartitionImpl(container, number + 1)).collect(Collectors.toList()));
+        IntStream.range(0, containerModel.getPartitionCount()).mapToObj(number -> new PartitionImpl(container, number + 1))
+            .collect(Collectors.toList()));
     return setupForm(container, model);
   }
 
   @RequestMapping(value = "/{containerId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long containerId, ModelMap model) throws IOException {
+  public ModelAndView setupEditForm(@PathVariable Long containerId, ModelMap model) throws IOException {
     SequencerPartitionContainer container = containerService.get(containerId);
-    model.put("title", container.getPlatform().getPlatformType().getContainerName() + " " + containerId);
+    model.put("title", container.getModel().getPlatformType().getContainerName() + " " + containerId);
     return setupForm(container, model);
   }
 
@@ -181,11 +178,11 @@ public class EditSequencerPartitionContainerController {
     model.put("containerRuns", runService.listByContainerId(container.getId()).stream().map(Dtos::asDto).collect(Collectors.toList()));
     model.put("clusteringKits",
         kitService.listKitDescriptorsByType(KitType.CLUSTERING).stream()
-            .filter(descriptor -> descriptor.getPlatformType() == container.getPlatform().getPlatformType())
+            .filter(descriptor -> descriptor.getPlatformType() == container.getModel().getPlatformType())
             .sorted(KitDescriptor::sortByName).collect(Collectors.toList()));
     model.put("multiplexingKits",
         kitService.listKitDescriptorsByType(KitType.MULTIPLEXING).stream()
-            .filter(descriptor -> descriptor.getPlatformType() == container.getPlatform().getPlatformType())
+            .filter(descriptor -> descriptor.getPlatformType() == container.getModel().getPlatformType())
             .sorted(KitDescriptor::sortByName).collect(Collectors.toList()));
     model.put("flowCellVersions", containerService.listFlowCellVersions());
     model.put("poreVersions", containerService.listPoreVersions());

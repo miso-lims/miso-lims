@@ -1,5 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.webapp.service;
 
+import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -29,9 +32,6 @@ import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 import uk.ac.bbsrc.tgac.miso.dto.ProgressiveRequestDto;
 import uk.ac.bbsrc.tgac.miso.dto.ProgressiveResponseDto;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
-
-import io.prometheus.client.Counter;
-import io.prometheus.client.Gauge;
 
 @Service
 public class RunScannerClient {
@@ -89,8 +89,8 @@ public class RunScannerClient {
       }
       for (NotificationDto dto : results) {
         try (AutoCloseable timer = saveTime.start()) {
-          (runService.processNotification(Dtos.to(dto, user), dto.getLaneCount(), dto.getContainerSerialNumber(), dto.getSequencerName(),
-              dto, dto) ? saveNew : saveUpdate).inc();
+          (runService.processNotification(Dtos.to(dto, user), dto.getLaneCount(), dto.getContainerModel(), dto.getContainerSerialNumber(),
+              dto.getSequencerName(), dto, dto) ? saveNew : saveUpdate).inc();
           saveCount.inc();
           badRuns.remove(dto.getRunAlias());
         } catch (Exception e) {

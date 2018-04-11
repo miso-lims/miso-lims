@@ -126,27 +126,6 @@ INSERT INTO SequencingParameters (parametersId, name, platformId, readLength, pa
   (3, '1x151', 1, 151, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V4'),
   (4, 'Micro 2x151', 2, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V3');
 
-INSERT INTO PlatformSizes(platform_platformId, partitionSize) VALUES
-  (1, 4),
-  (1, 8),
-  (2, 1),
-  (3, 1),
-  (3, 2),
-  (3, 3),
-  (3, 4),
-  (3, 5),
-  (3, 6),
-  (3, 7),
-  (3, 8),
-  (3, 9),
-  (3, 10),
-  (3, 11),
-  (3, 12),
-  (3, 13),
-  (3, 14),
-  (3, 15),
-  (3, 16);
-
 INSERT INTO Instrument (instrumentId, name, platformId, ip) VALUES
   (1, 'T2500', 1, '127.0.0.1');
 

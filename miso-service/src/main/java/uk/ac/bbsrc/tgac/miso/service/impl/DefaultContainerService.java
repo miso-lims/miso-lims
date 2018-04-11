@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -19,6 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
@@ -27,7 +29,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
-import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -41,8 +42,6 @@ public class DefaultContainerService
   private AuthorizationManager authorizationManager;
   @Autowired
   private SequencerPartitionContainerStore containerDao;
-  @Autowired
-  private PlatformService platformService;
   @Autowired
   private PoolService poolService;
   @Autowired
@@ -120,7 +119,6 @@ public class DefaultContainerService
   @Override
   public void applyChanges(SequencerPartitionContainer source, SequencerPartitionContainer managed) throws IOException {
     managed.setIdentificationBarcode(source.getIdentificationBarcode());
-    managed.setPlatform(source.getPlatform());
     managed.setClusteringKit(source.getClusteringKit());
     managed.setMultiplexingKit(source.getMultiplexingKit());
 
@@ -161,12 +159,12 @@ public class DefaultContainerService
    * </ul>
    * 
    * @param container the SequencerPartitionContainer to load entities into. Must contain at least the IDs of objects to load (e.g. to load
-   *          the persisted Project
-   *          into container.platform, container.platform.id must be set)
+   *          the persisted SequencingContainerModel
+   *          into container.model, container.model.id must be set)
    * @throws IOException
    */
   private void loadChildEntities(SequencerPartitionContainer container) throws IOException {
-    container.setPlatform(platformService.get(container.getPlatform().getId()));
+    container.setModel(getModel(container.getModel().getId()));
     if (container.getClusteringKit() != null) {
       KitDescriptor descriptor = kitService.getKitDescriptorById(container.getClusteringKit().getId());
       if (descriptor.getKitType() != KitType.CLUSTERING) {
@@ -239,10 +237,6 @@ public class DefaultContainerService
     this.securityProfileDao = securityProfileStore;
   }
 
-  public void setPlatformService(PlatformService platformService) {
-    this.platformService = platformService;
-  }
-
   @Override
   public void update(Partition partition) throws IOException {
     Partition original = containerDao.getPartitionById(partition.getId());
@@ -271,6 +265,21 @@ public class DefaultContainerService
   @Override
   public List<PoreVersion> listPoreVersions() throws IOException {
     return containerDao.listPoreVersions();
+  }
+
+  @Override
+  public SequencingContainerModel getModel(long id) throws IOException {
+    return containerDao.getModel(id);
+  }
+
+  @Override
+  public SequencingContainerModel findModel(Platform platform, String search, int partitionCount) throws IOException {
+    return containerDao.findModel(platform, search, partitionCount);
+  }
+
+  @Override
+  public List<SequencingContainerModel> listModels() throws IOException {
+    return containerDao.listModels();
   }
 
 }

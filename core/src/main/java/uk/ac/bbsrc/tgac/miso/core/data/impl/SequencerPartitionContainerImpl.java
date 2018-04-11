@@ -55,7 +55,6 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -98,10 +97,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
-  @ManyToOne(targetEntity = Platform.class)
-  @JoinColumn(name = "platform", nullable = false)
-  private Platform platform;
-
   @OneToMany(targetEntity = SequencerPartitionContainerChangeLog.class, mappedBy = "sequencerPartitionContainer", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
@@ -132,6 +127,10 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @ManyToOne
   @JoinColumn(name = "multiplexingKit")
   private KitDescriptor multiplexingKit;
+
+  @ManyToOne
+  @JoinColumn(name = "sequencingContainerModelId")
+  private SequencingContainerModel model;
 
   @OneToMany(targetEntity = ContainerQC.class, mappedBy = "container")
   private final Collection<ContainerQC> containerQCs = new TreeSet<>();
@@ -224,7 +223,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   @Override
   public String getLabelText() {
-    return getIdentificationBarcode() + " (" + getPlatform().getNameAndModel() + ")";
+    return getIdentificationBarcode() + " (" + getModel().getAlias() + ")";
   }
 
   /**
@@ -248,16 +247,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   public Run getLastRun() {
     return getRuns().stream().filter(r -> r.getStartDate() != null).max((a, b) -> a.getStartDate().compareTo(b.getStartDate()))
         .orElse(null);
-  }
-
-  @Override
-  public Platform getPlatform() {
-    return platform;
-  }
-
-  @Override
-  public void setPlatform(Platform platform) {
-    this.platform = platform;
   }
 
   @Override
@@ -358,7 +347,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   @Override
   public String getBarcodeExtraInfo() {
-    return getPartitions().size() + " " + getPlatform().getPlatformType().getPartitionName();
+    return getModel().getAlias();
   }
 
   @Override
@@ -407,6 +396,16 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   @Override
   public String getBarcodeSizeInfo() {
-    return String.format("%s: %d", platform.getPlatformType().getPluralPartitionName(), getPartitions().size());
+    return String.format("%s: %d", getModel().getPlatformType().getPluralPartitionName(), getPartitions().size());
+  }
+
+  @Override
+  public SequencingContainerModel getModel() {
+    return model;
+  }
+
+  @Override
+  public void setModel(SequencingContainerModel model) {
+    this.model = model;
   }
 }

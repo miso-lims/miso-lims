@@ -6,9 +6,11 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface ContainerService extends PaginatedDataSource<SequencerPartitionContainer>, BarcodableService<SequencerPartitionContainer> {
@@ -42,5 +44,11 @@ public interface ContainerService extends PaginatedDataSource<SequencerPartition
   PoreVersion getPoreVersion(long id) throws IOException;
 
   List<PoreVersion> listPoreVersions() throws IOException;
+
+  SequencingContainerModel getModel(long id) throws IOException;
+
+  SequencingContainerModel findModel(Platform platform, String search, int partitionCount) throws IOException;
+
+  List<SequencingContainerModel> listModels() throws IOException;
 
 }

@@ -16,7 +16,6 @@ import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 import uk.ac.bbsrc.tgac.miso.core.security.SuperuserAuthentication;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrNamingScheme;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateBoxDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
@@ -39,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateQcTypeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleNumberPerProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
@@ -1391,7 +1391,6 @@ public class MisoServiceManager {
     service.setAuthorizationManager(authorizationManager);
     service.setContainerDao(sequencerPartitionContainerDao);
     service.setPoolService(poolService);
-    service.setPlatformService(platformService);
     service.setSecurityProfileDao(securityProfileDao);
     setContainerService(service);
   }
@@ -1417,7 +1416,6 @@ public class MisoServiceManager {
   }
 
   private void updatePlatformServiceDependencies() {
-    if (containerService != null) containerService.setPlatformService(platformService);
     if (experimentService != null) experimentService.setPlatformService(platformService);
   }
 

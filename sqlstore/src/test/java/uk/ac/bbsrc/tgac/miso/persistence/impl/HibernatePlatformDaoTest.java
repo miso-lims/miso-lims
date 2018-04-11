@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -149,7 +148,6 @@ public class HibernatePlatformDaoTest extends AbstractDAOTest {
     oldPlatform.setPlatformType(oldPlatform.getPlatformType());
     oldPlatform.setInstrumentModel("Illumina HiSeq 2500");
     oldPlatform.setDescription("4-channel flow cell");
-    oldPlatform.setPartitionSizes(Collections.singleton(1));
 
     assertEquals(16L, dao.save(oldPlatform));
     Platform savedPlatform = dao.get(16L);
@@ -178,7 +176,6 @@ public class HibernatePlatformDaoTest extends AbstractDAOTest {
   Platform makePlatform(String instrumentModel, String description, Integer numContainers) {
     Platform platform = new Platform();
     platform.setDescription(description);
-    platform.setPartitionSizes(Collections.singleton(numContainers));
     platform.setInstrumentModel(instrumentModel);
     platform.setPlatformType(PlatformType.get("PacBio"));
     return platform;

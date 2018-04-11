@@ -18,7 +18,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
@@ -45,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -86,7 +86,7 @@ public class LoadGeneratorSource implements MigrationSource {
   private static final String OPT_LIBRARY_SELECTION_TYPE = "source.load-generator.librarySelectionTypeId";
   private static final String OPT_LIBRARY_STRATEGY_TYPE = "source.load-generator.libraryStrategyTypeId";
   private static final String OPT_RUN_SEQUENCER_ID = "source.load-generator.runSequencerId";
-  private static final String OPT_RUN_PLATFORM_ID = "source.load-generator.runPlatformId";
+  private static final String OPT_CONTAINER_MODEL_ID = "source.load-generator.containerModelId";
 
   // Division of samples for hierarchy
   private static final int percentIdentities = 5;
@@ -112,7 +112,7 @@ public class LoadGeneratorSource implements MigrationSource {
   private final long librarySelectionTypeId;
   private final long libraryStrategyTypeId;
   private final long runSequencerId;
-  private final long runPlatformId;
+  private final long containerModelId;
 
   private MigrationData migrationData = null;
 
@@ -150,7 +150,7 @@ public class LoadGeneratorSource implements MigrationSource {
     this.librarySelectionTypeId = properties.getRequiredLong(OPT_LIBRARY_SELECTION_TYPE);
     this.libraryStrategyTypeId = properties.getRequiredLong(OPT_LIBRARY_STRATEGY_TYPE);
     this.runSequencerId = properties.getRequiredLong(OPT_RUN_SEQUENCER_ID);
-    this.runPlatformId = properties.getRequiredLong(OPT_RUN_PLATFORM_ID);
+    this.containerModelId = properties.getRequiredLong(OPT_CONTAINER_MODEL_ID);
   }
 
   public List<Project> getProjects() {
@@ -472,9 +472,9 @@ public class LoadGeneratorSource implements MigrationSource {
 
     SequencerPartitionContainer container = new SequencerPartitionContainerImpl();
     container.setIdentificationBarcode(runBarcode);
-    Platform platform = new Platform();
-    platform.setId(runPlatformId);
-    container.setPlatform(platform);
+    SequencingContainerModel model = new SequencingContainerModel();
+    model.setId(containerModelId);
+    container.setModel(model);
 
     run.setHealth(HealthType.Completed);
     run.setStartDate(RUN_DATE);

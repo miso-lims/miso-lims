@@ -33,6 +33,7 @@ public abstract class NotificationDto implements Predicate<SequencingParameters>
   private String sequencerFolderPath;
   private String sequencerName;
   private String containerSerialNumber;
+  private String containerModel;
   private int laneCount;
   private HealthType healthType;
   private LocalDateTime startDate;
@@ -84,10 +85,22 @@ public abstract class NotificationDto implements Predicate<SequencingParameters>
   }
 
   /**
-   * Get the number of partitions in this run.
+   * @return the part number OR model name of the container
+   */
+  public String getContainerModel() {
+    return containerModel;
+  }
+
+  public void setContainerModel(String containerModel) {
+    this.containerModel = containerModel;
+  }
+
+  /**
+   * If container model is not provided, the lane count will be used to determine an appropriate container model in MISO. If MISO has to
+   * create a new container for this run, it will be pre-sized to this number of lanes. If, at a later time, the run scanner reports a
+   * different container size, any update from Run Scanner will be ignored by MISO.
    * 
-   * If MISO has to create a new container for this run, it will be pre-sized to this number of lanes. If, at a later time, the run scanner
-   * reports a different container size, any update from Run Scanner will be ignored by MISO.
+   * @return the number of partitions in this run.
    */
   public int getLaneCount() {
     return laneCount;
@@ -202,8 +215,9 @@ public abstract class NotificationDto implements Predicate<SequencingParameters>
   @Override
   public String toString() {
     return "NotificationDto [runAlias=" + runAlias + ", sequencerFolderPath=" + sequencerFolderPath + ", sequencerName=" + sequencerName
-        + ", containerSerialNumber=" + containerSerialNumber + ", laneCount=" + laneCount + ", healthType=" + healthType + ", startDate="
-        + startDate + ", completionDate=" + completionDate + ", pairedEndRun=" + pairedEndRun + ", software=" + software + "]";
+        + ", containerSerialNumber=" + containerSerialNumber + ", containerModel=" + containerModel + ", laneCount=" + laneCount
+        + ", healthType=" + healthType + ", startDate=" + startDate + ", completionDate=" + completionDate + ", pairedEndRun="
+        + pairedEndRun + ", software=" + software + "]";
   }
 
   @Override
@@ -212,6 +226,7 @@ public abstract class NotificationDto implements Predicate<SequencingParameters>
     int result = 1;
     result = prime * result + ((completionDate == null) ? 0 : completionDate.hashCode());
     result = prime * result + ((containerSerialNumber == null) ? 0 : containerSerialNumber.hashCode());
+    result = prime * result + ((containerModel == null) ? 0 : containerModel.hashCode());
     result = prime * result + ((healthType == null) ? 0 : healthType.hashCode());
     result = prime * result + laneCount;
     result = prime * result + ((metrics == null) ? 0 : metrics.hashCode());
@@ -236,6 +251,9 @@ public abstract class NotificationDto implements Predicate<SequencingParameters>
     if (containerSerialNumber == null) {
       if (other.containerSerialNumber != null) return false;
     } else if (!containerSerialNumber.equals(other.containerSerialNumber)) return false;
+    if (containerModel == null) {
+      if (other.containerModel != null) return false;
+    } else if (!containerModel.equals(other.containerModel)) return false;
     if (healthType != other.healthType) return false;
     if (laneCount != other.laneCount) return false;
     if (metrics == null) {

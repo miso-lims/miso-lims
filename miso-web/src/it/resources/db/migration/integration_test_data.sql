@@ -284,26 +284,47 @@ INSERT INTO SequencingParameters (parametersId, name, platformId, readLength, pa
   (3, '1x151', 1, 151, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V4'),
   (4, 'Micro 2x151', 2, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V3');
 
-INSERT INTO PlatformSizes(platform_platformId, partitionSize) VALUES
-  (1, 4),
-  (1, 8),
-  (2, 1),
-  (3, 1),
-  (3, 2),
-  (3, 3),
-  (3, 4),
-  (3, 5),
-  (3, 6),
-  (3, 7),
-  (3, 8),
-  (3, 9),
-  (3, 10),
-  (3, 11),
-  (3, 12),
-  (3, 13),
-  (3, 14),
-  (3, 15),
-  (3, 16);
+INSERT INTO SequencingContainerModel (sequencingContainerModelId, alias, identificationBarcode, partitionCount, platformType, fallback) VALUES
+(1, 'Generic 4-Lane Illumina Flow Cell', NULL, 4, 'ILLUMINA', 1),
+(2, 'Generic 8-Lane Illumina Flow Cell', NULL, 8, 'ILLUMINA', 1),
+(3, 'Generic 1-Lane Illumina Flow Cell', NULL, 1, 'ILLUMINA', 1),
+(4, 'Generic 1-SMRT-Cell PacBio 8Pac', NULL, 1, 'PACBIO', 1),
+(5, 'Generic 2-SMRT-Cell PacBio 8Pac', NULL, 2, 'PACBIO', 1),
+(6, 'Generic 3-SMRT-Cell PacBio 8Pac', NULL, 3, 'PACBIO', 1),
+(7, 'Generic 4-SMRT-Cell PacBio 8Pac', NULL, 4, 'PACBIO', 1),
+(8, 'Generic 5-SMRT-Cell PacBio 8Pac', NULL, 5, 'PACBIO', 1),
+(9, 'Generic 6-SMRT-Cell PacBio 8Pac', NULL, 6, 'PACBIO', 1),
+(10, 'Generic 7-SMRT-Cell PacBio 8Pac', NULL, 7, 'PACBIO', 1),
+(11, 'Generic 8-SMRT-Cell PacBio 8Pac', NULL, 8, 'PACBIO', 1),
+(12, 'Generic 9-SMRT-Cell PacBio 8Pac', NULL, 9, 'PACBIO', 1),
+(13, 'Generic 10-SMRT-Cell PacBio 8Pac', NULL, 10, 'PACBIO', 1),
+(14, 'Generic 11-SMRT-Cell PacBio 8Pac', NULL, 11, 'PACBIO', 1),
+(15, 'Generic 12-SMRT-Cell PacBio 8Pac', NULL, 12, 'PACBIO', 1),
+(16, 'Generic 13-SMRT-Cell PacBio 8Pac', NULL, 13, 'PACBIO', 1),
+(17, 'Generic 14-SMRT-Cell PacBio 8Pac', NULL, 14, 'PACBIO', 1),
+(18, 'Generic 15-SMRT-Cell PacBio 8Pac', NULL, 15, 'PACBIO', 1),
+(19, 'Generic 16-SMRT-Cell PacBio 8Pac', NULL, 16, 'PACBIO', 1);
+
+INSERT INTO SequencingContainerModel_Platform (platformId, sequencingContainerModelId) VALUES
+(1, 1),
+(1, 2),
+(2, 3),
+(3, 4),
+(3, 5),
+(3, 6),
+(3, 7),
+(3, 8),
+(3, 9),
+(3, 10),
+(3, 11),
+(3, 12),
+(3, 13),
+(3, 14),
+(3, 15),
+(3, 16),
+(3, 17),
+(3, 18),
+(3, 19);
 
 INSERT INTO Instrument (instrumentId, name, platformId, ip) VALUES
   (1, 'T2000', 1, '127.0.0.1'),
@@ -712,20 +733,20 @@ INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
 (500, 502, 'SAMPLE', 'A01'), (500, 504, 'LIBRARY', 'B01'), (500, 504, 'DILUTION', 'C01'), (500, 501, 'POOL', 'D01'), (500, 505, 'LIBRARY', 'F10'),
 (100001, 100006, 'LIBRARY', 'A02'), (100001, 100007, 'LIBRARY', 'A03'); 
 
-INSERT INTO SequencerPartitionContainer (containerId, securityProfile_profileId, identificationBarcode, platform, lastModifier, creator, created, lastModified) VALUES
-(1, 3, 'MISEQXX', 2, 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01'),
-(2, 4, 'PACBIO1', 3, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5002, 4, 'EXISTING', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5003, 4, 'REMOVABLE', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5004, 4, 'ADDPOOLS', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5005, 4, 'REMOVE_POOL', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5006, 4, 'REPLACE_POOL', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5008, 4, 'FAIL_LANE', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5009, 4, 'FAIL_LANE_WITH_NOTE', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5010, 4, 'FAIL_LANE_TO_PASS', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5100, 4, 'SEARCH_POOLS', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5101, 4, 'POOL_COMPLETED_ORDER', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(6001, 4, 'CHANGEABLE', 2, 1, 1, '2017-10-03 14:45', '2017-10-03 14:45');
+INSERT INTO SequencerPartitionContainer (containerId, securityProfile_profileId, identificationBarcode, sequencingContainerModelId, lastModifier, creator, created, lastModified) VALUES
+(1, 3, 'MISEQXX', 1, 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01'),
+(2, 4, 'PACBIO1', 11, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5002, 4, 'EXISTING', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5003, 4, 'REMOVABLE', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5004, 4, 'ADDPOOLS', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5005, 4, 'REMOVE_POOL', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5006, 4, 'REPLACE_POOL', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5008, 4, 'FAIL_LANE', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5009, 4, 'FAIL_LANE_WITH_NOTE', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5010, 4, 'FAIL_LANE_TO_PASS', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5100, 4, 'SEARCH_POOLS', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5101, 4, 'POOL_COMPLETED_ORDER', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(6001, 4, 'CHANGEABLE', 1, 1, 1, '2017-10-03 14:45', '2017-10-03 14:45');
 
 INSERT INTO `_Partition` (partitionId, partitionNumber, pool_poolId) VALUES 
 (1, 1, 1), (2, 1, NULL),
@@ -742,17 +763,23 @@ INSERT INTO `_Partition` (partitionId, partitionNumber, pool_poolId) VALUES
 (6001, 1, NULL);
 
 INSERT INTO SequencerPartitionContainer_Partition (container_containerId, partitions_partitionId) VALUES
-(1, 1), (2, 2),
-(5002, 5101), (5002, 5102),
-(5003, 5201), (5002, 5202),
-(5004, 5401), (5004, 5402),
-(5005, 5501), (5005, 5502),
+(1, 1),
+(2, 2),
+(5002, 5101),
+(5002, 5102),
+(5002, 5202),
+(5003, 5201),
+(5004, 5401),
+(5004, 5402),
+(5005, 5501),
+(5005, 5502),
 (5006, 5601),
 (5008, 5801),
 (5009, 5901),
 (5010, 5110),
 (5100, 5100),
-(5101, 5104), (5101, 5105),
+(5101, 5104),
+(5101, 5105),
 (6001, 6001);
 
 INSERT INTO Run (runId, name, securityProfile_profileId, alias, instrumentId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES

@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.util.Set;
 
 public class PlatformDto {
   private boolean active;
@@ -11,8 +10,6 @@ public class PlatformDto {
   private String instrumentModel;
 
   private int numContainers;
-
-  private Set<Integer> partitionSizes;
 
   private String platformType;
 
@@ -33,10 +30,6 @@ public class PlatformDto {
 
   public int getNumContainers() {
     return numContainers;
-  }
-
-  public Set<Integer> getPartitionSizes() {
-    return partitionSizes;
   }
 
   public String getPlatformType() {
@@ -65,10 +58,6 @@ public class PlatformDto {
 
   public void setNumContainers(int numContainers) {
     this.numContainers = numContainers;
-  }
-
-  public void setPartitionSizes(Set<Integer> partitionSizes) {
-    this.partitionSizes = partitionSizes;
   }
 
   public void setPlatformType(String platformType) {

@@ -31,6 +31,7 @@ import java.util.List;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
@@ -92,20 +93,6 @@ public interface SequencerPartitionContainer
    */
   void setPartitionLimit(int partitionLimit);
 
-  /**
-   * Returns the platform of this Container object.
-   * 
-   * @return Platform platform.
-   */
-  public Platform getPlatform();
-
-  /**
-   * Sets the platform of this Container object.
-   * 
-   * @param platform Platform.
-   */
-  public void setPlatform(Platform platform);
-
   @Override
   public Collection<ChangeLog> getChangeLog();
 
@@ -133,4 +120,9 @@ public interface SequencerPartitionContainer
   KitDescriptor getMultiplexingKit();
 
   void setMultiplexingKit(KitDescriptor multiplexingKit);
+
+  public SequencingContainerModel getModel();
+
+  public void setModel(SequencingContainerModel model);
+
 }

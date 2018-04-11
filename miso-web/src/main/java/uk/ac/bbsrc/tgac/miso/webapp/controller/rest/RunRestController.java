@@ -264,9 +264,11 @@ public class RunRestController extends RestController {
       throw new RestException("Multiple containers with this barcode.", Status.BAD_REQUEST);
     }
     SequencerPartitionContainer container = containers.iterator().next();
-    if (container.getPlatform().getId() != run.getSequencer().getPlatform().getId()) {
-      throw new RestException(String.format("This container is meant for %s but this run came from %s.",
-          container.getPlatform().getNameAndModel(), run.getSequencer().getPlatform().getNameAndModel()), Status.BAD_REQUEST);
+    if (container.getModel().getPlatforms().stream()
+        .noneMatch(platform -> platform.getId() == run.getSequencer().getPlatform().getId())) {
+      throw new RestException(String.format("Container model '%s' (%s) is not compatible with %s (%s) run",
+          container.getModel().getAlias(), container.getModel().getPlatformType(), run.getSequencer().getPlatform().getInstrumentModel(),
+          run.getSequencer().getPlatform().getPlatformType()), Status.BAD_REQUEST);
     }
     run.addSequencerPartitionContainer(container);
     runService.update(run);
