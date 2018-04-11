@@ -1929,6 +1929,18 @@ button.disabled {
   border: 0;
 }
 
+.handsontable td.htInvalid {
+  background-color: #f2dede !important; /*gives priority over td.area selection background*/
+}
+
+.handsontable .htAutocompleteArrow {
+  color: #696969;
+}
+
+.handsontable td.area .htAutocompleteArrow {
+  color: #696969;
+}
+
 .handsontable td.nonStandardAlias {
   background-color: #FFFFCC;
 }
