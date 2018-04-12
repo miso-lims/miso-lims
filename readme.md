@@ -3,6 +3,8 @@
 
 # MISO: An open source LIMS for small-to-large scale sequencing centres
 
+[![Join the chat at https://gitter.im/TGAC/miso-lims](https://badges.gitter.im/TGAC/miso-lims.svg)](https://gitter.im/TGAC/miso-lims?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 &copy; 2017. [Earlham Institute](http://earlham.ac.uk/), Norwich, UK, [Ontario Institute for Cancer Research](http://oicr.on.ca), Toronto, Canada
 
 > MISO project contacts: [Robert Davey](robert.davey@earlham.ac.uk), [Morgan Taschuk](morgan.taschuk@oicr.on.ca)
