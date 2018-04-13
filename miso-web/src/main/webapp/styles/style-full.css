@@ -1953,6 +1953,17 @@ button.disabled {
   background-color: #F0F0FF;
 }
 
+/* fix for autocomplete menus being hidden when they extend beyond the table */
+.handsontableEditor.autocompleteEditor, .handsontableEditor.autocompleteEditor .ht_master .wtHolder {
+  min-height: 138px;
+}
+
+/* hide unnecessary vertical scrollbar */
+#hotContainer > .ht_master > .wtHolder {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 .datatable-scroll {
     overflow-x: auto;
     overflow-y: visible;
