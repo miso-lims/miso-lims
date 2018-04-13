@@ -599,6 +599,14 @@ public class EditLibraryController {
     return setupForm(user, library, model);
   }
 
+  @RequestMapping(value = "/dilution/{dilutionId}", method = RequestMethod.GET)
+  public ModelAndView setupFormByDilution(@PathVariable Long dilutionId, ModelMap model) throws IOException {
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    LibraryDilution dilution = dilutionService.get(dilutionId);
+    model.put("title", "Library " + dilution.getLibrary().getId());
+    return setupForm(user, dilution.getLibrary(), model);
+  }
+
   private ModelAndView setupForm(User user, Library library, ModelMap model) throws IOException {
 
     if (library == null) {
