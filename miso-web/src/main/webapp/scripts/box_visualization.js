@@ -167,7 +167,7 @@
       self.clear();
       var table = jQuery('<table>');
       table.attr('id', self.table.substring(1));
-      table.attr('style', 'border:1px solid darkgrey;background:lightgrey;margin:20px;padding:10px;');
+      table.attr('style', 'border:1px solid darkgrey;background:lightgrey;padding:10px;');
       jQuery(self.div).append(table);
 
       var tBody = jQuery('<tBody>');
@@ -261,6 +261,32 @@
       }
       toggleGroupSelection(event, items);
     };
+
+    self.selectOddColumns = function() {
+      selectOddOrEvenColumns(true);
+    };
+
+    self.selectEvenColumns = function() {
+      selectOddOrEvenColumns(false);
+    }
+
+    var selectOddOrEvenColumns = function(odd) {
+      if (!self.isMultiSelectEnabled()) {
+        return;
+      }
+      self.clearSelection();
+      var firstCol = odd ? 1 : 2;
+      var items = [];
+      for (var col = firstCol; col <= self.size.cols; col += 2) {
+        for (var row = 1; row <= self.size.rows; row++) {
+          items.push(self.position[row][col]);
+        }
+      }
+      items.forEach(function(item) {
+        self.select(item, true);
+      });
+      callSelectionChanged(self.selectedItems);
+    }
 
     self.selectPos = function(row, col) {
       self.clearSelection();

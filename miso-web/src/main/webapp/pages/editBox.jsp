@@ -161,7 +161,17 @@
   </ul>
 </div>
 <div id="boxContentsDiagram">
-  <div id="boxContentsTable" class="unselectable" style="float:left;"></div>
+  <div class="note">
+    Hold down Ctrl (Windows, Linux) or Command (Mac) to select multiple positions.
+    Click a row or column header to select the entire row or column.
+  </div>
+  <div style="float:left;margin:20px;">
+    <div id="boxContentsTable" class="unselectable" style="margin-bottom:10px;"></div>
+    <div>
+      <button class="ui-state-default" onclick="Box.visual.selectOddColumns()">Select Odd Columns</button>
+      <button class="ui-state-default" onclick="Box.visual.selectEvenColumns()">Select Even Columns</button>
+    </div>
+  </div>
   <div id="singlePositionControls" style="float:left;padding:20px;">
     <table id="selectedPositionInfo">
 	    <tr>
@@ -222,10 +232,6 @@
       </tfoot>
     </table>
   </div>
-  <p style="clear: both;">
-    Hold down Control (Windows, Linux) or Command (Mac) to select multiple positions.<br/>
-    Click row or column header to select entire row or column.
-  </p>
   <br/>
 </div>
 
