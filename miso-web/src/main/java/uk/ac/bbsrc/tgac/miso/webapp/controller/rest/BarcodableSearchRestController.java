@@ -56,7 +56,7 @@ public class BarcodableSearchRestController extends RestController {
     case LIBRARY:
       return "library";
     case DILUTION:
-      return "library";
+      return "library/dilution";
     case CONTAINER:
       return "container";
     default:
