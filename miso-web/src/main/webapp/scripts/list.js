@@ -249,6 +249,7 @@ ListUtils = (function() {
         "mData": "id",
         "include": true,
         "bSortable": false,
+        "sClass": "noPrint",
         "mRender": function(data, type, full) {
           var checked = ListState[elementId].selected.some(function(obj) {
             return obj.id == data;
@@ -545,13 +546,14 @@ ListUtils = (function() {
       }
       updateSelectedLabel(state);
     },
-    idHyperlinkColumn: function(headerName, urlFragment, id, getLabel, priority, include) {
+    idHyperlinkColumn: function(headerName, urlFragment, id, getLabel, priority, include, addClass) {
       return {
         "sTitle": headerName,
         "mData": id,
         "include": include,
         "iSortPriority": priority,
         "bSortable": priority >= 0,
+        "sClass": addClass,
         "mRender": function(data, type, full) {
           if (type === 'display') {
             return data ? "<a href=\"/miso/" + urlFragment + "/" + data + "\">" + getLabel(full) + "</a>" : "";
@@ -562,7 +564,7 @@ ListUtils = (function() {
         }
       };
     },
-    labelHyperlinkColumn: function(headerName, urlFragment, getId, label, priority, include) {
+    labelHyperlinkColumn: function(headerName, urlFragment, getId, label, priority, include, addClass) {
       return {
         "sTitle": headerName,
         "mData": label,
@@ -570,6 +572,7 @@ ListUtils = (function() {
         "iSortPriority": priority,
         "bSortDirection": true,
         "bSortable": priority >= 0,
+        "sClass": addClass,
         "mRender": function(data, type, full) {
           if (type === 'display') {
             return data ? "<a href=\"/miso/" + urlFragment + "/" + getId(full) + "\">" + data + "</a>" : "";

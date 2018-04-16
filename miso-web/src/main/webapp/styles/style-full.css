@@ -2067,3 +2067,17 @@ button.disabled {
     border: 1px solid black;
     font-size: 12px;
 }
+
+@media print {
+  #pageHeader, #subcontent, .fg-toolbar, .sectionDivider, .noPrint {
+    display: none !important;
+  }
+  
+  #contentcolumn {
+    margin-left: 0;
+  }
+  
+  h1 {
+    border: none;
+  }
+}
