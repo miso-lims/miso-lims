@@ -2082,7 +2082,7 @@ button.disabled {
     border: none;
   }
   
-  .list_included_info {
+  .dataTables_info {
     font-weight: bold;
   }
   
