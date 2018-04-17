@@ -1,3 +1,15 @@
+# 0.2.116
+
+Changes:
+
+ * Optimize Edit Pool page for printing
+ * Fix double-clicking fill handle
+ * Fix sorting bug on bulk propagate Library page
+ * Added Select Odd/Even Columns buttons on Box page
+ * Make dilution search tile link to correct library page
+ * Add sequencing container models
+ * Add HiSeq X chemsitry
+
 # 0.2.115
 
 Changes:

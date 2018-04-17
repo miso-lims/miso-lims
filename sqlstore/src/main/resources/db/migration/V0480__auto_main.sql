@@ -1,3 +1,5 @@
+-- sequencing_container_models
+
 DROP TABLE IF EXISTS SequencingContainerModel_Platform;
 DROP TABLE IF EXISTS SequencingContainerModel;
 
@@ -169,3 +171,5 @@ INSERT INTO SequencingContainerModel_Platform (sequencingContainerModelId, platf
 SELECT m.sequencingContainerModelId, p.platformId FROM SequencingContainerModel m JOIN Platform p
 WHERE m.alias = 'Mid Output Flow Cell Cartridge V2' AND p.instrumentModel LIKE '%NextSeq 550';
 -- EndNoTest
+
+
