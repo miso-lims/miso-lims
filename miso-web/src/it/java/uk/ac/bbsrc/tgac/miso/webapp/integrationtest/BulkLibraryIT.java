@@ -127,32 +127,32 @@ public class BulkLibraryIT extends AbstractIT {
     BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(100004L), 1);
     HandsOnTable table = page.getTable();
 
-    List<String> designs = table.getDropdownOptions(LibColumns.DESIGN, 0);
+    Set<String> designs = table.getDropdownOptions(LibColumns.DESIGN, 0);
     assertEquals(7, designs.size());
     assertTrue(designs.contains("WG"));
     assertTrue(designs.contains("AS"));
 
-    List<String> codes = table.getDropdownOptions(LibColumns.CODE, 0);
+    Set<String> codes = table.getDropdownOptions(LibColumns.CODE, 0);
     assertEquals(9, codes.size());
     assertTrue(codes.contains("EX"));
     assertTrue(codes.contains("MR"));
 
-    List<String> platforms = table.getDropdownOptions(LibColumns.PLATFORM, 0);
+    Set<String> platforms = table.getDropdownOptions(LibColumns.PLATFORM, 0);
     assertEquals(2, platforms.size());
     assertTrue(platforms.contains("Illumina"));
     assertTrue(platforms.contains("PacBio"));
 
-    List<String> selections = table.getDropdownOptions(LibColumns.SELECTION, 0);
+    Set<String> selections = table.getDropdownOptions(LibColumns.SELECTION, 0);
     assertEquals(27, selections.size());
     assertTrue(selections.contains("cDNA"));
     assertTrue(selections.contains("PCR"));
 
-    List<String> strategies = table.getDropdownOptions(LibColumns.STRATEGY, 0);
+    Set<String> strategies = table.getDropdownOptions(LibColumns.STRATEGY, 0);
     assertEquals(20, strategies.size());
     assertTrue(strategies.contains("AMPLICON"));
     assertTrue(strategies.contains("OTHER"));
 
-    List<String> qcValues = table.getDropdownOptions(LibColumns.QC_PASSED, 0);
+    Set<String> qcValues = table.getDropdownOptions(LibColumns.QC_PASSED, 0);
     assertEquals(3, qcValues.size());
     assertTrue(qcValues.contains("True"));
     assertTrue(qcValues.contains("False"));
@@ -165,12 +165,12 @@ public class BulkLibraryIT extends AbstractIT {
     HandsOnTable table = page.getTable();
 
     // verify empty options; library type, index family, and kit depend on platform
-    List<String> types = table.getDropdownOptions(LibColumns.LIBRARY_TYPE, 0);
+    Set<String> types = table.getDropdownOptions(LibColumns.LIBRARY_TYPE, 0);
     assertTrue(types.isEmpty());
-    List<String> families = table.getDropdownOptions(LibColumns.INDEX_FAMILY, 0);
+    Set<String> families = table.getDropdownOptions(LibColumns.INDEX_FAMILY, 0);
     // may contain an empty String, which doesn't do any harm
-    assertTrue(families.isEmpty() || (families.size() == 1 && isStringEmptyOrNull(families.get(0))));
-    List<String> kits = table.getDropdownOptions(LibColumns.KIT_DESCRIPTOR, 0);
+    assertTrue(families.isEmpty() || (families.size() == 1 && isStringEmptyOrNull(families.iterator().next())));
+    Set<String> kits = table.getDropdownOptions(LibColumns.KIT_DESCRIPTOR, 0);
     assertTrue(kits.isEmpty());
 
     // select platform
@@ -193,10 +193,10 @@ public class BulkLibraryIT extends AbstractIT {
     assertTrue(kits.contains("Test Kit"));
 
     // indices depend on index family
-    List<String> index1s = table.getDropdownOptions(LibColumns.INDEX_1, 0);
+    Set<String> index1s = table.getDropdownOptions(LibColumns.INDEX_1, 0);
     assertEquals(1, index1s.size());
     assertTrue(index1s.contains(NO_INDEX));
-    List<String> index2s = table.getDropdownOptions(LibColumns.INDEX_2, 0);
+    Set<String> index2s = table.getDropdownOptions(LibColumns.INDEX_2, 0);
     assertEquals(1, index2s.size());
     assertTrue(index2s.contains(NO_INDEX));
 

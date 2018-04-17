@@ -118,7 +118,7 @@ public class BulkPoolIT extends AbstractIT {
     BulkPoolPage page = BulkPoolPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(200001L));
     HandsOnTable table = page.getTable();
 
-    List<String> qcValues = table.getDropdownOptions(Columns.QC_PASSED, 0);
+    Set<String> qcValues = table.getDropdownOptions(Columns.QC_PASSED, 0);
     assertEquals(3, qcValues.size());
     assertTrue(qcValues.contains("True"));
     assertTrue(qcValues.contains("False"));

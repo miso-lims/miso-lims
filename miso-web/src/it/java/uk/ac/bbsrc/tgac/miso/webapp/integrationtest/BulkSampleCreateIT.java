@@ -107,7 +107,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, tissueClassId);
     HandsOnTable table = page.getTable();
 
-    List<String> sampleTypes = table.getDropdownOptions(SamColumns.SAMPLE_TYPE, 0);
+    Set<String> sampleTypes = table.getDropdownOptions(SamColumns.SAMPLE_TYPE, 0);
     assertTrue(sampleTypes.size() >= 8);
     assertTrue(sampleTypes.contains("GENOMIC"));
     assertTrue(sampleTypes.contains("TRANSCRIPTOMIC"));
@@ -115,14 +115,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     table.enterText(SamColumns.SAMPLE_TYPE, 0, "GENOM");
     assertEquals("GENOMIC", table.getText(SamColumns.SAMPLE_TYPE, 0));
 
-    List<String> projects = table.getDropdownOptions(SamColumns.PROJECT, 0);
+    Set<String> projects = table.getDropdownOptions(SamColumns.PROJECT, 0);
     assertTrue(projects.size() > 0);
     assertTrue(projects.contains("PRO1"));
 
     table.enterText(SamColumns.PROJECT, 0, "PRO1");
     assertEquals("PRO1", table.getText(SamColumns.PROJECT, 0));
 
-    List<String> donorSexes = table.getDropdownOptions(SamColumns.DONOR_SEX, 0);
+    Set<String> donorSexes = table.getDropdownOptions(SamColumns.DONOR_SEX, 0);
     assertTrue(donorSexes.size() >= 5);
     assertTrue(donorSexes.contains("Female"));
     assertTrue(donorSexes.contains("Unspecified"));
@@ -130,7 +130,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     table.enterText(SamColumns.DONOR_SEX, 0, "Unspe");
     assertEquals("Unspecified", table.getText(SamColumns.DONOR_SEX, 0));
 
-    List<String> tissueOrigins = table.getDropdownOptions(SamColumns.TISSUE_ORIGIN, 0);
+    Set<String> tissueOrigins = table.getDropdownOptions(SamColumns.TISSUE_ORIGIN, 0);
     assertTrue(tissueOrigins.size() >= 3);
     assertTrue(tissueOrigins.contains("Bn (Brain)"));
     assertTrue(tissueOrigins.contains("Pa (Pancreas)"));
@@ -138,7 +138,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     table.enterText(SamColumns.TISSUE_ORIGIN, 0, "Ly");
     assertEquals("Ly (Lymphocyte)", table.getText(SamColumns.TISSUE_ORIGIN, 0));
 
-    List<String> tissueTypes = table.getDropdownOptions(SamColumns.TISSUE_TYPE, 0);
+    Set<String> tissueTypes = table.getDropdownOptions(SamColumns.TISSUE_TYPE, 0);
     assertTrue(tissueTypes.size() >= 14);
     assertTrue(tissueTypes.contains("P (Primary tumour)"));
     assertTrue(tissueTypes.contains("n (Unknown)"));
@@ -146,7 +146,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     table.enterText(SamColumns.TISSUE_TYPE, 0, "Benign");
     assertEquals("B (Benign tumour)", table.getText(SamColumns.TISSUE_TYPE, 0));
 
-    List<String> labs = table.getDropdownOptions(SamColumns.LAB, 0);
+    Set<String> labs = table.getDropdownOptions(SamColumns.LAB, 0);
     assertTrue(labs.size() >= 3); // 2 + (None)
     assertTrue(labs.contains("Pathology (University Health Network)"));
     assertTrue(labs.contains("(None)"));
@@ -154,7 +154,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     table.enterText(SamColumns.LAB, 0, "Bio");
     assertEquals("BioBank (University Health Network)", table.getText(SamColumns.LAB, 0));
 
-    List<String> materials = table.getDropdownOptions(SamColumns.TISSUE_MATERIAL, 0);
+    Set<String> materials = table.getDropdownOptions(SamColumns.TISSUE_MATERIAL, 0);
     assertTrue(materials.size() >= 4); // 3 + (None)
     assertTrue(materials.contains("FFPE"));
     assertTrue(materials.contains("(None)"));
@@ -162,7 +162,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     table.enterText(SamColumns.TISSUE_MATERIAL, 0, "Fresh");
     assertEquals("Fresh Frozen", table.getText(SamColumns.TISSUE_MATERIAL, 0));
 
-    List<String> qcStatuses = table.getDropdownOptions(SamColumns.QC_STATUS, 0);
+    Set<String> qcStatuses = table.getDropdownOptions(SamColumns.QC_STATUS, 0);
     assertTrue(qcStatuses.size() >= 10);
     assertTrue(qcStatuses.contains("Ready"));
     assertTrue(qcStatuses.contains("Refused Consent"));
@@ -293,7 +293,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, slideClassId);
     HandsOnTable table = page.getTable();
 
-    List<String> stains = table.getDropdownOptions(SamColumns.STAIN, 0);
+    Set<String> stains = table.getDropdownOptions(SamColumns.STAIN, 0);
     assertEquals(3, stains.size()); // 2 + (None)
     assertTrue(stains.contains("Cresyl Violet"));
     assertTrue(stains.contains("(None)"));
@@ -527,7 +527,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, gStockClassId);
     HandsOnTable table = page.getTable();
 
-    List<String> strStatuses = table.getDropdownOptions(SamColumns.STR_STATUS, 0);
+    Set<String> strStatuses = table.getDropdownOptions(SamColumns.STR_STATUS, 0);
     assertEquals(4, strStatuses.size());
     assertTrue(strStatuses.contains("Submitted"));
     assertTrue(strStatuses.contains("Fail"));
@@ -653,7 +653,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, rStockClassId);
     HandsOnTable table = page.getTable();
 
-    List<String> dnaseTreated = table.getDropdownOptions(SamColumns.DNASE_TREATED, 0);
+    Set<String> dnaseTreated = table.getDropdownOptions(SamColumns.DNASE_TREATED, 0);
     assertEquals(2, dnaseTreated.size());
     assertTrue(dnaseTreated.contains("True"));
     assertTrue(dnaseTreated.contains("False"));
@@ -783,7 +783,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, gAliquotClassId);
     HandsOnTable table = page.getTable();
 
-    List<String> purposes = table.getDropdownOptions(SamColumns.PURPOSE, 0);
+    Set<String> purposes = table.getDropdownOptions(SamColumns.PURPOSE, 0);
     assertEquals(11, purposes.size());
     assertTrue(purposes.contains("Library"));
     assertTrue(purposes.contains("Validation"));
@@ -1025,7 +1025,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, identityClassId);
     HandsOnTable table = page.getTable();
 
-    List<String> sampleTypes = table.getDropdownOptions(SamColumns.SAMPLE_TYPE, 0);
+    Set<String> sampleTypes = table.getDropdownOptions(SamColumns.SAMPLE_TYPE, 0);
     assertEquals(8, sampleTypes.size());
     assertTrue(sampleTypes.contains("GENOMIC"));
     assertTrue(sampleTypes.contains("TRANSCRIPTOMIC"));
@@ -1033,14 +1033,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     table.enterText(SamColumns.SAMPLE_TYPE, 0, "GENOM");
     assertEquals("GENOMIC", table.getText(SamColumns.SAMPLE_TYPE, 0));
 
-    List<String> projects = table.getDropdownOptions(SamColumns.PROJECT, 0);
+    Set<String> projects = table.getDropdownOptions(SamColumns.PROJECT, 0);
     assertTrue(projects.size() > 0);
     assertTrue(projects.contains("PRO1"));
 
     table.enterText(SamColumns.PROJECT, 0, "PRO1");
     assertEquals("PRO1", table.getText(SamColumns.PROJECT, 0));
 
-    List<String> donorSexes = table.getDropdownOptions(SamColumns.DONOR_SEX, 0);
+    Set<String> donorSexes = table.getDropdownOptions(SamColumns.DONOR_SEX, 0);
     assertEquals(5, donorSexes.size());
     assertTrue(donorSexes.contains("Female"));
     assertTrue(donorSexes.contains("Unspecified"));
@@ -1048,7 +1048,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     table.enterText(SamColumns.DONOR_SEX, 0, "Unspe");
     assertEquals("Unspecified", table.getText(SamColumns.DONOR_SEX, 0));
 
-    List<String> qcStatuses = table.getDropdownOptions(SamColumns.QC_STATUS, 0);
+    Set<String> qcStatuses = table.getDropdownOptions(SamColumns.QC_STATUS, 0);
     assertEquals(10, qcStatuses.size());
     assertTrue(qcStatuses.contains("Ready"));
     assertTrue(qcStatuses.contains("Refused Consent"));
