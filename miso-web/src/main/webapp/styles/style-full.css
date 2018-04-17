@@ -2069,12 +2069,21 @@ button.disabled {
 }
 
 @media print {
-  #pageHeader, #subcontent, .fg-toolbar, .sectionDivider, .noPrint {
-    display: none !important;
+  #pageHeader, #subcontent, .fg-toolbar, .sectionDivider, .counter, .dataTables_paginate, .noPrint {
+    display: none;
   }
   
   #contentcolumn {
     margin-left: 0;
+  }
+  
+  .datatable-scroll + .fg-toolbar {
+    display: block;
+    border: none;
+  }
+  
+  .list_included_info {
+    font-weight: bold;
   }
   
   h1 {
