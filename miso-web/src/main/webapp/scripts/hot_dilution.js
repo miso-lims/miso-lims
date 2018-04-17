@@ -52,7 +52,11 @@ HotTarget.dilution = {
           validator: HotUtils.validator.requiredText,
           include: true,
           unpack: function(dil, flat, setCellMeta) {
-            flat.creationDate = Utils.valOrNull(dil.creationDate);
+            if (create) {
+              flat.creationDate = Utils.getCurrentDate();
+            } else {
+              flat.creationDate = Utils.valOrNull(dil.creationDate);
+            }
           },
           pack: function(dil, flat, errorHandler) {
             dil.creationDate = flat.creationDate;
