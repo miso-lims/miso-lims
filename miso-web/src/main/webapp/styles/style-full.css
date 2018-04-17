@@ -2090,3 +2090,26 @@ button.disabled {
     border: 1px solid black;
     font-size: 12px;
 }
+
+@media print {
+  #pageHeader, #subcontent, .fg-toolbar, .sectionDivider, .counter, .dataTables_paginate, .noPrint {
+    display: none;
+  }
+  
+  #contentcolumn {
+    margin-left: 0;
+  }
+  
+  .datatable-scroll + .fg-toolbar {
+    display: block;
+    border: none;
+  }
+  
+  .dataTables_info {
+    font-weight: bold;
+  }
+  
+  h1 {
+    border: none;
+  }
+}

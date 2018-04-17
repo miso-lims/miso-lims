@@ -44,14 +44,14 @@ ListTarget.completion = {
     }
     return [ListUtils.idHyperlinkColumn("Name", "pool", "pool.id", function(completion) {
       return completion.pool.name;
-    }, 1, true), ListUtils.labelHyperlinkColumn("Alias", "pool", function(completion) {
+    }, 1, !config.poolId), ListUtils.labelHyperlinkColumn("Alias", "pool", function(completion) {
       return completion.pool.id;
-    }, "pool.alias", 0, true), {
+    }, "pool.alias", 0, !config.poolId), {
       "sTitle": "Description",
       "mData": "pool.description",
       "bSortable": false,
       "iSortPriority": 0,
-      "include": true
+      "include": !config.poolId
     }, {
       "sTitle": "Platform",
       "mData": "parameters.platform.instrumentModel",
