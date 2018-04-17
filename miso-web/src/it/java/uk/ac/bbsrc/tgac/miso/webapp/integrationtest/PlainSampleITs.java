@@ -70,7 +70,7 @@ public class PlainSampleITs extends AbstractIT {
     sampleColumns.forEach(col -> assertTrue("Check for column: '" + col + "'", headings.contains(col)));
     assertEquals(2, table.getRowCount());
 
-    List<String> sampleTypes = table.getDropdownOptions(SamColumns.SAMPLE_TYPE, 0);
+    Set<String> sampleTypes = table.getDropdownOptions(SamColumns.SAMPLE_TYPE, 0);
     assertFalse("Sample Types dropdown did not render; is table broken?", sampleTypes.isEmpty());
     assertTrue(sampleTypes.contains("GENOMIC"));
     assertTrue(sampleTypes.contains("METATRANSCRIPTOMIC"));
@@ -115,7 +115,7 @@ public class PlainSampleITs extends AbstractIT {
     libraryColumns.forEach(col -> assertTrue("Check for column: '" + col + "'", headings.contains(col)));
     assertEquals(1, table.getRowCount());
 
-    List<String> platforms = table.getDropdownOptions(LibColumns.PLATFORM, 0);
+    Set<String> platforms = table.getDropdownOptions(LibColumns.PLATFORM, 0);
     assertFalse("Platform dropdown did not render; confirm one active sequencer exists and that table is not broken", platforms.isEmpty());
     assertTrue(platforms.contains("Illumina"));
   }

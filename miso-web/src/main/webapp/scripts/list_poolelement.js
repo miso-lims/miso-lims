@@ -65,13 +65,13 @@ ListTarget.poolelement = {
       'iSortPriority': 0
     }, ListUtils.idHyperlinkColumn("Library Name", "library", "library.id", function(dilution) {
       return dilution.library.name;
-    }, 0, true), ListUtils.labelHyperlinkColumn("Library Alias", "library", function(dilution) {
+    }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Library Alias", "library", function(dilution) {
       return dilution.library.id;
     }, "library.alias", 0, true), ListUtils.idHyperlinkColumn("Sample Name", "sample", "library.parentSampleId", function(dilution) {
       return "SAM" + dilution.library.parentSampleId;
-    }, 0, true), ListUtils.labelHyperlinkColumn("Sample Alias", "sample", function(dilution) {
+    }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Sample Alias", "sample", function(dilution) {
       return dilution.library.parentSampleId;
-    }, "library.parentSampleAlias", 0, true), {
+    }, "library.parentSampleAlias", 0, true, "noPrint"), {
       "sTitle": "Targeted Sequencing",
       "mData": "targetedSequencingId",
       "include": Constants.isDetailedSample,
@@ -113,7 +113,8 @@ ListTarget.poolelement = {
       'sTitle': 'Last Modified',
       'mData': 'lastModified',
       'include': true,
-      'iSortPriority': 0
+      'iSortPriority': 0,
+      'sClass': 'noPrint'
     }, {
       'sTitle': 'Low Quality',
       'bSortable': false,

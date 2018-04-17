@@ -8,13 +8,13 @@ FOR EACH ROW
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
         CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT('identification barcode: ', COALESCE(OLD.identificationBarcode, 'n/a'), ' → ', COALESCE(NEW.identificationBarcode, 'n/a')) END,
-        CASE WHEN (NEW.platform IS NULL) <> (OLD.platform IS NULL) OR NEW.platform <> OLD.platform THEN CONCAT('platform: ', COALESCE(OLD.platform, 'n/a'), ' → ', COALESCE(NEW.platform, 'n/a')) END);
+        CASE WHEN NEW.sequencingContainerModelId <> OLD.sequencingContainerModelId THEN CONCAT('model: ', (SELECT alias FROM SequencingContainerModel WHERE sequencingContainerModelId = OLD.sequencingContainerModelId), ' → ', (SELECT alias FROM SequencingContainerModel WHERE sequencingContainerModelId = NEW.sequencingContainerModelId)) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.containerId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN 'identificationBarcode' END,
-        CASE WHEN (NEW.platform IS NULL) <> (OLD.platform IS NULL) OR NEW.platform <> OLD.platform THEN 'platform' END), ''),
+        CASE WHEN NEW.sequencingContainerModelId <> OLD.sequencingContainerModelId THEN 'model' END), ''),
       NEW.lastModifier,
       log_message,
       NEW.lastModified

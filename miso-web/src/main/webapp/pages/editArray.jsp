@@ -125,7 +125,7 @@ jQuery(document).ready(function() {
 <c:if test="${!empty arrayJson}">
   <h1>Samples</h1>
   <div id="arraySamplesSection">
-    <div id="arraySamplesVisual" class="unselectable" style="float:left;"></div>
+    <div id="arraySamplesVisual" class="unselectable" style="float:left;margin:20px;"></div>
     <div style="float:left;padding:20px;">
       <table id="selectedPositionInfo">
           <tr>

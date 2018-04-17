@@ -102,12 +102,14 @@ ListTarget.run = {
           "sTitle": "Type",
           "mData": "platformType",
           "include": !config.platformType,
-          "iSortPriority": 0
+          "iSortPriority": 0,
+          "sClass": config.poolId ? "noPrint" : undefined
         }, {
           "sTitle": "Last Modified",
           "mData": "lastModified",
           "include": Constants.isDetailedSample,
-          "iSortPriority": 0
+          "iSortPriority": 0,
+          "sClass": config.poolId ? "noPrint" : undefined
         }];
   },
   searchTermSelector: function(searchTerms) {

@@ -28,18 +28,19 @@ PaneTarget.barcode = (function() {
   var transform = function(searchResult) {
     return Tile.make([
         Tile.title(searchResult.entityType),
-        Tile.lines(["Name: " + searchResult.name, "Alias: " + searchResult.alias, "Barcode: " + searchResult.identificationBarcode])],
-      function() {
-        window.location = window.location.origin + searchResult.url;
-      }
-    );
+        Tile.lines(["Name: " + searchResult.name, searchResult.alias ? ("Alias: " + searchResult.alias) : null,
+            searchResult.identificationBarcode ? ("Barcode: " + searchResult.identificationBarcode) : null].filter(function(x) {
+          return !!x;
+        }))], function() {
+      window.location = window.location.origin + searchResult.url;
+    });
   };
 
   var createHelpMessage = function() {
     var message = document.createElement("P");
 
-    message.innerText = "Search barcodable items by name, alias, or barcode.  " +
-      "Alternatively, scan a barcode to see any matching items here.";
+    message.innerText = "Search barcodable items by name, alias, or barcode.  "
+        + "Alternatively, scan a barcode to see any matching items here.";
 
     return message;
   };

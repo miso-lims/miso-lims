@@ -37,7 +37,7 @@
 <div id="contentcolumn">
 <form:form id="pool-form" data-parsley-validate="" action="/miso/pool" method="POST" commandName="pool" autocomplete="off">
 <sessionConversation:insertSessionConversationId attributeName="pool"/>
-<h1><c:choose><c:when
+<h1 class="noPrint"><c:choose><c:when
     test="${pool.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose> Pool
   <button id="save" type="button" onclick="return Pool.savePool();" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
@@ -162,7 +162,11 @@
 </table>
 
 <%@ include file="volumeControl.jspf" %>
-<%@ include file="permissions.jsp" %>
+
+<div class="noPrint">
+  <%@ include file="permissions.jsp" %>
+</div>
+
 <br/>
 
 <script type="text/javascript">
@@ -221,11 +225,15 @@
   <miso:qcs id="list_qcs" item="${pool}"/>
   <miso:list-section id="list_order" name="Requested Orders" target="order" alwaysShow="true" items="${orders}" config="{ poolId: ${pool.id}, platformType: '${pool.platformType.name()}' }"/>
   <miso:list-section-ajax id="list_completion" name="Order Status" target="completion" config="{ poolId: ${pool.id} }"/>
-  <miso:list-section id="list_run" name="Runs" target="run" items="${runs}"/>
+  <miso:list-section id="list_run" name="Runs" target="run" items="${runs}" config="{ poolId: ${pool.id} }"/>
   <miso:list-section-ajax id="list_included" name="Included Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: false, duplicateIndicesSequences: ${duplicateIndicesSequences}, nearDuplicateIndicesSequences: ${nearDuplicateIndicesSequences} }"/>
-  <miso:list-section-ajax id="list_available" name="Available Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: true }"/>
+  <div class="noPrint">
+    <miso:list-section-ajax id="list_available" name="Available Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: true }"/>
+  </div>
 </c:if>
-<miso:changelog item="${pool}"/>
+<div class="noPrint">
+  <miso:changelog item="${pool}"/>
+</div>
 
 </div>
 </div>

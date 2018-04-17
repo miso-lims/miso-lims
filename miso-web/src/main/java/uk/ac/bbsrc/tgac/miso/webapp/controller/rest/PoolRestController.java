@@ -191,15 +191,15 @@ public class PoolRestController extends RestController {
             if (!relatedExperimentsOkay) {
               throw new RestException(
                   String.format("%s %d is used in an experiment.",
-                      partition.getSequencerPartitionContainer().getPlatform().getPlatformType().getPartitionName(),
+                      partition.getSequencerPartitionContainer().getModel().getPlatformType().getPartitionName(),
                       partition.getPartitionNumber()),
                   Status.BAD_REQUEST);
             }
           }
-          if (pool != null && partition.getSequencerPartitionContainer().getPlatform().getPlatformType() != pool.getPlatformType()) {
+          if (pool != null && partition.getSequencerPartitionContainer().getModel().getPlatformType() != pool.getPlatformType()) {
             throw new RestException(
                 String.format("%s %d in %s is not compatible with pool %s.",
-                    partition.getSequencerPartitionContainer().getPlatform().getPlatformType().getPartitionName(),
+                    partition.getSequencerPartitionContainer().getModel().getPlatformType().getPartitionName(),
                     partition.getPartitionNumber(), partition.getSequencerPartitionContainer().getIdentificationBarcode(), pool.getName()),
                 Status.BAD_REQUEST);
           }

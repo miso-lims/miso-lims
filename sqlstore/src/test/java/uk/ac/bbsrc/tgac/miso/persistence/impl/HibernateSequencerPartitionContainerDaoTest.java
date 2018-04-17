@@ -50,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -145,9 +146,8 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
     spc.setSecurityProfile(profile);
     Mockito.when(profile.getProfileId()).thenReturn(1L);
-    Platform platform = Mockito.mock(Platform.class);
-    spc.setPlatform(platform);
-    Mockito.when(platform.getId()).thenReturn(1L);
+    SequencingContainerModel model = (SequencingContainerModel) sessionFactory.getCurrentSession().get(SequencingContainerModel.class, 1L);
+    spc.setModel(model);
     spc.setLastModifier(emptyUser);
     Run run = Mockito.mock(Run.class);
     Mockito.when(run.getId()).thenReturn(1L);
@@ -184,9 +184,8 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
     Date now = new Date();
     pc.setSecurityProfile(profile);
     pc.setIdentificationBarcode(identificationBarcode);
-    Platform platform = new Platform();
-    platform.setId(1L);
-    pc.setPlatform(platform);
+    SequencingContainerModel model = (SequencingContainerModel) sessionFactory.getCurrentSession().get(SequencingContainerModel.class, 1L);
+    pc.setModel(model);
     pc.setCreationTime(now);
     pc.setCreator(emptyUser);
     pc.setLastModified(now);
@@ -252,5 +251,49 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
     List<SequencerPartitionContainer> spcs = dao.list(2, 2, false, "lastModified");
     assertEquals(2, spcs.size());
     assertEquals(2, spcs.get(0).getId());
+  }
+
+  @Test
+  public void testGetModel() throws Exception {
+    assertNotNull(dao.get(1L));
+  }
+
+  @Test
+  public void testFindModelByAlias() throws Exception {
+    Platform platform = (Platform) sessionFactory.getCurrentSession().get(Platform.class, 16L);
+    String search = "HiSeq PE Flow Cell v4";
+    int lanes = 8;
+    SequencingContainerModel model = dao.findModel(platform, search, lanes);
+    assertNotNull(model);
+    assertEquals(search, model.getAlias());
+    assertEquals(lanes, model.getPartitionCount());
+  }
+
+  @Test
+  public void testFindModelByBarcode() throws Exception {
+    Platform platform = (Platform) sessionFactory.getCurrentSession().get(Platform.class, 16L);
+    String search = "12345678";
+    int lanes = 8;
+    SequencingContainerModel model = dao.findModel(platform, search, lanes);
+    assertNotNull(model);
+    assertEquals(search, model.getIdentificationBarcode());
+    assertEquals(lanes, model.getPartitionCount());
+  }
+
+  @Test
+  public void testFindFallbackModel() throws Exception {
+    Platform platform = (Platform) sessionFactory.getCurrentSession().get(Platform.class, 16L);
+    String search = null;
+    int lanes = 8;
+    SequencingContainerModel model = dao.findModel(platform, search, lanes);
+    assertNotNull(model);
+    assertEquals(lanes, model.getPartitionCount());
+    assertTrue(model.isFallback());
+  }
+
+  @Test
+  public void testListModels() throws Exception {
+    List<SequencingContainerModel> models = dao.listModels();
+    assertEquals(3, models.size());
   }
 }

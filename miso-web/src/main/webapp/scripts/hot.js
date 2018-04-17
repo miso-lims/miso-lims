@@ -19,7 +19,7 @@ var HotUtils = {
       if (Utils.validation.isEmpty(value)) {
         return callback(true);
       } else {
-        return Handsontable.AutocompleteValidator.call(this, value, callback)
+        return Handsontable.validators.AutocompleteValidator.call(this, value, callback)
       }
     },
 
@@ -79,7 +79,7 @@ var HotUtils = {
       if (Utils.validation.isEmpty(value)) {
         callback(false);
       } else {
-        Handsontable.AutocompleteValidator.call(this, value, callback);
+        Handsontable.validators.AutocompleteValidator.call(this, value, callback);
       }
     },
 
@@ -191,9 +191,7 @@ var HotUtils = {
           var cols = rows[rows_i];
           for (var cols_i = 0; cols_i < cols.length; cols_i++) {
             var cellContents = '' + cols[cols_i];
-            // regex iterative with /g, so it will return an
-            // array of
-            // matches.
+            // regex iterative with /g, so it will return an array of matches.
             var numbersInCell = cellContents.match(/\d+/g);
             var template = cellContents;
             if (!numbersInCell) {
@@ -282,7 +280,7 @@ var HotUtils = {
       // 'changes' is a variable-length array of arrays. Each inner array has
       // the following structure:
       // [rowIndex, colName, oldValue, newValue]
-      if (['edit', 'autofill', 'paste'].indexOf(source) == -1) {
+      if (['edit', 'Autofill.fill', 'CopyPaste.paste'].indexOf(source) == -1) {
         return;
       }
       // update function may return a promise. If so, we will wait for it to be resolved/rejected before revalidating and rerendering
@@ -298,22 +296,24 @@ var HotUtils = {
           return column.depends == changes[i][1];
         }).forEach(function(column) {
           var currentChange = changes[i];
-          var flat = flatObjects[currentChange[0]];
-          var obj = data[currentChange[0]];
+          var visualRow = currentChange[0];
+          var dataRow = table.toPhysicalRow(currentChange[0]);
+          var flat = flatObjects[dataRow];
+          var obj = data[dataRow];
           var update = column.update(obj, flat, currentChange[3], function(readOnly) {
-            table.setCellMeta(currentChange[0], column.hotIndex, 'readOnly', readOnly);
+            table.setCellMeta(visualRow, column.hotIndex, 'readOnly', readOnly);
             needsRender = true;
           }, function(optionsObj) {
             for (prop in optionsObj) {
-              table.setCellMeta(currentChange[0], column.hotIndex, prop, optionsObj[prop]);
+              table.setCellMeta(visualRow, column.hotIndex, prop, optionsObj[prop]);
               needsRender = true;
             }
           }, function(value) {
-            var oldVal = flatObjects[currentChange[0]][column.data];
+            var oldVal = flatObjects[dataRow][column.data];
             if (!value || oldVal !== value) {
-              flatObjects[currentChange[0]][column.data] = value;
+              flatObjects[dataRow][column.data] = value;
               needsRender = true;
-              triggeredChanges.push([currentChange[0], column.data, oldVal, value]);
+              triggeredChanges.push([visualRow, column.data, oldVal, value]);
             }
           });
           if (update) {
@@ -334,7 +334,7 @@ var HotUtils = {
           });
         }
         if (triggeredChanges.length) {
-          table.runHooks('afterChange', triggeredChanges, 'autofill');
+          table.runHooks('afterChange', triggeredChanges, 'Autofill.fill');
         }
       });
     });
@@ -652,7 +652,7 @@ var HotUtils = {
 
   makeCellNSAlias: function(setCellMeta) {
     setCellMeta('renderer', function(instance, td, row, col, prop, value, cellProperties) {
-      Handsontable.TextRenderer.apply(this, arguments);
+      Handsontable.renderers.TextRenderer.apply(this, arguments);
       td.classList.add('nonStandardAlias');
       return td;
     });
@@ -660,7 +660,7 @@ var HotUtils = {
   },
 
   multipleOptionsRenderer: function(instance, td, row, col, prop, value, cellProperties) {
-    Handsontable.AutocompleteRenderer.apply(this, arguments);
+    Handsontable.renderers.AutocompleteRenderer.apply(this, arguments);
     td.classList.add('multipleOptions');
     return td;
   },
@@ -812,7 +812,7 @@ var HotUtils = {
       'trimDropdown': false,
       'source': source,
       'include': include,
-      'validator': (required ? HotUtils.validator.requiredAutocomplete : Handsontable.AutocompleteValidator),
+      'validator': (required ? HotUtils.validator.requiredAutocomplete : Handsontable.validators.AutocompleteValidator),
       'unpack': function(obj, flat, setCellMeta) {
         flat[property] = obj[property] || defaultValue;
       },

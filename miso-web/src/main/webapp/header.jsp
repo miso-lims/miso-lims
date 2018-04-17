@@ -79,6 +79,12 @@
   <!-- Parsley for form validation -->
   <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 
+  <!-- Third-party stylesheets imported first, so we are able to override them -->
+  <link href="<c:url value='/scripts/handsontable/dist/pikaday/pikaday.css'/>" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" media="screen" href="<c:url value='/scripts/handsontable/dist/handsontable.full.css'/>">
+  <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+  <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
+
   <!-- concatenated MISO stylesheets and scripts -->
   <link rel="stylesheet" href="<c:url value='/styles/style.css'/>" type="text/css">
   <script type="text/javascript" src="<c:url value='/miso/constants.js'/>?ts=<fmt:formatNumber value="${timestamp.time / 60000}" maxFractionDigits="0" groupingUsed="false" />"></script>
@@ -98,63 +104,65 @@
 </head>
 
 <body>
-<table class="full-width no-border">
-  <tr>
-    <td class="headertable" align="left">
-      <a href='<c:url value='/'/>'>
-        <img src="<c:url value='/styles/images/miso_bowl1_logo-tm.png'/>" alt="MISO Logo" name="logo" border="0" id="misologo"/>
-      </a>
-       <span id="instanceName">${misoInstanceName}</span>
-    </td>
-    <td class="headertable" align="right">
-      <img src="<c:url value='/styles/images/brand_logo.png'/>" alt="Brand Logo" name="logo" border="0" id="brandlogo"/>
-    </td>
-  </tr>
-</table>
+<div id="pageHeader">
+  <table class="full-width no-border">
+    <tr>
+      <td class="headertable" align="left">
+        <a href='<c:url value='/'/>'>
+          <img src="<c:url value='/styles/images/miso_bowl1_logo-tm.png'/>" alt="MISO Logo" name="logo" border="0" id="misologo"/>
+        </a>
+         <span id="instanceName">${misoInstanceName}</span>
+      </td>
+      <td class="headertable" align="right">
+        <img src="<c:url value='/styles/images/brand_logo.png'/>" alt="Brand Logo" name="logo" border="0" id="brandlogo"/>
+      </td>
+    </tr>
+  </table>
 
-<div id="navtabs">
-  <ul>
+  <div id="navtabs">
+    <ul>
 
-    <sec:authorize access="isAuthenticated()">
-      <li><a href="<c:url value="/miso/mainMenu"/>"><span>Home</span></a></li>
-    </sec:authorize>
+      <sec:authorize access="isAuthenticated()">
+        <li><a href="<c:url value="/miso/mainMenu"/>"><span>Home</span></a></li>
+      </sec:authorize>
 
-    <%--<sec:authorize access="hasRole('ROLE_ADMIN')">--%>
-    <%--<li><a href="<c:url value="/miso/admin/menu"/>"><span>Admin</span></a></li>--%>
-    <%--</sec:authorize>--%>
+      <%--<sec:authorize access="hasRole('ROLE_ADMIN')">--%>
+      <%--<li><a href="<c:url value="/miso/admin/menu"/>"><span>Admin</span></a></li>--%>
+      <%--</sec:authorize>--%>
 
-    <%--<sec:authorize access="hasRole('ROLE_TECH')">--%>
-    <%--<li><a href="<c:url value="/miso/tech/menu"/>"><span>Tech</span></a></li>--%>
-    <%--</sec:authorize>--%>
+      <%--<sec:authorize access="hasRole('ROLE_TECH')">--%>
+      <%--<li><a href="<c:url value="/miso/tech/menu"/>"><span>Tech</span></a></li>--%>
+      <%--</sec:authorize>--%>
 
-    <sec:authorize access="isAuthenticated()">
-      <li>
-        <a id="myAccountLink" href="<c:url value="/miso/myAccount"/>"><span id="myAccountSpan">My Account</span></a>
-      </li>
-    </sec:authorize>
-    <sec:authorize access="isAuthenticated()">
-      <li><a href="<c:url value="/miso/projects"/>"><span>My Projects</span></a></li>
-    </sec:authorize>
+      <sec:authorize access="isAuthenticated()">
+        <li>
+          <a id="myAccountLink" href="<c:url value="/miso/myAccount"/>"><span id="myAccountSpan">My Account</span></a>
+        </li>
+      </sec:authorize>
+      <sec:authorize access="isAuthenticated()">
+        <li><a href="<c:url value="/miso/projects"/>"><span>My Projects</span></a></li>
+      </sec:authorize>
 
-    <sec:authorize access="isAuthenticated()">
-      <li>
-        <a href="<c:url value="http://oicr-gsi.github.io/miso-docs-oicr/plain-index"/>"><span>Help</span></a>
-      </li>
-    </sec:authorize>
+      <sec:authorize access="isAuthenticated()">
+        <li>
+          <a href="<c:url value="http://oicr-gsi.github.io/miso-docs-oicr/plain-index"/>"><span>Help</span></a>
+        </li>
+      </sec:authorize>
 
-  </ul>
-</div>
-
-<sec:authorize access="isAuthenticated()">
-  <div id="loggedInBanner" style="display:inline-block">
-    <c:if test="${misoBugUrl != null}">
-      <a href="${misoBugUrl}" target="_blank">Report a problem</a> |
-    </c:if>
-    Logged in as:
-    <b id="currentUser"><sec:authentication property="principal.username"/></b>
-    | <a href="<c:url value="/logout"/>">Logout</a>
+    </ul>
   </div>
-</sec:authorize>
+
+  <sec:authorize access="isAuthenticated()">
+    <div id="loggedInBanner" style="display:inline-block">
+      <c:if test="${misoBugUrl != null}">
+        <a href="${misoBugUrl}" target="_blank">Report a problem</a> |
+      </c:if>
+      Logged in as:
+      <b id="currentUser"><sec:authentication property="principal.username"/></b>
+      | <a href="<c:url value="/logout"/>">Logout</a>
+    </div>
+  </sec:authorize>
+</div>
 
 <div id="content">
 <c:if test="${not empty error}">

@@ -178,13 +178,9 @@ public class IlluminaNotificationDto extends NotificationDto {
 
   @Override
   public String toString() {
-    return "IlluminaNotificationDto [callCycle=" + callCycle + ", chemistry=" + chemistry + ", imgCycle=" + imgCycle + ", indexLengths="
-        + indexLengths + ", numCycles=" + numCycles + ", poolNames=" + poolNames + ", readLength=" + readLength + ", scoreCycle="
-        + scoreCycle + ", bclCount=" + bclCount + ", runBasesMask=" + runBasesMask + ", getRunAlias()=" + getRunAlias()
-        + ", getSequencerName()=" + getSequencerName() + ", getContainerSerialNumber()=" + getContainerSerialNumber() + ", getLaneCount()="
-        + getLaneCount() + ", getHealthType()=" + getHealthType() + ", getSequencerFolderPath()=" + getSequencerFolderPath()
-        + ", isPairedEndRun()=" + isPairedEndRun() + ", getSoftware()=" + getSoftware() + ", getStartDate()=" + getStartDate()
-        + ", getCompletionDate()=" + getCompletionDate() + "]";
+    return super.toString() + ", IlluminaNotificationDto [callCycle=" + callCycle + ", chemistry=" + chemistry + ", imgCycle=" + imgCycle
+        + ", indexLengths=" + indexLengths + ", numCycles=" + numCycles + ", poolNames=" + poolNames + ", readLength=" + readLength
+        + ", scoreCycle=" + scoreCycle + ", bclCount=" + bclCount + ", runBasesMask=" + runBasesMask + ", numReads=" + numReads + "]";
   }
 
 }

@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.runscanner.processors;
 
+import io.prometheus.client.Counter;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,10 +11,12 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -21,15 +25,18 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
 import uk.ac.bbsrc.tgac.miso.core.data.Pair;
@@ -40,8 +47,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 import uk.ac.bbsrc.tgac.miso.runscanner.RunProcessor;
-
-import io.prometheus.client.Counter;
 
 /**
  * Scan an Illumina sequener's output using the Illumina Interop C++ library.
@@ -68,6 +73,27 @@ public final class DefaultIllumina extends RunProcessor {
   private static final Predicate<String> BCL_FILENAME = Pattern.compile("^s_[0-9]*_[0-9]*\\.bcl(\\.gz)?").asPredicate();
 
   private static final Predicate<String> BCL_BGZF_FILENAME = Pattern.compile("^[0-9]*\\.(bcl\\.bgzf|cbcl)").asPredicate();
+
+  private static final Set<XPathExpression> CONTAINER_PARTNUMBER_XPATHS;
+
+  private static final XPathExpression FLOWCELL;
+  private static final Pattern FLOWCELL_PATTERN = Pattern.compile("^([a-zA-Z]+(?: Rapid)?) (Flow Cell v\\d)$");
+  private static final XPathExpression FLOWCELL_PAIRED;
+
+  static {
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    try {
+      FLOWCELL = xpath.compile("//Setup/Flowcell/text()");
+      FLOWCELL_PAIRED = xpath.compile("//Setup/PairEndFC/text()");
+
+      XPathExpression miSeqPartNumber = xpath.compile("//FlowcellRFIDTag/PartNumber/text()");
+      XPathExpression novaSeqPartNum = xpath.compile("//FlowCellRfidTag/PartNumber/text()");
+
+      CONTAINER_PARTNUMBER_XPATHS = Collections.unmodifiableSet(Sets.newHashSet(miSeqPartNumber, novaSeqPartNum));
+    } catch (XPathExpressionException e) {
+      throw new IllegalStateException("Failed to compile xpaths", e);
+    }
+  }
 
   public static DefaultIllumina create(Builder builder, ObjectNode parameters) {
     return new DefaultIllumina(builder,
@@ -157,12 +183,17 @@ public final class DefaultIllumina extends RunProcessor {
       throw new IOException(e);
     }
 
-    // See if we can figure out the chemistry
-
-    dto.setChemistry(Stream.of("runParameters.xml", "RunParameters.xml").map(f -> new File(runDirectory, f))
-        .filter(file -> file.exists() && file.canRead()).findAny().flatMap(RunProcessor::parseXml)
-        .flatMap(parameters -> Arrays.stream(IlluminaChemistry.values()).filter(chemistry -> chemistry.test(parameters)).findFirst())
-        .orElse(IlluminaChemistry.UNKNOWN));
+    Stream.of("runParameters.xml", "RunParameters.xml")
+        .map(f -> new File(runDirectory, f))
+        .filter(file -> file.exists() && file.canRead())
+        .findAny()
+        .flatMap(RunProcessor::parseXml)
+        .ifPresent(runParams -> {
+          // See if we can figure out the chemistry
+            dto.setChemistry(Arrays.stream(IlluminaChemistry.values()).filter(chemistry -> chemistry.test(runParams)).findFirst()
+                .orElse(IlluminaChemistry.UNKNOWN));
+            dto.setContainerModel(findContainerModel(runParams));
+          });
 
     // See if we can figure out a sample sheet
     dto.setPoolNames(Optional.of(new File(runDirectory, "SampleSheet.csv"))//
@@ -262,4 +293,39 @@ public final class DefaultIllumina extends RunProcessor {
 
     return dto;
   }
+
+  private String findContainerModel(Document runParams) {
+    // See if we can figure out the container model
+    String partNum = CONTAINER_PARTNUMBER_XPATHS.stream()
+        .map(expr -> {
+          try {
+            return expr.evaluate(runParams);
+          } catch (XPathExpressionException e) {
+            // ignore
+            return null;
+          }
+        })
+        .filter(model -> !LimsUtils.isStringEmptyOrNull(model))
+        .findAny().orElse(null);
+    if (partNum != null) {
+      return partNum;
+    }
+    try {
+      String flowcell = FLOWCELL.evaluate(runParams);
+      if (LimsUtils.isStringEmptyOrNull(flowcell)) {
+        return null;
+      }
+      String paired = FLOWCELL_PAIRED.evaluate(runParams);
+      Matcher m = FLOWCELL_PATTERN.matcher(flowcell);
+      if (!LimsUtils.isStringEmptyOrNull(paired) && m.matches()) {
+        return m.group(1) + (Boolean.parseBoolean(paired) ? " PE " : " SR ") + m.group(2);
+      } else {
+        return flowcell;
+      }
+    } catch (XPathExpressionException e) {
+      // ignore
+      return null;
+    }
+  }
+
 }

@@ -313,44 +313,46 @@ HotTarget.sample = (function() {
                   contentType: "application/json; charset=utf8",
                   dataType: "json",
                   type: "POST"
-                }).success(function(data) {
-                  var potentialIdentities = [];
-                  // sort with identities from selected project on top
-                  var identitiesSources = [];
-                  if (data.length > 0) {
-                    data.sort(function(a, b) {
-                      var aSortId = a.projectId == selectedProject.id ? 0 : a.projectId;
-                      var bSortId = b.projectId == selectedProject.id ? 0 : b.projectId;
-                      return aSortId - bSortId;
-                    })
-                    potentialIdentities = data;
-                    for (var i = 0; i < potentialIdentities.length; i++) {
-                      var identityLabel = potentialIdentities[i].alias + " -- " + potentialIdentities[i].externalName;
-                      potentialIdentities[i].label = identityLabel;
-                      identitiesSources.push(identityLabel);
-                    }
-                  }
+                }).success(
+                    function(data) {
+                      var potentialIdentities = [];
+                      // sort with identities from selected project on top
+                      var identitiesSources = [];
+                      if (data.length > 0) {
+                        data.sort(function(a, b) {
+                          var aSortId = a.projectId == selectedProject.id ? 0 : a.projectId;
+                          var bSortId = b.projectId == selectedProject.id ? 0 : b.projectId;
+                          return aSortId - bSortId;
+                        })
+                        potentialIdentities = data;
+                        for (var i = 0; i < potentialIdentities.length; i++) {
+                          var identityLabel = potentialIdentities[i].alias + " -- " + potentialIdentities[i].externalName;
+                          potentialIdentities[i].label = identityLabel;
+                          identitiesSources.push(identityLabel);
+                        }
+                      }
 
-                  var indexOfMatchingIdentityInProject = -1;
-                  for (i = 0; i < data.length; i++) {
-                    if (data[i].projectId == selectedProject.id && data[i].externalName == flat.externalName) {
-                      indexOfMatchingIdentityInProject = i;
-                      break;
-                    }
-                  }
-                  if (indexOfMatchingIdentityInProject >= 0) {
-                    setData(identitiesSources[indexOfMatchingIdentityInProject]);
-                  } else {
-                    identitiesSources.unshift("First Receipt (" + selectedProject[label] + ")");
-                    setData(identitiesSources[0]);
-                  }
-                  flat.potentialIdentities = potentialIdentities;
-                  var cellOptions = {
-                    'source': identitiesSources,
-                    'renderer': (identitiesSources.length > 1 ? HotUtils.multipleOptionsRenderer : Handsontable.AutocompleteRenderer)
-                  };
-                  setOptions(cellOptions);
-                }).fail(function(response, textStatus, serverStatus) {
+                      var indexOfMatchingIdentityInProject = -1;
+                      for (i = 0; i < data.length; i++) {
+                        if (data[i].projectId == selectedProject.id && data[i].externalName == flat.externalName) {
+                          indexOfMatchingIdentityInProject = i;
+                          break;
+                        }
+                      }
+                      if (indexOfMatchingIdentityInProject >= 0) {
+                        setData(identitiesSources[indexOfMatchingIdentityInProject]);
+                      } else {
+                        identitiesSources.unshift("First Receipt (" + selectedProject[label] + ")");
+                        setData(identitiesSources[0]);
+                      }
+                      flat.potentialIdentities = potentialIdentities;
+                      var cellOptions = {
+                        'source': identitiesSources,
+                        'renderer': (identitiesSources.length > 1 ? HotUtils.multipleOptionsRenderer
+                            : Handsontable.renderers.AutocompleteRenderer)
+                      };
+                      setOptions(cellOptions);
+                    }).fail(function(response, textStatus, serverStatus) {
                   HotUtils.showServerErrors(response, serverStatus);
                 }).always(function() {
                   deferred.resolve();
@@ -435,7 +437,7 @@ HotTarget.sample = (function() {
               stains.unshift('(None)');
               return stains;
             }(),
-            validator: Handsontable.AutocompleteValidator,
+            validator: Handsontable.validators.AutocompleteValidator,
             unpack: function(sam, flat, setCellMeta) {
               if (sam.stain) {
                 flat.stainName = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(sam.stain.id),
@@ -558,7 +560,7 @@ HotTarget.sample = (function() {
                 setReadOnly(true);
                 setData('');
                 setOptions({
-                  'validator': Handsontable.TextValidator
+                  'validator': Handsontable.validators.TextValidator
                 })
               }
             }
