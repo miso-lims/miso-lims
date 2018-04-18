@@ -296,25 +296,6 @@ If a validator accepts custom duplication, that can be configured via
 to allow duplicate library aliases. A custom validator must be specified for this
 property to be enabled - the naming scheme’s default validator will not be altered.
 
-Existing naming schemes:
-
-| Naming Scheme              | Used for  | Generation                                                  | Validation         |
-|----------------------------|-----------|-------------------------------------------------------------|--------------------|
-| DefaultEntityNamingScheme  | all       | Uses 3-digit entity identifier (e.g. 'SAM' for Sample) + ID | Matches validation |
-| AllowAnythingNamingScheme  | all       | Uses Java class name. Not intended for generation purposes  | None               |
-| DefaultSampleNamingScheme  | Samples   | None built in                                               | TGAC/EI's standard |
-| OicrSampleNamingScheme     | Samples   | None built in                                               | OICR's standard    |
-| DefaultLibraryNamingScheme | Libraries | None built in                                               | TGAC/EI's standard |
-| OicrLibraryNamingScheme    | Libraries | None built in                                               | OICR's standard    |
-
-A Sample alias generator may also be configured via `miso.naming.generator.sample.alias`
-
-The values used in these options refer to classes in the `uk.ac.bbsrc.tgac.miso.core.service.naming`
-Java package. To create a new naming scheme option, create a new class in this package that extends
-`MisoNamingScheme<T>`. To create a new Sample alias generator, extend `NameGenerator<Sample>`.
-Extending the functionality to validate and/or generate additional fields is possible, but will
-require modifications at the Service layer as well.
-
 # Setting Up the Run Scanner
 The run scanner is a webservice that scans the paths containing
 sequencer output. It is not required for a functioning MISO install, but
