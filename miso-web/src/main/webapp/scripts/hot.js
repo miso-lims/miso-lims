@@ -292,15 +292,16 @@ var HotUtils = {
         if (changes[i][2] == changes[i][3] && (changes[i][2] || changes[i][3])) {
           continue;
         }
+        var currentChange = changes[i];
+        var visualRow = currentChange[0];
+        var dataRow = table.toPhysicalRow(currentChange[0]);
+        var flat = flatObjects[dataRow];
+        var obj = data[dataRow];
+
         columns.filter(function(column) {
-          return column.depends == changes[i][1];
+          return (Array.isArray(column.depends) && column.depends.indexOf(currentChange[1]) > -1) || column.depends == currentChange[1];
         }).forEach(function(column) {
-          var currentChange = changes[i];
-          var visualRow = currentChange[0];
-          var dataRow = table.toPhysicalRow(currentChange[0]);
-          var flat = flatObjects[dataRow];
-          var obj = data[dataRow];
-          var update = column.update(obj, flat, currentChange[3], function(readOnly) {
+          var update = column.update(obj, flat, currentChange[1], currentChange[3], function(readOnly) {
             table.setCellMeta(visualRow, column.hotIndex, 'readOnly', readOnly);
             needsRender = true;
           }, function(optionsObj) {
@@ -347,7 +348,7 @@ var HotUtils = {
       for (var i = 0; i < data.length; i++) {
         var flat = flatObjects[i];
         var obj = data[i];
-        column.update(obj, flat, flat[column.depends], function(readOnly) {
+        column.update(obj, flat, '*start', flat[column.depends], function(readOnly) {
           table.setCellMeta(i, column.hotIndex, 'readOnly', readOnly);
           needsRender = true;
         }, function(optionsObj) {

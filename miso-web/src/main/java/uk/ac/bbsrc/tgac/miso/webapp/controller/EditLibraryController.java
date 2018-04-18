@@ -103,6 +103,7 @@ import uk.ac.bbsrc.tgac.miso.dto.DetailedLibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
@@ -120,6 +121,7 @@ import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.service.TemplateService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkMergeTableBackend;
@@ -158,6 +160,7 @@ public class EditLibraryController {
     private static final String SHOW_LIBRARY_ALIAS = "showLibraryAlias";
     private static final String SHOW_DESCRIPTION = "showDescription";
     private static final String SHOW_VOLUME = "showVolume";
+    private static final String TEMPLATES = "templatesByProjectId";
   }
 
   @Autowired
@@ -195,6 +198,8 @@ public class EditLibraryController {
   private SampleValidRelationshipService sampleValidRelationshipService;
   @Autowired
   private ProjectService projectService;
+  @Autowired
+  private TemplateService templateService;
 
   public NamingScheme getNamingScheme() {
     return namingScheme;
@@ -395,54 +400,6 @@ public class EditLibraryController {
         setValue(isStringEmptyOrNull(text) ? null : Long.valueOf(text));
       }
     });
-  }
-
-  // Handsontable
-  @ModelAttribute("referenceDataJSON")
-  public JSONObject referenceDataJsonString() throws IOException {
-    final JSONObject hot = new JSONObject();
-    final List<String> qcValues = new ArrayList<>();
-    qcValues.add("true");
-    qcValues.add("false");
-    qcValues.add("");
-    JSONArray selectionTypes = new JSONArray();
-    for (final LibrarySelectionType lst : populateLibrarySelectionTypes()) {
-      JSONObject selType = new JSONObject();
-      selType.put("id", lst.getId());
-      selType.put("alias", lst.getName());
-      selectionTypes.add(selType);
-    }
-    JSONArray strategyTypes = new JSONArray();
-    for (final LibraryStrategyType lstrat : populateLibraryStrategyTypes()) {
-      JSONObject stratType = new JSONObject();
-      stratType.put("id", lstrat.getId());
-      stratType.put("alias", lstrat.getName());
-      strategyTypes.add(stratType);
-    }
-    JSONArray libraryTypes = new JSONArray();
-    for (final LibraryType lt : populateLibraryTypes()) {
-      JSONObject libType = new JSONObject();
-      libType.put("id", lt.getId());
-      libType.put("alias", lt.getDescription());
-      libType.put("platform", lt.getPlatformType());
-      libType.put("archived", lt.getArchived());
-      libraryTypes.add(libType);
-    }
-    JSONArray platformTypes = new JSONArray();
-    Collection<PlatformType> activePlatforms = platformService.listActivePlatformTypes();
-    for (final PlatformType platformType : PlatformType.values()) {
-      JSONObject platformTypeJson = new JSONObject();
-      platformTypeJson.put("id", platformType.getKey());
-      platformTypeJson.put("active", activePlatforms.isEmpty() || activePlatforms.contains(platformType));
-      platformTypes.add(platformTypeJson);
-    }
-
-    hot.put("qcValues", qcValues);
-    hot.put("selectionTypes", selectionTypes);
-    hot.put("strategyTypes", strategyTypes);
-    hot.put("libraryTypes", libraryTypes);
-
-    return hot;
   }
 
   /* HOT */
@@ -670,6 +627,8 @@ public class EditLibraryController {
   private final BulkPropagateTableBackend<Sample, LibraryDto> libraryBulkPropagateBackend = new BulkPropagateTableBackend<Sample, LibraryDto>(
       "library", LibraryDto.class, "Libraries", "Samples") {
 
+    Map<Long, List<LibraryTemplateDto>> templatesByProjectId;
+    
     @Override
     protected LibraryDto createDtoFromParent(Sample item) {
       LibraryDto dto;
@@ -687,12 +646,22 @@ public class EditLibraryController {
       }
       dto.setParentSampleId(item.getId());
       dto.setParentSampleAlias(item.getAlias());
+      dto.setParentSampleProjectId(item.getProject().getId());
       return dto;
     }
 
     @Override
     protected Stream<Sample> loadParents(List<Long> ids) throws IOException {
       Collection<Sample> results = sampleService.listByIdList(ids);
+      
+      // load templates
+      templatesByProjectId = results.stream()
+          .map(sam -> sam.getProject().getId())
+          .distinct()
+          .map(projectId -> templateService.listLibraryTemplatesForProject(projectId))
+          .filter(list -> !list.isEmpty())
+          .map(Dtos::asLibraryTemplateDtos)
+          .collect(Collectors.toMap(list -> list.get(0).getProjectId(), list -> list));
 
       SampleClass sampleClass = null;
       boolean hasPlain = false;
@@ -717,6 +686,9 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       writeLibraryConfiguration(mapper, config);
+      if (templatesByProjectId != null && !templatesByProjectId.isEmpty()) {
+        config.putPOJO(Config.TEMPLATES, templatesByProjectId);
+      }
     }
   };
 
