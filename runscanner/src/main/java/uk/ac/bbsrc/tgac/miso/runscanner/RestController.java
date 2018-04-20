@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.runscanner;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,10 +55,11 @@ public class RestController {
    * If no run is found, null is returned. If there are multiple runs with the same name that are from different sequencers, one is randomly
    * selected.
    */
-  @RequestMapping(value = "/run/{name}/metrics", method = RequestMethod.GET, produces = { "application/json" })
-  public HttpEntity<String> getMetricsByName(@PathVariable("name") String id) {
-    return new HttpEntity<>(
-        scheduler.finished().filter(dto -> dto.getRunAlias().equals(id)).findAny().map(NotificationDto::getMetrics).orElse("[]"));
+  @RequestMapping(value = "/run/{name}/metrics", method = RequestMethod.GET)
+  public HttpEntity<byte[]> getMetricsByName(@PathVariable("name") String id) {
+    return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON_UTF8).body(
+        scheduler.finished().filter(dto -> dto.getRunAlias().equals(id)).findAny().map(NotificationDto::getMetrics).orElse("[]")
+            .getBytes(StandardCharsets.UTF_8));
   }
 
   /**
