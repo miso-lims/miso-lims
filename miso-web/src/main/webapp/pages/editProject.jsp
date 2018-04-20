@@ -86,7 +86,7 @@
     <td><span id="creationDate"><fmt:formatDate pattern="yyyy-MM-dd" value="${project.creationDate}"/></span></td>
   </tr>
   <tr>
-    <td class="h">Alias:</td>
+    <td class="h">Alias:*</td>
     <td><form:input id="alias" path="alias" maxlength="${maxLengths['alias']}" class="validateable"/>
       <span id="aliascounter" class="counter"></span>
     </td>
