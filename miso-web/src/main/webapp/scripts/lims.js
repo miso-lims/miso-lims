@@ -257,11 +257,17 @@ var Utils = Utils
               option.text = field.getLabel ? field.getLabel(value) : value;
               option.value = index;
               input.appendChild(option);
+              if (field.value == option.text) {
+                input.value = index;
+                output[field.property] = value;
+              }
             });
             input.onchange = function() {
               output[field.property] = field.values[parseInt(input.value)];
             };
-            output[field.property] = field.values[0];
+            if (!field.value) {
+              output[field.property] = field.values[0];
+            }
             break;
           case 'text':
             input = document.createElement('INPUT');
@@ -460,24 +466,35 @@ var Utils = Utils
       },
       printDialog: function(type, ids) {
         Utils.ajaxWithDialog('Getting Printers', 'GET', window.location.origin + '/miso/rest/printer', null, function(printers) {
-          Utils.showWizardDialog('Select Printer', printers.filter(function(printer) {
-            return printer.available;
-          }).map(
-              function(printer) {
-                return {
-                  name: printer.name,
-                  handler: function() {
-                    Utils.ajaxWithDialog('Printing', 'POST', window.location.origin + '/miso/rest/printer/' + printer.id + '?'
-                        + jQuery.param({
-                          type: type,
-                          ids: ids.join(',')
-                        }), null, function(result) {
-                      Utils.showOkDialog('Printing', [result == ids.length ? 'Printing successful.'
-                          : (result + ' of ' + ids.length + ' printed.')]);
-                    });
-                  }
-                };
-              }));
+          Utils.showDialog('Select Printer', 'Print', [{
+            "property": "printer",
+            "label": "Printer",
+            "required": true,
+            "type": "select",
+            "value": window.localStorage.getItem("miso-printer"),
+            "values": printers.filter(function(printer) {
+              return printer.available;
+            }),
+            "getLabel": Utils.array.getName
+          }, {
+            "property": "copies",
+            "label": "Copies",
+            "required": true,
+            "type": "int",
+            "value": 1
+          }], function(result) {
+            window.localStorage.setItem("miso-printer", result.printer.name);
+            Utils.ajaxWithDialog('Printing', 'POST', window.location.origin + '/miso/rest/printer/' + result.printer.id + '?'
+                + jQuery.param({
+                  type: type,
+                  ids: ids.join(','),
+                  copies: Math.max(1, result.copies)
+                }), null,
+                function(result) {
+                  Utils.showOkDialog('Printing', [result == ids.length ? 'Printing successful.'
+                      : (result + ' of ' + ids.length + ' printed.')]);
+                });
+          }, null);
         });
       },
 
