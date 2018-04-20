@@ -252,7 +252,6 @@ public class HibernateSequencerPartitionContainerDao
     } else {
       criteria.add(Restrictions.or(Restrictions.eq("alias", search), Restrictions.eq("identificationBarcode", search)));
     }
-    criteria.add(Restrictions.eq("archived", false));
     return (SequencingContainerModel) criteria.uniqueResult();
   }
 
