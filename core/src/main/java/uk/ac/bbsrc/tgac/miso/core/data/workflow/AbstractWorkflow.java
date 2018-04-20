@@ -32,7 +32,7 @@ public abstract class AbstractWorkflow implements Workflow {
 
   private void processInputs(SortedSet<ProgressStep> steps) {
     for (ProgressStep step : steps) {
-      processInput(step);
+      processInput(getNextStepNumber(), step);
     }
   }
 

@@ -29,11 +29,6 @@ public class TestWorkflow extends AbstractWorkflow {
   private int nextStepNumber = 0;
 
   @Override
-  public WorkflowStepPrompt getNextStep() {
-    return getStep(nextStepNumber);
-  }
-
-  @Override
   public WorkflowStepPrompt getStep(int stepNumber) {
     if (!validStepNumber(stepNumber)) throw new IllegalArgumentException("Invalid step number");
 
@@ -51,11 +46,6 @@ public class TestWorkflow extends AbstractWorkflow {
   @Override
   public boolean isComplete() {
     return steps.stream().map(WorkflowStep::getProgressStep).noneMatch(Objects::isNull);
-  }
-
-  @Override
-  public void processInput(ProgressStep progressStep) {
-    processInput(nextStepNumber, progressStep);
   }
 
   @Override

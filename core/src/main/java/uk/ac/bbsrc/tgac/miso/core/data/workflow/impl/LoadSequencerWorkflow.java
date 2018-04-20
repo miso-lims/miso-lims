@@ -24,11 +24,6 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   }
 
   @Override
-  public WorkflowStepPrompt getNextStep() {
-    return null;
-  }
-
-  @Override
   public WorkflowStepPrompt getStep(int stepNumber) {
     return null;
   }
@@ -36,10 +31,6 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   @Override
   public boolean isComplete() {
     return false;
-  }
-
-  @Override
-  public void processInput(ProgressStep step) {
   }
 
   @Override

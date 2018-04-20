@@ -59,13 +59,6 @@ public class DefaultWorkflowManager implements WorkflowManager {
   }
 
   @Override
-  public Workflow processInput(Workflow workflow, String input) throws IOException {
-    workflow.processInput(makeProgressStep(input, workflow.getNextStep().getInputTypes()));
-    save(workflow.getProgress());
-    return workflow;
-  }
-
-  @Override
   public Workflow processInput(Workflow workflow, int stepNumber, String input) throws IOException {
     workflow.processInput(stepNumber, makeProgressStep(input, workflow.getStep(stepNumber).getInputTypes()));
     save(workflow.getProgress());

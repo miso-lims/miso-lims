@@ -10,8 +10,6 @@ public interface Workflow {
 
   void setProgress(Progress progress);
 
-  WorkflowStepPrompt getNextStep();
-
   /**
    * @param stepNumber step index
    */
@@ -26,11 +24,6 @@ public interface Workflow {
    * @return list of log messages for each step
    */
   List<String> getLog();
-
-  /**
-   * Validate and store input for the current step, which corresponds to the result of getNextStep.
-   */
-  void processInput(ProgressStep step);
 
   /**
    * Validate and store input for a step identified by the 0-indexed stepNumber.

@@ -13,11 +13,6 @@ public interface WorkflowManager {
   Workflow beginWorkflow(String workflowNameString) throws IOException;
 
   /**
-   * Similar to processInput(Workflow, int, String), but for workflow's current step
-   */
-  Workflow processInput(Workflow workflow, String input) throws IOException;
-
-  /**
    * Interpret input as part of the step identified by stepNumber.
    * Delegate input processing to Workflow.
    * Persist the updated Workflow.

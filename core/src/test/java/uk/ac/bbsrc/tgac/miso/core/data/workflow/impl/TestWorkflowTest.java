@@ -50,7 +50,6 @@ public class TestWorkflowTest {
     assertThrows(IllegalArgumentException.class, () -> workflow.processInput(2, makePoolStep(POOL_ALIAS, POOL_NAME)));
 
     assertEquivalent(makeProgress(WORKFLOW_NAME, new ProgressStep[] {}), workflow.getProgress());
-    assertIntegerPrompt(workflow.getNextStep());
     assertIntegerPrompt(workflow.getStep(0));
     assertThrows(IllegalArgumentException.class, () -> workflow.getStep(1));
     assertFalse(workflow.isComplete());
@@ -92,13 +91,13 @@ public class TestWorkflowTest {
   @Test
   public void testProcessInvalidInput() {
     workflow = makeNewWorkflow();
-    assertThrows(IllegalArgumentException.class, () -> workflow.processInput(makePoolStep(POOL_ALIAS, POOL_NAME)));
+    assertThrows(IllegalArgumentException.class, () -> workflow.processInput(0, makePoolStep(POOL_ALIAS, POOL_NAME)));
   }
 
   @Test
   public void testProcessValidInput() {
     workflow = makeNewWorkflow();
-    workflow.processInput(makeIntegerStep(INT_1));
+    workflow.processInput(0, makeIntegerStep(INT_1));
     assertReceivedOneInput(workflow, INT_1);
   }
 
@@ -106,7 +105,6 @@ public class TestWorkflowTest {
     assertThrows(IllegalArgumentException.class, () -> workflow.processInput(2, makePoolStep(POOL_ALIAS, POOL_NAME)));
 
     assertEquivalent(makeProgress(WORKFLOW_NAME, makeIntegerStep(input, 0)), workflow.getProgress());
-    assertPoolPrompt(workflow.getNextStep());
     assertIntegerPrompt(workflow.getStep(0));
     assertPoolPrompt(workflow.getStep(1));
     assertThrows(IllegalArgumentException.class, () -> workflow.getStep(2));
@@ -140,7 +138,7 @@ public class TestWorkflowTest {
   @Test
   public void testProcessInputAfterLoadingInput() {
     workflow = makeExistingWorkflow(makeIntegerStep(INT_1));
-    workflow.processInput(makePoolStep(POOL_ALIAS, POOL_NAME));
+    workflow.processInput(1, makePoolStep(POOL_ALIAS, POOL_NAME));
     assertReceivedTwoInputs(workflow, INT_1, POOL_ALIAS, POOL_NAME);
   }
 
@@ -148,7 +146,6 @@ public class TestWorkflowTest {
     assertThrows(IllegalArgumentException.class, () -> workflow.processInput(2, makePoolStep(POOL_ALIAS, POOL_NAME)));
 
     assertEquivalent(makeProgress(WORKFLOW_NAME, makeIntegerStep(intInput, 0), makePoolStep(poolAlias, poolName, 1)), workflow.getProgress());
-    assertThrows(IllegalArgumentException.class, workflow::getNextStep);
     assertIntegerPrompt(workflow.getStep(0));
     assertPoolPrompt(workflow.getStep(1));
     assertThrows(IllegalArgumentException.class, () -> workflow.getStep(2));
@@ -183,7 +180,7 @@ public class TestWorkflowTest {
   public void testProcessFailedInputDoesNotChangeProgress() {
     workflow = makeExistingWorkflow(makeIntegerStep(INT_1));
     try {
-      workflow.processInput(makeIntegerStep(INT_2));
+      workflow.processInput(1, makeIntegerStep(INT_2));
     } catch (Exception ignored) {
     }
     assertReceivedOneInput(workflow, INT_1);
