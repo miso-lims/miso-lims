@@ -160,7 +160,8 @@ public class PrinterRestController extends RestController {
 
   @RequestMapping(value = "{printerId}", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public long submit(@PathVariable("printerId") Long printerId, @RequestParam("type") String type, @RequestParam("ids") String ids)
+  public long submit(@PathVariable("printerId") Long printerId, @RequestParam("type") String type, @RequestParam("ids") String ids,
+      @RequestParam("copies") int copies)
       throws IOException {
     User user = authorizationManager.getCurrentUser();
     Printer printer = printerService.get(printerId);
@@ -195,7 +196,7 @@ public class PrinterRestController extends RestController {
     return COMMA.splitAsStream(ids)//
         .map(Long::parseLong)//
         .map(WhineyFunction.rethrow(fetcher))//
-        .filter(b -> printer.printBarcode(b, user))//
+        .filter(b -> printer.printBarcode(b, user, copies))//
         .count();
   }
 }

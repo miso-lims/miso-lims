@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -26,21 +27,21 @@ public enum Driver {
   BRADY_1D {
 
     @Override
-    public String encode(Barcodable b) {
+    public String encode(Barcodable b, int copies) {
       StringBuilder sb = new StringBuilder();
 
       sb.append("m m\n");
       sb.append("J\n");
       sb.append("S l1;0,0,6,9,50\n");
       sb.append("B 1,0,0,CODE128,5,0.25;").append(getBarcode(b)).append("\n");
-      sb.append("A ").append(b.getLabelText()).append("\n");
+      sb.append("A ").append(copies).append("\n");
       return sb.toString();
     }
 
   },
   BRADY_BPT_635_488 {
     @Override
-    public String encode(Barcodable barcodable) {
+    public String encode(Barcodable barcodable, int copies) {
       StringBuilder sb = new StringBuilder();
 
       try {
@@ -63,7 +64,7 @@ public enum Driver {
         sb.append("T 17,11,0,5,pt6;");
         appendBradyEscapedUnicode(sb, name);
         sb.append("\n");
-        sb.append("A 1\n");
+        sb.append("A ").append(copies).append("\n");
       } catch (UnsupportedEncodingException e) {
         log.error("get raw state", e);
       }
@@ -73,7 +74,7 @@ public enum Driver {
   },
   BRADY_THT_155_490 {
     @Override
-    public String encode(Barcodable barcodable) {
+    public String encode(Barcodable barcodable, int copies) {
       StringBuilder sb = new StringBuilder();
 
       sb.append("mm\n");
@@ -99,13 +100,13 @@ public enum Driver {
       font.set(3);
       offset.addAndGet(multiline(9, 2, barcodable.getBarcodeSizeInfo(), writer));
       multiline(9, 7 - offset.get(), barcodable.getBarcodeExtraInfo(), writer);
-      sb.append("A 1\n");
+      sb.append("A ").append(copies).append("\n");
       return sb.toString();
     }
   },
   BRADY_THT_179_492 {
     @Override
-    public String encode(Barcodable barcodable) {
+    public String encode(Barcodable barcodable, int copies) {
       StringBuilder sb = new StringBuilder();
 
       String barcode = getBarcode(barcodable);
@@ -131,14 +132,14 @@ public enum Driver {
         sb.append(LimsUtils.formatDate(barcodable.getBarcodeDate()));
         sb.append("\n");
       }
-      sb.append("A 1\n");
+      sb.append("A ").append(copies).append("\n");
       return sb.toString();
     }
   },
 
   BRADY_THT_181_492_3 {
     @Override
-    public String encode(Barcodable barcodable) {
+    public String encode(Barcodable barcodable, int copies) {
       StringBuilder sb = new StringBuilder();
 
       try {
@@ -167,7 +168,7 @@ public enum Driver {
         sb.append("T 17,11,0,5,pt6;");
         appendBradyEscapedUnicode(sb, name);
         sb.append("\n");
-        sb.append("A 1\n");
+        sb.append("A ").append(copies).append("\n");
       } catch (UnsupportedEncodingException e) {
         log.error("get raw state", e);
         return null;
@@ -179,7 +180,7 @@ public enum Driver {
     // Square
 
     @Override
-    public String encode(Barcodable b) {
+    public String encode(Barcodable b, int copies) {
       StringBuilder sb = new StringBuilder();
       sb.append("CT~~CD,~CC^~CT~\r\n");
       sb.append("^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR2,2~SD30^JUS^LRN^CI0^XZ\r\n");
@@ -214,7 +215,7 @@ public enum Driver {
       appendTruncated(15, b.getBarcodeExtraInfo(), sb::append);
       sb.append("^FS\r\n");
       sb.append("^XZ\n");
-      return sb.toString();
+      return String.join("", Collections.nCopies(copies, sb.toString()));
     }
 
   },
@@ -222,7 +223,7 @@ public enum Driver {
     // Rectangle + circle
 
     @Override
-    public String encode(Barcodable b) {
+    public String encode(Barcodable b, int copies) {
       StringBuilder sb = new StringBuilder();
       sb.append("CT~~CD,~CC^~CT~\r\n");
       sb.append("^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR2,2~SD30^JUS^LRN^CI0^XZ\r\n");
@@ -250,6 +251,7 @@ public enum Driver {
       sb.append("^FH\\^FD");
       sb.append(b.getAlias());
       sb.append("^FS\r\n");
+      sb.append("^PQ").append(copies).append("\r\n");
       sb.append("^XZ\r\n");
       return sb.toString();
     }
@@ -259,7 +261,7 @@ public enum Driver {
     // Rectangle
 
     @Override
-    public String encode(Barcodable b) {
+    public String encode(Barcodable b, int copies) {
       StringBuilder sb = new StringBuilder();
       sb.append("CT~~CD,~CC^~CT~\r\n");
       sb.append("^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR2,2~SD30^JUS^LRN^CI0^XZ\r\n");
@@ -286,6 +288,7 @@ public enum Driver {
       sb.append("^FS\r\n");
       sb.append("^BY32,32^FT158,96^BXN,2,200,0,0,1,~\r\n");
       sb.append("^FH\\^FD").append(getBarcode(b)).append("^FS\r\n");
+      sb.append("^PQ").append(copies).append("\r\n");
       sb.append("^XZ\r\n");
       return sb.toString();
     }
@@ -335,7 +338,7 @@ public enum Driver {
     for (line = 0; line < maxLines - 1 && input.length() > line * lineLength; line++) {
       writer.accept(line, input.substring(line * lineLength, Math.min(input.length(), (line + 1) * lineLength)));
     }
-    if (input.length() > (maxLines - 1) * lineLength) {
+    if (input.length() > maxLines * lineLength) {
       writer.accept(maxLines - 1, input.substring((maxLines - 1) * lineLength, maxLines * lineLength - 2) + "...");
       line++;
     }
@@ -345,6 +348,6 @@ public enum Driver {
   /**
    * Generate the printer commands needed to print a label for the supplied item.
    */
-  public abstract String encode(Barcodable b);
+  public abstract String encode(Barcodable b, int copies);
 
 }
