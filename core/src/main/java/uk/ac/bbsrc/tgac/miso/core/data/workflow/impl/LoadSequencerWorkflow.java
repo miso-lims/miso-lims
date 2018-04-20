@@ -40,17 +40,14 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   @Override
   public void processInput(ProgressStep step) {
-    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   @Override
   public void processInput(int stepNumber, ProgressStep step) {
-    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   @Override
   public void cancelInput() {
-    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   @Override
@@ -60,7 +57,6 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   @Override
   public void execute(WorkflowExecutor workflowExecutor) throws IOException {
-    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   @Override
