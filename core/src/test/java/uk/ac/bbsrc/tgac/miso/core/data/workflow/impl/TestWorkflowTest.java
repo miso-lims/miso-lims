@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName.LOAD_SEQUENCER;
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.WorkflowTestUtils.assertEquivalent;
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.WorkflowTestUtils.assertThrows;
+import static uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.WorkflowTestUtils.makeProgress;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,7 +17,6 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.workflow.Progress;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
@@ -214,18 +214,5 @@ public class TestWorkflowTest {
   private void assertPoolPrompt(WorkflowStepPrompt prompt) {
     assertEquals(Sets.newHashSet(InputType.POOL), prompt.getInputTypes());
     assertEquals("Scan a Pool to modify its concentration.", prompt.getMessage());
-  }
-
-  private Progress makeProgress(WorkflowName workflowName, ProgressStep... steps) {
-    Progress progress = makeProgress(workflowName);
-    progress.setSteps(Arrays.asList(steps));
-
-    return progress;
-  }
-
-  private Progress makeProgress(WorkflowName workflowName) {
-    Progress progress = new ProgressImpl();
-    progress.setWorkflowName(workflowName);
-    return progress;
   }
 }

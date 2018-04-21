@@ -2,8 +2,10 @@ package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.AssertionFailedError;
@@ -43,5 +45,18 @@ class WorkflowTestUtils {
         }
       }
     }
+  }
+
+  static Progress makeProgress(WorkflowName workflowName, ProgressStep... steps) {
+    Progress progress = makeProgress(workflowName);
+    progress.setSteps(Arrays.asList(steps));
+
+    return progress;
+  }
+
+  private static Progress makeProgress(WorkflowName workflowName) {
+    Progress progress = new ProgressImpl();
+    progress.setWorkflowName(workflowName);
+    return progress;
   }
 }
