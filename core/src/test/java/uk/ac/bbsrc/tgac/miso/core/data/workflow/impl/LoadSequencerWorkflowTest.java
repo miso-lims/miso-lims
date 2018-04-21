@@ -28,6 +28,12 @@ public class LoadSequencerWorkflowTest {
     assertNoInput(workflow);
   }
 
+  @Test
+  public void testProcessInvalidInput() {
+    Workflow workflow = new LoadSequencerWorkflow();
+    assertThrows(IllegalArgumentException.class, () -> workflow.setProgress(makeProgress(WORKFLOW_NAME, new PoolProgressStep())));
+  }
+
   private void assertNoInput(Workflow workflow) {
     assertThrows(IllegalArgumentException.class, () -> workflow.processInput(2, makeSpcStep()));
 
