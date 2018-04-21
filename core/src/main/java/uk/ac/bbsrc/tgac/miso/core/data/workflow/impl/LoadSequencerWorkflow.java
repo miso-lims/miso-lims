@@ -6,8 +6,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.collect.Sets;
+
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.AbstractWorkflow;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowExecutor;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
@@ -25,7 +28,9 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   @Override
   public WorkflowStepPrompt getStep(int stepNumber) {
-    return null;
+    if (stepNumber == 0) return new WorkflowStepPrompt(Sets.newHashSet(InputType.SEQUENCER_PARTITION_CONTAINER, InputType.STRING),
+        "Scan a flow cell serial number");
+    throw new IllegalArgumentException("Invalid step number");
   }
 
   @Override
@@ -35,6 +40,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   @Override
   public void processInput(int stepNumber, ProgressStep step) {
+    throw new IllegalArgumentException();
   }
 
   @Override
