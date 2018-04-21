@@ -2,20 +2,18 @@ package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName.LOAD_SEQUENCER;
+import static uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.WorkflowTestUtils.assertEquivalent;
+import static uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.WorkflowTestUtils.assertThrows;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import junit.framework.AssertionFailedError;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Progress;
@@ -54,17 +52,6 @@ public class TestWorkflowTest {
     assertThrows(IllegalArgumentException.class, () -> workflow.getStep(1));
     assertFalse(workflow.isComplete());
     assertEquals(Collections.emptyList(), workflow.getLog());
-  }
-
-  private <T extends Throwable> void assertThrows(Class<T> expectedType, Runnable runnable) {
-    try {
-      runnable.run();
-      throw new AssertionFailedError(String.format("Expected exception %s was not thrown", expectedType.toString()));
-    } catch (Throwable actualException) {
-      if (!expectedType.isInstance(actualException)) {
-        throw new AssertionFailedError(String.format("Expected exception %s was not thrown", expectedType.toString()));
-      }
-    }
   }
 
   @Test
@@ -227,29 +214,6 @@ public class TestWorkflowTest {
   private void assertPoolPrompt(WorkflowStepPrompt prompt) {
     assertEquals(Sets.newHashSet(InputType.POOL), prompt.getInputTypes());
     assertEquals("Scan a Pool to modify its concentration.", prompt.getMessage());
-  }
-
-  /**
-   * Match Progress object based on workflowName, stepNumber, and input fields
-   */
-  private void assertEquivalent(Progress expectedProgress, Progress actualProgress) {
-    assertEquals(expectedProgress.getWorkflowName(), actualProgress.getWorkflowName());
-
-    if (expectedProgress.getSteps() == null) {
-      assertNull(actualProgress.getSteps());
-    } else {
-      List<ProgressStep> expectedSteps = new ArrayList<>(expectedProgress.getSteps());
-      List<ProgressStep> actualSteps = new ArrayList<>(actualProgress.getSteps());
-      assertEquals(expectedSteps.size(), actualSteps.size());
-      for (int i = 0; i < expectedSteps.size(); ++i) {
-        assertEquals(expectedSteps.get(i).getStepNumber(), actualSteps.get(i).getStepNumber());
-        if (expectedSteps.get(i) instanceof IntegerProgressStep) {
-          assertEquals(((IntegerProgressStep) expectedSteps.get(i)).getInput(), ((IntegerProgressStep) actualSteps.get(i)).getInput());
-        } else {
-          assertEquals(((PoolProgressStep) expectedSteps.get(i)).getInput(), ((PoolProgressStep) actualSteps.get(i)).getInput());
-        }
-      }
-    }
   }
 
   private Progress makeProgress(WorkflowName workflowName, ProgressStep... steps) {
