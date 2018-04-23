@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 
 import java.util.ArrayList;
@@ -40,8 +41,13 @@ class WorkflowTestUtils {
         assertEquals(expectedSteps.get(i).getStepNumber(), actualSteps.get(i).getStepNumber());
         if (expectedSteps.get(i) instanceof IntegerProgressStep) {
           assertEquals(((IntegerProgressStep) expectedSteps.get(i)).getInput(), ((IntegerProgressStep) actualSteps.get(i)).getInput());
-        } else {
+        } else if (expectedSteps.get(i) instanceof PoolProgressStep) {
           assertEquals(((PoolProgressStep) expectedSteps.get(i)).getInput(), ((PoolProgressStep) actualSteps.get(i)).getInput());
+        } else if (expectedSteps.get(i) instanceof SequencerPartitionContainerProgressStep) {
+          assertEquals(((SequencerPartitionContainerProgressStep) expectedSteps.get(i)).getInput(),
+              ((SequencerPartitionContainerProgressStep) actualSteps.get(i)).getInput());
+        } else {
+          fail("Unexpected ProgressStep type");
         }
       }
     }
