@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.workflow;
 
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.IntegerProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.PoolProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SequencerPartitionContainerProgressStep;
 
 /**
  * Represents a possibly incomplete step in a Workflow.
@@ -24,6 +25,10 @@ public interface WorkflowStep {
   }
 
   default void processInput(IntegerProgressStep step) {
+    throwUnexpectedInput();
+  }
+
+  default void processInput(SequencerPartitionContainerProgressStep step) {
     throwUnexpectedInput();
   }
 
