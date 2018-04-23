@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -43,6 +44,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -131,8 +134,20 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, N
   private Collection<Kit> kits = new HashSet<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
+
+  @Column(name = "created", nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date creationTime;
+
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier")
   private User lastModifier;
+
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
 
   // defines a library on which this experiment will operate.
   @ManyToOne(targetEntity = LibraryImpl.class)
@@ -243,10 +258,6 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, N
     return ks;
   }
 
-  public User getLastModifier() {
-    return lastModifier;
-  }
-
   public Library getLibrary() {
     return library;
   }
@@ -311,10 +322,6 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, N
     this.kits = kits;
   }
 
-  public void setLastModifier(User lastModifier) {
-    this.lastModifier = lastModifier;
-  }
-
   public void setLibrary(Library library) {
     this.library = library;
   }
@@ -342,6 +349,51 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, N
 
   public void setTitle(String title) {
     this.title = title;
+  }
+
+  @Override
+  public User getCreator() {
+    return creator;
+  }
+
+  @Override
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return creationTime;
+  }
+
+  @Override
+  public void setCreationTime(Date creationTime) {
+    this.creationTime = creationTime;
+  }
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

@@ -214,4 +214,9 @@ public abstract class AbstractBox implements Box {
     return getCreationTime();
   }
 
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
 }

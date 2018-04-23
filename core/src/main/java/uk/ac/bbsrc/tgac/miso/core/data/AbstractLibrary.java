@@ -668,4 +668,9 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     return getSecurityProfile();
   }
 
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
 }

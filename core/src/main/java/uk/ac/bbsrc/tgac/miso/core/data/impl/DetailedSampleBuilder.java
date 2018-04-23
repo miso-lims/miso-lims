@@ -986,4 +986,9 @@ public class DetailedSampleBuilder
     throw new UnsupportedOperationException("Cannot delete non-persisted builder object");
   }
 
+  @Override
+  public boolean isSaved() {
+    return false;
+  }
+
 }

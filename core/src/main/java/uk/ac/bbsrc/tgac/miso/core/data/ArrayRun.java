@@ -155,34 +155,42 @@ public class ArrayRun implements Serializable, Aliasable, ChangeLoggable {
     this.completionDate = completionDate;
   }
 
+  @Override
   public User getCreator() {
     return creator;
   }
 
+  @Override
   public void setCreator(User creator) {
     this.creator = creator;
   }
 
+  @Override
   public Date getCreationTime() {
     return creationTime;
   }
 
+  @Override
   public void setCreationTime(Date creationTime) {
     this.creationTime = creationTime;
   }
 
+  @Override
   public User getLastModifier() {
     return lastModifier;
   }
 
+  @Override
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
   }
 
+  @Override
   public Date getLastModified() {
     return lastModified;
   }
 
+  @Override
   public void setLastModified(Date lastModified) {
     this.lastModified = lastModified;
   }
@@ -200,6 +208,11 @@ public class ArrayRun implements Serializable, Aliasable, ChangeLoggable {
     change.setColumnsChanged(columnsChanged);
     change.setUser(user);
     return change;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

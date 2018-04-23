@@ -263,34 +263,42 @@ public abstract class Run
     return runId;
   }
 
+  @Override
   public User getLastModifier() {
     return lastModifier;
   }
 
+  @Override
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
   }
 
+  @Override
   public Date getLastModified() {
     return lastModified;
   }
 
+  @Override
   public void setLastModified(Date lastModified) {
     this.lastModified = lastModified;
   }
 
+  @Override
   public User getCreator() {
     return creator;
   }
 
+  @Override
   public void setCreator(User creator) {
     this.creator = creator;
   }
 
+  @Override
   public Date getCreationTime() {
     return creationTime;
   }
 
+  @Override
   public void setCreationTime(Date created) {
     this.creationTime = created;
   }
@@ -463,6 +471,11 @@ public abstract class Run
 
   public String getProgress() {
     return getHealth() == HealthType.Running ? "Running" : "";
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }
