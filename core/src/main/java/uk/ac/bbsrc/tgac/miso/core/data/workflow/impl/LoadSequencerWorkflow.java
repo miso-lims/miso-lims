@@ -3,11 +3,8 @@ package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName.LOAD_SEQUENCER;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.Sets;
 
@@ -20,14 +17,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
 
 public class LoadSequencerWorkflow extends AbstractWorkflow {
-  private ScanSpcStep scanSpcStep = new ScanSpcStep();
-  private ScanModelStep scanModelStep = new ScanModelStep();
-  private List<LaneStep> laneSteps = new ArrayList<>();
-  private List<WorkflowStep> steps = Arrays.asList(scanSpcStep);
+  private ScanSpcStep scanSpcStep;
+  private ScanModelStep scanModelStep;
+  private List<LaneStep> laneSteps;
 
   @Override
   protected List<WorkflowStep> getCompletedSteps() {
-    return steps.stream().filter(s -> s.getProgressStep() != null).collect(Collectors.toList());
+    // todo
+    return Collections.emptyList();
   }
 
   @Override
@@ -39,31 +36,30 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   public WorkflowStepPrompt getStep(int stepNumber) {
     if (!validStepNumber(stepNumber)) throw new IllegalArgumentException("Invalid step number");
 
-    return steps.get(stepNumber).getPrompt();
+    // todo
+    return null;
   }
 
   private boolean validStepNumber(int stepNumber) {
-    return isExistingStepNumber(stepNumber) || (!isComplete() && stepNumber == steps.size() - 1);
-  }
-
-  private boolean isExistingStepNumber(int stepNumber) {
-    return 0 <= stepNumber && stepNumber < steps.size();
+    // todo
+    return false;
   }
 
   @Override
   public boolean isComplete() {
-    return steps.stream().map(WorkflowStep::getProgressStep).noneMatch(Objects::isNull);
+    // todo
+    return false;
   }
 
   @Override
   public void processInput(int stepNumber, ProgressStep step) {
     if (!validStepNumber(stepNumber)) throw new IllegalArgumentException("Invalid step number");
-    steps.get(stepNumber).processInput(step);
+    // todo
   }
 
   @Override
   public void cancelInput() {
-    steps.remove(steps.get(steps.size() - 1));
+    // todo
   }
 
   @Override
