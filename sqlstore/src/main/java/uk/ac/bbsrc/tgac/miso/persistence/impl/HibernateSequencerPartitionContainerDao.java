@@ -243,16 +243,28 @@ public class HibernateSequencerPartitionContainerDao
 
   @Override
   public SequencingContainerModel findModel(Platform platform, String search, int partitionCount) {
+    SequencingContainerModel model;
     Criteria criteria = currentSession().createCriteria(SequencingContainerModel.class);
     criteria.createAlias("platforms", "platform");
     criteria.add(Restrictions.eq("platform.id", platform.getId()));
     criteria.add(Restrictions.eq("partitionCount", partitionCount));
     if (LimsUtils.isStringEmptyOrNull(search)) {
       criteria.add(Restrictions.eq("fallback", true));
+      model = (SequencingContainerModel) criteria.uniqueResult();
     } else {
       criteria.add(Restrictions.or(Restrictions.eq("alias", search), Restrictions.eq("identificationBarcode", search)));
+      model = (SequencingContainerModel) criteria.uniqueResult();
+      if (model == null) {
+        // remove search restriction and get fallback option if search did not retrieve anything
+        Criteria fallback = currentSession().createCriteria(SequencingContainerModel.class);
+        fallback.createAlias("platforms", "platform");
+        fallback.add(Restrictions.eq("platform.id", platform.getId()));
+        fallback.add(Restrictions.eq("partitionCount", partitionCount));
+        fallback.add(Restrictions.eq("fallback", true));
+        model = (SequencingContainerModel) fallback.uniqueResult();
+      }
     }
-    return (SequencingContainerModel) criteria.uniqueResult();
+    return model;
   }
 
   @Override
