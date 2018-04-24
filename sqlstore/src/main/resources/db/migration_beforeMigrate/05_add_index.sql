@@ -30,8 +30,11 @@ CREATE PROCEDURE addIndex(
     SET errorMessage = CONCAT('IndexFamily ''', iFamilyName, ''' not found.');
     SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
   ELSE
-    IF NOT EXISTS (SELECT 1 FROM Indices WHERE indexFamilyId = famId AND sequence = iSequence AND position = iPosition)
+    IF EXISTS (SELECT 1 FROM Indices WHERE indexFamilyId = famId AND sequence = iSequence AND position = iPosition)
     THEN
+      SET errorMessage = CONCAT('An index with sequence ''', iSequence, ''' at position ', iPosition, ' already exists for indexFamily ', iFamilyName);
+      SIGNAL SQLSTATE '45000' SET message_text = errorMessage; 
+    ELSE
       INSERT INTO Indices(name, sequence, position, indexFamilyId)
       VALUES (iName, iSequence, iPosition, famId);
     END IF;
