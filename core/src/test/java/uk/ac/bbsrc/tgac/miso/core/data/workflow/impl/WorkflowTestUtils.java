@@ -38,14 +38,18 @@ class WorkflowTestUtils {
       List<ProgressStep> actualSteps = new ArrayList<>(actualProgress.getSteps());
       assertEquals(expectedSteps.size(), actualSteps.size());
       for (int i = 0; i < expectedSteps.size(); ++i) {
-        assertEquals(expectedSteps.get(i).getStepNumber(), actualSteps.get(i).getStepNumber());
-        if (expectedSteps.get(i) instanceof IntegerProgressStep) {
-          assertEquals(((IntegerProgressStep) expectedSteps.get(i)).getInput(), ((IntegerProgressStep) actualSteps.get(i)).getInput());
-        } else if (expectedSteps.get(i) instanceof PoolProgressStep) {
-          assertEquals(((PoolProgressStep) expectedSteps.get(i)).getInput(), ((PoolProgressStep) actualSteps.get(i)).getInput());
-        } else if (expectedSteps.get(i) instanceof SequencerPartitionContainerProgressStep) {
-          assertEquals(((SequencerPartitionContainerProgressStep) expectedSteps.get(i)).getInput(),
-              ((SequencerPartitionContainerProgressStep) actualSteps.get(i)).getInput());
+        ProgressStep expectedStep = expectedSteps.get(i);
+        ProgressStep actualStep = actualSteps.get(i);
+        assertEquals(expectedStep.getStepNumber(), actualStep.getStepNumber());
+        if (expectedStep instanceof IntegerProgressStep) {
+          assertEquals(((IntegerProgressStep) expectedStep).getInput(), ((IntegerProgressStep) actualStep).getInput());
+        } else if (expectedStep instanceof PoolProgressStep) {
+          assertEquals(((PoolProgressStep) expectedStep).getInput(), ((PoolProgressStep) actualStep).getInput());
+        } else if (expectedStep instanceof SequencerPartitionContainerProgressStep) {
+          assertEquals(((SequencerPartitionContainerProgressStep) expectedStep).getInput(),
+              ((SequencerPartitionContainerProgressStep) actualStep).getInput());
+        } else if (expectedStep instanceof StringProgressStep) {
+          assertEquals(((StringProgressStep) expectedStep).getInput(), ((StringProgressStep) actualStep).getInput());
         } else {
           fail("Unexpected ProgressStep type");
         }
