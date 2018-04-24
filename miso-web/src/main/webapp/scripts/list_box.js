@@ -41,6 +41,11 @@ ListTarget.box = {
   createColumns: function(config, projectId) {
     return [ListUtils.idHyperlinkColumn("Name", "box", "id", Utils.array.getName, 1, true),
         ListUtils.labelHyperlinkColumn("Alias", "box", Utils.array.getId, "alias", 0, true), {
+          "sTitle": "Description",
+          "mData": "description",
+          "include": true,
+          "iSortPriority": 0
+        }, {
           "sTitle": "Location",
           "mData": "locationBarcode",
           "include": true,

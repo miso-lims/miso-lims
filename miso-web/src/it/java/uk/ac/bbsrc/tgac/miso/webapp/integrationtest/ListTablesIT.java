@@ -46,8 +46,8 @@ public class ListTablesIT extends AbstractIT {
       Columns.LAST_RUN_NAME, Columns.LAST_RUN_ALIAS, Columns.LAST_SEQUENCER, Columns.LAST_MODIFIED);
   private static final Set<String> runsColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.SEQ_PARAMS, Columns.STATUS,
       Columns.START_DATE, Columns.END_DATE, Columns.LAST_MODIFIED);
-  private static final Set<String> boxesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.LOCATION,
-      Columns.ITEMS_CAPACITY, Columns.SIZE);
+  private static final Set<String> boxesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
+      Columns.LOCATION, Columns.ITEMS_CAPACITY, Columns.SIZE);
   private static final Set<String> sequencersColumns = Sets.newHashSet(Columns.INSTRUMENT_NAME, Columns.PLATFORM, Columns.MODEL,
       Columns.COMMISSIONED, Columns.DECOMMISSIONED, Columns.SERIAL_NUMBER);
   private static final Set<String> kitsColumns = Sets.newHashSet(Columns.KIT_NAME, Columns.VERSION, Columns.MANUFACTURER,
