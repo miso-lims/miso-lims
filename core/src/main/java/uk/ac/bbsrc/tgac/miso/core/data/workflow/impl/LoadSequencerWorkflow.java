@@ -30,7 +30,8 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   @Override
   protected List<WorkflowStep> getCompletedSteps() {
-    return Stream.concat(Stream.of(spcStep, modelStep), partitionSteps.stream()).collect(Collectors.toList());
+    return Stream.concat(Stream.of(spcStep, modelStep), partitionSteps.stream()).filter(s -> s.getProgressStep() != null)
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -62,7 +63,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   @Override
   public void processInput(int stepNumber, ProgressStep step) {
     if (stepNumber == 0) {
-      spcStep.processInput(step);
+      step.accept(spcStep);
       modelStep.cancelInput();
       for (PartitionStep partitionStep : partitionSteps) {
         partitionStep.cancelInput();
@@ -72,24 +73,16 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
         clearPartitionSteps(spcStep.getSpc().getModel().getPartitionCount());
       }
     } else if (stepNumber == 1) {
-      if (spcStep.getProgressStep() == null) throwInvalidStepNumber();
-
       if (spcStep.isKnown()) {
-        partitionSteps.get(0).processInput(step);
+        step.accept(partitionSteps.get(0));
       } else {
-        modelStep.processInput(step);
+        step.accept(modelStep);
         clearPartitionSteps(modelStep.getModel().getPartitionCount());
       }
     } else {
-      if (spcStep.getProgressStep() == null || (!spcStep.isKnown() && modelStep.getProgressStep() == null)) throwInvalidStepNumber();
       int partitionIndex = asPartitionIndex(stepNumber);
-      if (partitionIndex > partitionSteps.size()) throwInvalidStepNumber();
-      partitionSteps.get(partitionIndex).processInput(step);
+      step.accept(partitionSteps.get(partitionIndex));
     }
-  }
-
-  private void throwInvalidStepNumber() {
-    throw new IllegalArgumentException("Invalid step number");
   }
 
   private void clearPartitionSteps(int partitionCount) {
@@ -121,8 +114,8 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   @Override
   public String getConfirmMessage() {
     return String.format("Sequencing Container %s will be modified to contain Pools %s", spcStep.getSpc().getIdentificationBarcode(),
-        LimsUtils.joinWithConjunction(partitionSteps.stream().map(s -> s.getPool().getAlias()).collect(Collectors.toList()),
-            "and"));
+        LimsUtils.joinWithConjunction(
+            partitionSteps.stream().filter(s -> s.getPool() != null).map(s -> s.getPool().getAlias()).collect(Collectors.toList()), "and"));
   }
 
   @Override
@@ -147,7 +140,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
     @Override
     public WorkflowStepPrompt getPrompt() {
       return new WorkflowStepPrompt(Sets.newHashSet(InputType.POOL, InputType.EMPTY),
-          String.format("Scan a Pool to assign to partition %d, or enter no input to skip this partition", partitionIndex));
+          String.format("Scan a Pool to assign to partition %d, or enter no input to skip this partition", partitionIndex + 1));
     }
 
     @Override

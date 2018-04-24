@@ -17,12 +17,18 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
 
 public class LoadSequencerWorkflowTest {
   private static final WorkflowName WORKFLOW_NAME = LOAD_SEQUENCER;
   private static final String SPC_BARCODE = "spc_barcode";
+  private static SequencingContainerModel MODEL;
+  static {
+    MODEL = new SequencingContainerModel();
+    MODEL.setPartitionCount(2);
+  }
 
   @Test
   public void testNoInput() {
@@ -45,19 +51,16 @@ public class LoadSequencerWorkflowTest {
   @Test
   public void testProcessSequencingPartitionContainer() {
     Workflow workflow = makeWorkflow();
-    workflow.processInput(0, makeSpcStep(SPC_BARCODE));
+    SequencingContainerModel model1 = new SequencingContainerModel();
+    model1.setPartitionCount(1);
+    workflow.processInput(0, makeSpcStep(MODEL, SPC_BARCODE));
 
-    assertThrows(IllegalArgumentException.class, () -> workflow.processInput(2, new PoolProgressStep()));
-    assertEquivalent(makeProgress(WORKFLOW_NAME, makeSpcStep(SPC_BARCODE, 0)), workflow.getProgress());
-//    assertSpcPrompt(workflow.getStep(0));
+    assertEquivalent(makeProgress(WORKFLOW_NAME, makeSpcStep(MODEL, SPC_BARCODE, 0)), workflow.getProgress());
   }
 
   private void assertNoInput(Workflow workflow) {
-    assertThrows(IllegalArgumentException.class, () -> workflow.processInput(2, makeSpcStep(SPC_BARCODE)));
-
     assertEquivalent(makeProgress(WORKFLOW_NAME), workflow.getProgress());
     assertSpcPrompt(workflow.getStep(0));
-    assertThrows(IllegalArgumentException.class, () -> workflow.getStep(1));
     assertFalse(workflow.isComplete());
     assertEquals(Collections.emptyList(), workflow.getLog());
   }
@@ -67,16 +70,17 @@ public class LoadSequencerWorkflowTest {
     assertEquals("Scan a flow cell serial number", prompt.getMessage());
   }
 
-  private SequencerPartitionContainerProgressStep makeSpcStep(String barcode, int stepNumber) {
-    SequencerPartitionContainerProgressStep step = makeSpcStep(barcode);
+  private SequencerPartitionContainerProgressStep makeSpcStep(SequencingContainerModel model, String barcode, int stepNumber) {
+    SequencerPartitionContainerProgressStep step = makeSpcStep(model, barcode);
     step.setStepNumber(stepNumber);
     return step;
   }
 
-  private SequencerPartitionContainerProgressStep makeSpcStep(String barcode) {
+  private SequencerPartitionContainerProgressStep makeSpcStep(SequencingContainerModel model, String barcode) {
     SequencerPartitionContainerProgressStep step = new SequencerPartitionContainerProgressStep();
     SequencerPartitionContainer spc = new SequencerPartitionContainerImpl();
     spc.setIdentificationBarcode(barcode);
+    spc.setModel(model);
     step.setInput(spc);
     return step;
   }
