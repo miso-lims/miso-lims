@@ -29,7 +29,8 @@ public interface ProgressStep extends Serializable, Comparable<ProgressStep> {
 
   enum InputType {
     POOL("Pool", FactoryType.BARCODABLE, EntityType.POOL), INTEGER("Integer", FactoryType.INTEGER, null), SEQUENCER_PARTITION_CONTAINER(
-        "Sequencing Container", FactoryType.BARCODABLE, EntityType.CONTAINER), STRING("String", FactoryType.STRING, null);
+        "Sequencing Container", FactoryType.BARCODABLE,
+        EntityType.CONTAINER), STRING("String", FactoryType.STRING, null), EMPTY("Empty input", FactoryType.EMPTY, null);
 
     private String name;
     private FactoryType factoryType;
@@ -56,6 +57,6 @@ public interface ProgressStep extends Serializable, Comparable<ProgressStep> {
 
   enum FactoryType {
     // Must be declared in the intended order to be applied to construct a ProgressStep
-    BARCODABLE, INTEGER, STRING
+    EMPTY, BARCODABLE, INTEGER, STRING
   }
 }
