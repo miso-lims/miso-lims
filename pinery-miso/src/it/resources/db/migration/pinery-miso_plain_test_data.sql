@@ -191,9 +191,9 @@ INSERT INTO LibraryStrategyType (libraryStrategyTypeId, name, description) VALUE
   (1, 'WGS','WGS desc'),
   (20,'WXS','WXS desc');
 
-INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, kitType, platformType, lastModifier) VALUES
-  (1, 'Test Kit', 1, 'TestCo', '123', 'LIBRARY', 'ILLUMINA', 1),
-  (2, 'Test Kit Two', 2, 'TestCo', '124', 'LIBRARY', 'ILLUMINA', 1);
+INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, kitType, platformType, creator, created, lastModifier, lastModified) VALUES
+  (1, 'Test Kit', 1, 'TestCo', '123', 'LIBRARY', 'ILLUMINA', 1, '2018-04-24 12:20:00', 1, '2018-04-24 12:20:00'),
+  (2, 'Test Kit Two', 2, 'TestCo', '124', 'LIBRARY', 'ILLUMINA', 1, '2018-04-24 12:20:00', 1, '2018-04-24 12:20:00');
   
 INSERT INTO BoxUse (boxUseId, alias) VALUES 
 (1, 'DNA'), (2, 'RNA'), (3, 'Libraries'), (4, 'Sequencing'), (5, 'Storage'), (6, 'Tissue');
