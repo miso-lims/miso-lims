@@ -138,7 +138,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   private class PartitionStep implements WorkflowStep {
     private final int partitionIndex;
     private PoolProgressStep poolStep;
-    private EmptyProgressStep skipStep;
+    private SkipProgressStep skipStep;
 
     PartitionStep(int partitionIndex) {
       this.partitionIndex = partitionIndex;
@@ -177,7 +177,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
     }
 
     @Override
-    public void processInput(EmptyProgressStep step) {
+    public void processInput(SkipProgressStep step) {
       this.skipStep = step;
     }
 

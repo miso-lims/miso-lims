@@ -8,7 +8,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStep;
 
 @Entity
 @Table(name = "StepSkip")
-public class EmptyProgressStep extends AbstractProgressStep {
+public class SkipProgressStep extends AbstractProgressStep {
   private static final long serialVersionUID = 1L;
 
   @Override

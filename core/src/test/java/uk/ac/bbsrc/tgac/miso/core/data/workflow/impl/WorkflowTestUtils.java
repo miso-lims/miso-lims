@@ -50,7 +50,7 @@ class WorkflowTestUtils {
               ((SequencerPartitionContainerProgressStep) actualStep).getInput());
         } else if (expectedStep instanceof StringProgressStep) {
           assertEquals(((StringProgressStep) expectedStep).getInput(), ((StringProgressStep) actualStep).getInput());
-        } else if (expectedStep instanceof EmptyProgressStep) {
+        } else if (expectedStep instanceof SkipProgressStep) {
           // All SkipProgressSteps are equivalent
         } else {
           fail("Unexpected ProgressStep type");
