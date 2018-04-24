@@ -408,4 +408,10 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   public void setModel(SequencingContainerModel model) {
     this.model = model;
   }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
 }

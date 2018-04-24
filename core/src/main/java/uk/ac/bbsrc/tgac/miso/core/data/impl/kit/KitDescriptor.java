@@ -26,9 +26,11 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.kit;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -41,6 +43,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -93,13 +97,21 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
           @JoinColumn(name = "kitDescriptorId") })
   private Set<TargetedSequencing> targetedSequencing = new HashSet<>();
 
-  public void setTargetedSequencing(Set<TargetedSequencing> targetedSequencing) {
-    this.targetedSequencing = targetedSequencing;
-  }
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
+
+  @Column(name = "created", nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date creationTime;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
+
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
 
   @Enumerated(EnumType.STRING)
   private KitType kitType;
@@ -288,16 +300,52 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
     this.changelog = changelog;
   }
 
+  @Override
+  public User getCreator() {
+    return creator;
+  }
+
+  @Override
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return creationTime;
+  }
+
+  @Override
+  public void setCreationTime(Date creationTime) {
+    this.creationTime = creationTime;
+  }
+
+  @Override
   public User getLastModifier() {
     return lastModifier;
-   }
+  }
 
+  @Override
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
   }
 
+  @Override
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
   public Set<TargetedSequencing> getTargetedSequencing() {
     return targetedSequencing;
+  }
+
+  public void setTargetedSequencing(Set<TargetedSequencing> targetedSequencing) {
+    this.targetedSequencing = targetedSequencing;
   }
 
   /**
@@ -363,4 +411,10 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
     changeLog.setUser(user);
     return changeLog;
   }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
 }

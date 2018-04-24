@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.Date;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
@@ -244,25 +243,5 @@ public interface Sample
   void setQCs(Collection<SampleQC> qcs);
 
   public void setBoxPosition(SampleBoxPosition boxPosition);
-
-  // TODO: remove below fields to ChangeLoggable interface
-  public User getLastModifier();
-
-  @Override
-  public void setLastModifier(User user);
-
-  @Override
-  public Date getLastModified();
-
-  @Override
-  public void setLastModified(Date lastModified);
-
-  public User getCreator();
-
-  public void setCreator(User user);
-
-  public Date getCreationTime();
-
-  public void setCreationTime(Date creationTime);
 
 }

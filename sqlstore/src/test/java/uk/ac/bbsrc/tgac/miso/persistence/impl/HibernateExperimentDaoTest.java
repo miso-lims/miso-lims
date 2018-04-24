@@ -76,7 +76,7 @@ public class HibernateExperimentDaoTest extends AbstractDAOTest {
     User user = new UserImpl();
     user.setUserId(1L);
 
-    experiment.setLastModifier(user);
+    experiment.setChangeDetails(user);
     experiment.setName(namingScheme.generateNameFor(experiment));
     experiment.setTitle("Title");
     dao.save(experiment);
