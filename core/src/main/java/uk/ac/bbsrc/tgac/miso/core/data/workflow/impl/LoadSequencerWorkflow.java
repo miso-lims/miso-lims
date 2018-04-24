@@ -16,6 +16,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
 
 public class LoadSequencerWorkflow extends AbstractWorkflow {
+  private StartStep startStep = new StartStep();
+
   @Override
   protected List<WorkflowStep> getCompletedSteps() {
     return Collections.emptyList();
@@ -59,5 +61,47 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   @Override
   public String getName() {
     return "Load Sequencer Workflow";
+  }
+
+  private enum State {
+    START, RECEIVED_SPC, RECEIVED_SC_MODEL
+  }
+
+  private class StartStep implements WorkflowStep {
+    private StringProgressStep stringStep;
+    private SequencerPartitionContainerProgressStep spcStep;
+
+    @Override
+    public WorkflowStepPrompt getPrompt() {
+      return new WorkflowStepPrompt(Sets.newHashSet(InputType.SEQUENCER_PARTITION_CONTAINER, InputType.STRING),
+          "Scan a flow cell serial number");
+    }
+
+    @Override
+    public ProgressStep getProgressStep() {
+      return spcStep != null ? spcStep : stringStep;
+    }
+
+    @Override
+    public void cancelInput() {
+      spcStep = null;
+      stringStep = null;
+    }
+
+    @Override
+    public String getLogMessage() {
+      return spcStep != null ? String.format("Scanned existing Sequencing Container %s", spcStep.getInput().getIdentificationBarcode())
+          : String.format("Scanned new Sequencing Container %s", stringStep.getInput());
+    }
+
+    @Override
+    public void processInput(SequencerPartitionContainerProgressStep step) {
+      spcStep = step;
+    }
+
+    @Override
+    public void processInput(StringProgressStep step) {
+      stringStep = step;
+    }
   }
 }
