@@ -1,3 +1,14 @@
+# 0.2.117
+
+Changes:
+
+ * Fix user and time in QC change log entries
+ * Display description column on List Boxes page
+ * Fix problems with container models
+ * Make addIndex procedure notify user on error
+ * Allow printing multiple copies of a label
+ * Default dilution creation date to today
+
 # 0.2.116
 
 Changes:
@@ -8,7 +19,10 @@ Changes:
  * Added Select Odd/Even Columns buttons on Box page
  * Make dilution search tile link to correct library page
  * Add sequencing container models
- * Add HiSeq X chemsitry
+ * Add HiSeq X chemistry
+
+Bad: Run scanner could not find fallback sequencing container models,
+so runs failed to save correctly. Fixed in #0.2.117.
 
 # 0.2.115
 

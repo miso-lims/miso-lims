@@ -1,3 +1,5 @@
+-- changeloggables
+
 ALTER TABLE Experiment ADD COLUMN creator bigint(20);
 ALTER TABLE Experiment ADD COLUMN created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
 ALTER TABLE Experiment ADD COLUMN lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
@@ -40,3 +42,5 @@ UPDATE Study SET
 
 ALTER TABLE Study CHANGE COLUMN creator creator bigint(20) NOT NULL;
 ALTER TABLE Study ADD CONSTRAINT fk_study_creator FOREIGN KEY (creator) REFERENCES User (userId);
+
+
