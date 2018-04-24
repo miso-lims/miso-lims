@@ -6,6 +6,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.AbstractProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStep;
 
@@ -14,8 +15,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStep;
 public class SequencerPartitionContainerProgressStep extends AbstractProgressStep {
   private static final long serialVersionUID = 1L;
 
-  @ManyToOne(targetEntity = SequencerPartitionContainer.class)
-  @JoinColumn(name = "sequencerPartitionContainerId")
+  @ManyToOne(targetEntity = SequencerPartitionContainerImpl.class)
+  @JoinColumn(name = "containerId")
   private SequencerPartitionContainer input;
 
   @Override
