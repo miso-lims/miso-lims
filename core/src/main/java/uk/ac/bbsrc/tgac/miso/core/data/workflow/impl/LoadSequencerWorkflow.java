@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.AbstractWorkflow;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
@@ -65,6 +66,53 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   private enum State {
     START, RECEIVED_SPC, RECEIVED_SC_MODEL
+  }
+
+  private class LaneStep implements WorkflowStep {
+    private final int partitionIndex;
+    private PoolProgressStep poolStep;
+    private EmptyProgressStep skipStep;
+
+    public LaneStep(int partitionIndex) {
+      this.partitionIndex = partitionIndex;
+    }
+
+    @Override
+    public WorkflowStepPrompt getPrompt() {
+      return new WorkflowStepPrompt(Sets.newHashSet(InputType.POOL, InputType.EMPTY),
+          String.format("Scan a Pool to assign to partition %d, or enter no input to skip this partition", partitionIndex));
+    }
+
+    @Override
+    public ProgressStep getProgressStep() {
+      return poolStep != null ? poolStep : skipStep;
+    }
+
+    @Override
+    public void cancelInput() {
+      poolStep = null;
+      skipStep = null;
+    }
+
+    @Override
+    public String getLogMessage() {
+      if (poolStep != null) {
+        Pool pool = poolStep.getInput();
+        return String.format("Selected Pool %s (%s) for partition %d", pool.getAlias(), pool.getName(), partitionIndex);
+      }
+
+      return String.format("Skipped partition %d", partitionIndex);
+    }
+
+    @Override
+    public void processInput(PoolProgressStep step) {
+      this.poolStep = step;
+    }
+
+    @Override
+    public void processInput(EmptyProgressStep step) {
+      this.skipStep = step;
+    }
   }
 
   private class StartStep implements WorkflowStep {
