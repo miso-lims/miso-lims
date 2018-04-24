@@ -62,6 +62,27 @@ public class DefaultQualityControlService implements QualityControlService {
   }
 
   @Override
+  public QC updateQc(QC qc) throws IOException {
+    QcTargetStore handler = getHandler(qc.getType().getQcTarget());
+
+    QualityControlEntity entity = handler.getEntity(qc.getEntity().getId());
+    authorizationManager.throwIfNotWritable(entity);
+    User user = authorizationManager.getCurrentUser();
+
+    QC original = handler.get(qc.getId());
+    if (original.getType().getQcTypeId() != qc.getType().getQcTypeId()) {
+      throw new IllegalArgumentException("QC type has changed");
+    }
+    original.setResults(qc.getResults());
+
+    entity.setChangeDetails(user);
+    changeLoggableStore.update(entity);
+
+    handler.save(original);
+    return original;
+  }
+
+  @Override
   public QC get(QcTarget target, Long id) throws IOException {
     QC qc = getHandler(target).get(id);
     authorizationManager.throwIfNotReadable(qc.getEntity());
@@ -123,21 +144,6 @@ public class DefaultQualityControlService implements QualityControlService {
 
   public void setSampleQcStore(SampleQcStore sampleQcStore) {
     this.sampleQcStore = sampleQcStore;
-  }
-
-  @Override
-  public QC updateQc(QC qc) throws IOException {
-    QcTargetStore handler = getHandler(qc.getType().getQcTarget());
-
-    authorizationManager.throwIfNotWritable(handler.getEntity(qc.getEntity().getId()));
-
-    QC original = handler.get(qc.getId());
-    if (original.getType().getQcTypeId() != qc.getType().getQcTypeId()) {
-      throw new IllegalArgumentException("QC type has changed");
-    }
-    original.setResults(qc.getResults());
-    handler.save(original);
-    return original;
   }
 
 }
