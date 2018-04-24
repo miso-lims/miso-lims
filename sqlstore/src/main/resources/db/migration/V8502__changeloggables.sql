@@ -1,10 +1,9 @@
-SELECT userId INTO @admin FROM User WHERE loginName = 'admin';
-
 ALTER TABLE Experiment ADD COLUMN creator bigint(20);
 ALTER TABLE Experiment ADD COLUMN created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
 ALTER TABLE Experiment ADD COLUMN lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
 
 -- StartNoTest
+SELECT userId INTO @admin FROM User WHERE loginName = 'admin';
 UPDATE Experiment SET
   created = (SELECT MIN(changeTime) FROM ExperimentChangeLog WHERE experimentId = Experiment.experimentId),
   lastModified = (SELECT MAX(changeTime) FROM ExperimentChangeLog WHERE experimentId = Experiment.experimentId),

@@ -121,6 +121,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
         experiment.setPlatform(platformService.get(experiment.getPlatform().getId()));
         experiment.setLibrary(libraryService.get(experiment.getLibrary().getId()));
         experiment.setStudy(studyService.get(experiment.getStudy().getId()));
+        experiment.setChangeDetails(authorizationManager.getCurrentUser());
         if (experiment.getSecurityProfile().getProfileId() == SecurityProfile.UNSAVED_ID) {
           securityProfileStore.save(experiment.getSecurityProfile());
         } else {
@@ -160,7 +161,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
         kits.add(kitService.getKitById(k.getId()));
       }
       original.setKits(kits);
-      original.setLastModifier(authorizationManager.getCurrentUser());
+      original.setChangeDetails(authorizationManager.getCurrentUser());
       return experimentStore.save(original);
     } catch (MisoNamingException e) {
       throw new IOException("Cannot save Experiment - issue with naming scheme", e);

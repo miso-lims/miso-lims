@@ -32,8 +32,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateKitDao;
 
 public class HibernateKitDaoTest extends AbstractDAOTest {
 
@@ -98,7 +96,7 @@ public class HibernateKitDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListKitsByType() throws IOException {
-    List<Kit> kit = dao.listKitsByType(KitType.SEQUENCING);
+    List<Kit> kit = dao.listKitsByType(KitType.LIBRARY);
     assertThat(kit.size(), is(2));
   }
 
@@ -130,7 +128,7 @@ public class HibernateKitDaoTest extends AbstractDAOTest {
   @Test
   public void testGetKitDescriptorById() throws IOException {
     KitDescriptor kitDescriptor = dao.getKitDescriptorById(1L);
-    assertThat(kitDescriptor.getName(), is("GS Titanium Sequencing Kit XLR70"));
+    assertThat(kitDescriptor.getName(), is("Test Kit 1"));
   }
 
   @Test
@@ -141,8 +139,8 @@ public class HibernateKitDaoTest extends AbstractDAOTest {
 
   @Test
   public void testGetKitDescriptorByPartNumber() throws IOException {
-    KitDescriptor kitDescriptor = dao.getKitDescriptorByPartNumber("05233526001");
-    assertThat(kitDescriptor.getName(), is("GS Titanium Sequencing Kit XLR70"));
+    KitDescriptor kitDescriptor = dao.getKitDescriptorByPartNumber("k002");
+    assertThat(kitDescriptor.getName(), is("Test Kit 2"));
   }
 
   @Test
@@ -166,7 +164,7 @@ public class HibernateKitDaoTest extends AbstractDAOTest {
   @Test
   public void testSaveKitDescriptor() throws IOException {
     KitDescriptor newKitDescriptor = makeNewKitDescriptor();
-    newKitDescriptor.setLastModifier(user);
+    newKitDescriptor.setChangeDetails(user);
     long id = dao.saveKitDescriptor(newKitDescriptor);
     assertThat(id, not(0L));
     KitDescriptor savedKitDescriptor = dao.getKitDescriptorById(id);

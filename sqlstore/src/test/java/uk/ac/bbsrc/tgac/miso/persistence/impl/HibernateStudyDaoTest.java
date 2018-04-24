@@ -170,7 +170,7 @@ public class HibernateStudyDaoTest extends AbstractDAOTest {
     s.setDescription("foo");
     s.setSecurityProfile(profile);
     s.setProject(project);
-    s.setLastModifier(user);
+    s.setChangeDetails(user);
     return s;
   }
 
