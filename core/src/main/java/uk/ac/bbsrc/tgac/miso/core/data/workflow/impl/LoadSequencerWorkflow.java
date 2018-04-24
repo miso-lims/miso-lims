@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName.LOAD_SEQUENCER;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,7 +18,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
 
 public class LoadSequencerWorkflow extends AbstractWorkflow {
-  private StartStep startStep = new StartStep();
+  private ScanSpcStep scanSpcStep = new ScanSpcStep();
+  private ScanModelStep scanModelStep = new ScanModelStep();
+  private List<LaneStep> laneSteps = new ArrayList<>();
 
   @Override
   protected List<WorkflowStep> getCompletedSteps() {
@@ -115,9 +118,9 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
     }
   }
 
-  private class StartStep implements WorkflowStep {
-    private StringProgressStep stringStep;
+  private class ScanSpcStep implements WorkflowStep {
     private SequencerPartitionContainerProgressStep spcStep;
+    private StringProgressStep stringStep;
 
     @Override
     public WorkflowStepPrompt getPrompt() {
@@ -150,6 +153,44 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
     @Override
     public void processInput(StringProgressStep step) {
       stringStep = step;
+    }
+  }
+
+  private class ScanModelStep implements WorkflowStep {
+    private SequencingContainerModelProgressStep modelStep;
+    private StringProgressStep stringStep;
+
+    @Override
+    public WorkflowStepPrompt getPrompt() {
+      return new WorkflowStepPrompt(Sets.newHashSet(InputType.SEQUENCING_CONTAINER_MODEL, InputType.STRING),
+          "Scan the REF number of the Sequencing Container");
+    }
+
+    @Override
+    public ProgressStep getProgressStep() {
+      return modelStep != null ? modelStep : stringStep;
+    }
+
+    @Override
+    public void cancelInput() {
+      modelStep = null;
+      stringStep = null;
+    }
+
+    @Override
+    public String getLogMessage() {
+      return modelStep != null ? String.format("Selected Sequencing Container Model %s", modelStep.getInput().getIdentificationBarcode())
+          : String.format("Selected unknown Sequencing Container Model %s", stringStep.getInput());
+    }
+
+    @Override
+    public void processInput(SequencingContainerModelProgressStep step) {
+      this.modelStep = step;
+    }
+
+    @Override
+    public void processInput(StringProgressStep step) {
+      this.stringStep = step;
     }
   }
 }
