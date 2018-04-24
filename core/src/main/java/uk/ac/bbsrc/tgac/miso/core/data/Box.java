@@ -2,10 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
-
-import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -204,26 +201,4 @@ public interface Box extends SecurableByProfile, Barcodable, Locatable, ChangeLo
   @Override
   public Collection<ChangeLog> getChangeLog();
 
-  // TODO: remove below fields to ChangeLoggable interface
-  /**
-   * Returns the user who last modified this item.
-   */
-  public User getLastModifier();
-
-  /**
-   * Sets the user who last modified this item. It should always be set to the current user on save.
-   */
-  public void setLastModifier(User user);
-
-  public Date getLastModified();
-
-  public void setLastModified(Date lastModified);
-
-  public User getCreator();
-
-  public void setCreator(User user);
-
-  public Date getCreationTime();
-
-  public void setCreationTime(Date creationTime);
 }

@@ -603,4 +603,9 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     return getSecurityProfile();
   }
 
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
 }

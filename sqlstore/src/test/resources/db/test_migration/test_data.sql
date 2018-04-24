@@ -151,14 +151,14 @@ INSERT INTO ProjectOverview(overviewId, principalInvestigator, startDate, projec
 VALUES
  (1, 'Dr. Professorsworth', NOW(), 1);
 
-DELETE FROM `Study`;
-INSERT INTO `Study`(`studyId`, `name`, `description`, `accession`, `securityProfile_profileId`, `project_projectId`, `studyTypeId`, `alias`, `lastModifier`)
-VALUES (1,'STU1','Test study1',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study1',1),
-(2,'STU2','Test study2',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study2',1),
-(3,'STU3','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study3',1),
-(4,'STU4','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study4',1),
-(5,'STU5','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study5',1),
-(6,'STU6','delete me',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study6',1);
+DELETE FROM Study;
+INSERT INTO Study(studyId, name, description, accession, securityProfile_profileId, project_projectId, studyTypeId, alias, creator, created, lastModifier, lastModified)
+VALUES (1,'STU1','Test study1',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study1',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(2,'STU2','Test study2',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study2',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(3,'STU3','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study3',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(4,'STU4','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study4',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(5,'STU5','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study5',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(6,'STU6','delete me',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study6',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
 DELETE FROM `Experiment`;
 
@@ -249,6 +249,12 @@ VALUES (1,'WGS','Whole genome shotgun'),
 (12,'EST','Single pass sequencing of cDNA templates'),
 (14,'CTS','Concatenated Tag Sequencing');
 
+DELETE FROM `Kit`;
+DELETE FROM KitDescriptor;
+INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, stockLevel, kitType, platformType, creator, created, lastModifier, lastModified) VALUES
+(1, 'Test Kit 1', 1, 'KitMaker', 'k001', 0, 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(2, 'Test Kit 2', 1, 'KitMaker', 'k002', 0, 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
+
 DELETE FROM `Library`;
 INSERT INTO `Library`(`libraryId`, `name`, `description`, `accession`, `securityProfile_profileId`, `sample_sampleId`, `identificationBarcode`, `locationBarcode`, `libraryType`, `concentration`, `creationDate`, `platformType`, `alias`, `paired`, `librarySelectionType`, `libraryStrategyType`, `qcPassed`, `lastModifier`, `lastModified`, `creator`, `created`, `kitDescriptorId`)
 VALUES (1,'LIB1','Inherited from TEST_0001',NULL,1,1,'LIB1::TEST_0001_Bn_P_PE_300_WG','LIBRARY_INBOX_A01',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49', 1),
@@ -284,7 +290,6 @@ VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (13, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:13'),
 (14, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:15');
 
-DELETE FROM `Kit`;
 INSERT INTO `Kit`(`kitId`,`identificationBarcode`,`locationBarcode`,`lotNumber`,`kitDate`,`kitDescriptorId`) VALUES
 (1,'1234','Freezer2','LOT34',NOW(),1),
 (2,'5678','Freezer3','LOT35',NOW(),2);
@@ -384,40 +389,40 @@ VALUES (1,2),
 (1,1),
 (2,3);
 
-INSERT INTO `Experiment`(`experimentId`, `name`, `description`, `accession`, `title`, `securityProfile_profileId`, `study_studyId`, `alias`, `platform_platformId`,`lastModifier`, `library_libraryId`) 
+INSERT INTO `Experiment`(`experimentId`, `name`, `description`, `accession`, `title`, `securityProfile_profileId`, `study_studyId`, `alias`, `platform_platformId`,`lastModifier`, lastModified, creator, created, `library_libraryId`) 
 VALUES
-(1,'EXP1','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_1',16,1, 1),
-(2,'EXP2','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_2',16,1, 2),
-(3,'EXP3','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_3',16,1, 3),
-(4,'EXP4','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_4',16,1, 3),
-(5,'EXP5','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_5',16,1, 4),
-(6,'EXP6','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_6',16,1, 4),
-(7,'EXP7','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_7',16,1, 4),
-(8,'EXP8','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_8',16,1, 4),
-(9,'EXP9','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_9',16,1, 5),
-(10,'EXP10','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_10',16,1, 5),
-(11,'EXP11','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_11',16,1, 5),
-(12,'EXP12','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_12',16,1, 5),
-(13,'EXP13','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_13',16,1, 6),
-(14,'EXP14','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_14',16,1, 6),
-(15,'EXP15','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_15',16,1, 6),
-(16,'EXP16','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_16',16,1, 6),
-(17,'EXP17','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_17',16,1, 7),
-(18,'EXP18','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_18',16,1, 7),
-(19,'EXP19','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_19',16,1, 7),
-(20,'EXP20','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_20',16,1, 7),
-(21,'EXP21','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_21',16,1, 8),
-(22,'EXP22','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_22',16,1, 8),
-(23,'EXP23','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_23',16,1, 8),
-(24,'EXP24','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_24',16,1, 8),
-(25,'EXP25','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_25',16,1, 10),
-(26,'EXP26','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,2,'EXP_AUTOGEN_STU1_Other_26',16,1, 10),
-(27,'EXP27','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,3,'EXP_AUTOGEN_STU1_Other_27',16,1, 10),
-(28,'EXP28','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,4,'EXP_AUTOGEN_STU1_Other_28',16,1, 10),
-(29,'EXP29','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,2,'EXP_AUTOGEN_STU1_Other_29',16,1, 9),
-(30,'EXP30','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,3,'EXP_AUTOGEN_STU1_Other_30',16,1, 9),
-(31,'EXP31','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,4,'EXP_AUTOGEN_STU1_Other_31',16,1, 9),
-(32,'EXP32','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,5,'EXP_AUTOGEN_STU1_Other_32',16,1, 9);
+(1,'EXP1','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_1',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 1),
+(2,'EXP2','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_2',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 2),
+(3,'EXP3','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_3',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 3),
+(4,'EXP4','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_4',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 3),
+(5,'EXP5','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_5',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 4),
+(6,'EXP6','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_6',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 4),
+(7,'EXP7','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_7',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 4),
+(8,'EXP8','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_8',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 4),
+(9,'EXP9','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_9',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 5),
+(10,'EXP10','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_10',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 5),
+(11,'EXP11','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_11',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 5),
+(12,'EXP12','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_12',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 5),
+(13,'EXP13','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_13',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 6),
+(14,'EXP14','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_14',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 6),
+(15,'EXP15','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_15',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 6),
+(16,'EXP16','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_16',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 6),
+(17,'EXP17','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_17',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 7),
+(18,'EXP18','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_18',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 7),
+(19,'EXP19','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_19',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 7),
+(20,'EXP20','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_20',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 7),
+(21,'EXP21','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_21',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 8),
+(22,'EXP22','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_22',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 8),
+(23,'EXP23','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_23',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 8),
+(24,'EXP24','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_24',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 8),
+(25,'EXP25','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_25',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 10),
+(26,'EXP26','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,2,'EXP_AUTOGEN_STU1_Other_26',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 10),
+(27,'EXP27','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,3,'EXP_AUTOGEN_STU1_Other_27',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 10),
+(28,'EXP28','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,4,'EXP_AUTOGEN_STU1_Other_28',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 10),
+(29,'EXP29','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,2,'EXP_AUTOGEN_STU1_Other_29',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9),
+(30,'EXP30','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,3,'EXP_AUTOGEN_STU1_Other_30',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9),
+(31,'EXP31','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,4,'EXP_AUTOGEN_STU1_Other_31',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9),
+(32,'EXP32','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,5,'EXP_AUTOGEN_STU1_Other_32',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9);
 
 DELETE FROM `PoolQC`;
 INSERT INTO `PoolQC`(`qcId`, `pool_poolId`, `creator`, `date`, `type`, `results`)

@@ -93,7 +93,7 @@ public class DefaultStudyService implements StudyService, AuthorizedPaginatedDat
   @Override
   public long save(Study study) throws IOException {
     if (study.getId() == StudyImpl.UNSAVED_ID) {
-      study.setLastModifier(authorizationManager.getCurrentUser());
+      study.setChangeDetails(authorizationManager.getCurrentUser());
       study.setStudyType(studyStore.getType(study.getStudyType().getId()));
       study.setProject(projectStore.get(study.getProject().getId()));
       study.setName(LimsUtils.generateTemporaryName());
@@ -112,7 +112,7 @@ public class DefaultStudyService implements StudyService, AuthorizedPaginatedDat
       original.setAccession(study.getAccession());
       original.setAlias(study.getAlias());
       original.setDescription(study.getDescription());
-      original.setLastModifier(authorizationManager.getCurrentUser());
+      original.setChangeDetails(authorizationManager.getCurrentUser());
       // project is immutable
       original.setStudyType(studyStore.getType(study.getStudyType().getId()));
       return studyStore.save(original);

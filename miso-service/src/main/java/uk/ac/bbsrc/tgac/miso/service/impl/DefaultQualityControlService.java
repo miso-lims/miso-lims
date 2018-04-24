@@ -7,10 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.QualityControlEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLoggableStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ContainerQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
@@ -35,6 +38,8 @@ public class DefaultQualityControlService implements QualityControlService {
   private QualityControlTypeStore qcTypeStore;
   @Autowired
   private SampleQcStore sampleQcStore;
+  @Autowired
+  private ChangeLoggableStore changeLoggableStore;
 
   @Override
   public QC createQC(QC qc) throws IOException {
@@ -42,12 +47,16 @@ public class DefaultQualityControlService implements QualityControlService {
 
     QualityControlEntity entity = handler.getEntity(qc.getEntity().getId());
     authorizationManager.throwIfNotWritable(entity);
-    qc.setCreator(authorizationManager.getCurrentUser());
+    User user = authorizationManager.getCurrentUser();
+    qc.setCreator(user);
 
     QcType type = qcTypeStore.get(qc.getType().getQcTypeId());
     if (!type.getQcTarget().equals(entity.getQcTarget())) {
       throw new IllegalArgumentException("QC type and entity are mismatched.");
     }
+    entity.setChangeDetails(user);
+    changeLoggableStore.update(entity);
+
     long id = handler.save(qc);
     return handler.get(id);
   }

@@ -554,7 +554,12 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
 
     SequencingContainerModel model = containerService.findModel(sequencer.getPlatform(), containerModel, laneCount);
     if (model == null) {
-      throw new IllegalArgumentException("Invalid container parameters: model=" + containerModel + ", lanes=" + laneCount);
+      throw new IllegalArgumentException(
+          "Could not find container or fallback for parameters: model=" + containerModel + ", lanes=" + laneCount);
+    }
+    if (model.isFallback() && isNew) {
+      log.info("Could not find container model with model=" + containerModel + " and lanes=" + laneCount
+          + " for run " + source.getAlias() + "; used fallback container model instead.");
     }
 
     isMutated |= updateContainerFromNotification(target, user, model, containerSerialNumber, getLaneContents);

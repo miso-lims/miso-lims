@@ -69,8 +69,8 @@ public class Printer implements Deletable, Serializable {
     return enabled;
   }
 
-  public boolean printBarcode(Barcodable b, User user) {
-    return backend.print(driver.encode(b).getBytes(Charsets.US_ASCII), configuration, user);
+  public boolean printBarcode(Barcodable b, User user, int copies) {
+    return backend.print(driver.encode(b, copies).getBytes(Charsets.US_ASCII), configuration, user);
   }
 
   public void setBackend(Backend backend) {

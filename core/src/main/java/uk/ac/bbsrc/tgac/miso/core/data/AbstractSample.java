@@ -496,4 +496,9 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     return getSecurityProfile();
   }
 
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
 }

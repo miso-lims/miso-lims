@@ -29,7 +29,6 @@ import java.util.Date;
 import java.util.List;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
@@ -307,41 +306,6 @@ public interface Library
    * @param creationDate
    */
   public void setCreationDate(Date creationDate);
-
-  // TODO: remove below fields to ChangeLoggable interface
-
-  /**
-   * Returns the user who last modified this item.
-   */
-  public User getLastModifier();
-
-  /**
-   * Sets the user who last modified this item. It should always be set to the current user on save.
-   */
-  @Override
-  public void setLastModifier(User user);
-
-  @Override
-  public Date getLastModified();
-
-  @Override
-  public void setLastModified(Date lastModified);
-
-  public User getCreator();
-
-  public void setCreator(User user);
-
-  /**
-   * @return the time this entity was first persisted
-   */
-  public Date getCreationTime();
-
-  /**
-   * Sets the time that this entity was first persisted
-   * 
-   * @param creationTime
-   */
-  public void setCreationTime(Date creationTime);
 
   KitDescriptor getKitDescriptor();
 

@@ -86,9 +86,9 @@ INSERT INTO LibraryStrategyType (libraryStrategyTypeId, name, description) VALUE
 
 DELETE FROM LibraryDesign;
 
-INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, kitType, platformType, lastModifier) VALUES
-  (1, 'Test Kit', 1, 'TestCo', '123', 'LIBRARY', 'ILLUMINA', 1),
-  (2, 'Test Kit Two', 2, 'TestCo', '124', 'LIBRARY', 'ILLUMINA', 1);
+INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, kitType, platformType, creator, created, lastModifier, lastModified) VALUES
+  (1, 'Test Kit', 1, 'TestCo', '123', 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+  (2, 'Test Kit Two', 2, 'TestCo', '124', 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
 INSERT INTO BoxUse (boxUseId, alias) VALUES
 (1, 'DNA'), (2, 'RNA'), (3, 'Libraries'), (4, 'Sequencing'), (5, 'Storage'), (6, 'Tissue');
@@ -133,8 +133,8 @@ INSERT INTO Project(projectId, name, alias, shortName, creationDate, description
   progress, referenceGenomeId, lastUpdated) VALUES
   (1, 'PRO1', 'PLAIN', NULL, '2017-06-27', 'integration test project one', 1, 'ACTIVE', 1, '2017-06-27 14:11:00');
   
-INSERT INTO Study (studyId, name, securityProfile_profileId, project_projectId, alias, lastModifier, studyTypeId) VALUES
-(1, 'STU1', 1, 1, 'PLAIN Study One', 1, 1);
+INSERT INTO Study (studyId, name, securityProfile_profileId, project_projectId, alias, studyTypeId, creator, created, lastModifier, lastModified) VALUES
+(1, 'STU1', 1, 1, 'PLAIN Study One', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
 INSERT INTO Sample (sampleId, name, alias, description, securityProfile_profileId, identificationBarcode, sampleType, receivedDate, project_projectId,
 scientificName, volume, qcPassed, lastModifier, creator, created, lastModified) VALUES

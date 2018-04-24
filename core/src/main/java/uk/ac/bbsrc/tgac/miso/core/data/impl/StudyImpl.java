@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 
 import javax.persistence.CascadeType;
@@ -37,6 +38,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.w3c.dom.Document;
@@ -97,8 +100,20 @@ public class StudyImpl implements Study {
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
+
+  @Column(name = "created", nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date creationTime;
+
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier")
   private User lastModifier;
+
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
 
   /**
    * Construct a new Study with a default empty SecurityProfile
@@ -186,11 +201,6 @@ public class StudyImpl implements Study {
   }
 
   @Override
-  public User getLastModifier() {
-    return lastModifier;
-  }
-
-  @Override
   public String getName() {
     return name;
   }
@@ -246,11 +256,6 @@ public class StudyImpl implements Study {
   @Override
   public void setId(long id) {
     this.studyId = id;
-  }
-
-  @Override
-  public void setLastModifier(User lastModifier) {
-    this.lastModifier = lastModifier;
   }
 
   @Override
@@ -318,4 +323,50 @@ public class StudyImpl implements Study {
   public SecurityProfile getDeletionSecurityProfile() {
     return getSecurityProfile();
   }
+
+  @Override
+  public User getCreator() {
+    return creator;
+  }
+
+  @Override
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return creationTime;
+  }
+
+  @Override
+  public void setCreationTime(Date creationTime) {
+    this.creationTime = creationTime;
+  }
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
 }

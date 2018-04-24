@@ -25,10 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
-
-import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
@@ -92,26 +89,6 @@ public interface SequencerPartitionContainer
    * @param partitionLimit
    */
   void setPartitionLimit(int partitionLimit);
-
-  @Override
-  public Collection<ChangeLog> getChangeLog();
-
-  // TODO: remove below fields to ChangeLoggable interface
-  public User getLastModifier();
-
-  public void setLastModifier(User user);
-
-  public Date getLastModified();
-
-  public void setLastModified(Date lastModified);
-
-  public User getCreator();
-
-  public void setCreator(User user);
-
-  public Date getCreationTime();
-
-  public void setCreationTime(Date creationTime);
 
   void setClusteringKit(KitDescriptor clusteringKit);
 
