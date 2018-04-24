@@ -37,7 +37,7 @@ import java.util.TreeSet;
  */
 public interface Barcodable extends Nameable, Aliasable {
   public enum EntityType {
-    DILUTION, POOL, SAMPLE, LIBRARY, BOX, CONTAINER;
+    DILUTION, POOL, SAMPLE, LIBRARY, BOX, CONTAINER, CONTAINER_MODEL;
   }
   /**
    * Returns the label text of this Barcodable object.

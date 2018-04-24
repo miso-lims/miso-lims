@@ -4,6 +4,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.EmptyProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.IntegerProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.PoolProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SequencerPartitionContainerProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SequencingContainerModelProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.StringProgressStep;
 
 /**
@@ -39,6 +40,10 @@ public interface WorkflowStep {
   }
 
   default void processInput(EmptyProgressStep step) {
+    throwUnexpectedInput();
+  }
+
+  default void processInput(SequencingContainerModelProgressStep step) {
     throwUnexpectedInput();
   }
 
