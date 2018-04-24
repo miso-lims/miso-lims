@@ -96,21 +96,17 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   @Override
   public void cancelInput() {
-    if (spcStep.isKnown()) {
-      if (partitionSteps.stream().noneMatch(this::isComplete)) {
-        spcStep.cancelInput();
-      } else {
-        partitionSteps.get(partitionSteps.size() - 1).cancelInput();
-      }
+    if (partitionSteps.stream().anyMatch(this::isComplete)) {
+      getLastCompletedPartitionStep().cancelInput();
+    } else if (isComplete(modelStep)) {
+      modelStep.cancelInput();
     } else {
-      if (partitionSteps.stream().anyMatch(this::isComplete)) {
-        partitionSteps.get(partitionSteps.size() - 1).cancelInput();
-      } else if (modelStep.getProgressStep() != null) {
-        modelStep.cancelInput();
-      } else {
-        spcStep.cancelInput();
-      }
+      spcStep.cancelInput();
     }
+  }
+
+  private PartitionStep getLastCompletedPartitionStep() {
+    return partitionSteps.stream().filter(this::isComplete).reduce((first, second) -> second).orElse(null);
   }
 
   @Override
