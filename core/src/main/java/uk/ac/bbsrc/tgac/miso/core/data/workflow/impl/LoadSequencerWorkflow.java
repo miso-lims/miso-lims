@@ -154,10 +154,10 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
     @Override
     public String getLogMessage() {
-      if (poolStep == null) return String.format("Skipped partition %d", partitionIndex);
+      if (poolStep == null) return String.format("Skipped partition %d", partitionIndex + 1);
 
       Pool pool = poolStep.getInput();
-      return String.format("Selected Pool %s (%s) for partition %d", pool.getAlias(), pool.getName(), partitionIndex);
+      return String.format("Selected Pool %s (%s) for partition %d", pool.getAlias(), pool.getName(), partitionIndex + 1);
     }
 
     @Override
