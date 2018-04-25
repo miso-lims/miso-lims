@@ -226,7 +226,6 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   private class ScanModelStep implements WorkflowStep {
     private SequencingContainerModelProgressStep modelStep;
-    private StringProgressStep stringStep;
 
     @Override
     public WorkflowStepPrompt getPrompt() {
@@ -236,29 +235,22 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
     @Override
     public ProgressStep getProgressStep() {
-      return modelStep != null ? modelStep : stringStep;
+      return modelStep;
     }
 
     @Override
     public void cancelInput() {
       modelStep = null;
-      stringStep = null;
     }
 
     @Override
     public String getLogMessage() {
-      return modelStep != null ? String.format("Selected Sequencing Container Model %s", modelStep.getInput().getIdentificationBarcode())
-          : String.format("Selected unknown Sequencing Container Model %s", stringStep.getInput());
+      return String.format("Selected Sequencing Container Model %s", modelStep.getInput().getIdentificationBarcode());
     }
 
     @Override
     public void processInput(SequencingContainerModelProgressStep step) {
       this.modelStep = step;
-    }
-
-    @Override
-    public void processInput(StringProgressStep step) {
-      this.stringStep = step;
     }
 
     public SequencingContainerModel getModel() {
