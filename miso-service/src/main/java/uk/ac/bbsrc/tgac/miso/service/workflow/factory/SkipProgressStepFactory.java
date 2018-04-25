@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.workflow.factory;
 
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
-import static uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.FactoryType.EMPTY;
+import static uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.FactoryType.SKIP;
 
 import java.io.IOException;
 import java.util.Set;
@@ -20,12 +20,11 @@ public class SkipProgressStepFactory implements ProgressStepFactory {
    */
   @Override
   public ProgressStep create(String input, Set<InputType> inputTypes) throws IOException {
-    if (input.equals("")) return new SkipProgressStep();
-    return null;
+    return input.equals(InputType.SKIP.toString()) ? new SkipProgressStep() : null;
   }
 
   @Override
   public ProgressStep.FactoryType getFactoryType() {
-    return EMPTY;
+    return SKIP;
   }
 }

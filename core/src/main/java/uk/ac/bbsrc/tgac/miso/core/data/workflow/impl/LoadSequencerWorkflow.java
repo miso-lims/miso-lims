@@ -137,7 +137,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
     @Override
     public WorkflowStepPrompt getPrompt() {
-      return new WorkflowStepPrompt(Sets.newHashSet(InputType.POOL, InputType.EMPTY),
+      return new WorkflowStepPrompt(Sets.newHashSet(InputType.POOL, InputType.SKIP),
           String.format("Scan a Pool to assign to partition %d, or enter no input to skip this partition", partitionIndex + 1));
     }
 

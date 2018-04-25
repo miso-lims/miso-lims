@@ -2,6 +2,7 @@ var WorkflowDisplay = (function() {
   var display;
   var loadingTag = jQuery("<img src='/styles/images/ajax-loader.gif'>");
   var errorDiv = jQuery("<div id='inputError'></div>");
+  var SKIP = "SKIP";
 
   function ajax(method, url, onSuccess, onError) {
     showLoading();
@@ -132,10 +133,22 @@ var WorkflowDisplay = (function() {
     });
   }
 
+  function makeSkipButton(workflowId, stepNumber) {
+    return jQuery("<a class='ui-button ui-state-default'>").text("Skip Partition").click(function() {
+      processInput(workflowId, stepNumber, SKIP);
+    });
+  }
+
   function showPrompt(workflowId, stepNumber, complete, message, inputTypes, logMessages) {
-    var elements = [makeMessageTag(message), makeInputTag(workflowId, stepNumber), errorDiv]
-        .concat((stepNumber < logMessages.length ? [makeContinueButton(workflowId, complete)] : []), [makeLog(logMessages, workflowId,
-            stepNumber)]);
+    var elements = [makeMessageTag(message), makeInputTag(workflowId, stepNumber), errorDiv];
+    if (inputTypes.indexOf(SKIP) > -1) {
+      elements.push(makeSkipButton(workflowId, stepNumber));
+    }
+    if (stepNumber < logMessages.length) {
+      elements.push(makeContinueButton(workflowId, complete));
+    }
+    elements.push(makeLog(logMessages, workflowId, stepNumber));
+
     display.empty().append(elements).children("input").focus();
   }
 
