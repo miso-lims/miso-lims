@@ -20,6 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.PoolProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SequencerPartitionContainerProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SequencingContainerModelProgressStep;
 import uk.ac.bbsrc.tgac.miso.service.BarcodableViewService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
@@ -62,6 +63,10 @@ public class BarcodableProgressStepFactory implements ProgressStepFactory {
       SequencerPartitionContainerProgressStep spcStep = new SequencerPartitionContainerProgressStep();
       spcStep.setInput(barcodableViewService.getEntity(view));
       return spcStep;
+    case CONTAINER_MODEL:
+      SequencingContainerModelProgressStep modelStep = new SequencingContainerModelProgressStep();
+      modelStep.setInput(barcodableViewService.getEntity(view));
+      return modelStep;
     default:
       throw new UnsupportedOperationException("Unsupported entity type");
     }
