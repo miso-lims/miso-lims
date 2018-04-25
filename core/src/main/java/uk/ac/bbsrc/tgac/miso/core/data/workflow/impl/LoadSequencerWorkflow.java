@@ -230,7 +230,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
     @Override
     public WorkflowStepPrompt getPrompt() {
-      return new WorkflowStepPrompt(Sets.newHashSet(InputType.SEQUENCING_CONTAINER_MODEL, InputType.STRING),
+      return new WorkflowStepPrompt(Sets.newHashSet(InputType.SEQUENCING_CONTAINER_MODEL),
           "Scan the REF number of the Sequencing Container");
     }
 
