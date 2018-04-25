@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -111,9 +112,20 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   @Override
   public String getConfirmMessage() {
-    return String.format("Sequencing Container %s will be modified to contain the following Pools: %s", spcStep.getSpc().getIdentificationBarcode(),
-        LimsUtils.joinWithConjunction(
-            partitionSteps.stream().filter(s -> s.getPool() != null).map(s -> s.getPool().getAlias()).collect(Collectors.toList()), "and"));
+    List<Pool> poolsScanned = partitionSteps.stream().map(PartitionStep::getPool).filter(Objects::nonNull).collect(Collectors.toList());
+    if (poolsScanned.isEmpty()) {
+      if (spcStep.isKnown()) return "No modifications to make";
+      return String.format("Sequencing Container %s will be saved", spcStep.getBarcode());
+    } else {
+      String poolStrings = LimsUtils.joinWithConjunction(poolsScanned.stream().map(Pool::getAlias).collect(Collectors.toList()), "and");
+      if (spcStep.isKnown()) {
+        return String.format("Sequencing Container %s will be modified to contain the following Pools: %s",
+            spcStep.getSpc().getIdentificationBarcode(), poolStrings);
+      }
+
+      return String.format("Sequencing Container %s will be saved and the following Pools will be added to it: %s", spcStep.getBarcode(),
+          poolStrings);
+    }
   }
 
   @Override
@@ -221,6 +233,10 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
     public SequencerPartitionContainer getSpc() {
       return spcStep.getInput();
+    }
+
+    public String getBarcode() {
+      return spcStep == null ? stringStep.getInput() : spcStep.getInput().getIdentificationBarcode();
     }
   }
 
