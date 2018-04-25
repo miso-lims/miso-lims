@@ -22,7 +22,11 @@
 
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -46,7 +50,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -256,44 +259,5 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
   @Test
   public void testGetModel() throws Exception {
     assertNotNull(dao.get(1L));
-  }
-
-  @Test
-  public void testFindModelByAlias() throws Exception {
-    Platform platform = (Platform) sessionFactory.getCurrentSession().get(Platform.class, 16L);
-    String search = "HiSeq PE Flow Cell v4";
-    int lanes = 8;
-    SequencingContainerModel model = dao.findModel(platform, search, lanes);
-    assertNotNull(model);
-    assertEquals(search, model.getAlias());
-    assertEquals(lanes, model.getPartitionCount());
-  }
-
-  @Test
-  public void testFindModelByBarcode() throws Exception {
-    Platform platform = (Platform) sessionFactory.getCurrentSession().get(Platform.class, 16L);
-    String search = "12345678";
-    int lanes = 8;
-    SequencingContainerModel model = dao.findModel(platform, search, lanes);
-    assertNotNull(model);
-    assertEquals(search, model.getIdentificationBarcode());
-    assertEquals(lanes, model.getPartitionCount());
-  }
-
-  @Test
-  public void testFindFallbackModel() throws Exception {
-    Platform platform = (Platform) sessionFactory.getCurrentSession().get(Platform.class, 16L);
-    String search = null;
-    int lanes = 8;
-    SequencingContainerModel model = dao.findModel(platform, search, lanes);
-    assertNotNull(model);
-    assertEquals(lanes, model.getPartitionCount());
-    assertTrue(model.isFallback());
-  }
-
-  @Test
-  public void testListModels() throws Exception {
-    List<SequencingContainerModel> models = dao.listModels();
-    assertEquals(3, models.size());
   }
 }

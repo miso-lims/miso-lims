@@ -38,27 +38,38 @@ public class HibernateSequencingContainerModelDao implements SequencingContainer
   }
 
   @Override
-  public SequencingContainerModel getModel(long id) {
+  public SequencingContainerModel get(long id) {
     return (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, id);
   }
 
   @Override
-  public SequencingContainerModel findModel(Platform platform, String search, int partitionCount) {
+  public SequencingContainerModel find(Platform platform, String search, int partitionCount) {
+    SequencingContainerModel model;
     Criteria criteria = currentSession().createCriteria(SequencingContainerModel.class);
     criteria.createAlias("platforms", "platform");
     criteria.add(Restrictions.eq("platform.id", platform.getId()));
     criteria.add(Restrictions.eq("partitionCount", partitionCount));
     if (LimsUtils.isStringEmptyOrNull(search)) {
       criteria.add(Restrictions.eq("fallback", true));
+      model = (SequencingContainerModel) criteria.uniqueResult();
     } else {
       criteria.add(Restrictions.or(Restrictions.eq("alias", search), Restrictions.eq("identificationBarcode", search)));
+      model = (SequencingContainerModel) criteria.uniqueResult();
+      if (model == null) {
+        // remove search restriction and get fallback option if search did not retrieve anything
+        Criteria fallback = currentSession().createCriteria(SequencingContainerModel.class);
+        fallback.createAlias("platforms", "platform");
+        fallback.add(Restrictions.eq("platform.id", platform.getId()));
+        fallback.add(Restrictions.eq("partitionCount", partitionCount));
+        fallback.add(Restrictions.eq("fallback", true));
+        model = (SequencingContainerModel) fallback.uniqueResult();
+      }
     }
-    criteria.add(Restrictions.eq("archived", false));
-    return (SequencingContainerModel) criteria.uniqueResult();
+    return model;
   }
 
   @Override
-  public List<SequencingContainerModel> listModels() {
+  public List<SequencingContainerModel> list() {
     Criteria criteria = currentSession().createCriteria(SequencingContainerModel.class);
     @SuppressWarnings("unchecked")
     List<SequencingContainerModel> results = criteria.list();

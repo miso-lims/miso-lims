@@ -28,11 +28,9 @@ import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
@@ -106,19 +104,4 @@ public interface SequencerPartitionContainerStore extends PaginatedDataSource<Se
   public PoreVersion getPoreVersion(long id);
 
   public List<PoreVersion> listPoreVersions();
-
-  public SequencingContainerModel getModel(long id);
-
-  /**
-   * Attempt to find a SequencingContainerModel matching the supplied parameters
-   * 
-   * @param platform the platform to find a model for (required)
-   * @param search the alias or identificationBarcode of the model to search for. If null, will search for a "fallback" model instead
-   * @param partitionCount the number of partitions that the model must have (required)
-   * @return an appropriate model if one is found; null otherwise
-   */
-  public SequencingContainerModel findModel(Platform platform, String search, int partitionCount);
-
-  public List<SequencingContainerModel> listModels();
-
 }
