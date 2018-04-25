@@ -59,7 +59,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   @Override
   public boolean isComplete() {
-    return Stream.concat(Stream.of(spcStep), partitionSteps.stream()).allMatch(this::isComplete);
+    return partitionSteps.size() > 0 && Stream.concat(Stream.of(spcStep), partitionSteps.stream()).allMatch(this::isComplete);
   }
 
   @Override
