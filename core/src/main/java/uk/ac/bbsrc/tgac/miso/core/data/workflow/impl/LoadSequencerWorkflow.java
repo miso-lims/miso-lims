@@ -29,10 +29,10 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   @Override
   protected List<WorkflowStep> getCompletedSteps() {
-    return Stream.concat(Stream.of(spcStep, modelStep), partitionSteps.stream()).filter(this::isComplete).collect(Collectors.toList());
+    return Stream.concat(Stream.of(spcStep, modelStep), partitionSteps.stream()).filter(this::hasInput).collect(Collectors.toList());
   }
 
-  private boolean isComplete(WorkflowStep step) {
+  private boolean hasInput(WorkflowStep step) {
     return step.getProgressStep() != null;
   }
 
@@ -59,7 +59,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   @Override
   public boolean isComplete() {
-    return partitionSteps.size() > 0 && Stream.concat(Stream.of(spcStep), partitionSteps.stream()).allMatch(this::isComplete);
+    return partitionSteps.size() > 0 && Stream.concat(Stream.of(spcStep), partitionSteps.stream()).allMatch(this::hasInput);
   }
 
   @Override
@@ -96,9 +96,9 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   @Override
   public void cancelInput() {
-    if (partitionSteps.stream().anyMatch(this::isComplete)) {
+    if (partitionSteps.stream().anyMatch(this::hasInput)) {
       getLastCompletedPartitionStep().cancelInput();
-    } else if (isComplete(modelStep)) {
+    } else if (hasInput(modelStep)) {
       modelStep.cancelInput();
     } else {
       spcStep.cancelInput();
@@ -106,7 +106,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   }
 
   private PartitionStep getLastCompletedPartitionStep() {
-    return partitionSteps.stream().filter(this::isComplete).reduce((first, second) -> second).orElse(null);
+    return partitionSteps.stream().filter(this::hasInput).reduce((first, second) -> second).orElse(null);
   }
 
   @Override
