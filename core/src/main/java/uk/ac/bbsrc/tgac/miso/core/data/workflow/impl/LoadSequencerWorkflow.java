@@ -14,6 +14,7 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.AbstractWorkflow;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
@@ -130,7 +131,21 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   @Override
   public void execute(WorkflowExecutor workflowExecutor) throws IOException {
-    // todo
+    if (!isComplete()) throw new IllegalStateException("Workflow is not complete");
+
+    SequencerPartitionContainer spc;
+    if (spcStep.isKnown()) {
+      spc  = spcStep.getSpc();
+    } else {
+      spc = new SequencerPartitionContainerImpl();
+      SequencingContainerModel model = modelStep.getModel();
+      spc.setModel(model);
+      spc.setPartitionLimit(model.getPartitionCount());
+    }
+    for (int i = 0; i < partitionSteps.size(); ++i) {
+      spc.getPartitionAt(i).setPool(partitionSteps.get(i).getPool());
+    }
+    workflowExecutor.save(spc);
   }
 
   @Override

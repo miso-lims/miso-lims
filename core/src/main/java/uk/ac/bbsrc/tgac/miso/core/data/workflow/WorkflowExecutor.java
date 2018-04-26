@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.workflow;
 import java.io.IOException;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 
 /**
  * Responsible for supporting all of the necessary methods a Workflow will need to execute itself.
@@ -13,4 +14,6 @@ public interface WorkflowExecutor {
    * Create or update a pool in the database
    */
   Pool save(Pool pool) throws IOException;
+
+  SequencerPartitionContainer save(SequencerPartitionContainer spc) throws IOException;
 }
