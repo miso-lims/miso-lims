@@ -145,7 +145,7 @@ var HotUtils = {
       cells: function(row, col, prop) {
         var cellProperties = {};
 
-        if (flatObjects[row].saved) {
+        if (flatObjects[row] && flatObjects[row].saved) {
           cellProperties.readOnly = true;
         }
 
