@@ -114,7 +114,7 @@ public class LoadSequencerWorkflowTest {
     assertEquals(
         Arrays.asList(String.format("Scanned existing Sequencing Container %s", SPC_BARCODE), "Skipped partition 1", "Skipped partition 2"),
         workflow.getLog());
-    assertEquals("No modifications to make", workflow.getConfirmMessage());
+    assertEquals(String.format("All Pools will be removed from Sequencing Container %s", SPC_BARCODE), workflow.getConfirmMessage());
   }
 
   @Test

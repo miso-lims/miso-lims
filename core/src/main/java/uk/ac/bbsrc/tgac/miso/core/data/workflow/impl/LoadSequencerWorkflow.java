@@ -115,7 +115,8 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   public String getConfirmMessage() {
     List<Pool> poolsScanned = partitionSteps.stream().map(PartitionStep::getPool).filter(Objects::nonNull).collect(Collectors.toList());
     if (poolsScanned.isEmpty()) {
-      if (spcStep.isKnown()) return "No modifications to make";
+      if (spcStep.isKnown())
+        return String.format("All Pools will be removed from Sequencing Container %s", spcStep.getSpc().getIdentificationBarcode());
       return String.format("Sequencing Container %s will be saved", spcStep.getBarcode());
     } else {
       String poolStrings = LimsUtils.joinWithConjunction(poolsScanned.stream().map(Pool::getAlias).collect(Collectors.toList()), "and");
