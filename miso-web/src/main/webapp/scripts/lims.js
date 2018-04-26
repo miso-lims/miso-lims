@@ -317,6 +317,32 @@ var Utils = Utils
               showButtonPanel: true,
             });
             break;
+          case 'compare':
+            input = document.createElement('DIV');
+            var compareTypeControl = document.createElement('SELECT');
+            var values = ['ignore', '>', '>=', '=', '<=', '<'];
+            values.forEach(function(value, index) {
+              var option = document.createElement('OPTION');
+              option.text = field.getLabel ? field.getLabel(value) : value;
+              option.value = index;
+              compareTypeControl.appendChild(option);
+            });
+            compareTypeControl.value = 0;
+            output[field.compareTypeProperty] = 'ignore';
+            compareTypeControl.onchange = function() {
+              output[field.compareTypeProperty] = values[parseInt(compareTypeControl.value)];
+            };
+            input.appendChild(compareTypeControl);
+
+            var valueControl = document.createElement('INPUT');
+            valueControl.setAttribute('type', 'text');
+            valueControl.value = field.value || 0;
+            output[field.valueProperty] = field.value || 0;
+            valueControl.onchange = function() {
+              output[field.valueProperty] = parseFloat(valueControl.value);
+            };
+            input.appendChild(valueControl);
+            break;
           default:
             throw "Unknown field type: " + field.type;
           }

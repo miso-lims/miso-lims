@@ -73,6 +73,57 @@ HotTarget.library = (function() {
     };
   };
 
+  var checkQcs = function(table) {
+    Utils.showDialog('QC Criteria', 'Check', [{
+      label: 'Concentration',
+      type: 'compare',
+      compareTypeProperty: 'concentrationCompareType',
+      valueProperty: 'concentrationCompareValue'
+    }, {
+      label: 'Volume',
+      type: 'compare',
+      compareTypeProperty: 'volumeCompareType',
+      valueProperty: 'volumeCompareValue'
+    }, {
+      label: 'Size',
+      type: 'compare',
+      compareTypeProperty: 'sizeCompareType',
+      valueProperty: 'sizeCompareValue'
+    }], function(output) {
+      var rowCount = table.countRows();
+      var changes = [];
+      for (var row = 0; row < rowCount; row++) {
+        var concentration = table.getDataAtRowProp(row, 'concentration');
+        var volume = table.getDataAtRowProp(row, 'volume');
+        var size = table.getDataAtRowProp(row, 'dnaSize');
+        var pass = checkQc(concentration, output.concentrationCompareType, output.concentrationCompareValue)
+            && checkQc(volume, output.volumeCompareType, output.volumeCompareValue)
+            && checkQc(size, output.sizeCompareType, output.sizeCompareValue);
+        changes.push([row, 'qcPassed', pass ? 'True' : 'False']);
+      }
+      table.setDataAtRowProp(changes);
+    });
+  };
+
+  var checkQc = function(value, compareType, compareValue) {
+    switch (compareType) {
+    case 'ignore':
+      return true;
+    case '>':
+      return value > compareValue;
+    case '>=':
+      return value >= compareValue;
+    case '=':
+      return value == compareValue;
+    case '<=':
+      return value <= compareValue;
+    case '<':
+      return value < compareValue;
+    default:
+      throw 'Unknown compare type: ' + compareType;
+    }
+  };
+
   return {
     createUrl: '/miso/rest/library',
     updateUrl: '/miso/rest/library/',
@@ -399,7 +450,12 @@ HotTarget.library = (function() {
     },
 
     getCustomActions: function(table) {
-      return HotTarget.boxable.getCustomActions(table);
+      return HotTarget.boxable.getCustomActions(table).concat([{
+        buttonText: 'Check QCs',
+        eventHandler: function() {
+          checkQcs(table);
+        }
+      }]);
     },
 
     getBulkActions: function(config) {
