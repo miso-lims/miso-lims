@@ -24,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
 public class LoadSequencerWorkflowTest {
   private static final WorkflowName WORKFLOW_NAME = LOAD_SEQUENCER;
   private static final String SPC_BARCODE = "spc_barcode";
+  private static final String UNKNOWN_SPC_BARCODE = "unknown_barcode";
   private static SequencingContainerModel MODEL;
   static {
     MODEL = new SequencingContainerModel();
@@ -49,7 +50,7 @@ public class LoadSequencerWorkflowTest {
   }
 
   @Test
-  public void testProcessSequencingPartitionContainer() {
+  public void testProcessKnownSpc() {
     Workflow workflow = makeWorkflow();
     workflow.processInput(0, makeSpcStep(MODEL, SPC_BARCODE));
 
@@ -60,7 +61,37 @@ public class LoadSequencerWorkflowTest {
     assertEquals(Collections.singletonList(String.format("Scanned existing Sequencing Container %s", SPC_BARCODE)), workflow.getLog());
   }
 
+  @Test
+  public void testProcessUnknownSpc() {
+    Workflow workflow = makeWorkflow();
+    workflow.processInput(0, makeStringProgressStep(UNKNOWN_SPC_BARCODE));
+
+    assertEquivalent(makeProgress(WORKFLOW_NAME, makeStringProgressStep(UNKNOWN_SPC_BARCODE, 0)), workflow.getProgress());
+    assertSpcPrompt(workflow.getStep(0));
+    assertModelPrompt(workflow.getStep(1));
+    assertFalse(workflow.isComplete());
+    assertEquals(Collections.singletonList(String.format("Scanned new Sequencing Container %s", UNKNOWN_SPC_BARCODE)), workflow.getLog());
+  }
+
+  private void assertModelPrompt(WorkflowStepPrompt prompt) {
+    assertEquals(Sets.newHashSet(InputType.SEQUENCING_CONTAINER_MODEL), prompt.getInputTypes());
+    assertEquals("Scan the REF number of the Sequencing Container", prompt.getMessage());
+  }
+
+  private StringProgressStep makeStringProgressStep(String input) {
+    StringProgressStep step = new StringProgressStep();
+    step.setInput(input);
+    return step;
+  }
+
+  private StringProgressStep makeStringProgressStep(String input, int stepNumber) {
+    StringProgressStep step = makeStringProgressStep(input);
+    step.setStepNumber(stepNumber);
+    return step;
+  }
+
   private void assertPoolPrompt(WorkflowStepPrompt prompt, int partitionNumber) {
+    assertEquals(Sets.newHashSet(InputType.POOL, InputType.SKIP), prompt.getInputTypes());
     assertEquals(String.format("Scan a Pool to assign to partition %d, or enter no input to skip this partition", partitionNumber),
         prompt.getMessage());
   }
