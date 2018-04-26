@@ -98,7 +98,7 @@ public class LoadSequencerWorkflowTest {
     assertPoolPrompt(workflow.getStep(2), 1);
     assertFalse(workflow.isComplete());
     assertEquals(Arrays.asList(String.format("Scanned new Sequencing Container %s", UNKNOWN_SPC_BARCODE),
-        String.format("Selected Sequencing Container Model %s", MODEL.getIdentificationBarcode())), workflow.getLog());
+        String.format("Selected Sequencing Container Model %s", MODEL.getAlias())), workflow.getLog());
   }
 
   @Test
@@ -159,6 +159,26 @@ public class LoadSequencerWorkflowTest {
         Arrays.asList(String.format("Scanned new Sequencing Container %s", UNKNOWN_SPC_BARCODE),
             String.format("Selected Sequencing Container Model %s", MODEL.getAlias()), "Skipped partition 1", "Skipped partition 2"),
         workflow.getLog());
+  }
+
+  @Test
+  public void testProcessModelAndPools() {
+    StringProgressStep stringStep = makeStringProgressStep(UNKNOWN_SPC_BARCODE, 0);
+    SequencingContainerModelProgressStep modelStep = makeModelStep(MODEL, 1);
+    PoolProgressStep poolStep1 = makePoolStep(makePool(POOL_ALIAS_1, POOL_NAME_1), 2);
+    PoolProgressStep poolStep2 = makePoolStep(makePool(POOL_ALIAS_2, POOL_NAME_2), 3);
+    Workflow workflow = makeWorkflow(WORKFLOW_NAME, stringStep, modelStep, poolStep1, poolStep2);
+
+    assertEquivalent(makeProgress(WORKFLOW_NAME, stringStep, modelStep, poolStep1, poolStep2), workflow.getProgress());
+    assertSpcPrompt(workflow.getStep(0));
+    assertModelPrompt(workflow.getStep(1));
+    assertPoolPrompt(workflow.getStep(2), 1);
+    assertPoolPrompt(workflow.getStep(3), 2);
+    assertTrue(workflow.isComplete());
+    assertEquals(Arrays.asList(String.format("Scanned new Sequencing Container %s", UNKNOWN_SPC_BARCODE),
+        String.format("Selected Sequencing Container Model %s", MODEL.getAlias()),
+        String.format("Selected Pool %s (%s) for partition 1", POOL_ALIAS_1, POOL_NAME_1),
+        String.format("Selected Pool %s (%s) for partition 2", POOL_ALIAS_2, POOL_NAME_2)), workflow.getLog());
   }
 
   private PoolProgressStep makePoolStep(Pool pool, int stepNumber) {
