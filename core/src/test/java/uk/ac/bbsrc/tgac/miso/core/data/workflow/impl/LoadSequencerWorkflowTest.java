@@ -51,11 +51,18 @@ public class LoadSequencerWorkflowTest {
   @Test
   public void testProcessSequencingPartitionContainer() {
     Workflow workflow = makeWorkflow();
-    SequencingContainerModel model1 = new SequencingContainerModel();
-    model1.setPartitionCount(1);
     workflow.processInput(0, makeSpcStep(MODEL, SPC_BARCODE));
 
     assertEquivalent(makeProgress(WORKFLOW_NAME, makeSpcStep(MODEL, SPC_BARCODE, 0)), workflow.getProgress());
+    assertSpcPrompt(workflow.getStep(0));
+    assertPoolPrompt(workflow.getStep(1), 1);
+    assertFalse(workflow.isComplete());
+    assertEquals(Collections.singletonList(String.format("Scanned existing Sequencing Container %s", SPC_BARCODE)), workflow.getLog());
+  }
+
+  private void assertPoolPrompt(WorkflowStepPrompt prompt, int partitionNumber) {
+    assertEquals(String.format("Scan a Pool to assign to partition %d, or enter no input to skip this partition", partitionNumber),
+        prompt.getMessage());
   }
 
   private void assertNoInput(Workflow workflow) {
