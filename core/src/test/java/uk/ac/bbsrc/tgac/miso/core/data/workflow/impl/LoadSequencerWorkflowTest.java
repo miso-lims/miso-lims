@@ -17,7 +17,9 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
@@ -28,7 +30,11 @@ public class LoadSequencerWorkflowTest {
   private static final WorkflowName WORKFLOW_NAME = LOAD_SEQUENCER;
   private static final String SPC_BARCODE = "spc_barcode";
   private static final String UNKNOWN_SPC_BARCODE = "unknown_barcode";
-  private static SequencingContainerModel MODEL = makeModel(2);
+  private static final String POOL_ALIAS_1 = "Pool_alias_1";
+  private static final String POOL_NAME_1 = "Pool_name_1";
+  private static final String POOL_ALIAS_2 = "Pool_alias_2";
+  private static final String POOL_NAME_2 = "Pool_name_2";
+  private static final SequencingContainerModel MODEL = makeModel(2);
 
   @Test
   public void testNoInput() {
@@ -48,8 +54,7 @@ public class LoadSequencerWorkflowTest {
 
   @Test
   public void testProcessKnownSpc() {
-    Workflow workflow = makeWorkflow(WORKFLOW_NAME);
-    workflow.processInput(0, makeSpcStep(MODEL, SPC_BARCODE));
+    Workflow workflow = makeWorkflow(WORKFLOW_NAME, makeSpcStep(MODEL, SPC_BARCODE));
 
     assertEquivalent(makeProgress(WORKFLOW_NAME, makeSpcStep(MODEL, SPC_BARCODE, 0)), workflow.getProgress());
     assertSpcPrompt(workflow.getStep(0));
@@ -60,8 +65,7 @@ public class LoadSequencerWorkflowTest {
 
   @Test
   public void testProcessUnknownSpc() {
-    Workflow workflow = makeWorkflow(WORKFLOW_NAME);
-    workflow.processInput(0, makeStringProgressStep(UNKNOWN_SPC_BARCODE));
+    Workflow workflow = makeWorkflow(WORKFLOW_NAME, makeStringProgressStep(UNKNOWN_SPC_BARCODE));
 
     assertEquivalent(makeProgress(WORKFLOW_NAME, makeStringProgressStep(UNKNOWN_SPC_BARCODE, 0)), workflow.getProgress());
     assertSpcPrompt(workflow.getStep(0));
@@ -78,9 +82,7 @@ public class LoadSequencerWorkflowTest {
 
   @Test
   public void testProcessModel() {
-    Workflow workflow = makeWorkflow(WORKFLOW_NAME);
-    workflow.processInput(0, makeStringProgressStep(UNKNOWN_SPC_BARCODE));
-    workflow.processInput(1, makeModelStep(MODEL));
+    Workflow workflow = makeWorkflow(WORKFLOW_NAME, makeStringProgressStep(UNKNOWN_SPC_BARCODE, 0), makeModelStep(MODEL, 1));
 
     assertEquivalent(makeProgress(WORKFLOW_NAME, makeStringProgressStep(UNKNOWN_SPC_BARCODE, 0), makeModelStep(MODEL, 1)),
         workflow.getProgress());
@@ -93,11 +95,8 @@ public class LoadSequencerWorkflowTest {
   }
 
   @Test
-  public void testProcessKnownSPCAndSkipPartitions() {
-    Workflow workflow = makeWorkflow(WORKFLOW_NAME);
-    workflow.processInput(0, makeSpcStep(MODEL, SPC_BARCODE));
-    workflow.processInput(1, new SkipProgressStep());
-    workflow.processInput(2, new SkipProgressStep());
+  public void testProcessKnownSpcAndSkipPartitions() {
+    Workflow workflow = makeWorkflow(WORKFLOW_NAME, makeSpcStep(MODEL, SPC_BARCODE, 0), makeSkipStep(1), makeSkipStep(2));
 
     assertEquivalent(makeProgress(WORKFLOW_NAME, makeSpcStep(MODEL, SPC_BARCODE, 0), makeSkipStep(1), makeSkipStep(2)),
         workflow.getProgress());
@@ -109,6 +108,44 @@ public class LoadSequencerWorkflowTest {
         Arrays.asList(String.format("Scanned existing Sequencing Container %s", SPC_BARCODE), "Skipped partition 1", "Skipped partition 2"),
         workflow.getLog());
     assertEquals("No modifications to make", workflow.getConfirmMessage());
+  }
+
+  @Test
+  public void testProcessKnownSpcAndPools() {
+    SequencerPartitionContainerProgressStep spcStep = makeSpcStep(MODEL, SPC_BARCODE, 0);
+    PoolProgressStep poolStep1 = makePoolStep(makePool(POOL_ALIAS_1, POOL_NAME_1), 1);
+    PoolProgressStep poolStep2 = makePoolStep(makePool(POOL_ALIAS_2, POOL_NAME_2), 2);
+
+    Workflow workflow = makeWorkflow(WORKFLOW_NAME, spcStep, poolStep1, poolStep2);
+
+    assertEquivalent(makeProgress(WORKFLOW_NAME, spcStep, poolStep1, poolStep2), workflow.getProgress());
+    assertSpcPrompt(workflow.getStep(0));
+    assertPoolPrompt(workflow.getStep(1), 1);
+    assertPoolPrompt(workflow.getStep(2), 2);
+    assertTrue(workflow.isComplete());
+    assertEquals(
+        Arrays.asList(String.format("Scanned existing Sequencing Container %s", SPC_BARCODE),
+            String.format("Selected Pool %s (%s) for partition %d", poolStep1.getInput().getAlias(), poolStep1.getInput().getName(), 1),
+            String.format("Selected Pool %s (%s) for partition %d", poolStep2.getInput().getAlias(), poolStep2.getInput().getName(), 2)),
+        workflow.getLog());
+    assertEquals(
+        String.format("Sequencing Container %s will be modified to contain the following Pools: %s and %s",
+            spcStep.getInput().getIdentificationBarcode(), poolStep1.getInput().getAlias(), poolStep2.getInput().getAlias()),
+        workflow.getConfirmMessage());
+  }
+
+  private PoolProgressStep makePoolStep(Pool pool, int stepNumber) {
+    PoolProgressStep step = new PoolProgressStep();
+    step.setInput(pool);
+    step.setStepNumber(stepNumber);
+    return step;
+  }
+
+  private Pool makePool(String alias, String name) {
+    Pool pool = new PoolImpl();
+    pool.setAlias(alias);
+    pool.setName(name);
+    return pool;
   }
 
   private SkipProgressStep makeSkipStep(int stepNumber) {
