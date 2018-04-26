@@ -25,11 +25,8 @@ public class LoadSequencerWorkflowTest {
   private static final WorkflowName WORKFLOW_NAME = LOAD_SEQUENCER;
   private static final String SPC_BARCODE = "spc_barcode";
   private static final String UNKNOWN_SPC_BARCODE = "unknown_barcode";
-  private static SequencingContainerModel MODEL;
-  static {
-    MODEL = new SequencingContainerModel();
-    MODEL.setPartitionCount(2);
-  }
+  private static final String MODEL_ALIAS = "Model Alias";
+  private static SequencingContainerModel MODEL = makeModel(MODEL_ALIAS, 2);
 
   @Test
   public void testNoInput() {
@@ -71,6 +68,37 @@ public class LoadSequencerWorkflowTest {
     assertModelPrompt(workflow.getStep(1));
     assertFalse(workflow.isComplete());
     assertEquals(Collections.singletonList(String.format("Scanned new Sequencing Container %s", UNKNOWN_SPC_BARCODE)), workflow.getLog());
+  }
+
+  private static SequencingContainerModel makeModel(String alias, int partitionCount) {
+    SequencingContainerModel model = new SequencingContainerModel();
+    model.setPartitionCount(partitionCount);
+    return model;
+  }
+
+  @Test
+  public void testProcessModel() {
+    Workflow workflow = makeWorkflow();
+    workflow.processInput(0, makeStringProgressStep(UNKNOWN_SPC_BARCODE));
+    workflow.processInput(1, makeModelStep(MODEL));
+
+    assertEquivalent(makeProgress(WORKFLOW_NAME, makeStringProgressStep(UNKNOWN_SPC_BARCODE, 0), makeModelStep(MODEL, 1)),
+        workflow.getProgress());
+    assertSpcPrompt(workflow.getStep(0));
+    assertModelPrompt(workflow.getStep(1));
+    assertPoolPrompt(workflow.getStep(2), 1);
+  }
+
+  private SequencingContainerModelProgressStep makeModelStep(SequencingContainerModel model, int stepNumber) {
+    SequencingContainerModelProgressStep step = makeModelStep(model);
+    step.setStepNumber(stepNumber);
+    return step;
+  }
+
+  private SequencingContainerModelProgressStep makeModelStep(SequencingContainerModel model) {
+    SequencingContainerModelProgressStep step = new SequencingContainerModelProgressStep();
+    step.setInput(model);
+    return step;
   }
 
   private void assertModelPrompt(WorkflowStepPrompt prompt) {

@@ -52,6 +52,9 @@ class WorkflowTestUtils {
           assertEquals(((StringProgressStep) expectedStep).getInput(), ((StringProgressStep) actualStep).getInput());
         } else if (expectedStep instanceof SkipProgressStep) {
           // All SkipProgressSteps are equivalent
+        } else if (expectedStep instanceof SequencingContainerModelProgressStep) {
+          assertEquals(((SequencingContainerModelProgressStep) expectedStep).getInput(),
+              ((SequencingContainerModelProgressStep) actualStep).getInput());
         } else {
           fail("Unexpected ProgressStep type");
         }
