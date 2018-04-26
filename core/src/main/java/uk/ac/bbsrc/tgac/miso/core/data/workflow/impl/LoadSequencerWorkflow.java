@@ -261,7 +261,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
     @Override
     public String getLogMessage() {
-      return String.format("Selected Sequencing Container Model %s", modelStep.getInput().getIdentificationBarcode());
+      return String.format("Selected Sequencing Container Model %s", modelStep.getInput().getAlias());
     }
 
     @Override
