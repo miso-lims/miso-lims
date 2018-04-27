@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName.LOAD_SEQUENCER;
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.WorkflowTestUtils.assertEquivalent;
@@ -52,6 +53,7 @@ public class TestWorkflowTest {
     assertThrows(IllegalArgumentException.class, () -> workflow.getStep(1));
     assertFalse(workflow.isComplete());
     assertEquals(Collections.emptyList(), workflow.getLog());
+    assertEquals(new Integer(0), workflow.getNextStepNumber());
   }
 
   @Test
@@ -97,6 +99,7 @@ public class TestWorkflowTest {
     assertThrows(IllegalArgumentException.class, () -> workflow.getStep(2));
     assertFalse(workflow.isComplete());
     assertEquals(Collections.singletonList(String.format("Entered concentration value: %d", input)), workflow.getLog());
+    assertEquals(new Integer(1), workflow.getNextStepNumber());
   }
 
   @Test
@@ -140,6 +143,7 @@ public class TestWorkflowTest {
     assertEquals(
         Arrays.asList(String.format("Entered concentration value: %d", intInput), String.format("Selected Pool %s (%s)", poolAlias, poolName)),
         workflow.getLog());
+    assertNull(workflow.getNextStepNumber());
   }
 
   @Test
