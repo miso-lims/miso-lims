@@ -8,6 +8,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.LoadSequencerWorkflow;
 public interface Workflow {
   Progress getProgress();
 
+  /**
+   * setProgress must be called exactly once immediately after creating a Workflow
+   */
   void setProgress(Progress progress);
 
   /**
