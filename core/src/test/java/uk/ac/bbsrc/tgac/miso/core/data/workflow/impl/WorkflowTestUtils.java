@@ -12,6 +12,7 @@ import java.util.List;
 import junit.framework.AssertionFailedError;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Progress;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
 
 class WorkflowTestUtils {
   static <T extends Throwable> void assertThrows(Class<T> expectedType, Runnable runnable) {
@@ -67,6 +68,10 @@ class WorkflowTestUtils {
     progress.setSteps(Arrays.asList(steps));
 
     return progress;
+  }
+
+  static Workflow makeWorkflow(WorkflowName workflowName, ProgressStep... steps) {
+    return workflowName.createWorkflow(makeProgress(workflowName, steps));
   }
 
   private static Progress makeProgress(WorkflowName workflowName) {

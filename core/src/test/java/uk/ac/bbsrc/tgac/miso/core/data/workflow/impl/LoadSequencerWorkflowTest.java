@@ -9,6 +9,7 @@ import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName.LOA
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.WorkflowTestUtils.assertEquivalent;
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.WorkflowTestUtils.assertThrows;
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.WorkflowTestUtils.makeProgress;
+import static uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.WorkflowTestUtils.makeWorkflow;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,7 +23,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
-import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
 
@@ -45,12 +45,6 @@ public class LoadSequencerWorkflowTest {
   @Test
   public void testProcessInvalidInput() {
     assertThrows(IllegalArgumentException.class, () -> makeWorkflow(WORKFLOW_NAME).processInput(0, new PoolProgressStep()));
-  }
-
-  private Workflow makeWorkflow(WorkflowName workflowName, ProgressStep... progressSteps) {
-    Workflow workflow = new LoadSequencerWorkflow();
-    workflow.setProgress(makeProgress(workflowName, progressSteps));
-    return workflow;
   }
 
   @Test
