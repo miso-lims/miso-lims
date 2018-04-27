@@ -144,6 +144,8 @@ public class TestWorkflowTest {
         Arrays.asList(String.format("Entered concentration value: %d", intInput), String.format("Selected Pool %s (%s)", poolAlias, poolName)),
         workflow.getLog());
     assertNull(workflow.getNextStepNumber());
+    assertEquals(String.format("Pool %s (%s) will be modified to have concentration %d.", poolAlias, poolName, intInput),
+        workflow.getConfirmMessage());
   }
 
   @Test
