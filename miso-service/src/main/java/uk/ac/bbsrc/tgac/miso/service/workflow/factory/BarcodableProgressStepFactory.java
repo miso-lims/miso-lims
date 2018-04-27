@@ -25,6 +25,9 @@ import uk.ac.bbsrc.tgac.miso.service.BarcodableViewService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 
+/**
+ * Attempts to create a ProgressStep by using a BarcodableViewService to search for a barcode, and then retrieving the appropriate entity.
+ */
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class BarcodableProgressStepFactory implements ProgressStepFactory {
