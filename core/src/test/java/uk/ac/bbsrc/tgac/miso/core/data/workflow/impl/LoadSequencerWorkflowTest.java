@@ -34,8 +34,8 @@ public class LoadSequencerWorkflowTest {
   private static final String POOL_NAME_1 = "Pool_name_1";
   private static final String POOL_ALIAS_2 = "Pool_alias_2";
   private static final String POOL_NAME_2 = "Pool_name_2";
-  private static final String MODEL_ALILAS = "Model Alias";
-  private static final SequencingContainerModel MODEL = makeModel(MODEL_ALILAS, 2);
+  private static final String MODEL_ALIAS = "Model Alias";
+  private static final SequencingContainerModel MODEL = makeModel(MODEL_ALIAS, 2);
 
   @Test
   public void testNoInput() {
@@ -70,14 +70,9 @@ public class LoadSequencerWorkflowTest {
   }
 
   private static SequencingContainerModel makeModel(String alias, int partitionCount) {
-    SequencingContainerModel model = makeModel(partitionCount);
-    model.setAlias(alias);
-    return model;
-  }
-
-  private static SequencingContainerModel makeModel(int partitionCount) {
     SequencingContainerModel model = new SequencingContainerModel();
     model.setPartitionCount(partitionCount);
+    model.setAlias(alias);
     return model;
   }
 
@@ -177,8 +172,7 @@ public class LoadSequencerWorkflowTest {
 
   @Test
   public void testCancelInput() {
-    SequencerPartitionContainerProgressStep spcsStep = makeSpcStep(MODEL, SPC_BARCODE, 0);
-    Workflow workflow = makeWorkflow(WORKFLOW_NAME, spcsStep);
+    Workflow workflow = makeWorkflow(WORKFLOW_NAME, makeSpcStep(MODEL, SPC_BARCODE, 0));
     workflow.cancelInput();
 
     assertEquivalent(makeProgress(WORKFLOW_NAME), workflow.getProgress());
@@ -186,6 +180,22 @@ public class LoadSequencerWorkflowTest {
     assertFalse(workflow.isComplete());
     assertEquals(Collections.emptyList(), workflow.getLog());
     assertEquals(new Integer(0), workflow.getNextStepNumber());
+  }
+
+  @Test
+  public void testReprocessPartition() {
+    SequencingContainerModel model = new SequencingContainerModel();
+    model.setPartitionCount(1);
+    SequencerPartitionContainerProgressStep spcStep = makeSpcStep(makeModel(MODEL_ALIAS, 1), SPC_BARCODE, 0);
+    SkipProgressStep skipStep = makeSkipStep(1);
+    Workflow workflow = makeWorkflow(WORKFLOW_NAME, spcStep);
+    workflow.processInput(1, makePoolStep(makePool(POOL_ALIAS_1, POOL_NAME_1), 1));
+    workflow.processInput(1, skipStep);
+
+    assertEquivalent(makeProgress(WORKFLOW_NAME, spcStep, skipStep), workflow.getProgress());
+    assertTrue(workflow.isComplete());
+    assertEquals(Arrays.asList(String.format("Scanned existing Sequencing Container %s", SPC_BARCODE), "Skipped partition 1"),
+        workflow.getLog());
   }
 
   private PoolProgressStep makePoolStep(Pool pool, int stepNumber) {
