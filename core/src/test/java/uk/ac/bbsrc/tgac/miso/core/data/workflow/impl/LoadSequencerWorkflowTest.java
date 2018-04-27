@@ -181,6 +181,19 @@ public class LoadSequencerWorkflowTest {
         String.format("Selected Pool %s (%s) for partition 2", POOL_ALIAS_2, POOL_NAME_2)), workflow.getLog());
   }
 
+  @Test
+  public void testCancelInput() {
+    SequencerPartitionContainerProgressStep spcsStep = makeSpcStep(MODEL, SPC_BARCODE, 0);
+    Workflow workflow = makeWorkflow(WORKFLOW_NAME, spcsStep);
+    workflow.cancelInput();
+
+    assertEquivalent(makeProgress(WORKFLOW_NAME), workflow.getProgress());
+    assertSpcPrompt(workflow.getStep(0));
+    assertFalse(workflow.isComplete());
+    assertEquals(Collections.emptyList(), workflow.getLog());
+    assertEquals(new Integer(0), workflow.getNextStepNumber());
+  }
+
   private PoolProgressStep makePoolStep(Pool pool, int stepNumber) {
     PoolProgressStep step = new PoolProgressStep();
     step.setInput(pool);
