@@ -195,6 +195,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
     @Override
     public void processInput(SkipProgressStep step) {
+      this.poolStep = null;
       this.skipStep = step;
     }
 
