@@ -58,7 +58,8 @@ public interface Workflow {
   Integer getNextStepNumber();
 
   /**
-   * Represents a type of Workflow.  Should have a one-to-one correspondence with every implementation of Workflow
+   * Represents a type of Workflow.  Should have a one-to-one correspondence with every implementation of Workflow.
+   * All Workflows should be created through a call to createWorkflow(Progress)
    */
   enum WorkflowName {
     LOAD_SEQUENCER {
