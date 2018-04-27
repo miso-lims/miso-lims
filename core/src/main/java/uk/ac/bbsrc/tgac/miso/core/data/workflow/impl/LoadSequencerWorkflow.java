@@ -144,7 +144,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
       spc.setPartitionLimit(model.getPartitionCount());
     }
     for (int i = 0; i < partitionSteps.size(); ++i) {
-      spc.getPartitionAt(i).setPool(partitionSteps.get(i).getPool());
+      spc.getPartitionAt(i + 1).setPool(partitionSteps.get(i).getPool());
     }
     workflowExecutor.save(spc);
   }
