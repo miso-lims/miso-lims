@@ -114,21 +114,21 @@ public enum Driver {
       sb.append("J\n");
       sb.append("O R\n");
       sb.append("S l1;0.0,0.00,25.0,25.5,25.0\n");
-      sb.append("B 1.5,2,0,DATAMATRIX,0.3;").append(barcode).append("\n");
-      if (barcodable.getLabelText().length() > 14) {
-        sb.append("T 7.5,3,0,3,2;");
-        appendBradyEscapedUnicode(sb, barcodable.getLabelText().substring(0, 14));
+      sb.append("B 11,12,0,DATAMATRIX,0.3;").append(barcode).append("\n");
+      if (barcodable.getLabelText().length() > 17) {
+        sb.append("T 2,4,0,3,2;");
+        appendBradyEscapedUnicode(sb, barcodable.getLabelText().substring(0, 17));
         sb.append("\n");
-        sb.append("T 7.5,6,0,3,2;");
-        appendTruncated(14, barcodable.getLabelText().substring(14), s -> appendBradyEscapedUnicode(sb, s));
+        sb.append("T 2,7,0,3,2;");
+        appendTruncated(14, barcodable.getLabelText().substring(17), s -> appendBradyEscapedUnicode(sb, s));
         sb.append("\n");
       } else {
-        sb.append("T 7.5,3,0,3,2;");
+        sb.append("T 2,4,0,3,2;");
         appendTruncated(14, barcodable.getLabelText(), s -> appendBradyEscapedUnicode(sb, s));
         sb.append("\n");
       }
       if (barcodable.getBarcodeDate() != null) {
-        sb.append("T 7.5,9,0,3,2;");
+        sb.append("T 2,10,0,3,2;");
         sb.append(LimsUtils.formatDate(barcodable.getBarcodeDate()));
         sb.append("\n");
       }
@@ -190,28 +190,28 @@ public enum Driver {
       sb.append("^LL0185\r\n");
       sb.append("^LS0\r\n");
       if (b.getAlias().length() > 15) {
-        sb.append("^FT16,57^A0N,20,19^FH\\^FD");
+        sb.append("^FT16,59^A0N,20,19^FH\\^FD");
         sb.append(b.getAlias().substring(0, 15));
         sb.append("^FS\r\n");
-        sb.append("^FT16,81^A0N,20,19^FH\\^FD");
+        sb.append("^FT16,83^A0N,20,19^FH\\^FD");
         appendTruncated(15, b.getAlias().substring(15), sb::append);
         sb.append("^FS\r\n");
       } else {
-        sb.append("^FT16,57^A0N,20,19^FH\\^FD");
+        sb.append("^FT16,59^A0N,20,19^FH\\^FD");
         sb.append(b.getAlias());
         sb.append("^FS\r\n");
 
       }
       if (b.getBarcodeDate() != null) {
-        sb.append("^FT12,169^A0N,17,16^FH\\^FD");
+        sb.append("^FT12,171^A0N,17,16^FH\\^FD");
         sb.append(LimsUtils.formatDate(b.getBarcodeDate()));
         sb.append("^FS\r\n");
       }
-      sb.append("^BY42,42^FT150,176^BXN,3,200,0,0,1,~\r\n");
+      sb.append("^BY42,42^FT300,360^BXN,3,200,0,0,1,~\r\n");
       sb.append("^FH\\^FD");
       sb.append(getBarcode(b));
       sb.append("^FS\r\n");
-      sb.append("^FT16,110^A0N,20,19^FH\\^FD");
+      sb.append("^FT16,112^A0N,20,19^FH\\^FD");
       appendTruncated(15, b.getBarcodeExtraInfo(), sb::append);
       sb.append("^FS\r\n");
       sb.append("^XZ\n");
