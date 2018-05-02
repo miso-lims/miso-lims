@@ -28,7 +28,8 @@ std::string formatDate(std::tm *timeValue) {
   return date_buffer.str();
 }
 
-std::string getRunBasesMask(const illumina::interop::model::metrics::run_metrics &run){
+std::string
+getRunBasesMask(const illumina::interop::model::metrics::run_metrics &run) {
   std::stringstream basemask;
   auto first = true;
 
@@ -248,14 +249,29 @@ void add_global_chart(
        << run_summary.total_summary().percent_gt_q30() << " %";
   add_chart_row(values, "% > Q30", q_30.str());
   if (run_summary.begin() != run_summary.end()) {
-    std::stringstream total_reads;
-    total_reads.imbue(std::locale(""));
-    total_reads << std::accumulate(
+    // Read has two different meanings in this context due to Illumina
+    // terminology
+    auto total_read_count = std::accumulate(
         run_summary.begin()->begin(), run_summary.begin()->end(), 0L,
         [](long acc,
            const illumina::interop::model::summary::lane_summary &summary) {
           return acc + summary.reads();
         });
+
+    auto total_sequencing_reads = std::accumulate(
+        run.run_info().reads().begin(), run.run_info().reads().end(), 0,
+        [](int acc, const illumina::interop::model::run::read_info &read) {
+          return acc + (read.is_index() ? 0 : 1);
+        });
+
+    std::stringstream total_clusters;
+    total_clusters.imbue(std::locale(""));
+    total_clusters << (total_read_count / total_sequencing_reads);
+    add_chart_row(values, "Clusters", total_clusters.str());
+
+    std::stringstream total_reads;
+    total_reads.imbue(std::locale(""));
+    total_reads << total_read_count;
     add_chart_row(values, "Total Reads", total_reads.str());
   }
   result["values"] = std::move(values);
