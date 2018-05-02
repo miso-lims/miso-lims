@@ -1,8 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.service.workflow;
 
-import static uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.FactoryType;
-import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
@@ -17,12 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.User;
 import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Progress;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.FactoryType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowExecutor;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.ProgressImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.ProgressStore;
@@ -54,21 +54,21 @@ public class DefaultWorkflowManager implements WorkflowManager {
     Progress progress = new ProgressImpl();
     progress.setWorkflowName(workflowName);
 
-    saveProgress(progress);
+    save(progress);
     return workflowName.createWorkflow(progress);
   }
 
   @Override
   public Workflow processInput(Workflow workflow, String input) throws IOException {
-    workflow.processInput(makeProgressStep(input, workflow.getNextStep().getDataTypes()));
-    saveProgress(workflow.getProgress());
+    workflow.processInput(makeProgressStep(input, workflow.getNextStep().getInputTypes()));
+    save(workflow.getProgress());
     return workflow;
   }
 
   @Override
   public Workflow processInput(Workflow workflow, int stepNumber, String input) throws IOException {
-    workflow.processInput(stepNumber, makeProgressStep(input, workflow.getNextStep().getDataTypes()));
-    saveProgress(workflow.getProgress());
+    workflow.processInput(stepNumber, makeProgressStep(input, workflow.getStep(stepNumber).getInputTypes()));
+    save(workflow.getProgress());
     return workflow;
   }
 
@@ -99,26 +99,52 @@ public class DefaultWorkflowManager implements WorkflowManager {
   @Override
   public Workflow cancelInput(Workflow workflow) throws IOException {
     workflow.cancelInput();
-    saveProgress(workflow.getProgress());
+    save(workflow.getProgress());
     return workflow;
   }
 
-  private void saveProgress(Progress progress) throws IOException {
+  private void save(Progress progress) throws IOException {
     if (progress.getUser() != null) authorizationManager.throwIfNotOwner(progress.getUser());
-    progress.setUser(authorizationManager.getCurrentUser());
-
-    Date now = new Date();
-    if (progress.getCreationTime() == null) {
-      progress.setCreationTime(now);
+    if (progress.getId() == Progress.UNSAVED_ID) {
+      create(progress);
+    } else {
+      update(progress);
     }
-    progress.setLastModified(now);
+  }
 
+  private void update(Progress progress) throws IOException {
+    Progress managed = progressStore.getManaged(progress.getId());
+    managed.getSteps().forEach(step -> progressStore.delete(step));
+    managed.setSteps(progress.getSteps());
+    setChangeDetails(managed);
+    progressStore.save(managed);
+  }
+
+  private void create(Progress progress) throws IOException {
+    setChangeDetails(progress);
     progressStore.save(progress);
   }
 
+  private void setChangeDetails(Progress progress) throws IOException {
+    User user = authorizationManager.getCurrentUser();
+    Date now = new Date();
+
+    if (progress.getId() == Progress.UNSAVED_ID) {
+      progress.setUser(user);
+      if (progress.getCreationTime() == null) {
+        progress.setCreationTime(now);
+      }
+      if (progress.getLastModified() == null) {
+        progress.setLastModified(now);
+      }
+    } else {
+      progress.setLastModified(now);
+    }
+  }
+
   @Override
-  public Workflow loadWorkflow(long progressId) throws IOException {
-    Progress progress = progressStore.get(progressId);
+  public Workflow loadWorkflow(long id) throws IOException {
+    Progress progress = progressStore.get(id);
     if (progress == null) return null;
 
     authorizationManager.throwIfNotOwner(progress.getUser());

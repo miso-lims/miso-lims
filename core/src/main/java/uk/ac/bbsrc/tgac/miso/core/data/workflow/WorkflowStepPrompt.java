@@ -5,20 +5,20 @@ import java.util.Set;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
 
 public class WorkflowStepPrompt {
-  private Set<InputType> dataTypes;
+  private Set<InputType> inputTypes;
   private String message;
 
-  public WorkflowStepPrompt(Set<InputType> dataTypes, String message) {
-    this.dataTypes = dataTypes;
+  public WorkflowStepPrompt(Set<InputType> inputTypes, String message) {
+    this.inputTypes = inputTypes;
     this.message = message;
   }
 
-  public Set<InputType> getDataTypes() {
-    return dataTypes;
+  public Set<InputType> getInputTypes() {
+    return inputTypes;
   }
 
-  public void setDataTypes(Set<InputType> dataTypes) {
-    this.dataTypes = dataTypes;
+  public void setInputTypes(Set<InputType> inputTypes) {
+    this.inputTypes = inputTypes;
   }
 
   public String getMessage() {

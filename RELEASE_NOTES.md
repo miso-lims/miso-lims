@@ -1,3 +1,14 @@
+# 0.2.118
+
+Changes:
+
+ * Support newer versions of mySQL
+ * Change slide label layout
+ * Fixed increment on fill handle double-click
+ * DetailedSample: check for single sample class, not sample category on bulk sample actions
+ * update addKitDescriptor procedure (#1419)
+ * Add QC changelogs for Library, Pool, Container (#1418)
+
 # 0.2.117
 
 Changes:

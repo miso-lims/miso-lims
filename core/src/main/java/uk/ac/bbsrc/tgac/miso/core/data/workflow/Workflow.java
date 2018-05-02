@@ -44,7 +44,22 @@ public interface Workflow {
    */
   void cancelInput();
 
+  /**
+   * @return short message describing what will be executed
+   */
+  String getConfirmMessage();
+
   void execute(WorkflowExecutor workflowExecutor) throws IOException;
+
+  /**
+   * @return proper name of workflow, for display purposes
+   */
+  String getName();
+
+  /**
+   * @return the stepNumber of the next step that requires user input or null if the workflow is complete
+   */
+  Integer getNextStepNumber();
 
   /**
    * Represents a type of Workflow.  Should have a one-to-one correspondence with every implementation of Workflow

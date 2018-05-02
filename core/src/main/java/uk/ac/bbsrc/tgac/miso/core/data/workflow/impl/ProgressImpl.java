@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -37,7 +38,7 @@ public class ProgressImpl implements Progress {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long workflowProgressId;
+  private long workflowProgressId = Progress.UNSAVED_ID;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "workflowName")
@@ -55,7 +56,7 @@ public class ProgressImpl implements Progress {
   @Column(name = "lastModified", nullable = false)
   private Date lastModified;
 
-  @OneToMany(targetEntity = AbstractProgressStep.class, mappedBy = "id.progress")
+  @OneToMany(targetEntity = AbstractProgressStep.class, mappedBy = "id.progress", fetch = FetchType.EAGER)
   @Sort(type = SortType.NATURAL)
   private SortedSet<ProgressStep> steps;
 

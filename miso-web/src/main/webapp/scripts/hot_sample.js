@@ -594,18 +594,12 @@ HotTarget.sample = (function() {
               }
 
               var classes = getSampleClasses(samples);
-              var categories = Utils.array.deduplicateString(classes.map(function(sampleClass) {
-                return sampleClass.sampleCategory;
+              var classesAliases = Utils.array.deduplicateString(classes.map(function(sampleClass) {
+                return sampleClass.alias;
               }));
-              if (categories.length > 1) {
-                alert("You have selected samples of categories " + categories.join(" & ")
-                    + ". Please select samples from only one category.");
-                return;
-              }
-
-              if (categories[0] == 'Tissue Processing' && classes.length > 1) {
-                alert("You have selected samples of classes " + classes.map(Utils.array.getAlias).join(" & ")
-                    + ". Please select samples from only one tissue processing class.");
+              if (classesAliases.length > 1) {
+                alert("You have selected samples of classes " + classesAliases.join(" & ")
+                    + ". Please select samples from only one class.");
                 return;
               }
 

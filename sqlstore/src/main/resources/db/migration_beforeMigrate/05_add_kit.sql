@@ -17,8 +17,8 @@ CREATE PROCEDURE addKitDescriptor(
   IF NOT EXISTS (SELECT 1 FROM KitDescriptor WHERE name = iName)
   THEN
     SET createUser = getAdminUserId();
-    INSERT INTO KitDescriptor(name, version, manufacturer, partNumber, kitType, platformType, description, lastModifier)
-    VALUES (iName, iVersion, iManufacturer, iPartNumber, iKitType, iPlatformType, iDescription, createUser);
+    INSERT INTO KitDescriptor(name, version, manufacturer, partNumber, kitType, platformType, description, creator, lastModifier)
+    VALUES (iName, iVersion, iManufacturer, iPartNumber, iKitType, iPlatformType, iDescription, createUser, createUser);
   END IF;
 END//
 DELIMITER ;
