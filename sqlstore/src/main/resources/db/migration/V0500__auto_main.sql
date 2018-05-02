@@ -1,3 +1,5 @@
+-- stepInteger
+
 CREATE TABLE StepInteger (
   workflowProgressId BIGINT(20) NOT NULL,
   stepNumber         BIGINT(20) NOT NULL,
@@ -7,3 +9,5 @@ CREATE TABLE StepInteger (
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
+
+
