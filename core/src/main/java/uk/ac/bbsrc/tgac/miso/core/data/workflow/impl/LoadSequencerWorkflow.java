@@ -16,13 +16,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.AbstractWorkflow;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowExecutor;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class LoadSequencerWorkflow extends AbstractWorkflow {
   private final ContainerStep containerStep = new ContainerStep();
@@ -74,14 +74,14 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
       }
 
       if (containerStep.isExistingContainer()) {
-        resetPartitionSteps(containerStep.getContainer().getModel().getPartitionCount());
+        resetPartitionSteps(containerStep.getContainer().getModel());
       }
     } else if (stepNumber == 1) {
       if (containerStep.isExistingContainer()) {
         step.accept(partitionSteps.get(0));
       } else {
         step.accept(containerModelStep);
-        resetPartitionSteps(containerModelStep.getModel().getPartitionCount());
+        resetPartitionSteps(containerModelStep.getModel());
       }
     } else {
       int partitionIndex = asPartitionIndex(stepNumber);
@@ -89,10 +89,10 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
     }
   }
 
-  private void resetPartitionSteps(int partitionCount) {
+  private void resetPartitionSteps(SequencingContainerModel model) {
     partitionSteps = new ArrayList<>();
-    for (int i = 0; i < partitionCount; ++i) {
-      partitionSteps.add(new PartitionStep(i));
+    for (int i = 0; i < model.getPartitionCount(); ++i) {
+      partitionSteps.add(new PartitionStep(i, model.getPlatformType()));
     }
   }
 
@@ -115,18 +115,27 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   public String getConfirmMessage() {
     List<Pool> poolsScanned = partitionSteps.stream().map(PartitionStep::getPool).filter(Objects::nonNull).collect(Collectors.toList());
     if (poolsScanned.isEmpty()) {
-      if (containerStep.isExistingContainer())
-        return String.format("All Pools will be removed from Sequencing Container %s", containerStep.getContainer().getIdentificationBarcode());
-      return String.format("Sequencing Container %s will be saved", containerStep.getBarcode());
-    } else {
-      String poolStrings = LimsUtils.joinWithConjunction(poolsScanned.stream().map(Pool::getAlias).collect(Collectors.toList()), "and");
       if (containerStep.isExistingContainer()) {
-        return String.format("Sequencing Container %s will be modified to contain the following Pools: %s",
-            containerStep.getContainer().getIdentificationBarcode(), poolStrings);
+        return String.format("Remove all pools from %s '%s'?", getContainerName(), containerStep.getContainer().getIdentificationBarcode());
+      } else {
+        return String.format("Create empty %s '%s'?", getContainerName(), containerStep.getBarcode());
       }
+    } else {
+      if (containerStep.isExistingContainer()) {
+        return String.format("Add pools to existing %s '%s'?", getContainerName(), containerStep.getContainer().getIdentificationBarcode());
+      } else {
+        return String.format("Create %s '%s'?", getContainerName(), containerStep.getBarcode());
+      }
+    }
+  }
 
-      return String.format("Sequencing Container %s will be saved and the following Pools will be added to it: %s", containerStep.getBarcode(),
-          poolStrings);
+  private String getContainerName() {
+    if (containerModelStep.getProgressStep() != null) {
+      return containerModelStep.getModel().getPlatformType().getContainerName();
+    } else if (containerStep.getProgressStep() != null && containerStep.isExistingContainer()) {
+      return containerStep.getContainer().getModel().getPlatformType().getContainerName();
+    } else {
+      return "Sequencing Container";
     }
   }
 
@@ -157,17 +166,20 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   private static class PartitionStep implements WorkflowStep {
     private final int partitionIndex;
+    private final PlatformType platformType;
+
     private PoolProgressStep poolStep;
     private SkipProgressStep skipStep;
 
-    PartitionStep(int partitionIndex) {
+    PartitionStep(int partitionIndex, PlatformType platformType) {
       this.partitionIndex = partitionIndex;
+      this.platformType = platformType;
     }
 
     @Override
     public WorkflowStepPrompt getPrompt() {
       return new WorkflowStepPrompt(Sets.newHashSet(InputType.POOL, InputType.SKIP),
-          String.format("Scan a Pool to assign to partition %d, or enter no input to skip this partition", partitionIndex + 1));
+          String.format("Scan a Pool to assign to %s %d", platformType.getPartitionName(), partitionIndex + 1));
     }
 
     @Override
@@ -183,10 +195,12 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
     @Override
     public String getLogMessage() {
-      if (poolStep == null) return String.format("Skipped partition %d", partitionIndex + 1);
-
+      if (poolStep == null) {
+        return String.format("Selected NO POOL for %s %d", platformType.getPartitionName(), partitionIndex + 1);
+      }
       Pool pool = poolStep.getInput();
-      return String.format("Selected Pool %s (%s) for partition %d", pool.getAlias(), pool.getName(), partitionIndex + 1);
+      return String.format("Selected Pool %s (%s) for %s %d", pool.getAlias(), pool.getName(), platformType.getPartitionName(),
+          partitionIndex + 1);
     }
 
     @Override
@@ -212,7 +226,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
     private static final WorkflowStepPrompt PROMPT = new WorkflowStepPrompt(Sets.newHashSet(InputType.SEQUENCER_PARTITION_CONTAINER,
         InputType.STRING),
-        "Scan a flow cell serial number");
+        "Scan the Sequencing Container serial number (SN)");
 
     private SequencerPartitionContainerProgressStep containerStep;
     private StringProgressStep stringStep;
@@ -235,8 +249,15 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
     @Override
     public String getLogMessage() {
-      return containerStep != null ? String.format("Scanned existing Sequencing Container %s", containerStep.getInput().getIdentificationBarcode())
-          : String.format("Scanned new Sequencing Container %s", stringStep.getInput());
+      return String.format("Selected %s %s '%s'", containerStep == null ? "new" : "existing", getContainerName(), getBarcode());
+    }
+
+    private String getContainerName() {
+      if (containerStep == null) {
+        return "Sequencing Container";
+      } else {
+        return containerStep.getInput().getModel().getPlatformType().getContainerName();
+      }
     }
 
     @Override
@@ -263,12 +284,15 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   }
 
   private static class ContainerModelStep implements WorkflowStep {
+
+    private static final WorkflowStepPrompt PROMPT = new WorkflowStepPrompt(Sets.newHashSet(InputType.SEQUENCING_CONTAINER_MODEL),
+        "Scan the Sequencing Container part number (REF)");
+
     private SequencingContainerModelProgressStep modelStep;
 
     @Override
     public WorkflowStepPrompt getPrompt() {
-      return new WorkflowStepPrompt(Sets.newHashSet(InputType.SEQUENCING_CONTAINER_MODEL),
-          "Scan the REF number of the Sequencing Container");
+      return PROMPT;
     }
 
     @Override
@@ -283,7 +307,8 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
     @Override
     public String getLogMessage() {
-      return String.format("Selected Sequencing Container Model %s", modelStep.getInput().getAlias());
+      return String.format("Selected %s Model '%s'", modelStep.getInput().getPlatformType().getContainerName(),
+          modelStep.getInput().getAlias());
     }
 
     @Override
