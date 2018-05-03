@@ -11,9 +11,20 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
  */
 public interface WorkflowExecutor {
   /**
-   * Create or update a pool in the database
+   * Creates or updates a Pool
+   * 
+   * @param pool
+   * @return the updated Pool
+   * @throws IOException
    */
   Pool save(Pool pool) throws IOException;
 
+  /**
+   * Creates or updates a SequencerPartitionContainer
+   * 
+   * @param spc
+   * @return the updated SequencerPartitionContainer
+   * @throws IOException
+   */
   SequencerPartitionContainer save(SequencerPartitionContainer spc) throws IOException;
 }
