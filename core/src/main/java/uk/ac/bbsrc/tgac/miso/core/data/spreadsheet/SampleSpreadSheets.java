@@ -22,6 +22,9 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
 
   private static <S extends DetailedSample, T> Function<Sample, T> detailedSample(Class<S> clazz, Function<S, T> function, T defaultValue) {
     return s -> {
+      if (clazz.isInstance(s)) {
+        return function.apply(clazz.cast(s));
+      }
       if (LimsUtils.isDetailedSample(s)) {
         S parent = LimsUtils.getParent(clazz, (DetailedSample) s);
         if (parent != null) {
