@@ -320,27 +320,62 @@ var Utils = Utils
           case 'compare':
             input = document.createElement('DIV');
             var compareTypeControl = document.createElement('SELECT');
-            var values = ['ignore', '>', '>=', '=', '<=', '<'];
+            var values = [{
+              label: 'ignore',
+              comparator: function(x, y) {
+                return true;
+              }
+            }, {
+              label: '>',
+              comparator: function(x, y) {
+                return x > y;
+              }
+            }, {
+              label: '>=',
+              comparator: function(x, y) {
+                return x >= y;
+              }
+            }, {
+              label: '=',
+              comparator: function(x, y) {
+                return x = y;
+              }
+            }, {
+              label: '<=',
+              comparator: function(x, y) {
+                return x <= y;
+              }
+            }, {
+              label: '<',
+              comparator: function(x, y) {
+                return x < y;
+              }
+            }];
             values.forEach(function(value, index) {
               var option = document.createElement('OPTION');
-              option.text = field.getLabel ? field.getLabel(value) : value;
+              option.text = field.getLabel ? field.getLabel(value.label) : value.label;
               option.value = index;
               compareTypeControl.appendChild(option);
             });
             compareTypeControl.value = 0;
-            output[field.compareTypeProperty] = 'ignore';
-            compareTypeControl.onchange = function() {
-              output[field.compareTypeProperty] = values[parseInt(compareTypeControl.value)];
-            };
-            input.appendChild(compareTypeControl);
 
             var valueControl = document.createElement('INPUT');
             valueControl.setAttribute('type', 'text');
-            valueControl.value = field.value || 0;
-            output[field.valueProperty] = field.value || 0;
-            valueControl.onchange = function() {
-              output[field.valueProperty] = parseFloat(valueControl.value);
-            };
+            valueControl.value = 0;
+
+            var update = function() {
+              var y = parseFloat(valueControl.value);
+              output[field.property] = isNaN(y) ? function(x) {
+                return true;
+              } : function(x) {
+                return values[parseInt(compareTypeControl.value)].comparator(x, y);
+              }
+            }
+            compareTypeControl.onchange = update;
+            valueControl.onchange = update;
+            update();
+
+            input.appendChild(compareTypeControl);
             input.appendChild(valueControl);
             break;
           default:
