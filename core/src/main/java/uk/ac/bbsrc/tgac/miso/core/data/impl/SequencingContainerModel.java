@@ -46,6 +46,7 @@ public class SequencingContainerModel implements Serializable, Barcodable {
 
   private boolean fallback;
 
+  @Override
   public long getId() {
     return sequencingContainerModelId;
   }
@@ -54,6 +55,7 @@ public class SequencingContainerModel implements Serializable, Barcodable {
     this.sequencingContainerModelId = sequencingContainerModelId;
   }
 
+  @Override
   public String getAlias() {
     return alias;
   }
@@ -64,33 +66,31 @@ public class SequencingContainerModel implements Serializable, Barcodable {
 
   @Override
   public String getLabelText() {
-    // todo
-    return null;
+    return getAlias();
   }
 
+  @Override
   public String getIdentificationBarcode() {
     return identificationBarcode;
   }
 
   @Override
   public Date getBarcodeDate() {
-    // todo
     return null;
   }
 
   @Override
   public String getBarcodeExtraInfo() {
-    // todo
     return null;
   }
 
+  @Override
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
   }
 
   @Override
   public String getBarcodeSizeInfo() {
-    // todo
     return null;
   }
 
@@ -137,9 +137,11 @@ public class SequencingContainerModel implements Serializable, Barcodable {
     this.fallback = fallback;
   }
 
+  /**
+   * ContainerModels don't have names, but they implement an interface which requires this method.
+   */
   @Override
   public String getName() {
-    // todo
-    return null;
+    throw new UnsupportedOperationException();
   }
 }
