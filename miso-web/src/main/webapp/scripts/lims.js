@@ -338,7 +338,7 @@ var Utils = Utils
             }, {
               label: '=',
               comparator: function(x, y) {
-                return x = y;
+                return x == y;
               }
             }, {
               label: '<=',
