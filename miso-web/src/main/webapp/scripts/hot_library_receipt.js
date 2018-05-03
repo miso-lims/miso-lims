@@ -55,6 +55,10 @@ HotTarget.libraryReceipt = (function() {
 
     fixedColumns: 0,
 
+    getCustomActions: function(table) {
+      return HotTarget.library.getCustomActions(table);
+    },
+
     getBulkActions: function(config) {
       return [{
         name: 'Edit',

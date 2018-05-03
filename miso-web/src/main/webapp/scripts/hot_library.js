@@ -118,6 +118,32 @@ HotTarget.library = (function() {
     setReadOnly(design || (template && template.idProperty));
   };
 
+  var checkQcs = function(table) {
+    Utils.showDialog('QC Criteria', 'Check', [{
+      label: 'Concentration',
+      type: 'compare',
+      property: 'concentrationComparator',
+    }, {
+      label: 'Volume',
+      type: 'compare',
+      property: 'volumeComparator',
+    }, {
+      label: 'Size',
+      type: 'compare',
+      property: 'sizeComparator',
+    }], function(output) {
+      var rowCount = table.countRows();
+      var changes = [];
+      for (var row = 0; row < rowCount; row++) {
+        var pass = output.concentrationComparator(table.getDataAtRowProp(row, 'concentration'))
+            && output.volumeComparator(table.getDataAtRowProp(row, 'volume'))
+            && output.sizeComparator(table.getDataAtRowProp(row, 'dnaSize'))
+        changes.push([row, 'qcPassed', pass ? 'True' : 'False']);
+      }
+      table.setDataAtRowProp(changes);
+    });
+  };
+
   return {
     createUrl: '/miso/rest/library',
     updateUrl: '/miso/rest/library/',
@@ -516,7 +542,12 @@ HotTarget.library = (function() {
     },
 
     getCustomActions: function(table) {
-      return HotTarget.boxable.getCustomActions(table);
+      return HotTarget.boxable.getCustomActions(table).concat([{
+        buttonText: 'Check QCs',
+        eventHandler: function() {
+          checkQcs(table);
+        }
+      }]);
     },
 
     getBulkActions: function(config) {
