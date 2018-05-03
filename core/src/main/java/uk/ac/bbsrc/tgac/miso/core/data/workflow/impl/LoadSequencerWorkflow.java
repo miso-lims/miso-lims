@@ -25,13 +25,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class LoadSequencerWorkflow extends AbstractWorkflow {
-  private ScanSpcStep spcStep = new ScanSpcStep();
-  private ScanModelStep modelStep = new ScanModelStep();
+  private final ContainerStep containerStep = new ContainerStep();
+  private final ContainerModelStep containerModelStep = new ContainerModelStep();
   private List<PartitionStep> partitionSteps = Collections.emptyList();
 
   @Override
   protected List<WorkflowStep> getCompletedSteps() {
-    return Stream.concat(Stream.of(spcStep, modelStep), partitionSteps.stream()).filter(this::hasInput).collect(Collectors.toList());
+    return Stream.concat(Stream.of(containerStep, containerModelStep), partitionSteps.stream()).filter(this::hasInput).collect(Collectors.toList());
   }
 
   private boolean hasInput(WorkflowStep step) {
@@ -47,41 +47,41 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   public WorkflowStepPrompt getStep(int stepNumber) {
     switch (stepNumber) {
     case 0:
-      return spcStep.getPrompt();
+      return containerStep.getPrompt();
     case 1:
-      return spcStep.isKnown() ? partitionSteps.get(0).getPrompt() : modelStep.getPrompt();
+      return containerStep.isExistingContainer() ? partitionSteps.get(0).getPrompt() : containerModelStep.getPrompt();
     default:
       return partitionSteps.get(asPartitionIndex(stepNumber)).getPrompt();
     }
   }
 
   private int asPartitionIndex(int stepNumber) {
-    return stepNumber - (spcStep.isKnown() ? 1 : 2);
+    return stepNumber - (containerStep.isExistingContainer() ? 1 : 2);
   }
 
   @Override
   public boolean isComplete() {
-    return partitionSteps.size() > 0 && Stream.concat(Stream.of(spcStep), partitionSteps.stream()).allMatch(this::hasInput);
+    return partitionSteps.size() > 0 && Stream.concat(Stream.of(containerStep), partitionSteps.stream()).allMatch(this::hasInput);
   }
 
   @Override
   public void processInput(int stepNumber, ProgressStep step) {
     if (stepNumber == 0) {
-      step.accept(spcStep);
-      modelStep.cancelInput();
+      step.accept(containerStep);
+      containerModelStep.cancelInput();
       for (PartitionStep partitionStep : partitionSteps) {
         partitionStep.cancelInput();
       }
 
-      if (spcStep.isKnown()) {
-        clearPartitionSteps(spcStep.getSpc().getModel().getPartitionCount());
+      if (containerStep.isExistingContainer()) {
+        resetPartitionSteps(containerStep.getContainer().getModel().getPartitionCount());
       }
     } else if (stepNumber == 1) {
-      if (spcStep.isKnown()) {
+      if (containerStep.isExistingContainer()) {
         step.accept(partitionSteps.get(0));
       } else {
-        step.accept(modelStep);
-        clearPartitionSteps(modelStep.getModel().getPartitionCount());
+        step.accept(containerModelStep);
+        resetPartitionSteps(containerModelStep.getModel().getPartitionCount());
       }
     } else {
       int partitionIndex = asPartitionIndex(stepNumber);
@@ -89,7 +89,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
     }
   }
 
-  private void clearPartitionSteps(int partitionCount) {
+  private void resetPartitionSteps(int partitionCount) {
     partitionSteps = new ArrayList<>();
     for (int i = 0; i < partitionCount; ++i) {
       partitionSteps.add(new PartitionStep(i));
@@ -100,10 +100,10 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   public void cancelInput() {
     if (partitionSteps.stream().anyMatch(this::hasInput)) {
       getLastCompletedPartitionStep().cancelInput();
-    } else if (hasInput(modelStep)) {
-      modelStep.cancelInput();
+    } else if (hasInput(containerModelStep)) {
+      containerModelStep.cancelInput();
     } else {
-      spcStep.cancelInput();
+      containerStep.cancelInput();
     }
   }
 
@@ -115,17 +115,17 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   public String getConfirmMessage() {
     List<Pool> poolsScanned = partitionSteps.stream().map(PartitionStep::getPool).filter(Objects::nonNull).collect(Collectors.toList());
     if (poolsScanned.isEmpty()) {
-      if (spcStep.isKnown())
-        return String.format("All Pools will be removed from Sequencing Container %s", spcStep.getSpc().getIdentificationBarcode());
-      return String.format("Sequencing Container %s will be saved", spcStep.getBarcode());
+      if (containerStep.isExistingContainer())
+        return String.format("All Pools will be removed from Sequencing Container %s", containerStep.getContainer().getIdentificationBarcode());
+      return String.format("Sequencing Container %s will be saved", containerStep.getBarcode());
     } else {
       String poolStrings = LimsUtils.joinWithConjunction(poolsScanned.stream().map(Pool::getAlias).collect(Collectors.toList()), "and");
-      if (spcStep.isKnown()) {
+      if (containerStep.isExistingContainer()) {
         return String.format("Sequencing Container %s will be modified to contain the following Pools: %s",
-            spcStep.getSpc().getIdentificationBarcode(), poolStrings);
+            containerStep.getContainer().getIdentificationBarcode(), poolStrings);
       }
 
-      return String.format("Sequencing Container %s will be saved and the following Pools will be added to it: %s", spcStep.getBarcode(),
+      return String.format("Sequencing Container %s will be saved and the following Pools will be added to it: %s", containerStep.getBarcode(),
           poolStrings);
     }
   }
@@ -135,11 +135,11 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
     if (!isComplete()) throw new IllegalStateException("Workflow is not complete");
 
     SequencerPartitionContainer spc;
-    if (spcStep.isKnown()) {
-      spc  = spcStep.getSpc();
+    if (containerStep.isExistingContainer()) {
+      spc  = containerStep.getContainer();
     } else {
       spc = new SequencerPartitionContainerImpl();
-      SequencingContainerModel model = modelStep.getModel();
+      SequencingContainerModel model = containerModelStep.getModel();
       spc.setModel(model);
       spc.setPartitionLimit(model.getPartitionCount());
     }
@@ -154,7 +154,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
     return "Load Sequencer Workflow";
   }
 
-  private class PartitionStep implements WorkflowStep {
+  private static class PartitionStep implements WorkflowStep {
     private final int partitionIndex;
     private PoolProgressStep poolStep;
     private SkipProgressStep skipStep;
@@ -207,36 +207,40 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
     }
   }
 
-  private class ScanSpcStep implements WorkflowStep {
-    private SequencerPartitionContainerProgressStep spcStep;
+  private static class ContainerStep implements WorkflowStep {
+
+    private static final WorkflowStepPrompt PROMPT = new WorkflowStepPrompt(Sets.newHashSet(InputType.SEQUENCER_PARTITION_CONTAINER,
+        InputType.STRING),
+        "Scan a flow cell serial number");
+
+    private SequencerPartitionContainerProgressStep containerStep;
     private StringProgressStep stringStep;
 
     @Override
     public WorkflowStepPrompt getPrompt() {
-      return new WorkflowStepPrompt(Sets.newHashSet(InputType.SEQUENCER_PARTITION_CONTAINER, InputType.STRING),
-          "Scan a flow cell serial number");
+      return PROMPT;
     }
 
     @Override
     public ProgressStep getProgressStep() {
-      return spcStep != null ? spcStep : stringStep;
+      return containerStep != null ? containerStep : stringStep;
     }
 
     @Override
     public void cancelInput() {
-      spcStep = null;
+      containerStep = null;
       stringStep = null;
     }
 
     @Override
     public String getLogMessage() {
-      return spcStep != null ? String.format("Scanned existing Sequencing Container %s", spcStep.getInput().getIdentificationBarcode())
+      return containerStep != null ? String.format("Scanned existing Sequencing Container %s", containerStep.getInput().getIdentificationBarcode())
           : String.format("Scanned new Sequencing Container %s", stringStep.getInput());
     }
 
     @Override
     public void processInput(SequencerPartitionContainerProgressStep step) {
-      spcStep = step;
+      containerStep = step;
     }
 
     @Override
@@ -244,20 +248,20 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
       stringStep = step;
     }
 
-    public boolean isKnown() {
-      return spcStep != null;
+    public boolean isExistingContainer() {
+      return containerStep != null;
     }
 
-    public SequencerPartitionContainer getSpc() {
-      return spcStep.getInput();
+    public SequencerPartitionContainer getContainer() {
+      return containerStep.getInput();
     }
 
     public String getBarcode() {
-      return spcStep == null ? stringStep.getInput() : spcStep.getInput().getIdentificationBarcode();
+      return containerStep == null ? stringStep.getInput() : containerStep.getInput().getIdentificationBarcode();
     }
   }
 
-  private class ScanModelStep implements WorkflowStep {
+  private static class ContainerModelStep implements WorkflowStep {
     private SequencingContainerModelProgressStep modelStep;
 
     @Override
