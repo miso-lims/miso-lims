@@ -287,7 +287,7 @@ HotTarget.sample = (function() {
             include: show['Identity'] && config.targetSampleClass.alias != 'Identity'
                 && config.targetSampleClass.sampleCategory != 'Identity',
             depends: 'externalName',
-            update: function(sam, flat, value, setReadOnly, setOptions, setData) {
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               var deferred = jQuery.Deferred();
               var label = Constants.isDetailedSample ? 'shortName' : 'name';
               var selectedProject = config.project || Utils.array.findFirstOrNull(function(project) {
@@ -548,7 +548,7 @@ HotTarget.sample = (function() {
           HotUtils.makeColumnForText('QC Note', Constants.isDetailedSample && !config.isLibraryReceipt, 'detailedQcStatusNote', {
             readOnly: true,
             depends: 'detailedQcStatusDescription',
-            update: function(sam, flat, value, setReadOnly, setOptions, setData) {
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               var qcStatus = Utils.array.findFirstOrNull(Utils.array.descriptionPredicate(value), Constants.detailedQcStatuses);
               if (qcStatus != null && qcStatus.noteRequired) {
                 setReadOnly(false);

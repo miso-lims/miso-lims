@@ -35,6 +35,7 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
   private String parentSampleAlias;
   private Long parentSampleId;
   private Long parentSampleClassId;
+  private Long parentSampleProjectId;
   private String platformType;
   private Boolean qcPassed;
   private Long index1Id;
@@ -145,6 +146,10 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
 
   public Long getParentSampleClassId() {
     return parentSampleClassId;
+  }
+
+  public Long getParentSampleProjectId() {
+    return parentSampleProjectId;
   }
 
   public Long getParentSampleId() {
@@ -265,6 +270,10 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setParentSampleClassId(Long parentSampleClassId) {
     this.parentSampleClassId = parentSampleClassId;
+  }
+
+  public void setParentSampleProjectId(Long parentSampleProjectId) {
+    this.parentSampleProjectId = parentSampleProjectId;
   }
 
   public void setParentSampleId(Long parentSampleId) {

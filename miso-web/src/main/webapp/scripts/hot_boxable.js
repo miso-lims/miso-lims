@@ -42,7 +42,7 @@ HotTarget.boxable = (function() {
   var makeDiscardedColumn = function() {
     var col = HotUtils.makeColumnForBoolean('Discarded', true, 'discarded', true);
     col.depends = 'boxPosition';
-    col.update = function(obj, flat, value, setReadOnly, setOptions, setData) {
+    col.update = function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
       setOptions({
         validator: !value ? HotUtils.validator.requiredAutocomplete : mustBeFalseValidator
       });
@@ -126,7 +126,7 @@ HotTarget.boxable = (function() {
               }
             },
             depends: 'boxSearch',
-            update: function(obj, flat, value, setReadOnly, setOptions, setData) {
+            update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               var applyChanges = function(source) {
                 setOptions({
                   source: source
@@ -197,7 +197,7 @@ HotTarget.boxable = (function() {
               }
             },
             depends: 'boxAlias',
-            update: function(obj, flat, value, setReadOnly, setOptions, setData) {
+            update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               setReadOnly(!value);
               setOptions({
                 validator: value ? HotUtils.validator.requiredAutocomplete : HotUtils.validator.requiredEmpty

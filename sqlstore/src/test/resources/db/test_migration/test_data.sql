@@ -715,3 +715,11 @@ INSERT INTO StepSample(workflowProgressId, stepNumber, sampleId) VALUES
 
 INSERT INTO StepPool(workflowProgressId, stepNumber, poolId) VALUES
 (2, 1, 1);
+
+DELETE FROM LibraryTemplate_Index1;
+DELETE FROM LibraryTemplate_Index2;
+DELETE FROM DetailedLibraryTemplate;
+DELETE FROM LibraryTemplate;
+
+INSERT INTO LibraryTemplate(libraryTemplateId, alias, projectId) VALUES
+(1, 'pro1_temp1', 1);

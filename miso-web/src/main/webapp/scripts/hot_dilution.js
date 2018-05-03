@@ -95,7 +95,7 @@ HotTarget.dilution = {
           },
           depends: '*start', // This is a dummy value that gets this run on
           // table creation only
-          update: function(dil, flat, value, setReadOnly, setOptions, setData) {
+          update: function(dil, flat, flatProperty, value, setReadOnly, setOptions, setData) {
             var baseOptionList;
             var designCode = Utils.array.findFirstOrNull(function(code) {
               return dil.library.libraryDesignCodeId == code.id;
