@@ -141,6 +141,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
       spc = new SequencerPartitionContainerImpl();
       SequencingContainerModel model = containerModelStep.getModel();
       spc.setModel(model);
+      spc.setIdentificationBarcode(containerStep.getBarcode());
       spc.setPartitionLimit(model.getPartitionCount());
     }
     for (int i = 0; i < partitionSteps.size(); ++i) {
