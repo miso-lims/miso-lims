@@ -350,7 +350,7 @@ Edit `$CATALINA_HOME/conf/Catalina/localhost/miso.properties` of the MISO Tomcat
 
 It is possible to set up multiple run scanners managing different sequencers and add all the URLs to `miso.properties`.
 
-You can view the run scanner's state from the main page of the Run Scanner server: `http://<run-scanner-URL>:8080`.
+You can view the run scanner's state from the main page of the Run Scanner server.
 
 # Building the Application
 
@@ -375,7 +375,7 @@ To install or upgrade, perform the following steps:
 
 1. Backup your existing database.
 1. Stop MISO's Tomcat.
-1. `rm -rf $CATALINA_HOME/webapps/ROOT*`.
+1. Remove `$CATALINA_HOME/webapps/ROOT` directory and `$CATALINA_HOME/webapps/ROOT.war` file.
 1. Copy the `ROOT.war` from the build to `$CATALINA_HOME/webapps`.
 1. Make any necessary configuration changes to `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`.
 1. Migrate the database to the newest version. (Described below.)
