@@ -29,3 +29,6 @@ org.eclipse.wst.validation.prefs
 
 #Jekyll things
 _site/
+
+#Mac artifacts
+.DS_Store
