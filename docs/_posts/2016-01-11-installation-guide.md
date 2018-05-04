@@ -346,11 +346,11 @@ If you intend to scan Illumina runs, you will have to build `runscanner-illumina
 
 Start Tomcat on this machine.
 
-Edit `$CATALINA_HOME/conf/Catalina/localhost/miso.properties` and set `miso.runscanner.urls` to the URL of the Run Scanner instance and restart MISO.
+Edit `$CATALINA_HOME/conf/Catalina/localhost/miso.properties` of the MISO Tomcat server and set `miso.runscanner.urls` to the URL of the Run Scanner instance. Restart MISO.
 
 It is possible to set up multiple run scanners managing different sequencers and add all the URLs to `miso.properties`.
 
-You can view the run scanner's state from the main page of the Run Scanner server.
+You can view the run scanner's state from the main page of the Run Scanner server: `http://<run-scanner-URL>:8080`.
 
 # Building the Application
 
@@ -364,8 +364,8 @@ There will be two important build artefacts:
 * `miso-web/target/ROOT.war`
 * `runscanner/runscanner-*.war`
 
-
 <a name="upgrading"/>
+
 # Releasing and Upgrading
 
 Prior to release, ensure that you have followed the instructions in the
@@ -374,8 +374,8 @@ above and have WAR files for both MISO (`ROOT.war`) and Run Scanner(`runscanner-
 To install or upgrade, perform the following steps:
 
 1. Backup your existing database.
-1. Stop Tomcat.
-1. Remove `$CATALINA_HOME/webapps/ROOT`.
+1. Stop MISO's Tomcat.
+1. `rm -rf $CATALINA_HOME/webapps/ROOT*`.
 1. Copy the `ROOT.war` from the build to `$CATALINA_HOME/webapps`.
 1. Make any necessary configuration changes to `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`.
 1. Migrate the database to the newest version. (Described below.)
@@ -383,6 +383,7 @@ To install or upgrade, perform the following steps:
     1. Stop Run Scanner's Tomcat.
     1. Deploy the Run Scanner WAR.
     1. Restart Run Scanner's Tomcat.
+1. Restart MISO's Tomcat.
 
 ## Migrating the database
 
@@ -396,6 +397,7 @@ Updating the database (or setting it up initially) will apply patches to the dat
 # Monitoring
 
 The main MISO application and Run Scanner can be monitored using [Prometheus](http://prometheus.io/).
+Available metrics can be obtained at at `http://<miso-URL>/metrics` (note: no `/miso` before `/metrics`).
 
 # Next steps
 

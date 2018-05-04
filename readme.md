@@ -44,36 +44,16 @@ To use it:
 Navigate to [http://localhost:8090](http://localhost:8090) to login to miso with
 the credentials **admin/admin**.
 
-### Virtual Box
-
-An older version of MISO is available in our our virtual machine image with
-everything preinstalled. A VirtualBox instance is available with a
-self-contained MISO installation and MySQL database server, fully configured and
-can be used out-of-the-box.
-
-To use it:
-
-1.  Download VirtualBox software from:
-[https://www.virtualbox.org/](https://www.virtualbox.org/) 
-1.  Download the MISO OVA:
-[https://repos.tgac.ac.uk/miso/latest/MISO_Image.ova](https://repos.tgac.ac.uk/miso/latest/MISO_Image.ova)
-1.  Import this OVA file into VirtualBox via _File_ → _Import Appliance_. You
-may have to select _Bridged Adaptor_ instead of _NAT_ in the network settings.
-1.  Start the instance. Starting the appliance will result in an Ubuntu virtual
-machine complete with all MISO’s prerequisites pre-installed. The login for the
-virtual image is `miso` / `misoadmin`.
-1.  Start MISO server by using `./misoStart.sh` and then open the browser and go http://localhost:8080/
-1.  Log in to MISO using `admin` / `admin`. Only some simple configuration for
-certain elements is required, such as _Sequencer References_, Printers and any
-additional users and groups.
+Please add a sequencing _Instrument_ before you attempt to create libraries, as 
+libraries can only be created for platforms with active (non-retired) instruments.
 
 ## User Tutorial
 
 There is a [tutorial available](https://oicr-gsi.github.io/miso-docs-oicr/plain-index)
 for introducing new users to MISO's functionality. Some of the resources (MISO URL,
-ways of contacting the MISO administrators) are specific to Ontario Institute for
-Cancer Research, but this can be changed by forking and configuring the
-[tutorial repository](https://github.com/oicr-gsi/miso-docs-oicr).
+ways of contacting the MISO administrators) can be changed by forking and configuring
+the [tutorial repository](https://github.com/oicr-gsi/miso-docs-oicr) to suit your
+lab's specific needs.
 
 ## Running an Instance of MISO 
 
