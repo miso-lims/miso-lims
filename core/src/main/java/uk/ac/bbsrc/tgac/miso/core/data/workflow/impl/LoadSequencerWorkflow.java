@@ -262,11 +262,13 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
     @Override
     public void processInput(SequencerPartitionContainerProgressStep step) {
+      stringStep = null;
       containerStep = step;
     }
 
     @Override
     public void processInput(StringProgressStep step) {
+      containerStep = null;
       stringStep = step;
     }
 

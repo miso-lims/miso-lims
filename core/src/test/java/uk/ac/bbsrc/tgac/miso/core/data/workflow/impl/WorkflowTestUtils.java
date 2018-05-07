@@ -1,18 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.AssertionFailedError;
+
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Progress;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
-import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 
 class WorkflowTestUtils {
   static <T extends Throwable> void assertThrows(Class<T> expectedType, Runnable runnable) {
@@ -64,19 +62,10 @@ class WorkflowTestUtils {
   }
 
   static Progress makeProgress(WorkflowName workflowName, ProgressStep... steps) {
-    Progress progress = makeProgress(workflowName);
-    progress.setSteps(Arrays.asList(steps));
-
-    return progress;
-  }
-
-  static Workflow makeWorkflow(WorkflowName workflowName, ProgressStep... steps) {
-    return workflowName.createWorkflow(makeProgress(workflowName, steps));
-  }
-
-  private static Progress makeProgress(WorkflowName workflowName) {
     Progress progress = new ProgressImpl();
     progress.setWorkflowName(workflowName);
+    progress.setSteps(Arrays.asList(steps));
     return progress;
   }
+
 }
