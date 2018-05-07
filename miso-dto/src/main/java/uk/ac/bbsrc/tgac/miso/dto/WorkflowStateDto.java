@@ -1,10 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import static uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
-
 import java.util.List;
 import java.util.Set;
 
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
 
@@ -23,16 +22,16 @@ public class WorkflowStateDto {
    * If the workflow is complete, represent a completed workflow.  Otherwise, set the user's position to the next stepNumber
    */
   public WorkflowStateDto(Workflow workflow) {
-    workflowId = workflow.getProgress().getId();
-    log = workflow.getLog();
+    this.workflowId = workflow.getProgress().getId();
+    this.log = workflow.getLog();
     this.complete = workflow.isComplete();
     if (workflow.isComplete()) {
-      message = workflow.getConfirmMessage();
+      this.message = workflow.getConfirmMessage();
     } else {
-      stepNumber = workflow.getNextStepNumber();
+      this.stepNumber = workflow.getNextStepNumber();
       WorkflowStepPrompt prompt = workflow.getStep(stepNumber);
-      message = prompt.getMessage();
-      inputTypes = prompt.getInputTypes();
+      this.message = prompt.getMessage();
+      this.inputTypes = prompt.getInputTypes();
     }
   }
 
@@ -42,12 +41,23 @@ public class WorkflowStateDto {
    */
   public WorkflowStateDto(Workflow workflow, int stepNumber) {
     this.workflowId = workflow.getProgress().getId();
-    this.stepNumber = stepNumber;
-    this.complete = workflow.isComplete();
-    WorkflowStepPrompt prompt = workflow.getStep(stepNumber);
-    this.message = prompt.getMessage();
-    this.inputTypes = prompt.getInputTypes();
     this.log = workflow.getLog();
+    this.complete = workflow.isComplete();
+
+    if (stepNumber >= log.size()) {
+      if (workflow.isComplete()) {
+        this.message = workflow.getConfirmMessage();
+      } else {
+        this.stepNumber = workflow.getNextStepNumber();
+      }
+    } else {
+      this.stepNumber = stepNumber;
+    }
+    if (this.stepNumber != null) {
+      WorkflowStepPrompt prompt = workflow.getStep(stepNumber);
+      this.message = prompt.getMessage();
+      this.inputTypes = prompt.getInputTypes();
+    }
   }
 
   /**

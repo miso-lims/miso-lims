@@ -17,7 +17,7 @@ var WorkflowDisplay = (function() {
   }
 
   function showSuccess() {
-    display.empty().append(jQuery("<p>Workflow was successfully completed.</p>"));
+    display.empty().append(jQuery("<p class='workflowInstruction'>Workflow was successfully completed.</p>"));
   }
 
   function executeWorkflow(workflowId) {
