@@ -1,3 +1,16 @@
+# 0.2.119
+
+Changes:
+
+ * Fixed library page index dropdowns
+ * Increased warnings of near-duplicate indices to include edit distance of 1-2
+ * Add concentration and volume to Zebra labels
+ * Minor doc updates for installing MISO
+ * Detailed Sample: Fixed missing attributes in spreadsheet downloads
+ * Add total cluster count to run metrics summary table
+ * Added bulk Library 'Check QCs' button to set QC passed based on specified criteria
+ * Added project templates for library propagation
+
 # 0.2.118
 
 Changes:

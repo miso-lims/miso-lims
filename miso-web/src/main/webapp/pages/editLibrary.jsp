@@ -367,22 +367,6 @@
     </td>
   </tr>
 </table>
-<script type="text/javascript">
-    Library = Library || {};
-    Library.setOriginalIndices = function() {
-      Library.originalIndexFamilyId = ${library.getCurrentFamily().id};
-      Library.lastIndexPosition = 0;
-      jQuery('#indicesDiv').empty();
-      document.getElementById('indexFamily').value = Library.originalIndexFamilyId;
-      <c:forEach items="${library.indices}" var="index">
-        <c:if test="${index.id != 0}">
-          Library.ui.createIndexBox(${index.id});
-        </c:if>
-      </c:forEach>
-      Library.ui.createIndexNextBox();
-    };
-    Library.setOriginalIndices();
-  </script>
 <%@ include file="volumeControl.jspf" %>
 
 <c:if test="${detailedSample}">
@@ -495,7 +479,21 @@
 </div>
 
 <script type="text/javascript">
+  Library = Library || {};
+  Library.setOriginalIndices = function() {
+    Library.originalIndexFamilyId = ${library.getCurrentFamily().id};
+    document.getElementById('indexFamily').value = Library.originalIndexFamilyId;
+    <c:forEach items="${library.indices}" var="index">
+      <c:if test="${index.id != 0}">
+        jQuery('#index' + ${index.position}).val(${index.id});
+      </c:if>
+    </c:forEach>
+  };
+
   jQuery(document).ready(function () {
+    Library.ui.updateIndices();
+    Library.setOriginalIndices();
+    
     Library.ui.changeDesign(<c:out value="${library.libraryType.id}" default="0"/>, function() {
       Library.setOriginalIndices();
     });

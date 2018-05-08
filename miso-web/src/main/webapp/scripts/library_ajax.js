@@ -80,6 +80,16 @@ var Library = Library || {
     jQuery('#volume').attr('data-parsley-maxlength', '10');
     jQuery('#volume').attr('data-parsley-type', 'number');
 
+    // Indices validation
+    jQuery('#index1').attr('class', 'form-control');
+    if (jQuery('#indexFamily').val() > 0) {
+      jQuery('#index1').attr('data-parsley-required', 'true');
+      jQuery('#index1').attr('data-parsley-min', 1);
+    } else {
+      jQuery('#index1').attr('data-parsley-required', 'false');
+      jQuery('#index1').removeAttr('data-parsley-min');
+    }
+
     if (Constants.isDetailedSample) {
       var generatingAlias = Constants.automaticLibraryAlias == true && jQuery('#alias').val().length === 0;
       var selectedPlatform = jQuery('#platformTypes option:selected').text();
@@ -181,8 +191,22 @@ Library.ui = {
 
   updateIndices: function() {
     jQuery('#indicesDiv').empty();
-    Library.lastIndexPosition = 0;
-    Library.ui.createIndexNextBox();
+    var family = Library.ui.getCurrentIndexFamily();
+    var max = Library.ui.maxIndexPositionInFamily(family);
+    for (var pos = 1; pos <= max; pos++) {
+      Library.ui.createIndexSelect(pos);
+    }
+    // If this index family requires fewer indices than previously selected, we need to null them out in the form input or Spring will
+    // create an array with a mix of new and old indices.
+    var biggestMax = Library.ui.maxOfArray(Constants.indexFamilies.map(Library.ui.maxIndexPositionInFamily));
+    var container = document.getElementById('indicesDiv');
+    for (var j = max; j < biggestMax; j++) {
+      var nullInput = document.createElement("input");
+      nullInput.type = "hidden";
+      nullInput.value = "";
+      nullInput.name = "indices[" + j + "]";
+      container.appendChild(nullInput);
+    }
   },
 
   createIndexBox: function(id) {
@@ -204,30 +228,6 @@ Library.ui = {
     }));
   },
 
-  createIndexNextBox: function() {
-    var family = Library.ui.getCurrentIndexFamily();
-    var max = Library.ui.maxIndexPositionInFamily(family);
-    if (Library.lastIndexPosition < max) {
-      Library.ui.createIndexSelect(max, 0);
-    } else if (Library.lastIndexPosition == 0) {
-      var container = jQuery('#indicesDiv');
-      if (container.children().length == 0) {
-        container.text("No indices available.");
-      }
-    }
-    var container = document.getElementById('indicesDiv');
-    // If this index family requires fewer indices than previously selected, we need to null them out in the form input or Spring will
-    // create an array with a mix of new and old indices.
-    var biggestMax = Library.ui.maxOfArray(Constants.indexFamilies.map(Library.ui.maxIndexPositionInFamily));
-    for (var j = Library.lastIndexPosition; j < biggestMax; j++) {
-      var nullInput = document.createElement("input");
-      nullInput.type = "hidden";
-      nullInput.value = "";
-      nullInput.name = "indices[" + j + "]";
-      container.appendChild(nullInput);
-    }
-  },
-
   getCurrentIndexFamily: function() {
     var familyId = jQuery('#indexFamily').val();
     var families = Constants.indexFamilies.filter(function(family) {
@@ -243,200 +243,28 @@ Library.ui = {
     }
   },
 
-  createIndexSelect: function(newPosition, selectedId) {
+  createIndexSelect: function(position, selectedId) {
     var container = document.getElementById('indicesDiv');
-    for (var position = Library.lastIndexPosition + 1; position <= newPosition; position++) {
-      var widget = document.createElement("select");
-      widget.id = "index" + position;
-      widget.name = "indices[" + (position - 1) + "]";
-      if (position > 1) {
-        var nullOption = document.createElement("option");
-        nullOption.value = "";
-        nullOption.text = "(None)";
-        widget.appendChild(nullOption);
-      }
-      var indices = Library.ui.getCurrentIndexFamily().indices.filter(function(index) {
-        return index.position == position;
-      });
-      for (var i = 0; i < indices.length; i++) {
-        var option = document.createElement("option");
-        option.value = indices[i].id;
-        option.text = indices[i].name + " (" + indices[i].sequence + ")";
-        widget.appendChild(option);
-      }
-      if (position == newPosition) {
-        widget.value = selectedId;
-      }
-      container.appendChild(widget);
+    var widget = document.createElement("select");
+    widget.id = "index" + position;
+    widget.name = "indices[" + (position - 1) + "]";
+    if (position > 1) {
+      var nullOption = document.createElement("option");
+      nullOption.value = "";
+      nullOption.text = "(None)";
+      widget.appendChild(nullOption);
     }
-    Library.lastIndexPosition = newPosition;
-  },
-
-  fillDownIndexFamilySelects: function(tableselector, th) {
-    DatatableUtils.collapseInputs(tableselector);
-    var tableObj = jQuery(tableselector);
-    var table = tableObj.dataTable();
-    var header = jQuery(th);
-    var headerName = header.attr("header");
-    var firstSelectedRow = tableObj.find(".row_selected").first();
-    if (firstSelectedRow.length > 0) {
-      var td = firstSelectedRow.find("td[name=" + headerName + "]");
-      var tdtext = td.html();
-
-      var col = firstSelectedRow.children().index(td);
-
-      var frId = 0;
-      var aTrs = table.fnGetNodes();
-      for (var i = 0; i < aTrs.length; i++) {
-        if (jQuery(aTrs[i]).hasClass('row_selected')) {
-          frId = i;
-          break;
-        }
-      }
-
-      tableObj.find("tr:gt(" + frId + ")").each(function() {
-        table.fnUpdate(tdtext, table.fnGetPosition(this), col);
-      });
-
-      jQuery.get('../../library/indexPositionsJson', {
-        indexFamily: tdtext
-      }, {
-        success: function(json) {
-          tableObj.find("tr:gt(" + frId + ")").each(
-              function() {
-                var c = this.cells[col + 1];
-                jQuery(c).html("");
-                for (var i = 0; i < json.numApplicableIndices; i++) {
-                  jQuery(c).append(
-                      "<span class='indexSelectDiv' position='" + (i + 1) + "' id='indices" + (i + 1) + "'>- <i>Select...</i></span>");
-                  if (json.numApplicableIndices > 1 && i === 0) {
-                    jQuery(c).append("|");
-                  }
-                }
-
-                // bind editable to selects
-                jQuery("#cinput .indexSelectDiv").editable(function(value, settings) {
-                  return value;
-                }, {
-                  loadurl: '../../library/indicesForPosition',
-                  loaddata: function(value, settings) {
-                    var ret = {};
-                    ret["position"] = jQuery(this).attr("position");
-                    if (!Utils.validation.isNullCheck(tdtext)) {
-                      ret['indexFamily'] = tdtext;
-                    } else {
-                      ret['indexFamily'] = '';
-                    }
-                    return ret;
-                  },
-                  type: 'select',
-                  onblur: 'submit',
-                  placeholder: '',
-                  style: 'inherit',
-                  submitdata: function(tvalue, tsettings) {
-                    return {
-                      "row_id": this.parentNode.getAttribute('id'),
-                      "column": table.fnGetPosition(this)[2]
-                    };
-                  }
-                });
-              });
-        }
-      });
-    } else {
-      alert("Please select a row to use as the Fill Down template by clicking in the Select column for that row.");
+    var indices = Library.ui.getCurrentIndexFamily().indices.filter(function(index) {
+      return index.position == position;
+    });
+    for (var i = 0; i < indices.length; i++) {
+      var option = document.createElement("option");
+      option.value = indices[i].id;
+      option.text = indices[i].name + " (" + indices[i].sequence + ")";
+      widget.appendChild(option);
     }
-  },
-
-  fillDownIndexSelects: function(tableselector, th) {
-    DatatableUtils.collapseInputs(tableselector);
-    var tableObj = jQuery(tableselector);
-    var table = tableObj.dataTable();
-    var header = jQuery(th);
-    var headerName = header.attr("header");
-    var firstSelectedRow = tableObj.find(".row_selected").first();
-    if (firstSelectedRow.length > 0) {
-      var td = firstSelectedRow.find("td[name=" + headerName + "]");
-      var tdtext = td.html();
-
-      var col = firstSelectedRow.children().index(td);
-
-      var frId = 0;
-      var aTrs = table.fnGetNodes();
-      for (var i = 0; i < aTrs.length; i++) {
-        if (jQuery(aTrs[i]).hasClass('row_selected')) {
-          frId = i;
-          break;
-        }
-      }
-
-      var firstSelText = jQuery(aTrs[frId].cells[col - 1]).text();
-
-      tableObj.find("tr:gt(" + frId + ")").each(
-          function() {
-            var ifam = this.cells[col - 1];
-            var ifamText = jQuery(ifam).text();
-            var cell = jQuery(this.cells[col]);
-
-            if (ifamText.trim()) {
-              // no select means empty or already filled
-              if (firstSelText.indexOf("Select") === 0) {
-                // same family, just copy the cell
-                if (firstSelText === ifamText) {
-                  cell.html(tdtext);
-                } else {
-                  jQuery.get('../../library/indexPositionsJson', {
-                    indexFamily: ifamText
-                  }, {
-                    success: function(json) {
-                      cell.html("");
-                      for (var i = 0; i < json.numApplicableIndices; i++) {
-                        cell.append("<span class='indexSelectDiv' position='" + (i + 1) + "' id='indices" + (i + 1)
-                            + "'>- <i>Select...</i></span>");
-                        if (json.numApplicableIndices > 1 && i === 0) {
-                          cell.append("|");
-                        }
-                      }
-                    }
-                  });
-                }
-              } else {
-                // just copy select
-                if (firstSelText === ifamText) {
-                  cell.html(tdtext);
-                }
-              }
-            }
-
-            // bind editable to selects
-            jQuery("#cinput .indexSelectDiv").editable(function(value, settings) {
-              return value;
-            }, {
-              loadurl: '../../library/indicesForPosition',
-              loaddata: function(value, settings) {
-                var ret = {};
-                ret["position"] = jQuery(this).attr("position");
-                if (!Utils.validation.isNullCheck(ifamText)) {
-                  ret['indexFamily'] = ifamText;
-                } else {
-                  ret['indexFamily'] = '';
-                }
-
-                return ret;
-              },
-              type: 'select',
-              onblur: 'submit',
-              placeholder: '',
-              style: 'inherit',
-              submitdata: function(tvalue, tsettings) {
-                return {
-                  "row_id": this.parentNode.getAttribute('id'),
-                  "column": table.fnGetPosition(this)[2]
-                };
-              }
-            });
-          });
-    }
+    widget.value = selectedId ? selectedId : (position > 1 ? "" : 0);
+    container.appendChild(widget);
   },
 
   showLibraryNoteDialog: function(libraryId) {

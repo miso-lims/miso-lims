@@ -68,7 +68,7 @@ HotTarget.qc = function(qcTarget) {
         type: 'numeric',
         include: true,
         depends: 'typeName',
-        update: function(qc, flat, value, setReadOnly, setOptions, setData) {
+        update: function(qc, flat, flatProperty, value, setReadOnly, setOptions, setData) {
           var qcType = Utils.array.findFirstOrNull(function(qcType) {
             return qcType.qcTarget == qcTarget && qcType.name == flat.typeName;
           }, Constants.qcTypes);
@@ -123,7 +123,7 @@ HotTarget.qc = function(qcTarget) {
         include: true,
         depends: 'typeName',
         readOnly: true,
-        update: function(qc, flat, value, setReadOnly, setOptions, setData) {
+        update: function(qc, flat, flatProperty, value, setReadOnly, setOptions, setData) {
           flat.units = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(qcType) {
             return qcType.qcTarget == qcTarget && qcType.name == flat.typeName;
           }, Constants.qcTypes), 'units');

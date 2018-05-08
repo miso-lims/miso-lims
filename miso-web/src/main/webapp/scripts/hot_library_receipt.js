@@ -17,7 +17,13 @@ HotTarget.libraryReceipt = (function() {
       samColumns.forEach(function(col, colIndex) {
         col.data = 'sample.' + col.data;
         if (col.depends) {
-          col.depends = 'sample.' + col.depends;
+          if (Array.isArray(col.depends)) {
+            col.depends = col.depends.map(function(val) {
+              return 'sample.' + val;
+            });
+          } else {
+            col.depends = 'sample.' + col.depends;
+          }
         }
         col.libraryUnpack = col.unpack;
         col.unpack = function(lib, flat, setCellMeta) {
@@ -35,11 +41,11 @@ HotTarget.libraryReceipt = (function() {
         };
         if (col.update) {
           col.libraryUpdate = col.update;
-          col.update = function(lib, flat, value, setReadOnly, setOptions, setData) {
+          col.update = function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
             if (!flat.sample) {
               flat.sample = {};
             }
-            col.libraryUpdate(lib.sample, flat.sample, value, setReadOnly, setOptions, setData);
+            col.libraryUpdate(lib.sample, flat.sample, flatProperty, value, setReadOnly, setOptions, setData);
           };
         }
       });
@@ -48,6 +54,10 @@ HotTarget.libraryReceipt = (function() {
     },
 
     fixedColumns: 0,
+
+    getCustomActions: function(table) {
+      return HotTarget.library.getCustomActions(table);
+    },
 
     getBulkActions: function(config) {
       return [{

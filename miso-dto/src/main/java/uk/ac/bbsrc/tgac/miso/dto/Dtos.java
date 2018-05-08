@@ -89,6 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
@@ -96,6 +97,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
@@ -2283,4 +2285,60 @@ public class Dtos {
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     return dto;
   }
+
+  public static LibraryTemplateDto asDto(LibraryTemplate from) {
+    LibraryTemplateDto dto = null;
+    if (from instanceof DetailedLibraryTemplate) {
+      dto = asDetailedLibraryTemplateDto((DetailedLibraryTemplate) from);
+    } else {
+      dto = new LibraryTemplateDto();
+    }
+
+    dto.setId(from.getId());
+    dto.setAlias(from.getAlias());
+    dto.setProjectId(from.getProject().getId());
+    if (from.getPlatformType() != null) {
+      dto.setPlatformType(from.getPlatformType().getKey());
+    }
+    if (from.getLibraryType() != null) {
+      dto.setLibraryTypeId(from.getLibraryType().getId());
+    }
+    if (from.getLibrarySelectionType() != null) {
+      dto.setSelectionTypeId(from.getLibrarySelectionType().getId());
+    }
+    if (from.getLibraryStrategyType() != null) {
+      dto.setStrategyTypeId(from.getLibraryStrategyType().getId());
+    }
+    if (from.getKitDescriptor() != null) {
+      dto.setKitDescriptorId(from.getKitDescriptor().getId());
+    }
+    if (from.getIndexFamily() != null) {
+      dto.setIndexFamilyId(from.getIndexFamily().getId());
+      if (from.getIndexOnes() != null) {
+        dto.setIndexOneIds(from.getIndexOnes().entrySet().stream()
+            .collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue().getId())));
+      }
+      if (from.getIndexTwos() != null) {
+        dto.setIndexTwoIds(from.getIndexTwos().entrySet().stream()
+            .collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue().getId())));
+      }
+    }
+    return dto;
+  }
+
+  private static DetailedLibraryTemplateDto asDetailedLibraryTemplateDto(DetailedLibraryTemplate from) {
+    DetailedLibraryTemplateDto dto = new DetailedLibraryTemplateDto();
+    if (from.getLibraryDesign() != null) {
+      dto.setDesignId(from.getLibraryDesign().getId());
+    }
+    if (from.getLibraryDesignCode() != null) {
+      dto.setLibraryDesignCodeId(from.getLibraryDesignCode().getId());
+    }
+    return dto;
+  }
+
+  public static List<LibraryTemplateDto> asLibraryTemplateDtos(Collection<LibraryTemplate> from) {
+    return from.stream().map(Dtos::asDto).collect(Collectors.toList());
+  }
+
 }

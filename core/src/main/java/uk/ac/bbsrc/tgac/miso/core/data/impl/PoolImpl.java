@@ -366,7 +366,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public Set<String> getNearDuplicateIndicesSequences() {
-    return getIndexSequencesWithMinimumEditDistance(2);
+    return getIndexSequencesWithMinimumEditDistance(3);
   }
 
   private Set<String> getIndexSequencesWithMinimumEditDistance(int minimumDistance) {

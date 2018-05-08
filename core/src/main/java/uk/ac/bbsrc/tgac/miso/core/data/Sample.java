@@ -55,7 +55,7 @@ public interface Sample
   /** Field PREFIX */
   public static final String PREFIX = "SAM";
 
-  public static final String CONCENTRATION_UNITS = "ng/µl";
+  public static final String CONCENTRATION_UNITS = "ng/µL";
 
   public void setId(long id);
 
