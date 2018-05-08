@@ -1,3 +1,5 @@
+-- project_templates
+
 DROP TABLE IF EXISTS LibraryTemplate_Index1;
 DROP TABLE IF EXISTS LibraryTemplate_Index2;
 DROP TABLE IF EXISTS DetailedLibraryTemplate;
@@ -49,3 +51,10 @@ CREATE TABLE LibraryTemplate_Index2 (
   CONSTRAINT fk_libraryTemplateIndex2_libraryTemplate FOREIGN KEY (libraryTemplateId) REFERENCES LibraryTemplate (libraryTemplateId),
   CONSTRAINT fk_libraryTemplateIndex2_index FOREIGN KEY (indexId) REFERENCES Indices (indexId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- index_name
+
+ALTER TABLE Indices MODIFY COLUMN name varchar(24);
+
+
