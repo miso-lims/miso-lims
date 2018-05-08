@@ -80,6 +80,16 @@ var Library = Library || {
     jQuery('#volume').attr('data-parsley-maxlength', '10');
     jQuery('#volume').attr('data-parsley-type', 'number');
 
+    // Indices validation
+    jQuery('#index1').attr('class', 'form-control');
+    if (jQuery('#indexFamily').val() > 0) {
+      jQuery('#index1').attr('data-parsley-required', 'true');
+      jQuery('#index1').attr('data-parsley-min', 1);
+    } else {
+      jQuery('#index1').attr('data-parsley-required', 'false');
+      jQuery('#index1').removeAttr('data-parsley-min');
+    }
+
     if (Constants.isDetailedSample) {
       var generatingAlias = Constants.automaticLibraryAlias == true && jQuery('#alias').val().length === 0;
       var selectedPlatform = jQuery('#platformTypes option:selected').text();
@@ -181,8 +191,22 @@ Library.ui = {
 
   updateIndices: function() {
     jQuery('#indicesDiv').empty();
-    Library.lastIndexPosition = 0;
-    Library.ui.createIndexNextBox();
+    var family = Library.ui.getCurrentIndexFamily();
+    var max = Library.ui.maxIndexPositionInFamily(family);
+    for (var pos = 1; pos <= max; pos++) {
+      Library.ui.createIndexSelect(pos);
+    }
+    // If this index family requires fewer indices than previously selected, we need to null them out in the form input or Spring will
+    // create an array with a mix of new and old indices.
+    var biggestMax = Library.ui.maxOfArray(Constants.indexFamilies.map(Library.ui.maxIndexPositionInFamily));
+    var container = document.getElementById('indicesDiv');
+    for (var j = max; j < biggestMax; j++) {
+      var nullInput = document.createElement("input");
+      nullInput.type = "hidden";
+      nullInput.value = "";
+      nullInput.name = "indices[" + j + "]";
+      container.appendChild(nullInput);
+    }
   },
 
   createIndexBox: function(id) {
@@ -204,30 +228,6 @@ Library.ui = {
     }));
   },
 
-  createIndexNextBox: function() {
-    var family = Library.ui.getCurrentIndexFamily();
-    var max = Library.ui.maxIndexPositionInFamily(family);
-    if (Library.lastIndexPosition < max) {
-      Library.ui.createIndexSelect(max, 0);
-    } else if (Library.lastIndexPosition == 0) {
-      var container = jQuery('#indicesDiv');
-      if (container.children().length == 0) {
-        container.text("No indices available.");
-      }
-    }
-    var container = document.getElementById('indicesDiv');
-    // If this index family requires fewer indices than previously selected, we need to null them out in the form input or Spring will
-    // create an array with a mix of new and old indices.
-    var biggestMax = Library.ui.maxOfArray(Constants.indexFamilies.map(Library.ui.maxIndexPositionInFamily));
-    for (var j = Library.lastIndexPosition; j < biggestMax; j++) {
-      var nullInput = document.createElement("input");
-      nullInput.type = "hidden";
-      nullInput.value = "";
-      nullInput.name = "indices[" + j + "]";
-      container.appendChild(nullInput);
-    }
-  },
-
   getCurrentIndexFamily: function() {
     var familyId = jQuery('#indexFamily').val();
     var families = Constants.indexFamilies.filter(function(family) {
@@ -243,33 +243,28 @@ Library.ui = {
     }
   },
 
-  createIndexSelect: function(newPosition, selectedId) {
+  createIndexSelect: function(position, selectedId) {
     var container = document.getElementById('indicesDiv');
-    for (var position = Library.lastIndexPosition + 1; position <= newPosition; position++) {
-      var widget = document.createElement("select");
-      widget.id = "index" + position;
-      widget.name = "indices[" + (position - 1) + "]";
-      if (position > 1) {
-        var nullOption = document.createElement("option");
-        nullOption.value = "";
-        nullOption.text = "(None)";
-        widget.appendChild(nullOption);
-      }
-      var indices = Library.ui.getCurrentIndexFamily().indices.filter(function(index) {
-        return index.position == position;
-      });
-      for (var i = 0; i < indices.length; i++) {
-        var option = document.createElement("option");
-        option.value = indices[i].id;
-        option.text = indices[i].name + " (" + indices[i].sequence + ")";
-        widget.appendChild(option);
-      }
-      if (position == newPosition) {
-        widget.value = selectedId;
-      }
-      container.appendChild(widget);
+    var widget = document.createElement("select");
+    widget.id = "index" + position;
+    widget.name = "indices[" + (position - 1) + "]";
+    if (position > 1) {
+      var nullOption = document.createElement("option");
+      nullOption.value = "";
+      nullOption.text = "(None)";
+      widget.appendChild(nullOption);
     }
-    Library.lastIndexPosition = newPosition;
+    var indices = Library.ui.getCurrentIndexFamily().indices.filter(function(index) {
+      return index.position == position;
+    });
+    for (var i = 0; i < indices.length; i++) {
+      var option = document.createElement("option");
+      option.value = indices[i].id;
+      option.text = indices[i].name + " (" + indices[i].sequence + ")";
+      widget.appendChild(option);
+    }
+    widget.value = selectedId ? selectedId : (position > 1 ? "" : 0);
+    container.appendChild(widget);
   },
 
   fillDownIndexFamilySelects: function(tableselector, th) {
