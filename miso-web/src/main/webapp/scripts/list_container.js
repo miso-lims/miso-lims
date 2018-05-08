@@ -77,18 +77,27 @@ ListTarget.container = {
     return [{
       "name": "Add " + platformType.containerName,
       "handler": function() {
-        var models = Constants.containerModels.filter(function(m) {
-          return m.platformType == config.platformType && !m.archived;
-        }).sort(Utils.sorting.standardSort('alias')).map(function(model) {
+        var platforms = Constants.platforms.filter(function(p) {
+          return p.platformType === config.platformType && p.instrumentType === 'SEQUENCER' && p.active;
+        }).sort(Utils.sorting.standardSort('instrumentModel')).map(function(platform) {
           return {
-            name: model.alias,
+            name: platform.instrumentModel,
             handler: function() {
-              window.location = "/miso/container/new/" + model.id;
+              var models = Constants.containerModels.filter(function(m) {
+                return m.platformIds.indexOf(platform.id) !== -1;
+              }).sort(Utils.sorting.standardSort('alias')).map(function(model) {
+                return {
+                  name: model.alias,
+                  handler: function() {
+                    window.location = "/miso/container/new/" + model.id;
+                  }
+                }
+              });
+              Utils.showWizardDialog("Add " + platformType.containerName, models);
             }
           }
         });
-        Utils.showWizardDialog("Add " + platformType.containerName, models);
-
+        Utils.showWizardDialog("Add " + platformType.containerName, platforms);
       }
     }, ];
   },
