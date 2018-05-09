@@ -71,6 +71,34 @@ public enum Driver {
     public String encode(Barcodable barcodable, int copies) {
       StringBuilder sb = new StringBuilder();
 
+      String barcode = getBarcode(barcodable);
+      sb.append("mm\n");
+      sb.append("J\n");
+      sb.append("O R\n");
+      sb.append("S 0.0,0.00,12.78,12.78,41.50\n");
+      sb.append("B 2,2,0,DATAMATRIX,0.5;").append(barcode).append("\n");
+      sb.append("T 9,3,0,5,3;");
+      appendTruncated(12, barcodable.getName(), s -> appendBradyEscapedUnicode(sb, s));
+      sb.append("\n");
+      AtomicInteger offset = new AtomicInteger();
+      BiConsumer<Integer, String> writer = (line, text) -> {
+        sb.append("T 9,");
+        sb.append(5 + (line + offset.get()) * 3);
+        sb.append(",0,3,2;");
+        appendBradyEscapedUnicode(sb, text);
+        sb.append("\n");
+      };
+      offset.addAndGet(multiline(28, 5, barcodable.getLabelText(), writer));
+      multiline(28, 5 - offset.get(), barcodable.getBarcodeExtraInfo(), writer);
+      sb.append("A ").append(copies).append("\n");
+      return sb.toString();
+    }
+  },
+  BRADY_THT_155_490T {
+    @Override
+    public String encode(Barcodable barcodable, int copies) {
+      StringBuilder sb = new StringBuilder();
+
       sb.append("mm\n");
       sb.append("J\n");
       sb.append("O R\n");
