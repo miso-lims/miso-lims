@@ -48,6 +48,9 @@ Changes:
 Bad: Run scanner could not find fallback sequencing container models,
 so runs failed to save correctly. Fixed in #0.2.117.
 
+Note: If Flyway migration V0480__auto_main.sql fails, you may have bad data in your database that needs
+corrected before retrying the migration. See [Issue 1433](https://github.com/TGAC/miso-lims/issues/1433).
+
 # 0.2.115
 
 Changes:
