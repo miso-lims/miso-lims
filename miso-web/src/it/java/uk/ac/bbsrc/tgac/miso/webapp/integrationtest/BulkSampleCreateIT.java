@@ -38,15 +38,15 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
   // columns for creating Identity and everything else
   private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.DISCARDED,
       SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX,
       SamColumns.CONSENT, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.QC_STATUS,
       SamColumns.QC_NOTE);
 
   // columns for creating Tissue and everything downstream of it
-  private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.IDENTITY_ALIAS,
-      SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER,
-      SamColumns.LAB, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION);
+  private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS,
+      SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.RECEIVE_DATE, SamColumns.IDENTITY_ALIAS, SamColumns.TISSUE_ORIGIN,
+      SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER, SamColumns.LAB,
+      SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION);
 
   // columns specific to creating Slides
   private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.SLIDES, SamColumns.DISCARDS, SamColumns.THICKNESS,
@@ -1082,7 +1082,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> identity = new HashMap<>();
     identity.put(SamColumns.ALIAS, "PRO2_1001");
     identity.put(SamColumns.DESCRIPTION, "");
-    identity.put(SamColumns.ID_BARCODE, "");
     identity.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     identity.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     identity.put(SamColumns.PROJECT, "PRO2"); // different project so as not to mess with the SampleNumberPerProject generator
@@ -1113,7 +1112,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> identity = new HashMap<>();
     identity.put(SamColumns.ALIAS, "PRO2_1002");
     identity.put(SamColumns.DESCRIPTION, "");
-    identity.put(SamColumns.ID_BARCODE, "");
     identity.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     identity.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     identity.put(SamColumns.EXTERNAL_NAME, "ext2002"); // increment
