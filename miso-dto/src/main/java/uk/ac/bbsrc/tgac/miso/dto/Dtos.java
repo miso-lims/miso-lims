@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,7 +20,6 @@ import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
@@ -164,11 +162,7 @@ public class Dtos {
   }
 
   public static Set<TissueOriginDto> asTissueOriginDtos(Set<TissueOrigin> from) {
-    Set<TissueOriginDto> dtoSet = Sets.newHashSet();
-    for (TissueOrigin tissueOrigin : from) {
-      dtoSet.add(asDto(tissueOrigin));
-    }
-    return dtoSet;
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static TissueOrigin to(TissueOriginDto from) {
@@ -193,11 +187,7 @@ public class Dtos {
   }
 
   public static Set<TissueTypeDto> asTissueTypeDtos(Set<TissueType> from) {
-    Set<TissueTypeDto> dtoSet = Sets.newHashSet();
-    for (TissueType tissueType : from) {
-      dtoSet.add(asDto(tissueType));
-    }
-    return dtoSet;
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static TissueType to(TissueTypeDto from) {
@@ -224,11 +214,7 @@ public class Dtos {
   }
 
   public static Set<SubprojectDto> asSubprojectDtos(Set<Subproject> from) {
-    Set<SubprojectDto> dtoSet = Sets.newHashSet();
-    for (Subproject subproject : from) {
-      dtoSet.add(asDto(subproject));
-    }
-    return dtoSet;
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static Subproject to(SubprojectDto from) {
@@ -255,11 +241,7 @@ public class Dtos {
   }
 
   public static Set<SampleClassDto> asSampleClassDtos(Set<SampleClass> from) {
-    Set<SampleClassDto> dtoSet = Sets.newHashSet();
-    for (SampleClass sampleClass : from) {
-      dtoSet.add(asDto(sampleClass));
-    }
-    return dtoSet;
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static SampleClass to(SampleClassDto from) {
@@ -285,11 +267,7 @@ public class Dtos {
   }
 
   public static Set<DetailedQcStatusDto> asDetailedQcStatusDtos(Set<DetailedQcStatus> from) {
-    Set<DetailedQcStatusDto> dtoSet = Sets.newHashSet();
-    for (DetailedQcStatus detailedQcStatus : from) {
-      dtoSet.add(asDto(detailedQcStatus));
-    }
-    return dtoSet;
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static DetailedQcStatus to(DetailedQcStatusDto from) {
@@ -511,11 +489,7 @@ public class Dtos {
   }
 
   public static Set<TissueMaterialDto> asTissueMaterialDtos(Set<TissueMaterial> from) {
-    Set<TissueMaterialDto> dtoSet = Sets.newHashSet();
-    for (TissueMaterial tissueMaterial : from) {
-      dtoSet.add(asDto(tissueMaterial));
-    }
-    return dtoSet;
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static TissueMaterial to(TissueMaterialDto from) {
@@ -536,11 +510,7 @@ public class Dtos {
   }
 
   public static Set<SamplePurposeDto> asSamplePurposeDtos(Set<SamplePurpose> from) {
-    Set<SamplePurposeDto> dtoSet = Sets.newHashSet();
-    for (SamplePurpose samplePurpose : from) {
-      dtoSet.add(asDto(samplePurpose));
-    }
-    return dtoSet;
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static SamplePurpose to(SamplePurposeDto from) {
@@ -564,11 +534,7 @@ public class Dtos {
   }
 
   public static Set<SampleGroupDto> asSampleGroupDtos(Set<SampleGroupId> from) {
-    Set<SampleGroupDto> dtoSet = Sets.newHashSet();
-    for (SampleGroupId sampleGroup : from) {
-      dtoSet.add(asDto(sampleGroup));
-    }
-    return dtoSet;
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static SampleGroupId to(SampleGroupDto from) {
@@ -629,11 +595,7 @@ public class Dtos {
   }
 
   public static List<SampleDto> asSampleDtos(Collection<Sample> from, boolean full) {
-    List<SampleDto> dtoSet = new ArrayList<>();
-    for (Sample sample : from) {
-      dtoSet.add(full ? asDto(sample) : asMinimalDto(sample));
-    }
-    return dtoSet;
+    return from.stream().map(sample -> (full ? asDto(sample) : asMinimalDto(sample))).collect(Collectors.toList());
   }
 
   public static Sample to(SampleDto from) {
@@ -715,11 +677,7 @@ public class Dtos {
   }
 
   public static Set<SampleNumberPerProjectDto> asSampleNumberPerProjectDtos(Set<SampleNumberPerProject> from) {
-    Set<SampleNumberPerProjectDto> dtoSet = Sets.newHashSet();
-    for (SampleNumberPerProject sampleNumberPerProject : from) {
-      dtoSet.add(asDto(sampleNumberPerProject));
-    }
-    return dtoSet;
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static SampleNumberPerProject to(SampleNumberPerProjectDto from) {
@@ -743,11 +701,7 @@ public class Dtos {
   }
 
   public static Set<SampleValidRelationshipDto> asSampleValidRelationshipDtos(Set<SampleValidRelationship> from) {
-    Set<SampleValidRelationshipDto> dtoSet = Sets.newHashSet();
-    for (SampleValidRelationship sampleValidRelationship : from) {
-      dtoSet.add(asDto(sampleValidRelationship));
-    }
-    return dtoSet;
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static SampleValidRelationship to(SampleValidRelationshipDto from) {
@@ -767,11 +721,7 @@ public class Dtos {
   }
 
   public static Set<InstituteDto> asInstituteDtos(Set<Institute> from) {
-    Set<InstituteDto> dtoSet = Sets.newHashSet();
-    for (Institute institute : from) {
-      dtoSet.add(asDto(institute));
-    }
-    return dtoSet;
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static Institute to(InstituteDto from) {
@@ -795,11 +745,7 @@ public class Dtos {
   }
 
   public static Set<LabDto> asLabDtos(Collection<Lab> from) {
-    Set<LabDto> dtoSet = Sets.newHashSet();
-    for (Lab lab : from) {
-      dtoSet.add(asDto(lab));
-    }
-    return dtoSet;
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static Lab to(LabDto from) {
@@ -937,11 +883,7 @@ public class Dtos {
   }
 
   public static Set<KitDescriptorDto> asKitDescriptorDtos(Collection<KitDescriptor> from) {
-    Set<KitDescriptorDto> dtoSet = Sets.newHashSet();
-    for (KitDescriptor kd : from) {
-      dtoSet.add(asDto(kd));
-    }
-    return dtoSet;
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static KitDescriptor to(KitDescriptorDto from) {
@@ -1037,11 +979,7 @@ public class Dtos {
   }
 
   public static Set<PoolOrderDto> asPoolOrderDtos(Collection<PoolOrder> from) {
-    Set<PoolOrderDto> dtoSet = Sets.newHashSet();
-    for (PoolOrder po : from) {
-      dtoSet.add(asDto(po));
-    }
-    return dtoSet;
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static PoolOrder to(PoolOrderDto from) {
@@ -1072,10 +1010,7 @@ public class Dtos {
   }
 
   public static List<SequencingParametersDto> asSequencingParametersDtos(Collection<SequencingParameters> from) {
-    List<SequencingParametersDto> dtoList = new ArrayList<>();
-    for (SequencingParameters sp : from) {
-      dtoList.add(asDto(sp));
-    }
+    List<SequencingParametersDto> dtoList = from.stream().map(Dtos::asDto).collect(Collectors.toList());
     Collections.sort(dtoList, new Comparator<SequencingParametersDto>() {
 
       @Override
@@ -1176,11 +1111,7 @@ public class Dtos {
   }
 
   public static List<LibraryDto> asLibraryDtos(Collection<Library> from) {
-    List<LibraryDto> dtoSet = new ArrayList<>();
-    for (Library lib : from) {
-      dtoSet.add(asDto(lib));
-    }
-    return dtoSet;
+    return from.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
   public static Library to(LibraryDto from) {
@@ -1286,11 +1217,7 @@ public class Dtos {
   }
 
   private static List<BoxableDto> asBoxablesDtos(Map<String, BoxableView> boxables) {
-    List<BoxableDto> items = new ArrayList<>();
-    for (Entry<String, BoxableView> entry : boxables.entrySet()) {
-      items.add(asDto(entry.getValue()));
-    }
-    return items;
+    return boxables.entrySet().stream().map(entry -> asDto(entry.getValue())).collect(Collectors.toList());
   }
 
   public static List<BoxableDto> asBoxableDtos(List<BoxableView> boxables) {
@@ -1472,11 +1399,7 @@ public class Dtos {
   }
 
   public static List<PoolDto> asPoolDtos(Collection<Pool> poolSubset, boolean includeContents) {
-    List<PoolDto> dtoList = new ArrayList<>();
-    for (Pool pool : poolSubset) {
-      dtoList.add(asDto(pool, includeContents));
-    }
-    return dtoList;
+    return poolSubset.stream().map(pool -> asDto(pool, includeContents)).collect(Collectors.toList());
   }
 
   public static RunDto asDto(Run from) {
@@ -1516,11 +1439,7 @@ public class Dtos {
   }
 
   public static List<RunDto> asRunDtos(Collection<Run> runSubset) {
-    List<RunDto> dtoList = new ArrayList<>();
-    for (Run run : runSubset) {
-      dtoList.add(asDto(run));
-    }
-    return dtoList;
+    return runSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
   public static ContainerDto asDto(SequencerPartitionContainer from) {
@@ -1548,11 +1467,7 @@ public class Dtos {
   }
 
   public static List<ContainerDto> asContainerDtos(Collection<SequencerPartitionContainer> containerSubset) {
-    List<ContainerDto> dtoList = new ArrayList<>();
-    for (SequencerPartitionContainer container : containerSubset) {
-      dtoList.add(asDto(container));
-    }
-    return dtoList;
+    return containerSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
   public static ContainerModelDto asDto(SequencingContainerModel from) {
@@ -1607,19 +1522,11 @@ public class Dtos {
   }
 
   public static List<QcDto> asQcDtos(Collection<? extends QC> qcSubset) {
-    List<QcDto> dtoList = new ArrayList<>();
-    for (QC qc : qcSubset) {
-      dtoList.add(asDto(qc));
-    }
-    return dtoList;
+    return qcSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
   public static List<QcTypeDto> asQcTypeDtos(Collection<QcType> qcTypeSubset) {
-    List<QcTypeDto> dtoList = new ArrayList<>();
-    for (QcType qcType : qcTypeSubset) {
-      dtoList.add(asDto(qcType));
-    }
-    return dtoList;
+    return qcTypeSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
   public static PoolOrderCompletionDto asDto(PoolOrderCompletion from) {
@@ -1672,12 +1579,8 @@ public class Dtos {
     return dto;
   }
 
-  public static List<ProjectDto> asProjectDtos(Collection<Project> projects) {
-    List<ProjectDto> dtoList = new ArrayList<>();
-    for (Project project : projects) {
-      dtoList.add(asDto(project));
-    }
-    return dtoList;
+  public static List<ProjectDto> asProjectDtos(Collection<Project> from) {
+    return from.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
   public static LibraryDesignDto asDto(LibraryDesign from) {
@@ -2118,13 +2021,7 @@ public class Dtos {
   }
 
   private static List<ArraySampleDto> asArraySampleDtos(Map<String, Sample> arraySamples) {
-    List<ArraySampleDto> list = new ArrayList<>();
-    if (arraySamples != null) {
-      for (Entry<String, Sample> entry : arraySamples.entrySet()) {
-        list.add(asArraySampleDto(entry.getKey(), entry.getValue()));
-      }
-    }
-    return list;
+    return arraySamples.entrySet().stream().map(entry -> asArraySampleDto(entry.getKey(), entry.getValue())).collect(Collectors.toList());
   }
 
   private static ArraySampleDto asArraySampleDto(String position, Sample sample) {
