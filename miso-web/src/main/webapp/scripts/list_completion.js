@@ -49,6 +49,18 @@ ListTarget.completion = {
     }, "pool.alias", 0, !config.poolId), {
       "sTitle": "Description",
       "mData": "pool.description",
+      "mRender": function(data, type, full) {
+        var html = data ? data : ""
+        if (full.pool.duplicateIndices) {
+          html += " <span class='parsley-custom-error-message'><strong>(DUPLICATE INDICES)</strong></span>"
+        } else if (full.pool.nearDuplicateIndices) {
+          html += " <span class='parsley-custom-error-message'><strong>(NEAR-DUPLICATE INDICES)</strong></span>"
+        }
+        if (full.pool.hasLowQualityLibraries){
+          html += " <span class='parsley-custom-error-message'><strong>(LOW QUALITY LIBRARIES)</strong></span>"
+        }
+        return html;
+      },
       "bSortable": false,
       "iSortPriority": 0,
       "include": !config.poolId
