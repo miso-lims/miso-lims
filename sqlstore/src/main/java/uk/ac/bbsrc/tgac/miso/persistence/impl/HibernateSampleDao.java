@@ -257,7 +257,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
           Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
           criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
           return criteria.list();
-        }).flatMap(sams -> sams.stream()).collect(Collectors.toList());
+        }).flatMap(List::stream).collect(Collectors.toList());
     return records;
   }
 
@@ -281,7 +281,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
           criteria.add(Restrictions.eq("project.id", projectId));
           criteria.add(Restrictions.ilike("externalName", str));
           return criteria.list();
-        }).flatMap(sams -> sams.stream()).collect(Collectors.toList());
+        }).flatMap(List::stream).collect(Collectors.toList());
     
     // filter out those with a non-exact external name match
     return filterOnlyExactExternalNameMatches(records, externalNames);
@@ -289,12 +289,12 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
 
   private List<SampleIdentity> filterOnlyExactExternalNameMatches(Collection<SampleIdentity> candidates, String externalNames) {
     return candidates.stream().filter(sam -> {
-      Set<String> targets = SampleIdentityImpl.getSetFromString(externalNames).stream().map(str -> str.toLowerCase())
+      Set<String> targets = SampleIdentityImpl.getSetFromString(externalNames).stream().map(String::toLowerCase)
           .collect(Collectors.toSet());
       Set<String> externalNamesOfCandidate = SampleIdentityImpl.getSetFromString(sam.getExternalName()).stream()
-          .map(str -> str.toLowerCase()).collect(Collectors.toSet());
+          .map(String::toLowerCase).collect(Collectors.toSet());
       targets.retainAll(externalNamesOfCandidate);
-      return targets.size() != 0;
+      return !targets.isEmpty();
     }).collect(Collectors.toList());
   }
 

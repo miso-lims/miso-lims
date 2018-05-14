@@ -306,7 +306,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     long projectId = 1;
     Collection<SampleIdentity> exactMatches = dao.getIdentitiesByExactExternalNameAndProject(externalName, projectId);
     assertFalse(exactMatches.isEmpty());
-    assertEquals(exactMatches.size(), 1);
+    assertEquals(1, exactMatches.size());
   }
 
   @Test

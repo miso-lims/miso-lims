@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.exception.ConstraintViolationException;
-
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
@@ -38,7 +36,7 @@ public interface SampleService extends PaginatedDataSource<Sample>, BarcodableSe
 
   Collection<SampleIdentity> getIdentitiesByExactExternalNameAndProject(String externalName, Long projectId) throws IOException;
 
-  void confirmExternalNameUniqueForProjectIfRequired(String externalNames, Sample sample) throws IOException, ConstraintViolationException;
+  void confirmExternalNameUniqueForProjectIfRequired(String externalNames, Sample sample) throws IOException;
 
   public void addNote(Sample sample, Note note) throws IOException;
 

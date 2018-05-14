@@ -360,7 +360,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
    *           <b>and</b> the alias is used by multiple Samples
    * @throws IOException
    */
-  private void validateAliasUniqueness(Sample sample) throws ConstraintViolationException, IOException {
+  private void validateAliasUniqueness(Sample sample) throws IOException {
     if (isDetailedSample(sample) && ((DetailedSample) sample).hasNonStandardAlias()) {
       return;
     }
@@ -389,7 +389,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     if (!isUniqueExternalNameWithinProjectRequired()) return;
     Collection<SampleIdentity> matches = getIdentitiesByExactExternalNameAndProject(newExternalName,
         sample.getProject().getId());
-    if(matches.size() != 0) {
+    if (!matches.isEmpty()) {
       SampleIdentity existingIdentity = matches.iterator().next();
         throw new ConstraintViolationException("Duplicate external names not allowed within a project: External name " + newExternalName
           + " is already associated with Identity " + existingIdentity.getAlias() + " (" + existingIdentity.getExternalName() + ")",
