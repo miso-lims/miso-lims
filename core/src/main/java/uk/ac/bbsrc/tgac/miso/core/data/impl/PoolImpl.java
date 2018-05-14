@@ -396,7 +396,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private static boolean hasFakeSequence(PoolableElementView view) {
     return view.getIndices().stream()
         .map(Index::getFamily)
-        .anyMatch(f -> f.getFake());
+        .anyMatch(f -> f.hasFakeSequence());
   }
 
   @Override

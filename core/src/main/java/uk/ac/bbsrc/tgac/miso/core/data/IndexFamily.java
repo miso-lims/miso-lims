@@ -75,7 +75,7 @@ public class IndexFamily implements Serializable {
   private PlatformType platformType;
   @Id
   private Long indexFamilyId;
-  private boolean fake;
+  private boolean fakeSequence;
 
   public Boolean getArchived() {
     return archived;
@@ -117,8 +117,8 @@ public class IndexFamily implements Serializable {
     return platformType;
   }
 
-  public boolean getFake() {
-    return fake;
+  public boolean hasFakeSequence() {
+    return fakeSequence;
   }
 
   public void setArchived(Boolean archived) {
@@ -142,7 +142,7 @@ public class IndexFamily implements Serializable {
   }
 
   public void setFake(boolean fake) {
-    this.fake = fake;
+    this.fakeSequence = fake;
   }
 
   @Override
