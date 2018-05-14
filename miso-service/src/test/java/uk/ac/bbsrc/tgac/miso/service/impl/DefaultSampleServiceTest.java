@@ -5,8 +5,10 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasTemporaryName;
 import static uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils.generateTemporaryName;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.exception.ConstraintViolationException;
@@ -469,12 +471,12 @@ public class DefaultSampleServiceTest {
     Project project = new ProjectImpl();
     project.setId(1L);
     project.setReferenceGenome(humanReferenceGenome());
-    Set<SampleIdentity> idList = new HashSet<>();
+    List<SampleIdentity> idList = new ArrayList<>();
     SampleIdentity id1 = new SampleIdentityImpl();
     id1.setExternalName("String1,String2");
     id1.setProject(project);
     idList.add(id1);
-    Mockito.when(sut.getIdentitiesByExternalNameOrAlias(Matchers.anyString())).thenReturn(idList);
+    Mockito.when(sut.getIdentitiesByExactExternalNameAndProject(Matchers.anyString(), Matchers.anyLong())).thenReturn(idList);
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
     exception.expect(ConstraintViolationException.class);

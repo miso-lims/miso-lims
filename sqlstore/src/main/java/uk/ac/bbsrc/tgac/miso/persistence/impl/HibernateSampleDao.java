@@ -8,7 +8,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -246,26 +248,54 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public Collection<SampleIdentity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException {
-    if (isStringEmptyOrNull(externalName)) return Collections.emptySet();
-    String str = DbUtils.convertStringToSearchQuery(externalName, false);
-    Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
-    criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
+  public Collection<SampleIdentity> getIdentitiesByExternalNameOrAliasPartialMatch(String externalNames) throws IOException {
+    if (isStringEmptyOrNull(externalNames)) return Collections.emptySet();
     @SuppressWarnings("unchecked")
-    Collection<SampleIdentity> records = criteria.list();
+    List<SampleIdentity> records = (List<SampleIdentity>) SampleIdentityImpl.getSetFromString(externalNames)
+        .stream().map(extName -> {
+          String str = DbUtils.convertStringToSearchQuery(extName, false);
+          Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
+          criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
+          return criteria.list();
+        }).flatMap(sams -> sams.stream()).collect(Collectors.toList());
     return records;
   }
 
   @Override
-  public Collection<SampleIdentity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException {
-    if (isStringEmptyOrNull(externalName)) return Collections.emptySet();
+  public Collection<SampleIdentity> getIdentitiesByExactExternalName(String externalNames) throws IOException {
+    if (externalNames == null) return Collections.emptyList();
+
+    Collection<SampleIdentity> partialMatches = getIdentitiesByExternalNameOrAliasPartialMatch(externalNames);
+    return filterOnlyExactExternalNameMatches(partialMatches, externalNames);
+  }
+
+  @Override
+  public List<SampleIdentity> getIdentitiesByExactExternalNameAndProject(String externalNames, Long projectId) throws IOException {
+    if (isStringEmptyOrNull(externalNames)) return Collections.emptyList();
     if (projectId == null) throw new IllegalArgumentException("Must provide a projectId in search");
-    Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
-    criteria.add(Restrictions.eq("project.id", projectId));
-    criteria.add(Restrictions.eq("externalName", externalName).ignoreCase());
     @SuppressWarnings("unchecked")
-    Collection<SampleIdentity> records = criteria.list();
-    return records;
+    List<SampleIdentity> records = (List<SampleIdentity>) SampleIdentityImpl.getSetFromString(externalNames)
+        .stream().map(extName -> {
+          String str = DbUtils.convertStringToSearchQuery(extName, false);
+          Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
+          criteria.add(Restrictions.eq("project.id", projectId));
+          criteria.add(Restrictions.ilike("externalName", str));
+          return criteria.list();
+        }).flatMap(sams -> sams.stream()).collect(Collectors.toList());
+    
+    // filter out those with a non-exact external name match
+    return filterOnlyExactExternalNameMatches(records, externalNames);
+  }
+
+  private List<SampleIdentity> filterOnlyExactExternalNameMatches(Collection<SampleIdentity> candidates, String externalNames) {
+    return candidates.stream().filter(sam -> {
+      Set<String> targets = SampleIdentityImpl.getSetFromString(externalNames).stream().map(str -> str.toLowerCase())
+          .collect(Collectors.toSet());
+      Set<String> externalNamesOfCandidate = SampleIdentityImpl.getSetFromString(sam.getExternalName()).stream()
+          .map(str -> str.toLowerCase()).collect(Collectors.toSet());
+      targets.retainAll(externalNamesOfCandidate);
+      return targets.size() != 0;
+    }).collect(Collectors.toList());
   }
 
   @Override

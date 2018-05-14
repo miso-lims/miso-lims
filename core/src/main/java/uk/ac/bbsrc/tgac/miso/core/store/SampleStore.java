@@ -135,27 +135,38 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
   Long countAll() throws IOException;
 
   /**
-   * List all the identities which have at least one external name which (partially) matches the input String.
-   * The input String must be a single non-comma-separated external name or alias. If there are multiple comma-separated external names to
-   * search against, they must each be queried through this function.
+   * List all the identities which have an alias or at least one external name which (partially) matches the input String or a
+   * comma-separated portion of the input String.
    * 
    * @param externalName
    *          a single external name/alias string
-   * @return Collection<Identity> set of Identities which have an external name which matches the input string
+   * @return Collection<Identity> set of Identities which have an external name or alias which partially matches the input string
    * @throws IOException
    */
-  Collection<SampleIdentity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException;
+  Collection<SampleIdentity> getIdentitiesByExternalNameOrAliasPartialMatch(String externalName) throws IOException;
 
   /**
-   * List all the identities associated with a given project which have at least one external name which exactly matches the input String.
-   * The input String must be a single non-comma-separated external name.
+   * List all the identities which have at least one external name which exactly matches the input String or a comma-separated portion of
+   * the input String.
+   * 
+   * @param externalName
+   *          a single external name string
+   * @return Collection<Identity> set of Identities which have an external name with a (comma-separated) segment that partially matches the
+   *         input string
+   * @throws IOException
+   */
+  Collection<SampleIdentity> getIdentitiesByExactExternalName(String externalName) throws IOException;
+
+  /**
+   * List all the identities associated with a given project which have at least one external name which exactly matches the input String or
+   * a comma-separated portion of the input String.
    * 
    * @param externalName a single external name String
    * @param projectId Long
-   * @return Collection<Sample> set of Identities belonging to a given project which have an external name that matches the input string
+   * @return List<Sample> set of Identities belonging to a given project which have an external name that matches the input string
    * @throws IOException
    */
-  Collection<SampleIdentity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException;
+  List<SampleIdentity> getIdentitiesByExactExternalNameAndProject(String externalName, Long projectId) throws IOException;
 
   /**
    * Find a ghost Tissue with Identity, Tissue Origin, Tissue Type, times received, tube number, and passage number matching the provided
@@ -169,5 +180,6 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
   public SampleTissue getMatchingGhostTissue(SampleTissue tissue) throws IOException;
 
   public long getChildSampleCount(Sample sample);
+
 
 }

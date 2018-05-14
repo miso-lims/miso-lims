@@ -308,7 +308,7 @@ HotTarget.sample = (function() {
                 jQuery.ajax({
                   url: "/miso/rest/sample/identities",
                   data: JSON.stringify({
-                    "identitiesSearches": flat.externalName
+                    "identitiesSearches": [flat.externalName]
                   }),
                   contentType: "application/json; charset=utf8",
                   dataType: "json",

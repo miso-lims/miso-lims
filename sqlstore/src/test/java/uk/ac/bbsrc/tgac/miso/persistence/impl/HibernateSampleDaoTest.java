@@ -274,27 +274,65 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetIdentityByExternalName() throws IOException {
-    List<SampleIdentity> identity = (List<SampleIdentity>) dao.getIdentitiesByExternalNameOrAlias("EXT15");
-    assertTrue(identity.get(0).getExternalName().contains("EXT15"));
+  public void testGetIdentityByPartialMatchExternalName() throws IOException {
+    List<SampleIdentity> identity = (List<SampleIdentity>) dao.getIdentitiesByExternalNameOrAliasPartialMatch("EXT1");
+    assertTrue(identity.get(0).getExternalName().contains("EXT1"));
+  }
+
+  @Test
+  public void testGetIdentityByExactMatchExternalNameWithNonExactMatch() throws IOException {
+    String query = "EXT1";
+    List<SampleIdentity> exactMatches = (List<SampleIdentity>) dao.getIdentitiesByExactExternalName(query);
+    assertTrue(exactMatches.isEmpty());
+  }
+
+  @Test
+  public void testGetidentityByExactMatchExternalNameWithExactMatch() throws IOException {
+    String query = "EXT15";
+    List<SampleIdentity> exactMatches = (List<SampleIdentity>) dao.getIdentitiesByExactExternalName(query);
+    assertFalse(exactMatches.isEmpty());
+  }
+
+  @Test
+  public void testGetIdentityByExactMatchExternalNameWithEmptyString() throws IOException {
+    String query = "";
+    Collection<SampleIdentity> exactMatches = dao.getIdentitiesByExactExternalName(query);
+    assertTrue(exactMatches.isEmpty());
+  }
+
+  @Test
+  public void testGetIdentityByExternalNameAndProjectExactMatch() throws IOException {
+    String externalName = "EXT15";
+    long projectId = 1;
+    Collection<SampleIdentity> exactMatches = dao.getIdentitiesByExactExternalNameAndProject(externalName, projectId);
+    assertFalse(exactMatches.isEmpty());
+    assertEquals(exactMatches.size(), 1);
+  }
+
+  @Test
+  public void testGetIdentityByExternalNameAndProjectNonExactMatch() throws IOException {
+    String externalName = "EXT1";
+    long projectId = 1;
+    Collection<SampleIdentity> exactMatches = dao.getIdentitiesByExactExternalNameAndProject(externalName, projectId);
+    assertTrue(exactMatches.isEmpty());
   }
 
   @Test
   public void getIdentityByAlias() throws IOException {
-    Collection<SampleIdentity> identities = dao.getIdentitiesByExternalNameOrAlias("TEST_0001_IDENTITY_1");
+    Collection<SampleIdentity> identities = dao.getIdentitiesByExternalNameOrAliasPartialMatch("TEST_0001_IDENTITY_1");
     assertEquals(1, identities.size());
     assertEquals("TEST_0001_IDENTITY_1", identities.iterator().next().getAlias());
   }
 
   @Test
   public void getIdentityByNullAlias() throws IOException {
-    Collection<SampleIdentity> identities = dao.getIdentitiesByExternalNameOrAlias(null);
+    Collection<SampleIdentity> identities = dao.getIdentitiesByExternalNameOrAliasPartialMatch(null);
     assertTrue(identities.isEmpty());
   }
 
   @Test
   public void getIdentityByNonIdentityAlias() throws IOException {
-    Collection<SampleIdentity> identities = dao.getIdentitiesByExternalNameOrAlias("TEST_0001_Bn_P_nn_1-1_D_1");
+    Collection<SampleIdentity> identities = dao.getIdentitiesByExternalNameOrAliasPartialMatch("TEST_0001_Bn_P_nn_1-1_D_1");
     assertTrue(identities.isEmpty());
   }
 
