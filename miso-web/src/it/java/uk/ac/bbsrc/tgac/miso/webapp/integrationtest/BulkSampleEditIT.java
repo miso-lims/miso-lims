@@ -131,7 +131,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     Map<String, String> empty = new HashMap<>();
     empty.put(SamColumns.ALIAS, "TEST_0002");
     empty.put(SamColumns.DESCRIPTION, "");
-    empty.put(SamColumns.ID_BARCODE, "");
     empty.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
     empty.put(SamColumns.SCIENTIFIC_NAME, "Mus musculus");
     empty.put(SamColumns.EXTERNAL_NAME, "completely new");
