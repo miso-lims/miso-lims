@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
@@ -376,7 +377,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
       String sequence1 = getCombinedIndexSequences(views.get(i));
       for (int j = i + 1; j < views.size(); j++) {
         String sequence2 = getCombinedIndexSequences(views.get(j));
-        if (Index.checkEditDistance(sequence1, sequence2) < minimumDistance) {
+        if ((Index.checkEditDistance(sequence1, sequence2) < minimumDistance) &&
+            !((hasFakeSequence(views.get(i)) || hasFakeSequence(views.get(j))) && minimumDistance > 1)) {
           sequences.add(sequence1);
           sequences.add(sequence2);
         }
@@ -390,6 +392,13 @@ public class PoolImpl extends AbstractBoxable implements Pool {
         .sorted((i1, i2) -> Integer.compare(i1.getPosition(), i2.getPosition()))
         .map(Index::getSequence)
         .collect(Collectors.joining());
+  }
+
+  private static boolean hasFakeSequence(PoolableElementView view) {
+    return view.getIndices().stream()
+        .map(Index::getFamily)
+        .map(IndexFamily::getFake)
+        .reduce(false, (a, b) -> a || b);
   }
 
   @Override

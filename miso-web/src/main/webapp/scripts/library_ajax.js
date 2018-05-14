@@ -254,13 +254,15 @@ Library.ui = {
       nullOption.text = "(None)";
       widget.appendChild(nullOption);
     }
-    var indices = Library.ui.getCurrentIndexFamily().indices.filter(function(index) {
+    var family = Library.ui.getCurrentIndexFamily();
+    var indices = family.indices.filter(function(index) {
       return index.position == position;
     });
     for (var i = 0; i < indices.length; i++) {
       var option = document.createElement("option");
       option.value = indices[i].id;
-      option.text = indices[i].name + " (" + indices[i].sequence + ")";
+      option.text = indices[i].name;
+      if(!family.fake) option.text += " (" + indices[i].sequence + ")";
       widget.appendChild(option);
     }
     widget.value = selectedId ? selectedId : (position > 1 ? "" : 0);

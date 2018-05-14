@@ -1747,6 +1747,7 @@ public class Dtos {
     }
     dto.setMaximumNumber(from.getMaximumNumber());
     dto.setPlatformType(from.getPlatformType() == null ? null : from.getPlatformType().name());
+    dto.setFake(from.getFake());
     return dto;
   }
 

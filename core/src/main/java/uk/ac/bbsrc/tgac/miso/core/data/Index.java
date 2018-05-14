@@ -134,7 +134,7 @@ public class Index implements Nameable, Serializable {
   }
 
   public String getLabel() {
-    if (getSequence() == null) return getName();
+    if (getSequence() == null || getFamily().getFake()) return getName();
     return getName() + " (" + getSequence() + ")";
   }
 
