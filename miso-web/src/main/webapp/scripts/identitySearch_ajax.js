@@ -3,7 +3,7 @@
   IdentitySearch.lookup = function() {
     var data = getExternalNamesInput();
     if (!data || data.length == 0) {
-      showError('Enter at least one external name');
+      Utils.showOkDialog('Search error', ['Enter at least one external name']);
     } else {
       IdentitySearch.clearResults();
       jQuery('#searchButton').prop('disabled', true);
