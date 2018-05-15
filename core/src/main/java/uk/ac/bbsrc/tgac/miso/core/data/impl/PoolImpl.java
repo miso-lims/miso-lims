@@ -372,6 +372,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private Set<String> getIndexSequencesWithMinimumEditDistance(int minimumDistance) {
     Set<String> sequences = new HashSet<>();
     List<PoolableElementView> views = new ArrayList<>(getPoolableElementViews());
+    if (minimumDistance > 1 && views.stream().anyMatch(PoolImpl::hasFakeSequence)) return Collections.emptySet();
     for (int i = 0; i < views.size(); i++) {
       String sequence1 = getCombinedIndexSequences(views.get(i));
       for (int j = i + 1; j < views.size(); j++) {
@@ -390,6 +391,12 @@ public class PoolImpl extends AbstractBoxable implements Pool {
         .sorted((i1, i2) -> Integer.compare(i1.getPosition(), i2.getPosition()))
         .map(Index::getSequence)
         .collect(Collectors.joining());
+  }
+
+  private static boolean hasFakeSequence(PoolableElementView view) {
+    return view.getIndices().stream()
+        .map(Index::getFamily)
+        .anyMatch(f -> f.hasFakeSequence());
   }
 
   @Override
