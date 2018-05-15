@@ -257,7 +257,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
           Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
           criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
           return criteria.list();
-        }).flatMap(List::stream).collect(Collectors.toList());
+        }).flatMap(list -> list.stream()).collect(Collectors.toList());
     return records;
   }
 
@@ -281,7 +281,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
           criteria.add(Restrictions.eq("project.id", projectId));
           criteria.add(Restrictions.ilike("externalName", str));
           return criteria.list();
-        }).flatMap(List::stream).collect(Collectors.toList());
+        }).flatMap(list -> list.stream()).collect(Collectors.toList());
     
     // filter out those with a non-exact external name match
     return filterOnlyExactExternalNameMatches(records, externalNames);
