@@ -18,17 +18,14 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -235,44 +232,4 @@ public class HibernateSequencerPartitionContainerDao
     List<PoreVersion> results = criteria.list();
     return results;
   }
-
-  @Override
-  public SequencingContainerModel getModel(long id) {
-    return (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, id);
-  }
-
-  @Override
-  public SequencingContainerModel findModel(Platform platform, String search, int partitionCount) {
-    SequencingContainerModel model;
-    Criteria criteria = currentSession().createCriteria(SequencingContainerModel.class);
-    criteria.createAlias("platforms", "platform");
-    criteria.add(Restrictions.eq("platform.id", platform.getId()));
-    criteria.add(Restrictions.eq("partitionCount", partitionCount));
-    if (LimsUtils.isStringEmptyOrNull(search)) {
-      criteria.add(Restrictions.eq("fallback", true));
-      model = (SequencingContainerModel) criteria.uniqueResult();
-    } else {
-      criteria.add(Restrictions.or(Restrictions.eq("alias", search), Restrictions.eq("identificationBarcode", search)));
-      model = (SequencingContainerModel) criteria.uniqueResult();
-      if (model == null) {
-        // remove search restriction and get fallback option if search did not retrieve anything
-        Criteria fallback = currentSession().createCriteria(SequencingContainerModel.class);
-        fallback.createAlias("platforms", "platform");
-        fallback.add(Restrictions.eq("platform.id", platform.getId()));
-        fallback.add(Restrictions.eq("partitionCount", partitionCount));
-        fallback.add(Restrictions.eq("fallback", true));
-        model = (SequencingContainerModel) fallback.uniqueResult();
-      }
-    }
-    return model;
-  }
-
-  @Override
-  public List<SequencingContainerModel> listModels() {
-    Criteria criteria = currentSession().createCriteria(SequencingContainerModel.class);
-    @SuppressWarnings("unchecked")
-    List<SequencingContainerModel> results = criteria.list();
-    return results;
-  }
-
 }

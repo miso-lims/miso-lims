@@ -2114,33 +2114,50 @@ button.disabled {
   }
 }
 
-#workflowDisplay * {
-    font-size: 20px;
-    margin: 5px;
+#workflowDisplay {
+  margin: 12px;
+}
+
+#workflowDisplay > input {
+  font-size: 20px;
+}
+
+#workflowDisplay > .ui-button {
+  font-size: 20px;
+  padding: 3px;
+}
+
+.workflowInstruction {
+  font-size: 24px;
+  margin-bottom: 24px;
 }
 
 .workflowLogTable {
-    border-top: 1px solid black;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
-    border-collapse: collapse;
+  margin-top: 48px;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  border-collapse: collapse;
+  width: 100%;
 }
 
 .workflowLogTable td {
-    min-width: 40px;
-    border-bottom: 1px solid black;
+  font-size: 16px;
 }
 
-.redoStep {
-    width: 20px;
-    height: 20px;
+.workflowLogTable tr.odd {
+  background-color: #E2E4FF;
 }
 
 div#inputError {
-    color: red;
+  color: red;
+}
+
+.logIconCell {
+  width: 40px;
 }
 
 .logIcon {
-    width: 30px;
-    height: 30px;
+  width: 30px;
+  height: 30px;
+  margin: 5px 12px;
 }

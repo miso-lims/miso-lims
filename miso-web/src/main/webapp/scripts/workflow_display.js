@@ -2,6 +2,7 @@ var WorkflowDisplay = (function() {
   var display;
   var loadingTag = jQuery("<img src='/styles/images/ajax-loader.gif'>");
   var errorDiv = jQuery("<div id='inputError'></div>");
+  var SKIP = "SKIP";
 
   function ajax(method, url, onSuccess, onError) {
     showLoading();
@@ -14,9 +15,9 @@ var WorkflowDisplay = (function() {
       "error": onError
     })
   }
-  
+
   function showSuccess() {
-    display.empty().append(jQuery("<p>Workflow was successfully completed.</p>"));
+    display.empty().append(jQuery("<p class='workflowInstruction'>Workflow was successfully completed.</p>"));
   }
 
   function executeWorkflow(workflowId) {
@@ -49,8 +50,8 @@ var WorkflowDisplay = (function() {
     })), updateDisplay, showError);
   }
 
-  function makeMessageTag(message) {
-    return jQuery("<p>" + message + "</p>");
+  function makeInstructionTag(message) {
+    return jQuery("<p class='workflowInstruction'>" + message + "</p>");
   }
 
   function showLoading() {
@@ -84,29 +85,54 @@ var WorkflowDisplay = (function() {
     ajax("DELETE", "/miso/rest/workflow/" + workflowId + "/step/latest", updateDisplay, showError);
   }
 
+  function makeLogIconCell(file, label) {
+    var cell = jQuery("<td class='logIconCell'" + (label ? " title='" + label + "'" : "") + ">");
+    if (file) {
+      cell.append(jQuery("<img src='/styles/images/" + file + "' class='logIcon'>"));
+    } else {
+      cell.append(jQuery("<div class='logIcon'>"));
+    }
+    return cell;
+  }
+
   function makeArrowCell(entryStepNumber, currentStepNumber) {
-    return entryStepNumber === currentStepNumber ? jQuery("<td>").append(jQuery("<img src='/styles/images/arrow.svg' class='logIcon'>"))
-        : jQuery("<td>");
+    return entryStepNumber === currentStepNumber ? makeLogIconCell('arrow-right.svg') : makeLogIconCell();
   }
 
-  function makeModifyCell(entryStepNumber, numEntries) {
-    return entryStepNumber === numEntries - 1 ? jQuery("<td>").append(jQuery("<img src='/styles/images/cancel.png' class='logIcon'>"))
-        : jQuery("<td>").append(jQuery("<img src='/styles/images/redo.svg' class='logIcon'>"));
+  function makeActionCell(entryStepNumber, numEntries, workflowId) {
+    if (entryStepNumber === numEntries - 1) {
+      return makeLogIconCell('arrow-undo.svg', 'Undo').click(function() {
+        cancelInput(workflowId);
+      });
+    } else {
+      return makeLogIconCell('arrow-back.svg', 'Go Back').click(function() {
+        changeStep(workflowId, entryStepNumber);
+      });
+    }
   }
 
-  function makeLogEntryClickHandler(entryStepNumber, numEntries, workflowId) {
-    return function() {
-      entryStepNumber === numEntries - 1 ? cancelInput(workflowId) : changeStep(workflowId, entryStepNumber)
-    };
+  function makeRow(rowNum, cells) {
+    return jQuery("<tr class=" + (rowNum % 2 === 1 ? "odd" : "even") + ">").append(cells);
   }
 
-  function makeLog(logEntries, workflowId, currentStepNumber) {
+  function makeLog(logEntries, workflowId, currentStepNumber, complete) {
     var table = jQuery("<table class='workflowLogTable'>");
+    var rowNum = 1;
 
-    for (var i = 0; i < logEntries.length; i++) {
-      table.prepend(jQuery("<tr>").append(
-          [makeArrowCell(i, currentStepNumber), jQuery("<td>").text(logEntries[i]), jQuery("<td>"), makeModifyCell(i, logEntries.length)])
-          .click(makeLogEntryClickHandler(i, logEntries.length, workflowId)));
+    if (currentStepNumber != null && currentStepNumber < logEntries.length) {
+      var arrowCell = makeArrowCell(-1, currentStepNumber);
+      var messageCell = jQuery("<td>").text(complete ? "Complete workflow" : "Resume workflow");
+      var actionCell = makeLogIconCell('arrow-play.svg', 'Return').click(function() {
+        continueWorkflow(workflowId);
+      });
+      table.append(makeRow(rowNum++, [arrowCell, messageCell, actionCell]));
+    }
+
+    for (var i = logEntries.length - 1; i >= 0; i--) {
+      var arrowCell = makeArrowCell(i, currentStepNumber);
+      var messageCell = jQuery("<td>").text(logEntries[i]);
+      var actionCell = makeActionCell(i, logEntries.length, workflowId)
+      table.append(makeRow(rowNum++, [arrowCell, messageCell, actionCell]));
     }
 
     return table;
@@ -118,24 +144,30 @@ var WorkflowDisplay = (function() {
     });
   }
 
-  function showConfirm(workflowId, stepNumber, message, log) {
-    display.empty().append([makeMessageTag(message), makeExecuteButton(workflowId), errorDiv, makeLog(log, workflowId, stepNumber)]);
+  function showConfirm(workflowId, stepNumber, message, log, complete) {
+    display.empty().append(
+        [makeInstructionTag(message), makeExecuteButton(workflowId), errorDiv, makeLog(log, workflowId, stepNumber, complete)]);
   }
 
   function continueWorkflow(workflowId) {
     ajax("GET", "/miso/rest/workflow/" + workflowId + "/step/latest", updateDisplay, showError);
   }
 
-  function makeContinueButton(workflowId, complete) {
-    return jQuery("<a class='ui-button ui-state-default'>").text(complete ? "Finish editing" : "Go to current step").click(function() {
-      continueWorkflow(workflowId);
+  function makeSkipButton(workflowId, stepNumber) {
+    return jQuery("<a class='ui-button ui-state-default'>").text("Skip").click(function() {
+      processInput(workflowId, stepNumber, SKIP);
     });
   }
 
   function showPrompt(workflowId, stepNumber, complete, message, inputTypes, logMessages) {
-    var elements = [makeMessageTag(message), makeInputTag(workflowId, stepNumber), errorDiv]
-        .concat((stepNumber < logMessages.length ? [makeContinueButton(workflowId, complete)] : []), [makeLog(logMessages, workflowId,
-            stepNumber)]);
+    var elements = [makeInstructionTag(message), makeInputTag(workflowId, stepNumber)];
+    if (inputTypes.indexOf(SKIP) > -1) {
+      elements.push(jQuery('<br>'));
+      elements.push(makeSkipButton(workflowId, stepNumber));
+    }
+    elements.push(errorDiv);
+    elements.push(makeLog(logMessages, workflowId, stepNumber, complete));
+
     display.empty().append(elements).children("input").focus();
   }
 
@@ -147,7 +179,7 @@ var WorkflowDisplay = (function() {
     if (Number.isInteger(state["stepNumber"])) {
       showPrompt(state["workflowId"], state["stepNumber"], state["complete"], state["message"], state["inputTypes"], state["log"]);
     } else {
-      showConfirm(state["workflowId"], state["stepNumber"], state["message"], state["log"]);
+      showConfirm(state["workflowId"], state["stepNumber"], state["message"], state["log"], state["complete"]);
     }
   }
 

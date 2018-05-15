@@ -1,6 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasTemporaryName;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isIlluminaRun;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isLS454Run;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isOxfordNanoporeRun;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isSolidRun;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.validateNameOrThrow;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -57,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
@@ -111,6 +119,8 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   private SequencingParametersService sequencingParametersService;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private ContainerModelService containerModelService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -552,7 +562,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     }
     target.setSequencer(sequencer);
 
-    SequencingContainerModel model = containerService.findModel(sequencer.getPlatform(), containerModel, laneCount);
+    SequencingContainerModel model = containerModelService.find(sequencer.getPlatform(), containerModel, laneCount);
     if (model == null) {
       throw new IllegalArgumentException(
           "Could not find container or fallback for parameters: model=" + containerModel + ", lanes=" + laneCount);
