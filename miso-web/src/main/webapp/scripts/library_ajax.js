@@ -87,7 +87,7 @@ var Library = Library || {
       // Group ID validation
       jQuery('#groupId').attr('class', 'form-control');
       jQuery('#groupId').attr('data-parsley-type', 'alphanum');
-      jQuery('#groupId').attr('data-parsley-maxlength', '10');
+      jQuery('#groupId').attr('data-parsley-maxlength', '100');
 
       // Group Description validation
       jQuery('#groupDescription').attr('class', 'form-control');
