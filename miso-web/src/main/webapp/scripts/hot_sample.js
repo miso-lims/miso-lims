@@ -182,7 +182,7 @@ HotTarget.sample = (function() {
               sam.receivedDate = flat.receivedDate;
             }
           },
-          HotUtils.makeColumnForText('Matrix Barcode', !Constants.automaticBarcodes && !config.isLibraryReceipt, 'identificationBarcode', {
+          HotUtils.makeColumnForText('Matrix Barcode', !Constants.automaticBarcodes && !config.isLibraryReceipt && (!Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity'), 'identificationBarcode', {
             validator: HotUtils.validator.optionalTextNoSpecialChars
           }),
           HotUtils.makeColumnForEnum('Sample Type', true, true, 'sampleType', Constants.sampleTypes, null),
@@ -308,7 +308,7 @@ HotTarget.sample = (function() {
                 jQuery.ajax({
                   url: "/miso/rest/sample/identities",
                   data: JSON.stringify({
-                    "identitiesSearches": flat.externalName
+                    "identitiesSearches": [flat.externalName]
                   }),
                   contentType: "application/json; charset=utf8",
                   dataType: "json",
@@ -574,7 +574,10 @@ HotTarget.sample = (function() {
         var spliceIndex = columns.indexOf(columns.filter(function(column) {
           return column.data === 'identificationBarcode';
         })[0]) + 1;
-        columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns()));
+        if (!Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity') {
+          // don't add boxable columns to Identities
+          columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns()));
+        }
       }
 
       return columns;

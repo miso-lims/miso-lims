@@ -26,8 +26,10 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,7 +56,9 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -62,8 +66,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -74,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleLCMTubeDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
@@ -87,9 +92,10 @@ public class SampleRestController extends RestController {
 
   @Autowired
   private SampleService sampleService;
-
   @Autowired
   private SampleClassService sampleClassService;
+  @Autowired
+  private ProjectService projectService;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -263,7 +269,7 @@ public class SampleRestController extends RestController {
 
   /**
    * 
-   * @param identitiesSearches
+   * @param json
    *          String externalNames or Identity aliases
    * @param response
    * @return
@@ -271,20 +277,57 @@ public class SampleRestController extends RestController {
    */
   @RequestMapping(value = "/identities", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public Set<SampleDto> getIdentitiesBySearch(@RequestBody com.fasterxml.jackson.databind.JsonNode json,
+  public Set<SampleDto> getIdentityBySearch(@RequestBody com.fasterxml.jackson.databind.JsonNode json,
       HttpServletResponse response) throws IOException {
-    if (json.get("identitiesSearches").asText().length() == 0) {
-      throw new RestException("Must give search terms to look up identities", Status.BAD_REQUEST);
+    final JsonNode searchTerms = json.get("identitiesSearches");
+    final String project = (json.get("project") == null ? "" : json.get("project").asText());
+    if (!searchTerms.isArray() || searchTerms.size() == 0) {
+      throw new RestException("Please provide external name or alias for identity lookup", Status.BAD_REQUEST);
     }
-    Set<Sample> uniqueIdentities = new HashSet<>();
-    String searchTerms = json.get("identitiesSearches").asText();
-    for (String term : SampleIdentityImpl.getSetFromString(searchTerms.replaceAll(";", ","))) {
-      Collection<SampleIdentity> matches = sampleService.getIdentitiesByExternalNameOrAlias(term);
-      for (SampleIdentity identity : matches) {
-        uniqueIdentities.add(identity);
+    return getSamplesForIdentityString(searchTerms.get(0).asText(), project, true);
+  }
+
+  /**
+   * Only returns identities which exactly match
+   * 
+   * @param json
+   * @param response
+   * @return
+   * @throws IOException
+   */
+  @RequestMapping(value = "/identitiesLookup", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  public @ResponseBody List<Map<String, Set<SampleDto>>> getIdentitiesBySearch(@RequestBody com.fasterxml.jackson.databind.JsonNode json,
+      HttpServletResponse response) throws IOException {
+    final JsonNode searchTerms = json.get("identitiesSearches");
+    final String project = (json.get("project") == null ? "" : json.get("project").asText());
+    if (!searchTerms.isArray() || searchTerms.size() == 0) {
+      throw new RestException("Please provide external name or alias for identity lookup", Status.BAD_REQUEST);
+    }
+    List<Map<String, Set<SampleDto>>> identitiesBySearchTerm = new ArrayList<>();
+    for (JsonNode term : searchTerms) {
+      Set<SampleDto> uniqueIdentities = getSamplesForIdentityString(term.asText(), project, false);
+      if (uniqueIdentities.size() > 0) {
+        Map<String, Set<SampleDto>> found = new HashMap<>();
+        found.put(term.asText(), uniqueIdentities);
+        identitiesBySearchTerm.add(found);
       }
     }
-    return uniqueIdentities.stream().map(Dtos::asDto).collect(Collectors.toSet());
+    return identitiesBySearchTerm;
+  }
+
+  private Set<SampleDto> getSamplesForIdentityString(String identityIdentifier, String project, boolean permitPartialMatch)
+      throws IOException {
+    Collection<SampleIdentity> matches = new HashSet<>();
+    Project selected = null;
+    if (!LimsUtils.isStringEmptyOrNull(project)) selected = projectService.getProjectByAlias(project);
+    if (selected != null) {
+      matches = sampleService.getIdentitiesByExactExternalNameAndProject(identityIdentifier, selected.getId());
+    } else if (permitPartialMatch) {
+      matches = sampleService.getIdentitiesByExternalNameOrAlias(identityIdentifier);
+    } else {
+      matches = sampleService.getIdentitiesByExactExternalName(identityIdentifier);
+    }
+    return matches.stream().map(identity -> Dtos.asDto(identity)).collect(Collectors.toSet());
   }
 
   @RequestMapping(value = "/query", method = RequestMethod.POST, produces = { "application/json" })

@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,7 +38,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
@@ -362,7 +360,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
    *           <b>and</b> the alias is used by multiple Samples
    * @throws IOException
    */
-  private void validateAliasUniqueness(Sample sample) throws ConstraintViolationException, IOException {
+  private void validateAliasUniqueness(Sample sample) throws IOException {
     if (isDetailedSample(sample) && ((DetailedSample) sample).hasNonStandardAlias()) {
       return;
     }
@@ -389,16 +387,13 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   public void confirmExternalNameUniqueForProjectIfRequired(String newExternalName, Sample sample)
       throws IOException, ConstraintViolationException {
     if (!isUniqueExternalNameWithinProjectRequired()) return;
-    for (SampleIdentity existingIdentity : getIdentitiesByExternalNameOrAlias(newExternalName)) {
-      // not an issue if it matches an identity from another project
-      if (existingIdentity.getProject().getId() != sample.getProject().getId()) continue;
-      Set<String> intersection = new HashSet<>(SampleIdentityImpl.getSetFromString(newExternalName));
-      intersection.retainAll(SampleIdentityImpl.getSetFromString(existingIdentity.getExternalName()));
-      if (intersection.size() != 0) {
+    Collection<SampleIdentity> matches = getIdentitiesByExactExternalNameAndProject(newExternalName,
+        sample.getProject().getId());
+    if (!matches.isEmpty()) {
+      SampleIdentity existingIdentity = matches.iterator().next();
         throw new ConstraintViolationException("Duplicate external names not allowed within a project: External name " + newExternalName
-            + " is already associated with Identity " + existingIdentity.getAlias() + " (" + existingIdentity.getExternalName() + ")",
+          + " is already associated with Identity " + existingIdentity.getAlias() + " (" + existingIdentity.getExternalName() + ")",
             null, "externalName");
-      }
     }
   }
 
@@ -481,7 +476,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     } else {
       // If samples are being bulk received for the same new donor, they will all have a null parentId.
       // After the new donor's Identity is created, the following samples need to be parented to that now-existing Identity.
-      Collection<SampleIdentity> newlyCreated = getIdentitiesByExternalNameAndProject(identity.getExternalName(),
+      Collection<SampleIdentity> newlyCreated = getIdentitiesByExactExternalNameAndProject(identity.getExternalName(),
           descendant.getProject().getId());
       if (newlyCreated.size() > 1) {
         throw new IllegalArgumentException(
@@ -736,7 +731,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
    */
   private boolean isExternalNameDuplicatedInProject(Sample sample) throws IOException {
     SampleIdentity identity = (SampleIdentity) sample;
-    return getIdentitiesByExternalNameAndProject(identity.getExternalName(), identity.getProject().getId()).size() > 0;
+    return getIdentitiesByExactExternalNameAndProject(identity.getExternalName(), identity.getProject().getId()).size() > 0;
   }
 
   @Override
@@ -774,13 +769,19 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
   public Collection<SampleIdentity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException {
-    return sampleStore.getIdentitiesByExternalNameOrAlias(externalName);
+    return sampleStore.getIdentitiesByExternalNameOrAliasPartialMatch(externalName);
   }
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
-  public Collection<SampleIdentity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException {
-    return sampleStore.getIdentitiesByExternalNameAndProject(externalName, projectId);
+  public Collection<SampleIdentity> getIdentitiesByExactExternalName(String externalName) throws IOException {
+    return sampleStore.getIdentitiesByExactExternalName(externalName);
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.REQUIRED)
+  public Collection<SampleIdentity> getIdentitiesByExactExternalNameAndProject(String externalName, Long projectId) throws IOException {
+    return sampleStore.getIdentitiesByExactExternalNameAndProject(externalName, projectId);
   }
 
   @Override
