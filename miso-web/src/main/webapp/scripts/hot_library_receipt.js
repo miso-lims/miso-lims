@@ -45,7 +45,7 @@ HotTarget.libraryReceipt = (function() {
             if (!flat.sample) {
               flat.sample = {};
             }
-            col.libraryUpdate(lib.sample, flat.sample, flatProperty, value, setReadOnly, setOptions, setData);
+            return col.libraryUpdate(lib.sample, flat.sample, flatProperty, value, setReadOnly, setOptions, setData);
           };
         }
       });
