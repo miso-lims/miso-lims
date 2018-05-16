@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import io.prometheus.client.Gauge;
-
 import java.io.IOException;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
@@ -59,6 +57,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.prometheus.client.Gauge;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -82,7 +81,7 @@ import uk.ac.bbsrc.tgac.miso.dto.PlatformDto;
 import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
@@ -173,9 +172,9 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private PartitionQCService partitionQCService;
   @Autowired
-  private ContainerService containerService;
-  @Autowired
   private StudyService studyService;
+  @Autowired
+  private ContainerModelService containerModelService;
 
   @Autowired
   private NamingScheme namingScheme;
@@ -331,7 +330,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "studyTypes", studyService.listTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "sampleCategories", SampleClass.CATEGORIES, Function.identity());
     createArray(mapper, baseUri, node, "submissionAction", Arrays.asList(SubmissionActionType.values()), SubmissionActionType::name);
-    createArray(mapper, baseUri, node, "containerModels", containerService.listModels(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "containerModels", containerModelService.list(), Dtos::asDto);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);

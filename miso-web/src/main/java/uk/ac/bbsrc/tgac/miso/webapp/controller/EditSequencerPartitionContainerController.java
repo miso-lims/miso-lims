@@ -56,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
@@ -77,6 +78,8 @@ public class EditSequencerPartitionContainerController {
   private RunService runService;
   @Autowired
   private SecurityManager securityManager;
+  @Autowired
+  private ContainerModelService containerModelService;
 
   /**
    * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects
@@ -150,7 +153,7 @@ public class EditSequencerPartitionContainerController {
   @RequestMapping(value = "/new/{modelId}", method = RequestMethod.GET)
   public ModelAndView setupNewForm(@PathVariable("modelId") Long modelId, ModelMap model)
       throws IOException {
-    SequencingContainerModel containerModel = containerService.getModel(modelId);
+    SequencingContainerModel containerModel = containerModelService.get(modelId);
     if (containerModel == null) {
       throw new IllegalArgumentException("Invalid model id");
     }

@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -13,11 +14,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
-public class SequencingContainerModel implements Serializable {
+public class SequencingContainerModel implements Serializable, Barcodable {
 
   private static final long serialVersionUID = 1L;
 
@@ -44,6 +46,7 @@ public class SequencingContainerModel implements Serializable {
 
   private boolean fallback;
 
+  @Override
   public long getId() {
     return sequencingContainerModelId;
   }
@@ -52,6 +55,7 @@ public class SequencingContainerModel implements Serializable {
     this.sequencingContainerModelId = sequencingContainerModelId;
   }
 
+  @Override
   public String getAlias() {
     return alias;
   }
@@ -60,12 +64,34 @@ public class SequencingContainerModel implements Serializable {
     this.alias = alias;
   }
 
+  @Override
+  public String getLabelText() {
+    return getAlias();
+  }
+
+  @Override
   public String getIdentificationBarcode() {
     return identificationBarcode;
   }
 
+  @Override
+  public Date getBarcodeDate() {
+    return null;
+  }
+
+  @Override
+  public String getBarcodeExtraInfo() {
+    return null;
+  }
+
+  @Override
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
+  }
+
+  @Override
+  public String getBarcodeSizeInfo() {
+    return null;
   }
 
   public PlatformType getPlatformType() {
@@ -111,4 +137,11 @@ public class SequencingContainerModel implements Serializable {
     this.fallback = fallback;
   }
 
+  /**
+   * ContainerModels don't have names, but they implement an interface which requires this method.
+   */
+  @Override
+  public String getName() {
+    throw new UnsupportedOperationException();
+  }
 }

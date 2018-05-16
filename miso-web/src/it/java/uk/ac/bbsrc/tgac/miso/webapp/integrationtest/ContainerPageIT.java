@@ -12,6 +12,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
@@ -44,9 +45,10 @@ public class ContainerPageIT extends AbstractIT {
     // correct container model
     ListTabbedPage listContainers = ListTabbedPage.getTabbedListPage(getDriver(), getBaseUrl(), ListTarget.CONTAINERS);
     String containerName = PlatformType.get("Illumina").getContainerName();
-    SequencingContainerModel model = (SequencingContainerModel) getSession().get(SequencingContainerModel.class, 2L);
+    Platform miseq = (Platform) getSession().get(Platform.class, 2L);
+    SequencingContainerModel model = (SequencingContainerModel) getSession().get(SequencingContainerModel.class, 3L);
     String newUrl = listContainers
-        .clickButtonAndGetUrl(ButtonText.ADD + " " + containerName, Lists.newArrayList(model.getAlias()));
+        .clickButtonAndGetUrl(ButtonText.ADD + " " + containerName, Lists.newArrayList(miseq.getInstrumentModel(), model.getAlias()));
 
     assertTrue(newUrl.matches(".*/miso/container/new/" + model.getId()));
   }

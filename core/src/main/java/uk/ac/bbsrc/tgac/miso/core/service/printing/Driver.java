@@ -71,6 +71,34 @@ public enum Driver {
     public String encode(Barcodable barcodable, int copies) {
       StringBuilder sb = new StringBuilder();
 
+      String barcode = getBarcode(barcodable);
+      sb.append("mm\n");
+      sb.append("J\n");
+      sb.append("O R\n");
+      sb.append("S 0.0,0.00,12.78,12.78,41.50\n");
+      sb.append("B 2,2,0,DATAMATRIX,0.5;").append(barcode).append("\n");
+      sb.append("T 9,3,0,5,3;");
+      appendTruncated(12, barcodable.getName(), s -> appendBradyEscapedUnicode(sb, s));
+      sb.append("\n");
+      AtomicInteger offset = new AtomicInteger();
+      BiConsumer<Integer, String> writer = (line, text) -> {
+        sb.append("T 9,");
+        sb.append(5 + (line + offset.get()) * 3);
+        sb.append(",0,3,2;");
+        appendBradyEscapedUnicode(sb, text);
+        sb.append("\n");
+      };
+      offset.addAndGet(multiline(28, 5, barcodable.getLabelText(), writer));
+      multiline(28, 5 - offset.get(), barcodable.getBarcodeExtraInfo(), writer);
+      sb.append("A ").append(copies).append("\n");
+      return sb.toString();
+    }
+  },
+  BRADY_THT_155_490T {
+    @Override
+    public String encode(Barcodable barcodable, int copies) {
+      StringBuilder sb = new StringBuilder();
+
       sb.append("mm\n");
       sb.append("J\n");
       sb.append("O R\n");
@@ -247,6 +275,43 @@ public enum Driver {
 
   },
   ZEBRA_JTT_7 {
+    // Rectangle
+
+    @Override
+    public String encode(Barcodable b, int copies) {
+      StringBuilder sb = new StringBuilder();
+      sb.append("CT~~CD,~CC^~CT~\r\n");
+      sb.append("^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR2,2~SD30^JUS^LRN^CI28^XZ\r\n");
+      sb.append("^XA\r\n");
+      sb.append("^MMT\r\n");
+      sb.append("^PW200\r\n");
+      sb.append("^LL0098\r\n");
+      sb.append("^LS0\r\n");
+      sb.append("^FT14,27^A0N,20,19^FH\\^FD");
+      if (b.getAlias().length() > 18) {
+        sb.append(b.getAlias().substring(0, 18));
+      } else {
+        sb.append(b.getAlias());
+      }
+      sb.append("^FS\r\n");
+      if (b.getAlias().length() > 18) {
+        sb.append("^FT14,45^A0N,20,19^FH\\^FD");
+        appendTruncated(21, b.getAlias().substring(18), sb::append);
+        sb.append("^FS\r\n");
+      }
+      sb.append("^FT14,94^A0N,20,19^FH^FD").append(LimsUtils.formatDate(b.getBarcodeDate())).append("^FS\r\n");
+      sb.append("^FT13,74^A0N,20,19^FH^FD");
+      appendTruncated(12, b.getBarcodeExtraInfo(), s -> appendZebraEscapedUnicode(sb, s));
+      sb.append("^FS\r\n");
+      sb.append("^BY32,32^FT158,96^BXN,2,200,0,0,1,~\r\n");
+      sb.append("^FH\\^FD").append(getBarcode(b)).append("^FS\r\n");
+      sb.append("^PQ").append(copies).append("\r\n");
+      sb.append("^XZ\r\n");
+      return sb.toString();
+    }
+
+  },
+  ZEBRA_JTT_7S {
     // Rectangle
 
     @Override

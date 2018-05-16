@@ -1561,6 +1561,7 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setPlatformType(from.getPlatformType().name());
+    dto.setPlatformIds(from.getPlatforms().stream().map(Platform::getId).collect(Collectors.toList()));
     dto.setPartitionCount(from.getPartitionCount());
     dto.setArchived(from.isArchived());
     return dto;
@@ -1747,6 +1748,7 @@ public class Dtos {
     }
     dto.setMaximumNumber(from.getMaximumNumber());
     dto.setPlatformType(from.getPlatformType() == null ? null : from.getPlatformType().name());
+    dto.setFake(from.hasFakeSequence());
     return dto;
   }
 

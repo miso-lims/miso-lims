@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -20,13 +19,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
@@ -48,6 +47,8 @@ public class DefaultContainerService
   private SecurityProfileStore securityProfileDao;
   @Autowired
   private KitService kitService;
+  @Autowired
+  private ContainerModelService containerModelService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -164,7 +165,7 @@ public class DefaultContainerService
    * @throws IOException
    */
   private void loadChildEntities(SequencerPartitionContainer container) throws IOException {
-    container.setModel(getModel(container.getModel().getId()));
+    container.setModel(containerModelService.get(container.getModel().getId()));
     if (container.getClusteringKit() != null) {
       KitDescriptor descriptor = kitService.getKitDescriptorById(container.getClusteringKit().getId());
       if (descriptor.getKitType() != KitType.CLUSTERING) {
@@ -266,20 +267,4 @@ public class DefaultContainerService
   public List<PoreVersion> listPoreVersions() throws IOException {
     return containerDao.listPoreVersions();
   }
-
-  @Override
-  public SequencingContainerModel getModel(long id) throws IOException {
-    return containerDao.getModel(id);
-  }
-
-  @Override
-  public SequencingContainerModel findModel(Platform platform, String search, int partitionCount) throws IOException {
-    return containerDao.findModel(platform, search, partitionCount);
-  }
-
-  @Override
-  public List<SequencingContainerModel> listModels() throws IOException {
-    return containerDao.listModels();
-  }
-
 }

@@ -31,7 +31,7 @@ public class WorkflowRestController extends RestController {
     Workflow workflow = workflowManager.loadWorkflow(workflowId);
     workflowManager.processInput(workflow, stepNumber, input);
 
-    return new WorkflowStateDto(workflow);
+    return new WorkflowStateDto(workflow, stepNumber + 1);
   }
 
   @RequestMapping(value = "/{workflowId}/execute", method = RequestMethod.POST)

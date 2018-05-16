@@ -1,3 +1,16 @@
+# 0.2.120
+
+Changes:
+
+ * Add Load Sequencer Workflow 
+ * Filter container models by platform in create dialog
+ * Create a second variant of Zebra JTT-7 label
+ * Change reads/cluster terminology in Illumina summary
+ * Allow index families to have fake sequences 
+ * Add a second THT-155-590 label
+ * Add (near-) duplicate indices and low quality libraries warnings to orders pages
+ * Note possible Flyway migration error 
+
 # 0.2.119
 
 Changes:
@@ -47,6 +60,9 @@ Changes:
 
 Bad: Run scanner could not find fallback sequencing container models,
 so runs failed to save correctly. Fixed in #0.2.117.
+
+Note: If Flyway migration V0480__auto_main.sql fails, you may have bad data in your database that needs
+corrected before retrying the migration. See [Issue 1433](https://github.com/TGAC/miso-lims/issues/1433).
 
 # 0.2.115
 

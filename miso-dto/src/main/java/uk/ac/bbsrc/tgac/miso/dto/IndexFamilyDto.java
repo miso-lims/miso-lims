@@ -9,6 +9,7 @@ public class IndexFamilyDto {
   private int maximumNumber;
   private String name;
   private String platformType;
+  private boolean fakeSequence;
 
   public long getId() {
     return id;
@@ -28,6 +29,10 @@ public class IndexFamilyDto {
 
   public String getPlatformType() {
     return platformType;
+  }
+
+  public boolean hasFakeSequence() {
+    return fakeSequence;
   }
 
   public boolean isArchived() {
@@ -56,5 +61,9 @@ public class IndexFamilyDto {
 
   public void setPlatformType(String platformType) {
     this.platformType = platformType;
+  }
+
+  public void setFake(boolean fake) {
+    this.fakeSequence = fake;
   }
 }

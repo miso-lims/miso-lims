@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.List;
+
 public class ContainerModelDto {
 
   private Long id;
@@ -8,6 +10,7 @@ public class ContainerModelDto {
   private String platformType;
   private Integer partitionCount;
   private Boolean archived;
+  private List<Long> platformIds;
 
   public Long getId() {
     return id;
@@ -55,6 +58,14 @@ public class ContainerModelDto {
 
   public void setArchived(Boolean archived) {
     this.archived = archived;
+  }
+
+  public List<Long> getPlatformIds() {
+    return platformIds;
+  }
+
+  public void setPlatformIds(List<Long> platformIds) {
+    this.platformIds = platformIds;
   }
 
 }

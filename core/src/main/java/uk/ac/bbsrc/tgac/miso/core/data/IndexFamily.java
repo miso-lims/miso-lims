@@ -54,6 +54,7 @@ public class IndexFamily implements Serializable {
     NULL.setId(0L);
     NULL.setName("No indices");
     NULL.setArchived(false);
+    NULL.setFake(true);
     Index index = new Index();
     index.setFamily(NULL);
     index.setId(0L);
@@ -74,6 +75,7 @@ public class IndexFamily implements Serializable {
   private PlatformType platformType;
   @Id
   private Long indexFamilyId;
+  private boolean fakeSequence;
 
   public Boolean getArchived() {
     return archived;
@@ -115,6 +117,10 @@ public class IndexFamily implements Serializable {
     return platformType;
   }
 
+  public boolean hasFakeSequence() {
+    return fakeSequence;
+  }
+
   public void setArchived(Boolean archived) {
     this.archived = archived;
   }
@@ -133,6 +139,10 @@ public class IndexFamily implements Serializable {
 
   public void setPlatformType(PlatformType platform) {
     this.platformType = platform;
+  }
+
+  public void setFake(boolean fake) {
+    this.fakeSequence = fake;
   }
 
   @Override
