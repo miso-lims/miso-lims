@@ -246,7 +246,6 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.NAME, null);
     attrs.put(Columns.ALIAS, "IPOT_0001_Pa_P_PE_POOL");
     attrs.put(Columns.BARCODE, null);
-    attrs.put(Columns.CREATE_DATE, null);
     attrs.put(Columns.CONCENTRATION, null);
     attrs.put(Columns.VOLUME, null);
     attrs.put(Columns.QC_PASSED, "Unknown");
@@ -284,7 +283,6 @@ public class BulkPoolIT extends AbstractIT {
     row0.put(Columns.NAME, null);
     row0.put(Columns.ALIAS, "IPOT_0001_Pa_P_PE_251_WG_POOL");
     row0.put(Columns.BARCODE, null);
-    row0.put(Columns.CREATE_DATE, null);
     row0.put(Columns.CONCENTRATION, null);
     row0.put(Columns.VOLUME, null);
     row0.put(Columns.QC_PASSED, "Unknown");
@@ -386,7 +384,6 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.NAME, null);
     attrs.put(Columns.ALIAS, "IPOT_0001_Pa_P_PE_POOL");
     attrs.put(Columns.BARCODE, null);
-    attrs.put(Columns.CREATE_DATE, null);
     attrs.put(Columns.CONCENTRATION, null);
     attrs.put(Columns.VOLUME, null);
     attrs.put(Columns.QC_PASSED, "Unknown");
