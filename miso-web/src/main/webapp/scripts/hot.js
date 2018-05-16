@@ -292,11 +292,11 @@ var HotUtils = {
         if (changes[i][2] == changes[i][3] && (changes[i][2] || changes[i][3])) {
           continue;
         }
-        var currentChange = changes[i];
-        var visualRow = currentChange[0];
-        var dataRow = table.toPhysicalRow(currentChange[0]);
-        var flat = flatObjects[dataRow];
-        var obj = data[dataRow];
+        const currentChange = changes[i];
+        const visualRow = currentChange[0];
+        const dataRow = table.toPhysicalRow(currentChange[0]);
+        const flat = flatObjects[dataRow];
+        const obj = data[dataRow];
 
         columns.filter(function(column) {
           return (Array.isArray(column.depends) && column.depends.indexOf(currentChange[1]) > -1) || column.depends == currentChange[1];
@@ -310,9 +310,9 @@ var HotUtils = {
               needsRender = true;
             }
           }, function(value) {
-            var oldVal = flatObjects[dataRow][column.data];
+            var oldVal = flat[column.data];
             if (!value || oldVal !== value) {
-              flatObjects[dataRow][column.data] = value;
+              flat[column.data] = value;
               needsRender = true;
               triggeredChanges.push([visualRow, column.data, oldVal, value]);
             }
