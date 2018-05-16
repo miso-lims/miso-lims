@@ -1,3 +1,16 @@
+# 0.2.120
+
+Changes:
+
+ * Add Load Sequencer Workflow 
+ * Filter container models by platform in create dialog
+ * Create a second variant of Zebra JTT-7 label
+ * Change reads/cluster terminology in Illumina summary
+ * Allow index families to have fake sequences 
+ * Add a second THT-155-590 label
+ * Add (near-) duplicate indices and low quality libraries warnings to orders pages
+ * Note possible Flyway migration error 
+
 # 0.2.119
 
 Changes:

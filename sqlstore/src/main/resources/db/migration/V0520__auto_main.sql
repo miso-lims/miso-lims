@@ -1,3 +1,5 @@
+-- workflow_progress_steps
+
 CREATE TABLE StepSequencerPartitionContainer (
   workflowProgressId BIGINT(20) NOT NULL,
   stepNumber         BIGINT(20) NOT NULL,
@@ -38,3 +40,10 @@ CREATE TABLE StepSkip (
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
+
+
+-- add_index_family_fake
+
+ALTER TABLE IndexFamily ADD COLUMN fakeSequence BOOLEAN NOT NULL DEFAULT FALSE;
+
+
