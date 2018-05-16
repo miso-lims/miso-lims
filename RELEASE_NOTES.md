@@ -1,3 +1,10 @@
+# 0.2.121
+
+Changes:
+
+ * Make DetailedSample identity search page
+ * Make DetailedSample group IDs longer & allow `-_`
+
 # 0.2.120
 
 Changes:

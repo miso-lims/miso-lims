@@ -20,9 +20,11 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
   private static final Set<String> commonColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.DISCARDED,
       SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION,
       SamColumns.QC_STATUS, SamColumns.QC_NOTE);
+
+  private static final Set<String> boxableColumns = Sets.newHashSet(SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS,
+      SamColumns.BOX_POSITION, SamColumns.DISCARDED);
 
   private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX, SamColumns.CONSENT);
 
@@ -72,7 +74,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     Map<String, String> editable = new HashMap<>();
     editable.put(SamColumns.ALIAS, "TEST_0005");
     editable.put(SamColumns.DESCRIPTION, "changed");
-    editable.put(SamColumns.ID_BARCODE, "changed");
     editable.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
     editable.put(SamColumns.SCIENTIFIC_NAME, "changed");
     editable.put(SamColumns.EXTERNAL_NAME, "changed");
@@ -106,7 +107,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     Map<String, String> editable = new HashMap<>();
     editable.put(SamColumns.ALIAS, "TEST_0002");
     editable.put(SamColumns.DESCRIPTION, "new description");
-    editable.put(SamColumns.ID_BARCODE, "MATRIX");
     editable.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
     editable.put(SamColumns.SCIENTIFIC_NAME, "Mus musculus");
     editable.put(SamColumns.EXTERNAL_NAME, "completely new");
@@ -131,7 +131,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     Map<String, String> empty = new HashMap<>();
     empty.put(SamColumns.ALIAS, "TEST_0002");
     empty.put(SamColumns.DESCRIPTION, "");
-    empty.put(SamColumns.ID_BARCODE, "");
     empty.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
     empty.put(SamColumns.SCIENTIFIC_NAME, "Mus musculus");
     empty.put(SamColumns.EXTERNAL_NAME, "completely new");
@@ -155,6 +154,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     // Goal: ensure all expected fields are present and no extra
     Set<String> expectedHeadings = Sets.newHashSet();
     expectedHeadings.addAll(commonColumns);
+    expectedHeadings.addAll(boxableColumns);
     expectedHeadings.addAll(tissueColumns);
 
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Tissue")));
@@ -276,6 +276,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     // Goal: ensure all expected fields are present, and no extra
     Set<String> expectedHeadings = Sets.newHashSet();
     expectedHeadings.addAll(commonColumns);
+    expectedHeadings.addAll(boxableColumns);
     expectedHeadings.addAll(slideColumns);
 
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Slide")));
@@ -382,6 +383,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     // Goal: ensure all expected fields are present, and no extra
     Set<String> expectedHeadings = Sets.newHashSet();
     expectedHeadings.addAll(commonColumns);
+    expectedHeadings.addAll(boxableColumns);
     expectedHeadings.addAll(curlsColumns);
 
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Curls")));
@@ -476,6 +478,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     // Goal: ensure all expected fields are present, and no extra
     Set<String> expectedHeadings = Sets.newHashSet();
     expectedHeadings.addAll(commonColumns);
+    expectedHeadings.addAll(boxableColumns);
     expectedHeadings.addAll(lcmTubeColumns);
 
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("LCM Tube")));
