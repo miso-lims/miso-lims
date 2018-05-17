@@ -117,6 +117,7 @@ public abstract class AbstractSecurityManager implements SecurityManager {
       original.setInternal(user.isInternal());
       original.setFullName(user.getFullName());
       original.setRoles(user.getRoles());
+      original.setFavouriteWorkflows(user.getFavouriteWorkflows());
       if (isPasswordMutable()) {
         if (user.getPassword() != null) {
           original.setPassword(user.getPassword());

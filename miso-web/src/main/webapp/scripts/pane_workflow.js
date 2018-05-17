@@ -39,8 +39,14 @@ PaneTarget.workflow = (function() {
 	  return {
 		createPane : function(paneId) {
 			var divs = Pane.createPane(paneId, title);
+			
+			var createWorkflowTiles = favouriteWorkflows.map(function(data) {
+		  	return Tile.make([Tile.title("Begin New " + data.description)], function(){
+		  		window.location = window.location.origin + '/miso/workflow/new/' + data.workflowName;
+		  	})
+		  });
 
-			var createNewWorkflowTile = Tile.make([ Tile.title("Begin New Workflow") ],
+			createWorkflowTiles.push(Tile.make([ Tile.title("Begin New Workflow") ],
 					function() {
 						Utils.showWizardDialog("Begin New Workflow", Constants.workflows.map(function(workflow) {
 							return {
@@ -50,9 +56,35 @@ PaneTarget.workflow = (function() {
 									}
 							};
 							}));
-						});
-
-			Pane.updateTiles(divs.content, transform, url, null, [createNewWorkflowTile]);
+						}));
+			
+			createWorkflowTiles.push(Tile.make([ Tile.title("Edit Favourite Workflows") ],
+					function() {
+						Utils.showWizardDialog("Edit Favourite Workflows", Constants.workflows.map(function(workflow) {
+							if(favouriteWorkflows.map(function(favourite){
+								return favourite.workflowName;
+							}).indexOf(workflow.workflowName) < 0){
+								return {
+									name : "Add " + workflow.description + " to Favourites",
+									handler : function() {
+										Utils.ajaxWithDialog('Adding Workflow to Favourites', 'POST', "/miso/rest/workflow/favourites/add/" + workflow.workflowName, 
+												null, Utils.page.pageReload);
+										}
+								};
+							} else {
+								return {
+									name : "Remove " + workflow.description + " from Favourites",
+									handler : function() {
+										Utils.ajaxWithDialog('Removing Workflow from Favourites', 'POST', "/miso/rest/workflow/favourites/remove/" + workflow.workflowName, 
+												null, Utils.page.pageReload);
+										}
+								};
+								}
+							}
+							));
+						}));
+			
+			Pane.updateTiles(divs.content, transform, url, null, createWorkflowTiles);
 		}
 	};
 })();

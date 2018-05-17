@@ -238,6 +238,9 @@ public class MenuController implements ServletContextAware {
       if (checks.keySet().contains("error")) {
         model.put("error", checks.get("error"));
       }
+      ObjectMapper mapper = new ObjectMapper();
+      model.put("favouriteWorkflows",
+          user.getFavouriteWorkflows().stream().map(Dtos::asDto).map(dto -> mapper.valueToTree(dto)).collect(Collectors.toList()));
       if (Arrays.asList(user.getRoles()).contains("ROLE_EXTERNAL") && !Arrays.asList(user.getRoles()).contains("ROLE_INTERNAL")) {
         return new ModelAndView("/pages/external/externalMain.jsp", model);
       } else {
