@@ -60,7 +60,7 @@ PaneTarget.instrument_status = (function() {
     createPane: function(paneId) {
       var divs = Pane.createPane(paneId, title);
 
-      Pane.updateTiles(divs.content, transform, url);
+      Pane.updateTiles(divs.content, transform, url, null, []);
     }
   };
 })();
