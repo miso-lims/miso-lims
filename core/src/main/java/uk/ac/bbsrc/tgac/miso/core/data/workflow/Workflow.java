@@ -47,10 +47,6 @@ public interface Workflow {
 
   void execute(WorkflowExecutor workflowExecutor) throws IOException;
 
-  /**
-   * @return proper name of workflow, for display purposes
-   */
-  String getName();
 
   /**
    * @return the stepNumber of the next step that requires user input or null if the workflow is complete
@@ -67,6 +63,11 @@ public interface Workflow {
       public Workflow createWorkflow() {
         return new LoadSequencerWorkflow();
       }
+
+      @Override
+      public final String getDescription() {
+        return "Load Sequencer Workflow";
+      }
     };
 
     public Workflow createWorkflow(Progress progress) {
@@ -76,5 +77,7 @@ public interface Workflow {
     }
 
     protected abstract Workflow createWorkflow();
+
+    public abstract String getDescription();
   }
 }

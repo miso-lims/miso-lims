@@ -141,6 +141,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
@@ -2241,4 +2242,10 @@ public class Dtos {
     return from.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
+  public static WorkflowNameDto asDto(WorkflowName from) {
+    WorkflowNameDto dto = new WorkflowNameDto();
+    dto.setWorkflowName(from);
+    dto.setDescription(from.getDescription());
+    return dto;
+  }
 }

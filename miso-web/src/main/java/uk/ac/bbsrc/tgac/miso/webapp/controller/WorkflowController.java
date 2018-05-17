@@ -27,7 +27,7 @@ public class WorkflowController {
   @RequestMapping("/new/{workflowName}")
   public ModelAndView createWorkflow(@PathVariable String workflowName, ModelMap model) throws IOException {
     Workflow workflow = workflowManager.beginWorkflow(workflowName);
-    model.put("title", workflow.getName());
+    model.put("title", workflow.getProgress().getWorkflowName().getDescription());
     model.put("state", new ObjectMapper().writeValueAsString(new WorkflowStateDto(workflow)));
     return new ModelAndView("/pages/workflow.jsp", model);
   }
@@ -35,7 +35,7 @@ public class WorkflowController {
   @RequestMapping("/edit/{id}")
   public ModelAndView editWorkflow(@PathVariable long id, ModelMap model) throws IOException {
     Workflow workflow = workflowManager.loadWorkflow(id);
-    model.put("title", workflow.getName());
+    model.put("title", workflow.getProgress().getWorkflowName().getDescription());
     model.put("state", new ObjectMapper().writeValueAsString(new WorkflowStateDto(workflow)));
     return new ModelAndView("/pages/workflow.jsp", model);
   }

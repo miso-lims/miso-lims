@@ -159,10 +159,6 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
     workflowExecutor.save(spc);
   }
 
-  @Override
-  public String getName() {
-    return "Load Sequencer Workflow";
-  }
 
   private static class PartitionStep implements WorkflowStep {
     private final int partitionIndex;
