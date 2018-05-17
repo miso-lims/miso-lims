@@ -28,8 +28,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -49,6 +55,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -81,6 +88,12 @@ public class UserImpl implements User, Serializable {
   private boolean external = false;
   private boolean admin = false;
   private boolean active = true;
+
+  @ElementCollection
+  @CollectionTable(name = "User_FavouriteWorkflows", joinColumns = @JoinColumn(name = "userId", referencedColumnName = "userId"))
+  @Column(name = "favouriteWorkflow")
+  @Enumerated(EnumType.STRING)
+  private Set<WorkflowName> favouriteWorkflows = new HashSet<>();
 
   @ManyToMany(targetEntity = Group.class)
   @Fetch(FetchMode.SUBSELECT)
@@ -239,6 +252,16 @@ public class UserImpl implements User, Serializable {
     }
     this.roles = roleString.toString();
   }
+  
+  @Override
+  public Set<WorkflowName> getFavouriteWorkflows() {
+    return favouriteWorkflows;
+  }
+
+  @Override
+  public void setFavouriteWorkflows(Set<WorkflowName> favouriteWorkflows) {
+    this.favouriteWorkflows = favouriteWorkflows;
+  }
 
   /**
    * Users are equated by login name.
@@ -291,4 +314,5 @@ public class UserImpl implements User, Serializable {
     if (getId() > t.getUserId()) return 1;
     return 0;
   }
+
 }
