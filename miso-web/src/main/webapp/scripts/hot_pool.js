@@ -54,7 +54,11 @@ HotTarget.pool = {
       validator: HotUtils.validator.requiredText,
       include: true,
       unpack: function(pool, flat, setCellMeta) {
-        flat.creationDate = pool.creationDate || null;
+        if (create) {
+          flat.creationDate = Utils.getCurrentDate();
+        } else {
+          flat.creationDate = Utils.valOrNull(pool.creationDate);
+        }
       },
       pack: function(pool, flat, errorHandler) {
         pool.creationDate = flat.creationDate;
