@@ -22,9 +22,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
  */
 public class TestWorkflow extends AbstractWorkflow {
 
-  private IntegerWorkflowStep step0 = new IntegerWorkflowStep("Input a concentration as an integer.");
-  private PoolWorkflowStep step1 = new PoolWorkflowStep("Scan a Pool to modify its concentration.");
-  private List<WorkflowStep> steps = Arrays.asList(step0, step1);
+  private final IntegerWorkflowStep step0 = new IntegerWorkflowStep("Input a concentration as an integer.");
+  private final PoolWorkflowStep step1 = new PoolWorkflowStep("Scan a Pool to modify its concentration.");
+  private final List<WorkflowStep> steps = Arrays.asList(step0, step1);
 
   private int nextStepNumber = 0;
 
@@ -78,11 +78,6 @@ public class TestWorkflow extends AbstractWorkflow {
     pool.setConcentration((double) step0.getInput());
 
     workflowExecutor.save(pool);
-  }
-
-  @Override
-  public String getName() {
-    return "Test Workflow";
   }
 
   private int currentStepNumber() {
