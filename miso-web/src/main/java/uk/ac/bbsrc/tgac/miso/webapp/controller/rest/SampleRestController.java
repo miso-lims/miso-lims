@@ -319,7 +319,7 @@ public class SampleRestController extends RestController {
       throws IOException {
     Collection<SampleIdentity> matches = new HashSet<>();
     Project selected = null;
-    if (!LimsUtils.isStringEmptyOrNull(project)) selected = projectService.getProjectByAlias(project);
+    if (!LimsUtils.isStringEmptyOrNull(project)) selected = projectService.getProjectByShortName(project);
     if (selected != null) {
       matches = sampleService.getIdentitiesByExactExternalNameAndProject(identityIdentifier, selected.getId());
     } else if (permitPartialMatch) {
