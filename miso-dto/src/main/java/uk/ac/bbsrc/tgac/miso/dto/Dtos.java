@@ -141,7 +141,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
@@ -2246,6 +2248,48 @@ public class Dtos {
     WorkflowNameDto dto = new WorkflowNameDto();
     dto.setWorkflowName(from);
     dto.setDescription(from.getDescription());
+    return dto;
+  }
+
+  public static WorkflowStateDto asDto(Workflow from) {
+    WorkflowStateDto dto = new WorkflowStateDto();
+    dto.setName(from.getProgress().getWorkflowName().getDescription());
+    dto.setWorkflowId(from.getProgress().getId());
+    dto.setLog(from.getLog());
+    dto.setComplete(from.isComplete());
+    dto.setLastModified(formatDateTime(from.getProgress().getLastModified()));
+    if (from.isComplete()) {
+      dto.setMessage(from.getConfirmMessage());
+    } else {
+      dto.setStepNumber(from.getNextStepNumber());
+      WorkflowStepPrompt prompt = from.getStep(dto.getStepNumber());
+      dto.setMessage(prompt.getMessage());
+      dto.setInputTypes(prompt.getInputTypes());
+    }
+    return dto;
+  }
+
+  public static WorkflowStateDto asDto(Workflow from, int stepNumber) {
+    WorkflowStateDto dto = new WorkflowStateDto();
+    dto.setName(from.getProgress().getWorkflowName().getDescription());
+    dto.setWorkflowId(from.getProgress().getId());
+    dto.setLog(from.getLog());
+    dto.setComplete(from.isComplete());
+    dto.setLastModified(formatDateTime(from.getProgress().getLastModified()));
+    if (stepNumber >= from.getLog().size()) {
+      if (from.isComplete()) {
+        dto.setMessage(from.getConfirmMessage());
+      } else {
+        dto.setStepNumber(from.getNextStepNumber());
+      }
+    } else {
+      dto.setStepNumber(stepNumber);
+    }
+    if (dto.getStepNumber() != null) {
+      WorkflowStepPrompt prompt = from.getStep(stepNumber);
+      dto.setMessage(prompt.getMessage());
+      dto.setInputTypes(prompt.getInputTypes());
+    }
     return dto;
   }
 }

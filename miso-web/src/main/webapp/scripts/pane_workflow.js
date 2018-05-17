@@ -36,22 +36,23 @@ PaneTarget.workflow = (function() {
     });
   };
 
-  return {
-    createPane: function(paneId) {
-      var divs = Pane.createPane(paneId, title);
-      
-      Pane.updateTiles(divs.content, transform, url);
-    }
-  };
+	  return {
+		createPane : function(paneId) {
+			var divs = Pane.createPane(paneId, title);
+
+			var createNewWorkflowTile = Tile.make([ Tile.title("Begin New Workflow") ],
+					function() {
+						Utils.showWizardDialog("Begin New Workflow", Constants.workflows.map(function(workflow) {
+							return {
+								name : workflow.description,
+								handler : function() {
+									window.location = window.location.origin + '/miso/workflow/new/' + workflow.workflowName;
+									}
+							};
+							}));
+						});
+
+			Pane.updateTiles(divs.content, transform, url, null, [createNewWorkflowTile]);
+		}
+	};
 })();
-/*
-function(){
-    	Utils.showWizardDialog("Create New Workflow", Constants.workflows.map(function(workflow){
-    		return {
-    			name: workflow.description,
-    			handler: function(){
-    				window.location = window.location.origin + '/miso/workflow/new/' + workflow.workflowName;
-    			}
-    		};
-    	}));	
-    }
