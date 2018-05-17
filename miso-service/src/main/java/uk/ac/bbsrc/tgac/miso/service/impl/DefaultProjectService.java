@@ -104,6 +104,14 @@ public class DefaultProjectService implements ProjectService {
     projectStore.saveOverview(managed);
   }
 
+  // GETS
+  @Override
+  public Project getProjectById(long projectId) throws IOException {
+    Project project = projectStore.get(projectId);
+    authorizationManager.throwIfNotReadable(project);
+    return project;
+  }
+
   @Override
   public Project getProjectByAlias(String projectAlias) throws IOException {
     Project project = projectStore.getByAlias(projectAlias);
@@ -111,10 +119,9 @@ public class DefaultProjectService implements ProjectService {
     return project;
   }
 
-  // GETS
   @Override
-  public Project getProjectById(long projectId) throws IOException {
-    Project project = projectStore.get(projectId);
+  public Project getProjectByShortName(String projectShortName) throws IOException {
+    Project project = projectStore.getByShortName(projectShortName);
     authorizationManager.throwIfNotReadable(project);
     return project;
   }

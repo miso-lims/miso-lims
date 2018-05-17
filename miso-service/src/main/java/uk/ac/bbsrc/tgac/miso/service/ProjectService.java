@@ -49,6 +49,8 @@ public interface ProjectService {
 
   public Project getProjectByAlias(String projectAlias) throws IOException;
 
+  public Project getProjectByShortName(String projectShortName) throws IOException;
+
   public ProjectOverview getProjectOverviewById(long overviewId) throws IOException;
 
   // LISTS
