@@ -255,6 +255,15 @@ public class EditProjectController {
     return setupForm(ProjectImpl.UNSAVED_ID, model);
   }
 
+  @RequestMapping(value = "/shortname/{shortName}", method = RequestMethod.GET)
+  public ModelAndView byProjectShortName(@PathVariable String shortName, ModelMap model) throws IOException {
+    Project project = projectService.getProjectByShortName(shortName);
+    if (project == null) {
+      return new ModelAndView("/pages/notFound.jsp", model);
+    }
+    return setupForm(project.getId(), model);
+  }
+
   @RequestMapping(value = "/{projectId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long projectId, ModelMap model) throws IOException {
     try {
@@ -269,8 +278,9 @@ public class EditProjectController {
       }
 
       if (project == null) {
-        throw new SecurityException("No such Project");
+        return new ModelAndView("/pages/notFound.jsp", model);
       }
+
       model.put("referenceGenome", referenceGenomeService.listAllReferenceGenomeTypes());
       model.put("formObj", project);
       model.put("project", project);
