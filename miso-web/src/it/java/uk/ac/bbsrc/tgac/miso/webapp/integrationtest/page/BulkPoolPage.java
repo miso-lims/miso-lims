@@ -30,6 +30,11 @@ public class BulkPoolPage extends HeaderFooterPage {
     public static final String QC_PASSED = "QC Passed?";
     public static final String READY_TO_RUN = "Ready to Run?";
 
+    public static final String DILUTION_NAME = "Dilution Name";
+    public static final String LIBRARY_ALIAS = "Library Alias";
+    public static final String LIBRARY_SIZE = "Library Size";
+    public static final String POOL = "Pool";
+
     private Columns() {
       throw new IllegalStateException("Util class not intended for instantiation");
     }
@@ -72,13 +77,17 @@ public class BulkPoolPage extends HeaderFooterPage {
     return new BulkPoolPage(driver);
   }
 
+  protected WebElement getToolbar() {
+    return toolbar;
+  }
+
   public HandsOnTable getTable() {
     return table;
   }
 
   public BulkPoolPage chainEdit() {
     WebElement html = getHtmlElement();
-    toolbar.findElement(EDIT_BUTTON_TEXT).click();
+    getToolbar().findElement(EDIT_BUTTON_TEXT).click();
     waitForPageRefresh(html);
     return new BulkPoolPage(getDriver());
   }

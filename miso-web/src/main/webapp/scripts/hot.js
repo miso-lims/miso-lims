@@ -622,9 +622,10 @@ var HotUtils = {
 
     if (target.hasOwnProperty('getCustomActions')) {
       target.getCustomActions(table, config).forEach(function(action) {
-        var button = document.createElement('SPAN');
+        var button = document.createElement('A');
         button.setAttribute('class', 'ui-button ui-state-default');
         button.innerText = action.buttonText;
+        button.href = '#';
         button.addEventListener('click', action.eventHandler);
         document.getElementById('bulkactions').appendChild(button);
       });
