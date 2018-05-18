@@ -40,7 +40,6 @@
   <security:http pattern="/styles/**" security="none" /><!-- filters="none"/> -->
   <security:http pattern="/scripts/**" security="none" /><!-- filters="none"/> -->
   <security:http pattern="/images/**" security="none" /><!-- filters="none"/> -->
-  <security:http pattern="/registerUser" security="none" /><!-- filters="none"/> -->
 
   <security:http use-expressions="true" auto-config="false" entry-point-ref="loginUrlAuthenticationEntryPoint">
 

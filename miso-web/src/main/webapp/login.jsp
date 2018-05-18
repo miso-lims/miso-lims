@@ -51,7 +51,6 @@
         </tr>
         <tr>
           <td align="left">
-            <!--<small><a href="registerUser">New user</a></small>-->
           </td>
           <td align="right">
             <input type="submit" name="login" value="Login &#187;" tabindex="5"/>
