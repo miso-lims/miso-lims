@@ -742,6 +742,11 @@ div.checklist {
     text-align: left;
 }
 
+.note p {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
 .blueback {
     background-color: #EEEEFF;
     border: 1px solid #333333;
