@@ -156,7 +156,7 @@ HotTarget.pool = (function() {
         validator: HotUtils.validator.requiredText,
         include: true,
         unpack: function(pool, flat, setCellMeta) {
-          if (create) {
+          if (!pool.creationDate && create) {
             flat.creationDate = Utils.getCurrentDate();
           } else {
             flat.creationDate = Utils.valOrNull(pool.creationDate);
