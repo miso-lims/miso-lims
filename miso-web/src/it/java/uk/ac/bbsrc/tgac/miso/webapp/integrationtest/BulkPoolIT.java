@@ -347,8 +347,8 @@ public class BulkPoolIT extends AbstractIT {
     BulkPoolCustomPage page = BulkPoolCustomPage.get(getDriver(), getBaseUrl(), Sets.newHashSet(504L, 505L, 701L, 702L), 2);
     HandsOnTable table = page.getTable();
 
-    final String pool1 = "IPOT_POOL_CUSTOM_1";
-    final String pool2 = "IPOT_POOL_CUSTOM_2";
+    final String pool1 = "IPOT_POOL_CUSTOM_A";
+    final String pool2 = "IPOT_POOL_CUSTOM_B";
 
     Map<String, String> row0 = Maps.newLinkedHashMap();
     row0.put(Columns.ALIAS, pool1);
