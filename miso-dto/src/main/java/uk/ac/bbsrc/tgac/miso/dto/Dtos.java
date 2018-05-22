@@ -973,6 +973,7 @@ public class Dtos {
   public static PoolOrderDto asDto(PoolOrder from) {
     PoolOrderDto dto = new PoolOrderDto();
     dto.setId(from.getId());
+    dto.setPool(asDto(from.getPool(), false));
     dto.setParameters(asDto(from.getSequencingParameter()));
     dto.setPartitions(from.getPartitions());
     dto.setCreatedById(from.getCreatedBy().getUserId());
@@ -989,7 +990,7 @@ public class Dtos {
   public static PoolOrder to(PoolOrderDto from) {
     PoolOrder to = new PoolOrderImpl();
     if (from.getId() != null) to.setId(from.getId());
-    to.setPoolId(from.getPoolId());
+    to.setPool(to(from.getPool()));
     to.setSequencingParameter(to(from.getParameters()));
     to.setPartitions(from.getPartitions());
     return to;

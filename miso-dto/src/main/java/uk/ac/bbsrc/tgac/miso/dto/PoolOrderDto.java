@@ -2,9 +2,9 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 public class PoolOrderDto {
   private Long id;
-  private SequencingParametersDto parameterId;
+  private SequencingParametersDto parameters;
   private Integer partitions;
-  private Long poolId;
+  private PoolDto pool;
   private Long createdById;
   private String createdByUrl;
   private String creationDate;
@@ -18,31 +18,31 @@ public class PoolOrderDto {
   }
 
   public SequencingParametersDto getParameters() {
-    return parameterId;
+    return parameters;
   }
 
   public Integer getPartitions() {
     return partitions;
   }
 
-  public Long getPoolId() {
-    return poolId;
+  public PoolDto getPool() {
+    return pool;
   }
 
   public void setId(Long id) {
     this.id = id;
   }
 
-  public void setParameters(SequencingParametersDto parameterId) {
-    this.parameterId = parameterId;
+  public void setParameters(SequencingParametersDto parameters) {
+    this.parameters = parameters;
   }
 
   public void setPartitions(Integer partitions) {
     this.partitions = partitions;
   }
 
-  public void setPoolId(Long poolId) {
-    this.poolId = poolId;
+  public void setPool(PoolDto pool) {
+    this.pool = pool;
   }
 
   public Long getCreatedById() {

@@ -198,62 +198,13 @@ HotTarget.pool = (function() {
           });
         }
       }, {
-        name: "Create Order",
+        name: "Create Orders",
         action: function(pools) {
-          var platformTypes = Utils.array.deduplicateString(pools.map(function(pool) {
-            return pool.platformType;
-          }));
-          if (platformTypes.length > 1) {
-            Utils.showOkDialog("Create Order", ["All pools must be for the same platform. Currently selected:"].concat(platformTypes));
-          }
-
-          var platformType = Utils.array.findFirstOrNull(function(pt) {
-            return pt.name == platformTypes[0];
-          }, Constants.platformTypes);
-          Utils.showWizardDialog('Create Order', Constants.platforms.filter(function(platform) {
-            return platform.platformType == platformType.name && platform.active;
-          }).map(function(platform) {
-            return {
-              name: platform.instrumentModel,
-              handler: function() {
-                Utils.showDialog('Create Order', 'Save', [{
-                  type: "select",
-                  label: "Sequencing Parameters",
-                  property: "parameters",
-                  values: Constants.sequencingParameters.filter(function(parameters) {
-                    return parameters.platform.id == platform.id;
-                  }),
-                  getLabel: Utils.array.getName
-                }, {
-                  type: "int",
-                  label: platformType.pluralPartitionName,
-                  property: "count",
-                  value: 1
-                }], function(results) {
-
-                  var createNext = function(index) {
-                    if (index >= pools.length) {
-                      window.location = window.location.origin + '/miso/pools';
-                      return;
-                    }
-
-                    Utils.ajaxWithDialog('Creating Order', 'POST', '/miso/rest/poolorder', {
-                      "poolId": pools[index].id,
-                      "partitions": results.count,
-                      "parameters": results.parameters,
-                    }, function() {
-                      createNext(index + 1);
-                    });
-                  };
-                  createNext(0);
-                });
-              }
-            };
-          }));
+          window.location = window.location.origin + '/miso/order/bulk/create?' + jQuery.param({
+            ids: pools.map(Utils.array.getId).join(',')
+          });
         }
-      },
-
-      HotUtils.printAction('pool'), ].concat(HotUtils.makeQcActions("Pool"));
+      }, HotUtils.printAction('pool')].concat(HotUtils.makeQcActions("Pool"));
     },
 
     confirmSave: function(flatObjects, isCreate, config, table) {
