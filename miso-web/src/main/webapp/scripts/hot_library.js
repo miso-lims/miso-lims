@@ -278,7 +278,7 @@ HotTarget.library = (function() {
             include: config.isLibraryReceipt || !create,
             unpack: function(lib, flat, setCellMeta) {
               // If creating, default to today's date in format YYYY-MM-DD
-              if (create) {
+              if (!lib.receivedDate && create) {
                 flat.receivedDate = Utils.getCurrentDate();
               } else {
                 flat.receivedDate = Utils.valOrNull(lib.receivedDate);
