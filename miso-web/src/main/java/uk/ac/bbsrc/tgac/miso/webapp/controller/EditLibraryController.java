@@ -126,6 +126,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkMergeTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -979,5 +980,44 @@ public class EditLibraryController {
   @RequestMapping(value = "dilution/bulk/merge", method = RequestMethod.GET)
   public ModelAndView propagatePoolsMerged(@RequestParam("ids") String dilutionIds, ModelMap model) throws IOException {
     return poolBulkMergeBackend.propagate(dilutionIds, model);
+  }
+
+  private static class BulkCustomPoolTableBackend extends BulkTableBackend<PoolDto> {
+
+    private final int poolQuantity;
+    private final List<DilutionDto> dilutions;
+    private final PlatformType platformType;
+
+    public BulkCustomPoolTableBackend(int poolQuantity, String idString, LibraryDilutionService dilutionService) throws IOException {
+      super("pool", PoolDto.class);
+      this.poolQuantity = poolQuantity;
+      List<LibraryDilution> ldis = dilutionService.listByIdList(parseIds(idString));
+      List<PlatformType> platformTypes = ldis.stream().map(dilution -> dilution.getLibrary().getPlatformType()).distinct()
+          .collect(Collectors.toList());
+      if (platformTypes.size() > 1) {
+        throw new IllegalArgumentException("Cannot create a pool for multiple platforms: "
+            + String.join(", ", platformTypes.stream().map(Enum::name).toArray(CharSequence[]::new)));
+      }
+      this.dilutions = ldis.stream().map(Dtos::asDto).collect(Collectors.toList());
+      this.platformType = platformTypes.get(0);
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      config.putPOJO("dilutionsToPool", dilutions);
+    }
+
+    public ModelAndView create(ModelMap model) throws IOException {
+      PoolDto dto = new PoolDto();
+      dto.setPlatformType(this.platformType.name());
+      return prepare(model, true, "Create Pools from Dilutions", Collections.nCopies(poolQuantity, dto));
+    }
+
+  }
+
+  @RequestMapping(value = "dilution/bulk/pool", method = RequestMethod.GET)
+  public ModelAndView propagatePoolsCustom(@RequestParam("ids") String dilutionIds, @RequestParam("quantity") int poolQuantity, ModelMap model)
+      throws IOException {
+    return new BulkCustomPoolTableBackend(poolQuantity, dilutionIds, dilutionService).create(model);
   }
 }

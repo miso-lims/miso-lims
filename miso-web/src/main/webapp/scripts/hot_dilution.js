@@ -52,7 +52,7 @@ HotTarget.dilution = {
           validator: HotUtils.validator.requiredText,
           include: true,
           unpack: function(dil, flat, setCellMeta) {
-            if (create) {
+            if (!dil.creationDate && create) {
               flat.creationDate = Utils.getCurrentDate();
             } else {
               flat.creationDate = Utils.valOrNull(dil.creationDate);
@@ -155,6 +155,24 @@ HotTarget.dilution = {
         HotUtils.warnIfConsentRevoked(items, function() {
           window.location = window.location.origin + '/miso/library/dilution/bulk/propagate?' + jQuery.param({
             ids: items.map(Utils.array.getId).join(',')
+          });
+        }, HotTarget.dilution.getLabel);
+      },
+      allowOnLibraryPage: true
+    }, {
+      name: 'Pool custom',
+      title: 'Divide dilutions into several pools',
+      action: function(items) {
+        HotUtils.warnIfConsentRevoked(items, function() {
+          Utils.showDialog("Create Pools", "Create", [{
+            label: 'Quantity',
+            property: 'quantity',
+            type: 'int'
+          }], function(data) {
+            window.location = window.location.origin + '/miso/library/dilution/bulk/pool?' + jQuery.param({
+              ids: items.map(Utils.array.getId).join(','),
+              quantity: data.quantity
+            });
           });
         }, HotTarget.dilution.getLabel);
       },

@@ -110,7 +110,7 @@ HotTarget.boxable = (function() {
             trimDropdown: false,
             source: [''],
             unpack: function(obj, flat, setCellMeta) {
-              if (obj.box) {
+              if (obj.box && obj.box.alias) {
                 flat.boxAlias = obj.box.alias;
                 cacheBox(obj.box, obj.boxPosition);
               }
