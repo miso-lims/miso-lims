@@ -296,7 +296,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     tissue.forEach((k, v) -> table.enterText(k, 0, v));
     tissue.forEach((k, v) -> table.enterText(k, 1, v));
     // need to enter this here, after project is entered otherwise identity lookup fails
-    tissue.put(SamColumns.EXTERNAL_NAME, "ext3"); // increment
+    tissue.put(SamColumns.EXTERNAL_NAME, "ext3,ext4"); // increment
     table.enterText(SamColumns.EXTERNAL_NAME, 0, tissue.get(SamColumns.EXTERNAL_NAME));
     table.enterText(SamColumns.EXTERNAL_NAME, 1, tissue.get(SamColumns.EXTERNAL_NAME));
 
