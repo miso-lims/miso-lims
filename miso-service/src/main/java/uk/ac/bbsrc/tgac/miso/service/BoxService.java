@@ -14,7 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<Box> {
+public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<Box>, DeleterService<Box> {
   @Override
   public default EntityType getEntityType() {
     return EntityType.BOX;
@@ -64,5 +64,16 @@ public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<
    * @throws IOException
    */
   public void updateBoxableLocation(Boxable boxable) throws IOException;
+
+  @Override
+  public default void beforeDelete(Box object) throws IOException {
+    object.removeAllBoxables();
+    save(object);
+  }
+
+  @Override
+  public default void authorizeDeletion(Box object) throws IOException {
+    getAuthorizationManager().throwIfNotWritable(object);
+  }
 
 }
