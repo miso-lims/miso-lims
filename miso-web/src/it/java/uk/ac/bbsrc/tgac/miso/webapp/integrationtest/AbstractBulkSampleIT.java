@@ -54,6 +54,19 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertTrue("Sample alias generation", !isStringEmptyOrNull(table.getText(SamColumns.ALIAS, 0)));
   }
 
+  protected void saveSeveralAndAssertAllSuccess(HandsOnTable table, int numRows) {
+    HandsOnTableSaveResult result = table.save();
+
+    assertTrue("Server errors: " + result.getServerErrors().toString(), result.getServerErrors().isEmpty());
+    assertTrue("Save errors: " + result.getSaveErrors().toString(), result.getSaveErrors().isEmpty());
+    assertTrue("Sample save", result.getItemsSaved() == numRows);
+
+    for (int i = 0; i < numRows; i++) {
+      assertTrue("Sample name generation", table.getText(SamColumns.NAME, i).contains("SAM"));
+      assertTrue("Sample alias generation", !isStringEmptyOrNull(table.getText(SamColumns.ALIAS, i)));
+    }
+  }
+
   protected void assertPlainSampleAttributes(Map<String, String> attributes, Sample sample, boolean newlyCreated) {
     if (newlyCreated) {
       assertEntityAttribute(SamColumns.PROJECT, attributes, sample, s -> s.getProject().getShortName());
