@@ -84,7 +84,7 @@ ListTarget.container = {
             name: platform.instrumentModel,
             handler: function() {
               var models = Constants.containerModels.filter(function(m) {
-                return m.platformIds.indexOf(platform.id) !== -1;
+                return (m.platformIds.indexOf(platform.id) !== -1 && !m.archived);
               }).sort(Utils.sorting.standardSort('alias')).map(function(model) {
                 return {
                   name: model.alias,
