@@ -4,61 +4,19 @@ import java.util.List;
 import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
-import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
-import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
 
 /**
  * Represents a user's position in a Workflow
  */
 public class WorkflowStateDto {
+  private String name;
   private long workflowId;
   private Integer stepNumber;
   private boolean complete;
   private String message;
   private Set<InputType> inputTypes;
   private List<String> log;
-
-  /**
-   * If the workflow is complete, represent a completed workflow.  Otherwise, set the user's position to the next stepNumber
-   */
-  public WorkflowStateDto(Workflow workflow) {
-    this.workflowId = workflow.getProgress().getId();
-    this.log = workflow.getLog();
-    this.complete = workflow.isComplete();
-    if (workflow.isComplete()) {
-      this.message = workflow.getConfirmMessage();
-    } else {
-      this.stepNumber = workflow.getNextStepNumber();
-      WorkflowStepPrompt prompt = workflow.getStep(stepNumber);
-      this.message = prompt.getMessage();
-      this.inputTypes = prompt.getInputTypes();
-    }
-  }
-
-  /**
-   * Represent a user's position in a Workflow at the specified stepNumber
-   * @param stepNumber must refer to a previously completed step, or the next step
-   */
-  public WorkflowStateDto(Workflow workflow, int stepNumber) {
-    this.workflowId = workflow.getProgress().getId();
-    this.log = workflow.getLog();
-    this.complete = workflow.isComplete();
-
-    if (stepNumber >= log.size()) {
-      if (workflow.isComplete()) {
-        this.message = workflow.getConfirmMessage();
-      } else {
-        this.stepNumber = workflow.getNextStepNumber();
-      }
-    } else {
-      this.stepNumber = stepNumber;
-    }
-    if (this.stepNumber != null) {
-      WorkflowStepPrompt prompt = workflow.getStep(stepNumber);
-      this.message = prompt.getMessage();
-      this.inputTypes = prompt.getInputTypes();
-    }
-  }
+  private String lastModified;
 
   /**
    * Describes a message to display to the user. May be a user input prompt or workflow execution confirmation
@@ -118,5 +76,21 @@ public class WorkflowStateDto {
 
   public void setComplete(boolean complete) {
     this.complete = complete;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(String lastModified) {
+    this.lastModified = lastModified;
   }
 }

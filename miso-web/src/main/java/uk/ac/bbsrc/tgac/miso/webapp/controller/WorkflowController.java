@@ -12,7 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
-import uk.ac.bbsrc.tgac.miso.dto.WorkflowStateDto;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.workflow.WorkflowManager;
 
 /**
@@ -27,16 +27,16 @@ public class WorkflowController {
   @RequestMapping("/new/{workflowName}")
   public ModelAndView createWorkflow(@PathVariable String workflowName, ModelMap model) throws IOException {
     Workflow workflow = workflowManager.beginWorkflow(workflowName);
-    model.put("title", workflow.getName());
-    model.put("state", new ObjectMapper().writeValueAsString(new WorkflowStateDto(workflow)));
+    model.put("title", workflow.getProgress().getWorkflowName().getDescription());
+    model.put("state", new ObjectMapper().writeValueAsString(Dtos.asDto(workflow)));
     return new ModelAndView("/pages/workflow.jsp", model);
   }
 
   @RequestMapping("/edit/{id}")
   public ModelAndView editWorkflow(@PathVariable long id, ModelMap model) throws IOException {
     Workflow workflow = workflowManager.loadWorkflow(id);
-    model.put("title", workflow.getName());
-    model.put("state", new ObjectMapper().writeValueAsString(new WorkflowStateDto(workflow)));
+    model.put("title", workflow.getProgress().getWorkflowName().getDescription());
+    model.put("state", new ObjectMapper().writeValueAsString(Dtos.asDto(workflow)));
     return new ModelAndView("/pages/workflow.jsp", model);
   }
 }

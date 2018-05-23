@@ -35,8 +35,13 @@
                  align="right"></div>
         </div>
 
+        <script type="text/javascript">
+            favouriteWorkflows = ${favouriteWorkflows};
+        </script>
+
         <miso:tiles-ajax id="tiles_barcode" target="barcode"/>
         <miso:tiles-ajax id="tiles_instrument_status" target="instrument_status"/>
+        <miso:tiles-ajax id="tiles_workflow" target="workflow"/>
 
         <div class="dashboard_widget">
             <div class="widget_title ui-corner-top">

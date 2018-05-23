@@ -63,11 +63,13 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
+import uk.ac.bbsrc.tgac.miso.dto.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
@@ -123,6 +125,8 @@ public class PoolRestController extends RestController {
   @Autowired
   private PoolService poolService;
   @Autowired
+  private RunService runService;
+  @Autowired
   private ContainerService containerService;
   @Autowired
   private PoolableElementViewService poolableElementViewService;
@@ -136,6 +140,12 @@ public class PoolRestController extends RestController {
       throw new RestException("No pool found with ID: " + poolId, Status.NOT_FOUND);
     }
     return Dtos.asDto(p, true);
+  }
+
+  @RequestMapping(value = "{poolId}/runs", method = RequestMethod.GET, produces = "application/json")
+  public @ResponseBody List<RunDto> getRunsByPoolId(@PathVariable Long poolId) throws IOException {
+    Collection<Run> rr = runService.listByPoolId(poolId);
+    return Dtos.asRunDtos(rr);
   }
 
   @RequestMapping(method = RequestMethod.POST, produces = "application/json")

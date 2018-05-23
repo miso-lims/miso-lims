@@ -30,6 +30,12 @@
   </div>
 </c:if>
 
+<sec:authorize access="isAuthenticated()">
+  <script>
+  window.location = '/miso/mainMenu';
+  </script>
+</sec:authorize>
+
 <div id="login-form">
     <form action="/login" method="POST">
     <div style="margin:0;padding:0;display:inline">

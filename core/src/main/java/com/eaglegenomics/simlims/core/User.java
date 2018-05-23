@@ -2,8 +2,11 @@ package com.eaglegenomics.simlims.core;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
+
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 
 /**
  * com.eaglegenomics.simlims.core
@@ -46,6 +49,8 @@ public interface User extends Serializable, Comparable<User> {
 
   boolean isInternal();
 
+  Set<WorkflowName> getFavouriteWorkflows();
+
   void setAdmin(boolean admin);
 
   void setExternal(boolean external);
@@ -61,4 +66,6 @@ public interface User extends Serializable, Comparable<User> {
   void setLoginName(String loginName);
 
   void setRoles(String[] roles);
+
+  void setFavouriteWorkflows(Set<WorkflowName> favouriteWorkflows);
 }

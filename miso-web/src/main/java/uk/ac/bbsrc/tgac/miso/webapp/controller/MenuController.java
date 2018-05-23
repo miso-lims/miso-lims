@@ -57,7 +57,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.prometheus.client.Gauge;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -72,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
@@ -107,6 +107,8 @@ import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
+
+import io.prometheus.client.Gauge;
 
 @Controller
 public class MenuController implements ServletContextAware {
@@ -236,6 +238,9 @@ public class MenuController implements ServletContextAware {
       if (checks.keySet().contains("error")) {
         model.put("error", checks.get("error"));
       }
+      ObjectMapper mapper = new ObjectMapper();
+      model.put("favouriteWorkflows",
+          user.getFavouriteWorkflows().stream().map(Dtos::asDto).map(dto -> mapper.valueToTree(dto)).collect(Collectors.toList()));
       if (Arrays.asList(user.getRoles()).contains("ROLE_EXTERNAL") && !Arrays.asList(user.getRoles()).contains("ROLE_INTERNAL")) {
         return new ModelAndView("/pages/external/externalMain.jsp", model);
       } else {
@@ -340,6 +345,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "referenceGenomes", referenceGenomeService.listAllReferenceGenomeTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "spreadsheetFormats", Arrays.asList(SpreadSheetFormat.values()), Dtos::asDto);
     createArray(mapper, baseUri, node, "sampleSpreadsheets", Arrays.asList(SampleSpreadSheets.values()), Dtos::asDto);
+    createArray(mapper, baseUri, node, "workflows", Arrays.asList(WorkflowName.values()), Dtos::asDto);
 
     ArrayNode platformTypes = node.putArray("platformTypes");
     Collection<PlatformType> activePlatformTypes = platformService.listActivePlatformTypes();

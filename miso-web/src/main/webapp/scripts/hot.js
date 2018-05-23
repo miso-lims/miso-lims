@@ -102,6 +102,18 @@ var HotUtils = {
    * these are being created or modified and a list of data items.
    */
   makeTable: function(target, create, data, config) {
+    jQuery('#additionalHotNotes').hide();
+    jQuery('#additionalHotNotes').empty();
+    if (typeof target.getNotes === 'function') {
+      var notes = target.getNotes(config);
+      if (notes && notes.length) {
+        notes.forEach(function(note) {
+          jQuery('#additionalHotNotes').append('<p>' + note + '</p>');
+        });
+        jQuery('#additionalHotNotes').show();
+      }
+    }
+
     var hotContainer = document.getElementById('hotContainer');
     // Get all the columns we intend to show and create a “flat” dummy object
     // for each row in the table.
@@ -270,6 +282,22 @@ var HotUtils = {
         }, 200);
       }
     });
+
+    table.getDtoData = function() {
+      var errorHandler = function(errorMessage) {
+        // ignore errors since we are not saving yet
+      };
+      for (var i = 0; i < data.length; i++) {
+        columns.forEach(function(c) {
+          c.pack(data[i], flatObjects[i], function(errorMessage) {
+            table.setCellMeta(i, c.hotIndex, 'valid', false);
+            errorHandler(errorMessage);
+          });
+        });
+      }
+      return data;
+    };
+
     hotContainer.style.display = '';
 
     cellMetaData.forEach(function(data) {
@@ -292,11 +320,11 @@ var HotUtils = {
         if (changes[i][2] == changes[i][3] && (changes[i][2] || changes[i][3])) {
           continue;
         }
-        var currentChange = changes[i];
-        var visualRow = currentChange[0];
-        var dataRow = table.toPhysicalRow(currentChange[0]);
-        var flat = flatObjects[dataRow];
-        var obj = data[dataRow];
+        const currentChange = changes[i];
+        const visualRow = currentChange[0];
+        const dataRow = table.toPhysicalRow(currentChange[0]);
+        const flat = flatObjects[dataRow];
+        const obj = data[dataRow];
 
         columns.filter(function(column) {
           return (Array.isArray(column.depends) && column.depends.indexOf(currentChange[1]) > -1) || column.depends == currentChange[1];
@@ -310,9 +338,9 @@ var HotUtils = {
               needsRender = true;
             }
           }, function(value) {
-            var oldVal = flatObjects[dataRow][column.data];
+            var oldVal = flat[column.data];
             if (!value || oldVal !== value) {
-              flatObjects[dataRow][column.data] = value;
+              flat[column.data] = value;
               needsRender = true;
               triggeredChanges.push([visualRow, column.data, oldVal, value]);
             }
@@ -399,14 +427,17 @@ var HotUtils = {
         jQuery(save).removeClass('disabled');
       }
     }
-    save
-        .addEventListener(
-            'click',
+    jQuery(save)
+        .click(
             function() {
               jQuery
-                  .when(target.hasOwnProperty('confirmSave') ? target.confirmSave(flatObjects, create) : null)
+                  .when(target.hasOwnProperty('confirmSave') ? target.confirmSave(flatObjects, create, config, table) : null)
                   .done(
                       function() {
+                        if (typeof target.customSave === 'function') {
+                          target.customSave(table, config);
+                          return;
+                        }
                         // reset server error messages
                         HotUtils.serverErrors = [];
                         // We are now saving the contents of the table. This can be called
@@ -590,10 +621,11 @@ var HotUtils = {
     });
 
     if (target.hasOwnProperty('getCustomActions')) {
-      target.getCustomActions(table).forEach(function(action) {
-        var button = document.createElement('SPAN');
+      target.getCustomActions(table, config).forEach(function(action) {
+        var button = document.createElement('A');
         button.setAttribute('class', 'ui-button ui-state-default');
         button.innerText = action.buttonText;
+        button.href = '#';
         button.addEventListener('click', action.eventHandler);
         document.getElementById('bulkactions').appendChild(button);
       });

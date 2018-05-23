@@ -270,24 +270,24 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public List<SampleIdentity> getIdentitiesByExactExternalNameAndProject(String externalNames, Long projectId) throws IOException {
-    if (isStringEmptyOrNull(externalNames)) return Collections.emptyList();
+  public Collection<SampleIdentity> getIdentitiesByExactExternalNameAndProject(String externalNames, Long projectId) throws IOException {
+    if (isStringEmptyOrNull(externalNames)) return Collections.emptySet();
     if (projectId == null) throw new IllegalArgumentException("Must provide a projectId in search");
     @SuppressWarnings("unchecked")
-    List<SampleIdentity> records = (List<SampleIdentity>) SampleIdentityImpl.getSetFromString(externalNames)
+    Set<SampleIdentity> records = (Set<SampleIdentity>) SampleIdentityImpl.getSetFromString(externalNames)
         .stream().map(extName -> {
           String str = DbUtils.convertStringToSearchQuery(extName, false);
           Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
           criteria.add(Restrictions.eq("project.id", projectId));
           criteria.add(Restrictions.ilike("externalName", str));
           return criteria.list();
-        }).flatMap(list -> list.stream()).collect(Collectors.toList());
+        }).flatMap(list -> list.stream()).distinct().collect(Collectors.toSet());
     
     // filter out those with a non-exact external name match
     return filterOnlyExactExternalNameMatches(records, externalNames);
   }
 
-  private List<SampleIdentity> filterOnlyExactExternalNameMatches(Collection<SampleIdentity> candidates, String externalNames) {
+  private Collection<SampleIdentity> filterOnlyExactExternalNameMatches(Collection<SampleIdentity> candidates, String externalNames) {
     return candidates.stream().filter(sam -> {
       Set<String> targets = SampleIdentityImpl.getSetFromString(externalNames).stream().map(String::toLowerCase)
           .collect(Collectors.toSet());
@@ -295,7 +295,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
           .map(String::toLowerCase).collect(Collectors.toSet());
       targets.retainAll(externalNamesOfCandidate);
       return !targets.isEmpty();
-    }).collect(Collectors.toList());
+    }).collect(Collectors.toSet());
   }
 
   @Override

@@ -87,7 +87,7 @@ var Pane = (function() {
     div.appendChild(inner);
   };
 
-  var createTilesDiv = function(items, transform) {
+  var createTilesDiv = function(items, transform, add) {
     var innerContent = document.createElement("DIV");
 
     items.map(transform).forEach(function(item) {
@@ -95,7 +95,13 @@ var Pane = (function() {
         innerContent.appendChild(item);
       }
     });
-
+    
+    add.forEach(function(item) {
+      if (item) {
+        innerContent.appendChild(item);
+      }
+    });
+    
     return innerContent;
   };
 
@@ -121,8 +127,8 @@ var Pane = (function() {
     updateDiv(div, loader);
   };
 
-  var showResults = function(results, transform, div) {
-    updateDiv(div, createTilesDiv(results, transform));
+  var showResults = function(results, transform, div, add) {
+    updateDiv(div, createTilesDiv(results, transform, add));
   };
 
   var showError = function(xhr, textStatus, errorThrown, div) {
@@ -178,18 +184,20 @@ var Pane = (function() {
         content: contentDiv
       };
     },
-    updateTiles: function(div, transform, url, query) {
+    
+    // add specifies any special tiles to be added to the bottom of the pane
+    updateTiles: function(div, transform, url, query, add) {
       ajaxCall(function() {
         showLoader(div)
       }, function(results) {
-        showResults(results, transform, div);
+        showResults(results, transform, div, add);
       }, function(xhr, textStatus, errorThrown) {
         showError(xhr, textStatus, errorThrown, div);
       }, url, query);
     },
     registerSearchHandlers: function(inputTag, transform, url, outputDiv) {
       var doSearch = function() {
-        Pane.updateTiles(outputDiv, transform, url, inputTag.value);
+        Pane.updateTiles(outputDiv, transform, url, inputTag.value, []);
       };
 
       // Wait 100 ms before doing the search to allow the paste buffer to copy into the input field
@@ -201,6 +209,6 @@ var Pane = (function() {
           doSearch();
         }
       };
-    }
+    },
   }
 })();

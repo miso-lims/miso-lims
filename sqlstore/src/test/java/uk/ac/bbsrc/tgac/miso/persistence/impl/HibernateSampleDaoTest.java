@@ -282,14 +282,14 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   @Test
   public void testGetIdentityByExactMatchExternalNameWithNonExactMatch() throws IOException {
     String query = "EXT1";
-    List<SampleIdentity> exactMatches = (List<SampleIdentity>) dao.getIdentitiesByExactExternalName(query);
+    Collection<SampleIdentity> exactMatches = dao.getIdentitiesByExactExternalName(query);
     assertTrue(exactMatches.isEmpty());
   }
 
   @Test
   public void testGetidentityByExactMatchExternalNameWithExactMatch() throws IOException {
     String query = "EXT15";
-    List<SampleIdentity> exactMatches = (List<SampleIdentity>) dao.getIdentitiesByExactExternalName(query);
+    Collection<SampleIdentity> exactMatches = dao.getIdentitiesByExactExternalName(query);
     assertFalse(exactMatches.isEmpty());
   }
 
