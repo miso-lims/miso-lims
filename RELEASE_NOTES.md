@@ -1,3 +1,15 @@
+# 0.2.122
+
+Changes:
+
+ * Hide archived containers in create wizard
+ * distribute dilutions into custom number of pools (#1452)
+ * fix external name lookup (#1457)
+ * Add workflow pane
+ * fixup identity search by project (#1451)
+ * Default pool creation date to today (#1448)
+ * Fix race condition in identity selection due to bad scoping
+
 # 0.2.121
 
 Changes:
