@@ -72,6 +72,17 @@ public interface SequencerPartitionContainerStore extends PaginatedDataSource<Se
   List<SequencerPartitionContainer> listAllSequencerPartitionContainersByRunId(long runId) throws IOException;
 
   /**
+   * List all SequencerPartitionContainers given a parent Pool ID
+   * 
+   * @param poolId
+   *          of type long
+   * @return List<SequencerPartitionContainer>
+   * @throws java.io.IOException
+   *           when
+   */
+  List<Partition> listAllPartitionsByPoolId(long poolId) throws IOException;
+
+  /**
    * List all SequencerPartitionContainers given an ID barcode
    * 
    * @param barcode
