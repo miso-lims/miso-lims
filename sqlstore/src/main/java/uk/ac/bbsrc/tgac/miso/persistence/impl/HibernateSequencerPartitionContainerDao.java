@@ -106,6 +106,17 @@ public class HibernateSequencerPartitionContainerDao
   }
 
   @Override
+  public List<Partition> listAllPartitionsByPoolId(long poolId)
+      throws IOException {
+    Criteria criteria = currentSession().createCriteria(PartitionImpl.class);
+    criteria.createAlias("pool", "pool");
+    criteria.add(Restrictions.eq("pool.id", poolId));
+    @SuppressWarnings("unchecked")
+    List<Partition> records = criteria.list();
+    return records;
+  }
+
+  @Override
   public List<SequencerPartitionContainer> listSequencerPartitionContainersByBarcode(String barcode)
       throws IOException {
     Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);

@@ -108,7 +108,7 @@
 
   <c:if test="${container.id != 0}">
     <miso:qcs id="list_qcs" item="${container}"/>
-    <miso:list-section id="list_partition" name="${container.model.platformType.partitionName}" target="partition" items="${containerPartitions}" config="{ 'platformType' : '${container.model.platformType.name()}', 'showContainer' : false }"/>
+    <miso:list-section id="list_partition" name="${container.model.platformType.pluralPartitionName}" target="partition" items="${containerPartitions}" config="{ 'platformType' : '${container.model.platformType.name()}', 'showContainer' : false , 'showPool' : true}"/>
   </c:if>
   <miso:list-section id="list_run" name="Runs" target="run" items="${containerRuns}"/>
   <miso:changelog item="${container}"/>

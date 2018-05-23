@@ -82,6 +82,11 @@ public class DefaultContainerService
   }
 
   @Override
+  public Collection<Partition> listPartitionsByPoolId(long poolId) throws IOException {
+    return containerDao.listAllPartitionsByPoolId(poolId);
+  }
+
+  @Override
   public SequencerPartitionContainer get(long containerId) throws IOException, AuthorizationException {
     SequencerPartitionContainer container = containerDao.get(containerId);
     authorizationManager.throwIfNotReadable(container);
