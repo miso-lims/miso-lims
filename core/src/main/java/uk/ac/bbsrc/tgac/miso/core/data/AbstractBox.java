@@ -215,6 +215,21 @@ public abstract class AbstractBox implements Box {
   }
 
   @Override
+  public String getDeleteType() {
+    return "Box";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName() + " (" + getAlias() + ")";
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    return getSecurityProfile();
+  }
+
+  @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
   }
