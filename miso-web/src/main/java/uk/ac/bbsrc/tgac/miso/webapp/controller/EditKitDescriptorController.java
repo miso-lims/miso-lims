@@ -31,6 +31,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -96,9 +97,7 @@ public class EditKitDescriptorController {
         model.put("title", "New Kit Descriptor");
       } else {
         kitDescriptor = kitService.getKitDescriptorById(kitDescriptorId);
-        if (kitDescriptor == null) {
-          throw new SecurityException("No such Kit Descriptor");
-        }
+        if (kitDescriptor == null) throw new NotFoundException("No kit found for ID " + kitDescriptorId.toString());
         model.put("title", kitDescriptor.getName());
       }
 

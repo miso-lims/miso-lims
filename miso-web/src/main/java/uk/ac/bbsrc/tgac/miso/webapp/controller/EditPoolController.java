@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -189,9 +190,7 @@ public class EditPoolController {
         model.put("title", "Pool " + poolId);
       }
 
-      if (pool == null) {
-        throw new SecurityException("No such Pool");
-      }
+      if (pool == null) throw new NotFoundException("No pool found for ID " + poolId.toString());
 
       model.put("formObj", pool);
       model.put("pool", pool);

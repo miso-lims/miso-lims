@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,8 +34,9 @@ public class WorkflowController {
   }
 
   @RequestMapping("/edit/{id}")
-  public ModelAndView editWorkflow(@PathVariable long id, ModelMap model) throws IOException {
+  public ModelAndView editWorkflow(@PathVariable Long id, ModelMap model) throws IOException {
     Workflow workflow = workflowManager.loadWorkflow(id);
+    if (workflow == null) throw new NotFoundException("No workflow found for ID " + id.toString());
     model.put("title", workflow.getProgress().getWorkflowName().getDescription());
     model.put("state", new ObjectMapper().writeValueAsString(Dtos.asDto(workflow)));
     return new ModelAndView("/pages/workflow.jsp", model);

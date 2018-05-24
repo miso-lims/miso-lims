@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -553,6 +554,7 @@ public class EditLibraryController {
   public ModelAndView setupForm(@PathVariable Long libraryId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Library library = libraryService.get(libraryId);
+    if (library == null) throw new NotFoundException("No library found for ID " + libraryId.toString());
     model.put("title", "Library " + library.getId());
     return setupForm(user, library, model);
   }
@@ -567,9 +569,7 @@ public class EditLibraryController {
 
   private ModelAndView setupForm(User user, Library library, ModelMap model) throws IOException {
 
-    if (library == null) {
-      throw new SecurityException("No such Library.");
-    }
+    if (library == null) throw new NotFoundException("No library found");
 
     model.put("formObj", library);
     model.put("library", library);
@@ -722,20 +722,14 @@ public class EditLibraryController {
     Project project = null;
     if (projectId != null) {
       project = projectService.getProjectById(projectId);
-      if (project == null) {
-        throw new IllegalArgumentException("Invalid Project ID");
-      }
+      if (project == null) throw new NotFoundException("No project found for ID " + projectId.toString());
     }
 
     SampleClass aliquotClass = null;
     if (isDetailedSampleEnabled()) {
-      if (aliquotClassId == null) {
-        throw new IllegalArgumentException("Sample Class ID is required for Detailed Sample");
-      }
+      if (aliquotClassId == null) throw new NotFoundException("Sample Class ID is required");
       aliquotClass = sampleClassService.get(aliquotClassId);
-      if (aliquotClass == null) {
-        throw new IllegalArgumentException("Invalid Sample Class ID");
-      }
+      if (aliquotClass == null) throw new NotFoundException("Requested sample class not found");
       DetailedLibraryDto detailedDto = new DetailedLibraryDto();
       libDto = detailedDto;
       SampleAliquotDto samDto = new SampleAliquotDto();
@@ -759,9 +753,7 @@ public class EditLibraryController {
     public BulkReceiveLibraryBackend(LibraryDto dto, Integer quantity, Project project, SampleClass aliquotClass, String defaultSciName)
         throws IOException {
       super("libraryReceipt", LibraryDto.class, "Libraries", dto, quantity);
-      if (isDetailedSampleEnabled() && aliquotClass == null) {
-        throw new IllegalArgumentException("Aliquot Class cannot be null");
-      }
+      if (isDetailedSampleEnabled() && aliquotClass == null) throw new NotFoundException("Aliquot class cannot be null");
       this.project = project;
       this.aliquotClass = aliquotClass;
       this.defaultSciName = defaultSciName;

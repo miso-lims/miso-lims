@@ -7,8 +7,6 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.ModelMap;
@@ -32,8 +30,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPageWithAuthorization;
 
 public abstract class AbstractInstituteDefaultsController<Model extends Aliasable, Dto> {
-
-  private static final Logger log = LoggerFactory.getLogger(EditPoolController.class);
 
   private final BulkEditTableBackend<Model, Dto> bulkEditBackend = new BulkEditTableBackend<Model, Dto>(getType(), getDtoClass(),
       getName()) {
