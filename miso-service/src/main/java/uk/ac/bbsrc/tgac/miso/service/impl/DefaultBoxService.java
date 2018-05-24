@@ -173,6 +173,11 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   }
 
   @Override
+  public List<Box> getByPartialSearch(String search) {
+    return boxStore.getByPartialSearch(search);
+  }
+
+  @Override
   public Collection<BoxSize> listSizes() throws IOException {
     return boxStore.listAllBoxSizes();
   }
