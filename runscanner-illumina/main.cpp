@@ -369,6 +369,38 @@ void add_lane_charts(
   output.append(std::move(result));
 }
 
+void add_lane_cluster_plot(
+    const illumina::interop::model::metrics::run_metrics &run,
+    const illumina::interop::model::summary::run_summary &run_summary,
+    Json::Value &output) {
+  if (run_summary.begin() == run_summary.end()) {
+    return;
+  }
+
+  Json::Value result(Json::objectValue);
+  result["type"] = "illumina-clusters-by-lane";
+  Json::Value cluster_data(Json::arrayValue);
+  Json::Value cluster_pf_data(Json::arrayValue);
+
+  for (const auto summary : *run_summary.begin()) {
+    cluster_data.append(summary.reads());
+    cluster_pf_data.append(summary.reads_pf());
+  }
+
+  Json::Value series(Json::arrayValue);
+  Json::Value cluster_series(Json::objectValue);
+  Json::Value cluster_pf_series(Json::objectValue);
+  cluster_series["name"] = "Clusters";
+  cluster_pf_series["name"] = "Clusters PF";
+  cluster_series["data"] = std::move(cluster_data);
+  cluster_pf_series["data"] = std::move(cluster_pf_data);
+  series.append(std::move(cluster_series));
+  series.append(std::move(cluster_pf_series));
+  result["series"] = std::move(series);
+
+  output.append(std::move(result));
+}
+
 /* Create the Illumina yield-by-read graph. This is not provided by the Illumina
  * library, so we must fetch the yield data from the run summary. */
 void add_yield_bars(
@@ -545,6 +577,7 @@ int main(int argc, const char **argv) {
   add_global_chart(run, run_summary, metrics_results);
   add_lane_charts(run, run_summary, metrics_results);
   add_yield_bars(run, run_summary, metrics_results);
+  add_lane_cluster_plot(run, run_summary, metrics_results);
   /* The FastWriter will convert the metrics into a compact JSON string. */
   Json::FastWriter fastWriter;
   result["metrics"] = fastWriter.write(metrics_results);
