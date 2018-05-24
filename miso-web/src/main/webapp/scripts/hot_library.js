@@ -144,6 +144,13 @@ HotTarget.library = (function() {
     });
   };
 
+  var sortOptions = {
+    sampleBoxColumn: {
+      sortFunction: HotUtils.sorting.colSort,
+      sortColumn: 'sampleBoxPositionLabel'
+    }
+  };
+
   return {
     createUrl: '/miso/rest/library',
     updateUrl: '/miso/rest/library/',
@@ -155,7 +162,17 @@ HotTarget.library = (function() {
         return acc || type.id == lib.libraryTypeId && type.alias.indexOf('Pair') != -1;
       }, lib.paired);
     },
-
+    onLoad: function(config, table) {
+      if (config.sort) {
+        var sortOption = sortOptions[config.sort];
+        var sortColIndex = table.propToCol(sortOption.sortColumn);
+        var rowCount = table.countRows();
+        for (var i = 0; i < rowCount; i++) {
+          table.setCellMeta(i, sortColIndex, 'sortFunction', sortOption.sortFunction);
+        }
+        table.sort(sortColIndex);
+      }
+    },
     createColumns: function(config, create, data) {
       var validationCache = {};
       var columns = [

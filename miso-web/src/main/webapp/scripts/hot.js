@@ -616,9 +616,6 @@ var HotUtils = {
                             });
                       });
             });
-    table.validateCells(function() {
-      table.render();
-    });
 
     if (target.hasOwnProperty('getCustomActions')) {
       target.getCustomActions(table, config).forEach(function(action) {
@@ -630,6 +627,14 @@ var HotUtils = {
         document.getElementById('bulkactions').appendChild(button);
       });
     }
+
+    if (typeof target.onLoad === 'function') {
+      target.onLoad(config, table);
+    }
+
+    table.validateCells(function() {
+      table.render();
+    });
   },
 
   sorting: {
