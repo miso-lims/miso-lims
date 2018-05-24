@@ -329,6 +329,7 @@ var RunGraph = (function() {
         lineGraph('illumina-called-intensity-by-cycle', 'Called Intensity', 'Average Intensity per Cycle'),
         lineGraph('illumina-base-percent-by-cycle', 'Base %', 'Percentage'),
         illuminaPerLanePlot('illumina-cluster-density-by-lane', 'Cluster Density', 'Density (K/mm²)'),
+        lineGraph('illumina-clusters-by-lane', 'Lane', 'Clusters'),
         barGraph('illumina-yield-by-read', 'Yields', 'Yield (gb)')],
     // Takes a list of metrics and renders them to #metricsdiv
     renderMetrics: function(metrics, partitionNames) {
