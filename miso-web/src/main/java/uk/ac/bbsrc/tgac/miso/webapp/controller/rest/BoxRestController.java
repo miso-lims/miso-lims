@@ -166,6 +166,12 @@ public class BoxRestController extends RestController {
     return Dtos.asBoxDtos(results, true);
   }
 
+  @RequestMapping(value = "/boxes/search/partial")
+  public @ResponseBody List<BoxDto> partialSearch(@RequestParam("q") String search) {
+    List<Box> results = boxService.getByPartialSearch(search);
+    return Dtos.asBoxDtos(results, true);
+  }
+
   /**
    * Creates an Excel spreadsheet that contains the list of all Boxable items located in a particular position. Empty positions are not
    * listed.

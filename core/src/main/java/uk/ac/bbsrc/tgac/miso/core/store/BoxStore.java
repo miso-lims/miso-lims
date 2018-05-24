@@ -57,6 +57,8 @@ public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
 
   public List<Box> getBySearch(String search);
 
+  public List<Box> getByPartialSearch(String search);
+
   Collection<BoxUse> listAllBoxUses() throws IOException;
   
   Collection<String> listAllBoxUsesStrings() throws IOException;

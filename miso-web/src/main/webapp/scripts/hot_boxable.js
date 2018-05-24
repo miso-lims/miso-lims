@@ -127,48 +127,52 @@ HotTarget.boxable = (function() {
             },
             depends: 'boxSearch',
             update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              var applyChanges = function(source) {
+              var applyChanges = function(source, autoSelect) {
                 setOptions({
                   source: source
                 });
-                setData(source.length > 1 ? 'SELECT' : source[0]);
+                setData(source.length > 1 && !autoSelect ? 'SELECT' : source[0]);
               };
 
               if (!value) {
-                applyChanges(['']);
+                applyChanges([''], false);
                 return;
               }
-              if (boxSearchCache[value]) {
-                applyChanges(boxSearchCache[value].map(function(item) {
+              if (boxSearchCache[value.toLowerCase()]) {
+                applyChanges(boxSearchCache[value.toLowerCase()].map(function(item) {
                   return item.alias;
-                }));
+                }), (boxSearchCache[value.toLowerCase()][0].name.toLowerCase() == value.toLowerCase()
+                		|| boxSearchCache[value.toLowerCase()][0].alias.toLowerCase() == value.toLowerCase() 
+                		|| (boxSearchCache[value.toLowerCase()][0].identificationBarcode && boxSearchCache[value.toLowerCase()][0].identificationBarcode.toLowerCase() == value.toLowerCase())));
                 return;
               }
 
               setData('(...searching...)');
               var deferred = jQuery.Deferred();
               jQuery.ajax({
-                url: '/miso/rest/boxes/search?' + jQuery.param({
+                url: '/miso/rest/boxes/search/partial?' + jQuery.param({
                   q: value
                 }),
                 contentType: "application/json; charset=utf8",
                 dataType: "json"
               }).success(function(data) {
-                boxSearchCache[value] = data;
+                boxSearchCache[value.toLowerCase()] = data;
                 jQuery.each(data, function(index, item) {
                   if (!boxesByAlias[item.alias]) {
                     cacheBox(item);
                   }
                 });
                 if (!data.length) {
-                  applyChanges(['']);
+                  applyChanges([''], false);
                 } else {
                   applyChanges(data.map(function(item) {
                     return item.alias;
-                  }));
+                  }), (data[0].name.toLowerCase() == value.toLowerCase() 
+                  		|| data[0].alias.toLowerCase() == value.toLowerCase() 
+                  		|| (data[0].identificationBarcode && data[0].identificationBarcode.toLowerCase() == value.toLowerCase())));
                 }
               }).fail(function(response, textStatus, serverStatus) {
-                applyChanges(['']);
+                applyChanges([''], false);
                 HotUtils.showServerErrors(response, serverStatus);
               }).always(function() {
                 deferred.resolve();

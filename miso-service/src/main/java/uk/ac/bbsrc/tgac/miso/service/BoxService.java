@@ -37,6 +37,8 @@ public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<
 
   public List<Box> getBySearch(String search);
 
+  public List<Box> getByPartialSearch(String search);
+
   public Collection<BoxSize> listSizes() throws IOException;
 
   /**

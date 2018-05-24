@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -179,6 +181,41 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
         ));
     @SuppressWarnings("unchecked")
     List<Box> results = criteria.list();
+    return results;
+  }
+  
+  private static String getMostSimilarProperty(Box box, String search) {
+    List<String> properties = new ArrayList<>(Arrays.asList(box.getAlias(), box.getName()));
+    if (box.getIdentificationBarcode() != null) {
+      properties.add(box.getIdentificationBarcode());
+    }
+    return properties.stream().map(String::toLowerCase).filter(p -> p.indexOf(search) >= 0)
+        .min(Comparator.comparingInt(p -> p.indexOf(search))).orElse("");
+  }
+
+  @Override
+  public List<Box> getByPartialSearch(String search) {
+    if (search == null) {
+      throw new NullPointerException("No search String provided");
+    }
+    Criteria criteria = currentSession().createCriteria(BoxImpl.class);
+    criteria.add(Restrictions.or(
+        Restrictions.like("identificationBarcode", search, MatchMode.ANYWHERE),
+        Restrictions.like("name", search, MatchMode.ANYWHERE),
+        Restrictions.like(FIELD_ALIAS, search, MatchMode.ANYWHERE)));
+    @SuppressWarnings("unchecked")
+    List<Box> results = criteria.list();
+    results.sort((Box b1, Box b2) -> {
+      String p1 = getMostSimilarProperty(b1, search.toLowerCase());
+      String p2 = getMostSimilarProperty(b2, search.toLowerCase());
+      if (p1.indexOf(search.toLowerCase()) == p2.indexOf(search.toLowerCase())) {
+        if (p1.length() == p2.length()) {
+            return b1.getAlias().compareTo(b2.getAlias());
+          }
+        return p1.length() - p2.length();
+        }
+      return p1.indexOf(search.toLowerCase()) - p2.indexOf(search.toLowerCase());
+      });
     return results;
   }
 
