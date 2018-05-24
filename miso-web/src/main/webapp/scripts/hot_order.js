@@ -89,7 +89,7 @@ HotTarget.order = (function() {
             source: params
           });
         }
-      }, HotUtils.makeColumnForInt('Partitions', true, 'partitions', HotUtils.validator.requiredNumber)];
+      }, HotUtils.makeColumnForInt('Partitions', true, 'partitions', HotUtils.validator.requiredPositiveInt)];
     },
     getCustomActions: function(table) {
       return [];

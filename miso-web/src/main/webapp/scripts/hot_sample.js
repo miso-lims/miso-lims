@@ -182,7 +182,8 @@ HotTarget.sample = (function() {
               sam.receivedDate = flat.receivedDate;
             }
           },
-          HotUtils.makeColumnForText('Matrix Barcode', !Constants.automaticBarcodes && !config.isLibraryReceipt && (!Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity'), 'identificationBarcode', {
+          HotUtils.makeColumnForText('Matrix Barcode', !Constants.automaticBarcodes && !config.isLibraryReceipt
+              && (!Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity'), 'identificationBarcode', {
             validator: HotUtils.validator.optionalTextNoSpecialChars
           }),
           HotUtils.makeColumnForEnum('Sample Type', true, true, 'sampleType', Constants.sampleTypes, null),
@@ -403,8 +404,8 @@ HotTarget.sample = (function() {
           HotUtils.makeColumnForConstantsList('Tissue Type', show['Tissue'], 'tissueTypeAlias', 'tissueTypeId', 'id', 'label',
               Constants.tissueTypes, true),
           HotUtils.makeColumnForInt('Passage #', show['Tissue'], 'passageNumber', null),
-          HotUtils.makeColumnForInt('Times Received', show['Tissue'], 'timesReceived', HotUtils.validator.requiredNumber),
-          HotUtils.makeColumnForInt('Tube Number', show['Tissue'], 'tubeNumber', HotUtils.validator.requiredNumber),
+          HotUtils.makeColumnForInt('Times Received', show['Tissue'], 'timesReceived', HotUtils.validator.requiredPositiveInt),
+          HotUtils.makeColumnForInt('Tube Number', show['Tissue'], 'tubeNumber', HotUtils.validator.requiredPositiveInt),
           HotUtils.makeColumnForConstantsList('Lab', show['Tissue'] && !config.isLibraryReceipt, 'labComposite', 'labId', 'id', 'label',
               Constants.labs, false),
           HotUtils.makeColumnForText('Secondary ID', show['Tissue'] && !config.isLibraryReceipt, 'secondaryIdentifier', {
@@ -418,9 +419,9 @@ HotTarget.sample = (function() {
 
           // Tissue Processing: Slides columns
           HotUtils.makeColumnForInt('Slides', (show['Tissue Processing'] && config.targetSampleClass.alias == 'Slide'), 'slides',
-              HotUtils.validator.requiredNumber),
+              HotUtils.validator.requiredPositiveInt),
           HotUtils.makeColumnForInt('Discards', (show['Tissue Processing'] && config.targetSampleClass.alias == 'Slide'), 'discards',
-              HotUtils.validator.requiredNumber),
+              HotUtils.validator.requiredPositiveInt),
           HotUtils.makeColumnForInt('Thickness', (show['Tissue Processing'] && config.targetSampleClass.alias == 'Slide'), 'thickness',
               null),
           {
@@ -454,7 +455,7 @@ HotTarget.sample = (function() {
 
           // Tissue Processing: LCM Tube columns
           HotUtils.makeColumnForInt('Slides Consumed', (show['Tissue Processing'] && config.targetSampleClass.alias == 'LCM Tube'),
-              'slidesConsumed', HotUtils.validator.requiredNumber),
+              'slidesConsumed', HotUtils.validator.requiredPositiveInt),
 
           // Stock columns
           HotUtils.makeColumnForEnum('STR Status', show['Stock'] && !config.isLibraryReceipt, true, 'strStatus', Constants.strStatuses,
@@ -584,93 +585,91 @@ HotTarget.sample = (function() {
     },
 
     getBulkActions: function(config) {
-      return [
-          {
-            name: "Edit",
-            action: function(samples) {
+      return [{
+        name: "Edit",
+        action: function(samples) {
 
-              if (samples.some(function(sample) {
-                return sample.sampleClassId;
-              }) && !Constants.isDetailedSample) {
-                alert("There's detailed samples, but MISO is not configured for this.");
-                return;
-              }
+          if (samples.some(function(sample) {
+            return sample.sampleClassId;
+          }) && !Constants.isDetailedSample) {
+            alert("There's detailed samples, but MISO is not configured for this.");
+            return;
+          }
 
-              var classes = getSampleClasses(samples);
-              var classesAliases = Utils.array.deduplicateString(classes.map(function(sampleClass) {
-                return sampleClass.alias;
-              }));
-              if (classesAliases.length > 1) {
-                alert("You have selected samples of classes " + classesAliases.join(" & ")
-                    + ". Please select samples from only one class.");
-                return;
-              }
+          var classes = getSampleClasses(samples);
+          var classesAliases = Utils.array.deduplicateString(classes.map(function(sampleClass) {
+            return sampleClass.alias;
+          }));
+          if (classesAliases.length > 1) {
+            alert("You have selected samples of classes " + classesAliases.join(" & ") + ". Please select samples from only one class.");
+            return;
+          }
 
-              window.location = "/miso/sample/bulk/edit?" + jQuery.param({
-                ids: samples.map(Utils.array.getId).join(',')
-              });
-            }
+          window.location = "/miso/sample/bulk/edit?" + jQuery.param({
+            ids: samples.map(Utils.array.getId).join(',')
+          });
+        }
 
-          }, {
-            name: "Propagate",
-            action: function(samples) {
-              HotUtils.warnIfConsentRevoked(samples, function() {
-                var idsString = samples.map(Utils.array.getId).join(",");
-                var classes = getSampleClasses(samples);
+      }, {
+        name: "Propagate",
+        action: function(samples) {
+          HotUtils.warnIfConsentRevoked(samples, function() {
+            var idsString = samples.map(Utils.array.getId).join(",");
+            var classes = getSampleClasses(samples);
 
-                // In the case of plain samples, this will be empty, which is fine.
-                var targets = getChildSampleClasses(classes).sort(Utils.sorting.sampleClassComparator).map(function(sampleClass) {
+            // In the case of plain samples, this will be empty, which is fine.
+            var targets = getChildSampleClasses(classes).sort(Utils.sorting.sampleClassComparator).map(function(sampleClass) {
 
-                  return {
-                    name: sampleClass.alias,
-                    action: function(replicates) {
-                      window.location = "/miso/sample/bulk/propagate?" + jQuery.param({
-                        parentIds: idsString,
-                        replicates: replicates,
-                        sampleClassId: sampleClass.id
-                      });
-                    }
-                  };
-
-                });
-                if (!Constants.isDetailedSample || classes.every(function(sampleClass) {
-                  return sampleClass.sampleCategory == "Aliquot";
-                })) {
-                  targets.push({
-                    name: "Library",
-                    action: function(replicates) {
-                      window.location = "/miso/library/bulk/propagate?" + jQuery.param({
-                        ids: idsString,
-                        replicates: replicates
-                      });
-                    }
+              return {
+                name: sampleClass.alias,
+                action: function(replicates) {
+                  window.location = "/miso/sample/bulk/propagate?" + jQuery.param({
+                    parentIds: idsString,
+                    replicates: replicates,
+                    sampleClassId: sampleClass.id
                   });
                 }
+              };
 
-                if (targets.length == 0) {
-                  alert("No propagation is possible from the samples.");
-                  return;
+            });
+            if (!Constants.isDetailedSample || classes.every(function(sampleClass) {
+              return sampleClass.sampleCategory == "Aliquot";
+            })) {
+              targets.push({
+                name: "Library",
+                action: function(replicates) {
+                  window.location = "/miso/library/bulk/propagate?" + jQuery.param({
+                    ids: idsString,
+                    replicates: replicates
+                  });
                 }
-
-                Utils.showDialog(targets.length > 1 ? 'Propagate Samples' : ('Propagate to ' + targets[0].name), 'Propagate', [{
-                  property: 'replicates',
-                  type: 'int',
-                  label: 'Replicates',
-                  value: 1
-                }, targets.length > 1 ? {
-                  property: 'target',
-                  type: 'select',
-                  label: 'To',
-                  values: targets,
-                  getLabel: Utils.array.getName
-                } : null].filter(function(x) {
-                  return !!x;
-                }), function(result) {
-                  (result.target || targets[0]).action(result.replicates);
-                });
               });
             }
-          }, HotUtils.printAction('sample'), HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets),
+
+            if (targets.length == 0) {
+              alert("No propagation is possible from the samples.");
+              return;
+            }
+
+            Utils.showDialog(targets.length > 1 ? 'Propagate Samples' : ('Propagate to ' + targets[0].name), 'Propagate', [{
+              property: 'replicates',
+              type: 'int',
+              label: 'Replicates',
+              value: 1
+            }, targets.length > 1 ? {
+              property: 'target',
+              type: 'select',
+              label: 'To',
+              values: targets,
+              getLabel: Utils.array.getName
+            } : null].filter(function(x) {
+              return !!x;
+            }), function(result) {
+              (result.target || targets[0]).action(result.replicates);
+            });
+          });
+        }
+      }, HotUtils.printAction('sample'), HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets),
           Constants.isDetailedSample ? HotUtils.makeParents('sample', HotUtils.parentCategoriesForDetailed()) : null, ].concat(HotUtils
           .makeQcActions("Sample"));
     },

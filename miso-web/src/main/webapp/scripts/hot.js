@@ -31,10 +31,10 @@ var HotUtils = {
     },
 
     /**
-     * Custom validator for required numeric fields
+     * Custom validator for required positive integers
      */
-    requiredNumber: function(value, callback) {
-      return callback(!Utils.validation.isEmpty(value) && Handsontable.helper.isNumeric(value));
+    requiredPositiveInt: function(value, callback) {
+      return callback(/^[0-9]+$/g.test(value));
     },
 
     /**
