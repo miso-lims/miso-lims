@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -58,8 +59,9 @@ public class StorageLocation {
   }
 
   @Id
+  @Column(name = "locationId")
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long locationId;
+  private long id;
 
   @ManyToOne
   @JoinColumn(name = "parentLocationId", nullable = true)
@@ -78,12 +80,12 @@ public class StorageLocation {
   @OneToMany(targetEntity = BoxImpl.class, mappedBy = "storageLocation")
   private Set<Box> boxes;
 
-  public long getLocationId() {
-    return locationId;
+  public long getId() {
+    return id;
   }
 
-  public void setLocationId(long locationId) {
-    this.locationId = locationId;
+  public void setId(long id) {
+    this.id = id;
   }
 
   public StorageLocation getParentLocation() {
@@ -99,7 +101,7 @@ public class StorageLocation {
   }
 
   public Set<StorageLocation> getChildLocations() {
-    return childLocations;
+    return childLocations == null ? Collections.emptySet() : childLocations;
   }
 
   public LocationUnit getLocationUnit() {
@@ -127,7 +129,7 @@ public class StorageLocation {
   }
 
   public Set<Box> getBoxes() {
-    return boxes;
+    return boxes == null ? Collections.emptySet() : boxes;
   }
 
   public void setBoxes(Set<Box> boxes) {
@@ -135,8 +137,11 @@ public class StorageLocation {
   }
 
   public String getDisplayLocation() {
-    return (getParentLocation() == null ? "" : getParentLocation().getDisplayLocation() + ", ")
-        + getLocationUnit().getDisplayName() + " " + getAlias();
+    return getLocationUnit().getDisplayName() + " " + getAlias();
+  }
+
+  public String getFullDisplayLocation() {
+    return (getParentLocation() == null ? "" : getParentLocation().getFullDisplayLocation() + ", ") + getDisplayLocation();
   }
 
 }

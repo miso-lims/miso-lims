@@ -116,6 +116,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
@@ -2289,6 +2290,38 @@ public class Dtos {
       WorkflowStepPrompt prompt = from.getStep(stepNumber);
       dto.setMessage(prompt.getMessage());
       dto.setInputTypes(prompt.getInputTypes());
+    }
+    return dto;
+  }
+
+  public static StorageLocationDto asDto(StorageLocation from, boolean includeChildLocations) {
+    StorageLocationDto dto = new StorageLocationDto();
+    dto.setId(from.getId());
+    if (from.getParentLocation() != null) {
+      dto.setParentLocationId(from.getParentLocation().getId());
+    }
+    dto.setLocationUnit(from.getLocationUnit().name());
+    switch (from.getLocationUnit().getBoxStorageAmount()) {
+    case NONE:
+      dto.setAvailableStorage(false);
+      break;
+    case SINGLE:
+      dto.setAvailableStorage(from.getBoxes().isEmpty());
+      break;
+    case MULTIPLE:
+      dto.setAvailableStorage(true);
+      break;
+    default:
+      throw new IllegalStateException("Unexpected BoxStorageAmount");
+    }
+    dto.setAlias(from.getAlias());
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    dto.setDisplayLocation(from.getDisplayLocation());
+    dto.setFullDisplayLocation(from.getFullDisplayLocation());
+    if (includeChildLocations) {
+      dto.setChildLocations(from.getChildLocations().stream()
+          .map(child -> Dtos.asDto(child, false))
+          .collect(Collectors.toList()));
     }
     return dto;
   }

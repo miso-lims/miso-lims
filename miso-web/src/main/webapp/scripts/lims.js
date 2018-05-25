@@ -751,6 +751,16 @@ Utils.ui = {
         }
       });
     });
+  },
+
+  setDisabled: function(selector, disabled) {
+    var element = jQuery(selector);
+    element.prop('disabled', disabled);
+    if (disabled) {
+      element.addClass('disabled');
+    } else {
+      element.removeClass('disabled');
+    }
   }
 };
 
@@ -865,6 +875,14 @@ Utils.array = {
   findFirstOrNull: function(predicate, referenceCollection) {
     var results = referenceCollection.filter(predicate);
     return results.length > 0 ? results[0] : null;
+  },
+  findUniqueOrThrow: function(predicate, referenceCollection) {
+    var results = referenceCollection.filter(predicate);
+    if (results.length != 1) {
+      throw 'element not found';
+    } else {
+      return results[0];
+    }
   },
   maybeGetProperty: function(obj, propertyName) {
     return obj ? obj[propertyName] : null;

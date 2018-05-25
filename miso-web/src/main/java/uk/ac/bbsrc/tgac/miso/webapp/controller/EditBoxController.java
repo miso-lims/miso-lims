@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
+import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
@@ -75,6 +79,18 @@ public class EditBoxController {
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return boxService.getColumnSizes();
+  }
+
+  @InitBinder
+  public void includeForeignKeys(WebDataBinder binder) {
+    binder.registerCustomEditor(StorageLocation.class, new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        StorageLocation location = new StorageLocation();
+        location.setId(Long.valueOf(text));
+        setValue(location);
+      }
+    });
   }
 
   public List<String> boxSizesAsRowsByColumns() throws IOException {
