@@ -34,7 +34,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -91,7 +91,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -623,7 +622,7 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.put(Config.SORTABLE_LOCATION, true);
-      writeLibraryConfiguration(mapper, config);
+      writeLibraryConfiguration(config);
     }
   };
 
@@ -631,10 +630,10 @@ public class EditLibraryController {
 
     private final SampleService sampleService;
     private final TemplateService templateService;
-    private final BiConsumer<ObjectMapper, ObjectNode> additionalConfigFunction;
+    private final Consumer<ObjectNode> additionalConfigFunction;
 
     public LibraryBulkPropagateBackend(SampleService sampleService, TemplateService templateService,
-        BiConsumer<ObjectMapper, ObjectNode> additionalConfigFunction) {
+        Consumer<ObjectNode> additionalConfigFunction) {
       super("library", LibraryDto.class, "Libraries", "Samples");
       this.sampleService = sampleService;
       this.templateService = templateService;
@@ -700,7 +699,7 @@ public class EditLibraryController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      additionalConfigFunction.accept(mapper, config);
+      additionalConfigFunction.accept(config);
       if (templatesByProjectId != null && !templatesByProjectId.isEmpty()) {
         config.putPOJO(Config.TEMPLATES, templatesByProjectId);
       }
@@ -716,7 +715,7 @@ public class EditLibraryController {
 
   }
 
-  private void writeLibraryConfiguration(ObjectMapper mapper, ObjectNode config) {
+  private void writeLibraryConfiguration(ObjectNode config) {
     config.put(Config.SHOW_DESCRIPTION, showDescription);
     config.put(Config.SHOW_VOLUME, showVolume);
     config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
@@ -726,7 +725,7 @@ public class EditLibraryController {
 
   @RequestMapping(value = "/bulk/propagate", method = RequestMethod.GET)
   public ModelAndView propagateFromSamples(@RequestParam("ids") String sampleIds, @RequestParam("replicates") int replicates,
-      @RequestParam(name = "sort", required = false) String sort, ModelMap model) throws IOException, MisoNamingException {
+      @RequestParam(name = "sort", required = false) String sort, ModelMap model) throws IOException {
     return new LibraryBulkPropagateBackend(sampleService, templateService, this::writeLibraryConfiguration)
         .propagate(sampleIds, replicates, sort, model);
   }

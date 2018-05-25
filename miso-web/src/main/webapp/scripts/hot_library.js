@@ -166,11 +166,7 @@ HotTarget.library = (function() {
       if (config.sort) {
         var sortOption = sortOptions[config.sort];
         var sortColIndex = table.propToCol(sortOption.sortColumn);
-        var rowCount = table.countRows();
-        for (var i = 0; i < rowCount; i++) {
-          table.setCellMeta(i, sortColIndex, 'sortFunction', sortOption.sortFunction);
-        }
-        table.sort(sortColIndex);
+        HotUtils.sortTable(table, sortColIndex, sortOption.sortFunction);
       }
     },
     createColumns: function(config, create, data) {
