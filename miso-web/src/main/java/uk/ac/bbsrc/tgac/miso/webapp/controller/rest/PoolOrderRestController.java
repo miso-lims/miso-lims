@@ -12,7 +12,6 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
@@ -102,14 +100,13 @@ public class PoolOrderRestController extends RestController {
 
   @RequestMapping(value = "/poolorder", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> createPoolOrder(@RequestBody PoolOrderDto poolOrderDto, UriComponentsBuilder b, HttpServletResponse response)
+  @ResponseStatus(code = HttpStatus.CREATED)
+  public PoolOrderDto createPoolOrder(@RequestBody PoolOrderDto poolOrderDto, UriComponentsBuilder b, HttpServletResponse response)
       throws IOException {
     PoolOrder poolOrder = Dtos.to(poolOrderDto);
     Long id = poolOrderService.create(poolOrder);
-    UriComponents uriComponents = b.path("/poolorder/{id}").buildAndExpand(id);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    PoolOrder saved = poolOrderService.get(id);
+    return Dtos.asDto(saved);
   }
   
   @RequestMapping(value = "/poolorder/dt/completions/all/{platform}", method = RequestMethod.GET, produces = { "application/json" })

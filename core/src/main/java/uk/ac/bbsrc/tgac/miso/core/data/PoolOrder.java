@@ -8,9 +8,9 @@ public interface PoolOrder extends Deletable {
 
   public void setId(Long id);
 
-  public Long getPoolId();
+  public Pool getPool();
 
-  public void setPoolId(Long poolId);
+  public void setPool(Pool pool);
 
   public Integer getPartitions();
 
