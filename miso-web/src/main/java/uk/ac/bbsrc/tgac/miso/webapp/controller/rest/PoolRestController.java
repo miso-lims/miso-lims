@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,6 +39,7 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,10 +52,20 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -61,16 +73,21 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
+import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
-import uk.ac.bbsrc.tgac.miso.dto.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderCompletionDto;
+import uk.ac.bbsrc.tgac.miso.dto.RunDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
+import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
 
@@ -132,6 +149,10 @@ public class PoolRestController extends RestController {
   private PoolableElementViewService poolableElementViewService;
   @Autowired
   private PoolOrderCompletionService poolOrderCompletionService;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private LibraryDilutionService dilutionService;
 
   @RequestMapping(value = "{poolId}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody PoolDto getPoolById(@PathVariable Long poolId) throws IOException {
@@ -315,6 +336,69 @@ public class PoolRestController extends RestController {
       pools.add(pool);
     }
     poolService.bulkDelete(pools);
+  }
+
+  private static Stream<Sample> getSamples(Pool pool) {
+    return pool.getPoolableElementViews().stream().map(PoolableElementView::getSample);
+  }
+
+  private final ParentFinder<Pool> parentFinder = (new ParentFinder<Pool>() {
+
+    @Override
+    protected Pool fetch(long id) throws IOException {
+      return poolService.get(id);
+    }
+  })
+      .add(new ParentFinder.SampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, PoolRestController::getSamples))//
+      .add(new ParentFinder.SampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, PoolRestController::getSamples))//
+      .add(new ParentFinder.SampleAdapter<>(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class,
+          PoolRestController::getSamples))//
+      .add(new ParentFinder.SampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class, PoolRestController::getSamples))//
+      .add(new ParentFinder.SampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class, PoolRestController::getSamples))//
+      .add(new ParentFinder.ParentAdapter<Pool, Sample, SampleDto>("Sample") {
+
+        @Override
+        public SampleDto asDto(Sample model) {
+          return Dtos.asDto(model);
+        }
+
+        @Override
+        public Stream<Sample> find(Pool model, Consumer<String> emitError) {
+          return getSamples(model);
+        }
+
+      })
+      .add(new ParentFinder.ParentAdapter<Pool, Library, LibraryDto>("Library") {
+
+        @Override
+        public LibraryDto asDto(Library model) {
+          return Dtos.asDto(model);
+        }
+
+        @Override
+        public Stream<Library> find(Pool model, Consumer<String> emitError) {
+          return model.getPoolableElementViews().stream().map(WhineyFunction.rethrow(v -> libraryService.get(v.getLibraryId())));
+        }
+      })
+      .add(new ParentFinder.ParentAdapter<Pool, LibraryDilution, DilutionDto>("Dilution") {
+
+        @Override
+        public DilutionDto asDto(LibraryDilution model) {
+          return Dtos.asDto(model);
+        }
+
+        @Override
+        public Stream<LibraryDilution> find(Pool model, Consumer<String> emitError) {
+          return model.getPoolableElementViews().stream().map(WhineyFunction.rethrow(v -> dilutionService.get(v.getDilutionId())));
+        }
+      });
+
+
+  @RequestMapping(value = "/parents/{category}", method = RequestMethod.POST)
+  @ResponseBody
+  public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
+    return parentFinder.list(ids, category);
   }
 
 }
