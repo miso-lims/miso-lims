@@ -23,6 +23,7 @@
   ~ **********************************************************************
   --%>
 
-<p><a href="javascript:void(0);" onclick="window.history.back();">Return to Previous Page</a></p>
+<p>The page you requested was not found.<br/>
+  <a href="javascript:void(0);" onclick="window.history.back();">Return to Previous Page</a></p>
 
 <%@ include file="/footer.jsp" %>

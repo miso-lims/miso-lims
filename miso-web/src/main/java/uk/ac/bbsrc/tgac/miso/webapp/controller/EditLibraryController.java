@@ -27,6 +27,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -722,14 +723,14 @@ public class EditLibraryController {
     Project project = null;
     if (projectId != null) {
       project = projectService.getProjectById(projectId);
-      if (project == null) throw new NotFoundException("No project found for ID " + projectId.toString());
+      if (project == null) throw new InvalidParameterException("No project found for ID " + projectId.toString());
     }
 
     SampleClass aliquotClass = null;
     if (isDetailedSampleEnabled()) {
-      if (aliquotClassId == null) throw new NotFoundException("Sample Class ID is required");
+      if (aliquotClassId == null) throw new InvalidParameterException("Sample Class ID is required");
       aliquotClass = sampleClassService.get(aliquotClassId);
-      if (aliquotClass == null) throw new NotFoundException("Requested sample class not found");
+      if (aliquotClass == null) throw new InvalidParameterException("Requested sample class not found");
       DetailedLibraryDto detailedDto = new DetailedLibraryDto();
       libDto = detailedDto;
       SampleAliquotDto samDto = new SampleAliquotDto();
@@ -753,7 +754,7 @@ public class EditLibraryController {
     public BulkReceiveLibraryBackend(LibraryDto dto, Integer quantity, Project project, SampleClass aliquotClass, String defaultSciName)
         throws IOException {
       super("libraryReceipt", LibraryDto.class, "Libraries", dto, quantity);
-      if (isDetailedSampleEnabled() && aliquotClass == null) throw new NotFoundException("Aliquot class cannot be null");
+      if (isDetailedSampleEnabled() && aliquotClass == null) throw new InvalidParameterException("Aliquot class cannot be null");
       this.project = project;
       this.aliquotClass = aliquotClass;
       this.defaultSciName = defaultSciName;
