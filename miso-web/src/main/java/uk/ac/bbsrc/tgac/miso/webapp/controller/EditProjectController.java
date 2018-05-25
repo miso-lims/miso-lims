@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -255,6 +256,13 @@ public class EditProjectController {
     return setupForm(ProjectImpl.UNSAVED_ID, model);
   }
 
+  @RequestMapping(value = "/shortname/{shortName}", method = RequestMethod.GET)
+  public ModelAndView byProjectShortName(@PathVariable String shortName, ModelMap model) throws IOException {
+    Project project = projectService.getProjectByShortName(shortName);
+    if (project == null) throw new NotFoundException("No project found for shortname " + shortName);
+    return setupForm(project.getId(), model);
+  }
+
   @RequestMapping(value = "/{projectId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long projectId, ModelMap model) throws IOException {
     try {
@@ -268,9 +276,8 @@ public class EditProjectController {
         model.put("title", "Project " + projectId);
       }
 
-      if (project == null) {
-        throw new SecurityException("No such Project");
-      }
+      if (project == null) throw new NotFoundException("No project found for ID " + projectId.toString());
+
       model.put("referenceGenome", referenceGenomeService.listAllReferenceGenomeTypes());
       model.put("formObj", project);
       model.put("project", project);

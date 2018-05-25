@@ -38,8 +38,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -53,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -69,12 +66,6 @@ public class DownloadController {
   protected static final Logger log = LoggerFactory.getLogger(DownloadController.class);
 
   @Autowired
-  private SecurityManager securityManager;
-
-  @Autowired
-  private AuthorizationManager authorizationManager;
-
-  @Autowired
   private ProjectService projectService;
 
   @Autowired
@@ -85,10 +76,6 @@ public class DownloadController {
 
   @Autowired
   private QualityControlService qcService;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;

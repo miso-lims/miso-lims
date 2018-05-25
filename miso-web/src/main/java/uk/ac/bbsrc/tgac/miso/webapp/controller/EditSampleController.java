@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
@@ -638,7 +639,7 @@ public class EditSampleController {
 
         if (projectId != null) {
           Project project = projectService.getProjectById(projectId);
-          if (project == null) throw new SecurityException("No such project.");
+          if (project == null) throw new NotFoundException("No project found for ID " + projectId.toString());
           model.addAttribute("project", project);
           sample.setProject(project);
 
@@ -660,7 +661,7 @@ public class EditSampleController {
         model.put("projectsDtos", mapper.valueToTree(projects));
       } else {
         sample = sampleService.get(sampleId);
-        if (sample == null) throw new SecurityException("No such sample.");
+        if (sample == null) throw new NotFoundException("No sample found for ID " + sampleId.toString());
         model.put("sampleCategory", detailedSample ? ((DetailedSample) sample).getSampleClass().getSampleCategory() : "plain");
         if (detailedSample) {
           model.put("sampleClass", ((DetailedSample) sample).getSampleClass().getAlias());

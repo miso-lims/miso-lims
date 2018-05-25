@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
@@ -44,8 +45,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
@@ -59,7 +58,6 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
-import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 
 @Controller
@@ -73,11 +71,7 @@ public class EditSequencerPartitionContainerController {
   @Autowired
   private KitService kitService;
   @Autowired
-  private PlatformService platformService;
-  @Autowired
   private RunService runService;
-  @Autowired
-  private SecurityManager securityManager;
   @Autowired
   private ContainerModelService containerModelService;
 
@@ -138,25 +132,15 @@ public class EditSequencerPartitionContainerController {
     this.containerService = containerService;
   }
 
-  public void setPlatformService(PlatformService platformService) {
-    this.platformService = platformService;
-  }
-
   public void setRunService(RunService runService) {
     this.runService = runService;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
 
   @RequestMapping(value = "/new/{modelId}", method = RequestMethod.GET)
   public ModelAndView setupNewForm(@PathVariable("modelId") Long modelId, ModelMap model)
       throws IOException {
     SequencingContainerModel containerModel = containerModelService.get(modelId);
-    if (containerModel == null) {
-      throw new IllegalArgumentException("Invalid model id");
-    }
+    if (containerModel == null) throw new NotFoundException("No container model found for ID " + modelId.toString());
     SequencerPartitionContainer container = containerModel.getPlatformType().createContainer();
     container.setModel(containerModel);
 

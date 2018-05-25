@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
@@ -144,7 +145,7 @@ public class EditServiceRecordController {
       model.put(ModelKeys.FILES.getKey(), populateServiceRecordFiles(sr));
       model.put("title", "Service Record " + sr.getId());
     } else {
-      throw new IOException("No such Service Record");
+      throw new NotFoundException("No service found for ID " + recordId.toString());
     }
     return new ModelAndView("/pages/editServiceRecord.jsp", model);
   }
@@ -152,9 +153,7 @@ public class EditServiceRecordController {
   @RequestMapping(value = "/new/{instrumentId}", method = RequestMethod.GET)
   public ModelAndView newServiceRecord(@PathVariable(value = "instrumentId") Long instrumentId, ModelMap model) throws IOException {
     Instrument instrument = instrumentService.get(instrumentId);
-    if (instrument == null) {
-      throw new IOException("No such Instrument.");
-    }
+    if (instrument == null) throw new NotFoundException("No instrument found for ID " + instrumentId.toString());
     ServiceRecord record = new ServiceRecord();
     record.setInstrument(instrument);
     model.put(ModelKeys.RECORD.getKey(), record);
