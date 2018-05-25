@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -164,8 +165,8 @@ public class LibraryDilutionRestController extends RestController {
     return PaginationFilter.bulkSearch(names, dilutionService, Dtos::asDto, message -> new RestException(message, Status.BAD_REQUEST));
   }
 
-  private static Sample getSample(LibraryDilution dilution) {
-    return dilution.getLibrary().getSample();
+  private static Stream<Sample> getSample(LibraryDilution dilution) {
+    return Stream.of(dilution.getLibrary().getSample());
   }
   private final ParentFinder<LibraryDilution> parentFinder = (new ParentFinder<LibraryDilution>() {
 
@@ -188,8 +189,8 @@ public class LibraryDilutionRestController extends RestController {
         }
 
         @Override
-        public Sample find(LibraryDilution model, Consumer<String> emitError) {
-          return model.getLibrary().getSample();
+        public Stream<Sample> find(LibraryDilution model, Consumer<String> emitError) {
+          return Stream.of(model.getLibrary().getSample());
         }
       })//
       .add(new ParentFinder.ParentAdapter<LibraryDilution, Library, LibraryDto>("Library") {
@@ -200,8 +201,8 @@ public class LibraryDilutionRestController extends RestController {
         }
 
         @Override
-        public Library find(LibraryDilution model, Consumer<String> emitError) {
-          return model.getLibrary();
+        public Stream<Library> find(LibraryDilution model, Consumer<String> emitError) {
+          return Stream.of(model.getLibrary());
         }
       });
 

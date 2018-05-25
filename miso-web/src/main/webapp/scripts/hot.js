@@ -955,7 +955,7 @@ var HotUtils = {
                   "name": "View Selected",
                   "handler": function() {
                     Utils.showOkDialog(category.name + ' Parents', parents.map(function(parent) {
-                      return parent.name + ' (' + parent.alias + ')';
+                      return parent.name + (parent.alias ? ' (' + parent.alias + ')' : '');
                     }), showActionDialog);
                   }
                 });

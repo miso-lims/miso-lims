@@ -31,7 +31,7 @@ public abstract class ParentFinder<M extends Identifiable> {
 
     public abstract D asDto(P model);
 
-    public abstract P find(M model, Consumer<String> emitError);
+    public abstract Stream<P> find(M model, Consumer<String> emitError);
 
     private final String category;
 
@@ -45,7 +45,7 @@ public abstract class ParentFinder<M extends Identifiable> {
 
     public final HttpEntity<byte[]> handle(ObjectMapper mapper, Stream<M> items) throws JsonProcessingException {
       List<String> errors = new ArrayList<>();
-      List<D> parents = items.map(item -> find(item, errors::add))//
+      List<D> parents = items.flatMap(item -> find(item, errors::add))//
           .filter(Objects::nonNull)//
           .collect(Collectors.groupingBy(Identifiable::getId)).values().stream()//
           .map(l -> l.get(0))//
@@ -59,17 +59,19 @@ public abstract class ParentFinder<M extends Identifiable> {
   }
 
   public static SampleAdapter<Sample> parent(String category, Class<? extends DetailedSample> targetClass) {
-    return new SampleAdapter<>(category, true, targetClass, Function.identity());
+    return new SampleAdapter<>(category, true, targetClass, Stream::of);
   }
   public static final class SampleAdapter<M extends Identifiable> extends ParentAdapter<M, Sample, SampleDto> {
-    private final Function<M, Sample> getSample;
+    private final Function<M, Stream<Sample>> getSample;
     private final Class<? extends DetailedSample> targetClass;
     private final boolean strict;
 
-    public SampleAdapter(String category, Class<? extends DetailedSample> targetClass, Function<M, Sample> getSample) {
+    public SampleAdapter(String category, Class<? extends DetailedSample> targetClass, Function<M, Stream<Sample>> getSample) {
       this(category, false, targetClass, getSample);
     }
-    public SampleAdapter(String category, boolean strict, Class<? extends DetailedSample> targetClass, Function<M, Sample> getSample) {
+
+    public SampleAdapter(String category, boolean strict, Class<? extends DetailedSample> targetClass,
+        Function<M, Stream<Sample>> getSample) {
       super(category);
       this.strict = strict;
       this.targetClass = targetClass;
@@ -82,22 +84,24 @@ public abstract class ParentFinder<M extends Identifiable> {
     }
 
     @Override
-    public Sample find(M model, Consumer<String> emitError) {
-      Sample sample = getSample.apply(model);
-      if (sample == null) return null;
-      if (sample instanceof DetailedSample) {
-        if (!strict && targetClass.isInstance(sample)) {
-          return sample;
+    public Stream<Sample> find(M model, Consumer<String> emitError) {
+      return getSample.apply(model).flatMap(sample -> {
+        if (sample == null) return Stream.empty();
+        if (sample instanceof DetailedSample) {
+          if (!strict && targetClass.isInstance(sample)) {
+            return Stream.of(sample);
+          }
+          DetailedSample parent = LimsUtils.getParent(targetClass, (DetailedSample) sample);
+          if (parent == null) {
+            emitError.accept(String.format("%s (%s) has no %s.", sample.getName(), sample.getAlias(), category()));
+            return Stream.empty();
+          }
+          return Stream.of(parent);
+        } else {
+          emitError.accept(String.format("%s (%s) has no parents of any kind.", sample.getName(), sample.getAlias()));
+          return Stream.empty();
         }
-        DetailedSample parent = LimsUtils.getParent(targetClass, (DetailedSample) sample);
-        if (parent == null) {
-          emitError.accept(String.format("%s (%s) has no %s.", sample.getName(), sample.getAlias(), category()));
-        }
-        return parent;
-      } else {
-        emitError.accept(String.format("%s (%s) has no parents of any kind.", sample.getName(), sample.getAlias()));
-        return null;
-      }
+      });
     }
 
   }

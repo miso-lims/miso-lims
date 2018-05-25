@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -197,6 +198,10 @@ public class LibraryRestController extends RestController {
     return PaginationFilter.bulkSearch(names, libraryService, Dtos::asDto, message -> new RestException(message, Status.BAD_REQUEST));
   }
 
+  private static Stream<Sample> getSample(Library library) {
+    return Stream.of(library.getSample());
+  }
+
   private final ParentFinder<Library> parentFinder = (new ParentFinder<Library>() {
 
     @Override
@@ -204,12 +209,12 @@ public class LibraryRestController extends RestController {
       return libraryService.get(id);
     }
   })//
-      .add(new ParentFinder.SampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, Library::getSample))//
-      .add(new ParentFinder.SampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, Library::getSample))//
+      .add(new ParentFinder.SampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, LibraryRestController::getSample))//
+      .add(new ParentFinder.SampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, LibraryRestController::getSample))//
       .add(new ParentFinder.SampleAdapter<>(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class,
-          Library::getSample))//
-      .add(new ParentFinder.SampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class, Library::getSample))//
-      .add(new ParentFinder.SampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class, Library::getSample))//
+          LibraryRestController::getSample))//
+      .add(new ParentFinder.SampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class, LibraryRestController::getSample))//
+      .add(new ParentFinder.SampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class, LibraryRestController::getSample))//
       .add(new ParentFinder.ParentAdapter<Library, Sample, SampleDto>("Sample") {
 
         @Override
@@ -218,8 +223,8 @@ public class LibraryRestController extends RestController {
         }
 
         @Override
-        public Sample find(Library model, Consumer<String> emitError) {
-          return model.getSample();
+        public Stream<Sample> find(Library model, Consumer<String> emitError) {
+          return Stream.of(model.getSample());
         }
       });
 
