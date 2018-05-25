@@ -23,7 +23,15 @@
   ~ **********************************************************************
   --%>
 
-<p>The page you requested was not found.<br/>
-  <a href="javascript:void(0);" onclick="window.history.back();">Return to Previous Page</a></p>
+<p><a href="javascript:void(0);" onclick="window.history.back();">Return to Previous Page</a></p>
+  
+<script type="text/javascript">
+  const p = document.createElement('P');
+  const strong = document.createElement('STRONG');
+  const notFound = document.createTextNode('The page you requested was not found.');
+  strong.appendChild(notFound);
+  p.appendChild(strong);
+  document.getElementById('flasherror').parentNode.insertBefore(p, document.getElementById('flasherror'));
+</script>
 
 <%@ include file="/footer.jsp" %>
