@@ -44,7 +44,7 @@ public class EditOrderController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-
+      // no config necessary
     }
   };
 

@@ -73,17 +73,18 @@ HotTarget.order = (function() {
         },
         depends: 'platform',
         update: function(order, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+          var params = null;
           if (value) {
             var platform = Utils.array.findFirstOrNull(function(platform) {
               return platform.instrumentModel == value;
             }, Constants.platforms);
-            var params = Constants.sequencingParameters.filter(function(parameters) {
+            params = Constants.sequencingParameters.filter(function(parameters) {
               return parameters.platform.id == platform.id;
             }).map(function(parameters) {
               return parameters.name;
             }).sort();
           } else {
-            var params = [];
+            params = [];
           }
           setOptions({
             source: params
