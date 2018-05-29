@@ -638,10 +638,14 @@ HotTarget.sample = (function() {
               targets.push({
                 name: "Library",
                 action: function(replicates) {
-                  window.location = "/miso/library/bulk/propagate?" + jQuery.param({
+                  var params = {
                     ids: idsString,
                     replicates: replicates
-                  });
+                  }
+                  if (config.sortLibraryPropagate) {
+                    params.sort = config.sortLibraryPropagate;
+                  }
+                  window.location = "/miso/library/bulk/propagate?" + jQuery.param(params);
                 }
               });
             }

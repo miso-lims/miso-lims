@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -92,7 +93,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -164,6 +164,7 @@ public class EditLibraryController {
     private static final String SHOW_DESCRIPTION = "showDescription";
     private static final String SHOW_VOLUME = "showVolume";
     private static final String TEMPLATES = "templatesByProjectId";
+    private static final String SORT = "sort";
   }
 
   @Autowired
@@ -622,15 +623,27 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.put(Config.SORTABLE_LOCATION, true);
-      writeLibraryConfiguration(mapper, config);
+      writeLibraryConfiguration(config);
     }
   };
 
-  private final BulkPropagateTableBackend<Sample, LibraryDto> libraryBulkPropagateBackend = new BulkPropagateTableBackend<Sample, LibraryDto>(
-      "library", LibraryDto.class, "Libraries", "Samples") {
+  private static class LibraryBulkPropagateBackend extends BulkPropagateTableBackend<Sample, LibraryDto> {
 
-    Map<Long, List<LibraryTemplateDto>> templatesByProjectId;
-    
+    private final SampleService sampleService;
+    private final TemplateService templateService;
+    private final Consumer<ObjectNode> additionalConfigFunction;
+
+    public LibraryBulkPropagateBackend(SampleService sampleService, TemplateService templateService,
+        Consumer<ObjectNode> additionalConfigFunction) {
+      super("library", LibraryDto.class, "Libraries", "Samples");
+      this.sampleService = sampleService;
+      this.templateService = templateService;
+      this.additionalConfigFunction = additionalConfigFunction;
+    }
+
+    private Map<Long, List<LibraryTemplateDto>> templatesByProjectId;
+    private String sort = null;
+
     @Override
     protected LibraryDto createDtoFromParent(Sample item) {
       LibraryDto dto;
@@ -655,7 +668,7 @@ public class EditLibraryController {
     @Override
     protected Stream<Sample> loadParents(List<Long> ids) throws IOException {
       Collection<Sample> results = sampleService.listByIdList(ids);
-      
+
       // load templates
       templatesByProjectId = results.stream()
           .map(sam -> sam.getProject().getId())
@@ -687,14 +700,23 @@ public class EditLibraryController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      writeLibraryConfiguration(mapper, config);
+      additionalConfigFunction.accept(config);
       if (templatesByProjectId != null && !templatesByProjectId.isEmpty()) {
         config.putPOJO(Config.TEMPLATES, templatesByProjectId);
       }
+      if (sort != null) {
+        config.put(Config.SORT, sort);
+      }
     }
-  };
 
-  private void writeLibraryConfiguration(ObjectMapper mapper, ObjectNode config) {
+    public ModelAndView propagate(String idString, int replicates, String sort, ModelMap model) throws IOException {
+      this.sort = sort;
+      return propagate(idString, replicates, model);
+    }
+
+  }
+
+  private void writeLibraryConfiguration(ObjectNode config) {
     config.put(Config.SHOW_DESCRIPTION, showDescription);
     config.put(Config.SHOW_VOLUME, showVolume);
     config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
@@ -704,8 +726,9 @@ public class EditLibraryController {
 
   @RequestMapping(value = "/bulk/propagate", method = RequestMethod.GET)
   public ModelAndView propagateFromSamples(@RequestParam("ids") String sampleIds, @RequestParam("replicates") int replicates,
-      ModelMap model) throws IOException, MisoNamingException {
-    return libraryBulkPropagateBackend.propagate(sampleIds, replicates, model);
+      @RequestParam(name = "sort", required = false) String sort, ModelMap model) throws IOException {
+    return new LibraryBulkPropagateBackend(sampleService, templateService, this::writeLibraryConfiguration)
+        .propagate(sampleIds, replicates, sort, model);
   }
 
   @RequestMapping(value = "/bulk/edit", method = RequestMethod.GET)
