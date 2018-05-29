@@ -582,7 +582,9 @@ HotTarget.library = (function() {
         }
       }, HotUtils.printAction('library'),
 
-      HotUtils.makeParents('library', HotUtils.parentCategoriesForDetailed()), ].concat(HotUtils.makeQcActions("Library"));
+      HotUtils.makeParents('library', HotUtils.relationCategoriesForDetailed()), 
+      HotUtils.makeChildren('library',[HotUtils.relations.dilution(), HotUtils.relations.pool()])
+      ].concat(HotUtils.makeQcActions("Library"));
     }
   };
 })();

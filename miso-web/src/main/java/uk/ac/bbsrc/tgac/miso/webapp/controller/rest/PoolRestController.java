@@ -342,20 +342,20 @@ public class PoolRestController extends RestController {
     return pool.getPoolableElementViews().stream().map(PoolableElementView::getSample);
   }
 
-  private final ParentFinder<Pool> parentFinder = (new ParentFinder<Pool>() {
+  private final RelationFinder<Pool> parentFinder = (new RelationFinder<Pool>() {
 
     @Override
     protected Pool fetch(long id) throws IOException {
       return poolService.get(id);
     }
   })
-      .add(new ParentFinder.SampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, PoolRestController::getSamples))//
-      .add(new ParentFinder.SampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, PoolRestController::getSamples))//
-      .add(new ParentFinder.SampleAdapter<>(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class,
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, PoolRestController::getSamples))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, PoolRestController::getSamples))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class,
           PoolRestController::getSamples))//
-      .add(new ParentFinder.SampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class, PoolRestController::getSamples))//
-      .add(new ParentFinder.SampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class, PoolRestController::getSamples))//
-      .add(new ParentFinder.ParentAdapter<Pool, Sample, SampleDto>("Sample") {
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class, PoolRestController::getSamples))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class, PoolRestController::getSamples))//
+      .add(new RelationFinder.RelationAdapter<Pool, Sample, SampleDto>("Sample") {
 
         @Override
         public SampleDto asDto(Sample model) {
@@ -368,7 +368,7 @@ public class PoolRestController extends RestController {
         }
 
       })
-      .add(new ParentFinder.ParentAdapter<Pool, Library, LibraryDto>("Library") {
+      .add(new RelationFinder.RelationAdapter<Pool, Library, LibraryDto>("Library") {
 
         @Override
         public LibraryDto asDto(Library model) {
@@ -380,7 +380,7 @@ public class PoolRestController extends RestController {
           return model.getPoolableElementViews().stream().map(WhineyFunction.rethrow(v -> libraryService.get(v.getLibraryId())));
         }
       })
-      .add(new ParentFinder.ParentAdapter<Pool, LibraryDilution, DilutionDto>("Dilution") {
+      .add(new RelationFinder.RelationAdapter<Pool, LibraryDilution, DilutionDto>("Dilution") {
 
         @Override
         public DilutionDto asDto(LibraryDilution model) {

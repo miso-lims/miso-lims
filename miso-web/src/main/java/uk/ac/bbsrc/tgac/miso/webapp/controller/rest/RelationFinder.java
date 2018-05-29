@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -20,14 +21,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 
-public abstract class ParentFinder<M extends Identifiable> {
-  public abstract static class ParentAdapter<M extends Identifiable, P extends Identifiable, D> {
+public abstract class RelationFinder<M extends Identifiable> {
+  public abstract static class RelationAdapter<M extends Identifiable, P extends Identifiable, D> {
 
     public abstract D asDto(P model);
 
@@ -39,38 +41,38 @@ public abstract class ParentFinder<M extends Identifiable> {
       return category;
     }
 
-    public ParentAdapter(String category) {
+    public RelationAdapter(String category) {
       this.category = category;
     }
 
     public final HttpEntity<byte[]> handle(ObjectMapper mapper, Stream<M> items) throws JsonProcessingException {
       List<String> errors = new ArrayList<>();
-      List<D> parents = items.flatMap(item -> find(item, errors::add))//
+      List<D> relations = items.flatMap(item -> find(item, errors::add))//
           .filter(Objects::nonNull)//
           .collect(Collectors.groupingBy(Identifiable::getId)).values().stream()//
           .map(l -> l.get(0))//
           .map(this::asDto)//
           .collect(Collectors.toList());
-      if (!errors.isEmpty()) {
+      if (!errors.isEmpty() && relations.isEmpty()) {
         throw new RestException(errors.stream().collect(Collectors.joining("\n")), Status.BAD_REQUEST);
       }
-      return new HttpEntity<>(mapper.writeValueAsBytes(parents));
+      return new HttpEntity<>(mapper.writeValueAsBytes(relations));
     }
   }
 
-  public static SampleAdapter<Sample> parent(String category, Class<? extends DetailedSample> targetClass) {
-    return new SampleAdapter<>(category, true, targetClass, Stream::of);
+  public static ParentSampleAdapter<Sample> parent(String category, Class<? extends DetailedSample> targetClass) {
+    return new ParentSampleAdapter<>(category, true, targetClass, Stream::of);
   }
-  public static final class SampleAdapter<M extends Identifiable> extends ParentAdapter<M, Sample, SampleDto> {
+  public static final class ParentSampleAdapter<M extends Identifiable> extends RelationAdapter<M, Sample, SampleDto> {
     private final Function<M, Stream<Sample>> getSample;
     private final Class<? extends DetailedSample> targetClass;
     private final boolean strict;
 
-    public SampleAdapter(String category, Class<? extends DetailedSample> targetClass, Function<M, Stream<Sample>> getSample) {
+    public ParentSampleAdapter(String category, Class<? extends DetailedSample> targetClass, Function<M, Stream<Sample>> getSample) {
       this(category, false, targetClass, getSample);
     }
 
-    public SampleAdapter(String category, boolean strict, Class<? extends DetailedSample> targetClass,
+    public ParentSampleAdapter(String category, boolean strict, Class<? extends DetailedSample> targetClass,
         Function<M, Stream<Sample>> getSample) {
       super(category);
       this.strict = strict;
@@ -106,10 +108,10 @@ public abstract class ParentFinder<M extends Identifiable> {
 
   }
 
-  private final Map<String, ParentAdapter<M, ?, ?>> adapters = new HashMap<>();
+  private final Map<String, RelationAdapter<M, ?, ?>> adapters = new HashMap<>();
   private final ObjectMapper mapper = new ObjectMapper();
 
-  public ParentFinder<M> add(ParentAdapter<M, ?, ?> adapter) {
+  public RelationFinder<M> add(RelationAdapter<M, ?, ?> adapter) {
     adapters.put(adapter.category(), adapter);
     return this;
   }
@@ -117,11 +119,50 @@ public abstract class ParentFinder<M extends Identifiable> {
   protected abstract M fetch(long id) throws IOException;
 
   public HttpEntity<byte[]> list(List<Long> ids, String category) throws JsonProcessingException {
-    ParentAdapter<M, ?, ?> adapter = adapters.get(category);
+    RelationAdapter<M, ?, ?> adapter = adapters.get(category);
     if (adapter == null) {
       throw new RestException(String.format("No such category %s.", category), Status.NOT_FOUND);
     }
     return adapter.handle(mapper, ids.stream().map(WhineyFunction.rethrow(this::fetch)));
+  }
+
+  public static ChildrenSampleAdapter child(String category, Class<? extends DetailedSample> targetClass) {
+    return new ChildrenSampleAdapter(category, targetClass);
+  }
+  public static class ChildrenSampleAdapter extends RelationAdapter<Sample, DetailedSample, SampleDto> {
+
+    public ChildrenSampleAdapter(String category, Class<? extends DetailedSample> targetClass) {
+      super(category);
+      this.targetClass = targetClass;
+    }
+
+    private final Class<? extends DetailedSample> targetClass;
+
+    @Override
+    public SampleDto asDto(DetailedSample model) {
+      return Dtos.asDto(model);
+    }
+
+    @Override
+    public Stream<DetailedSample> find(Sample model, Consumer<String> emitError) {
+      Set<DetailedSample> children = searchChildren(targetClass, (DetailedSample) model).collect(Collectors.toSet());
+      if (children.isEmpty()) {
+        emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
+        return Stream.empty();
+      }
+      return children.stream();
+    }
+
+    private static Stream<DetailedSample> searchChildren(Class<? extends DetailedSample> targetChildClass, DetailedSample model) {
+      return model.getChildren().stream()
+          .flatMap(child -> Stream.concat(Stream.of(child).filter(targetChildClass::isInstance), searchChildren(targetChildClass, child)));
+    }
+
+    public static Stream<Library> searchChildrenLibraries(DetailedSample model) {
+      return model.getChildren().stream()
+          .flatMap(child -> Stream.concat(child.getLibraries().stream(), searchChildrenLibraries(child)));
+    }
+
   }
 
 }
