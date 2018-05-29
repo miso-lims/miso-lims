@@ -212,13 +212,16 @@ public final class DefaultIllumina extends RunProcessor {
     dto.setPoolNames(Optional.of(new File(runDirectory, "SampleSheet.csv"))//
         .filter(File::canRead)//
         .map(File::toPath)
-        .map(WhineyFunction.rethrow(Files::lines))//
-        .orElse(Stream.empty())//
-        .filter(LimsUtils.rejectUntil(line -> line.startsWith("Sample_ID,")))//
-        .map(COMMA::split)//
-        .map(Pair.number(1))
-        .filter(pair -> pair.getValue().length > 0)//
-        .collect(Collectors.toMap(Entry::getKey, e -> e.getValue()[0])));
+        .map(WhineyFunction.rethrow(path -> {
+          try (Stream<String> lines = Files.lines(path)) {
+            return lines.filter(LimsUtils.rejectUntil(line -> line.startsWith("Sample_ID,")))//
+                .map(COMMA::split)//
+                .map(Pair.number(1))
+                .filter(pair -> pair.getValue().length > 0)//
+                .collect(Collectors.toMap(Entry::getKey, e -> e.getValue()[0]));
+          }
+        }))//
+        .orElse(Collections.emptyMap()));
 
     // The Illumina library can't distinguish between a failed run and one that either finished or is still going. Scan the logs, if
     // available to determine if the run failed.
