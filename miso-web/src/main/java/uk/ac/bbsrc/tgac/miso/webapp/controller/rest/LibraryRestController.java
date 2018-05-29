@@ -65,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -75,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
  * A controller to handle all REST requests for Libraries
@@ -202,6 +204,12 @@ public class LibraryRestController extends RestController {
   public List<LibraryDto> getLibariesInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
     return PaginationFilter.bulkSearch(names, libraryService, Dtos::asDto, message -> new RestException(message, Status.BAD_REQUEST));
+  }
+
+  @RequestMapping(value = "/spreadsheet", method = RequestMethod.GET)
+  @ResponseBody
+  public HttpEntity<byte[]> getSpreadsheet(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder) {
+    return MisoWebUtils.generateSpreadsheet(libraryService::get, LibrarySpreadSheets::valueOf, request, response);
   }
 
   private static Stream<Sample> getSample(Library library) {

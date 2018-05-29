@@ -39,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryDilutionSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -165,6 +166,12 @@ public class LibraryDilutionRestController extends RestController {
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
     return PaginationFilter.bulkSearch(names, dilutionService, Dtos::asDto, message -> new RestException(message, Status.BAD_REQUEST));
+  }
+
+  @RequestMapping(value = "/spreadsheet", method = RequestMethod.GET)
+  @ResponseBody
+  public HttpEntity<byte[]> getSpreadsheet(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder) {
+    return MisoWebUtils.generateSpreadsheet(dilutionService::get, LibraryDilutionSpreadSheets::valueOf, request, response);
   }
 
   private static Stream<Sample> getSample(LibraryDilution dilution) {
