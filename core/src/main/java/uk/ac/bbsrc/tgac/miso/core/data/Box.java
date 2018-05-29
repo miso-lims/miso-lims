@@ -14,7 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * 
  * A Box usually has dimensions 8 by 12. (A-H, 1-12, A01 through H12)
  */
-public interface Box extends SecurableByProfile, Barcodable, Locatable, ChangeLoggable, Serializable {
+public interface Box extends SecurableByProfile, Barcodable, Locatable, ChangeLoggable, Serializable, Deletable {
 
   public static final String PREFIX = "BOX";
 

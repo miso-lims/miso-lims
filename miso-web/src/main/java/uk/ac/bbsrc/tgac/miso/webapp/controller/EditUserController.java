@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -120,7 +121,7 @@ public class EditUserController {
           throw new SecurityException("You can only edit your own user details.");
         }
       } else {
-        throw new IOException("No such user");
+        throw new NotFoundException("No user found for ID " + userId.toString());
       }
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {

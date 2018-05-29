@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -60,6 +61,9 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
 
   @Autowired
   private SecurityProfileStore securityProfileStore;
+
+  @Autowired
+  private DeletionStore deletionStore;
 
   private void addBoxContentsChangeLog(Box box, String message) throws IOException {
     BoxChangeLog changeLog = new BoxChangeLog();
@@ -169,6 +173,11 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   }
 
   @Override
+  public List<Box> getByPartialSearch(String search) {
+    return boxStore.getByPartialSearch(search);
+  }
+
+  @Override
   public Collection<BoxSize> listSizes() throws IOException {
     return boxStore.listAllBoxSizes();
   }
@@ -250,7 +259,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
 
       // Needs to be a new map to force Hibernate to delete all associations before inserting
       // (prevent violation of unique constraint when position-swapping two items)
-      original.setBoxables(new HashMap<String, BoxableView>(box.getBoxables()));
+      original.setBoxables(new HashMap<>(box.getBoxables()));
 
       if (message.length() > 0) {
         addBoxContentsChangeLog(original, message.toString());
@@ -357,6 +366,11 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       box.setBoxable(boxable.getBoxPosition(), BoxableView.fromBoxable(boxable));
       save(box);
     }
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
   }
 
 }

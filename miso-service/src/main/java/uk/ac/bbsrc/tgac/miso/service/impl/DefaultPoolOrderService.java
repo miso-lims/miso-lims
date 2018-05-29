@@ -46,14 +46,14 @@ public class DefaultPoolOrderService implements PoolOrderService {
 
   @Override
   public Long create(PoolOrder poolOrder) throws IOException {
-    Pool pool = poolService.get(poolOrder.getPoolId());
+    Pool pool = poolService.get(poolOrder.getPool().getId());
     authorizationManager.throwIfNotWritable(pool);
     if (pool == null) {
-      throw new IOException("No such pool: " + poolOrder.getPoolId());
+      throw new IOException("No such pool: " + poolOrder.getPool().getId());
     }
 
     User user = authorizationManager.getCurrentUser();
-    poolOrder.setPoolId(pool.getId());
+    poolOrder.setPool(pool);
     poolOrder.setSequencingParameter(sequencingParametersService.get(poolOrder.getSequencingParameter().getId()));
     poolOrder.setCreatedBy(user);
     poolOrder.setUpdatedBy(user);
@@ -62,7 +62,7 @@ public class DefaultPoolOrderService implements PoolOrderService {
 
   @Override
   public void update(PoolOrder poolOrder) throws IOException {
-    Pool owner = poolService.get(poolOrder.getPoolId());
+    Pool owner = poolService.get(poolOrder.getPool().getId());
     authorizationManager.throwIfNotWritable(owner);
     User user = authorizationManager.getCurrentUser();
     poolOrder.setCreatedBy(user);
@@ -111,14 +111,14 @@ public class DefaultPoolOrderService implements PoolOrderService {
 
   @Override
   public void beforeDelete(PoolOrder object) throws IOException {
-    Pool pool = poolService.get(object.getPoolId());
+    Pool pool = poolService.get(object.getPool().getId());
     pool.setLastModifier(authorizationManager.getCurrentUser());
     poolService.save(pool);
   }
 
   @Override
   public void authorizeDeletion(PoolOrder object) throws IOException {
-    Pool pool = poolService.get(object.getPoolId());
+    Pool pool = poolService.get(object.getPool().getId());
     authorizationManager.throwIfNotWritable(pool);
   }
 

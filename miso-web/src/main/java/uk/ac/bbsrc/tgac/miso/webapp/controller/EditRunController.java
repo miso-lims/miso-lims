@@ -254,6 +254,7 @@ public class EditRunController {
       partitionConfig.put("isFull", run.isFull());
       partitionConfig.put("showContainer", true);
       partitionConfig.put("sequencingParametersId", run.getSequencingParameters() == null ? 0 : run.getSequencingParameters().getId());
+      partitionConfig.put("showPool", true);
       model.put("partitionConfig", mapper.writeValueAsString(partitionConfig));
       model.put("experiments",
           experimentService.listAllByRunId(run.getId()).stream().map(Dtos::asDto)

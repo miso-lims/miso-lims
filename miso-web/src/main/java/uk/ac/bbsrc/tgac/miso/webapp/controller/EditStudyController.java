@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -129,9 +130,7 @@ public class EditStudyController {
   public ModelAndView setupForm(@PathVariable Long studyId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Study study = studyService.get(studyId);
-    if (study == null) {
-      throw new SecurityException("No such Study");
-    }
+    if (study == null) throw new NotFoundException("No study found for ID " + studyId.toString());
 
     return setupForm(study, user, "Study " + studyId, model);
   }

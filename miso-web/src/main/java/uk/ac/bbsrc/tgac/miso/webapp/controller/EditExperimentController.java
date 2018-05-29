@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -90,9 +91,7 @@ public class EditExperimentController {
   public ModelAndView setupForm(@PathVariable Long experimentId, ModelMap model) throws IOException {
     Experiment experiment = experimentService.get(experimentId);
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    if (experiment == null) {
-      throw new SecurityException("No such Experiment");
-    }
+    if (experiment == null) throw new NotFoundException("No experiment found for ID " + experimentId.toString());
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode consumableConfig = mapper.createObjectNode();
     consumableConfig.put("experimentId", experiment.getId());

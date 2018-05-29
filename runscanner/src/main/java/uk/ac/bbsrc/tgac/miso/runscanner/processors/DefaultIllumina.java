@@ -1,10 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.runscanner.processors;
 
-import io.prometheus.client.Counter;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,6 +48,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 import uk.ac.bbsrc.tgac.miso.runscanner.RunProcessor;
+
+import io.prometheus.client.Counter;
 
 /**
  * Scan an Illumina sequener's output using the Illumina Interop C++ library.
@@ -169,18 +172,28 @@ public final class DefaultIllumina extends RunProcessor {
   public NotificationDto process(File runDirectory, TimeZone tz) throws IOException {
     // Call the C++ program to do the real work and write a notification DTO to standard output. The C++ object has no direct binding to the
     // DTO, so any changes to the DTO must be manually changed in the C++ code.
-    ProcessBuilder builder = new ProcessBuilder("nice", "runscanner-illumina", runDirectory.getAbsolutePath()).directory(runDirectory);
+    ProcessBuilder builder = new ProcessBuilder("nice", "runscanner-illumina", runDirectory.getAbsolutePath()).directory(runDirectory)
+        .redirectError(Redirect.INHERIT);
     builder.environment().put("TZ", tz.getID());
     Process process = builder.start();
 
-    IlluminaNotificationDto dto = createObjectMapper().readValue(process.getInputStream(), IlluminaNotificationDto.class);
-    dto.setSequencerFolderPath(runDirectory.getAbsolutePath());
-    try {
-      if (process.waitFor() != 0) {
-        throw new IOException("Illumina run processor did not exit cleanly: " + runDirectory.getAbsolutePath());
+    IlluminaNotificationDto dto;
+    int exitcode;
+    try (InputStream output = process.getInputStream(); OutputStream input = process.getOutputStream()) {
+      dto = createObjectMapper().readValue(output, IlluminaNotificationDto.class);
+      dto.setSequencerFolderPath(runDirectory.getAbsolutePath());
+    } finally {
+      try {
+        exitcode = process.waitFor();
+      } catch (InterruptedException e) {
+        throw new IOException(e);
+      } finally {
+        process.destroy();
       }
-    } catch (InterruptedException e) {
-      throw new IOException(e);
+    }
+
+    if (exitcode != 0) {
+      throw new IOException("Illumina run processor did not exit cleanly: " + runDirectory.getAbsolutePath());
     }
 
     Stream.of("runParameters.xml", "RunParameters.xml")
@@ -190,22 +203,25 @@ public final class DefaultIllumina extends RunProcessor {
         .flatMap(RunProcessor::parseXml)
         .ifPresent(runParams -> {
           // See if we can figure out the chemistry
-            dto.setChemistry(Arrays.stream(IlluminaChemistry.values()).filter(chemistry -> chemistry.test(runParams)).findFirst()
-                .orElse(IlluminaChemistry.UNKNOWN));
-            dto.setContainerModel(findContainerModel(runParams));
-          });
+          dto.setChemistry(Arrays.stream(IlluminaChemistry.values()).filter(chemistry -> chemistry.test(runParams)).findFirst()
+              .orElse(IlluminaChemistry.UNKNOWN));
+          dto.setContainerModel(findContainerModel(runParams));
+        });
 
     // See if we can figure out a sample sheet
     dto.setPoolNames(Optional.of(new File(runDirectory, "SampleSheet.csv"))//
         .filter(File::canRead)//
         .map(File::toPath)
-        .map(WhineyFunction.rethrow(Files::lines))//
-        .orElse(Stream.empty())//
-        .filter(LimsUtils.rejectUntil(line -> line.startsWith("Sample_ID,")))//
-        .map(COMMA::split)//
-        .map(Pair.number(1))
-        .filter(pair -> pair.getValue().length > 0)//
-        .collect(Collectors.toMap(Entry::getKey, e -> e.getValue()[0])));
+        .map(WhineyFunction.rethrow(path -> {
+          try (Stream<String> lines = Files.lines(path)) {
+            return lines.filter(LimsUtils.rejectUntil(line -> line.startsWith("Sample_ID,")))//
+                .map(COMMA::split)//
+                .map(Pair.number(1))
+                .filter(pair -> pair.getValue().length > 0)//
+                .collect(Collectors.toMap(Entry::getKey, e -> e.getValue()[0]));
+          }
+        }))//
+        .orElse(Collections.emptyMap()));
 
     // The Illumina library can't distinguish between a failed run and one that either finished or is still going. Scan the logs, if
     // available to determine if the run failed.

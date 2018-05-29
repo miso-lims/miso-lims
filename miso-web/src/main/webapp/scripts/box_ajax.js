@@ -422,7 +422,9 @@ Box.ui = {
     var actions = [];
     switch (entityTypes[0]) {
     case 'SAMPLE':
-      actions = HotTarget.sample.getBulkActions({});
+      actions = HotTarget.sample.getBulkActions({
+        sortLibraryPropagate: 'sampleBoxColumn'
+      });
       break;
     case 'LIBRARY':
       actions = HotTarget.library.getBulkActions({});

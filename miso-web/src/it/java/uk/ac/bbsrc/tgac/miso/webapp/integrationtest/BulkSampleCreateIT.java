@@ -270,6 +270,60 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   }
 
   @Test
+  public void testCreateTwoTissuesForOneIdentityWithProject() throws Exception {
+    // Goal: ensure one tissue associated with a predefined project and a single (but not pre-existing) identity can be saved
+    BulkSamplePage page = getCreatePage(2, projectId, tissueClassId);
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> tissue = new HashMap<>();
+    tissue.put(SamColumns.DESCRIPTION, "Description");
+    tissue.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    tissue.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
+    tissue.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
+    tissue.put(SamColumns.GROUP_ID, "1");
+    tissue.put(SamColumns.GROUP_DESCRIPTION, "Test one");
+    tissue.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
+    tissue.put(SamColumns.TISSUE_TYPE, "P (Primary tumour)");
+    tissue.put(SamColumns.PASSAGE_NUMBER, "");
+    tissue.put(SamColumns.TIMES_RECEIVED, "1");
+    // tube number will be added separately to differentiate the tissues
+    tissue.put(SamColumns.LAB, "BioBank (University Health Network)");
+    tissue.put(SamColumns.SECONDARY_ID, "tube id 1");
+    tissue.put(SamColumns.TISSUE_MATERIAL, "FFPE");
+    tissue.put(SamColumns.REGION, "Medulla oblongata");
+    tissue.put(SamColumns.QC_STATUS, "Ready");
+
+    tissue.forEach((k, v) -> table.enterText(k, 0, v));
+    tissue.forEach((k, v) -> table.enterText(k, 1, v));
+    // need to enter this here, after project is entered otherwise identity lookup fails
+    tissue.put(SamColumns.EXTERNAL_NAME, "ext3,ext4"); // increment
+    table.enterText(SamColumns.EXTERNAL_NAME, 0, tissue.get(SamColumns.EXTERNAL_NAME));
+    table.enterText(SamColumns.EXTERNAL_NAME, 1, tissue.get(SamColumns.EXTERNAL_NAME));
+
+    table.enterText(SamColumns.TUBE_NUMBER, 0, "1");
+    table.enterText(SamColumns.TUBE_NUMBER, 1, "2");
+
+    assertIdentityLookupWasSuccessful(table, 0);
+    assertIdentityLookupWasSuccessful(table, 1);
+
+    saveSeveralAndAssertAllSuccess(table, 2);
+
+    tissue.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    String newId = table.getText(SamColumns.NAME, 0).substring(3, table.getText(SamColumns.NAME, 0).length());
+
+    // verify attributes against what got saved to the database
+    Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
+    SampleTissue created = (SampleTissue) getSession().get(SampleTissueImpl.class, Long.valueOf(newId));
+
+    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
+    String row0Alias = table.getText(SamColumns.ALIAS, 0);
+    String row1Alias = table.getText(SamColumns.ALIAS, 1);
+    assertFalse("confirm alias generated", isStringEmptyOrNull(row0Alias));
+    assertEquals("confirm same identity alias", row0Alias.substring(0, 9), row1Alias.substring(0, 9));
+    // everything else should be the same as in testCreateOneTissueNoProject() since the `pack` methods do not differ
+  }
+
+  @Test
   public void testCreateSlideSetup() throws Exception {
     // Goal: ensure all expected fields are present, and no extra
     Set<String> expectedHeadings = Sets.newHashSet();

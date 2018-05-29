@@ -17,6 +17,7 @@ import javax.persistence.TemporalType;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 
@@ -30,8 +31,9 @@ public class PoolOrderImpl implements PoolOrder, Serializable {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long poolOrderId;
 
-  @Column(nullable = false)
-  private Long poolId;
+  @ManyToOne(targetEntity = PoolImpl.class)
+  @JoinColumn(name = "poolId", nullable = false)
+  private Pool pool;
 
   @Column(nullable = false)
   private Integer partitions;
@@ -67,13 +69,13 @@ public class PoolOrderImpl implements PoolOrder, Serializable {
   }
 
   @Override
-  public Long getPoolId() {
-    return poolId;
+  public Pool getPool() {
+    return pool;
   }
 
   @Override
-  public void setPoolId(Long poolId) {
-    this.poolId = poolId;
+  public void setPool(Pool pool) {
+    this.pool = pool;
   }
 
   @Override
@@ -143,7 +145,7 @@ public class PoolOrderImpl implements PoolOrder, Serializable {
 
   @Override
   public String getDeleteDescription() {
-    return "Pool " + getPoolId() + " - "
+    return "Pool " + getPool().getId() + " - "
         + getPartitions() + " partitions of "
         + getSequencingParameter().getName();
   }

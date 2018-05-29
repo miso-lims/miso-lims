@@ -168,7 +168,7 @@
 <c:if test="${not empty error}">
   <br/>
 
-  <div class="flasherror">${error}</div>
+  <div id="flasherror" class="flasherror">${error}</div>
   <br/>
 </c:if>
 <sec:authorize access="isAuthenticated()">

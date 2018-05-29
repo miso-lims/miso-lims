@@ -31,10 +31,10 @@ var HotUtils = {
     },
 
     /**
-     * Custom validator for required numeric fields
+     * Custom validator for required positive integers
      */
-    requiredNumber: function(value, callback) {
-      return callback(!Utils.validation.isEmpty(value) && Handsontable.helper.isNumeric(value));
+    requiredPositiveInt: function(value, callback) {
+      return callback(/^[0-9]+$/g.test(value));
     },
 
     /**
@@ -320,11 +320,16 @@ var HotUtils = {
         if (changes[i][2] == changes[i][3] && (changes[i][2] || changes[i][3])) {
           continue;
         }
-        const currentChange = changes[i];
-        const visualRow = currentChange[0];
-        const dataRow = table.toPhysicalRow(currentChange[0]);
-        const flat = flatObjects[dataRow];
-        const obj = data[dataRow];
+        const
+        currentChange = changes[i];
+        const
+        visualRow = currentChange[0];
+        const
+        dataRow = table.toPhysicalRow(currentChange[0]);
+        const
+        flat = flatObjects[dataRow];
+        const
+        obj = data[dataRow];
 
         columns.filter(function(column) {
           return (Array.isArray(column.depends) && column.depends.indexOf(currentChange[1]) > -1) || column.depends == currentChange[1];
@@ -393,18 +398,13 @@ var HotUtils = {
     });
 
     var makeSortButton = function(sortOption, sortColIndex) {
-      var rowCount = table.countRows();
-      function sortListener() {
-        for (var i = 0; i < rowCount; i++) {
-          table.setCellMeta(i, sortColIndex, 'sortFunction', sortOption.sortFunc);
-        }
-        table.sort(sortColIndex);
-      }
       var button = document.createElement('SPAN');
       button.setAttribute('class', 'ui-button ui-state-default');
       button.id = 'sort' + sortOption.sortTarget;
       button.innerText = sortOption.buttonText;
-      button.addEventListener('click', sortListener);
+      button.addEventListener('click', function() {
+        HotUtils.sortTable(table, sortColIndex, sortOption.sortFunc);
+      });
       return button;
     };
 
@@ -616,9 +616,6 @@ var HotUtils = {
                             });
                       });
             });
-    table.validateCells(function() {
-      table.render();
-    });
 
     if (target.hasOwnProperty('getCustomActions')) {
       target.getCustomActions(table, config).forEach(function(action) {
@@ -630,6 +627,14 @@ var HotUtils = {
         document.getElementById('bulkactions').appendChild(button);
       });
     }
+
+    if (typeof target.onLoad === 'function') {
+      target.onLoad(config, table);
+    }
+
+    table.validateCells(function() {
+      table.render();
+    });
   },
 
   sorting: {
@@ -994,6 +999,14 @@ var HotUtils = {
     } else {
       callback();
     }
+  },
+
+  sortTable: function(table, sortColIndex, sortFunction) {
+    var rowCount = table.countRows();
+    for (var i = 0; i < rowCount; i++) {
+      table.setCellMeta(i, sortColIndex, 'sortFunction', sortFunction);
+    }
+    table.sort(sortColIndex);
   }
 };
 

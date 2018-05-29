@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -82,9 +83,7 @@ public class EditInstrumentController {
     Instrument sr = instrumentService.get(instrumentId);
     Collection<ServiceRecord> serviceRecords = serviceRecordService.listByInstrument(instrumentId);
 
-    if (sr == null) {
-      throw new IOException("Cannot retrieve the requested instrument");
-    }
+    if (sr == null) throw new NotFoundException("No instrument found for ID " + instrumentId.toString());
     if (user.isAdmin()) {
       model.put("otherInstruments",
           instrumentService.list().stream().filter(other -> other.getId() != instrumentId).collect(Collectors.toList()));

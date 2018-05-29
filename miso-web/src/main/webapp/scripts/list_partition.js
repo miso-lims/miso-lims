@@ -28,6 +28,9 @@ ListTarget.partition = {
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
+  	if(!config.showPool){
+  		return [];
+  	}
     var maxDilutions = 5;
     var platformType = Utils.array.findFirstOrNull(function(pt) {
       return pt.name == config.platformType;
@@ -254,7 +257,7 @@ ListTarget.partition = {
     }, {
       "sTitle": "Pool",
       "mData": "pool",
-      "include": true,
+      "include": config.showPool,
       "iSortPriority": 0,
       "mRender": function(data, type, full) {
         if (!data) {

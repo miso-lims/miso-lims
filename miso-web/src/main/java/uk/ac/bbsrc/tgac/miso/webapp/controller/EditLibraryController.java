@@ -27,6 +27,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,6 +35,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -43,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -90,7 +93,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -162,6 +164,7 @@ public class EditLibraryController {
     private static final String SHOW_DESCRIPTION = "showDescription";
     private static final String SHOW_VOLUME = "showVolume";
     private static final String TEMPLATES = "templatesByProjectId";
+    private static final String SORT = "sort";
   }
 
   @Autowired
@@ -553,6 +556,7 @@ public class EditLibraryController {
   public ModelAndView setupForm(@PathVariable Long libraryId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Library library = libraryService.get(libraryId);
+    if (library == null) throw new NotFoundException("No library found for ID " + libraryId.toString());
     model.put("title", "Library " + library.getId());
     return setupForm(user, library, model);
   }
@@ -567,9 +571,7 @@ public class EditLibraryController {
 
   private ModelAndView setupForm(User user, Library library, ModelMap model) throws IOException {
 
-    if (library == null) {
-      throw new SecurityException("No such Library.");
-    }
+    if (library == null) throw new NotFoundException("No library found");
 
     model.put("formObj", library);
     model.put("library", library);
@@ -621,15 +623,27 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.put(Config.SORTABLE_LOCATION, true);
-      writeLibraryConfiguration(mapper, config);
+      writeLibraryConfiguration(config);
     }
   };
 
-  private final BulkPropagateTableBackend<Sample, LibraryDto> libraryBulkPropagateBackend = new BulkPropagateTableBackend<Sample, LibraryDto>(
-      "library", LibraryDto.class, "Libraries", "Samples") {
+  private static class LibraryBulkPropagateBackend extends BulkPropagateTableBackend<Sample, LibraryDto> {
 
-    Map<Long, List<LibraryTemplateDto>> templatesByProjectId;
-    
+    private final SampleService sampleService;
+    private final TemplateService templateService;
+    private final Consumer<ObjectNode> additionalConfigFunction;
+
+    public LibraryBulkPropagateBackend(SampleService sampleService, TemplateService templateService,
+        Consumer<ObjectNode> additionalConfigFunction) {
+      super("library", LibraryDto.class, "Libraries", "Samples");
+      this.sampleService = sampleService;
+      this.templateService = templateService;
+      this.additionalConfigFunction = additionalConfigFunction;
+    }
+
+    private Map<Long, List<LibraryTemplateDto>> templatesByProjectId;
+    private String sort = null;
+
     @Override
     protected LibraryDto createDtoFromParent(Sample item) {
       LibraryDto dto;
@@ -654,7 +668,7 @@ public class EditLibraryController {
     @Override
     protected Stream<Sample> loadParents(List<Long> ids) throws IOException {
       Collection<Sample> results = sampleService.listByIdList(ids);
-      
+
       // load templates
       templatesByProjectId = results.stream()
           .map(sam -> sam.getProject().getId())
@@ -686,14 +700,23 @@ public class EditLibraryController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      writeLibraryConfiguration(mapper, config);
+      additionalConfigFunction.accept(config);
       if (templatesByProjectId != null && !templatesByProjectId.isEmpty()) {
         config.putPOJO(Config.TEMPLATES, templatesByProjectId);
       }
+      if (sort != null) {
+        config.put(Config.SORT, sort);
+      }
     }
-  };
 
-  private void writeLibraryConfiguration(ObjectMapper mapper, ObjectNode config) {
+    public ModelAndView propagate(String idString, int replicates, String sort, ModelMap model) throws IOException {
+      this.sort = sort;
+      return propagate(idString, replicates, model);
+    }
+
+  }
+
+  private void writeLibraryConfiguration(ObjectNode config) {
     config.put(Config.SHOW_DESCRIPTION, showDescription);
     config.put(Config.SHOW_VOLUME, showVolume);
     config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
@@ -703,8 +726,9 @@ public class EditLibraryController {
 
   @RequestMapping(value = "/bulk/propagate", method = RequestMethod.GET)
   public ModelAndView propagateFromSamples(@RequestParam("ids") String sampleIds, @RequestParam("replicates") int replicates,
-      ModelMap model) throws IOException, MisoNamingException {
-    return libraryBulkPropagateBackend.propagate(sampleIds, replicates, model);
+      @RequestParam(name = "sort", required = false) String sort, ModelMap model) throws IOException {
+    return new LibraryBulkPropagateBackend(sampleService, templateService, this::writeLibraryConfiguration)
+        .propagate(sampleIds, replicates, sort, model);
   }
 
   @RequestMapping(value = "/bulk/edit", method = RequestMethod.GET)
@@ -722,20 +746,14 @@ public class EditLibraryController {
     Project project = null;
     if (projectId != null) {
       project = projectService.getProjectById(projectId);
-      if (project == null) {
-        throw new IllegalArgumentException("Invalid Project ID");
-      }
+      if (project == null) throw new InvalidParameterException("No project found for ID " + projectId.toString());
     }
 
     SampleClass aliquotClass = null;
     if (isDetailedSampleEnabled()) {
-      if (aliquotClassId == null) {
-        throw new IllegalArgumentException("Sample Class ID is required for Detailed Sample");
-      }
+      if (aliquotClassId == null) throw new InvalidParameterException("Sample Class ID is required");
       aliquotClass = sampleClassService.get(aliquotClassId);
-      if (aliquotClass == null) {
-        throw new IllegalArgumentException("Invalid Sample Class ID");
-      }
+      if (aliquotClass == null) throw new InvalidParameterException("Requested sample class not found");
       DetailedLibraryDto detailedDto = new DetailedLibraryDto();
       libDto = detailedDto;
       SampleAliquotDto samDto = new SampleAliquotDto();
@@ -759,9 +777,7 @@ public class EditLibraryController {
     public BulkReceiveLibraryBackend(LibraryDto dto, Integer quantity, Project project, SampleClass aliquotClass, String defaultSciName)
         throws IOException {
       super("libraryReceipt", LibraryDto.class, "Libraries", dto, quantity);
-      if (isDetailedSampleEnabled() && aliquotClass == null) {
-        throw new IllegalArgumentException("Aliquot Class cannot be null");
-      }
+      if (isDetailedSampleEnabled() && aliquotClass == null) throw new InvalidParameterException("Aliquot class cannot be null");
       this.project = project;
       this.aliquotClass = aliquotClass;
       this.defaultSciName = defaultSciName;
