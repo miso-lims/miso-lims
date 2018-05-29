@@ -1537,6 +1537,7 @@ public class Dtos {
 
   public static PoolOrderCompletionDto asDto(PoolOrderCompletion from) {
     PoolOrderCompletionDto dto = new PoolOrderCompletionDto();
+    dto.setId(from.getPool().getId() + "_" + from.getSequencingParameters().getId());
     dto.setPool(asDto(from.getPool(), false));
     dto.setParameters(asDto(from.getSequencingParameters()));
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));

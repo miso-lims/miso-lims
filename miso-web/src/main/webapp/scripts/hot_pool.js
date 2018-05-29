@@ -199,6 +199,7 @@ HotTarget.pool = (function() {
         }
       }, {
         name: "Create Orders",
+        excludeOnOrders: true,
         action: function(pools) {
           window.location = window.location.origin + '/miso/order/bulk/create?' + jQuery.param({
             ids: pools.map(Utils.array.getId).join(',')
