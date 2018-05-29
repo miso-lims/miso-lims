@@ -31,7 +31,23 @@ ListTarget.completion = {
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
-    return [];
+    if (config.poolId) {
+      return [];
+    }
+    return HotTarget.pool.getBulkActions().filter(function(action) {
+      return !action || !action.excludeOnOrders;
+    }).map(function(action) {
+      return action ? {
+
+        name: action.name + ' (Pool)',
+        action: function(orders) {
+          action.action(orders.map(function(order) {
+            return order.pool;
+          }));
+        }
+
+      } : null;
+    });
   },
   createStaticActions: function(config, prodjectId) {
     return [];
@@ -56,7 +72,7 @@ ListTarget.completion = {
         } else if (full.pool.nearDuplicateIndices) {
           html += " <span class='parsley-custom-error-message'><strong>(NEAR-DUPLICATE INDICES)</strong></span>"
         }
-        if (full.pool.hasLowQualityLibraries){
+        if (full.pool.hasLowQualityLibraries) {
           html += " <span class='parsley-custom-error-message'><strong>(LOW QUALITY LIBRARIES)</strong></span>"
         }
         return html;
@@ -157,14 +173,12 @@ ListTarget.completion = {
     }];
   },
   searchTermSelector: function(searchTerms) {
-    return [
-      searchTerms['fulfilled'],
-      searchTerms['active'],
-      searchTerms['runstatus'],
-      searchTerms['changed'],
-      searchTerms['platform'],
-      searchTerms['index_name'],
-      searchTerms['index_seq']
-    ]
+    return [searchTerms['fulfilled'], //
+    searchTerms['active'], //
+    searchTerms['runstatus'], //
+    searchTerms['changed'], //
+    searchTerms['platform'], //
+    searchTerms['index_name'],//
+    searchTerms['index_seq']]
   }
 };

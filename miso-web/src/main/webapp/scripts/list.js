@@ -256,7 +256,7 @@ ListUtils = (function() {
           }) ? " checked=\"checked\"" : "";
 
           return "<input type=\"checkbox\" id=\"" + elementId + "_toggle" + data
-              + "\" onclick=\"ListUtils._checkEventHandler(this.checked, event, " + data + ", '" + elementId + "')\"" + checked + ">";
+              + "\" onclick='ListUtils._checkEventHandler(this.checked, event, " + JSON.stringify(data) + ", \"" + elementId + "\")'" + checked + ">";
         }
       });
       if (staticActions.length > 0) {

@@ -3,7 +3,9 @@ package uk.ac.bbsrc.tgac.miso.dto;
 public class PoolOrderCompletionDto {
   private int completed;
   private int failed;
+  private String id;
   private String lastUpdated;
+  private int loaded;
   private SequencingParametersDto parameters;
   private PoolDto pool;
   private int remaining;
@@ -12,7 +14,6 @@ public class PoolOrderCompletionDto {
   private int started;
   private int stopped;
   private int unknown;
-  private int loaded;
 
   public int getCompleted() {
     return completed;
@@ -20,6 +21,10 @@ public class PoolOrderCompletionDto {
 
   public int getFailed() {
     return failed;
+  }
+
+  public String getId() {
+    return id;
   }
 
   public String getLastUpdated() {
@@ -70,6 +75,10 @@ public class PoolOrderCompletionDto {
     this.failed = failed;
   }
 
+  public void setId(String id) {
+    this.id = id;
+  }
+
   public void setLastUpdated(String lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
@@ -89,7 +98,6 @@ public class PoolOrderCompletionDto {
   public void setRemaining(int remaining) {
     this.remaining = remaining;
   }
-
   public void setRequested(int requested) {
     this.requested = requested;
   }
@@ -97,6 +105,7 @@ public class PoolOrderCompletionDto {
   public void setRunning(int running) {
     this.running = running;
   }
+
   public void setStarted(int started) {
     this.started = started;
   }
