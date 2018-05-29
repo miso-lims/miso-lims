@@ -7,7 +7,7 @@ CREATE TABLE StorageLocation (
   PRIMARY KEY (locationId),
   CONSTRAINT fk_location_parent FOREIGN KEY (parentLocationId) REFERENCES StorageLocation (locationId),
   CONSTRAINT uk_storagelocation_barcode UNIQUE (identificationBarcode),
-  CONSTRAINT uk_storagelocation_child UNIQUE (parentLocationId, alias)
+  CONSTRAINT uk_storagelocation_child UNIQUE (parentLocationId, locationUnit, alias)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE Box ADD COLUMN locationId bigint(20);

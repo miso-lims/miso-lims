@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,10 +18,15 @@ import javax.persistence.OneToMany;
 
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 
 @Entity
-public class StorageLocation {
+public class StorageLocation implements Serializable, Aliasable {
+
+  private static final long serialVersionUID = 1L;
+
+  private static final long UNSAVED_ID = 0L;
 
   public enum BoxStorageAmount {
     NONE, SINGLE, MULTIPLE;
@@ -61,7 +67,7 @@ public class StorageLocation {
   @Id
   @Column(name = "locationId")
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long id;
+  private long id = UNSAVED_ID;
 
   @ManyToOne
   @JoinColumn(name = "parentLocationId", nullable = true)
@@ -80,6 +86,7 @@ public class StorageLocation {
   @OneToMany(targetEntity = BoxImpl.class, mappedBy = "storageLocation")
   private Set<Box> boxes;
 
+  @Override
   public long getId() {
     return id;
   }
@@ -112,6 +119,7 @@ public class StorageLocation {
     this.locationUnit = locationUnit;
   }
 
+  @Override
   public String getAlias() {
     return alias;
   }
@@ -142,6 +150,10 @@ public class StorageLocation {
 
   public String getFullDisplayLocation() {
     return (getParentLocation() == null ? "" : getParentLocation().getFullDisplayLocation() + ", ") + getDisplayLocation();
+  }
+  
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

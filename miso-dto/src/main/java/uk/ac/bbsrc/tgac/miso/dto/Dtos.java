@@ -117,6 +117,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
@@ -2294,7 +2295,7 @@ public class Dtos {
     return dto;
   }
 
-  public static StorageLocationDto asDto(StorageLocation from, boolean includeChildLocations) {
+  public static StorageLocationDto asDto(StorageLocation from, boolean includeChildLocations, boolean recursive) {
     StorageLocationDto dto = new StorageLocationDto();
     dto.setId(from.getId());
     if (from.getParentLocation() != null) {
@@ -2320,9 +2321,24 @@ public class Dtos {
     dto.setFullDisplayLocation(from.getFullDisplayLocation());
     if (includeChildLocations) {
       dto.setChildLocations(from.getChildLocations().stream()
-          .map(child -> Dtos.asDto(child, false))
+          .map(child -> Dtos.asDto(child, recursive, recursive))
           .collect(Collectors.toList()));
     }
     return dto;
+  }
+
+  public static StorageLocation to(StorageLocationDto from) {
+    StorageLocation location = new StorageLocation();
+    location.setId(from.getId());
+    location.setAlias(from.getAlias());
+    if (!LimsUtils.isStringEmptyOrNull(from.getIdentificationBarcode())) {
+      location.setIdentificationBarcode(from.getIdentificationBarcode());
+    }
+    if (from.getParentLocationId() != null) {
+      location.setParentLocation(new StorageLocation());
+      location.getParentLocation().setId(from.getParentLocationId());
+    }
+    location.setLocationUnit(LocationUnit.valueOf(from.getLocationUnit()));
+    return location;
   }
 }

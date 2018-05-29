@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class StorageLocationDto {
 
   private long id;
-  private long parentLocationId;
+  private Long parentLocationId;
   private String locationUnit;
   private boolean availableStorage;
   private String alias;
@@ -24,11 +24,11 @@ public class StorageLocationDto {
     this.id = id;
   }
 
-  public long getParentLocationId() {
+  public Long getParentLocationId() {
     return parentLocationId;
   }
 
-  public void setParentLocationId(long parentLocationId) {
+  public void setParentLocationId(Long parentLocationId) {
     this.parentLocationId = parentLocationId;
   }
 
