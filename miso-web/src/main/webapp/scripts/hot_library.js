@@ -580,7 +580,7 @@ HotTarget.library = (function() {
             });
           });
         }
-      }, HotUtils.printAction('library'),
+      }, HotUtils.printAction('library'), HotUtils.spreadsheetAction('/miso/rest/library/spreadsheet', Constants.librarySpreadsheets),
 
       HotUtils.makeParents('library', HotUtils.relationCategoriesForDetailed()), 
       HotUtils.makeChildren('library',[HotUtils.relations.dilution(), HotUtils.relations.pool()])
