@@ -929,33 +929,79 @@ var HotUtils = {
       }
     }, ];
   },
-  makeParents: function(slug, parentCategories) {
+  
+  makeParents: function(slug, parentCategories){
+  	return HotUtils.makeRelations(slug + '/parents', 'Parents', parentCategories, true);
+  },
+  
+  makeChildren: function(slug, childCategories){
+  	return HotUtils.makeRelations(slug + '/children', 'Children', childCategories, false);
+  },
+  
+  makeRelations: function(slug, relationship, relationCategories, useParentBound) {
 
     return {
-      name: "Parents",
+      name: relationship,
       action: function(items) {
-        Utils.showWizardDialog('Parents', parentCategories.map(function(category) {
+      	function makeCategoriesFilter(items){
+      		if(!Constants.isDetailedSample){
+      			return function(category){
+      				if(useParentBound){
+      					return category.index >= Constants.sampleCategories.length;
+      				}
+      				return category.index > Constants.sampleCategories.length;
+      			};
+      		}
+      		var childBound = Constants.sampleCategories.length - 1;
+      		var parentBound = 0;
+      		for(sample in items){
+      			if(items[sample].sampleClassId === undefined){
+      				parentBound = Constants.sampleCategories.length - 1;
+      				continue;
+      			}
+      			var index = Constants.sampleCategories.indexOf(Constants.sampleClasses.find(function(sampleClass){
+      				return sampleClass.id == items[sample].sampleClassId;
+      			}).sampleCategory);
+      			if(index > parentBound){
+      				parentBound = index;
+      			}
+      			if(index < childBound){
+      				childBound = index;
+      			}
+      		}
+      		if(useParentBound){
+      			return function(category){
+      				return category.index <= parentBound || category.index >= Constants.sampleCategories.length;
+      			};
+      		} else {
+      			return function(category){
+      				return category.index >= childBound;
+      			}
+      		}
+      	}
+      	
+      	var actions = relationCategories.filter(makeCategoriesFilter(items)).map(function(category) {
           return {
             "name": category.name,
             "handler": function() {
-              Utils.ajaxWithDialog('Searching', 'POST', '/miso/rest/' + slug + '/parents/' + category.name, items.map(function(s) {
+              Utils.ajaxWithDialog('Searching', 'POST', '/miso/rest/' + slug + '/' + category.name, items.map(function(s) {
                 return s.id;
-              }), function(parents) {
+              }), function(relations) {
                 var selectedActions = category.target.getBulkActions(category.config).filter(function(bulkAction) {
                   return !!bulkAction;
                 }).map(function(bulkAction) {
                   return {
                     "name": bulkAction.name,
                     "handler": function() {
-                      bulkAction.action(parents);
+                      bulkAction.action(relations);
                     }
                   };
                 });
                 selectedActions.unshift({
                   "name": "View Selected",
                   "handler": function() {
-                    Utils.showOkDialog(category.name + ' Parents', parents.map(function(parent) {
-                      return parent.name + (parent.alias ? ' (' + parent.alias + ')' : '');
+                    Utils.showOkDialog(category.name + ' ' + relationship, relations.map(function(relation) {
+                      return relation.name + (relation.alias ? ' (' + relation.alias + ')' : '');
                     }), showActionDialog);
                   }
                 });
@@ -966,23 +1012,51 @@ var HotUtils = {
               });
             }
           };
-        }));
+        })
+        if(actions.length == 1){
+        	actions[0].handler();
+        } else {
+        	Utils.showWizardDialog(relationship, actions);
+        }
       }
     };
   },
 
-  parentCategoriesForDetailed: function() {
+  relationCategoriesForDetailed: function() { // Change name to relationCategoriesForDetailed
     return Constants.isDetailedSample ? Constants.sampleCategories.map(function(category) {
       return {
         "name": category,
         "target": HotTarget.sample,
-        "config": {}
+        "config": {},
+        "index": Constants.sampleCategories.indexOf(category)
       };
     }) : [{
       "name": "Sample",
       "target": HotTarget.sample,
-      "config": {}
+      "config": {},
+      "index": Constants.sampleCategories.length
     }];
+  },
+  
+  relations: {
+  	library: function(){return { 
+  		"name": "Library",
+      "target": HotTarget.library,
+      "config": {},
+      "index": Constants.sampleCategories.length + 1
+    };},
+    dilution: function(){return {
+      "name": "Dilution",
+      "target": HotTarget.dilution,
+      "config": {},
+      "index": Constants.sampleCategories.length + 2
+    };},
+    pool: function(){return {
+      "name": "Pool",
+      "target": HotTarget.pool,
+      "config": {},
+      "index": Constants.sampleCategories.length + 3
+    };}
   },
 
   warnIfConsentRevoked: function(items, callback, getLabel) {

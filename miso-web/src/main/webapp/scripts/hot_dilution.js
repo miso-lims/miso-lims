@@ -179,11 +179,8 @@ HotTarget.dilution = {
       allowOnLibraryPage: true
     }, HotUtils.printAction('dilution'),
 
-    HotUtils.makeParents('librarydilution', HotUtils.parentCategoriesForDetailed().concat([{
-      "name": "Library",
-      "target": HotTarget.library,
-      "config": {}
-    }])), ];
+    HotUtils.makeParents('librarydilution', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library()])), 
+    HotUtils.makeChildren('librarydilution',[HotUtils.relations.pool()])];
   }
 
 };

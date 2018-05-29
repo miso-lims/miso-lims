@@ -205,7 +205,13 @@ HotTarget.pool = (function() {
             ids: pools.map(Utils.array.getId).join(',')
           });
         }
-      }, HotUtils.printAction('pool')].concat(HotUtils.makeQcActions("Pool"));
+      },
+
+      HotUtils.printAction('pool'), 
+      
+      HotUtils.makeParents('pool', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library(), HotUtils.relations.dilution()]))
+      
+      ].concat(HotUtils.makeQcActions("Pool"));
     },
 
     confirmSave: function(flatObjects, isCreate, config, table) {

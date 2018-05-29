@@ -630,7 +630,6 @@ HotTarget.sample = (function() {
                   });
                 }
               };
-
             });
             if (!Constants.isDetailedSample || classes.every(function(sampleClass) {
               return sampleClass.sampleCategory == "Aliquot";
@@ -674,8 +673,11 @@ HotTarget.sample = (function() {
           });
         }
       }, HotUtils.printAction('sample'), HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets),
-          Constants.isDetailedSample ? HotUtils.makeParents('sample', HotUtils.parentCategoriesForDetailed()) : null, ].concat(HotUtils
-          .makeQcActions("Sample"));
+          
+          Constants.isDetailedSample ? HotUtils.makeParents('sample', HotUtils.relationCategoriesForDetailed()) : null,
+          		
+          HotUtils.makeChildren('sample', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library(), HotUtils.relations.dilution(), HotUtils.relations.pool()]))
+          ].concat(HotUtils.makeQcActions("Sample"));
     },
 
     getCustomActions: function(table) {
