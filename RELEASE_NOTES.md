@@ -1,3 +1,16 @@
+# 0.2.123
+
+Changes:
+
+ * Fix RunScanner resource leaks
+ * Include partial matches in box search
+ * Auto-sort by sample box column when propagating libraries from the box page
+ * Add URL for linking to project by shortname
+ * Add Illumina clusters per lane plot
+ * Allow bulk creating orders with different parameters
+ * Add partition table to pool page
+ * Allow deleting boxes
+
 # 0.2.122
 
 Changes:
