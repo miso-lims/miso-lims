@@ -263,9 +263,20 @@ Box.ui = {
             }
           };
         })());
-        input.on('paste', (function(e) {
+        input.on('paste', (function() {
           var index = i;
           return function(e) {
+            for (var clipEvent = e; clipEvent.originalEvent && clipEvent.type == 'paste'; clipEvent = clipEvent.originalEvent);
+            var lines = clipEvent.clipboardData ? clipEvent.clipboardData.getData('Text').split(/\r?\n/) : [];
+            if (lines.length > 1) {
+              for (var next = 0; next < lines.length; next++) {
+                var inputBox = jQuery('#bulkUpdateTable tbody input:eq(' + next + ')');
+                inputBox.val(lines[next].replace(/^\s*|\s*$/g, ''));
+              }
+              jQuery('#bulkUpdateTable tbody input:eq(' + next + ')').focus();
+              e.preventDefault();
+              return;
+            }
             window.setTimeout(function() {
               jQuery('#bulkUpdateTable tbody input:eq(' + (index + 1) + ')').focus();
             }, 100);
