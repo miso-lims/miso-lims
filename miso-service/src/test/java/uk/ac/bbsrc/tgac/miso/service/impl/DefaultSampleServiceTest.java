@@ -471,6 +471,22 @@ public class DefaultSampleServiceTest {
     project.setReferenceGenome(humanReferenceGenome());
     Set<SampleIdentity> idSet = new HashSet<>();
     SampleIdentity id1 = new SampleIdentityImpl();
+    id1.setId(1L);
+    id1.setExternalName("String1,String2");
+    id1.setProject(project);
+    idSet.add(id1);
+    Mockito.when(sut.getIdentitiesByExactExternalNameAndProject(Matchers.anyString(), Matchers.anyLong())).thenReturn(idSet);
+    sut.confirmExternalNameUniqueForProjectIfRequired("String1,String3", id1);
+  }
+
+  @Test
+  public void testCanEditExternalNameTest() throws IOException {
+    Project project = new ProjectImpl();
+    project.setId(1L);
+    project.setReferenceGenome(humanReferenceGenome());
+    Set<SampleIdentity> idSet = new HashSet<>();
+    SampleIdentity id1 = new SampleIdentityImpl();
+    id1.setId(1L);
     id1.setExternalName("String1,String2");
     id1.setProject(project);
     idSet.add(id1);
