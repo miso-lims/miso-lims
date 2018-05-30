@@ -207,7 +207,7 @@ HotTarget.pool = (function() {
         }
       },
 
-      HotUtils.printAction('pool'), 
+      HotUtils.printAction('pool'), HotUtils.spreadsheetAction('/miso/rest/pool/spreadsheet', Constants.poolSpreadsheets),
       
       HotUtils.makeParents('pool', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library(), HotUtils.relations.dilution()]))
       
