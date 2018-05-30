@@ -127,6 +127,30 @@
       <td>Location:</td>
       <td><form:input id="location" path="locationBarcode"/></td>
     </tr>
+    <tr>
+      <td>Freezer Location:</td>
+      <td>
+        <input name="storageLocation" id="storageLocation" type="hidden" value="${empty box.storageLocation ? 0 : box.storageLocation.id}">  
+        <span id="freezerLocation">
+          <c:choose>
+            <c:when test="${not empty box.storageLocation}">${box.storageLocation.getFullDisplayLocation()}</c:when>
+            <c:otherwise>Unknown</c:otherwise>
+          </c:choose>
+        </span>
+      </td>
+    </tr>
+    <tr>
+      <td>Change Location (scan or select):</td>
+      <td>
+        <input id="freezerLocationScan" type="text" style="width: 120px;">
+        <span id="freezerLocationRoot"></span>
+        <select id="freezerLocationSelect" onchange="Box.ui.onLocationSelect()">
+        </select>
+        <img id="freezerLocationLoader" src="/styles/images/ajax-loader.gif" class="fg-button hidden"/>
+        <button id="setFreezerLocation" type="button" class="ui-state-default" onclick="Box.ui.setFreezerLocation()">Set</button>
+        <button id="resetFreezerLocation" type="button" class="ui-state-default" onclick="Box.ui.resetLocationSearch()">Reset</button>
+      </td>
+    </tr>
   </table>
 </div>
 </form:form>
@@ -136,6 +160,19 @@
   jQuery(document).ready(function () {
     // Attaches form validation listener
     Validate.attachParsley('#box-form');
+    Box.ui.resetLocationSearch();
+    
+    jQuery('#freezerLocationScan').keyup(function(event) {
+      if (event.which == "13") {
+        Box.ui.onLocationScan();
+      }
+    });
+
+    jQuery('#freezerLocationScan').on('paste', function(e) {
+      window.setTimeout(function() {
+        Box.ui.onLocationScan();
+      }, 100);
+    });
   });
 </script>
 

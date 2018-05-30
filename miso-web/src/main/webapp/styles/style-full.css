@@ -2166,3 +2166,44 @@ div#inputError {
   height: 30px;
   margin: 5px 12px;
 }
+
+.storageComponentContainer {
+  float: left;
+  padding: 12px;
+}
+
+.storageComponentLabel {
+  float: left;
+}
+
+.storageComponentButton {
+  float: right;
+}
+
+.storageComponent, .storageComponent td {
+  border: 1px solid darkgrey;
+  border-collapse: collapse;
+  background: lightgrey;
+}
+
+.storageComponent td {
+  padding: 12px;
+}
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.storageComponent td .storageNode {
+  float: left;
+  border: 1px solid black;
+  background: #0085B7;
+  padding: 12px;
+  margin: 2px;
+}
+
+.storageComponent .selected {
+  background: #00BAFF !important;
+}

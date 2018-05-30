@@ -19,6 +19,7 @@ import javax.persistence.TemporalType;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 
@@ -68,6 +69,10 @@ public abstract class AbstractBox implements Box {
 
   @OneToMany(targetEntity = BoxChangeLog.class, mappedBy = "box", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
+
+  @ManyToOne
+  @JoinColumn(name = "locationId", nullable = true)
+  private StorageLocation storageLocation;
 
   @Override
   public long getId() {
@@ -232,6 +237,16 @@ public abstract class AbstractBox implements Box {
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public StorageLocation getStorageLocation() {
+    return storageLocation;
+  }
+
+  @Override
+  public void setStorageLocation(StorageLocation storageLocation) {
+    this.storageLocation = storageLocation;
   }
 
 }

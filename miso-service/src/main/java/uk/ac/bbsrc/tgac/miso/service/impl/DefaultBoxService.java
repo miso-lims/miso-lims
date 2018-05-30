@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.BoxStorageAmount;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
@@ -39,6 +41,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
@@ -49,6 +54,9 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   private AuthorizationManager authorizationManager;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
+
+  @Autowired
+  private StorageLocationService storageLocationService;
 
   @Autowired
   private BoxStore boxStore;
@@ -81,6 +89,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
     to.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(from.getIdentificationBarcode()));
     to.setLocationBarcode(from.getLocationBarcode());
     to.setUse(boxStore.getUseById(from.getUse().getId()));
+    to.setStorageLocation(from.getStorageLocation());
   }
 
   @Override
@@ -190,12 +199,16 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   @Override
   public long save(Box box) throws IOException {
     setChangeDetails(box);
+    if (box.getStorageLocation() != null) {
+      box.setStorageLocation(storageLocationService.get(box.getStorageLocation().getId()));
+    }
     if (box.getId() == AbstractBox.UNSAVED_ID) {
       return saveNewBox(box);
     } else {
       Box original = boxStore.get(box.getId());
       authorizationManager.throwIfNotWritable(original);
       applyChanges(box, original);
+      validateChange(box, original);
       StringBuilder message = new StringBuilder();
 
       // get persisted version of new box contents before change
@@ -269,6 +282,36 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
     }
   }
 
+  /**
+   * Checks submitted data for validity, throwing a ValidationException containing all of the errors if invalid
+   * 
+   * @param box submitted Box to validate
+   * @param beforeChange the already-persisted Box before changes
+   * @throws IOException
+   */
+  private void validateChange(Box box, Box beforeChange) throws IOException {
+    List<ValidationError> errors = new ArrayList<>();
+
+    if (box.getStorageLocation() != null) {
+      if (box.getStorageLocation().getLocationUnit().getBoxStorageAmount() == BoxStorageAmount.NONE) {
+        errors.add(new ValidationError("storageLocation", "Invalid box location"));
+      } else if (box.getStorageLocation().getLocationUnit().getBoxStorageAmount() == BoxStorageAmount.SINGLE) {
+        if (beforeChange == null || beforeChange.getStorageLocation() == null
+            || beforeChange.getStorageLocation().getId() != box.getStorageLocation().getId()) {
+          box.getStorageLocation().getBoxes().forEach(b -> {
+            if (b.getId() != box.getId()) {
+              errors.add(new ValidationError("storageLocation", "Location already occupied"));
+            }
+          });
+        }
+      }
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
+    }
+  }
+
   private long saveNewBox(Box box) throws IOException {
     authorizationManager.throwIfNotWritable(box);
     try {
@@ -276,6 +319,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       box.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(box.getSecurityProfile())));
       setChangeDetails(box);
       box.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(box.getIdentificationBarcode()));
+      validateChange(box, null);
       boxStore.save(box);
 
       if (autoGenerateIdBarcodes) {
