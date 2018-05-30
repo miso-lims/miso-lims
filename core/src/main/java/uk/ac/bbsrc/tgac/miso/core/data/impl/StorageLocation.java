@@ -26,7 +26,7 @@ public class StorageLocation implements Serializable, Aliasable {
 
   private static final long serialVersionUID = 1L;
 
-  private static final long UNSAVED_ID = 0L;
+  public static final long UNSAVED_ID = 0L;
 
   public enum BoxStorageAmount {
     NONE, SINGLE, MULTIPLE;
@@ -100,11 +100,14 @@ public class StorageLocation implements Serializable, Aliasable {
   }
 
   public void setParentLocation(StorageLocation parentLocation) {
-    this.parentLocation = parentLocation;
-    if (parentLocation.childLocations == null) {
-      parentLocation.childLocations = new HashSet<>();
+    if (this.getLocationUnit() != LocationUnit.ROOM) {
+      // rooms are at the top of the hierarchy so parentLocation should be null
+      this.parentLocation = parentLocation;
+      if (parentLocation.childLocations == null) {
+        parentLocation.childLocations = new HashSet<>();
+      }
+      parentLocation.childLocations.add(this);
     }
-    parentLocation.childLocations.add(this);
   }
 
   public Set<StorageLocation> getChildLocations() {
