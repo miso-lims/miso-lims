@@ -22,6 +22,8 @@ public enum LibraryDilutionSpreadSheets implements Spreadsheet<LibraryDilution> 
       Column.forString("Library Barcode", dilution -> dilution.getLibrary().getIdentificationBarcode()), //
       Column.forString("Library Type", dilution -> dilution.getLibrary().getLibraryType().getDescription()), //
       Column.forString("Index(es)", LibraryDilutionSpreadSheets::listIndices), //
+      Column.forString("Targeted Sequencing",
+          dilution -> dilution.getTargetedSequencing() != null ? dilution.getTargetedSequencing().getAlias() : ""), //
       Column.forString("Sample Name", dilution -> dilution.getLibrary().getSample().getName()), //
       Column.forString("Sample Alias", dilution -> dilution.getLibrary().getSample().getAlias()), //
       Column.forString("Sample Barcode", dilution -> dilution.getLibrary().getSample().getIdentificationBarcode()), //
