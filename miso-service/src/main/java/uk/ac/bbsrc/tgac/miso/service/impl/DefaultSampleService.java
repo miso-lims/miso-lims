@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
@@ -390,10 +391,17 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     Collection<SampleIdentity> matches = getIdentitiesByExactExternalNameAndProject(newExternalName,
         sample.getProject().getId());
     if (!matches.isEmpty()) {
-      SampleIdentity existingIdentity = matches.iterator().next();
-        throw new ConstraintViolationException("Duplicate external names not allowed within a project: External name " + newExternalName
-          + " is already associated with Identity " + existingIdentity.getAlias() + " (" + existingIdentity.getExternalName() + ")",
-            null, "externalName");
+      for (SampleIdentity match : matches) {
+        if (match.getId() != sample.getId()) {
+          Set<String> matchExtNames = SampleIdentityImpl.getSetFromString(match.getExternalName());
+          Set<String> newExtNames = SampleIdentityImpl.getSetFromString(newExternalName);
+          newExtNames.retainAll(matchExtNames);
+          throw new ConstraintViolationException(
+              "Duplicate external names not allowed within a project: External name \"" + String.join(",", newExtNames)
+                  + "\" is already associated with Identity " + match.getAlias() + " (" + match.getExternalName() + ")",
+              null, "externalName");
+        }
+      }
     }
   }
 
