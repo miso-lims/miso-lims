@@ -733,6 +733,22 @@ var HotUtils = {
     };
     return baseobj;
   },
+  
+  makeAutocompleteColumnForConstantsList: function(headerName, include, flatProperty, modelProperty, id, name, items, required, search, getData, baseobj, sortFunc) {
+  	baseobj = HotUtils.makeColumnForConstantsList(headerName, include, flatProperty, modelProperty, id, name, items, required, baseobj, sortFunc);
+    baseobj.depends = flatProperty;
+    baseobj.update = function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+			if (value) {
+				var match = items.find(function(item){
+					return search(item, value);
+				});
+				if (match) {
+					setData(getData(match));
+				}
+			}
+    }
+    return baseobj;
+  },
 
   makeColumnForBoolean: function(headerName, include, property, required) {
     return {

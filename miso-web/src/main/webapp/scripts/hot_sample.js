@@ -399,10 +399,18 @@ HotTarget.sample = (function() {
           HotUtils.makeColumnForText('Group Desc.', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupDescription', {}),
 
           // Tissue columns
-          HotUtils.makeColumnForConstantsList('Tissue Origin', show['Tissue'], 'tissueOriginAlias', 'tissueOriginId', 'id', 'label',
-              Constants.tissueOrigins, true),
-          HotUtils.makeColumnForConstantsList('Tissue Type', show['Tissue'], 'tissueTypeAlias', 'tissueTypeId', 'id', 'label',
-              Constants.tissueTypes, true),
+          HotUtils.makeAutocompleteColumnForConstantsList('Tissue Origin', show['Tissue'], 'tissueOriginAlias', 'tissueOriginId', 'id', 'label',
+              Constants.tissueOrigins, true, function(item, value) {
+      					return item.alias.toLowerCase() == value.toLowerCase() || item.description.toLowerCase() == value.toLowerCase();
+      				}, function(item){
+      					return item.label;
+      				}),
+          HotUtils.makeAutocompleteColumnForConstantsList('Tissue Type', show['Tissue'], 'tissueTypeAlias', 'tissueTypeId', 'id', 'label',
+              Constants.tissueTypes, true, function(item, value) {
+      					return item.alias.toLowerCase() == value.toLowerCase() || item.description.toLowerCase() == value.toLowerCase();
+      				}, function(item){
+      					return item.label;
+      				}),
           HotUtils.makeColumnForInt('Passage #', show['Tissue'], 'passageNumber', null),
           HotUtils.makeColumnForInt('Times Received', show['Tissue'], 'timesReceived', HotUtils.validator.requiredPositiveInt),
           HotUtils.makeColumnForInt('Tube Number', show['Tissue'], 'tubeNumber', HotUtils.validator.requiredPositiveInt),
