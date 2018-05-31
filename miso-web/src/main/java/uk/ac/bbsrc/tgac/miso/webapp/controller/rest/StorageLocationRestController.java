@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.StorageLocationDto;
 import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
@@ -114,6 +115,18 @@ public class StorageLocationRestController extends RestController {
     }
 
     return createStack(freezer, height);
+  }
+
+  @RequestMapping(value = "/rooms", method = RequestMethod.POST)
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public StorageLocationDto addRoom(@RequestParam(name = "alias", required = true) String alias,
+      @RequestParam(name = "identificationBarcode", required = false) String identificationBarcode) throws IOException {
+    StorageLocation room = makeStorage(alias, LocationUnit.ROOM, null);
+    room.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(identificationBarcode));
+    long savedId = storageLocationService.createRoom(room);
+    StorageLocation saved = storageLocationService.get(savedId);
+    return Dtos.asDto(saved, false, false);
   }
 
   private StorageLocation makeStorage(String alias, LocationUnit locationUnit, StorageLocation parent) {

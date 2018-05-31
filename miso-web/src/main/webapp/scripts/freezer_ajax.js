@@ -23,6 +23,10 @@
   Freezer.validateAndSave = function() {
     Validate.cleanFields('#freezer-form');
     Validate.clearErrors('#freezer-form');
+    
+    $('#room').attr('class', 'form-control');
+    $('#room').attr('data-parsley-required', 'true');
+    $('#room').attr('data-parsley-errors-container', '#roomError');
 
     $('#alias').attr('class', 'form-control');
     $('#alias').attr('data-parsley-required', 'true');
@@ -42,10 +46,34 @@
       save(!freezerJson || !freezerJson.id);
     });
   };
+  
+  Freezer.addRoom = function () {
+    var fields = [{
+	  type: 'text',
+	  label: 'Alias',
+	  property: 'alias',
+	  required: true
+	}, {
+	  type: 'text',
+	  label: 'Barcode',
+	  property: 'identificationBarcode',
+	  required: false
+	}];
+    Utils.showDialog('Add Room', 'Add', fields, function(output) {
+      var params = {};
+      fields.forEach(function(field) {
+        params[field.property] = output[field.property];
+      });
+      var url = '/miso/rest/storagelocations/rooms' + '?' + $.param(params);
+      Utils.ajaxWithDialog("Adding Room", 'POST', url, {}, function(responseData) {
+        Utils.showOkDialog('Room created', []);
+      });
+    });
+  };
 
   Freezer.addFreezerStorage = function() {
     Utils.showWizardDialog('Add Freezer Storage', [{
-      name: 'shelf',
+      name: 'Shelf',
       handler: function() {
         var url = '/miso/rest/storagelocations/freezers/' + freezerJson.id + '/shelves';
         Utils.ajaxWithDialog("Adding Storage", 'POST', url, {}, function(responseData) {

@@ -18,6 +18,8 @@ public interface StorageLocationService {
 
   public Map<String, Integer> getColumnSizes() throws IOException;
 
+  public long createRoom(StorageLocation room);
+
   public long saveFreezer(StorageLocation freezer);
 
   public long addFreezerStorage(StorageLocation storage);

@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.store.StorageLocationStore;
@@ -58,12 +57,24 @@ public class DefaultStorageLocationService implements StorageLocationService {
   }
 
   @Override
+  public long createRoom(StorageLocation room) {
+    if (room.getLocationUnit() != LocationUnit.ROOM) {
+      throw new IllegalArgumentException("Location is not a room");
+    }
+    if (room.getId() == StorageLocation.UNSAVED_ID) {
+      return storageLocationStore.save(room);
+    } else {
+      throw new IllegalArgumentException("Can not yet update rooms");
+    }
+  }
+
+  @Override
   public long saveFreezer(StorageLocation freezer) {
     if (freezer.getLocationUnit() != LocationUnit.FREEZER) {
       throw new IllegalArgumentException("Location is not a freezer");
     }
     loadChildEntities(freezer);
-    if (freezer.getId() == Array.UNSAVED_ID) {
+    if (freezer.getId() == StorageLocation.UNSAVED_ID) {
       return create(freezer);
     } else {
       return update(freezer);
