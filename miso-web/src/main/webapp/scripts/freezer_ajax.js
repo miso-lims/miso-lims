@@ -48,6 +48,9 @@
   };
   
   Freezer.addRoom = function () {
+    Freezer.addRoomWithCallback(function() { Utils.showOkDialog('Room created', []); });
+  },
+  Freezer.addRoomWithCallback = function (callback) {
     var fields = [{
 	  type: 'text',
 	  label: 'Alias',
@@ -66,7 +69,7 @@
       });
       var url = '/miso/rest/storagelocations/rooms' + '?' + $.param(params);
       Utils.ajaxWithDialog("Adding Room", 'POST', url, {}, function(responseData) {
-        Utils.showOkDialog('Room created', []);
+        callback();
       });
     });
   };
