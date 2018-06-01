@@ -68,7 +68,7 @@ HotTarget.order = (function() {
         },
         pack: function(order, flat, errorHandler) {
           order.parameters = Utils.array.findFirstOrNull(function(param) {
-            return param.name == flat.sequencingParameters;
+            return param.name == flat.sequencingParameters && param.platform.instrumentModel == flat.platform;
           }, Constants.sequencingParameters);
         },
         depends: 'platform',

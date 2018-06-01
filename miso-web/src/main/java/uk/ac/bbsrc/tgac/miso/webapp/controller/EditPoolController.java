@@ -192,8 +192,10 @@ public class EditPoolController {
 
       if (pool == null) throw new NotFoundException("No pool found for ID " + poolId.toString());
 
+      ObjectMapper mapper = new ObjectMapper();
       model.put("formObj", pool);
       model.put("pool", pool);
+      model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(pool, false)));
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
