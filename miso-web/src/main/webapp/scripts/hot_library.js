@@ -37,7 +37,7 @@ HotTarget.library = (function() {
           return index.label == label && index.position == n;
         }, families[0].indices), 'id');
       },
-      depends: ['indexFamilyName', 'templateAlias', 'boxPosition'],
+      depends: ['indexFamilyName', 'templateAlias', 'boxPosition', 'index' + n + 'Label'],
       update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
         var indexFamily = null;
         if (flatProperty === 'indexFamilyName' || flatProperty === '*start') {
@@ -61,6 +61,20 @@ HotTarget.library = (function() {
             'source': indices
           });
           setData(data);
+        } else if (flatProperty === 'index' + n + 'Label'){
+          var pt = getPlatformType(flat.platformType);
+          indexFamily = Utils.array.findFirstOrNull(function(family) {
+            return family.name == flat.indexFamilyName && family.platformType == pt;
+          }, Constants.indexFamilies);
+          var indices = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
+            return index.position == n;
+          });
+        	var match = indices.find(function(index){
+						return index.sequence.toLowerCase() == value.toLowerCase() || index.label.toLowerCase() == value.toLowerCase();
+					});
+					if (match) {
+						setData(match.label);
+					}
         }
         var readOnly = false;
         if (flat.templateAlias && flat.boxPosition && indexFamily) {
