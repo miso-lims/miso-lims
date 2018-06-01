@@ -71,44 +71,47 @@ ListTarget.order = {
     }, ];
   },
   createStaticActions: function(config, projectId) {
-    var platformType = Utils.array.findFirstOrNull(function(pt) {
-      return pt.name == config.platformType;
-    }, Constants.platformTypes);
-    return [{
-      name: "Create",
-      handler: function() {
-        Utils.showWizardDialog('Create Order', Constants.platforms.filter(function(platform) {
-          return platform.platformType == platformType.name && platform.active;
-        }).map(function(platform) {
-          return {
-            name: platform.instrumentModel,
-            handler: function() {
-              Utils.showDialog('Create Order', 'Save', [{
-                type: "select",
-                label: "Sequencing Parameters",
-                property: "parameters",
-                values: Constants.sequencingParameters.filter(function(parameters) {
-                  return parameters.platform.id == platform.id;
-                }),
-                getLabel: Utils.array.getName
-              }, {
-                type: "int",
-                label: platformType.pluralPartitionName,
-                property: "count",
-                value: 1
-              }], function(results) {
+    if (config.pool.id) {
+      var platformType = Utils.array.findFirstOrNull(function(pt) {
+        return pt.name == config.platformType;
+      }, Constants.platformTypes);
+      return [{
+        name: "Create",
+        handler: function() {
+          Utils.showWizardDialog('Create Order', Constants.platforms.filter(function(platform) {
+            return platform.platformType == platformType.name && platform.active;
+          }).map(function(platform) {
+            return {
+              name: platform.instrumentModel,
+              handler: function() {
+                Utils.showDialog('Create Order', 'Save', [{
+                  type: "select",
+                  label: "Sequencing Parameters",
+                  property: "parameters",
+                  values: Constants.sequencingParameters.filter(function(parameters) {
+                    return parameters.platform.id == platform.id;
+                  }),
+                  getLabel: Utils.array.getName
+                }, {
+                  type: "int",
+                  label: platformType.pluralPartitionName,
+                  property: "count",
+                  value: 1
+                }], function(results) {
 
-                Utils.ajaxWithDialog('Creating Order', 'POST', '/miso/rest/poolorder', {
-                  "poolId": config.poolId,
-                  "partitions": results.count,
-                  "parameters": results.parameters,
-                }, Utils.page.pageReload);
-              });
-            }
-          };
-        }));
-      }
-    }];
+                  Utils.ajaxWithDialog('Creating Order', 'POST', '/miso/rest/poolorder', {
+                    "pool": config.pool,
+                    "partitions": results.count,
+                    "parameters": results.parameters,
+                  }, Utils.page.pageReload);
+                });
+              }
+            };
+          }));
+        }
+      }];
+    }
+    return [];
   },
   createColumns: function(config, projectId) {
     var platformType = Utils.array.findFirstOrNull(function(pt) {
