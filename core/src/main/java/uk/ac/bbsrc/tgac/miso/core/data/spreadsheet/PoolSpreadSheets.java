@@ -12,8 +12,10 @@ public enum PoolSpreadSheets implements Spreadsheet<Pool> {
       Column.forString("Name", Pool::getName), //
       Column.forString("Alias", Pool::getAlias), //
       Column.forString("Barcode", Pool::getIdentificationBarcode), //
-      Column.forString("Latest qPCR QC", pool -> pool.getQCs().stream().filter(qc -> qc.getType().getName().equals("qPCR"))
-          .max(Comparator.comparing(PoolQC::getDate)).map(qc -> qc.getResults().toString()).orElse("No QC")));
+      Column.forDouble("Latest qPCR QC", pool -> pool.getQCs().stream()//
+          .filter(qc -> qc.getType().getName().equals("qPCR"))
+          .max(Comparator.comparing(PoolQC::getDate).thenComparing(Comparator.comparing(PoolQC::getLastModified)))//
+          .map(PoolQC::getResults).orElse(0.0)));
 
   private final List<Column<Pool>> columns;
   private final String description;

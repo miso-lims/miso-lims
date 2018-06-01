@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -95,6 +96,8 @@ public class HibernateSampleQcDaoTest extends AbstractDAOTest {
     newSampleQC.getType().setQcTypeId(1L);
     newSampleQC.setCreator(new UserImpl());
     newSampleQC.getCreator().setUserId(1L);
+    newSampleQC.setCreationTime(new Date());
+    newSampleQC.setLastModified(new Date());
     long id = dao.save(newSampleQC);
 
     SampleQC savedSampleQC = dao.get(id);
