@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,8 @@ public class DefaultQualityControlService implements QualityControlService {
     authorizationManager.throwIfNotWritable(entity);
     User user = authorizationManager.getCurrentUser();
     qc.setCreator(user);
+    qc.setCreationTime(new Date());
+    qc.setLastModified(qc.getCreationTime());
 
     QcType type = qcTypeStore.get(qc.getType().getQcTypeId());
     if (!type.getQcTarget().equals(entity.getQcTarget())) {
@@ -74,6 +77,7 @@ public class DefaultQualityControlService implements QualityControlService {
       throw new IllegalArgumentException("QC type has changed");
     }
     original.setResults(qc.getResults());
+    original.setLastModified(new Date());
 
     entity.setChangeDetails(user);
     changeLoggableStore.update(entity);

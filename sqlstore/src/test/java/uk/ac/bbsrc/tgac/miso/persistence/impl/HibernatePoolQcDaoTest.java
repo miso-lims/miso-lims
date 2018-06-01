@@ -81,6 +81,8 @@ public class HibernatePoolQcDaoTest extends AbstractDAOTest {
     QcType type = new QcType();
     type.setQcTypeId(8L);
     qc.setType(type);
+    qc.setCreationTime(new Date());
+    qc.setLastModified(new Date());
     assertNull(dao.get(autoIncrementId));
     assertEquals(autoIncrementId, dao.save(qc));
     PoolQC saved = (PoolQC) dao.get(autoIncrementId);
