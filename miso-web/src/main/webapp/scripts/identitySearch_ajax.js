@@ -1,6 +1,6 @@
 (function(IdentitySearch, $, undefined) { // NOSONAR (paranoid assurance that undefined is undefined)
 
-  IdentitySearch.lookup = function() {
+  IdentitySearch.lookup = function(exactMatch) {
     var data = getExternalNamesInput();
     if (!data || data.length == 0) {
       Utils.showOkDialog('Search error', ['Enter at least one external name']);
@@ -11,7 +11,7 @@
       jQuery('#ajaxLoaderDiv').html('<img src="/styles/images/ajax-loader.gif"/>');
        
       $.ajax({
-        url: '/miso/rest/sample/identitiesLookup',
+        url: '/miso/rest/sample/identitiesLookup?exactMatch=' + (exactMatch ? 'true' : 'false'),
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json; charset=utf8',
@@ -35,7 +35,7 @@
           result[searchTerm].map(function (sam) {
             var btn = document.createElement('INPUT');
             btn.type = 'button';
-            btn.value = sam.alias;
+            btn.value = sam.alias + ' (' + sam.externalName + ')';
             btn.onclick = IdentitySearch.sampleSearchFor;
             return btn;
           }).map(function (button) {

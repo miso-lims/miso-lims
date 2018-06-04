@@ -257,34 +257,35 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
           Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
           criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
           return criteria.list();
-        }).flatMap(list -> list.stream()).collect(Collectors.toList());
+        }).flatMap(list -> list.stream())
+        .collect(Collectors.toList());
     return records;
   }
 
   @Override
-  public Collection<SampleIdentity> getIdentitiesByExactExternalName(String externalNames) throws IOException {
-    if (externalNames == null) return Collections.emptyList();
-
-    Collection<SampleIdentity> partialMatches = getIdentitiesByExternalNameOrAliasPartialMatch(externalNames);
-    return filterOnlyExactExternalNameMatches(partialMatches, externalNames);
-  }
-
-  @Override
-  public Collection<SampleIdentity> getIdentitiesByExactExternalNameAndProject(String externalNames, Long projectId) throws IOException {
+  public Collection<SampleIdentity> getIdentitiesByExternalNameAndProject(String externalNames, Long projectId, boolean exactMatch)
+      throws IOException {
     if (isStringEmptyOrNull(externalNames)) return Collections.emptySet();
-    if (projectId == null) throw new IllegalArgumentException("Must provide a projectId in search");
     @SuppressWarnings("unchecked")
     Set<SampleIdentity> records = (Set<SampleIdentity>) SampleIdentityImpl.getSetFromString(externalNames)
         .stream().map(extName -> {
           String str = DbUtils.convertStringToSearchQuery(extName, false);
           Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
-          criteria.add(Restrictions.eq("project.id", projectId));
+          if (projectId != null) {
+            criteria.add(Restrictions.eq("project.id", projectId));
+          }
           criteria.add(Restrictions.ilike("externalName", str));
           return criteria.list();
-        }).flatMap(list -> list.stream()).distinct().collect(Collectors.toSet());
+        }).flatMap(list -> list.stream())
+        .distinct()
+        .collect(Collectors.toSet());
     
     // filter out those with a non-exact external name match
-    return filterOnlyExactExternalNameMatches(records, externalNames);
+    if (exactMatch) {
+      return filterOnlyExactExternalNameMatches(records, externalNames);
+    } else {
+      return records;
+    }
   }
 
   private Collection<SampleIdentity> filterOnlyExactExternalNameMatches(Collection<SampleIdentity> candidates, String externalNames) {

@@ -51,6 +51,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -73,7 +74,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -305,7 +305,8 @@ public class SampleRestController extends RestController {
    * @throws IOException
    */
   @RequestMapping(value = "/identitiesLookup", method = RequestMethod.POST, headers = { "Content-type=application/json" })
-  public @ResponseBody List<Map<String, Set<SampleDto>>> getIdentitiesBySearch(@RequestBody com.fasterxml.jackson.databind.JsonNode json,
+  public @ResponseBody List<Map<String, Set<SampleDto>>> getIdentitiesBySearch(@RequestParam boolean exactMatch,
+      @RequestBody com.fasterxml.jackson.databind.JsonNode json,
       HttpServletResponse response) throws IOException {
     final JsonNode searchTerms = json.get("identitiesSearches");
     final String project = (json.get("project") == null ? "" : json.get("project").asText());
@@ -314,7 +315,7 @@ public class SampleRestController extends RestController {
     }
     List<Map<String, Set<SampleDto>>> identitiesBySearchTerm = new ArrayList<>();
     for (JsonNode term : searchTerms) {
-      Set<SampleDto> uniqueIdentities = getSamplesForIdentityString(term.asText(), project, false);
+      Set<SampleDto> uniqueIdentities = getSamplesForIdentityString(term.asText(), project, exactMatch);
       if (uniqueIdentities.size() > 0) {
         Map<String, Set<SampleDto>> found = new HashMap<>();
         found.put(term.asText(), uniqueIdentities);
@@ -324,17 +325,17 @@ public class SampleRestController extends RestController {
     return identitiesBySearchTerm;
   }
 
-  private Set<SampleDto> getSamplesForIdentityString(String identityIdentifier, String project, boolean permitPartialMatch)
+  private Set<SampleDto> getSamplesForIdentityString(String identityIdentifier, String project, boolean exactMatch)
       throws IOException {
     Collection<SampleIdentity> matches = new HashSet<>();
     Project selected = null;
-    if (!LimsUtils.isStringEmptyOrNull(project)) selected = projectService.getProjectByShortName(project);
+    selected = projectService.getProjectByShortName(project);
     if (selected != null) {
-      matches = sampleService.getIdentitiesByExactExternalNameAndProject(identityIdentifier, selected.getId());
-    } else if (permitPartialMatch) {
-      matches = sampleService.getIdentitiesByExternalNameOrAlias(identityIdentifier);
+      matches = sampleService.getIdentitiesByExternalNameAndProject(identityIdentifier, selected.getId(), exactMatch);
+    } else if (exactMatch) {
+      matches = sampleService.getIdentitiesByExternalNameAndProject(identityIdentifier, null, exactMatch);
     } else {
-      matches = sampleService.getIdentitiesByExactExternalName(identityIdentifier);
+      matches = sampleService.getIdentitiesByExternalNameOrAlias(identityIdentifier);
     }
     return matches.stream().map(identity -> Dtos.asDto(identity)).collect(Collectors.toSet());
   }

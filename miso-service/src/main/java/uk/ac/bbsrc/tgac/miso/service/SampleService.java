@@ -32,9 +32,8 @@ public interface SampleService extends PaginatedDataSource<Sample>, BarcodableSe
 
   Collection<SampleIdentity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException;
 
-  Collection<SampleIdentity> getIdentitiesByExactExternalName(String externalName) throws IOException;
-
-  Collection<SampleIdentity> getIdentitiesByExactExternalNameAndProject(String externalName, Long projectId) throws IOException;
+  Collection<SampleIdentity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId, boolean exactMatch)
+      throws IOException;
 
   void confirmExternalNameUniqueForProjectIfRequired(String externalNames, Sample sample) throws IOException;
 
