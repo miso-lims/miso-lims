@@ -135,17 +135,6 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
   Long countAll() throws IOException;
 
   /**
-   * List all the identities which have an alias or at least one external name which (partially) matches the input String or a
-   * comma-separated portion of the input String.
-   * 
-   * @param externalName
-   *          a single external name/alias string
-   * @return Collection<Identity> set of Identities which have an external name or alias which partially matches the input string
-   * @throws IOException
-   */
-  Collection<SampleIdentity> getIdentitiesByExternalNameOrAliasPartialMatch(String externalName) throws IOException;
-
-  /**
    * List all the identities associated with a given project which have at least one external name which exactly or partially matches the
    * input String or a comma-separated portion of the input String.
    * 
@@ -155,7 +144,7 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
    * @return List<Sample> set of Identities belonging to a given project which have an external name that matches the input string
    * @throws IOException
    */
-  Collection<SampleIdentity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId, boolean exactMatch)
+  Collection<SampleIdentity> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId, boolean exactMatch)
       throws IOException;
 
   /**

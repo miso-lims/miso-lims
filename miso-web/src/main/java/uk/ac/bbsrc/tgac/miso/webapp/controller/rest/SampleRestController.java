@@ -276,34 +276,6 @@ public class SampleRestController extends RestController {
     return getSample(id, b);
   }
 
-  /**
-   * 
-   * @param json
-   *          String externalNames or Identity aliases
-   * @param response
-   * @return
-   * @throws IOException
-   */
-  @RequestMapping(value = "/identities", method = RequestMethod.POST, headers = { "Content-type=application/json" })
-  @ResponseBody
-  public Set<SampleDto> getIdentityBySearch(@RequestBody com.fasterxml.jackson.databind.JsonNode json,
-      HttpServletResponse response) throws IOException {
-    final JsonNode searchTerms = json.get("identitiesSearches");
-    final String project = (json.get("project") == null ? "" : json.get("project").asText());
-    if (!searchTerms.isArray() || searchTerms.size() == 0) {
-      throw new RestException("Please provide external name or alias for identity lookup", Status.BAD_REQUEST);
-    }
-    return getSamplesForIdentityString(searchTerms.get(0).asText(), project, true);
-  }
-
-  /**
-   * Only returns identities which exactly match
-   * 
-   * @param json
-   * @param response
-   * @return
-   * @throws IOException
-   */
   @RequestMapping(value = "/identitiesLookup", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   public @ResponseBody List<Map<String, Set<SampleDto>>> getIdentitiesBySearch(@RequestParam boolean exactMatch,
       @RequestBody com.fasterxml.jackson.databind.JsonNode json,
@@ -331,11 +303,9 @@ public class SampleRestController extends RestController {
     Project selected = null;
     selected = projectService.getProjectByShortName(project);
     if (selected != null) {
-      matches = sampleService.getIdentitiesByExternalNameAndProject(identityIdentifier, selected.getId(), exactMatch);
-    } else if (exactMatch) {
-      matches = sampleService.getIdentitiesByExternalNameAndProject(identityIdentifier, null, exactMatch);
+      matches = sampleService.getIdentitiesByExternalNameOrAliasAndProject(identityIdentifier, selected.getId(), exactMatch);
     } else {
-      matches = sampleService.getIdentitiesByExternalNameOrAlias(identityIdentifier);
+      matches = sampleService.getIdentitiesByExternalNameOrAliasAndProject(identityIdentifier, null, exactMatch);
     }
     return matches.stream().map(identity -> Dtos.asDto(identity)).collect(Collectors.toSet());
   }

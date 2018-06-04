@@ -458,7 +458,8 @@ public class DefaultSampleServiceTest {
     id1.setExternalName("String1,String2");
     id1.setProject(project);
     idList.add(id1);
-    Mockito.when(sut.getIdentitiesByExternalNameOrAlias(Matchers.anyString())).thenReturn(idList);
+    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
+        .thenReturn(idList);
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
     sut.confirmExternalNameUniqueForProjectIfRequired("String3", newSample);
@@ -475,7 +476,7 @@ public class DefaultSampleServiceTest {
     id1.setExternalName("String1,String2");
     id1.setProject(project);
     idSet.add(id1);
-    Mockito.when(sut.getIdentitiesByExternalNameAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
+    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
         .thenReturn(idSet);
     sut.confirmExternalNameUniqueForProjectIfRequired("String1,String3", id1);
   }
@@ -491,7 +492,7 @@ public class DefaultSampleServiceTest {
     id1.setExternalName("String1,String2");
     id1.setProject(project);
     idSet.add(id1);
-    Mockito.when(sut.getIdentitiesByExternalNameAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
+    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
         .thenReturn(idSet);
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
@@ -510,7 +511,7 @@ public class DefaultSampleServiceTest {
     id1.setProject(project);
     idList.add(id1);
     sut.setUniqueExternalNameWithinProjectRequired(false);
-    Mockito.when(sut.getIdentitiesByExternalNameAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
+    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
         .thenReturn(idList);
     Sample newSample = new SampleImpl();
     newSample.setProject(project);

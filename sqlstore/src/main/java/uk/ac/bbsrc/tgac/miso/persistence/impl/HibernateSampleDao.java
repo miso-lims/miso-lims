@@ -248,33 +248,18 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public Collection<SampleIdentity> getIdentitiesByExternalNameOrAliasPartialMatch(String externalNames) throws IOException {
-    if (isStringEmptyOrNull(externalNames)) return Collections.emptySet();
-    @SuppressWarnings("unchecked")
-    List<SampleIdentity> records = (List<SampleIdentity>) SampleIdentityImpl.getSetFromString(externalNames)
-        .stream().map(extName -> {
-          String str = DbUtils.convertStringToSearchQuery(extName, false);
-          Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
-          criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
-          return criteria.list();
-        }).flatMap(list -> list.stream())
-        .collect(Collectors.toList());
-    return records;
-  }
-
-  @Override
-  public Collection<SampleIdentity> getIdentitiesByExternalNameAndProject(String externalNames, Long projectId, boolean exactMatch)
+  public Collection<SampleIdentity> getIdentitiesByExternalNameOrAliasAndProject(String query, Long projectId, boolean exactMatch)
       throws IOException {
-    if (isStringEmptyOrNull(externalNames)) return Collections.emptySet();
+    if (isStringEmptyOrNull(query)) return Collections.emptySet();
     @SuppressWarnings("unchecked")
-    Set<SampleIdentity> records = (Set<SampleIdentity>) SampleIdentityImpl.getSetFromString(externalNames)
-        .stream().map(extName -> {
-          String str = DbUtils.convertStringToSearchQuery(extName, false);
+    Set<SampleIdentity> records = (Set<SampleIdentity>) SampleIdentityImpl.getSetFromString(query)
+        .stream().map(extNameOrAlias -> {
+          String str = DbUtils.convertStringToSearchQuery(extNameOrAlias, false);
           Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
           if (projectId != null) {
             criteria.add(Restrictions.eq("project.id", projectId));
           }
-          criteria.add(Restrictions.ilike("externalName", str));
+          criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
           return criteria.list();
         }).flatMap(list -> list.stream())
         .distinct()
@@ -282,20 +267,21 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     
     // filter out those with a non-exact external name match
     if (exactMatch) {
-      return filterOnlyExactExternalNameMatches(records, externalNames);
+      return filterOnlyExactExternalNameMatches(records, query);
     } else {
       return records;
     }
   }
 
-  private Collection<SampleIdentity> filterOnlyExactExternalNameMatches(Collection<SampleIdentity> candidates, String externalNames) {
+  private Collection<SampleIdentity> filterOnlyExactExternalNameMatches(Collection<SampleIdentity> candidates,
+      String externalNamesOrAlias) {
     return candidates.stream().filter(sam -> {
-      Set<String> targets = SampleIdentityImpl.getSetFromString(externalNames).stream().map(String::toLowerCase)
+      Set<String> targets = SampleIdentityImpl.getSetFromString(externalNamesOrAlias).stream().map(String::toLowerCase)
           .collect(Collectors.toSet());
       Set<String> externalNamesOfCandidate = SampleIdentityImpl.getSetFromString(sam.getExternalName()).stream()
           .map(String::toLowerCase).collect(Collectors.toSet());
       targets.retainAll(externalNamesOfCandidate);
-      return !targets.isEmpty();
+      return !targets.isEmpty() || externalNamesOrAlias.equals(sam.getAlias());
     }).collect(Collectors.toSet());
   }
 

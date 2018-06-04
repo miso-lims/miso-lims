@@ -306,10 +306,12 @@ HotTarget.sample = (function() {
               return deferred.promise();
 
               function getIdentities() {
+                // we search by null project in case the user wants to choose an identity from another project
                 jQuery.ajax({
-                  url: "/miso/rest/sample/identities",
+                  url: "/miso/rest/sample/identitiesLookup?exactMatch=true",
                   data: JSON.stringify({
-                    "identitiesSearches": [flat.externalName]
+                    "identitiesSearches": [flat.externalName],
+                    "project": null
                   }),
                   contentType: "application/json; charset=utf8",
                   dataType: "json",
