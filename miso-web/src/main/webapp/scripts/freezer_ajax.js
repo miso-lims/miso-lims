@@ -226,10 +226,58 @@
   }
 
   function getLevelTwoNodeSelectFunction(node) {
-    return function() {
-      $('#levelTwoStorageContainer .selected').removeClass('selected');
-      node.addClass('selected');
-    };
+  	function assignBox(){
+  		Utils.showDialog('Search for Box to Assign', 'Search', [{
+        type: "text",
+        label: "Search",
+        property: "query",
+        value: ""
+      }, ], function(results){
+  			Utils.ajaxWithDialog('Searching for Boxes', 'GET', '/miso/rest/boxes/search/partial?' + jQuery.param({
+          q: results.query,
+          b: true
+        }), null, function(response) {
+  				Utils.showWizardDialog('Select Box to Assign', response.map(function(box){
+  					return{
+  						name: box.alias,
+  						handler: function(){
+  							// set box location to node.item
+  						}
+  					}
+  				}));
+  			})
+  		});
+  	}
+    switch (node.item.locationUnit) { 
+    case 'STACK_POSITION':
+    	return function() {
+    		assignBox();
+      	$('#levelTwoStorageContainer .selected').removeClass('selected');
+      	node.addClass('selected');
+    	};
+    	break;
+    case 'LOOSE_STORAGE':
+    	return function() {
+	    	var actions = node.item.boxes.map(function(box){
+	  			return {
+	  				name: "View " + box.alias,
+	  				handler: function(){
+	  					window.location = window.location.origin + '/miso/box/' + box.id;
+	  				}
+	  			};
+	  		});
+	    	actions.unshift({
+	  			name: "Add Box to Storage",
+	  			handler: assignBox
+	  		});
+    		Utils.showWizardDialog('Boxes in ' + node.item.displayLocation, actions);
+      	$('#levelTwoStorageContainer .selected').removeClass('selected');
+      	node.addClass('selected');
+    	};
+    	break;
+    default:
+    	throw 'Unexpected box location';
+    }
   }
 
   function displayRack(rack) {
@@ -254,7 +302,9 @@
       var cells = [];
       for (var col = 0; col < stackCount; col++) {
         var node = $('<td>').text(
-            rack.childLocations[col].displayLocation + ', ' + rack.childLocations[col].childLocations[row].displayLocation);
+            rack.childLocations[col].displayLocation + ', ' + rack.childLocations[col].childLocations[row].displayLocation + 
+            ' (' + (rack.childLocations[col].childLocations[row].boxes[0] ? rack.childLocations[col].childLocations[row].boxes[0].alias : 'empty') + ')');
+        node.item = rack.childLocations[col].childLocations[row];
         node.click(getLevelTwoNodeSelectFunction(node));
         cells.unshift(node);
       }
@@ -274,7 +324,8 @@
         throw 'Unexpected location unit';
       }
       var row = $('<tr>');
-      var cell = $('<td>').text(stackpos.displayLocation);
+      var cell = $('<td>').text(stackpos.displayLocation + ' (' + (stackpos.boxes[0] ? stackpos.boxes[0].alias : 'empty') + ')');
+      cell.item = stackpos;
       cell.click(getLevelTwoNodeSelectFunction(cell));
       row.append(cell);
       table.append(row);
@@ -284,7 +335,12 @@
   function displayLooseStorage(storage) {
     var table = $('#levelTwoStorageLayout');
     var row = $('<tr>');
-    var cell = $('<td>').text('(unorganised space)')
+    var cell = $('<td>');
+    for(box in storage.boxes){
+    	cell.append(document.createTextNode(storage.boxes[box].alias)).append('<br/>');
+    }
+    cell.append(document.createTextNode('(Unorganized Space)'));
+    cell.item = storage;
     cell.click(getLevelTwoNodeSelectFunction(cell));
     row.append(cell);
     table.append(row);

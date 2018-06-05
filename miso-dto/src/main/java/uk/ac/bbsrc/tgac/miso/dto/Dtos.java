@@ -2326,6 +2326,7 @@ public class Dtos {
           .map(child -> Dtos.asDto(child, recursive, recursive))
           .collect(Collectors.toList()));
     }
+    dto.setBoxes(from.getBoxes().stream().map(box -> asDto(box, true)).collect(Collectors.toSet()));
     return dto;
   }
 
