@@ -321,13 +321,15 @@ HotTarget.sample = (function() {
                       var potentialIdentities = [];
                       // sort with identities from selected project on top
                       var identitiesSources = [];
-                      if (data.length > 0) {
-                        data.sort(function(a, b) {
+                      var found = [];
+                      if (data[0] && data[0][flat.externalName] && data[0][flat.externalName].length > 0) {
+                        found = data[0][flat.externalName];
+                        found.sort(function(a, b) {
                           var aSortId = a.projectId == selectedProject.id ? 0 : a.projectId;
                           var bSortId = b.projectId == selectedProject.id ? 0 : b.projectId;
                           return aSortId - bSortId;
                         })
-                        potentialIdentities = data;
+                        potentialIdentities = found;
                         for (var i = 0; i < potentialIdentities.length; i++) {
                           var identityLabel = potentialIdentities[i].alias + " -- " + potentialIdentities[i].externalName;
                           potentialIdentities[i].label = identityLabel;
@@ -336,8 +338,8 @@ HotTarget.sample = (function() {
                       }
 
                       var indexOfMatchingIdentityInProject = -1;
-                      for (i = 0; i < data.length; i++) {
-                        if (data[i].projectId == selectedProject.id && data[i].externalName == flat.externalName) {
+                      for (i = 0; i < found.length; i++) {
+                        if (found[i].projectId == selectedProject.id && found[i].externalName == flat.externalName) {
                           indexOfMatchingIdentityInProject = i;
                           break;
                         }
