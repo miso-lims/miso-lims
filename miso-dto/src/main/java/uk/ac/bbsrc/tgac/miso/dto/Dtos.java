@@ -116,6 +116,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
@@ -1537,6 +1539,7 @@ public class Dtos {
 
   public static PoolOrderCompletionDto asDto(PoolOrderCompletion from) {
     PoolOrderCompletionDto dto = new PoolOrderCompletionDto();
+    dto.setId(from.getPool().getId() + "_" + from.getSequencingParameters().getId());
     dto.setPool(asDto(from.getPool(), false));
     dto.setParameters(asDto(from.getSequencingParameters()));
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
@@ -2292,5 +2295,52 @@ public class Dtos {
       dto.setInputTypes(prompt.getInputTypes());
     }
     return dto;
+  }
+
+  public static StorageLocationDto asDto(StorageLocation from, boolean includeChildLocations, boolean recursive) {
+    StorageLocationDto dto = new StorageLocationDto();
+    dto.setId(from.getId());
+    if (from.getParentLocation() != null) {
+      dto.setParentLocationId(from.getParentLocation().getId());
+    }
+    dto.setLocationUnit(from.getLocationUnit().name());
+    switch (from.getLocationUnit().getBoxStorageAmount()) {
+    case NONE:
+      dto.setAvailableStorage(false);
+      break;
+    case SINGLE:
+      dto.setAvailableStorage(from.getBoxes().isEmpty());
+      break;
+    case MULTIPLE:
+      dto.setAvailableStorage(true);
+      break;
+    default:
+      throw new IllegalStateException("Unexpected BoxStorageAmount");
+    }
+    dto.setAlias(from.getAlias());
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    dto.setDisplayLocation(from.getDisplayLocation());
+    dto.setFullDisplayLocation(from.getFullDisplayLocation());
+    if (includeChildLocations) {
+      dto.setChildLocations(from.getChildLocations().stream()
+          .map(child -> Dtos.asDto(child, recursive, recursive))
+          .collect(Collectors.toList()));
+    }
+    return dto;
+  }
+
+  public static StorageLocation to(StorageLocationDto from) {
+    StorageLocation location = new StorageLocation();
+    location.setId(from.getId());
+    location.setAlias(from.getAlias());
+    if (!LimsUtils.isStringEmptyOrNull(from.getIdentificationBarcode())) {
+      location.setIdentificationBarcode(from.getIdentificationBarcode());
+    }
+    if (from.getParentLocationId() != null) {
+      location.setParentLocation(new StorageLocation());
+      location.getParentLocation().setId(from.getParentLocationId());
+    }
+    location.setLocationUnit(LocationUnit.valueOf(from.getLocationUnit()));
+    return location;
   }
 }

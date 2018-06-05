@@ -255,7 +255,7 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   @Test
   public void testGetBoxColumnSizes() throws Exception {
     Map<String, Integer> boxColumnSizes = dao.getBoxColumnSizes();
-    assertEquals(13, boxColumnSizes.size());
+    assertEquals(14, boxColumnSizes.size());
   }
 
   @Test

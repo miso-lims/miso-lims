@@ -263,9 +263,20 @@ Box.ui = {
             }
           };
         })());
-        input.on('paste', (function(e) {
+        input.on('paste', (function() {
           var index = i;
           return function(e) {
+            for (var clipEvent = e; clipEvent.originalEvent && clipEvent.type == 'paste'; clipEvent = clipEvent.originalEvent);
+            var lines = clipEvent.clipboardData ? clipEvent.clipboardData.getData('Text').split(/\r?\n/) : [];
+            if (lines.length > 1) {
+              for (var next = 0; next < lines.length; next++) {
+                var inputBox = jQuery('#bulkUpdateTable tbody input:eq(' + next + ')');
+                inputBox.val(lines[next].replace(/^\s*|\s*$/g, ''));
+              }
+              jQuery('#bulkUpdateTable tbody input:eq(' + next + ')').focus();
+              e.preventDefault();
+              return;
+            }
             window.setTimeout(function() {
               jQuery('#bulkUpdateTable tbody input:eq(' + (index + 1) + ')').focus();
             }, 100);
@@ -687,4 +698,136 @@ Box.ui = {
     Box.visual.setDisabled(false);
     jQuery(focusSelector).focus();
   },
+
+  freezerLocations: [],
+  parentFreezerLocation: null,
+
+  resetLocationSearch: function() {
+    jQuery('#freezerLocationLoader').show();
+    jQuery('#freezerLocationScan').empty();
+    jQuery('#freezerLocationRoot').text('');
+    jQuery('#freezerLocationSelect').empty();
+    Utils.ui.setDisabled('#setFreezerLocation', true);
+    Utils.ui.setDisabled('#resetFreezerLocation', true);
+
+    jQuery.ajax({
+      url: '/miso/rest/storagelocations/freezers',
+      type: 'GET',
+      dataType: 'json',
+      contentType: 'application/json; charset=utf8'
+    }).success(function(data) {
+      Box.ui.setFreezerLocationOptions(data, null, true);
+    }).fail(function(response, textStatus, serverStatus) {
+      Utils.showOkDialog('Error', ['Freezer search failed']);
+    }).always(function() {
+      jQuery('#freezerLocationLoader').hide();
+      Utils.ui.setDisabled('#resetFreezerLocation', false);
+    });
+  },
+
+  setFreezerLocationOptions: function(locations, parentLocation, fullDisplay) {
+    Box.ui.freezerLocations = locations;
+    Box.ui.parentFreezerLocation = parentLocation;
+    jQuery('#freezerLocationSelect').empty();
+    jQuery('#freezerLocationSelect').append('<option value="-1">SELECT</option>');
+    var displayProperty = fullDisplay ? 'fullDisplayLocation' : 'displayLocation';
+    locations.sort(function(a, b) {
+      if (a[displayProperty] < b[displayProperty]) {
+        return -1;
+      }
+      if (a[displayProperty] > b[displayProperty]) {
+        return 1;
+      }
+      return 0;
+    });
+    locations.forEach(function(location) {
+      jQuery('#freezerLocationSelect').append(
+          '<option value="' + location.id + '">' + location[displayProperty] + (location.availableStorage ? ' *' : '') + '</option>');
+    });
+    jQuery('#freezerLocationSelect').val('-1');
+  },
+
+  getSelectedLocation: function() {
+    var locationId = jQuery('#freezerLocationSelect').val();
+    if (locationId == -1) {
+      if (!Box.ui.parentFreezerLocation) {
+        throw 'No location selected';
+      }
+      return Box.ui.parentFreezerLocation;
+    }
+    return Utils.array.findUniqueOrThrow(function(location) {
+      return location.id == locationId;
+    }, Box.ui.freezerLocations);
+  },
+
+  onLocationSelect: function() {
+    jQuery('#freezerLocationLoader').show();
+    jQuery('#freezerLocationScan').empty();
+    Utils.ui.setDisabled('#setFreezerLocation', true);
+    Utils.ui.setDisabled('#resetFreezerLocation', true);
+
+    var location = Box.ui.getSelectedLocation();
+
+    jQuery.ajax({
+      url: '/miso/rest/storagelocations/' + location.id + '/children',
+      type: 'GET',
+      dataType: 'json',
+      contentType: 'application/json; charset=utf8'
+    }).success(function(data) {
+      if (data.length) {
+        jQuery('#freezerLocationRoot').text(location.fullDisplayLocation + ' > ');
+        Box.ui.setFreezerLocationOptions(data, location, false);
+      }
+    }).fail(function(response, textStatus, serverStatus) {
+      Utils.showOkDialog('Error', ['Location search failed']);
+    }).always(function() {
+      jQuery('#freezerLocationLoader').hide();
+      Utils.ui.setDisabled('#resetFreezerLocation', false);
+      Utils.ui.setDisabled('#setFreezerLocation', !location.availableStorage);
+    });
+  },
+
+  onLocationScan: function() {
+    jQuery('#freezerLocationLoader').show();
+    Utils.ui.setDisabled('#setFreezerLocation', true);
+    Utils.ui.setDisabled('#resetFreezerLocation', true);
+
+    var barcode = jQuery('#freezerLocationScan').val();
+
+    jQuery.ajax({
+      url: '/miso/rest/storagelocations/bybarcode?' + jQuery.param({
+        q: barcode
+      }),
+      type: 'GET',
+      dataType: 'json',
+      contentType: 'application/json; charset=utf8'
+    }).success(
+        function(data) {
+          if (data.childLocations && data.childLocations.length) {
+            jQuery('#freezerLocationRoot').text(data.fullDisplayLocation + ' > ');
+            Box.ui.setFreezerLocationOptions(data.childLocations, data, false);
+          } else {
+            jQuery('#freezerLocationRoot').text('');
+            jQuery('#freezerLocationSelect').empty();
+            jQuery('#freezerLocationSelect').append(
+                '<option value="' + data.id + '">' + data.fullDisplayLocation + (data.availableStorage ? ' *' : '') + '</option>');
+            Box.ui.freezerLocations = [data];
+            Box.ui.parentFreezerLocation = null;
+          }
+          Utils.ui.setDisabled('#setFreezerLocation', !data.availableStorage);
+        }).fail(function(response, textStatus, serverStatus) {
+      Utils.showOkDialog('Error', ['No storage location found with barcode \'' + barcode + '\'']);
+    }).always(function() {
+      jQuery('#freezerLocationLoader').hide();
+      Utils.ui.setDisabled('#resetFreezerLocation', false);
+    });
+  },
+
+  setFreezerLocation: function() {
+    Utils.ui.setDisabled('#setFreezerLocation', true);
+    var location = Box.ui.getSelectedLocation();
+    jQuery('#storageLocation').val(location.id);
+    jQuery('#freezerLocation').text(location.fullDisplayLocation);
+    Box.ui.resetLocationSearch();
+  }
 };

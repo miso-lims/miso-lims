@@ -588,8 +588,9 @@ Sample.ui = {
                   jQuery
                       .ajax(
                           {
-                            url: "/miso/rest/sample/identities",
+                            url: "/miso/rest/sample/identitiesLookup?exactMatch=true",
                             data: "{\"identitiesSearches\":" + JSON.stringify([jQuery('#externalNameInput').val()])
+                                + ", \"project\": " + jQuery('#project').val()
                                 + ", \"requestCounter\":1}",
                             contentType: 'application/json; charset=utf8',
                             dataType: 'json',

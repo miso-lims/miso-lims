@@ -199,12 +199,19 @@ HotTarget.pool = (function() {
         }
       }, {
         name: "Create Orders",
+        excludeOnOrders: true,
         action: function(pools) {
           window.location = window.location.origin + '/miso/order/bulk/create?' + jQuery.param({
             ids: pools.map(Utils.array.getId).join(',')
           });
         }
-      }, HotUtils.printAction('pool')].concat(HotUtils.makeQcActions("Pool"));
+      },
+
+      HotUtils.printAction('pool'), HotUtils.spreadsheetAction('/miso/rest/pool/spreadsheet', Constants.poolSpreadsheets),
+      
+      HotUtils.makeParents('pool', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library(), HotUtils.relations.dilution()]))
+      
+      ].concat(HotUtils.makeQcActions("Pool"));
     },
 
     confirmSave: function(flatObjects, isCreate, config, table) {

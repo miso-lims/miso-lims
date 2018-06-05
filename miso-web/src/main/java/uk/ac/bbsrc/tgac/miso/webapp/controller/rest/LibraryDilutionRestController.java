@@ -3,7 +3,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,16 +39,19 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryDilutionSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
+import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
 @RequestMapping("/rest/librarydilution")
@@ -164,23 +169,29 @@ public class LibraryDilutionRestController extends RestController {
     return PaginationFilter.bulkSearch(names, dilutionService, Dtos::asDto, message -> new RestException(message, Status.BAD_REQUEST));
   }
 
-  private static Sample getSample(LibraryDilution dilution) {
-    return dilution.getLibrary().getSample();
+  @RequestMapping(value = "/spreadsheet", method = RequestMethod.GET)
+  @ResponseBody
+  public HttpEntity<byte[]> getSpreadsheet(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder) {
+    return MisoWebUtils.generateSpreadsheet(dilutionService::get, LibraryDilutionSpreadSheets::valueOf, request, response);
   }
-  private final ParentFinder<LibraryDilution> parentFinder = (new ParentFinder<LibraryDilution>() {
+
+  private static Stream<Sample> getSample(LibraryDilution dilution) {
+    return Stream.of(dilution.getLibrary().getSample());
+  }
+  private final RelationFinder<LibraryDilution> parentFinder = (new RelationFinder<LibraryDilution>() {
 
     @Override
     protected LibraryDilution fetch(long id) throws IOException {
       return dilutionService.get(id);
     }
   })//
-      .add(new ParentFinder.SampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, LibraryDilutionRestController::getSample))//
-      .add(new ParentFinder.SampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, LibraryDilutionRestController::getSample))//
-      .add(new ParentFinder.SampleAdapter<>(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class,
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, LibraryDilutionRestController::getSample))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, LibraryDilutionRestController::getSample))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class,
           LibraryDilutionRestController::getSample))//
-      .add(new ParentFinder.SampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class, LibraryDilutionRestController::getSample))//
-      .add(new ParentFinder.SampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class, LibraryDilutionRestController::getSample))//
-      .add(new ParentFinder.ParentAdapter<LibraryDilution, Sample, SampleDto>("Sample") {
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class, LibraryDilutionRestController::getSample))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class, LibraryDilutionRestController::getSample))//
+      .add(new RelationFinder.RelationAdapter<LibraryDilution, Sample, SampleDto>("Sample") {
 
         @Override
         public SampleDto asDto(Sample model) {
@@ -188,11 +199,11 @@ public class LibraryDilutionRestController extends RestController {
         }
 
         @Override
-        public Sample find(LibraryDilution model, Consumer<String> emitError) {
-          return model.getLibrary().getSample();
+        public Stream<Sample> find(LibraryDilution model, Consumer<String> emitError) {
+          return Stream.of(model.getLibrary().getSample());
         }
       })//
-      .add(new ParentFinder.ParentAdapter<LibraryDilution, Library, LibraryDto>("Library") {
+      .add(new RelationFinder.RelationAdapter<LibraryDilution, Library, LibraryDto>("Library") {
 
         @Override
         public LibraryDto asDto(Library model) {
@@ -200,8 +211,8 @@ public class LibraryDilutionRestController extends RestController {
         }
 
         @Override
-        public Library find(LibraryDilution model, Consumer<String> emitError) {
-          return model.getLibrary();
+        public Stream<Library> find(LibraryDilution model, Consumer<String> emitError) {
+          return Stream.of(model.getLibrary());
         }
       });
 
@@ -210,6 +221,38 @@ public class LibraryDilutionRestController extends RestController {
   public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
     return parentFinder.list(ids, category);
+  }
+
+  private final RelationFinder<LibraryDilution> childFinder = (new RelationFinder<LibraryDilution>() {
+
+    @Override
+    protected LibraryDilution fetch(long id) throws IOException {
+      return dilutionService.get(id);
+    }
+  })//
+      .add(new RelationFinder.RelationAdapter<LibraryDilution, Pool, PoolDto>("Pool") {
+
+        @Override
+        public PoolDto asDto(Pool model) {
+          return Dtos.asDto(model, false);
+        }
+
+        @Override
+        public Stream<Pool> find(LibraryDilution model, Consumer<String> emitError) {
+          Set<Pool> children = model.getPools();
+          if (children.isEmpty()) {
+            emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
+            return Stream.empty();
+          }
+          return children.stream();
+        }
+      });
+
+  @RequestMapping(value = "/children/{category}", method = RequestMethod.POST)
+  @ResponseBody
+  public HttpEntity<byte[]> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
+    return childFinder.list(ids, category);
   }
 
   @RequestMapping(value = "/bulk-delete", method = RequestMethod.POST)

@@ -51,8 +51,10 @@
       <label>Project<br/>
         <input id="projectAlias" style="width:inherit;"/>
       </label>
-      <button class="ui-button ui-state-default" onclick="IdentitySearch.lookup();"
-        style="width:100%; margin-top:6px; margin-bottom:6px;">Search</button><br/>
+      <button class="ui-button ui-state-default" onclick="IdentitySearch.lookup(true);"
+        style="width:100%; margin-top:6px; margin-bottom:6px;">Search for Exact Match</button><br/>
+      <button class="ui-button ui-state-default" onclick="IdentitySearch.lookup(false);"
+        style="width:100%; margin-top:6px; margin-bottom:6px;">Search for Partial Match</button><br/>
       <button class="ui-button ui-state-default" onclick="IdentitySearch.clearForm();" style="width:100%;">Clear</button>
     </div>
     <div style="display:table-cell;">

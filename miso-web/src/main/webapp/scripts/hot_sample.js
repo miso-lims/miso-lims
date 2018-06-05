@@ -306,10 +306,12 @@ HotTarget.sample = (function() {
               return deferred.promise();
 
               function getIdentities() {
+                // we search by null project in case the user wants to choose an identity from another project
                 jQuery.ajax({
-                  url: "/miso/rest/sample/identities",
+                  url: "/miso/rest/sample/identitiesLookup?exactMatch=true",
                   data: JSON.stringify({
-                    "identitiesSearches": [flat.externalName]
+                    "identitiesSearches": [flat.externalName],
+                    "project": null
                   }),
                   contentType: "application/json; charset=utf8",
                   dataType: "json",
@@ -319,13 +321,15 @@ HotTarget.sample = (function() {
                       var potentialIdentities = [];
                       // sort with identities from selected project on top
                       var identitiesSources = [];
-                      if (data.length > 0) {
-                        data.sort(function(a, b) {
+                      var found = [];
+                      if (data[0] && data[0][flat.externalName] && data[0][flat.externalName].length > 0) {
+                        found = data[0][flat.externalName];
+                        found.sort(function(a, b) {
                           var aSortId = a.projectId == selectedProject.id ? 0 : a.projectId;
                           var bSortId = b.projectId == selectedProject.id ? 0 : b.projectId;
                           return aSortId - bSortId;
                         })
-                        potentialIdentities = data;
+                        potentialIdentities = found;
                         for (var i = 0; i < potentialIdentities.length; i++) {
                           var identityLabel = potentialIdentities[i].alias + " -- " + potentialIdentities[i].externalName;
                           potentialIdentities[i].label = identityLabel;
@@ -334,8 +338,8 @@ HotTarget.sample = (function() {
                       }
 
                       var indexOfMatchingIdentityInProject = -1;
-                      for (i = 0; i < data.length; i++) {
-                        if (data[i].projectId == selectedProject.id && data[i].externalName == flat.externalName) {
+                      for (i = 0; i < found.length; i++) {
+                        if (found[i].projectId == selectedProject.id && found[i].externalName == flat.externalName) {
                           indexOfMatchingIdentityInProject = i;
                           break;
                         }
@@ -399,10 +403,18 @@ HotTarget.sample = (function() {
           HotUtils.makeColumnForText('Group Desc.', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupDescription', {}),
 
           // Tissue columns
-          HotUtils.makeColumnForConstantsList('Tissue Origin', show['Tissue'], 'tissueOriginAlias', 'tissueOriginId', 'id', 'label',
-              Constants.tissueOrigins, true),
-          HotUtils.makeColumnForConstantsList('Tissue Type', show['Tissue'], 'tissueTypeAlias', 'tissueTypeId', 'id', 'label',
-              Constants.tissueTypes, true),
+          HotUtils.makeAutocompleteColumnForConstantsList('Tissue Origin', show['Tissue'], 'tissueOriginAlias', 'tissueOriginId', 'id', 'label',
+              Constants.tissueOrigins, true, function(item, value) {
+      					return item.alias.toLowerCase() == value.toLowerCase() || item.description.toLowerCase() == value.toLowerCase();
+      				}, function(item){
+      					return item.label;
+      				}),
+          HotUtils.makeAutocompleteColumnForConstantsList('Tissue Type', show['Tissue'], 'tissueTypeAlias', 'tissueTypeId', 'id', 'label',
+              Constants.tissueTypes, true, function(item, value) {
+      					return item.alias.toLowerCase() == value.toLowerCase() || item.description.toLowerCase() == value.toLowerCase();
+      				}, function(item){
+      					return item.label;
+      				}),
           HotUtils.makeColumnForInt('Passage #', show['Tissue'], 'passageNumber', null),
           HotUtils.makeColumnForInt('Times Received', show['Tissue'], 'timesReceived', HotUtils.validator.requiredPositiveInt),
           HotUtils.makeColumnForInt('Tube Number', show['Tissue'], 'tubeNumber', HotUtils.validator.requiredPositiveInt),
@@ -630,7 +642,6 @@ HotTarget.sample = (function() {
                   });
                 }
               };
-
             });
             if (!Constants.isDetailedSample || classes.every(function(sampleClass) {
               return sampleClass.sampleCategory == "Aliquot";
@@ -674,8 +685,11 @@ HotTarget.sample = (function() {
           });
         }
       }, HotUtils.printAction('sample'), HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets),
-          Constants.isDetailedSample ? HotUtils.makeParents('sample', HotUtils.parentCategoriesForDetailed()) : null, ].concat(HotUtils
-          .makeQcActions("Sample"));
+          
+          Constants.isDetailedSample ? HotUtils.makeParents('sample', HotUtils.relationCategoriesForDetailed()) : null,
+          		
+          HotUtils.makeChildren('sample', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library(), HotUtils.relations.dilution(), HotUtils.relations.pool()]))
+          ].concat(HotUtils.makeQcActions("Sample"));
     },
 
     getCustomActions: function(table) {

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
@@ -192,6 +193,10 @@ public interface Box extends SecurableByProfile, Barcodable, Locatable, ChangeLo
 
   @Override
   public void setLocationBarcode(String barcode);
+
+  public StorageLocation getStorageLocation();
+
+  public void setStorageLocation(StorageLocation storageLocation);
 
   /**
    * Returns the change logs of this Box object.

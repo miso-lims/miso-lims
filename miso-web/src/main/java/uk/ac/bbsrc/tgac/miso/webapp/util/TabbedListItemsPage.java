@@ -15,12 +15,14 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 
 public class TabbedListItemsPage {
@@ -91,6 +93,24 @@ public class TabbedListItemsPage {
     model.put("property", property);
     model.put("tabs", tabs);
     return new ModelAndView("/pages/listTabbed.jsp", model);
+  }
+
+  public <V> ModelAndView list(Function<String, Stream<V>> getter, ModelMap model) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode config = mapper.createObjectNode();
+    writeConfiguration(mapper, config);
+    model.put("config", mapper.writeValueAsString(config));
+    model.put("targetType", "ListTarget." + targetType);
+    model.put("projectId", null);
+    model.put("property", property);
+    model.put("tabs", tabs);
+
+    model.put("data", tabs.keySet().stream().collect(Collectors.toMap(Function.identity(), WhineyFunction.rethrow(key -> {
+      ArrayNode array = mapper.createArrayNode();
+      getter.apply(key).forEach(array::addPOJO);
+      return mapper.writeValueAsString(array);
+    }))));
+    return new ModelAndView("/pages/listTabbedStatic.jsp", model);
   }
 
   public final ModelAndView listByProject(long project, ModelMap model) throws IOException {

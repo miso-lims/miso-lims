@@ -458,7 +458,8 @@ public class DefaultSampleServiceTest {
     id1.setExternalName("String1,String2");
     id1.setProject(project);
     idList.add(id1);
-    Mockito.when(sut.getIdentitiesByExternalNameOrAlias(Matchers.anyString())).thenReturn(idList);
+    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
+        .thenReturn(idList);
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
     sut.confirmExternalNameUniqueForProjectIfRequired("String3", newSample);
@@ -471,10 +472,28 @@ public class DefaultSampleServiceTest {
     project.setReferenceGenome(humanReferenceGenome());
     Set<SampleIdentity> idSet = new HashSet<>();
     SampleIdentity id1 = new SampleIdentityImpl();
+    id1.setId(1L);
     id1.setExternalName("String1,String2");
     id1.setProject(project);
     idSet.add(id1);
-    Mockito.when(sut.getIdentitiesByExactExternalNameAndProject(Matchers.anyString(), Matchers.anyLong())).thenReturn(idSet);
+    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
+        .thenReturn(idSet);
+    sut.confirmExternalNameUniqueForProjectIfRequired("String1,String3", id1);
+  }
+
+  @Test
+  public void testCanEditExternalNameTest() throws IOException {
+    Project project = new ProjectImpl();
+    project.setId(1L);
+    project.setReferenceGenome(humanReferenceGenome());
+    Set<SampleIdentity> idSet = new HashSet<>();
+    SampleIdentity id1 = new SampleIdentityImpl();
+    id1.setId(1L);
+    id1.setExternalName("String1,String2");
+    id1.setProject(project);
+    idSet.add(id1);
+    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
+        .thenReturn(idSet);
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
     exception.expect(ConstraintViolationException.class);
@@ -492,7 +511,8 @@ public class DefaultSampleServiceTest {
     id1.setProject(project);
     idList.add(id1);
     sut.setUniqueExternalNameWithinProjectRequired(false);
-    Mockito.when(sut.getIdentitiesByExternalNameOrAlias(Matchers.anyString())).thenReturn(idList);
+    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
+        .thenReturn(idList);
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
     sut.confirmExternalNameUniqueForProjectIfRequired("String1", newSample);

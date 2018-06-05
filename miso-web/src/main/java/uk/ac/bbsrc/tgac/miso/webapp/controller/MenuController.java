@@ -65,6 +65,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryDilutionSpreadSheets;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
@@ -345,6 +348,9 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "referenceGenomes", referenceGenomeService.listAllReferenceGenomeTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "spreadsheetFormats", Arrays.asList(SpreadSheetFormat.values()), Dtos::asDto);
     createArray(mapper, baseUri, node, "sampleSpreadsheets", Arrays.asList(SampleSpreadSheets.values()), Dtos::asDto);
+    createArray(mapper, baseUri, node, "librarySpreadsheets", Arrays.asList(LibrarySpreadSheets.values()), Dtos::asDto);
+    createArray(mapper, baseUri, node, "libraryDilutionSpreadsheets", Arrays.asList(LibraryDilutionSpreadSheets.values()), Dtos::asDto);
+    createArray(mapper, baseUri, node, "poolSpreadsheets", Arrays.asList(PoolSpreadSheets.values()), Dtos::asDto);
     createArray(mapper, baseUri, node, "workflows", Arrays.asList(WorkflowName.values()), Dtos::asDto);
 
     ArrayNode platformTypes = node.putArray("platformTypes");

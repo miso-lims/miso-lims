@@ -31,7 +31,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,6 +51,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -58,6 +61,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -66,13 +72,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
+import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
+import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleLCMTubeDto;
@@ -267,36 +276,9 @@ public class SampleRestController extends RestController {
     return getSample(id, b);
   }
 
-  /**
-   * 
-   * @param json
-   *          String externalNames or Identity aliases
-   * @param response
-   * @return
-   * @throws IOException
-   */
-  @RequestMapping(value = "/identities", method = RequestMethod.POST, headers = { "Content-type=application/json" })
-  @ResponseBody
-  public Set<SampleDto> getIdentityBySearch(@RequestBody com.fasterxml.jackson.databind.JsonNode json,
-      HttpServletResponse response) throws IOException {
-    final JsonNode searchTerms = json.get("identitiesSearches");
-    final String project = (json.get("project") == null ? "" : json.get("project").asText());
-    if (!searchTerms.isArray() || searchTerms.size() == 0) {
-      throw new RestException("Please provide external name or alias for identity lookup", Status.BAD_REQUEST);
-    }
-    return getSamplesForIdentityString(searchTerms.get(0).asText(), project, true);
-  }
-
-  /**
-   * Only returns identities which exactly match
-   * 
-   * @param json
-   * @param response
-   * @return
-   * @throws IOException
-   */
   @RequestMapping(value = "/identitiesLookup", method = RequestMethod.POST, headers = { "Content-type=application/json" })
-  public @ResponseBody List<Map<String, Set<SampleDto>>> getIdentitiesBySearch(@RequestBody com.fasterxml.jackson.databind.JsonNode json,
+  public @ResponseBody List<Map<String, Set<SampleDto>>> getIdentitiesBySearch(@RequestParam boolean exactMatch,
+      @RequestBody com.fasterxml.jackson.databind.JsonNode json,
       HttpServletResponse response) throws IOException {
     final JsonNode searchTerms = json.get("identitiesSearches");
     final String project = (json.get("project") == null ? "" : json.get("project").asText());
@@ -305,7 +287,7 @@ public class SampleRestController extends RestController {
     }
     List<Map<String, Set<SampleDto>>> identitiesBySearchTerm = new ArrayList<>();
     for (JsonNode term : searchTerms) {
-      Set<SampleDto> uniqueIdentities = getSamplesForIdentityString(term.asText(), project, false);
+      Set<SampleDto> uniqueIdentities = getSamplesForIdentityString(term.asText(), project, exactMatch);
       if (uniqueIdentities.size() > 0) {
         Map<String, Set<SampleDto>> found = new HashMap<>();
         found.put(term.asText(), uniqueIdentities);
@@ -315,17 +297,15 @@ public class SampleRestController extends RestController {
     return identitiesBySearchTerm;
   }
 
-  private Set<SampleDto> getSamplesForIdentityString(String identityIdentifier, String project, boolean permitPartialMatch)
+  private Set<SampleDto> getSamplesForIdentityString(String identityIdentifier, String project, boolean exactMatch)
       throws IOException {
     Collection<SampleIdentity> matches = new HashSet<>();
     Project selected = null;
-    if (!LimsUtils.isStringEmptyOrNull(project)) selected = projectService.getProjectByShortName(project);
+    selected = projectService.getProjectByShortName(project);
     if (selected != null) {
-      matches = sampleService.getIdentitiesByExactExternalNameAndProject(identityIdentifier, selected.getId());
-    } else if (permitPartialMatch) {
-      matches = sampleService.getIdentitiesByExternalNameOrAlias(identityIdentifier);
+      matches = sampleService.getIdentitiesByExternalNameOrAliasAndProject(identityIdentifier, selected.getId(), exactMatch);
     } else {
-      matches = sampleService.getIdentitiesByExactExternalName(identityIdentifier);
+      matches = sampleService.getIdentitiesByExternalNameOrAliasAndProject(identityIdentifier, null, exactMatch);
     }
     return matches.stream().map(identity -> Dtos.asDto(identity)).collect(Collectors.toSet());
   }
@@ -343,24 +323,102 @@ public class SampleRestController extends RestController {
     return MisoWebUtils.generateSpreadsheet(sampleService::get, SampleSpreadSheets::valueOf, request, response);
   }
 
-  private final ParentFinder<Sample> parentFinder = (new ParentFinder<Sample>() {
+  private final RelationFinder<Sample> parentFinder = (new RelationFinder<Sample>() {
 
     @Override
     protected Sample fetch(long id) throws IOException {
       return sampleService.get(id);
     }
   })//
-      .add(ParentFinder.parent(SampleIdentity.CATEGORY_NAME, SampleIdentity.class))//
-      .add(ParentFinder.parent(SampleTissue.CATEGORY_NAME, SampleTissue.class))//
-      .add(ParentFinder.parent(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class))//
-      .add(ParentFinder.parent(SampleStock.CATEGORY_NAME, SampleStock.class))//
-      .add(ParentFinder.parent(SampleAliquot.CATEGORY_NAME, SampleAliquot.class));
+      .add(RelationFinder.parent(SampleIdentity.CATEGORY_NAME, SampleIdentity.class))//
+      .add(RelationFinder.parent(SampleTissue.CATEGORY_NAME, SampleTissue.class))//
+      .add(RelationFinder.parent(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class))//
+      .add(RelationFinder.parent(SampleStock.CATEGORY_NAME, SampleStock.class))//
+      .add(RelationFinder.parent(SampleAliquot.CATEGORY_NAME, SampleAliquot.class));
 
   @RequestMapping(value = "/parents/{category}", method = RequestMethod.POST)
   @ResponseBody
   public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
     return parentFinder.list(ids, category);
+  }
+
+  private final RelationFinder<Sample> childFinder = (new RelationFinder<Sample>() {
+
+    @Override
+    protected Sample fetch(long id) throws IOException {
+      return sampleService.get(id);
+    }
+  })
+      .add(RelationFinder.child(SampleIdentity.CATEGORY_NAME, SampleIdentity.class))//
+      .add(RelationFinder.child(SampleTissue.CATEGORY_NAME, SampleTissue.class))//
+      .add(RelationFinder.child(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class))//
+      .add(RelationFinder.child(SampleStock.CATEGORY_NAME, SampleStock.class))//
+      .add(RelationFinder.child(SampleAliquot.CATEGORY_NAME, SampleAliquot.class))
+      
+      .add(new RelationFinder.RelationAdapter<Sample, Library, LibraryDto>("Library") {
+
+        @Override
+        public LibraryDto asDto(Library model) {
+          return Dtos.asDto(model);
+        }
+
+        @Override
+        public Stream<Library> find(Sample model, Consumer<String> emitError) {
+          Set<Library> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model)
+              .collect(Collectors.toSet());
+          if (children.isEmpty()) {
+            emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
+            return Stream.empty();
+          }
+          return children.stream();
+        }
+      })
+
+      .add(new RelationFinder.RelationAdapter<Sample, LibraryDilution, DilutionDto>("Dilution") {
+
+        @Override
+        public DilutionDto asDto(LibraryDilution model) {
+          return Dtos.asDto(model);
+        }
+
+        @Override
+        public Stream<LibraryDilution> find(Sample model, Consumer<String> emitError) {
+          Set<LibraryDilution> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model)
+              .flatMap(library -> library.getLibraryDilutions().stream()).collect(Collectors.toSet());
+          if (children.isEmpty()) {
+            emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
+            return Stream.empty();
+          }
+          return children.stream();
+        }
+      })
+
+      .add(new RelationFinder.RelationAdapter<Sample, Pool, PoolDto>("Pool") {
+
+        @Override
+        public PoolDto asDto(Pool model) {
+          return Dtos.asDto(model, false);
+        }
+
+        @Override
+        public Stream<Pool> find(Sample model, Consumer<String> emitError) {
+          Set<Pool> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model)
+              .flatMap(library -> library.getLibraryDilutions().stream().flatMap(dilution -> dilution.getPools().stream()))
+              .collect(Collectors.toSet());
+          if (children.isEmpty()) {
+            emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
+            return Stream.empty();
+          }
+          return children.stream();
+        }
+      });
+
+  @RequestMapping(value = "/children/{category}", method = RequestMethod.POST)
+  @ResponseBody
+  public HttpEntity<byte[]> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
+    return childFinder.list(ids, category);
   }
 
   @RequestMapping(value = "/bulk-delete", method = RequestMethod.POST)

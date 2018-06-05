@@ -65,7 +65,8 @@ HotTarget.qc = function(qcTarget) {
       }, {
         header: 'Result',
         data: 'results',
-        type: 'numeric',
+        type: 'text',
+        validator: HotUtils.validator.requiredNumber,
         include: true,
         depends: 'typeName',
         update: function(qc, flat, flatProperty, value, setReadOnly, setOptions, setData) {
@@ -85,8 +86,7 @@ HotTarget.qc = function(qcTarget) {
             setData(false);
           } else {
             setOptions({
-              type: 'numeric',
-              format: '0.' + '0'.repeat(qcType.precisionAfterDecimal)
+              type: 'text',
             });
             setData(0);
           }
