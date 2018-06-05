@@ -182,8 +182,8 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   }
 
   @Override
-  public List<Box> getByPartialSearch(String search) {
-    return boxStore.getByPartialSearch(search);
+  public List<Box> getByPartialSearch(String search, boolean onlyMatchBeginning) {
+    return boxStore.getByPartialSearch(search, onlyMatchBeginning);
   }
 
   @Override
