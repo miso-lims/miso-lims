@@ -1,3 +1,5 @@
+-- freezers
+
 CREATE TABLE StorageLocation (
   locationId bigint(20) NOT NULL AUTO_INCREMENT,
   parentLocationId bigint(20),
@@ -12,3 +14,17 @@ CREATE TABLE StorageLocation (
 
 ALTER TABLE Box ADD COLUMN locationId bigint(20);
 ALTER TABLE Box ADD CONSTRAINT fk_box_location FOREIGN KEY (locationId) REFERENCES StorageLocation (locationId);
+
+
+-- qc
+
+ALTER TABLE ContainerQC ADD created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE ContainerQC ADD lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE LibraryQC ADD created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE LibraryQC ADD lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE PoolQC ADD created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE PoolQC ADD lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE SampleQC ADD created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE SampleQC ADD lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+

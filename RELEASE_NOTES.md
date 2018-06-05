@@ -1,3 +1,22 @@
+# 0.2.124
+
+Changes:
+
+ * DetailedSample: Add identity search partial match and fix exact match by project bug
+ * Add Autocomplete on Paste to Bulk Index Columns
+ * Change QCs to have created/updated timestamps
+ * Fix bugs in pool orders
+ * Add pool spreadsheet
+ * Add spreadsheets for libraries and dilutions with external name
+ * Add Autocomplete to Tissue Origin and Tissue Type Columns
+ * Add find children
+ * Add Find Parents To Pools Table
+ * Add list freezers and rooms page
+ * Allow variable number of decimal places in QCs
+ * Add Freezer tracking
+ * Allow skipping to the next box when pasting into box update
+ * Add actions for pools onto list orders pages
+
 # 0.2.123
 
 Changes:
@@ -10,6 +29,9 @@ Changes:
  * Allow bulk creating orders with different parameters
  * Add partition table to pool page
  * Allow deleting boxes
+
+Bad:
+ * Introduced bug that broke creating pool Orders
 
 # 0.2.122
 
