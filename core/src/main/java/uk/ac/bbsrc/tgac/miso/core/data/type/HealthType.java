@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -81,7 +81,9 @@ public enum HealthType {
   public static ArrayList<String> getKeys() {
     ArrayList<String> keys = new ArrayList<>();
     for (HealthType h : HealthType.values()) {
-      keys.add(h.getKey());
+      if (h != Requested) {
+        keys.add(h.getKey());
+      }
     }
     return keys;
   }
