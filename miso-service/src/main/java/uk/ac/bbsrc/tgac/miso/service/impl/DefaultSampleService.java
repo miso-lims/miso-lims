@@ -388,8 +388,8 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   public void confirmExternalNameUniqueForProjectIfRequired(String newExternalName, Sample sample)
       throws IOException, ConstraintViolationException {
     if (!isUniqueExternalNameWithinProjectRequired()) return;
-    Collection<SampleIdentity> matches = getIdentitiesByExactExternalNameAndProject(newExternalName,
-        sample.getProject().getId());
+    Collection<SampleIdentity> matches = getIdentitiesByExternalNameOrAliasAndProject(newExternalName,
+        sample.getProject().getId(), true);
     if (!matches.isEmpty()) {
       for (SampleIdentity match : matches) {
         if (match.getId() != sample.getId()) {
@@ -484,8 +484,8 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     } else {
       // If samples are being bulk received for the same new donor, they will all have a null parentId.
       // After the new donor's Identity is created, the following samples need to be parented to that now-existing Identity.
-      Collection<SampleIdentity> newlyCreated = getIdentitiesByExactExternalNameAndProject(identity.getExternalName(),
-          descendant.getProject().getId());
+      Collection<SampleIdentity> newlyCreated = getIdentitiesByExternalNameOrAliasAndProject(identity.getExternalName(),
+          descendant.getProject().getId(), true);
       if (newlyCreated.size() > 1) {
         throw new IllegalArgumentException(
             "IdentityId is required since there are multiple identities with external name "
@@ -739,7 +739,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
    */
   private boolean isExternalNameDuplicatedInProject(Sample sample) throws IOException {
     SampleIdentity identity = (SampleIdentity) sample;
-    return getIdentitiesByExactExternalNameAndProject(identity.getExternalName(), identity.getProject().getId()).size() > 0;
+    return getIdentitiesByExternalNameOrAliasAndProject(identity.getExternalName(), identity.getProject().getId(), true).size() > 0;
   }
 
   @Override
@@ -776,20 +776,9 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
-  public Collection<SampleIdentity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException {
-    return sampleStore.getIdentitiesByExternalNameOrAliasPartialMatch(externalName);
-  }
-
-  @Override
-  @Transactional(propagation = Propagation.REQUIRED)
-  public Collection<SampleIdentity> getIdentitiesByExactExternalName(String externalName) throws IOException {
-    return sampleStore.getIdentitiesByExactExternalName(externalName);
-  }
-
-  @Override
-  @Transactional(propagation = Propagation.REQUIRED)
-  public Collection<SampleIdentity> getIdentitiesByExactExternalNameAndProject(String externalName, Long projectId) throws IOException {
-    return sampleStore.getIdentitiesByExactExternalNameAndProject(externalName, projectId);
+  public Collection<SampleIdentity> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId, boolean exactMatch)
+      throws IOException {
+    return sampleStore.getIdentitiesByExternalNameOrAliasAndProject(externalName, projectId, exactMatch);
   }
 
   @Override

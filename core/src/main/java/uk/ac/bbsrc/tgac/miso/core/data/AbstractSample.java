@@ -448,6 +448,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     return new EqualsBuilder()
         .appendSuper(super.equals(obj))
         .append(accession, other.accession)
+        .append(getAlias(), other.getAlias())
         .append(description, other.description)
         .append(identificationBarcode, other.identificationBarcode)
         .append(locationBarcode, other.locationBarcode)

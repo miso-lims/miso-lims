@@ -135,38 +135,17 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
   Long countAll() throws IOException;
 
   /**
-   * List all the identities which have an alias or at least one external name which (partially) matches the input String or a
-   * comma-separated portion of the input String.
-   * 
-   * @param externalName
-   *          a single external name/alias string
-   * @return Collection<Identity> set of Identities which have an external name or alias which partially matches the input string
-   * @throws IOException
-   */
-  Collection<SampleIdentity> getIdentitiesByExternalNameOrAliasPartialMatch(String externalName) throws IOException;
-
-  /**
-   * List all the identities which have at least one external name which exactly matches the input String or a comma-separated portion of
-   * the input String.
-   * 
-   * @param externalName
-   *          a single external name string
-   * @return Collection<Identity> set of Identities which have an external name with a (comma-separated) segment that partially matches the
-   *         input string
-   * @throws IOException
-   */
-  Collection<SampleIdentity> getIdentitiesByExactExternalName(String externalName) throws IOException;
-
-  /**
-   * List all the identities associated with a given project which have at least one external name which exactly matches the input String or
-   * a comma-separated portion of the input String.
+   * List all the identities associated with a given project which have at least one external name which exactly or partially matches the
+   * input String or a comma-separated portion of the input String.
    * 
    * @param externalName a single external name String
    * @param projectId Long
+   * @param boolean exactMatch
    * @return List<Sample> set of Identities belonging to a given project which have an external name that matches the input string
    * @throws IOException
    */
-  Collection<SampleIdentity> getIdentitiesByExactExternalNameAndProject(String externalName, Long projectId) throws IOException;
+  Collection<SampleIdentity> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId, boolean exactMatch)
+      throws IOException;
 
   /**
    * Find a ghost Tissue with Identity, Tissue Origin, Tissue Type, times received, tube number, and passage number matching the provided
