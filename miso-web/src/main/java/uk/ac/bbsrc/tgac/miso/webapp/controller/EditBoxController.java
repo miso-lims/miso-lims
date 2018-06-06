@@ -145,6 +145,16 @@ public class EditBoxController {
       ObjectMapper mapper = new ObjectMapper();
       model.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(box, true)));
 
+      // add FreezerUrl
+      if (box.getStorageLocation() != null) {
+        StorageLocation freezer = box.getStorageLocation().getFreezerLocation();
+        if (freezer != null) {
+          model.put("freezerURL", "../freezer/" + freezer.getId());
+        } else {
+          model.put("freezerURL", "javascript:void(0)");
+        }
+      }
+
       return new ModelAndView("/pages/editBox.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {

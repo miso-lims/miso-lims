@@ -85,6 +85,7 @@ public interface AbstractListPage {
     public static final String GROUP_NAME = "Group Name";
     public static final String AVG_INSERT_SIZE = "Average Insert Size";
     public static final String SEQ_PARAMS = "Seq. Params.";
+    public static final String STORAGE_LOCATION = "Storage Location";
   }
 
   public static class ListTarget {
