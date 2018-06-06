@@ -106,7 +106,7 @@ jQuery(document).ready(function() {
 
 <c:if test="${!empty freezerJson}">
   <h1>Layout</h1>
-  <div id="layoutSection">
+  <div id="layoutSection" style="overflow:auto">
   
     <div id="freezerLayoutContainer" class="storageComponentContainer unselectable">
       <span class="storageComponentLabel">Freezer</span>
@@ -128,6 +128,8 @@ jQuery(document).ready(function() {
   });
   </script>
 </c:if>
+
+<miso:list-section id="list_box" name="Boxes" target="box" items="${boxes}" config="{'showFreezerLocation':true, 'boxUse':false, 'showStorageLocation':false}"/>
 
 </div>
 </div>

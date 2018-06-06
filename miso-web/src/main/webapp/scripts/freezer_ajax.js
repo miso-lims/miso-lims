@@ -226,57 +226,58 @@
   }
 
   function getLevelTwoNodeSelectFunction(node) {
-  	function assignBox(){
-  		Utils.showDialog('Search for Box to Assign', 'Search', [{
-        type: "text",
-        label: "Search",
-        property: "query",
-        value: ""
-      }, ], function(results){
-  			Utils.ajaxWithDialog('Searching for Boxes', 'GET', '/miso/rest/boxes/search/partial?' + jQuery.param({
-          q: results.query,
-          b: true
-        }), null, function(response) {
-  				Utils.showWizardDialog('Select Box to Assign', response.map(function(box){
-  					return{
-  						name: box.alias,
-  						handler: function(){
-  							// set box location to node.item
-  						}
-  					}
-  				}));
-  			})
-  		});
-  	}
-    switch (node.item.locationUnit) { 
+    function assignBox() {
+      Utils.showDialog('Search for Box to Assign', 'Search', [ {
+        type : "text",
+        label : "Search",
+        property : "query",
+        value : ""
+      }, ], function(results) {
+        Utils.ajaxWithDialog('Searching for Boxes', 'GET', '/miso/rest/boxes/search/partial?' + jQuery.param({
+          q : results.query,
+          b : true
+          }), null, function(response) {
+          Utils.showWizardDialog('Select Box to Assign', response.map(function(box) {
+            return {
+              name : box.alias,
+              handler : function() {
+                // set box location to node.item
+                }
+            }
+            }));
+          })
+      });
+    }
+    switch (node.item.locationUnit) {
     case 'STACK_POSITION':
-    	return function() {
-    		assignBox();
-      	$('#levelTwoStorageContainer .selected').removeClass('selected');
-      	node.addClass('selected');
-    	};
-    	break;
+      return function() {
+      assignBox();
+        $('#levelTwoStorageContainer .selected').removeClass('selected');
+        node.addClass('selected');
+      };
+      break;
     case 'LOOSE_STORAGE':
-    	return function() {
-	    	var actions = node.item.boxes.map(function(box){
-	  			return {
-	  				name: "View " + box.alias,
-	  				handler: function(){
-	  					window.location = window.location.origin + '/miso/box/' + box.id;
-	  				}
-	  			};
-	  		});
-	    	actions.unshift({
-	  			name: "Add Box to Storage",
-	  			handler: assignBox
-	  		});
-    		Utils.showWizardDialog('Boxes in ' + node.item.displayLocation, actions);
-      	$('#levelTwoStorageContainer .selected').removeClass('selected');
-      	node.addClass('selected');
-    	};
-    	break;
+      return function() {
+        var actions = node.item.boxes.map(function(box) {
+          return {
+            name : "View " + box.alias,
+            handler : function() {
+              window.location = window.location.origin + '/miso/box/' + box.id;
+            }
+          };
+        });
+        actions.unshift({
+          name : "Add Box to Storage",
+          handler : assignBox
+        });
+        Utils
+            .showWizardDialog('Boxes in ' + node.item.displayLocation, actions);
+        $('#levelTwoStorageContainer .selected').removeClass('selected');
+        node.addClass('selected');
+      };
+      break;
     default:
-    	throw 'Unexpected box location';
+      throw 'Unexpected box location';
     }
   }
 

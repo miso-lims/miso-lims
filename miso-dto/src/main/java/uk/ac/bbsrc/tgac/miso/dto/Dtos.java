@@ -1219,6 +1219,10 @@ public class Dtos {
     if (includeBoxables && from.getBoxables() != null) {
       dto.setItems(asBoxablesDtos(from.getBoxables()));
     }
+    if (from.getStorageLocation() != null) {
+      dto.setFreezerDisplayLocation(from.getStorageLocation().getFreezerDisplayLocation());
+      dto.setStorageDisplayLocation(from.getStorageLocation().getFullDisplayLocation());
+    }
     dto.setTubeCount(from.getTubeCount());
     return dto;
   }

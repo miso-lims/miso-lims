@@ -99,6 +99,15 @@ public class StorageLocation implements Serializable, Aliasable {
     return parentLocation;
   }
 
+  public StorageLocation getFreezerLocation() {
+    if (locationUnit == LocationUnit.FREEZER) {
+      return this;
+    } else if (getParentLocation() == null || locationUnit == LocationUnit.ROOM) {
+      return null;
+    }
+    return getParentLocation().getFreezerLocation();
+  }
+
   public void setParentLocation(StorageLocation parentLocation) {
     if (this.getLocationUnit() != LocationUnit.ROOM) {
       // rooms are at the top of the hierarchy so parentLocation should be null
@@ -155,6 +164,12 @@ public class StorageLocation implements Serializable, Aliasable {
     return (getParentLocation() == null ? "" : getParentLocation().getFullDisplayLocation() + ", ") + getDisplayLocation();
   }
   
+  public String getFreezerDisplayLocation() {
+    return ((getParentLocation() == null || getParentLocation().getLocationUnit() == LocationUnit.FREEZER
+        || getParentLocation().getLocationUnit() == LocationUnit.ROOM) ? ""
+        : getParentLocation().getFreezerDisplayLocation() + ", ") + getDisplayLocation();
+  }
+
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
   }
