@@ -372,11 +372,14 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private Set<String> getIndexSequencesWithMinimumEditDistance(int minimumDistance) {
     Set<String> sequences = new HashSet<>();
     List<PoolableElementView> views = new ArrayList<>(getPoolableElementViews());
-    if (minimumDistance > 1 && views.stream().anyMatch(PoolImpl::hasFakeSequence)) return Collections.emptySet();
+    if (minimumDistance > 1 && views.stream().allMatch(PoolImpl::hasFakeSequence)) return Collections.emptySet();
     for (int i = 0; i < views.size(); i++) {
       String sequence1 = getCombinedIndexSequences(views.get(i));
       for (int j = i + 1; j < views.size(); j++) {
         String sequence2 = getCombinedIndexSequences(views.get(j));
+        if (!isCheckNecessary(views.get(i), views.get(j), minimumDistance)) {
+          continue;
+        }
         if (Index.checkEditDistance(sequence1, sequence2) < minimumDistance) {
           sequences.add(sequence1);
           sequences.add(sequence2);
@@ -384,6 +387,11 @@ public class PoolImpl extends AbstractBoxable implements Pool {
       }
     }
     return sequences;
+  }
+
+  private static boolean isCheckNecessary(PoolableElementView view1, PoolableElementView view2, int minimumDistance) {
+    return !((hasFakeSequence(view1) || hasFakeSequence(view2))
+        && (minimumDistance > 1 || getCombinedIndexSequences(view1).length() != getCombinedIndexSequences(view2).length()));
   }
 
   private static String getCombinedIndexSequences(PoolableElementView view) {
