@@ -88,15 +88,6 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
   Collection<String> listAllSampleTypes() throws IOException;
 
   /**
-   * List all persisted objects
-   * 
-   * @return Collection<Sample>
-   * @throws IOException
-   *           when the objects cannot be retrieved
-   */
-  Collection<Sample> listAllByReceivedDate(long limit) throws IOException;
-
-  /**
    * List all Samples associated with identificationBarcodes from the given identificationBarcode list
    * 
    * @return Collection<Sample>

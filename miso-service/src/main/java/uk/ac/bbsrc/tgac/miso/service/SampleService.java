@@ -41,9 +41,6 @@ public interface SampleService extends PaginatedDataSource<Sample>, BarcodableSe
 
   Sample getByBarcode(String barcode) throws IOException;
 
-
-  Collection<Sample> listByReceivedDate(long limit) throws IOException;
-
   Collection<Sample> listByProjectId(long projectId) throws IOException;
 
   /**

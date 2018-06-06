@@ -26,14 +26,6 @@
 <div id="maincontent">
     <div id="contentcolumn">
         <h1>Dashboard</h1>
-        <div id="rightpanel" style="float:right;margin-top:10px;">
-            <div align="right" style="margin-right:5px;">
-                <h2>Projects with recently<br/> received samples:</h2>
-            </div>
-            <div id="latestSamplesList" class="elementList ui-corner-all"
-                 style="height:720px;width:250px;margin-top:10px;"
-                 align="right"></div>
-        </div>
 
         <script type="text/javascript">
             favouriteWorkflows = ${favouriteWorkflows};
@@ -66,7 +58,6 @@
 </div>
 <script type="text/javascript">
   jQuery(document).ready(function() {
-    Dashboard.showLatestReceivedtSamples();
     Search.loadAll();
     Utils.timer.typewatchFunc(jQuery('#searchProject'), function () {
         Search.dashboardSearch(jQuery('#searchProject'))

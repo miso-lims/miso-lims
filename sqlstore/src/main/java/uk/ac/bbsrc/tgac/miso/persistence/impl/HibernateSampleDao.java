@@ -19,7 +19,6 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
@@ -149,16 +148,6 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   @Override
   public Collection<Sample> listAll() throws IOException {
     return list();
-  }
-
-  @Override
-  public Collection<Sample> listAllByReceivedDate(long limit) throws IOException {
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    criteria.addOrder(Order.desc("receivedDate"));
-    criteria.setMaxResults((int) limit);
-    @SuppressWarnings("unchecked")
-    List<Sample> records = criteria.list();
-    return records;
   }
 
   @Override

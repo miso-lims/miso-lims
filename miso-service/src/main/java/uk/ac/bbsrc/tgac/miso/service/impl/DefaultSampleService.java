@@ -754,12 +754,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   }
 
   @Override
-  public Collection<Sample> listByReceivedDate(long limit) throws IOException {
-    Collection<Sample> samples = sampleStore.listAllByReceivedDate(limit);
-    return authorizationManager.filterUnreadable(samples);
-  }
-
-  @Override
   public Collection<Sample> listByProjectId(long projectId) throws IOException {
     Collection<Sample> samples = sampleStore.listByProjectId(projectId);
     return authorizationManager.filterUnreadable(samples);
