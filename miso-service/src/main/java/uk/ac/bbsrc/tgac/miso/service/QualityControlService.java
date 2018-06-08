@@ -32,4 +32,6 @@ public interface QualityControlService {
 
   QC updateQc(QC qc) throws IOException;
 
+  QC save(QC qc) throws IOException;
+
 }
