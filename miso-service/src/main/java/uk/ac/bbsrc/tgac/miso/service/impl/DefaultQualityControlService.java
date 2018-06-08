@@ -150,4 +150,9 @@ public class DefaultQualityControlService implements QualityControlService {
     this.sampleQcStore = sampleQcStore;
   }
 
+  @Override
+  public QC save(QC qc) throws IOException {
+    return createQC(qc);
+  }
+
 }

@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.service.workflow.factory;
 
-import static uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
-import static uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.FactoryType.BARCODABLE;
 
 import java.io.IOException;
@@ -16,9 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.PoolProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SampleProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SequencerPartitionContainerProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SequencingContainerModelProgressStep;
 import uk.ac.bbsrc.tgac.miso.service.BarcodableViewService;
@@ -70,8 +71,13 @@ public class BarcodableProgressStepFactory implements ProgressStepFactory {
       SequencingContainerModelProgressStep modelStep = new SequencingContainerModelProgressStep();
       modelStep.setInput(barcodableViewService.getEntity(view));
       return modelStep;
+    case SAMPLE:
+      SampleProgressStep sampleStep = new SampleProgressStep();
+      sampleStep.setInput(barcodableViewService.getEntity(view));
+      return sampleStep;
     default:
       throw new UnsupportedOperationException("Unsupported entity type");
     }
   }
+
 }

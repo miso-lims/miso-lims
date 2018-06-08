@@ -2,6 +2,9 @@ package uk.ac.bbsrc.tgac.miso.core.data.workflow;
 
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.IntegerProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.PoolProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.PositiveDoubleProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.PositiveIntegerProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SampleProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SequencerPartitionContainerProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SequencingContainerModelProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SkipProgressStep;
@@ -47,6 +50,18 @@ public interface WorkflowStep {
     throwUnexpectedInput();
   }
 
+  default void processInput(SampleProgressStep step) {
+    throwUnexpectedInput();
+  }
+
+  default void processInput(PositiveDoubleProgressStep step) {
+    throwUnexpectedInput();
+  }
+
+  default void processInput(PositiveIntegerProgressStep step) {
+    throwUnexpectedInput();
+  }
+
   void cancelInput();
 
   /**
@@ -60,4 +75,6 @@ public interface WorkflowStep {
   default void throwUnexpectedInput() {
     throw new IllegalArgumentException("Unexpected input");
   }
+
+
 }

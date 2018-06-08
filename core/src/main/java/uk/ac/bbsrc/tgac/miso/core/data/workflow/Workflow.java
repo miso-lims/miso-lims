@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.LoadSequencerWorkflow;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SamplesReceivedWorkflow;
 
 public interface Workflow {
   Progress getProgress();
@@ -67,6 +68,17 @@ public interface Workflow {
       @Override
       public final String getDescription() {
         return "Load Sequencer Workflow";
+      }
+    },
+    SAMPLES_RECEIVED {
+      @Override
+      public Workflow createWorkflow() {
+        return new SamplesReceivedWorkflow();
+      }
+
+      @Override
+      public final String getDescription() {
+        return "Samples Received Workflow";
       }
     };
 

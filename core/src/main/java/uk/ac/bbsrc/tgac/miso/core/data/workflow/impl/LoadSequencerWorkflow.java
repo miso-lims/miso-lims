@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName.LOAD_SEQUENCER;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +38,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   @Override
   protected WorkflowName getWorkflowName() {
-    return LOAD_SEQUENCER;
+    return WorkflowName.LOAD_SEQUENCER;
   }
 
   @Override
