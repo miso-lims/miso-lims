@@ -98,6 +98,20 @@ Note that the platform must be in all caps, and the instrumentModel must be an e
 Note also that if adding an instrument which references an upgraded instrument, the upgraded instrument must already exist in MISO. If the instrument to be added has not been upgraded, set upgradedInstrumentName to `NULL`.
 <a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_instrument.sql">Source</a>
 
+## Container Models
+
+Each instrument model can have various container models associated. The default container models are generic
+`Unknown <#>-<Partition> <Platform> <Container Name>`, like "Unknown 4-Lane Illumina Flow Cell" or "Unknown 8-SMRT-CELL PacBio 8Pac". The run scanner uses container models to determine the correct container for a run. Container models can only be added by a MISO administrator. 
+
+```
+addContainerModel(name, identificationBarcode, partitionCount, platform, instrumentModel);
+```
+
+See **List of container models** below for usage examples, including a full list of the container models found by OICR, which can be added to your MISO as desired. If you do not add any container models, MISO will use the generic container models. MISO will emit a warning in the logs when attempting to save a new run when it cannot find a container model (but will not prevent the run from being saved, and will not warn the user). If you would like this type of error to not be emitted, you can use the information from these warnings to add new container models.
+
+Note that the sequencing platform must be in all caps, and the instrumentModel must be an exact match for a value in `Platform.instrumentModel`.
+<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_containermodel.sql">Source</a>
+
 
 ## Sequencing Parameters
 
@@ -225,3 +239,50 @@ CALL deleteSample(sampleId, sampleAlias);
 # Upgrading to the latest version.
 
 To upgrade MISO to the latest version, follow the upgrading instructions in [Building and Deploying](installation-guide#upgrading).
+
+### List of container models
+INSERT INTO SequencingContainerModel(alias, identificationBarcode, partitionCount, platformType) VALUES
+
+*NovaSeq*
+```
+CALL addContainerModel('S2 Flow Cell', '20015845', 2, 'ILLUMINA', 'Illumina NovaSeq 6000');
+CALL addContainerModel('S4 Flow Cell', '20015843', 4, 'ILLUMINA', 'Illumina NovaSeq 6000');
+```
+
+*HiSeq 2500*
+```
+CALL addContainerModel('HiSeq SR Flow Cell v4', '15052255', 8, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq PE Flow Cell v4', '15049346', 8, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq SR Flow Cell v3', NULL, 8, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq PE Flow Cell v3', '15022186', 8, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Flow Cell v3', NULL, 8, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Flow Cell', NULL, 1, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Flow Cell v1', NULL, 8, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Flow Cell v1.5', NULL, 8, 'ILLUMINA', 'Illumina HiSeq 2500');
+```
+
+*HiSeq 2500 Rapid Run*
+```
+CALL addContainerModel('HiSeq Rapid PE Flow Cell v2', '15053059', 2, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Rapid SR Flow Cell v2', '15053060', 2, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Rapid PE Flow Cell', '15034173', 2, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Rapid SR Flow Cell', '15034244', 2, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Rapid PE Flow Cell v1', NULL, 2, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Rapid SR Flow Cell v1', NULL, 2, 'ILLUMINA', 'Illumina HiSeq 2500');
+```
+
+*MiSeq*
+```
+CALL addContainerModel('PE MiSeq Flow Cell', '15028382', 1, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('PE-Micro MiSeq Flow Cell', '15035218', 1, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('PE-Nano MiSeq Flow Cell', '15035217', 1, 'ILLUMINA', 'Illumina HiSeq 2500');
+```
+
+*NextSeq 550*
+```
+CALL addContainerModel('High Output Flow Cell Cartridge V2', '15065973', 4, 'ILLUMINA', 'Illumina NextSeq 500');
+CALL addContainerModel('Mid Output Flow Cell Cartridge V2', '15065974', 4, 'ILLUMINA', 'Illumina NextSeq 500');
+```
+
+*HiSeq X*
+`CALL addContainerModel('HiSeq X', NULL, 8, 'ILLUMINA', 'Illumina HiSeq X');`
