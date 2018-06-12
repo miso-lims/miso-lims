@@ -96,6 +96,7 @@ public class DefaultKitService implements KitService {
       original.setKitDescriptor(getKitDescriptorById(kit.getKitDescriptor().getId()));
       original.setLocationBarcode(kit.getLocationBarcode());
       original.setLotNumber(kit.getLotNumber());
+      kit = original;
     }
     return kitStore.save(kit);
   }
@@ -157,7 +158,20 @@ public class DefaultKitService implements KitService {
    */
   private void setChangeDetails(KitDescriptor kitDescriptor) throws IOException {
     User user = authorizationManager.getCurrentUser();
+    Date now = new Date();
     kitDescriptor.setLastModifier(user);
+
+    if (kitDescriptor.getId() == KitDescriptor.UNSAVED_ID) {
+      kitDescriptor.setCreator(user);
+      if (kitDescriptor.getCreationTime() == null) {
+        kitDescriptor.setCreationTime(now);
+        kitDescriptor.setLastModified(now);
+      } else if (kitDescriptor.getLastModified() == null) {
+        kitDescriptor.setLastModified(now);
+      }
+    } else {
+      kitDescriptor.setLastModified(now);
+    }
   }
 
   @Override
