@@ -1219,6 +1219,10 @@ public class Dtos {
     if (includeBoxables && from.getBoxables() != null) {
       dto.setItems(asBoxablesDtos(from.getBoxables()));
     }
+    if (from.getStorageLocation() != null) {
+      dto.setFreezerDisplayLocation(from.getStorageLocation().getFreezerDisplayLocation());
+      dto.setStorageDisplayLocation(from.getStorageLocation().getFullDisplayLocation());
+    }
     dto.setTubeCount(from.getTubeCount());
     return dto;
   }
@@ -1659,7 +1663,7 @@ public class Dtos {
     }
     dto.setMaximumNumber(from.getMaximumNumber());
     dto.setPlatformType(from.getPlatformType() == null ? null : from.getPlatformType().name());
-    dto.setFake(from.hasFakeSequence());
+    dto.setFakeSequence(from.hasFakeSequence());
     return dto;
   }
 
@@ -2326,6 +2330,7 @@ public class Dtos {
           .map(child -> Dtos.asDto(child, recursive, recursive))
           .collect(Collectors.toList()));
     }
+    dto.setBoxes(from.getBoxes().stream().map(box -> asDto(box, true)).collect(Collectors.toSet()));
     return dto;
   }
 

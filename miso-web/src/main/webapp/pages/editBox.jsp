@@ -133,7 +133,7 @@
         <input name="storageLocation" id="storageLocation" type="hidden" value="${empty box.storageLocation ? 0 : box.storageLocation.id}">  
         <span id="freezerLocation">
           <c:choose>
-            <c:when test="${not empty box.storageLocation}">${box.storageLocation.getFullDisplayLocation()}</c:when>
+            <c:when test="${not empty box.storageLocation}"><a href="${freezerURL}">${box.storageLocation.getFullDisplayLocation()}</a></c:when>
             <c:otherwise>Unknown</c:otherwise>
           </c:choose>
         </span>

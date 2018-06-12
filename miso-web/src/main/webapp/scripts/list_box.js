@@ -62,6 +62,18 @@ ListTarget.box = {
           "include": true,
           "iSortPriority": 0
         }, {
+          "sTitle": "Freezer Location",
+          "mData": "freezerDisplayLocation",
+          "include": config.showFreezerLocation,
+          "bSortable": false,
+          "iSortPriority": 0
+        }, {
+          "sTitle": "Storage Location",
+          "mData": "storageDisplayLocation",
+          "include": config.showStorageLocation,
+          "bSortable": false,
+          "iSortPriority": 0
+        }, {
           "sTitle": "Location",
           "mData": "locationBarcode",
           "include": true,

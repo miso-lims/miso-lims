@@ -121,23 +121,6 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAllByReceivedDate() throws Exception {
-    Collection<Sample> samples = dao.listAllByReceivedDate(99);
-
-    Date previous = null;
-    for (Sample sample : samples) {
-      if (previous != null && sample.getReceivedDate() != null) {
-        log.debug("testing receivedDates " + previous + " comes before " + sample.getReceivedDate());
-        assertTrue(
-            "not ordered by received date descending",
-            previous.equals(sample.getReceivedDate()) || previous.after(sample.getReceivedDate()));
-      }
-      previous = sample.getReceivedDate();
-    }
-
-  }
-
-  @Test
   public void testCount() throws Exception {
     int total = dao.count();
     assertEquals(20, total);

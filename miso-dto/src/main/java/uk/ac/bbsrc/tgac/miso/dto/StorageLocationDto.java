@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -15,6 +16,7 @@ public class StorageLocationDto {
   private String displayLocation;
   private String fullDisplayLocation;
   private List<StorageLocationDto> childLocations;
+  private Set<BoxDto> boxes;
 
   public long getId() {
     return id;
@@ -87,6 +89,14 @@ public class StorageLocationDto {
 
   public void setChildLocations(List<StorageLocationDto> childLocations) {
     this.childLocations = childLocations;
+  }
+
+  public Set<BoxDto> getBoxes() {
+    return boxes;
+  }
+
+  public void setBoxes(Set<BoxDto> set) {
+    this.boxes = set;
   }
 
 }

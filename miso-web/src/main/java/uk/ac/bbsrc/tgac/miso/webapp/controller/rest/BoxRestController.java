@@ -167,8 +167,8 @@ public class BoxRestController extends RestController {
   }
 
   @RequestMapping(value = "/boxes/search/partial")
-  public @ResponseBody List<BoxDto> partialSearch(@RequestParam("q") String search) {
-    List<Box> results = boxService.getByPartialSearch(search);
+  public @ResponseBody List<BoxDto> partialSearch(@RequestParam("q") String search, @RequestParam("b") boolean onlyMatchBeginning) {
+    List<Box> results = boxService.getByPartialSearch(search, onlyMatchBeginning);
     return Dtos.asBoxDtos(results, true);
   }
 

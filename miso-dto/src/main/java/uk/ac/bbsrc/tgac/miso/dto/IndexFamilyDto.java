@@ -31,7 +31,7 @@ public class IndexFamilyDto {
     return platformType;
   }
 
-  public boolean hasFakeSequence() {
+  public boolean getFakeSequence() {
     return fakeSequence;
   }
 
@@ -63,7 +63,7 @@ public class IndexFamilyDto {
     this.platformType = platformType;
   }
 
-  public void setFake(boolean fake) {
+  public void setFakeSequence(boolean fake) {
     this.fakeSequence = fake;
   }
 }

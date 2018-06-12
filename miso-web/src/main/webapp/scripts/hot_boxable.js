@@ -151,7 +151,8 @@ HotTarget.boxable = (function() {
               var deferred = jQuery.Deferred();
               jQuery.ajax({
                 url: '/miso/rest/boxes/search/partial?' + jQuery.param({
-                  q: value
+                  q: value,
+                  b: false
                 }),
                 contentType: "application/json; charset=utf8",
                 dataType: "json"

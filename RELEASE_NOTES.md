@@ -1,3 +1,19 @@
+# 0.2.125
+
+Changes:
+
+ * Add Boxes table to Edit Freezer page
+ * Add Put Boxes in Storage to Freezers Page
+ * Add SQL convenience procedure documentation
+ * Use .xlsx extension for spreadsheets
+ * Remove “projects with recent samples” box
+ * Remove Requested health type from edit run page
+
+# 
+
+Changes:
+
+
 # 0.2.124
 
 Changes:

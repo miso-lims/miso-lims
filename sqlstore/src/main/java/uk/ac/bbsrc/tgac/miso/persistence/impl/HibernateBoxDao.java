@@ -194,15 +194,15 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public List<Box> getByPartialSearch(String search) {
+  public List<Box> getByPartialSearch(String search, boolean onlyMatchBeginning) {
     if (search == null) {
       throw new NullPointerException("No search String provided");
     }
     Criteria criteria = currentSession().createCriteria(BoxImpl.class);
     criteria.add(Restrictions.or(
-        Restrictions.like("identificationBarcode", search, MatchMode.ANYWHERE),
-        Restrictions.like("name", search, MatchMode.ANYWHERE),
-        Restrictions.like(FIELD_ALIAS, search, MatchMode.ANYWHERE)));
+        Restrictions.like("identificationBarcode", search, onlyMatchBeginning ? MatchMode.START : MatchMode.ANYWHERE),
+        Restrictions.like("name", search, onlyMatchBeginning ? MatchMode.START : MatchMode.ANYWHERE),
+        Restrictions.like(FIELD_ALIAS, search, onlyMatchBeginning ? MatchMode.START : MatchMode.ANYWHERE)));
     @SuppressWarnings("unchecked")
     List<Box> results = criteria.list();
     results.sort((Box b1, Box b2) -> {

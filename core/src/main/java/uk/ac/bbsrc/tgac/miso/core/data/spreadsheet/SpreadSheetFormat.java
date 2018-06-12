@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 import org.springframework.http.MediaType;
 
 public enum SpreadSheetFormat {
-  EXCEL("Microsoft Excel", "xls", "application", "vnd.ms-excel") {
+  EXCEL("Microsoft Excel", "xlsx", "application", "vnd.ms-excel") {
 
     @Override
     public <T> byte[] generate(Stream<T> input, Spreadsheet<T> format) {

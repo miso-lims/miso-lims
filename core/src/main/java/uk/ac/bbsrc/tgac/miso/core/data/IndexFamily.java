@@ -54,7 +54,7 @@ public class IndexFamily implements Serializable {
     NULL.setId(0L);
     NULL.setName("No indices");
     NULL.setArchived(false);
-    NULL.setFake(true);
+    NULL.setFake(false);
     Index index = new Index();
     index.setFamily(NULL);
     index.setId(0L);

@@ -43,6 +43,17 @@ var HotUtils = {
     optionalNumber: function(value, callback) {
       return callback(Utils.validation.isEmpty(value) || Handsontable.helper.isNumeric(value));
     },
+    
+    /**
+     * Custom validator for optional numeric fields
+     */
+    requiredNumber: function(value, callback) {
+    	if (Utils.validation.isEmpty(value)) {
+    		return callback(false);
+    	}
+      return callback(Handsontable.helper.isNumeric(value));
+    },
+
 
     /**
      * Custom validator for text fields that fails on extra-special characters

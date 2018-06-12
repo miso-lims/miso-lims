@@ -50,24 +50,4 @@ var Search = Search || {
     self.dashboardSearch(jQuery('#searchProject'), true);
     self.dashboardSearch(jQuery('#searchRun'), true);
   },
-
-  insertResult: function(id, v) {
-    var i = $(id);
-    i.value = v;
-    $(id + 'result').style.visibility = 'hidden';
-  },
-
-  filterListOnAttribute: function(input, attr, list) {
-    var func = function(input, attr, list) {
-      var filter = jQuery(input).val();
-      if (filter) {
-        jQuery('#' + list).find("li").not("[" + attr + "*=" + filter + "]").hide();
-        jQuery('#' + list).find("li[" + attr + "*=" + filter + "]").show();
-      } else {
-        jQuery('#' + list).find("li").show();
-      }
-    };
-
-    Utils.timer.timedFunc(func(input, attr, list), 200);
-  }
 };
