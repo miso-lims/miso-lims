@@ -48,6 +48,7 @@ public class EditFreezerController {
   @RequestMapping("/new")
   public ModelAndView newArray(ModelMap model) throws IOException {
     model.addAttribute(MODEL_ATTR_PAGEMODE, "create");
+    model.put("title", "New Storage Location");
     return new ModelAndView(JSP, model);
   }
 
@@ -60,6 +61,7 @@ public class EditFreezerController {
     }
 
     ObjectMapper mapper = new ObjectMapper();
+    model.put("title", "Freezer " + freezer.getId());
     model.addAttribute(MODEL_ATTR_JSON, mapper.writer().writeValueAsString(Dtos.asDto(freezer, true, true)));
     model.put("boxes", boxesInStorage(freezer).map(box -> Dtos.asDto(box, false)).collect(Collectors.toSet()));
     return new ModelAndView(JSP, model);
