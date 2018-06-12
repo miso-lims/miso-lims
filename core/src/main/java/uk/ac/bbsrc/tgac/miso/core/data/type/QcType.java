@@ -33,6 +33,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 
 /**
@@ -46,7 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
  */
 @Entity
 @Table(name = "QCType")
-public class QcType implements Comparable<QcType>, Serializable {
+public class QcType implements Comparable<QcType>, Serializable, Aliasable {
   private static final long serialVersionUID = 1L;
 
   public static final Long UNSAVED_ID = 0L;
@@ -245,5 +246,15 @@ public class QcType implements Comparable<QcType>, Serializable {
     sb.append(" : ");
     sb.append(getUnits());
     return sb.toString();
+  }
+
+  @Override
+  public long getId() {
+    return qcTypeId;
+  }
+
+  @Override
+  public String getAlias() {
+    return name;
   }
 }
