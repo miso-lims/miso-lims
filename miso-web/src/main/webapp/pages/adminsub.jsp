@@ -67,6 +67,7 @@
           <li><a href="<c:url value="/miso/tissuematerial/list"/>">Tissue Materials</a></li>
           <li><a href="<c:url value="/miso/tissueorigin/list"/>">Tissue Origins</a></li>
           <li><a href="<c:url value="/miso/samplepurpose/list"/>">Sample Purposes</a></li>
+          <li><a href="<c:url value="/miso/qctype/list"/>">QC Types</a></li>
           <li><a href="<c:url value="/miso/subproject/list"/>">Subprojects</a></li>
           <li><a href="<c:url value="/miso/institute/list"/>">Institutes</a></li>
           <li><a href="<c:url value="/miso/lab/list"/>">Labs</a></li>

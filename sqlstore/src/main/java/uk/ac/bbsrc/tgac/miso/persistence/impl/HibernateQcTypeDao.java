@@ -28,11 +28,11 @@ public class HibernateQcTypeDao implements QualityControlTypeStore {
   private Session currentSession() {
     return getSessionFactory().getCurrentSession();
   }
+
   @Override
   public QcType get(long id) throws IOException {
     return (QcType) currentSession().get(QcType.class, id);
   }
-
 
   public SessionFactory getSessionFactory() {
     return sessionFactory;
@@ -46,8 +46,18 @@ public class HibernateQcTypeDao implements QualityControlTypeStore {
     return records;
   }
 
+  @Override
+  public long create(QcType qcType) throws IOException {
+    return (Long) currentSession().save(qcType);
+  }
+
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
+  }
+
+  @Override
+  public void update(QcType qcType) throws IOException {
+    currentSession().update(qcType);
   }
 
 }

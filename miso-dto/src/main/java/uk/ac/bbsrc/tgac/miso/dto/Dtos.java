@@ -1498,6 +1498,10 @@ public class Dtos {
     return models.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
+  public static Set<QcTypeDto> asQcTypeDtos(Set<QcType> from) {
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
+  }
+
   public static QcTypeDto asDto(QcType from) {
     QcTypeDto dto = new QcTypeDto();
     dto.setId(from.getQcTypeId());
