@@ -29,7 +29,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.125-oicr-SNAPSHOT</version>
+    <version>0.2.125-oicr</version>
   </parent>
   <artifactId>runscanner</artifactId>
   <packaging>war</packaging>
