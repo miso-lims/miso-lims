@@ -8,7 +8,6 @@ import java.util.Map;
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -58,7 +57,5 @@ public interface SampleService extends PaginatedDataSource<Sample>, BarcodableSe
   Map<String, Integer> getSampleColumnSizes() throws IOException;
 
   Sample save(Sample sample) throws IOException;
-
-  DetailedSample save(DetailedSample sample) throws IOException;
 
 }

@@ -3,6 +3,8 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,9 @@ import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class DefaultWorkflowExecutor implements WorkflowExecutor {
+
+  private static final Logger log = LoggerFactory.getLogger(DefaultWorkflowExecutor.class);
+
   @Autowired
   PoolService poolService;
 
@@ -92,7 +97,7 @@ public class DefaultWorkflowExecutor implements WorkflowExecutor {
                     validRelationship -> !validRelationship.getArchived() && validRelationship.getChild().getId() == sampleClass.getId()
                     && validRelationship.getParent().getId() == sample.getSampleClass().getId());
           } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error getting SampleValidRelationship", e);
             return false;
           }
         })
