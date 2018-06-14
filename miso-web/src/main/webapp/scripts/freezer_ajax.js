@@ -241,7 +241,11 @@
             return {
               name : box.alias,
               handler : function() {
-                // set box location to node.item
+                Utils.ajaxWithDialog('Moving Box', 'POST', '/miso/rest/box/' + box.id + '/setlocation?' + jQuery.param({
+                  storageId: node.item.id
+                }), {}, Utils.page.pageReload, function(json) {
+                  Utils.showOkDialog('Error Moving Box', [json.error]);
+                });
                 }
             }
             }));
