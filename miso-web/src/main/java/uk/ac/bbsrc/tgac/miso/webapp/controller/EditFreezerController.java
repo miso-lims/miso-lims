@@ -46,7 +46,7 @@ public class EditFreezerController {
   }
 
   @RequestMapping("/new")
-  public ModelAndView newArray(ModelMap model) throws IOException {
+  public ModelAndView newStorageLocation(ModelMap model) {
     model.addAttribute(MODEL_ATTR_PAGEMODE, "create");
     model.put("title", "New Storage Location");
     return new ModelAndView(JSP, model);

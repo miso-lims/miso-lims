@@ -14,8 +14,6 @@ public class KitDescriptorDto {
   private Integer stockLevel;
   private String kitType;
   private String platformType;
-  
-  public KitDescriptorDto() {}
 
   public Long getId() {
     return id;

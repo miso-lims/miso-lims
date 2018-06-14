@@ -355,7 +355,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
    */
   @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     sb.append(getId());
     sb.append(" : ");
     sb.append(getName());
