@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -45,6 +47,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.BoxStorageAmount;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
@@ -61,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -69,6 +74,9 @@ import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 @Controller
 @RequestMapping("/rest")
 public class BoxRestController extends RestController {
+
+  private static final Logger log = LoggerFactory.getLogger(BoxRestController.class);
+
   @Autowired
   private BoxService boxService;
 
@@ -86,6 +94,9 @@ public class BoxRestController extends RestController {
 
   @Autowired
   private LibraryDilutionService libraryDilutionService;
+
+  @Autowired
+  private StorageLocationService storageLocationService;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSampleEnabled;
@@ -665,6 +676,39 @@ public class BoxRestController extends RestController {
     boxService.save(box);
     Box updated = boxService.get(boxId);
     return Dtos.asDto(updated, true);
+  }
+
+  @RequestMapping(value = "/box/{boxId}/setlocation", method = RequestMethod.POST)
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody void setBoxLocation(@PathVariable(name = "boxId", required = true) long boxId,
+      @RequestParam("storageId") long storageId)
+      throws IOException {
+    Box box = boxService.get(boxId);
+    StorageLocation storageLocation = storageLocationService.get(storageId);
+    Set<Box> oldBoxes = storageLocation.getBoxes();
+    if (storageLocation.getLocationUnit().getBoxStorageAmount() == BoxStorageAmount.NONE) {
+      throw new RestException("Boxes cannot be stored in the location unit '" + storageLocation.getLocationUnit().getDisplayName() + "'",
+          Status.BAD_REQUEST);
+    } else if (storageLocation.getLocationUnit().getBoxStorageAmount() == BoxStorageAmount.SINGLE && !oldBoxes.isEmpty()) {
+      oldBoxes.stream().forEach(old -> {
+        Box oldBox;
+        try {
+          oldBox = boxService.get(old.getId());
+        } catch (IOException e) {
+          log.error("Error getting old Box", e);
+          return;
+        }
+        oldBox.setStorageLocation(null);
+        try {
+          boxService.save(oldBox);
+        } catch (IOException e) {
+          log.error("Error saving old Box", e);
+          return;
+        }
+      });
+    }
+    box.setStorageLocation(storageLocation);
+    boxService.save(box);
   }
 
 }
