@@ -28,7 +28,7 @@ public class KitDescriptorPageIT extends AbstractIT {
     Map<KitDescriptorPage.Field, String> fields = Maps.newLinkedHashMap();
     fields.put(Field.ID, "Unsaved");
     fields.put(Field.NAME, null);
-    fields.put(Field.VERSION, "0.0");
+    fields.put(Field.VERSION, "0");
     fields.put(Field.MANUFACTURER, null);
     fields.put(Field.PART_NUMBER, null);
     fields.put(Field.STOCK_LEVEL, "0");
@@ -40,7 +40,7 @@ public class KitDescriptorPageIT extends AbstractIT {
     // enter kit info
     Map<KitDescriptorPage.Field, String> changes = Maps.newLinkedHashMap();
     changes.put(Field.NAME, "Test Clustering Kit");
-    changes.put(Field.VERSION, "1.5");
+    changes.put(Field.VERSION, "1");
     changes.put(Field.MANUFACTURER, "ACME");
     changes.put(Field.PART_NUMBER, "123");
     changes.put(Field.STOCK_LEVEL, "11");
@@ -69,7 +69,7 @@ public class KitDescriptorPageIT extends AbstractIT {
     Map<KitDescriptorPage.Field, String> fields = Maps.newLinkedHashMap();
     fields.put(Field.ID, "1");
     fields.put(Field.NAME, "Test Kit");
-    fields.put(Field.VERSION, "1.0");
+    fields.put(Field.VERSION, "1");
     fields.put(Field.MANUFACTURER, "TestCo");
     fields.put(Field.PART_NUMBER, "123");
     fields.put(Field.STOCK_LEVEL, "0");
@@ -78,7 +78,7 @@ public class KitDescriptorPageIT extends AbstractIT {
     assertFieldValues("initial values", fields, page1);
 
     Map<KitDescriptorPage.Field, String> changes = Maps.newLinkedHashMap();
-    changes.put(Field.VERSION, "2.0");
+    changes.put(Field.VERSION, "2");
     changes.put(Field.MANUFACTURER, "CoTest");
     changes.put(Field.PART_NUMBER, "321");
     changes.put(Field.STOCK_LEVEL, "1");

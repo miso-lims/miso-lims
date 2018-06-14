@@ -8,7 +8,7 @@ public class KitDescriptorDto {
   private Long id;
   private String url;
   private String name;
-  private Double version;
+  private Integer version;
   private String manufacturer;
   private String partNumber;
   private Integer stockLevel;
@@ -41,11 +41,11 @@ public class KitDescriptorDto {
     this.name = name;
   }
 
-  public Double getVersion() {
+  public Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Double version) {
+  public void setVersion(Integer version) {
     this.version = version;
   }
 
