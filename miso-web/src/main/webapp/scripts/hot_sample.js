@@ -643,7 +643,6 @@ HotTarget.sample = (function() {
                 }
               };
             });
-            console.log(targets);
             if (!Constants.isDetailedSample || classes.every(function(sampleClass) {
               return sampleClass.sampleCategory == "Aliquot";
             })) {

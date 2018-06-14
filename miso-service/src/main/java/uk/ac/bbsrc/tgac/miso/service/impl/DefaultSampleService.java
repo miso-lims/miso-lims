@@ -880,15 +880,5 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       return get(sample.getId());
     }
   }
-
   
-  @Override
-  public DetailedSample save(DetailedSample sample) throws IOException {
-    if (sample.getId() == SampleImpl.UNSAVED_ID) {
-      return (DetailedSample) get(create(sample));
-    } else {
-      update(sample);
-      return (DetailedSample) get(sample.getId());
-    }
-  }
 }

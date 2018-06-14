@@ -25,7 +25,7 @@ public class PositiveDoubleProgressStep extends AbstractProgressStep {
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + (int) input; // not really sure what's supposed to go here
+    result = prime * result + (int) input;
     return result;
   }
 
