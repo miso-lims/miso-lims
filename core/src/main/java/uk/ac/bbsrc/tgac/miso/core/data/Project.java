@@ -30,6 +30,7 @@ import java.util.Date;
 import com.eaglegenomics.simlims.core.Group;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
@@ -192,6 +193,10 @@ public interface Project extends Comparable<Project>, SecurableByProfile, Watcha
   public ReferenceGenome getReferenceGenome();
 
   public void setReferenceGenome(ReferenceGenome referenceGenome);
+
+  public TargetedSequencing getDefaultTargetedSequencing();
+
+  public void setDefaultTargetedSequencing(TargetedSequencing defaultTargetedSequencing);
 
   @Override
   public void setWatchGroup(Group group);

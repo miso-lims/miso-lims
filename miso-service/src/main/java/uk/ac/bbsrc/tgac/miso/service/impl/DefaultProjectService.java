@@ -54,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
+import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -69,7 +70,8 @@ public class DefaultProjectService implements ProjectService {
   private ProjectStore projectStore;
   @Autowired
   private ReferenceGenomeDao referenceGenomeDao;
-
+  @Autowired
+  private TargetedSequencingStore targetedSequencingStore;
   @Autowired
   private SecurityProfileStore securityProfileStore;
   @Autowired
@@ -245,6 +247,11 @@ public class DefaultProjectService implements ProjectService {
       original.setLastUpdated(new Date());
       original.setProgress(project.getProgress());
       original.setReferenceGenome(referenceGenomeDao.getReferenceGenome(project.getReferenceGenome().getId()));
+      if (project.getDefaultTargetedSequencing() != null) {
+        original.setDefaultTargetedSequencing(targetedSequencingStore.get(project.getDefaultTargetedSequencing().getId()));
+      } else {
+        original.setDefaultTargetedSequencing(null);
+      }
       original.setShortName(project.getShortName());
       for (ProjectOverview po : project.getOverviews()) {
         if (po.getId() == ProjectOverview.UNSAVED_ID) {

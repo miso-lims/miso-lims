@@ -67,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
@@ -79,6 +80,7 @@ import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 
 @Controller
 @RequestMapping("/project")
@@ -97,6 +99,8 @@ public class EditProjectController {
 
   @Autowired
   private ReferenceGenomeService referenceGenomeService;
+  @Autowired
+  private TargetedSequencingService targetedSequencingService;
   @Autowired
   private RunService runService;
   @Autowired
@@ -279,6 +283,10 @@ public class EditProjectController {
       if (project == null) throw new NotFoundException("No project found for ID " + projectId.toString());
 
       model.put("referenceGenome", referenceGenomeService.listAllReferenceGenomeTypes());
+
+      Collection<TargetedSequencing> targetedSequencingList = targetedSequencingService.list();
+      targetedSequencingList.add(TargetedSequencing.NULL);
+      model.put("targetedSequencing", targetedSequencingList);
       model.put("formObj", project);
       model.put("project", project);
       model.put("projectFiles", populateProjectFiles(projectId));
