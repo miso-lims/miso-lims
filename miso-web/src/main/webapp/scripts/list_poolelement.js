@@ -106,6 +106,9 @@ ListTarget.poolelement = {
         } else if (config.nearDuplicateIndicesSequences && config.nearDuplicateIndicesSequences.indexOf(combined) != -1) {
           html += " <span class='parsley-custom-error-message'><strong>(NEAR-DUPLICATE INDEX)</strong></span>";
         }
+        if(indices.length == 0){
+          html += " <span class='parsley-custom-error-message'><strong>(NO INDEX)</strong></span>";
+        }
 
         return html;
       }
