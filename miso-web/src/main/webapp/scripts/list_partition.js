@@ -66,7 +66,7 @@ ListTarget.partition = {
           return element.identityConsentLevel === 'Revoked';
         });
         if (consentRevoked.length) {
-          problems.push("(CONSENT REVOKED)");
+          problems.push("CONSENT REVOKED");
         }
         problems = problems.map(Tile.error);
 
