@@ -345,4 +345,5 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
   public void writeUrls(URI baseUri) {
     setUrl(WritableUrls.buildUriPath(baseUri, "/rest/library/{id}", getId()));
   }
+
 }
