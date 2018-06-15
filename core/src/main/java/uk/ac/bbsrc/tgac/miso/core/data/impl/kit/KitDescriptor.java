@@ -82,7 +82,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long kitDescriptorId = KitDescriptor.UNSAVED_ID;
   private String name = "";
-  private Double version = 0.0D;
+  private Integer version = 0;
   private String manufacturer = "";
   private String partNumber = "";
   private Integer stockLevel = 0;
@@ -160,9 +160,9 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
   /**
    * Returns the version of this KitDescriptor object.
    *
-   * @return Double version.
+   * @return Integer version.
    */
-  public Double getVersion() {
+  public Integer getVersion() {
     return version;
   }
 
@@ -172,7 +172,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
    * @param version
    *          version.
    */
-  public void setVersion(Double version) {
+  public void setVersion(Integer version) {
     this.version = version;
   }
 
@@ -355,7 +355,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
    */
   @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     sb.append(getId());
     sb.append(" : ");
     sb.append(getName());

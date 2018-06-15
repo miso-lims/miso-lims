@@ -27,14 +27,15 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <form:form action="/miso/kitdescriptor" method="POST" commandName="kitDescriptor" autocomplete="off">
+    <form:form id="kitdescriptor-form" action="/miso/kitdescriptor" method="POST" commandName="kitDescriptor" autocomplete="off">
 
       <sessionConversation:insertSessionConversationId attributeName="kitDescriptor"/>
 
       <h1><c:choose><c:when
           test="${kitDescriptor.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
         Kit Descriptor
-        <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+        <button id="save" type="submit" class="fg-button ui-state-default ui-corner-all"
+        onclick="return KitDescriptor.validateKitDescriptor();">Save</button>
       </h1>
       <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
         <div id="note_arrowclick" class="toggleLeft"></div>
@@ -45,7 +46,7 @@
       <table class="in">
         <tr>
           <td class="h">ID:</td>
-          <td>
+          <td id="kitDescriptorId">
             <c:choose>
               <c:when test="${kitDescriptor.id != 0}">${kitDescriptor.id}</c:when>
               <c:otherwise><i>Unsaved</i></c:otherwise>
@@ -58,7 +59,7 @@
         </tr>
         <tr>
           <td class="h">Version:</td>
-          <td><form:input path="version"/></td>
+          <td><form:input id="version" path="version"/></td>
         </tr>
         <tr>
           <td class="h">Manufacturer:</td>
@@ -70,30 +71,29 @@
         </tr>
         <tr>
           <td class="h">Stock Level:</td>
-          <td><form:input path="stockLevel"/></td>
+          <td><form:input id="stockLevel" path="stockLevel"/></td>
         </tr>
         <tr>
           <td class="h">Description:</td>
-          <td><form:input path="description"/><span id="descriptionCounter" class="counter"></span></td>
+          <td><form:input id="description" path="description"/><span id="descriptionCounter" class="counter"></span></td>
         </tr>
         <tr>
+          <td>Kit Type:</td>
           <c:choose>
             <c:when test="${kitDescriptor.id == 0 or empty kitDescriptor.kitType}">
-              <td>Kit Type:</td>
               <td>
                 <form:select id="kitTypes" path="kitType" items="${kitTypes}"/>
               </td>
             </c:when>
             <c:otherwise>
-              <td>Kit Type</td>
-              <td>${kitDescriptor.kitType}</td>
+              <td id="kitTypes">${kitDescriptor.kitType}</td>
             </c:otherwise>
           </c:choose>
         </tr>
         <tr>
+          <td>Platform Type:</td>
           <c:choose>
             <c:when test="${kitDescriptor.id == 0 or empty kitDescriptor.platformType}">
-              <td>Platform Type:</td>
               <td>
                 <form:select id="platformTypes" path="platformType">
                   <form:options items="${platformTypes}" itemValue="key" itemLabel="key"/>
@@ -101,8 +101,7 @@
               </td>
             </c:when>
             <c:otherwise>
-              <td>Platform Type</td>
-              <td>${kitDescriptor.platformType}</td>
+              <td id="platformTypes">${kitDescriptor.platformType}</td>
             </c:otherwise>
           </c:choose>
         </tr>
