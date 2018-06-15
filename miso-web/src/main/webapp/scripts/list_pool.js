@@ -72,6 +72,9 @@ ListTarget.pool = {
             } else if (full.nearDuplicateIndices) {
               html += " <span class='parsley-custom-error-message'><strong>(NEAR-DUPLICATE INDICES)</strong></span>"
             }
+            if(full.hasEmptySequence) {
+              html += " <span class='parsley-custom-error-message'><strong>(MISSING INDEX)</strong></span>"            
+            }
             return html;
           },
           "include": true,

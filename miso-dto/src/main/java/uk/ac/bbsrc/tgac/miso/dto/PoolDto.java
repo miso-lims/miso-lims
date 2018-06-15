@@ -31,6 +31,7 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
   private boolean hasLowQualityLibraries;
   private int dilutionCount;
   private Double insertSize;
+  private boolean hasEmptySequence;
 
   public String getAlias() {
     return alias;
@@ -225,5 +226,13 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setInsertSize(Double insertSize) {
     this.insertSize = insertSize;
+  }
+
+  public boolean getHasEmptySequence() {
+    return hasEmptySequence;
+  }
+
+  public void setHasEmptySequence(boolean hasEmptySequence) {
+    this.hasEmptySequence = hasEmptySequence;
   }
 }

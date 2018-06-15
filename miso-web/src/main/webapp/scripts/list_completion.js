@@ -75,6 +75,9 @@ ListTarget.completion = {
         if (full.pool.hasLowQualityLibraries) {
           html += " <span class='parsley-custom-error-message'><strong>(LOW QUALITY LIBRARIES)</strong></span>"
         }
+        if(full.pool.hasEmptySequence){
+          html += " <span class='parsley-custom-error-message'><strong>(MISSING INDEX)</strong></span>"
+        }
         return html;
       },
       "bSortable": false,
