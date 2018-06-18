@@ -228,8 +228,8 @@ public class EditPoolController {
     } else if (!nearDuplicates.isEmpty()) {
       warnings.add("This pool contains near-duplicate indices!");
     }
-    if (pool.hasViewWithoutIndex()) {
-      warnings.add("This pool contains a dilution with no index!");
+    if (pool.hasLibrariesWithoutIndex()) {
+      warnings.add("This pool contains multiple libraries with no index!");
     }
     addConsentWarning(pool, warnings);
     model.addAttribute("warnings", warnings);
