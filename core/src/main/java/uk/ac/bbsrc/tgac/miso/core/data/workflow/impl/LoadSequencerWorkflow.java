@@ -63,7 +63,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   }
 
   @Override
-  public void processInput(int stepNumber, ProgressStep step) {
+  public List<String> processInput(int stepNumber, ProgressStep step) {
     if (stepNumber == 0) {
       step.accept(containerStep);
       containerModelStep.cancelInput();
@@ -85,6 +85,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
       int partitionIndex = asPartitionIndex(stepNumber);
       step.accept(partitionSteps.get(partitionIndex));
     }
+    return Collections.emptyList();
   }
 
   private void resetPartitionSteps(SequencingContainerModel model) {

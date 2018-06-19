@@ -31,7 +31,7 @@ public interface ProgressStep extends Serializable, Comparable<ProgressStep> {
         "Sequencing Container", FactoryType.BARCODABLE,
         EntityType.CONTAINER), STRING("String", FactoryType.STRING, null), SKIP("SKIP", FactoryType.SKIP, null), SEQUENCING_CONTAINER_MODEL(
             "Sequencing Container Model", FactoryType.BARCODABLE, EntityType.CONTAINER_MODEL), SAMPLE("Sample", FactoryType.BARCODABLE, EntityType.SAMPLE),
-    POSITIVE_DOUBLE("Positive Double", FactoryType.POSITIVE_DOUBLE, null), POSITIVE_INTEGER("Positive Integer", FactoryType.POSITIVE_INTEGER, null), SAMPLE_STOCK("Stock", FactoryType.STOCK, EntityType.SAMPLE);
+    POSITIVE_DOUBLE("Positive Double", FactoryType.POSITIVE_DOUBLE, null), POSITIVE_INTEGER("Positive Integer", FactoryType.POSITIVE_INTEGER, null), SAMPLE_STOCK("Stock", FactoryType.STOCK, EntityType.SAMPLE), BOX("Box", FactoryType.BARCODABLE, EntityType.BOX), BOX_POSITION("Box Position", FactoryType.BOX_POSITION, null);
 
     private final String name;
     private final FactoryType factoryType;
@@ -58,6 +58,6 @@ public interface ProgressStep extends Serializable, Comparable<ProgressStep> {
 
   enum FactoryType {
     // Must be declared in the intended order to be applied to construct a ProgressStep
-    SKIP, STOCK, BARCODABLE, POSITIVE_INTEGER, INTEGER, POSITIVE_DOUBLE, STRING
+    SKIP, STOCK, BARCODABLE, POSITIVE_INTEGER, INTEGER, POSITIVE_DOUBLE, BOX_POSITION, STRING
   }
 }

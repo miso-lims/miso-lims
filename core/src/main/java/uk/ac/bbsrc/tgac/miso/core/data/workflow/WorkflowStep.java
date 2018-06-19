@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow;
 
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.BoxPositionProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.BoxProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.IntegerProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.PoolProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.PositiveDoubleProgressStep;
@@ -62,6 +64,14 @@ public interface WorkflowStep {
     throwUnexpectedInput();
   }
 
+  default void processInput(BoxProgressStep step) {
+    throwUnexpectedInput();
+  }
+
+  default void processInput(BoxPositionProgressStep step) {
+    throwUnexpectedInput();
+  }
+
   void cancelInput();
 
   /**
@@ -76,5 +86,8 @@ public interface WorkflowStep {
     throw new IllegalArgumentException("Unexpected input");
   }
 
+  default String getError() {
+    return null;
+  }
 
 }

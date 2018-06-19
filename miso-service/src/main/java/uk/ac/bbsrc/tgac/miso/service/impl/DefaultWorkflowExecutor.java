@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.QC;
@@ -18,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowExecutor;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
@@ -53,6 +55,9 @@ public class DefaultWorkflowExecutor implements WorkflowExecutor {
   @Autowired
   SamplePurposeService samplePurposeService;
 
+  @Autowired
+  BoxService boxService;
+
   @Override
   public Pool save(Pool pool) throws IOException {
     return poolService.get(poolService.save(pool));
@@ -76,6 +81,11 @@ public class DefaultWorkflowExecutor implements WorkflowExecutor {
   @Override
   public Sample save(Sample sample) throws IOException {
     return sampleService.save(sample);
+  }
+
+  @Override
+  public Box save(Box box) throws IOException {
+    return boxService.get(boxService.save(box));
   }
 
   @Override
