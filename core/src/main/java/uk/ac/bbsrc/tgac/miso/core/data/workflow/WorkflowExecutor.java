@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.workflow;
 import java.io.IOException;
 import java.util.Collection;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -52,6 +53,15 @@ public interface WorkflowExecutor {
    * @throws IOException
    */
   Sample save(Sample sample) throws IOException;
+
+  /**
+   * Creates or updates a Box
+   * 
+   * @param box
+   * @return the updated Box
+   * @throws IOException
+   */
+  Box save(Box box) throws IOException;
 
   /**
    * Creates a new Aliquot from a Stock

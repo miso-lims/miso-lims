@@ -32,8 +32,10 @@ public interface Workflow {
   /**
    * Validate and store input for a step identified by the 0-indexed stepNumber.
    * If stepNumber refers to a previous step, an implementation may or may not choose to invalidate future steps.
+   * 
+   * @return
    */
-  void processInput(int stepNumber, ProgressStep step);
+  List<String> processInput(int stepNumber, ProgressStep step);
 
   /**
    * Removes the latest step and any effects it caused.
