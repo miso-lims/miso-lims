@@ -197,10 +197,10 @@ public class BulkDilutionIT extends AbstractIT {
     testDilutionAttribute(DilColumns.VOLUME, attributes, dilution, dil -> dil.getVolume().toString());
     testDilutionAttribute(DilColumns.CREATION_DATE, attributes, dilution, dil -> dil.getCreationDate().toString());
     testDilutionAttribute(DilColumns.TARGETED_SEQUENCING, attributes, dilution, dil -> {
-      if (dil.getTargetedSequencing() == null) {
+      if (dil.getDefaultTargetedSequencing() == null) {
         return null;
       }
-      return dil.getTargetedSequencing().getAlias();
+      return dil.getDefaultTargetedSequencing().getAlias();
     });
   }
 

@@ -117,6 +117,10 @@ public class ProjectImpl implements Project {
   @JoinColumn(name = "referenceGenomeId", referencedColumnName = "referenceGenomeId", nullable = false)
   private ReferenceGenome referenceGenome;
 
+  @ManyToOne(targetEntity = TargetedSequencing.class)
+  @JoinColumn(name = "targetedSequencingId", referencedColumnName = "targetedSequencingId", nullable = true)
+  private TargetedSequencing defaultTargetedSequencing;
+
   @ManyToOne
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = null;
@@ -428,6 +432,16 @@ public class ProjectImpl implements Project {
         .append(referenceGenome, other.referenceGenome)
         .append(shortName, other.shortName)
         .isEquals();
+  }
+
+  @Override
+  public TargetedSequencing getDefaultTargetedSequencing() {
+    return defaultTargetedSequencing;
+  }
+
+  @Override
+  public void setDefaultTargetedSequencing(TargetedSequencing targetedSequencing) {
+    this.defaultTargetedSequencing = targetedSequencing;
   }
 
 }

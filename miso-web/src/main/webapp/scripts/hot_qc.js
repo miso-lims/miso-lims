@@ -47,7 +47,7 @@ HotTarget.qc = function(qcTarget) {
         data: 'typeName',
         type: 'dropdown',
         source: Constants.qcTypes.filter(function(qcType) {
-          return qcType.qcTarget == qcTarget;
+          return qcType.qcTarget == qcTarget && !qcType.archived;
         }).map(Utils.array.getName).sort(),
         unpack: function(qc, flat, setCellMeta) {
           flat.typeName = qc.type ? qc.type.name : "";

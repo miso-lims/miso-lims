@@ -209,4 +209,6 @@ public interface Pool
 
   public String getLongestIndex();
 
+  boolean hasLibrariesWithoutIndex();
+
 }

@@ -29,6 +29,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 @Table(name = "TargetedSequencing")
 public class TargetedSequencing implements Serializable {
 
+  public static final TargetedSequencing NULL = new TargetedSequencing();
+
+  static {
+    NULL.setId(null);
+    NULL.setAlias("None");
+    NULL.setArchived(false);
+  }
+
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
 

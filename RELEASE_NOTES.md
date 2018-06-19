@@ -1,3 +1,13 @@
+# 0.2.126
+
+Changes:
+
+ * Add Default Targeted Sequencing setting for Projects
+ * Add warnings to pools with missing indices
+ * Display order platform on pool tiles when filling sequencing containers
+ * Fix unable to place boxes in freezers on freezers page
+ * Hide archived QCTypes from the create QC tables
+
 # 0.2.125
 
 Changes:

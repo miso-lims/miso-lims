@@ -375,9 +375,12 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     if (minimumDistance > 1 && views.stream().allMatch(PoolImpl::hasFakeSequence)) return Collections.emptySet();
     for (int i = 0; i < views.size(); i++) {
       String sequence1 = getCombinedIndexSequences(views.get(i));
+      if (sequence1.length() == 0) {
+        continue;
+      }
       for (int j = i + 1; j < views.size(); j++) {
         String sequence2 = getCombinedIndexSequences(views.get(j));
-        if (!isCheckNecessary(views.get(i), views.get(j), minimumDistance)) {
+        if (sequence2.length() == 0 || !isCheckNecessary(views.get(i), views.get(j), minimumDistance)) {
           continue;
         }
         if (Index.checkEditDistance(sequence1, sequence2) < minimumDistance) {
@@ -405,6 +408,21 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     return view.getIndices().stream()
         .map(Index::getFamily)
         .anyMatch(f -> f.hasFakeSequence());
+  }
+
+  @Override
+  public boolean hasLibrariesWithoutIndex() {
+    List<PoolableElementView> views = new ArrayList<>(getPoolableElementViews());
+    int count = 0;
+    for (int i = 0; i < views.size(); i++) {
+      if (views.get(i).getIndices().isEmpty()) {
+        count++;
+        if (count >= 2) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @Override

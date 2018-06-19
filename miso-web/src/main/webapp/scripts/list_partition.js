@@ -51,13 +51,16 @@ ListTarget.partition = {
 
       response.items.forEach(function(item) {
         var problems = [];
-        if (item.pool.hasLowQualityLibraries) {
-          problems.push("LOW QUALITY LIBRARIES");
-        }
         if (item.pool.duplicateIndices) {
           problems.push("DUPLICATE INDICES");
         } else if (item.pool.nearDuplicateIndices) {
           problems.push("NEAR-DUPLICATE INDICES");
+        }
+        if (item.pool.hasLowQualityLibraries) {
+          problems.push("LOW QUALITY LIBRARIES");
+        }
+        if (item.pool.hasEmptySequence){
+          problems.push("MISSING INDEX");
         }
         var consentRevoked = item.pool.pooledElements.filter(function(element) {
           return element.identityConsentLevel === 'Revoked';
@@ -80,7 +83,7 @@ ListTarget.partition = {
           return order.remaining > 0;
         }).map(
             function(order) {
-              return order.parameters.name + ": " + order.remaining + " "
+              return order.parameters.platform.instrumentModel + " " + order.parameters.name + ": " + order.remaining + " "
                   + (order.remaining == 1 ? platformType.partitionName : platformType.pluralPartitionName) + " remaining";
             });
 
@@ -270,13 +273,16 @@ ListTarget.partition = {
         var prettyName = data.name + " (" + data.alias + ")";
         if (type === 'display') {
           var problems = [];
-          if (data.hasLowQualityLibraries) {
-            problems.push("LOW QUALITY LIBRARIES");
-          }
           if (data.duplicateIndices) {
-            problems.push("DUPLICATE INDICES");
+            problems.push("(DUPLICATE INDICES)");
           } else if (data.nearDuplicateIndices) {
-            problems.push("NEAR-DUPLICATE INDICES");
+            problems.push("(NEAR-DUPLICATE INDICES)");
+          }
+          if (data.hasLowQualityLibraries) {
+            problems.push("(LOW QUALITY LIBRARIES)");
+          }
+          if(data.hasEmptySequence){
+            problems.push("(MISSING INDEX)");
           }
 
           return "<a href=\"/miso/pool/" + data.id + "\">" + prettyName + "</a>" + (problems.length > 0 ? problems.map(function(message) {

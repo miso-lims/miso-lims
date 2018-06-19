@@ -1398,6 +1398,7 @@ public class Dtos {
       dto.setDuplicateIndices(!from.getDuplicateIndicesSequences().isEmpty());
       dto.setNearDuplicateIndices(!from.getNearDuplicateIndicesSequences().isEmpty());
     }
+    dto.setHasEmptySequence(from.hasLibrariesWithoutIndex());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     if (from.getBox() != null) {

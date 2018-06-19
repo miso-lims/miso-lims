@@ -13,7 +13,7 @@ public enum PoolSpreadSheets implements Spreadsheet<Pool> {
       Column.forString("Alias", Pool::getAlias), //
       Column.forString("Barcode", Pool::getIdentificationBarcode), //
       Column.forDouble("Latest qPCR QC", pool -> pool.getQCs().stream()//
-          .filter(qc -> qc.getType().getName().equals("qPCR"))
+          .filter(qc -> qc.getType().getName().contains("qPCR"))
           .max(Comparator.comparing(PoolQC::getDate).thenComparing(Comparator.comparing(PoolQC::getLastModified)))//
           .map(PoolQC::getResults).orElse(0.0)));
 

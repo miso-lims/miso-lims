@@ -76,7 +76,7 @@ HotTarget.dilution = {
               return dil.library.libraryDesignCodeId == code.id;
             }, Constants.libraryDesignCodes);
             if (Utils.array.maybeGetProperty(designCode, 'targetedSequencingRequired')) {
-              setCellMeta('validator', HotUtils.validator.requiredAutocompleteWithNullValue('(None)'));
+              setCellMeta('validator', HotUtils.validator.requiredAutocomplete);
               missingValueString = '';
             } else {
               setCellMeta('validator', HotUtils.validator.permitEmptyDropdown);

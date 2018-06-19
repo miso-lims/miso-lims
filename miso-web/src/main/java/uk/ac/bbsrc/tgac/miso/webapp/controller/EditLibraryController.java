@@ -814,6 +814,9 @@ public class EditLibraryController {
     protected DilutionDto createDtoFromParent(Library item) {
       DilutionDto dto = new DilutionDto();
       dto.setLibrary(Dtos.asDto(item));
+      if (item.getSample().getProject().getDefaultTargetedSequencing() != null) {
+        dto.setTargetedSequencingId(item.getSample().getProject().getDefaultTargetedSequencing().getId());
+      }
       return dto;
     }
 

@@ -94,11 +94,11 @@ public class EditKitDescriptorController {
       KitDescriptor kitDescriptor = null;
       if (kitDescriptorId == KitDescriptor.UNSAVED_ID) {
         kitDescriptor = new KitDescriptor();
-        model.put("title", "New Kit Descriptor");
+        model.addAttribute("title", "New Kit Descriptor");
       } else {
         kitDescriptor = kitService.getKitDescriptorById(kitDescriptorId);
         if (kitDescriptor == null) throw new NotFoundException("No kit found for ID " + kitDescriptorId.toString());
-        model.put("title", kitDescriptor.getName());
+        model.put("title", "Kit Descriptor " + kitDescriptor.getId());
       }
 
       model.put("formObj", kitDescriptor);
