@@ -87,11 +87,13 @@ need to add a grant privilege to the MISO database from your remote machine:
     GRANT ALL ON `lims`.* TO 'tgaclims'@'your.tomcat.install.server';
     GRANT ALL ON `lims`.* TO 'tgaclims'@'your.tomcat.install.server' IDENTIFIED BY 'tgaclims';
 
-Download the Flyway command line tool and install it.
 
 <a id="root">
 
 # Setting Up the Application Server
+
+Download the [Flyway command line tool](https://flywaydb.org/documentation/commandline/) and install it.
+
 The application server needs [Tomcat 8](https://tomcat.apache.org/download-80.cgi).
 
 Create a file called `ROOT.xml` in the following directory
