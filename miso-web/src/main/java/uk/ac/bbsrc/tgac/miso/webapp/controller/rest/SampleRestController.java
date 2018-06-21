@@ -276,6 +276,14 @@ public class SampleRestController extends RestController {
     return getSample(id, b);
   }
 
+  /**
+   * Given a list of external name search terms, returns a list of identities which match those search terms, in the
+   * same order as the original list. Search can be scoped by project, and can be for an exact match or for a partial match.
+   * 
+   * @param exactMatch whether a distinct external name of an existing identity needs to exactly match the given search term.
+   * @param json a list of search terms and possibly the project shortName
+   * @return a list of maps between search terms and matching identities
+   */
   @RequestMapping(value = "/identitiesLookup", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   public @ResponseBody List<Map<String, Set<SampleDto>>> getIdentitiesBySearch(@RequestParam boolean exactMatch,
       @RequestBody com.fasterxml.jackson.databind.JsonNode json,
@@ -286,13 +294,12 @@ public class SampleRestController extends RestController {
       throw new RestException("Please provide external name or alias for identity lookup", Status.BAD_REQUEST);
     }
     List<Map<String, Set<SampleDto>>> identitiesBySearchTerm = new ArrayList<>();
-    for (JsonNode term : searchTerms) {
+    for (int i = 0; i < searchTerms.size(); i++) {
+      JsonNode term = searchTerms.get(i);
       Set<SampleDto> uniqueIdentities = getSamplesForIdentityString(term.asText(), project, exactMatch);
-      if (uniqueIdentities.size() > 0) {
-        Map<String, Set<SampleDto>> found = new HashMap<>();
-        found.put(term.asText(), uniqueIdentities);
-        identitiesBySearchTerm.add(found);
-      }
+      Map<String, Set<SampleDto>> found = new HashMap<>();
+      found.put(term.asText(), uniqueIdentities);
+      identitiesBySearchTerm.add(i, found);
     }
     return identitiesBySearchTerm;
   }
