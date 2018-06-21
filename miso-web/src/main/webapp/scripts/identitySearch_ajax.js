@@ -18,7 +18,7 @@
         data: JSON.stringify({"identitiesSearches": data, "project": $('#projectAlias').val() })
       }).success(function(results) {
         results.sort(function(a, b) {
-          return data.indexOf(Object.keys(a)[0]) > data.indexOf(Object.keys(b)[0]);
+          return data.indexOf(Object.keys(a)[0]) - data.indexOf(Object.keys(b)[0]);
         });
         var tbody = document.getElementById('externalNameResults');
         results.map(function (result) {
@@ -59,7 +59,8 @@
   }
   
   IdentitySearch.unbreakString = function (str) {
-    return str.split(' ').join('\u00A0').split('-').join('\u2011');
+    // \u00A0 = non-breaking space; \u2011 = non-breaking hyphen
+		return str.split(' ').join('\u00A0').split('-').join('\u2011');
   }
   
   IdentitySearch.sampleSearchFor = function() {
