@@ -413,13 +413,9 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public boolean hasLibrariesWithoutIndex() {
     List<PoolableElementView> views = new ArrayList<>(getPoolableElementViews());
-    int count = 0;
     for (int i = 0; i < views.size(); i++) {
       if (views.get(i).getIndices().isEmpty()) {
-        count++;
-        if (count >= 2) {
-          return true;
-        }
+        return true;
       }
     }
     return false;
