@@ -17,7 +17,8 @@ public interface AbstractListPage {
     public static final String LAST_MODIFIED = "Last Modified";
     public static final String SAMPLE_NAME = "Sample Name";
     public static final String SAMPLE_ALIAS = "Sample Alias";
-    public static final String INDICES = "Index(es)";
+    public static final String INDEX = "Index(es)";
+    public static final String INDICES = "Indices";
     public static final String LIBRARY_NAME = "Library Name";
     public static final String LIBRARY_ALIAS = "Library Alias";
     public static final String CREATOR = "Creator";

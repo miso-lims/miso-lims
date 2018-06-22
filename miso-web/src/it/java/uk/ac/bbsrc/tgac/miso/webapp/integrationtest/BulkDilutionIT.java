@@ -158,7 +158,7 @@ public class BulkDilutionIT extends AbstractIT {
 
   @Test
   public void testVolumeUsedWarning() {
-    BulkDilutionPage page = BulkDilutionPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(600L));
+    BulkDilutionPage page = BulkDilutionPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(700L));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
@@ -180,7 +180,7 @@ public class BulkDilutionIT extends AbstractIT {
 
   @Test
   public void testVolumeUsedNoWarning() {
-    BulkDilutionPage page = BulkDilutionPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(601L));
+    BulkDilutionPage page = BulkDilutionPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(701L));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();

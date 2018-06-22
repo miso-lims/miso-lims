@@ -22,7 +22,7 @@ public class FormPageTestUtils {
       if (val == null) {
         assertTrue(String.format(formatString, key.toString()) + " expected null, is " + fieldValue, isStringEmptyOrNull(fieldValue));
       } else {
-        assertEquals(String.format(formatString, key.toString()), val, page.getField(key));
+        assertEquals(String.format(formatString, key.toString()), val, fieldValue);
       }
     });
   }

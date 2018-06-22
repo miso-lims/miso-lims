@@ -22,6 +22,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage.PoolTableWrapp
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.dialog.AddNoteDialog;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.Note;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
+
 
 public class PoolPageIT extends AbstractIT {
 
@@ -275,6 +277,41 @@ public class PoolPageIT extends AbstractIT {
     PoolPage page2 = page1.removeSelectedDilutions();
     DataTable includedTable2 = page2.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
     assertEquals(0, includedTable2.countRows());
+  }
+
+  @Test
+  public void testDilutionTableWarnings() {
+    testDilutionTableWarningOnPoolWithError(801L, "(NO INDEX)");
+    testDilutionTableWarningOnPoolWithError(802L, "(NEAR-DUPLICATE INDEX)");
+    testDilutionTableWarningOnPoolWithError(803L, "(DUPLICATE INDEX)");
+  }
+
+  public void testDilutionTableWarningOnPoolWithError(long id, String warning) {
+    PoolPage page = PoolPage.getForEdit(getDriver(), getBaseUrl(), id);
+    DataTable table = page.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
+    assertTrue("Dilution table fails to show '" + warning + "' warning", table.doesColumnContainSubstring(Columns.INDICES, warning));
+  }
+
+  @Test
+  public void testHeaderWarningsOnPoolsWithError() {
+    testHeaderWarningOnPoolWithError(801L, "This pool contains at least one library with no index!");
+    testHeaderWarningOnPoolWithError(802L, "This pool contains near-duplicate indices!");
+    testHeaderWarningOnPoolWithError(803L, "This pool contains duplicate indices!");
+    testHeaderWarningOnPoolWithError(804L, "This pool contains at least one low quality library!");
+  }
+
+  public void testHeaderWarningOnPoolWithError(long id, String warning) {
+    PoolPage page = PoolPage.getForEdit(getDriver(), getBaseUrl(), id);
+    assertTrue("Page fails to show '" + warning + "' warning", page.getField(Field.WARNINGS).contains(warning));
+  }
+
+  @Test
+  public void testWarningsOnPoolWithNoErrors() {
+    PoolPage page = PoolPage.getForEdit(getDriver(), getBaseUrl(), 120001L);
+    DataTable table = page.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
+    assertFalse(table.doesColumnContainSubstring(Columns.INDICES, "(NO INDEX)"));
+    assertFalse(table.doesColumnContainSubstring(Columns.INDICES, "(NEAR-DUPLICATE INDEX)"));
+    assertFalse(table.doesColumnContainSubstring(Columns.INDICES, "(DUPLICATE INDICES)"));
   }
 
   private void assertPoolAttributes(Map<PoolPage.Field, String> expectedValues, Pool pool) {

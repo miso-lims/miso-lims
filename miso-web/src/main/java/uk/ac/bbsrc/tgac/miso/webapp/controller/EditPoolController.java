@@ -223,7 +223,10 @@ public class EditPoolController {
       warnings.add("This pool contains near-duplicate indices!");
     }
     if (pool.hasLibrariesWithoutIndex()) {
-      warnings.add("This pool contains multiple libraries with no index!");
+      warnings.add("This pool contains at least one library with no index!");
+    }
+    if (pool.getHasLowQualityMembers()) {
+      warnings.add("This pool contains at least one low quality library!");
     }
     addConsentWarning(pool, warnings);
     model.addAttribute("warnings", warnings);
