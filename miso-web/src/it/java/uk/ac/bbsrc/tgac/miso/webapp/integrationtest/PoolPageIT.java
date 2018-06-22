@@ -16,12 +16,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage.Field;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage.PoolTableWrapperId;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.dialog.AddNoteDialog;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.Note;
+
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage.DilutionTableErrors;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage.PoolTableWrapperId;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.dialog.AddNoteDialog;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class PoolPageIT extends AbstractIT {
 
@@ -275,6 +275,12 @@ public class PoolPageIT extends AbstractIT {
     PoolPage page2 = page1.removeSelectedDilutions();
     DataTable includedTable2 = page2.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
     assertEquals(0, includedTable2.countRows());
+  }
+
+  @Test
+  public void testNoIndexError() {
+    PoolPage page = PoolPage.getForEdit(getDriver(), getBaseUrl(), 801L);
+    assertEquals(DilutionTableErrors.NO_INDEX, page.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS).getTextAtCell(DilutionTableColumns, 0));
   }
 
   private void assertPoolAttributes(Map<PoolPage.Field, String> expectedValues, Pool pool) {
