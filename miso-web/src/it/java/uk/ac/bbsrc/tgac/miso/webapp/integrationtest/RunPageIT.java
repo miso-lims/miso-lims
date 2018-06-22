@@ -445,6 +445,24 @@ public class RunPageIT extends AbstractIT {
     }
   }
 
+  @Test
+  public void testPoolTileWarnings() throws Exception {
+    testPoolTileWarning("IPO801", "MISSING INDEX");
+    testPoolTileWarning("IPO802", "NEAR-DUPLICATE INDICES");
+    testPoolTileWarning("IPO803", "DUPLICATE INDICES");
+    testPoolTileWarning("IPO804", "LOW QUALITY LIBRARIES");
+  }
+
+  public void testPoolTileWarning(String search, String warning) throws Exception {
+    RunPage page = RunPage.getForEdit(getDriver(), getBaseUrl(), 5100L);
+
+    page.searchForPools(false, Arrays.asList(0), PoolSearch.SEARCH, search);
+    List<String> poolWarnings = page.getPoolWarningsFromTiles();
+    assertTrue(poolWarnings.size() >= 1);
+
+    assertTrue(poolWarnings.contains(warning));
+  }
+
   private void assertRunAttributes(Map<RunPage.Field, String> expectedValues, Run run) {
     assertAttribute(Field.ID, expectedValues, Long.toString(run.getId()));
     assertAttribute(Field.NAME, expectedValues, run.getName());

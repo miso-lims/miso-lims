@@ -26,7 +26,9 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     QC_PASSED(By.name("qcPassed"), FieldType.RADIO),
     VOLUME(By.id("volume"), FieldType.TEXT),
     DISCARDED(By.id("discarded"), FieldType.CHECKBOX),
-    LOCATION(By.id("location"), FieldType.LABEL);
+    LOCATION(By.id("location"), FieldType.LABEL),
+    
+    WARNINGS(By.className("big-warning"), FieldType.LABEL);
 
     private final By selector;
     private final FieldType type;
@@ -112,4 +114,5 @@ public class PoolPage extends FormPage<PoolPage.Field> {
   public DataTable getTable(String tableWrapperId) {
     return new DataTable(getDriver(), tableWrapperId);
   }
+
 }

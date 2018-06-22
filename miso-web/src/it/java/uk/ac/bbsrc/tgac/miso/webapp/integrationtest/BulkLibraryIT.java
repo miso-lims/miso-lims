@@ -183,10 +183,11 @@ public class BulkLibraryIT extends AbstractIT {
     assertTrue(types.contains("Single End"));
 
     families = table.getDropdownOptions(LibColumns.INDEX_FAMILY, 0);
-    assertEquals(3, families.size());
+    assertEquals(4, families.size());
     assertTrue(families.contains(NO_INDEX_FAMILY));
     assertTrue(families.contains("Single Index 6bp"));
     assertTrue(families.contains("Dual Index 6bp"));
+    assertTrue(families.contains("Similar Index Pair"));
 
     kits = table.getDropdownOptions(LibColumns.KIT_DESCRIPTOR, 0);
     assertEquals(2, kits.size());

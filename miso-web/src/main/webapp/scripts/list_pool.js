@@ -75,10 +75,14 @@ ListTarget.pool = {
             if(full.hasEmptySequence) {
               html += " <span class='parsley-custom-error-message'><strong>(MISSING INDEX)</strong></span>"            
             }
+            if (full.hasLowQualityLibraries) {
+              html += " <span class='parsley-custom-error-message'><strong>(LOW QUALITY LIBRARIES)</strong></span>";
+            }
             return html;
           },
           "include": true,
-          "iSortPriority": 0
+          "iSortPriority": 0,
+          "bSortable": false
         }, {
           "sTitle": "Date Created",
           "mData": "creationDate",

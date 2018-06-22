@@ -227,7 +227,7 @@
   <miso:list-section-ajax id="list_completion" name="Order Status" target="completion" config="{ poolId: ${pool.id} }"/>
   <miso:list-section id="list_run" name="Runs" target="run" items="${runs}" config="{ poolId: ${pool.id} }"/>
   <miso:list-section id="list_partition" name="${pool.platformType.pluralPartitionName}" target="partition" items="${partitions}" config="{'showContainer': true, 'showPool': false}"/>
-  <miso:list-section-ajax id="list_included" name="Included Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: false, duplicateIndicesSequences: ${duplicateIndicesSequences}, nearDuplicateIndicesSequences: ${nearDuplicateIndicesSequences} }"/>
+  <miso:list-section-ajax id="list_included" name="Included Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: false, duplicateIndicesSequences: ${duplicateIndicesSequences}, nearDuplicateIndicesSequences: ${nearDuplicateIndicesSequences}}"/>
   <div class="noPrint">
     <miso:list-section-ajax id="list_available" name="Available Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: true }"/>
   </div>
