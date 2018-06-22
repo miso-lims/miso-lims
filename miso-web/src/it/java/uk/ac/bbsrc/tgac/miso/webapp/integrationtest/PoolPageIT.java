@@ -18,7 +18,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage;
-import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage.DilutionTableErrors;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage.DilutionTableColumns;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage.DilutionTableWarnings;
 import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage.PoolTableWrapperId;
 import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.dialog.AddNoteDialog;
 import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
@@ -278,9 +279,11 @@ public class PoolPageIT extends AbstractIT {
   }
 
   @Test
-  public void testNoIndexError() {
+  public void testNoIndexWarning() {
     PoolPage page = PoolPage.getForEdit(getDriver(), getBaseUrl(), 801L);
-    assertEquals(DilutionTableErrors.NO_INDEX, page.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS).getTextAtCell(DilutionTableColumns, 0));
+    assertEquals(DilutionTableWarnings.NO_INDEX,
+        page.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS).getTextAtCell(DilutionTableColumns.INDICES, 0));
+    // test for text at top of page too
   }
 
   private void assertPoolAttributes(Map<PoolPage.Field, String> expectedValues, Pool pool) {

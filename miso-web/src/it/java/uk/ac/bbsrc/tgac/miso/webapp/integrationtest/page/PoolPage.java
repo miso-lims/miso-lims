@@ -58,7 +58,7 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     public static final String CHANGES = "changelog_wrapper";
   }
 
-  public static class DilutionTableErrors {
+  public static class DilutionTableWarnings {
     public static final String NO_INDEX = "(NO INDEX)";
     public static final String DUPLICATE_INDEX = "(DUPLICATE INDEX)";
   }
@@ -67,7 +67,7 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     public static final String INDICES = "indexIds";
   }
 
-  public static class PoolPageErrors {
+  public static class PoolPageWarnings {
     public static final String NO_INDEX = "This pool contains duplicate indicies!";
     public static final String DUPLICATE_INDEX = "This pool contains at least one library with no index!";
   }
