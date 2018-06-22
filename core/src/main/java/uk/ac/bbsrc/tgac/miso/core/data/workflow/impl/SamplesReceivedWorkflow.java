@@ -146,9 +146,9 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
 
   @Override
   public String getConfirmMessage() {
-    // Change this
-    return "Add a Qubit QC with value " + qcStep.getQCValue() + "ng/µl to Stock '" + sampleStep.getAlias() + "' and propagate to "
-        + aliquotStep.getAliquotQuantity() + " Aliquot(s)?";
+    return "Add a Qubit QC with value " + qcStep.getQCValue() + "ng/µl to Stock '" + sampleStep.getAlias() + "', propagate to "
+        + aliquotStep.getAliquotQuantity() + " Aliquot(s) and insert them into Box '" + boxStep.getAlias()
+        + "' with the specified locations and values?";
   }
 
   @Override
