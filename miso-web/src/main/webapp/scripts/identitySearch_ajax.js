@@ -17,9 +17,6 @@
         contentType: 'application/json; charset=utf8',
         data: JSON.stringify({"identitiesSearches": data, "project": $('#projectAlias').val() })
       }).success(function(results) {
-        results.sort(function(a, b) {
-          return data.indexOf(Object.keys(a)[0]) - data.indexOf(Object.keys(b)[0]);
-        });
         var tbody = document.getElementById('externalNameResults');
         results.map(function (result) {
           var tr = document.createElement('TR');
