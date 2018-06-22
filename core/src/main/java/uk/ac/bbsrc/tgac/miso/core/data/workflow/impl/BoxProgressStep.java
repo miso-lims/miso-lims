@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -15,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStep;
 public class BoxProgressStep extends AbstractProgressStep {
   private static final long serialVersionUID = 1L;
 
-  @ManyToOne(targetEntity = BoxImpl.class)
+  @ManyToOne(targetEntity = BoxImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "boxId")
   private Box input;
 

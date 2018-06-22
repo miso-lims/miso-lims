@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
@@ -51,10 +52,12 @@ public class HibernateProgressDao implements ProgressStore {
 
   @Override
   public List<Progress> listByUserId(long id) {
+    Criteria criteria = currentSession().createCriteria(ProgressImpl.class);
+    criteria.createAlias("user", "u")
+        .add(Restrictions.eq("u.userId", id));
+    criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
     @SuppressWarnings("unchecked")
-    List<Progress> results = currentSession().createCriteria(ProgressImpl.class).createAlias("user", "u")
-        .add(Restrictions.eq("u.userId", id)).list();
-
+    List<Progress> results = criteria.list();
     return results;
   }
 
