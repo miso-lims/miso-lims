@@ -2207,3 +2207,13 @@ div#inputError {
 .storageComponent .selected {
   background: #00BAFF !important;
 }
+
+.small-gap-right {
+  margin-right: 1ch;
+  padding: 0.25ch 0.5ch;
+}
+
+.clickable-non-link {
+  cursor: pointer;
+  color: rgb(0,102,204);
+}
