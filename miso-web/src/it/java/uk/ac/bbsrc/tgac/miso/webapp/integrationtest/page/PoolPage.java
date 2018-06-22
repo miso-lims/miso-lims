@@ -8,9 +8,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ButtonText;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.NotesSection;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ButtonText;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.NotesSection;
 
 public class PoolPage extends FormPage<PoolPage.Field> {
 
@@ -56,6 +56,20 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     public static final String INCLUDED_DILUTIONS = "list_included_wrapper";
     public static final String AVAILABLE_DILUTIONS = "list_available_wrapper";
     public static final String CHANGES = "changelog_wrapper";
+  }
+
+  public static class DilutionTableWarnings {
+    public static final String NO_INDEX = "(NO INDEX)";
+    public static final String DUPLICATE_INDEX = "(DUPLICATE INDEX)";
+  }
+
+  public static class DilutionTableColumns {
+    public static final String INDICES = "indexIds";
+  }
+
+  public static class PoolPageWarnings {
+    public static final String NO_INDEX = "This pool contains duplicate indicies!";
+    public static final String DUPLICATE_INDEX = "This pool contains at least one library with no index!";
   }
 
   private static final String NEW_TITLE_PREFIX = "New Pool ";

@@ -17,15 +17,14 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ListTarget;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage.Tabs;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage.ProjectTable;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ListTarget;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListPage;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage.Tabs;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage.ProjectTable;
+import src.it.java.uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class ListTablesIT extends AbstractIT {
 
@@ -303,6 +302,14 @@ public class ListTablesIT extends AbstractIT {
       testTabbedSearch(ListTarget.POOLS, query);
       testProjectPageSearch(ProjectTable.POOLS, query);
     });
+  }
+
+  @Test
+  public void testListPoolErrors() throws Exception {
+    ListPage page = getList(ListTarget.POOLS);
+    DataTable table = page.getTable();
+    table.searchFor("LDI701");
+    assertEquals(table.getTextAtCell("description", 0), "(MISSING INDEX)");
   }
 
   @Test
