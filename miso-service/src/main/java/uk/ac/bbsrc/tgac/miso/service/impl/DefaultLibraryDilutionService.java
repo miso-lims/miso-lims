@@ -158,18 +158,18 @@ public class DefaultLibraryDilutionService
     // pre-save field generation
     dilution.setName(generateTemporaryName());
     long savedId = save(dilution).getId();
-    boxService.updateBoxableLocation(dilution);
+    boxService.updateBoxableLocation(dilution, null);
     return savedId;
   }
 
   @Override
   public void update(LibraryDilution dilution) throws IOException {
-    LibraryDilution updatedDilution = get(dilution.getId());
-    authorizationManager.throwIfNotWritable(updatedDilution);
-    applyChanges(updatedDilution, dilution);
-    loadChildEntities(updatedDilution);
-    save(updatedDilution);
-    boxService.updateBoxableLocation(dilution);
+    LibraryDilution managed = get(dilution.getId());
+    authorizationManager.throwIfNotWritable(managed);
+    applyChanges(managed, dilution);
+    loadChildEntities(managed);
+    save(managed);
+    boxService.updateBoxableLocation(dilution, managed);
   }
 
   @Override
