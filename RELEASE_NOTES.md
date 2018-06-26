@@ -1,3 +1,10 @@
+# 0.2.127
+
+Changes:
+
+ * Fix table filtering and make results copyable in identity search
+ * Clarify which server needs Flyway installed on iti (documentation)
+
 # 0.2.126
 
 Changes:

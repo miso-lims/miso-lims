@@ -17,9 +17,6 @@
         contentType: 'application/json; charset=utf8',
         data: JSON.stringify({"identitiesSearches": data, "project": $('#projectAlias').val() })
       }).success(function(results) {
-        results.sort(function(a, b) {
-          return data.indexOf(Object.keys(a)[0]) > data.indexOf(Object.keys(b)[0]);
-        });
         var tbody = document.getElementById('externalNameResults');
         results.map(function (result) {
           var tr = document.createElement('TR');
@@ -33,13 +30,17 @@
           var identityAliasTd = document.createElement('TD');
           // create custom buttons for each found identity
           result[searchTerm].map(function (sam) {
-            var btn = document.createElement('INPUT');
-            btn.type = 'button';
-            btn.value = sam.alias + ' (' + sam.externalName + ')';
-            btn.onclick = IdentitySearch.sampleSearchFor;
-            return btn;
-          }).map(function (button) {
-            identityAliasTd.appendChild(button);
+            var span = document.createElement('SPAN');
+            span.className = 'small-gap-right clickable-non-link';
+            var label = sam.alias + ' (' + sam.externalName + ')';
+            var txt = document.createTextNode(IdentitySearch.unbreakString(label));
+            span.appendChild(txt);
+            span.dataset.alias = sam.alias
+            span.onclick = IdentitySearch.sampleSearchFor;
+            return span;
+          }).map(function (span) {
+            identityAliasTd.appendChild(span);
+            identityAliasTd.appendChild(document.createTextNode(' '));
           });
           tr.appendChild(identityAliasTd);
           tbody.appendChild(tr);
@@ -54,8 +55,13 @@
     }
   }
   
+  IdentitySearch.unbreakString = function (str) {
+    // \u00A0 = non-breaking space; \u2011 = non-breaking hyphen
+		return str.split(' ').join('\u00A0').split('-').join('\u2011');
+  }
+  
   IdentitySearch.sampleSearchFor = function() {
-    $('#list_samples_filter input').val(this.value);
+    $('#list_samples_filter input').val(this.dataset.alias);
     $('#list_samples').dataTable().fnFilter($('#list_samples_filter :input').val()); // regrettably ugly
   }
 

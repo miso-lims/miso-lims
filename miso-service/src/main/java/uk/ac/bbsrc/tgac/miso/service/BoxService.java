@@ -65,7 +65,7 @@ public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<
    * @param boxable Boxable to update, with its box (id) and boxPosition set accordingly
    * @throws IOException
    */
-  public void updateBoxableLocation(Boxable boxable) throws IOException;
+  public void updateBoxableLocation(Boxable boxable, Boxable original) throws IOException;
 
   @Override
   public default void beforeDelete(Box object) throws IOException {
