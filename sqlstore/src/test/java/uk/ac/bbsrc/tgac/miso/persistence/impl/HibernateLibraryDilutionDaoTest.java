@@ -205,11 +205,14 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
 
     final LibraryDilution ld = new LibraryDilution();
     final Library lib = new LibraryImpl();
+    UserImpl user = new UserImpl();
+    user.setId(1L);
+    user.setFullName("moi");
     lib.setId(1L);
+    ld.setCreator(user);
     ld.setLibrary(lib);
     ld.setConcentration(12.5D);
     ld.setCreationDate(new Date());
-    ld.setDilutionCreator("moi");
     ld.setName("nom de plume");
     Long newId = dao.save(ld);
     final LibraryDilution saved = dao.get(newId);

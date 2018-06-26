@@ -453,7 +453,7 @@ public class ImportExportControllerHelperService {
                   ldi.setConcentration(Double.valueOf(jsonArrayElement.getString(11)));
                   ldi.setCreationDate(new Date());
                   ldi.setLastModified(ldi.getCreationDate());
-                  ldi.setDilutionCreator(user.getLoginName());
+                  ldi.setCreator(user);
                   if (!library.getLibraryDilutions().contains(ldi)) {
                     library.addDilution(ldi);
                     log.info("Added library dilution: {}", ldi);

@@ -96,9 +96,9 @@ public class LibraryDilution extends AbstractBoxable
 
   private String concentrationUnits;
 
-  @Column(name = "dilutionUserName", nullable = false)
-  private String dilutionCreator;
-
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
   @ManyToOne(targetEntity = LibraryImpl.class)
   @JoinColumn(name = "library_libraryId")
   private Library library;
@@ -184,12 +184,12 @@ public class LibraryDilution extends AbstractBoxable
     this.name = name;
   }
 
-  public String getDilutionCreator() {
-    return dilutionCreator;
+  public User getCreator() {
+    return creator;
   }
 
-  public void setDilutionCreator(String dilutionUserName) {
-    this.dilutionCreator = dilutionUserName;
+  public void setCreator(User creator) {
+    this.creator = creator;
   }
 
   public Date getCreationDate() {
@@ -308,10 +308,10 @@ public class LibraryDilution extends AbstractBoxable
       } else if (!creationDate.equals(them.getCreationDate())) {
         return false;
       }
-      if (dilutionCreator == null) {
-        if (them.getDilutionCreator() != null)
+      if (creator == null) {
+        if (them.getCreator() != null)
           return false;
-      } else if (!dilutionCreator.equals(them.getDilutionCreator())) {
+      } else if (!creator.equals(them.getCreator())) {
         return false;
       }
       if (library == null) {
@@ -341,7 +341,7 @@ public class LibraryDilution extends AbstractBoxable
       final int PRIME = 37;
       int hashcode = 1;
       if (getCreationDate() != null) hashcode = PRIME * hashcode + getCreationDate().hashCode();
-      if (getDilutionCreator() != null) hashcode = PRIME * hashcode + getDilutionCreator().hashCode();
+      if (getCreator() != null) hashcode = PRIME * hashcode + getCreator().hashCode();
       if (getConcentration() != null) hashcode = PRIME * hashcode + getConcentration().hashCode();
       return hashcode;
     }

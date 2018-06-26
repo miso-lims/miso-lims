@@ -10,7 +10,7 @@ AS SELECT
     d.identificationBarcode AS dilutionBarcode,
     d.lastUpdated AS lastModified,
     d.creationDate AS created,
-    d.dilutionUserName AS creatorName,
+    createUser.fullName AS creatorName,
     d.targetedSequencingId AS targetedSequencingId,
     modUser.loginName AS lastModifierName,
     d.preMigrationId AS preMigrationId,
@@ -41,6 +41,7 @@ AS SELECT
     box.locationBarcode AS boxLocationBarcode
   FROM LibraryDilution d
     LEFT JOIN User modUser ON modUser.userId = d.lastModifier
+    JOIN User createUser ON createUser.userId = d.creator
     JOIN Library l ON l.libraryId = d.library_libraryId
     JOIN Sample s ON s.sampleId = l.sample_sampleId
     JOIN Project p ON p.projectId = s.project_projectId

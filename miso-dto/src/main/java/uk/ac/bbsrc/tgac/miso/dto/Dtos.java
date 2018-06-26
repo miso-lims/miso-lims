@@ -1302,7 +1302,7 @@ public class Dtos {
     DilutionDto dto = new DilutionDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
-    dto.setDilutionUserName(from.getDilutionCreator());
+    dto.setDilutionUserName(from.getCreator().getFullName());
     dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
     dto.setVolume(from.getVolume() == null ? null : from.getVolume().toString());
     dto.setConcentrationUnits(from.getConcentrationUnits());
@@ -1393,7 +1393,6 @@ public class Dtos {
     to.setVolume(from.getVolume() == null ? null : Double.valueOf(from.getVolume()));
     to.setVolumeUsed(from.getVolumeUsed() == null ? null : Double.valueOf(from.getVolumeUsed()));
     to.setLibrary(to(from.getLibrary()));
-    to.setDilutionCreator(from.getDilutionUserName());
     to.setCreationDate(parseDate(from.getCreationDate()));
     if (from.getTargetedSequencingId() != null) {
       to.setTargetedSequencing(new TargetedSequencing());
