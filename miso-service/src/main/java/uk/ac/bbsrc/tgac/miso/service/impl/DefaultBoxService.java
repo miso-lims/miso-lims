@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -37,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
+import uk.ac.bbsrc.tgac.miso.core.util.LatencyHistogram;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -50,6 +53,10 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSource<Box> {
+
+  private static final LatencyHistogram updateTime = new LatencyHistogram("miso_box_update_item_time",
+      "The time to update the information associated with a boxable.");
+
   @Autowired
   private AuthorizationManager authorizationManager;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
@@ -152,7 +159,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
 
   @Override
   public Map<String, Integer> getColumnSizes() throws IOException {
-      return boxStore.getBoxColumnSizes();
+    return boxStore.getBoxColumnSizes();
   }
 
   @Override
@@ -384,31 +391,40 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   }
 
   @Override
-  public void updateBoxableLocation(Boxable boxable) throws IOException {
-    if (boxable.isDiscarded()) {
-      boxable.removeFromBox();
-    }
-    if (boxable.getBox() != null && boxable.getBoxPosition() == null) {
-      throw new IllegalArgumentException("Box position missing");
-    } else if (boxable.getBoxPosition() != null && (boxable.getBox() == null || boxable.getBox().getId() == AbstractBox.UNSAVED_ID)) {
-      throw new IllegalArgumentException("Box position set, but no box specified");
-    }
-    BoxableView managed = getBoxableView(new BoxableId(boxable.getEntityType(), boxable.getId()));
-    if (managed.getBoxId() != null && boxable.getBox() == null) {
-      Box box = getDetached(managed.getBoxId());
-      box.removeBoxable(managed.getBoxPosition());
-      save(box);
-    } else if (boxable.getBox() != null && (
-        managed.getBoxId() == null
-            || managed.getBoxId().longValue() != boxable.getBox().getId()
-            || !managed.getBoxPosition().equals(boxable.getBoxPosition())
-        )) {
-      Box box = getDetached(boxable.getBox().getId());
-      if (box.getBoxable(boxable.getBoxPosition()) != null) {
-        throw new IllegalArgumentException(String.format("Box position already occupied: %s %s", box.getName(), boxable.getBoxPosition()));
+  public void updateBoxableLocation(Boxable boxable, Boxable original) throws IOException {
+    try (AutoCloseable timer = updateTime.start()) {
+      if (original != null && boxable.isDiscarded() == original.isDiscarded()
+          && Objects.equals(boxable.getBoxPosition(), original.getBoxPosition())
+          && Objects.equals(Optional.ofNullable(boxable.getBox()).map(Box::getId),
+              Optional.ofNullable(original.getBox()).map(Box::getId))) {
+        return;
       }
-      box.setBoxable(boxable.getBoxPosition(), BoxableView.fromBoxable(boxable));
-      save(box);
+      if (boxable.isDiscarded()) {
+        boxable.removeFromBox();
+      }
+      if (boxable.getBox() != null && boxable.getBoxPosition() == null) {
+        throw new IllegalArgumentException("Box position missing");
+      } else if (boxable.getBoxPosition() != null && (boxable.getBox() == null || boxable.getBox().getId() == AbstractBox.UNSAVED_ID)) {
+        throw new IllegalArgumentException("Box position set, but no box specified");
+      }
+      BoxableView managed = getBoxableView(new BoxableId(boxable.getEntityType(), boxable.getId()));
+      if (managed.getBoxId() != null && boxable.getBox() == null) {
+        Box box = getDetached(managed.getBoxId());
+        box.removeBoxable(managed.getBoxPosition());
+        save(box);
+      } else if (boxable.getBox() != null && (managed.getBoxId() == null
+          || managed.getBoxId().longValue() != boxable.getBox().getId()
+          || !managed.getBoxPosition().equals(boxable.getBoxPosition()))) {
+        Box box = getDetached(boxable.getBox().getId());
+        if (box.getBoxable(boxable.getBoxPosition()) != null) {
+          throw new IllegalArgumentException(
+              String.format("Box position already occupied: %s %s", box.getName(), boxable.getBoxPosition()));
+        }
+        box.setBoxable(boxable.getBoxPosition(), BoxableView.fromBoxable(boxable));
+        save(box);
+      }
+    } catch (Exception e) {
+      throw new IOException(e);
     }
   }
 
