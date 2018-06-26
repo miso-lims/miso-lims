@@ -1016,7 +1016,7 @@ public class FormUtils {
         ldi.setSecurityProfile(library.getSecurityProfile());
         ldi.setConcentration(Double.valueOf(dilutionMolarity));
         ldi.setCreationDate(new Date());
-        ldi.setDilutionCreator(u.getLoginName());
+        ldi.setCreator(u);
         if (!library.getLibraryDilutions().contains(ldi)) {
           library.addDilution(ldi);
           log.info("Added library dilution: {}", ldi);

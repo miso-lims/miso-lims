@@ -48,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -388,9 +389,12 @@ public class LoadGeneratorSource implements MigrationSource {
 
   private static LibraryDilution createLibraryDilution(Library library, int dilutionNum) {
     LibraryDilution ldi = new LibraryDilution();
+    UserImpl user = new UserImpl();
+    user.setId(5L);
+    user.setFullName("load-test");
     ldi.setLibrary(library);
     ldi.setConcentration(1D);
-    ldi.setDilutionCreator("load-test");
+    ldi.setCreator(user);
     // preMigrationId is used to link Dilutions/PoolableElementViews to Pools before they are saved
     ldi.setPreMigrationId((long) dilutionNum);
     return ldi;

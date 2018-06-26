@@ -2,6 +2,7 @@ INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `intern
 (1,1,1,0,'admin',1,'admin','ROLE_ADMIN,ROLE_INTERNAL','d033e22ae348aeb5660fc2140aec35850c4da997','admin@admin'),
 (3,1,0,0,'user',1,'user','ROLE_INTERNAL','user','user@user.user');
 
+
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Human hg19 random');
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (2, 'Human hg19');
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (3, 'Human hg18 random');
@@ -688,23 +689,23 @@ INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (603, 8),
   (604, 8);
 
-INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, lastModifier, lastUpdated) VALUES
-(1, 'LDI1', 5.9, 1, '12321', '2017-07-20', 'admin', 2, 1, '2017-07-20 09:01:00'),
-(304, 'LDI304', 7.97, 304, '300304', '2017-08-14', 'admin', 1, 1, '2017-08-14 12:25:00'),
-(305, 'LDI305', 7.97, 305, '300305', '2017-08-14', 'admin', 1, 1, '2017-08-14 12:25:00'),
-(120001, 'LDI120001', 4, 120001, NULL, '2017-08-15', 'admin', 2, 1, '2017-08-15 09:01:00'),
-(120002, 'LDI120002', 4, 120002, NULL, '2017-08-15', 'admin', 2, 1, '2017-08-15 09:01:00'),
-(200001, 'LDI200001', 4, 200001, NULL, '2017-08-15', 'admin', 2, 1, '2017-08-15 09:01:00'),
-(200002, 'LDI200002', 3, 200002, NULL, '2017-08-15', 'admin', 2, 1, '2017-08-15 09:01:00'),
-(504, 'LDI504', 5.9, 504, 'TIB_Dil', '2017-08-15', 'admin', 1, 1, '2017-08-15 13:55:00'),
-(505, 'LDI505', 3.3, 504, 'TIB_replaceDil', '2017-08-15', 'admin', 1, 1, '2017-08-15 13:55:00'),
-(701, 'LDI701', 2.2, 504, 'test_pooling_1', '2017-10-16', 'admin', 1, 1, '2017-10-16 15:59:00'),
-(702, 'LDI702', 2.2, 504, 'test_pooling_2', '2017-10-16', 'admin', 1, 1, '2017-10-16 15:59:00'),
-(800, 'LDI800', 2.2, 600, 'low_quality_library', '2018-06-26', 'admin', 1, 1, '2018-06-26 11:39:00'),
-(801, 'LDI801', 2.2, 601, 'similar_index_1', '2018-06-26', 'admin', 1, 1, '2018-06-26 11:39:00'),
-(802, 'LDI802', 2.2, 602, 'similar_index_2', '2018-06-26', 'admin', 1, 1, '2018-06-26 11:39:00'),
-(803, 'LDI803', 2.2, 603, 'same_index_1', '2018-06-26', 'admin', 1, 1, '2018-06-26 11:39:00'),
-(804, 'LDI804', 2.2, 604, 'same_index_2', '2018-06-26', 'admin', 1, 1, '2018-06-26 11:39:00');
+INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, creator, securityProfile_profileId, lastModifier, lastUpdated) VALUES
+(1, 'LDI1', 5.9, 1, '12321', '2017-07-20', 1, 2, 1, '2017-07-20 09:01:00'),
+(304, 'LDI304', 7.97, 304, '300304', '2017-08-14', 1, 1, 1, '2017-08-14 12:25:00'),
+(305, 'LDI305', 7.97, 305, '300305', '2017-08-14', 1, 1, 1, '2017-08-14 12:25:00'),
+(120001, 'LDI120001', 4, 120001, NULL, '2017-08-15', 1, 2, 1, '2017-08-15 09:01:00'),
+(120002, 'LDI120002', 4, 120002, NULL, '2017-08-15', 1, 2, 1, '2017-08-15 09:01:00'),
+(200001, 'LDI200001', 4, 200001, NULL, '2017-08-15', 1, 2, 1, '2017-08-15 09:01:00'),
+(200002, 'LDI200002', 3, 200002, NULL, '2017-08-15', 1, 2, 1, '2017-08-15 09:01:00'),
+(504, 'LDI504', 5.9, 504, 'TIB_Dil', '2017-08-15', 1, 1, 1, '2017-08-15 13:55:00'),
+(505, 'LDI505', 3.3, 504, 'TIB_replaceDil', '2017-08-15', 1, 1, 1, '2017-08-15 13:55:00'),
+(701, 'LDI701', 2.2, 504, 'test_pooling_1', '2017-10-16', 1, 1, 1, '2017-10-16 15:59:00'),
+(702, 'LDI702', 2.2, 504, 'test_pooling_2', '2017-10-16', 1, 1, 1, '2017-10-16 15:59:00'),
+(800, 'LDI800', 2.2, 600, 'low_quality_library', '2018-06-26', 1, 1, 1, '2018-06-26 11:39:00'),
+(801, 'LDI801', 2.2, 601, 'similar_index_1', '2018-06-26', 1, 1, 1, '2018-06-26 11:39:00'),
+(802, 'LDI802', 2.2, 602, 'similar_index_2', '2018-06-26', 1, 1, 1, '2018-06-26 11:39:00'),
+(803, 'LDI803', 2.2, 603, 'same_index_1', '2018-06-26', 1, 1, 1, '2018-06-26 11:39:00'),
+(804, 'LDI804', 2.2, 604, 'same_index_2', '2018-06-26', 1, 1, 1, '2018-06-26 11:39:00');
 
 INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
 (1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 2, 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL),
