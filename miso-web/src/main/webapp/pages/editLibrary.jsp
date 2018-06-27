@@ -374,12 +374,6 @@
 <br/>
 <h2>Details</h2>
 <table class="in">
-  <c:if test="${not empty library.preMigrationId}">
-  <tr>
-    <td>GSLE ID:</td>
-    <td><a href="http://lims.res.oicr.on.ca/gsle/GA/templateDetails?template_id=${library.preMigrationId}">${library.preMigrationId}</a>
-  </tr>
-  </c:if>
   <tr>
     <td class="h">Group ID:</td>
     <td>

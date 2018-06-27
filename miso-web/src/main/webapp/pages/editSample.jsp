@@ -354,12 +354,6 @@
       <br/>
       <h2>Details</h2>
       <table class="in">
-        <c:if test="${not empty sample.preMigrationId}">
-          <tr>
-            <td>GSLE ID:</td>
-            <td><a href="http://lims.res.oicr.on.ca/gsle/GA/templateDetails?template_id=${sample.preMigrationId}">${sample.preMigrationId}</a>
-          </tr>
-        </c:if>
         <c:if test="${sample.id != 0}">
           <tr>
             <td class="h">Parent:</td>
