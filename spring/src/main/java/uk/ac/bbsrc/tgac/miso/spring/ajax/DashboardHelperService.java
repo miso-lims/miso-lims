@@ -81,6 +81,19 @@ public class DashboardHelperService {
     return b;
   }
 
+  private StringBuilder generateProjectDashboardCell(StringBuilder b, String misoClass, Long id, String name, String alias,
+      String shortName) {
+    b.append("<a class=\"dashboardresult\" href=\"/miso/" + misoClass + "/" + id
+        + "\"><div onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+    b.append("Name: <b>" + name + "</b><br/>");
+    if (shortName != null) {
+      b.append("Short Name: <b>" + shortName + "</b><br/>");
+    }
+    b.append("Alias: <b>" + alias + "</b><br/>");
+    b.append("</div></a>");
+    return b;
+  }
+
   public JSONObject searchProject(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");
     try {
@@ -96,7 +109,7 @@ public class DashboardHelperService {
         Collections.sort(projects);
         Collections.reverse(projects);
         for (Project p : projects) {
-          generateDashboardCell(b, "project", p.getId(), p.getName(), p.getAlias());
+          generateProjectDashboardCell(b, "project", p.getId(), p.getName(), p.getAlias(), p.getShortName());
         }
       } else {
         b.append("No matches");
