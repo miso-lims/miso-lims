@@ -334,7 +334,7 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
     public WorkflowStepPrompt getPrompt() {
       firstFreePosition = getFirstFreePosition();
       return new WorkflowStepPrompt(Sets.newHashSet(InputType.BOX_POSITION, InputType.SKIP),
-          String.format("Enter a Box Position to place Aliquot #%d.\nSkipping will default to position %s", aliquotIndex + 1,
+          String.format("Enter a Box Position to place Aliquot #%d. Skipping will default to position %s", aliquotIndex + 1,
               firstFreePosition));
     }
 
@@ -521,7 +521,7 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
     public WorkflowStepPrompt getPrompt() {
       firstFreePosition = getFirstFreePosition();
       return new WorkflowStepPrompt(Sets.newHashSet(InputType.BOX_POSITION, InputType.SKIP),
-          String.format("Enter a Box Position to place the Stock.\nSkipping will default to position %s", firstFreePosition));
+          String.format("Enter a Box Position to place the Stock. Skipping will default to position %s", firstFreePosition));
     }
 
     @Override
