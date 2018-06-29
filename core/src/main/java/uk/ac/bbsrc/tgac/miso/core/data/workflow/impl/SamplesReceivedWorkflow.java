@@ -28,22 +28,27 @@ import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 
 public class SamplesReceivedWorkflow extends AbstractWorkflow {
 
-  private final SampleStep sampleStep = new SampleStep();
+  private final StockStep stockStep = new StockStep();
   private final QCStep qcStep = new QCStep();
+  private final StockBoxStep stockBoxStep = new StockBoxStep();
+  private StockBoxPositionStep stockBoxPositionStep;
   private final AliquotStep aliquotStep = new AliquotStep();
-  private final BoxStep boxStep = new BoxStep();
+  private final AliquotBoxStep aliquotBoxStep = new AliquotBoxStep();
   private List<WorkflowStep> aliquotHandlingSteps = Collections.emptyList();
 
   private final Set<String> occupiedLocations = new HashSet<>();
 
   @Override
   protected List<WorkflowStep> getCompletedSteps() {
-    return Stream.concat(Stream.of(sampleStep, qcStep, aliquotStep, boxStep), aliquotHandlingSteps.stream()).filter(this::hasInput)
+    return Stream
+        .concat(Stream.of(stockStep, qcStep, stockBoxStep, stockBoxPositionStep, aliquotStep, aliquotBoxStep),
+            aliquotHandlingSteps.stream())
+        .filter(this::hasInput)
         .collect(Collectors.toList());
   }
 
   private boolean hasInput(WorkflowStep step) {
-    return step.getProgressStep() != null;
+    return step != null && step.getProgressStep() != null;
   }
 
   @Override
@@ -54,52 +59,80 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
   @Override
   public WorkflowStepPrompt getStep(int stepNumber) {
     if (stepNumber == 0) {
-      return sampleStep.getPrompt();
+      return stockStep.getPrompt();
     } else if (stepNumber == 1) {
       return qcStep.getPrompt();
     } else if (stepNumber == 2) {
-      return aliquotStep.getPrompt();
+      return stockBoxStep.getPrompt();
     } else if (stepNumber == 3) {
-      return boxStep.getPrompt();
+      return stockBoxPositionStep.getPrompt();
+    } else if (stepNumber == 4) {
+      return aliquotStep.getPrompt();
+    } else if (stepNumber == 5) {
+      return aliquotBoxStep.getPrompt();
     } else {
       return aliquotHandlingSteps.get(asAliquotIndex(stepNumber)).getPrompt();
     }
   }
 
   private int asAliquotIndex(int stepNumber) {
-    return stepNumber - 4;
+    return stepNumber - 6;
   }
 
   @Override
   public boolean isComplete() {
-    return Stream.concat(Stream.of(sampleStep, qcStep, aliquotStep, boxStep), aliquotHandlingSteps.stream()).allMatch(this::hasInput);
+    return Stream.concat(Stream.of(stockStep, qcStep, stockBoxStep, stockBoxPositionStep, aliquotStep, aliquotBoxStep),
+        aliquotHandlingSteps.stream()).allMatch(this::hasInput);
   }
 
   @Override
   public List<String> processInput(int stepNumber, ProgressStep step) {
     List<String> errors = new ArrayList<>();
     if (stepNumber == 0) {
-      step.accept(sampleStep);
+      step.accept(stockStep);
       qcStep.cancelInput();
+      stockBoxStep.cancelInput();
+      cancelStockBoxPositionStep();
       aliquotStep.cancelInput();
-      boxStep.cancelInput();
+      aliquotBoxStep.cancelInput();
       cancelAliquotHandlingSteps();
     } else if (stepNumber == 1) {
       step.accept(qcStep);
+      stockBoxStep.cancelInput();
+      cancelStockBoxPositionStep();
       aliquotStep.cancelInput();
-      boxStep.cancelInput();
-      cancelAliquotHandlingSteps();
-    } else if (stepNumber == 2) {
-      step.accept(aliquotStep);
-      boxStep.cancelInput();
-      boxStep.setNumAliquots(aliquotStep.getAliquotQuantity());
+      aliquotBoxStep.cancelInput();
       cancelAliquotHandlingSteps();
     } else if (stepNumber == 3) {
-      step.accept(boxStep);
-      if (hasInput(boxStep)) {
-        resetAliquotHandlingSteps(aliquotStep.getAliquotQuantity(), boxStep.getBox());
+      step.accept(stockBoxStep);
+      if (hasInput(stockBoxStep)) {
+        stockBoxPositionStep = new StockBoxPositionStep(stockBoxStep.getBox());
+        aliquotStep.cancelInput();
+        aliquotBoxStep.cancelInput();
+        cancelAliquotHandlingSteps();
       } else {
-        errors.add(boxStep.getError());
+        errors.add(stockBoxStep.getError());
+      }
+    } else if (stepNumber == 4) {
+      step.accept(stockBoxPositionStep);
+      if (hasInput(stockBoxPositionStep)) {
+        aliquotStep.cancelInput();
+        aliquotBoxStep.cancelInput();
+        cancelAliquotHandlingSteps();
+      } else {
+        errors.add(stockBoxPositionStep.getError());
+      }
+    } else if (stepNumber == 5) {
+      step.accept(aliquotStep);
+      aliquotBoxStep.cancelInput();
+      aliquotBoxStep.setNumAliquots(aliquotStep.getAliquotQuantity());
+      cancelAliquotHandlingSteps();
+    } else if (stepNumber == 6) {
+      step.accept(aliquotBoxStep);
+      if (hasInput(aliquotBoxStep)) {
+        resetAliquotHandlingSteps(aliquotStep.getAliquotQuantity(), aliquotBoxStep.getBox());
+      } else {
+        errors.add(aliquotBoxStep.getError());
       }
     } else {
       step.accept(aliquotHandlingSteps.get(asAliquotIndex(stepNumber)));
@@ -116,10 +149,16 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
     }
   }
 
+  private void cancelStockBoxPositionStep() {
+    if (stockBoxPositionStep != null) {
+      stockBoxPositionStep.cancelInput();
+    }
+  }
+
   private void resetAliquotHandlingSteps(int aliquotQuantity, Box box) {
     aliquotHandlingSteps = new ArrayList<>();
     for (int i = 0; i < aliquotQuantity; i++) {
-      aliquotHandlingSteps.add(new BoxPositionStep(i, box, occupiedLocations));
+      aliquotHandlingSteps.add(new AliquotBoxPositionStep(i, box, occupiedLocations));
       aliquotHandlingSteps.add(new VolumeStep(i));
       aliquotHandlingSteps.add(new ConcentrationStep(i));
     }
@@ -129,14 +168,18 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
   public void cancelInput() {
     if (aliquotHandlingSteps.stream().anyMatch(this::hasInput)) {
       getLastCompletedAliquotHandlingStep().cancelInput();
-    } else if (hasInput(boxStep)) {
-      boxStep.cancelInput();
+    } else if (hasInput(aliquotBoxStep)) {
+      aliquotBoxStep.cancelInput();
     } else if (hasInput(aliquotStep)) {
       aliquotStep.cancelInput();
+    } else if (hasInput(stockBoxPositionStep)) {
+      stockBoxPositionStep.cancelInput();
+    } else if (hasInput(stockBoxStep)) {
+      stockBoxStep.cancelInput();
     } else if (hasInput(qcStep)) {
       qcStep.cancelInput();
-    } else if (hasInput(sampleStep)) {
-      sampleStep.cancelInput();
+    } else if (hasInput(stockStep)) {
+      stockStep.cancelInput();
     }
   }
 
@@ -146,8 +189,9 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
 
   @Override
   public String getConfirmMessage() {
-    return "Add a Qubit QC with value " + qcStep.getQCValue() + "ng/µl to Stock '" + sampleStep.getAlias() + "', propagate to "
-        + aliquotStep.getAliquotQuantity() + " Aliquot(s) and insert them into Box '" + boxStep.getAlias()
+    return "Add a Qubit QC with value " + qcStep.getQCValue() + "ng/µl to Stock '" + stockStep.getAlias() + "', place it in Box '"
+        + stockBoxStep.getAlias() + "' at Position '" + stockBoxPositionStep.getPosition() + "', propagate to "
+        + aliquotStep.getAliquotQuantity() + " Aliquot(s) and insert them into Box '" + aliquotBoxStep.getAlias()
         + "' with the specified locations and values?";
   }
 
@@ -155,9 +199,10 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
   public void execute(WorkflowExecutor workflowExecutor) throws IOException {
     if (!isComplete()) throw new IllegalStateException("Workflow is not complete");
 
-    Sample sample = sampleStep.getSample();
+    Sample sample = stockStep.getSample();
     SampleQC qc = new SampleQC();
-    Box box = boxStep.getBox();
+    Box aliquotBox = aliquotBoxStep.getBox();
+    Box stockBox = stockBoxStep.getBox();
 
     qc.setSample(sample);
     qc.setType(workflowExecutor.getQcTypeList().stream().filter(type -> type.getQcTarget() == QcTarget.Sample).findFirst().orElse(null));
@@ -167,18 +212,21 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
     qcs.add(qc);
     sample.setQCs(qcs);
     
+    stockBox.setBoxable(stockBoxPositionStep.getPosition(), BoxableView.fromBoxable(sample));
+
     for (int i = 0; i < aliquotStep.getAliquotQuantity(); i++) {
       SampleAliquot aliquot = workflowExecutor.createAliquotFromParent(sample);
       aliquot.setVolume(((VolumeStep) aliquotHandlingSteps.get(3 * i + 1)).getVolume());
       aliquot.setConcentration(((ConcentrationStep) aliquotHandlingSteps.get(3 * i + 2)).getConcentration());
       workflowExecutor.save(aliquot);
-      box.setBoxable(((BoxPositionStep) aliquotHandlingSteps.get(3 * i)).getPosition(), BoxableView.fromBoxable(aliquot));
+      aliquotBox.setBoxable(((AliquotBoxPositionStep) aliquotHandlingSteps.get(3 * i)).getPosition(), BoxableView.fromBoxable(aliquot));
 
     }
 
-    workflowExecutor.save(box);
+    workflowExecutor.save(aliquotBox);
     workflowExecutor.save(qc);
     workflowExecutor.save(sample);
+    workflowExecutor.save(stockBox);
   }
   
   private static class ConcentrationStep implements WorkflowStep {
@@ -265,7 +313,7 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
 
   }
 
-  private static class BoxPositionStep implements WorkflowStep {
+  private static class AliquotBoxPositionStep implements WorkflowStep {
 
     private BoxPositionProgressStep boxPositionStep;
 
@@ -276,7 +324,7 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
 
     private String error;
 
-    BoxPositionStep(int aliquotIndex, Box box, Set<String> occupiedLocations) {
+    AliquotBoxPositionStep(int aliquotIndex, Box box, Set<String> occupiedLocations) {
       this.aliquotIndex = aliquotIndex;
       this.box = box;
       this.occupiedLocations = occupiedLocations;
@@ -333,7 +381,6 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
       return (boxPositionStep != null && boxPositionStep.getInput().equals(position)) ||
           (box.isValidPosition(position) && isColumnNonZero(position) && box.isFreePosition(position)
               && !occupiedLocations.contains(position));
-      // box.isFreePosition does not seem to work properly when the workflow is viewed through the view workflows tab
     }
 
     public boolean isColumnNonZero(String position) {
@@ -357,9 +404,9 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
 
   }
 
-  private static class BoxStep implements WorkflowStep {
+  private static class AliquotBoxStep implements WorkflowStep {
 
-    private static final WorkflowStepPrompt PROMPT = new WorkflowStepPrompt(Sets.newHashSet(InputType.BOX), "Scan the Box barcode");
+    private static final WorkflowStepPrompt PROMPT = new WorkflowStepPrompt(Sets.newHashSet(InputType.BOX), "Scan the Box barcode for the Aliqout(s)");
 
     private BoxProgressStep boxStep;
 
@@ -455,6 +502,139 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
     }
 
   }
+  
+  private static class StockBoxPositionStep implements WorkflowStep {
+
+    private BoxPositionProgressStep boxPositionStep;
+
+    private final Box box;
+    private String firstFreePosition;
+
+    private String error;
+
+    StockBoxPositionStep(Box box) {
+      this.box = box;
+    }
+
+    @Override
+    public WorkflowStepPrompt getPrompt() {
+      firstFreePosition = getFirstFreePosition();
+      return new WorkflowStepPrompt(Sets.newHashSet(InputType.BOX_POSITION, InputType.SKIP),
+          String.format("Enter a Box Position to place the Stock.\nSkipping will default to position %s", firstFreePosition));
+    }
+
+    @Override
+    public ProgressStep getProgressStep() {
+      return boxPositionStep;
+    }
+
+    @Override
+    public void cancelInput() {
+      boxPositionStep = null;
+    }
+
+    @Override
+    public String getLogMessage() {
+      return String.format("Place Stock at position %s", getPosition());
+    }
+
+    @Override
+    public void processInput(BoxPositionProgressStep step) {
+      if (isLocationFree(step.getInput())) {
+        boxPositionStep = step;
+      } else if (!box.isValidPosition(step.getInput())) {
+        error = String.format("The Box '%s' does not have a position '%s'", box.getAlias(), step.getInput());
+      } else if (!box.isFreePosition(step.getInput())) {
+        error = String.format("The position '%s' is already occupied", step.getInput());
+      }
+    }
+
+    @Override
+    public void processInput(SkipProgressStep step) {
+      this.boxPositionStep = new BoxPositionProgressStep();
+      boxPositionStep.setInput(firstFreePosition);
+    }
+
+    public String getPosition() {
+      return boxPositionStep != null ? boxPositionStep.getInput() : firstFreePosition;
+    }
+
+    public boolean isLocationFree(String position) {
+      return (boxPositionStep != null && boxPositionStep.getInput().equals(position)) ||
+          (box.isValidPosition(position) && isColumnNonZero(position) && box.isFreePosition(position));
+    }
+
+    public boolean isColumnNonZero(String position) {
+      return BoxUtils.tryParseInt(position.substring(1, 3)) != 0;
+    }
+
+    public String getFirstFreePosition() {
+      for (int i = 0; i < box.getSize().getRows(); i++) {
+        for (int j = 1; j <= box.getSize().getColumns(); j++) {
+          String position = (char) (i + 'A') + String.format("%02d", j);
+          if (isLocationFree(position)) return position;
+        }
+      }
+      return null;
+    }
+
+    @Override
+    public String getError() {
+      return error;
+    }
+
+  }
+
+  private static class StockBoxStep implements WorkflowStep {
+
+    private static final WorkflowStepPrompt PROMPT = new WorkflowStepPrompt(Sets.newHashSet(InputType.BOX), "Scan the Box barcode for the Stock");
+
+    private BoxProgressStep boxStep;
+
+    private String error;
+
+    @Override
+    public WorkflowStepPrompt getPrompt() {
+      return PROMPT;
+    }
+
+    @Override
+    public ProgressStep getProgressStep() {
+      return boxStep;
+    }
+
+    @Override
+    public void cancelInput() {
+      boxStep = null;
+    }
+
+    @Override
+    public String getLogMessage() {
+      return String.format("Place Stock in Box '%s'", getAlias());
+    }
+
+    @Override
+    public void processInput(BoxProgressStep step) {
+      if (step.getInput().getFreeCount() >= 1) {
+        boxStep = step;
+      } else {
+        error = String.format("Box '%s' is full", step.getInput().getAlias());
+      }
+    }
+
+    public String getAlias() {
+      return boxStep.getInput().getAlias();
+    }
+
+    public Box getBox() {
+      return boxStep.getInput();
+    }
+
+    @Override
+    public String getError() {
+      return error;
+    }
+  }
 
   private static class QCStep implements WorkflowStep {
     
@@ -493,7 +673,7 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
     }
   }
 
-  private static class SampleStep implements WorkflowStep {
+  private static class StockStep implements WorkflowStep {
 
     private static final WorkflowStepPrompt PROMPT = new WorkflowStepPrompt(Sets.newHashSet(InputType.SAMPLE_STOCK),
         "Scan the Stock Barcode");
