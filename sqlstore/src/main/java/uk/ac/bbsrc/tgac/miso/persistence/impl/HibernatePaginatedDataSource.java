@@ -216,6 +216,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationByKitName(Criteria criteria, String name, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " cannot be filtered by kit name.");
+  }
+
+  @Override
   default void restrictPaginationByPending(Criteria criteria, Consumer<String> errorHandler) {
     errorHandler.accept(getFriendlyName() + " is not dependable.");
   }
