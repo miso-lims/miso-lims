@@ -103,7 +103,7 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
       aliquotStep.cancelInput();
       aliquotBoxStep.cancelInput();
       cancelAliquotHandlingSteps();
-    } else if (stepNumber == 3) {
+    } else if (stepNumber == 2) {
       step.accept(stockBoxStep);
       if (hasInput(stockBoxStep)) {
         stockBoxPositionStep = new StockBoxPositionStep(stockBoxStep.getBox());
@@ -113,7 +113,7 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
       } else {
         errors.add(stockBoxStep.getError());
       }
-    } else if (stepNumber == 4) {
+    } else if (stepNumber == 3) {
       step.accept(stockBoxPositionStep);
       if (hasInput(stockBoxPositionStep)) {
         aliquotStep.cancelInput();
@@ -122,12 +122,12 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
       } else {
         errors.add(stockBoxPositionStep.getError());
       }
-    } else if (stepNumber == 5) {
+    } else if (stepNumber == 4) {
       step.accept(aliquotStep);
       aliquotBoxStep.cancelInput();
       aliquotBoxStep.setNumAliquots(aliquotStep.getAliquotQuantity());
       cancelAliquotHandlingSteps();
-    } else if (stepNumber == 6) {
+    } else if (stepNumber == 5) {
       step.accept(aliquotBoxStep);
       if (hasInput(aliquotBoxStep)) {
         resetAliquotHandlingSteps(aliquotStep.getAliquotQuantity(), aliquotBoxStep.getBox());
@@ -406,7 +406,8 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
 
   private static class AliquotBoxStep implements WorkflowStep {
 
-    private static final WorkflowStepPrompt PROMPT = new WorkflowStepPrompt(Sets.newHashSet(InputType.BOX), "Scan the Box barcode for the Aliqout(s)");
+    private static final WorkflowStepPrompt PROMPT = new WorkflowStepPrompt(Sets.newHashSet(InputType.BOX),
+        "Scan the barcode of the Box for the Aliquots");
 
     private BoxProgressStep boxStep;
 
@@ -587,7 +588,8 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
 
   private static class StockBoxStep implements WorkflowStep {
 
-    private static final WorkflowStepPrompt PROMPT = new WorkflowStepPrompt(Sets.newHashSet(InputType.BOX), "Scan the Box barcode for the Stock");
+    private static final WorkflowStepPrompt PROMPT = new WorkflowStepPrompt(Sets.newHashSet(InputType.BOX),
+        "Scan the barcode of the Box for the Stock");
 
     private BoxProgressStep boxStep;
 
