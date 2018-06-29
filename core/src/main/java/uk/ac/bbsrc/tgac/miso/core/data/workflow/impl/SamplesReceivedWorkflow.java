@@ -58,19 +58,20 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
 
   @Override
   public WorkflowStepPrompt getStep(int stepNumber) {
-    if (stepNumber == 0) {
+    switch (stepNumber) {
+    case 0:
       return stockStep.getPrompt();
-    } else if (stepNumber == 1) {
+    case 1:
       return qcStep.getPrompt();
-    } else if (stepNumber == 2) {
+    case 2:
       return stockBoxStep.getPrompt();
-    } else if (stepNumber == 3) {
+    case 3:
       return stockBoxPositionStep.getPrompt();
-    } else if (stepNumber == 4) {
+    case 4:
       return aliquotStep.getPrompt();
-    } else if (stepNumber == 5) {
+    case 5:
       return aliquotBoxStep.getPrompt();
-    } else {
+    default:
       return aliquotHandlingSteps.get(asAliquotIndex(stepNumber)).getPrompt();
     }
   }
@@ -88,7 +89,8 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
   @Override
   public List<String> processInput(int stepNumber, ProgressStep step) {
     List<String> errors = new ArrayList<>();
-    if (stepNumber == 0) {
+    switch (stepNumber) {
+    case 0:
       step.accept(stockStep);
       qcStep.cancelInput();
       stockBoxStep.cancelInput();
@@ -96,14 +98,16 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
       aliquotStep.cancelInput();
       aliquotBoxStep.cancelInput();
       cancelAliquotHandlingSteps();
-    } else if (stepNumber == 1) {
+      break;
+    case 1:
       step.accept(qcStep);
       stockBoxStep.cancelInput();
       cancelStockBoxPositionStep();
       aliquotStep.cancelInput();
       aliquotBoxStep.cancelInput();
       cancelAliquotHandlingSteps();
-    } else if (stepNumber == 2) {
+      break;
+    case 2:
       step.accept(stockBoxStep);
       if (hasInput(stockBoxStep)) {
         stockBoxPositionStep = new StockBoxPositionStep(stockBoxStep.getBox());
@@ -113,7 +117,8 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
       } else {
         errors.add(stockBoxStep.getError());
       }
-    } else if (stepNumber == 3) {
+      break;
+    case 3:
       step.accept(stockBoxPositionStep);
       if (hasInput(stockBoxPositionStep)) {
         aliquotStep.cancelInput();
@@ -122,23 +127,27 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
       } else {
         errors.add(stockBoxPositionStep.getError());
       }
-    } else if (stepNumber == 4) {
+      break;
+    case 4:
       step.accept(aliquotStep);
       aliquotBoxStep.cancelInput();
       aliquotBoxStep.setNumAliquots(aliquotStep.getAliquotQuantity());
       cancelAliquotHandlingSteps();
-    } else if (stepNumber == 5) {
+      break;
+    case 5:
       step.accept(aliquotBoxStep);
       if (hasInput(aliquotBoxStep)) {
         resetAliquotHandlingSteps(aliquotStep.getAliquotQuantity(), aliquotBoxStep.getBox());
       } else {
         errors.add(aliquotBoxStep.getError());
       }
-    } else {
+      break;
+    default:
       step.accept(aliquotHandlingSteps.get(asAliquotIndex(stepNumber)));
       if (aliquotHandlingSteps.get(asAliquotIndex(stepNumber)).getError() != null) {
         errors.add(aliquotHandlingSteps.get(asAliquotIndex(stepNumber)).getError());
       }
+      break;
     }
     return errors;
   }
