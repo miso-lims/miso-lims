@@ -37,7 +37,7 @@ HotTarget.dilution = {
           pack: function(dil, flat, errorHandler) {
           }
         },
-        HotUtils.makeColumnForFloat('Conc. (' + Constants.libraryDilutionConcentrationUnits + ')', true, 'concentration', true),
+        HotUtils.makeColumnForFloat('Conc. (' + Constants.libraryDilutionConcentrationUnits + ')', true, 'concentration', false),
         HotUtils.makeColumnForFloat('Volume', true, 'volume', false),
         {
           header: 'Creation Date',
