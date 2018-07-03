@@ -69,13 +69,12 @@
     </td>
   </tr>
   <tr>
-    <td colspan="2">
-      <c:if test="${!empty warnings}">
-        <span style="float:right;"><img src="/styles/images/fail.png"/></span>
-        <c:forEach items="${warnings}" var="warning">
-          <p class="big-warning">${warning}</p>
-        </c:forEach>
-      </c:if>
+    <td colspan="2" id="warnings">
+        <script>
+            jQuery(document).ready(function() {
+                jQuery('#warnings').append(WarningTarget.pool.headerWarnings(${poolDto}));
+            });
+        </script>
     </td>
   </tr>
   <tr>
