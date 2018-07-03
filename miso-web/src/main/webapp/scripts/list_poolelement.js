@@ -106,16 +106,7 @@ ListTarget.poolelement = {
           return index.label;
         }).join(', ');
 
-        if (config.duplicateIndicesSequences && config.duplicateIndicesSequences.indexOf(combined) != -1) {
-          html += " <span class='parsley-custom-error-message'><strong>(DUPLICATE INDEX)</strong></span>";
-        } else if (config.nearDuplicateIndicesSequences && config.nearDuplicateIndicesSequences.indexOf(combined) != -1) {
-          html += " <span class='parsley-custom-error-message'><strong>(NEAR-DUPLICATE INDEX)</strong></span>";
-        }
-        if(indices.length == 0){
-          html += " <span class='parsley-custom-error-message'><strong>(NO INDEX)</strong></span>";
-        }
-
-        return html;
+        return WarningTarget.poolelement.tableWarnings(html, combined, config.duplicateIndicesSequences, config.nearDuplicateIndicesSequences);
       }
     }, {
       'sTitle': 'Last Modified',

@@ -50,25 +50,7 @@ ListTarget.partition = {
       });
 
       response.items.forEach(function(item) {
-        var problems = [];
-        if (item.pool.duplicateIndices) {
-          problems.push("DUPLICATE INDICES");
-        } else if (item.pool.nearDuplicateIndices) {
-          problems.push("NEAR-DUPLICATE INDICES");
-        }
-        if (item.pool.hasLowQualityLibraries) {
-          problems.push("LOW QUALITY LIBRARIES");
-        }
-        if (item.pool.hasEmptySequence){
-          problems.push("MISSING INDEX");
-        }
-        var consentRevoked = item.pool.pooledElements.filter(function(element) {
-          return element.identityConsentLevel === 'Revoked';
-        });
-        if (consentRevoked.length) {
-          problems.push("CONSENT REVOKED");
-        }
-        problems = problems.map(Tile.error);
+        var warnings = WarningTarget.pool.tileWarnings(item.pool);
 
         var dilutionInfo = item.pool.pooledElements.filter(function(element, index, array) {
           return array.length < maxDilutions || index < maxDilutions - 1;
@@ -87,8 +69,8 @@ ListTarget.partition = {
                   + (order.remaining == 1 ? platformType.partitionName : platformType.pluralPartitionName) + " remaining";
             });
 
-        var tileParts = [Tile.titleAndStatus(item.pool.name + " (" + item.pool.alias + ")", problems.length == 0 ? Tile.statusOk() : Tile
-            .statusBad())].concat(problems);
+        var tileParts = [Tile.titleAndStatus(item.pool.name + " (" + item.pool.alias + ")", warnings.length == 0 ? Tile.statusOk() : Tile
+            .statusBad())].concat(warnings);
         tileParts.push(Tile.lines(dilutionInfo, false));
         tileParts.push(Tile.lines(orderInfo, true));
 
@@ -262,37 +244,7 @@ ListTarget.partition = {
       "mData": "pool",
       "include": config.showPool,
       "iSortPriority": 0,
-      "mRender": function(data, type, full) {
-        if (!data) {
-          if (type === 'display') {
-            return "(None)";
-          } else {
-            return "";
-          }
-        }
-        var prettyName = data.name + " (" + data.alias + ")";
-        if (type === 'display') {
-          var problems = [];
-          if (data.duplicateIndices) {
-            problems.push("(DUPLICATE INDICES)");
-          } else if (data.nearDuplicateIndices) {
-            problems.push("(NEAR-DUPLICATE INDICES)");
-          }
-          if (data.hasLowQualityLibraries) {
-            problems.push("(LOW QUALITY LIBRARIES)");
-          }
-          if(data.hasEmptySequence){
-            problems.push("(MISSING INDEX)");
-          }
-
-          return "<a href=\"/miso/pool/" + data.id + "\">" + prettyName + "</a>" + (problems.length > 0 ? problems.map(function(message) {
-            return ' <span class="lowquality">' + message + '</span>';
-          }).join('') + '<img style="float:right; height:25px;" src="/styles/images/fail.png" />' : "");
-        } else {
-          return prettyName;
-        }
-
-      }
+      "mRender": WarningTarget.partition.tableWarnings
     }, {
       "sTitle": "Dilutions",
       "mData": "pool",
