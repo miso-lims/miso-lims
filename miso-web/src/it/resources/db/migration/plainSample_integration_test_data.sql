@@ -143,7 +143,7 @@ scientificName, volume, qcPassed, lastModifier, creator, created, lastModified) 
 INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, securityProfile_profileId, sample_sampleId, platformType,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
   volume, concentration, locationBarcode, kitDescriptorId) VALUES
-  (1, 'LIB1', 'PLAIN_L0001_1-1', 'LIB1::PLAIN_L0001_1-1', 'plain lib', 2, 1, 'ILLUMINA', 1, 3, 1,  '2016-11-07', 
+  (1, 'LIB1', 'PLAIN_L0001-1_1', 'LIB1::PLAIN_L0001-1_1', 'plain lib', 2, 1, 'ILLUMINA', 1, 3, 1,  '2016-11-07', 
     1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, 300, 5.0, 2.75, NULL, 1);
 
 INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES

@@ -5,6 +5,8 @@ AS SELECT
     d.concentration AS dilutionConcentration,
     d.concentrationUnits AS dilutionConcentrationUnits,
     d.volume AS dilutionVolume,
+    d.ngUsed AS dilutionNgUsed,
+    d.volumeUsed AS dilutionVolumeUsed,
     d.identificationBarcode AS dilutionBarcode,
     d.lastUpdated AS lastModified,
     d.creationDate AS created,

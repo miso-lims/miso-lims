@@ -50,6 +50,10 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private Double dilutionVolume;
 
+  private Double dilutionNgUsed;
+
+  private Double dilutionVolumeUsed;
+
   private Long preMigrationId;
 
   @Temporal(TemporalType.TIMESTAMP)
@@ -133,9 +137,11 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     v.setDilutionBarcode(dilution.getIdentificationBarcode());
     v.setDilutionConcentration(dilution.getConcentration());
     v.setDilutionConcentrationUnits(dilution.getConcentrationUnits());
+    v.setDilutionNgUsed(dilution.getNgUsed());
     v.setDilutionId(dilution.getId());
     v.setDilutionName(dilution.getName());
     v.setDilutionVolume(dilution.getVolume());
+    v.setDilutionVolumeUsed(dilution.getVolumeUsed());
     v.setLastModified(dilution.getLastModified());
     v.setPreMigrationId(dilution.getPreMigrationId());
     if (dilution.getBox() != null) {
@@ -225,6 +231,22 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   public void setDilutionConcentrationUnits(String dilutionConcentrationUnits) {
     this.dilutionConcentrationUnits = dilutionConcentrationUnits;
+  }
+
+  public Double getDilutionNgUsed() {
+    return dilutionNgUsed;
+  }
+
+  public void setDilutionNgUsed(Double dilutionNmUsed) {
+    this.dilutionNgUsed = dilutionNmUsed;
+  }
+
+  public Double getDilutionVolumeUsed() {
+    return dilutionVolumeUsed;
+  }
+
+  public void setDilutionVolumeUsed(Double dilutionVolumeUsed) {
+    this.dilutionVolumeUsed = dilutionVolumeUsed;
   }
 
   public String getProjectShortName() {
