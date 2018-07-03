@@ -27,6 +27,8 @@ public class BulkDilutionPage extends HeaderFooterPage {
     public static final String CONCENTRATION = "Conc.";
     public static final String CONCENTRATION_UNITS = "Conc. Units";
     public static final String VOLUME = "Volume";
+    public static final String NG_USED = "ng Lib. Used";
+    public static final String VOLUME_USED = "Vol. Lib. Used";
     public static final String CREATION_DATE = "Creation Date";
     public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
 

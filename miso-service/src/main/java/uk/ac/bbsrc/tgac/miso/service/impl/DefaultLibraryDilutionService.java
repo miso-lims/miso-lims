@@ -155,9 +155,15 @@ public class DefaultLibraryDilutionService
     }
     authorizationManager.throwIfNotWritable(dilution);
 
+    Library library = dilution.getLibrary();
+    if (dilution.getVolumeUsed() != null && library.getVolume() != null) {
+      library.setVolume(library.getVolume() - dilution.getVolumeUsed());
+    }
+
     // pre-save field generation
     dilution.setName(generateTemporaryName());
     long savedId = save(dilution).getId();
+    libraryService.update(library);
     boxService.updateBoxableLocation(dilution, null);
     return savedId;
   }
@@ -166,9 +172,22 @@ public class DefaultLibraryDilutionService
   public void update(LibraryDilution dilution) throws IOException {
     LibraryDilution managed = get(dilution.getId());
     authorizationManager.throwIfNotWritable(managed);
+
+    Library library = dilution.getLibrary();
+    if (library.getVolume() != null) {
+      if (dilution.getVolumeUsed() != null && managed.getVolumeUsed() != null) {
+        library.setVolume(library.getVolume() + managed.getVolumeUsed() - dilution.getVolumeUsed());
+      } else if (managed.getVolumeUsed() != null) {
+        library.setVolume(library.getVolume() + managed.getVolumeUsed());
+      } else {
+        library.setVolume(library.getVolume() - dilution.getVolumeUsed());
+      }
+    }
+
     applyChanges(managed, dilution);
     loadChildEntities(managed);
     save(managed);
+    libraryService.update(library);
     boxService.updateBoxableLocation(dilution, managed);
   }
 
@@ -232,6 +251,8 @@ public class DefaultLibraryDilutionService
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setVolume(source.getVolume());
     target.setConcentrationUnits(source.getConcentrationUnits());
+    target.setNgUsed(source.getNgUsed());
+    target.setVolumeUsed(source.getVolumeUsed());
   }
 
   public void setDilutionDao(LibraryDilutionStore dilutionDao) {

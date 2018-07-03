@@ -55,6 +55,8 @@ HotTarget.dilution = {
           allowHtml: true
         },
         HotUtils.makeColumnForFloat('Volume', true, 'volume', false),
+        HotUtils.makeColumnForFloat('ng Lib. Used', true, 'ngUsed', false),
+        HotUtils.makeColumnForFloat('Vol. Lib. Used', true, 'volumeUsed', false),
         {
           header: 'Creation Date',
           data: 'creationDate',

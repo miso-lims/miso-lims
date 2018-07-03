@@ -132,6 +132,10 @@ public class LibraryDilution extends AbstractBoxable
   @PrimaryKeyJoinColumn
   private DilutionBoxPosition boxPosition;
 
+  private Double ngUsed;
+
+  private Double volumeUsed;
+
   @Override
   public Boxable.EntityType getEntityType() {
     return Boxable.EntityType.DILUTION;
@@ -422,6 +426,22 @@ public class LibraryDilution extends AbstractBoxable
   @Override
   public SecurityProfile getDeletionSecurityProfile() {
     return getSecurityProfile();
+  }
+
+  public Double getNgUsed() {
+    return ngUsed;
+  }
+
+  public void setNgUsed(Double ngUsed) {
+    this.ngUsed = ngUsed;
+  }
+
+  public Double getVolumeUsed() {
+    return volumeUsed;
+  }
+
+  public void setVolumeUsed(Double volumeUsed) {
+    this.volumeUsed = volumeUsed;
   }
 
 }
