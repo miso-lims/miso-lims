@@ -558,7 +558,39 @@ HotTarget.library = (function() {
             }
           }, HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
           HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false),
-          HotUtils.makeColumnForFloat('Vol. (&#181;l)', config.showVolume, 'volume', false),
+          {
+            header: 'Vol. (&#181;l)',
+            data: 'volume',
+            type: 'text',
+            include: config.showVolume,
+            unpack: function(obj, flat, setCellMeta) {
+              flat['volume'] = Utils.valOrNull(obj['volume']);
+            },
+            validator: HotUtils.validator.optionalNumber,
+            pack: function(obj, flat, errorHandler) {
+              var output;
+              if (Utils.validation.isEmpty(flat['volume'])) {
+                output = null;
+              } else {
+                var result = parseFloat(flat['volume']);
+                if (isNaN(result)) {
+                  errorHandler('Vol. (&#181;l)' + ' is not a number.');
+                  return;
+                }
+                output = result;
+              }
+              obj['volume'] = output;
+            },
+            depends: 'templateAlias',
+            update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              var template = getTemplate(config, lib.parentSampleProjectId, value);
+              if (template && template.defaultVolume) {
+                setData(template.defaultVolume);
+              } else {
+                setData(null);
+              }
+            }
+          },
           HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false), ];
 
       var spliceIndex = columns.indexOf(columns.filter(function(column) {
