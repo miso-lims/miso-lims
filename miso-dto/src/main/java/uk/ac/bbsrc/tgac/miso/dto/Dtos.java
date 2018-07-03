@@ -2213,6 +2213,7 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setProjectId(from.getProject().getId());
+    dto.setDefaultVolume(from.getDefaultVolume());
     if (from.getPlatformType() != null) {
       dto.setPlatformType(from.getPlatformType().getKey());
     }
