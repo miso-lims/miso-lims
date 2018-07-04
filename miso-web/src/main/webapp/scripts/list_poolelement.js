@@ -58,9 +58,14 @@ ListTarget.poolelement = {
         return full.name;
       }
     }, {
-      'sTitle': 'Conc. (' + Constants.libraryDilutionConcentrationUnits + ')',
+      'sTitle': 'Conc.',
       'sType': 'natural',
       'mData': 'concentration',
+      'include': true,
+      'iSortPriority': 0
+    }, {
+      'sTitle': 'Conc. Units',
+      'mData': 'concentrationUnits',
       'include': true,
       'iSortPriority': 0
     }, ListUtils.idHyperlinkColumn("Library Name", "library", "library.id", function(dilution) {

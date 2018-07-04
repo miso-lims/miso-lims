@@ -1269,6 +1269,7 @@ public class Dtos {
     dto.setDilutionUserName(from.getDilutionCreator());
     dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
     dto.setVolume(from.getVolume() == null ? null : from.getVolume().toString());
+    dto.setConcentrationUnits(from.getConcentrationUnits());
     if (from.getCreationDate() != null) {
       dto.setCreationDate(formatDate(from.getCreationDate()));
     }
@@ -1311,6 +1312,7 @@ public class Dtos {
     dto.setName(from.getDilutionName());
     dto.setDilutionUserName(from.getCreatorName());
     dto.setConcentration(from.getDilutionConcentration() == null ? null : from.getDilutionConcentration().toString());
+    dto.setConcentrationUnits(from.getDilutionConcentrationUnits());
     dto.setLastModified(formatDateTime(from.getLastModified()));
     dto.setCreationDate(formatDate(from.getCreated()));
     dto.setIdentificationBarcode(from.getDilutionBarcode());
@@ -1346,6 +1348,7 @@ public class Dtos {
     }
     to.setIdentificationBarcode(from.getIdentificationBarcode());
     to.setConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
+    to.setConcentrationUnits(from.getConcentrationUnits());
     to.setVolume(from.getVolume() == null ? null : Double.valueOf(from.getVolume()));
     to.setLibrary(to(from.getLibrary()));
     to.setDilutionCreator(from.getDilutionUserName());

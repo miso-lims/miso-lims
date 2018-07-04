@@ -231,6 +231,7 @@ public class DefaultLibraryDilutionService
     target.setTargetedSequencing(source.getTargetedSequencing());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setVolume(source.getVolume());
+    target.setConcentrationUnits(source.getConcentrationUnits());
   }
 
   public void setDilutionDao(LibraryDilutionStore dilutionDao) {

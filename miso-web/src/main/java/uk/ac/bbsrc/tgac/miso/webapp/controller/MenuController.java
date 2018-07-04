@@ -299,7 +299,6 @@ public class MenuController implements ServletContextAware {
     node.put("automaticBarcodes", autoGenerateIdentificationBarcodes());
     node.put("automaticSampleAlias", namingScheme.hasSampleAliasGenerator());
     node.put("automaticLibraryAlias", namingScheme.hasLibraryAliasGenerator());
-    node.put("libraryDilutionConcentrationUnits", LibraryDilution.UNITS);
     node.put("poolConcentrationUnits", PoolImpl.CONCENTRATION_UNITS);
     node.put("sampleConcentrationUnits", Sample.CONCENTRATION_UNITS);
 
@@ -346,6 +345,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "indexFamilies", indexFamilies, Dtos::asDto);
     createArray(mapper, baseUri, node, "qcTypes", qcService.listQcTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "qcTargets", Arrays.asList(QcTarget.values()), Function.identity());
+    createArray(mapper, baseUri, node, "dilutionConcentrationUnits", LibraryDilution.CONCENTRATION_UNITS, Function.identity());
     createArray(mapper, baseUri, node, "partitionQcTypes", partitionQCService.listTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "referenceGenomes", referenceGenomeService.listAllReferenceGenomeTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "spreadsheetFormats", Arrays.asList(SpreadSheetFormat.values()), Dtos::asDto);

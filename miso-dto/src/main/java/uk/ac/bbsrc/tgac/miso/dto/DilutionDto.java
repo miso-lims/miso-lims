@@ -12,6 +12,7 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
   private String identificationBarcode;
   private String locationLabel;
   private String concentration;
+  private String concentrationUnits;
   private String volume;
   private String creationDate;
   private String dilutionCreatorName;
@@ -62,6 +63,14 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setConcentration(String concentration) {
     this.concentration = concentration;
+  }
+
+  public String getConcentrationUnits() {
+    return concentrationUnits;
+  }
+
+  public void setConcentrationUnits(String concentrationUnits) {
+    this.concentrationUnits = concentrationUnits;
   }
 
   public String getCreationDate() {

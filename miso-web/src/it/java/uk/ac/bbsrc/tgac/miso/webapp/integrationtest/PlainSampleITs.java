@@ -46,8 +46,8 @@ public class PlainSampleITs extends AbstractIT {
       LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.CONCENTRATION);
 
   private static final Set<String> dilutionColumns = Sets.newHashSet(DilColumns.NAME, DilColumns.LIBRARY_ALIAS, DilColumns.BOX_SEARCH,
-      DilColumns.BOX_ALIAS, DilColumns.BOX_POSITION, DilColumns.DISCARDED, DilColumns.CONCENTRATION, DilColumns.VOLUME,
-      DilColumns.CREATION_DATE);
+      DilColumns.BOX_ALIAS, DilColumns.BOX_POSITION, DilColumns.DISCARDED, DilColumns.CONCENTRATION, DilColumns.CONCENTRATION_UNITS,
+      DilColumns.VOLUME, DilColumns.CREATION_DATE);
 
   @Before
   public void setup() {

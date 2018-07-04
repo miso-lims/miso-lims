@@ -3,6 +3,7 @@ AS SELECT
     d.dilutionId,
     d.name AS dilutionName,
     d.concentration AS dilutionConcentration,
+    d.concentrationUnits AS dilutionConcentrationUnits,
     d.volume AS dilutionVolume,
     d.identificationBarcode AS dilutionBarcode,
     d.lastUpdated AS lastModified,
