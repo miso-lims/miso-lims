@@ -92,7 +92,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
@@ -343,11 +342,6 @@ public class EditSampleController {
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return sampleService.getSampleColumnSizes();
-  }
-
-  @ModelAttribute("libraryDilutionUnits")
-  public String libraryDilutionUnits() {
-    return LibraryDilution.UNITS;
   }
 
   @ModelAttribute("poolConcentrationUnits")
