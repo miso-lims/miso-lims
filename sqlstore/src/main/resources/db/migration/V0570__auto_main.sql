@@ -1,3 +1,5 @@
+-- Samples_Recieved_Workflow
+
 CREATE TABLE StepPositiveDouble (
   workflowProgressId BIGINT(20) NOT NULL,
   stepNumber         BIGINT(20) NOT NULL,
@@ -38,3 +40,20 @@ CREATE TABLE StepBoxPosition (
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
+
+
+-- Template_Default_Volume
+
+ALTER TABLE LibraryTemplate ADD COLUMN `defaultVolume` double DEFAULT NULL AFTER projectId;
+
+
+-- Optional_Dilution_Concentration
+
+ALTER TABLE LibraryDilution MODIFY COLUMN concentration double;
+
+
+-- Optional_Pool_Concentration
+
+ALTER TABLE `Pool` MODIFY COLUMN `concentration` double DEFAULT NULL;
+
+

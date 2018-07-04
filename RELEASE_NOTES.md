@@ -1,3 +1,14 @@
+# 0.2.128
+
+Changes:
+
+ * Make pool concentration optional
+ * Make dilution concentration optional
+ * Add optional volume to project templates
+ * Add Samples Received Workflow
+ * Add project short name to home page project tiles
+ * Allow adding QC-types through the front-end
+
 # 0.2.127
 
 Changes:

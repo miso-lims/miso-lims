@@ -1,1 +1,0 @@
-ALTER TABLE `Pool` MODIFY COLUMN `concentration` double DEFAULT NULL;
