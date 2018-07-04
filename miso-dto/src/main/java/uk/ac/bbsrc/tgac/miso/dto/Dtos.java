@@ -58,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.QC;
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -1545,6 +1546,8 @@ public class Dtos {
     dto.setQcTarget(from.getQcTarget());
     dto.setUnits(from.getUnits());
     dto.setPrecisionAfterDecimal(from.getPrecisionAfterDecimal());
+    dto.setCorrespondingField(from.getCorrespondingField());
+    dto.setAutoUpdateField(from.isAutoUpdateField());
     dto.setArchived(from.isArchived());
     return dto;
   }
@@ -1558,6 +1561,8 @@ public class Dtos {
     to.setUnits(from.getUnits());
     to.setPrecisionAfterDecimal(from.getPrecisionAfterDecimal());
     to.setArchived(from.isArchived());
+    to.setCorrespondingField(from.getCorrespondingField());
+    to.setAutoUpdateField(from.isAutoUpdateField());
     return to;
   }
 
@@ -2392,5 +2397,12 @@ public class Dtos {
     }
     location.setLocationUnit(LocationUnit.valueOf(from.getLocationUnit()));
     return location;
+  }
+
+  public static QcTargetDto asDto(QcTarget from) {
+    QcTargetDto dto = new QcTargetDto();
+    dto.setQcTarget(from);
+    dto.setCorrespondingFields(from.getCorrespondingFields());
+    return dto;
   }
 }
