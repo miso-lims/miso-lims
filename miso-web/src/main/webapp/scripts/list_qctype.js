@@ -75,6 +75,18 @@ ListTarget.qctype = {
       "include": true,
       "iSortPriority": 0,
       "bSortable": false
+    }, {
+      "sTitle": "Corresponding Field",
+      "mData": "correspondingField",
+      "include": true,
+      "iSortPriority": 0,
+      "bSortable": true
+    }, {
+      "sTitle": "Auto Update Field",
+      "mData": "autoUpdateField",
+      "include": true,
+      "iSortPriority": 0,
+      "bSortable": true
     }, ];
   }
 };

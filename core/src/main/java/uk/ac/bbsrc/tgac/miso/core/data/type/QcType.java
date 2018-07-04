@@ -34,6 +34,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
+import uk.ac.bbsrc.tgac.miso.core.data.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 
 /**
@@ -63,6 +64,9 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable {
   private String units;
   private Integer precisionAfterDecimal;
   private boolean archived;
+  @Enumerated(EnumType.STRING)
+  private QcCorrespondingField correspondingField;
+  private boolean autoUpdateField;
 
   /**
    * Returns the qcTypeId of this QcType object.
@@ -256,5 +260,21 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable {
   @Override
   public String getAlias() {
     return name;
+  }
+
+  public QcCorrespondingField getCorrespondingField() {
+    return correspondingField;
+  }
+
+  public void setCorrespondingField(QcCorrespondingField correspondingField) {
+    this.correspondingField = correspondingField;
+  }
+
+  public boolean isAutoUpdateField() {
+    return autoUpdateField;
+  }
+
+  public void setAutoUpdateField(boolean autoUpdateField) {
+    this.autoUpdateField = autoUpdateField;
   }
 }
