@@ -177,7 +177,11 @@ public class PoolRestController extends RestController {
   @ResponseBody
   public PoolDto createPool(@RequestBody PoolDto pool, UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
-    Long id = poolService.save(Dtos.to(pool));
+    Pool poolobj = Dtos.to(pool);
+    if (poolobj.getVolume() == null && poolobj.getPoolableElementViews().stream().allMatch(view -> view.getDilutionVolumeUsed() != null)) {
+      poolobj.setVolume(poolobj.getPoolableElementViews().stream().mapToDouble(view -> view.getDilutionVolumeUsed()).sum());
+    }
+    Long id = poolService.save(poolobj);
     return getPoolById(id);
   }
 
