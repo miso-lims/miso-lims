@@ -1786,6 +1786,7 @@ public class Dtos {
       PoolableElementView view = new PoolableElementView();
       view.setDilutionId(dilution.getId());
       view.setDilutionName(dilution.getName());
+      view.setDilutionVolumeUsed(dilution.getVolumeUsed() == null ? null : Double.valueOf(dilution.getVolumeUsed()));
       return view;
     }).collect(Collectors.toSet()));
     to.setQcPassed(dto.getQcPassed());

@@ -909,6 +909,9 @@ public class EditLibraryController {
       dto.setAlias(item.getLibrary().getAlias() + "_POOL");
       dto.setPooledElements(Collections.singleton(Dtos.asDto(item)));
       dto.setPlatformType(item.getLibrary().getPlatformType().name());
+      if (item.getVolumeUsed() != null) {
+        dto.setVolume(item.getVolumeUsed().toString());
+      }
       return dto;
     }
 
@@ -983,6 +986,10 @@ public class EditLibraryController {
         }
       }
       dto.setPooledElements(parents.stream().map(Dtos::asDto).collect(Collectors.toSet()));
+      if (dto.getPooledElements().stream().allMatch(element -> element.getVolumeUsed() != null)) {
+        dto.setVolume(
+            Double.toString(dto.getPooledElements().stream().mapToDouble(element -> Double.parseDouble(element.getVolumeUsed())).sum()));
+      }
       return dto;
     }
 
