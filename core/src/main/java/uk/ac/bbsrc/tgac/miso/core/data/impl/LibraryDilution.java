@@ -87,8 +87,9 @@ public class LibraryDilution extends AbstractBoxable
   @Column(nullable = false)
   @Temporal(TemporalType.DATE)
   private Date creationDate;
-  @Column(nullable = false)
+
   private Double concentration;
+
   @Column(name = "dilutionUserName", nullable = false)
   private String dilutionCreator;
 

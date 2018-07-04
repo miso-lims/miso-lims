@@ -9,4 +9,8 @@ public interface QualityControlTypeStore {
   Collection<QcType> list() throws IOException;
 
   QcType get(long id) throws IOException;
+
+  long create(QcType qcType) throws IOException;
+
+  void update(QcType qcType) throws IOException;
 }

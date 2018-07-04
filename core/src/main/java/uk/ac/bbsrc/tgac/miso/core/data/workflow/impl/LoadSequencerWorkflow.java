@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName.LOAD_SEQUENCER;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +38,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
 
   @Override
   protected WorkflowName getWorkflowName() {
-    return LOAD_SEQUENCER;
+    return WorkflowName.LOAD_SEQUENCER;
   }
 
   @Override
@@ -65,7 +63,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
   }
 
   @Override
-  public void processInput(int stepNumber, ProgressStep step) {
+  public List<String> processInput(int stepNumber, ProgressStep step) {
     if (stepNumber == 0) {
       step.accept(containerStep);
       containerModelStep.cancelInput();
@@ -87,6 +85,7 @@ public class LoadSequencerWorkflow extends AbstractWorkflow {
       int partitionIndex = asPartitionIndex(stepNumber);
       step.accept(partitionSteps.get(partitionIndex));
     }
+    return Collections.emptyList();
   }
 
   private void resetPartitionSteps(SequencingContainerModel model) {

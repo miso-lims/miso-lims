@@ -54,7 +54,7 @@ var Pool = {
 
     // Concentration input field validation
     jQuery('#concentration').attr('class', 'form-control');
-    jQuery('#concentration').attr('data-parsley-required', 'true');
+    jQuery('#concentration').attr('data-parsley-required', 'false');
     jQuery('#concentration').attr('data-parsley-maxlength', '10');
     jQuery('#concentration').attr('data-parsley-type', 'number');
 

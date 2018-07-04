@@ -177,7 +177,7 @@ public class HibernateProgressDaoTest extends AbstractDAOTest {
   }
 
   /**
-   * Similar to a Progress constructor.  However, an ID is not set, as IDs are dynamically generated.
+   * Similar to a Progress constructor. However, an ID is not set, as IDs are dynamically generated.
    */
   private Progress makeProgress(WorkflowName workflowName, User user, Date creationTime, Date lastModified,
       List<ProgressStep> steps) {
@@ -206,7 +206,7 @@ public class HibernateProgressDaoTest extends AbstractDAOTest {
     assertTrue(actualProgress.getCreationTime().getTime() <= actualProgress.getLastModified().getTime());
 
     // The Progress of each ProgressStep is not matched, as the Progress's ID is automatically generated
-    //  and comparing the fields of each ProgressStep's parent would cause infinite recursion
+    // and comparing the fields of each ProgressStep's parent would cause infinite recursion
     assertSameStepNumbers(expectedProgress.getSteps(), actualProgress.getSteps());
   }
 

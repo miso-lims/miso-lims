@@ -49,11 +49,13 @@ public class TestWorkflow extends AbstractWorkflow {
   }
 
   @Override
-  public void processInput(int stepNumber, ProgressStep progressStep) {
+  public List<String> processInput(int stepNumber, ProgressStep progressStep) {
     if (!validStepNumber(stepNumber)) throw new IllegalArgumentException("Invalid step number");
 
     progressStep.accept(steps.get(stepNumber));
     if (stepNumber == nextStepNumber) nextStepNumber++;
+
+    return Collections.emptyList();
   }
 
   @Override

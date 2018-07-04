@@ -871,4 +871,14 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     return boxService;
   }
 
+  @Override
+  public Sample save(Sample sample) throws IOException {
+    if (sample.getId() == SampleImpl.UNSAVED_ID) {
+      return get(create(sample));
+    } else {
+      update(sample);
+      return get(sample.getId());
+    }
+  }
+  
 }

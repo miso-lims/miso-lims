@@ -44,6 +44,8 @@ public class LibraryTemplate implements Serializable {
   @JoinColumn(name = "projectId", nullable = false)
   private Project project;
 
+  private Double defaultVolume;
+
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
 
@@ -101,6 +103,14 @@ public class LibraryTemplate implements Serializable {
 
   public void setProject(Project project) {
     this.project = project;
+  }
+
+  public Double getDefaultVolume() {
+    return defaultVolume;
+  }
+
+  public void setDefaultVolume(Double defaultVolume) {
+    this.defaultVolume = defaultVolume;
   }
 
   public PlatformType getPlatformType() {

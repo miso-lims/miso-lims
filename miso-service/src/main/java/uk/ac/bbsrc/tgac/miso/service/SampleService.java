@@ -56,4 +56,6 @@ public interface SampleService extends PaginatedDataSource<Sample>, BarcodableSe
 
   Map<String, Integer> getSampleColumnSizes() throws IOException;
 
+  Sample save(Sample sample) throws IOException;
+
 }

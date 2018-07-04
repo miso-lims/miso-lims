@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.LoadSequencerWorkflow;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SamplesReceivedWorkflow;
 
 public interface Workflow {
   Progress getProgress();
@@ -31,8 +32,10 @@ public interface Workflow {
   /**
    * Validate and store input for a step identified by the 0-indexed stepNumber.
    * If stepNumber refers to a previous step, an implementation may or may not choose to invalidate future steps.
+   * 
+   * @return list of error messages to display
    */
-  void processInput(int stepNumber, ProgressStep step);
+  List<String> processInput(int stepNumber, ProgressStep step);
 
   /**
    * Removes the latest step and any effects it caused.
@@ -67,6 +70,17 @@ public interface Workflow {
       @Override
       public final String getDescription() {
         return "Load Sequencer Workflow";
+      }
+    },
+    SAMPLES_RECEIVED {
+      @Override
+      public Workflow createWorkflow() {
+        return new SamplesReceivedWorkflow();
+      }
+
+      @Override
+      public final String getDescription() {
+        return "Samples Received Workflow";
       }
     };
 

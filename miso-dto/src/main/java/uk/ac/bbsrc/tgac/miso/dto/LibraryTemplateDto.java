@@ -21,6 +21,8 @@ public class LibraryTemplateDto {
 
   private long projectId;
 
+  private Double defaultVolume;
+
   private String platformType;
 
   private long libraryTypeId;
@@ -59,6 +61,14 @@ public class LibraryTemplateDto {
 
   public void setProjectId(long projectId) {
     this.projectId = projectId;
+  }
+
+  public Double getDefaultVolume() {
+    return defaultVolume;
+  }
+
+  public void setDefaultVolume(Double defaultVolume) {
+    this.defaultVolume = defaultVolume;
   }
 
   public String getPlatformType() {

@@ -165,7 +165,7 @@ HotTarget.pool = (function() {
         pack: function(pool, flat, errorHandler) {
           pool.creationDate = flat.creationDate;
         }
-      }, HotUtils.makeColumnForFloat('Concentration (' + Constants.poolConcentrationUnits + ')', true, 'concentration', true),
+      }, HotUtils.makeColumnForFloat('Concentration (' + Constants.poolConcentrationUnits + ')', true, 'concentration', false),
           HotUtils.makeColumnForFloat('Volume (&#181;l)', true, 'volume', false),
           HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false)];
 

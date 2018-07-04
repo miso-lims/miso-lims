@@ -60,7 +60,10 @@ public class DefaultWorkflowManager implements WorkflowManager {
 
   @Override
   public Workflow processInput(Workflow workflow, int stepNumber, String input) throws IOException {
-    workflow.processInput(stepNumber, makeProgressStep(input, workflow.getStep(stepNumber).getInputTypes()));
+    List<String> errors = workflow.processInput(stepNumber, makeProgressStep(input, workflow.getStep(stepNumber).getInputTypes()));
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors.stream().map(err -> new ValidationError(err)).collect(Collectors.toList()));
+    }
     save(workflow.getProgress());
     return workflow;
   }
