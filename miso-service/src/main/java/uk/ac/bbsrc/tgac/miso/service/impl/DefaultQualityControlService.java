@@ -57,6 +57,11 @@ public class DefaultQualityControlService implements QualityControlService {
     if (!type.getQcTarget().equals(entity.getQcTarget())) {
       throw new IllegalArgumentException("QC type and entity are mismatched.");
     }
+
+    if (qc.getType().isAutoUpdateField()) {
+      handler.updateEntity(qc.getEntity().getId(), qc.getType().getCorrespondingField(), qc.getResults());
+    }
+
     entity.setChangeDetails(user);
     changeLoggableStore.update(entity);
 
@@ -78,6 +83,10 @@ public class DefaultQualityControlService implements QualityControlService {
     }
     original.setResults(qc.getResults());
     original.setLastModified(new Date());
+
+    if (qc.getType().isAutoUpdateField()) {
+      handler.updateEntity(qc.getEntity().getId(), qc.getType().getCorrespondingField(), qc.getResults());
+    }
 
     entity.setChangeDetails(user);
     changeLoggableStore.update(entity);

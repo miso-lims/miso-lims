@@ -19,6 +19,7 @@ import javax.persistence.Transient;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
@@ -234,6 +235,11 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @Override
   public String getBarcodeSizeInfo() {
     return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), Sample.CONCENTRATION_UNITS);
+  }
+
+  @Override
+  public void updateFromQc(QcCorrespondingField correspondingField, double value) {
+    correspondingField.updateField(this, value);
   }
 
 }
