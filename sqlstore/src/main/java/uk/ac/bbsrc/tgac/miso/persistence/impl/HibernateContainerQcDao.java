@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.QC;
+import uk.ac.bbsrc.tgac.miso.core.data.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.QualityControlEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
@@ -38,7 +39,7 @@ public class HibernateContainerQcDao implements ContainerQcStore {
 
   @Override
   public QualityControlEntity getEntity(long id) throws IOException {
-    return (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, id);
+    return getSequencerPartitionContainer(id);
   }
 
   @Override
@@ -55,6 +56,17 @@ public class HibernateContainerQcDao implements ContainerQcStore {
       currentSession().update(containerQC);
       return containerQC.getId();
     }
+  }
+
+  private SequencerPartitionContainer getSequencerPartitionContainer(long id) throws IOException {
+    return (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, id);
+  }
+
+  @Override
+  public void updateEntity(long id, QcCorrespondingField correspondingField, double value) throws IOException {
+    SequencerPartitionContainer container = getSequencerPartitionContainer(id);
+    correspondingField.updateField(container, value);
+    currentSession().update(container);
   }
 
 }
