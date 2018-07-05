@@ -33,17 +33,17 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
@@ -61,7 +61,7 @@ public class SampleNumberPerProjectController extends RestController {
   @Autowired
   private SampleNumberPerProjectService sampleNumberPerProjectService;
 
-  @RequestMapping(value = "/samplenumberperproject/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/samplenumberperproject/{id}", produces = { "application/json" })
   @ResponseBody
   public SampleNumberPerProjectDto getSampleNumberPerProject(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -87,7 +87,7 @@ public class SampleNumberPerProjectController extends RestController {
     return sampleNumberPerProjectDto;
   }
 
-  @RequestMapping(value = "/samplenumberperprojects", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/samplenumberperprojects", produces = { "application/json" })
   @ResponseBody
   public Set<SampleNumberPerProjectDto> getSampleNumberPerProjects(UriComponentsBuilder uriBuilder, HttpServletResponse response) 
       throws IOException {
@@ -99,26 +99,25 @@ public class SampleNumberPerProjectController extends RestController {
     return sampleNumberPerProjectDtos;
   }
 
-  @RequestMapping(value = "/samplenumberperproject", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(value = "/samplenumberperproject", headers = { "Content-type=application/json" })
+  @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public ResponseEntity<?> createSampleNumberPerProject(@RequestBody SampleNumberPerProjectDto sampleNumberPerProjectDto,
+  public SampleNumberPerProjectDto createSampleNumberPerProject(@RequestBody SampleNumberPerProjectDto sampleNumberPerProjectDto,
       UriComponentsBuilder b, HttpServletResponse response) throws IOException {
     SampleNumberPerProject sampleNumberPerProject = Dtos.to(sampleNumberPerProjectDto);
     Long id = sampleNumberPerProjectService.create(sampleNumberPerProject, sampleNumberPerProjectDto.getProjectId());
-    UriComponents uriComponents = b.path("/samplenumberperproject/{id}").buildAndExpand(id);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    return Dtos.asDto(sampleNumberPerProjectService.get(id));
   }
 
-  @RequestMapping(value = "/samplenumberperproject/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "/samplenumberperproject/{id}", headers = { "Content-type=application/json" })
+  @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public ResponseEntity<?> updateSampleNumberPerProject(@PathVariable("id") Long id,
+  public SampleNumberPerProjectDto updateSampleNumberPerProject(@PathVariable("id") Long id,
       @RequestBody SampleNumberPerProjectDto sampleNumberPerProjectDto, HttpServletResponse response) throws IOException {
     SampleNumberPerProject sampleNumberPerProject = Dtos.to(sampleNumberPerProjectDto);
     sampleNumberPerProject.setId(id);
     sampleNumberPerProjectService.update(sampleNumberPerProject);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return Dtos.asDto(sampleNumberPerProjectService.get(id));
   }
 
 }

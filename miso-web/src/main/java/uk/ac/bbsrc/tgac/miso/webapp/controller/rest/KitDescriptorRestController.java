@@ -13,10 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -66,7 +68,7 @@ public class KitDescriptorRestController extends RestController {
     return kitDescriptorDto;
   }
 
-  @RequestMapping(value = "/kitdescriptor/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/kitdescriptor/{id}", produces = { "application/json" })
   @ResponseBody
   public KitDescriptorDto getKitDescriptor(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) throws IOException {
     KitDescriptor kd = kitService.getKitDescriptorById(id);
@@ -79,7 +81,7 @@ public class KitDescriptorRestController extends RestController {
     }
   }
 
-  @RequestMapping(value = "/kitdescriptors", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/kitdescriptors", produces = { "application/json" })
   @ResponseBody
   public Set<KitDescriptorDto> getKitDescriptors(UriComponentsBuilder uriBuilder) throws IOException {
     Collection<KitDescriptor> kitDescriptors = kitService.listKitDescriptors();
@@ -90,7 +92,7 @@ public class KitDescriptorRestController extends RestController {
     return dtos;
   }
 
-  @RequestMapping(value = "/kitdescriptor", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(value = "/kitdescriptor", headers = { "Content-type=application/json" })
   @ResponseBody
   @ResponseStatus(HttpStatus.CREATED)
   public void createKitDescriptor(@RequestBody KitDescriptorDto kitDescriptorDto, UriComponentsBuilder uriBuilder) throws IOException {
@@ -101,7 +103,7 @@ public class KitDescriptorRestController extends RestController {
     kitService.saveKitDescriptor(kd);
   }
 
-  @RequestMapping(value = "/kitdescriptor/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "/kitdescriptor/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
   @ResponseStatus(HttpStatus.OK)
   public void updateKitDescriptor(@PathVariable("id") Long id, @RequestBody KitDescriptorDto kitDescriptorDto,
@@ -111,14 +113,14 @@ public class KitDescriptorRestController extends RestController {
     kitService.saveKitDescriptor(kd);
   }
 
-  @RequestMapping(value = "/kitdescriptor/dt", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/kitdescriptor/dt", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<KitDescriptorDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
-  @RequestMapping(value = "/kitdescriptor/dt/type/{type}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/kitdescriptor/dt/type/{type}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<KitDescriptorDto> dataTableByType(@PathVariable("type") String type, HttpServletRequest request,
       HttpServletResponse response,

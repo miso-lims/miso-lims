@@ -12,10 +12,13 @@ import javax.ws.rs.core.Response.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -59,20 +62,20 @@ public class ArrayRestController extends RestController {
 
   };
 
-  @RequestMapping(value = "/dt", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/dt",  produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<ArrayDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping()
   @ResponseStatus(HttpStatus.CREATED)
   public @ResponseBody ArrayDto save(@RequestBody ArrayDto dto) throws IOException {
     return doSave(dto);
   }
 
-  @RequestMapping(value = "/{arrayId}", method = RequestMethod.PUT)
+  @PutMapping(value = "/{arrayId}")
   public @ResponseBody ArrayDto update(@PathVariable(name = "arrayId", required = true) long arrayId, @RequestBody ArrayDto dto)
       throws IOException {
     if (dto.getId().longValue() != arrayId) {
@@ -92,7 +95,7 @@ public class ArrayRestController extends RestController {
     return Dtos.asDto(saved);
   }
 
-  @RequestMapping(value = "/{arrayId}/positions/{position}", method = RequestMethod.DELETE)
+  @DeleteMapping(value = "/{arrayId}/positions/{position}")
   public @ResponseBody ArrayDto removeSample(@PathVariable(name = "arrayId", required = true) long arrayId,
       @PathVariable(name = "position", required = true) String position) throws IOException {
     Array array = arrayService.get(arrayId);
@@ -113,7 +116,7 @@ public class ArrayRestController extends RestController {
     return Dtos.asDto(saved);
   }
 
-  @RequestMapping(value = "/{arrayId}/positions/{position}", method = RequestMethod.PUT)
+  @PutMapping(value = "/{arrayId}/positions/{position}")
   public @ResponseBody ArrayDto addSample(@PathVariable(name = "arrayId", required = true) long arrayId,
       @PathVariable(name = "position", required = true) String position,
       @RequestParam(name = "sampleId", required = true) long sampleId) throws IOException {
@@ -135,7 +138,7 @@ public class ArrayRestController extends RestController {
     return Dtos.asDto(saved);
   }
 
-  @RequestMapping(value = "/sample-search", method = RequestMethod.GET)
+  @GetMapping(value = "/sample-search")
   public @ResponseBody List<SampleDto> findSamples(@RequestParam(name = "q", required = true) String search) throws IOException {
     if (LimsUtils.isStringEmptyOrNull(search)) {
       return new ArrayList<>();
@@ -144,7 +147,7 @@ public class ArrayRestController extends RestController {
     return Dtos.asSampleDtos(samples, false);
   }
 
-  @RequestMapping(value = "/{arrayId}/changelog", method = RequestMethod.GET)
+  @GetMapping(value = "/{arrayId}/changelog")
   public @ResponseBody List<ChangeLogDto> getChangelog(@PathVariable(name = "arrayId", required = true) long arrayId) throws IOException {
     Array array = arrayService.get(arrayId);
     if (array == null) {

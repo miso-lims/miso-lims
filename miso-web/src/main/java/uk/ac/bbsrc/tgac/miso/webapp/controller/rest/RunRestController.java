@@ -41,11 +41,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -72,7 +72,6 @@ import uk.ac.bbsrc.tgac.miso.dto.RunDto;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler.RestError;
 
 /**
  * A controller to handle all REST requests for Runs
@@ -142,7 +141,7 @@ public class RunRestController extends RestController {
     this.securityManager = securityManager;
   }
 
-  @RequestMapping(value = "{runId}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "{runId}", produces = "application/json")
   public @ResponseBody RunDto getRunById(@PathVariable Long runId) throws IOException {
     Run r = runService.get(runId);
     if (r == null) {
@@ -151,7 +150,7 @@ public class RunRestController extends RestController {
     return Dtos.asDto(r);
   }
 
-  @RequestMapping(value = "{runId}/full", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "{runId}/full", produces = "application/json")
   public @ResponseBody RunDto getRunByIdFull(@PathVariable Long runId) throws IOException {
     Run r = runService.get(runId);
     if (r == null) {
@@ -160,13 +159,13 @@ public class RunRestController extends RestController {
     return Dtos.asDto(r, true, true, true);
   }
 
-  @RequestMapping(value = "{runId}/containers", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "{runId}/containers", produces = "application/json")
   public @ResponseBody List<ContainerDto> getContainersByRunId(@PathVariable Long runId) throws IOException {
     Collection<SequencerPartitionContainer> cc = containerService.listByRunId(runId);
     return Dtos.asContainerDtos(cc, true, true);
   }
 
-  @RequestMapping(value = "/alias/{runAlias}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/alias/{runAlias}", produces = "application/json")
   public @ResponseBody RunDto getRunByAlias(@PathVariable String runAlias) throws IOException {
     Run r = runService.getRunByAlias(runAlias);
     if (r == null) {
@@ -175,25 +174,25 @@ public class RunRestController extends RestController {
     return Dtos.asDto(r);
   }
 
-  @RequestMapping(value = "/{runId}/samplesheet", method = RequestMethod.GET)
+  @GetMapping(value = "/{runId}/samplesheet")
   public HttpEntity<String> getSampleSheetForRun(@PathVariable Long runId, HttpServletResponse response) throws IOException {
     Run run = runService.get(runId);
     return getSampleSheetForRun(run, SampleSheet.CASAVA_1_8, response);
   }
 
-  @RequestMapping(value = "/{runId}/oldsamplesheet", method = RequestMethod.GET)
+  @GetMapping(value = "/{runId}/oldsamplesheet")
   public HttpEntity<String> getOldSampleSheetForRun(@PathVariable Long runId, HttpServletResponse response) throws IOException {
     Run run = runService.get(runId);
     return getSampleSheetForRun(run, SampleSheet.CASAVA_1_7, response);
   }
 
-  @RequestMapping(value = "/alias/{runAlias}/samplesheet", method = RequestMethod.GET)
+  @GetMapping(value = "/alias/{runAlias}/samplesheet")
   public HttpEntity<String> getSampleSheetForRunByAlias(@PathVariable String runAlias, HttpServletResponse response) throws IOException {
     Run run = runService.getRunByAlias(runAlias);
     return getSampleSheetForRun(run, SampleSheet.CASAVA_1_8, response);
   }
 
-  @RequestMapping(value = "/alias/{runAlias}/oldsamplesheet", method = RequestMethod.GET)
+  @GetMapping(value = "/alias/{runAlias}/oldsamplesheet")
   public HttpEntity<String> getOldSampleSheetForRunByAlias(@PathVariable String runAlias, HttpServletResponse response)
       throws IOException {
     Run run = runService.getRunByAlias(runAlias);
@@ -217,20 +216,20 @@ public class RunRestController extends RestController {
     return new HttpEntity<>(casavaVersion.createSampleSheet(run, user), headers);
   }
 
-  @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(produces = "application/json")
   public @ResponseBody List<RunDto> listAllRuns() throws IOException {
     Collection<Run> lr = runService.list();
     return Dtos.asRunDtos(lr);
   }
 
-  @RequestMapping(value = "/dt", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<RunDto> dataTable(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder)
       throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
-  @RequestMapping(value = "/dt/project/{id}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<RunDto> dataTableByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder)
@@ -238,7 +237,7 @@ public class RunRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
   }
 
-  @RequestMapping(value = "/dt/platform/{platform}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/dt/platform/{platform}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<RunDto> dataTableByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder)
@@ -250,7 +249,7 @@ public class RunRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(platformType));
   }
 
-  @RequestMapping(value = "/dt/sequencer/{id}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/dt/sequencer/{id}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<RunDto> dataTableBySequencer(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder)
@@ -258,12 +257,7 @@ public class RunRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.sequencer(id));
   }
 
-  @ExceptionHandler(Exception.class)
-  public @ResponseBody RestError handleError(HttpServletRequest request, HttpServletResponse response, Exception exception) {
-    return RestExceptionHandler.handleException(request, response, exception);
-  }
-
-  @RequestMapping(value = "{runId}/add", method = RequestMethod.POST, produces = "application/json")
+  @PostMapping(value = "{runId}/add", produces = "application/json")
   @ResponseStatus(code = HttpStatus.OK)
   public void addContainerByBarcode(@PathVariable Long runId, @RequestParam("barcode") String barcode) throws IOException {
     Run run = runService.get(runId);
@@ -286,7 +280,7 @@ public class RunRestController extends RestController {
     runService.update(run);
   }
 
-  @RequestMapping(value = "{runId}/remove", method = RequestMethod.POST, produces = "application/json")
+  @PostMapping(value = "{runId}/remove", produces = "application/json")
   @ResponseStatus(code = HttpStatus.OK)
   public void removeContainer(@PathVariable Long runId, @RequestBody List<Long> containerIds) throws IOException {
     Run run = runService.get(runId);
@@ -295,7 +289,7 @@ public class RunRestController extends RestController {
     runService.update(run);
   }
 
-  @RequestMapping(value = "{runId}/qc", method = RequestMethod.POST, produces = "application/json")
+  @PostMapping(value = "{runId}/qc", produces = "application/json")
   @ResponseStatus(code = HttpStatus.OK)
   public void setQc(@PathVariable Long runId, @RequestBody RunPartitionQCRequest request) throws IOException {
     Run run = runService.get(runId);

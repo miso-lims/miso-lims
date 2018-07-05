@@ -10,11 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
@@ -27,12 +25,12 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleCategoryDto;
 public class SampleCategoryController {
   protected static final Logger log = LoggerFactory.getLogger(SampleCategoryController.class);
 
-  @RequestMapping(value = "/samplecategories", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/samplecategories", produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SampleCategoryDto>> getSampleCategories(HttpServletResponse response) {
+  public Set<SampleCategoryDto> getSampleCategories(HttpServletResponse response) {
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(true);
     scanner.addIncludeFilter(new AnnotationTypeFilter(SampleCategory.class));
-    Set<SampleCategoryDto> results = new HashSet<SampleCategoryDto>();
+    Set<SampleCategoryDto> results = new HashSet<>();
     for (BeanDefinition definition : scanner.findCandidateComponents("uk.ac.bbsrc.tgac.miso.core.data")) {
       SampleCategoryDto category = new SampleCategoryDto();
       category.setClassName(definition.getBeanClassName());
@@ -50,6 +48,6 @@ public class SampleCategoryController {
         log.error("Looking for sample categories", e);
       }
     }
-    return new ResponseEntity<>(results, HttpStatus.OK);
+    return results;
   }
 }

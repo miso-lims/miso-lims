@@ -35,10 +35,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -59,7 +62,7 @@ public class SamplePurposeController extends RestController {
   @Autowired
   private SamplePurposeService samplePurposeService;
 
-  @RequestMapping(value = "/samplepurpose/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/samplepurpose/{id}", produces = { "application/json" })
   @ResponseBody
   public SamplePurposeDto getSamplePurpose(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -84,7 +87,7 @@ public class SamplePurposeController extends RestController {
     return samplePurposeDto;
   }
 
-  @RequestMapping(value = "/samplepurposes", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/samplepurposes", produces = { "application/json" })
   @ResponseBody
   public Set<SamplePurposeDto> getSamplePurposes(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<SamplePurpose> samplePurposes = samplePurposeService.getAll();
@@ -95,7 +98,7 @@ public class SamplePurposeController extends RestController {
     return samplePurposeDtos;
   }
 
-  @RequestMapping(value = "/samplepurpose", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(value = "/samplepurpose", headers = { "Content-type=application/json" })
   @ResponseBody
   public SamplePurposeDto createSamplePurpose(@RequestBody SamplePurposeDto samplePurposeDto, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -104,7 +107,7 @@ public class SamplePurposeController extends RestController {
     return getSamplePurpose(id, uriBuilder, response);
   }
 
-  @RequestMapping(value = "/samplepurpose/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "/samplepurpose/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
   public SamplePurposeDto updateSamplePurpose(@PathVariable("id") Long id, @RequestBody SamplePurposeDto samplePurposeDto,
       UriComponentsBuilder uriBuilder,
@@ -115,7 +118,7 @@ public class SamplePurposeController extends RestController {
     return getSamplePurpose(id, uriBuilder, response);
   }
 
-  @RequestMapping(value = "/samplepurpose/{id}", method = RequestMethod.DELETE)
+  @DeleteMapping(value = "/samplepurpose/{id}")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void deleteSamplePurpose(@PathVariable(name = "id", required = true) long id, HttpServletResponse response) throws IOException {
     SamplePurpose samplePurpose = samplePurposeService.get(id);

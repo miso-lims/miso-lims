@@ -33,24 +33,23 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
-import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 
 @Controller
 @RequestMapping("/rest")
@@ -61,10 +60,8 @@ public class SampleClassController extends RestController {
 
   @Autowired
   private SampleClassService sampleClassService;
-  @Autowired
-  private SampleValidRelationshipService sampleValidRelationshipService;
 
-  @RequestMapping(value = "/sampleclass/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/sampleclass/{id}", produces = { "application/json" })
   @ResponseBody
   public SampleClassDto getSampleClass(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -79,9 +76,10 @@ public class SampleClassController extends RestController {
   }
 
 
-  @RequestMapping(value = "/sampleclasses", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/sampleclasses", produces = { "application/json" })
   @ResponseBody
-  public Set<SampleClassDto> getSampleClasses(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
+  public Set<SampleClassDto> getSampleClasses(UriComponentsBuilder uriBuilder, HttpServletResponse response)
+      throws IOException {
     return sampleClassService.getAll().stream().map(sc -> {
       SampleClassDto dto = Dtos.asDto(sc);
       dto.writeUrls(uriBuilder);
@@ -89,26 +87,25 @@ public class SampleClassController extends RestController {
     }).collect(Collectors.toSet());
   }
 
-  @RequestMapping(value = "/sampleclass", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(value = "/sampleclass", headers = { "Content-type=application/json" })
+  @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public ResponseEntity<?> createSampleClass(@RequestBody SampleClassDto sampleClassDto, UriComponentsBuilder b,
+  public SampleClassDto createSampleClass(@RequestBody SampleClassDto sampleClassDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
     SampleClass sampleClass = Dtos.to(sampleClassDto);
     Long id = sampleClassService.create(sampleClass);
-    UriComponents uriComponents = b.path("/sampleclass/{id}").buildAndExpand(id);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    return Dtos.asDto(sampleClassService.get(id));
   }
 
-  @RequestMapping(value = "/sampleclass/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "/sampleclass/{id}", headers = { "Content-type=application/json" })
+  @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public ResponseEntity<?> updateSampleClass(@PathVariable("id") Long id, @RequestBody SampleClassDto sampleClassDto,
+  public SampleClassDto updateSampleClass(@PathVariable("id") Long id, @RequestBody SampleClassDto sampleClassDto,
       HttpServletResponse response) throws IOException {
     SampleClass sampleClass = Dtos.to(sampleClassDto);
     sampleClass.setId(id);
     sampleClassService.update(sampleClass);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return Dtos.asDto(sampleClassService.get(id));
   }
 
 }

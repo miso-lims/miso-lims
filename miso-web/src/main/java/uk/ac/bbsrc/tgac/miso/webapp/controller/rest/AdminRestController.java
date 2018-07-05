@@ -14,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -108,7 +108,7 @@ public class AdminRestController extends DefaultRestController {
   @Autowired
   private SessionFactory sessionFactory;
 
-  @RequestMapping(value = "/cache/clear", method = RequestMethod.POST)
+  @PostMapping(value = "/cache/clear")
   @ResponseBody
   @ResponseStatus(HttpStatus.OK)
   public boolean clearCache() {
@@ -133,7 +133,7 @@ public class AdminRestController extends DefaultRestController {
     return true;
   }
 
-  @RequestMapping(value = "/barcode/regen", method = RequestMethod.POST)
+  @PostMapping(value = "/barcode/regen")
   @ResponseBody
   @ResponseStatus(HttpStatus.OK)
   public List<RegenerationResponse> regenerateAllBarcodes() throws IOException {

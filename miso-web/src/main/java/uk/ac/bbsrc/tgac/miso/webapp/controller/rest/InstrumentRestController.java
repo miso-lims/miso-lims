@@ -14,10 +14,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponents;
@@ -54,7 +55,7 @@ public class InstrumentRestController extends RestController {
     this.instrumentService = instrumentService;
   }
 
-  @RequestMapping(value = "/{instrumentId}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/{instrumentId}", produces = "application/json")
   @ResponseBody
   public InstrumentDto getById(@PathVariable Long instrumentId) throws IOException {
     Instrument r = instrumentService.get(instrumentId);
@@ -64,7 +65,7 @@ public class InstrumentRestController extends RestController {
     return Dtos.asDto(r);
   }
 
-  @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(produces = "application/json")
   @ResponseBody
   public List<InstrumentDto> listAll() throws IOException {
     return instrumentService.list().stream().map(Dtos::asDto).collect(Collectors.toList());
@@ -72,7 +73,7 @@ public class InstrumentRestController extends RestController {
 
   private static final Logger log = LoggerFactory.getLogger(InstrumentRestController.class);
 
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping(produces = "application/json")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public InstrumentDto create(@RequestBody InstrumentDto instrumentDto, UriComponentsBuilder b, HttpServletResponse response)
@@ -98,14 +99,14 @@ public class InstrumentRestController extends RestController {
     return created;
   }
 
-  @RequestMapping(value = "/dt", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<InstrumentDto> datatable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
-  @RequestMapping(value = "/dt/instrument-type/{type}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/dt/instrument-type/{type}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<InstrumentDto> datatableByInstrumentType(@PathVariable("type") String type, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {

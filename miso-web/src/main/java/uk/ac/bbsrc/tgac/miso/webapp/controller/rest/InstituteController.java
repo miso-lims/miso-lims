@@ -12,10 +12,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -47,7 +50,7 @@ public class InstituteController extends RestController {
     return instituteDto;
   }
   
-  @RequestMapping(value = "/institute/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/institute/{id}", produces = { "application/json" })
   @ResponseBody
   public InstituteDto getInstitute(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) throws IOException {
     Institute institute = instituteService.get(id);
@@ -60,7 +63,7 @@ public class InstituteController extends RestController {
     }
   }
   
-  @RequestMapping(value = "/institutes", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/institutes", produces = { "application/json" })
   @ResponseBody
   public Set<InstituteDto> getInstitutes(UriComponentsBuilder uriBuilder) throws IOException {
     Set<Institute> institutes = instituteService.getAll();
@@ -71,7 +74,7 @@ public class InstituteController extends RestController {
     return instituteDtos;
   }
   
-  @RequestMapping(value = "/institute", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(value = "/institute", headers = { "Content-type=application/json" })
   @ResponseBody
   public InstituteDto createInstitute(@RequestBody InstituteDto instituteDto, UriComponentsBuilder uriBuilder) throws IOException {
     Institute institute = Dtos.to(instituteDto);
@@ -79,7 +82,7 @@ public class InstituteController extends RestController {
     return getInstitute(id, uriBuilder);
   }
   
-  @RequestMapping(value = "/institute/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "/institute/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
   public InstituteDto updateInstitute(@PathVariable("id") Long id, @RequestBody InstituteDto instituteDto,
       UriComponentsBuilder uriBuilder) throws IOException {
@@ -89,7 +92,7 @@ public class InstituteController extends RestController {
     return getInstitute(id, uriBuilder);
   }
   
-  @RequestMapping(value = "/institute/{id}", method = RequestMethod.DELETE)
+  @DeleteMapping(value = "/institute/{id}")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void deleteInstitute(@PathVariable(name = "id", required = true) long id, HttpServletResponse response) throws IOException {
     Institute institute = instituteService.get(id);
