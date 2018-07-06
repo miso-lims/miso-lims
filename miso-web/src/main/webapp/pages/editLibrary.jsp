@@ -341,7 +341,7 @@
   <td><form:input id="volume" path="volume"/></td>
 </tr>
 <tr>
-  <td class="h"><label for="initialConcentration">Initial Concentration (<span id="concentrationUnits"></span>):</label></td>
+  <td class="h"><label for="initialConcentration">Initial Concentration:</label></td>
   <td><form:input id="initialConcentration" path="initialConcentration"/></td>
 </tr>
 <tr>
@@ -393,9 +393,6 @@
   </tr>
 </table>
 </c:if>
-<script type="text/javascript">
-  Library.ui.updateConcentrationUnits();
-</script>
 
 <c:choose>
   <c:when
