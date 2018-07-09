@@ -115,9 +115,9 @@ HotTarget.qctype = {
             obj['autoUpdateField'] = false;
           }
         },
-        depends: 'correspondingField',
+        depends: ['correspondingField', 'resultFormat'],
         update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-          if(Utils.validation.isEmpty(value)){
+          if(Utils.validation.isEmpty(value) || flat['resultFormat'] === 'Yes/No'){
             setData("False");
             setReadOnly(true);
           } else {
