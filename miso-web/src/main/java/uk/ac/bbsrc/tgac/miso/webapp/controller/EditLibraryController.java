@@ -87,7 +87,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -354,11 +353,6 @@ public class EditLibraryController {
           .collect(Collectors.toList()));
       model.put("indexFamilies", visibleFamilies);
     }
-  }
-
-  @ModelAttribute("poolConcentrationUnits")
-  public String poolConcentrationUnits() {
-    return PoolImpl.CONCENTRATION_UNITS;
   }
 
   @ModelAttribute("prepKits")

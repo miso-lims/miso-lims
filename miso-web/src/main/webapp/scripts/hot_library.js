@@ -576,7 +576,7 @@ HotTarget.library = (function() {
           }, HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
           HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false),
           {
-            header: 'Vol. (&#181;l)',
+            header: 'Volume',
             data: 'volume',
             type: 'text',
             include: config.showVolume,
@@ -591,7 +591,7 @@ HotTarget.library = (function() {
               } else {
                 var result = parseFloat(flat['volume']);
                 if (isNaN(result)) {
-                  errorHandler('Vol. (&#181;l)' + ' is not a number.');
+                  errorHandler('Volume' + ' is not a number.');
                   return;
                 }
                 output = result;

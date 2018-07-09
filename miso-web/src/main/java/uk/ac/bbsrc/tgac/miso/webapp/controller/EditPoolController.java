@@ -149,11 +149,6 @@ public class EditPoolController {
     return PlatformType.platformTypeNames(platformService.listActivePlatformTypes());
   }
 
-  @ModelAttribute("poolConcentrationUnits")
-  public String poolConcentrationUnits() {
-    return PoolImpl.CONCENTRATION_UNITS;
-  }
-
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 

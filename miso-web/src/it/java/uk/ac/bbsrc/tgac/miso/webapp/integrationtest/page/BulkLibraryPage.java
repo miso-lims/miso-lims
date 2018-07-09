@@ -43,7 +43,7 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String KIT_DESCRIPTOR = "Kit";
     public static final String QC_PASSED = "QC Passed?";
     public static final String SIZE = "Size (bp)";
-    public static final String VOLUME = "Vol. (µl)";
+    public static final String VOLUME = "Volume";
     public static final String CONCENTRATION = "Conc.";
 
     private LibColumns() {

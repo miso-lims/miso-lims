@@ -91,7 +91,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @Table(name = "Pool")
 public class PoolImpl extends AbstractBoxable implements Pool {
   private static final int CONCENTRATION_LENGTH = 17;
-  public static final String CONCENTRATION_UNITS = "nM";
   private static final int DESCRIPTION_LENGTH = 255;
   private static final int ID_BARCODE_LENGTH = 255;
   private static final int NAME_LENGTH = 255;

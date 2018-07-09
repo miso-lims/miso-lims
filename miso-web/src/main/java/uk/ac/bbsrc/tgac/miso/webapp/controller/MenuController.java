@@ -60,12 +60,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryDilutionSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
@@ -299,8 +297,6 @@ public class MenuController implements ServletContextAware {
     node.put("automaticBarcodes", autoGenerateIdentificationBarcodes());
     node.put("automaticSampleAlias", namingScheme.hasSampleAliasGenerator());
     node.put("automaticLibraryAlias", namingScheme.hasLibraryAliasGenerator());
-    node.put("poolConcentrationUnits", PoolImpl.CONCENTRATION_UNITS);
-    node.put("sampleConcentrationUnits", Sample.CONCENTRATION_UNITS);
 
     final Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
 
@@ -362,7 +358,6 @@ public class MenuController implements ServletContextAware {
       dto.put("name", platformType.name());
       dto.put("key", platformType.getKey());
       dto.put("containerName", platformType.getContainerName());
-      dto.put("libraryConcentrationUnits", platformType.getLibraryConcentrationUnits());
       dto.put("active", activePlatformTypes.contains(platformType));
       dto.put("partitionName", platformType.getPartitionName());
       dto.put("pluralPartitionName", platformType.getPluralPartitionName());
