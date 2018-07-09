@@ -20,7 +20,6 @@ import javax.persistence.Transient;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.QcCorrespondingField;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -61,6 +60,7 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   private String groupDescription;
   private boolean isSynthetic = false;
   private Double concentration;
+  private String concentrationUnits;
 
   @Column(nullable = false)
   private boolean nonStandardAlias = false;
@@ -234,12 +234,22 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
 
   @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), Sample.CONCENTRATION_UNITS);
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits(), getConcentrationUnits());
   }
 
   @Override
-  public void updateFromQc(QcCorrespondingField correspondingField, double value) {
-    correspondingField.updateField(this, value);
+  public void updateFromQc(QcCorrespondingField correspondingField, double value, String units) {
+    correspondingField.updateField(this, value, units);
+  }
+
+  @Override
+  public String getConcentrationUnits() {
+    return concentrationUnits;
+  }
+
+  @Override
+  public void setConcentrationUnits(String concentrationUnits) {
+    this.concentrationUnits = concentrationUnits;
   }
 
 }

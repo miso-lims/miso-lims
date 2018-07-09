@@ -71,6 +71,7 @@ public class DetailedSampleBuilder
   private String alias;
   private User lastModifier;
   private Double volume;
+  private String volumeUnits;
   private boolean discarded = false;
   private boolean isSynthetic = false;
   private boolean nonStandardAlias = false;
@@ -115,6 +116,7 @@ public class DetailedSampleBuilder
   private SampleClass stockClass;
   private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
   private Double concentration;
+  private String concentrationUnits;
   private Boolean dnaseTreated;
 
   // TissueProcessingSample attributes
@@ -490,6 +492,16 @@ public class DetailedSampleBuilder
   }
 
   @Override
+  public String getConcentrationUnits() {
+    return concentrationUnits;
+  }
+
+  @Override
+  public void setConcentrationUnits(String concentrationUnits) {
+    this.concentrationUnits = concentrationUnits;
+  }
+
+  @Override
   public Boolean getArchived() {
     return archived;
   }
@@ -693,6 +705,16 @@ public class DetailedSampleBuilder
   }
 
   @Override
+  public String getVolumeUnits() {
+    return volumeUnits;
+  }
+
+  @Override
+  public void setVolumeUnits(String volumeUnits) {
+    this.volumeUnits = volumeUnits;
+  }
+
+  @Override
   public String getBoxPosition() {
     return null;
   }
@@ -875,6 +897,7 @@ public class DetailedSampleBuilder
     sample.setAlias(alias);
     sample.setLastModifier(lastModifier);
     sample.setVolume(volume);
+    sample.setVolumeUnits(volumeUnits);
     sample.setDiscarded(discarded);
     sample.getChangeLog().addAll(changeLog);
     sample.setNotes(notes);
@@ -888,6 +911,7 @@ public class DetailedSampleBuilder
     sample.setGroupDescription(groupDescription);
     sample.setSynthetic(isSynthetic);
     sample.setConcentration(concentration);
+    sample.setConcentrationUnits(concentrationUnits);
     sample.setNonStandardAlias(nonStandardAlias);
     sample.setSiblingNumber(siblingNumber);
     sample.setPreMigrationId(preMigrationId);

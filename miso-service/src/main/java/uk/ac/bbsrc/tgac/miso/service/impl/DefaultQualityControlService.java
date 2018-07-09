@@ -59,7 +59,7 @@ public class DefaultQualityControlService implements QualityControlService {
     }
 
     if (qc.getType().isAutoUpdateField()) {
-      handler.updateEntity(qc.getEntity().getId(), qc.getType().getCorrespondingField(), qc.getResults());
+      handler.updateEntity(qc.getEntity().getId(), qc.getType().getCorrespondingField(), qc.getResults(), qc.getType().getUnits());
     }
 
     entity.setChangeDetails(user);
@@ -83,10 +83,6 @@ public class DefaultQualityControlService implements QualityControlService {
     }
     original.setResults(qc.getResults());
     original.setLastModified(new Date());
-
-    if (qc.getType().isAutoUpdateField()) {
-      handler.updateEntity(qc.getEntity().getId(), qc.getType().getCorrespondingField(), qc.getResults());
-    }
 
     entity.setChangeDetails(user);
     changeLoggableStore.update(entity);

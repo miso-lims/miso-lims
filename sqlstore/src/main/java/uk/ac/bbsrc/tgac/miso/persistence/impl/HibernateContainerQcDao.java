@@ -63,9 +63,9 @@ public class HibernateContainerQcDao implements ContainerQcStore {
   }
 
   @Override
-  public void updateEntity(long id, QcCorrespondingField correspondingField, double value) throws IOException {
+  public void updateEntity(long id, QcCorrespondingField correspondingField, double value, String units) throws IOException {
     SequencerPartitionContainer container = getSequencerPartitionContainer(id);
-    correspondingField.updateField(container, value);
+    correspondingField.updateField(container, value, units);
     currentSession().update(container);
   }
 

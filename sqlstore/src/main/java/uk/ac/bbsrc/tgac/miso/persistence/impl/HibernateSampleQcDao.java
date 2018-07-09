@@ -73,9 +73,9 @@ public class HibernateSampleQcDao implements SampleQcStore {
   }
 
   @Override
-  public void updateEntity(long id, QcCorrespondingField correspondingField, double value) throws IOException {
+  public void updateEntity(long id, QcCorrespondingField correspondingField, double value, String units) throws IOException {
     SampleImpl sample = getSample(id);
-    sample.updateFromQc(correspondingField, value);
+    sample.updateFromQc(correspondingField, value, units);
     currentSession().update(sample);
   }
 }

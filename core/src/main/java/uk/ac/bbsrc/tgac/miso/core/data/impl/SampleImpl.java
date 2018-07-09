@@ -78,8 +78,8 @@ public class SampleImpl extends AbstractSample {
     return changeLog;
   }
 
-  public void updateFromQc(QcCorrespondingField correspondingField, double value) {
-    correspondingField.updateField(this, value);
+  public void updateFromQc(QcCorrespondingField correspondingField, double value, String units) {
+    correspondingField.updateField(this, value, units);
   }
 
 }

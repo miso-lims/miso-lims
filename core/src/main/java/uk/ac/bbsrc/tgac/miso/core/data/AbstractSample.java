@@ -115,6 +115,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private Boolean qcPassed;
   private String identificationBarcode;
   private String locationBarcode;
+  private String volumeUnits;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -478,7 +479,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), null, null);
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), null, getVolumeUnits(), null);
   }
 
   @Override
@@ -500,6 +501,16 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getVolumeUnits() {
+    return volumeUnits;
+  }
+
+  @Override
+  public void setVolumeUnits(String volumeUnits) {
+    this.volumeUnits = volumeUnits;
   }
 
 }

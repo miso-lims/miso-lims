@@ -422,12 +422,14 @@ public class LimsUtils {
     return Arrays.stream(sets).flatMap(Collection::stream).collect(Collectors.toSet());
   }
 
-  public static String makeVolumeAndConcentrationLabel(Double volume, Double concentration, String concentrationUnits) {
+  public static String makeVolumeAndConcentrationLabel(Double volume, Double concentration, String volumeUnits, String concentrationUnits) {
+    volumeUnits = (volumeUnits == null ? "" : volumeUnits);
+    concentrationUnits = (concentrationUnits == null ? "" : concentrationUnits);
     if (volume != null && volume != 0 && concentration != null && concentration != 0) {
-      return String.format("%.0fµL@%.0f%s", volume, concentration, concentrationUnits);
+      return String.format("%.0f%s@%.0f%s", volume, volumeUnits, concentration, concentrationUnits);
     }
     if (volume != null && volume != 0) {
-      return String.format("%.0fµL", volume);
+      return String.format("%.0f%s", volume, volumeUnits);
     }
     if (concentration != null && concentration != 0) {
       return String.format("%.0f%s", concentration, concentrationUnits);

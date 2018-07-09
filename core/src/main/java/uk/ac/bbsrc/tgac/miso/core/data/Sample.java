@@ -244,4 +244,18 @@ public interface Sample
 
   public void setBoxPosition(SampleBoxPosition boxPosition);
 
+  /**
+   * Returns the volume units of this Sample object.
+   * 
+   * @return String volumeUnits.
+   */
+  public String getVolumeUnits();
+
+  /**
+   * Sets the volumeUnits of this Sample object.
+   * 
+   * @param volumeUnits volumeUnits.
+   */
+  public void setVolumeUnits(String volumeUnits);
+
 }

@@ -96,9 +96,9 @@ public class HibernatePoolQCDao implements PoolQcStore {
   }
 
   @Override
-  public void updateEntity(long id, QcCorrespondingField correspondingField, double value) throws IOException {
+  public void updateEntity(long id, QcCorrespondingField correspondingField, double value, String units) throws IOException {
     Pool pool = getPool(id);
-    correspondingField.updateField(pool, value);
+    correspondingField.updateField(pool, value, units);
     currentSession().update(pool);
   }
 }

@@ -16,5 +16,5 @@ public interface QcTargetStore {
 
   public long save(QC qc) throws IOException;
 
-  public void updateEntity(long id, QcCorrespondingField correspondingField, double value) throws IOException;
+  public void updateEntity(long id, QcCorrespondingField correspondingField, double value, String units) throws IOException;
 }
