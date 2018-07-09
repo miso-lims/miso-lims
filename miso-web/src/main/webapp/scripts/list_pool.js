@@ -81,7 +81,7 @@ ListTarget.pool = {
           "iSortPriority": 0,
           "bSortable": false,
         }, {
-          "sTitle": "Conc. (" + Constants.poolConcentrationUnits + ")",
+          "sTitle": "Concentration",
           "mData": "concentration",
           "include": true,
           "iSortPriority": 0
