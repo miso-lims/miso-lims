@@ -167,8 +167,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
-  @Transient
-  private String units = "";
+  private String concentrationUnits;
+  private String volumeUnits;
 
   @Transient
   // not Hibernate-managed
@@ -334,10 +334,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     return securityProfile;
   }
 
-  public String getUnits() {
-    return this.units;
-  }
-
   @Override
   public String getWatchableIdentifier() {
     return getName();
@@ -492,8 +488,24 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     this.securityProfile = securityProfile;
   }
 
-  public void setUnits(String units) {
-    this.units = units;
+  @Override
+  public String getConcentrationUnits() {
+    return this.concentrationUnits;
+  }
+
+  @Override
+  public void setConcentrationUnits(String concentrationUnits) {
+    this.concentrationUnits = concentrationUnits;
+  }
+
+  @Override
+  public String getVolumeUnits() {
+    return this.volumeUnits;
+  }
+
+  @Override
+  public void setVolumeUnits(String volumeUnits) {
+    this.volumeUnits = volumeUnits;
   }
 
   @Override
@@ -614,7 +626,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getUnits());
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits(), getConcentrationUnits());
   }
 
   @Override

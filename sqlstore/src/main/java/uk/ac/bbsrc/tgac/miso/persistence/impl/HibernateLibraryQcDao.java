@@ -73,9 +73,9 @@ public class HibernateLibraryQcDao implements LibraryQcStore {
   }
 
   @Override
-  public void updateEntity(long id, QcCorrespondingField correspondingField, double value) throws IOException {
+  public void updateEntity(long id, QcCorrespondingField correspondingField, double value, String units) throws IOException {
     Library library = getLibrary(id);
-    correspondingField.updateField(library, value);
+    correspondingField.updateField(library, value, units);
     currentSession().update(library);
   }
 }

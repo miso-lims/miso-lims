@@ -114,7 +114,7 @@
     </td>
   </tr>
   <tr>
-    <td class="h">Desired Concentration (${poolConcentrationUnits}):*</td>
+    <td class="h">Desired Concentration<span id="concentrationUnits"></span>:*</td>
     <td><form:input id="concentration" path="concentration"/></td>
   </tr>
   <tr>
@@ -144,7 +144,7 @@
   </tr>
   
   <tr>
-    <td>Volume (&#181;l):</td>
+    <td>Volume<span id="volumeUnits"></span>:</td>
     <td><form:input id="volume" path="volume"/></td>
   </tr>
   <tr>
@@ -167,6 +167,11 @@
 </div>
 
 <br/>
+
+<script type="text/javascript">
+  Pool.ui.updateConcentrationUnits('${pool.concentrationUnits}');
+  Pool.ui.updateVolumeUnits('${pool.volumeUnits}');
+</script>
 
 <script type="text/javascript">
   jQuery(document).ready(function () {

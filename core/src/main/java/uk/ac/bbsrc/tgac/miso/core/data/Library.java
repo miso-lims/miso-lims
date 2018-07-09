@@ -315,4 +315,32 @@ public interface Library
 
   public void setReceivedDate(Date date);
 
+  /**
+   * Returns the concentration units of this Library object.
+   * 
+   * @return String concentrationUnits.
+   */
+  public String getConcentrationUnits();
+
+  /**
+   * Sets the concentrationUnits of this Library object.
+   * 
+   * @param concentrationUnits concentrationUnits.
+   */
+  public void setConcentrationUnits(String concentrationUnits);
+
+  /**
+   * Returns the volume units of this Library object.
+   * 
+   * @return String volumeUnits.
+   */
+  public String getVolumeUnits();
+
+  /**
+   * Sets the volumeUnits of this Library object.
+   * 
+   * @param volumeUnits volumeUnits.
+   */
+  public void setVolumeUnits(String volumeUnits);
+
 }
