@@ -32,17 +32,17 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
@@ -60,7 +60,7 @@ public class SampleGroupController extends RestController {
   @Autowired
   private SampleGroupService sampleGroupService;
 
-  @RequestMapping(value = "/samplegroup/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/samplegroup/{id}", produces = { "application/json" })
   @ResponseBody
   public SampleGroupDto getSampleGroup(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
@@ -74,7 +74,7 @@ public class SampleGroupController extends RestController {
     }
   }
 
-  @RequestMapping(value = "/samplegroups", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/samplegroups", produces = { "application/json" })
   @ResponseBody
   public Set<SampleGroupDto> getSampleGroups(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<SampleGroupId> sampleGroups = sampleGroupService.getAll();
@@ -85,26 +85,24 @@ public class SampleGroupController extends RestController {
     return sampleGroupDtos;
   }
 
-  @RequestMapping(value = "/samplegroup", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(value = "/samplegroup", headers = { "Content-type=application/json" })
+  @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public ResponseEntity<?> createSampleGroup(@RequestBody SampleGroupDto sampleGroupDto, UriComponentsBuilder b,
+  public SampleGroupDto createSampleGroup(@RequestBody SampleGroupDto sampleGroupDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
     SampleGroupId sampleGroup = Dtos.to(sampleGroupDto);
     Long id = sampleGroupService.create(sampleGroup, sampleGroupDto.getProjectId(), sampleGroupDto.getSubprojectId());
-    UriComponents uriComponents = b.path("/samplegroup/{id}").buildAndExpand(id);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    return Dtos.asDto(sampleGroupService.get(id));
   }
 
-  @RequestMapping(value = "/samplegroup/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "/samplegroup/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> updateSampleGroup(@PathVariable("id") Long id, @RequestBody SampleGroupDto sampleGroupDto,
+  public SampleGroupDto updateSampleGroup(@PathVariable("id") Long id, @RequestBody SampleGroupDto sampleGroupDto,
       HttpServletResponse response) throws IOException {
     SampleGroupId sampleGroup = Dtos.to(sampleGroupDto);
     sampleGroup.setId(id);
     sampleGroupService.update(sampleGroup);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return Dtos.asDto(sampleGroupService.get(id));
   }
 
 }

@@ -36,10 +36,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
@@ -60,7 +62,7 @@ public class DetailedQcStatusController extends RestController {
   @Autowired
   private DetailedQcStatusService detailedQcStatusService;
 
-  @RequestMapping(value = "/detailedqcstatus/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/detailedqcstatus/{id}", produces = { "application/json" })
   @ResponseBody
   public DetailedQcStatusDto getDetailedQcStatus(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -74,7 +76,7 @@ public class DetailedQcStatusController extends RestController {
     }
   }
 
-  @RequestMapping(value = "/detailedqcstatuses", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/detailedqcstatuses", produces = { "application/json" })
   @ResponseBody
   public Set<DetailedQcStatusDto> getDetailedQcStatuses(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<DetailedQcStatus> detailedQcStatuses = detailedQcStatusService.getAll();
@@ -85,7 +87,7 @@ public class DetailedQcStatusController extends RestController {
     return detailedQcStatusDtos;
   }
 
-  @RequestMapping(value = "/detailedqcstatus", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(value = "/detailedqcstatus", headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> createDetailedQcStatus(@RequestBody DetailedQcStatusDto detailedQcStatusDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
@@ -97,7 +99,7 @@ public class DetailedQcStatusController extends RestController {
     return new ResponseEntity<>(headers, HttpStatus.CREATED);
   }
 
-  @RequestMapping(value = "/detailedqcstatus/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "/detailedqcstatus/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> updateDetailedQcStatus(@PathVariable("id") Long id, @RequestBody DetailedQcStatusDto detailedQcStatusDto,
       HttpServletResponse response) throws IOException {

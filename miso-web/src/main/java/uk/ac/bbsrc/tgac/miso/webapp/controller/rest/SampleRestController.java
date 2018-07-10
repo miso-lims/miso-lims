@@ -47,10 +47,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -126,7 +128,7 @@ public class SampleRestController extends RestController {
     }
   };
 
-  @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
   public SampleDto getSample(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder)
       throws IOException {
@@ -140,7 +142,7 @@ public class SampleRestController extends RestController {
     }
   }
 
-  @RequestMapping(method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(produces = { "application/json" })
   @ResponseBody
   public List<SampleDto> getSamples(UriComponentsBuilder uriBuilder) throws IOException {
     List<Sample> samples = sampleService.list();
@@ -152,14 +154,14 @@ public class SampleRestController extends RestController {
     return sampleDtos;
   }
 
-  @RequestMapping(value = "/dt", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/dt", produces = { "application/json" })
   @ResponseBody
   public DataTablesResponseDto<SampleDto> getDTSamples(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
-  @RequestMapping(value = "/dt/project/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/dt/project/{id}", produces = { "application/json" })
   @ResponseBody
   public DataTablesResponseDto<SampleDto> getDTSamplesByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response,
@@ -167,7 +169,7 @@ public class SampleRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
   }
 
-  @RequestMapping(value = "/dt/project/{id}/arrayed", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/dt/project/{id}/arrayed", produces = { "application/json" })
   @ResponseBody
   public DataTablesResponseDto<SampleDto> getDTArrayedSamplesByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response,
@@ -175,7 +177,7 @@ public class SampleRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id), PaginationFilter.arrayed(true));
   }
 
-  @RequestMapping(method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public SampleDto createSample(@RequestBody SampleDto sampleDto, UriComponentsBuilder b, HttpServletResponse response) throws IOException {
@@ -262,7 +264,7 @@ public class SampleRestController extends RestController {
     return parentClass == null ? null : parentClass.getId();
   }
 
-  @RequestMapping(value = "/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
   @ResponseStatus(HttpStatus.OK)
   public SampleDto updateSample(@PathVariable("id") Long id, @RequestBody SampleDto sampleDto, UriComponentsBuilder b) throws IOException {
@@ -284,8 +286,10 @@ public class SampleRestController extends RestController {
    * @param json a list of search terms and possibly the project shortName
    * @return a list of maps between search terms and matching identities
    */
-  @RequestMapping(value = "/identitiesLookup", method = RequestMethod.POST, headers = { "Content-type=application/json" })
-  public @ResponseBody List<Map<String, Set<SampleDto>>> getIdentitiesBySearch(@RequestParam boolean exactMatch,
+  @PostMapping(value = "/identitiesLookup", headers = { "Content-type=application/json" })
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<Map<String, Set<SampleDto>>> getIdentitiesBySearch(@RequestParam boolean exactMatch,
       @RequestBody com.fasterxml.jackson.databind.JsonNode json,
       HttpServletResponse response) throws IOException {
     final JsonNode searchTerms = json.get("identitiesSearches");
@@ -317,14 +321,14 @@ public class SampleRestController extends RestController {
     return matches.stream().map(identity -> Dtos.asDto(identity)).collect(Collectors.toSet());
   }
 
-  @RequestMapping(value = "/query", method = RequestMethod.POST, produces = { "application/json" })
+  @PostMapping(value = "/query", produces = { "application/json" })
   @ResponseBody
   public List<SampleDto> getSamplesInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
     return PaginationFilter.bulkSearch(names, sampleService, Dtos::asDto, message -> new RestException(message, Status.BAD_REQUEST));
   }
 
-  @RequestMapping(value = "/spreadsheet", method = RequestMethod.GET)
+  @GetMapping(value = "/spreadsheet")
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder) {
     return MisoWebUtils.generateSpreadsheet(sampleService::get, SampleSpreadSheets::valueOf, request, response);
@@ -343,7 +347,7 @@ public class SampleRestController extends RestController {
       .add(RelationFinder.parent(SampleStock.CATEGORY_NAME, SampleStock.class))//
       .add(RelationFinder.parent(SampleAliquot.CATEGORY_NAME, SampleAliquot.class));
 
-  @RequestMapping(value = "/parents/{category}", method = RequestMethod.POST)
+  @PostMapping(value = "/parents/{category}")
   @ResponseBody
   public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
@@ -421,14 +425,14 @@ public class SampleRestController extends RestController {
         }
       });
 
-  @RequestMapping(value = "/children/{category}", method = RequestMethod.POST)
+  @PostMapping(value = "/children/{category}")
   @ResponseBody
   public HttpEntity<byte[]> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
     return childFinder.list(ids, category);
   }
 
-  @RequestMapping(value = "/bulk-delete", method = RequestMethod.POST)
+  @PostMapping(value = "/bulk-delete")
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {

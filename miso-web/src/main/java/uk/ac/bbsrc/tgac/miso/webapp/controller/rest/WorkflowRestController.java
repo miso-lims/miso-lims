@@ -8,9 +8,11 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -40,7 +42,7 @@ public class WorkflowRestController extends RestController {
   @Autowired
   private AuthorizationManager authorizationManager;
 
-  @RequestMapping(value = "/{workflowId}/step/{stepNumber}", method = RequestMethod.POST)
+  @PostMapping(value = "/{workflowId}/step/{stepNumber}")
   public @ResponseBody WorkflowStateDto process(@PathVariable("workflowId") long workflowId, @PathVariable("stepNumber") int stepNumber,
       @RequestParam("input") String input) throws IOException {
     Workflow workflow = workflowManager.loadWorkflow(workflowId);
@@ -49,38 +51,38 @@ public class WorkflowRestController extends RestController {
     return Dtos.asDto(workflow, stepNumber + 1);
   }
 
-  @RequestMapping(value = "/{workflowId}/execute", method = RequestMethod.POST)
+  @PostMapping(value = "/{workflowId}/execute")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public @ResponseBody void execute(@PathVariable("workflowId") long workflowId) throws IOException {
     workflowManager.execute(workflowManager.loadWorkflow(workflowId));
   }
 
-  @RequestMapping(value = "/{workflowId}/step/{stepNumber}", method = RequestMethod.GET)
+  @GetMapping(value = "/{workflowId}/step/{stepNumber}")
   public @ResponseBody WorkflowStateDto getStep(@PathVariable("workflowId") long workflowId, @PathVariable("stepNumber") int stepNumber)
       throws IOException {
     Workflow workflow = workflowManager.loadWorkflow(workflowId);
     return Dtos.asDto(workflow, stepNumber);
   }
 
-  @RequestMapping(value = "/{workflowId}/step/latest", method = RequestMethod.GET)
+  @GetMapping(value = "/{workflowId}/step/latest")
   public @ResponseBody WorkflowStateDto nextStep(@PathVariable("workflowId") long workflowId) throws IOException {
     return Dtos.asDto(workflowManager.loadWorkflow(workflowId));
   }
 
-  @RequestMapping(value = "/{workflowId}/step/latest", method = RequestMethod.DELETE)
+  @DeleteMapping(value = "/{workflowId}/step/latest")
   public @ResponseBody WorkflowStateDto cancelInput(@PathVariable("workflowId") long workflowId) throws IOException {
     Workflow workflow = workflowManager.loadWorkflow(workflowId);
     workflowManager.cancelInput(workflow);
     return Dtos.asDto(workflow);
   }
 
-  @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(produces = "application/json")
   @ResponseBody
   public List<WorkflowStateDto> list() throws IOException {
     return workflowManager.listUserWorkflows().stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  @RequestMapping(method = RequestMethod.POST, value = "/favourites/add/{workflowName}")
+  @PostMapping(value = "/favourites/add/{workflowName}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ResponseBody
   public void addFavourite(@PathVariable WorkflowName workflowName)
@@ -91,7 +93,7 @@ public class WorkflowRestController extends RestController {
     securityManager.saveUser(user);
   }
 
-  @RequestMapping(method = RequestMethod.POST, value = "/favourites/remove/{workflowName}")
+  @PostMapping(value = "/favourites/remove/{workflowName}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ResponseBody
   public void removeFavourite(@PathVariable WorkflowName workflowName)

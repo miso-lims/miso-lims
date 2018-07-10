@@ -34,9 +34,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
@@ -92,7 +92,7 @@ public class ExternalRestController extends RestController {
     this.sampleService = sampleService;
   }
 
-  @RequestMapping(value = "projects", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "projects",  produces = "application/json")
   public @ResponseBody String jsonRest() throws IOException {
     StringBuilder sb = new StringBuilder();
     Collection<Project> lp = projectService.listAllProjects();
@@ -120,7 +120,7 @@ public class ExternalRestController extends RestController {
     return "{" + sb.toString() + "}";
   }
 
-  @RequestMapping(value = "project/{projectId}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "project/{projectId}",  produces = "application/json")
   public @ResponseBody String jsonRestProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     StringBuilder sb = new StringBuilder();
 

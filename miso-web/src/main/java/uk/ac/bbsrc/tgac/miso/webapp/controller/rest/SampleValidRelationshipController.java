@@ -32,17 +32,17 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
@@ -60,7 +60,7 @@ public class SampleValidRelationshipController extends RestController {
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
 
-  @RequestMapping(value = "/samplevalidrelationship/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/samplevalidrelationship/{id}", produces = { "application/json" })
   @ResponseBody
   public SampleValidRelationshipDto getSampleValidRelationship(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -74,7 +74,7 @@ public class SampleValidRelationshipController extends RestController {
     }
   }
 
-  @RequestMapping(value = "/samplevalidrelationships", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/samplevalidrelationships", produces = { "application/json" })
   @ResponseBody
   public Set<SampleValidRelationshipDto> getSampleValidRelationships(UriComponentsBuilder uriBuilder, HttpServletResponse response) 
       throws IOException {
@@ -86,28 +86,27 @@ public class SampleValidRelationshipController extends RestController {
     return sampleValidRelationshipDtos;
   }
 
-  @RequestMapping(value = "/samplevalidrelationship", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(value = "/samplevalidrelationship", headers = { "Content-type=application/json" })
+  @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public ResponseEntity<?> createSampleValidRelationship(@RequestBody SampleValidRelationshipDto sampleValidRelationshipDto,
+  public SampleValidRelationshipDto createSampleValidRelationship(@RequestBody SampleValidRelationshipDto sampleValidRelationshipDto,
       UriComponentsBuilder b, HttpServletResponse response) throws IOException {
     SampleValidRelationship sampleValidRelationship = Dtos.to(sampleValidRelationshipDto);
     Long id = sampleValidRelationshipService.create(sampleValidRelationship, sampleValidRelationshipDto.getParentId(),
         sampleValidRelationshipDto.getChildId());
-    UriComponents uriComponents = b.path("/samplevalidrelationship/{id}").buildAndExpand(id);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    return Dtos.asDto(sampleValidRelationshipService.get(id));
   }
 
-  @RequestMapping(value = "/samplevalidrelationship/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "/samplevalidrelationship/{id}", headers = { "Content-type=application/json" })
+  @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public ResponseEntity<?> updateSampleValidRelationship(@PathVariable("id") Long id,
+  public SampleValidRelationshipDto updateSampleValidRelationship(@PathVariable("id") Long id,
       @RequestBody SampleValidRelationshipDto sampleValidRelationshipDto, HttpServletResponse response) throws IOException {
     SampleValidRelationship sampleValidRelationship = Dtos.to(sampleValidRelationshipDto);
     sampleValidRelationship.setId(id);
     sampleValidRelationshipService.update(sampleValidRelationship, sampleValidRelationshipDto.getParentId(),
         sampleValidRelationshipDto.getChildId());
-    return new ResponseEntity<>(HttpStatus.OK);
+    return Dtos.asDto(sampleValidRelationshipService.get(id));
   }
 
 }

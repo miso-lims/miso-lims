@@ -25,15 +25,17 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -43,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.dto.ChangeLogDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
 import uk.ac.bbsrc.tgac.miso.dto.KitConsumableDto;
@@ -66,7 +69,7 @@ public class ExperimentRestController extends RestController {
   @Autowired
   private RunService runService;
 
-  @RequestMapping(value = "/rest/experiment/{experimentId}/addkit", method = RequestMethod.POST, produces = "application/json")
+  @PostMapping(value = "/rest/experiment/{experimentId}/addkit", produces = "application/json")
   public @ResponseBody KitConsumableDto addKit(@PathVariable Long experimentId, @RequestBody KitConsumableDto dto) throws IOException {
     Experiment experiment = experimentService.get(experimentId);
     if (experiment == null) {
@@ -89,7 +92,7 @@ public class ExperimentRestController extends RestController {
     return Dtos.asDto(kit);
   }
 
-  @RequestMapping(value = "/rest/experiment/{experimentId}/add", method = RequestMethod.POST, produces = "application/json")
+  @PostMapping(value = "/rest/experiment/{experimentId}/add", produces = "application/json")
   public @ResponseBody ExperimentDto addPartition(@PathVariable Long experimentId, @RequestParam("runId") Long runId,
       @RequestParam("partitionId") Long partitionId) throws IOException {
     Experiment experiment = experimentService.get(experimentId);
@@ -121,7 +124,7 @@ public class ExperimentRestController extends RestController {
     return get(experimentId);
   }
 
-  @RequestMapping(value = "/rest/experiment", method = RequestMethod.POST, produces = "application/json")
+  @PostMapping(value = "/rest/experiment", produces = "application/json")
   public @ResponseBody ExperimentDto create(@RequestBody ExperimentDto dto) throws IOException {
     Experiment experiment = Dtos.to(dto);
     experiment.setId(Experiment.UNSAVED_ID);
@@ -129,7 +132,7 @@ public class ExperimentRestController extends RestController {
     return get(id);
   }
 
-  @RequestMapping(value = "/rest/experiment/{experimentId}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/rest/experiment/{experimentId}", produces = "application/json")
   public @ResponseBody ExperimentDto get(@PathVariable Long experimentId) throws IOException {
     Experiment experiment = experimentService.get(experimentId);
     if (experiment == null) {
@@ -138,14 +141,16 @@ public class ExperimentRestController extends RestController {
     return Dtos.asDto(experiment);
   }
 
-  @RequestMapping(value = "/rest/experiments", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody Collection<Experiment> list() throws IOException {
-    return experimentService.listAll();
+  @GetMapping(value = "/rest/experiments", produces = "application/json")
+  public @ResponseBody List<ExperimentDto> list() throws IOException {
+    Collection<Experiment> experiments = experimentService.listAll();
+    return experiments.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  @RequestMapping(value = "/rest/experiments/changes", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody Collection<ChangeLog> listChanges() throws IOException {
-    return changeLogService.listAll("Experiment");
+  @GetMapping(value = "/rest/experiments/changes", produces = "application/json")
+  public @ResponseBody List<ChangeLogDto> listChanges() throws IOException {
+    Collection<ChangeLog> changeLogs = changeLogService.listAll("Experiment");
+    return changeLogs.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
 }

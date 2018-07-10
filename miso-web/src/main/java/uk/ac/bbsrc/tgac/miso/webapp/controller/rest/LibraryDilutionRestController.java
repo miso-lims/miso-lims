@@ -18,10 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponents;
@@ -83,7 +85,7 @@ public class LibraryDilutionRestController extends RestController {
     this.dilutionService = dilutionService;
   }
 
-  @RequestMapping(value = "{dilutionId}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "{dilutionId}", produces = "application/json")
   @ResponseBody
   public DilutionDto getDilution(@PathVariable Long dilutionId) throws IOException {
     LibraryDilution dilution = dilutionService.get(dilutionId);
@@ -91,7 +93,7 @@ public class LibraryDilutionRestController extends RestController {
     return dilutionDto;
   }
 
-  @RequestMapping(method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(headers = { "Content-type=application/json" })
   @ResponseBody
   public DilutionDto createDilution(@RequestBody DilutionDto dilutionDto, UriComponentsBuilder b, HttpServletResponse response)
       throws IOException {
@@ -116,7 +118,7 @@ public class LibraryDilutionRestController extends RestController {
     return getDilution(id);
   }
 
-  @RequestMapping(value = "{dilutionId}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "{dilutionId}", headers = { "Content-type=application/json" })
   @ResponseBody
   public DilutionDto updateDilution(@PathVariable Long dilutionId, @RequestBody DilutionDto dilutionDto)
       throws IOException {
@@ -131,21 +133,21 @@ public class LibraryDilutionRestController extends RestController {
     return getDilution(dilutionId);
   }
 
-  @RequestMapping(value = "dt", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "dt", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<DilutionDto> getDilutions(HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
-  @RequestMapping(value = "dt/project/{id}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "dt/project/{id}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<DilutionDto> getDilutionsByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
   }
 
-  @RequestMapping(value = "dt/pool/{id}/available", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "dt/pool/{id}/available", produces = "application/json")
   public @ResponseBody DataTablesResponseDto<DilutionDto> availableDilutions(@PathVariable("id") Long poolId, HttpServletRequest request,
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
@@ -154,14 +156,14 @@ public class LibraryDilutionRestController extends RestController {
     return jQueryBackend.get(request, response, null, PaginationFilter.platformType(pool.getPlatformType()));
   }
 
-  @RequestMapping(value = "dt/pool/{id}/included", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "dt/pool/{id}/included", produces = "application/json")
   public @ResponseBody DataTablesResponseDto<DilutionDto> includedDilutions(@PathVariable("id") Long poolId, HttpServletRequest request,
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, null, PaginationFilter.pool(poolId));
   }
 
-  @RequestMapping(value = "query", method = RequestMethod.POST, produces = { "application/json" })
+  @PostMapping(value = "query", produces = { "application/json" })
   @ResponseBody
   public List<DilutionDto> getLibraryDilutionsInBulk(@RequestBody List<String> names, HttpServletRequest request,
       HttpServletResponse response,
@@ -169,7 +171,7 @@ public class LibraryDilutionRestController extends RestController {
     return PaginationFilter.bulkSearch(names, dilutionService, Dtos::asDto, message -> new RestException(message, Status.BAD_REQUEST));
   }
 
-  @RequestMapping(value = "/spreadsheet", method = RequestMethod.GET)
+  @GetMapping(value = "/spreadsheet")
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder) {
     return MisoWebUtils.generateSpreadsheet(dilutionService::get, LibraryDilutionSpreadSheets::valueOf, request, response);
@@ -216,7 +218,7 @@ public class LibraryDilutionRestController extends RestController {
         }
       });
 
-  @RequestMapping(value = "/parents/{category}", method = RequestMethod.POST)
+  @PostMapping(value = "/parents/{category}")
   @ResponseBody
   public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
@@ -248,14 +250,14 @@ public class LibraryDilutionRestController extends RestController {
         }
       });
 
-  @RequestMapping(value = "/children/{category}", method = RequestMethod.POST)
+  @PostMapping(value = "/children/{category}")
   @ResponseBody
   public HttpEntity<byte[]> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
     return childFinder.list(ids, category);
   }
 
-  @RequestMapping(value = "/bulk-delete", method = RequestMethod.POST)
+  @PostMapping(value = "/bulk-delete")
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {

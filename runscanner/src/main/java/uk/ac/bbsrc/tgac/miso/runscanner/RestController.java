@@ -12,7 +12,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,7 +46,7 @@ public class RestController {
    * If no run is found, null is returned. If there are multiple runs with the same name that are from different sequencers, one is randomly
    * selected.
    */
-  @RequestMapping(value = "/run/{name}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/run/{name}", produces = { "application/json" })
   @ResponseBody
   public NotificationDto getByName(@PathVariable("name") String id) {
     return scheduler.finished().filter(dto -> dto.getRunAlias().equals(id)).findAny().orElse(null);
@@ -67,7 +69,7 @@ public class RestController {
    * 
    * Runs are not guaranteed to have unique names.
    */
-  @RequestMapping(value = "/runs/all", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/runs/all", produces = { "application/json" })
   @ResponseBody
   public List<NotificationDto> list() {
     return scheduler.finished().collect(Collectors.toList());
@@ -89,7 +91,7 @@ public class RestController {
    * @param request
    * @return
    */
-  @RequestMapping(value = "/runs/progressive", method = RequestMethod.POST, produces = { "application/json" })
+  @PostMapping(value = "/runs/progressive", produces = { "application/json" })
   @ResponseBody
   public ProgressiveResponseDto progressive(@RequestBody ProgressiveRequestDto request) {
     ProgressiveResponseDto response = new ProgressiveResponseDto();

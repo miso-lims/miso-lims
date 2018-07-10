@@ -26,7 +26,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
@@ -36,10 +38,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -49,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.ReferenceGenomeDto;
 import uk.ac.bbsrc.tgac.miso.dto.SubprojectDto;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
@@ -70,7 +76,7 @@ public class SubprojectController extends RestController {
   @Autowired
   private ReferenceGenomeService referenceGenomeService;
 
-  @RequestMapping(value = "/subproject/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/subproject/{id}", produces = { "application/json" })
   @ResponseBody
   public SubprojectDto getSubproject(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
@@ -84,7 +90,7 @@ public class SubprojectController extends RestController {
     }
   }
 
-  @RequestMapping(value = "/subprojects", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/subprojects", produces = { "application/json" })
   @ResponseBody
   public Set<SubprojectDto> getSubprojects(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<Subproject> subprojects = subprojectService.getAll();
@@ -95,14 +101,15 @@ public class SubprojectController extends RestController {
     return subprojectDtos;
   }
 
-  @RequestMapping(value = "/referencegenomes", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/referencegenomes", produces = { "application/json" })
   @ResponseBody
-  public Collection<ReferenceGenome> getReferenceGenomeOptions(UriComponentsBuilder uriComponentsBuilder, HttpServletResponse response)
+  public List<ReferenceGenomeDto> getReferenceGenomeOptions(UriComponentsBuilder uriComponentsBuilder, HttpServletResponse response)
       throws IOException {
-    return referenceGenomeService.listAllReferenceGenomeTypes();
+    Collection<ReferenceGenome> referenceGenomes = referenceGenomeService.listAllReferenceGenomeTypes();
+    return referenceGenomes.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  @RequestMapping(value = "/subproject", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(value = "/subproject", headers = { "Content-type=application/json" })
   @ResponseBody
   public SubprojectDto createSubproject(@RequestBody SubprojectDto subprojectDto, UriComponentsBuilder uriBuilder,
       HttpServletResponse response)
@@ -112,7 +119,7 @@ public class SubprojectController extends RestController {
     return getSubproject(id, uriBuilder, response);
   }
 
-  @RequestMapping(value = "/subproject/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "/subproject/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
   public SubprojectDto updateSubproject(@PathVariable("id") Long id, @RequestBody SubprojectDto subprojectDto,
       UriComponentsBuilder uriBuilder,
@@ -123,7 +130,7 @@ public class SubprojectController extends RestController {
     return getSubproject(id, uriBuilder, response);
   }
 
-  @RequestMapping(value = "/subproject/{id}", method = RequestMethod.DELETE)
+  @DeleteMapping(value = "/subproject/{id}")
   @ResponseStatus(code = HttpStatus.OK)
   public void deleteSubproject(@PathVariable(name = "id", required = true) long id, HttpServletResponse response) throws IOException {
     Subproject subproject = subprojectService.get(id);
@@ -133,7 +140,7 @@ public class SubprojectController extends RestController {
     subprojectService.delete(subproject);
   }
 
-  @RequestMapping(value = "/subproject/{id}/groups", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/subproject/{id}/groups", produces = { "application/json" })
   @ResponseBody
   public Collection<Integer> getSubprojectSampleGroups(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {

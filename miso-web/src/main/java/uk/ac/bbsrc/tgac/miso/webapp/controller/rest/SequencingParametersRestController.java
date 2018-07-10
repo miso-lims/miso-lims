@@ -8,17 +8,17 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
@@ -37,7 +37,7 @@ public class SequencingParametersRestController extends RestController {
   @Autowired
   private PlatformService platformService;
 
-  @RequestMapping(value = "/sequencingparameters/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/sequencingparameters/{id}", produces = { "application/json" })
   @ResponseBody
   public SequencingParametersDto getSequencingParameters(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -49,7 +49,7 @@ public class SequencingParametersRestController extends RestController {
     }
   }
 
-  @RequestMapping(value = "/sequencingparameters", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/sequencingparameters", produces = { "application/json" })
   @ResponseBody
   public List<SequencingParametersDto> getSequencingParametersAlll(UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
@@ -60,9 +60,11 @@ public class SequencingParametersRestController extends RestController {
     return dtos;
   }
 
-  @RequestMapping(value = "/sequencingparameters", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(value = "/sequencingparameters", headers = { "Content-type=application/json" })
+  @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public ResponseEntity<?> createSequencingParameters(@RequestBody SequencingParametersDto sequencingParamtersDto, UriComponentsBuilder b,
+  public SequencingParametersDto createSequencingParameters(@RequestBody SequencingParametersDto sequencingParamtersDto,
+      UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
     Platform platform = platformService.get(sequencingParamtersDto.getPlatform().getId());
     if (platform == null) {
@@ -72,15 +74,13 @@ public class SequencingParametersRestController extends RestController {
     sp.setName(sequencingParamtersDto.getName());
     sp.setPlatform(platform);
     Long id = sequencingParametersService.create(sp);
-    UriComponents uriComponents = b.path("/poolorder/{id}").buildAndExpand(id);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    return Dtos.asDto(sequencingParametersService.get(id));
   }
 
-  @RequestMapping(value = "/sequencingparameters/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "/sequencingparameters/{id}", headers = { "Content-type=application/json" })
+  @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public ResponseEntity<?> updateSequencingParameters(@PathVariable("id") Long id, @RequestBody SequencingParametersDto spDto,
+  public SequencingParametersDto updateSequencingParameters(@PathVariable("id") Long id, @RequestBody SequencingParametersDto spDto,
       HttpServletResponse response) throws IOException {
     SequencingParameters sequencingParameters = sequencingParametersService.get(id);
     if (sequencingParameters == null) {
@@ -88,7 +88,7 @@ public class SequencingParametersRestController extends RestController {
     }
     sequencingParameters.setName(spDto.getName());
     sequencingParametersService.update(sequencingParameters);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return Dtos.asDto(sequencingParametersService.get(id));
   }
 
   private static SequencingParametersDto writeUrls(SequencingParametersDto sequencingParametersDto, UriComponentsBuilder uriBuilder) {

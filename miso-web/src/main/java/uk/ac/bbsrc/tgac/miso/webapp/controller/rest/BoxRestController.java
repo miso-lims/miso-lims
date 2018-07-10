@@ -28,10 +28,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -124,14 +126,14 @@ public class BoxRestController extends RestController {
     this.boxScanners = boxScanners;
   }
 
-  @RequestMapping(value = "/box/dt", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/box/dt",  produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<BoxDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
-  @RequestMapping(value = "/box/dt/use/{id}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/box/dt/use/{id}",  produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<BoxDto> dataTableByUse(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response,
@@ -139,12 +141,13 @@ public class BoxRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.boxUse(id));
   }
 
-  @RequestMapping(value = "/boxes/rest/", method = RequestMethod.GET)
-  public @ResponseBody Collection<Box> jsonRest() throws IOException {
-    return boxService.list(0, 0, true, "id");
+  @GetMapping(value = "/boxes/rest")
+  public @ResponseBody Collection<BoxDto> jsonRest() throws IOException {
+    Collection<Box> boxes = authorizationManager.filterUnreadable(boxService.list());
+    return Dtos.asBoxDtos(boxes, false);
   }
 
-  @RequestMapping(value = "/box/{boxId}/position/{position}", method = RequestMethod.PUT, consumes = { "application/json" },
+  @PutMapping(value = "/box/{boxId}/position/{position}",  consumes = { "application/json" },
       produces = { "application/json" })
   public @ResponseBody BoxDto setPosition(@PathVariable("boxId") Long boxId, @PathVariable("position") String position,
       @RequestParam("entity") String entity) throws IOException {
@@ -190,7 +193,7 @@ public class BoxRestController extends RestController {
    * @param boxId ID of the Box
    * @return JSON object with "hashCode" field representing the hash code of the spreadsheet filename
    */
-  @RequestMapping(value = "/box/{boxId}/spreadsheet", method = RequestMethod.GET)
+  @GetMapping(value = "/box/{boxId}/spreadsheet")
   public @ResponseBody JSONObject createSpreadsheet(@PathVariable("boxId") Long boxId) {
     try {
       return exportBoxContentsForm(boxId);
@@ -352,7 +355,7 @@ public class BoxRestController extends RestController {
    * 
    * @param requestData
    */
-  @RequestMapping(value = "/box/prepare-scan", method = RequestMethod.POST)
+  @PostMapping(value = "/box/prepare-scan")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void prepareBoxScanner(@RequestBody(required = true) ScannerPreparationRequest requestData) {
     if (requestData.getRows() == null || requestData.getColumns() == null) {
@@ -498,7 +501,7 @@ public class BoxRestController extends RestController {
    *         (if
    *         applicable)
    */
-  @RequestMapping(value = "/box/{boxId}/scan", method = RequestMethod.POST)
+  @PostMapping(value = "/box/{boxId}/scan")
   public @ResponseBody ScanResultsDto getBoxScan(@PathVariable(required = true) int boxId,
       @RequestBody(required = true) ScanRequest requestData) {
     try {
@@ -639,7 +642,7 @@ public class BoxRestController extends RestController {
 
   }
   
-  @RequestMapping(value = "/box/{boxId}/bulk-update", method = RequestMethod.POST)
+  @PostMapping(value = "/box/{boxId}/bulk-update")
   public @ResponseBody BoxDto bulkUpdatePositions(@PathVariable long boxId, @RequestBody List<BulkUpdateRequestItem> items) throws IOException {
     Box box = boxService.get(boxId);
     if (box == null) {
@@ -678,7 +681,7 @@ public class BoxRestController extends RestController {
     return Dtos.asDto(updated, true);
   }
 
-  @RequestMapping(value = "/box/{boxId}/setlocation", method = RequestMethod.POST)
+  @PostMapping(value = "/box/{boxId}/setlocation")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody void setBoxLocation(@PathVariable(name = "boxId", required = true) long boxId,
       @RequestParam("storageId") long storageId)
