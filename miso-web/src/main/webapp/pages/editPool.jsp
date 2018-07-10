@@ -169,8 +169,8 @@
 <br/>
 
 <script type="text/javascript">
-  Pool.ui.updateConcentrationUnits('${pool.concentrationUnits}');
-  Pool.ui.updateVolumeUnits('${pool.volumeUnits}');
+  Utils.ui.updateConcentrationUnits('${pool.concentrationUnits}');
+  Utils.ui.updateVolumeUnits('${pool.volumeUnits}');
 </script>
 
 <script type="text/javascript">

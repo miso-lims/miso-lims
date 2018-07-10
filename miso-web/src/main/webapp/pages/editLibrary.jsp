@@ -403,8 +403,8 @@
 </table>
 </c:if>
 <script type="text/javascript">
-  Library.ui.updateConcentrationUnits('${library.concentrationUnits}');
-  Library.ui.updateVolumeUnits('${library.volumeUnits}');
+  Utils.ui.updateConcentrationUnits('${library.concentrationUnits}');
+  Utils.ui.updateVolumeUnits('${library.volumeUnits}');
 </script>
 
 <c:choose>

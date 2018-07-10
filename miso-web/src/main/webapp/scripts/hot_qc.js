@@ -46,6 +46,7 @@ HotTarget.qc = function(qcTarget) {
         header: 'Type',
         data: 'typeName',
         type: 'dropdown',
+        allowHtml: true,
         source: Constants.qcTypes.filter(function(qcType) {
           return qcType.qcTarget == qcTarget && !qcType.archived;
         }).map(Utils.array.getName).sort(),
@@ -117,9 +118,8 @@ HotTarget.qc = function(qcTarget) {
         header: 'Units',
         data: 'units',
         type: 'text',
-        renderer: function(instance, td, row, col, prop, value, cellProperties) {
-          td.innerHTML = value;
-        },
+        allowHtml: true,
+        renderer: "html",
         include: true,
         depends: 'typeName',
         readOnly: true,

@@ -107,22 +107,6 @@ public interface DetailedSample extends Sample {
   void setIdentityId(Long identityId);
 
   /**
-   * Returns the concentration units of this DetailedSample object.
-   * 
-   * @return String concentrationUnits.
-   */
-  @Override
-  public String getConcentrationUnits();
-
-  /**
-   * Sets the concentrationUnits of this DetailedSample object.
-   * 
-   * @param concentrationUnits concentrationUnits.
-   */
-  @Override
-  public void setConcentrationUnits(String concentrationUnits);
-
-  /**
    * Searches the sample hierarchy until a Group ID is found. Returns null if no sample has a Group ID.
    * 
    * @return Sample nearest sample with a non-empty group ID. May be the current sample.

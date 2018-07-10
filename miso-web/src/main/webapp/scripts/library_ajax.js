@@ -130,14 +130,6 @@ var Library = Library || {
 };
 
 Library.ui = {
-  updateConcentrationUnits: function(concentrationUnits) {
-    var units = Utils.validation.isEmpty(concentrationUnits) ? '' : ' (' + concentrationUnits + ')';
-    jQuery('#concentrationUnits').html(units);
-  },
-  updateVolumeUnits: function(volumeUnits) {
-    var units = Utils.validation.isEmpty(volumeUnits) ? '' : ' (' + volumeUnits + ')';
-    jQuery('#volumeUnits').html(units);
-  },
   changePlatformType: function(originalLibraryTypeId, callback) {
     var platformType = Library.ui.getSelectedPlatformType();
 
