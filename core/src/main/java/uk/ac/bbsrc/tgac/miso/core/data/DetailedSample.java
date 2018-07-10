@@ -106,15 +106,12 @@ public interface DetailedSample extends Sample {
 
   void setIdentityId(Long identityId);
 
-  Double getConcentration();
-
-  void setConcentration(Double concentration);
-
   /**
    * Returns the concentration units of this DetailedSample object.
    * 
    * @return String concentrationUnits.
    */
+  @Override
   public String getConcentrationUnits();
 
   /**
@@ -122,6 +119,7 @@ public interface DetailedSample extends Sample {
    * 
    * @param concentrationUnits concentrationUnits.
    */
+  @Override
   public void setConcentrationUnits(String concentrationUnits);
 
   /**

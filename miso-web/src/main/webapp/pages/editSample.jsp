@@ -263,6 +263,10 @@
       <td><form:input id="volume" path="volume"/></td>
     </tr>
     <tr>
+      <td class="h">Concentration<span id="concentrationUnits"></span>:</td>
+      <td><form:input id="concentration" path="concentration"/></td>
+    </tr>
+    <tr>
       <td><label for="discarded">Discarded:</label></td>
       <td><form:checkbox id="discarded" path="discarded"/></td>
     </tr>
@@ -415,10 +419,6 @@
           <td>
             <form:input id="groupDescription" path="groupDescription"/>
           </td>
-        </tr>
-        <tr>
-          <td class="h">Concentration<span id="concentrationUnits"></span>:</td>
-          <td><form:input id="concentration" path="concentration"/></td>
         </tr>
       </table>
 
