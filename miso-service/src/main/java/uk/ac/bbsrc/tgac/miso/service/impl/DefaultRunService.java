@@ -1,13 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasTemporaryName;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isIlluminaRun;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isLS454Run;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isOxfordNanoporeRun;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isSolidRun;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.validateNameOrThrow;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -77,7 +70,7 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultRunService implements RunService, AuthorizedPaginatedDataSource<Run> {
-  
+
   private static class NotIn implements Predicate<SequencerPartitionContainer> {
 
     private final Collection<SequencerPartitionContainer> containers;
@@ -96,7 +89,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       return true;
     }
   }
-  
+
   private static final Logger log = LoggerFactory.getLogger(DefaultRunService.class);
 
   @Autowired
@@ -750,7 +743,19 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
         // Alternatively, a human set the status to not-done but runscanner has indicated that the run is now done, so we will update with
         // this.
         managed.setHealth(notification.getHealth());
-        managed.setCompletionDate(notification.getHealth().isDone() ? notification.getCompletionDate() : null);
+        Date completionDate = null;
+        if (notification.getHealth().isDone()) {
+          // RunScanner might not have been able to figure out a date this run was completed. If so, use the existing completino date,
+          // otherwise, guess.
+          if (notification.getCompletionDate() != null) {
+            completionDate = notification.getCompletionDate();
+          } else if (managed.getCompletionDate() != null) {
+            completionDate = managed.getCompletionDate();
+          } else {
+            completionDate = new Date();
+          }
+        }
+        managed.setCompletionDate(completionDate);
         return true;
       }
     }
