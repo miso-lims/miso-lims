@@ -49,6 +49,7 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
   private Long rootSampleClassId;
   private String rootSampleClassUrl;
   private String volume;
+  private String concentration;
   private Long updatedById;
   private String updatedByUrl;
   private String lastModified;
@@ -201,6 +202,14 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setVolume(String volume) {
     this.volume = volume;
+  }
+
+  public String getConcentration() {
+    return concentration;
+  }
+
+  public void setConcentration(String concentration) {
+    this.concentration = concentration;
   }
 
   public Long getUpdatedById() {

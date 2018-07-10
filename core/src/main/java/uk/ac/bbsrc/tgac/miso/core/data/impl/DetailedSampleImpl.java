@@ -59,8 +59,6 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   private String groupId;
   private String groupDescription;
   private boolean isSynthetic = false;
-  private Double concentration;
-  private String concentrationUnits;
 
   @Column(nullable = false)
   private boolean nonStandardAlias = false;
@@ -183,16 +181,6 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   }
 
   @Override
-  public Double getConcentration() {
-    return concentration;
-  }
-
-  @Override
-  public void setConcentration(Double concentration) {
-    this.concentration = concentration;
-  }
-
-  @Override
   public boolean hasNonStandardAlias() {
     return nonStandardAlias;
   }
@@ -240,16 +228,6 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @Override
   public void updateFromQc(QcCorrespondingField correspondingField, double value, String units) {
     correspondingField.updateField(this, value, units);
-  }
-
-  @Override
-  public String getConcentrationUnits() {
-    return concentrationUnits;
-  }
-
-  @Override
-  public void setConcentrationUnits(String concentrationUnits) {
-    this.concentrationUnits = concentrationUnits;
   }
 
 }

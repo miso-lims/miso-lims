@@ -16,7 +16,7 @@ public enum QcCorrespondingField {
     }
 
     @Override
-    public void updateField(DetailedSample sample, double value, String units) {
+    public void updateField(Sample sample, double value, String units) {
       sample.setConcentration(value);
       sample.setConcentrationUnits(units);
     }

@@ -418,7 +418,6 @@ public class Dtos {
     to.setGroupId(nullifyStringIfBlank(from.getGroupId()));
     to.setGroupDescription(nullifyStringIfBlank(from.getGroupDescription()));
     to.setSynthetic(from.getSynthetic());
-    to.setConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
     if (from.getIdentityId() != null) {
       to.setIdentityId(from.getIdentityId());
     }
@@ -637,6 +636,7 @@ public class Dtos {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     to.setVolume(isStringEmptyOrNull(from.getVolume()) ? null : Double.valueOf(from.getVolume()));
+    to.setConcentration(isStringEmptyOrNull(from.getConcentration()) ? null : Double.valueOf(from.getConcentration()));
     to.setDiscarded(from.isDiscarded());
     if (from.getProjectId() != null) {
       to.setProject(new ProjectImpl());

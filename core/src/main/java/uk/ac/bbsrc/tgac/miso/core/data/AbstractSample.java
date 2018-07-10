@@ -116,6 +116,8 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private String identificationBarcode;
   private String locationBarcode;
   private String volumeUnits;
+  private Double concentration;
+  private String concentrationUnits;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -479,7 +481,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), null, getVolumeUnits(), null);
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits(), getConcentrationUnits());
   }
 
   @Override
@@ -511,6 +513,26 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setVolumeUnits(String volumeUnits) {
     this.volumeUnits = volumeUnits;
+  }
+
+  @Override
+  public String getConcentrationUnits() {
+    return concentrationUnits;
+  }
+
+  @Override
+  public void setConcentrationUnits(String concentrationUnits) {
+    this.concentrationUnits = concentrationUnits;
+  }
+
+  @Override
+  public Double getConcentration() {
+    return concentration;
+  }
+
+  @Override
+  public void setConcentration(Double concentration) {
+    this.concentration = concentration;
   }
 
 }
