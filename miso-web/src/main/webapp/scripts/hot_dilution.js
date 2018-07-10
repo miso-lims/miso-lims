@@ -204,10 +204,10 @@ HotTarget.dilution = {
   confirmSave: function(flatObjects, isCreate, config, table) {
     var deferred = jQuery.Deferred();
     
-    dilutions = table.getDtoData();
+    var dilutions = table.getDtoData();
     
     var seen = {};
-    libraries = dilutions.filter(function(dilution){
+    var libraries = dilutions.filter(function(dilution){
       return !(Utils.validation.isEmpty(dilution.volumeUsed) || dilution.volumeUsed <= 0);
     }).map(function(dilution){
       return dilution.library;
@@ -232,7 +232,7 @@ HotTarget.dilution = {
       }).volume -= dilution.volumeUsed;
     });
     
-    overUsedCount = libraries.filter(function(library){
+    var overUsedCount = libraries.filter(function(library){
       return library.volume < 0;
     }).length
     

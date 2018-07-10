@@ -17,6 +17,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkDilutionPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkDilutionPage.DilColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
@@ -155,6 +156,50 @@ public class BulkDilutionIT extends AbstractIT {
     assertNotNull(page2.chainPoolSeparately());
   }
 
+  @Test
+  public void testVolumeUsedWarning() {
+    BulkDilutionPage page = BulkDilutionPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(600L));
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> attrs = Maps.newLinkedHashMap();
+    attrs.put(DilColumns.VOLUME_USED, "100.01");
+
+    fillRow(table, 0, attrs);
+
+    assertColumnValues(table, 0, attrs, "pre-save");
+    saveAndAssertSuccessForSavePrompt(table);
+    assertColumnValues(table, 0, attrs, "post-save");
+
+    Long newId = getSavedId(table, 0);
+    LibraryDilution saved = (LibraryDilution) getSession().get(LibraryDilution.class, newId);
+    assertDilutionAttributes(attrs, saved);
+
+    LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
+    assertTrue("Expected library volume to be negative, received positive value", savedLib.getVolume() < 0);
+  }
+
+  @Test
+  public void testVolumeUsedNoWarning() {
+    BulkDilutionPage page = BulkDilutionPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(601L));
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> attrs = Maps.newLinkedHashMap();
+    attrs.put(DilColumns.VOLUME_USED, "99.99");
+
+    fillRow(table, 0, attrs);
+
+    assertColumnValues(table, 0, attrs, "pre-save");
+    saveAndAssertSuccess(table);
+    assertColumnValues(table, 0, attrs, "post-save");
+
+    Long newId = getSavedId(table, 0);
+    LibraryDilution saved = (LibraryDilution) getSession().get(LibraryDilution.class, newId);
+    assertDilutionAttributes(attrs, saved);
+
+    LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
+    assertTrue("Expected library volume to be negative, received positive value", savedLib.getVolume() > 0);
+  }
+
   private long getSavedId(HandsOnTable table, int rowNum) {
     return Long.valueOf(table.getText(DilColumns.NAME, 0).substring(3, table.getText(DilColumns.NAME, 0).length()));
   }
@@ -190,6 +235,22 @@ public class BulkDilutionIT extends AbstractIT {
     }
   }
 
+  private void saveAndAssertSuccessForSavePrompt(HandsOnTable table) {
+    HandsOnTableSaveResult result = table.save(true);
+
+    if (result.getItemsSaved() != table.getRowCount()) {
+      log.error(result.printSummary());
+    }
+
+    assertEquals("Save count", table.getRowCount(), result.getItemsSaved());
+    assertTrue("Server error messages", result.getServerErrors().isEmpty());
+    assertTrue("Save error messages", result.getSaveErrors().isEmpty());
+
+    for (int i = 0; i < table.getRowCount(); i++) {
+      assertTrue("Dilution name generation", table.getText(DilColumns.NAME, i).contains("LDI"));
+    }
+  }
+
   private void assertDilutionAttributes(Map<String, String> attributes, LibraryDilution dilution) {
     testDilutionAttribute(DilColumns.NAME, attributes, dilution, LibraryDilution::getName);
     testDilutionAttribute(DilColumns.ID_BARCODE, attributes, dilution, LibraryDilution::getIdentificationBarcode);
@@ -197,6 +258,8 @@ public class BulkDilutionIT extends AbstractIT {
     testDilutionAttribute(DilColumns.CONCENTRATION, attributes, dilution, dil -> dil.getConcentration().toString());
     testDilutionAttribute(DilColumns.VOLUME, attributes, dilution, dil -> dil.getVolume().toString());
     testDilutionAttribute(DilColumns.CREATION_DATE, attributes, dilution, dil -> dil.getCreationDate().toString());
+    testDilutionAttribute(DilColumns.NG_USED, attributes, dilution, dil -> dil.getNgUsed().toString());
+    testDilutionAttribute(DilColumns.VOLUME_USED, attributes, dilution, dil -> dil.getVolumeUsed().toString());
     testDilutionAttribute(DilColumns.TARGETED_SEQUENCING, attributes, dilution, dil -> {
       if (dil.getTargetedSequencing() == null) {
         return null;
