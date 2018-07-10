@@ -87,6 +87,8 @@ public interface AbstractListPage {
     public static final String AVG_INSERT_SIZE = "Average Insert Size";
     public static final String SEQ_PARAMS = "Seq. Params.";
     public static final String STORAGE_LOCATION = "Storage Location";
+    public static final String NG_USED = "ng Lib. Used";
+    public static final String VOLUME_USED = "Vol. Lib. Used";
   }
 
   public static class ListTarget {

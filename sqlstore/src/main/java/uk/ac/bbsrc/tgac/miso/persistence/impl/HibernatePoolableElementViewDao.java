@@ -117,6 +117,10 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
       return "dilutionConcentration";
     case "concentrationUnits":
       return "dilutionConcentrationUnits";
+    case "ngUsed":
+      return "dilutionNgUsed";
+    case "volumeUsed":
+      return "dilutionVolumeUsed";
     default:
       return original;
     }
