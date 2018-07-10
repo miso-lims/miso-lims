@@ -1,3 +1,12 @@
+# 0.2.129
+
+Changes:
+
+ * Speed up most List Tables pages
+ * Remove static concentration units from edit library page
+ * Add columns for ng and volume of library used by library dilutions
+ * Add concentration units field on Library Dilutions
+
 # 0.2.128
 
 Changes:
