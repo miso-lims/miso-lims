@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
+import uk.ac.bbsrc.tgac.miso.core.data.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 
 public class QcTypeDto {
@@ -15,6 +16,9 @@ public class QcTypeDto {
   private String units;
   private Integer precisionAfterDecimal;
   private boolean archived;
+  @Enumerated(EnumType.STRING)
+  private QcCorrespondingField correspondingField;
+  private boolean autoUpdateField;
 
   public Long getId() {
     return id;
@@ -70,6 +74,22 @@ public class QcTypeDto {
 
   public void setArchived(boolean archived) {
     this.archived = archived;
+  }
+
+  public QcCorrespondingField getCorrespondingField() {
+    return correspondingField;
+  }
+
+  public void setCorrespondingField(QcCorrespondingField correspondingField) {
+    this.correspondingField = correspondingField;
+  }
+
+  public boolean isAutoUpdateField() {
+    return autoUpdateField;
+  }
+
+  public void setAutoUpdateField(boolean autoUpdateField) {
+    this.autoUpdateField = autoUpdateField;
   }
 
 }

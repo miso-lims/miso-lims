@@ -58,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.QC;
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -1269,6 +1270,9 @@ public class Dtos {
     dto.setDilutionUserName(from.getDilutionCreator());
     dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
     dto.setVolume(from.getVolume() == null ? null : from.getVolume().toString());
+    dto.setConcentrationUnits(from.getConcentrationUnits());
+    dto.setNgUsed(from.getNgUsed() == null ? null : from.getNgUsed().toString());
+    dto.setVolumeUsed(from.getVolumeUsed() == null ? null : from.getVolumeUsed().toString());
     if (from.getCreationDate() != null) {
       dto.setCreationDate(formatDate(from.getCreationDate()));
     }
@@ -1311,12 +1315,15 @@ public class Dtos {
     dto.setName(from.getDilutionName());
     dto.setDilutionUserName(from.getCreatorName());
     dto.setConcentration(from.getDilutionConcentration() == null ? null : from.getDilutionConcentration().toString());
+    dto.setConcentrationUnits(from.getDilutionConcentrationUnits());
     dto.setLastModified(formatDateTime(from.getLastModified()));
     dto.setCreationDate(formatDate(from.getCreated()));
     dto.setIdentificationBarcode(from.getDilutionBarcode());
     dto.setIndexIds(from.getIndices().stream().map(Index::getId).collect(Collectors.toList()));
     dto.setTargetedSequencingId(from.getTargetedSequencingId());
     dto.setVolume(from.getDilutionVolume() == null ? null : from.getDilutionVolume().toString());
+    dto.setNgUsed(from.getDilutionNgUsed() == null ? null : from.getDilutionNgUsed().toString());
+    dto.setVolumeUsed(from.getDilutionVolumeUsed() == null ? null : from.getDilutionVolumeUsed().toString());
 
     LibraryDto ldto = new LibraryDto();
     ldto.setId(from.getLibraryId());
@@ -1346,7 +1353,10 @@ public class Dtos {
     }
     to.setIdentificationBarcode(from.getIdentificationBarcode());
     to.setConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
+    to.setConcentrationUnits(from.getConcentrationUnits());
+    to.setNgUsed(from.getNgUsed() == null ? null : Double.valueOf(from.getNgUsed()));
     to.setVolume(from.getVolume() == null ? null : Double.valueOf(from.getVolume()));
+    to.setVolumeUsed(from.getVolumeUsed() == null ? null : Double.valueOf(from.getVolumeUsed()));
     to.setLibrary(to(from.getLibrary()));
     to.setDilutionCreator(from.getDilutionUserName());
     to.setCreationDate(parseDate(from.getCreationDate()));
@@ -1415,6 +1425,10 @@ public class Dtos {
   }
 
   public static RunDto asDto(Run from) {
+    return asDto(from, false, false, false);
+  }
+
+  public static RunDto asDto(Run from, boolean includeContainers, boolean includeContainerPartitions, boolean includePoolContents) {
     RunDto dto = new RunDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1447,6 +1461,11 @@ public class Dtos {
       dto.setParameters(parametersDto);
     }
     dto.setProgress(from.getProgress());
+
+    if (includeContainers) {
+      dto.setContainers(asContainerDtos(from.getSequencerPartitionContainers(), includeContainerPartitions, includePoolContents));
+    }
+
     return dto;
   }
 
@@ -1455,6 +1474,10 @@ public class Dtos {
   }
 
   public static ContainerDto asDto(SequencerPartitionContainer from) {
+    return asDto(from, false, false);
+  }
+
+  public static ContainerDto asDto(SequencerPartitionContainer from, boolean includePartitions, boolean includePoolContents) {
     ContainerDto dto = new ContainerDto();
     dto.setId(from.getId());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
@@ -1475,11 +1498,16 @@ public class Dtos {
     if (from.getMultiplexingKit() != null) {
       dto.setMultiplexingKit(asDto(from.getMultiplexingKit()));
     }
+
+    if (includePartitions) {
+      dto.setPartitions(asPartitionDtos(from.getPartitions(), includePoolContents));
+    }
     return dto;
   }
 
-  public static List<ContainerDto> asContainerDtos(Collection<SequencerPartitionContainer> containerSubset) {
-    return containerSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
+  public static List<ContainerDto> asContainerDtos(Collection<SequencerPartitionContainer> containerSubset,
+      boolean includeContainerPartitions, boolean includePoolContents) {
+    return asContainerDtos(containerSubset, includeContainerPartitions, includePoolContents);
   }
 
   public static ContainerModelDto asDto(SequencingContainerModel from) {
@@ -1492,6 +1520,14 @@ public class Dtos {
     dto.setPartitionCount(from.getPartitionCount());
     dto.setArchived(from.isArchived());
     return dto;
+  }
+
+  public static List<PartitionDto> asPartitionDtos(Collection<Partition> partitionSubset, boolean includePoolContents) {
+    List<PartitionDto> dtoList = new ArrayList<>();
+    for (Partition partition : partitionSubset) {
+      dtoList.add(asDto(partition, includePoolContents));
+    }
+    return dtoList;
   }
 
   public static List<ContainerModelDto> asDtos(Collection<SequencingContainerModel> models) {
@@ -1510,6 +1546,8 @@ public class Dtos {
     dto.setQcTarget(from.getQcTarget());
     dto.setUnits(from.getUnits());
     dto.setPrecisionAfterDecimal(from.getPrecisionAfterDecimal());
+    dto.setCorrespondingField(from.getCorrespondingField());
+    dto.setAutoUpdateField(from.isAutoUpdateField());
     dto.setArchived(from.isArchived());
     return dto;
   }
@@ -1523,6 +1561,8 @@ public class Dtos {
     to.setUnits(from.getUnits());
     to.setPrecisionAfterDecimal(from.getPrecisionAfterDecimal());
     to.setArchived(from.isArchived());
+    to.setCorrespondingField(from.getCorrespondingField());
+    to.setAutoUpdateField(from.isAutoUpdateField());
     return to;
   }
 
@@ -1914,12 +1954,16 @@ public class Dtos {
   }
 
   public static PartitionDto asDto(Partition from) {
+    return asDto(from, false);
+  }
+
+  public static PartitionDto asDto(Partition from, boolean includePoolContents) {
     PartitionDto dto = new PartitionDto();
     dto.setId(from.getId());
     dto.setContainerId(from.getSequencerPartitionContainer().getId());
     dto.setContainerName(from.getSequencerPartitionContainer().getIdentificationBarcode());
     dto.setPartitionNumber(from.getPartitionNumber());
-    dto.setPool(from.getPool() == null ? null : asDto(from.getPool(), false));
+    dto.setPool(from.getPool() == null ? null : asDto(from.getPool(), includePoolContents));
     return dto;
   }
 
@@ -2353,5 +2397,12 @@ public class Dtos {
     }
     location.setLocationUnit(LocationUnit.valueOf(from.getLocationUnit()));
     return location;
+  }
+
+  public static QcTargetDto asDto(QcTarget from) {
+    QcTargetDto dto = new QcTargetDto();
+    dto.setQcTarget(from);
+    dto.setCorrespondingFields(from.getCorrespondingFields());
+    return dto;
   }
 }

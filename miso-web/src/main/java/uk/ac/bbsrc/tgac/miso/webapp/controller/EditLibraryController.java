@@ -354,11 +354,6 @@ public class EditLibraryController {
     }
   }
 
-  @ModelAttribute("libraryDilutionUnits")
-  public String libraryDilutionUnits() {
-    return LibraryDilution.UNITS;
-  }
-
   @ModelAttribute("poolConcentrationUnits")
   public String poolConcentrationUnits() {
     return PoolImpl.CONCENTRATION_UNITS;

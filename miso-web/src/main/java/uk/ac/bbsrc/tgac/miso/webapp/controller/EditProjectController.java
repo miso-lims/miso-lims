@@ -176,11 +176,6 @@ public class EditProjectController {
     return PoolImpl.CONCENTRATION_UNITS;
   }
 
-  @ModelAttribute("libraryDilutionUnits")
-  public String libraryDilutionUnits() {
-    return LibraryDilution.UNITS;
-  }
-
   @RequestMapping(value = "/graph/{projectId}", method = RequestMethod.GET)
   public @ResponseBody JSONObject graphRest(@PathVariable Long projectId) throws IOException {
     JSONObject j = new JSONObject();

@@ -43,10 +43,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -112,7 +114,7 @@ public class LibraryRestController extends RestController {
     this.libraryService = libraryService;
   }
 
-  @RequestMapping(value = "/{libraryId}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/{libraryId}", produces = "application/json")
   @ResponseBody
   public LibraryDto getLibraryById(@PathVariable Long libraryId) throws IOException {
     Library l = libraryService.get(libraryId);
@@ -123,7 +125,7 @@ public class LibraryRestController extends RestController {
     return dto;
   }
 
-  @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(produces = "application/json")
   @ResponseBody
   public List<LibraryDto> listAllLibraries() throws IOException {
     Collection<Library> libraries = libraryService.list();
@@ -131,7 +133,7 @@ public class LibraryRestController extends RestController {
     return dtos;
   }
 
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping(produces = "application/json")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public LibraryDto createLibrary(@RequestBody LibraryDto libraryDto, UriComponentsBuilder b, HttpServletResponse response)
@@ -166,7 +168,7 @@ public class LibraryRestController extends RestController {
     return created;
   }
 
-  @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+  @PutMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public LibraryDto updateLibrary(@PathVariable("id") Long id, @RequestBody LibraryDto libraryDto) throws IOException {
@@ -184,14 +186,14 @@ public class LibraryRestController extends RestController {
     return getLibraryById(id);
   }
 
-  @RequestMapping(value = "/dt", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<LibraryDto> getLibraries(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
-  @RequestMapping(value = "/dt/project/{id}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<LibraryDto> getLibrariesForProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response,
@@ -199,14 +201,14 @@ public class LibraryRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
   }
 
-  @RequestMapping(value = "/query", method = RequestMethod.POST, produces = { "application/json" })
+  @PostMapping(value = "/query", produces = { "application/json" })
   @ResponseBody
   public List<LibraryDto> getLibariesInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
     return PaginationFilter.bulkSearch(names, libraryService, Dtos::asDto, message -> new RestException(message, Status.BAD_REQUEST));
   }
 
-  @RequestMapping(value = "/spreadsheet", method = RequestMethod.GET)
+  @GetMapping(value = "/spreadsheet")
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder) {
     return MisoWebUtils.generateSpreadsheet(libraryService::get, LibrarySpreadSheets::valueOf, request, response);
@@ -242,7 +244,7 @@ public class LibraryRestController extends RestController {
         }
       });
 
-  @RequestMapping(value = "/parents/{category}", method = RequestMethod.POST)
+  @PostMapping(value = "/parents/{category}")
   @ResponseBody
   public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
@@ -292,14 +294,14 @@ public class LibraryRestController extends RestController {
         }
       });
 
-  @RequestMapping(value = "/children/{category}", method = RequestMethod.POST)
+  @PostMapping(value = "/children/{category}")
   @ResponseBody
   public HttpEntity<byte[]> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
     return childFinder.list(ids, category);
   }
 
-  @RequestMapping(value = "/bulk-delete", method = RequestMethod.POST)
+  @PostMapping(value = "/bulk-delete")
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {

@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.net.URI;
+import java.util.List;
 
 public class RunDto implements WritableUrls {
   private Long id;
@@ -14,6 +15,7 @@ public class RunDto implements WritableUrls {
   private String progress;
   private String url;
   private SequencingParametersDto parameters;
+  private List<ContainerDto> containers;
 
   public Long getId() {
     return id;
@@ -108,4 +110,11 @@ public class RunDto implements WritableUrls {
     this.progress = progress;
   }
 
+  public List<ContainerDto> getContainers() {
+    return containers;
+  }
+
+  public void setContainers(List<ContainerDto> containers) {
+    this.containers = containers;
+  }
 }

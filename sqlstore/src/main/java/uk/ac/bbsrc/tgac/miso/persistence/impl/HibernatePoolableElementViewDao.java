@@ -115,6 +115,8 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
       return "platformType";
     case "concentration":
       return "dilutionConcentration";
+    case "concentrationUnits":
+      return "dilutionConcentrationUnits";
     default:
       return original;
     }

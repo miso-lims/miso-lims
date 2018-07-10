@@ -42,10 +42,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -80,7 +82,6 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.RunDto;
-import uk.ac.bbsrc.tgac.miso.dto.PoolOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
@@ -90,7 +91,6 @@ import uk.ac.bbsrc.tgac.miso.service.PoolOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
-import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
@@ -158,7 +158,7 @@ public class PoolRestController extends RestController {
   @Autowired
   private LibraryDilutionService dilutionService;
 
-  @RequestMapping(value = "{poolId}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "{poolId}", produces = "application/json")
   public @ResponseBody PoolDto getPoolById(@PathVariable Long poolId) throws IOException {
     Pool p = poolService.get(poolId);
     if (p == null) {
@@ -167,22 +167,21 @@ public class PoolRestController extends RestController {
     return Dtos.asDto(p, true);
   }
 
-  @RequestMapping(value = "{poolId}/runs", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "{poolId}/runs", produces = "application/json")
   public @ResponseBody List<RunDto> getRunsByPoolId(@PathVariable Long poolId) throws IOException {
     Collection<Run> rr = runService.listByPoolId(poolId);
     return Dtos.asRunDtos(rr);
   }
 
-  @RequestMapping(method = RequestMethod.POST, produces = "application/json")
+  @PostMapping(produces = "application/json")
   @ResponseBody
   public PoolDto createPool(@RequestBody PoolDto pool, UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
     Long id = poolService.save(Dtos.to(pool));
     return getPoolById(id);
-
   }
 
-  @RequestMapping(value = "{poolId}", method = RequestMethod.PUT, produces = "application/json")
+  @PutMapping(value = "{poolId}", produces = "application/json")
   @ResponseBody
   public PoolDto updatePool(@PathVariable Long poolId, @RequestBody PoolDto pool) throws IOException {
     Pool p = Dtos.to(pool);
@@ -191,7 +190,7 @@ public class PoolRestController extends RestController {
     return Dtos.asDto(poolService.get(poolId), true);
   }
 
-  @RequestMapping(value = "/{poolId}/contents", method = RequestMethod.PUT, produces = "application/json")
+  @PutMapping(value = "/{poolId}/contents", produces = "application/json")
   public @ResponseBody PoolDto changePoolContents(@PathVariable Long poolId, @RequestBody PoolChangeRequest request) throws IOException {
     Pool pool = poolService.get(poolId);
     Stream<PoolableElementView> originalMinusRemoved = pool.getPoolableElementViews().stream()
@@ -202,7 +201,7 @@ public class PoolRestController extends RestController {
     return Dtos.asDto(poolService.get(poolId), true);
   }
 
-  @RequestMapping(value = "/{poolId}/assign", method = RequestMethod.POST, produces = "application/json")
+  @PostMapping(value = "/{poolId}/assign", produces = "application/json")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void assignPool(@PathVariable Long poolId, @RequestBody List<Long> partitionIds) throws IOException {
     Pool pool = poolId == 0 ? null : poolService.get(poolId);
@@ -246,7 +245,7 @@ public class PoolRestController extends RestController {
     }
   }
 
-  @RequestMapping(value = "platform/{platform}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "platform/{platform}", produces = "application/json")
   @ResponseBody
   public List<PoolDto> getPoolsByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
@@ -260,7 +259,7 @@ public class PoolRestController extends RestController {
     }
   }
 
-  @RequestMapping(value = "dt/platform/{platform}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "dt/platform/{platform}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<PoolDto> getDTPoolsByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
@@ -271,7 +270,7 @@ public class PoolRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(platformType));
   }
 
-  @RequestMapping(value = "dt/project/{id}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "dt/project/{id}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<PoolDto> getDTPoolsByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
@@ -287,7 +286,7 @@ public class PoolRestController extends RestController {
     return poolDtos;
   }
 
-  @RequestMapping(value = "/picker/search")
+  @GetMapping(value = "/picker/search")
   @ResponseBody
   public PoolPickerResponse getPickersBySearch(@RequestParam("platform") String platform, @RequestParam("query") String query)
       throws IOException {
@@ -296,7 +295,7 @@ public class PoolRestController extends RestController {
         PaginationFilter.query(query));
   }
 
-  @RequestMapping(value = "/picker/recent")
+  @GetMapping(value = "/picker/recent")
   @ResponseBody
   public PoolPickerResponse getPickersBySearch(@RequestParam("platform") String platform)
       throws IOException {
@@ -316,7 +315,7 @@ public class PoolRestController extends RestController {
     return new PoolPickerEntry(Dtos.asDto(pool, true), completions);
   }
 
-  @RequestMapping(value = "query", method = RequestMethod.POST, produces = { "application/json" })
+  @PostMapping(value = "query", produces = { "application/json" })
   @ResponseBody
   public List<PoolDto> getPoolsInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
@@ -324,13 +323,13 @@ public class PoolRestController extends RestController {
         message -> new RestException(message, Status.BAD_REQUEST));
   }
 
-  @RequestMapping(value = "/spreadsheet", method = RequestMethod.GET)
+  @GetMapping(value = "/spreadsheet")
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder) {
     return MisoWebUtils.generateSpreadsheet(poolService::get, PoolSpreadSheets::valueOf, request, response);
   }
 
-  @RequestMapping(value = "/bulk-delete", method = RequestMethod.POST)
+  @PostMapping(value = "/bulk-delete")
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
@@ -404,7 +403,7 @@ public class PoolRestController extends RestController {
       });
 
 
-  @RequestMapping(value = "/parents/{category}", method = RequestMethod.POST)
+  @PostMapping(value = "/parents/{category}")
   @ResponseBody
   public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {

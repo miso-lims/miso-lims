@@ -190,6 +190,12 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   }
 
   @Override
+  public List<Box> list() throws IOException {
+    Collection<Box> boxes = boxStore.listAll();
+    return authorizationManager.filterUnreadable(boxes);
+  }
+
+  @Override
   public List<Box> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
       throws IOException {
     return authorizationManager.filterUnreadable(boxStore.list(errorHandler, offset, limit, sortDir, sortCol, filter));

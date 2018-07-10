@@ -67,7 +67,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
@@ -147,11 +146,6 @@ public class EditPoolController {
   @ModelAttribute("platformTypes")
   public Collection<String> populatePlatformTypes() throws IOException {
     return PlatformType.platformTypeNames(platformService.listActivePlatformTypes());
-  }
-
-  @ModelAttribute("libraryDilutionUnits")
-  public String libraryDilutionUnits() {
-    return LibraryDilution.UNITS;
   }
 
   @ModelAttribute("poolConcentrationUnits")

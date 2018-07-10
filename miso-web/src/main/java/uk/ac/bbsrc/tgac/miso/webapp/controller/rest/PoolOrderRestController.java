@@ -13,12 +13,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -68,7 +70,7 @@ public class PoolOrderRestController extends RestController {
   @Autowired
   private PoolOrderCompletionService poolOrderCompletionService;
 
-  @RequestMapping(value = "/pool/{id}/orders", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/pool/{id}/orders", produces = { "application/json" })
   @ResponseBody
   public Set<PoolOrderDto> getOrdersByPool(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
@@ -79,14 +81,14 @@ public class PoolOrderRestController extends RestController {
     return dtos;
   }
 
-  @RequestMapping(value = "/pool/{id}/dt/completions", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/pool/{id}/dt/completions", produces = { "application/json" })
   @ResponseBody
   public DataTablesResponseDto<PoolOrderCompletionDto> getCompletionsByPool(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletRequest request, HttpServletResponse response)
       throws IOException {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.pool(id));
   }
 
-  @RequestMapping(value = "/poolorder/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/poolorder/{id}", produces = { "application/json" })
   @ResponseBody
   public PoolOrderDto getPoolOrder(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
@@ -98,7 +100,7 @@ public class PoolOrderRestController extends RestController {
     }
   }
 
-  @RequestMapping(value = "/poolorder", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(value = "/poolorder", headers = { "Content-type=application/json" })
   @ResponseBody
   @ResponseStatus(code = HttpStatus.CREATED)
   public PoolOrderDto createPoolOrder(@RequestBody PoolOrderDto poolOrderDto, UriComponentsBuilder b, HttpServletResponse response)
@@ -109,7 +111,7 @@ public class PoolOrderRestController extends RestController {
     return Dtos.asDto(saved);
   }
   
-  @RequestMapping(value = "/poolorder/dt/completions/all/{platform}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/poolorder/dt/completions/all/{platform}", produces = { "application/json" })
   @ResponseBody
   public DataTablesResponseDto<PoolOrderCompletionDto> getDtCompletions(@PathVariable String platform, UriComponentsBuilder uriBuilder,
       HttpServletRequest request, HttpServletResponse response)
@@ -117,7 +119,7 @@ public class PoolOrderRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 
-  @RequestMapping(value = "/poolorder/dt/completions/active/{platform}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/poolorder/dt/completions/active/{platform}", produces = { "application/json" })
   @ResponseBody
   public DataTablesResponseDto<PoolOrderCompletionDto> getDtCompletionsUnfulfilled(@PathVariable String platform,
       UriComponentsBuilder uriBuilder, HttpServletRequest request,
@@ -127,7 +129,7 @@ public class PoolOrderRestController extends RestController {
         PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 
-  @RequestMapping(value = "/poolorder/dt/completions/pending/{platform}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/poolorder/dt/completions/pending/{platform}", produces = { "application/json" })
   @ResponseBody
   public DataTablesResponseDto<PoolOrderCompletionDto> getDtCompletionsPending(@PathVariable String platform,
       UriComponentsBuilder uriBuilder, HttpServletRequest request,
@@ -137,9 +139,10 @@ public class PoolOrderRestController extends RestController {
         PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 
-  @RequestMapping(value = "/poolorder/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "/poolorder/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> updatePoolOrder(@PathVariable("id") Long id, @RequestBody PoolOrderDto poolOrderDto,
+  @ResponseStatus(HttpStatus.OK)
+  public void updatePoolOrder(@PathVariable("id") Long id, @RequestBody PoolOrderDto poolOrderDto,
       HttpServletResponse response) throws IOException {
     PoolOrder poolOrder = poolOrderService.get(id);
     if (poolOrder == null) {
@@ -152,10 +155,9 @@ public class PoolOrderRestController extends RestController {
     }
     poolOrder.setSequencingParameter(parameters);
     poolOrderService.update(poolOrder);
-    return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/poolorder/{id}", method = RequestMethod.DELETE)
+  @DeleteMapping(value = "/poolorder/{id}")
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deletePoolOrder(@PathVariable(name = "id", required = true) long id, HttpServletResponse response) throws IOException {
@@ -177,7 +179,7 @@ public class PoolOrderRestController extends RestController {
     return poolOrderDto;
   }
 
-  @RequestMapping(value = "/poolorder/picker/active", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/poolorder/picker/active", produces = { "application/json" })
   @ResponseBody
   public PoolPickerResponse getPickersByUnfulfilled(@RequestParam("platform") String platform) throws IOException {
     return getPoolPickerWithFilters(100,
@@ -185,7 +187,7 @@ public class PoolOrderRestController extends RestController {
         PaginationFilter.fulfilled(false));
   }
 
-  @RequestMapping(value = "/poolorder/picker/chemistry", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/poolorder/picker/chemistry", produces = { "application/json" })
   @ResponseBody
   public PoolPickerResponse getPickersByChemistry(@RequestParam("platform") String platform,
       @RequestParam("seqParamsId") Long paramsId,

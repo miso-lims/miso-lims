@@ -9,10 +9,12 @@ import javax.ws.rs.core.Response.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -31,14 +33,14 @@ public class StorageLocationRestController extends RestController {
   @Autowired
   private StorageLocationService storageLocationService;
 
-  @RequestMapping(value = "/freezers", method = RequestMethod.GET)
+  @GetMapping(value = "/freezers")
   public @ResponseBody List<StorageLocationDto> getFreezers() {
     return storageLocationService.listFreezers().stream()
         .map(freezer -> Dtos.asDto(freezer, false, false))
         .collect(Collectors.toList());
   }
 
-  @RequestMapping(value = "/bybarcode", method = RequestMethod.GET)
+  @GetMapping(value = "/bybarcode")
   public @ResponseBody StorageLocationDto getLocation(@RequestParam(name = "q", required = true) String barcode) {
     StorageLocation location = storageLocationService.getByBarcode(barcode);
     if (location == null) {
@@ -47,7 +49,7 @@ public class StorageLocationRestController extends RestController {
     return Dtos.asDto(location, true, false);
   }
 
-  @RequestMapping(value = "/{id}/children", method = RequestMethod.GET)
+  @GetMapping(value = "/{id}/children")
   public @ResponseBody List<StorageLocationDto> getChildLocations(@PathVariable(name = "id", required = true) long id) {
     StorageLocation location = storageLocationService.get(id);
     if (location == null) {
@@ -58,13 +60,13 @@ public class StorageLocationRestController extends RestController {
         .collect(Collectors.toList());
   }
 
-  @RequestMapping(value = "/freezers", method = RequestMethod.POST)
+  @PostMapping(value = "/freezers")
   @ResponseStatus(HttpStatus.CREATED)
   public @ResponseBody StorageLocationDto createFreezer(@RequestBody StorageLocationDto dto) {
     return doSave(dto);
   }
 
-  @RequestMapping(value = "/freezers/{id}", method = RequestMethod.PUT)
+  @PutMapping(value = "/freezers/{id}")
   public @ResponseBody StorageLocationDto update(@PathVariable(name = "id", required = true) long id, @RequestBody StorageLocationDto dto)
       throws IOException {
     if (dto.getId() != id) {
@@ -81,7 +83,7 @@ public class StorageLocationRestController extends RestController {
     return Dtos.asDto(saved, true, true);
   }
 
-  @RequestMapping(value = "/freezers/{id}/shelves", method = RequestMethod.POST)
+  @PostMapping(value = "/freezers/{id}/shelves")
   public @ResponseBody StorageLocationDto addFreezerShelf(@PathVariable(name = "id", required = true) long id) {
     StorageLocation freezer = getFreezer(id);
     int lastShelf = freezer.getChildLocations().stream().filter(loc -> {
@@ -106,7 +108,7 @@ public class StorageLocationRestController extends RestController {
     return freezer;
   }
 
-  @RequestMapping(value = "/freezers/{id}/stacks", method = RequestMethod.POST)
+  @PostMapping(value = "/freezers/{id}/stacks")
   public @ResponseBody StorageLocationDto addFreezerStack(@PathVariable(name = "id", required = true) long id,
       @RequestParam(name = "height", required = true) int height) {
     StorageLocation freezer = getFreezer(id);
@@ -117,7 +119,7 @@ public class StorageLocationRestController extends RestController {
     return createStack(freezer, height);
   }
 
-  @RequestMapping(value = "/rooms", method = RequestMethod.POST)
+  @PostMapping(value = "/rooms")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public StorageLocationDto addRoom(@RequestParam(name = "alias", required = true) String alias,
@@ -158,7 +160,7 @@ public class StorageLocationRestController extends RestController {
     return Dtos.asDto(saved, false, false);
   }
 
-  @RequestMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/stacks", method = RequestMethod.POST)
+  @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/stacks")
   public @ResponseBody StorageLocationDto addShelfStack(@PathVariable(name = "freezerId", required = true) long freezerId,
       @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "height", required = true) int height) {
     StorageLocation freezer = getFreezer(freezerId);
@@ -169,7 +171,7 @@ public class StorageLocationRestController extends RestController {
     return createStack(shelf, height);
   }
 
-  @RequestMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/racks", method = RequestMethod.POST)
+  @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/racks")
   public @ResponseBody StorageLocationDto addShelfRack(@PathVariable(name = "freezerId", required = true) long freezerId,
       @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "depth", required = true) int depth,
       @RequestParam(name = "height", required = true) int height) {
@@ -191,7 +193,7 @@ public class StorageLocationRestController extends RestController {
     return doSave(rack);
   }
 
-  @RequestMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/loose", method = RequestMethod.POST)
+  @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/loose")
   public @ResponseBody StorageLocationDto addShelfLooseStorage(@PathVariable(name = "freezerId", required = true) long freezerId,
       @PathVariable(name = "shelfId", required = true) long shelfId) {
     StorageLocation freezer = getFreezer(freezerId);

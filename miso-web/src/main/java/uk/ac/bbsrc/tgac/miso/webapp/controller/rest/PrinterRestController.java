@@ -14,10 +14,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -86,7 +89,7 @@ public class PrinterRestController extends RestController {
   @Autowired
   private SampleService sampleService;
 
-  @RequestMapping(method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(headers = { "Content-type=application/json" })
   @ResponseBody
   @ResponseStatus(code = HttpStatus.CREATED)
   public PrinterDto create(@RequestBody PrinterDto dto) throws IOException {
@@ -94,14 +97,14 @@ public class PrinterRestController extends RestController {
     return get(printerService.create(printer));
   }
 
-  @RequestMapping(value = "dt", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "dt", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<PrinterDto> dataTable(HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
-  @RequestMapping(method = RequestMethod.DELETE, headers = { "Content-type=application/json" })
+  @DeleteMapping(headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@RequestBody List<Long> printerIds) throws IOException {
     for (long id : printerIds) {
@@ -112,19 +115,19 @@ public class PrinterRestController extends RestController {
     }
   }
 
-  @RequestMapping(value = "/disable", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "/disable", headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void disable(@RequestBody List<Long> printerIds) throws IOException {
     setState(printerIds, false);
   }
 
-  @RequestMapping(value = "/enable", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "/enable", headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void enable(@RequestBody List<Long> printerIds) throws IOException {
     setState(printerIds, true);
   }
 
-  @RequestMapping(value = "{printerId}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "{printerId}", produces = "application/json")
   public @ResponseBody PrinterDto get(@PathVariable Long printerId) throws IOException {
     Printer printer = printerService.get(printerId);
     if (printer == null) {
@@ -133,7 +136,7 @@ public class PrinterRestController extends RestController {
     return Dtos.asDto(printer);
   }
 
-  @RequestMapping(method = RequestMethod.GET, headers = { "Content-type=application/json" })
+  @GetMapping(headers = { "Content-type=application/json" })
   @ResponseBody
   public List<PrinterDto> list() throws IOException {
     return printerService.list(0, 0, true, "id").stream().map(Dtos::asDto).collect(Collectors.toList());
@@ -158,7 +161,7 @@ public class PrinterRestController extends RestController {
     }
   }
 
-  @RequestMapping(value = "{printerId}", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(value = "{printerId}", headers = { "Content-type=application/json" })
   @ResponseBody
   public long submit(@PathVariable("printerId") Long printerId, @RequestParam("type") String type, @RequestParam("ids") String ids,
       @RequestParam("copies") int copies)

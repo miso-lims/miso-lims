@@ -33,11 +33,6 @@ public class LibraryDilutionTest {
       private static final long serialVersionUID = 1L;
 
       @Override
-      public String getUnits() {
-        return null;
-      }
-
-      @Override
       public Library getLibrary() {
         return null;
       }

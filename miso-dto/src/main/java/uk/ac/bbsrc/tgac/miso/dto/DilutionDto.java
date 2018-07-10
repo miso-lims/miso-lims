@@ -12,6 +12,7 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
   private String identificationBarcode;
   private String locationLabel;
   private String concentration;
+  private String concentrationUnits;
   private String volume;
   private String creationDate;
   private String dilutionCreatorName;
@@ -21,6 +22,8 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
   private String lastModified;
   private List<Long> indexIds;
   private String identityConsentLevel;
+  private String ngUsed;
+  private String volumeUsed;
 
   public Long getId() {
     return id;
@@ -62,6 +65,14 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setConcentration(String concentration) {
     this.concentration = concentration;
+  }
+
+  public String getConcentrationUnits() {
+    return concentrationUnits;
+  }
+
+  public void setConcentrationUnits(String concentrationUnits) {
+    this.concentrationUnits = concentrationUnits;
   }
 
   public String getCreationDate() {
@@ -141,6 +152,22 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setIdentityConsentLevel(String identityConsentLevel) {
     this.identityConsentLevel = identityConsentLevel;
+  }
+
+  public String getNgUsed() {
+    return ngUsed;
+  }
+
+  public void setNgUsed(String ngUsed) {
+    this.ngUsed = ngUsed;
+  }
+
+  public String getVolumeUsed() {
+    return volumeUsed;
+  }
+
+  public void setVolumeUsed(String volumeUsed) {
+    this.volumeUsed = volumeUsed;
   }
 
 }

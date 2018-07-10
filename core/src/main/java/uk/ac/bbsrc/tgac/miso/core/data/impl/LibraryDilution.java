@@ -26,7 +26,10 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -76,7 +79,8 @@ public class LibraryDilution extends AbstractBoxable
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
 
-  public static final String UNITS = "nM";
+  public static final List<String> CONCENTRATION_UNITS = Collections.unmodifiableList(Arrays.asList(
+      "nM", "ng/&#181;l"));
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -89,6 +93,8 @@ public class LibraryDilution extends AbstractBoxable
   private Date creationDate;
 
   private Double concentration;
+
+  private String concentrationUnits;
 
   @Column(name = "dilutionUserName", nullable = false)
   private String dilutionCreator;
@@ -126,6 +132,10 @@ public class LibraryDilution extends AbstractBoxable
   @PrimaryKeyJoinColumn
   private DilutionBoxPosition boxPosition;
 
+  private Double ngUsed;
+
+  private Double volumeUsed;
+
   @Override
   public Boxable.EntityType getEntityType() {
     return Boxable.EntityType.DILUTION;
@@ -137,10 +147,6 @@ public class LibraryDilution extends AbstractBoxable
 
   public void setLibrary(Library library) {
     this.library = library;
-  }
-
-  public String getUnits() {
-    return UNITS;
   }
 
   public TargetedSequencing getTargetedSequencing() {
@@ -200,6 +206,14 @@ public class LibraryDilution extends AbstractBoxable
 
   public void setConcentration(Double concentration) {
     this.concentration = concentration;
+  }
+
+  public String getConcentrationUnits() {
+    return this.concentrationUnits;
+  }
+
+  public void setConcentrationUnits(String concentrationUnits) {
+    this.concentrationUnits = concentrationUnits;
   }
 
   @Override
@@ -396,7 +410,7 @@ public class LibraryDilution extends AbstractBoxable
 
   @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getUnits());
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getConcentrationUnits());
   }
 
   @Override
@@ -412,6 +426,22 @@ public class LibraryDilution extends AbstractBoxable
   @Override
   public SecurityProfile getDeletionSecurityProfile() {
     return getSecurityProfile();
+  }
+
+  public Double getNgUsed() {
+    return ngUsed;
+  }
+
+  public void setNgUsed(Double ngUsed) {
+    this.ngUsed = ngUsed;
+  }
+
+  public Double getVolumeUsed() {
+    return volumeUsed;
+  }
+
+  public void setVolumeUsed(Double volumeUsed) {
+    this.volumeUsed = volumeUsed;
   }
 
 }

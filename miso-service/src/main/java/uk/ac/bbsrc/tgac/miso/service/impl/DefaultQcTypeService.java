@@ -42,6 +42,8 @@ public class DefaultQcTypeService implements QcTypeService {
     updatedQcType.setQcTarget(qcType.getQcTarget());
     updatedQcType.setUnits(LimsUtils.isStringBlankOrNull(qcType.getUnits()) ? "" : qcType.getUnits());
     updatedQcType.setPrecisionAfterDecimal(qcType.getPrecisionAfterDecimal());
+    updatedQcType.setCorrespondingField(qcType.getCorrespondingField());
+    updatedQcType.setAutoUpdateField(qcType.isAutoUpdateField());
     qcTypeStore.update(updatedQcType);
   }
 

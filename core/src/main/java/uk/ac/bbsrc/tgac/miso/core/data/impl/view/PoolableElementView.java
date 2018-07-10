@@ -44,9 +44,15 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private Double dilutionConcentration;
 
+  private String dilutionConcentrationUnits;
+
   private String dilutionBarcode;
 
   private Double dilutionVolume;
+
+  private Double dilutionNgUsed;
+
+  private Double dilutionVolumeUsed;
 
   private Long preMigrationId;
 
@@ -130,9 +136,12 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     PoolableElementView v = new PoolableElementView();
     v.setDilutionBarcode(dilution.getIdentificationBarcode());
     v.setDilutionConcentration(dilution.getConcentration());
+    v.setDilutionConcentrationUnits(dilution.getConcentrationUnits());
+    v.setDilutionNgUsed(dilution.getNgUsed());
     v.setDilutionId(dilution.getId());
     v.setDilutionName(dilution.getName());
     v.setDilutionVolume(dilution.getVolume());
+    v.setDilutionVolumeUsed(dilution.getVolumeUsed());
     v.setLastModified(dilution.getLastModified());
     v.setPreMigrationId(dilution.getPreMigrationId());
     if (dilution.getBox() != null) {
@@ -216,6 +225,30 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     this.dilutionConcentration = dilutionConcentration;
   }
 
+  public String getDilutionConcentrationUnits() {
+    return dilutionConcentrationUnits;
+  }
+
+  public void setDilutionConcentrationUnits(String dilutionConcentrationUnits) {
+    this.dilutionConcentrationUnits = dilutionConcentrationUnits;
+  }
+
+  public Double getDilutionNgUsed() {
+    return dilutionNgUsed;
+  }
+
+  public void setDilutionNgUsed(Double dilutionNmUsed) {
+    this.dilutionNgUsed = dilutionNmUsed;
+  }
+
+  public Double getDilutionVolumeUsed() {
+    return dilutionVolumeUsed;
+  }
+
+  public void setDilutionVolumeUsed(Double dilutionVolumeUsed) {
+    this.dilutionVolumeUsed = dilutionVolumeUsed;
+  }
+
   public String getProjectShortName() {
     return projectShortName;
   }
@@ -230,10 +263,6 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   public void setProjectAlias(String projectAlias) {
     this.projectAlias = projectAlias;
-  }
-
-  public static String getUnits() {
-    return LibraryDilution.UNITS;
   }
 
   public Long getProjectId() {

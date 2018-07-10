@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.net.URI;
+import java.util.List;
 
 public class ContainerDto implements WritableUrls {
   private Long id;
@@ -15,6 +16,7 @@ public class ContainerDto implements WritableUrls {
   private String lastModified;
   private KitDescriptorDto clusteringKit;
   private KitDescriptorDto multiplexingKit;
+  private List<PartitionDto> partitions;
 
   public Long getId() {
     return id;
@@ -108,5 +110,13 @@ public class ContainerDto implements WritableUrls {
 
   public void setMultiplexingKit(KitDescriptorDto multiplexingKit) {
     this.multiplexingKit = multiplexingKit;
+  }
+
+  public List<PartitionDto> getPartitions() {
+    return partitions;
+  }
+
+  public void setPartitions(List<PartitionDto> partitions) {
+    this.partitions = partitions;
   }
 }

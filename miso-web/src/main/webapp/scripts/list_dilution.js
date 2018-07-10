@@ -64,8 +64,13 @@ ListTarget.dilution = {
         }, {
           property: "concentration",
           type: "float",
-          label: "Conc. (" + Constants.libraryDilutionConcentrationUnits + ")",
+          label: "Conc.",
           required: true
+        }, {
+          property: "concentrationUnits",
+          type: "text",
+          label: "Conc. Units",
+          required: false
         }, {
           property: "creationDate",
           type: "date",
@@ -97,6 +102,7 @@ ListTarget.dilution = {
             "name": dil.name,
             "identificationBarcode": dil.identificationBarcode,
             "concentration": dil.concentration,
+            "concentrationUnits": dil.concentrationUnits,
             "creationDate": dil.creationDate,
             "targetedSequencingId": dil.targetedSequencing && dil.targetedSequencing.id != 0 ? dil.targetedSequencing.id : null
 
@@ -140,6 +146,11 @@ ListTarget.dilution = {
     }, {
       "sTitle": "Concentration",
       "mData": "concentration",
+      "include": true,
+      "iSortPriority": 0
+    }, {
+      "sTitle": "Conc. Units",
+      "mData": "concentrationUnits",
       "include": true,
       "iSortPriority": 0
     }, {

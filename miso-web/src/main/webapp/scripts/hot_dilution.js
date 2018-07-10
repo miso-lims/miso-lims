@@ -37,8 +37,26 @@ HotTarget.dilution = {
           pack: function(dil, flat, errorHandler) {
           }
         },
-        HotUtils.makeColumnForFloat('Conc. (' + Constants.libraryDilutionConcentrationUnits + ')', true, 'concentration', false),
+        HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false),
+        {
+          header: 'Conc. Units',
+          data: 'concentrationUnits',
+          type: 'dropdown',
+          trimDropdown: false,
+          source: Constants.dilutionConcentrationUnits,
+          include: true,
+          validator: HotUtils.validator.requiredAutocomplete,
+          unpack: function(obj, flat, setCellMeta) {
+            flat['concentrationUnits'] = obj['concentrationUnits'] || Constants.dilutionConcentrationUnits[0];
+          },
+          pack: function(obj, flat, errorHandler) {
+            obj['concentrationUnits'] = flat['concentrationUnits'];
+          },
+          allowHtml: true
+        },
         HotUtils.makeColumnForFloat('Volume', true, 'volume', false),
+        HotUtils.makeColumnForFloat('ng Lib. Used', true, 'ngUsed', false),
+        HotUtils.makeColumnForFloat('Vol. Lib. Used', true, 'volumeUsed', false),
         {
           header: 'Creation Date',
           data: 'creationDate',

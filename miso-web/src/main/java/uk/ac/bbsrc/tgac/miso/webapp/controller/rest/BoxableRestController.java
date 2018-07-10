@@ -11,9 +11,10 @@ import javax.ws.rs.core.Response.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -32,7 +33,7 @@ public class BoxableRestController extends RestController {
   @Autowired
   private BoxService boxService;
 
-  @RequestMapping(value = "/search", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/search", produces = "application/json")
   @ResponseBody
   public List<BoxableDto> search(@RequestParam("q") String search, HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
@@ -40,7 +41,7 @@ public class BoxableRestController extends RestController {
     return Dtos.asBoxableDtos(results);
   }
 
-  @RequestMapping(value = "/bulk-delete", method = RequestMethod.POST)
+  @PostMapping(value = "/bulk-delete")
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {

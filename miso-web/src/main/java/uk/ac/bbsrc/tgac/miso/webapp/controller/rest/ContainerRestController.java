@@ -35,9 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -81,19 +81,19 @@ public class ContainerRestController extends RestController {
 
   };
 
-  @RequestMapping(value = "{containerBarcode}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "{containerBarcode}", produces = "application/json")
   public @ResponseBody List<ContainerDto> jsonRest(@PathVariable String containerBarcode) throws IOException {
     return containerService.listByBarcode(containerBarcode).stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  @RequestMapping(value = "/dt", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<ContainerDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
-  @RequestMapping(value = "/dt/platform/{platform}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/dt/platform/{platform}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<ContainerDto> dataTableByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
       HttpServletResponse response,

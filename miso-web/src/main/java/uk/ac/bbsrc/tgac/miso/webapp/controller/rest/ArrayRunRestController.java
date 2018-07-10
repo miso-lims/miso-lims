@@ -12,10 +12,12 @@ import javax.ws.rs.core.Response.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -58,14 +60,14 @@ public class ArrayRunRestController extends RestController {
 
   };
 
-  @RequestMapping(value = "/dt", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<ArrayRunDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
-  @RequestMapping(value = "/dt/project/{id}", method = RequestMethod.GET, produces = "application/json")
+  @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<ArrayRunDto> dataTableByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder)
@@ -73,13 +75,13 @@ public class ArrayRunRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
   }
 
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping(produces = "application/json")
   @ResponseStatus(HttpStatus.CREATED)
   public @ResponseBody ArrayRunDto save(@RequestBody ArrayRunDto dto) throws IOException {
     return doSave(dto);
   }
 
-  @RequestMapping(value = "/{arrayRunId}", method = RequestMethod.PUT)
+  @PutMapping(value = "/{arrayRunId}")
   public @ResponseBody ArrayRunDto update(@PathVariable(name = "arrayRunId", required = true) long arrayRunId,
       @RequestBody ArrayRunDto dto) throws IOException {
     if (dto.getId().longValue() != arrayRunId) {
@@ -99,7 +101,7 @@ public class ArrayRunRestController extends RestController {
     return Dtos.asDto(saved);
   }
 
-  @RequestMapping(value = "/array-search", method = RequestMethod.GET)
+  @GetMapping(value = "/array-search")
   public @ResponseBody List<ArrayDto> findArrays(@RequestParam(name = "q", required = true) String search) throws IOException {
     if (LimsUtils.isStringEmptyOrNull(search)) {
       return new ArrayList<>();
@@ -108,7 +110,7 @@ public class ArrayRunRestController extends RestController {
     return Dtos.asArrayDtos(arrays);
   }
 
-  @RequestMapping(value = "/{arrayRunId}/changelog", method = RequestMethod.GET)
+  @GetMapping(value = "/{arrayRunId}/changelog")
   public @ResponseBody List<ChangeLogDto> getChangelog(@PathVariable(name = "arrayRunId", required = true) long arrayRunId)
       throws IOException {
     ArrayRun run = arrayRunService.get(arrayRunId);
