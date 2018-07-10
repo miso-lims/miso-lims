@@ -364,7 +364,8 @@ INSERT INTO Project(projectId, name, alias, shortName, creationDate, description
   (400, 'PRO400', 'StudiesIT', 'STUT', '2017-08-16', 'studies test project', 1, 'ACTIVE', 1, '2017-08-16 14:50:00'),
   (500, 'PRO500', 'Tubes In Boxes', 'TIB', '2017-08-15', 'test tubes in and out of boxes', 1, 'ACTIVE', 1, '2017-08-15 13:45:00'),
   (900, 'PRO900', 'Add Overview', 'POV', '2017-10-20', 'add project overview', 1, 'ACTIVE', 1, '2017-10-20 15:30:00'),
-  (4440, 'PRO4440', 'Propagate Samples', 'PROP', '2017-10-26', 'propagate samples', 1, 'ACTIVE', 1, '2017-10-26 14:20:00');
+  (4440, 'PRO4440', 'Propagate Samples', 'PROP', '2017-10-26', 'propagate samples', 1, 'ACTIVE', 1, '2017-10-26 14:20:00'),
+  (2200, 'PRO2200', 'Update Via QC', 'UQC', '2018-07-10', 'update via qc', 1, 'ACTIVE', 1, '2018-07-10 12:52:00');
 
 INSERT INTO SampleNumberPerProject(projectId, highestSampleNumber, padding, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (100001, 1, 4, 1, '2017-10-11 15:33:00', 1, '2017-10-11 15:33:00');
@@ -431,6 +432,10 @@ INSERT INTO Sample(sampleId, project_projectId, name, alias, securityProfile_pro
   (4446, 4440, 'SAM4446', 'PROP_0001_nn_n_1-1_R_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
   (4447, 4440, 'SAM4447', 'PROP_0001_nn_n_1-1_R_1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00');
 
+INSERT INTO Sample(sampleId, project_projectId, name, alias, securityProfile_profileId, sampleType, scientificName, creator, created,
+  lastModifier, lastModified, volume, concentration, volumeUnits, concentrationUnits) VALUES
+  (2201, 2200, 'SAM2201', 'UQC_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2018-07-10 12:53:00', 1, '2018-07-10 12:53:00', 50, 60, 'volumeUnits', 'concentrationUnits');
+
 INSERT INTO DetailedSample (sampleId, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, concentration, archived) VALUES
 (1, 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, 0),
 (2, 23, 1, NULL, '7357', 'TEST', 1, NULL, NULL, 0),
@@ -452,7 +457,8 @@ INSERT INTO DetailedSample (sampleId, sampleClassId, parentId, siblingNumber, gr
 (4444, 10, 4443, 1, NULL, NULL, NULL, NULL, NULL, 0),
 (4445, 14, 4442, 1, NULL, NULL, NULL, NULL, NULL, 0),
 (4446, 13, 4442, 1, NULL, NULL, NULL, NULL, NULL, 0),
-(4447, 17, 4446, 1, NULL, NULL, NULL, NULL, NULL, 0);
+(4447, 17, 4446, 1, NULL, NULL, NULL, NULL, NULL, 0),
+(2201, 23, 4441, 1, NULL, NULL, NULL, NULL, NULL, 0);
 
 INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId, archived) VALUES
   (100001, 1, NULL, 1, 0),  -- Identity
@@ -894,3 +900,13 @@ INSERT INTO ArrayPosition(arrayId, position, sampleId) VALUES
 
 INSERT INTO ArrayRun(arrayRunId, alias, instrumentId, arrayId, health, startDate, creator, created, lastModifier, lastModified) VALUES
 (1, 'ArrayRun_1', 3, 1, 'Running', '2018-02-02', 1, '2018-02-02 15:40:00', 1, '2018-02-02 15:40:00');
+
+INSERT INTO QCType(qcTypeId, name, description, qcTarget, units, archived, precisionAfterDecimal, correspondingField, autoUpdateField) VALUES
+(101, 'test edit qc', '', 'Sample', 'test units', 0, 2, 'NONE', 0),
+(102, 'update volume qc', '', 'Sample', 'new volume', 0, 2, 'VOLUME', 1),
+(103, 'update concentration qc', '', 'Sample', 'new conc', 0, 2, 'CONCENTRATION', 1);
+
+INSERT INTO SampleQC(sample_sampleId, creator, date, type, results, created, lastModified) VALUES
+(2201, 1, '2018-07-10', 101, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
+
+

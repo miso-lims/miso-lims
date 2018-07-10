@@ -325,14 +325,6 @@ Sample.options = {
 };
 
 Sample.ui = {
-  updateConcentrationUnits: function(concentrationUnits) {
-    var units = Utils.validation.isEmpty(concentrationUnits) ? '' : ' (' + concentrationUnits + ')';
-    jQuery('#concentrationUnits').html(units);
-  },
-  updateVolumeUnits: function(volumeUnits) {
-    var units = Utils.validation.isEmpty(volumeUnits) ? '' : ' (' + volumeUnits + ')';
-    jQuery('#volumeUnits').html(units);
-  },
   filterSampleGroupOptions: function() {
     var validSampleGroups = [];
     var subProjectId = Sample.ui.getSelectedSubprojectId();

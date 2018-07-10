@@ -683,8 +683,8 @@
 </form:form>
 
 <script type="text/javascript">
-  Sample.ui.updateConcentrationUnits('${sample.concentrationUnits}');
-  Sample.ui.updateVolumeUnits('${sample.volumeUnits}');
+  Utils.ui.updateConcentrationUnits('${sample.concentrationUnits}');
+  Utils.ui.updateVolumeUnits('${sample.volumeUnits}');
 </script>
 
 <c:if test="${sample.id != 0}">

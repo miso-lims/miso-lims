@@ -46,22 +46,23 @@ public enum QcCorrespondingField {
   NONE;
 
   public void updateField(Pool pool, double value, String units) {
+    throw new UnsupportedOperationException("Method not implemented for unspecified field");
   }
 
   public void updateField(Library library, double value, String units) {
-  }
-
-  public void updateField(DetailedSample sample, double value, String units) {
-    updateField((Sample) sample, value, units);
+    throw new UnsupportedOperationException("Method not implemented for unspecified field");
   }
 
   public void updateField(Sample sample, double value, String units) {
+    throw new UnsupportedOperationException("Method not implemented for unspecified field");
   }
 
   public void updateField(Run run, double value, String units) {
+    throw new UnsupportedOperationException("Method not implemented for unspecified field");
   }
 
   public void updateField(SequencerPartitionContainer container, double value, String units) {
+    throw new UnsupportedOperationException("Method not implemented for unspecified field");
   }
 
 }

@@ -79,14 +79,6 @@ var Pool = {
 };
 
 Pool.ui = {
-   updateConcentrationUnits: function(concentrationUnits) {
-      var units = Utils.validation.isEmpty(concentrationUnits) ? '' : ' (' + concentrationUnits + ')';
-      jQuery('#concentrationUnits').html(units);
-  },
-  updateVolumeUnits: function(volumeUnits) {
-    var units = Utils.validation.isEmpty(volumeUnits) ? '' : ' (' + volumeUnits + ')';
-    jQuery('#volumeUnits').html(units);
-  },
   showPoolNoteDialog: function(poolId) {
     var self = this;
     jQuery('#addNoteDialog')
