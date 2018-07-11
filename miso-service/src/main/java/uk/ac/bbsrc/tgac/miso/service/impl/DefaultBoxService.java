@@ -63,12 +63,6 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   private static final LatencyHistogram discardTime = new LatencyHistogram("miso_box_discard_item_time",
       "The time to discard a boxable.");
 
-  private static final LatencyHistogram fetchTime = new LatencyHistogram("miso_box_fetch_item_time",
-      "The time to fetch a box when updating.");
-
-  private static final LatencyHistogram removeTime = new LatencyHistogram("miso_box_remove_item_time",
-      "The time to remove a boxable.");
-
   private static final LatencyHistogram setTime = new LatencyHistogram("miso_box_set_item_time",
       "The time to set a boxable.");
 
@@ -484,28 +478,8 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       } else if (boxable.getBoxPosition() != null && (boxable.getBox() == null || boxable.getBox().getId() == AbstractBox.UNSAVED_ID)) {
         throw new IllegalArgumentException("Box position set, but no box specified");
       }
-      BoxableView managed;
-      try (AutoCloseable fetchTimer = fetchTime.start()) {
-        managed = getBoxableView(new BoxableId(boxable.getEntityType(), boxable.getId()));
-      }
-      if (managed.getBoxId() != null && boxable.getBox() == null) {
-        try (AutoCloseable removeTimer = removeTime.start()) {
-          Box box = getDetached(managed.getBoxId());
-          box.removeBoxable(managed.getBoxPosition());
-          save(box);
-        }
-      } else if (boxable.getBox() != null && (managed.getBoxId() == null
-          || managed.getBoxId().longValue() != boxable.getBox().getId()
-          || !managed.getBoxPosition().equals(boxable.getBoxPosition()))) {
-        try (AutoCloseable setTimer = setTime.start()) {
-          Box box = getDetached(boxable.getBox().getId());
-          if (box.getBoxable(boxable.getBoxPosition()) != null) {
-            throw new IllegalArgumentException(
-                String.format("Box position already occupied: %s %s", box.getName(), boxable.getBoxPosition()));
-          }
-          box.setBoxable(boxable.getBoxPosition(), BoxableView.fromBoxable(boxable));
-          save(box);
-        }
+      try (AutoCloseable setTimer = setTime.start()) {
+        boxStore.moveItem(boxable, authorizationManager.getCurrentUser());
       }
     } catch (Exception e) {
       throw new IOException(e);
