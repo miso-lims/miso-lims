@@ -110,10 +110,21 @@ public class DefaultStorageLocationService implements StorageLocationService {
   private void validateChange(StorageLocation storage, StorageLocation beforeChange) {
     List<ValidationError> errors = new ArrayList<>();
 
-    // TODO: validate all LocationUnit relationships
+    validateLocationUnitRelationships(storage, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
+    }
+  }
+
+  private void validateLocationUnitRelationships(StorageLocation storage, List<ValidationError> errors) {
+    if (storage.getParentLocation() != null
+        && !storage.getLocationUnit().getAcceptableParents().contains(storage.getParentLocation().getLocationUnit())) {
+      errors.add(new ValidationError(String.format("%s is not an appropriate container for %s",
+          storage.getParentLocation().getLocationUnit().getDisplayName(), storage.getLocationUnit().getDisplayName())));
+      for (StorageLocation child : storage.getChildLocations()) {
+        validateLocationUnitRelationships(child, errors);
+      }
     }
   }
 
