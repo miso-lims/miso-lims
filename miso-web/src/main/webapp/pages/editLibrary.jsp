@@ -375,6 +375,15 @@
 <h2>Details</h2>
 <table class="in">
   <tr>
+    <td class="h">Sample Group ID (and Group Description):</td>
+    <td>
+      <c:choose>
+      <c:when test="${empty library.sample.groupId}">(None)</c:when>
+      <c:otherwise>${library.sample.groupId} (${library.sample.groupDescription})</c:otherwise>
+      </c:choose>
+    </td>
+  </tr>
+  <tr>
     <td class="h">Group ID:</td>
     <td>
       <form:input id="groupId" path="groupId"/>
