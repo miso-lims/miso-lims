@@ -529,6 +529,11 @@ public class DetailedSampleBuilder
   }
 
   @Override
+  public String getNearestSampleGroupId(boolean startWithSelf) {
+    throw new UnsupportedOperationException("Method not implemented on builder");
+  }
+
+  @Override
   public String getExternalName() {
     return externalName;
   }

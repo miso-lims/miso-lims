@@ -24,7 +24,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
       SamColumns.QC_STATUS, SamColumns.QC_NOTE);
 
   private static final Set<String> boxableColumns = Sets.newHashSet(SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS,
-      SamColumns.BOX_POSITION, SamColumns.DISCARDED);
+      SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.UPSTREAM_GROUP_ID);
 
   private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX, SamColumns.CONSENT);
 

@@ -396,6 +396,15 @@
           </td>
         </tr>
         <tr>
+        <td class="h">Upstream Group ID:</td>
+        <td>
+          <c:choose>
+          <c:when test="${nearestSampleGroupId}">(None)</c:when>
+          <c:otherwise>${nearestSampleGroupId}</c:otherwise>
+          </c:choose>
+        </td>
+        </tr>
+        <tr>
           <td class="h">Group ID:</td>
           <td>
             <form:input id="groupId" path="groupId"/>

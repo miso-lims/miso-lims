@@ -659,6 +659,7 @@ public class EditSampleController {
         model.put("sampleCategory", detailedSample ? ((DetailedSample) sample).getSampleClass().getSampleCategory() : "plain");
         if (detailedSample) {
           model.put("sampleClass", ((DetailedSample) sample).getSampleClass().getAlias());
+          model.put("nearestSampleGroupId", ((DetailedSample) sample).getNearestSampleGroupId(false));
         }
         model.put("title", "Sample " + sampleId);
 

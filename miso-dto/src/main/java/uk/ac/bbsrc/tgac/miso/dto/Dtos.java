@@ -356,6 +356,9 @@ public class Dtos {
       dto.setParentTissueSampleClassId(from.getParent().getSampleClass().getId());
       dto.setIdentityConsentLevel(getIdentityConsentLevelString(from));
     }
+    if (!isIdentitySample(from)) {
+      dto.setNearestSampleGroupId(from.getNearestSampleGroupId(false));
+    }
     if (from.getGroupId() != null) {
       dto.setGroupId(from.getGroupId());
     }
@@ -941,6 +944,7 @@ public class Dtos {
     }
     if (from.getSample() != null) {
       dto.setIdentityConsentLevel(getIdentityConsentLevelString((DetailedSample) from.getSample()));
+      dto.setNearestSampleGroupId(((DetailedSample) from.getSample()).getNearestSampleGroupId(true));
     }
     return dto;
   }

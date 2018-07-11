@@ -15,6 +15,7 @@ public class DetailedLibraryDto extends LibraryDto {
   private String groupId;
   private String groupDescription;
   private String identityConsentLevel;
+  private String nearestSampleGroupId;
 
   public Boolean getArchived() {
     return archived;
@@ -78,6 +79,14 @@ public class DetailedLibraryDto extends LibraryDto {
 
   public void setIdentityConsentLevel(String identityConsentLevel) {
     this.identityConsentLevel = identityConsentLevel;
+  }
+
+  public String getNearestSampleGroupId() {
+    return nearestSampleGroupId;
+  }
+
+  public void setNearestSampleGroupId(String nearestSampleGroupId) {
+    this.nearestSampleGroupId = nearestSampleGroupId;
   }
 
 }

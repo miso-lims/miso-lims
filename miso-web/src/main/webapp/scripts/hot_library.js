@@ -315,6 +315,19 @@ HotTarget.library = (function() {
               lib.receivedDate = flat.receivedDate;
             }
           },
+          {
+            header: 'Upstream Group ID',
+            data: 'nearestSampleGroupId',
+            include: Constants.isDetailedSample,
+            type: 'text',
+            readOnly: true,
+            unpack: function(lib, flat, setCellMeta) {
+              flat.nearestSampleGroupId = lib.nearestSampleGroupId ? lib.nearestSampleGroupId : '(None)';
+            },
+            pack: function(lib, flat, errorHandler) {
+              // left blank as this will never be deserialized into the Library model
+            }
+          },
           HotUtils.makeColumnForText('Group ID', Constants.isDetailedSample, 'groupId', {
             validator: HotUtils.validator.optionalTextAlphanumeric
           }),

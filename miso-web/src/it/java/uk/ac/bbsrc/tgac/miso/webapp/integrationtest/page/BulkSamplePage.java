@@ -33,6 +33,7 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String DONOR_SEX = "Donor Sex";
     public static final String CONSENT = "Consent";
     public static final String SAMPLE_CLASS = "Sample Class";
+    public static final String UPSTREAM_GROUP_ID = "Upstream Group ID";
     public static final String GROUP_ID = "Group ID";
     public static final String GROUP_DESCRIPTION = "Group Desc.";
     public static final String TISSUE_ORIGIN = "Tissue Origin";

@@ -26,6 +26,7 @@ public class DetailedSampleDto extends SampleDto {
   private boolean nonStandardAlias;
   private Long identityId;
   private String identityConsentLevel;
+  private String nearestSampleGroupId;
 
   public Long getParentId() {
     return parentId;
@@ -196,6 +197,14 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setIdentityConsentLevel(String identityConsentLevel) {
     this.identityConsentLevel = identityConsentLevel;
+  }
+
+  public String getNearestSampleGroupId() {
+    return nearestSampleGroupId;
+  }
+
+  public void setNearestSampleGroupId(String nearestSampleGroupId) {
+    this.nearestSampleGroupId = nearestSampleGroupId;
   }
 
 }

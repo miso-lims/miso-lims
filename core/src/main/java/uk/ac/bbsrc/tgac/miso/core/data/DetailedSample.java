@@ -109,4 +109,12 @@ public interface DetailedSample extends Sample {
 
   void setConcentration(Double concentration);
 
+  /**
+   * Searches the sample hierarchy until a Group ID is found. Returns null if no sample has a Group ID.
+   * 
+   * @param boolean startWithSelf whether the check should start at the current sample before proceeding to upstream samples
+   * @return String a group ID value located on a sample in the hierarchy
+   */
+  String getNearestSampleGroupId(boolean startWithSelf);
+
 }

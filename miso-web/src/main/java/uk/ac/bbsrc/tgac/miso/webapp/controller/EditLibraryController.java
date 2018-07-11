@@ -599,6 +599,9 @@ public class EditLibraryController {
     model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
     model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
     model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, library, securityManager.listAllGroups()));
+    if (LimsUtils.isDetailedLibrary(library)) {
+      model.put("nearestSampleGroupId", ((DetailedSample) library.getSample()).getNearestSampleGroupId(true));
+    }
     return new ModelAndView("/pages/editLibrary.jsp", model);
   }
 
@@ -650,6 +653,7 @@ public class EditLibraryController {
         if (sample.getBox() != null) {
           detailedDto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(sample.getBox().getAlias(), sample.getBoxPosition()));
         }
+        detailedDto.setNearestSampleGroupId(sample.getNearestSampleGroupId(true));
         dto = detailedDto;
       } else {
         dto = new LibraryDto();

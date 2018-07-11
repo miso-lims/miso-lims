@@ -397,6 +397,19 @@ HotTarget.sample = (function() {
             },
             include: Constants.isDetailedSample
           },
+          {
+            header: 'Upstream Group ID',
+            data: 'nearestSampleGroupId',
+            include: Constants.isDetailedSample && !config.targetSampleClass.alias != 'Identity' && !config.isLibraryReceipt && !config.create,
+            type: 'text',
+            readOnly: true,
+            unpack: function(sam, flat, setCellMeta) {
+              flat.nearestSampleGroupId = sam.nearestSampleGroupId ? sam.nearestSampleGroupId : '(None)';
+            },
+            pack: function(sam, flat, errorHandler) {
+              // left blank as this will never be deserialized into the Sample model
+            }
+          },
           HotUtils.makeColumnForText('Group ID', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupId', {
             validator: HotUtils.validator.optionalTextAlphanumeric
           }),

@@ -160,6 +160,17 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   }
 
   @Override
+  public String getNearestSampleGroupId(boolean checkSelf) {
+    DetailedSample start = this;
+    if (!checkSelf) start = this.getParent();
+    for (DetailedSample sample = start; sample != null; sample = sample.getParent()) {
+      String groupId = sample.getGroupId();
+      if (!LimsUtils.isStringEmptyOrNull(groupId)) return groupId;
+    }
+    return null;
+  }
+
+  @Override
   public Boolean isSynthetic() {
     return isSynthetic;
   }
