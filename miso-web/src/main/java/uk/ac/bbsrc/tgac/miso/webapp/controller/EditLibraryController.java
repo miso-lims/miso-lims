@@ -650,6 +650,8 @@ public class EditLibraryController {
         if (sample.getBox() != null) {
           detailedDto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(sample.getBox().getAlias(), sample.getBoxPosition()));
         }
+        detailedDto.setGroupId(sample.getGroupId());
+        detailedDto.setGroupDescription(sample.getGroupDescription());
         dto = detailedDto;
       } else {
         dto = new LibraryDto();
