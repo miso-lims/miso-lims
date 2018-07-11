@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
@@ -177,13 +178,12 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     criteria.add(Restrictions.or(
         Restrictions.eq("identificationBarcode", search),
         Restrictions.eq("name", search),
-        Restrictions.eq(FIELD_ALIAS, search)
-        ));
+        Restrictions.eq(FIELD_ALIAS, search)));
     @SuppressWarnings("unchecked")
     List<Box> results = criteria.list();
     return results;
   }
-  
+
   private static String getMostSimilarProperty(Box box, String search) {
     List<String> properties = new ArrayList<>(Arrays.asList(box.getAlias(), box.getName()));
     if (box.getIdentificationBarcode() != null) {
@@ -210,12 +210,12 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
       String p2 = getMostSimilarProperty(b2, search.toLowerCase());
       if (p1.indexOf(search.toLowerCase()) == p2.indexOf(search.toLowerCase())) {
         if (p1.length() == p2.length()) {
-            return b1.getAlias().compareTo(b2.getAlias());
-          }
-        return p1.length() - p2.length();
+          return b1.getAlias().compareTo(b2.getAlias());
         }
+        return p1.length() - p2.length();
+      }
       return p1.indexOf(search.toLowerCase()) - p2.indexOf(search.toLowerCase());
-      });
+    });
     return results;
   }
 
@@ -320,8 +320,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     criteria.add(Restrictions.or(
         Restrictions.eq("identificationBarcode", search),
         Restrictions.eq("name", search),
-        Restrictions.eq(FIELD_ALIAS, search)
-        ));
+        Restrictions.eq(FIELD_ALIAS, search)));
     criteria.add(Restrictions.eq("discarded", false));
     @SuppressWarnings("unchecked")
     List<BoxableView> results = criteria.list();
@@ -395,4 +394,22 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     criteria.add(Restrictions.eq("use.id", id));
   }
 
+  @Override
+  public void moveItem(Boxable item, User currentUser) {
+    if (item.getBox() == null) {
+      Query removeStatement = currentSession().createSQLQuery("call removeBoxItem(?,?,?)");
+      removeStatement.setLong(0, currentUser.getUserId());
+      removeStatement.setLong(1, item.getId());
+      removeStatement.setString(2, item.getEntityType().name());
+      removeStatement.executeUpdate();
+      return;
+    }
+    Query moveStatement = currentSession().createSQLQuery("call moveBoxItem(?,?,?,?,?)");
+    moveStatement.setLong(0, currentUser.getUserId());
+    moveStatement.setLong(1, item.getBox().getId());
+    moveStatement.setLong(2, item.getId());
+    moveStatement.setString(3, item.getEntityType().name());
+    moveStatement.setString(4, item.getBoxPosition());
+    moveStatement.executeUpdate();
+  }
 }

@@ -96,4 +96,6 @@ public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
    */
   public List<BoxableView> getBoxableViewsBySearch(String search);
 
+  public void moveItem(Boxable item, User currentUser);
+
 }
