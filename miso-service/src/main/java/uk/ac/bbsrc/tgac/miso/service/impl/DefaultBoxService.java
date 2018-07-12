@@ -28,15 +28,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.BoxStorageAmount;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LatencyHistogram;
@@ -44,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
@@ -81,7 +84,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   private BoxStore boxStore;
 
   @Autowired
-  private ChangeLogStore changeLogStore;
+  private ChangeLogService changeLogService;
 
   @Autowired
   private NamingScheme namingScheme;
@@ -99,7 +102,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
     changeLog.setColumnsChanged("contents");
     changeLog.setUser(authorizationManager.getCurrentUser());
     changeLog.setSummary(message);
-    changeLogStore.create(changeLog);
+    changeLogService.create(changeLog);
   }
 
   private void applyChanges(Box from, Box to) throws IOException {
@@ -232,6 +235,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
     } else {
       Box original = boxStore.get(box.getId());
       authorizationManager.throwIfNotWritable(original);
+      logStorageChange(box, original);
       applyChanges(box, original);
       validateChange(box, original);
       StringBuilder message = new StringBuilder();
@@ -352,10 +356,63 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       }
       box.setName(namingScheme.generateNameFor(box));
       validateNameOrThrow(box, namingScheme);
+
+      if (box.getStorageLocation() != null) {
+        addStorageChangeLog(box.getStorageLocation(), box, true);
+      }
+
       return boxStore.save(box);
     } catch (MisoNamingException e) {
       throw new IOException("Invalid name for box", e);
     }
+  }
+
+  private void logStorageChange(Box box, Box original) throws IOException {
+    if (original.getStorageLocation() == null && box.getStorageLocation() == null) {
+      return;
+    } else if (original.getStorageLocation() == null && box.getStorageLocation() != null) {
+      addStorageChangeLog(getFreezer(box), box, true);
+    } else if (original.getStorageLocation() != null && box.getStorageLocation() == null) {
+      addStorageChangeLog(getFreezer(original), box, false);
+    } else if (getFreezer(original).getId() != getFreezer(box).getId()) {
+      addStorageChangeLog(getFreezer(original), box, false);
+      addStorageChangeLog(getFreezer(box), box, true);
+    } else if (original.getStorageLocation().getId() != box.getStorageLocation().getId()) {
+      String message = String.format("Relocated %s (%s) from %s to %s", box.getAlias(), box.getName(),
+          original.getStorageLocation().getFreezerDisplayLocation(), box.getStorageLocation().getFreezerDisplayLocation());
+      ChangeLog change = getFreezer(box).createChangeLog(message, "", authorizationManager.getCurrentUser());
+      changeLogService.create(change);
+    }
+  }
+
+  private StorageLocation getFreezer(Box box) {
+    if (box.getStorageLocation() == null) {
+      throw new IllegalArgumentException(String.format("%s (%s) does not have a storage location", box.getAlias(), box.getName()));
+    }
+    StorageLocation location = box.getStorageLocation().getFreezerLocation();
+    if (location == null) {
+      throw new IllegalArgumentException(String.format("Location %s does not have a parent freezer", box.getStorageLocation().getAlias()));
+    }
+    return location;
+  }
+
+  /**
+   * Add a changelog entry to record a Box added to or removed from a StorageLocation
+   * 
+   * @param location the StorageLocation that box was added to or removed from
+   * @param box the Box that was added or removed
+   * @param addition true for addition; false for removal
+   * @throws IOException
+   */
+  private void addStorageChangeLog(StorageLocation location, Box box, boolean addition) throws IOException {
+    if (location.getLocationUnit() != LocationUnit.FREEZER) {
+      throw new IllegalArgumentException(String.format("%s is not a freezer", location.getAlias()));
+    }
+    String message = addition ?
+        String.format("Added %s (%s) to %s", box.getAlias(), box.getName(), box.getStorageLocation().getFreezerDisplayLocation())
+        : (String.format("Removed %s (%s)", box.getAlias(), box.getName()));
+    ChangeLog change = location.createChangeLog(message, "", authorizationManager.getCurrentUser());
+    changeLogService.create(change);
   }
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
@@ -370,8 +427,8 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
     this.boxStore = boxStore;
   }
 
-  public void setChangeLogStore(ChangeLogStore changeLogStore) {
-    this.changeLogStore = changeLogStore;
+  public void setChangeLogService(ChangeLogService changeLogService) {
+    this.changeLogService = changeLogService;
   }
 
   public void setNamingScheme(NamingScheme namingScheme) {

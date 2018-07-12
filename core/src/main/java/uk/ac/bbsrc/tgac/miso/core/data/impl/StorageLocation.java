@@ -1,10 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -15,14 +19,20 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.StorageLocationChangeLog;
 
 @Entity
-public class StorageLocation implements Serializable, Aliasable {
+public class StorageLocation implements Serializable, Aliasable, ChangeLoggable {
 
   private static final long serialVersionUID = 1L;
 
@@ -85,6 +95,25 @@ public class StorageLocation implements Serializable, Aliasable {
 
   @OneToMany(targetEntity = BoxImpl.class, mappedBy = "storageLocation")
   private Set<Box> boxes;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
+
+  @Column(name = "created", nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date creationTime;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier", nullable = false)
+  private User lastModifier;
+
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
+
+  @OneToMany(targetEntity = StorageLocationChangeLog.class, mappedBy = "storageLocation", cascade = CascadeType.REMOVE)
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Override
   public long getId() {
@@ -170,8 +199,64 @@ public class StorageLocation implements Serializable, Aliasable {
         : getParentLocation().getFreezerDisplayLocation() + ", ") + getDisplayLocation();
   }
 
+  @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User user) {
+    this.lastModifier = user;
+  }
+
+  @Override
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  @Override
+  public User getCreator() {
+    return creator;
+  }
+
+  @Override
+  public void setCreator(User user) {
+    this.creator = user;
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return creationTime;
+  }
+
+  @Override
+  public void setCreationTime(Date creationTime) {
+    this.creationTime = creationTime;
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    StorageLocationChangeLog change = new StorageLocationChangeLog();
+    change.setStorageLocation(this);
+    change.setSummary(summary);
+    change.setColumnsChanged(columnsChanged);
+    change.setUser(user);
+    return change;
   }
 
 }

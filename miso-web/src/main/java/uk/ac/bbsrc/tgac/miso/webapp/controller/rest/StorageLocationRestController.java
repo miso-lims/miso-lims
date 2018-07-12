@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.dto.ChangeLogDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.StorageLocationDto;
 import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
@@ -62,7 +63,7 @@ public class StorageLocationRestController extends RestController {
 
   @PostMapping(value = "/freezers")
   @ResponseStatus(HttpStatus.CREATED)
-  public @ResponseBody StorageLocationDto createFreezer(@RequestBody StorageLocationDto dto) {
+  public @ResponseBody StorageLocationDto createFreezer(@RequestBody StorageLocationDto dto) throws IOException {
     return doSave(dto);
   }
 
@@ -76,7 +77,7 @@ public class StorageLocationRestController extends RestController {
     return doSave(dto);
   }
 
-  private StorageLocationDto doSave(StorageLocationDto dto) {
+  private StorageLocationDto doSave(StorageLocationDto dto) throws IOException {
     StorageLocation freezer = Dtos.to(dto);
     long savedId = storageLocationService.saveFreezer(freezer);
     StorageLocation saved = storageLocationService.get(savedId);
@@ -84,7 +85,7 @@ public class StorageLocationRestController extends RestController {
   }
 
   @PostMapping(value = "/freezers/{id}/shelves")
-  public @ResponseBody StorageLocationDto addFreezerShelf(@PathVariable(name = "id", required = true) long id) {
+  public @ResponseBody StorageLocationDto addFreezerShelf(@PathVariable(name = "id", required = true) long id) throws IOException {
     StorageLocation freezer = getFreezer(id);
     int lastShelf = freezer.getChildLocations().stream().filter(loc -> {
       return loc.getLocationUnit() == LocationUnit.SHELF;
@@ -110,7 +111,7 @@ public class StorageLocationRestController extends RestController {
 
   @PostMapping(value = "/freezers/{id}/stacks")
   public @ResponseBody StorageLocationDto addFreezerStack(@PathVariable(name = "id", required = true) long id,
-      @RequestParam(name = "height", required = true) int height) {
+      @RequestParam(name = "height", required = true) int height) throws IOException {
     StorageLocation freezer = getFreezer(id);
     if (height < 1) {
       throw new RestException("Invalid stack height", Status.BAD_REQUEST);
@@ -145,7 +146,7 @@ public class StorageLocationRestController extends RestController {
     }).map(StorageLocation::getAlias).mapToInt(Integer::parseInt).max().orElse(0) + 1);
   }
 
-  private StorageLocationDto createStack(StorageLocation parent, int height) {
+  private StorageLocationDto createStack(StorageLocation parent, int height) throws IOException {
     String stackNumber = findNextNumber(parent, LocationUnit.STACK);
     StorageLocation stack = makeStorage(stackNumber, LocationUnit.STACK, parent);
     for (int i = 0; i < height; i++) {
@@ -154,7 +155,7 @@ public class StorageLocationRestController extends RestController {
     return doSave(stack);
   }
 
-  private StorageLocationDto doSave(StorageLocation storage) {
+  private StorageLocationDto doSave(StorageLocation storage) throws IOException {
     long savedId = storageLocationService.addFreezerStorage(storage);
     StorageLocation saved = storageLocationService.get(savedId);
     return Dtos.asDto(saved, false, false);
@@ -162,7 +163,8 @@ public class StorageLocationRestController extends RestController {
 
   @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/stacks")
   public @ResponseBody StorageLocationDto addShelfStack(@PathVariable(name = "freezerId", required = true) long freezerId,
-      @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "height", required = true) int height) {
+      @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "height", required = true) int height)
+      throws IOException {
     StorageLocation freezer = getFreezer(freezerId);
     StorageLocation shelf = getShelf(freezer, shelfId);
     if (height < 1) {
@@ -174,7 +176,7 @@ public class StorageLocationRestController extends RestController {
   @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/racks")
   public @ResponseBody StorageLocationDto addShelfRack(@PathVariable(name = "freezerId", required = true) long freezerId,
       @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "depth", required = true) int depth,
-      @RequestParam(name = "height", required = true) int height) {
+      @RequestParam(name = "height", required = true) int height) throws IOException {
     StorageLocation freezer = getFreezer(freezerId);
     StorageLocation shelf = getShelf(freezer, shelfId);
     if (height < 1) {
@@ -195,7 +197,7 @@ public class StorageLocationRestController extends RestController {
 
   @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/loose")
   public @ResponseBody StorageLocationDto addShelfLooseStorage(@PathVariable(name = "freezerId", required = true) long freezerId,
-      @PathVariable(name = "shelfId", required = true) long shelfId) {
+      @PathVariable(name = "shelfId", required = true) long shelfId) throws IOException {
     StorageLocation freezer = getFreezer(freezerId);
     StorageLocation shelf = getShelf(freezer, shelfId);
     StorageLocation storage = makeStorage(findNextNumber(shelf, LocationUnit.LOOSE_STORAGE), LocationUnit.LOOSE_STORAGE, shelf);
@@ -210,6 +212,18 @@ public class StorageLocationRestController extends RestController {
       throw new RestException("Shelf not found", Status.NOT_FOUND);
     }
     return shelf;
+  }
+
+  @GetMapping(value = "/freezers/{freezerId}/changelog")
+  public @ResponseBody List<ChangeLogDto> getFreezerChangelog(@PathVariable(name = "freezerId", required = true) long freezerId)
+      throws IOException {
+    StorageLocation freezer = storageLocationService.get(freezerId);
+    if (freezer == null) {
+      throw new RestException("Freezer not found", Status.NOT_FOUND);
+    }
+    return freezer.getChangeLog().stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList());
   }
 
 }

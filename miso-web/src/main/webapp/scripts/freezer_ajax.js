@@ -1,5 +1,6 @@
 (function(Freezer, $, undefined) { // NOSONAR (paranoid assurance that undefined is undefined)
   var freezerJson = null;
+  var changelogInitialised = false;
 
   var heightField = {
     type: 'int',
@@ -23,7 +24,7 @@
   Freezer.validateAndSave = function() {
     Validate.cleanFields('#freezer-form');
     Validate.clearErrors('#freezer-form');
-    
+
     $('#room').attr('class', 'form-control');
     $('#room').attr('data-parsley-required', 'true');
     $('#room').attr('data-parsley-errors-container', '#roomError');
@@ -46,22 +47,23 @@
       save(!freezerJson || !freezerJson.id);
     });
   };
-  
-  Freezer.addRoom = function () {
-    Freezer.addRoomWithCallback(function() { Utils.showOkDialog('Room created', []); });
-  },
-  Freezer.addRoomWithCallback = function (callback) {
+
+  Freezer.addRoom = function() {
+    Freezer.addRoomWithCallback(function() {
+      Utils.showOkDialog('Room created', []);
+    });
+  }, Freezer.addRoomWithCallback = function(callback) {
     var fields = [{
-	  type: 'text',
-	  label: 'Alias',
-	  property: 'alias',
-	  required: true
-	}, {
-	  type: 'text',
-	  label: 'Barcode',
-	  property: 'identificationBarcode',
-	  required: false
-	}];
+      type: 'text',
+      label: 'Alias',
+      property: 'alias',
+      required: true
+    }, {
+      type: 'text',
+      label: 'Barcode',
+      property: 'identificationBarcode',
+      required: false
+    }];
     Utils.showDialog('Add Room', 'Add', fields, function(output) {
       var params = {};
       fields.forEach(function(field) {
@@ -125,6 +127,7 @@
       $('#alias').val(freezerJson.alias);
       $('#identificationBarcode').val(freezerJson.identificationBarcode);
       updateVisual();
+      updateChangelogs();
     }
   }
 
@@ -227,35 +230,35 @@
 
   function getLevelTwoNodeSelectFunction(node) {
     function assignBox() {
-      Utils.showDialog('Search for Box to Assign', 'Search', [ {
-        type : "text",
-        label : "Search",
-        property : "query",
-        value : ""
+      Utils.showDialog('Search for Box to Assign', 'Search', [{
+        type: "text",
+        label: "Search",
+        property: "query",
+        value: ""
       }, ], function(results) {
         Utils.ajaxWithDialog('Searching for Boxes', 'GET', '/miso/rest/boxes/search/partial?' + jQuery.param({
-          q : results.query,
-          b : true
-          }), null, function(response) {
+          q: results.query,
+          b: true
+        }), null, function(response) {
           Utils.showWizardDialog('Select Box to Assign', response.map(function(box) {
             return {
-              name : box.alias,
-              handler : function() {
+              name: box.alias,
+              handler: function() {
                 Utils.ajaxWithDialog('Moving Box', 'POST', '/miso/rest/box/' + box.id + '/setlocation?' + jQuery.param({
                   storageId: node.item.id
                 }), {}, Utils.page.pageReload, function(json) {
                   Utils.showOkDialog('Error Moving Box', [json.error]);
                 });
-                }
+              }
             }
-            }));
-          })
+          }));
+        })
       });
     }
     switch (node.item.locationUnit) {
     case 'STACK_POSITION':
       return function() {
-      assignBox();
+        assignBox();
         $('#levelTwoStorageContainer .selected').removeClass('selected');
         node.addClass('selected');
       };
@@ -264,18 +267,17 @@
       return function() {
         var actions = node.item.boxes.map(function(box) {
           return {
-            name : "View " + box.alias,
-            handler : function() {
+            name: "View " + box.alias,
+            handler: function() {
               window.location = window.location.origin + '/miso/box/' + box.id;
             }
           };
         });
         actions.unshift({
-          name : "Add Box to Storage",
-          handler : assignBox
+          name: "Add Box to Storage",
+          handler: assignBox
         });
-        Utils
-            .showWizardDialog('Boxes in ' + node.item.displayLocation, actions);
+        Utils.showWizardDialog('Boxes in ' + node.item.displayLocation, actions);
         $('#levelTwoStorageContainer .selected').removeClass('selected');
         node.addClass('selected');
       };
@@ -307,8 +309,12 @@
       var cells = [];
       for (var col = 0; col < stackCount; col++) {
         var node = $('<td>').text(
-            rack.childLocations[col].displayLocation + ', ' + rack.childLocations[col].childLocations[row].displayLocation + 
-            ' (' + (rack.childLocations[col].childLocations[row].boxes[0] ? rack.childLocations[col].childLocations[row].boxes[0].alias : 'empty') + ')');
+            rack.childLocations[col].displayLocation
+                + ', '
+                + rack.childLocations[col].childLocations[row].displayLocation
+                + ' ('
+                + (rack.childLocations[col].childLocations[row].boxes[0] ? rack.childLocations[col].childLocations[row].boxes[0].alias
+                    : 'empty') + ')');
         node.item = rack.childLocations[col].childLocations[row];
         node.click(getLevelTwoNodeSelectFunction(node));
         cells.unshift(node);
@@ -341,8 +347,8 @@
     var table = $('#levelTwoStorageLayout');
     var row = $('<tr>');
     var cell = $('<td>');
-    for(box in storage.boxes){
-    	cell.append(document.createTextNode(storage.boxes[box].alias)).append('<br/>');
+    for (box in storage.boxes) {
+      cell.append(document.createTextNode(storage.boxes[box].alias)).append('<br/>');
     }
     cell.append(document.createTextNode('(Unorganized Space)'));
     cell.item = storage;
@@ -378,6 +384,23 @@
       window.location.href = '/miso/freezer/' + data.id;
     }).fail(function(response, textStatus, serverStatus) {
       Validate.displayErrors(JSON.parse(response.responseText), '#freezer-form');
+    });
+  }
+
+  function updateChangelogs() {
+    $.ajax({
+      url: '/miso/rest/storagelocations/freezers/' + freezerJson.id + '/changelog',
+      type: 'GET',
+      dataType: 'json'
+    }).success(function(data) {
+      if (changelogInitialised) {
+        $('#changelog').dataTable().fnDestroy();
+        $('#changelog').empty();
+      }
+      changelogInitialised = true;
+      ListUtils.createStaticTable('changelog', ListTarget.changelog, {}, data);
+    }).fail(function(response, textStatus, serverStatus) {
+      Validate.displayErrors(JSON.parse(response.responseText));
     });
   }
 
