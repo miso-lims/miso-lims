@@ -24,7 +24,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
       SamColumns.QC_STATUS, SamColumns.QC_NOTE);
 
   private static final Set<String> boxableColumns = Sets.newHashSet(SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS,
-      SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.UPSTREAM_GROUP_ID);
+      SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.EFFECTIVE_GROUP_ID);
 
   private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX, SamColumns.CONSENT);
 
@@ -193,15 +193,18 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     editable.put(SamColumns.REGION, "changed");
     editable.put(SamColumns.QC_STATUS, "Refused Consent");
 
-   // assert not equals to start
-   editable.forEach((k, v) -> assertNotEquals(v, table.getText(k, 0)));
-   // make the changes
-   editable.forEach((k, v) -> table.enterText(k, 0, v));
-   // assert that the changes have been made
-   editable.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    // assert not equals to start
+    editable.forEach((k, v) -> assertNotEquals(v, table.getText(k, 0)));
+    assertNotEquals("changed", table.getText(SamColumns.EFFECTIVE_GROUP_ID, 0));
+    // make the changes
+    editable.remove(SamColumns.EFFECTIVE_GROUP_ID); // should be auto-updated
+    editable.forEach((k, v) -> table.enterText(k, 0, v));
+    // assert that the changes have been made
+    editable.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
    
-   // ensure dependent columns update properly
-   // no tissue-specific dependent columns at this time
+    // ensure dependent columns update properly
+    assertEquals("changed", table.getText(SamColumns.EFFECTIVE_GROUP_ID, 0));
+    // no tissue-specific dependent columns at this time
   }
   
   @Test

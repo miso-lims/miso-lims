@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -160,14 +161,12 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   }
 
   @Override
-  public String getNearestSampleGroupId(boolean checkSelf) {
-    DetailedSample start = this;
-    if (!checkSelf) start = this.getParent();
-    for (DetailedSample sample = start; sample != null; sample = sample.getParent()) {
+  public Optional<DetailedSample> getEffectiveGroupIdSample() {
+    for (DetailedSample sample = this; sample != null; sample = sample.getParent()) {
       String groupId = sample.getGroupId();
-      if (!LimsUtils.isStringEmptyOrNull(groupId)) return groupId;
+      if (!LimsUtils.isStringEmptyOrNull(groupId)) return Optional.of(sample);
     }
-    return null;
+    return Optional.empty();
   }
 
   @Override

@@ -28,7 +28,7 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String SAMPLE_LOCATION = "Sample Location";
     public static final String DESCRIPTION = "Description";
     public static final String RECEIVE_DATE = "Date of receipt";
-    public static final String UPSTREAM_GROUP_ID = "Upstream Group ID";
+    public static final String EFFECTIVE_GROUP_ID = "Effective Group ID";
     public static final String GROUP_ID = "Group ID";
     public static final String GROUP_DESC = "Group Desc.";
     public static final String DESIGN = "Design";

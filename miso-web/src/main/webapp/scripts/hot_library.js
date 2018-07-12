@@ -316,13 +316,17 @@ HotTarget.library = (function() {
             }
           },
           {
-            header: 'Upstream Group ID',
-            data: 'nearestSampleGroupId',
-            include: Constants.isDetailedSample,
+            header: 'Effective Group ID',
+            data: 'effectiveGroupId',
+            include: Constants.isDetailedSample && !config.isLibraryReceipt,
             type: 'text',
             readOnly: true,
+            depends: 'groupId',
+            update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              if (flatProperty === 'groupId') setData(flat.groupId);
+            },
             unpack: function(lib, flat, setCellMeta) {
-              flat.nearestSampleGroupId = lib.nearestSampleGroupId ? lib.nearestSampleGroupId : '(None)';
+              flat.effectiveGroupId = lib.effectiveGroupId ? lib.effectiveGroupId : '(None)';
             },
             pack: function(lib, flat, errorHandler) {
               // left blank as this will never be deserialized into the Library model

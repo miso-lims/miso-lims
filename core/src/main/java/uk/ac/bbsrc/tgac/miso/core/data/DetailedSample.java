@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DetailedSample extends Sample {
 
@@ -112,9 +113,8 @@ public interface DetailedSample extends Sample {
   /**
    * Searches the sample hierarchy until a Group ID is found. Returns null if no sample has a Group ID.
    * 
-   * @param boolean startWithSelf whether the check should start at the current sample before proceeding to upstream samples
-   * @return String a group ID value located on a sample in the hierarchy
+   * @return Sample nearest sample with a non-empty group ID. May be the current sample.
    */
-  String getNearestSampleGroupId(boolean startWithSelf);
+  Optional<DetailedSample> getEffectiveGroupIdSample();
 
 }

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -356,8 +357,10 @@ public class Dtos {
       dto.setParentTissueSampleClassId(from.getParent().getSampleClass().getId());
       dto.setIdentityConsentLevel(getIdentityConsentLevelString(from));
     }
-    if (!isIdentitySample(from)) {
-      dto.setNearestSampleGroupId(from.getNearestSampleGroupId(false));
+    Optional<DetailedSample> effective = from.getEffectiveGroupIdSample();
+    if (effective.isPresent()) {
+      dto.setEffectiveGroupId(effective.get().getGroupId());
+      dto.setEffectiveGroupIdSample(effective.get().getAlias());
     }
     if (from.getGroupId() != null) {
       dto.setGroupId(from.getGroupId());
@@ -938,13 +941,20 @@ public class Dtos {
     dto.setNonStandardAlias(from.hasNonStandardAlias());
     if (from.getGroupId() != null) {
       dto.setGroupId(from.getGroupId());
+      dto.setEffectiveGroupId(from.getGroupId());
+      dto.setEffectiveGroupIdSample(from.getAlias());
+    } else {
+      Optional<DetailedSample> effective = ((DetailedSample) from.getSample()).getEffectiveGroupIdSample();
+      if (effective.isPresent()) {
+        dto.setEffectiveGroupId(effective.get().getGroupId());
+        dto.setEffectiveGroupIdSample(effective.get().getAlias());
+      }
     }
     if (from.getGroupDescription() != null) {
       dto.setGroupDescription(from.getGroupDescription());
     }
     if (from.getSample() != null) {
       dto.setIdentityConsentLevel(getIdentityConsentLevelString((DetailedSample) from.getSample()));
-      dto.setNearestSampleGroupId(((DetailedSample) from.getSample()).getNearestSampleGroupId(true));
     }
     return dto;
   }

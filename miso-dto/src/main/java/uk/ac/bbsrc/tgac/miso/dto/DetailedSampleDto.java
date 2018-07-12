@@ -26,7 +26,8 @@ public class DetailedSampleDto extends SampleDto {
   private boolean nonStandardAlias;
   private Long identityId;
   private String identityConsentLevel;
-  private String nearestSampleGroupId;
+  private String effectiveGroupId;
+  private String effectiveGroupIdSample;
 
   public Long getParentId() {
     return parentId;
@@ -199,12 +200,20 @@ public class DetailedSampleDto extends SampleDto {
     this.identityConsentLevel = identityConsentLevel;
   }
 
-  public String getNearestSampleGroupId() {
-    return nearestSampleGroupId;
+  public String getEffectiveGroupId() {
+    return effectiveGroupId;
   }
 
-  public void setNearestSampleGroupId(String nearestSampleGroupId) {
-    this.nearestSampleGroupId = nearestSampleGroupId;
+  public void setEffectiveGroupId(String effectiveGroupId) {
+    this.effectiveGroupId = effectiveGroupId;
+  }
+
+  public String getEffectiveGroupIdSample() {
+    return effectiveGroupIdSample;
+  }
+
+  public void setEffectiveGroupIdSample(String effectiveGroupIdSample) {
+    this.effectiveGroupIdSample = effectiveGroupIdSample;
   }
 
 }

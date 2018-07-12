@@ -399,8 +399,8 @@
         <td class="h">Upstream Group ID:</td>
         <td>
           <c:choose>
-          <c:when test="${nearestSampleGroupId}">(None)</c:when>
-          <c:otherwise>${nearestSampleGroupId}</c:otherwise>
+          <c:when test="${empty effectiveGroupId}">(None)</c:when>
+          <c:otherwise>${effectiveGroupId}</c:otherwise>
           </c:choose>
         </td>
         </tr>
