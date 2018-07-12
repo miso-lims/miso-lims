@@ -179,7 +179,7 @@ public class DefaultLibraryDilutionService
         library.setVolume(library.getVolume() + managed.getVolumeUsed() - dilution.getVolumeUsed());
       } else if (managed.getVolumeUsed() != null) {
         library.setVolume(library.getVolume() + managed.getVolumeUsed());
-      } else {
+      } else if (dilution.getVolumeUsed() != null) {
         library.setVolume(library.getVolume() - dilution.getVolumeUsed());
       }
     }
