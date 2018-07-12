@@ -1651,7 +1651,7 @@ public class MisoServiceManager {
     service.setBoxStore(boxDao);
     service.setAuthorizationManager(authorizationManager);
     service.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
-    service.setChangeLogStore(changeLogDao);
+    service.setChangeLogService(changeLogService);
     service.setNamingScheme(namingScheme);
     service.setSecurityProfileStore(securityProfileDao);
     setBoxService(service);

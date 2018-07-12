@@ -131,6 +131,10 @@ jQuery(document).ready(function() {
 
 <miso:list-section id="list_box" name="Boxes" target="box" items="${boxes}" config="{'showFreezerLocation':true, 'boxUse':false, 'showStorageLocation':false}"/>
 
+<br/>
+<h1>Changes</h1>
+<table id='changelog' class='display no-border ui-widget-content'></table>
+
 </div>
 </div>
 </div>
