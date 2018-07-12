@@ -46,7 +46,7 @@
 <div class="bs-callout bs-callout-warning hidden">
   <h2>Oh snap!</h2>
   <p>This form seems to be invalid</p>
-  <div id="generalErrors"></div>
+  <div class="generalErrors"></div>
 </div>
 <br/>
 
