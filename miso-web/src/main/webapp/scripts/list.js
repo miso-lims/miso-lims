@@ -99,6 +99,10 @@ ListUtils = (function() {
     "box": {
       term: "box:NAME",
       help: "Checks if an item is located in a particular box.  The name can either be the partial name or partial alias of the box."
+    },
+    "kitname": {
+      term: "kitname:NAME",
+      help: "Checks if an item uses a library, clustering, or multiplexing kit of the specified name. This is a partial match."
     }
   };
 
@@ -178,6 +182,7 @@ ListUtils = (function() {
       '  Multiple searches can be separated by spaces (not AND).' +
       '  If a filter does not apply, it is ignored.' +
       '  Any other search term is taken as a regular query and matched against the current fields for each item.' +
+      '  To search for a term with spaces, surround the entire term in quotation marks.' +
       '</p>' +
       '<br/>' +
       makePopupTable(target) +
