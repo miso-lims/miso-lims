@@ -129,6 +129,8 @@ public class ListTablesIT extends AbstractIT {
 
   private static final Set<String> box = Sets.newHashSet("box:BOX1", "box:box");
 
+  private static final Set<String> kitName = Sets.newHashSet("kitname:\"Test Kit\"");
+
   private static final Set<String> projectsQueries = concatSets(Sets.newHashSet("PRO1"), createdDates, createdOnDates,
       creator, modifier);
 
@@ -137,7 +139,7 @@ public class ListTablesIT extends AbstractIT {
       createdDates, createdOnDates, receivedDates, creator, modifier, box);
 
   private static final Set<String> librariesQueries = concatSets(
-      Sets.newHashSet("LIB1"), createdDates, createdOnDates, creator, modifier, platform, indices, box);
+      Sets.newHashSet("LIB1"), createdDates, createdOnDates, creator, modifier, platform, indices, box, kitName);
 
   private static final Set<String> dilutionsQueries = concatSets(
       Sets.newHashSet("LDI1"), createdDates, createdOnDates, creator, modifier, platform, indices, box);
@@ -148,7 +150,7 @@ public class ListTablesIT extends AbstractIT {
   private static final Set<String> ordersQueries = Sets.newHashSet("IPO1", "is:fulfilled", "is:active", "is:order");
 
   private static final Set<String> containersQueries = concatSets(
-      Sets.newHashSet("Container"), createdDates, createdOnDates, creator, modifier, platform);
+      Sets.newHashSet("Container"), createdDates, createdOnDates, creator, modifier, platform, kitName);
 
   private static final Set<String> runsQueries = concatSets(
       Sets.newHashSet("RUN1", "is:unknown", "is:complete", "is:completed", "is:failed", "is:started",
@@ -159,7 +161,7 @@ public class ListTablesIT extends AbstractIT {
 
   private static final Set<String> sequencersQueries = Sets.newHashSet("Sequencer");
 
-  private static final Set<String> kitsQueries = Sets.newHashSet("Kit");
+  private static final Set<String> kitsQueries = concatSets(Sets.newHashSet("Kit"), kitName);
 
   private static final Set<String> indicesQueries = Sets.newHashSet("Index 1", "TGCATGCA");
 
