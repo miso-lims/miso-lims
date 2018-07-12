@@ -707,6 +707,11 @@ INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId,
 (803, 'LDI803', 2.2, 603, 'same_index_1', '2018-06-26', 1, 1, 1, '2018-06-26 11:39:00'),
 (804, 'LDI804', 2.2, 604, 'same_index_2', '2018-06-26', 1, 1, 1, '2018-06-26 11:39:00');
 
+
+INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, lastModifier, lastUpdated, volumeUsed) VALUES
+(901, 'LDI901', 4.3, 504, 'auto_calculate_pool_1', '2018-07-12', 'admin', 1, 1, '2018-07-12 09:43:00', 14.7),
+(902, 'LDI902', 1.7, 504, 'auto_calculate_pool_2', '2018-07-12', 'admin', 1, 1, '2018-07-12 09:43:00', 21.3);
+
 INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
 (1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 2, 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL),
 (501, 2.2, NULL, 'IPO501', 'TIB_Pool', 'TIB_Pool', NULL, '2017-08-15', 1, 'ILLUMINA', 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00', 1),
