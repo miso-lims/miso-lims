@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
 import java.util.List;
 import java.util.Map;
@@ -167,7 +168,7 @@ public class BulkDilutionIT extends AbstractIT {
     fillRow(table, 0, attrs);
 
     assertColumnValues(table, 0, attrs, "pre-save");
-    saveAndAssertSuccessForSavePrompt(table);
+    saveAndAssertSuccess(table, true);
     assertColumnValues(table, 0, attrs, "post-save");
 
     Long newId = getSavedId(table, 0);
@@ -217,38 +218,6 @@ public class BulkDilutionIT extends AbstractIT {
         assertEquals(String.format(formatString, rowNum, key), val, table.getText(key, rowNum));
       }
     });
-  }
-
-  private void saveAndAssertSuccess(HandsOnTable table) {
-    HandsOnTableSaveResult result = table.save();
-
-    if (result.getItemsSaved() != table.getRowCount()) {
-      log.error(result.printSummary());
-    }
-
-    assertEquals("Save count", table.getRowCount(), result.getItemsSaved());
-    assertTrue("Server error messages", result.getServerErrors().isEmpty());
-    assertTrue("Save error messages", result.getSaveErrors().isEmpty());
-
-    for (int i = 0; i < table.getRowCount(); i++) {
-      assertTrue("Dilution name generation", table.getText(DilColumns.NAME, i).contains("LDI"));
-    }
-  }
-
-  private void saveAndAssertSuccessForSavePrompt(HandsOnTable table) {
-    HandsOnTableSaveResult result = table.save(true);
-
-    if (result.getItemsSaved() != table.getRowCount()) {
-      log.error(result.printSummary());
-    }
-
-    assertEquals("Save count", table.getRowCount(), result.getItemsSaved());
-    assertTrue("Server error messages", result.getServerErrors().isEmpty());
-    assertTrue("Save error messages", result.getSaveErrors().isEmpty());
-
-    for (int i = 0; i < table.getRowCount(); i++) {
-      assertTrue("Dilution name generation", table.getText(DilColumns.NAME, i).contains("LDI"));
-    }
   }
 
   private void assertDilutionAttributes(Map<String, String> attributes, LibraryDilution dilution) {
