@@ -26,6 +26,7 @@
 <script src="<c:url value='/scripts/handsontable/dist/moment/moment.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/handsontable/dist/handsontable.full.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/handsontable_renderers.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/download/download.js'/>" type="text/javascript"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">
