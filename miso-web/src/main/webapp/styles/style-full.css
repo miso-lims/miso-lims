@@ -2174,6 +2174,7 @@ div#inputError {
 
 .storageComponentLabel {
   float: left;
+  font-weight: bold;
 }
 
 .storageComponentButton {

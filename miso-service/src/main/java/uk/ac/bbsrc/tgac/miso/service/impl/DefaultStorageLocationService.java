@@ -100,18 +100,18 @@ public class DefaultStorageLocationService implements StorageLocationService {
     }
   }
 
-  private long create(StorageLocation freezer) throws IOException {
-    validateChange(freezer, null);
-    createParentIfNecessary(freezer);
-    freezer.setChangeDetails(authorizationManager.getCurrentUser());
-    return storageLocationStore.save(freezer);
+  private long create(StorageLocation location) throws IOException {
+    validateChange(location, null);
+    createParentIfNecessary(location);
+    location.setChangeDetails(authorizationManager.getCurrentUser());
+    return storageLocationStore.save(location);
   }
 
-  private long update(StorageLocation freezer) throws IOException {
-    StorageLocation managed = get(freezer.getId());
-    validateChange(freezer, managed);
-    createParentIfNecessary(freezer);
-    applyChanges(freezer, managed);
+  private long update(StorageLocation location) throws IOException {
+    StorageLocation managed = get(location.getId());
+    validateChange(location, managed);
+    createParentIfNecessary(location);
+    applyChanges(location, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     return storageLocationStore.save(managed);
   }
@@ -167,6 +167,11 @@ public class DefaultStorageLocationService implements StorageLocationService {
       addFreezerStorage(child);
     }
     return savedId;
+  }
+
+  @Override
+  public long updateStorageComponent(StorageLocation location) throws IOException {
+    return update(location);
   }
 
 }
