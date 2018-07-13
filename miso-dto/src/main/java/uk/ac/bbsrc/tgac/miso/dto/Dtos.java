@@ -945,10 +945,10 @@ public class Dtos {
       dto.setEffectiveGroupIdSample(from.getAlias());
     } else {
       Optional<DetailedSample> effective = ((DetailedSample) from.getSample()).getEffectiveGroupIdSample();
-      if (effective.isPresent()) {
-        dto.setEffectiveGroupId(effective.get().getGroupId());
-        dto.setEffectiveGroupIdSample(effective.get().getAlias());
-      }
+      effective.ifPresent(upstream -> {
+        dto.setEffectiveGroupId(upstream.getGroupId());
+        dto.setEffectiveGroupIdSample(upstream.getAlias());
+      });
     }
     if (from.getGroupDescription() != null) {
       dto.setGroupDescription(from.getGroupDescription());
