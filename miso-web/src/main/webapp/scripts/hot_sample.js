@@ -400,7 +400,7 @@ HotTarget.sample = (function() {
           {
             header: 'Effective Group ID',
             data: 'effectiveGroupId',
-            include: Constants.isDetailedSample && !config.targetSampleClass.alias != 'Identity' && !config.isLibraryReceipt && !config.create,
+            include: Constants.isDetailedSample && config.targetSampleClass.alias != 'Identity' && !config.isLibraryReceipt && !config.create,
             type: 'text',
             readOnly: true,
             depends: 'groupId',
