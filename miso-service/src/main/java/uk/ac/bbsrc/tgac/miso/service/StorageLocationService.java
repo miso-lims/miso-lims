@@ -24,4 +24,6 @@ public interface StorageLocationService {
 
   public long addFreezerStorage(StorageLocation storage) throws IOException;
 
+  public long updateStorageComponent(StorageLocation location) throws IOException;
+
 }

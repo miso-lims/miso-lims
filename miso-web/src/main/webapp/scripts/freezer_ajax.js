@@ -1,6 +1,7 @@
 (function(Freezer, $, undefined) { // NOSONAR (paranoid assurance that undefined is undefined)
   var freezerJson = null;
   var changelogInitialised = false;
+  var selectedComponent = null;
 
   var heightField = {
     type: 'int',
@@ -14,6 +15,13 @@
     label: 'Depth (stacks)',
     property: 'depth',
     required: true
+  };
+
+  var barcodeField = {
+    type: 'text',
+    label: 'Barcode',
+    property: 'identificationBarcode',
+    required: false
   };
 
   Freezer.setFreezerJson = function(json) {
@@ -48,6 +56,23 @@
     });
   };
 
+  Freezer.validateAndSaveComponent = function() {
+    Validate.cleanFields('#freezerComponent-form');
+    Validate.clearErrors('#freezerComponent-form');
+
+    $('#storageComponentBarcode').attr('class', 'form-control');
+    $('#storageComponentBarcode').attr('data-parsley-maxlength', '255');
+    $('#storageComponentBarcode').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    $('#storageComponentBarcode').attr('data-parsley-errors-container', '#storageComponentBarcodeError');
+
+    $('#freezerComponent-form').parsley();
+    $('#freezerComponent-form').parsley().validate();
+
+    Validate.updateWarningOrSubmit('#freezerComponent-form', null, function() {
+      saveComponent();
+    });
+  };
+
   Freezer.addRoom = function() {
     Freezer.addRoomWithCallback(function() {
       Utils.showOkDialog('Room created', []);
@@ -79,20 +104,14 @@
   };
 
   Freezer.addFreezerStorage = function() {
-    Utils.showWizardDialog('Add Freezer Storage', [{
-      name: 'Shelf',
-      handler: function() {
-        var url = '/miso/rest/storagelocations/freezers/' + freezerJson.id + '/shelves';
-        Utils.ajaxWithDialog("Adding Storage", 'POST', url, {}, function(responseData) {
-          window.location.href = '/miso/freezer/' + freezerJson.id;
-        });
-      }
-    }, makeHandler('Stack', [heightField], '/stacks')]);
+    Utils.showWizardDialog('Add Freezer Storage', [makeHandler('Shelf', [barcodeField], '/shelves'),
+        makeHandler('Stack', [heightField, barcodeField], '/stacks')]);
   };
 
   Freezer.addShelfStorage = function(shelf) {
-    Utils.showWizardDialog('Add Shelf Storage', [makeHandler('Rack', [depthField, heightField], '/shelves/' + shelf.id + '/racks'),
-        makeHandler('Stack', [heightField], '/shelves/' + shelf.id + '/stacks'), {
+    Utils.showWizardDialog('Add Shelf Storage', [
+        makeHandler('Rack', [depthField, heightField, barcodeField], '/shelves/' + shelf.id + '/racks'),
+        makeHandler('Stack', [heightField, barcodeField], '/shelves/' + shelf.id + '/stacks'), {
           name: 'Loose Storage',
           handler: function() {
             var url = '/miso/rest/storagelocations/freezers/' + freezerJson.id + '/shelves/' + shelf.id + '/loose';
@@ -158,6 +177,7 @@
         table.append(stackRow);
       }
 
+      $('#editStorageComponentContainer').hide();
       $('#levelTwoStorageContainer').hide();
     }
   }
@@ -177,8 +197,9 @@
     var cell = $('<td>');
     cell.append('<span class="storageComponentLabel">' + shelf.displayLocation + '</span>');
     var button = $('<button type="button" class="ui-state-default storageComponentButton">Add Storage</button>');
-    button.click(function() {
+    button.click(function(event) {
       Freezer.addShelfStorage(shelf);
+      event.stopPropagation();
     });
     cell.append(button);
     cell.append('<div class="clearfix"></div>');
@@ -197,16 +218,25 @@
         addShelfItem(item, cell);
       });
     }
+    cell.click(function(event) {
+      $('#freezerLayoutContainer .selected').removeClass('selected');
+      selectedComponent = shelf;
+      cell.addClass('selected');
+      $('#levelTwoStorageContainer').hide();
+      displayEditStorageComponentControls(shelf);
+    });
     row.append(cell);
     container.append(row);
   }
 
   function addShelfItem(item, shelfCell) {
     var node = $('<div>').addClass('storageNode').text(item.displayLocation);
-    node.click(function() {
+    node.click(function(event) {
       $('#freezerLayoutContainer .selected').removeClass('selected');
+      selectedComponent = item;
       node.addClass('selected');
       displayLevelTwoStorage(item);
+      event.stopPropagation();
     });
     shelfCell.append(node);
   }
@@ -217,17 +247,28 @@
     switch (storage.locationUnit) {
     case 'RACK':
       displayRack(storage);
+      displayEditStorageComponentControls(storage);
       break;
     case 'STACK':
       displayStack(storage);
+      displayEditStorageComponentControls(storage);
       break;
     case 'LOOSE_STORAGE':
       displayLooseStorage(storage);
+      $('#editStorageComponentContainer').hide();
       break;
     default:
       throw 'Unexpected location unit';
     }
+
     $('#levelTwoStorageContainer').show();
+  }
+
+  function displayEditStorageComponentControls(storage) {
+    $('#storageComponentAlias').text(storage.displayLocation);
+    $('#storageComponentId').text(storage.id);
+    $('#storageComponentBarcode').val(storage.identificationBarcode);
+    $('#editStorageComponentContainer').show();
   }
 
   function getLevelTwoNodeSelectFunction(node) {
@@ -262,7 +303,9 @@
       return function() {
         assignBox();
         $('#levelTwoStorageContainer .selected').removeClass('selected');
+        selectedComponent = node.item;
         node.addClass('selected');
+        displayEditStorageComponentControls(node.item);
       };
       break;
     case 'LOOSE_STORAGE':
@@ -281,7 +324,9 @@
         });
         Utils.showWizardDialog('Boxes in ' + node.item.displayLocation, actions);
         $('#levelTwoStorageContainer .selected').removeClass('selected');
+        selectedComponent = node.item;
         node.addClass('selected');
+        $('#editStorageComponentContainer').hide();
       };
       break;
     default:
@@ -403,6 +448,26 @@
       ListUtils.createStaticTable('changelog', ListTarget.changelog, {}, data);
     }).fail(function(response, textStatus, serverStatus) {
       Validate.displayErrors(JSON.parse(response.responseText));
+    });
+  }
+
+  function saveComponent() {
+    var component = {};
+    for ( var prop in selectedComponent) {
+      component[prop] = selectedComponent[prop];
+    }
+    component.identificationBarcode = $('#storageComponentBarcode').val();
+
+    $.ajax({
+      url: '/miso/rest/storagelocations/' + component.id,
+      type: 'PUT',
+      dataType: 'json',
+      contentType: 'application/json; charset=utf8',
+      data: JSON.stringify(component)
+    }).success(function() {
+      window.location.href = '/miso/freezer/' + freezerJson.id;
+    }).fail(function(response, textStatus, serverStatus) {
+      Validate.displayErrors(JSON.parse(response.responseText), '#freezerComponent-form');
     });
   }
 
