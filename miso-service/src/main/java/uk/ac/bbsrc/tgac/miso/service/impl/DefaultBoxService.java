@@ -368,20 +368,20 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   }
 
   private void logStorageChange(Box box, Box original) throws IOException {
-    if (original.getStorageLocation() == null && box.getStorageLocation() == null) {
-      return;
-    } else if (original.getStorageLocation() == null && box.getStorageLocation() != null) {
+    if (original.getStorageLocation() == null && box.getStorageLocation() != null) {
       addStorageChangeLog(getFreezer(box), box, true);
     } else if (original.getStorageLocation() != null && box.getStorageLocation() == null) {
       addStorageChangeLog(getFreezer(original), box, false);
-    } else if (getFreezer(original).getId() != getFreezer(box).getId()) {
-      addStorageChangeLog(getFreezer(original), box, false);
-      addStorageChangeLog(getFreezer(box), box, true);
-    } else if (original.getStorageLocation().getId() != box.getStorageLocation().getId()) {
-      String message = String.format("Relocated %s (%s) from %s to %s", box.getAlias(), box.getName(),
-          original.getStorageLocation().getFreezerDisplayLocation(), box.getStorageLocation().getFreezerDisplayLocation());
-      ChangeLog change = getFreezer(box).createChangeLog(message, "", authorizationManager.getCurrentUser());
-      changeLogService.create(change);
+    } else if (original.getStorageLocation() != null && box.getStorageLocation() != null) {
+      if (getFreezer(original).getId() != getFreezer(box).getId()) {
+        addStorageChangeLog(getFreezer(original), box, false);
+        addStorageChangeLog(getFreezer(box), box, true);
+      } else if (original.getStorageLocation().getId() != box.getStorageLocation().getId()) {
+        String message = String.format("Relocated %s (%s) from %s to %s", box.getAlias(), box.getName(),
+            original.getStorageLocation().getFreezerDisplayLocation(), box.getStorageLocation().getFreezerDisplayLocation());
+        ChangeLog change = getFreezer(box).createChangeLog(message, "", authorizationManager.getCurrentUser());
+        changeLogService.create(change);
+      }
     }
   }
 

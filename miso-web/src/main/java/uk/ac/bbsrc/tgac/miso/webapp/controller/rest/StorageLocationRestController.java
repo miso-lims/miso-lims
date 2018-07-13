@@ -87,9 +87,11 @@ public class StorageLocationRestController extends RestController {
   @PostMapping(value = "/freezers/{id}/shelves")
   public @ResponseBody StorageLocationDto addFreezerShelf(@PathVariable(name = "id", required = true) long id) throws IOException {
     StorageLocation freezer = getFreezer(id);
-    int lastShelf = freezer.getChildLocations().stream().filter(loc -> {
-      return loc.getLocationUnit() == LocationUnit.SHELF;
-    }).map(StorageLocation::getAlias).mapToInt(Integer::parseInt).max().orElse(0);
+    int lastShelf = freezer.getChildLocations().stream()
+        .filter(loc -> loc.getLocationUnit() == LocationUnit.SHELF)
+        .map(StorageLocation::getAlias)
+        .mapToInt(Integer::parseInt)
+        .max().orElse(0);
 
     StorageLocation shelf = new StorageLocation();
     shelf.setAlias(Integer.toString(lastShelf + 1));
@@ -215,8 +217,7 @@ public class StorageLocationRestController extends RestController {
   }
 
   @GetMapping(value = "/freezers/{freezerId}/changelog")
-  public @ResponseBody List<ChangeLogDto> getFreezerChangelog(@PathVariable(name = "freezerId", required = true) long freezerId)
-      throws IOException {
+  public @ResponseBody List<ChangeLogDto> getFreezerChangelog(@PathVariable(name = "freezerId", required = true) long freezerId) {
     StorageLocation freezer = storageLocationService.get(freezerId);
     if (freezer == null) {
       throw new RestException("Freezer not found", Status.NOT_FOUND);

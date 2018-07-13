@@ -52,7 +52,9 @@
     Freezer.addRoomWithCallback(function() {
       Utils.showOkDialog('Room created', []);
     });
-  }, Freezer.addRoomWithCallback = function(callback) {
+  };
+
+  Freezer.addRoomWithCallback = function(callback) {
     var fields = [{
       type: 'text',
       label: 'Alias',
@@ -347,7 +349,7 @@
     var table = $('#levelTwoStorageLayout');
     var row = $('<tr>');
     var cell = $('<td>');
-    for (box in storage.boxes) {
+    for ( var box in storage.boxes) {
       cell.append(document.createTextNode(storage.boxes[box].alias)).append('<br/>');
     }
     cell.append(document.createTextNode('(Unorganized Space)'));
