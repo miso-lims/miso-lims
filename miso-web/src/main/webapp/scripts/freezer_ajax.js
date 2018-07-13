@@ -111,7 +111,8 @@
   Freezer.addShelfStorage = function(shelf) {
     Utils.showWizardDialog('Add Shelf Storage', [
         makeHandler('Rack', [depthField, heightField, barcodeField], '/shelves/' + shelf.id + '/racks'),
-        makeHandler('Stack', [heightField, barcodeField], '/shelves/' + shelf.id + '/stacks'), {
+        makeHandler('Stack', [heightField, barcodeField], '/shelves/' + shelf.id + '/stacks'),
+        makeHandler('Tray Rack', [heightField, barcodeField], '/shelves/' + shelf.id + '/tray-racks'), {
           name: 'Loose Storage',
           handler: function() {
             var url = '/miso/rest/storagelocations/freezers/' + freezerJson.id + '/shelves/' + shelf.id + '/loose';
@@ -205,8 +206,10 @@
     cell.append('<div class="clearfix"></div>');
     if (shelf.childLocations) {
       var shelfItems = shelf.childLocations.filter(function(location) {
-        return location.locationUnit === 'RACK';
+        return location.locationUnit === 'TRAY_RACK';
       }).sort(compareLocations).concat(shelf.childLocations.filter(function(location) {
+        return location.locationUnit === 'RACK';
+      }).sort(compareLocations)).concat(shelf.childLocations.filter(function(location) {
         return location.locationUnit === 'STACK';
       }).sort(compareLocations)).concat(shelf.childLocations.filter(function(location) {
         return location.locationUnit === 'LOOSE_STORAGE';
@@ -256,6 +259,10 @@
     case 'LOOSE_STORAGE':
       displayLooseStorage(storage);
       $('#editStorageComponentContainer').hide();
+      break;
+    case 'TRAY_RACK':
+      displayTrayRack(storage);
+      displayEditStorageComponentControls(storage);
       break;
     default:
       throw 'Unexpected location unit';
@@ -309,29 +316,59 @@
       };
       break;
     case 'LOOSE_STORAGE':
-      return function() {
-        var actions = node.item.boxes.map(function(box) {
-          return {
-            name: "View " + box.alias,
-            handler: function() {
-              window.location = window.location.origin + '/miso/box/' + box.id;
-            }
-          };
-        });
-        actions.unshift({
-          name: "Add Box to Storage",
-          handler: assignBox
-        });
-        Utils.showWizardDialog('Boxes in ' + node.item.displayLocation, actions);
-        $('#levelTwoStorageContainer .selected').removeClass('selected');
-        selectedComponent = node.item;
-        node.addClass('selected');
-        $('#editStorageComponentContainer').hide();
-      };
+      return getUnorganizedStorageSelectFunction(node, false, assignBox);
       break;
+    case 'TRAY':
+      return getUnorganizedStorageSelectFunction(node, true, assignBox);
     default:
       throw 'Unexpected box location';
     }
+  }
+
+  function getUnorganizedStorageSelectFunction(node, allowEdit, assignBoxFunction) {
+    return function() {
+      var actions = node.item.boxes.map(function(box) {
+        return {
+          name: "View " + box.alias,
+          handler: function() {
+            window.location = window.location.origin + '/miso/box/' + box.id;
+          }
+        };
+      });
+      actions.unshift({
+        name: "Add Box to Storage",
+        handler: assignBoxFunction
+      });
+      Utils.showWizardDialog('Boxes in ' + node.item.displayLocation, actions);
+      $('#levelTwoStorageContainer .selected').removeClass('selected');
+      selectedComponent = node.item;
+      node.addClass('selected');
+      if (allowEdit) {
+        displayEditStorageComponentControls(node.item);
+      } else {
+        $('#editStorageComponentContainer').hide();
+      }
+    };
+  }
+
+  function displayTrayRack(rack) {
+    var table = $('#levelTwoStorageLayout');
+    rack.childLocations.sort(compareLocations).forEach(function(tray) {
+      if (tray.locationUnit != 'TRAY') {
+        throw 'Unexpected location unit';
+      }
+      var row = $('<tr>');
+      var cell = $('<td>');
+      cell.append(document.createTextNode(tray.displayLocation)).append('<br/>');
+      for ( var box in tray.boxes) {
+        cell.append(document.createTextNode(tray.boxes[box].alias)).append('<br/>');
+      }
+      cell.append(document.createTextNode('(Unorganized Space)'));
+      cell.item = tray;
+      cell.click(getLevelTwoNodeSelectFunction(cell));
+      row.append(cell);
+      table.append(row);
+    });
   }
 
   function displayRack(rack) {

@@ -204,6 +204,22 @@ public class StorageLocationRestController extends RestController {
     return doSave(rack);
   }
 
+  @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/tray-racks")
+  public @ResponseBody StorageLocationDto addShelfTrayRack(@PathVariable(name = "freezerId", required = true) long freezerId,
+      @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "height", required = true) int height,
+      @RequestParam(name = "identificationBarcode", required = false) String barcode) {
+    StorageLocation freezer = getFreezer(freezerId);
+    StorageLocation shelf = getShelf(freezer, shelfId);
+    if (height < 1) {
+      throw new RestException("Invalid rack height", Status.BAD_REQUEST);
+    }
+    StorageLocation trayRack = makeStorage(findNextNumber(shelf, LocationUnit.TRAY_RACK), LocationUnit.TRAY_RACK, shelf, barcode);
+    for (int i = 0; i < height; i++) {
+      makeStorage(Integer.toString(i + 1), LocationUnit.TRAY, trayRack, null);
+    }
+    return doSave(trayRack);
+  }
+
   @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/loose")
   public @ResponseBody StorageLocationDto addShelfLooseStorage(@PathVariable(name = "freezerId", required = true) long freezerId,
       @PathVariable(name = "shelfId", required = true) long shelfId,
