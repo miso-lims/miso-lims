@@ -375,11 +375,11 @@
 <h2>Details</h2>
 <table class="in">
   <tr>
-    <td class="h">Upstream Group ID:</td>
+    <td class="h">Effective Group ID:</td>
     <td id="effectiveGroupId">
       <c:choose>
       <c:when test="${empty effectiveGroupId}">(None)</c:when>
-      <c:otherwise>${effectiveGroupId}</c:otherwise>
+      <c:otherwise>${effectiveGroupId} (${effectiveGroupIdSample})</c:otherwise>
       </c:choose>
     </td>
   </tr>
