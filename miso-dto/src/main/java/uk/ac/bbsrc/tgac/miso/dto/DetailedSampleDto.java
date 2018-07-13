@@ -25,6 +25,7 @@ public class DetailedSampleDto extends SampleDto {
   private boolean nonStandardAlias;
   private Long identityId;
   private String identityConsentLevel;
+  private String externalNames;
   private String effectiveGroupId;
   private String effectiveGroupIdSample;
   private String creationDate;
@@ -214,6 +215,14 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setCreationDate(String creationDate) {
     this.creationDate = creationDate;
+  }
+
+ public String getExternalNames() {
+    return externalNames;
+  }
+
+  public void setExternalNames(String externalNames) {
+    this.externalNames = externalNames;
   }
 
 }

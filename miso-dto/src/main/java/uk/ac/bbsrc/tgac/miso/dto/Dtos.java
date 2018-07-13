@@ -430,6 +430,13 @@ public class Dtos {
     }
     to.setNonStandardAlias(from.getNonStandardAlias());
     to.setParent(getParent(from));
+    if (!LimsUtils.isStringEmptyOrNull(from.getExternalNames()) && to.getParent() != null) {
+      SampleIdentity identity = LimsUtils.getParent(SampleIdentity.class, to);
+      if (identity == null) {
+        throw new IllegalStateException("Missing Identity at root of hierarchy");
+      }
+      identity.setExternalName(from.getExternalNames());
+    }
     return to;
   }
 

@@ -1963,6 +1963,10 @@ button.disabled {
   background-color: #F0F0FF;
 }
 
+.handsontable td.notification {
+  background-color: #FDEABC;
+}
+
 /* fix for autocomplete menus being hidden when they extend beyond the table */
 .handsontableEditor.autocompleteEditor, .handsontableEditor.autocompleteEditor .ht_master .wtHolder {
   min-height: 138px;
