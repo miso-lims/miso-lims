@@ -2,8 +2,8 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -60,11 +60,7 @@ public class SampleIdentityImpl extends DetailedSampleImpl implements SampleIden
    * @return Set<String> external name(s) set
    */
   public static Set<String> getSetFromString(String externalNameString) {
-    Set<String> externalNames = new HashSet<String>();
-    for (String part : externalNameString.split(",")) {
-      externalNames.add(part.trim().replaceAll("\\s+", " "));
-    }
-    return externalNames;
+    return COMMA.splitAsStream(externalNameString).map(part -> part.trim().replaceAll("\\s+", " ")).collect(Collectors.toSet());
   }
 
   @Override
