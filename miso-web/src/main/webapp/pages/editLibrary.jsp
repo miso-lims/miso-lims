@@ -375,6 +375,15 @@
 <h2>Details</h2>
 <table class="in">
   <tr>
+    <td class="h">Effective Group ID:</td>
+    <td id="effectiveGroupId">
+      <c:choose>
+      <c:when test="${empty effectiveGroupId}">(None)</c:when>
+      <c:otherwise>${effectiveGroupId} (${effectiveGroupIdSample})</c:otherwise>
+      </c:choose>
+    </td>
+  </tr>
+  <tr>
     <td class="h">Group ID:</td>
     <td>
       <form:input id="groupId" path="groupId"/>

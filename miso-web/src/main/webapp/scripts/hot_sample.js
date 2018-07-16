@@ -397,6 +397,23 @@ HotTarget.sample = (function() {
             },
             include: Constants.isDetailedSample
           },
+          {
+            header: 'Effective Group ID',
+            data: 'effectiveGroupId',
+            include: Constants.isDetailedSample && config.targetSampleClass.alias != 'Identity' && !config.isLibraryReceipt && !config.create,
+            type: 'text',
+            readOnly: true,
+            depends: 'groupId',
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              if (flatProperty === 'groupId') setData(flat.groupId);
+            },
+            unpack: function(sam, flat, setCellMeta) {
+              flat.effectiveGroupId = sam.effectiveGroupId ? sam.effectiveGroupId : '(None)';
+            },
+            pack: function(sam, flat, errorHandler) {
+              // left blank as this will never be deserialized into the Sample model
+            }
+          },
           HotUtils.makeColumnForText('Group ID', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupId', {
             validator: HotUtils.validator.optionalTextAlphanumeric
           }),
