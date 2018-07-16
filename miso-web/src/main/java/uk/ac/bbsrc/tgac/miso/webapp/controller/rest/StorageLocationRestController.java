@@ -207,7 +207,7 @@ public class StorageLocationRestController extends RestController {
   @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/tray-racks")
   public @ResponseBody StorageLocationDto addShelfTrayRack(@PathVariable(name = "freezerId", required = true) long freezerId,
       @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "height", required = true) int height,
-      @RequestParam(name = "identificationBarcode", required = false) String barcode) {
+      @RequestParam(name = "identificationBarcode", required = false) String barcode) throws IOException {
     StorageLocation freezer = getFreezer(freezerId);
     StorageLocation shelf = getShelf(freezer, shelfId);
     if (height < 1) {
