@@ -118,13 +118,14 @@ public class StorageLocationRestController extends RestController {
   @PostMapping(value = "/freezers/{id}/stacks")
   public @ResponseBody StorageLocationDto addFreezerStack(@PathVariable(name = "id", required = true) long id,
       @RequestParam(name = "height", required = true) int height,
-      @RequestParam(name = "identificationBarcode", required = false) String barcode) throws IOException {
+      @RequestParam(name = "identificationBarcode", required = false) String barcode, @RequestBody List<String> childBarcodes)
+      throws IOException {
     StorageLocation freezer = getFreezer(id);
     if (height < 1) {
       throw new RestException("Invalid stack height", Status.BAD_REQUEST);
     }
 
-    return createStack(freezer, height, barcode);
+    return createStack(freezer, height, barcode, childBarcodes);
   }
 
   @PostMapping(value = "/rooms")
@@ -154,11 +155,12 @@ public class StorageLocationRestController extends RestController {
     }).map(StorageLocation::getAlias).mapToInt(Integer::parseInt).max().orElse(0) + 1);
   }
 
-  private StorageLocationDto createStack(StorageLocation parent, int height, String barcode) throws IOException {
+  private StorageLocationDto createStack(StorageLocation parent, int height, String barcode, List<String> childBarcodes)
+      throws IOException {
     String stackNumber = findNextNumber(parent, LocationUnit.STACK);
     StorageLocation stack = makeStorage(stackNumber, LocationUnit.STACK, parent, barcode);
-    for (int i = 0; i < height; i++) {
-      makeStorage(Integer.toString(i + 1), LocationUnit.STACK_POSITION, stack, null);
+    for (int i = 1; i <= height; i++) {
+      makeStorage(Integer.toString(i), LocationUnit.STACK_POSITION, stack, childBarcodes.get(i - 1));
     }
     return doSave(stack);
   }
@@ -172,20 +174,22 @@ public class StorageLocationRestController extends RestController {
   @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/stacks")
   public @ResponseBody StorageLocationDto addShelfStack(@PathVariable(name = "freezerId", required = true) long freezerId,
       @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "height", required = true) int height,
-      @RequestParam(name = "identificationBarcode", required = false) String barcode) throws IOException {
+      @RequestParam(name = "identificationBarcode", required = false) String barcode, @RequestBody List<String> childBarcodes)
+      throws IOException {
     StorageLocation freezer = getFreezer(freezerId);
     StorageLocation shelf = getShelf(freezer, shelfId);
     if (height < 1) {
       throw new RestException("Invalid stack height", Status.BAD_REQUEST);
     }
-    return createStack(shelf, height, barcode);
+    return createStack(shelf, height, barcode, childBarcodes);
   }
 
   @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/racks")
   public @ResponseBody StorageLocationDto addShelfRack(@PathVariable(name = "freezerId", required = true) long freezerId,
       @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "depth", required = true) int depth,
       @RequestParam(name = "height", required = true) int height,
-      @RequestParam(name = "identificationBarcode", required = false) String barcode) throws IOException {
+      @RequestParam(name = "identificationBarcode", required = false) String barcode, @RequestBody List<String> childBarcodes)
+      throws IOException {
     StorageLocation freezer = getFreezer(freezerId);
     StorageLocation shelf = getShelf(freezer, shelfId);
     if (height < 1) {
@@ -195,13 +199,31 @@ public class StorageLocationRestController extends RestController {
       throw new RestException("Invalid rack depth", Status.BAD_REQUEST);
     }
     StorageLocation rack = makeStorage(findNextNumber(shelf, LocationUnit.RACK), LocationUnit.RACK, shelf, barcode);
-    for (int i = 0; i < depth; i++) {
-      StorageLocation stack = makeStorage(Integer.toString(i + 1), LocationUnit.STACK, rack, null);
-      for (int j = 0; j < height; j++) {
-        makeStorage(Integer.toString(j + 1), LocationUnit.STACK_POSITION, stack, null);
+    for (int i = 1; i <= depth; i++) {
+      StorageLocation stack = makeStorage(Integer.toString(i), LocationUnit.STACK, rack, null);
+      for (int j = 1; j <= height; j++) {
+        int barcodeNum = (i - 1) * height + j - 1;
+        makeStorage(Integer.toString(j), LocationUnit.STACK_POSITION, stack, childBarcodes.get(barcodeNum));
       }
     }
     return doSave(rack);
+  }
+
+  @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/tray-racks")
+  public @ResponseBody StorageLocationDto addShelfTrayRack(@PathVariable(name = "freezerId", required = true) long freezerId,
+      @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "height", required = true) int height,
+      @RequestParam(name = "identificationBarcode", required = false) String barcode, @RequestBody List<String> childBarcodes)
+      throws IOException {
+    StorageLocation freezer = getFreezer(freezerId);
+    StorageLocation shelf = getShelf(freezer, shelfId);
+    if (height < 1) {
+      throw new RestException("Invalid rack height", Status.BAD_REQUEST);
+    }
+    StorageLocation trayRack = makeStorage(findNextNumber(shelf, LocationUnit.TRAY_RACK), LocationUnit.TRAY_RACK, shelf, barcode);
+    for (int i = 1; i <= height; i++) {
+      makeStorage(Integer.toString(i), LocationUnit.TRAY, trayRack, childBarcodes.get(i - 1));
+    }
+    return doSave(trayRack);
   }
 
   @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/loose")

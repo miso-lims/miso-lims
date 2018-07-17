@@ -5,7 +5,7 @@
 
   var heightField = {
     type: 'int',
-    label: 'Height (boxes)',
+    label: 'Height (rows)',
     property: 'height',
     required: true
   };
@@ -105,13 +105,14 @@
 
   Freezer.addFreezerStorage = function() {
     Utils.showWizardDialog('Add Freezer Storage', [makeHandler('Shelf', [barcodeField], '/shelves'),
-        makeHandler('Stack', [heightField, barcodeField], '/stacks')]);
+        makeHandler('Stack', [heightField, barcodeField], '/stacks', getStackChildLabels)]);
   };
 
   Freezer.addShelfStorage = function(shelf) {
     Utils.showWizardDialog('Add Shelf Storage', [
-        makeHandler('Rack', [depthField, heightField, barcodeField], '/shelves/' + shelf.id + '/racks'),
-        makeHandler('Stack', [heightField, barcodeField], '/shelves/' + shelf.id + '/stacks'), {
+        makeHandler('Rack', [depthField, heightField, barcodeField], '/shelves/' + shelf.id + '/racks', getRackChildLabels),
+        makeHandler('Stack', [heightField, barcodeField], '/shelves/' + shelf.id + '/stacks', getStackChildLabels),
+        makeHandler('Tray Rack', [heightField, barcodeField], '/shelves/' + shelf.id + '/tray-racks', getTrayRackChildLabels), {
           name: 'Loose Storage',
           handler: function() {
             var url = '/miso/rest/storagelocations/freezers/' + freezerJson.id + '/shelves/' + shelf.id + '/loose';
@@ -122,7 +123,7 @@
         }]);
   };
 
-  function makeHandler(name, fields, relativeUrl) {
+  function makeHandler(name, fields, relativeUrl, getChildBarcodeLabelsFunction) {
     return {
       name: name,
       handler: function() {
@@ -132,12 +133,79 @@
             params[field.property] = output[field.property];
           });
           var url = '/miso/rest/storagelocations/freezers/' + freezerJson.id + relativeUrl + '?' + $.param(params);
-          Utils.ajaxWithDialog("Adding Storage", 'POST', url, {}, function(responseData) {
-            window.location.href = '/miso/freezer/' + freezerJson.id;
-          });
+          var data = [];
+          var submitFunction = function() {
+            Utils.ajaxWithDialog("Adding Storage", 'POST', url, data, function(responseData) {
+              window.location.href = '/miso/freezer/' + freezerJson.id;
+            });
+          };
+          if (getChildBarcodeLabelsFunction) {
+            var childBarcodeLabels = getChildBarcodeLabelsFunction(output);
+            var childBarcodeFields = [];
+            for (var i = 0; i < childBarcodeLabels.length; i++) {
+              childBarcodeFields.push({
+                type: 'text',
+                label: childBarcodeLabels[i] + ' barcode',
+                property: 'childBarcode' + i,
+                required: false
+              });
+            }
+            Utils.showDialog('Add ' + name + ' - Barcodes', 'OK', childBarcodeFields, function(output) {
+              for ( var key in output) {
+                data.push(output[key]);
+              }
+              submitFunction();
+            });
+          } else {
+            submitFunction();
+          }
         });
       }
     }
+  }
+
+  function getStackChildLabels(output) {
+    var labels = [];
+    for (var i = 1; i <= output.height; i++) {
+      var label = 'Slot ' + i;
+      if (i === 1) {
+        label += ' (bottom)';
+      } else if (i === output.height) {
+        label += ' (top)';
+      }
+      labels.push(label);
+    }
+    return labels;
+  }
+
+  function getRackChildLabels(output) {
+    var labels = [];
+    for (var stack = 1; stack <= output.depth; stack++) {
+      for (var slot = 1; slot <= output.height; slot++) {
+        var label = 'Stack ' + stack + ', Slot ' + slot;
+        if (stack === 1 && slot === 1) {
+          label += ' (front bottom)';
+        } else if (stack === output.depth && slot === output.height) {
+          label += ' (back top)';
+        }
+        labels.push(label);
+      }
+    }
+    return labels;
+  }
+
+  function getTrayRackChildLabels(output) {
+    var labels = [];
+    for (var i = 1; i <= output.height; i++) {
+      var label = 'Tray ' + i;
+      if (i === 1) {
+        label += ' (top)';
+      } else if (i === output.height) {
+        label += ' (bottom)';
+      }
+      labels.push(label);
+    }
+    return labels;
   }
 
   function updatePage() {
@@ -205,8 +273,10 @@
     cell.append('<div class="clearfix"></div>');
     if (shelf.childLocations) {
       var shelfItems = shelf.childLocations.filter(function(location) {
-        return location.locationUnit === 'RACK';
+        return location.locationUnit === 'TRAY_RACK';
       }).sort(compareLocations).concat(shelf.childLocations.filter(function(location) {
+        return location.locationUnit === 'RACK';
+      }).sort(compareLocations)).concat(shelf.childLocations.filter(function(location) {
         return location.locationUnit === 'STACK';
       }).sort(compareLocations)).concat(shelf.childLocations.filter(function(location) {
         return location.locationUnit === 'LOOSE_STORAGE';
@@ -256,6 +326,10 @@
     case 'LOOSE_STORAGE':
       displayLooseStorage(storage);
       $('#editStorageComponentContainer').hide();
+      break;
+    case 'TRAY_RACK':
+      displayTrayRack(storage);
+      displayEditStorageComponentControls(storage);
       break;
     default:
       throw 'Unexpected location unit';
@@ -309,29 +383,59 @@
       };
       break;
     case 'LOOSE_STORAGE':
-      return function() {
-        var actions = node.item.boxes.map(function(box) {
-          return {
-            name: "View " + box.alias,
-            handler: function() {
-              window.location = window.location.origin + '/miso/box/' + box.id;
-            }
-          };
-        });
-        actions.unshift({
-          name: "Add Box to Storage",
-          handler: assignBox
-        });
-        Utils.showWizardDialog('Boxes in ' + node.item.displayLocation, actions);
-        $('#levelTwoStorageContainer .selected').removeClass('selected');
-        selectedComponent = node.item;
-        node.addClass('selected');
-        $('#editStorageComponentContainer').hide();
-      };
+      return getUnorganizedStorageSelectFunction(node, false, assignBox);
       break;
+    case 'TRAY':
+      return getUnorganizedStorageSelectFunction(node, true, assignBox);
     default:
       throw 'Unexpected box location';
     }
+  }
+
+  function getUnorganizedStorageSelectFunction(node, allowEdit, assignBoxFunction) {
+    return function() {
+      var actions = node.item.boxes.map(function(box) {
+        return {
+          name: "View " + box.alias,
+          handler: function() {
+            window.location = window.location.origin + '/miso/box/' + box.id;
+          }
+        };
+      });
+      actions.unshift({
+        name: "Add Box to Storage",
+        handler: assignBoxFunction
+      });
+      Utils.showWizardDialog('Boxes in ' + node.item.displayLocation, actions);
+      $('#levelTwoStorageContainer .selected').removeClass('selected');
+      selectedComponent = node.item;
+      node.addClass('selected');
+      if (allowEdit) {
+        displayEditStorageComponentControls(node.item);
+      } else {
+        $('#editStorageComponentContainer').hide();
+      }
+    };
+  }
+
+  function displayTrayRack(rack) {
+    var table = $('#levelTwoStorageLayout');
+    rack.childLocations.sort(compareLocations).forEach(function(tray) {
+      if (tray.locationUnit != 'TRAY') {
+        throw 'Unexpected location unit';
+      }
+      var row = $('<tr>');
+      var cell = $('<td>');
+      cell.append(document.createTextNode(tray.displayLocation)).append('<br/>');
+      for ( var box in tray.boxes) {
+        cell.append(document.createTextNode(tray.boxes[box].alias)).append('<br/>');
+      }
+      cell.append(document.createTextNode('(Unorganized Space)'));
+      cell.item = tray;
+      cell.click(getLevelTwoNodeSelectFunction(cell));
+      row.append(cell);
+      table.append(row);
+    });
   }
 
   function displayRack(rack) {

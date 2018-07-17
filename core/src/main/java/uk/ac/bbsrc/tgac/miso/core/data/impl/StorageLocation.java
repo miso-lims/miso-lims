@@ -49,7 +49,9 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
     RACK("Rack", Sets.newHashSet(SHELF), BoxStorageAmount.NONE),
     STACK("Stack", Sets.newHashSet(FREEZER, SHELF, RACK), BoxStorageAmount.NONE),
     STACK_POSITION("Slot", Sets.newHashSet(STACK), BoxStorageAmount.SINGLE),
-    LOOSE_STORAGE("Loose Storage", Sets.newHashSet(SHELF), BoxStorageAmount.MULTIPLE);
+    LOOSE_STORAGE("Loose Storage", Sets.newHashSet(SHELF), BoxStorageAmount.MULTIPLE),
+    TRAY_RACK("Tray Rack", Sets.newHashSet(SHELF), BoxStorageAmount.NONE),
+    TRAY("Tray", Sets.newHashSet(TRAY_RACK), BoxStorageAmount.MULTIPLE);
 
     private final String displayName;
     private final Set<LocationUnit> parents;
