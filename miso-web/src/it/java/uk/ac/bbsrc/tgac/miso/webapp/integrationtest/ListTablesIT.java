@@ -32,8 +32,8 @@ public class ListTablesIT extends AbstractIT {
   private static final Set<String> samplesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.SAMPLE_CLASS,
       Columns.SAMPLE_TYPE, Columns.QC_PASSED, Columns.LOCATION, Columns.CREATION_DATE, Columns.LAST_MODIFIED);
   private static final Set<String> librariesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
-      Columns.SAMPLE_NAME,
-      Columns.SAMPLE_ALIAS, Columns.QC_PASSED, Columns.INDEX, Columns.LOCATION, Columns.LAST_MODIFIED);
+      Columns.SAMPLE_NAME, Columns.SAMPLE_ALIAS, Columns.QC_PASSED, Columns.INDEX, Columns.LOCATION, Columns.LAST_MODIFIED,
+      Columns.WARNINGS);
   private static final Set<String> dilutionsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.LIBRARY_NAME,
       Columns.LIBRARY_ALIAS, Columns.MATRIX_BARCODE, Columns.PLATFORM, Columns.TARGETED_SEQUENCING, Columns.DIL_CONCENTRATION,
       Columns.CONCENTRATION_UNITS, Columns.VOLUME, Columns.NG_USED, Columns.VOLUME_USED, Columns.CREATOR, Columns.CREATION_DATE);
@@ -268,6 +268,11 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
+  public void testListLibrariesWarnings() throws Exception {
+    testWarningNormal(ListTarget.LIBRARIES, "LIB901", "(NEGATIVE VOLUME)", Columns.WARNINGS);
+  }
+
+  @Test
   public void testListDilutionsPageSetup() throws Exception {
     // Goal: ensure all expected columns are present and no extra
     testPageSetup(ListTarget.DILUTIONS, dilutionsColumns);
@@ -309,10 +314,10 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListPoolsWarnings() throws Exception {
-    testWarning(ListTarget.POOLS, "no indices", "(MISSING INDEX)");
-    testWarning(ListTarget.POOLS, "similar index", "(NEAR-DUPLICATE INDICES)");
-    testWarning(ListTarget.POOLS, "same index", "(DUPLICATE INDICES)");
-    testWarning(ListTarget.POOLS, "low quality library", "(LOW QUALITY LIBRARIES)");
+    testWarningTabbed(ListTarget.POOLS, "no indices", "(MISSING INDEX)", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.POOLS, "similar index", "(NEAR-DUPLICATE INDICES)", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.POOLS, "same index", "(DUPLICATE INDICES)", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.POOLS, "low quality library", "(LOW QUALITY LIBRARIES)", Columns.DESCRIPTION);
   }
 
   @Test
@@ -357,10 +362,10 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListOrdersWarnings() throws Exception {
-    testWarning(ListTarget.ORDERS_ALL, "no indices", "(MISSING INDEX)");
-    testWarning(ListTarget.ORDERS_ALL, "similar index", "(NEAR-DUPLICATE INDICES)");
-    testWarning(ListTarget.ORDERS_ALL, "same index", "(DUPLICATE INDICES)");
-    testWarning(ListTarget.ORDERS_ALL, "low quality library", "(LOW QUALITY LIBRARIES)");
+    testWarningTabbed(ListTarget.ORDERS_ALL, "no indices", "(MISSING INDEX)", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.ORDERS_ALL, "similar index", "(NEAR-DUPLICATE INDICES)", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.ORDERS_ALL, "same index", "(DUPLICATE INDICES)", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.ORDERS_ALL, "low quality library", "(LOW QUALITY LIBRARIES)", Columns.DESCRIPTION);
   }
 
   @Test
@@ -644,12 +649,20 @@ public class ListTablesIT extends AbstractIT {
     }
   }
 
-  private void testWarning(String target, String query, String warning) {
+  private void testWarningNormal(String target, String query, String warning, String column) {
+    ListPage page = getList(target);
+    DataTable table = page.getTable();
+    table.searchFor(query);
+    assertTrue(String.format("'%s' column does not contain '%s' warning", column, warning),
+        table.doesColumnContainSubstring(column, warning));
+  }
+
+  private void testWarningTabbed(String target, String query, String warning, String column) {
     ListTabbedPage page = getTabbedList(target);
     DataTable table = page.getTable();
     table.searchFor(query);
-    assertTrue("Description column does not have warning '" + warning + "'",
-        table.doesColumnContainSubstring(Columns.DESCRIPTION, warning));
+    assertTrue(String.format("'%s' column does not contain '%s' warning", column, warning),
+        table.doesColumnContainSubstring(column, warning));
   }
 
   private int compareFirstTwoNonMatchingValues(DataTable table, String heading) {
