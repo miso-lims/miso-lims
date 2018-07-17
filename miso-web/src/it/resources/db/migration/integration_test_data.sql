@@ -628,6 +628,20 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0),
   (701, 'LIB701', 'TIB_0001_nn_n_PE_701_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0),
+  (801, 'LIB801', 'TIB_0001_nn_n_PE_801_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0),
+  (802, 'LIB802', 'TIB_0001_nn_n_PE_802_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0),
+  (803, 'LIB803', 'TIB_0001_nn_n_PE_803_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0),
+  (804, 'LIB804', 'TIB_0001_nn_n_PE_804_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 60, NULL, NULL, 1, 0),
+  (805, 'LIB805', 'TIB_0001_nn_n_PE_805_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 1, NULL, NULL, 1, 0),
+  (806, 'LIB806', 'TIB_0001_nn_n_PE_806_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 60, NULL, NULL, 1, 0),
+  (807, 'LIB807', 'TIB_0001_nn_n_PE_807_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 60, NULL, NULL, 1, 0),
   (901, 'LIB901', 'TIB_0001_nn_n_PE_901_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, -30, NULL, NULL, 1, 0);
 
@@ -710,7 +724,11 @@ INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId,
 
 INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, lastModifier, lastUpdated, volumeUsed) VALUES
 (901, 'LDI901', 4.3, 504, 'auto_calculate_pool_1', '2018-07-12', 'admin', 1, 1, '2018-07-12 09:43:00', 14.7),
-(902, 'LDI902', 1.7, 504, 'auto_calculate_pool_2', '2018-07-12', 'admin', 1, 1, '2018-07-12 09:43:00', 21.3);
+(902, 'LDI902', 1.7, 504, 'auto_calculate_pool_2', '2018-07-12', 'admin', 1, 1, '2018-07-12 09:43:00', 21.3),
+(1001, 'LDI1001', 1.7, 804, 'edit_volumeused_1', '2018-07-12', 'admin', 1, 1, '2018-07-12 09:43:00', 40),
+(1002, 'LDI1002', 1.7, 805, 'edit_volumeused_2', '2018-07-12', 'admin', 1, 1, '2018-07-12 09:43:00', NULL),
+(1003, 'LDI1003', 1.7, 806, 'edit_volumeused_3', '2018-07-12', 'admin', 1, 1, '2018-07-12 09:43:00', 40),
+(1004, 'LDI1004', 1.7, 807, 'edit_volumeused_4', '2018-07-12', 'admin', 1, 1, '2018-07-12 09:43:00', 40);
 
 INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
 (1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 2, 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL),
