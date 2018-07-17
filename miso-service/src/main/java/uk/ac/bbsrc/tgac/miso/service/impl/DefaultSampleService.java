@@ -820,7 +820,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   @Override
   public Collection<String> listSampleTypes() throws IOException {
-    return sampleStore.listAllSampleTypes();
+    return sampleStore.listSampleTypes();
   }
 
   @Override

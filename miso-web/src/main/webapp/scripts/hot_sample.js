@@ -186,7 +186,28 @@ HotTarget.sample = (function() {
               && (!Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity'), 'identificationBarcode', {
             validator: HotUtils.validator.optionalTextNoSpecialChars
           }),
-          HotUtils.makeColumnForEnum('Sample Type', true, true, 'sampleType', Constants.sampleTypes, null),
+          {
+            'header': 'Sample Type',
+            'data': 'sampleType',
+            'type': 'dropdown',
+            'trimDropdown': false,
+            'source': [],
+            'include': true,
+            'validator': HotUtils.validator.requiredAutocomplete,
+            'unpack': function(obj, flat, setCellMeta) {
+              flat.sampleType = obj.sampleType;
+            },
+            'pack': function(obj, flat, errorHandler) {
+              obj.sampleType = flat.sampleType;
+            },
+            depends: '*start',
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              setOptions({
+                source: (sam.sampleType && Constants.sampleTypes.indexOf(sam.sampleType) === -1) ? Constants.sampleTypes
+                    .concat([sam.sampleType]) : Constants.sampleTypes
+              });
+            }
+          },
           HotUtils.makeColumnForText('Sci. Name', true, 'scientificName', {
             validator: HotUtils.validator.requiredTextNoSpecialChars,
             unpack: function(obj, flat, setCellMeta) {

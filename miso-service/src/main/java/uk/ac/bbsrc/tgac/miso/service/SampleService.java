@@ -52,6 +52,10 @@ public interface SampleService extends PaginatedDataSource<Sample>, BarcodableSe
    */
   Collection<Sample> listByIdList(List<Long> idList) throws IOException;
 
+  /**
+   * @return a List of all non-archived SampleTypes
+   * @throws IOException
+   */
   Collection<String> listSampleTypes() throws IOException;
 
   Map<String, Integer> getSampleColumnSizes() throws IOException;

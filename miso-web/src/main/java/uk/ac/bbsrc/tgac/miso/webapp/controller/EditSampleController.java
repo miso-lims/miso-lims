@@ -689,7 +689,11 @@ public class EditSampleController {
 
       model.put("formObj", sample);
       model.put("sample", sample);
-      model.put("sampleTypes", sampleService.listSampleTypes());
+      Collection<String> sampleTypes = sampleService.listSampleTypes();
+      if (!sampleTypes.contains(sample.getSampleType())) {
+        sampleTypes.add(sample.getSampleType());
+      }
+      model.put("sampleTypes", sampleTypes);
       if (LimsUtils.isDetailedSample(sample) && LimsUtils.getIdentityConsentLevel((DetailedSample) sample) == ConsentLevel.REVOKED) {
         model.put("warning", "Donor has revoked consent");
       }
