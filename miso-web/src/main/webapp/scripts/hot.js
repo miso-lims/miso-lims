@@ -43,17 +43,16 @@ var HotUtils = {
     optionalNumber: function(value, callback) {
       return callback(Utils.validation.isEmpty(value) || Handsontable.helper.isNumeric(value));
     },
-    
+
     /**
      * Custom validator for optional numeric fields
      */
     requiredNumber: function(value, callback) {
-    	if (Utils.validation.isEmpty(value)) {
-    		return callback(false);
-    	}
+      if (Utils.validation.isEmpty(value)) {
+        return callback(false);
+      }
       return callback(Handsontable.helper.isNumeric(value));
     },
-
 
     /**
      * Custom validator for text fields that fails on extra-special characters
@@ -331,16 +330,11 @@ var HotUtils = {
         if (changes[i][2] == changes[i][3] && (changes[i][2] || changes[i][3])) {
           continue;
         }
-        const
-        currentChange = changes[i];
-        const
-        visualRow = currentChange[0];
-        const
-        dataRow = table.toPhysicalRow(currentChange[0]);
-        const
-        flat = flatObjects[dataRow];
-        const
-        obj = data[dataRow];
+        const currentChange = changes[i];
+        const visualRow = currentChange[0];
+        const dataRow = table.toPhysicalRow(currentChange[0]);
+        const flat = flatObjects[dataRow];
+        const obj = data[dataRow];
 
         columns.filter(function(column) {
           return (Array.isArray(column.depends) && column.depends.indexOf(currentChange[1]) > -1) || column.depends == currentChange[1];
@@ -628,16 +622,56 @@ var HotUtils = {
                       });
             });
 
+    var customActions = [{
+      buttonText: "Export",
+      eventHandler: function() {
+        var data = {
+          headers: table.getColHeader(),
+          rows: []
+        };
+
+        for (var row = 0; row < table.countRows(); row++) {
+          data.rows.push(table.getDataAtRow(row));
+        }
+
+        Utils.showDialog('Export Data', 'Export', [{
+          property: 'format',
+          type: 'select',
+          label: 'Format',
+          values: Constants.spreadsheetFormats,
+          getLabel: function(x) {
+            return x.description;
+          }
+        }], function(result) {
+          var request = new XMLHttpRequest(); // xhr because jQuery.ajax doesn't support blob response
+          request.open('POST', '/miso/rest/hot/spreadsheet?format=' + result.format.name);
+          request.responseType = 'blob';
+          request.setRequestHeader('Content-Type', 'application/json; charset=utf8');
+          request.onreadystatechange = function() {
+            if (request.readyState === 4) {
+              if (request.status === 200) {
+                var filename = /filename=(.*)$/.exec(request.getResponseHeader('Content-Disposition'))[1];
+                download(request.response, filename, request.getResponseHeader('Content-Type'));
+              } else {
+                Utils.showOkDialog('Error', ['Download failed.']);
+              }
+            }
+          }
+          request.send(JSON.stringify(data));
+        });
+      }
+    }];
     if (target.hasOwnProperty('getCustomActions')) {
-      target.getCustomActions(table, config).forEach(function(action) {
-        var button = document.createElement('A');
-        button.setAttribute('class', 'ui-button ui-state-default');
-        button.innerText = action.buttonText;
-        button.href = '#';
-        button.addEventListener('click', action.eventHandler);
-        document.getElementById('bulkactions').appendChild(button);
-      });
+      customActions = target.getCustomActions(table, config).concat(customActions);
     }
+    customActions.forEach(function(action) {
+      var button = document.createElement('A');
+      button.setAttribute('class', 'ui-button ui-state-default');
+      button.innerText = action.buttonText;
+      button.href = '#';
+      button.addEventListener('click', action.eventHandler);
+      document.getElementById('bulkactions').appendChild(button);
+    });
 
     if (typeof target.onLoad === 'function') {
       target.onLoad(config, table);
@@ -744,19 +778,21 @@ var HotUtils = {
     };
     return baseobj;
   },
-  
-  makeAutocompleteColumnForConstantsList: function(headerName, include, flatProperty, modelProperty, id, name, items, required, search, getData, baseobj, sortFunc) {
-  	baseobj = HotUtils.makeColumnForConstantsList(headerName, include, flatProperty, modelProperty, id, name, items, required, baseobj, sortFunc);
+
+  makeAutocompleteColumnForConstantsList: function(headerName, include, flatProperty, modelProperty, id, name, items, required, search,
+      getData, baseobj, sortFunc) {
+    baseobj = HotUtils.makeColumnForConstantsList(headerName, include, flatProperty, modelProperty, id, name, items, required, baseobj,
+        sortFunc);
     baseobj.depends = flatProperty;
     baseobj.update = function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-			if (value) {
-				var match = items.find(function(item){
-					return search(item, value);
-				});
-				if (match) {
-					setData(getData(match));
-				}
-			}
+      if (value) {
+        var match = items.find(function(item) {
+          return search(item, value);
+        });
+        if (match) {
+          setData(getData(match));
+        }
+      }
     }
     return baseobj;
   },
@@ -956,58 +992,58 @@ var HotUtils = {
       }
     }, ];
   },
-  
-  makeParents: function(slug, parentCategories){
-  	return HotUtils.makeRelations(slug + '/parents', 'Parents', parentCategories, true);
+
+  makeParents: function(slug, parentCategories) {
+    return HotUtils.makeRelations(slug + '/parents', 'Parents', parentCategories, true);
   },
-  
-  makeChildren: function(slug, childCategories){
-  	return HotUtils.makeRelations(slug + '/children', 'Children', childCategories, false);
+
+  makeChildren: function(slug, childCategories) {
+    return HotUtils.makeRelations(slug + '/children', 'Children', childCategories, false);
   },
-  
+
   makeRelations: function(slug, relationship, relationCategories, useParentBound) {
 
     return {
       name: relationship,
       action: function(items) {
-      	function makeCategoriesFilter(items){
-      		if(!Constants.isDetailedSample){
-      			return function(category){
-      				if(useParentBound){
-      					return category.index >= Constants.sampleCategories.length;
-      				}
-      				return category.index > Constants.sampleCategories.length;
-      			};
-      		}
-      		var childBound = Constants.sampleCategories.length - 1;
-      		var parentBound = 0;
-      		for(sample in items){
-      			if(items[sample].sampleClassId === undefined){
-      				parentBound = Constants.sampleCategories.length - 1;
-      				continue;
-      			}
-      			var index = Constants.sampleCategories.indexOf(Constants.sampleClasses.find(function(sampleClass){
-      				return sampleClass.id == items[sample].sampleClassId;
-      			}).sampleCategory);
-      			if(index > parentBound){
-      				parentBound = index;
-      			}
-      			if(index < childBound){
-      				childBound = index;
-      			}
-      		}
-      		if(useParentBound){
-      			return function(category){
-      				return category.index <= parentBound || category.index >= Constants.sampleCategories.length;
-      			};
-      		} else {
-      			return function(category){
-      				return category.index >= childBound;
-      			}
-      		}
-      	}
-      	
-      	var actions = relationCategories.filter(makeCategoriesFilter(items)).map(function(category) {
+        function makeCategoriesFilter(items) {
+          if (!Constants.isDetailedSample) {
+            return function(category) {
+              if (useParentBound) {
+                return category.index >= Constants.sampleCategories.length;
+              }
+              return category.index > Constants.sampleCategories.length;
+            };
+          }
+          var childBound = Constants.sampleCategories.length - 1;
+          var parentBound = 0;
+          for (sample in items) {
+            if (items[sample].sampleClassId === undefined) {
+              parentBound = Constants.sampleCategories.length - 1;
+              continue;
+            }
+            var index = Constants.sampleCategories.indexOf(Constants.sampleClasses.find(function(sampleClass) {
+              return sampleClass.id == items[sample].sampleClassId;
+            }).sampleCategory);
+            if (index > parentBound) {
+              parentBound = index;
+            }
+            if (index < childBound) {
+              childBound = index;
+            }
+          }
+          if (useParentBound) {
+            return function(category) {
+              return category.index <= parentBound || category.index >= Constants.sampleCategories.length;
+            };
+          } else {
+            return function(category) {
+              return category.index >= childBound;
+            }
+          }
+        }
+
+        var actions = relationCategories.filter(makeCategoriesFilter(items)).map(function(category) {
           return {
             "name": category.name,
             "handler": function() {
@@ -1040,10 +1076,10 @@ var HotUtils = {
             }
           };
         })
-        if(actions.length == 1){
-        	actions[0].handler();
+        if (actions.length == 1) {
+          actions[0].handler();
         } else {
-        	Utils.showWizardDialog(relationship, actions);
+          Utils.showWizardDialog(relationship, actions);
         }
       }
     };
@@ -1064,26 +1100,32 @@ var HotUtils = {
       "index": Constants.sampleCategories.length
     }];
   },
-  
+
   relations: {
-  	library: function(){return { 
-  		"name": "Library",
-      "target": HotTarget.library,
-      "config": {},
-      "index": Constants.sampleCategories.length + 1
-    };},
-    dilution: function(){return {
-      "name": "Dilution",
-      "target": HotTarget.dilution,
-      "config": {},
-      "index": Constants.sampleCategories.length + 2
-    };},
-    pool: function(){return {
-      "name": "Pool",
-      "target": HotTarget.pool,
-      "config": {},
-      "index": Constants.sampleCategories.length + 3
-    };}
+    library: function() {
+      return {
+        "name": "Library",
+        "target": HotTarget.library,
+        "config": {},
+        "index": Constants.sampleCategories.length + 1
+      };
+    },
+    dilution: function() {
+      return {
+        "name": "Dilution",
+        "target": HotTarget.dilution,
+        "config": {},
+        "index": Constants.sampleCategories.length + 2
+      };
+    },
+    pool: function() {
+      return {
+        "name": "Pool",
+        "target": HotTarget.pool,
+        "config": {},
+        "index": Constants.sampleCategories.length + 3
+      };
+    }
   },
 
   warnIfConsentRevoked: function(items, callback, getLabel) {
