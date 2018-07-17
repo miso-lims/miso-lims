@@ -90,6 +90,7 @@ public interface AbstractListPage {
     public static final String STORAGE_LOCATION = "Storage Location";
     public static final String NG_USED = "ng Lib. Used";
     public static final String VOLUME_USED = "Vol. Lib. Used";
+    public static final String WARNINGS = "Warnings";
   }
 
   public static class ListTarget {

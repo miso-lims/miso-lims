@@ -368,6 +368,16 @@ public class LibraryPageIT extends AbstractIT {
     assertFalse(afterDeleteNotes.stream().anyMatch(expectedText));
   }
 
+  @Test
+  public void testHeaderWarningsOnLibrariesWithError() {
+    testHeaderWarningOnLibrariesWithError(901L, "This library has a negative volume!");
+  }
+
+  public void testHeaderWarningOnLibrariesWithError(long id, String warning) {
+    LibraryPage page = LibraryPage.get(getDriver(), getBaseUrl(), id);
+    assertTrue("Page fails to show '" + warning + "' warning", page.getField(Field.WARNINGS).contains(warning));
+  }
+
   private static final DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
 
   private static void assertDetailedLibraryAttributes(Map<Field, String> expectedValues, DetailedLibrary lib) {

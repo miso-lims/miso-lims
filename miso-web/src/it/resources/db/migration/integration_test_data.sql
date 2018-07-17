@@ -626,7 +626,9 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
   (700, 'LIB700', 'TIB_0001_nn_n_PE_700_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0),
   (701, 'LIB701', 'TIB_0001_nn_n_PE_701_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
-    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0);
+    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0),
+  (901, 'LIB901', 'TIB_0001_nn_n_PE_901_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, -30, NULL, NULL, 1, 0);
 
 INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, securityProfile_profileId, sample_sampleId, platformType,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
