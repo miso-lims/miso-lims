@@ -403,18 +403,18 @@ HotTarget.sample = (function() {
           HotUtils.makeColumnForText('Group Desc.', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupDescription', {}),
 
           // Tissue columns
-          HotUtils.makeAutocompleteColumnForConstantsList('Tissue Origin', show['Tissue'], 'tissueOriginAlias', 'tissueOriginId', 'id', 'label',
-              Constants.tissueOrigins, true, function(item, value) {
-      					return item.alias.toLowerCase() == value.toLowerCase() || item.description.toLowerCase() == value.toLowerCase();
-      				}, function(item){
-      					return item.label;
-      				}),
+          HotUtils.makeAutocompleteColumnForConstantsList('Tissue Origin', show['Tissue'], 'tissueOriginAlias', 'tissueOriginId', 'id',
+              'label', Constants.tissueOrigins, true, function(item, value) {
+                return item.alias.toLowerCase() == value.toLowerCase() || item.description.toLowerCase() == value.toLowerCase();
+              }, function(item) {
+                return item.label;
+              }),
           HotUtils.makeAutocompleteColumnForConstantsList('Tissue Type', show['Tissue'], 'tissueTypeAlias', 'tissueTypeId', 'id', 'label',
               Constants.tissueTypes, true, function(item, value) {
-      					return item.alias.toLowerCase() == value.toLowerCase() || item.description.toLowerCase() == value.toLowerCase();
-      				}, function(item){
-      					return item.label;
-      				}),
+                return item.alias.toLowerCase() == value.toLowerCase() || item.description.toLowerCase() == value.toLowerCase();
+              }, function(item) {
+                return item.label;
+              }),
           HotUtils.makeColumnForInt('Passage #', show['Tissue'], 'passageNumber', null),
           HotUtils.makeColumnForInt('Times Received', show['Tissue'], 'timesReceived', HotUtils.validator.requiredPositiveInt),
           HotUtils.makeColumnForInt('Tube Number', show['Tissue'], 'tubeNumber', HotUtils.validator.requiredPositiveInt),
@@ -597,99 +597,105 @@ HotTarget.sample = (function() {
     },
 
     getBulkActions: function(config) {
-      return [{
-        name: "Edit",
-        action: function(samples) {
+      return [
+          {
+            name: "Edit",
+            action: function(samples) {
 
-          if (samples.some(function(sample) {
-            return sample.sampleClassId;
-          }) && !Constants.isDetailedSample) {
-            alert("There's detailed samples, but MISO is not configured for this.");
-            return;
-          }
+              if (samples.some(function(sample) {
+                return sample.sampleClassId;
+              }) && !Constants.isDetailedSample) {
+                alert("There's detailed samples, but MISO is not configured for this.");
+                return;
+              }
 
-          var classes = getSampleClasses(samples);
-          var classesAliases = Utils.array.deduplicateString(classes.map(function(sampleClass) {
-            return sampleClass.alias;
-          }));
-          if (classesAliases.length > 1) {
-            alert("You have selected samples of classes " + classesAliases.join(" & ") + ". Please select samples from only one class.");
-            return;
-          }
+              var classes = getSampleClasses(samples);
+              var classesAliases = Utils.array.deduplicateString(classes.map(function(sampleClass) {
+                return sampleClass.alias;
+              }));
+              if (classesAliases.length > 1) {
+                alert("You have selected samples of classes " + classesAliases.join(" & ") + ". Please select samples from only one class.");
+                return;
+              }
 
-          window.location = "/miso/sample/bulk/edit?" + jQuery.param({
-            ids: samples.map(Utils.array.getId).join(',')
-          });
-        }
-
-      }, {
-        name: "Propagate",
-        action: function(samples) {
-          HotUtils.warnIfConsentRevoked(samples, function() {
-            var idsString = samples.map(Utils.array.getId).join(",");
-            var classes = getSampleClasses(samples);
-
-            // In the case of plain samples, this will be empty, which is fine.
-            var targets = getChildSampleClasses(classes).sort(Utils.sorting.sampleClassComparator).map(function(sampleClass) {
-
-              return {
-                name: sampleClass.alias,
-                action: function(replicates) {
-                  window.location = "/miso/sample/bulk/propagate?" + jQuery.param({
-                    parentIds: idsString,
-                    replicates: replicates,
-                    sampleClassId: sampleClass.id
-                  });
-                }
-              };
-            });
-            if (!Constants.isDetailedSample || classes.every(function(sampleClass) {
-              return sampleClass.sampleCategory == "Aliquot";
-            })) {
-              targets.push({
-                name: "Library",
-                action: function(replicates) {
-                  var params = {
-                    ids: idsString,
-                    replicates: replicates
-                  }
-                  if (config.sortLibraryPropagate) {
-                    params.sort = config.sortLibraryPropagate;
-                  }
-                  window.location = "/miso/library/bulk/propagate?" + jQuery.param(params);
-                }
+              window.location = "/miso/sample/bulk/edit?" + jQuery.param({
+                ids: samples.map(Utils.array.getId).join(',')
               });
             }
 
-            if (targets.length == 0) {
-              alert("No propagation is possible from the samples.");
-              return;
-            }
+          },
+          {
+            name: "Propagate",
+            action: function(samples) {
+              HotUtils.warnIfConsentRevoked(samples, function() {
+                var idsString = samples.map(Utils.array.getId).join(",");
+                var classes = getSampleClasses(samples);
 
-            Utils.showDialog(targets.length > 1 ? 'Propagate Samples' : ('Propagate to ' + targets[0].name), 'Propagate', [{
-              property: 'replicates',
-              type: 'int',
-              label: 'Replicates',
-              value: 1
-            }, targets.length > 1 ? {
-              property: 'target',
-              type: 'select',
-              label: 'To',
-              values: targets,
-              getLabel: Utils.array.getName
-            } : null].filter(function(x) {
-              return !!x;
-            }), function(result) {
-              (result.target || targets[0]).action(result.replicates);
-            });
-          });
-        }
-      }, HotUtils.printAction('sample'), HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets),
-          
+                // In the case of plain samples, this will be empty, which is fine.
+                var targets = Utils.array.removeArchived(getChildSampleClasses(classes)).sort(Utils.sorting.sampleClassComparator).map(
+                    function(sampleClass) {
+
+                      return {
+                        name: sampleClass.alias,
+                        action: function(replicates) {
+                          window.location = "/miso/sample/bulk/propagate?" + jQuery.param({
+                            parentIds: idsString,
+                            replicates: replicates,
+                            sampleClassId: sampleClass.id
+                          });
+                        }
+                      };
+                    });
+                if (!Constants.isDetailedSample || classes.every(function(sampleClass) {
+                  return sampleClass.sampleCategory == "Aliquot";
+                })) {
+                  targets.push({
+                    name: "Library",
+                    action: function(replicates) {
+                      var params = {
+                        ids: idsString,
+                        replicates: replicates
+                      }
+                      if (config.sortLibraryPropagate) {
+                        params.sort = config.sortLibraryPropagate;
+                      }
+                      window.location = "/miso/library/bulk/propagate?" + jQuery.param(params);
+                    }
+                  });
+                }
+
+                if (targets.length == 0) {
+                  alert("No propagation is possible from the samples.");
+                  return;
+                }
+
+                Utils.showDialog(targets.length > 1 ? 'Propagate Samples' : ('Propagate to ' + targets[0].name), 'Propagate', [{
+                  property: 'replicates',
+                  type: 'int',
+                  label: 'Replicates',
+                  value: 1
+                }, targets.length > 1 ? {
+                  property: 'target',
+                  type: 'select',
+                  label: 'To',
+                  values: targets,
+                  getLabel: Utils.array.getName
+                } : null].filter(function(x) {
+                  return !!x;
+                }), function(result) {
+                  (result.target || targets[0]).action(result.replicates);
+                });
+              });
+            }
+          },
+          HotUtils.printAction('sample'),
+          HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets),
+
           Constants.isDetailedSample ? HotUtils.makeParents('sample', HotUtils.relationCategoriesForDetailed()) : null,
-          		
-          HotUtils.makeChildren('sample', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library(), HotUtils.relations.dilution(), HotUtils.relations.pool()]))
-          ].concat(HotUtils.makeQcActions("Sample"));
+
+          HotUtils.makeChildren('sample', HotUtils.relationCategoriesForDetailed().concat(
+              [HotUtils.relations.library(), HotUtils.relations.dilution(), HotUtils.relations.pool()]))].concat(HotUtils
+          .makeQcActions("Sample"));
     },
 
     getCustomActions: function(table) {

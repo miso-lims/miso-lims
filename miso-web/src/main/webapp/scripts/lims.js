@@ -946,6 +946,11 @@ Utils.array = {
     }).filter(function(obj, index, arr) {
       return index == 0 || obj.id != arr[index - 1].id;
     });
+  },
+  removeArchived: function(input) {
+    return input.filter(function(a) {
+      return !a.archived;
+    });
   }
 };
 

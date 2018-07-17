@@ -46,6 +46,8 @@ public class SampleClassImpl implements SampleClass {
   @Column(nullable = true)
   private String suffix;
 
+  private boolean archived;
+
   @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
@@ -142,6 +144,16 @@ public class SampleClassImpl implements SampleClass {
   @Override
   public void setSuffix(String suffix) {
     this.suffix = suffix;
+  }
+
+  @Override
+  public boolean isArchived() {
+    return archived;
+  }
+
+  @Override
+  public void setArchived(boolean archived) {
+    this.archived = archived;
   }
 
   @Override

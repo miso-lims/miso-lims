@@ -12,6 +12,7 @@ public class SampleClassDto implements WritableUrls {
   private String alias;
   private String sampleCategory;
   private String suffix;
+  private boolean archived;
   private Long createdById;
   private String createdByUrl;
   private String creationDate;
@@ -106,6 +107,14 @@ public class SampleClassDto implements WritableUrls {
 
   public void setSuffix(String suffix) {
     this.suffix = suffix;
+  }
+
+  public boolean isArchived() {
+    return archived;
+  }
+
+  public void setArchived(boolean archived) {
+    this.archived = archived;
   }
 
   public Boolean getDNAseTreatable() {
