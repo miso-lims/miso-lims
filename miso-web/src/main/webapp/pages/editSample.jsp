@@ -420,6 +420,15 @@
             <form:input id="groupDescription" path="groupDescription"/>
           </td>
         </tr>
+        <tr>
+          <td>Date of Creation:</td>
+          <td>
+            <form:input path="creationDate" id="creationdatepicker" placeholder="YYYY-MM-DD"/>
+            <script type="text/javascript">
+              Utils.ui.addDatePicker("creationdatepicker");
+            </script>
+          </td>
+        </tr>
       </table>
 
       <c:if test="${sampleCategory eq 'Tissue' or sampleCategory eq 'new'}">

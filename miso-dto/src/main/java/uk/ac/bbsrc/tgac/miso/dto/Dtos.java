@@ -297,6 +297,7 @@ public class Dtos {
     if (isDetailedSample(from)) {
       DetailedSample detailed = (DetailedSample) from;
       dto.setSampleClassId(detailed.getSampleClass().getId());
+      dto.setCreationDate(detailed.getCreationDate() == null ? "" : formatDate(detailed.getCreationDate()));
       dto.setIdentityConsentLevel(getIdentityConsentLevelString(detailed));
     }
     return dto;
@@ -375,6 +376,7 @@ public class Dtos {
     if (from.isSynthetic() != null) {
       dto.setSynthetic(from.isSynthetic());
     }
+    dto.setCreationDate(from.getCreationDate() == null ? "" : formatDate(from.getCreationDate()));
     dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
     dto.setNonStandardAlias(from.hasNonStandardAlias());
     if (from.getDetailedQcStatus() != null) {
@@ -418,6 +420,7 @@ public class Dtos {
     to.setGroupId(nullifyStringIfBlank(from.getGroupId()));
     to.setGroupDescription(nullifyStringIfBlank(from.getGroupDescription()));
     to.setSynthetic(from.getSynthetic());
+    to.setCreationDate(LimsUtils.isStringEmptyOrNull(from.getCreationDate()) ? null : parseDate(from.getCreationDate()));
     if (from.getIdentityId() != null) {
       to.setIdentityId(from.getIdentityId());
     }

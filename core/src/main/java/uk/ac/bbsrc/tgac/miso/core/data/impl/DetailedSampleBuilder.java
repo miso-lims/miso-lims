@@ -91,6 +91,7 @@ public class DetailedSampleBuilder
   private Integer siblingNumber;
   private Long preMigrationId;
   private Long identityId;
+  private Date creationDate;
 
   // Identity attributes
   private String externalName;
@@ -807,6 +808,16 @@ public class DetailedSampleBuilder
     this.identityId = identityId;
   }
 
+  @Override
+  public Date getCreationDate() {
+    return creationDate;
+  }
+
+  @Override
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
+  }
+
   public DetailedSample build() {
     if (sampleClass == null || sampleClass.getSampleCategory() == null) {
       throw new NullPointerException("Missing sample class or category");
@@ -916,6 +927,7 @@ public class DetailedSampleBuilder
     sample.setSiblingNumber(siblingNumber);
     sample.setPreMigrationId(preMigrationId);
     sample.setQCs(sampleQCs);
+    sample.setCreationDate(creationDate);
 
     return sample;
   }

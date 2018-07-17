@@ -213,6 +213,12 @@ ListTarget.sample = {
           "include": true,
           "iSortPriority": 0
         }, {
+          "sTitle": "Creation Date",
+          "mData": "creationDate",
+          "include": Constants.isDetailedSample,
+          "iSortPriority": 0,
+          "bVisible": "true"
+        }, {
           "sTitle": "Last Modified",
           "mData": "lastModified",
           "include": Constants.isDetailedSample,

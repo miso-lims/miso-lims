@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
@@ -64,6 +67,9 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   
   @Column(updatable = false)
   private Long preMigrationId;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date creationDate;
 
   @Transient
   private Long identityId;
@@ -217,6 +223,16 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @Override
   public void setIdentityId(Long identityId) {
     this.identityId = identityId;
+  }
+
+  @Override
+  public Date getCreationDate() {
+    return creationDate;
+  }
+
+  @Override
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
   }
 
   @Override

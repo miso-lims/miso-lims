@@ -1,0 +1,1 @@
+ALTER TABLE DetailedSample ADD COLUMN creationDate DATE DEFAULT NULL;

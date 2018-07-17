@@ -669,6 +669,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       dTarget.setArchived(dSource.getArchived());
       dTarget.setGroupDescription(dSource.getGroupDescription());
       dTarget.setGroupId(dSource.getGroupId());
+      dTarget.setCreationDate(dSource.getCreationDate());
 
       dTarget.setDetailedQcStatus(dSource.getDetailedQcStatus());
       dTarget.setDetailedQcStatusNote(nullifyStringIfBlank(dSource.getDetailedQcStatusNote()));

@@ -143,6 +143,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
 
+
 @Controller
 @RequestMapping("/sample")
 @SessionAttributes("sample")
