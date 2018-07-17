@@ -151,8 +151,8 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public Collection<String> listAllSampleTypes() throws IOException {
-    return getJdbcTemplate().queryForList("SELECT name FROM SampleType", String.class);
+  public Collection<String> listSampleTypes() throws IOException {
+    return getJdbcTemplate().queryForList("SELECT name FROM SampleType WHERE archived = 0", String.class);
   }
 
   @Override

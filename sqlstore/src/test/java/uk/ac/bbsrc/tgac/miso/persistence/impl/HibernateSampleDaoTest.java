@@ -196,7 +196,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListAllSampleTypes() throws Exception {
-    Collection<String> sampleTypes = dao.listAllSampleTypes();
+    Collection<String> sampleTypes = dao.listSampleTypes();
     List<String> types = Arrays
         .asList("NON GENOMIC", "GENOMIC", "OTHER", "VIRAL RNA", "SYNTHETIC", "TRANSCRIPTOMIC", "METAGENOMIC", "METATRANSCRIPTOMIC");
 

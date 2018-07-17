@@ -79,13 +79,13 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
   Collection<Sample> listByAlias(String alias) throws IOException;
 
   /**
-   * List all SampleTypes
+   * List all non-archived SampleTypes
    * 
    * @return Collection<String>
    * @throws IOException
    *           when
    */
-  Collection<String> listAllSampleTypes() throws IOException;
+  Collection<String> listSampleTypes() throws IOException;
 
   /**
    * List all Samples associated with identificationBarcodes from the given identificationBarcode list
