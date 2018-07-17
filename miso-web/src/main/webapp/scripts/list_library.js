@@ -64,7 +64,7 @@ ListTarget.library = {
             property: 'sampleClass',
             type: 'select',
             label: 'Aliquot Class',
-            values: Constants.sampleClasses.filter(function(sampleClass) {
+            values: Utils.array.removeArchived(Constants.sampleClasses).filter(function(sampleClass) {
               return sampleClass.sampleCategory === 'Aliquot';
             }).sort(Utils.sorting.sampleClassComparator),
             getLabel: Utils.array.getAlias
