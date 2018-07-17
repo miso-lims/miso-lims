@@ -21,7 +21,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
   private static final Set<String> commonColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
       SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION,
-      SamColumns.QC_STATUS, SamColumns.QC_NOTE);
+      SamColumns.CREATION_DATE, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
 
   private static final Set<String> boxableColumns = Sets.newHashSet(SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS,
       SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.EFFECTIVE_GROUP_ID);
@@ -81,6 +81,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     editable.put(SamColumns.GROUP_ID, "changed");
     editable.put(SamColumns.GROUP_DESCRIPTION, "changed");
     editable.put(SamColumns.QC_STATUS, "Refused Consent");
+    editable.put(SamColumns.CREATION_DATE, "2018-07-17");
 
     editable.forEach((k, v) -> table.enterText(k, 0, v));
     editable.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
@@ -115,6 +116,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     editable.put(SamColumns.GROUP_DESCRIPTION, "miles");
     editable.put(SamColumns.QC_STATUS, "OKd by Collaborator");
     editable.put(SamColumns.QC_NOTE, "Approved");
+    editable.put(SamColumns.CREATION_DATE, "");
 
     // make the changes
     editable.forEach((k, v) -> table.enterText(k, 0, v));

@@ -114,8 +114,20 @@ public interface DetailedSample extends Sample {
    */
   Optional<DetailedSample> getEffectiveGroupIdSample();
 
+  /**
+   * Field for storing the date of sample creation. This is not the date that the sample was entered into MISO.
+   * This field is not automatically generated on sample creation and must be specified by a user.
+   * 
+   * @return creationDate
+   */
   Date getCreationDate();
 
+  /**
+   * Sets the date of sample creation to the specified date. This is not the date the sample was entered into MISO.
+   * This field is not automatically generated on sample creation and must be specified by a user.
+   * 
+   * @param creationDate
+   */
   void setCreationDate(Date creationDate);
 
 }
