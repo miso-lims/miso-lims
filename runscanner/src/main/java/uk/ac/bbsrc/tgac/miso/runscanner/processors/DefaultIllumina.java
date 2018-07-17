@@ -238,7 +238,8 @@ public final class DefaultIllumina extends RunProcessor {
               return null;
             }
             Matcher m = FAILED_MESSAGE.matcher(failMessage);
-            return LocalDateTime.parse(m.group(1), FAILED_MESSAGE_DATE_FORMATTER);
+            // Somehow, scanner will return things that don't match, so, we check again
+            return m.matches() ? LocalDateTime.parse(m.group(1), FAILED_MESSAGE_DATE_FORMATTER) : null;
           } catch (FileNotFoundException e) {
             log.error("RTA file vanished before reading", e);
             return null;
