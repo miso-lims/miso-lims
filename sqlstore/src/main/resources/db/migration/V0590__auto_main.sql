@@ -1,3 +1,5 @@
+-- freezer_changelogs
+
 DROP TABLE IF EXISTS StorageLocationChangeLog;
 CREATE TABLE StorageLocationChangeLog (
   storageLocationChangeLogId bigint(20) NOT NULL AUTO_INCREMENT,
@@ -26,3 +28,5 @@ ALTER TABLE StorageLocation CHANGE COLUMN creator creator bigint(20) NOT NULL;
 ALTER TABLE StorageLocation ADD CONSTRAINT fk_storagelocation_creator FOREIGN KEY (creator) REFERENCES User (userId);
 ALTER TABLE StorageLocation CHANGE COLUMN lastModifier lastModifier bigint(20) NOT NULL;
 ALTER TABLE StorageLocation ADD CONSTRAINT fk_storagelocation_modifier FOREIGN KEY (lastModifier) REFERENCES User (userId);
+
+

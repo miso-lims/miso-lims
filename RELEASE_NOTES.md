@@ -1,3 +1,18 @@
+# 0.2.130
+
+Changes:
+
+ * Add tray rack storage type
+ * Some speed gains when moving items in boxes
+ * Add ability to export Handsontable data to spreadsheets
+ * Make effective group IDs more visible (DetailedSample)
+ * Show and set barcodes on most storage units
+ * Add freezer changelogs
+ * Show "No Index" warning message everywhere when pool contains at least one dilution with no index
+ * Add warnings for dilution volume library used exceeding parent library volume
+ * Add ng Lib Used and Vol Lib Used to List Dilutions
+ * Automatically calculate pool volumes
+
 # 0.2.129
 
 Changes:
