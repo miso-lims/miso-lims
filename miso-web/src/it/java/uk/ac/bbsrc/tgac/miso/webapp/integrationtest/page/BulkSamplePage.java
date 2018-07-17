@@ -36,6 +36,7 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String EFFECTIVE_GROUP_ID = "Effective Group ID";
     public static final String GROUP_ID = "Group ID";
     public static final String GROUP_DESCRIPTION = "Group Desc.";
+    public static final String CREATION_DATE = "Date of Creation";
     public static final String TISSUE_ORIGIN = "Tissue Origin";
     public static final String TISSUE_TYPE = "Tissue Type";
     public static final String PASSAGE_NUMBER = "Passage #";

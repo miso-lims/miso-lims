@@ -92,6 +92,8 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertEntityAttribute(SamColumns.GROUP_ID, attributes, sample, s -> s.getGroupId() == null ? "" : s.getGroupId());
     assertEntityAttribute(SamColumns.GROUP_DESCRIPTION, attributes, sample,
         s -> s.getGroupDescription() == null ? "" : s.getGroupDescription());
+    assertEntityAttribute(SamColumns.CREATION_DATE, attributes, sample,
+        s -> s.getCreationDate() == null ? "" : LimsUtils.formatDate(s.getCreationDate()));
   }
 
   protected void assertSampleClass(String sampleClass, DetailedSample sample) {

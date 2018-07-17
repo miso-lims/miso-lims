@@ -30,7 +30,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 public class ListTablesIT extends AbstractIT {
 
   private static final Set<String> samplesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.SAMPLE_CLASS,
-      Columns.SAMPLE_TYPE, Columns.QC_PASSED, Columns.LOCATION, Columns.LAST_MODIFIED);
+      Columns.SAMPLE_TYPE, Columns.QC_PASSED, Columns.LOCATION, Columns.CREATION_DATE, Columns.LAST_MODIFIED);
   private static final Set<String> librariesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
       Columns.SAMPLE_NAME,
       Columns.SAMPLE_ALIAS, Columns.QC_PASSED, Columns.INDEX, Columns.LOCATION, Columns.LAST_MODIFIED);

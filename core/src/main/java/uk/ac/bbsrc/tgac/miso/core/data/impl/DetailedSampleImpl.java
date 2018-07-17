@@ -68,7 +68,7 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @Column(updatable = false)
   private Long preMigrationId;
 
-  @Temporal(TemporalType.TIMESTAMP)
+  @Temporal(TemporalType.DATE)
   private Date creationDate;
 
   @Transient
