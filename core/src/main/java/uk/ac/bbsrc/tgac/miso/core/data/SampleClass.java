@@ -58,6 +58,10 @@ public interface SampleClass extends Serializable {
 
   void setArchived(boolean archived);
 
+  boolean isDirectCreationAllowed();
+
+  void setDirectCreationAllowed(boolean directCreationAllowed);
+
   Boolean getDNAseTreatable();
 
   void setDNAseTreatable(Boolean treatable);

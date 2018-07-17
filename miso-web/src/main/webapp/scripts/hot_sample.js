@@ -670,20 +670,21 @@ HotTarget.sample = (function() {
                 var classes = getSampleClasses(samples);
 
                 // In the case of plain samples, this will be empty, which is fine.
-                var targets = Utils.array.removeArchived(getChildSampleClasses(classes)).sort(Utils.sorting.sampleClassComparator).map(
-                    function(sampleClass) {
+                var targets = Utils.array.removeArchived(getChildSampleClasses(classes)).filter(function(sampleClass) {
+                  return sampleClass.directCreationAllowed;
+                }).sort(Utils.sorting.sampleClassComparator).map(function(sampleClass) {
 
-                      return {
-                        name: sampleClass.alias,
-                        action: function(replicates) {
-                          window.location = "/miso/sample/bulk/propagate?" + jQuery.param({
-                            parentIds: idsString,
-                            replicates: replicates,
-                            sampleClassId: sampleClass.id
-                          });
-                        }
-                      };
-                    });
+                  return {
+                    name: sampleClass.alias,
+                    action: function(replicates) {
+                      window.location = "/miso/sample/bulk/propagate?" + jQuery.param({
+                        parentIds: idsString,
+                        replicates: replicates,
+                        sampleClassId: sampleClass.id
+                      });
+                    }
+                  };
+                });
                 if (!Constants.isDetailedSample || classes.every(function(sampleClass) {
                   return sampleClass.sampleCategory == "Aliquot";
                 })) {
