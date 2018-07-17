@@ -27,6 +27,7 @@ public class DetailedSampleDto extends SampleDto {
   private String identityConsentLevel;
   private String effectiveGroupId;
   private String effectiveGroupIdSample;
+  private String creationDate;
 
   public Long getParentId() {
     return parentId;
@@ -205,6 +206,14 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setEffectiveGroupIdSample(String effectiveGroupIdSample) {
     this.effectiveGroupIdSample = effectiveGroupIdSample;
+  }
+
+  public String getCreationDate() {
+    return creationDate;
+  }
+
+  public void setCreationDate(String creationDate) {
+    this.creationDate = creationDate;
   }
 
 }

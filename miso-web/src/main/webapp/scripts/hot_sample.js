@@ -439,6 +439,24 @@ HotTarget.sample = (function() {
             validator: HotUtils.validator.optionalTextAlphanumeric
           }),
           HotUtils.makeColumnForText('Group Desc.', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupDescription', {}),
+          {
+            header: 'Date of Creation',
+            data: 'creationDate',
+            type: 'date',
+            dateFormat: 'YYYY-MM-DD',
+            datePickerConfig: {
+              firstDay: 0,
+              numberOfMonths: 1
+            },
+            allowEmpty: true,
+            include: Constants.isDetailedSample && !config.isLibraryReceipt,
+            unpack: function(sam, flat, setCellMeta) {
+              flat.creationDate = Utils.valOrNull(sam.creationDate);
+            },
+            pack: function(sam, flat, errorHandler) {
+              sam.creationDate = flat.creationDate;
+            }
+          },
 
           // Tissue columns
           HotUtils.makeAutocompleteColumnForConstantsList('Tissue Origin', show['Tissue'], 'tissueOriginAlias', 'tissueOriginId', 'id',

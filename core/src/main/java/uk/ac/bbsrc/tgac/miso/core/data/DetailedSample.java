@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -112,5 +113,9 @@ public interface DetailedSample extends Sample {
    * @return Sample nearest sample with a non-empty group ID. May be the current sample.
    */
   Optional<DetailedSample> getEffectiveGroupIdSample();
+
+  Date getCreationDate();
+
+  void setCreationDate(Date creationDate);
 
 }
