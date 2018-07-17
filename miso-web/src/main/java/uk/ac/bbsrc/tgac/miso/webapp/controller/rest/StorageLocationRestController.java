@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.dto.ChangeLogDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.StorageLocationDto;
 import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
@@ -62,7 +63,7 @@ public class StorageLocationRestController extends RestController {
 
   @PostMapping(value = "/freezers")
   @ResponseStatus(HttpStatus.CREATED)
-  public @ResponseBody StorageLocationDto createFreezer(@RequestBody StorageLocationDto dto) {
+  public @ResponseBody StorageLocationDto createFreezer(@RequestBody StorageLocationDto dto) throws IOException {
     return doSave(dto);
   }
 
@@ -76,7 +77,7 @@ public class StorageLocationRestController extends RestController {
     return doSave(dto);
   }
 
-  private StorageLocationDto doSave(StorageLocationDto dto) {
+  private StorageLocationDto doSave(StorageLocationDto dto) throws IOException {
     StorageLocation freezer = Dtos.to(dto);
     long savedId = storageLocationService.saveFreezer(freezer);
     StorageLocation saved = storageLocationService.get(savedId);
@@ -84,16 +85,22 @@ public class StorageLocationRestController extends RestController {
   }
 
   @PostMapping(value = "/freezers/{id}/shelves")
-  public @ResponseBody StorageLocationDto addFreezerShelf(@PathVariable(name = "id", required = true) long id) {
+  public @ResponseBody StorageLocationDto addFreezerShelf(@PathVariable(name = "id", required = true) long id,
+      @RequestParam(name = "identificationBarcode", required = false) String barcode) throws IOException {
     StorageLocation freezer = getFreezer(id);
-    int lastShelf = freezer.getChildLocations().stream().filter(loc -> {
-      return loc.getLocationUnit() == LocationUnit.SHELF;
-    }).map(StorageLocation::getAlias).mapToInt(Integer::parseInt).max().orElse(0);
+    int lastShelf = freezer.getChildLocations().stream()
+        .filter(loc -> loc.getLocationUnit() == LocationUnit.SHELF)
+        .map(StorageLocation::getAlias)
+        .mapToInt(Integer::parseInt)
+        .max().orElse(0);
 
     StorageLocation shelf = new StorageLocation();
     shelf.setAlias(Integer.toString(lastShelf + 1));
     shelf.setLocationUnit(LocationUnit.SHELF);
     shelf.setParentLocation(freezer);
+    if (!LimsUtils.isStringEmptyOrNull(barcode)) {
+      shelf.setIdentificationBarcode(barcode);
+    }
 
     long savedId = storageLocationService.addFreezerStorage(shelf);
     StorageLocation saved = storageLocationService.get(savedId);
@@ -110,13 +117,15 @@ public class StorageLocationRestController extends RestController {
 
   @PostMapping(value = "/freezers/{id}/stacks")
   public @ResponseBody StorageLocationDto addFreezerStack(@PathVariable(name = "id", required = true) long id,
-      @RequestParam(name = "height", required = true) int height) {
+      @RequestParam(name = "height", required = true) int height,
+      @RequestParam(name = "identificationBarcode", required = false) String barcode, @RequestBody List<String> childBarcodes)
+      throws IOException {
     StorageLocation freezer = getFreezer(id);
     if (height < 1) {
       throw new RestException("Invalid stack height", Status.BAD_REQUEST);
     }
 
-    return createStack(freezer, height);
+    return createStack(freezer, height, barcode, childBarcodes);
   }
 
   @PostMapping(value = "/rooms")
@@ -124,18 +133,19 @@ public class StorageLocationRestController extends RestController {
   @ResponseBody
   public StorageLocationDto addRoom(@RequestParam(name = "alias", required = true) String alias,
       @RequestParam(name = "identificationBarcode", required = false) String identificationBarcode) throws IOException {
-    StorageLocation room = makeStorage(alias, LocationUnit.ROOM, null);
+    StorageLocation room = makeStorage(alias, LocationUnit.ROOM, null, null);
     room.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(identificationBarcode));
     long savedId = storageLocationService.createRoom(room);
     StorageLocation saved = storageLocationService.get(savedId);
     return Dtos.asDto(saved, false, false);
   }
 
-  private StorageLocation makeStorage(String alias, LocationUnit locationUnit, StorageLocation parent) {
+  private StorageLocation makeStorage(String alias, LocationUnit locationUnit, StorageLocation parent, String barcode) {
     StorageLocation storage = new StorageLocation();
     storage.setAlias(alias);
     storage.setLocationUnit(locationUnit);
     storage.setParentLocation(parent);
+    storage.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(barcode));
     return storage;
   }
 
@@ -145,16 +155,17 @@ public class StorageLocationRestController extends RestController {
     }).map(StorageLocation::getAlias).mapToInt(Integer::parseInt).max().orElse(0) + 1);
   }
 
-  private StorageLocationDto createStack(StorageLocation parent, int height) {
+  private StorageLocationDto createStack(StorageLocation parent, int height, String barcode, List<String> childBarcodes)
+      throws IOException {
     String stackNumber = findNextNumber(parent, LocationUnit.STACK);
-    StorageLocation stack = makeStorage(stackNumber, LocationUnit.STACK, parent);
-    for (int i = 0; i < height; i++) {
-      makeStorage(Integer.toString(i + 1), LocationUnit.STACK_POSITION, stack);
+    StorageLocation stack = makeStorage(stackNumber, LocationUnit.STACK, parent, barcode);
+    for (int i = 1; i <= height; i++) {
+      makeStorage(Integer.toString(i), LocationUnit.STACK_POSITION, stack, childBarcodes.get(i - 1));
     }
     return doSave(stack);
   }
 
-  private StorageLocationDto doSave(StorageLocation storage) {
+  private StorageLocationDto doSave(StorageLocation storage) throws IOException {
     long savedId = storageLocationService.addFreezerStorage(storage);
     StorageLocation saved = storageLocationService.get(savedId);
     return Dtos.asDto(saved, false, false);
@@ -162,19 +173,23 @@ public class StorageLocationRestController extends RestController {
 
   @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/stacks")
   public @ResponseBody StorageLocationDto addShelfStack(@PathVariable(name = "freezerId", required = true) long freezerId,
-      @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "height", required = true) int height) {
+      @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "height", required = true) int height,
+      @RequestParam(name = "identificationBarcode", required = false) String barcode, @RequestBody List<String> childBarcodes)
+      throws IOException {
     StorageLocation freezer = getFreezer(freezerId);
     StorageLocation shelf = getShelf(freezer, shelfId);
     if (height < 1) {
       throw new RestException("Invalid stack height", Status.BAD_REQUEST);
     }
-    return createStack(shelf, height);
+    return createStack(shelf, height, barcode, childBarcodes);
   }
 
   @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/racks")
   public @ResponseBody StorageLocationDto addShelfRack(@PathVariable(name = "freezerId", required = true) long freezerId,
       @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "depth", required = true) int depth,
-      @RequestParam(name = "height", required = true) int height) {
+      @RequestParam(name = "height", required = true) int height,
+      @RequestParam(name = "identificationBarcode", required = false) String barcode, @RequestBody List<String> childBarcodes)
+      throws IOException {
     StorageLocation freezer = getFreezer(freezerId);
     StorageLocation shelf = getShelf(freezer, shelfId);
     if (height < 1) {
@@ -183,22 +198,41 @@ public class StorageLocationRestController extends RestController {
     if (depth < 2) {
       throw new RestException("Invalid rack depth", Status.BAD_REQUEST);
     }
-    StorageLocation rack = makeStorage(findNextNumber(shelf, LocationUnit.RACK), LocationUnit.RACK, shelf);
-    for (int i = 0; i < depth; i++) {
-      StorageLocation stack = makeStorage(Integer.toString(i + 1), LocationUnit.STACK, rack);
-      for (int j = 0; j < height; j++) {
-        makeStorage(Integer.toString(j + 1), LocationUnit.STACK_POSITION, stack);
+    StorageLocation rack = makeStorage(findNextNumber(shelf, LocationUnit.RACK), LocationUnit.RACK, shelf, barcode);
+    for (int i = 1; i <= depth; i++) {
+      StorageLocation stack = makeStorage(Integer.toString(i), LocationUnit.STACK, rack, null);
+      for (int j = 1; j <= height; j++) {
+        int barcodeNum = (i - 1) * height + j - 1;
+        makeStorage(Integer.toString(j), LocationUnit.STACK_POSITION, stack, childBarcodes.get(barcodeNum));
       }
     }
     return doSave(rack);
   }
 
-  @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/loose")
-  public @ResponseBody StorageLocationDto addShelfLooseStorage(@PathVariable(name = "freezerId", required = true) long freezerId,
-      @PathVariable(name = "shelfId", required = true) long shelfId) {
+  @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/tray-racks")
+  public @ResponseBody StorageLocationDto addShelfTrayRack(@PathVariable(name = "freezerId", required = true) long freezerId,
+      @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "height", required = true) int height,
+      @RequestParam(name = "identificationBarcode", required = false) String barcode, @RequestBody List<String> childBarcodes)
+      throws IOException {
     StorageLocation freezer = getFreezer(freezerId);
     StorageLocation shelf = getShelf(freezer, shelfId);
-    StorageLocation storage = makeStorage(findNextNumber(shelf, LocationUnit.LOOSE_STORAGE), LocationUnit.LOOSE_STORAGE, shelf);
+    if (height < 1) {
+      throw new RestException("Invalid rack height", Status.BAD_REQUEST);
+    }
+    StorageLocation trayRack = makeStorage(findNextNumber(shelf, LocationUnit.TRAY_RACK), LocationUnit.TRAY_RACK, shelf, barcode);
+    for (int i = 1; i <= height; i++) {
+      makeStorage(Integer.toString(i), LocationUnit.TRAY, trayRack, childBarcodes.get(i - 1));
+    }
+    return doSave(trayRack);
+  }
+
+  @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/loose")
+  public @ResponseBody StorageLocationDto addShelfLooseStorage(@PathVariable(name = "freezerId", required = true) long freezerId,
+      @PathVariable(name = "shelfId", required = true) long shelfId,
+      @RequestParam(name = "identificationBarcode", required = false) String barcode) throws IOException {
+    StorageLocation freezer = getFreezer(freezerId);
+    StorageLocation shelf = getShelf(freezer, shelfId);
+    StorageLocation storage = makeStorage(findNextNumber(shelf, LocationUnit.LOOSE_STORAGE), LocationUnit.LOOSE_STORAGE, shelf, barcode);
     return doSave(storage);
   }
 
@@ -210,6 +244,25 @@ public class StorageLocationRestController extends RestController {
       throw new RestException("Shelf not found", Status.NOT_FOUND);
     }
     return shelf;
+  }
+
+  @GetMapping(value = "/freezers/{freezerId}/changelog")
+  public @ResponseBody List<ChangeLogDto> getFreezerChangelog(@PathVariable(name = "freezerId", required = true) long freezerId) {
+    StorageLocation freezer = storageLocationService.get(freezerId);
+    if (freezer == null) {
+      throw new RestException("Freezer not found", Status.NOT_FOUND);
+    }
+    return freezer.getChangeLog().stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList());
+  }
+
+  @PutMapping(value = "/{locationId}")
+  @ResponseStatus(value = HttpStatus.NO_CONTENT)
+  public void updateStorageComponent(@PathVariable(name = "locationId", required = true) long locationId,
+      @RequestBody StorageLocationDto dto) throws IOException {
+    StorageLocation component = Dtos.to(dto);
+    storageLocationService.updateStorageComponent(component);
   }
 
 }

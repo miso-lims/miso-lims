@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -74,6 +75,7 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
@@ -599,6 +601,23 @@ public class EditLibraryController {
     model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
     model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
     model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, library, securityManager.listAllGroups()));
+    if (LimsUtils.isDetailedLibrary(library)) {
+      DetailedLibrary detailed = (DetailedLibrary) library;
+      String effectiveGroupId = "";
+      String effectiveGroupIdSampleAlias = "";
+      if (!LimsUtils.isStringEmptyOrNull(detailed.getGroupId())) {
+        effectiveGroupId = detailed.getGroupId();
+        effectiveGroupIdSampleAlias = library.getAlias();
+      } else {
+        Optional<DetailedSample> effective = ((DetailedSample) detailed.getSample()).getEffectiveGroupIdSample();
+        if (effective.isPresent()) {
+          effectiveGroupId = effective.get().getGroupId();
+          effectiveGroupIdSampleAlias = effective.get().getAlias();
+        }
+      }
+      model.put("effectiveGroupId", effectiveGroupId);
+      model.put("effectiveGroupIdSample", effectiveGroupIdSampleAlias);
+    }
     return new ModelAndView("/pages/editLibrary.jsp", model);
   }
 
@@ -649,6 +668,11 @@ public class EditLibraryController {
         detailedDto.setNonStandardAlias(sample.hasNonStandardAlias());
         if (sample.getBox() != null) {
           detailedDto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(sample.getBox().getAlias(), sample.getBoxPosition()));
+        }
+        Optional<DetailedSample> effective = sample.getEffectiveGroupIdSample();
+        if (effective.isPresent()) {
+          detailedDto.setEffectiveGroupId(effective.get().getGroupId());
+          detailedDto.setEffectiveGroupIdSample(effective.get().getAlias());
         }
         dto = detailedDto;
       } else {
@@ -909,6 +933,9 @@ public class EditLibraryController {
       dto.setAlias(item.getLibrary().getAlias() + "_POOL");
       dto.setPooledElements(Collections.singleton(Dtos.asDto(item)));
       dto.setPlatformType(item.getLibrary().getPlatformType().name());
+      if (item.getVolumeUsed() != null) {
+        dto.setVolume(item.getVolumeUsed().toString());
+      }
       return dto;
     }
 
@@ -983,6 +1010,10 @@ public class EditLibraryController {
         }
       }
       dto.setPooledElements(parents.stream().map(Dtos::asDto).collect(Collectors.toSet()));
+      if (dto.getPooledElements().stream().allMatch(element -> element.getVolumeUsed() != null)) {
+        dto.setVolume(
+            Double.toString(dto.getPooledElements().stream().mapToDouble(element -> Double.parseDouble(element.getVolumeUsed())).sum()));
+      }
       return dto;
     }
 

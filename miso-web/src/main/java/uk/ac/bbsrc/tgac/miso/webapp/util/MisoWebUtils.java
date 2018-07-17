@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.HandsontableSpreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -129,15 +131,26 @@ public class MisoWebUtils {
       HttpServletResponse response) {
     Spreadsheet<T> spreadsheet = formatLibrary.apply(request.getParameter("sheet"));
     SpreadSheetFormat formatter = SpreadSheetFormat.valueOf(request.getParameter("format"));
+    HttpHeaders headers = makeHttpHeaders(spreadsheet, formatter, response);
+    return new HttpEntity<>(formatter.generate(
+        COMMA.splitAsStream(request.getParameter("ids")).map(Long::parseLong).map(WhineyFunction.rethrow(fetcher)), spreadsheet), headers);
+  }
+
+  public static HttpEntity<byte[]> generateSpreadsheet(List<String> headers, List<List<String>> data,
+      SpreadSheetFormat formatter,
+      HttpServletResponse response) {
+    Spreadsheet<List<String>> spreadsheet = new HandsontableSpreadsheet(headers);
+    HttpHeaders httpHeaders = makeHttpHeaders(spreadsheet, formatter, response);
+    return new HttpEntity<>(formatter.generate(data.stream(), spreadsheet), httpHeaders);
+  }
+
+  private static <T> HttpHeaders makeHttpHeaders(Spreadsheet<T> spreadsheet, SpreadSheetFormat formatter, HttpServletResponse response) {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(formatter.mediaType());
     response.setHeader("Content-Disposition",
         "attachment; filename=" + String.format("%s-%s.%s", spreadsheet.name(), DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(
             ZonedDateTime.now()), formatter.extension()));
-
-    return new HttpEntity<>(formatter.generate(
-        COMMA.splitAsStream(request.getParameter("ids")).map(Long::parseLong).map(WhineyFunction.rethrow(fetcher)), spreadsheet), headers);
-
+    return headers;
   }
 
 }

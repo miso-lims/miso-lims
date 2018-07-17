@@ -67,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
@@ -200,7 +201,13 @@ public class EditPoolController {
       model.put("orders",
           poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asPoolOrderDtos(poolOrderService.getByPool(poolId)));
 
-      addWarnings(pool, model);
+      model.put("duplicateIndicesSequences", mapper.writeValueAsString(pool.getDuplicateIndicesSequences()));
+      model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(pool.getNearDuplicateIndicesSequences()));
+
+      List<String> warnings = new ArrayList<>();
+      addConsentWarning(pool, warnings);
+      model.addAttribute("warnings", warnings);
+
       return new ModelAndView("/pages/editPool.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
@@ -208,25 +215,6 @@ public class EditPoolController {
       }
       throw ex;
     }
-  }
-
-  private void addWarnings(Pool pool, ModelMap model) throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper();
-    Set<String> duplicates = pool.getDuplicateIndicesSequences();
-    Set<String> nearDuplicates = pool.getNearDuplicateIndicesSequences();
-    model.put("duplicateIndicesSequences", mapper.writeValueAsString(duplicates));
-    model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(nearDuplicates));
-    List<String> warnings = new ArrayList<>();
-    if (!duplicates.isEmpty()) {
-      warnings.add("This pool contains duplicate indices!");
-    } else if (!nearDuplicates.isEmpty()) {
-      warnings.add("This pool contains near-duplicate indices!");
-    }
-    if (pool.hasLibrariesWithoutIndex()) {
-      warnings.add("This pool contains multiple libraries with no index!");
-    }
-    addConsentWarning(pool, warnings);
-    model.addAttribute("warnings", warnings);
   }
 
   private void addConsentWarning(Pool pool, List<String> warnings) {

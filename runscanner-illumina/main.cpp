@@ -525,19 +525,24 @@ int main(int argc, const char **argv) {
    * one. */
   const auto extractions =
       run.get<illumina::interop::model::metrics::extraction_metric>();
-  std::time_t extraction_time(std::accumulate(
-      extractions.begin(), extractions.end(), 0,
-      [](illumina::interop::model::metric_base::base_metric::ulong_t a,
-         const illumina::interop::model::metrics::extraction_metric &m) {
-        return std::max(a, m.date_time());
-      }));
-  if (extraction_time == 0) {
+
+  /* Newer sequencers no longer include dates in extraction metrics, so if
+   * there are extraction metrics, but no date, just continue along. If the
+   * extraction metrics are missing, then the run is probably still running.*/
+  if (extractions.size() == 0) {
     is_complete = false;
   } else {
-    auto extraction_tm = std::localtime(&extraction_time);
-    result["completionDate"] = formatDate(extraction_tm);
+    std::time_t extraction_time(std::accumulate(
+        extractions.begin(), extractions.end(), 0,
+        [](illumina::interop::model::metric_base::base_metric::ulong_t a,
+           const illumina::interop::model::metrics::extraction_metric &m) {
+          return std::max(a, m.date_time());
+        }));
+    if (extraction_time > 0) {
+      auto extraction_tm = std::localtime(&extraction_time);
+      result["completionDate"] = formatDate(extraction_tm);
+    }
   }
-
   is_complete &= run_summary.cycle_state().called_cycle_range().last_cycle() ==
                  run.run_info().total_cycles();
 

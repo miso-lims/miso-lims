@@ -256,7 +256,8 @@ INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_gro
 
 INSERT INTO IndexFamily (indexFamilyId, name, platformType) VALUES
   (1, 'Single Index 6bp', 'ILLUMINA'),
-  (2, 'Dual Index 6bp', 'ILLUMINA');
+  (2, 'Dual Index 6bp', 'ILLUMINA'),
+  (3, 'Similar Index Pair', 'ILLUMINA');
 
 INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
   (1,  1, 'Index 01', 'AAAAAA', 1),
@@ -270,7 +271,9 @@ INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
   (9,  2, 'B01',      'AAATTT', 2),
   (10, 2, 'B02',      'CCCGGG', 2),
   (11, 2, 'B03',      'GGGCCC', 2),
-  (12, 2, 'B04',      'TTTAAA', 2);
+  (12, 2, 'B04',      'TTTAAA', 2),
+  (13, 3, 'Index 01', 'AAAAAC', 1),
+  (14, 3, 'Index 02', 'AAAAGT', 1);
 
 INSERT INTO Platform (platformId, name, instrumentModel, numContainers, instrumentType) VALUES
   (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1, 'SEQUENCER'),
@@ -605,7 +608,26 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
   (504, 'LIB504', 'TIB_0001_nn_n_PE_404_WG', 'TIB_Lib', NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, NULL, NULL, 1, 0),
   (505, 'LIB505', 'TIB_0001_nn_n_PE_505_WG', 'TIB_Lib2', NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
-    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, NULL, NULL, 1, 0);
+    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, NULL, NULL, 1, 0),
+  (601, 'LIB601', 'TIB_0001_nn_n_PE_601_WG', 'SimLib1', NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
+    1, '2018-06-26 11:38:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, 1, 0),
+  (602, 'LIB602', 'TIB_0001_nn_n_PE_602_WG', 'SimLib2', NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
+    1, '2018-06-26 11:38:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, 1, 0),
+  (603, 'LIB603', 'TIB_0001_nn_n_PE_603_WG', 'SameLib1', NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
+    1, '2018-06-26 11:38:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, 1, 0),
+  (604, 'LIB604', 'TIB_0001_nn_n_PE_604_WG', 'SameLib2', NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
+    1, '2018-06-26 11:38:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, 1, 0),
+  (700, 'LIB700', 'TIB_0001_nn_n_PE_700_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0),
+  (701, 'LIB701', 'TIB_0001_nn_n_PE_701_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0);
+
+INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, securityProfile_profileId, sample_sampleId, platformType,
+  libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
+  volume, concentration, locationBarcode, kitDescriptorId, discarded, lowQuality) VALUES
+  (600, 'LIB600', 'TIB_0001_nn_n_PE_600_WG', 'BADLIB', NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+    1, '2017-08-15 13:55:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, 1, 0, 1);
+
 
 INSERT INTO DetailedLibrary(libraryId, archived, libraryDesign, libraryDesignCodeId) VALUES
   (1, 0, 1, 7),
@@ -650,7 +672,12 @@ INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (120002, 2),
   (304, 5),
   (305, 6),
-  (306, 9);
+  (306, 9),
+  (600, 9),
+  (601, 13),
+  (602, 14),
+  (603, 8),
+  (604, 8);
 
 INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, lastModifier, lastUpdated) VALUES
 (1, 'LDI1', 5.9, 1, '12321', '2017-07-20', 'admin', 2, 1, '2017-07-20 09:01:00'),
@@ -663,7 +690,12 @@ INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId,
 (504, 'LDI504', 5.9, 504, 'TIB_Dil', '2017-08-15', 'admin', 1, 1, '2017-08-15 13:55:00'),
 (505, 'LDI505', 3.3, 504, 'TIB_replaceDil', '2017-08-15', 'admin', 1, 1, '2017-08-15 13:55:00'),
 (701, 'LDI701', 2.2, 504, 'test_pooling_1', '2017-10-16', 'admin', 1, 1, '2017-10-16 15:59:00'),
-(702, 'LDI702', 2.2, 504, 'test_pooling_2', '2017-10-16', 'admin', 1, 1, '2017-10-16 15:59:00');
+(702, 'LDI702', 2.2, 504, 'test_pooling_2', '2017-10-16', 'admin', 1, 1, '2017-10-16 15:59:00'),
+(800, 'LDI800', 2.2, 600, 'low_quality_library', '2018-06-26', 'admin', 1, 1, '2018-06-26 11:39:00'),
+(801, 'LDI801', 2.2, 601, 'similar_index_1', '2018-06-26', 'admin', 1, 1, '2018-06-26 11:39:00'),
+(802, 'LDI802', 2.2, 602, 'similar_index_2', '2018-06-26', 'admin', 1, 1, '2018-06-26 11:39:00'),
+(803, 'LDI803', 2.2, 603, 'same_index_1', '2018-06-26', 'admin', 1, 1, '2018-06-26 11:39:00'),
+(804, 'LDI804', 2.2, 604, 'same_index_2', '2018-06-26', 'admin', 1, 1, '2018-06-26 11:39:00');
 
 INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
 (1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 2, 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL),
@@ -687,7 +719,11 @@ INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarc
 (5104, 4, 4, 'IPO5104', 'POOL_WITH_COMPLETED_ORDERS', 'ipobar5104', 'mission accomplished', '2017-09-27', 2, 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
 (5105, 4, 4, 'IPO5105', 'POOL_NOT_READY', 'ipobar5105', 'unprepared', '2017-09-27', 2, 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
 (701, 4, 4, 'IPO701', 'TEST_POOLING_DILUTIONS', 'ipobar701', 'test pool', '2017-10-17', 2, 'ILLUMINA', 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL),
-(702, 4, 4, 'IPO702', 'TEST_REMOVING_DILUTIONS', 'ipobar702', 'test pool', '2017-10-17', 2, 'ILLUMINA', 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL);
+(702, 4, 4, 'IPO702', 'TEST_REMOVING_DILUTIONS', 'ipobar702', 'test pool', '2017-10-17', 2, 'ILLUMINA', 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL),
+(801, 4, 4, 'IPO801', 'TEST_NO_INDEX_WARNING', 'ipobar801', 'no indices', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
+(802, 4, 4, 'IPO802', 'TEST_SIMILAR_INDEX_WARNING', 'ipobar802', 'similar index', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
+(803, 4, 4, 'IPO803', 'TEST_SAME_INDEX_WARNING', 'ipobar803', 'same index', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
+(804, 4, 4, 'IPO804', 'TEST_BAD_LIBRARY_WARNING', 'ipobar804', 'low quality library', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL);
 
 INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
 (1, 1),
@@ -703,13 +739,23 @@ INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
 (200003, 200002),
 (200004, 200001),
 (501, 504),
-(702, 702);
+(702, 702),
+(801, 200001),
+(802, 801),
+(802, 802),
+(803, 803),
+(803, 804),
+(804, 800);
 
 INSERT INTO PoolOrder (poolOrderId, poolId, partitions, parametersId, createdBy, updatedBy, creationDate, lastUpdated) VALUES
 (1, 5103, 2, 4, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00'),
 (2, 5103, 2, 3, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00'),
 (3, 5102, 2, 2, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00'),
-(4, 5104, 2, 2, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00');
+(4, 5104, 2, 2, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00'),
+(5, 801, 2, 2, 1, 1, '2018-06-26 10:10:00', '2018-06-26 10:10:00'),
+(6, 802, 2, 2, 1, 1, '2018-06-26 10:10:00', '2018-06-26 10:10:00'),
+(7, 803, 2, 2, 1, 1, '2018-06-26 10:10:00', '2018-06-26 10:10:00'),
+(8, 804, 2, 2, 1, 1, '2018-06-26 10:10:00', '2018-06-26 10:10:00');
 
 INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, securityProfile_profileId, lastModifier, creator, created, lastModified) VALUES
 (1, 1, 1, 'BOX1', 'First Box', 1, 1, 1, '2017-07-20 13:01:01', '2017-07-20 13:01:01'),

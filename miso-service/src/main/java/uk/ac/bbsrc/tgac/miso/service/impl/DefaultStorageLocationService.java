@@ -15,6 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.StorageLocationStore;
 import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -23,12 +24,23 @@ public class DefaultStorageLocationService implements StorageLocationService {
   @Autowired
   private StorageLocationStore storageLocationStore;
 
+  @Autowired
+  private AuthorizationManager authorizationManager;
+
   public StorageLocationStore getStorageLocationStore() {
     return storageLocationStore;
   }
 
   public void setStorageLocationStore(StorageLocationStore storageLocationStore) {
     this.storageLocationStore = storageLocationStore;
+  }
+
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
   }
 
   @Override
@@ -57,10 +69,11 @@ public class DefaultStorageLocationService implements StorageLocationService {
   }
 
   @Override
-  public long createRoom(StorageLocation room) {
+  public long createRoom(StorageLocation room) throws IOException {
     if (room.getLocationUnit() != LocationUnit.ROOM) {
       throw new IllegalArgumentException("Location is not a room");
     }
+    room.setChangeDetails(authorizationManager.getCurrentUser());
     if (room.getId() == StorageLocation.UNSAVED_ID) {
       return storageLocationStore.save(room);
     } else {
@@ -69,7 +82,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
   }
 
   @Override
-  public long saveFreezer(StorageLocation freezer) {
+  public long saveFreezer(StorageLocation freezer) throws IOException {
     if (freezer.getLocationUnit() != LocationUnit.FREEZER) {
       throw new IllegalArgumentException("Location is not a freezer");
     }
@@ -87,17 +100,19 @@ public class DefaultStorageLocationService implements StorageLocationService {
     }
   }
 
-  private long create(StorageLocation freezer) {
-    validateChange(freezer, null);
-    createParentIfNecessary(freezer);
-    return storageLocationStore.save(freezer);
+  private long create(StorageLocation location) throws IOException {
+    validateChange(location, null);
+    createParentIfNecessary(location);
+    location.setChangeDetails(authorizationManager.getCurrentUser());
+    return storageLocationStore.save(location);
   }
 
-  private long update(StorageLocation freezer) {
-    StorageLocation managed = get(freezer.getId());
-    validateChange(freezer, managed);
-    createParentIfNecessary(freezer);
-    applyChanges(freezer, managed);
+  private long update(StorageLocation location) throws IOException {
+    StorageLocation managed = get(location.getId());
+    validateChange(location, managed);
+    createParentIfNecessary(location);
+    applyChanges(location, managed);
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
     return storageLocationStore.save(managed);
   }
 
@@ -110,15 +125,27 @@ public class DefaultStorageLocationService implements StorageLocationService {
   private void validateChange(StorageLocation storage, StorageLocation beforeChange) {
     List<ValidationError> errors = new ArrayList<>();
 
-    // TODO: validate all LocationUnit relationships
+    validateLocationUnitRelationships(storage, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
   }
 
-  private void createParentIfNecessary(StorageLocation freezer) {
+  private void validateLocationUnitRelationships(StorageLocation storage, List<ValidationError> errors) {
+    if (storage.getParentLocation() != null
+        && !storage.getLocationUnit().getAcceptableParents().contains(storage.getParentLocation().getLocationUnit())) {
+      errors.add(new ValidationError(String.format("%s is not an appropriate container for %s",
+          storage.getParentLocation().getLocationUnit().getDisplayName(), storage.getLocationUnit().getDisplayName())));
+      for (StorageLocation child : storage.getChildLocations()) {
+        validateLocationUnitRelationships(child, errors);
+      }
+    }
+  }
+
+  private void createParentIfNecessary(StorageLocation freezer) throws IOException {
     if (freezer.getParentLocation() != null && !freezer.getParentLocation().isSaved()) {
+      freezer.getParentLocation().setChangeDetails(authorizationManager.getCurrentUser());
       long parentId = storageLocationStore.save(freezer.getParentLocation());
       freezer.setParentLocation(storageLocationStore.get(parentId));
     }
@@ -131,12 +158,20 @@ public class DefaultStorageLocationService implements StorageLocationService {
   }
 
   @Override
-  public long addFreezerStorage(StorageLocation storage) {
+  public long addFreezerStorage(StorageLocation storage) throws IOException {
     validateChange(storage, null);
     loadChildEntities(storage);
+    storage.setChangeDetails(authorizationManager.getCurrentUser());
     long savedId = storageLocationStore.save(storage);
-    storage.getChildLocations().forEach(this::addFreezerStorage);
+    for (StorageLocation child : storage.getChildLocations()) {
+      addFreezerStorage(child);
+    }
     return savedId;
+  }
+
+  @Override
+  public long updateStorageComponent(StorageLocation location) throws IOException {
+    return update(location);
   }
 
 }

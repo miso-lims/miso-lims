@@ -163,6 +163,10 @@ public class DataTable extends AbstractElement {
     return getColumnValues(columnHeading).contains(target);
   }
 
+  public boolean doesColumnContainSubstring(String columnHeading, String target) {
+    return getColumnValues(columnHeading).stream().anyMatch(value -> value != null && value.contains(target));
+  }
+
   public void searchFor(String searchTerm) {
     waitUntil(elementToBeClickable(searchBar));
     searchBar.clear();

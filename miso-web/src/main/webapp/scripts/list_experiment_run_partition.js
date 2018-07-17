@@ -65,30 +65,7 @@ ListTarget.experiment_run_partition = {
           "mData": "partition.pool",
           "include": true,
           "iSortPriority": 0,
-          "mRender": function(data, type, full) {
-            if (!data) {
-              if (type === 'display') {
-                return "(None)";
-              } else {
-                return "";
-              }
-            }
-            var prettyName = data.name + " (" + data.alias + ")";
-            if (type === 'display') {
-              var problems = [data.hasLowQualityLibraries ? "LOW QUALITY LIBRARIES" : null,
-                  data.duplicateIndices ? "DUPLICATE INDICES" : null].filter(function(x) {
-                return x;
-              });
-
-              return "<a href=\"/miso/pool/" + data.id + "\">" + prettyName + "</a>"
-                  + (problems.length > 0 ? problems.map(function(message) {
-                    return ' <span class="lowquality">' + message + '</span>';
-                  }).join('') + '<img style="float:right; height:25px;" src="/styles/images/fail.png" />' : "");
-            } else {
-              return prettyName;
-            }
-
-          }
+          "mRender": WarningTarget.experiment_run_partition.tableWarnings
         }, ];
   }
 };

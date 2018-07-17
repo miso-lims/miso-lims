@@ -41,9 +41,11 @@ public class BulkLibraryIT extends AbstractIT {
       LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2,
       LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.VOLUME, LibColumns.CONCENTRATION);
 
-  private static final Set<String> editColumns = Sets.newHashSet(LibColumns.RECEIVE_DATE, LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION);
+  private static final Set<String> editColumns = Sets.newHashSet(LibColumns.RECEIVE_DATE, LibColumns.SAMPLE_ALIAS,
+      LibColumns.SAMPLE_LOCATION, LibColumns.EFFECTIVE_GROUP_ID);
 
-  private static final Set<String> propagateColumns = Sets.newHashSet(LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION);
+  private static final Set<String> propagateColumns = Sets.newHashSet(LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
+      LibColumns.EFFECTIVE_GROUP_ID);
 
   private static final Set<String> receiptColumns = Sets.newHashSet(SamColumns.SAMPLE_TYPE,
       SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.EXTERNAL_NAME,
@@ -183,10 +185,11 @@ public class BulkLibraryIT extends AbstractIT {
     assertTrue(types.contains("Single End"));
 
     families = table.getDropdownOptions(LibColumns.INDEX_FAMILY, 0);
-    assertEquals(3, families.size());
+    assertEquals(4, families.size());
     assertTrue(families.contains(NO_INDEX_FAMILY));
     assertTrue(families.contains("Single Index 6bp"));
     assertTrue(families.contains("Dual Index 6bp"));
+    assertTrue(families.contains("Similar Index Pair"));
 
     kits = table.getDropdownOptions(LibColumns.KIT_DESCRIPTOR, 0);
     assertEquals(2, kits.size());

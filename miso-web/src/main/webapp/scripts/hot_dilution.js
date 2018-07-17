@@ -199,6 +199,56 @@ HotTarget.dilution = {
 
     HotUtils.makeParents('librarydilution', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library()])), 
     HotUtils.makeChildren('librarydilution',[HotUtils.relations.pool()])];
+  },
+
+  confirmSave: function(flatObjects, isCreate, config, table) {
+    var deferred = jQuery.Deferred();
+    
+    var dilutions = table.getDtoData();
+    
+    var seen = {};
+    var libraries = dilutions.filter(function(dilution){
+      return !(Utils.validation.isEmpty(dilution.volumeUsed) || dilution.volumeUsed <= 0);
+    }).map(function(dilution){
+      return dilution.library;
+    }).filter(function(library){
+      return library != null;
+    }).filter(function(library){
+      return seen.hasOwnProperty(library.id) ? false : (seen[library.id] = true);
+    }).map(function(library){
+      return jQuery.extend(true, {}, library);
+    });
+    
+    if(libraries.length == 0){
+      deferred.resolve();
+      return deferred.promise();
+    }
+            
+    dilutions.filter(function(dilution){
+      return dilution.library != null && dilution.library.volume != null && dilution.volumeUsed != null;
+    }).forEach(function(dilution){
+      libraries.find(function(library){
+        return library.id == dilution.library.id;
+      }).volume -= dilution.volumeUsed;
+    });
+    
+    var overUsedCount = libraries.filter(function(library){
+      return library.volume < 0;
+    }).length
+    
+  if(overUsedCount){
+    Utils.showConfirmDialog('Not Enough Library Volume', 'Save', ['Saving will cause ' + overUsedCount
+      + (overUsedCount > 1 ? ' libraries to have negative volumes. ' : ' library to have a negative volume. ')
+      + 'Are you sure you want to proceed?'], function() {
+      deferred.resolve();
+    }, function() {
+      deferred.reject();
+    });
+  } else {
+    deferred.resolve();
+  }
+  return deferred.promise();
+    
   }
 
 };

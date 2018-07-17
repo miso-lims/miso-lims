@@ -69,13 +69,12 @@
     </td>
   </tr>
   <tr>
-    <td colspan="2">
-      <c:if test="${!empty warnings}">
-        <span style="float:right;"><img src="/styles/images/fail.png"/></span>
-        <c:forEach items="${warnings}" var="warning">
-          <p class="big-warning">${warning}</p>
-        </c:forEach>
-      </c:if>
+    <td colspan="2" id="warnings">
+        <script>
+            jQuery(document).ready(function() {
+                jQuery('#warnings').append(WarningTarget.pool.headerWarnings(${poolDto}));
+            });
+        </script>
     </td>
   </tr>
   <tr>
@@ -227,7 +226,7 @@
   <miso:list-section-ajax id="list_completion" name="Order Status" target="completion" config="{ poolId: ${pool.id} }"/>
   <miso:list-section id="list_run" name="Runs" target="run" items="${runs}" config="{ poolId: ${pool.id} }"/>
   <miso:list-section id="list_partition" name="${pool.platformType.pluralPartitionName}" target="partition" items="${partitions}" config="{'showContainer': true, 'showPool': false}"/>
-  <miso:list-section-ajax id="list_included" name="Included Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: false, duplicateIndicesSequences: ${duplicateIndicesSequences}, nearDuplicateIndicesSequences: ${nearDuplicateIndicesSequences} }"/>
+  <miso:list-section-ajax id="list_included" name="Included Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: false, duplicateIndicesSequences: ${duplicateIndicesSequences}, nearDuplicateIndicesSequences: ${nearDuplicateIndicesSequences}}"/>
   <div class="noPrint">
     <miso:list-section-ajax id="list_available" name="Available Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: true }"/>
   </div>

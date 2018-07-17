@@ -33,10 +33,10 @@ public class ListTablesIT extends AbstractIT {
       Columns.SAMPLE_TYPE, Columns.QC_PASSED, Columns.LOCATION, Columns.LAST_MODIFIED);
   private static final Set<String> librariesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
       Columns.SAMPLE_NAME,
-      Columns.SAMPLE_ALIAS, Columns.QC_PASSED, Columns.INDICES, Columns.LOCATION, Columns.LAST_MODIFIED);
+      Columns.SAMPLE_ALIAS, Columns.QC_PASSED, Columns.INDEX, Columns.LOCATION, Columns.LAST_MODIFIED);
   private static final Set<String> dilutionsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.LIBRARY_NAME,
       Columns.LIBRARY_ALIAS, Columns.MATRIX_BARCODE, Columns.PLATFORM, Columns.TARGETED_SEQUENCING, Columns.DIL_CONCENTRATION,
-      Columns.CONCENTRATION_UNITS, Columns.VOLUME, Columns.CREATOR, Columns.CREATION_DATE);
+      Columns.CONCENTRATION_UNITS, Columns.VOLUME, Columns.NG_USED, Columns.VOLUME_USED, Columns.CREATOR, Columns.CREATION_DATE);
   private static final Set<String> poolsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
       Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.DILUTIONS, Columns.POOL_CONCENTRATION, Columns.LOCATION,
       Columns.AVG_INSERT_SIZE, Columns.LAST_MODIFIED);
@@ -306,6 +306,14 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
+  public void testListPoolsWarnings() throws Exception {
+    testWarning(ListTarget.POOLS, "no indices", "(MISSING INDEX)");
+    testWarning(ListTarget.POOLS, "similar index", "(NEAR-DUPLICATE INDICES)");
+    testWarning(ListTarget.POOLS, "same index", "(DUPLICATE INDICES)");
+    testWarning(ListTarget.POOLS, "low quality library", "(LOW QUALITY LIBRARIES)");
+  }
+
+  @Test
   public void testListOrdersSetup() throws Exception {
     for (String pageName : new String[] { ListTarget.ORDERS_ALL,  ListTarget.ORDERS_ACTIVE,  ListTarget.ORDERS_PENDING }) {
       // this one is special because the number of order completion states is variable
@@ -343,6 +351,14 @@ public class ListTablesIT extends AbstractIT {
       testTabbedSearch(ListTarget.ORDERS_ALL, query);
       testTabbedSearch(ListTarget.ORDERS_PENDING, query);
     });
+  }
+
+  @Test
+  public void testListOrdersWarnings() throws Exception {
+    testWarning(ListTarget.ORDERS_ALL, "no indices", "(MISSING INDEX)");
+    testWarning(ListTarget.ORDERS_ALL, "similar index", "(NEAR-DUPLICATE INDICES)");
+    testWarning(ListTarget.ORDERS_ALL, "same index", "(DUPLICATE INDICES)");
+    testWarning(ListTarget.ORDERS_ALL, "low quality library", "(LOW QUALITY LIBRARIES)");
   }
 
   @Test
@@ -624,6 +640,14 @@ public class ListTablesIT extends AbstractIT {
         }
       }
     }
+  }
+
+  private void testWarning(String target, String query, String warning) {
+    ListTabbedPage page = getTabbedList(target);
+    DataTable table = page.getTable();
+    table.searchFor(query);
+    assertTrue("Description column does not have warning '" + warning + "'",
+        table.doesColumnContainSubstring(Columns.DESCRIPTION, warning));
   }
 
   private int compareFirstTwoNonMatchingValues(DataTable table, String heading) {

@@ -315,6 +315,23 @@ HotTarget.library = (function() {
               lib.receivedDate = flat.receivedDate;
             }
           },
+          {
+            header: 'Effective Group ID',
+            data: 'effectiveGroupId',
+            include: Constants.isDetailedSample && !config.isLibraryReceipt,
+            type: 'text',
+            readOnly: true,
+            depends: 'groupId',
+            update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              if (flatProperty === 'groupId') setData(flat.groupId);
+            },
+            unpack: function(lib, flat, setCellMeta) {
+              flat.effectiveGroupId = lib.effectiveGroupId ? lib.effectiveGroupId : '(None)';
+            },
+            pack: function(lib, flat, errorHandler) {
+              // left blank as this will never be deserialized into the Library model
+            }
+          },
           HotUtils.makeColumnForText('Group ID', Constants.isDetailedSample, 'groupId', {
             validator: HotUtils.validator.optionalTextAlphanumeric
           }),

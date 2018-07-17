@@ -15,6 +15,8 @@ public class DetailedLibraryDto extends LibraryDto {
   private String groupId;
   private String groupDescription;
   private String identityConsentLevel;
+  private String effectiveGroupId;
+  private String effectiveGroupIdSample;
 
   public Boolean getArchived() {
     return archived;
@@ -78,6 +80,22 @@ public class DetailedLibraryDto extends LibraryDto {
 
   public void setIdentityConsentLevel(String identityConsentLevel) {
     this.identityConsentLevel = identityConsentLevel;
+  }
+
+  public String getEffectiveGroupId() {
+    return effectiveGroupId;
+  }
+
+  public void setEffectiveGroupId(String effectiveGroupId) {
+    this.effectiveGroupId = effectiveGroupId;
+  }
+
+  public String getEffectiveGroupIdSample() {
+    return effectiveGroupIdSample;
+  }
+
+  public void setEffectiveGroupIdSample(String effectiveGroupIdSample) {
+    this.effectiveGroupIdSample = effectiveGroupIdSample;
   }
 
 }

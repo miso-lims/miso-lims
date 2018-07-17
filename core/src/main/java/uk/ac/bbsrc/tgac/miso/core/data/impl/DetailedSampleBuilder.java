@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.TreeSet;
 
 import org.w3c.dom.Document;
@@ -526,6 +527,11 @@ public class DetailedSampleBuilder
   @Override
   public void setGroupDescription(String groupDescription) {
     this.groupDescription = groupDescription;
+  }
+
+  @Override
+  public Optional<DetailedSample> getEffectiveGroupIdSample() {
+    throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
   @Override

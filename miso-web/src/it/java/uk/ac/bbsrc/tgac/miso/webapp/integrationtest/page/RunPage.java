@@ -235,4 +235,12 @@ public class RunPage extends FormPage<RunPage.Field> {
         .map(title -> Long.valueOf(title.getText().substring(3, title.getText().indexOf(" "))))
         .collect(Collectors.toList());
   }
+
+  public List<String> getPoolWarningsFromTiles() {
+    if (!dialog.isDisplayed()) {
+      throw new IllegalStateException("Dialog is not visible");
+    }
+    List<WebElement> poolWarnings = dialog.findElements(By.className("parsley-custom-error-message"));
+    return poolWarnings.stream().map(warning -> warning.getText().substring(2)).collect(Collectors.toList());
+  }
 }

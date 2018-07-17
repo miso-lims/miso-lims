@@ -46,7 +46,7 @@
 <div class="bs-callout bs-callout-warning hidden">
   <h2>Oh snap!</h2>
   <p>This form seems to be invalid</p>
-  <div id="generalErrors"></div>
+  <div class="generalErrors"></div>
 </div>
 <br/>
 
@@ -115,6 +115,36 @@ jQuery(document).ready(function() {
       <table id="freezerLayout" class="storageComponent"></table>
     </div>
     
+    <div id="editStorageComponentContainer" class="storageComponentContainer">
+      <form:form id="freezerComponent-form" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8">
+        <div class="bs-callout bs-callout-warning hidden">
+          <h2>Oh snap!</h2>
+          <p>This form seems to be invalid</p>
+          <div class="generalErrors"></div>
+        </div>
+        <span class="storageComponentLabel">Edit <span id="storageComponentAlias"></span></span>
+        <button id="saveStorageComponent" type="button" class="fg-button ui-state-default ui-corner-all" onclick="Freezer.validateAndSaveComponent()">Save</button>
+        <br />
+        <table>
+          <tbody>
+            <tr>
+              <td class="h">Location ID:</td>
+              <td>
+                <span id="storageComponentId"></span>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Barcode:</td>
+              <td>
+                <input id="storageComponentBarcode" type="text">
+                <div id="storageComponentBarcodeError" class="errorContainer"></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form:form>
+    </div>
+    
     <div id="levelTwoStorageContainer" class="storageComponentContainer unselectable">
       <span id="levelTwoStorageAlias" class="storageComponentLabel"></span>
       <div class="clearfix"></div>
@@ -130,6 +160,10 @@ jQuery(document).ready(function() {
 </c:if>
 
 <miso:list-section id="list_box" name="Boxes" target="box" items="${boxes}" config="{'showFreezerLocation':true, 'boxUse':false, 'showStorageLocation':false}"/>
+
+<br/>
+<h1>Changes</h1>
+<table id='changelog' class='display no-border ui-widget-content'></table>
 
 </div>
 </div>

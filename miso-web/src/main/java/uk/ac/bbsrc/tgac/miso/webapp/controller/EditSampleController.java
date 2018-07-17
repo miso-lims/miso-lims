@@ -35,6 +35,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -659,6 +660,11 @@ public class EditSampleController {
         model.put("sampleCategory", detailedSample ? ((DetailedSample) sample).getSampleClass().getSampleCategory() : "plain");
         if (detailedSample) {
           model.put("sampleClass", ((DetailedSample) sample).getSampleClass().getAlias());
+          Optional<DetailedSample> effective = ((DetailedSample) sample).getEffectiveGroupIdSample();
+          if (effective.isPresent()) {
+            model.put("effectiveGroupId", effective.get().getGroupId());
+            model.put("effectiveGroupIdSample", effective.get().getAlias());
+          }
         }
         model.put("title", "Sample " + sampleId);
 

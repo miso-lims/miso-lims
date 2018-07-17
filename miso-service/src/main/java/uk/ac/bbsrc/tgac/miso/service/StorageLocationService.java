@@ -18,10 +18,12 @@ public interface StorageLocationService {
 
   public Map<String, Integer> getColumnSizes() throws IOException;
 
-  public long createRoom(StorageLocation room);
+  public long createRoom(StorageLocation room) throws IOException;
 
-  public long saveFreezer(StorageLocation freezer);
+  public long saveFreezer(StorageLocation freezer) throws IOException;
 
-  public long addFreezerStorage(StorageLocation storage);
+  public long addFreezerStorage(StorageLocation storage) throws IOException;
+
+  public long updateStorageComponent(StorageLocation location) throws IOException;
 
 }

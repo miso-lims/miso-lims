@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
@@ -237,7 +238,8 @@ public final class DefaultIllumina extends RunProcessor {
               return null;
             }
             Matcher m = FAILED_MESSAGE.matcher(failMessage);
-            return LocalDateTime.parse(m.group(1), FAILED_MESSAGE_DATE_FORMATTER);
+            // Somehow, scanner will return things that don't match, so, we check again
+            return m.matches() ? LocalDateTime.parse(m.group(1), FAILED_MESSAGE_DATE_FORMATTER) : null;
           } catch (FileNotFoundException e) {
             log.error("RTA file vanished before reading", e);
             return null;
@@ -263,6 +265,7 @@ public final class DefaultIllumina extends RunProcessor {
 
       if (updatedHealth.isPresent()) {
         completness_method_success.labels("xml").inc();
+        updateCompletionDateFromFile(runDirectory, "RunCompletionStatus.xml", dto);
       }
 
       if (!updatedHealth.isPresent() && dto.getNumReads() > 0) {
@@ -270,6 +273,7 @@ public final class DefaultIllumina extends RunProcessor {
           // It's allegedly done.
           updatedHealth = Optional.of(HealthType.Completed);
           completness_method_success.labels("complete.txt").inc();
+          updateCompletionDateFromFile(runDirectory, "CopyComplete.txt", dto);
         } else {
           // Well, that didn't work. Maybe there are netcopy files.
           long netCopyFiles = IntStream.rangeClosed(1, dto.getNumReads())//
@@ -281,7 +285,12 @@ public final class DefaultIllumina extends RunProcessor {
             // This might mean incomplete or it might mean the sequencer never wrote the files
           } else {
             // If we see some net copy files, then it's still running; if they're all here, assume it's done.
-            updatedHealth = Optional.of(netCopyFiles < dto.getNumReads() ? HealthType.Running : HealthType.Completed);
+            if (netCopyFiles < dto.getNumReads()) {
+              updatedHealth = Optional.of(HealthType.Running);
+            } else {
+              updatedHealth = Optional.of(HealthType.Completed);
+              updateCompletionDateFromFile(runDirectory, String.format("Basecalling_Netcopy_complete_Read%d.txt", dto.getNumReads()), dto);
+            }
             completness_method_success.labels("netcopy").inc();
           }
         }
@@ -308,6 +317,13 @@ public final class DefaultIllumina extends RunProcessor {
     }
 
     return dto;
+  }
+
+  private void updateCompletionDateFromFile(File runDirectory, String fileName, IlluminaNotificationDto dto) throws IOException {
+    if (dto.getCompletionDate() == null) {
+      dto.setCompletionDate(Files.getLastModifiedTime(new File(runDirectory, fileName).toPath()).toInstant()
+          .atZone(ZoneId.of("Z")).toLocalDateTime());
+    }
   }
 
   private String findContainerModel(Document runParams) {

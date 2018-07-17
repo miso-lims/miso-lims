@@ -103,6 +103,8 @@ ListTarget.dilution = {
             "identificationBarcode": dil.identificationBarcode,
             "concentration": dil.concentration,
             "concentrationUnits": dil.concentrationUnits,
+            "ngUsed": dil.ngUsed,
+            "volumeUsed": dil.volumeUsed,
             "creationDate": dil.creationDate,
             "targetedSequencingId": dil.targetedSequencing && dil.targetedSequencing.id != 0 ? dil.targetedSequencing.id : null
 
@@ -156,6 +158,16 @@ ListTarget.dilution = {
     }, {
       "sTitle": "Volume",
       "mData": "volume",
+      "include": true,
+      "iSortPriority": 0
+    }, {
+      "sTitle": "ng Lib. Used",
+      "mData": "ngUsed",
+      "include": true,
+      "iSortPriority": 0
+    }, {
+      "sTitle": "Vol. Lib. Used",
+      "mData": "volumeUsed",
       "include": true,
       "iSortPriority": 0
     }, {

@@ -26,6 +26,8 @@ public class DetailedSampleDto extends SampleDto {
   private boolean nonStandardAlias;
   private Long identityId;
   private String identityConsentLevel;
+  private String effectiveGroupId;
+  private String effectiveGroupIdSample;
 
   public Long getParentId() {
     return parentId;
@@ -196,6 +198,22 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setIdentityConsentLevel(String identityConsentLevel) {
     this.identityConsentLevel = identityConsentLevel;
+  }
+
+  public String getEffectiveGroupId() {
+    return effectiveGroupId;
+  }
+
+  public void setEffectiveGroupId(String effectiveGroupId) {
+    this.effectiveGroupId = effectiveGroupId;
+  }
+
+  public String getEffectiveGroupIdSample() {
+    return effectiveGroupIdSample;
+  }
+
+  public void setEffectiveGroupIdSample(String effectiveGroupIdSample) {
+    this.effectiveGroupIdSample = effectiveGroupIdSample;
   }
 
 }
