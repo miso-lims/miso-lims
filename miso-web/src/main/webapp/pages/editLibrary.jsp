@@ -114,11 +114,16 @@
   </td>
 </tr>
 <tr>
-  <td colspan="2">
+  <td colspan="2" id ="warnings">
     <c:if test="${!empty warning}">
       <span style="float:right;"><img src="/styles/images/fail.png"/></span>
       <p class="big-warning">${warning}</p>
     </c:if>
+    <script>
+      jQuery(document).ready(function() {
+        jQuery('#warnings').append(WarningTarget.library.headerWarnings(${libraryDto}));
+      });
+    </script>
   </td>
 </tr>
 <tr>

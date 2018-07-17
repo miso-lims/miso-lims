@@ -128,6 +128,14 @@ ListTarget.library = {
           "include": true,
           "iSortPriority": 0,
           "bVisible": false
+        }, {
+          "sTitle": "Warnings",
+          "mData": null,
+          "mRender": WarningTarget.library.tableWarnings,
+          "include": true,
+          "iSortPriority": 0,
+          "bVisible": true,
+          "bSortable": false
         }];
   },
   searchTermSelector: function(searchTerms) {

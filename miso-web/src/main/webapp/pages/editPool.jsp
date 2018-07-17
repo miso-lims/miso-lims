@@ -70,11 +70,11 @@
   </tr>
   <tr>
     <td colspan="2" id="warnings">
-        <script>
-            jQuery(document).ready(function() {
-                jQuery('#warnings').append(WarningTarget.pool.headerWarnings(${poolDto}));
-            });
-        </script>
+      <script>
+        jQuery(document).ready(function() {
+          jQuery('#warnings').append(WarningTarget.pool.headerWarnings(${poolDto}));
+        });
+      </script>
     </td>
   </tr>
   <tr>
