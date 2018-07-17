@@ -240,6 +240,7 @@ public class Dtos {
     dto.setSampleCategory(from.getSampleCategory());
     dto.setSuffix(from.getSuffix());
     dto.setArchived(from.isArchived());
+    dto.setDirectCreationAllowed(from.isDirectCreationAllowed());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -258,6 +259,7 @@ public class Dtos {
     to.setSampleCategory(from.getSampleCategory());
     to.setSuffix(from.getSuffix());
     to.setArchived(from.isArchived());
+    to.setDirectCreationAllowed(from.isDirectCreationAllowed());
     to.setDNAseTreatable(from.getDNAseTreatable());
     return to;
   }
