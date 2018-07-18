@@ -202,8 +202,7 @@
             <div class="exppreview" id="pool-notes-${n.count}">
               <b>${note.creationDate}</b>: ${note.text}
               <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}</span>
-                <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
                   <span style="color:#000000">
                     <a href='#' onclick="Pool.ui.deletePoolNote('${pool.id}', '${note.noteId}');">
                       <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span>

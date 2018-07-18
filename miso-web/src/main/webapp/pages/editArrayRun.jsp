@@ -182,7 +182,7 @@ jQuery(document).ready(function() {
     countDirection: 'down'
   });
   
-  ArrayRun.userIsAdmin = ${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')};
+  ArrayRun.userIsAdmin = ${miso:isAdmin()};
   ArrayRun.setRunJson(${pageMode eq 'create' ? null : arrayRunJson});
   
   jQuery('#arraySearchField').keyup(function(event) {
