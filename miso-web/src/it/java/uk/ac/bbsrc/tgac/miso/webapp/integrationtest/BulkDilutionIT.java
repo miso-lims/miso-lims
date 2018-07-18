@@ -35,6 +35,8 @@ public class BulkDilutionIT extends AbstractIT {
 
   private static final String NO_TAR_SEQ = "(None)";
 
+  private static final double EPSILON = 0.000001;
+
   @Before
   public void setup() {
     loginAdmin();
@@ -220,8 +222,8 @@ public class BulkDilutionIT extends AbstractIT {
     assertDilutionAttributes(attrs, saved);
 
     LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
-    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 89.9f, savedLib.getVolume()),
-        savedLib.getVolume() == 89.9f);
+    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 89.9, savedLib.getVolume()),
+        compareDoubles(savedLib.getVolume(), 89.9));
   }
 
   @Test
@@ -233,7 +235,7 @@ public class BulkDilutionIT extends AbstractIT {
     row0.put(DilColumns.VOLUME_USED, "12.34");
 
     Map<String, String> row1 = Maps.newLinkedHashMap();
-    row1.put(DilColumns.VOLUME_USED, "110.3");
+    row1.put(DilColumns.VOLUME_USED, "110.2");
 
     fillRow(table, 0, row0);
     fillRow(table, 1, row1);
@@ -253,12 +255,12 @@ public class BulkDilutionIT extends AbstractIT {
     assertDilutionAttributes(row1, saved1);
 
     LibraryImpl savedLib0 = (LibraryImpl) getSession().get(LibraryImpl.class, saved0.getLibrary().getId());
-    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 87.66f, savedLib0.getVolume()),
-        savedLib0.getVolume() == 87.66f);
+    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 87.66, savedLib0.getVolume()),
+        savedLib0.getVolume() == 87.66);
 
     LibraryImpl savedLib1 = (LibraryImpl) getSession().get(LibraryImpl.class, saved1.getLibrary().getId());
-    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", -10.3f, savedLib1.getVolume()),
-        savedLib1.getVolume() == -10.3f);
+    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", -10.2, savedLib1.getVolume()),
+        compareDoubles(savedLib1.getVolume(), -10.2));
   }
 
   @Test
@@ -280,8 +282,8 @@ public class BulkDilutionIT extends AbstractIT {
     assertDilutionAttributes(attrs, saved);
 
     LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
-    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 49.8f, savedLib.getVolume()),
-        savedLib.getVolume() == 49.8f);
+    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 49.8, savedLib.getVolume()),
+        compareDoubles(savedLib.getVolume(), 49.8));
   }
 
   @Test
@@ -303,8 +305,8 @@ public class BulkDilutionIT extends AbstractIT {
     assertDilutionAttributes(attrs, saved);
 
     LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
-    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 67.6f, savedLib.getVolume()),
-        savedLib.getVolume() == 67.6f);
+    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 67.6, savedLib.getVolume()),
+        compareDoubles(savedLib.getVolume(), 67.6));
   }
 
   @Test
@@ -326,8 +328,8 @@ public class BulkDilutionIT extends AbstractIT {
     assertDilutionAttributes(attrs, saved);
 
     LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
-    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 87.8f, savedLib.getVolume()),
-        savedLib.getVolume() == 87.8f);
+    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 87.8, savedLib.getVolume()),
+        compareDoubles(savedLib.getVolume(), 87.8));
   }
 
   @Test
@@ -349,8 +351,8 @@ public class BulkDilutionIT extends AbstractIT {
     assertDilutionAttributes(attrs, saved);
 
     LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
-    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 100f, savedLib.getVolume()),
-        savedLib.getVolume() == 100f);
+    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 100.0, savedLib.getVolume()),
+        compareDoubles(savedLib.getVolume(), 100.0));
   }
 
   private long getSavedId(HandsOnTable table, int rowNum) {
@@ -408,5 +410,9 @@ public class BulkDilutionIT extends AbstractIT {
     } else {
       return value == null || value.isEmpty() ? null : value;
     }
+  }
+
+  private boolean compareDoubles(double d1, double d2) {
+    return (Math.abs(d1 - d2) <= EPSILON);
   }
 }
