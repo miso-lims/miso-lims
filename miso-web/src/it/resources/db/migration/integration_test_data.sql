@@ -637,7 +637,7 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
   (804, 'LIB804', 'TIB_0001_nn_n_PE_804_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 60, NULL, NULL, 1, 0),
   (805, 'LIB805', 'TIB_0001_nn_n_PE_805_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
-    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 1, NULL, NULL, 1, 0),
+    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0),
   (806, 'LIB806', 'TIB_0001_nn_n_PE_806_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 60, NULL, NULL, 1, 0),
   (807, 'LIB807', 'TIB_0001_nn_n_PE_807_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
@@ -651,6 +651,11 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
   (600, 'LIB600', 'TIB_0001_nn_n_PE_600_WG', 'BADLIB', NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, 1, 0, 1);
 
+INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, securityProfile_profileId, sample_sampleId, platformType,
+  libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
+  volume, concentration, locationBarcode, kitDescriptorId, discarded, volumeUnits, concentrationUnits) VALUES
+  (2201, 'LIB2201', 'TIB_0001_nn_n_PE_2201_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 50, 60, NULL, 1, 0, 'volumeUnits', 'concentrationUnits');
 
 INSERT INTO DetailedLibrary(libraryId, archived, libraryDesign, libraryDesignCodeId) VALUES
   (1, 0, 1, 7),
@@ -722,13 +727,13 @@ INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId,
 (804, 'LDI804', 2.2, 604, 'same_index_2', '2018-06-26', 1, 1, 1, '2018-06-26 11:39:00');
 
 
-INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, lastModifier, lastUpdated, volumeUsed) VALUES
-(901, 'LDI901', 4.3, 504, 'auto_calculate_pool_1', '2018-07-12', 'admin', 1, 1, '2018-07-12 09:43:00', 14.7),
-(902, 'LDI902', 1.7, 504, 'auto_calculate_pool_2', '2018-07-12', 'admin', 1, 1, '2018-07-12 09:43:00', 21.3),
-(1001, 'LDI1001', 1.7, 804, 'edit_volumeused_1', '2018-07-12', 'admin', 1, 1, '2018-07-12 09:43:00', 40),
-(1002, 'LDI1002', 1.7, 805, 'edit_volumeused_2', '2018-07-12', 'admin', 1, 1, '2018-07-12 09:43:00', NULL),
-(1003, 'LDI1003', 1.7, 806, 'edit_volumeused_3', '2018-07-12', 'admin', 1, 1, '2018-07-12 09:43:00', 40),
-(1004, 'LDI1004', 1.7, 807, 'edit_volumeused_4', '2018-07-12', 'admin', 1, 1, '2018-07-12 09:43:00', 40);
+INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, creator, securityProfile_profileId, lastModifier, lastUpdated, volumeUsed) VALUES
+(901, 'LDI901', 4.3, 504, 'auto_calculate_pool_1', '2018-07-12', 1, 1, 1, '2018-07-12 09:43:00', 14.7),
+(902, 'LDI902', 1.7, 504, 'auto_calculate_pool_2', '2018-07-12', 1, 1, 1, '2018-07-12 09:43:00', 21.3),
+(1001, 'LDI1001', 1.7, 804, 'edit_volumeused_1', '2018-07-12', 1, 1, 1, '2018-07-12 09:43:00', 40),
+(1002, 'LDI1002', 1.7, 805, 'edit_volumeused_2', '2018-07-12', 1, 1, 1, '2018-07-12 09:43:00', NULL),
+(1003, 'LDI1003', 1.7, 806, 'edit_volumeused_3', '2018-07-12', 1, 1, 1, '2018-07-12 09:43:00', 40),
+(1004, 'LDI1004', 1.7, 807, 'edit_volumeused_4', '2018-07-12', 1, 1, 1, '2018-07-12 09:43:00', 40);
 
 INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
 (1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 2, 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL),
@@ -759,6 +764,9 @@ INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarc
 (802, 4, 4, 'IPO802', 'TEST_SIMILAR_INDEX_WARNING', 'ipobar802', 'similar index', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
 (803, 4, 4, 'IPO803', 'TEST_SAME_INDEX_WARNING', 'ipobar803', 'same index', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
 (804, 4, 4, 'IPO804', 'TEST_BAD_LIBRARY_WARNING', 'ipobar804', 'low quality library', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL);
+
+INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, lastModifier, creator, created, lastModified, qcPassed, volumeUnits, concentrationUnits) VALUES
+(2201, 50, 60, 'IPO2201', 'AUTO_UPDATE_QC', 'ipobar2201', 'autoupdate qc', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL, 'volumeUnits', 'concentrationUnits');
 
 INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
 (1, 1),
@@ -937,7 +945,14 @@ INSERT INTO ArrayRun(arrayRunId, alias, instrumentId, arrayId, health, startDate
 INSERT INTO QCType(qcTypeId, name, description, qcTarget, units, archived, precisionAfterDecimal, correspondingField, autoUpdateField) VALUES
 (101, 'test edit qc', '', 'Sample', 'test units', 0, 2, 'NONE', 0),
 (102, 'update volume qc', '', 'Sample', 'new volume', 0, 2, 'VOLUME', 1),
-(103, 'update concentration qc', '', 'Sample', 'new conc', 0, 2, 'CONCENTRATION', 1);
+(103, 'update concentration qc', '', 'Sample', 'new conc', 0, 2, 'CONCENTRATION', 1),
+(104, 'test edit qc', '', 'Library', 'test units', 0, 2, 'NONE', 0),
+(105, 'update volume qc', '', 'Library', 'new volume', 0, 2, 'VOLUME', 1),
+(106, 'update concentration qc', '', 'Library', 'new conc', 0, 2, 'CONCENTRATION', 1),
+(107, 'test edit qc', '', 'Pool', 'test units', 0, 2, 'NONE', 0),
+(108, 'update volume qc', '', 'Pool', 'new volume', 0, 2, 'VOLUME', 1),
+(109, 'update concentration qc', '', 'Pool', 'new conc', 0, 2, 'CONCENTRATION', 1);
+
 
 INSERT INTO SampleQC(sample_sampleId, creator, date, type, results, created, lastModified) VALUES
 (2201, 1, '2018-07-10', 101, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
@@ -945,6 +960,12 @@ INSERT INTO SampleQC(sample_sampleId, creator, date, type, results, created, las
 INSERT INTO Workset(worksetId, alias, description, creator, created, lastModifier, lastModified) VALUES
 (1, 'Workset One', 'Workset One description', 1, '2018-08-03 13:12:00', 1, '2018-08-03 13:12:00'),
 (2, 'Workset Two', 'Workset Two description', 1, '2018-08-03 13:12:00', 1, '2018-08-03 13:12:00');
+
+INSERT INTO LibraryQC(library_libraryId, creator, date, type, results, created, lastModified) VALUES
+(2201, 1, '2018-07-10', 104, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
+
+INSERT INTO PoolQC(pool_poolId, creator, date, type, results, created, lastModified) VALUES
+(2201, 1, '2018-07-10', 107, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
 
 INSERT INTO Workset_Sample(worksetId, sampleId) VALUES
 (1, 100001),

@@ -19,19 +19,18 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage.QcColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
 
-public class BulkSampleQCIT extends AbstractBulkSampleIT {
+public class BulkPoolQCIT extends AbstractIT {
 
-  private static final Logger log = LoggerFactory.getLogger(BulkSampleQCIT.class);
+  private static final Logger log = LoggerFactory.getLogger(BulkPoolQCIT.class);
 
-  private static final Set<String> qcColumns = Sets.newHashSet(QcColumns.SAMPLE_ALIAS, QcColumns.DATE, QcColumns.TYPE,
+  private static final Set<String> qcColumns = Sets.newHashSet(QcColumns.POOL_ALIAS, QcColumns.DATE, QcColumns.TYPE,
       QcColumns.RESULT, QcColumns.UNITS);
 
   @Before
@@ -40,11 +39,11 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
   }
 
   private BulkQCPage getEditPage(List<Long> ids) {
-    return BulkQCPage.getForEditSample(getDriver(), getBaseUrl(), ids);
+    return BulkQCPage.getForEditPool(getDriver(), getBaseUrl(), ids);
   }
 
   private BulkQCPage getAddPage(List<Long> ids, int copies) {
-    return BulkQCPage.getForAddSample(getDriver(), getBaseUrl(), ids, copies);
+    return BulkQCPage.getForAddPool(getDriver(), getBaseUrl(), ids, copies);
   }
 
 
@@ -82,7 +81,7 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
 
   @Test
   public void testAddQc() throws Exception {
-    // Goal: ensure a sample QC can be added
+    // Goal: ensure a pool QC can be added
     BulkQCPage page = getAddPage(Arrays.asList(2201L), 1);
     HandsOnTable table = page.getTable();
 
@@ -93,23 +92,23 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
 
     fillRow(table, 0, attrs);
 
-    assertFalse(table.isWritable(QcColumns.SAMPLE_ALIAS, 0));
+    assertFalse(table.isWritable(QcColumns.POOL_ALIAS, 0));
     assertFalse(table.isWritable(QcColumns.UNITS, 0));
 
     assertColumnValues(table, 0, attrs, "pre-save");
     saveAndAssertSuccess(table);
     assertColumnValues(table, 0, attrs, "post-save");
 
-    Criteria c = getSession().createCriteria(SampleQC.class);
+    Criteria c = getSession().createCriteria(PoolQC.class);
     c.addOrder(Order.desc("qcId"));
     c.setMaxResults(1);
-    SampleQC saved = (SampleQC) c.uniqueResult();
+    PoolQC saved = (PoolQC) c.uniqueResult();
     assertQCAttributes(attrs, saved);
   }
 
   @Test
   public void testEditQc() throws Exception {
-    // Goal: ensure a sample QC can be edited
+    // Goal: ensure a pool QC can be edited
     BulkQCPage page = getEditPage(Arrays.asList(2201L));
     HandsOnTable table = page.getTable();
 
@@ -119,7 +118,7 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
 
     fillRow(table, 0, attrs);
 
-    assertFalse(table.isWritable(QcColumns.SAMPLE_ALIAS, 0));
+    assertFalse(table.isWritable(QcColumns.POOL_ALIAS, 0));
     assertFalse(table.isWritable(QcColumns.UNITS, 0));
     assertFalse(table.isWritable(QcColumns.TYPE, 0));
 
@@ -127,10 +126,10 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
     saveAndAssertSuccess(table);
     assertColumnValues(table, 0, attrs, "post-save");
 
-    Criteria c = getSession().createCriteria(SampleQC.class);
+    Criteria c = getSession().createCriteria(PoolQC.class);
     c.addOrder(Order.desc("qcId"));
     c.setMaxResults(1);
-    SampleQC saved = (SampleQC) c.uniqueResult();
+    PoolQC saved = (PoolQC) c.uniqueResult();
     assertQCAttributes(attrs, saved);
   }
 
@@ -147,23 +146,23 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
     
     fillRow(table, 0, attrs);
     
-    assertFalse(table.isWritable(QcColumns.SAMPLE_ALIAS, 0));
+    assertFalse(table.isWritable(QcColumns.POOL_ALIAS, 0));
     assertFalse(table.isWritable(QcColumns.UNITS, 0));
 
     assertColumnValues(table, 0, attrs, "pre-save");
     saveAndAssertSuccess(table);
     assertColumnValues(table, 0, attrs, "post-save");
 
-    Criteria c = getSession().createCriteria(SampleQC.class);
+    Criteria c = getSession().createCriteria(PoolQC.class);
     c.addOrder(Order.desc("qcId"));
     c.setMaxResults(1);
-    SampleQC saved = (SampleQC) c.uniqueResult();
+    PoolQC saved = (PoolQC) c.uniqueResult();
     assertQCAttributes(attrs, saved);
     
-    assertTrue(String.format("Expected volume to be updated to %f, instead got %f", Double.parseDouble("10.43"), saved.getSample().getVolume()),
-        saved.getSample().getVolume().equals(Double.parseDouble("10.43")));
-    assertTrue(String.format("Expected volume units to be updated to %s, instead got %s", "new volume", saved.getSample().getVolumeUnits()),
-        saved.getSample().getVolumeUnits().equals("new volume"));
+    assertTrue(String.format("Expected volume to be updated to %f, instead got %f", Double.parseDouble("10.43"), saved.getPool().getVolume()),
+        saved.getPool().getVolume().equals(Double.parseDouble("10.43")));
+    assertTrue(String.format("Expected volume units to be updated to %s, instead got %s", "new volume", saved.getPool().getVolumeUnits()),
+        saved.getPool().getVolumeUnits().equals("new volume"));
   }
 
   @Test
@@ -179,27 +178,27 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
     
     fillRow(table, 0, attrs);
     
-    assertFalse(table.isWritable(QcColumns.SAMPLE_ALIAS, 0));
+    assertFalse(table.isWritable(QcColumns.POOL_ALIAS, 0));
     assertFalse(table.isWritable(QcColumns.UNITS, 0));
 
     assertColumnValues(table, 0, attrs, "pre-save");
     saveAndAssertSuccess(table);
     assertColumnValues(table, 0, attrs, "post-save");
 
-    Criteria c = getSession().createCriteria(SampleQC.class);
+    Criteria c = getSession().createCriteria(PoolQC.class);
     c.addOrder(Order.desc("qcId"));
     c.setMaxResults(1);
-    SampleQC saved = (SampleQC) c.uniqueResult();
+    PoolQC saved = (PoolQC) c.uniqueResult();
     assertQCAttributes(attrs, saved);
     
     assertTrue(
         String.format("Expected concentration to be updated to %f, instead got %f", Double.parseDouble("24.78"),
-            saved.getSample().getConcentration()),
-        saved.getSample().getConcentration().equals(Double.parseDouble("24.78")));
+            saved.getPool().getConcentration()),
+        saved.getPool().getConcentration().equals(Double.parseDouble("24.78")));
     assertTrue(
         String.format("Expected concentration units to be updated to %s, instead got %s", "new conc",
-            saved.getSample().getConcentrationUnits()),
-        saved.getSample().getConcentrationUnits().equals("new conc"));
+            saved.getPool().getConcentrationUnits()),
+        saved.getPool().getConcentrationUnits().equals("new conc"));
   }
   
   private void saveAndAssertSuccess(HandsOnTable table) {
@@ -229,11 +228,11 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
     });
   }
 
-  private void assertQCAttributes(Map<String, String> attributes, SampleQC sampleQc) {
-    testQCAttribute(QcColumns.DATE, attributes, sampleQc, qc -> qc.getDate().toString());
-    testQCAttribute(QcColumns.TYPE, attributes, sampleQc, qc -> qc.getType().getName());
-    testQCAttribute(QcColumns.RESULT, attributes, sampleQc, qc -> qc.getResults().toString());
-    testQCAttribute(QcColumns.UNITS, attributes, sampleQc, qc -> qc.getType().getUnits());
+  private void assertQCAttributes(Map<String, String> attributes, PoolQC PoolQc) {
+    testQCAttribute(QcColumns.DATE, attributes, PoolQc, qc -> qc.getDate().toString());
+    testQCAttribute(QcColumns.TYPE, attributes, PoolQc, qc -> qc.getType().getName());
+    testQCAttribute(QcColumns.RESULT, attributes, PoolQc, qc -> qc.getResults().toString());
+    testQCAttribute(QcColumns.UNITS, attributes, PoolQc, qc -> qc.getType().getUnits());
   }
 
   private <T> void testQCAttribute(String column, Map<String, String> attributes, T object, Function<T, String> getter) {

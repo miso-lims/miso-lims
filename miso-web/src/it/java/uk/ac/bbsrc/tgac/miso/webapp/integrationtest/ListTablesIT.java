@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,6 +26,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage.Tabs;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage.ProjectTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class ListTablesIT extends AbstractIT {
@@ -34,10 +37,10 @@ public class ListTablesIT extends AbstractIT {
       Columns.SAMPLE_NAME, Columns.SAMPLE_ALIAS, Columns.QC_PASSED, Columns.INDEX, Columns.LOCATION, Columns.LAST_MODIFIED,
       Columns.WARNINGS);
   private static final Set<String> dilutionsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.LIBRARY_NAME,
-      Columns.LIBRARY_ALIAS, Columns.MATRIX_BARCODE, Columns.PLATFORM, Columns.TARGETED_SEQUENCING, Columns.DIL_CONCENTRATION,
+      Columns.LIBRARY_ALIAS, Columns.MATRIX_BARCODE, Columns.PLATFORM, Columns.TARGETED_SEQUENCING, Columns.CONCENTRATION,
       Columns.CONCENTRATION_UNITS, Columns.VOLUME, Columns.NG_USED, Columns.VOLUME_USED, Columns.CREATOR, Columns.CREATION_DATE);
   private static final Set<String> poolsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
-      Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.DILUTIONS, Columns.POOL_CONCENTRATION, Columns.LOCATION,
+      Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.DILUTIONS, Columns.CONCENTRATION, Columns.LOCATION,
       Columns.AVG_INSERT_SIZE, Columns.LAST_MODIFIED);
   private static final Set<String> ordersColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
       Columns.PLATFORM, Columns.LONGEST_INDEX, Columns.SEQUENCING_PARAMETERS, Columns.REMAINING, Columns.LAST_MODIFIED);
@@ -142,6 +145,16 @@ public class ListTablesIT extends AbstractIT {
       return Integer.compare(id1, id2);
     } else {
       return standardComparator.compare(name1, name2);
+    }
+  };
+
+  private static final Comparator<String> numericComparator = (num1, num2) -> {
+    if (NumberUtils.isCreatable(num1) && NumberUtils.isCreatable(num2)) {
+      double d1 = Double.valueOf(num1);
+      double d2 = Double.valueOf(num2);
+      return Double.compare(d1, d2);
+    } else {
+      return standardComparator.compare(num1, num2);
     }
   };
 
@@ -455,19 +468,31 @@ public class ListTablesIT extends AbstractIT {
       // if there are at least two rows, ensure that sort was correct
       if (!table.isTableEmpty() && table.countRows() > 1) {
         int sort1 = compareFirstTwoNonMatchingValues(table, heading);
+        List<String> columnSort1 = getColumn(table, heading);
         // sort the other way
         table.sortByColumn(heading);
         assertTrue("second sort on column '" + heading, isStringEmptyOrNull(page.getErrors().getText()));
         int sort2 = compareFirstTwoNonMatchingValues(table, heading);
+        List<String> columnSort2 = getColumn(table, heading);
 
         // compare results (if either is 0, value of the other can be anything though)
         if (sort1 != 0) {
           assertTrue(
-              heading + " column second sort order should differ from first",
+              heading + " column second sort order should differ from first:"
+                  + " First sort order was <" + String.join(", ", columnSort1) + ">, "
+                  + "Second sort order was <" + String.join(", ", columnSort2) + ">",
               sort2 == 0 || sort1 > 0 != sort2 > 0);
         }
       }
     }
+  }
+
+  private List<String> getColumn(DataTable table, String heading) {
+    List<String> colVals = new ArrayList<>();
+    for (int rowNum = 0; rowNum < table.countRows(); rowNum++) {
+      colVals.add(table.getTextAtCell(heading, rowNum));
+    }
+    return colVals;
   }
 
   private void testWarningNormal(String target, String query, String warning, String column) {
@@ -505,6 +530,8 @@ public class ListTablesIT extends AbstractIT {
     case Columns.NAME:
     case Columns.SAMPLE_NAME:
       return nameNumericComparator;
+    case Columns.CONCENTRATION:
+      return numericComparator;
     default:
       return standardComparator;
     }
