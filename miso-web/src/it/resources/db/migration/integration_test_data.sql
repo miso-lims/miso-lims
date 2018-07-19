@@ -663,7 +663,8 @@ INSERT INTO DetailedLibrary(libraryId, archived, libraryDesign, libraryDesignCod
   (305, 0, NULL, 7),
   (306, 0, NULL, 7),
   (504, 0, NULL, 7),
-  (505, 0, NULL, 7);
+  (505, 0, NULL, 7),
+  (901, 0, NULL, 7);
 
 INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (100001, 5),
