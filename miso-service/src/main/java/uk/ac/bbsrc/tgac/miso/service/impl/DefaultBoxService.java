@@ -142,6 +142,15 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   }
 
   @Override
+  public List<Box> listByIdList(List<Long> idList) throws IOException {
+    List<Box> boxes = boxStore.getByIdList(idList);
+    for (Box box : boxes) {
+      authorizationManager.throwIfNotReadable(box);
+    }
+    return boxes;
+  }
+
+  @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
   }
@@ -214,8 +223,18 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   }
 
   @Override
+  public BoxSize getSize(long id) throws IOException {
+    return boxStore.getSizeById(id);
+  }
+
+  @Override
   public Collection<BoxUse> listUses() throws IOException {
     return boxStore.listAllBoxUses();
+  }
+
+  @Override
+  public BoxUse getUse(long id) throws IOException {
+    return boxStore.getUseById(id);
   }
 
   @Override
@@ -223,15 +242,18 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
     setChangeDetails(box);
     if (box.getStorageLocation() != null) {
       box.setStorageLocation(storageLocationService.get(box.getStorageLocation().getId()));
+    } else {
+      box.setStorageLocation(null);
     }
+    loadChildEntities(box);
     if (box.getId() == AbstractBox.UNSAVED_ID) {
       return saveNewBox(box);
     } else {
       Box original = boxStore.get(box.getId());
       authorizationManager.throwIfNotWritable(original);
       logStorageChange(box, original);
-      applyChanges(box, original);
       validateChange(box, original);
+      applyChanges(box, original);
       StringBuilder message = new StringBuilder();
 
       // get persisted version of new box contents before change
@@ -305,6 +327,13 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
     }
   }
 
+  private void loadChildEntities(Box box) throws IOException {
+    if (box.getSize() != null) {
+      box.setSize(getSize(box.getSize().getId()));
+    }
+    box.setUse(getUse(box.getUse().getId()));
+  }
+
   /**
    * Checks submitted data for validity, throwing a ValidationException containing all of the errors if invalid
    * 
@@ -329,7 +358,6 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
         }
       }
     }
-
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }

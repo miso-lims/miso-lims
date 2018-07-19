@@ -18,6 +18,7 @@ public class BoxDto {
   private String identificationBarcode;
   private String locationBarcode;
   private int tubeCount;
+  private String storageLocationBarcode;
   private String freezerDisplayLocation;
   private String storageDisplayLocation;
 
@@ -147,6 +148,14 @@ public class BoxDto {
 
   public void setStorageDisplayLocation(String storageDisplayLocation) {
     this.storageDisplayLocation = storageDisplayLocation;
+  }
+
+  public String getStorageLocationBarcode() {
+    return storageLocationBarcode;
+  }
+
+  public void setStorageLocationBarcode(String storageLocationBarcode) {
+    this.storageLocationBarcode = storageLocationBarcode;
   }
 
 }

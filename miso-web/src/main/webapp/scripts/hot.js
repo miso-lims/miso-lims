@@ -105,6 +105,13 @@ var HotUtils = {
           HotUtils.validator.requiredAutocomplete(value, callback);
         }
       }
+      
+    },
+    /**
+     * Custom validator for setting fields to manually be invalid
+     */
+    invalid: function(value, callback) {
+      return callback(false);
     }
   },
   /**
