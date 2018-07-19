@@ -951,35 +951,6 @@ public class EditLibraryController {
   private final BulkMergeTableBackend<PoolDto> poolBulkMergeBackend = new BulkMergeTableBackend<PoolDto>(
       "pool", PoolDto.class, "Pools", "Dilutions") {
 
-    /** Given a bunch of strings, find the long substring that matches all of them that doesn't end in numbers or underscores. */
-    private String findCommonPrefix(String[] str) {
-      StringBuilder commonPrefix = new StringBuilder();
-
-      while (commonPrefix.length() < str[0].length()) {
-        char current = str[0].charAt(commonPrefix.length());
-        boolean matches = true;
-        for (int i = 1; matches && i < str.length; i++) {
-          if (str[i].charAt(commonPrefix.length()) != current) {
-            matches = false;
-          }
-        }
-        if (matches) {
-          commonPrefix.append(current);
-        } else {
-          break;
-        }
-      }
-      // Chew back any digits at the end
-      while (commonPrefix.length() > 0 && Character.isDigit(commonPrefix.charAt(commonPrefix.length() - 1))) {
-        commonPrefix.setLength(commonPrefix.length() - 1);
-      }
-      if (commonPrefix.length() > 0 && commonPrefix.charAt(commonPrefix.length() - 1) == '_') {
-        commonPrefix.setLength(commonPrefix.length() - 1);
-      }
-      return (commonPrefix.length() > 0) ? commonPrefix.toString() : null;
-
-    }
-
     @Override
     protected PoolDto createDtoFromParents(List<Long> ids) throws IOException {
       List<LibraryDilution> parents = dilutionService.listByIdList(ids);
@@ -998,7 +969,8 @@ public class EditLibraryController {
       if (parents.size() == 1) {
         dto.setAlias(parents.get(0).getLibrary().getAlias() + "_POOL");
       } else {
-        String commonPrefix = findCommonPrefix(parents.stream().map(dilution -> dilution.getLibrary().getAlias()).toArray(String[]::new));
+        String commonPrefix = LimsUtils
+            .findCommonPrefix(parents.stream().map(dilution -> dilution.getLibrary().getAlias()).toArray(String[]::new));
         if (commonPrefix != null) {
           dto.setAlias(commonPrefix + "_POOL");
         }

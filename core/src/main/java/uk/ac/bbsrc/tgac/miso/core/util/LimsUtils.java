@@ -452,4 +452,33 @@ public class LimsUtils {
       return String.join(", ", wordsCopy);
     }
   }
+
+  /** Given a bunch of strings, find the long substring that matches all of them that doesn't end in numbers or underscores. */
+  public static String findCommonPrefix(String[] str) {
+    StringBuilder commonPrefix = new StringBuilder();
+
+    while (commonPrefix.length() < str[0].length()) {
+      char current = str[0].charAt(commonPrefix.length());
+      boolean matches = true;
+      for (int i = 1; matches && i < str.length; i++) {
+        if (str[i].charAt(commonPrefix.length()) != current) {
+          matches = false;
+        }
+      }
+      if (matches) {
+        commonPrefix.append(current);
+      } else {
+        break;
+      }
+    }
+    // Chew back any digits at the end
+    while (commonPrefix.length() > 0 && Character.isDigit(commonPrefix.charAt(commonPrefix.length() - 1))) {
+      commonPrefix.setLength(commonPrefix.length() - 1);
+    }
+    if (commonPrefix.length() > 0 && commonPrefix.charAt(commonPrefix.length() - 1) == '_') {
+      commonPrefix.setLength(commonPrefix.length() - 1);
+    }
+    return (commonPrefix.length() > 0) ? commonPrefix.toString() : null;
+
+  }
 }
