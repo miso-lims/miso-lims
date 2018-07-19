@@ -50,6 +50,14 @@ ListTarget.pool = {
         });
       }
     });
+    actions.push({
+      name: "Merge",
+      action: function(items){
+        window.location = window.location.origin + '/miso/pool/bulk/merge?' + jQuery.param({
+          ids: items.map(Utils.array.getId).join(',')
+        });
+      }
+    });
     return actions;
   },
   createStaticActions: function(config, prodjectId) {
