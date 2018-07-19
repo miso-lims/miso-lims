@@ -269,7 +269,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListLibrariesWarnings() throws Exception {
-    testWarning(ListTarget.LIBRARIES, "LIB901", "(NEGATIVE VOLUME)", Columns.WARNINGS);
+    testWarningNormal(ListTarget.LIBRARIES, "LIB901", "(NEGATIVE VOLUME)", Columns.WARNINGS);
   }
 
   @Test
@@ -314,10 +314,10 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListPoolsWarnings() throws Exception {
-    testWarning(ListTarget.POOLS, "no indices", "(MISSING INDEX)", Columns.DESCRIPTION);
-    testWarning(ListTarget.POOLS, "similar index", "(NEAR-DUPLICATE INDICES)", Columns.DESCRIPTION);
-    testWarning(ListTarget.POOLS, "same index", "(DUPLICATE INDICES)", Columns.DESCRIPTION);
-    testWarning(ListTarget.POOLS, "low quality library", "(LOW QUALITY LIBRARIES)", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.POOLS, "no indices", "(MISSING INDEX)", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.POOLS, "similar index", "(NEAR-DUPLICATE INDICES)", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.POOLS, "same index", "(DUPLICATE INDICES)", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.POOLS, "low quality library", "(LOW QUALITY LIBRARIES)", Columns.DESCRIPTION);
   }
 
   @Test
@@ -362,10 +362,10 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListOrdersWarnings() throws Exception {
-    testWarning(ListTarget.ORDERS_ALL, "no indices", "(MISSING INDEX)", Columns.DESCRIPTION);
-    testWarning(ListTarget.ORDERS_ALL, "similar index", "(NEAR-DUPLICATE INDICES)", Columns.DESCRIPTION);
-    testWarning(ListTarget.ORDERS_ALL, "same index", "(DUPLICATE INDICES)", Columns.DESCRIPTION);
-    testWarning(ListTarget.ORDERS_ALL, "low quality library", "(LOW QUALITY LIBRARIES)", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.ORDERS_ALL, "no indices", "(MISSING INDEX)", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.ORDERS_ALL, "similar index", "(NEAR-DUPLICATE INDICES)", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.ORDERS_ALL, "same index", "(DUPLICATE INDICES)", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.ORDERS_ALL, "low quality library", "(LOW QUALITY LIBRARIES)", Columns.DESCRIPTION);
   }
 
   @Test
@@ -649,7 +649,15 @@ public class ListTablesIT extends AbstractIT {
     }
   }
 
-  private void testWarning(String target, String query, String warning, String column) {
+  private void testWarningNormal(String target, String query, String warning, String column) {
+    ListTabbedPage page = getTabbedList(target);
+    DataTable table = page.getTable();
+    table.searchFor(query);
+    assertTrue(String.format("'%s' column does not contain '%s' warning", column, warning),
+        table.doesColumnContainSubstring(column, warning));
+  }
+
+  private void testWarningTabbed(String target, String query, String warning, String column) {
     ListTabbedPage page = getTabbedList(target);
     DataTable table = page.getTable();
     table.searchFor(query);
