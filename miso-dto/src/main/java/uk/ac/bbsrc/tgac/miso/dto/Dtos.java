@@ -1245,6 +1245,7 @@ public class Dtos {
       dto.setItems(asBoxablesDtos(from.getBoxables()));
     }
     if (from.getStorageLocation() != null) {
+      dto.setStorageLocationBarcode(from.getStorageLocation().getIdentificationBarcode());
       dto.setFreezerDisplayLocation(from.getStorageLocation().getFreezerDisplayLocation());
       dto.setStorageDisplayLocation(from.getStorageLocation().getFullDisplayLocation());
     }
@@ -1284,6 +1285,7 @@ public class Dtos {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     to.setIdentificationBarcode(from.getIdentificationBarcode());
+    to.setLocationBarcode(from.getLocationBarcode() == null ? "" : from.getLocationBarcode());
     return to;
   }
 
