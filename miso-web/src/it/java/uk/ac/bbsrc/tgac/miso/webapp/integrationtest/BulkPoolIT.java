@@ -56,6 +56,18 @@ public class BulkPoolIT extends AbstractIT {
   }
 
   @Test
+  public void testMergeSetup() throws Exception {
+    BulkPoolPage page = BulkPoolPage.getForMerge(getDriver(), getBaseUrl(), Sets.newHashSet(200001L, 200002L));
+    HandsOnTable table = page.getTable();
+    List<String> headings = table.getColumnHeadings();
+    assertEquals(commonColumns.size(), headings.size());
+    for (String col : commonColumns) {
+      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+    }
+    assertEquals(1, table.getRowCount());
+  }
+
+  @Test
   public void testSelectForPoolTogether() {
     // goal: confirm that using the List Dilutions page to select dilutions for pooling together
     // directs the page to the correct link with the correct dilutions
@@ -506,6 +518,51 @@ public class BulkPoolIT extends AbstractIT {
     assertPoolAttributes(attrs, saved2);
   }
 
+  @Test
+  public void testSelectForMerge() {
+    ListPage listPools = ListPage.getListPage(getDriver(), getBaseUrl(), ListTarget.POOLS);
+    DataTable pools = listPools.getTable();
+    pools.searchFor("IPO20000"); // should get IPO200001 and IPO200002
+
+    pools.checkBoxForRow(0);
+    pools.checkBoxForRow(1);
+    String newUrl = listPools.clickButtonAndGetUrl(ButtonText.MERGE);
+
+    assertTrue(newUrl.contains(BulkPoolPage.MERGE_URL_FRAGMENT));
+    List<String> ids = Arrays.asList(newUrl.split("=")[1].split("%2C"));
+    assertEquals(2, ids.size());
+    assertTrue(ids.contains("200001"));
+    assertTrue(ids.contains("200002"));
+  }
+
+  @Test
+  public void testMerge() throws Exception {
+    BulkPoolPage page = BulkPoolPage.getForMerge(getDriver(), getBaseUrl(), Sets.newHashSet(200005L, 200006L));
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> changes = Maps.newLinkedHashMap();
+    changes.put(Columns.ALIAS, "IPOT_POOL_merged");
+    changes.put(Columns.BARCODE, "ipobar_merged");
+    changes.put(Columns.CREATE_DATE, "2016-07-14");
+    changes.put(Columns.CONCENTRATION, "7.0");
+    changes.put(Columns.VOLUME, "6.78");
+    changes.put(Columns.QC_PASSED, "True");
+    fillRow(table, 0, changes);
+
+    assertColumnValues(table, 0, changes, "changes pre-save");
+    saveAndAssertSuccess(table);
+    assertColumnValues(table, 0, changes, "post-save");
+
+    String savedName = assertAndGetSavedName(table, 0);
+    changes.put(Columns.NAME, savedName);
+    Long savedId = Long.valueOf(savedName.substring(3, savedName.length()));
+
+    Pool saved = (Pool) getSession().get(PoolImpl.class, savedId);
+    assertPoolAttributes(changes, saved);
+
+    assertPoolableElementViews(saved, Sets.newHashSet(120001L, 200001L, 200002L));
+  }
+
   private static void assertPoolAttributes(Map<String, String> attributes, Pool pool) {
     assertEntityAttribute(Columns.ALIAS, attributes, pool, Pool::getAlias);
     assertEntityAttribute(Columns.BARCODE, attributes, pool, Pool::getIdentificationBarcode);
@@ -513,6 +570,14 @@ public class BulkPoolIT extends AbstractIT {
     assertEntityAttribute(Columns.CONCENTRATION, attributes, pool, p -> p.getConcentration().toString());
     assertEntityAttribute(Columns.VOLUME, attributes, pool, p -> p.getVolume() == null ? null : p.getVolume().toString());
     assertEntityAttribute(Columns.QC_PASSED, attributes, pool, p -> getQcPassedString(p.getQcPassed()));
+  }
+
+  private static void assertPoolableElementViews(Pool pool, Set<Long> ids) {
+    assertTrue("Incorrect number of pooled elements in pool", pool.getPoolableElementViews().size() == ids.size());
+    ids.stream().forEach(id -> {
+      assertTrue("Pool does not contain element with id " + id,
+          pool.getPoolableElementViews().stream().map(PoolableElementView::getDilutionId).collect(Collectors.toList()).contains(id));
+    });
   }
 
   private static String assertAndGetSavedName(HandsOnTable table, int rowNum) {

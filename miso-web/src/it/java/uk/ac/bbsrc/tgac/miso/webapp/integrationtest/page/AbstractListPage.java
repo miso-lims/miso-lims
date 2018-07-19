@@ -127,6 +127,7 @@ public interface AbstractListPage {
     public static final String ADD = "Add";
     public static final String CREATE_ORDER = "Create Order";
     public static final String REMOVE = "Remove";
+    public static final String MERGE = "Merge";
   }
 
   public WebElement getErrors();

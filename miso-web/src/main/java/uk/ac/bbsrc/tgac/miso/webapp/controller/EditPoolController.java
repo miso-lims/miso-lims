@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -316,35 +317,6 @@ public class EditPoolController {
   private final BulkMergeTableBackend<PoolDto> bulkMergeBackend = new BulkMergeTableBackend<PoolDto>(
       "pool", PoolDto.class, "Pool", "Pools") {
 
-    /** Given a bunch of strings, find the long substring that matches all of them that doesn't end in numbers or underscores. */
-    private String findCommonPrefix(String[] str) {
-      StringBuilder commonPrefix = new StringBuilder();
-
-      while (commonPrefix.length() < str[0].length()) {
-        char current = str[0].charAt(commonPrefix.length());
-        boolean matches = true;
-        for (int i = 1; matches && i < str.length; i++) {
-          if (str[i].charAt(commonPrefix.length()) != current) {
-            matches = false;
-          }
-        }
-        if (matches) {
-          commonPrefix.append(current);
-        } else {
-          break;
-        }
-      }
-      // Chew back any digits at the end
-      while (commonPrefix.length() > 0 && Character.isDigit(commonPrefix.charAt(commonPrefix.length() - 1))) {
-        commonPrefix.setLength(commonPrefix.length() - 1);
-      }
-      if (commonPrefix.length() > 0 && commonPrefix.charAt(commonPrefix.length() - 1) == '_') {
-        commonPrefix.setLength(commonPrefix.length() - 1);
-      }
-      return (commonPrefix.length() > 0) ? commonPrefix.toString() : null;
-
-    }
-
     @Override
     protected PoolDto createDtoFromParents(List<Long> parentIds) throws IOException {
       PoolDto dto = new PoolDto();
@@ -364,16 +336,16 @@ public class EditPoolController {
       String parentString = parents.stream().map(Pool::getName).collect(Collectors.joining(", "));
       dto.setDescription("Created from merging pools: " + parentString);
 
-      String commonPrefix = findCommonPrefix(parents.stream().map(Pool::getAlias).toArray(String[]::new));
+      String commonPrefix = LimsUtils.findCommonPrefix(parents.stream().map(Pool::getAlias).toArray(String[]::new));
       if (commonPrefix != null) {
         dto.setAlias(commonPrefix + "_POOL");
       }
 
       dto.setPooledElements(
           parents.stream().flatMap(pool -> pool.getPoolableElementViews().stream()).map(Dtos::asDto).collect(Collectors.toSet()));
-      List<String> volumeUnits = parents.stream().map(Pool::getVolumeUnits).filter(units -> units != null).distinct()
+      List<String> volumeUnits = parents.stream().map(Pool::getVolumeUnits).filter(Objects::nonNull).distinct()
           .collect(Collectors.toList());
-      if (parents.stream().allMatch(pool -> (pool.getVolume() != null)) && volumeUnits.size() == 1) {
+      if (parents.stream().map(Pool::getVolume).allMatch(Objects::nonNull) && volumeUnits.size() == 1) {
         dto.setVolume(Double.toString(parents.stream().mapToDouble(Pool::getVolume).sum()));
       }
 
