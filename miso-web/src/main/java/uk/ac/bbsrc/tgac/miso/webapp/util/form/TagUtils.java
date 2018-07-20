@@ -9,6 +9,10 @@ public class TagUtils {
 
   private static final Logger log = Logger.getLogger(TagUtils.class);
 
+  private TagUtils() {
+    throw new IllegalStateException("Static util class not intended for instantiation");
+  }
+
   public static boolean instanceOf(Object o, String className) {
     try {
       return Class.forName(className).isInstance(o);
@@ -19,8 +23,11 @@ public class TagUtils {
   }
 
   public static boolean isCurrentUser(String username) {
-    return username.toLowerCase()
-        .equals(getAuthentication().getName().toLowerCase());
+    Authentication auth = getAuthentication();
+    if (auth == null || auth.getName() == null) {
+      return false;
+    }
+    return username.equalsIgnoreCase(auth.getName());
   }
 
   public static boolean isAdmin() {
@@ -32,9 +39,12 @@ public class TagUtils {
   }
 
   private static boolean hasRole(String role) {
-    for (GrantedAuthority authority : getAuthentication().getAuthorities()) {
-      if (authority.getAuthority().toUpperCase().equals(role)) {
-        return true;
+    Authentication auth = getAuthentication();
+    if (auth != null && auth.getAuthorities() != null) {
+      for (GrantedAuthority authority : auth.getAuthorities()) {
+        if (authority.getAuthority().equalsIgnoreCase(role)) {
+          return true;
+        }
       }
     }
     return false;
