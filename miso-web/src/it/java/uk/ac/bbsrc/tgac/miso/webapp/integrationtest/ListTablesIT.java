@@ -650,7 +650,7 @@ public class ListTablesIT extends AbstractIT {
   }
 
   private void testWarningNormal(String target, String query, String warning, String column) {
-    ListTabbedPage page = getList(target);
+    ListPage page = getList(target);
     DataTable table = page.getTable();
     table.searchFor(query);
     assertTrue(String.format("'%s' column does not contain '%s' warning", column, warning),
