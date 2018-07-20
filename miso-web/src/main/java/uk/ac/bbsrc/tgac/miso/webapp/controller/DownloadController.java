@@ -41,15 +41,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
-import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 
 /**
@@ -66,9 +63,6 @@ public class DownloadController {
   protected static final Logger log = LoggerFactory.getLogger(DownloadController.class);
 
   @Autowired
-  private ProjectService projectService;
-
-  @Autowired
   private FilesManager filesManager;
 
   @Autowired
@@ -77,28 +71,12 @@ public class DownloadController {
   @Autowired
   private QualityControlService qcService;
 
-  public void setProjectService(ProjectService projectService) {
-    this.projectService = projectService;
-  }
-
   public void setFilesManager(FilesManager filesManager) {
     this.filesManager = filesManager;
   }
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
-  }
-
-  @RequestMapping(value = "/project/{id}/{hashcode}", method = RequestMethod.GET)
-  protected void downloadProjectFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response) throws Exception {
-    projectService.getProjectById(id); // service invoked for permission check only
-    lookupAndRetrieveFile(Project.class, id.toString(), hashcode, response);
-  }
-
-  @RequestMapping(value = "/servicerecord/{id}/{hashcode}", method = RequestMethod.GET)
-  protected void downloadServiceRecordFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
-      throws Exception {
-    lookupAndRetrieveFile(ServiceRecord.class, id.toString(), hashcode, response);
   }
 
   @RequestMapping(value = "/sample/forms/{hashcode}", method = RequestMethod.GET)

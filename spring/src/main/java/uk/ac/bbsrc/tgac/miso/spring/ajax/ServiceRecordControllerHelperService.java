@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 
 import javax.servlet.http.HttpSession;
 
@@ -18,7 +17,6 @@ import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
 
 @Ajaxified
@@ -29,15 +27,9 @@ public class ServiceRecordControllerHelperService {
   private SecurityManager securityManager;
   @Autowired
   private ServiceRecordService serviceRecordService;
-  @Autowired
-  private MisoFilesManager misoFileManager;
   
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-  
-  public void setMisoFileManager(MisoFilesManager misoFileManager) {
-    this.misoFileManager = misoFileManager;
   }
   
   public JSONObject deleteServiceRecord(HttpSession session, JSONObject json) {
@@ -65,41 +57,6 @@ public class ServiceRecordControllerHelperService {
       }
     } else {
       return JSONUtils.SimpleJSONError("Only admins can delete objects.");
-    }
-  }
-  
-  public JSONObject deleteServiceRecordAttachment(HttpSession session, JSONObject json) {
-    final Long id = json.getLong("id");
-    final Integer hashcode = json.getInt("hashcode");
-    User user = null;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    } catch (final IOException e) {
-      log.error("delete service record file", e);
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
-    }
-    try {
-      if (user.isAdmin()) {
-        String filename = null;
-        for (final String s : misoFileManager.getFileNames(ServiceRecord.class, id.toString())) {
-          if (s.hashCode() == hashcode) {
-            filename = s;
-            break;
-          }
-        }
-        if (filename == null) {
-          return JSONUtils.SimpleJSONError("File not found");
-        }
-        log.info(MessageFormat.format("Attempting to delete file {0}", filename));
-        misoFileManager.deleteFile(ServiceRecord.class, id.toString(), filename);
-        log.info(MessageFormat.format("{0} deleted", filename));
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError(MessageFormat.format("Cannot delete file id {0}.  Access denied.", id));
-      }
-    } catch (final IOException e) {
-      log.error("delete service record file", e);
-      return JSONUtils.SimpleJSONError("Cannot remove file: " + e.getMessage());
     }
   }
   

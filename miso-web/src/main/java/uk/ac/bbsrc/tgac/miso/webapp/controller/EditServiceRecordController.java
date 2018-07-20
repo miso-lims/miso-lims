@@ -28,9 +28,7 @@ import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -121,17 +119,6 @@ public class EditServiceRecordController {
     this.filesManager = filesManager;
   }
   
-  public Map<Integer, String> populateServiceRecordFiles(ServiceRecord record) throws IOException {
-    if (record.getId() != ServiceRecord.UNSAVED_ID) {
-      Map<Integer, String> fileMap = new HashMap<>();
-      for (String s : filesManager.getFileNames(ServiceRecord.class, String.valueOf(record.getId()))) {
-        fileMap.put(s.hashCode(), s);
-      }
-      return fileMap;
-    }
-    return Collections.emptyMap();
-  }
-  
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return serviceRecordService.getColumnSizes();
@@ -142,7 +129,6 @@ public class EditServiceRecordController {
     ServiceRecord sr = serviceRecordService.get(recordId);
     if (sr != null) {
       model.put(ModelKeys.RECORD.getKey(), sr);
-      model.put(ModelKeys.FILES.getKey(), populateServiceRecordFiles(sr));
       model.put("title", "Service Record " + sr.getId());
     } else {
       throw new NotFoundException("No service found for ID " + recordId.toString());

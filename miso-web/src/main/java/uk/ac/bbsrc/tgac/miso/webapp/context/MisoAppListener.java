@@ -99,13 +99,14 @@ public class MisoAppListener implements ServletContextListener {
     log.info("Checking MISO storage paths...");
     String baseStoragePath = misoProperties.get("miso.baseDirectory");
     context.getServletContext().setAttribute("miso.baseDirectory", baseStoragePath);
+    String fileStoragePath = misoProperties.get("miso.fileStorageDirectory");
 
     String taxonLookupEnabled = misoProperties.get("miso.taxonLookup.enabled");
     context.getServletContext().setAttribute("taxonLookupEnabled", Boolean.parseBoolean(taxonLookupEnabled));
 
-    Map<String, String> dirchecks = MisoWebUtils.checkStorageDirectories(baseStoragePath);
+    Map<String, String> dirchecks = MisoWebUtils.checkStorageDirectories(baseStoragePath, fileStoragePath);
     if (dirchecks.keySet().contains("error")) {
-      log.error(dirchecks.get("error"));
+      throw new IllegalStateException(dirchecks.get("error"));
     } else {
       log.info(dirchecks.get("ok"));
     }

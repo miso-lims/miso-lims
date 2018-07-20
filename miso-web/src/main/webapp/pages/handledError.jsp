@@ -1,5 +1,3 @@
-<%@ include file="/header.jsp" %>
-
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
   ~ MISO project contacts: Robert Davey @ TGAC
@@ -23,15 +21,16 @@
   ~ **********************************************************************
   --%>
 
+<%@ include file="/header.jsp" %>
+
+<p class="errorTitle">${genericMessage}</p>
+<div id="flasherror" class="flasherror">${specificMessage}</div>
+<br/>
+
+<c:if test="${showBugUrl}">
+  <p><a href="${misoBugUrl}">Report Bug</a></p>
+</c:if>
+
 <p><a href="javascript:void(0);" onclick="window.history.back();">Return to Previous Page</a></p>
-  
-<script type="text/javascript">
-  const p = document.createElement('P');
-  const strong = document.createElement('STRONG');
-  const notFound = document.createTextNode('The page you requested was not found.');
-  strong.appendChild(notFound);
-  p.appendChild(strong);
-  document.getElementById('flasherror').parentNode.insertBefore(p, document.getElementById('flasherror'));
-</script>
 
 <%@ include file="/footer.jsp" %>

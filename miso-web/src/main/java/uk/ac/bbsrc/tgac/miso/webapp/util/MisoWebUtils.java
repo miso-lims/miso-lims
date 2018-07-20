@@ -59,28 +59,22 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 public class MisoWebUtils {
   private static final Logger log = LoggerFactory.getLogger(MisoWebUtils.class);
 
-  public static String generateErrorDivMessage(String errorMessage) {
-    return "<div id='errordiv' class='flasherror'>" + errorMessage + "</div>";
-  }
-
-  public static String generateErrorDivMessage(String errorMessage, String exceptionMessage) {
-    return "<div id='errordiv' class='flasherror'>" + errorMessage + "<br/><pre>" + exceptionMessage + "</pre></div>";
-  }
-
-  public static Map<String, String> checkStorageDirectories(String baseStoragePath) {
+  public static Map<String, String> checkStorageDirectories(String baseStoragePath, String fileStoragePath) {
     Map<String, String> checks = new HashMap<>();
     if (baseStoragePath.endsWith("/")) {
       try {
         File misoDir = new File(baseStoragePath);
         if (LimsUtils.checkDirectory(misoDir, true)) {
-          LimsUtils.checkDirectory(new File(baseStoragePath, "files"), true);
-          LimsUtils.checkDirectory(new File(baseStoragePath, "files/submission"), true);
           LimsUtils.checkDirectory(new File(baseStoragePath, "log"), true);
           LimsUtils.checkDirectory(new File(baseStoragePath, "temp"), true);
-          checks.put("ok", "All storage directories OK");
+          if (LimsUtils.checkDirectory(new File(fileStoragePath), true)) {
+            LimsUtils.checkDirectory(new File(fileStoragePath, "submission"), true);
+            checks.put("ok", "All storage directories OK");
+          } else {
+            checks.put("error", "Error accessing MISO storage files directory.");
+          }
         } else {
-          checks.put("error",
-              "MISO storage directory seems to exist, but some other IO error occurred. Please check that this directory is writable.");
+          checks.put("error", "Error accessing MISO storage base directory.");
         }
       } catch (IOException e) {
         log.error("check storage directories", e);

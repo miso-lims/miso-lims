@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -187,34 +186,6 @@ public class ProjectControllerHelperService {
     } catch (final IOException e) {
       log.error("delete project overview", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
-    }
-  }
-
-  public JSONObject deleteProjectFile(HttpSession session, JSONObject json) {
-    final Long id = json.getLong("id");
-    final Integer hashcode = json.getInt("hashcode");
-    try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      final Project project = projectService.getProjectById(id);
-
-      if (project.getSecurityProfile().userCanWrite(user)) {
-        String filename = null;
-        for (final String s : misoFileManager.getFileNames(Project.class, id.toString())) {
-          if (s.hashCode() == hashcode) {
-            filename = s;
-            break;
-          }
-        }
-        log.info(MessageFormat.format("Attempting to delete file {0}", filename));
-        misoFileManager.deleteFile(Project.class, id.toString(), filename);
-        log.info(MessageFormat.format("{0} deleted", filename));
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError(MessageFormat.format("Cannot delete file id {0}.  Access denied.", id));
-      }
-    } catch (final IOException e) {
-      log.error("delete project file", e);
-      return JSONUtils.SimpleJSONError("Cannot remove file: " + e.getMessage());
     }
   }
 

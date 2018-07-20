@@ -72,7 +72,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -98,9 +97,6 @@ public class EditProjectController {
 
   @Autowired
   private ProjectService projectService;
-
-  @Autowired
-  private FilesManager filesManager;
 
   @Autowired
   private IssueTrackerManager issueTrackerManager;
@@ -130,10 +126,6 @@ public class EditProjectController {
     this.projectService = projectService;
   }
 
-  public void setFilesManager(FilesManager filesManager) {
-    this.filesManager = filesManager;
-  }
-
   public void setSampleService(SampleService sampleService) {
     this.sampleService = sampleService;
   }
@@ -158,20 +150,6 @@ public class EditProjectController {
   public void initBinder(WebDataBinder binder) {
     CustomDateEditor cde = new CustomDateEditor(LimsUtils.getDateFormat(), true);
     binder.registerCustomEditor(Date.class, cde);
-  }
-
-  public Map<Integer, String> populateProjectFiles(Long projectId) throws IOException {
-    if (projectId != ProjectImpl.UNSAVED_ID) {
-      Project p = projectService.getProjectById(projectId);
-      if (p != null) {
-        Map<Integer, String> fileMap = new HashMap<>();
-        for (String s : filesManager.getFileNames(Project.class, projectId.toString())) {
-          fileMap.put(s.hashCode(), s);
-        }
-        return fileMap;
-      }
-    }
-    return Collections.emptyMap();
   }
 
   @ModelAttribute("maxLengths")
@@ -285,6 +263,7 @@ public class EditProjectController {
         log.error("Error retrieving issues", e);
       }
     }
+
     model.put("projectIssues", issues.stream().map(Dtos::asDto).collect(Collectors.toList()));
     model.put("referenceGenome", referenceGenomeService.listAllReferenceGenomeTypes());
 
@@ -293,7 +272,6 @@ public class EditProjectController {
     model.put("targetedSequencing", targetedSequencingList);
     model.put("formObj", project);
     model.put("project", project);
-    model.put("projectFiles", populateProjectFiles(projectId));
     model.put("owners", LimsSecurityUtils.getPotentialOwners(user, project, securityManager.listAllUsers()));
     model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, project, securityManager.listAllUsers()));
     model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, project, securityManager.listAllGroups()));

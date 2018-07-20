@@ -471,6 +471,28 @@ var Utils = Utils
           }
         });
       },
+
+      showAjaxErrorDialog: function(xhr, textStatus, errorThrown, errorCallback) {
+        var lines = ['Error: ' + errorThrown];
+        try {
+          var responseObj = JSON.parse(xhr.responseText);
+          if (responseObj.detail) {
+            lines = lines.concat(responseObj.detail.split('\n'));
+            if (responseObj.dataFormat === 'validation') {
+              jQuery.each(responseObj.data, function(key, val) {
+                var errors = val.split('\n');
+                jQuery.each(errors, function(index, error) {
+                  lines.push('* ' + (key === 'GENERAL' ? error : (key + ": " + error)));
+                });
+              });
+            }
+          }
+        } catch (e) {
+          // If we got detail, great; if we didn't meh.
+        }
+        Utils.showOkDialog(title, lines, errorCallback);
+      },
+
       ajaxWithDialog: function(title, method, url, data, callback, errorCallback) {
         var dialogArea = document.getElementById('dialog');
         while (dialogArea.hasChildNodes()) {
@@ -504,24 +526,7 @@ var Utils = Utils
           },
           'error': function(xhr, textStatus, errorThrown) {
             dialog.dialog("close");
-            var lines = ['Error: ' + errorThrown];
-            try {
-              var responseObj = JSON.parse(xhr.responseText);
-              if (responseObj.detail) {
-                lines = lines.concat(responseObj.detail.split('\n'));
-                if (responseObj.dataFormat === 'validation') {
-                  jQuery.each(responseObj.data, function(key, val) {
-                    var errors = val.split('\n');
-                    jQuery.each(errors, function(index, error) {
-                      lines.push('* ' + (key === 'GENERAL' ? error : (key + ": " + error)));
-                    });
-                  });
-                }
-              }
-            } catch (e) {
-              // If we got detail, great; if we didn't meh.
-            }
-            Utils.showOkDialog(title, lines, errorCallback);
+            Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown, errorCallback);
           }
         });
       },
