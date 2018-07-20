@@ -144,66 +144,20 @@
     </form:form>
     
     <script type="text/javascript">
-		  jQuery(document).ready(function () {
-		    // Attaches a Parsley form validator.
-	      Validate.attachParsley('#serviceRecordForm');
-	    });
-	  </script>
-    
-    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#uploadArrowClick'), 'uploadDiv');">
-      Attachments
-      <div id="uploadArrowClick" class="toggleLeft"></div>
-    </div>
-    <div id="uploadDiv" class="simplebox" style="display:none;">
-      <c:choose>
-        <c:when test="${serviceRecord.id != 0}">
-          <table class="in">
-            <tr>
-              <td>
-                <form method='post'
-                    id='ajaxUploadForm'
-                    action="<c:url value="/miso/upload/servicerecord"/>"
-                    enctype="multipart/form-data"
-                    target="targetUpload"
-                    onsubmit="Utils.fileUpload.fileUploadProgress('ajaxUploadForm', 'statusDiv', ServiceRecord.ui.serviceRecordFileUploadSuccess);">
-                  <input type="hidden" name="serviceRecordId" value="${serviceRecord.id}"/>
-                  <input type="file" name="file"/>
-                  <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-                </form>
-                <iframe id='targetUpload' name='targetUpload' src='' style='display: none'></iframe>
-                <div id="statusDiv"></div>
-              </td>
-            </tr>
-          </table>
-        </c:when>
-        <c:otherwise>
-          You may upload files after the service record has been saved.
-        </c:otherwise>
-      </c:choose>
-    </div>
-    
-    <c:if test="${serviceRecord.id != 0}">
-      <div id="serviceRecordFiles">
-        <c:forEach items="${serviceRecordFiles}" var="file">
-          <div id='btnPanel' style='float: left; width: 32px;'>
-          <c:if test="${miso:isAdmin()}">
-            <table>
-              <tr>
-                <td class="misoicon" onclick="ServiceRecord.ui.deleteFile(${serviceRecord.id}, ${file.key});">
-                  <span class="ui-icon ui-icon-trash"></span>
-                </td>
-              </tr>
-            </table>
-            </c:if>
-          </div>
-          <a class="listbox" href="<c:url value='/miso/download/servicerecord/${serviceRecord.id}/${file.key}'/>">
-            <span onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox" style='margin-left: 32px;'>
-              ${file.value}
-            </span>
-          </a>
-        </c:forEach>
-      </div>
-    </c:if>
+      jQuery(document).ready(function () {
+        // Attaches a Parsley form validator.
+        Validate.attachParsley('#serviceRecordForm');
+      });
+	</script>
+
+    <c:choose>
+      <c:when test="${serviceRecord.id != 0}">
+        <miso:attachments item="${serviceRecord}"/>
+      </c:when>
+      <c:otherwise>
+        You can attach files after the service record has been saved.
+      </c:otherwise>
+    </c:choose>
     
   </div>
 </div>

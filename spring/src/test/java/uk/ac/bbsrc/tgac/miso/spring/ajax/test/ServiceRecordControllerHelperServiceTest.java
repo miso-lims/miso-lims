@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax.test;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +19,6 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONObject;
 
-import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
@@ -100,89 +98,6 @@ public class ServiceRecordControllerHelperServiceTest {
     request.put("recordId", 1L);
     
     JSONObject result = chs.deleteServiceRecord(null, request);
-    assertNotNull(result.get("error"));
-    assertNull(result.get("response"));
-  }
-
-  @Test
-  public void testDeleteServiceRecordAttachment() throws IOException {
-    setAuthenticatedUser("me", true);
-    String testFileName = "testfile";
-    JSONObject request = new JSONObject();
-    request.put("id", 1L);
-    request.put("hashcode", testFileName.hashCode());
-    
-    Mockito.when(misoFileManager.getFileNames(ServiceRecord.class, "1"))
-        .thenReturn(Arrays.asList("oneFile", testFileName, "otherFile"));
-    
-    JSONObject result = chs.deleteServiceRecordAttachment(null, request);
-    assertNotNull(result.get("response"));
-    assertNull(result.get("error"));
-  }
-  
-  @Test
-  public void testDeleteServiceRecordAttachmentNonAdmin() throws IOException {
-    setAuthenticatedUser("me", false);
-    String testFileName = "testfile";
-    JSONObject request = new JSONObject();
-    request.put("id", 1L);
-    request.put("hashcode", testFileName.hashCode());
-    
-    Mockito.when(misoFileManager.getFileNames(ServiceRecord.class, "1"))
-        .thenReturn(Arrays.asList("oneFile", testFileName, "otherFile"));
-    
-    JSONObject result = chs.deleteServiceRecordAttachment(null, request);
-    assertNotNull(result.get("error"));
-    assertNull(result.get("response"));
-  }
-  
-  @Test
-  public void testDeleteServiceRecordAttachmentNoFile() throws IOException {
-    setAuthenticatedUser("me", true);
-    String testFileName = "testfile";
-    JSONObject request = new JSONObject();
-    request.put("id", 1L);
-    request.put("hashcode", testFileName.hashCode());
-    
-    Mockito.when(misoFileManager.getFileNames(ServiceRecord.class, "1"))
-        .thenReturn(Arrays.asList("oneFile", "otherFile"));
-    
-    JSONObject result = chs.deleteServiceRecordAttachment(null, request);
-    assertNotNull(result.get("error"));
-    assertNull(result.get("response"));
-  }
-  
-  @Test
-  public void testDeleteServiceRecordAttachmentDeleteException() throws IOException {
-    setAuthenticatedUser("me", true);
-    String testFileName = "testfile";
-    JSONObject request = new JSONObject();
-    request.put("id", 1L);
-    request.put("hashcode", testFileName.hashCode());
-    
-    Mockito.when(misoFileManager.getFileNames(ServiceRecord.class, "1"))
-        .thenReturn(Arrays.asList("oneFile", testFileName, "otherFile"));
-    Mockito.doThrow(new IOException()).when(misoFileManager).deleteFile(ServiceRecord.class, "1", testFileName);
-    
-    JSONObject result = chs.deleteServiceRecordAttachment(null, request);
-    assertNotNull(result.get("error"));
-    assertNull(result.get("response"));
-  }
-  
-  @Test
-  public void testDeleteServiceRecordAttachmentUserException() throws IOException {
-    final String username = "me";
-    setAuthenticatedUser(username, true);
-    Mockito.doThrow(new IOException()).when(securityManager).getUserByLoginName(username);
-    String testFileName = "testfile";
-    JSONObject request = new JSONObject();
-    request.put("id", 1L);
-    request.put("hashcode", testFileName.hashCode());
-    
-    Mockito.when(misoFileManager.getFileNames(ServiceRecord.class, "1"))
-        .thenReturn(Arrays.asList("oneFile", testFileName, "otherFile"));
-    
-    JSONObject result = chs.deleteServiceRecordAttachment(null, request);
     assertNotNull(result.get("error"));
     assertNull(result.get("response"));
   }

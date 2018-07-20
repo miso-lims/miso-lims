@@ -28,7 +28,6 @@ import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -108,7 +107,6 @@ import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 import io.prometheus.client.Gauge;
 
@@ -226,10 +224,6 @@ public class MenuController implements ServletContextAware {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       model.put("title", "Home");
-      Map<String, String> checks = MisoWebUtils.checkStorageDirectories((String) servletContext.getAttribute("miso.baseDirectory"));
-      if (checks.keySet().contains("error")) {
-        model.put("error", checks.get("error"));
-      }
       ObjectMapper mapper = new ObjectMapper();
       model.put("favouriteWorkflows",
           user.getFavouriteWorkflows().stream().map(Dtos::asDto).map(dto -> mapper.valueToTree(dto)).collect(Collectors.toList()));

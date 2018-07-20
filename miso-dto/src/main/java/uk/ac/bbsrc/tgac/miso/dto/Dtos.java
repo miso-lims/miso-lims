@@ -94,6 +94,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
@@ -2447,4 +2448,15 @@ public class Dtos {
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
     return dto;
   }
+
+  public static AttachmentDto asDto(FileAttachment from) {
+    AttachmentDto dto = new AttachmentDto();
+    dto.setId(from.getId());
+    dto.setFilename(from.getFilename());
+    dto.setPath(from.getPath());
+    dto.setCreator(from.getCreator().getLoginName());
+    dto.setCreated(formatDateTime(from.getCreationTime()));
+    return dto;
+  }
+
 }

@@ -44,7 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Project extends Comparable<Project>, SecurableByProfile, Watchable, Nameable, Serializable {
+public interface Project extends Comparable<Project>, SecurableByProfile, Watchable, Nameable, Serializable, Attachable {
 
   /** Field PREFIX */
   public static final String PREFIX = "PRO";

@@ -481,50 +481,9 @@
     Project Files
     <div id="upload_arrowclick" class="toggleLeft"></div>
   </div>
-  <div id="uploaddiv" class="simplebox expandable_section" style="display:none;">
-    <table class="in">
-      <tr>
-        <td>
-          <form method='post'
-                id='ajax_upload_form'
-                action="<c:url value="/miso/upload/project"/>"
-                enctype="multipart/form-data"
-                target="target_upload"
-                onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Project.ui.projectFileUploadSuccess);">
-            <input type="hidden" name="projectId" value="${project.id}"/>
-            <input type="file" name="file"/>
-            <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-          </form>
-          <iframe id='target_upload' name='target_upload' src='' style='display: none'></iframe>
-          <div id="statusdiv"></div>
-        </td>
-      </tr>
-    </table>
-
-    <div id="projectfiles" style="display:inline-block;">
-      <c:forEach items="${projectFiles}" var="file">
-        <br/>
-        <div id='btnPanel' style='width: 32px;'>
-          <table>
-            <tr>
-              <c:if test="${miso:isAdmin()}">
-                <td class="misoicon" onclick="Project.ui.deleteFile(${project.id}, ${file.key});">
-                  <span class="ui-icon ui-icon-trash"></span>
-                </td>
-              </c:if>
-            </tr>
-          </table>
-      </div>
-      <a class="listbox" href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">
-  
-        <span onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox" style='margin-left: 32px;'>
-            ${file.value}
-        </span>
-      </a>
-      </c:forEach>
-      </div>
-  
-    </div>
+  <div id="uploaddiv" class="expandable_section" style="display:none;">
+    <miso:attachments item="${project}"/>
+  </div>
 </div>
 <br/>
 

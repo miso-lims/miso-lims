@@ -70,6 +70,11 @@
     <property name="dataSource" ref="dataSource" />
     <property name="sqlMigrationSuffix" value=".test.sql" />
     <property name="locations" value="classpath:uk.ac.bbsrc.tgac.miso.db.migration,db/test_migration"/>
+    <property name="placeholders">
+      <map>
+        <entry key="filesDir" value="/storage/miso/files/" />
+      </map>
+    </property>
   </bean>
 
 </beans>

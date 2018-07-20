@@ -369,20 +369,33 @@
 		<dynamic-attributes>false</dynamic-attributes>
 	</tag>
 
-
 	<tag>
-		<description>Renders a change log</description>
-		<name>changelog</name>
-		<tag-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.ChangeLogTag</tag-class>
-		<body-content>JSP</body-content>
-		<attribute>
-			<description>The thing to build the change log for</description>
-			<name>item</name>
-			<required>true</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<dynamic-attributes>false</dynamic-attributes>
-	</tag>
+        <description>Renders a change log</description>
+        <name>changelog</name>
+        <tag-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.ChangeLogTag</tag-class>
+        <body-content>JSP</body-content>
+        <attribute>
+            <description>The thing to build the change log for</description>
+            <name>item</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <dynamic-attributes>false</dynamic-attributes>
+    </tag>
+    
+    <tag>
+        <description>Renders an attachments upload/download table</description>
+        <name>attachments</name>
+        <tag-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.AttachmentsTag</tag-class>
+        <body-content>JSP</body-content>
+        <attribute>
+            <description>The thing for which to build the attachments table</description>
+            <name>item</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <dynamic-attributes>false</dynamic-attributes>
+    </tag>
 
     <function>
         <name>instanceOf</name>

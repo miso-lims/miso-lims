@@ -2,25 +2,30 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 
 @Entity
 @Table(name = "ServiceRecord")
-public class ServiceRecord implements Serializable, Deletable {
+public class ServiceRecord implements Serializable, Deletable, Attachable {
 
   private static final long serialVersionUID = 1L;
 
@@ -51,6 +56,11 @@ public class ServiceRecord implements Serializable, Deletable {
 
   @Temporal(TemporalType.TIMESTAMP)
   private Date restoredTime;
+
+  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinTable(name = "ServiceRecord_Attachment", joinColumns = { @JoinColumn(name = "recordId") }, inverseJoinColumns = {
+      @JoinColumn(name = "attachmentId") })
+  private List<FileAttachment> attachments;
 
   public void setId(long id) {
     this.recordId = id;
@@ -123,6 +133,21 @@ public class ServiceRecord implements Serializable, Deletable {
 
   public Date getRestoredTime() {
     return restoredTime;
+  }
+
+  @Override
+  public List<FileAttachment> getAttachments() {
+    return attachments;
+  }
+
+  @Override
+  public void setAttachments(List<FileAttachment> attachments) {
+    this.attachments = attachments;
+  }
+
+  @Override
+  public String getAttachmentsTarget() {
+    return "servicerecord";
   }
 
   @Override

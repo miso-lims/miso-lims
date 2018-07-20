@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -89,6 +90,11 @@ public class ProjectImpl implements Project {
   private String name = "";
   private String alias = "";
   private String shortName;
+
+  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinTable(name = "Project_Attachment", joinColumns = { @JoinColumn(name = "projectId") }, inverseJoinColumns = {
+      @JoinColumn(name = "attachmentId") })
+  private List<FileAttachment> attachments;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -347,6 +353,21 @@ public class ProjectImpl implements Project {
   @Override
   public String getWatchableIdentifier() {
     return getName();
+  }
+
+  @Override
+  public List<FileAttachment> getAttachments() {
+    return attachments;
+  }
+
+  @Override
+  public void setAttachments(List<FileAttachment> attachments) {
+    this.attachments = attachments;
+  }
+
+  @Override
+  public String getAttachmentsTarget() {
+    return "project";
   }
 
   @Override

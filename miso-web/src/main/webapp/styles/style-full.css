@@ -390,6 +390,11 @@ table.containerSummary td.partitionOccupied {
     background-color: #ff9999 !important;
 }
 
+.errorTitle {
+	font-size: 3.8em;
+	font-weight: bold;
+}
+
 .add {
     background-image: url(images/add.png);
     background-position: 0% 50%;
@@ -1054,7 +1059,7 @@ div.flasherror {
     color: #880000;
     padding: 4px 4px 4px 30px;
     margin-bottom: 12px;
-    font-size: 1em;
+    font-size: 1.3em;
     border: 2px solid;
 }
 
