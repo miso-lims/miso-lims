@@ -50,11 +50,12 @@ import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -108,6 +109,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
@@ -122,6 +124,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.service.ArrayService;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
@@ -179,6 +182,8 @@ public class EditSampleController {
   private ArrayRunService arrayRunService;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private BoxService boxService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -276,6 +281,7 @@ public class EditSampleController {
     private static final String DEFAULT_SCI_NAME = "defaultSciName";
     private static final String SOURCE_SAMPLE_CLASS = "sourceSampleClass";
     private static final String TARGET_SAMPLE_CLASS = "targetSampleClass";
+    private static final String BOX = "box";
   }
 
   @ModelAttribute("stains")
@@ -593,27 +599,27 @@ public class EditSampleController {
     });
   }
 
-  @RequestMapping(value = "/new", method = RequestMethod.GET)
+  @GetMapping(value = "/new")
   public ModelAndView newUnassignedSample(ModelMap model) throws IOException {
     return setupForm(AbstractSample.UNSAVED_ID, null, model);
   }
 
-  @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
+  @GetMapping(value = "/new/{projectId}")
   public ModelAndView newAssignedSample(@PathVariable Long projectId, ModelMap model) throws IOException {
     return setupForm(AbstractSample.UNSAVED_ID, projectId, model);
   }
 
-  @RequestMapping(value = "/rest/{sampleId}", method = RequestMethod.GET)
+  @GetMapping(value = "/rest/{sampleId}")
   public @ResponseBody Sample jsonRest(@PathVariable Long sampleId) throws IOException {
     return sampleService.get(sampleId);
   }
 
-  @RequestMapping(value = "/{sampleId}", method = RequestMethod.GET)
+  @GetMapping(value = "/{sampleId}")
   public ModelAndView setupForm(@PathVariable Long sampleId, ModelMap model) throws IOException {
     return setupForm(sampleId, null, model);
   }
 
-  @RequestMapping(value = "/{sampleId}/project/{projectId}", method = RequestMethod.GET)
+  @GetMapping(value = "/{sampleId}/project/{projectId}")
   public ModelAndView setupForm(@PathVariable Long sampleId, @PathVariable Long projectId, ModelMap model) throws IOException {
     try {
       User user = authorizationManager.getCurrentUser();
@@ -741,7 +747,7 @@ public class EditSampleController {
     }
   }
 
-  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  @GetMapping(value = "/rest/changes")
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
     return changeLogService.listAll("Sample");
   }
@@ -750,7 +756,7 @@ public class EditSampleController {
    * Used to edit samples with ids from given {sampleIds}.
    * Sends Dtos objects which will then be used for editing in grid.
    */
-  @RequestMapping(value = "/bulk/edit", method = RequestMethod.GET)
+  @GetMapping(value = "/bulk/edit")
   public ModelAndView editBulkSamples(@RequestParam("ids") String sampleIds, ModelMap model) throws IOException {
     return new BulkEditSampleBackend().edit(sampleIds, model);
   }
@@ -760,11 +766,13 @@ public class EditSampleController {
    * 
    * Sends Dtos objects which will then be used for editing in grid.
    */
-  @RequestMapping(value = "/bulk/propagate", method = RequestMethod.GET)
+  @GetMapping(value = "/bulk/propagate")
   public ModelAndView propagateBulkSamples(@RequestParam("parentIds") String parentIds, @RequestParam("sampleClassId") Long sampleClassId,
-      @RequestParam("replicates") int replicates,
-      ModelMap model) throws IOException {
-    BulkPropagateSampleBackend bulkPropagateSampleBackend = new BulkPropagateSampleBackend(sampleClassService.get(sampleClassId));
+      @RequestParam("replicates") int replicates, @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model)
+      throws IOException {
+    BulkPropagateSampleBackend bulkPropagateSampleBackend = new BulkPropagateSampleBackend(sampleClassService.get(sampleClassId),
+        (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null));
+
     return bulkPropagateSampleBackend.propagate(parentIds, replicates, model);
   }
 
@@ -776,10 +784,11 @@ public class EditSampleController {
    * </ul>
    * Sends Dtos objects which will then be used for editing in grid.
    */
-  @RequestMapping(value = "/bulk/new", method = RequestMethod.GET)
+  @GetMapping(value = "/bulk/new")
   public ModelAndView createBulkSamples(@RequestParam("quantity") Integer quantity,
       @RequestParam(value = "sampleClassId", required = false) Long sampleClassId,
-      @RequestParam(value = "projectId", required = false) Long projectId, ModelMap model) throws IOException {
+      @RequestParam(value = "projectId", required = false) Long projectId, @RequestParam(value = "boxId", required = false) Long boxId,
+      ModelMap model) throws IOException {
     if (quantity == null || quantity <= 0) throw new RestException("Must specify quantity of samples to create", Status.BAD_REQUEST);
 
     final SampleDto template;
@@ -803,6 +812,10 @@ public class EditSampleController {
     } else {
       project = projectService.getProjectById(projectId);
       template.setProjectId(projectId);
+    }
+
+    if (boxId != null) {
+      template.setBox(Dtos.asDto(boxService.get(boxId), true));
     }
 
     return new BulkCreateSampleBackend(template.getClass(), template, quantity, project, target).create(model);
@@ -840,7 +853,7 @@ public class EditSampleController {
     return detailedTemplate;
   }
 
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping
   public String processSubmit(@ModelAttribute("sample") Sample sample, ModelMap model, SessionStatus session)
       throws IOException {
     if (sample instanceof DetailedSampleBuilder) {
@@ -918,10 +931,12 @@ public class EditSampleController {
   private final class BulkPropagateSampleBackend extends BulkPropagateTableBackend<Sample, SampleDto> {
     private SampleClass sourceSampleClass;
     private final SampleClass targetSampleClass;
+    private final BoxDto newBox;
 
-    private BulkPropagateSampleBackend(SampleClass targetSampleClass) {
+    private BulkPropagateSampleBackend(SampleClass targetSampleClass, BoxDto newBox) {
       super("sample", SampleDto.class, "Samples", "Samples");
       this.targetSampleClass = targetSampleClass;
+      this.newBox = newBox;
     }
 
     @Override
@@ -967,6 +982,8 @@ public class EditSampleController {
 
         dto.setSampleClassId(targetSampleClass.getId());
         sourceSampleClass = sample.getSampleClass();
+
+        dto.setBox(newBox);
       } else {
         throw new IllegalArgumentException("Cannot create plain samples from other plain samples!");
       }
@@ -985,18 +1002,21 @@ public class EditSampleController {
       config.put(Config.DNASE_TREATABLE, targetSampleClass.getDNAseTreatable());
       config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(targetSampleClass));
       config.putPOJO(Config.SOURCE_SAMPLE_CLASS, Dtos.asDto(sourceSampleClass));
+      config.putPOJO(Config.BOX, newBox);
     }
   };
 
   private final class BulkCreateSampleBackend extends BulkCreateTableBackend<SampleDto> {
     private final SampleClass targetSampleClass;
     private final Project project;
+    private final BoxDto box;
 
     public BulkCreateSampleBackend(Class<? extends SampleDto> dtoClass, SampleDto dto, Integer quantity, Project project,
         SampleClass sampleClass) {
       super("sample", dtoClass, "Samples", dto, quantity);
       targetSampleClass = sampleClass;
       this.project = project;
+      box = dto.getBox();
     }
 
     @Override
@@ -1015,6 +1035,7 @@ public class EditSampleController {
         config.putPOJO("project", Dtos.asDto(project));
       }
       config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
+      config.putPOJO(Config.BOX, box);
     }
   };
 

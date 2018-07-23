@@ -29,6 +29,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
@@ -1300,6 +1302,16 @@ public class Dtos {
     to.setDescription(from.getDescription());
     to.setIdentificationBarcode(from.getIdentificationBarcode());
     to.setLocationBarcode(from.getLocationBarcode() == null ? "" : from.getLocationBarcode());
+    if (from.getUseId() != null) {
+      BoxUse use = new BoxUse();
+      use.setId(from.getUseId());
+      to.setUse(use);
+    }
+    if (from.getSizeId() != null) {
+      BoxSize size = new BoxSize();
+      size.setId(from.getSizeId());
+      to.setSize(size);
+    }
     return to;
   }
 

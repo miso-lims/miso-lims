@@ -58,7 +58,6 @@ ListTarget.library = {
           label: 'Quantity',
           value: 1
         }];
-
         if (Constants.isDetailedSample) {
           fields.unshift({
             property: 'sampleClass',
@@ -70,17 +69,18 @@ ListTarget.library = {
             getLabel: Utils.array.getAlias
           });
         }
-
-        Utils.showDialog('Receive Libraries', 'Receive', fields, function(result) {
+        HotUtils.showDialogForBoxCreation('Receive Libraries', 'Receive', fields, '/miso/library/bulk/receive?', function(result) {
           if (result.quantity < 1) {
             Utils.showOkDialog('Receive Libraries', ["That's a peculiar number of libraries to receive."]);
             return;
           }
-          window.location = '/miso/library/bulk/receive?' + jQuery.param({
+          return {
             quantity: result.quantity,
             projectId: projectId,
             sampleClassId: Constants.isDetailedSample ? result.sampleClass.id : null
-          });
+          };
+        }, function(result) {
+          return result.quanitity;
         });
       }
     }];

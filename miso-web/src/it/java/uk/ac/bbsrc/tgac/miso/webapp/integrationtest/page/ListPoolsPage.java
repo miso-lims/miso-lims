@@ -27,6 +27,9 @@ public class ListPoolsPage extends ListPage {
     WebElement dialog = getDriver().findElement(By.id("dialog"));
     for (WebElement p : dialog.findElements(By.tagName("p"))) {
       Matcher m = poolProportionFieldPattern.matcher(p.getText());
+      if (p.getText().contains("Create New Box")) {
+        continue;
+      }
       if (!m.matches()) {
         throw new IllegalStateException("Dialog has unexpected field: " + p.getText());
       }

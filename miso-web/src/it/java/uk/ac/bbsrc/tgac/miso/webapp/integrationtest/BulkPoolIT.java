@@ -81,7 +81,7 @@ public class BulkPoolIT extends AbstractIT {
 
     dilutions.checkBoxForRow(0);
     dilutions.checkBoxForRow(1);
-    String newUrl = listDilutions.clickButtonAndGetUrl(ButtonText.POOL_TOGETHER);
+    String newUrl = listDilutions.clickButtonAndGetUrlWithConfirm(ButtonText.POOL_TOGETHER);
 
     assertTrue(newUrl.contains(BulkPoolPage.POOL_TOGETHER_URL_FRAGMENT));
     List<String> ids = Arrays.asList(newUrl.split("=")[1].split("%2C"));
@@ -101,7 +101,7 @@ public class BulkPoolIT extends AbstractIT {
 
     dilutions.checkBoxForRow(0);
     dilutions.checkBoxForRow(1);
-    String newUrl = listDilutions.clickButtonAndGetUrl(ButtonText.POOL_SEPARATELY);
+    String newUrl = listDilutions.clickButtonAndGetUrlWithConfirm(ButtonText.POOL_SEPARATELY);
 
 
     assertTrue(newUrl.contains(BulkPoolPage.POOL_SEPARATELY_URL_FRAGMENT));

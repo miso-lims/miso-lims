@@ -114,6 +114,6 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
   }
 
   public String clickButtonAndGetUrl(String linkText, List<String> selections) {
-    return clickLinkButtonAndGetUrl(linkText, selections);
+    return clickLinkButtonAndGetUrl(linkText, selections, false);
   }
 }

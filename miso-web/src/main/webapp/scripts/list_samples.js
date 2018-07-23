@@ -108,21 +108,26 @@ ListTarget.sample = {
             getLabel: Utils.array.getAlias
           });
         }
-
-        Utils.showDialog('Create Samples', 'Create', fields, function(result) {
+        HotUtils.showDialogForBoxCreation('Create Samples', 'Create', fields, '/miso/sample/bulk/new?', function(result) {
           if (result.quantity < 1) {
             Utils.showOkDialog('Create Samples', ["That's a peculiar number of samples to create."]);
             return;
           }
-          if (!Constants.isDetailedSample && result.quantity == 1) {
+          if(result.createBox && Constants.isDetailedSample && result.sampleClass.sampleCategory == 'Identity'){
+            Utils.showOkDialog('Error', ["Identities cannot be placed in boxes"]);
+            return;
+          }
+          if (!result.createBox && !Constants.isDetailedSample && result.quantity == 1) {
             window.location = '/miso/sample/new' + (projectId ? '/' + projectId : '');
             return;
           }
-          window.location = '/miso/sample/bulk/new?' + jQuery.param({
+          return {
             quantity: result.quantity,
             projectId: projectId,
             sampleClassId: Constants.isDetailedSample ? result.sampleClass.id : null
-          });
+          };
+        }, function(result) {
+          return result.quantity;
         });
       }
     }, {

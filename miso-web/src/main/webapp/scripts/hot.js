@@ -1172,6 +1172,27 @@ var HotUtils = {
       table.setCellMeta(i, sortColIndex, 'sortFunction', sortFunction);
     }
     table.sort(sortColIndex);
+  },
+  
+  showDialogForBoxCreation: function(title, okButton, fields, pageURL, generateParams, getItemCount){
+    fields.push(ListUtils.createBoxField);
+    Utils.showDialog(title, okButton, fields, function(result) {
+      var params = generateParams(result);
+      if(params == null){
+        return;
+      }
+      var loadPage = function(){
+        window.location = window.location.origin + pageURL + jQuery.param(params);
+      }
+      if (result.createBox){
+        Utils.createBoxDialog(result, getItemCount, function(newBox){
+          params.boxId = newBox.id;
+          loadPage();
+        });
+      } else {
+        loadPage();
+      }
+    }); 
   }
 };
 

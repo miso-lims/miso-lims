@@ -3,6 +3,9 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class BoxDto {
   private String alias;
   private String name;

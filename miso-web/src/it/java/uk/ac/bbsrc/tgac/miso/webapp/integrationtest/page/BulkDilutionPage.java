@@ -88,6 +88,7 @@ public class BulkDilutionPage extends HeaderFooterPage {
   public BulkPoolPage chainPoolSeparately() {
     WebElement html = getHtmlElement();
     toolbar.findElement(POOL_SEPARATELY_BUTTON_TEXT).click();
+    clickOk();
     waitForPageRefresh(html);
     return new BulkPoolPage(getDriver());
   }

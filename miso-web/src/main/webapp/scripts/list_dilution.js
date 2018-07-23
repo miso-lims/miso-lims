@@ -94,10 +94,11 @@ ListTarget.dilution = {
             required: true
           });
         }
+        
+        fields.push(ListUtils.createBoxField)
 
         Utils.showDialog("Create Dilution", "Create", fields, function(dil) {
-          // check barcode
-          Utils.ajaxWithDialog('Saving Dilution', 'POST', '/miso/rest/librarydilution', {
+          var newDil = {
             "library": config.library,
             "name": dil.name,
             "identificationBarcode": dil.identificationBarcode,
@@ -107,9 +108,30 @@ ListTarget.dilution = {
             "volumeUsed": dil.volumeUsed,
             "creationDate": dil.creationDate,
             "targetedSequencingId": dil.targetedSequencing && dil.targetedSequencing.id != 0 ? dil.targetedSequencing.id : null
-
-          }, Utils.page.pageReload);
-
+          }
+          var makeDilution = function(){
+            Utils.ajaxWithDialog('Saving Dilution', 'POST', '/miso/rest/librarydilution', newDil, Utils.page.pageReload);
+          }
+          if (dil.createBox){
+            Utils.createBoxDialog(dil, function(result){
+              return 1;
+            }, function(newBox){
+              var boxFields = [{
+                property: 'position',
+                type: 'select',
+                label: 'Box Position',
+                values: Utils.getEmptyBoxPositions(newBox),
+                required: true
+              }];
+              Utils.showDialog("Select Box Position", "Select", boxFields, function(box) {
+                newDil['box'] = newBox;
+                newDil['boxPosition'] = box.position;
+                makeDilution();
+              })
+            });
+          } else {
+            makeDilution();
+          }
         });
 
       }

@@ -519,4 +519,15 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
     return deletionStore;
   }
 
+  @Override
+  public void throwIfBoxPositionIsFilled(Boxable boxable) throws IOException {
+    if (boxable.getBox() == null || boxable.getBoxPosition() == null) return;
+    Box box = get(boxable.getBox().getId());
+    BoxableView boxableView = box.getBoxable(boxable.getBoxPosition());
+    if (boxableView == null) return;
+    if (!(boxableView.getId().getTargetId() == boxable.getId() && boxableView.getId().getTargetType() == boxable.getEntityType())) {
+      throw new IllegalArgumentException("Box position '" + boxable.getBoxPosition() + "' in box '" + box.getAlias() + "' is not empty");
+    }
+  }
+
 }

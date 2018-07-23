@@ -725,7 +725,7 @@ HotTarget.sample = (function() {
         })[0]) + 1;
         if (!Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity') {
           // don't add boxable columns to Identities
-          columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns()));
+          columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns(config)));
         }
       }
 
@@ -774,8 +774,9 @@ HotTarget.sample = (function() {
 
                   return {
                     name: sampleClass.alias,
-                    action: function(replicates) {
+                    action: function(replicates, newBoxId) {
                       window.location = "/miso/sample/bulk/propagate?" + jQuery.param({
+                        boxId: newBoxId,
                         parentIds: idsString,
                         replicates: replicates,
                         sampleClassId: sampleClass.id
@@ -788,8 +789,9 @@ HotTarget.sample = (function() {
                 })) {
                   targets.push({
                     name: "Library",
-                    action: function(replicates) {
+                    action: function(replicates, newBoxId) {
                       var params = {
+                        boxId: newBoxId,
                         ids: idsString,
                         replicates: replicates
                       }
@@ -811,16 +813,29 @@ HotTarget.sample = (function() {
                   type: 'int',
                   label: 'Replicates',
                   value: 1
-                }, targets.length > 1 ? {
+                }, (targets.length > 1 ? {
                   property: 'target',
                   type: 'select',
                   label: 'To',
                   values: targets,
                   getLabel: Utils.array.getName
-                } : null].filter(function(x) {
+                } : null), ListUtils.createBoxField].filter(function(x) {
                   return !!x;
                 }), function(result) {
-                  (result.target || targets[0]).action(result.replicates);
+                  var boxId = null;
+                  var loadPage = function(){
+                    (result.target || targets[0]).action(result.replicates, boxId);
+                  }
+                  if (result.createBox){
+                    Utils.createBoxDialog(result, function(result){
+                      return result.replicates * samples.length;
+                    }, function(newBox) {
+                      boxId = newBox.id;
+                      loadPage();
+                    });
+                  } else {
+                    loadPage();
+                  }
                 });
               });
             }
