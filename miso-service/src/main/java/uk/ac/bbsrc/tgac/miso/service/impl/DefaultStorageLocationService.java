@@ -101,6 +101,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
   }
 
   private long create(StorageLocation location) throws IOException {
+    location.setParentLocation(storageLocationStore.get(location.getParentLocation().getId()));
     validateChange(location, null);
     createParentIfNecessary(location);
     location.setChangeDetails(authorizationManager.getCurrentUser());
@@ -109,6 +110,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
 
   private long update(StorageLocation location) throws IOException {
     StorageLocation managed = get(location.getId());
+    location.setParentLocation(storageLocationStore.get(location.getParentLocation().getId()));
     validateChange(location, managed);
     createParentIfNecessary(location);
     applyChanges(location, managed);
