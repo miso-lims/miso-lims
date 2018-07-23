@@ -37,7 +37,7 @@
     </div>
 
     <div class="column">
-      <sec:authorize access="hasRole('ROLE_ADMIN')">
+      <c:if test="${miso:isAdmin()}">
         <div class="portlet">
           <div class="portlet-header">Administration</div>
           <div class="portlet-content">
@@ -47,7 +47,7 @@
             </c:if>
           </div>
         </div>
-      </sec:authorize>
+      </c:if>
     </div>
   </div>
 </div>

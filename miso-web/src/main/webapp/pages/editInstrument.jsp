@@ -36,13 +36,13 @@
     <form:form id="instrument_form" data-parsley-validate="" action="/miso/instrument" method="POST" commandName="instrument" autocomplete="off">
       <sessionConversation:insertSessionConversationId attributeName="instrument"/>
       <h1>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
+        <c:if test="${miso:isAdmin()}">
           Edit
-        </sec:authorize>
+        </c:if>
         Instrument
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
+        <c:if test="${miso:isAdmin()}">
           <button id="save" onclick="return Instrument.validateInstrument();" class="fg-button ui-state-default ui-corner-all">Save</button>
-        </sec:authorize>
+        </c:if>
       </h1>
       <div class="breadcrumbs">
         <ul>
@@ -91,7 +91,7 @@
           <td class="h">Serial Number:</td>
           <td>
             <c:choose>
-              <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+              <c:when test="${miso:isAdmin()}">
                 <form:input path="serialNumber" id="serialNumber" name="serialNumber" class="validateable"/><span id="serialNumberCounter" class="counter"></span>
               </c:when>
               <c:otherwise><span id="serialNumber">${instrument.serialNumber}</span></c:otherwise>
@@ -102,7 +102,7 @@
           <td class="h">Name:*</td>
           <td>
             <c:choose>
-              <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+              <c:when test="${miso:isAdmin()}">
                 <form:input path="name" id="name" name="name" class="validateable"/><span id="nameCounter" class="counter"></span>
               </c:when>
               <c:otherwise><span id="name">${instrument.name}</span></c:otherwise>
@@ -113,7 +113,7 @@
           <td>IP Address:*</td>
           <td>
             <c:choose>
-              <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+              <c:when test="${miso:isAdmin()}">
                 <input type="text" id="ipAddress" name="ipAddress" value="${trimmedIpAddress}" class="validateable"/>
                 <input type="hidden" value="on" name="_ipAddress"/>
               </c:when>
@@ -133,7 +133,7 @@
           <td class="h">Commissioned:</td>
           <td>
             <c:choose>
-              <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+              <c:when test="${miso:isAdmin()}">
                 <form:input path="dateCommissioned" id="datecommissionedpicker" placeholder="YYYY-MM-DD" class="validateable"/>
                 <script type="text/javascript">
                   Utils.ui.addDatePicker("datecommissionedpicker");
@@ -149,7 +149,7 @@
           <td>Status:</td>
           <td>
             <c:choose>
-              <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+              <c:when test="${miso:isAdmin()}">
                 <label><input type="radio" name="status" value="production" onchange="Instrument.ui.showStatusRows();" <c:if test="${instrument.dateDecommissioned == null}">checked</c:if>/> Production</label>
                 <label><input type="radio" name="status" value="retired" onchange="Instrument.ui.showStatusRows();" <c:if test="${instrument.dateDecommissioned != null && instrument.upgradedInstrument == null}">checked</c:if>/> Retired</label>
                 <label><input type="radio" name="status" value="upgraded" onchange="Instrument.ui.showStatusRows();" <c:if test="${instrument.dateDecommissioned != null && instrument.upgradedInstrument != null}">checked</c:if>/> Upgraded</label>
@@ -170,7 +170,7 @@
           <td class="h">Decommissioned:*</td>
           <td>
             <c:choose>
-              <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+              <c:when test="${miso:isAdmin()}">
                 <form:input path="dateDecommissioned" id="datedecommissionedpicker" placeholder="YYYY-MM-DD" class="validateable"/>
                 <script type="text/javascript">
                   Utils.ui.addDatePicker("datedecommissionedpicker");
@@ -185,7 +185,7 @@
         <tr id="upgradedInstrumentRow">
           <td class="h">Upgraded To:*</td>
           <td>
-            <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+            <c:if test="${miso:isAdmin()}">
               <form:select id="upgradedInstrument" path="upgradedInstrument"  class="validateable" onchange="Instrument.ui.updateUpgradedInstrumentLink();">
                 <form:option value="0">(choose)</form:option>
                 <form:options items="${otherInstruments}" itemLabel="name" itemValue="id"/>
@@ -196,7 +196,7 @@
         </tr>
       </table>
       <c:choose>
-        <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+        <c:when test="${miso:isAdmin()}">
           <script type="text/javascript">
             jQuery(document).ready(function() {
 	          Instrument.ui.showStatusRows();
@@ -246,7 +246,7 @@
               <th>Title</th>
               <th>Serviced By</th>
               <th>Reference Number</th>
-              <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+              <c:if test="${miso:isAdmin()}">
                 <th class="fit">Delete</th>
               </c:if>
             </tr>
@@ -258,7 +258,7 @@
                 <td><a href='<c:url value="/miso/instrument/servicerecord/${record.id}"/>'>${record.title}</a></td>
                 <td>${record.servicedByName}</td>
                 <td>${record.referenceNumber}</td>
-                <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                <c:if test="${miso:isAdmin()}">
                   <td class="misoicon" onclick="Instrument.ui.deleteServiceRecord(${record.id}, Utils.page.pageReload);">
                     <span class="ui-icon ui-icon-trash"></span>
                   </td>
@@ -280,7 +280,7 @@
             { "sType": 'string' },
             { "sType": 'string' },
             { "sType": 'string' }
-            <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+            <c:if test="${miso:isAdmin()}">
               ,{ "bSortable": false }
             </c:if>
           ],

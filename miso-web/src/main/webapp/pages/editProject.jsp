@@ -106,8 +106,7 @@
     <td>Progress:*</td>
     <td>
       <c:choose>
-        <c:when test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                        or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+        <c:when test="${miso:isCurrentUser(project.securityProfile.owner.loginName) or miso:isAdmin()}">
           <div id="progressButtons">
             <form:radiobuttons id="progress" path="progress"/>
           </div>
@@ -190,8 +189,7 @@
 <table class="list" id="overview">
   <thead>
   <tr>
-    <c:if test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                        or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+    <c:if test="${miso:isCurrentUser(project.securityProfile.owner.loginName) or miso:isAdmin()}">
       <th>Lock/Unlock</th>
     </c:if>
     <th>Principal Investigator</th>
@@ -204,8 +202,7 @@
   </thead>
   <tbody>
   <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-    <c:if test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                      or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+    <c:if test="${miso:isCurrentUser(project.securityProfile.owner.loginName) or miso:isAdmin()}">
       <c:choose>
         <c:when test="${overview.locked}">
           <td style="text-align:center;">
@@ -227,8 +224,7 @@
     <td>${overview.principalInvestigator}</td>
     <td>
       <c:choose>
-        <c:when test="${overview.locked eq false and ((project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                      or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN'))}">
+        <c:when test="${overview.locked eq false and (miso:isCurrentUser(project.securityProfile.owner.loginName) or miso:isAdmin())}">
           <form:input path="overviews['${ov.count-1}'].startDate" id="startdatepicker"/>
           <script type="text/javascript">
             Utils.ui.addDatePicker("startdatepicker");
@@ -241,8 +237,7 @@
     </td>
     <td>
       <c:choose>
-        <c:when test="${overview.locked eq false and ((project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                      or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN'))}">
+        <c:when test="${overview.locked eq false and (miso:isCurrentUser(project.securityProfile.owner.loginName) or miso:isAdmin())}">
           <form:input path="overviews['${ov.count-1}'].endDate" id="enddatepicker"/>
           <script type="text/javascript">
             Utils.ui.addDatePicker("enddatepicker");
@@ -255,8 +250,7 @@
     </td>
     <td>
       <c:choose>
-        <c:when test="${overview.locked eq false and ((project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                      or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN'))}">
+        <c:when test="${overview.locked eq false and (miso:isCurrentUser(project.securityProfile.owner.loginName) or miso:isAdmin())}">
           <form:input path="overviews['${ov.count-1}'].numProposedSamples"
                       id="numProposedSamples${ov.count-1}"/>
         </c:when>
@@ -281,8 +275,7 @@
         <div class="exppreview" id="overview-notes-${n.count}">
           <b>${note.creationDate}</b>: ${note.text}
           <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
-            <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                            or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+            <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
               <span style="color:#000000">
                 <a href='#' onclick="Project.overview.deleteProjectOverviewNote('${overview.id}', '${note.noteId}');">
                   <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span>
@@ -531,11 +524,11 @@
         <div id='btnPanel' style='width: 32px;'>
           <table>
             <tr>
-              <sec:authorize access="hasRole('ROLE_ADMIN')">
+              <c:if test="${miso:isAdmin()}">
                 <td class="misoicon" onclick="Project.ui.deleteFile(${project.id}, ${file.key});">
                   <span class="ui-icon ui-icon-trash"></span>
                 </td>
-              </sec:authorize>
+              </c:if>
             </tr>
           </table>
       </div>
@@ -557,7 +550,7 @@
 <div id="studies_section_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="studies_section" class="expandable_section">
-  <miso:list-section-ajax id="project_studies" name="Studies" target="study" project="${project}" config="{ isAdmin : ${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')} }"/>
+  <miso:list-section-ajax id="project_studies" name="Studies" target="study" project="${project}" config="{ isAdmin : ${miso:isAdmin()} }"/>
 </div>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#samples_section_arrowclick'), 'samples_section');">

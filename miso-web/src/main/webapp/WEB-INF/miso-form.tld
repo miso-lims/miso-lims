@@ -389,6 +389,24 @@
         <function-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.TagUtils</function-class>
         <function-signature>boolean instanceOf(java.lang.Object, java.lang.String)</function-signature>
     </function>
+    
+    <function>
+        <name>isCurrentUser</name>
+        <function-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.TagUtils</function-class>
+        <function-signature>boolean isCurrentUser(java.lang.String)</function-signature>
+    </function>
+    
+    <function>
+        <name>isAdmin</name>
+        <function-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.TagUtils</function-class>
+        <function-signature>boolean isAdmin()</function-signature>
+    </function>
+    
+    <function>
+        <name>isTech</name>
+        <function-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.TagUtils</function-class>
+        <function-signature>boolean isTech()</function-signature>
+    </function>
 
 
 </taglib>

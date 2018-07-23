@@ -32,8 +32,7 @@
       <td class="h">Owner:</td>
       <td>
         <c:choose>
-          <c:when test="${(formObj.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+          <c:when test="${miso:isCurrentUser(formObj.securityProfile.owner.loginName) or miso:isAdmin()}">
             <form:select path="securityProfile.owner" id="securityProfile_owner">
               <form:option value="" label="Select..."/>
               <form:options items="${owners}" itemLabel="fullName" itemValue="userId"/>
@@ -45,7 +44,6 @@
                 ${formObj.securityProfile.owner.fullName}
               </c:when>
               <c:otherwise>
-                <%-- ${SPRING_SECURITY_CONTEXT.authentication.principal.fullName} --%>
                 <i>None</i>
               </c:otherwise>
             </c:choose>
@@ -53,9 +51,7 @@
         </c:choose>
       </td>
     </tr>
-    <c:if test="${empty formObj.securityProfile or
-                    (formObj.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username) or
-                    fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+    <c:if test="${empty formObj.securityProfile or miso:isCurrentUser(formObj.securityProfile.owner.loginName) or miso:isAdmin()}">
       <tr>
         <td class="h">Allow all internal users access?:</td>
         <td><form:checkbox path="securityProfile.allowAllInternal"/></td>
