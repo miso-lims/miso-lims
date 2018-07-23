@@ -176,6 +176,11 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @JoinTable(name = "Pool_Watcher", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = { @JoinColumn(name = "userId") })
   private Set<User> watchUsers = new HashSet<>();
 
+  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinTable(name = "Pool_Attachment", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = {
+      @JoinColumn(name = "attachmentId") })
+  private List<FileAttachment> attachments;
+
   public PoolImpl() {
     setSecurityProfile(new SecurityProfile());
   }
@@ -345,6 +350,21 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   public Set<User> getWatchUsers() {
     return watchUsers;
+  }
+
+  @Override
+  public List<FileAttachment> getAttachments() {
+    return attachments;
+  }
+
+  @Override
+  public void setAttachments(List<FileAttachment> attachments) {
+    this.attachments = attachments;
+  }
+
+  @Override
+  public String getAttachmentsTarget() {
+    return "pool";
   }
 
   @Override

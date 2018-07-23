@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.Attachable;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
+@SuppressWarnings({ "squid:S1948" }) // non-Serializable fields
 public class AttachmentsTag extends RequestContextAwareTag {
 
   private static final long serialVersionUID = 1L;
@@ -17,13 +18,13 @@ public class AttachmentsTag extends RequestContextAwareTag {
 
   @Override
   protected int doStartTagInternal() throws Exception {
-    Attachable item = (Attachable) this.item;
+    Attachable attachable = (Attachable) this.item;
     ObjectMapper mapper = new ObjectMapper();
 
     pageContext.getOut().append(String.format(
         "<br/><h1>Attachments</h1><table id='attachments' class='display no-border ui-widget-content'></table><script type='text/javascript'>jQuery(document).ready(function () { ListUtils.createStaticTable('attachments', ListTarget.attachment, {entityType: '%1$s', entityId: %2$s}, %3$s);});</script>",
-        item.getAttachmentsTarget(), item.getId(),
-        mapper.writeValueAsString(item.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList()))));
+        attachable.getAttachmentsTarget(), attachable.getId(),
+        mapper.writeValueAsString(attachable.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList()))));
     return SKIP_BODY;
   }
 

@@ -220,6 +220,7 @@
 <!-- notes end -->
 
 <c:if test="${pool.id != 0}">
+  <miso:attachments item="${pool}"/>
   <miso:qcs id="list_qcs" item="${pool}"/>
   <miso:list-section id="list_order" name="Requested Orders" target="order" alwaysShow="true" items="${orders}" config="{ pool: ${poolDto}, platformType: '${pool.platformType.name()}' }"/>
   <miso:list-section-ajax id="list_completion" name="Order Status" target="completion" config="{ poolId: ${pool.id} }"/>

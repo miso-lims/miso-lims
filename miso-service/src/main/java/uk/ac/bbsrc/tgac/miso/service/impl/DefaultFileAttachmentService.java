@@ -21,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.AttachableStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
@@ -34,6 +35,9 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
 
   @Autowired
   private AttachableStore attachableStore;
+
+  @Autowired
+  private PoolService poolService;
 
   @Autowired
   private ProjectService projectService;
@@ -53,6 +57,7 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   private final Map<String, Function<Long, Attachable>> entityFetchers = new HashMap<>();
 
   public DefaultFileAttachmentService() {
+    entityFetchers.put("pool", WhineyFunction.rethrow(id -> poolService.get(id)));
     entityFetchers.put("project", WhineyFunction.rethrow(id -> projectService.getProjectById(id)));
     entityFetchers.put("run", WhineyFunction.rethrow(id -> runService.get(id)));
     entityFetchers.put("servicerecord", WhineyFunction.rethrow(id -> serviceRecordService.get(id)));
@@ -117,7 +122,9 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
       managed.getAttachments().add(attachment);
       attachableStore.save(managed);
     } catch (Exception e) {
-      targetFile.delete();
+      if (!targetFile.delete()) {
+        log.error("Failed to save attachment, but file was still saved: {}", targetFile.getAbsolutePath());
+      }
       throw e;
     }
   }
@@ -166,16 +173,15 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
         }
       }
       if (!dir.delete()) {
-        log.error("Failed to delete directory for deleted object: " + dir.getAbsolutePath());
+        log.error("Failed to delete directory for deleted object: {}", dir.getAbsolutePath());
       }
     }
   }
 
   private void deleteFileOrLog(File file, Attachable object, FileAttachment attachment) {
     if (!file.delete()) {
-      log.error(String.format("File no longer associated with an object, but failed to delete: %s%s from %s %d", file.getName(),
-          (attachment == null ? "" : " (" + attachment.getFilename() + ")"), attachment.getFilename(), object.getAttachmentsTarget(),
-          object.getId()));
+      log.error("File no longer associated with an object, but failed to delete: {}{} from {} {}", new Object[] { file.getName(),
+          (attachment == null ? "" : " (" + attachment.getFilename() + ")"), object.getAttachmentsTarget(), Long.valueOf(object.getId()) });
     }
   }
 

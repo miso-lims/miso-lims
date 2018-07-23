@@ -89,7 +89,7 @@ public class MisoFilesManager implements FilesManager {
   protected File getFile(Class<?> type, String qualifier, String fileName, boolean createIfNotExist) throws IOException {
     final File path = new File(fileStorageDirectory + "/" + type.getSimpleName().toLowerCase() + "/" + qualifier + "/");
     final File file = new File(path, fileName);
-    log.info("Looking up " + file);
+    log.info("Looking up {}", file);
     if (path.exists()) {
       if (file.exists()) {
         if (file.canRead()) {
