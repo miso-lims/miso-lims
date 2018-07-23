@@ -162,10 +162,6 @@
 
 <%@ include file="volumeControl.jspf" %>
 
-<div class="noPrint">
-  <%@ include file="permissions.jsp" %>
-</div>
-
 <br/>
 
 <script type="text/javascript">
@@ -179,7 +175,6 @@
     Validate.attachParsley('#pool-form');
   });
 </script>
-</form:form>
 
 <!--notes start -->
 <c:if test="${pool.id != 0}">
@@ -236,8 +231,10 @@
   </div>
 </c:if>
 <div class="noPrint">
+  <%@ include file="permissions.jsp" %>
   <miso:changelog item="${pool}"/>
 </div>
+</form:form>
 
 </div>
 </div>
