@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,7 +44,7 @@ public class AttachmentController {
   @PostMapping(value = "/{entityType}/{entityId}")
   @ResponseStatus(HttpStatus.OK)
   public void acceptUpload(@PathVariable String entityType, @PathVariable long entityId, MultipartHttpServletRequest request)
-      throws IllegalStateException, IOException {
+      throws IOException {
     Attachable item = fileAttachmentService.get(entityType, entityId);
     if (item == null) {
       throw new NotFoundException(entityType + " not found");
@@ -58,13 +57,11 @@ public class AttachmentController {
 
   private List<MultipartFile> getMultipartFiles(MultipartHttpServletRequest request) {
     List<MultipartFile> files = new ArrayList<>();
-    Map<String, MultipartFile> fMap = request.getFileMap();
-    for (String fileName : fMap.keySet()) {
-      MultipartFile fileItem = fMap.get(fileName);
+    request.getFileMap().forEach((key, fileItem) -> {
       if (fileItem.getSize() > 0) {
         files.add(fileItem);
       }
-    }
+    });
     return files;
   }
 

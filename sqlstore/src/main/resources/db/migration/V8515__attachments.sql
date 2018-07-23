@@ -1,6 +1,9 @@
 DROP TABLE IF EXISTS Project_Attachment;
 DROP TABLE IF EXISTS ServiceRecord_Attachment;
+DROP TABLE IF EXISTS Run_Attachment;
+DROP TABLE IF EXISTS Pool_Attachment;
 DROP TABLE IF EXISTS Attachment;
+DROP TABLE IF EXISTS TempValues;
 
 CREATE TABLE Attachment (
   attachmentId bigint(20) NOT NULL AUTO_INCREMENT,
@@ -34,6 +37,14 @@ CREATE TABLE Run_Attachment (
   PRIMARY KEY (runId, attachmentId),
   CONSTRAINT fk_attachment_run FOREIGN KEY (runId) REFERENCES Run (runId),
   CONSTRAINT fk_run_attachment FOREIGN KEY (attachmentId) REFERENCES Attachment (attachmentId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE Pool_Attachment (
+  poolId bigint(20) NOT NULL,
+  attachmentId bigint(20) NOT NULL,
+  PRIMARY KEY (poolId, attachmentId),
+  CONSTRAINT fk_attachment_pool FOREIGN KEY (poolId) REFERENCES Pool (poolId),
+  CONSTRAINT fk_pool_attachment FOREIGN KEY (attachmentId) REFERENCES Attachment (attachmentId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE TempValues (

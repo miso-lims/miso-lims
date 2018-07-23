@@ -8,15 +8,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Logger;
 
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class V8520__Attachments implements JdbcMigration {
 
-  private static final Logger log = Logger.getLogger(V8520__Attachments.class.getName());
+  private static final Logger log = LoggerFactory.getLogger(V8520__Attachments.class);
 
   private enum EntityType {
     PROJECT("project", "Project", "projectId", "Project_Attachment"),
@@ -69,7 +70,7 @@ public class V8520__Attachments implements JdbcMigration {
     }
     basePath = Paths.get(filesDir);
 
-    log.info(String.format("scanning directory %s", filesDir));
+    log.info("scanning directory {}", filesDir);
     try (PreparedStatement insertStatement = connection.prepareStatement(
         "INSERT INTO Attachment(filename, path, creator, created)"
             + " VALUES (?, ?, (SELECT userId FROM User WHERE loginName = 'admin'), NOW());",
@@ -85,7 +86,7 @@ public class V8520__Attachments implements JdbcMigration {
   private void scanTypeDir(EntityType type, PreparedStatement insertStatement) throws SQLException {
     File dir = new File(filesDir + type.getDirName());
     if (dir.exists()) {
-      log.info(String.format("scanning directory %s", dir.getAbsolutePath()));
+      log.info("scanning directory {}", dir.getAbsolutePath());
       try (PreparedStatement getStatement = connection
           .prepareStatement(String.format("SELECT * FROM %s WHERE %s = ?", type.getTable(), type.getPrimaryKey()));
           PreparedStatement joinStatement = connection.prepareStatement(
@@ -99,9 +100,9 @@ public class V8520__Attachments implements JdbcMigration {
 
   private void processObjectDir(EntityType type, File dir, PreparedStatement getStatement, PreparedStatement insertStatement,
       PreparedStatement joinStatement) throws SQLException {
-    log.info("scanning directory " + dir.getAbsolutePath());
+    log.info("scanning directory {}", dir.getAbsolutePath());
     if (!dir.isDirectory()) {
-      log.warning(String.format("Unexpected non-directory found: %s", dir.getAbsolutePath()));
+      log.warn("Unexpected non-directory found: {}", dir.getAbsolutePath());
     } else {
       long entityId = 0L;
       try {
@@ -110,15 +111,17 @@ public class V8520__Attachments implements JdbcMigration {
         // ignore error - failure handled below
       }
       if (entityId == 0L) {
-        log.warning(String.format("Unexpected directory name: %s", dir.getAbsolutePath()));
+        log.warn("Unexpected directory name: {}", dir.getAbsolutePath());
       } else {
         getStatement.setLong(1, entityId);
-        if (!getStatement.executeQuery().next()) {
-          log.warning(String.format("Found files for non-existant %s %d", type.getTable(), entityId));
-        } else {
-          joinStatement.setLong(1, entityId);
-          for (File objectFile : dir.listFiles()) {
-            processFile(objectFile, insertStatement, joinStatement);
+        try (ResultSet results = getStatement.executeQuery()) {
+          if (!results.next()) {
+            log.warn("Found files for non-existant {} {}", type.getTable(), entityId);
+          } else {
+            joinStatement.setLong(1, entityId);
+            for (File objectFile : dir.listFiles()) {
+              processFile(objectFile, insertStatement, joinStatement);
+            }
           }
         }
       }
@@ -127,41 +130,42 @@ public class V8520__Attachments implements JdbcMigration {
 
   private void processFile(File objectFile, PreparedStatement insertStatement, PreparedStatement joinStatement) throws SQLException {
     if (!objectFile.isFile()) {
-      log.warning(String.format("Unexpected non-file found: %s", objectFile.getAbsolutePath()));
+      log.warn("Unexpected non-file found: {}", objectFile.getAbsolutePath());
     } else {
-      log.info("processing file " + objectFile.getAbsolutePath());
+      log.info("processing file {}", objectFile.getAbsolutePath());
       Path filePath = Paths.get(objectFile.getAbsolutePath());
       String relativePath = File.separator + basePath.relativize(filePath).toString();
 
       insertStatement.setString(1, objectFile.getName());
       insertStatement.setString(2, relativePath);
       if (insertStatement.executeUpdate() == 0) {
-        throw new RuntimeException("Failed to insert attachment data");
+        throw new SQLException("Failed to insert attachment data");
       }
 
       joinStatement.setLong(2, getGeneratedId(insertStatement));
       if (joinStatement.executeUpdate() == 0) {
-        throw new RuntimeException("Failed to insert attachment relationship data");
+        throw new SQLException("Failed to insert attachment relationship data");
       }
     }
   }
 
   private String getFilesDir() throws SQLException {
-    try (Statement stmt = connection.createStatement()) {
-      ResultSet results = stmt.executeQuery("SELECT val FROM TempValues WHERE name = 'filesDir';");
+    try (Statement stmt = connection.createStatement();
+        ResultSet results = stmt.executeQuery("SELECT val FROM TempValues WHERE name = 'filesDir';")) {
       if (!results.next()) {
-        throw new RuntimeException("Error retrieving filesDir");
+        throw new SQLException("Error retrieving filesDir");
       }
       return results.getString(1);
     }
   }
 
   private long getGeneratedId(PreparedStatement stmt) throws SQLException {
-    ResultSet keys = stmt.getGeneratedKeys();
-    if (!keys.next()) {
-      throw new RuntimeException("Error inserting attachment data");
+    try (ResultSet keys = stmt.getGeneratedKeys()) {
+      if (!keys.next()) {
+        throw new SQLException("Error inserting attachment data");
+      }
+      return keys.getLong(1);
     }
-    return keys.getLong(1);
   }
 
   private void dropTempTable() throws SQLException {
