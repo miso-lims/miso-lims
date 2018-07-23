@@ -28,6 +28,14 @@ CREATE TABLE ServiceRecord_Attachment (
   CONSTRAINT fk_serviceRecord_attachment FOREIGN KEY (attachmentId) REFERENCES Attachment (attachmentId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE Run_Attachment (
+  runId bigint(20) NOT NULL,
+  attachmentId bigint(20) NOT NULL,
+  PRIMARY KEY (runId, attachmentId),
+  CONSTRAINT fk_attachment_run FOREIGN KEY (runId) REFERENCES Run (runId),
+  CONSTRAINT fk_run_attachment FOREIGN KEY (attachmentId) REFERENCES Attachment (attachmentId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE TempValues (
   name varchar(255) NOT NULL,
   val varchar(255) NOT NULL,

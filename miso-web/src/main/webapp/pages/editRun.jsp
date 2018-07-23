@@ -313,6 +313,7 @@
 </c:if>
 
   <c:if test="${run.id != 0}">
+    <miso:attachments item="${run}"/>
     <div id="issues">
       <miso:list-section id="list_issue" name="Related Issues" target="issue" items="${runIssues}" config="{}"/>
     </div>

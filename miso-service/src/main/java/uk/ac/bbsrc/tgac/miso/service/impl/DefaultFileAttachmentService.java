@@ -22,6 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -38,6 +39,9 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   private ProjectService projectService;
 
   @Autowired
+  private RunService runService;
+
+  @Autowired
   private ServiceRecordService serviceRecordService;
 
   @Autowired
@@ -50,35 +54,24 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
 
   public DefaultFileAttachmentService() {
     entityFetchers.put("project", WhineyFunction.rethrow(id -> projectService.getProjectById(id)));
+    entityFetchers.put("run", WhineyFunction.rethrow(id -> runService.get(id)));
     entityFetchers.put("servicerecord", WhineyFunction.rethrow(id -> serviceRecordService.get(id)));
-  }
-
-  public AttachableStore getAttachableStore() {
-    return attachableStore;
   }
 
   public void setAttachableStore(AttachableStore attachableStore) {
     this.attachableStore = attachableStore;
   }
 
-  public ProjectService getProjectService() {
-    return projectService;
-  }
-
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
   }
 
-  public ServiceRecordService getServiceRecordService() {
-    return serviceRecordService;
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   public void setServiceRecordService(ServiceRecordService serviceRecordService) {
     this.serviceRecordService = serviceRecordService;
-  }
-
-  public AuthorizationManager getAuthorizationManager() {
-    return authorizationManager;
   }
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
@@ -87,10 +80,6 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
 
   public void setFileStorageDirectory(String fileStorageDirectory) {
     this.fileStorageDirectory = fileStorageDirectory;
-  }
-
-  public String getFileStorageDirectory() {
-    return this.fileStorageDirectory;
   }
 
   @Override
