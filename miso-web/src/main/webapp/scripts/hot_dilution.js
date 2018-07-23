@@ -134,7 +134,7 @@ HotTarget.dilution = {
     var spliceIndex = columns.indexOf(columns.filter(function(column) {
       return column.data === 'identificationBarcode';
     })[0]) + 1;
-    columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns()));
+    columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns(config)));
     return columns;
   },
 
@@ -160,8 +160,13 @@ HotTarget.dilution = {
       title: 'Create one pool from many dilutions',
       action: function(items) {
         HotUtils.warnIfConsentRevoked(items, function() {
-          window.location = window.location.origin + '/miso/library/dilution/bulk/merge?' + jQuery.param({
-            ids: items.map(Utils.array.getId).join(',')
+          var fields = [];
+          HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, '/miso/library/dilution/bulk/merge?', function(result) {
+            return {
+              ids: items.map(Utils.array.getId).join(',')
+            };
+          }, function(result) {
+            return 1;
           });
         }, HotTarget.dilution.getLabel);
       },
@@ -170,9 +175,14 @@ HotTarget.dilution = {
       name: 'Pool separately',
       title: 'Create a pool for each dilution',
       action: function(items) {
-        HotUtils.warnIfConsentRevoked(items, function() {
-          window.location = window.location.origin + '/miso/library/dilution/bulk/propagate?' + jQuery.param({
-            ids: items.map(Utils.array.getId).join(',')
+        HotUtils.warnIfConsentRevoked(items, function() {         
+          var fields = [];
+          HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, '/miso/library/dilution/bulk/propagate?', function(result) {
+            return {
+              ids: items.map(Utils.array.getId).join(',')
+            };
+          }, function(result) {
+            return items.length;
           });
         }, HotTarget.dilution.getLabel);
       },
@@ -182,16 +192,20 @@ HotTarget.dilution = {
       title: 'Divide dilutions into several pools',
       action: function(items) {
         HotUtils.warnIfConsentRevoked(items, function() {
-          Utils.showDialog("Create Pools", "Create", [{
+          var fields = [{
             label: 'Quantity',
             property: 'quantity',
-            type: 'int'
-          }], function(data) {
-            window.location = window.location.origin + '/miso/library/dilution/bulk/pool?' + jQuery.param({
+            type: 'int',
+          }];
+          HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, '/miso/library/dilution/bulk/pool?', function(result) {
+            console.log(result);
+            return {
               ids: items.map(Utils.array.getId).join(','),
-              quantity: data.quantity
-            });
-          });
+              quantity: result.quantity
+            };
+          }, function(result) {
+            return result.quantity;
+          })
         }, HotTarget.dilution.getLabel);
       },
       allowOnLibraryPage: true

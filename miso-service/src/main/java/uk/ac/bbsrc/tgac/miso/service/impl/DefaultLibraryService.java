@@ -153,6 +153,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       library.getSample().setId(sampleId);
     }
     loadChildEntities(library);
+    boxService.throwIfBoxPositionIsFilled(library);
     setChangeDetails(library);
     if (library.getSecurityProfile() == null) {
       library.inheritPermissions(sampleService.get(library.getSample().getId()));
@@ -175,6 +176,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     Library managed = get(library.getId());
     List<Index> originalIndices = new ArrayList<>(managed.getIndices());
     authorizationManager.throwIfNotWritable(managed);
+    boxService.throwIfBoxPositionIsFilled(library);
     boolean validateAliasUniqueness = !managed.getAlias().equals(library.getAlias());
     applyChanges(managed, library);
     setChangeDetails(managed);

@@ -661,7 +661,7 @@ HotTarget.library = (function() {
       var spliceIndex = columns.indexOf(columns.filter(function(column) {
         return column.data === 'identificationBarcode';
       })[0]) + 1;
-      columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns()));
+      columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns(config)));
       return columns;
     },
 
@@ -686,8 +686,24 @@ HotTarget.library = (function() {
         name: 'Make dilutions',
         action: function(items) {
           HotUtils.warnIfConsentRevoked(items, function() {
-            window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate?' + jQuery.param({
-              ids: items.map(Utils.array.getId).join(',')
+            var fields = [ListUtils.createBoxField];
+            Utils.showDialog('Make Dilutions', 'Create', fields, function(result) {
+              var params = {
+                ids: items.map(Utils.array.getId).join(',')
+              }
+              var loadPage = function(){
+                window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate?' + jQuery.param(params);
+              }
+              if (result.createBox){
+                Utils.createBoxDialog(result, function(result){
+                  return items.length;
+                }, function(newBox){
+                  params['boxId'] = newBox.id;
+                  loadPage();
+                });
+              } else {
+                loadPage();
+              }
             });
           });
         }

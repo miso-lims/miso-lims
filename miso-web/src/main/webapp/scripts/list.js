@@ -611,6 +611,15 @@ ListUtils = (function() {
               || "Unknown";
         };
       },
+    },
+    createBoxField: {
+      property: 'createBox',
+      type: 'select',
+      label: 'Create New Box',
+      values: [false, true],
+      getLabel: function(value){
+        return value ? 'Yes' : 'No';
+      }
     }
   };
 })();

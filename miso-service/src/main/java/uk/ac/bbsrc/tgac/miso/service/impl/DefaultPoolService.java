@@ -190,6 +190,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       loadSecurityProfile(pool);
       loadPoolDilutions(pool.getPoolDilutions(), pool);
       setChangeDetails(pool);
+      boxService.throwIfBoxPositionIsFilled(pool);
       poolStore.save(pool);
 
       if (autoGenerateIdBarcodes) {
@@ -206,6 +207,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     } else {
       managed = poolStore.get(pool.getId());
       authorizationManager.throwIfNotWritable(managed);
+      boxService.throwIfBoxPositionIsFilled(pool);
       managed.setAlias(pool.getAlias());
       managed.setConcentration(pool.getConcentration());
       managed.setDescription(pool.getDescription());

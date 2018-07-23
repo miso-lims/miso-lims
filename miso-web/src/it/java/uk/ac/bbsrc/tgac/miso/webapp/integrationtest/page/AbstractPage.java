@@ -303,10 +303,13 @@ public abstract class AbstractPage extends AbstractElement {
     return getDriver().getCurrentUrl();
   }
 
-  protected String clickLinkButtonAndGetUrl(String linkText, List<String> selections) {
+  protected String clickLinkButtonAndGetUrl(String linkText, List<String> selections, boolean confirmRequired) {
     WebElement button = getDriver().findElement(By.linkText(linkText));
     WebElement html = getHtmlElement();
     button.click();
+    if (confirmRequired) {
+      clickOk();
+    }
     if (selections != null && !selections.isEmpty()) {
       selections.forEach(selection -> {
         WebElement link = getDriver().findElement(By.id("dialog")).findElement(By.partialLinkText(selection));

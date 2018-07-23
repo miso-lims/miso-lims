@@ -229,6 +229,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   public Long create(Sample sample) throws IOException {
     loadChildEntities(sample);
     authorizationManager.throwIfNotWritable(sample);
+    boxService.throwIfBoxPositionIsFilled(sample);
     setChangeDetails(sample);
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
@@ -680,6 +681,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     Sample managed = get(sample.getId());
     boolean validateAliasUniqueness = !managed.getAlias().equals(sample.getAlias());
     authorizationManager.throwIfNotWritable(managed);
+    boxService.throwIfBoxPositionIsFilled(sample);
     applyChanges(managed, sample);
     setChangeDetails(managed);
     loadChildEntities(managed);

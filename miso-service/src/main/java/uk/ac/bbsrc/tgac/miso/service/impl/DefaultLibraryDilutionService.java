@@ -154,6 +154,7 @@ public class DefaultLibraryDilutionService
       dilution.inheritPermissions(libraryService.get(dilution.getLibrary().getId()));
     }
     authorizationManager.throwIfNotWritable(dilution);
+    boxService.throwIfBoxPositionIsFilled(dilution);
 
     Library library = dilution.getLibrary();
     if (dilution.getVolumeUsed() != null && library.getVolume() != null) {
@@ -172,6 +173,7 @@ public class DefaultLibraryDilutionService
   public void update(LibraryDilution dilution) throws IOException {
     LibraryDilution managed = get(dilution.getId());
     authorizationManager.throwIfNotWritable(managed);
+    boxService.throwIfBoxPositionIsFilled(dilution);
 
     Library library = dilution.getLibrary();
     if (library.getVolume() != null) {

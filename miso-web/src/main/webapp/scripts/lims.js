@@ -377,7 +377,7 @@ var Utils = Utils
 
             input.appendChild(compareTypeControl);
             input.appendChild(valueControl);
-            break;
+            break; 
           default:
             throw "Unknown field type: " + field.type;
           }
@@ -595,6 +595,75 @@ var Utils = Utils
         // Zero-pad month and day if necessary
         return yyyy + "-" + (mm < 10 ? "0" + mm : mm) + "-" + (dd < 10 ? "0" + dd : dd);
       },
+      createBoxDialog: function(result, getItemCount, callback){
+        var boxFields = [{
+          property: 'alias',
+          type: 'text',
+          label: 'Alias',
+          value: '',
+          required: true
+        }, {
+          property: 'use',
+          type: 'select',
+          label: 'Box Use',
+          values: Constants.boxUses,
+          getLabel: Utils.array.getAlias,
+          required: true
+        }, {
+          property: 'size',
+          type: 'select',
+          label: 'Box Size',
+          values: Constants.boxSizes,
+          getLabel: function(boxSize){
+            return boxSize.scannable ? boxSize.rowsByColumns + " (Scannable)" : boxSize.rowsByColumns;
+          },
+          required: true
+        }, {
+          property: 'matrixBarcode',
+          type: 'text',
+          label: 'Matrix Barcode',
+          value: ''
+        }];
+        var createBoxDto = function(boxFields){
+          var box = {};
+          box['alias'] = boxFields['alias'];
+          box['description'] = boxFields['description'] || '';
+          box['sizeId'] = boxFields['size'].id;
+          box['useId'] = boxFields['use'].id;
+          box['identificationBarcode'] = boxFields['matrixBarcode'];
+          box['locationBarcode'] = boxFields['locationBarcode'];
+          box['tubeCount'] = 0;
+          box['storageLocationBarcode'] = boxFields['storageLocationBarcode'];
+          return box;
+        }
+        Utils.showDialog('Create Box', 'Create', boxFields, function(boxResult) {             
+          var box = createBoxDto(boxResult);
+          var boxSize = Utils.array.findFirstOrNull(function(size) {
+            return size.id == box.sizeId;
+          }, Constants.boxSizes);
+          if(getItemCount(result) > boxSize.rows * boxSize.columns){
+            Utils.showOkDialog('Error', ['The box is too small for the number of items.',
+              'If this is intended, please create the box manually before entering the data.']);
+            return;
+          }
+          Utils.ajaxWithDialog('Creating Box', 'POST', '/miso/rest/box', box, callback);
+        });
+      },
+      getEmptyBoxPositions: function(box){
+        var occupied = box.items.map(function(item) {
+          return item.coordinates;
+        });
+        var free = [];
+        for (var row = 0; row < box.rows; row++) {
+          for (var col = 0; col < box.cols; col++) {
+            var pos = String.fromCharCode(65 + row) + (col < 9 ? '0' : '') + (col + 1);
+            if (occupied.indexOf(pos) === -1) {
+              free.push(pos);
+            }
+          }
+        }
+        return free;
+      }
     };
 
 Utils.timer = {
