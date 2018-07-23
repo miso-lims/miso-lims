@@ -57,6 +57,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -78,8 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @Table(name = "Run")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Run
-    implements SecurableByProfile, Comparable<Run>, Watchable, Nameable, ChangeLoggable, Aliasable,
-    Serializable {
+    implements SecurableByProfile, Comparable<Run>, Watchable, Nameable, ChangeLoggable, Aliasable, Attachable, Serializable {
   private static final long serialVersionUID = 1L;
 
   /** Field PREFIX */
@@ -161,6 +161,11 @@ public abstract class Run
   @ManyToMany(targetEntity = UserImpl.class)
   @JoinTable(name = "Run_Watcher", joinColumns = { @JoinColumn(name = "runId") }, inverseJoinColumns = { @JoinColumn(name = "userId") })
   private Set<User> watchUsers = new HashSet<>();
+
+  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinTable(name = "Run_Attachment", joinColumns = { @JoinColumn(name = "runId") }, inverseJoinColumns = {
+      @JoinColumn(name = "attachmentId") })
+  private List<FileAttachment> attachments;
 
   /**
    * Construct a new Run with a default empty SecurityProfile
@@ -357,6 +362,21 @@ public abstract class Run
 
   public Set<User> getWatchUsers() {
     return watchUsers;
+  }
+
+  @Override
+  public List<FileAttachment> getAttachments() {
+    return attachments;
+  }
+
+  @Override
+  public void setAttachments(List<FileAttachment> attachments) {
+    this.attachments = attachments;
+  }
+
+  @Override
+  public String getAttachmentsTarget() {
+    return "run";
   }
 
   @Override
