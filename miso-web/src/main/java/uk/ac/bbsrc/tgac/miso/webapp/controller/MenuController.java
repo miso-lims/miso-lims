@@ -193,16 +193,6 @@ public class MenuController implements ServletContextAware {
     return autoGenerateIdBarcodes;
   }
 
-  @RequestMapping("/tech/menu")
-  public String techMenu() {
-    return "/pages/techMenu.jsp";
-  }
-
-  @RequestMapping("/admin/menu")
-  public String adminMenu() {
-    return "/pages/adminMenu.jsp";
-  }
-
   @RequestMapping("/myAccount")
   public ModelAndView myAccountMenu(ModelMap model) {
     try {
@@ -251,16 +241,6 @@ public class MenuController implements ServletContextAware {
     } catch (IOException e) {
       return new ModelAndView("/login.jsp", model);
     }
-  }
-
-  @RequestMapping("/projectMenu")
-  public String projectMenu() {
-    return "/pages/projectMenu.jsp";
-  }
-
-  @RequestMapping("/activity/menu")
-  public String activityMenu() {
-    return "/pages/activityMenu.jsp";
   }
 
   @Override
