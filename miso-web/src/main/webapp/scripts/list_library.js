@@ -64,7 +64,7 @@ ListTarget.library = {
             property: 'sampleClass',
             type: 'select',
             label: 'Aliquot Class',
-            values: Constants.sampleClasses.filter(function(sampleClass) {
+            values: Utils.array.removeArchived(Constants.sampleClasses).filter(function(sampleClass) {
               return sampleClass.sampleCategory === 'Aliquot';
             }).sort(Utils.sorting.sampleClassComparator),
             getLabel: Utils.array.getAlias
@@ -132,6 +132,6 @@ ListTarget.library = {
   },
   searchTermSelector: function(searchTerms) {
     return [searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'],
-        searchTerms['index_name'], searchTerms['index_seq'], searchTerms['institute'], searchTerms['external'], searchTerms['box']]
+        searchTerms['index_name'], searchTerms['index_seq'], searchTerms['institute'], searchTerms['external'], searchTerms['box'], searchTerms['kitname']]
   }
 };

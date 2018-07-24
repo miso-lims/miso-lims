@@ -259,8 +259,12 @@
     </c:otherwise>
     </c:choose>
     <tr>
-      <td>Volume (&#181;l):</td>
+      <td>Volume<span id="volumeUnits"></span>:</td>
       <td><form:input id="volume" path="volume"/></td>
+    </tr>
+    <tr>
+      <td class="h">Concentration<span id="concentrationUnits"></span>:</td>
+      <td><form:input id="concentration" path="concentration"/></td>
     </tr>
     <tr>
       <td><label for="discarded">Discarded:</label></td>
@@ -417,8 +421,13 @@
           </td>
         </tr>
         <tr>
-          <td class="h">Concentration (${sampleConcentrationUnits}):</td>
-          <td><form:input id="concentration" path="concentration"/></td>
+          <td>Date of Creation:</td>
+          <td>
+            <form:input path="creationDate" id="creationdatepicker" placeholder="YYYY-MM-DD"/>
+            <script type="text/javascript">
+              Utils.ui.addDatePicker("creationdatepicker");
+            </script>
+          </td>
         </tr>
       </table>
 
@@ -665,8 +674,7 @@
             <div class="exppreview" id="sample-notes-${n.count}">
               <b>${note.creationDate}</b>: ${note.text}
               <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
-                <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
                 <span style="color:#000000"><a href='#' onclick="Sample.ui.deleteSampleNote('${sample.id}', '${note.noteId}');">
                   <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span></a></span>
                 </c:if>
@@ -681,6 +689,11 @@
   </c:if>
 </div>
 </form:form>
+
+<script type="text/javascript">
+  Utils.ui.updateConcentrationUnits('${sample.concentrationUnits}');
+  Utils.ui.updateVolumeUnits('${sample.volumeUnits}');
+</script>
 
 <c:if test="${sample.id != 0}">
   <miso:qcs id="list_qc" item="${sample}"/>

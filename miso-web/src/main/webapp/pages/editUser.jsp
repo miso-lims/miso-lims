@@ -26,7 +26,7 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <c:choose>
-      <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN') and (user.loginName ne SPRING_SECURITY_CONTEXT.authentication.principal.username)}">
+      <c:when test="${miso:isAdmin() and not miso:isCurrentUser(user.loginName)}">
         <form:form id="user-form" data-parsley-validation="" action="/miso/admin/user" method="POST" commandName="user" autocomplete="off">
           <sessionConversation:insertSessionConversationId attributeName="user"/>
           <h1><c:choose><c:when
@@ -48,44 +48,43 @@
             <tr>
               <td>Full name:</td>
               <td>
-                <sec:authorize access="hasRole('ROLE_ADMIN')">
+                <c:if test="${miso:isAdmin()}">
                   <form:input id="fullName" path="fullName"/><span id="fullNameCounter" class="counter"></span>
-                </sec:authorize>
+                </c:if>
 
-                <sec:authorize access="hasRole('ROLE_TECH')">
+                <c:if test="${miso:isTech()}">
                   ${user.fullName}
-                </sec:authorize>
+                </c:if>
               </td>
             </tr>
             <tr>
               <td>Login name:</td>
               <td>
-                <sec:authorize access="hasRole('ROLE_ADMIN')">
+                <c:if test="${miso:isAdmin()}">
                   <form:input id="loginName" path="loginName"/><span id="loginNameCounter" class="counter"></span>
-                </sec:authorize>
+                </c:if>
 
-                <sec:authorize access="hasRole('ROLE_TECH')">
+                <c:if test="${miso:isTech()}">
                   ${user.loginName}
-                </sec:authorize>
+                </c:if>
               </td>
             </tr>
             <tr>
               <td>Email Address</td>
               <td>
                 <c:choose>
-                  <c:when test="${(user.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                        or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                  <c:when test="${miso:isCurrentUser(user.loginName) or miso:isAdmin()}">
                     <form:input id="email" path="email"/><span id="emailCounter" class="counter"></span>
                   </c:when>
                   <c:otherwise>
-                    <sec:authorize access="hasRole('ROLE_TECH')">
+                    <c:if test="${miso:isTech()}">
                       ${user.email}
-                    </sec:authorize>
+                    </c:if>
                   </c:otherwise>
                 </c:choose>
               </td>
             </tr>
-            <sec:authorize access="hasRole('ROLE_ADMIN')">
+            <c:if test="${miso:isAdmin()}">
               <c:choose>
                 <c:when test="${mutablePassword}">
                   <tr>
@@ -120,7 +119,7 @@
                 <td>Active?:</td>
                 <td><form:checkbox path="active"/></td>
               </tr>
-            </sec:authorize>
+            </c:if>
             <tr>
               <td>Groups:</td>
               <td>
@@ -161,7 +160,7 @@
               <td>Email Address</td>
               <td>
                 <c:choose>
-                  <c:when test="${user.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username}">
+                  <c:when test="${miso:isCurrentUser(user.loginName)}">
                     <form:input path="email"/>
                   </c:when>
                   <c:otherwise>

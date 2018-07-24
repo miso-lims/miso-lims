@@ -36,6 +36,7 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String EFFECTIVE_GROUP_ID = "Effective Group ID";
     public static final String GROUP_ID = "Group ID";
     public static final String GROUP_DESCRIPTION = "Group Desc.";
+    public static final String CREATION_DATE = "Date of Creation";
     public static final String TISSUE_ORIGIN = "Tissue Origin";
     public static final String TISSUE_TYPE = "Tissue Type";
     public static final String PASSAGE_NUMBER = "Passage #";
@@ -51,8 +52,8 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String STAIN = "Stain";
     public static final String SLIDES_CONSUMED = "Slides Consumed";
     public static final String STR_STATUS = "STR Status";
-    public static final String VOLUME = "Vol. (µl)";
-    public static final String CONCENTRATION = "Conc. (ng/µL)";
+    public static final String VOLUME = "Volume";
+    public static final String CONCENTRATION = "Concentration";
     public static final String QC_STATUS = "QC Status";
     public static final String DNASE_TREATED = "DNAse";
     public static final String QC_NOTE = "QC Note";

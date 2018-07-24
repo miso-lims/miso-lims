@@ -91,7 +91,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @Table(name = "Pool")
 public class PoolImpl extends AbstractBoxable implements Pool {
   private static final int CONCENTRATION_LENGTH = 17;
-  public static final String CONCENTRATION_UNITS = "nM";
   private static final int DESCRIPTION_LENGTH = 255;
   private static final int ID_BARCODE_LENGTH = 255;
   private static final int NAME_LENGTH = 255;
@@ -167,8 +166,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
-  @Transient
-  private String units = "";
+  private String concentrationUnits;
+  private String volumeUnits;
 
   @Transient
   // not Hibernate-managed
@@ -334,10 +333,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     return securityProfile;
   }
 
-  public String getUnits() {
-    return this.units;
-  }
-
   @Override
   public String getWatchableIdentifier() {
     return getName();
@@ -492,8 +487,24 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     this.securityProfile = securityProfile;
   }
 
-  public void setUnits(String units) {
-    this.units = units;
+  @Override
+  public String getConcentrationUnits() {
+    return this.concentrationUnits;
+  }
+
+  @Override
+  public void setConcentrationUnits(String concentrationUnits) {
+    this.concentrationUnits = concentrationUnits;
+  }
+
+  @Override
+  public String getVolumeUnits() {
+    return this.volumeUnits;
+  }
+
+  @Override
+  public void setVolumeUnits(String volumeUnits) {
+    this.volumeUnits = volumeUnits;
   }
 
   @Override
@@ -614,7 +625,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getUnits());
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits(), getConcentrationUnits());
   }
 
   @Override

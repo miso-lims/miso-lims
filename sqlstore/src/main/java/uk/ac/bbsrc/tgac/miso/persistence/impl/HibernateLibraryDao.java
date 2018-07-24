@@ -435,6 +435,12 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     restrictPaginationByIndices(criteria, index);
   }
 
+  @Override
+  public void restrictPaginationByKitName(Criteria criteria, String name, Consumer<String> errorHandler) {
+    criteria.createAlias("kitDescriptor", "kitDescriptor");
+    criteria.add(Restrictions.ilike("kitDescriptor.name", name, MatchMode.START));
+  }
+
   public static void restrictPaginationByIndices(Criteria criteria, String index) {
     criteria.add(Restrictions.or(Restrictions.ilike("indices.name", index, MatchMode.ANYWHERE),
         Restrictions.ilike("indices.sequence", index, MatchMode.EXACT)));

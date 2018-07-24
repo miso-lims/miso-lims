@@ -46,6 +46,9 @@ public class SampleClassImpl implements SampleClass {
   @Column(nullable = true)
   private String suffix;
 
+  private boolean archived;
+  private boolean directCreationAllowed;
+
   @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
@@ -142,6 +145,26 @@ public class SampleClassImpl implements SampleClass {
   @Override
   public void setSuffix(String suffix) {
     this.suffix = suffix;
+  }
+
+  @Override
+  public boolean isArchived() {
+    return archived;
+  }
+
+  @Override
+  public void setArchived(boolean archived) {
+    this.archived = archived;
+  }
+
+  @Override
+  public boolean isDirectCreationAllowed() {
+    return directCreationAllowed;
+  }
+
+  @Override
+  public void setDirectCreationAllowed(boolean directCreationAllowed) {
+    this.directCreationAllowed = directCreationAllowed;
   }
 
   @Override

@@ -761,7 +761,18 @@ Utils.ui = {
     } else {
       element.removeClass('disabled');
     }
-  }
+  },
+  
+  updateConcentrationUnits: function(concentrationUnits) {
+    var units = Utils.validation.isEmpty(concentrationUnits) ? '' : ' (' + concentrationUnits + ')';
+    jQuery('#concentrationUnits').html(units);
+  },
+  
+  updateVolumeUnits: function(volumeUnits) {
+    var units = Utils.validation.isEmpty(volumeUnits) ? '' : ' (' + volumeUnits + ')';
+    jQuery('#volumeUnits').html(units);
+  },
+  
 };
 
 Utils.fileUpload = {
@@ -945,6 +956,11 @@ Utils.array = {
       return a.id - b.id;
     }).filter(function(obj, index, arr) {
       return index == 0 || obj.id != arr[index - 1].id;
+    });
+  },
+  removeArchived: function(input) {
+    return input.filter(function(a) {
+      return !a.archived;
     });
   }
 };

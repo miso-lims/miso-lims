@@ -130,7 +130,6 @@ var Library = Library || {
 };
 
 Library.ui = {
-
   changePlatformType: function(originalLibraryTypeId, callback) {
     var platformType = Library.ui.getSelectedPlatformType();
 

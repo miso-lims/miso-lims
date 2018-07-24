@@ -49,6 +49,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     attrs.put(SamColumns.REGION, "Medulla oblongata");
     attrs.put(SamColumns.QC_STATUS, "Ready");
+    attrs.put(SamColumns.CREATION_DATE, "2018-07-17");
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
 
@@ -82,6 +83,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.GROUP_ID, "1");
     attrs.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     attrs.put(SamColumns.QC_STATUS, "Ready");
+    attrs.put(SamColumns.CREATION_DATE, "");
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
 

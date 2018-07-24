@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.QC;
+import uk.ac.bbsrc.tgac.miso.core.data.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.QualityControlEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
@@ -38,7 +39,7 @@ public class HibernateLibraryQcDao implements LibraryQcStore {
 
   @Override
   public QualityControlEntity getEntity(long id) throws IOException {
-    return (Library) currentSession().get(LibraryImpl.class, id);
+    return getLibrary(id);
   }
 
   public SessionFactory getSessionFactory() {
@@ -65,5 +66,16 @@ public class HibernateLibraryQcDao implements LibraryQcStore {
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
+  }
+
+  private Library getLibrary(long id) throws IOException {
+    return (Library) currentSession().get(LibraryImpl.class, id);
+  }
+
+  @Override
+  public void updateEntity(long id, QcCorrespondingField correspondingField, double value, String units) throws IOException {
+    Library library = getLibrary(id);
+    correspondingField.updateField(library, value, units);
+    currentSession().update(library);
   }
 }

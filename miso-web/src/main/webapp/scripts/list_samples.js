@@ -102,7 +102,9 @@ ListTarget.sample = {
             property: 'sampleClass',
             type: 'select',
             label: 'Sample Class',
-            values: Constants.sampleClasses.sort(Utils.sorting.sampleClassComparator),
+            values: Utils.array.removeArchived(Constants.sampleClasses).filter(function(sampleClass) {
+              return sampleClass.directCreationAllowed;
+            }).sort(Utils.sorting.sampleClassComparator),
             getLabel: Utils.array.getAlias
           });
         }
@@ -210,6 +212,12 @@ ListTarget.sample = {
           },
           "include": true,
           "iSortPriority": 0
+        }, {
+          "sTitle": "Creation Date",
+          "mData": "creationDate",
+          "include": Constants.isDetailedSample,
+          "iSortPriority": 0,
+          "bVisible": "true"
         }, {
           "sTitle": "Last Modified",
           "mData": "lastModified",

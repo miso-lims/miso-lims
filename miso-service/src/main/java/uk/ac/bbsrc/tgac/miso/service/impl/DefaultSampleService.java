@@ -660,6 +660,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     target.setDescription(source.getDescription());
     target.setDiscarded(source.isDiscarded());
     target.setVolume(source.getVolume());
+    target.setConcentration(source.getConcentration());
     target.setLocationBarcode(source.getLocationBarcode());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     if (isDetailedSample(target)) {
@@ -668,7 +669,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       dTarget.setArchived(dSource.getArchived());
       dTarget.setGroupDescription(dSource.getGroupDescription());
       dTarget.setGroupId(dSource.getGroupId());
-      dTarget.setConcentration(dSource.getConcentration());
+      dTarget.setCreationDate(dSource.getCreationDate());
 
       dTarget.setDetailedQcStatus(dSource.getDetailedQcStatus());
       dTarget.setDetailedQcStatusNote(nullifyStringIfBlank(dSource.getDetailedQcStatusNote()));
@@ -820,7 +821,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   @Override
   public Collection<String> listSampleTypes() throws IOException {
-    return sampleStore.listAllSampleTypes();
+    return sampleStore.listSampleTypes();
   }
 
   @Override

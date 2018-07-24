@@ -234,8 +234,7 @@
 
 <tr>
   <c:choose>
-    <c:when test="${library.id == 0 or empty library.libraryType or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')
-        or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
+    <c:when test="${library.id == 0 or empty library.libraryType or miso:isAdmin() or miso:isTech()}">
       <td>Platform - Library Type:</td>
       <td>
         <form:select id="platformTypes" path="platformType" items="${platformTypes}"
@@ -268,10 +267,7 @@
   </tr>
 </c:if>
   <c:choose>
-    <c:when test="${library.id == 0
-                  or empty library.librarySelectionType
-                  or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')
-                  or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
+    <c:when test="${library.id == 0 or empty library.librarySelectionType or miso:isAdmin() or miso:isTech()}">
       <td>Library Selection Type:</td>
       <td>
         <miso:select id="librarySelectionTypes" path="librarySelectionType" items="${librarySelectionTypes}"
@@ -287,10 +283,7 @@
 <tr>
   <c:choose>
     <c:when
-        test="${library.id == 0
-              or empty library.libraryStrategyType
-              or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')
-              or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
+        test="${library.id == 0 or empty library.libraryStrategyType or miso:isAdmin() or miso:isTech()}">
       <td>Library Strategy Type:</td>
       <td>
         <miso:select id="libraryStrategyTypes" path="libraryStrategyType" items="${libraryStrategyTypes}"
@@ -337,11 +330,11 @@
   <td><form:input id="dnaSize" path="dnaSize"/></td>
 </tr>
 <tr>
-  <td>Volume (&#181;l):</td>
+  <td>Volume<span id="volumeUnits"></span>:</td>
   <td><form:input id="volume" path="volume"/></td>
 </tr>
 <tr>
-  <td class="h"><label for="initialConcentration">Initial Concentration:</label></td>
+  <td class="h"><label for="initialConcentration">Initial Concentration<span id="concentrationUnits"></span>:</label></td>
   <td><form:input id="initialConcentration" path="initialConcentration"/></td>
 </tr>
 <tr>
@@ -402,6 +395,10 @@
   </tr>
 </table>
 </c:if>
+<script type="text/javascript">
+  Utils.ui.updateConcentrationUnits('${library.concentrationUnits}');
+  Utils.ui.updateVolumeUnits('${library.volumeUnits}');
+</script>
 
 <c:choose>
   <c:when
@@ -452,8 +449,7 @@
           <div class="exppreview" id="library-notes-${n.count}">
             <b>${note.creationDate}</b>: ${note.text}
               <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
-                <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
                 <span style="color:#000000"><a href='#' onclick="Library.ui.deleteLibraryNote('${library.id}', '${note.noteId}');">
                   <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span></a></span>
                 </c:if>

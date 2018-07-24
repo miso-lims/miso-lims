@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.QC;
+import uk.ac.bbsrc.tgac.miso.core.data.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.QualityControlEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
@@ -38,7 +39,7 @@ public class HibernateSampleQcDao implements SampleQcStore {
 
   @Override
   public QualityControlEntity getEntity(long id) throws IOException {
-    return (Sample) currentSession().get(SampleImpl.class, id);
+    return getSample(id);
   }
 
   public SessionFactory getSessionFactory() {
@@ -65,5 +66,16 @@ public class HibernateSampleQcDao implements SampleQcStore {
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
+  }
+
+  private SampleImpl getSample(long id) throws IOException {
+    return (SampleImpl) currentSession().get(SampleImpl.class, id);
+  }
+
+  @Override
+  public void updateEntity(long id, QcCorrespondingField correspondingField, double value, String units) throws IOException {
+    SampleImpl sample = getSample(id);
+    sample.updateFromQc(correspondingField, value, units);
+    currentSession().update(sample);
   }
 }

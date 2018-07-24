@@ -1,3 +1,19 @@
+# 0.2.131
+
+Changes:
+
+ * Allow merging pools
+ * Fixed pending pool orders calculation
+ * Fixed NPE when updating storage locations
+ * Fix username checks on LDAP
+ * Fix error when assigning freezers during box creation
+ * Add creation date to detailed sample
+ * Move concentration from detailed sample to Sample
+ * Automatically update entity field values for auto-updateable QCs
+ * Allow setting whether a sample class can be created directly
+ * Allow archiving sample types and sample classes
+ * Add search by kit feature
+
 # 0.2.130
 
 Changes:

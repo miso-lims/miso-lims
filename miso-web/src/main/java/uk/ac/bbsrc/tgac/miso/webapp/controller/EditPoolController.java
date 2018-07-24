@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,7 +56,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -67,7 +66,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
@@ -87,6 +85,7 @@ import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkMergeTableBackend;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -147,11 +146,6 @@ public class EditPoolController {
   @ModelAttribute("platformTypes")
   public Collection<String> populatePlatformTypes() throws IOException {
     return PlatformType.platformTypeNames(platformService.listActivePlatformTypes());
-  }
-
-  @ModelAttribute("poolConcentrationUnits")
-  public String poolConcentrationUnits() {
-    return PoolImpl.CONCENTRATION_UNITS;
   }
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
@@ -319,4 +313,54 @@ public class EditPoolController {
   public ModelAndView editPools(@RequestParam("ids") String poolIds, ModelMap model) throws IOException {
     return bulkEditBackend.edit(poolIds, model);
   }
+
+  private final BulkMergeTableBackend<PoolDto> bulkMergeBackend = new BulkMergeTableBackend<PoolDto>(
+      "pool", PoolDto.class, "Pool", "Pools") {
+
+    @Override
+    protected PoolDto createDtoFromParents(List<Long> parentIds) throws IOException {
+      PoolDto dto = new PoolDto();
+      List<Pool> parents = new ArrayList<>(poolService.listByIdList(parentIds));
+
+      if (parents.size() < 2) {
+        throw new IllegalStateException("Not enough pools to merge");
+      }
+
+      List<PlatformType> platformTypes = parents.stream().map(Pool::getPlatformType).distinct().collect(Collectors.toList());
+      if (platformTypes.size() > 1) {
+        throw new IllegalArgumentException("Cannot merge pools from multiple platforms: "
+            + String.join(", ", platformTypes.stream().map(Enum::name).toArray(CharSequence[]::new)));
+      }
+      dto.setPlatformType(platformTypes.get(0).name());
+
+      String parentString = parents.stream().map(Pool::getName).collect(Collectors.joining(", "));
+      dto.setDescription("Created from merging pools: " + parentString);
+
+      String commonPrefix = LimsUtils.findCommonPrefix(parents.stream().map(Pool::getAlias).toArray(String[]::new));
+      if (commonPrefix != null) {
+        dto.setAlias(commonPrefix + "_POOL");
+      }
+
+      dto.setPooledElements(
+          parents.stream().flatMap(pool -> pool.getPoolableElementViews().stream()).map(Dtos::asDto).collect(Collectors.toSet()));
+      List<String> volumeUnits = parents.stream().map(Pool::getVolumeUnits).filter(Objects::nonNull).distinct()
+          .collect(Collectors.toList());
+      if (parents.stream().map(Pool::getVolume).allMatch(Objects::nonNull) && volumeUnits.size() == 1) {
+        dto.setVolume(Double.toString(parents.stream().mapToDouble(Pool::getVolume).sum()));
+      }
+
+      return dto;
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+    }
+
+  };
+
+  @RequestMapping(value = "/bulk/merge", method = RequestMethod.GET)
+  public ModelAndView propagatePoolsMerged(@RequestParam("ids") String dilutionIds, ModelMap model) throws IOException {
+    return bulkMergeBackend.propagate(dilutionIds, model);
+  }
+
 }

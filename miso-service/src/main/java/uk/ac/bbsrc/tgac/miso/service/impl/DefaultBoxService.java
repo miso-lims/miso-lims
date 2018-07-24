@@ -352,7 +352,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       validateNameOrThrow(box, namingScheme);
 
       if (box.getStorageLocation() != null) {
-        addStorageChangeLog(box.getStorageLocation(), box, true);
+        addStorageChangeLog(getFreezer(box), box, true);
       }
 
       return boxStore.save(box);

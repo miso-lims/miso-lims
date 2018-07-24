@@ -114,6 +114,9 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Column(name = "concentration")
   private Double initialConcentration;
 
+  private String concentrationUnits;
+  private String volumeUnits;
+
   @ManyToMany(targetEntity = Index.class)
   @JoinTable(name = "Library_Index", joinColumns = {
       @JoinColumn(name = "library_libraryId", nullable = false) }, inverseJoinColumns = {
@@ -649,8 +652,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getInitialConcentration(),
-        getPlatformType().getLibraryConcentrationUnits());
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getInitialConcentration(), getVolumeUnits(), getConcentrationUnits());
   }
 
   @Override
@@ -671,6 +673,26 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getConcentrationUnits() {
+    return concentrationUnits;
+  }
+
+  @Override
+  public void setConcentrationUnits(String concentrationUnits) {
+    this.concentrationUnits = concentrationUnits;
+  }
+
+  @Override
+  public String getVolumeUnits() {
+    return volumeUnits;
+  }
+
+  @Override
+  public void setVolumeUnits(String volumeUnits) {
+    this.volumeUnits = volumeUnits;
   }
 
 }

@@ -51,37 +51,37 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
  * @since 0.0.2
  */
 public enum PlatformType {
-  ILLUMINA("Illumina", "Flow Cell", "Lane", "Lanes", "nM", "ILLUMINA") {
+  ILLUMINA("Illumina", "Flow Cell", "Lane", "Lanes", "ILLUMINA") {
     @Override
     public Run createRun(User user) {
       return new IlluminaRun(user);
     }
   }, //
-  LS454("LS454", "Plate", "Lane", "Lanes", "nM", "LS454") {
+  LS454("LS454", "Plate", "Lane", "Lanes", "LS454") {
     @Override
     public Run createRun(User user) {
       return new LS454Run(user);
     }
   }, //
-  SOLID("Solid", "Slide", "Lane", "Lanes", "nM", "ABI_SOLID") {
+  SOLID("Solid", "Slide", "Lane", "Lanes", "ABI_SOLID") {
     @Override
     public Run createRun(User user) {
       return new SolidRun(user);
     }
   }, //
-  IONTORRENT("IonTorrent", "Chip", "Chip", "Chips", "nM", null) {
+  IONTORRENT("IonTorrent", "Chip", "Chip", "Chips", null) {
     @Override
     public Run createRun(User user) {
       return new IonTorrentRun(user);
     }
   }, //
-  PACBIO("PacBio", "8Pac", "SMRT Cell", "SMRT Cells", "pM", null) {
+  PACBIO("PacBio", "8Pac", "SMRT Cell", "SMRT Cells", null) {
     @Override
     public Run createRun(User user) {
       return new PacBioRun(user);
     }
   }, //
-  OXFORDNANOPORE("Oxford Nanopore", "Flow Cell", "Flow Cell", "Flow Cells", "nM", null) {
+  OXFORDNANOPORE("Oxford Nanopore", "Flow Cell", "Flow Cell", "Flow Cells", null) {
     @Override
     public Run createRun(User user) {
       return new OxfordNanoporeRun(user);
@@ -100,7 +100,6 @@ public enum PlatformType {
   private final String containerName;
   private final String partitionName;
   private final String pluralPartitionName;
-  private final String libraryConcentrationUnits;
   private final String sraName;
   /**
    * Field lookup
@@ -118,13 +117,11 @@ public enum PlatformType {
    * @param key
    *          of type String
    */
-  PlatformType(String key, String containerName, String partitionName, String pluralPartitionName, String libraryConcentrationUnits,
-      String sraName) {
+  PlatformType(String key, String containerName, String partitionName, String pluralPartitionName, String sraName) {
     this.key = key;
     this.containerName = containerName;
     this.partitionName = partitionName;
     this.pluralPartitionName = pluralPartitionName;
-    this.libraryConcentrationUnits = libraryConcentrationUnits;
     this.sraName = sraName;
   }
 
@@ -175,10 +172,6 @@ public enum PlatformType {
 
   public String getPartitionName() {
     return partitionName;
-  }
-
-  public String getLibraryConcentrationUnits() {
-    return libraryConcentrationUnits;
   }
 
   public String getSraName() {

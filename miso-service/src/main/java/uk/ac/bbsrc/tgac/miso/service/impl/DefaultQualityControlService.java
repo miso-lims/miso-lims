@@ -57,6 +57,11 @@ public class DefaultQualityControlService implements QualityControlService {
     if (!type.getQcTarget().equals(entity.getQcTarget())) {
       throw new IllegalArgumentException("QC type and entity are mismatched.");
     }
+
+    if (qc.getType().isAutoUpdateField()) {
+      handler.updateEntity(qc.getEntity().getId(), qc.getType().getCorrespondingField(), qc.getResults(), qc.getType().getUnits());
+    }
+
     entity.setChangeDetails(user);
     changeLoggableStore.update(entity);
 

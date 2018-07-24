@@ -244,4 +244,46 @@ public interface Sample
 
   public void setBoxPosition(SampleBoxPosition boxPosition);
 
+  /**
+   * Returns the volume units of this Sample object.
+   * 
+   * @return String volumeUnits.
+   */
+  public String getVolumeUnits();
+
+  /**
+   * Sets the volumeUnits of this Sample object.
+   * 
+   * @param volumeUnits volumeUnits.
+   */
+  public void setVolumeUnits(String volumeUnits);
+
+  /**
+   * Returns the concentration units of this Sample object.
+   * 
+   * @return String concentrationUnits.
+   */
+  public String getConcentrationUnits();
+
+  /**
+   * Sets the concentrationUnits of this Sample object.
+   * 
+   * @param concentrationUnits concentrationUnits.
+   */
+  public void setConcentrationUnits(String concentrationUnits);
+
+  /**
+   * Returns the concentration of this Sample object.
+   * 
+   * @return Double concentration.
+   */
+  public Double getConcentration();
+
+  /**
+   * Sets the concentration of this Sample object.
+   * 
+   * @param Double Concentration.
+   */
+  public void setConcentration(Double concentration);
+
 }

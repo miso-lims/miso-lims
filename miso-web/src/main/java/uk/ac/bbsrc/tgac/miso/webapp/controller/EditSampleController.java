@@ -93,7 +93,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -142,6 +141,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
+
 
 @Controller
 @RequestMapping("/sample")
@@ -283,11 +283,6 @@ public class EditSampleController {
     return stainService.list();
   }
 
-  @ModelAttribute("sampleConcentrationUnits")
-  public String sampleConcentrationUnits() {
-    return Sample.CONCENTRATION_UNITS;
-  }
-
   public Map<String, Sample> getAdjacentSamplesInProject(Sample s, @RequestParam(value = "projectId", required = false) Long projectId)
       throws IOException {
     Project p = s.getProject();
@@ -343,11 +338,6 @@ public class EditSampleController {
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return sampleService.getSampleColumnSizes();
-  }
-
-  @ModelAttribute("poolConcentrationUnits")
-  public String poolConcentrationUnits() {
-    return PoolImpl.CONCENTRATION_UNITS;
   }
 
   @Autowired
@@ -695,7 +685,11 @@ public class EditSampleController {
 
       model.put("formObj", sample);
       model.put("sample", sample);
-      model.put("sampleTypes", sampleService.listSampleTypes());
+      Collection<String> sampleTypes = sampleService.listSampleTypes();
+      if (!sampleTypes.contains(sample.getSampleType())) {
+        sampleTypes.add(sample.getSampleType());
+      }
+      model.put("sampleTypes", sampleTypes);
       if (LimsUtils.isDetailedSample(sample) && LimsUtils.getIdentityConsentLevel((DetailedSample) sample) == ConsentLevel.REVOKED) {
         model.put("warning", "Donor has revoked consent");
       }

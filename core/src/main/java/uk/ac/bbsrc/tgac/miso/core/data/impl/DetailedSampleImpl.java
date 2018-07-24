@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,11 +16,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -59,13 +61,15 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   private String groupId;
   private String groupDescription;
   private boolean isSynthetic = false;
-  private Double concentration;
 
   @Column(nullable = false)
   private boolean nonStandardAlias = false;
   
   @Column(updatable = false)
   private Long preMigrationId;
+
+  @Temporal(TemporalType.DATE)
+  private Date creationDate;
 
   @Transient
   private Long identityId;
@@ -182,16 +186,6 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   }
 
   @Override
-  public Double getConcentration() {
-    return concentration;
-  }
-
-  @Override
-  public void setConcentration(Double concentration) {
-    this.concentration = concentration;
-  }
-
-  @Override
   public boolean hasNonStandardAlias() {
     return nonStandardAlias;
   }
@@ -232,8 +226,18 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   }
 
   @Override
+  public Date getCreationDate() {
+    return creationDate;
+  }
+
+  @Override
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
+  }
+
+  @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), Sample.CONCENTRATION_UNITS);
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits(), getConcentrationUnits());
   }
 
 }

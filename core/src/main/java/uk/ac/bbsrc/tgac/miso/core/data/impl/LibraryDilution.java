@@ -410,7 +410,7 @@ public class LibraryDilution extends AbstractBoxable
 
   @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getConcentrationUnits());
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), "µL", getConcentrationUnits());
   }
 
   @Override

@@ -37,6 +37,8 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByKitType(T item, KitType type, Consumer<String> errorHandler);
 
+  public void restrictPaginationByKitName(T item, String name, Consumer<String> errorHandler);
+
   public void restrictPaginationByPending(T item, Consumer<String> errorHandler);
 
   public void restrictPaginationByPlatformType(T item, PlatformType platformType, Consumer<String> errorHandler);

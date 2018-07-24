@@ -26,7 +26,7 @@ public abstract interface PaginationFilter {
   public final static List<AgoMatcher> AGO_MATCHERS = Arrays.asList(new AgoMatcher("h(|ours?)", 3600),
       new AgoMatcher("d(|ays?)", 3600 * 24));
 
-  public static final Pattern WHITESPACE = Pattern.compile("\\s+");
+  public static final Pattern WHITESPACE = Pattern.compile("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
   public static PaginationFilter archived(boolean isArchived) {
     return new PaginationFilter() {
@@ -181,11 +181,22 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter kitName(String name) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByKitName(item, name, errorHandler);
+      }
+    };
+  }
+
   /**
    * Search terms are documented in miso-web/src/main/webapp/scripts/list.js
    */
   public static PaginationFilter[] parse(String request, String currentUser, Consumer<String> errorHandler) {
     return WHITESPACE.splitAsStream(request).map(x -> {
+      x = x.replace("\"", "");
       if (x.isEmpty()) return null;
       if (x.contains(":")) {
         String[] parts = x.split(":", 2);
@@ -262,6 +273,9 @@ public abstract interface PaginationFilter {
           return institute(parts[1]);
         case "box":
           return box(parts[1]);
+        case "kitname":
+          return kitName(parts[1]);
+
         }
       }
       return query(x);

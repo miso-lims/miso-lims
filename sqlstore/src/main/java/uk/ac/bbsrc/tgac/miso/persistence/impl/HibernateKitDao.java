@@ -33,6 +33,7 @@ import java.util.function.Consumer;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -187,6 +188,11 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
   @Override
   public void restrictPaginationByKitType(Criteria criteria, KitType type, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("kitType", type));
+  }
+
+  @Override
+  public void restrictPaginationByKitName(Criteria criteria, String name, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.ilike("name", name, MatchMode.START));
   }
 
   @Override

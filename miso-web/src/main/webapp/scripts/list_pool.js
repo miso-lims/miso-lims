@@ -50,6 +50,14 @@ ListTarget.pool = {
         });
       }
     });
+    actions.push({
+      name: "Merge",
+      action: function(items){
+        window.location = window.location.origin + '/miso/pool/bulk/merge?' + jQuery.param({
+          ids: items.map(Utils.array.getId).join(',')
+        });
+      }
+    });
     return actions;
   },
   createStaticActions: function(config, prodjectId) {
@@ -81,7 +89,7 @@ ListTarget.pool = {
           "iSortPriority": 0,
           "bSortable": false,
         }, {
-          "sTitle": "Conc. (" + Constants.poolConcentrationUnits + ")",
+          "sTitle": "Concentration",
           "mData": "concentration",
           "include": true,
           "iSortPriority": 0

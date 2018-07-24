@@ -165,8 +165,8 @@ HotTarget.pool = (function() {
         pack: function(pool, flat, errorHandler) {
           pool.creationDate = flat.creationDate;
         }
-      }, HotUtils.makeColumnForFloat('Concentration (' + Constants.poolConcentrationUnits + ')', true, 'concentration', false),
-          HotUtils.makeColumnForFloat('Volume (&#181;l)', true, 'volume', false),
+      }, HotUtils.makeColumnForFloat('Concentration', true, 'concentration', false),
+          HotUtils.makeColumnForFloat('Volume', true, 'volume', false),
           HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false)];
 
       var spliceIndex = columns.indexOf(columns.filter(function(column) {

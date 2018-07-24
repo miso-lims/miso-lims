@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.QC;
+import uk.ac.bbsrc.tgac.miso.core.data.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.QualityControlEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
@@ -62,7 +63,7 @@ public class HibernatePoolQCDao implements PoolQcStore {
 
   @Override
   public QualityControlEntity getEntity(long id) throws IOException {
-    return (Pool) currentSession().get(PoolImpl.class, id);
+    return getPool(id);
   }
 
 
@@ -88,5 +89,16 @@ public class HibernatePoolQCDao implements PoolQcStore {
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
+  }
+
+  private Pool getPool(long id) throws IOException {
+    return (Pool) currentSession().get(PoolImpl.class, id);
+  }
+
+  @Override
+  public void updateEntity(long id, QcCorrespondingField correspondingField, double value, String units) throws IOException {
+    Pool pool = getPool(id);
+    correspondingField.updateField(pool, value, units);
+    currentSession().update(pool);
   }
 }

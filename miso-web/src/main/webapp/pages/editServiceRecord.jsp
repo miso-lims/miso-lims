@@ -186,7 +186,7 @@
       <div id="serviceRecordFiles">
         <c:forEach items="${serviceRecordFiles}" var="file">
           <div id='btnPanel' style='float: left; width: 32px;'>
-          <sec:authorize access="hasRole('ROLE_ADMIN')">
+          <c:if test="${miso:isAdmin()}">
             <table>
               <tr>
                 <td class="misoicon" onclick="ServiceRecord.ui.deleteFile(${serviceRecord.id}, ${file.key});">
@@ -194,7 +194,7 @@
                 </td>
               </tr>
             </table>
-            </sec:authorize>
+            </c:if>
           </div>
           <a class="listbox" href="<c:url value='/miso/download/servicerecord/${serviceRecord.id}/${file.key}'/>">
             <span onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox" style='margin-left: 32px;'>
@@ -208,7 +208,7 @@
   </div>
 </div>
 
-<sec:authorize access="hasRole('ROLE_ADMIN')">
+<c:if test="${miso:isAdmin()}">
   <script type="text/javascript">
     jQuery(document).ready(function () {
       jQuery('#title').simplyCountable({
@@ -240,7 +240,7 @@
       });
     });
   </script>
-</sec:authorize>
+</c:if>
 
 <%@ include file="adminsub.jsp" %>
 

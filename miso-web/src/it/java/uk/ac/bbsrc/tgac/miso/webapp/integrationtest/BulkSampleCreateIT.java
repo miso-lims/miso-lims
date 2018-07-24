@@ -39,8 +39,8 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   // columns for creating Identity and everything else
   private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
       SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX,
-      SamColumns.CONSENT, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.QC_STATUS,
-      SamColumns.QC_NOTE);
+      SamColumns.CONSENT, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.CREATION_DATE,
+      SamColumns.QC_STATUS, SamColumns.QC_NOTE);
 
   // columns for creating Tissue and everything downstream of it
   private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS,
@@ -1145,6 +1145,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     identity.put(SamColumns.GROUP_ID, "");
     identity.put(SamColumns.GROUP_DESCRIPTION, "");
     identity.put(SamColumns.QC_STATUS, "Ready");
+    identity.put(SamColumns.CREATION_DATE, "2018-07-17");
 
     identity.forEach((k, v) -> table.enterText(k, 0, v));
 
@@ -1172,6 +1173,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     identity.put(SamColumns.GROUP_ID, "");
     identity.put(SamColumns.GROUP_DESCRIPTION, "");
     identity.put(SamColumns.QC_STATUS, "Ready");
+    identity.put(SamColumns.CREATION_DATE, "");
 
     identity.forEach((k, v) -> table.enterText(k, 0, v));
 

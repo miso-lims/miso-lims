@@ -240,6 +240,8 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setSampleCategory(from.getSampleCategory());
     dto.setSuffix(from.getSuffix());
+    dto.setArchived(from.isArchived());
+    dto.setDirectCreationAllowed(from.isDirectCreationAllowed());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -257,6 +259,8 @@ public class Dtos {
     to.setAlias(from.getAlias());
     to.setSampleCategory(from.getSampleCategory());
     to.setSuffix(from.getSuffix());
+    to.setArchived(from.isArchived());
+    to.setDirectCreationAllowed(from.isDirectCreationAllowed());
     to.setDNAseTreatable(from.getDNAseTreatable());
     return to;
   }
@@ -293,6 +297,7 @@ public class Dtos {
     if (isDetailedSample(from)) {
       DetailedSample detailed = (DetailedSample) from;
       dto.setSampleClassId(detailed.getSampleClass().getId());
+      dto.setCreationDate(detailed.getCreationDate() == null ? "" : formatDate(detailed.getCreationDate()));
       dto.setIdentityConsentLevel(getIdentityConsentLevelString(detailed));
     }
     return dto;
@@ -371,6 +376,7 @@ public class Dtos {
     if (from.isSynthetic() != null) {
       dto.setSynthetic(from.isSynthetic());
     }
+    dto.setCreationDate(from.getCreationDate() == null ? "" : formatDate(from.getCreationDate()));
     dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
     dto.setNonStandardAlias(from.hasNonStandardAlias());
     if (from.getDetailedQcStatus() != null) {
@@ -414,7 +420,7 @@ public class Dtos {
     to.setGroupId(nullifyStringIfBlank(from.getGroupId()));
     to.setGroupDescription(nullifyStringIfBlank(from.getGroupDescription()));
     to.setSynthetic(from.getSynthetic());
-    to.setConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
+    to.setCreationDate(LimsUtils.isStringEmptyOrNull(from.getCreationDate()) ? null : parseDate(from.getCreationDate()));
     if (from.getIdentityId() != null) {
       to.setIdentityId(from.getIdentityId());
     }
@@ -633,6 +639,7 @@ public class Dtos {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     to.setVolume(isStringEmptyOrNull(from.getVolume()) ? null : Double.valueOf(from.getVolume()));
+    to.setConcentration(isStringEmptyOrNull(from.getConcentration()) ? null : Double.valueOf(from.getConcentration()));
     to.setDiscarded(from.isDiscarded());
     if (from.getProjectId() != null) {
       to.setProject(new ProjectImpl());

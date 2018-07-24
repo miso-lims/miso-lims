@@ -211,4 +211,32 @@ public interface Pool
 
   boolean hasLibrariesWithoutIndex();
 
+  /**
+   * Returns the concentration units of this Pool object.
+   * 
+   * @return String concentrationUnits.
+   */
+  public String getConcentrationUnits();
+
+  /**
+   * Sets the concentrationUnits of this Pool object.
+   * 
+   * @param concentrationUnits concentrationUnits.
+   */
+  public void setConcentrationUnits(String concentrationUnits);
+
+  /**
+   * Returns the volume units of this Pool object.
+   * 
+   * @return String volumeUnits.
+   */
+  public String getVolumeUnits();
+
+  /**
+   * Sets the volumeUnits of this Pool object.
+   * 
+   * @param volumeUnits volumeUnits.
+   */
+  public void setVolumeUnits(String volumeUnits);
+
 }

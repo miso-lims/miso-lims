@@ -9,8 +9,10 @@ import java.util.function.Consumer;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -197,6 +199,15 @@ public class HibernateSequencerPartitionContainerDao
   @Override
   public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("model.platformType", platformType));
+  }
+
+  @Override
+  public void restrictPaginationByKitName(Criteria criteria, String name, Consumer<String> errorHandler) {
+    criteria.createAlias("clusteringKit", "clusteringKit", JoinType.LEFT_OUTER_JOIN);
+    criteria.createAlias("multiplexingKit", "multiplexingKit", JoinType.LEFT_OUTER_JOIN);
+    criteria.add(Restrictions.disjunction()
+        .add(Restrictions.ilike("clusteringKit.name", name, MatchMode.START))
+        .add(Restrictions.ilike("multiplexingKit.name", name, MatchMode.START)));
   }
 
   @Override

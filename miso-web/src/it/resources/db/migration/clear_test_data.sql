@@ -38,6 +38,7 @@ DELETE FROM LibraryChangeLog;
 DELETE FROM Library;
 DELETE FROM LibraryDesign;
 DELETE FROM LibraryDesignCode;
+DELETE FROM SampleQC;
 DELETE FROM SampleAliquot;
 DELETE FROM SampleStock;
 DELETE FROM SampleSlide;

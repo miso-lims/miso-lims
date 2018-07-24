@@ -25,8 +25,8 @@ public class BulkPoolPage extends HeaderFooterPage {
     public static final String BOX_POSITION = "Position";
     public static final String DISCARDED = "Discarded";
     public static final String CREATE_DATE = "Creation Date";
-    public static final String CONCENTRATION = "Concentration (nM)";
-    public static final String VOLUME = "Volume (µl)";
+    public static final String CONCENTRATION = "Concentration";
+    public static final String VOLUME = "Volume";
     public static final String QC_PASSED = "QC Passed?";
     public static final String READY_TO_RUN = "Ready to Run?";
 
@@ -41,8 +41,10 @@ public class BulkPoolPage extends HeaderFooterPage {
   };
 
   private static final By EDIT_BUTTON_TEXT = By.linkText("Edit");
+  private static final By MERGE_BUTTON_TEXT = By.linkText("Merge");
   public static final String POOL_SEPARATELY_URL_FRAGMENT = "miso/library/dilution/bulk/propagate";
   public static final String POOL_TOGETHER_URL_FRAGMENT = "miso/library/dilution/bulk/merge";
+  public static final String MERGE_URL_FRAGMENT = "miso/pool/bulk/merge";
 
   @FindBy(id = "bulkactions")
   private WebElement toolbar;
@@ -52,13 +54,21 @@ public class BulkPoolPage extends HeaderFooterPage {
   public BulkPoolPage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
-    waitWithTimeout().until(or(titleContains("Create Pools from Dilutions "), titleContains("Edit Pools ")));
+    waitWithTimeout()
+        .until(or(titleContains("Create Pools from Dilutions "), titleContains("Edit Pools "), titleContains("Create Pool from Pools ")));
     table = new HandsOnTable(driver);
   }
 
   public static BulkPoolPage getForEdit(WebDriver driver, String baseUrl, Collection<Long> poolIds) {
     String ids = Joiner.on(',').join(poolIds);
     String url = baseUrl + "miso/pool/bulk/edit?ids=" + ids;
+    driver.get(url);
+    return new BulkPoolPage(driver);
+  }
+
+  public static BulkPoolPage getForMerge(WebDriver driver, String baseUrl, Collection<Long> poolIds) {
+    String ids = Joiner.on(',').join(poolIds);
+    String url = baseUrl + "miso/pool/bulk/merge?ids=" + ids;
     driver.get(url);
     return new BulkPoolPage(driver);
   }

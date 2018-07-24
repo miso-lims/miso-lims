@@ -54,6 +54,14 @@ public interface SampleClass extends Serializable {
    */
   void setSuffix(String suffix);
 
+  boolean isArchived();
+
+  void setArchived(boolean archived);
+
+  boolean isDirectCreationAllowed();
+
+  void setDirectCreationAllowed(boolean directCreationAllowed);
+
   Boolean getDNAseTreatable();
 
   void setDNAseTreatable(Boolean treatable);

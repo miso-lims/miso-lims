@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -106,15 +107,27 @@ public interface DetailedSample extends Sample {
 
   void setIdentityId(Long identityId);
 
-  Double getConcentration();
-
-  void setConcentration(Double concentration);
-
   /**
    * Searches the sample hierarchy until a Group ID is found. Returns null if no sample has a Group ID.
    * 
    * @return Sample nearest sample with a non-empty group ID. May be the current sample.
    */
   Optional<DetailedSample> getEffectiveGroupIdSample();
+
+  /**
+   * Field for storing the date of sample creation. This is not the date that the sample was entered into MISO.
+   * This field is not automatically generated on sample creation and must be specified by a user.
+   * 
+   * @return creationDate
+   */
+  Date getCreationDate();
+
+  /**
+   * Sets the date of sample creation to the specified date. This is not the date the sample was entered into MISO.
+   * This field is not automatically generated on sample creation and must be specified by a user.
+   * 
+   * @param creationDate
+   */
+  void setCreationDate(Date creationDate);
 
 }

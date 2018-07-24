@@ -325,7 +325,6 @@ Sample.options = {
 };
 
 Sample.ui = {
-
   filterSampleGroupOptions: function() {
     var validSampleGroups = [];
     var subProjectId = Sample.ui.getSelectedSubprojectId();

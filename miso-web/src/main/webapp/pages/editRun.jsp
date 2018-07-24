@@ -155,7 +155,7 @@
     <td>Run Path:*</td>
     <td>
       <c:choose>
-        <c:when test="${empty run.filePath or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}"><form:input id="filePath" path="filePath"/></c:when>
+        <c:when test="${empty run.filePath or miso:isAdmin()}"><form:input id="filePath" path="filePath"/></c:when>
         <c:otherwise><span id="filePath">${run.filePath}</span></c:otherwise>
       </c:choose>
     </td>
@@ -235,7 +235,7 @@
       <script type="text/javascript">
       Utils.ui.addDatePicker("startDate");
       Utils.ui.addDatePicker("completionDate");
-      Run.userIsAdmin = ${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')};
+      Run.userIsAdmin = ${miso:isAdmin()};
       var startDate = document.getElementById("startDate");
       startDate.disabled = startDate.value && !Run.userIsAdmin;
       Run.checkForCompletionDate(false);
@@ -295,8 +295,7 @@
             <b>${note.creationDate}</b>: ${note.text}
           <span class="float-right"
                 style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
-            <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                            or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+            <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
               <span style="color:#000000">
                 <a href='#' onclick="Run.ui.deleteRunNote('${run.id}', '${note.noteId}');">
                   <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span>
