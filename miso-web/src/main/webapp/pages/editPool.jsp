@@ -69,13 +69,15 @@
     </td>
   </tr>
   <tr>
-    <td colspan="2" id="warnings">
-      <script>
-        jQuery(document).ready(function() {
-          jQuery('#warnings').append(WarningTarget.pool.headerWarnings(${poolDto}));
-        });
-      </script>
-    </td>
+    <c:if test="${pool.id != 0}">
+      <td colspan="2" id="warnings">
+        <script>
+            jQuery(document).ready(function() {
+                jQuery('#warnings').append(WarningTarget.pool.headerWarnings(${poolDto}));
+            });
+        </script>
+      </td>
+    </c:if>
   </tr>
   <tr>
     <td class="h">Name:</td>
