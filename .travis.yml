@@ -8,8 +8,7 @@ env:
     - MAVEN_SETTINGS="${TRAVIS_BUILD_DIR}/gsi-config"
     - MAVEN_OPTS="-Xms1g -Xmx2g" 
   matrix: 
-    - JOB=SONAR
-    - JOB=UNIT_TEST
+    - JOB=SONAR_AND_UNIT_TESTS
     - JOB=PLAIN_WEB_IT
     - JOB=BULK_WEB_IT
     - JOB=OTHER_WEB_IT
