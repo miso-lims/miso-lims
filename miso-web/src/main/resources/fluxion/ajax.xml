@@ -46,7 +46,6 @@
     </bean>
 
   <bean id="projectControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectControllerHelperService">
-    <property name="issueTrackerManager" ref="issueTrackerManager" />
   </bean>
 
   <bean id="sampleControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.SampleControllerHelperService">

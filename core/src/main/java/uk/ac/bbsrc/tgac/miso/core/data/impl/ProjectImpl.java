@@ -29,9 +29,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -104,11 +102,6 @@ public class ProjectImpl implements Project {
 
   @OneToMany(targetEntity = ProjectOverview.class, mappedBy = "project", cascade = CascadeType.ALL)
   private Collection<ProjectOverview> overviews = new HashSet<>();
-
-  @ElementCollection
-  @CollectionTable(name = "Project_Issues", joinColumns = { @JoinColumn(name = "project_projectId") })
-  @Column(name = "issueKey")
-  private Collection<String> issueKeys = new HashSet<>();
 
   @Enumerated(EnumType.STRING)
   private ProgressType progress;
@@ -314,21 +307,6 @@ public class ProjectImpl implements Project {
 
     // add
     this.studies.add(s);
-  }
-
-  @Override
-  public Collection<String> getIssueKeys() {
-    return issueKeys;
-  }
-
-  @Override
-  public void setIssueKeys(Collection<String> issueKeys) {
-    this.issueKeys = issueKeys;
-  }
-
-  @Override
-  public void addIssueKey(String issueKey) {
-    this.issueKeys.add(issueKey);
   }
 
   public void setWatchUsers(Set<User> watchUsers) {

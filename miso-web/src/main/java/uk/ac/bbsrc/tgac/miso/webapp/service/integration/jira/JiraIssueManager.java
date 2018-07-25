@@ -38,6 +38,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Lists;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.client.apache.ApacheHttpClient;
@@ -68,6 +69,8 @@ import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 public class JiraIssueManager implements IssueTrackerManager {
 
   private static final DateFormat ISO8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+  private static final List<Character> SPECIAL_CHARS = Lists.newArrayList('+', '-', '&', '|', '!', '(', ')', '{', '}', '[', ']', '^', '~',
+      '*', '?', '\\', ':');
 
   private String oAuthConsumerKey;
   private String oAuthConsumerSecret;
@@ -106,11 +109,19 @@ public class JiraIssueManager implements IssueTrackerManager {
   public void setClient(Client client) {
     this.client = client;
   }
+
+  @Override
+  public List<Issue> getIssuesByTag(String tag) throws IOException {
+    Map<String, String> params = new HashMap<>();
+    params.put("jql", "labels=" + tag);
+    WebResource webResource = prepareWebResource(getRestUri("/search", params));
+    return retrieveList(webResource);
+  }
   
   @Override
   public List<Issue> searchIssues(String query) throws IOException {
     Map<String, String> params = new HashMap<>();
-    params.put("jql", "text~" + query);
+    params.put("jql", "text~'" + query.replaceAll("\\s*", "+") + "'");
     WebResource webResource = prepareWebResource(getRestUri("/search", params));
     return retrieveList(webResource);
   }

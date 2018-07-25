@@ -453,26 +453,9 @@
   Tracked Issues
   <div id="issues_arrowclick" class="toggleLeft"></div>
 </div>
-<div id="issuesdiv" class="note expandable_section" style="display:none;">
-  <c:choose>
-    <c:when test="${project.id != 0}">
-      To link issues to this project please enter your issue keys here, separated by a single comma, e.g. FOO-1,FOO-2,FOO-3:<br/>
-      <input type="text" id="previewKeys" name="previewKeys"/>
-      <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.issues.previewIssueKeys();">
-        Preview Issues
-      </button>
-      <br/>
-    </c:when>
-    <c:otherwise>
-      To import a project from an issue tracker, please enter an Issue Key to form the basis of this project.
-      Enter a SINGLE key, e.g. FOO-1, and click Import to link this project to an external issue.<br/>
-      <input type="text" id="previewKey" name="previewKey"/>
-      <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.issues.importProjectFromIssue();">
-        Import
-      </button>
-    </c:otherwise>
-  </c:choose>
-  <div id="issues"></div>
+<div id="issuesdiv" class="expandable_section" style="display:none;">
+  <div class="note">Tag an issue with the project's short name (${project.shortName}) to have it show up here.</div>
+  <miso:list-section id="list_issue" name="Related Issues" target="issue" items="${projectIssues}" config="{}"/>
 </div>
 
 <%@ include file="permissions.jsp" %>

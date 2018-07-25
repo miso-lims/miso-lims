@@ -28,7 +28,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -58,6 +60,7 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -69,8 +72,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
+import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
@@ -95,6 +100,9 @@ public class EditProjectController {
 
   @Autowired
   private FilesManager filesManager;
+
+  @Autowired
+  private IssueTrackerManager issueTrackerManager;
 
   @Autowired
   private ReferenceGenomeService referenceGenomeService;
@@ -259,6 +267,7 @@ public class EditProjectController {
   @RequestMapping(value = "/{projectId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long projectId, ModelMap model) throws IOException {
     try {
+      List<Issue> issues = Collections.emptyList();
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Project project = null;
       if (projectId == ProjectImpl.UNSAVED_ID) {
@@ -266,11 +275,17 @@ public class EditProjectController {
         model.put("title", "New Project");
       } else {
         project = projectService.getProjectById(projectId);
+        if (project == null) {
+          throw new NotFoundException("No project found for ID " + projectId.toString());
+        }
         model.put("title", "Project " + projectId);
+        try {
+          issues = issueTrackerManager.getIssuesByTag(project.getShortName());
+        } catch (IOException e) {
+          log.error("Error retrieving issues", e);
+        }
       }
-
-      if (project == null) throw new NotFoundException("No project found for ID " + projectId.toString());
-
+      model.put("projectIssues", issues.stream().map(Dtos::asDto).collect(Collectors.toList()));
       model.put("referenceGenome", referenceGenomeService.listAllReferenceGenomeTypes());
 
       Collection<TargetedSequencing> targetedSequencingList = targetedSequencingService.list();

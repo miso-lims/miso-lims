@@ -243,7 +243,6 @@ public class DefaultProjectService implements ProjectService {
       authorizationManager.throwIfNotWritable(original);
       original.setAlias(project.getAlias());
       original.setDescription(project.getDescription());
-      original.setIssueKeys(project.getIssueKeys());
       original.setLastUpdated(new Date());
       original.setProgress(project.getProgress());
       original.setReferenceGenome(referenceGenomeDao.getReferenceGenome(project.getReferenceGenome().getId()));

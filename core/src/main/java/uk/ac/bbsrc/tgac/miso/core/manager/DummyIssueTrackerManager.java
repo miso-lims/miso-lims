@@ -19,6 +19,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 public class DummyIssueTrackerManager implements IssueTrackerManager {
 
   @Override
+  public List<Issue> getIssuesByTag(String tag) throws IOException {
+    return Collections.emptyList();
+  }
+
+  @Override
   public List<Issue> searchIssues(String query) throws IOException {
     return Collections.emptyList();
   }

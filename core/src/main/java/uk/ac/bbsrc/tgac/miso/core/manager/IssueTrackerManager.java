@@ -40,6 +40,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Issue;
  */
 public interface IssueTrackerManager {
 
+  public List<Issue> getIssuesByTag(String tag) throws IOException;
+
   public List<Issue> searchIssues(String query) throws IOException;
 
   public void setConfiguration(Properties properties);
