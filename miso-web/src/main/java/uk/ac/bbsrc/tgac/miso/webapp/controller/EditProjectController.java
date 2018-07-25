@@ -267,54 +267,47 @@ public class EditProjectController {
 
   @GetMapping("/{projectId}")
   public ModelAndView setupForm(@PathVariable Long projectId, ModelMap model) throws IOException {
-    try {
-      List<Issue> issues = Collections.emptyList();
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Project project = null;
-      if (projectId == ProjectImpl.UNSAVED_ID) {
-        project = new ProjectImpl(user);
-        model.put("title", "New Project");
-      } else {
-        project = projectService.getProjectById(projectId);
-        if (project == null) {
-          throw new NotFoundException("No project found for ID " + projectId.toString());
-        }
-        model.put("title", "Project " + projectId);
-        try {
-          issues = issueTrackerManager.getIssuesByTag(project.getShortName());
-        } catch (IOException e) {
-          log.error("Error retrieving issues", e);
-        }
+    List<Issue> issues = Collections.emptyList();
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    Project project = null;
+    if (projectId == ProjectImpl.UNSAVED_ID) {
+      project = new ProjectImpl(user);
+      model.put("title", "New Project");
+    } else {
+      project = projectService.getProjectById(projectId);
+      if (project == null) {
+        throw new NotFoundException("No project found for ID " + projectId.toString());
       }
-      model.put("projectIssues", issues.stream().map(Dtos::asDto).collect(Collectors.toList()));
-      model.put("referenceGenome", referenceGenomeService.listAllReferenceGenomeTypes());
-
-      Collection<TargetedSequencing> targetedSequencingList = targetedSequencingService.list();
-      targetedSequencingList.add(TargetedSequencing.NULL);
-      model.put("targetedSequencing", targetedSequencingList);
-      model.put("formObj", project);
-      model.put("project", project);
-      model.put("projectFiles", populateProjectFiles(projectId));
-      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, project, securityManager.listAllUsers()));
-      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, project, securityManager.listAllUsers()));
-      model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, project, securityManager.listAllGroups()));
-      model.put("overviews", project.getOverviews());
-
-      Map<Long, String> overviewMap = new HashMap<>();
-      for (ProjectOverview po : project.getOverviews()) {
-        if (po.getWatchers().contains(user)) {
-          overviewMap.put(po.getId(), user.getLoginName());
-        }
+      model.put("title", "Project " + projectId);
+      try {
+        issues = issueTrackerManager.getIssuesByTag(project.getShortName());
+      } catch (IOException e) {
+        log.error("Error retrieving issues", e);
       }
-      model.put("overviewMap", overviewMap);
-
-      return new ModelAndView("/pages/editProject.jsp", model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show project", ex);
-      }
-      throw ex;
     }
+    model.put("projectIssues", issues.stream().map(Dtos::asDto).collect(Collectors.toList()));
+    model.put("referenceGenome", referenceGenomeService.listAllReferenceGenomeTypes());
+
+    Collection<TargetedSequencing> targetedSequencingList = targetedSequencingService.list();
+    targetedSequencingList.add(TargetedSequencing.NULL);
+    model.put("targetedSequencing", targetedSequencingList);
+    model.put("formObj", project);
+    model.put("project", project);
+    model.put("projectFiles", populateProjectFiles(projectId));
+    model.put("owners", LimsSecurityUtils.getPotentialOwners(user, project, securityManager.listAllUsers()));
+    model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, project, securityManager.listAllUsers()));
+    model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, project, securityManager.listAllGroups()));
+    model.put("overviews", project.getOverviews());
+
+    Map<Long, String> overviewMap = new HashMap<>();
+    for (ProjectOverview po : project.getOverviews()) {
+      if (po.getWatchers().contains(user)) {
+        overviewMap.put(po.getId(), user.getLoginName());
+      }
+    }
+    model.put("overviewMap", overviewMap);
+
+    return new ModelAndView("/pages/editProject.jsp", model);
   }
 
   @PostMapping
