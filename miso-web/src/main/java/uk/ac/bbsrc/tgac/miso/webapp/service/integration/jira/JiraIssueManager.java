@@ -38,7 +38,6 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.client.apache.ApacheHttpClient;
@@ -68,9 +67,10 @@ import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 @Component
 public class JiraIssueManager implements IssueTrackerManager {
 
-  private static final DateFormat ISO8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-  private static final List<Character> SPECIAL_CHARS = Lists.newArrayList('+', '-', '&', '|', '!', '(', ')', '{', '}', '[', ']', '^', '~',
-      '*', '?', '\\', ':');
+  private static final String restApiUrl = "/rest/api/";
+  private static final String jiraRestApiVersion = "2";
+
+  private final DateFormat ISO8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
   private String oAuthConsumerKey;
   private String oAuthConsumerSecret;
@@ -80,8 +80,6 @@ public class JiraIssueManager implements IssueTrackerManager {
   private String httpBasicAuthPassword;
 
   private String baseTrackerUrl;
-  private final String restApiUrl = "/rest/api/";
-  private final String jiraRestApiVersion = "2";
 
   public Client client;
 
@@ -94,20 +92,10 @@ public class JiraIssueManager implements IssueTrackerManager {
     sb.append(relativeUrl);
     if (params != null && !params.isEmpty()) {
       sb.append("?");
-      params.forEach((key, value) -> {
-        sb.append(key).append("=").append(value).append("&");
-      });
+      params.forEach((key, value) -> sb.append(key).append("=").append(value).append("&"));
       sb.deleteCharAt(sb.lastIndexOf("&"));
     }
     return URI.create(sb.toString());
-  }
-
-  public void setBaseTrackerUrl(String baseTrackerUrl) {
-    this.baseTrackerUrl = baseTrackerUrl;
-  }
-
-  public void setClient(Client client) {
-    this.client = client;
   }
 
   @Override
@@ -135,7 +123,7 @@ public class JiraIssueManager implements IssueTrackerManager {
         config.getProperties().put(ApacheHttpClientConfig.PROPERTY_PREEMPTIVE_AUTHENTICATION, true);
         ApacheHttpClientHandler ahcHandler = new ApacheHttpClientHandler(new HttpClient(new MultiThreadedHttpConnectionManager()), config);
         ApacheHttpClient ahc = new ApacheHttpClient(ahcHandler);
-        setClient(ahc);
+        this.client = ahc;
         wr = ahc.resource(uri);
       } else {
         wr = this.client.resource(uri);
@@ -147,7 +135,7 @@ public class JiraIssueManager implements IssueTrackerManager {
 
         OAuthSecrets secrets = new OAuthSecrets().consumerSecret(oAuthConsumerSecret);
         OAuthClientFilter filter = new OAuthClientFilter(c.getProviders(), params, secrets);
-        setClient(c);
+        this.client = c;
         wr = c.resource(uri);
         wr.addFilter(filter);
       } else {

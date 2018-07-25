@@ -43,11 +43,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
@@ -178,7 +179,7 @@ public class EditProjectController {
     return projectService.getProjectColumnSizes();
   }
 
-  @RequestMapping(value = "/graph/{projectId}", method = RequestMethod.GET)
+  @GetMapping("/graph/{projectId}")
   public @ResponseBody JSONObject graphRest(@PathVariable Long projectId) throws IOException {
     JSONObject j = new JSONObject();
     try {
@@ -252,19 +253,19 @@ public class EditProjectController {
     }
   }
 
-  @RequestMapping(value = "/new", method = RequestMethod.GET)
+  @GetMapping("/new")
   public ModelAndView setupForm(ModelMap model) throws IOException {
     return setupForm(ProjectImpl.UNSAVED_ID, model);
   }
 
-  @RequestMapping(value = "/shortname/{shortName}", method = RequestMethod.GET)
+  @GetMapping("/shortname/{shortName}")
   public ModelAndView byProjectShortName(@PathVariable String shortName, ModelMap model) throws IOException {
     Project project = projectService.getProjectByShortName(shortName);
     if (project == null) throw new NotFoundException("No project found for shortname " + shortName);
     return setupForm(project.getId(), model);
   }
 
-  @RequestMapping(value = "/{projectId}", method = RequestMethod.GET)
+  @GetMapping("/{projectId}")
   public ModelAndView setupForm(@PathVariable Long projectId, ModelMap model) throws IOException {
     try {
       List<Issue> issues = Collections.emptyList();
@@ -316,7 +317,7 @@ public class EditProjectController {
     }
   }
 
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping
   public String processSubmit(@ModelAttribute("project") Project project, ModelMap model, SessionStatus session, HttpServletRequest request)
       throws IOException {
     try {
