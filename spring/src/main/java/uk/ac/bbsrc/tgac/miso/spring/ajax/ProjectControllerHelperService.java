@@ -246,65 +246,6 @@ public class ProjectControllerHelperService {
     return JSONUtils.SimpleJSONResponse("ok");
   }
 
-  public JSONObject previewIssues(HttpSession session, JSONObject json) {
-    if (issueTrackerManager != null) {
-      final List<JSONObject> issueList = new ArrayList<>();
-      final List<String> errorList = new ArrayList<>();
-      final JSONArray issues = JSONArray.fromObject(json.getString("issues"));
-      for (final JSONObject issueKey : (Iterable<JSONObject>) issues) {
-        JSONObject issue = null;
-        try {
-          issue = issueTrackerManager.getIssue(issueKey.getString("key"));
-          if (issue != null) {
-            issueList.add(issue);
-          } else {
-            errorList.add(issueKey.getString("key"));
-          }
-        } catch (final IOException e) {
-          log.error("preview issues", e);
-          errorList.add(issueKey.getString("key"));
-        }
-      }
-
-      final JSONObject j = new JSONObject();
-      j.put("validIssues", JSONArray.fromObject(issueList));
-      j.put("invalidIssues", JSONArray.fromObject(errorList));
-      return j;
-    } else {
-      return JSONUtils.SimpleJSONError("No issue tracker manager available.");
-    }
-  }
-
-  public JSONObject getIssues(HttpSession session, JSONObject json) {
-    if (issueTrackerManager != null) {
-      final Long projectId = json.getLong("projectId");
-      try {
-        final Project project = projectService.getProjectById(projectId);
-        final JSONObject j = new JSONObject();
-        if (project != null) {
-          final List<JSONObject> issueList = new ArrayList<>();
-
-          if (project.getIssueKeys() != null) {
-            for (final String issueKey : project.getIssueKeys()) {
-              final JSONObject issue = issueTrackerManager.getIssue(issueKey);
-              if (issue != null) {
-                issueList.add(issue);
-              }
-            }
-            j.put("issues", JSONArray.fromObject(issueList));
-          }
-        }
-        return j;
-      } catch (final IOException e) {
-        log.error("get issues", e);
-        return JSONUtils.SimpleJSONError(e.getMessage());
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("No issue tracker manager available.");
-    }
-  }
-
-
   public JSONObject generateSampleDeliveryForm(HttpSession session, JSONObject json) {
     Boolean plate = false;
     if ("yes".equals(json.getString("plate"))) {

@@ -41,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
@@ -2425,6 +2426,16 @@ public class Dtos {
     QcTargetDto dto = new QcTargetDto();
     dto.setQcTarget(from);
     dto.setCorrespondingFields(from.getCorrespondingFields());
+    return dto;
+  }
+
+  public static IssueDto asDto(Issue from) {
+    IssueDto dto = new IssueDto();
+    dto.setKey(from.getKey());
+    dto.setSummary(from.getSummary());
+    dto.setUrl(from.getUrl());
+    dto.setStatus(from.getStatus());
+    dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
     return dto;
   }
 }

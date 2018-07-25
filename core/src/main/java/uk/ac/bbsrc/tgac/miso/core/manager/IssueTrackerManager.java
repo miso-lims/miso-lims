@@ -24,9 +24,10 @@
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
-import net.sf.json.JSONObject;
+import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.manager
@@ -38,40 +39,9 @@ import net.sf.json.JSONObject;
  * @since 0.0.3
  */
 public interface IssueTrackerManager {
-  String OAUTH = "oauth";
-  String BASIC = "basic";
 
-  String getType();
+  public List<Issue> searchIssues(String query) throws IOException;
 
-  JSONObject getIssue(String issueKey) throws IOException;
+  public void setConfiguration(Properties properties);
 
-  String getBaseTrackerUrl();
-
-  void setConfiguration(Properties properties);
-
-  public enum TrackerType {
-    JIRA("jira"), RT("RT");
-
-    /** Field key */
-    private final String key;
-
-    /**
-     * Constructs a TrackerType based on a given key
-     * 
-     * @param key
-     *          of type String
-     */
-    TrackerType(String key) {
-      this.key = key;
-    }
-
-    /**
-     * Returns the key of this TrackerType enum.
-     * 
-     * @return String key.
-     */
-    public String getKey() {
-      return key;
-    }
-  }
 }

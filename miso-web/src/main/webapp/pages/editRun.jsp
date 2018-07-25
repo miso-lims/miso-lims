@@ -313,6 +313,9 @@
 </c:if>
 
   <c:if test="${run.id != 0}">
+    <div id="issues">
+      <miso:list-section id="list_issue" name="Related Issues" target="issue" items="${runIssues}" config="{}"/>
+    </div>
     <div id="containers">
       <miso:list-section id="list_container" name="${run.platformType.containerName}" target="container" items="${runContainers}" alwaysShow="true" config="${partitionConfig}"/>
     </div>
