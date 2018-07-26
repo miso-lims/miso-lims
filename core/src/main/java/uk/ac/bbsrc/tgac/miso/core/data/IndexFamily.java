@@ -76,6 +76,7 @@ public class IndexFamily implements Serializable {
   @Id
   private Long indexFamilyId;
   private boolean fakeSequence;
+  private boolean uniqueDualIndex;
 
   public Boolean getArchived() {
     return archived;
@@ -143,6 +144,14 @@ public class IndexFamily implements Serializable {
 
   public void setFake(boolean fake) {
     this.fakeSequence = fake;
+  }
+
+  public void setUniqueDualIndex(boolean uniqueDualIndex) {
+    this.uniqueDualIndex = uniqueDualIndex;
+  }
+
+  public boolean isUniqueDualIndex() {
+    return uniqueDualIndex;
   }
 
   @Override
