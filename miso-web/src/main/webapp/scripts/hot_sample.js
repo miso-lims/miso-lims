@@ -2,6 +2,12 @@
  * Sample-specific Handsontable code
  */
 HotTarget.sample = (function() {
+  
+  var getSampleClass = function(sample) {
+    return Constants.sampleClasses.find(function(sampleClass) {
+      return sample.sampleClassId == sampleClass.id;
+    });
+  };
 
   var getSampleClasses = function(samples) {
     var classIds = Utils.array.deduplicateNumeric(samples.map(function(sample) {
@@ -745,7 +751,24 @@ HotTarget.sample = (function() {
             }
           },
           HotUtils.printAction('sample'),
-          HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets),
+          HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets, function(samples, spreadsheet){
+            var errors = [];
+            var invalidSamples = [];
+            samples.forEach(function(sample){
+              if(!spreadsheet.sheet.allowedClasses.includes(getSampleClass(sample).sampleCategory)){
+                invalidSamples.push(sample);
+              }
+            })
+            if(invalidSamples.length > 0){
+              errors.push("Error: Invalid sample class types");
+              errors.push("Allowed types: " + spreadsheet.sheet.allowedClasses.join(", "));
+              errors.push("Invalid samples:")
+              invalidSamples.forEach(function(sample){
+                errors.push("* " + sample.alias + " (" + getSampleClass(sample).alias + ")");
+              })
+            }
+            return errors;
+          }),
 
           Constants.isDetailedSample ? HotUtils.makeParents('sample', HotUtils.relationCategoriesForDetailed()) : null,
 

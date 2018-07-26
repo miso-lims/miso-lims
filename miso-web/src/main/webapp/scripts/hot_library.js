@@ -672,7 +672,11 @@ HotTarget.library = (function() {
             });
           });
         }
-      }, HotUtils.printAction('library'), HotUtils.spreadsheetAction('/miso/rest/library/spreadsheet', Constants.librarySpreadsheets),
+      }, HotUtils.printAction('library'), HotUtils.spreadsheetAction('/miso/rest/library/spreadsheet', Constants.librarySpreadsheets,
+          function(libraries, spreadsheet){
+        var errors = [];
+        return errors;
+      }),
 
       HotUtils.makeParents('library', HotUtils.relationCategoriesForDetailed()), 
       HotUtils.makeChildren('library',[HotUtils.relations.dilution(), HotUtils.relations.pool()])

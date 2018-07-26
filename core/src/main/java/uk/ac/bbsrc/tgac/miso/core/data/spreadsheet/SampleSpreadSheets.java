@@ -6,19 +6,46 @@ import java.util.function.Function;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public enum SampleSpreadSheets implements Spreadsheet<Sample> {
   TRACKING_LIST("Tracking List", //
+      Arrays.asList(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
+          SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
       Column.forString("Name", Sample::getName), //
       Column.forString("Alias", Sample::getAlias), //
       Column.forString("Barcode", Sample::getIdentificationBarcode), //
       Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
       Column.forString("Secondary Identifier", detailedSample(SampleTissue.class, SampleTissue::getSecondaryIdentifier, "")), //
-      Column.forString("Location", BoxUtils::makeLocationLabel));
+      Column.forString("Location", BoxUtils::makeLocationLabel)),
+  
+  TRANSFER_LIST("Transfer List", //
+      Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
+      Column.forString("Name", Sample::getName), //
+      Column.forString("Alias", Sample::getAlias),
+      Column.forString("Type", detailedSample(SampleStock.class, (sam -> {
+        if (sam.getSampleClass().getAlias().contains("DNA")) {
+          return "DNA";
+        } else if (sam.getSampleClass().getAlias().contains("RNA")) {
+          return "RNA";
+        } else {
+          return "Other";
+        }
+      }), "Other")), //
+      Column.forString("Barcode", Sample::getIdentificationBarcode), //
+      Column.forString("External Identifier",  detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
+      Column.forDouble("Volume (uL)", Sample::getVolume), //
+      Column.forDouble("Concentration (ng/uL)", Sample::getConcentration), //
+      Column.forDouble("Total (ng)",
+          (sam -> (sam.getVolume() != null && sam.getConcentration() != null) ? sam.getVolume() * sam.getConcentration() : null)), //
+      Column.forString("Subproject", detailedSample(SampleIdentity.class,
+          (dsam -> dsam.getSubproject() != null ? dsam.getSubproject().getAlias() : ""), "")));
 
   private static <S extends DetailedSample, T> Function<Sample, T> detailedSample(Class<S> clazz, Function<S, T> function, T defaultValue) {
     return s -> {
@@ -36,12 +63,14 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
   }
 
   private final List<Column<Sample>> columns;
+  private final List<String> allowedClasses;
   private final String description;
 
   @SafeVarargs
-  private SampleSpreadSheets(String description, Column<Sample>... columns) {
+  private SampleSpreadSheets(String description, List<String> allowedClasses, Column<Sample>... columns) {
     this.description = description;
     this.columns = Arrays.asList(columns);
+    this.allowedClasses = allowedClasses;
   }
 
   @Override
@@ -52,5 +81,9 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
   @Override
   public String description() {
     return description;
+  }
+
+  public List<String> allowedClasses() {
+    return allowedClasses;
   }
 }
