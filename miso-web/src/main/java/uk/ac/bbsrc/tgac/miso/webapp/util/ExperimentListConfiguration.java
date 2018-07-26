@@ -9,6 +9,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pair;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -77,12 +78,11 @@ public class ExperimentListConfiguration {
     Map<Library, List<Partition>> libraryGroups = run.getSequencerPartitionContainers().stream()//
         .flatMap(container -> container.getPartitions().stream())//
         .filter(partition -> partition.getPool() != null)//
-        .flatMap(partition -> {
-          return partition.getPool().getPoolableElementViews().stream()//
-              .map(PoolableElementView::getLibraryId)//
-              .distinct()
-              .map(libraryId -> new Pair<>(libraryId, partition));
-        })//
+        .flatMap(partition -> partition.getPool().getPoolDilutions().stream()//
+            .map(PoolDilution::getPoolableElementView)//
+            .map(PoolableElementView::getLibraryId)//
+            .distinct()
+            .map(libraryId -> new Pair<>(libraryId, partition)))//
         .collect(Collectors.groupingBy(Pair::getKey))//
         .entrySet().stream()//
         .collect(Collectors.toMap(//

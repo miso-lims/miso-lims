@@ -9,6 +9,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 
 public enum SampleSheet {
@@ -46,7 +47,8 @@ public enum SampleSheet {
   };
 
   private Stream<String> createRowsForPartition(User user, List<String> columns, Partition partition) {
-    return partition.getPool().getPoolableElementViews().stream()//
+    return partition.getPool().getPoolDilutions().stream()//
+        .map(PoolDilution::getPoolableElementView)
         .map(dilution -> {
           String[] output = new String[columns.size()];
           makeColumns(partition, dilution, user.getLoginName(), output);

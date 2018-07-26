@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
@@ -64,7 +65,8 @@ public class EraSubmissionPreparation {
     @Override
     protected Stream<Pair<PoolableElementView, Partition>> items() {
       return submission.getExperiments().stream().flatMap(experiment -> experiment.getRunPartitions().stream()).flatMap(
-          rp -> rp.getPartition().getPool().getPoolableElementViews().stream().map(poolable -> new Pair<>(poolable, rp.getPartition())));
+          rp -> rp.getPartition().getPool().getPoolDilutions().stream()
+              .map(pd -> new Pair<>(pd.getPoolableElementView(), rp.getPartition())));
     }
 
     @Override
@@ -93,7 +95,7 @@ public class EraSubmissionPreparation {
 
       Element dataBlock = xml.getOwnerDocument().createElementNS(null, "DATA_BLOCK");
       dataBlock.setAttribute("sector", Integer.toString(entry.getValue().getPartitionNumber()));
-      if (entry.getValue().getPool().getPoolableElementViews().size() > 1) {
+      if (entry.getValue().getPool().getPoolDilutions().size() > 1) {
         // multiplexed
         dataBlock.setAttribute("member_name", entry.getKey().getDilutionName());
       }
@@ -156,12 +158,12 @@ public class EraSubmissionPreparation {
       }
 
       experiment.getRunPartitions().stream().map(RunPartition::getPartition).map(Partition::getPool).distinct()
-          .filter(pool -> pool.getPoolableElementViews().size() > 1).forEach(pool -> {
+          .filter(pool -> pool.getPoolDilutions().size() > 1).forEach(pool -> {
             // multiplexed pool
             Element xmlPool = xml.getOwnerDocument().createElementNS(null, "POOL");
             sampleDescriptor.appendChild(xmlPool);
 
-            for (PoolableElementView dilution : pool.getPoolableElementViews()) {
+            pool.getPoolDilutions().stream().map(PoolDilution::getPoolableElementView).forEach(dilution -> {
               Element xmlMember = xml.getOwnerDocument().createElementNS(null, "MEMBER");
               xmlMember.setAttribute("member_name", dilution.getDilutionName());
               xmlMember.setAttribute("refcenter", centreName);
@@ -183,7 +185,7 @@ public class EraSubmissionPreparation {
                 xmlReadLabel.setTextContent(vsb.toString());
               }
               xmlMember.appendChild(xmlReadLabel);
-            }
+            });
           });
       xmlDesign.appendChild(sampleDescriptor);
 
@@ -225,7 +227,7 @@ public class EraSubmissionPreparation {
 
       Element poolingStrategy = xml.getOwnerDocument().createElementNS(null, "POOLING_STRATEGY");
       boolean isMultiplexed = experiment.getRunPartitions().stream().map(RunPartition::getPartition).map(Partition::getPool)
-          .map(Pool::getPoolableElementViews)
+          .map(Pool::getPoolDilutions)
           .mapToInt(Set::size).anyMatch(x -> x > 1);
       poolingStrategy.setTextContent(isMultiplexed ? "multiplexed libraries" : "none");
       libraryDescriptor.appendChild(poolingStrategy);

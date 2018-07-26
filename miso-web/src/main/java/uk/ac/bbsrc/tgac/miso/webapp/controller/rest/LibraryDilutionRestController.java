@@ -156,13 +156,6 @@ public class LibraryDilutionRestController extends RestController {
     return jQueryBackend.get(request, response, null, PaginationFilter.platformType(pool.getPlatformType()));
   }
 
-  @GetMapping(value = "dt/pool/{id}/included", produces = "application/json")
-  public @ResponseBody DataTablesResponseDto<DilutionDto> includedDilutions(@PathVariable("id") Long poolId, HttpServletRequest request,
-      HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, null, PaginationFilter.pool(poolId));
-  }
-
   @PostMapping(value = "query", produces = { "application/json" })
   @ResponseBody
   public List<DilutionDto> getLibraryDilutionsInBulk(@RequestBody List<String> names, HttpServletRequest request,

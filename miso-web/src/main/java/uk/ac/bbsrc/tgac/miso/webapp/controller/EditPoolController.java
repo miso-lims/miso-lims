@@ -28,13 +28,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +44,10 @@ import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,6 +60,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
 
 import net.sf.json.JSONArray;
 
@@ -67,12 +70,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
@@ -81,11 +86,10 @@ import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
-import uk.ac.bbsrc.tgac.miso.webapp.util.BulkMergeTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -112,8 +116,6 @@ public class EditPoolController {
   @Autowired
   private PlatformService platformService;
   @Autowired
-  private PoolableElementViewService poolableElementViewService;
-  @Autowired
   private PoolService poolService;
   @Autowired
   private RunService runService;
@@ -124,10 +126,6 @@ public class EditPoolController {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-
-  public void setPoolableElementViewService(PoolableElementViewService poolableElementViewService) {
-    this.poolableElementViewService = poolableElementViewService;
   }
 
   public void setRunService(RunService runService) {
@@ -161,12 +159,12 @@ public class EditPoolController {
     return poolService.getPoolColumnSizes();
   }
 
-  @RequestMapping(value = "/new", method = RequestMethod.GET)
+  @GetMapping(value = "/new")
   public ModelAndView newUnassignedPool(ModelMap model) throws IOException {
     return setupForm(PoolImpl.UNSAVED_ID, model);
   }
 
-  @RequestMapping(value = "/{poolId}", method = RequestMethod.GET)
+  @GetMapping(value = "/{poolId}")
   public ModelAndView setupForm(@PathVariable Long poolId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -198,22 +196,23 @@ public class EditPoolController {
       model.put("duplicateIndicesSequences", mapper.writeValueAsString(pool.getDuplicateIndicesSequences()));
       model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(pool.getNearDuplicateIndicesSequences()));
 
+      model.put("includedDilutions", Dtos.asDto(pool, true).getPooledElements());
+
       List<String> warnings = new ArrayList<>();
       addConsentWarning(pool, warnings);
       model.addAttribute("warnings", warnings);
 
       return new ModelAndView("/pages/editPool.jsp", model);
     } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show pool", ex);
-      }
+      log.debug("Failed to show pool", ex);
       throw ex;
     }
   }
 
   private void addConsentWarning(Pool pool, List<String> warnings) {
-    List<String> consentRevokedNames = pool.getPoolableElementViews()
+    List<String> consentRevokedNames = pool.getPoolDilutions()
         .stream()
+        .map(PoolDilution::getPoolableElementView)
         .filter(ldi -> {
           Sample sam = ldi.getSample();
           return LimsUtils.isDetailedSample(sam) && LimsUtils.getIdentityConsentLevel((DetailedSample) sam) == ConsentLevel.REVOKED;
@@ -244,23 +243,7 @@ public class EditPoolController {
     return selected;
   }
 
-  @RequestMapping(value = "/import", method = RequestMethod.POST)
-  public String importDilutionsToPool(HttpServletRequest request, ModelMap model) throws IOException {
-    Pool p = (PoolImpl) model.get("pool");
-    String[] dils = request.getParameterValues("importdilslist");
-    for (String s : dils) {
-      PoolableElementView ld = poolableElementViewService.getByBarcode(s);
-      if (ld != null) {
-        p.getPoolableElementViews().add(ld);
-      }
-    }
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    p.setLastModifier(user);
-    poolService.save(p);
-    return "redirect:/miso/pool/" + p.getId();
-  }
-
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping
   public String processSubmit(@ModelAttribute("pool") Pool pool, ModelMap model, SessionStatus session)
       throws IOException {
     try {
@@ -268,7 +251,7 @@ public class EditPoolController {
       // update them to avoid reverting the state.
       if (pool.getId() != PoolImpl.UNSAVED_ID) {
         Pool original = poolService.get(pool.getId());
-        pool.setPoolableElementViews(original.getPoolableElementViews());
+        pool.setPoolDilutions(original.getPoolDilutions());
       }
 
       poolService.save(pool);
@@ -276,9 +259,7 @@ public class EditPoolController {
       model.clear();
       return "redirect:/miso/pool/" + pool.getId();
     } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save pool", ex);
-      }
+      log.debug("Failed to save pool", ex);
       throw ex;
     }
   }
@@ -309,16 +290,21 @@ public class EditPoolController {
     }
   };
 
-  @RequestMapping(value = "/bulk/edit", method = RequestMethod.GET)
+  @GetMapping(value = "/bulk/edit")
   public ModelAndView editPools(@RequestParam("ids") String poolIds, ModelMap model) throws IOException {
     return bulkEditBackend.edit(poolIds, model);
   }
 
-  private final BulkMergeTableBackend<PoolDto> bulkMergeBackend = new BulkMergeTableBackend<PoolDto>(
-      "pool", PoolDto.class, "Pool", "Pools") {
+  private static class BulkMergePoolsBackend extends BulkTableBackend<PoolDto> {
 
-    @Override
-    protected PoolDto createDtoFromParents(List<Long> parentIds) throws IOException {
+    private final PoolService poolService;
+
+    public BulkMergePoolsBackend(PoolService poolService) {
+      super("pool", PoolDto.class);
+      this.poolService = poolService;
+    }
+
+    protected PoolDto createDtoFromParents(List<Long> parentIds, List<Integer> proportions) throws IOException {
       PoolDto dto = new PoolDto();
       List<Pool> parents = new ArrayList<>(poolService.listByIdList(parentIds));
 
@@ -341,8 +327,27 @@ public class EditPoolController {
         dto.setAlias(commonPrefix + "_POOL");
       }
 
-      dto.setPooledElements(
-          parents.stream().flatMap(pool -> pool.getPoolableElementViews().stream()).map(Dtos::asDto).collect(Collectors.toSet()));
+      Set<DilutionDto> dilutionDtos = new HashSet<>();
+      for (Pool parent : parents) {
+        for (int i = 0; i < parentIds.size(); i++) {
+          if (parentIds.get(i).equals(Long.valueOf(parent.getId()))) {
+            for (PoolDilution pd : parent.getPoolDilutions()) {
+              DilutionDto existing = dilutionDtos.stream().filter(d -> d.getId().equals(pd.getPoolableElementView().getDilutionId()))
+                  .findFirst().orElse(null);
+              if (existing == null) {
+                DilutionDto ldiDto = Dtos.asDto(pd.getPoolableElementView());
+                ldiDto.setProportion(pd.getProportion() * proportions.get(i));
+                dilutionDtos.add(ldiDto);
+              } else {
+                existing.setProportion(existing.getProportion() + pd.getProportion() * proportions.get(i));
+              }
+            }
+            break;
+          }
+        }
+      }
+      dto.setPooledElements(dilutionDtos);
+
       List<String> volumeUnits = parents.stream().map(Pool::getVolumeUnits).filter(Objects::nonNull).distinct()
           .collect(Collectors.toList());
       if (parents.stream().map(Pool::getVolume).allMatch(Objects::nonNull) && volumeUnits.size() == 1) {
@@ -354,13 +359,35 @@ public class EditPoolController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      // no config necessary
     }
 
-  };
+    public ModelAndView merge(String parentIdsString, String proportionsString, ModelMap model) throws IOException {
+      List<Long> parentIds = parseIds(parentIdsString);
+      List<Integer> proportions = parseProportions(proportionsString);
+      List<PoolDto> dtos = Lists.newArrayList(createDtoFromParents(parentIds, proportions));
+      return prepare(model, true, "Merge Pools", dtos);
+    }
 
-  @RequestMapping(value = "/bulk/merge", method = RequestMethod.GET)
-  public ModelAndView propagatePoolsMerged(@RequestParam("ids") String dilutionIds, ModelMap model) throws IOException {
-    return bulkMergeBackend.propagate(dilutionIds, model);
+    private static List<Integer> parseProportions(String proportionsString) {
+      String[] split = proportionsString.split(",");
+      List<Integer> proportions = new ArrayList<>();
+      for (int i = 0; i < split.length; i++) {
+        Integer prop = Integer.valueOf(split[i]);
+        if (prop < 1) {
+          throw new IllegalArgumentException("Invalid proportion: prop");
+        }
+        proportions.add(prop);
+      }
+      return proportions;
+    }
+
+  }
+
+  @GetMapping(value = "/bulk/merge")
+  public ModelAndView propagatePoolsMerged(@RequestParam("ids") String poolIds, @RequestParam String proportions, ModelMap model)
+      throws IOException {
+    return new BulkMergePoolsBackend(poolService).merge(poolIds, proportions, model);
   }
 
 }

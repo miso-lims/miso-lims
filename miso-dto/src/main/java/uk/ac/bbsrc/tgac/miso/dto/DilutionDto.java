@@ -24,6 +24,7 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
   private String identityConsentLevel;
   private String ngUsed;
   private String volumeUsed;
+  private Integer proportion;
 
   public Long getId() {
     return id;
@@ -168,6 +169,14 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setVolumeUsed(String volumeUsed) {
     this.volumeUsed = volumeUsed;
+  }
+
+  public Integer getProportion() {
+    return proportion;
+  }
+
+  public void setProportion(Integer proportion) {
+    this.proportion = proportion;
   }
 
 }

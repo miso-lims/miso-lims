@@ -23,10 +23,23 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.util;
 
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.User;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -44,13 +57,32 @@ import org.odftoolkit.odfdom.incubator.doc.text.OdfTextParagraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.User;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
-import uk.ac.bbsrc.tgac.miso.core.data.type.*;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.DeliveryFormException;
 import uk.ac.bbsrc.tgac.miso.core.exception.InputFormException;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
@@ -59,13 +91,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
-
-import java.io.*;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 /**
  * @author Rob Davey
@@ -261,7 +286,7 @@ public class FormUtils {
           if (!ss.isEmpty()) {
             if (ss.size() == 1) {
               s = ss.iterator().next();
-              log.info("Got sample: " + s.getAlias());
+              log.info("Got sample: {}", s.getAlias());
             } else {
               throw new InputFormException("Multiple samples retrieved with this alias: '" + salias + "'. Cannot process.");
             }
@@ -420,7 +445,7 @@ public class FormUtils {
           if (!ss.isEmpty()) {
             if (ss.size() == 1) {
               s = ss.iterator().next();
-              log.info("Got sample: " + s.getAlias());
+              log.info("Got sample: {}", s.getAlias());
             } else {
               throw new InputFormException("Multiple samples retrieved with this alias: '" + salias + "'. Cannot process.");
             }
@@ -577,7 +602,7 @@ public class FormUtils {
     boolean paired;
     if (pairedCell != null && pairedCell.getBooleanValue() != null) {
       paired = pairedCell.getBooleanValue();
-      log.info("Got paired: " + paired);
+      log.info("Got paired: {}", paired);
     } else {
       throw new InputFormException("'Paired' cell is empty. Please specify TRUE or FALSE.");
     }
@@ -590,7 +615,7 @@ public class FormUtils {
     if (pt == null) {
       throw new InputFormException("Cannot resolve Platform type from: '" + platformCell.getStringValue() + "'");
     } else {
-      log.info("Got platform type: " + pt.getKey());
+      log.info("Got platform type: {}", pt.getKey());
     }
 
     OdfTableCell typeCell = oTable.getCellByPosition("C2");
@@ -609,7 +634,7 @@ public class FormUtils {
     if (lt == null) {
       throw new InputFormException("Cannot resolve Library type from: '" + typeCell.getStringValue() + "'");
     } else {
-      log.info("Got library type: " + lt.getDescription());
+      log.info("Got library type: {}", lt.getDescription());
     }
 
     OdfTableCell selectionCell = oTable.getCellByPosition("D2");
@@ -620,7 +645,7 @@ public class FormUtils {
     if (ls == null) {
       throw new InputFormException("Cannot resolve Library Selection type from: '" + selectionCell.getStringValue() + "'");
     } else {
-      log.info("Got library selection type: " + ls.getName());
+      log.info("Got library selection type: {}", ls.getName());
     }
 
     OdfTableCell strategyCell = oTable.getCellByPosition("E2");
@@ -631,7 +656,7 @@ public class FormUtils {
     if (lst == null) {
       throw new InputFormException("Cannot resolve Library Strategy type from: '" + strategyCell.getStringValue() + "'");
     } else {
-      log.info("Got library strategy type: " + lst.getName());
+      log.info("Got library strategy type: {}", lst.getName());
     }
 
     // process entries
@@ -648,7 +673,7 @@ public class FormUtils {
           if (!ss.isEmpty()) {
             if (ss.size() == 1) {
               s = ss.iterator().next();
-              log.info("Got sample: " + s.getAlias());
+              log.info("Got sample: {}", s.getAlias());
             } else {
               throw new InputFormException(
                   "Multiple samples retrieved with this alias: '" + sampleAliasCell.getStringValue() + "'. Cannot process.");
@@ -686,7 +711,7 @@ public class FormUtils {
             processLibraryQC(libraryQcCell, libraryQcMolarityCell, libraryQcInsertSizeCell, library, u, qcService);
             processIndices(indexFamilyCell, indicesCell, library, indexService);
             processDilutions(dilutionMolarityCell, library, pools.get(poolNumberCell), u);
-            log.info("Added library: " + library.toString());
+            log.info("Added library: {}", library);
             s.addLibrary(library);
           }
           samples.add(s);
@@ -711,7 +736,7 @@ public class FormUtils {
     boolean paired;
     if (getCellValueAsString(pairedCell) != null) {
       paired = pairedCell.getBooleanCellValue();
-      log.info("Got paired: " + paired);
+      log.info("Got paired: {}", paired);
     } else {
       throw new InputFormException("'Paired' cell is empty. Please specify TRUE or FALSE.");
     }
@@ -724,7 +749,7 @@ public class FormUtils {
     if (pt == null) {
       throw new InputFormException("Cannot resolve Platform type from: '" + getCellValueAsString(platformCell) + "'");
     } else {
-      log.info("Got platform type: " + pt.getKey());
+      log.info("Got platform type: {}", pt.getKey());
     }
 
     XSSFCell typeCell = glrow.getCell(2);
@@ -743,7 +768,7 @@ public class FormUtils {
     if (lt == null) {
       throw new InputFormException("Cannot resolve Library type from: '" + getCellValueAsString(typeCell) + "'");
     } else {
-      log.info("Got library type: " + lt.getDescription());
+      log.info("Got library type: {}", lt.getDescription());
     }
 
     XSSFCell selectionCell = glrow.getCell(3);
@@ -754,7 +779,7 @@ public class FormUtils {
     if (ls == null) {
       throw new InputFormException("Cannot resolve Library Selection type from: '" + getCellValueAsString(selectionCell) + "'");
     } else {
-      log.info("Got library selection type: " + ls.getName());
+      log.info("Got library selection type: {}", ls.getName());
     }
 
     XSSFCell strategyCell = glrow.getCell(4);
@@ -765,7 +790,7 @@ public class FormUtils {
     if (lst == null) {
       throw new InputFormException("Cannot resolve Library Strategy type from: '" + getCellValueAsString(strategyCell) + "'");
     } else {
-      log.info("Got library strategy type: " + lst.getName());
+      log.info("Got library strategy type: {}", lst.getName());
     }
 
     // process entries
@@ -784,7 +809,7 @@ public class FormUtils {
         if (!ss.isEmpty()) {
           if (ss.size() == 1) {
             s = ss.iterator().next();
-            log.info("Got sample: " + s.getAlias());
+            log.info("Got sample: {}", s.getAlias());
           } else {
             throw new InputFormException("Multiple samples retrieved with this alias: '" + salias + "'. Cannot process.");
           }
@@ -821,7 +846,7 @@ public class FormUtils {
           processLibraryQC(libraryQcCell, libraryQcMolarityCell, libraryQcInsertSizeCell, library, u, qcService);
           processIndices(indexKitCell, indexTagsCell, library, indexService);
           processDilutions(dilutionMolarityCell, library, pools.get(poolNumberCell), u);
-          log.info("Added library: " + library.toString());
+          log.info("Added library: {}", library);
           s.addLibrary(library);
         }
         samples.add(s);
@@ -836,16 +861,16 @@ public class FormUtils {
         Pool pool = new PoolImpl();
         pool.setAlias(poolAlias);
         pools.put(poolAlias, pool);
-        log.info("Added pool: " + poolAlias);
+        log.info("Added pool: {}", poolAlias);
       }
 
       if (!isStringEmptyOrNull(poolConvertedMolarity)) {
         Pool p = pools.get(poolAlias);
         if (p != null) {
-          log.info("Retrieved pool " + poolAlias);
+          log.info("Retrieved pool {}", poolAlias);
           try {
             double d = Double.valueOf(poolConvertedMolarity);
-            log.info("Got conc " + d);
+            log.info("Got conc {}", d);
             p.setConcentration(d);
           } catch (NumberFormatException nfe) {
             throw new InputFormException("Supplied pool concentration for pool '" + poolAlias + "' is invalid", nfe);
@@ -867,7 +892,7 @@ public class FormUtils {
         sqc.setType(qcService.getQcType(QcTarget.Sample, "QuBit"));
         if (s.getQCs().stream().noneMatch(existing -> existing.getType().getQcTypeId() == sqc.getType().getQcTypeId())) {
           qcService.createQC(sqc);
-          log.info("Added sample QC: " + sqc.toString());
+          log.info("Added sample QC: {}", sqc);
         }
       } catch (NumberFormatException nfe) {
         throw new InputFormException("Supplied Sample QC concentration for sample '" + sampleQc + "' is invalid", nfe);
@@ -937,7 +962,7 @@ public class FormUtils {
           lqc.setType(qcService.getQcType(QcTarget.Library, libraryQc));
           if (library.getQCs().stream().noneMatch(existing -> existing.getType().getQcTypeId() == lqc.getType().getQcTypeId())) {
             qcService.createQC(lqc);
-            log.info("Added library QC: " + lqc.toString());
+            log.info("Added library QC: {}", lqc);
           }
         } else {
           throw new InputFormException("No such Library QC type '" + libraryQc + "'");
@@ -994,11 +1019,11 @@ public class FormUtils {
         ldi.setDilutionCreator(u.getLoginName());
         if (!library.getLibraryDilutions().contains(ldi)) {
           library.addDilution(ldi);
-          log.info("Added library dilution: " + ldi.toString());
+          log.info("Added library dilution: {}", ldi);
         }
         if (p != null) {
-          p.getPoolableElementViews().add(PoolableElementView.fromDilution(ldi));
-          log.info("Added library dilution to pool: " + p.toString());
+          p.getPoolDilutions().add(new PoolDilution(p, PoolableElementView.fromDilution(ldi)));
+          log.info("Added library dilution to pool: {}", p);
         }
       } catch (NumberFormatException nfe) {
         throw new InputFormException("Supplied LibraryDilution concentration for library '" + library.getAlias() + "' ("

@@ -47,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -422,11 +423,12 @@ public class LoadGeneratorSource implements MigrationSource {
   private Pool createPool(Set<LibraryDilution> libraryDilutions, int poolNum) {
     Pool p = new PoolImpl();
     p.setAlias("Test_Pool_" + poolNum);
-    Set<PoolableElementView> poolables = Sets.newHashSet();
+    Set<PoolDilution> poolables = Sets.newHashSet();
     for (LibraryDilution ldi : libraryDilutions) {
-      poolables.add(PoolableElementView.fromDilution(ldi));
+      PoolDilution pd = new PoolDilution(p, PoolableElementView.fromDilution(ldi));
+      poolables.add(pd);
     }
-    p.setPoolableElementViews(poolables);
+    p.setPoolDilutions(poolables);
     p.setConcentration(2D);
     p.setPlatformType(PlatformType.ILLUMINA);
     return p;

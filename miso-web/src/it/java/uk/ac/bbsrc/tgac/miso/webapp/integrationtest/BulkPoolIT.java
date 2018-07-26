@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,12 +14,13 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ButtonText;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ListTarget;
@@ -26,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPoolCustomPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPoolPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPoolPage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListPoolsPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
@@ -57,7 +60,7 @@ public class BulkPoolIT extends AbstractIT {
 
   @Test
   public void testMergeSetup() throws Exception {
-    BulkPoolPage page = BulkPoolPage.getForMerge(getDriver(), getBaseUrl(), Sets.newHashSet(200001L, 200002L));
+    BulkPoolPage page = BulkPoolPage.getForMerge(getDriver(), getBaseUrl(), Lists.newArrayList(200001L, 200002L), Lists.newArrayList(1, 2));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     assertEquals(commonColumns.size(), headings.size());
@@ -404,18 +407,18 @@ public class BulkPoolIT extends AbstractIT {
 
     Pool saved0 = (Pool) getSession().get(PoolImpl.class, savedId0);
     assertPoolAttributes(row0, saved0);
-    assertEquals(2, saved0.getPoolableElementViews().size());
-    List<Long> pool0DilutionIds = saved0.getPoolableElementViews().stream()
-        .map(PoolableElementView::getDilutionId)
+    assertEquals(2, saved0.getPoolDilutions().size());
+    List<Long> pool0DilutionIds = saved0.getPoolDilutions().stream()
+        .map(pd -> pd.getPoolableElementView().getDilutionId())
         .collect(Collectors.toList());
     assertTrue(pool0DilutionIds.contains(Long.valueOf(504L)));
     assertTrue(pool0DilutionIds.contains(Long.valueOf(505L)));
 
     Pool saved1 = (Pool) getSession().get(PoolImpl.class, savedId1);
     assertPoolAttributes(row1, saved1);
-    assertEquals(2, saved1.getPoolableElementViews().size());
-    List<Long> pool1DilutionIds = saved1.getPoolableElementViews().stream()
-        .map(PoolableElementView::getDilutionId)
+    assertEquals(2, saved1.getPoolDilutions().size());
+    List<Long> pool1DilutionIds = saved1.getPoolDilutions().stream()
+        .map(pd -> pd.getPoolableElementView().getDilutionId())
         .collect(Collectors.toList());
     assertTrue(pool1DilutionIds.contains(Long.valueOf(701L)));
     assertTrue(pool1DilutionIds.contains(Long.valueOf(702L)));
@@ -520,24 +523,34 @@ public class BulkPoolIT extends AbstractIT {
 
   @Test
   public void testSelectForMerge() {
-    ListPage listPools = ListPage.getListPage(getDriver(), getBaseUrl(), ListTarget.POOLS);
+    ListPoolsPage listPools = ListPoolsPage.getListPage(getDriver(), getBaseUrl());
     DataTable pools = listPools.getTable();
     pools.searchFor("IPO20000"); // should get IPO200001 and IPO200002
 
     pools.checkBoxForRow(0);
     pools.checkBoxForRow(1);
-    String newUrl = listPools.clickButtonAndGetUrl(ButtonText.MERGE);
+    
+    Map<String, Integer> proportions = new HashMap<>();
+    proportions.put("IPO200001", 1);
+    proportions.put("IPO200002", 3);
+    BulkPoolPage newPage = listPools.mergeSelected(proportions);
+    assertNotNull(newPage);
 
+    String newUrl = getDriver().getCurrentUrl();
     assertTrue(newUrl.contains(BulkPoolPage.MERGE_URL_FRAGMENT));
-    List<String> ids = Arrays.asList(newUrl.split("=")[1].split("%2C"));
-    assertEquals(2, ids.size());
-    assertTrue(ids.contains("200001"));
-    assertTrue(ids.contains("200002"));
+    String[] ids = newUrl.split("=")[1].split("(%2C|&proportions)");
+    assertEquals(2, ids.length);
+    assertEquals("200001", ids[0]);
+    assertEquals("200002", ids[1]);
+    String[] props = newUrl.split("=")[2].split("(%2C)");
+    assertEquals(2, props.length);
+    assertEquals("1", props[0]);
+    assertEquals("3", props[1]);
   }
 
   @Test
   public void testMerge() throws Exception {
-    BulkPoolPage page = BulkPoolPage.getForMerge(getDriver(), getBaseUrl(), Sets.newHashSet(200005L, 200006L));
+    BulkPoolPage page = BulkPoolPage.getForMerge(getDriver(), getBaseUrl(), Lists.newArrayList(200005L, 200006L), Lists.newArrayList(1, 2));
     HandsOnTable table = page.getTable();
 
     Map<String, String> changes = Maps.newLinkedHashMap();
@@ -560,7 +573,7 @@ public class BulkPoolIT extends AbstractIT {
     Pool saved = (Pool) getSession().get(PoolImpl.class, savedId);
     assertPoolAttributes(changes, saved);
 
-    assertPoolableElementViews(saved, Sets.newHashSet(120001L, 200001L, 200002L));
+    assertPoolableElementViews(saved, Lists.newArrayList(120001L, 200001L, 200002L), Lists.newArrayList(3, 2, 1));
   }
 
   private static void assertPoolAttributes(Map<String, String> attributes, Pool pool) {
@@ -572,12 +585,16 @@ public class BulkPoolIT extends AbstractIT {
     assertEntityAttribute(Columns.QC_PASSED, attributes, pool, p -> getQcPassedString(p.getQcPassed()));
   }
 
-  private static void assertPoolableElementViews(Pool pool, Set<Long> ids) {
-    assertTrue("Incorrect number of pooled elements in pool", pool.getPoolableElementViews().size() == ids.size());
-    ids.stream().forEach(id -> {
-      assertTrue("Pool does not contain element with id " + id,
-          pool.getPoolableElementViews().stream().map(PoolableElementView::getDilutionId).collect(Collectors.toList()).contains(id));
-    });
+  private static void assertPoolableElementViews(Pool pool, List<Long> ids, List<Integer> proportions) {
+    assertTrue("Incorrect number of pooled elements in pool", pool.getPoolDilutions().size() == ids.size());
+    for (int i = 0; i < ids.size(); i++) {
+      final Long id = ids.get(i);
+      PoolDilution poolDilution = pool.getPoolDilutions().stream()
+          .filter(pd -> Long.valueOf(pd.getPoolableElementView().getDilutionId()).equals(id))
+          .findFirst().orElse(null);
+      assertNotNull("Pool does not contain element with id " + id, poolDilution);
+      assertEquals("Saved PoolDilution has incorrect proportion", proportions.get(i), Integer.valueOf(poolDilution.getProportion()));
+    }
   }
 
   private static String assertAndGetSavedName(HandsOnTable table, int rowNum) {

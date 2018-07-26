@@ -321,7 +321,7 @@ public class ProjectControllerHelperService {
             sb.append("Pools: <ul>");
             for (final Pool p : pools) {
               sb.append("<li>").append(p.getName()).append(" (").append(p.getAlias()).append(") - ")
-                  .append(p.getPoolableElementViews().size())
+                  .append(p.getPoolDilutions().size())
                   .append(" dilutions<li>");
             }
             sb.append("</ul><br/>");

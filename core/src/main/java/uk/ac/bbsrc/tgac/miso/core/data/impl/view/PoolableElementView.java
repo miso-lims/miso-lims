@@ -534,4 +534,172 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     this.sample = sample;
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((boxAlias == null) ? 0 : boxAlias.hashCode());
+    result = prime * result + ((boxIdentificationBarcode == null) ? 0 : boxIdentificationBarcode.hashCode());
+    result = prime * result + ((boxLocationBarcode == null) ? 0 : boxLocationBarcode.hashCode());
+    result = prime * result + ((boxName == null) ? 0 : boxName.hashCode());
+    result = prime * result + ((created == null) ? 0 : created.hashCode());
+    result = prime * result + ((creatorName == null) ? 0 : creatorName.hashCode());
+    result = prime * result + ((dilutionBarcode == null) ? 0 : dilutionBarcode.hashCode());
+    result = prime * result + ((dilutionConcentration == null) ? 0 : dilutionConcentration.hashCode());
+    result = prime * result + ((dilutionConcentrationUnits == null) ? 0 : dilutionConcentrationUnits.hashCode());
+    result = prime * result + (int) (dilutionId ^ (dilutionId >>> 32));
+    result = prime * result + ((dilutionName == null) ? 0 : dilutionName.hashCode());
+    result = prime * result + ((dilutionNgUsed == null) ? 0 : dilutionNgUsed.hashCode());
+    result = prime * result + ((dilutionVolume == null) ? 0 : dilutionVolume.hashCode());
+    result = prime * result + ((dilutionVolumeUsed == null) ? 0 : dilutionVolumeUsed.hashCode());
+    result = prime * result + ((indices == null) ? 0 : indices.hashCode());
+    result = prime * result + ((lastModified == null) ? 0 : lastModified.hashCode());
+    result = prime * result + ((lastModifierName == null) ? 0 : lastModifierName.hashCode());
+    result = prime * result + ((libraryAlias == null) ? 0 : libraryAlias.hashCode());
+    result = prime * result + ((libraryBarcode == null) ? 0 : libraryBarcode.hashCode());
+    result = prime * result + ((libraryDescription == null) ? 0 : libraryDescription.hashCode());
+    result = prime * result + ((libraryDnaSize == null) ? 0 : libraryDnaSize.hashCode());
+    result = prime * result + ((libraryId == null) ? 0 : libraryId.hashCode());
+    result = prime * result + ((libraryName == null) ? 0 : libraryName.hashCode());
+    result = prime * result + (libraryPaired ? 1231 : 1237);
+    result = prime * result + ((librarySelectionType == null) ? 0 : librarySelectionType.hashCode());
+    result = prime * result + ((libraryStrategyType == null) ? 0 : libraryStrategyType.hashCode());
+    result = prime * result + (lowQualityLibrary ? 1231 : 1237);
+    result = prime * result + ((platformType == null) ? 0 : platformType.hashCode());
+    result = prime * result + ((preMigrationId == null) ? 0 : preMigrationId.hashCode());
+    result = prime * result + ((projectAlias == null) ? 0 : projectAlias.hashCode());
+    result = prime * result + ((projectId == null) ? 0 : projectId.hashCode());
+    result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
+    result = prime * result + ((projectShortName == null) ? 0 : projectShortName.hashCode());
+    result = prime * result + ((sampleAccession == null) ? 0 : sampleAccession.hashCode());
+    result = prime * result + ((sampleAlias == null) ? 0 : sampleAlias.hashCode());
+    result = prime * result + ((sampleDescription == null) ? 0 : sampleDescription.hashCode());
+    result = prime * result + ((sampleId == null) ? 0 : sampleId.hashCode());
+    result = prime * result + ((sampleName == null) ? 0 : sampleName.hashCode());
+    result = prime * result + ((sampleType == null) ? 0 : sampleType.hashCode());
+    result = prime * result + ((targetedSequencingId == null) ? 0 : targetedSequencingId.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    PoolableElementView other = (PoolableElementView) obj;
+    if (boxAlias == null) {
+      if (other.boxAlias != null) return false;
+    } else if (!boxAlias.equals(other.boxAlias)) return false;
+    if (boxIdentificationBarcode == null) {
+      if (other.boxIdentificationBarcode != null) return false;
+    } else if (!boxIdentificationBarcode.equals(other.boxIdentificationBarcode)) return false;
+    if (boxLocationBarcode == null) {
+      if (other.boxLocationBarcode != null) return false;
+    } else if (!boxLocationBarcode.equals(other.boxLocationBarcode)) return false;
+    if (boxName == null) {
+      if (other.boxName != null) return false;
+    } else if (!boxName.equals(other.boxName)) return false;
+    if (created == null) {
+      if (other.created != null) return false;
+    } else if (!created.equals(other.created)) return false;
+    if (creatorName == null) {
+      if (other.creatorName != null) return false;
+    } else if (!creatorName.equals(other.creatorName)) return false;
+    if (dilutionBarcode == null) {
+      if (other.dilutionBarcode != null) return false;
+    } else if (!dilutionBarcode.equals(other.dilutionBarcode)) return false;
+    if (dilutionConcentration == null) {
+      if (other.dilutionConcentration != null) return false;
+    } else if (!dilutionConcentration.equals(other.dilutionConcentration)) return false;
+    if (dilutionConcentrationUnits == null) {
+      if (other.dilutionConcentrationUnits != null) return false;
+    } else if (!dilutionConcentrationUnits.equals(other.dilutionConcentrationUnits)) return false;
+    if (dilutionId != other.dilutionId) return false;
+    if (dilutionName == null) {
+      if (other.dilutionName != null) return false;
+    } else if (!dilutionName.equals(other.dilutionName)) return false;
+    if (dilutionNgUsed == null) {
+      if (other.dilutionNgUsed != null) return false;
+    } else if (!dilutionNgUsed.equals(other.dilutionNgUsed)) return false;
+    if (dilutionVolume == null) {
+      if (other.dilutionVolume != null) return false;
+    } else if (!dilutionVolume.equals(other.dilutionVolume)) return false;
+    if (dilutionVolumeUsed == null) {
+      if (other.dilutionVolumeUsed != null) return false;
+    } else if (!dilutionVolumeUsed.equals(other.dilutionVolumeUsed)) return false;
+    if (indices == null) {
+      if (other.indices != null) return false;
+    } else if (!indices.equals(other.indices)) return false;
+    if (lastModified == null) {
+      if (other.lastModified != null) return false;
+    } else if (!lastModified.equals(other.lastModified)) return false;
+    if (lastModifierName == null) {
+      if (other.lastModifierName != null) return false;
+    } else if (!lastModifierName.equals(other.lastModifierName)) return false;
+    if (libraryAlias == null) {
+      if (other.libraryAlias != null) return false;
+    } else if (!libraryAlias.equals(other.libraryAlias)) return false;
+    if (libraryBarcode == null) {
+      if (other.libraryBarcode != null) return false;
+    } else if (!libraryBarcode.equals(other.libraryBarcode)) return false;
+    if (libraryDescription == null) {
+      if (other.libraryDescription != null) return false;
+    } else if (!libraryDescription.equals(other.libraryDescription)) return false;
+    if (libraryDnaSize == null) {
+      if (other.libraryDnaSize != null) return false;
+    } else if (!libraryDnaSize.equals(other.libraryDnaSize)) return false;
+    if (libraryId == null) {
+      if (other.libraryId != null) return false;
+    } else if (!libraryId.equals(other.libraryId)) return false;
+    if (libraryName == null) {
+      if (other.libraryName != null) return false;
+    } else if (!libraryName.equals(other.libraryName)) return false;
+    if (libraryPaired != other.libraryPaired) return false;
+    if (librarySelectionType == null) {
+      if (other.librarySelectionType != null) return false;
+    } else if (!librarySelectionType.equals(other.librarySelectionType)) return false;
+    if (libraryStrategyType == null) {
+      if (other.libraryStrategyType != null) return false;
+    } else if (!libraryStrategyType.equals(other.libraryStrategyType)) return false;
+    if (lowQualityLibrary != other.lowQualityLibrary) return false;
+    if (platformType != other.platformType) return false;
+    if (preMigrationId == null) {
+      if (other.preMigrationId != null) return false;
+    } else if (!preMigrationId.equals(other.preMigrationId)) return false;
+    if (projectAlias == null) {
+      if (other.projectAlias != null) return false;
+    } else if (!projectAlias.equals(other.projectAlias)) return false;
+    if (projectId == null) {
+      if (other.projectId != null) return false;
+    } else if (!projectId.equals(other.projectId)) return false;
+    if (projectName == null) {
+      if (other.projectName != null) return false;
+    } else if (!projectName.equals(other.projectName)) return false;
+    if (projectShortName == null) {
+      if (other.projectShortName != null) return false;
+    } else if (!projectShortName.equals(other.projectShortName)) return false;
+    if (sampleAccession == null) {
+      if (other.sampleAccession != null) return false;
+    } else if (!sampleAccession.equals(other.sampleAccession)) return false;
+    if (sampleAlias == null) {
+      if (other.sampleAlias != null) return false;
+    } else if (!sampleAlias.equals(other.sampleAlias)) return false;
+    if (sampleDescription == null) {
+      if (other.sampleDescription != null) return false;
+    } else if (!sampleDescription.equals(other.sampleDescription)) return false;
+    if (sampleId == null) {
+      if (other.sampleId != null) return false;
+    } else if (!sampleId.equals(other.sampleId)) return false;
+    if (sampleName == null) {
+      if (other.sampleName != null) return false;
+    } else if (!sampleName.equals(other.sampleName)) return false;
+    if (sampleType == null) {
+      if (other.sampleType != null) return false;
+    } else if (!sampleType.equals(other.sampleType)) return false;
+    if (targetedSequencingId == null) {
+      if (other.targetedSequencingId != null) return false;
+    } else if (!targetedSequencingId.equals(other.targetedSequencingId)) return false;
+    return true;
+  }
+
 }

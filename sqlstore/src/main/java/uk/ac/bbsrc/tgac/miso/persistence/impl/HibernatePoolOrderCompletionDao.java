@@ -108,7 +108,8 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao, 
 
   @Override
   public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
-    criteria.createAlias("pool.pooledElementViews", "dilutionForIndex");
+    criteria.createAlias("pool.poolDilutions", "poolDilution");
+    criteria.createAlias("poolDilution.poolableElementView", "dilutionForIndex");
     criteria.createAlias("dilutionForIndex.indices", "indices");
     HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
   }
