@@ -207,7 +207,11 @@ HotTarget.pool = (function() {
         }
       },
 
-      HotUtils.printAction('pool'), HotUtils.spreadsheetAction('/miso/rest/pool/spreadsheet', Constants.poolSpreadsheets),
+      HotUtils.printAction('pool'), HotUtils.spreadsheetAction('/miso/rest/pool/spreadsheet', Constants.poolSpreadsheets, 
+          function(pools, spreadsheet){
+        var errors = [];
+        return errors;
+      }),
       
       HotUtils.makeParents('pool', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library(), HotUtils.relations.dilution()]))
       

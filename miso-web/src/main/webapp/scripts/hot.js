@@ -944,7 +944,7 @@ var HotUtils = {
     };
   },
 
-  spreadsheetAction: function(url, sheets) {
+  spreadsheetAction: function(url, sheets, generateErrors) {
     return {
       name: 'Download',
       action: function(items) {
@@ -965,11 +965,16 @@ var HotUtils = {
             return x.description;
           }
         }], function(result) {
-          window.location = window.location.origin + url + '?' + jQuery.param({
-            ids: items.map(Utils.array.getId).join(','),
-            format: result.format.name,
-            sheet: result.sheet.name
-          });
+          var errors = generateErrors(items, result)
+          if(errors.length >= 1){
+            Utils.showOkDialog("Error", errors);
+          } else {
+            window.location = window.location.origin + url + '?' + jQuery.param({
+              ids: items.map(Utils.array.getId).join(','),
+              format: result.format.name,
+              sheet: result.sheet.name
+            });
+          }
         });
 
       },

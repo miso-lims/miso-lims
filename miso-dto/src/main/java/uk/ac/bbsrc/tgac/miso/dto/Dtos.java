@@ -137,6 +137,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
@@ -2257,6 +2258,14 @@ public class Dtos {
     SpreadsheetDto dto = new SpreadsheetDto();
     dto.setDescription(from.description());
     dto.setName(from.name());
+    return dto;
+  }
+
+  public static SampleSpreadSheetDto asDto(SampleSpreadSheets from) {
+    SampleSpreadSheetDto dto = new SampleSpreadSheetDto();
+    dto.setDescription(from.description());
+    dto.setName(from.name());
+    dto.setAllowedClasses(from.allowedClasses());
     return dto;
   }
 
