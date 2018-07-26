@@ -67,10 +67,10 @@ import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 @Component
 public class JiraIssueManager implements IssueTrackerManager {
 
-  private static final String restApiUrl = "/rest/api/";
-  private static final String jiraRestApiVersion = "2";
+  private static final String REST_API_URL = "/rest/api/";
+  private static final String JIRA_REST_API_VERSION = "2";
 
-  private final DateFormat ISO8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+  private final DateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
   private String oAuthConsumerKey;
   private String oAuthConsumerSecret;
@@ -85,7 +85,7 @@ public class JiraIssueManager implements IssueTrackerManager {
 
   private URI getRestUri(String relativeUrl, Map<String, String> params) {
     StringBuilder sb = new StringBuilder();
-    sb.append(baseTrackerUrl).append(restApiUrl).append(jiraRestApiVersion);
+    sb.append(baseTrackerUrl).append(REST_API_URL).append(JIRA_REST_API_VERSION);
     if (!relativeUrl.startsWith("/")) {
       sb.append("/");
     }
@@ -172,7 +172,7 @@ public class JiraIssueManager implements IssueTrackerManager {
     JSONObject status = fields.getJSONObject("status");
     issue.setStatus(status.getString("name"));
     try {
-      issue.setLastUpdated(ISO8601_FORMAT.parse(fields.getString("updated")));
+      issue.setLastUpdated(iso8601Format.parse(fields.getString("updated")));
     } catch (ParseException e) {
       throw new IllegalArgumentException("Invalid date format: " + fields.getString("updated"), e);
     }
