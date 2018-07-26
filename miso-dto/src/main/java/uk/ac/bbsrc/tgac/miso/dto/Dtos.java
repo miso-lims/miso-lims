@@ -1730,6 +1730,7 @@ public class Dtos {
     dto.setMaximumNumber(from.getMaximumNumber());
     dto.setPlatformType(from.getPlatformType() == null ? null : from.getPlatformType().name());
     dto.setFakeSequence(from.hasFakeSequence());
+    dto.setUniqueDualIndex(from.isUniqueDualIndex());
     return dto;
   }
 
