@@ -20,6 +20,7 @@ public class BulkPoolPage extends HeaderFooterPage {
   public static class Columns {
     public static final String NAME = "Pool Name";
     public static final String ALIAS = "Pool Alias";
+    public static final String DESCRIPTION = "Description";
     public static final String BARCODE = "Matrix Barcode";
     public static final String BOX_SEARCH = "Box Search";
     public static final String BOX_ALIAS = "Box Alias";
