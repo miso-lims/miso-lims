@@ -512,6 +512,14 @@
   <miso:list-section-ajax id="project_libraries" name="Libraries" target="library" project="${project}" config="{}"/>
 </div>
 
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#librarytemplates_section_arrowclick'), 'librarytemplates_section');">
+  Library Templates
+<div id="librarytemplates_section_arrowclick" class="toggleLeft"></div>
+</div>
+<div id="librarytemplates_section" class="expandable_section">
+  <miso:list-section-ajax id="project_librarytemplates" name="Library Templates" target="library_template" project="${project}" config="{}"/>
+</div>
+
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#dilutions_section_arrowclick'), 'dilutions_section');">
   Dilutions
 <div id="dilutions_section_arrowclick" class="toggleLeft"></div>

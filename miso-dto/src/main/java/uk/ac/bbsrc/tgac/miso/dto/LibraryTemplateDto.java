@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = DetailedLibraryTemplateDto.class, name = "Detailed"),
@@ -16,31 +16,22 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName(value = "Plain")
 public class LibraryTemplateDto {
 
-  private long libraryTemplateId;
-
+  private Long libraryTemplateId;
   private String alias;
-
   private List<Long> projectIds;
-
   private Double defaultVolume;
-
   private String platformType;
-
-  private long libraryTypeId;
-
-  private long selectionTypeId;
-
-  private long strategyTypeId;
-
-  private long kitDescriptorId;
-
-  private long indexFamilyId;
+  private Long libraryTypeId;
+  private Long selectionTypeId;
+  private Long strategyTypeId;
+  private Long kitDescriptorId;
+  private Long indexFamilyId;
 
   private Map<String, Long> indexOneIds;
 
   private Map<String, Long> indexTwoIds;
 
-  public long getId() {
+  public Long getId() {
     return libraryTemplateId;
   }
 
@@ -80,43 +71,43 @@ public class LibraryTemplateDto {
     this.platformType = platformType;
   }
 
-  public long getLibraryTypeId() {
+  public Long getLibraryTypeId() {
     return libraryTypeId;
   }
 
-  public void setLibraryTypeId(long libraryTypeId) {
+  public void setLibraryTypeId(Long libraryTypeId) {
     this.libraryTypeId = libraryTypeId;
   }
 
-  public long getSelectionTypeId() {
+  public Long getSelectionTypeId() {
     return selectionTypeId;
   }
 
-  public void setSelectionTypeId(long selectionTypeId) {
+  public void setSelectionTypeId(Long selectionTypeId) {
     this.selectionTypeId = selectionTypeId;
   }
 
-  public long getStrategyTypeId() {
+  public Long getStrategyTypeId() {
     return strategyTypeId;
   }
 
-  public void setStrategyTypeId(long strategyTypeId) {
+  public void setStrategyTypeId(Long strategyTypeId) {
     this.strategyTypeId = strategyTypeId;
   }
 
-  public long getKitDescriptorId() {
+  public Long getKitDescriptorId() {
     return kitDescriptorId;
   }
 
-  public void setKitDescriptorId(long kitDescriptorId) {
+  public void setKitDescriptorId(Long kitDescriptorId) {
     this.kitDescriptorId = kitDescriptorId;
   }
 
-  public long getIndexFamilyId() {
+  public Long getIndexFamilyId() {
     return indexFamilyId;
   }
 
-  public void setIndexFamilyId(long indexFamilyId) {
+  public void setIndexFamilyId(Long indexFamilyId) {
     this.indexFamilyId = indexFamilyId;
   }
 

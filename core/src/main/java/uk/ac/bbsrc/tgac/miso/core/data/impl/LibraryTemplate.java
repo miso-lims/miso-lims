@@ -19,6 +19,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -30,7 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public class LibraryTemplate implements Serializable {
+public class LibraryTemplate implements Serializable, Deletable {
 
   private static final long serialVersionUID = 1L;
 
@@ -85,6 +88,7 @@ public class LibraryTemplate implements Serializable {
       @JoinColumn(name = "indexId") })
   private Map<String, Index> indexTwos;
 
+  @Override
   public long getId() {
     return libraryTemplateId;
   }
@@ -179,6 +183,23 @@ public class LibraryTemplate implements Serializable {
 
   public void setIndexTwos(Map<String, Index> indexTwos) {
     this.indexTwos = indexTwos;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Library Template";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    // return getAlias() + " (" + getProjects().getAlias() + ")";
+    return getAlias();
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    // return getProject().getSecurityProfile();
+    return null;
   }
 
 }

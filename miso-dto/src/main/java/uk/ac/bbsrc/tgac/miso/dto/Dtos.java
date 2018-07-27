@@ -2327,23 +2327,13 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setProjectIds(from.getProjects().stream().map(Project::getId).collect(Collectors.toList()));
     dto.setDefaultVolume(from.getDefaultVolume());
-    if (from.getPlatformType() != null) {
-      dto.setPlatformType(from.getPlatformType().getKey());
-    }
-    if (from.getLibraryType() != null) {
-      dto.setLibraryTypeId(from.getLibraryType().getId());
-    }
-    if (from.getLibrarySelectionType() != null) {
-      dto.setSelectionTypeId(from.getLibrarySelectionType().getId());
-    }
-    if (from.getLibraryStrategyType() != null) {
-      dto.setStrategyTypeId(from.getLibraryStrategyType().getId());
-    }
-    if (from.getKitDescriptor() != null) {
-      dto.setKitDescriptorId(from.getKitDescriptor().getId());
-    }
+    dto.setPlatformType(from.getPlatformType() != null ? from.getPlatformType().toString() : null);
+    dto.setLibraryTypeId(from.getLibraryType() != null ? from.getLibraryType().getId() : null);
+    dto.setSelectionTypeId(from.getLibrarySelectionType() != null ? from.getLibrarySelectionType().getId() : null);
+    dto.setStrategyTypeId(from.getLibraryStrategyType() != null ? from.getLibraryStrategyType().getId() : null);
+    dto.setKitDescriptorId(from.getKitDescriptor() != null ? from.getKitDescriptor().getId() : null);
+    dto.setIndexFamilyId(from.getIndexFamily() != null ? from.getIndexFamily().getId() : null);
     if (from.getIndexFamily() != null) {
-      dto.setIndexFamilyId(from.getIndexFamily().getId());
       if (from.getIndexOnes() != null) {
         dto.setIndexOneIds(from.getIndexOnes().entrySet().stream()
             .collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue().getId())));
@@ -2358,12 +2348,8 @@ public class Dtos {
 
   private static DetailedLibraryTemplateDto asDetailedLibraryTemplateDto(DetailedLibraryTemplate from) {
     DetailedLibraryTemplateDto dto = new DetailedLibraryTemplateDto();
-    if (from.getLibraryDesign() != null) {
-      dto.setDesignId(from.getLibraryDesign().getId());
-    }
-    if (from.getLibraryDesignCode() != null) {
-      dto.setLibraryDesignCodeId(from.getLibraryDesignCode().getId());
-    }
+    dto.setDesignId(from.getLibraryDesign() != null ? from.getLibraryDesign().getId() : null);
+    dto.setDesignCodeId(from.getLibraryDesignCode() != null ? from.getLibraryDesignCode().getId() : null);
     return dto;
   }
 
@@ -2554,6 +2540,72 @@ public class Dtos {
       }).collect(Collectors.toSet()));
     }
     return workset;
+  }
+
+ public static LibraryTemplate to(LibraryTemplateDto from) {
+    LibraryTemplate to = null;
+    if (from instanceof DetailedLibraryTemplateDto) {
+      to = toDetailedLibraryTemplate((DetailedLibraryTemplateDto) from);
+    } else {
+      to = new LibraryTemplate();
+    }
+    if (from.getId() != null) to.setId(from.getId());
+    to.setAlias(from.getAlias());
+    to.setPlatformType(PlatformType.get(from.getPlatformType()));
+    if (from.getDefaultVolume() != null) {
+      to.setDefaultVolume(from.getDefaultVolume());
+    }
+
+    List<Project> projects = new ArrayList<>();
+    from.getProjectIds().stream().forEach(id -> {
+      Project project = new ProjectImpl();
+      project.setId(id);
+      projects.add(project);
+    });
+    to.setProjects(projects);
+
+    if (from.getLibraryTypeId() != null) {
+      LibraryType libraryType = new LibraryType();
+      libraryType.setId(from.getLibraryTypeId());
+      to.setLibraryType(libraryType);
+    }
+    if (from.getSelectionTypeId() != null) {
+      LibrarySelectionType librarySelectionType = new LibrarySelectionType();
+      librarySelectionType.setId(from.getSelectionTypeId());
+      to.setLibrarySelectionType(librarySelectionType);
+    }
+    if (from.getStrategyTypeId() != null) {
+      LibraryStrategyType libraryStrategyType = new LibraryStrategyType();
+      libraryStrategyType.setId(from.getStrategyTypeId());
+      to.setLibraryStrategyType(libraryStrategyType);
+    }
+    if (from.getKitDescriptorId() != null) {
+      KitDescriptor kitDescriptor = new KitDescriptor();
+      kitDescriptor.setId(from.getKitDescriptorId());
+      to.setKitDescriptor(kitDescriptor);
+    }
+    if (from.getIndexFamilyId() != null) {
+      IndexFamily indexFamily = new IndexFamily();
+      indexFamily.setId(from.getIndexFamilyId());
+      to.setIndexFamily(indexFamily);
+    }
+    return to;
+  }
+
+  public static DetailedLibraryTemplate toDetailedLibraryTemplate(DetailedLibraryTemplateDto from) {
+    if (from == null) return null;
+    DetailedLibraryTemplate to = new DetailedLibraryTemplate();
+    if (from.getDesignId() != null) {
+      LibraryDesign design = new LibraryDesign();
+      design.setId(from.getDesignId());
+      to.setLibraryDesign(design);
+    }
+    if (from.getDesignCodeId() != null) {
+      LibraryDesignCode ldCode = new LibraryDesignCode();
+      ldCode.setId(from.getDesignCodeId());
+      to.setLibraryDesignCode(ldCode);
+    }
+    return to;
   }
 
 }
