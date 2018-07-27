@@ -9,16 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 
-public class HibernateTemplateDaoTest extends AbstractDAOTest {
+public class HibernateLibraryTemplateDaoTest extends AbstractDAOTest {
 
   @Autowired
   private SessionFactory sessionFactory;
 
-  private HibernateTemplateDao sut;
+  private HibernateLibraryTemplateDao sut;
 
   @Before
   public void setup() {
-    sut = new HibernateTemplateDao();
+    sut = new HibernateLibraryTemplateDao();
     sut.setSessionFactory(sessionFactory);
   }
 

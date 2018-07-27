@@ -3,10 +3,9 @@
  */
 
 HotTarget.library = (function() {
-  var getPlatformType = function(value) {
-    return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(platformType) {
-      return platformType.key == value;
-    }, Constants.platformTypes), 'name');
+  
+  var getDesign = function(name) {
+    return Utils.array.findFirstOrNull(Utils.array.namePredicate(name), Constants.libraryDesigns);
   };
 
   var makeIndexColumn = function(config, n) {
@@ -45,7 +44,7 @@ HotTarget.library = (function() {
       update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
         var indexFamily = null;
         if (flatProperty === 'indexFamilyName' || flatProperty === '*start') {
-          var pt = getPlatformType(flat.platformType);
+          var pt = HotUtils.getPlatformType(flat.platformType);
           indexFamily = Utils.array.findFirstOrNull(function(family) {
             return family.name == flat.indexFamilyName && family.platformType == pt;
           }, Constants.indexFamilies);
@@ -66,7 +65,7 @@ HotTarget.library = (function() {
           });
           setData(data);
         } else if (flatProperty === 'index' + n + 'Label') {
-          var pt = getPlatformType(flat.platformType);
+          var pt = HotUtils.getPlatformType(flat.platformType);
           indexFamily = Utils.array.findFirstOrNull(function(family) {
             return family.name == flat.indexFamilyName && family.platformType == pt;
           }, Constants.indexFamilies);
@@ -84,19 +83,19 @@ HotTarget.library = (function() {
           indexFamily = Utils.array.findFirstOrNull(function(family) {
             return family.name == flat.indexFamilyName && family.platformType == pt;
           }, Constants.indexFamilies);
-          if (!!indexFamily && indexFamily.uniqueDualIndex) {
+          if (indexFamily && indexFamily.uniqueDualIndex) {
             var indexName = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
               return index.position == n - 1;
             }).find(function(index) {
               return index.label == value
             }).name;
-            if (!!indexName) {
+            if (indexName) {
               var dualIndex = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
                 return index.position == n;
               }).find(function(index) {
                 return index.name == indexName;
               });
-              if (!!dualIndex) {
+              if (dualIndex) {
                 setData(dualIndex.label);
               } else {
                 Utils.showOkDialog('Error', ['There is no dual index for index \'' + indexName + '\'',
@@ -129,36 +128,8 @@ HotTarget.library = (function() {
     return Utils.array.findFirstOrNull(Utils.array.aliasPredicate(templateAlias), config.templatesByProjectId[projectId]);
   };
 
-  var getDesign = function(name) {
-    return Utils.array.findFirstOrNull(Utils.array.namePredicate(name), Constants.libraryDesigns);
-  };
-
   var updateFromTemplate = function(template, idProperty, source, displayProperty, setReadOnly, setData) {
-    var readOnly = false;
-    if (template && template[idProperty]) {
-      var change = Utils.array.findFirstOrNull(Utils.array.idPredicate(template[idProperty]), source);
-      if (change) {
-        setData(change[displayProperty]);
-        readOnly = true;
-      }
-    }
-    setReadOnly(readOnly);
-  };
-
-  var updateFromTemplateOrDesign = function(design, template, idProperty, source, displayProperty, setReadOnly, setData) {
-    var id = null;
-    if (design) {
-      id = design[idProperty];
-    } else if (template) {
-      id = template[idProperty];
-    }
-    if (id) {
-      var change = Utils.array.findFirstOrNull(Utils.array.idPredicate(id), source);
-      if (change) {
-        setData(change[displayProperty]);
-      }
-    }
-    setReadOnly(design || (template && template.idProperty));
+    HotUtils.updateFromTemplateOrDesign(null, template, idProperty, source, displayProperty, setReadOnly, setData);
   };
 
   var checkQcs = function(table) {
@@ -459,7 +430,7 @@ HotTarget.library = (function() {
                 update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
                   var design = getDesign(flat.libraryDesignAlias);
                   var template = getTemplate(config, lib.parentSampleProjectId, flat.templateAlias);
-                  updateFromTemplateOrDesign(design, template, 'designCodeId', Constants.libraryDesignCodes, 'code', setReadOnly, setData);
+                  HotUtils.updateFromTemplateOrDesign(design, template, 'designCodeId', Constants.libraryDesignCodes, 'code', setReadOnly, setData);
                 },
                 validator: HotUtils.validator.requiredAutocomplete
               }),
@@ -510,7 +481,7 @@ HotTarget.library = (function() {
             },
             update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               if (flatProperty === 'platformType' || flatProperty === '*start') {
-                var pt = getPlatformType(flat.platformType);
+                var pt = HotUtils.getPlatformType(flat.platformType);
                 setOptions({
                   'source': Constants.libraryTypes.filter(function(lt) {
                     return lt.platform == pt && (!lt.archived || lib.libraryTypeId == lt.id);
@@ -534,7 +505,7 @@ HotTarget.library = (function() {
                 update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
                   var design = getDesign(flat.libraryDesignAlias);
                   var template = getTemplate(config, lib.parentSampleProjectId, flat.templateAlias);
-                  updateFromTemplateOrDesign(design, template, 'selectionId', Constants.librarySelections, 'name', setReadOnly, setData);
+                  HotUtils.updateFromTemplateOrDesign(design, template, 'selectionId', Constants.librarySelections, 'name', setReadOnly, setData);
                 }
               }),
           HotUtils.makeColumnForConstantsList('Strategy', true, 'libraryStrategyTypeAlias', 'libraryStrategyTypeId', 'id', 'name',
@@ -543,7 +514,7 @@ HotTarget.library = (function() {
                 update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
                   var design = getDesign(flat.libraryDesignAlias);
                   var template = getTemplate(config, lib.parentSampleProjectId, flat.templateAlias);
-                  updateFromTemplateOrDesign(design, template, 'strategyId', Constants.libraryStrategies, 'name', setReadOnly, setData);
+                  HotUtils.updateFromTemplateOrDesign(design, template, 'strategyId', Constants.libraryStrategies, 'name', setReadOnly, setData);
                 }
               }),
           {

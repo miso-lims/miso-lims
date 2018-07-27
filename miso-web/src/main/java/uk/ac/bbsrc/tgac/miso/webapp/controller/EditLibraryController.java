@@ -121,6 +121,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
@@ -128,7 +129,6 @@ import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
-import uk.ac.bbsrc.tgac.miso.service.TemplateService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkMergeTableBackend;
@@ -209,7 +209,7 @@ public class EditLibraryController {
   @Autowired
   private ProjectService projectService;
   @Autowired
-  private TemplateService templateService;
+  private LibraryTemplateService libraryTemplateService;
   @Autowired
   private BoxService boxService;
 
@@ -647,15 +647,15 @@ public class EditLibraryController {
   private static class LibraryBulkPropagateBackend extends BulkPropagateTableBackend<Sample, LibraryDto> {
 
     private final SampleService sampleService;
-    private final TemplateService templateService;
+    private final LibraryTemplateService libraryTemplateService;
     private final Consumer<ObjectNode> additionalConfigFunction;
     private final BoxDto newBox;
 
-    public LibraryBulkPropagateBackend(SampleService sampleService, TemplateService templateService,
+    public LibraryBulkPropagateBackend(SampleService sampleService, LibraryTemplateService libraryTemplateService,
         Consumer<ObjectNode> additionalConfigFunction, BoxDto newBox) {
       super("library", LibraryDto.class, "Libraries", "Samples");
       this.sampleService = sampleService;
-      this.templateService = templateService;
+      this.libraryTemplateService = libraryTemplateService;
       this.additionalConfigFunction = additionalConfigFunction;
       this.newBox = newBox;
     }
@@ -700,7 +700,7 @@ public class EditLibraryController {
           .distinct()
           .map(projectId -> {
             Map<Long, List<LibraryTemplateDto>> map = new HashMap<>();
-            map.put(projectId, Dtos.asLibraryTemplateDtos(templateService.listLibraryTemplatesForProject(projectId)));
+            map.put(projectId, Dtos.asLibraryTemplateDtos(libraryTemplateService.listLibraryTemplatesForProject(projectId)));
             return map;
           })
           .filter(map -> !map.values().stream().allMatch(value -> value.isEmpty()))
@@ -759,7 +759,7 @@ public class EditLibraryController {
       @RequestParam(name = "sort", required = false) String sort, @RequestParam(name = "boxId", required = false) Long boxId,
       ModelMap model) throws IOException {
     BoxDto newBox = boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null;
-    return new LibraryBulkPropagateBackend(sampleService, templateService, this::writeLibraryConfiguration, newBox)
+    return new LibraryBulkPropagateBackend(sampleService, libraryTemplateService, this::writeLibraryConfiguration, newBox)
         .propagate(sampleIds, replicates, sort, model);
   }
 
