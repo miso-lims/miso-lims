@@ -209,7 +209,12 @@
 </tr>
 <tr>
   <td class="h">Creation date:</td>
-  <td id="creationDate"><fmt:formatDate pattern="yyyy-MM-dd" type="date" value="${library.creationDate}"/></td>
+  <td id="creationDate">
+    <form:input path="creationDate" id="creationdatepicker" placeholder="YYYY-MM-DD"/>
+    <script type="text/javascript">
+      Utils.ui.addDatePicker("creationdatepicker");
+    </script>
+  </td>
 </tr>
 <c:if test="${not empty library.accession}">
   <tr>

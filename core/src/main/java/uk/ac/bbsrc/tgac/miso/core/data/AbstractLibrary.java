@@ -92,7 +92,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private String description;
   private String accession;
 
-  @Column(nullable = false)
   @Temporal(TemporalType.DATE)
   private Date creationDate = new Date();
 
