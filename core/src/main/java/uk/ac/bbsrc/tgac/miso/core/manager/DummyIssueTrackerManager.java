@@ -1,9 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
-import net.sf.json.JSONObject;
+import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.manager
@@ -15,22 +17,19 @@ import net.sf.json.JSONObject;
  * @since 0.1.6
  */
 public class DummyIssueTrackerManager implements IssueTrackerManager {
+
   @Override
-  public String getType() {
-    return "DUMMY";
+  public List<Issue> getIssuesByTag(String tag) throws IOException {
+    return Collections.emptyList();
   }
 
   @Override
-  public JSONObject getIssue(String issueKey) throws IOException {
-    return null;
-  }
-
-  @Override
-  public String getBaseTrackerUrl() {
-    return null;
+  public List<Issue> searchIssues(String query) throws IOException {
+    return Collections.emptyList();
   }
 
   @Override
   public void setConfiguration(Properties properties) {
+    // do nothing for dummy class
   }
 }

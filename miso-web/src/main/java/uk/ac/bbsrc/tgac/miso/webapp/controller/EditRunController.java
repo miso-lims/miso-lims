@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
@@ -61,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -115,6 +117,9 @@ public class EditRunController {
   private LibraryService libraryService;
   @Autowired
   private ExperimentService experimentService;
+
+  @Autowired
+  private IssueTrackerManager issueTrackerManager;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -238,7 +243,12 @@ public class EditRunController {
             }
             return dto;
           })).collect(Collectors.toList()));
-
+      try {
+        model.put("runIssues", issueTrackerManager.searchIssues(run.getAlias()).stream().map(Dtos::asDto).collect(Collectors.toList()));
+      } catch (IOException e) {
+        model.put("runIssues", Collections.emptyList());
+        log.error("Error retrieving issues", e);
+      }
       model.put("formObj", run);
       model.put("run", run);
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, run, securityManager.listAllUsers()));

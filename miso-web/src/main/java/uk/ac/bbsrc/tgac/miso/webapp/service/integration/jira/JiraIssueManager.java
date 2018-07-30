@@ -25,6 +25,13 @@ package uk.ac.bbsrc.tgac.miso.webapp.service.integration.jira;
 
 import java.io.IOException;
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -41,10 +48,11 @@ import com.sun.jersey.oauth.client.OAuthClientFilter;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
-import uk.ac.bbsrc.tgac.miso.core.util.jira.IssueJsonConverter;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.service.integration.jira
@@ -58,6 +66,12 @@ import uk.ac.bbsrc.tgac.miso.core.util.jira.IssueJsonConverter;
  */
 @Component
 public class JiraIssueManager implements IssueTrackerManager {
+
+  private static final String REST_API_URL = "/rest/api/";
+  private static final String JIRA_REST_API_VERSION = "2";
+
+  private final DateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+
   private String oAuthConsumerKey;
   private String oAuthConsumerSecret;
   private String oAuthSignatureMethod;
@@ -65,48 +79,39 @@ public class JiraIssueManager implements IssueTrackerManager {
   private String httpBasicAuthUsername;
   private String httpBasicAuthPassword;
 
-  public String baseTrackerUrl;
-  private final String restApiUrl = "/rest/api/";
-  public String jiraRestApiVersion = "2";
-
-  public final String jiraIssueSuffix = restApiUrl + jiraRestApiVersion + "/issue/";
+  private String baseTrackerUrl;
 
   public Client client;
 
-  @Override
-  public String getBaseTrackerUrl() {
-    return baseTrackerUrl;
-  }
-
-  public void setBaseTrackerUrl(String baseTrackerUrl) {
-    this.baseTrackerUrl = baseTrackerUrl;
-  }
-
-  public void setClient(Client client) {
-    this.client = client;
-  }
-
-  @Override
-  public String getType() {
-    return IssueTrackerManager.TrackerType.JIRA.getKey();
-  }
-
-  @Override
-  public JSONObject getIssue(String issueKey) throws IOException {
-    WebResource webResource = prepareWebResource(URI.create(baseTrackerUrl + jiraIssueSuffix + issueKey));
-    if (webResource != null) {
-      try {
-        String json = webResource.get(String.class);
-        if (json != null) {
-          return IssueJsonConverter.jiraToMiso(JSONObject.fromObject(json));
-        }
-      } catch (Exception e) {
-        throw new IOException("Unable to get resource: " + issueKey, e);
-      }
-      return null;
-    } else {
-      throw new IOException("No viable resource to query for issue. Please check your IssueTrackerManager configuration.");
+  private URI getRestUri(String relativeUrl, Map<String, String> params) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(baseTrackerUrl).append(REST_API_URL).append(JIRA_REST_API_VERSION);
+    if (!relativeUrl.startsWith("/")) {
+      sb.append("/");
     }
+    sb.append(relativeUrl);
+    if (params != null && !params.isEmpty()) {
+      sb.append("?");
+      params.forEach((key, value) -> sb.append(key).append("=").append(value).append("&"));
+      sb.deleteCharAt(sb.lastIndexOf("&"));
+    }
+    return URI.create(sb.toString());
+  }
+
+  @Override
+  public List<Issue> getIssuesByTag(String tag) throws IOException {
+    Map<String, String> params = new HashMap<>();
+    params.put("jql", "labels=" + tag);
+    WebResource webResource = prepareWebResource(getRestUri("/search", params));
+    return retrieveList(webResource);
+  }
+  
+  @Override
+  public List<Issue> searchIssues(String query) throws IOException {
+    Map<String, String> params = new HashMap<>();
+    params.put("jql", "text~'" + query.replaceAll("\\s*", "+") + "'");
+    WebResource webResource = prepareWebResource(getRestUri("/search", params));
+    return retrieveList(webResource);
   }
 
   private WebResource prepareWebResource(URI uri) {
@@ -118,7 +123,7 @@ public class JiraIssueManager implements IssueTrackerManager {
         config.getProperties().put(ApacheHttpClientConfig.PROPERTY_PREEMPTIVE_AUTHENTICATION, true);
         ApacheHttpClientHandler ahcHandler = new ApacheHttpClientHandler(new HttpClient(new MultiThreadedHttpConnectionManager()), config);
         ApacheHttpClient ahc = new ApacheHttpClient(ahcHandler);
-        setClient(ahc);
+        this.client = ahc;
         wr = ahc.resource(uri);
       } else {
         wr = this.client.resource(uri);
@@ -130,14 +135,48 @@ public class JiraIssueManager implements IssueTrackerManager {
 
         OAuthSecrets secrets = new OAuthSecrets().consumerSecret(oAuthConsumerSecret);
         OAuthClientFilter filter = new OAuthClientFilter(c.getProviders(), params, secrets);
-        setClient(c);
+        this.client = c;
         wr = c.resource(uri);
         wr.addFilter(filter);
       } else {
         wr = this.client.resource(uri);
       }
+    } else {
+      throw new IllegalStateException("No viable credentials to query for issue. Please check your IssueTrackerManager configuration.");
     }
     return wr;
+  }
+
+  private List<Issue> retrieveList(WebResource webResource) throws IOException {
+    try {
+      String json = webResource.get(String.class);
+      JSONObject jsonData = JSONObject.fromObject(json);
+      JSONArray jsonIssues = jsonData.getJSONArray("issues");
+      List<Issue> issues = new ArrayList<>();
+      for (int i = 0; i < jsonIssues.size(); i++) {
+        issues.add(makeIssue(jsonIssues.getJSONObject(i)));
+      }
+      return issues;
+    } catch (Exception e) {
+      throw new IOException("Unable to get resource", e);
+    }
+  }
+
+  private Issue makeIssue(JSONObject json) {
+    Issue issue = new Issue();
+    String key = json.getString("key");
+    issue.setKey(key);
+    JSONObject fields = json.getJSONObject("fields");
+    issue.setSummary(fields.getString("summary"));
+    issue.setUrl(baseTrackerUrl + "/browse/" + key);
+    JSONObject status = fields.getJSONObject("status");
+    issue.setStatus(status.getString("name"));
+    try {
+      issue.setLastUpdated(iso8601Format.parse(fields.getString("updated")));
+    } catch (ParseException e) {
+      throw new IllegalArgumentException("Invalid date format: " + fields.getString("updated"), e);
+    }
+    return issue;
   }
 
   private abstract class ConfigValue {
@@ -195,10 +234,18 @@ public class JiraIssueManager implements IssueTrackerManager {
             httpBasicAuthPassword = value;
           }
 
+        }, new ConfigValue("baseUrl") {
+
+          @Override
+          protected void set(String value) {
+            baseTrackerUrl = value;
+          }
+
         }
 
     }) {
       value.configure(properties);
     }
   }
+
 }

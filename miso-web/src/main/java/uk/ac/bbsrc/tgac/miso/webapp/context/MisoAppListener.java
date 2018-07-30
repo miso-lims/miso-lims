@@ -23,18 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-import io.prometheus.client.hibernate.HibernateStatisticsCollector;
-import io.prometheus.client.hotspot.DefaultExports;
-import io.prometheus.jmx.JmxCollector;
-
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javax.management.MalformedObjectNameException;
 import javax.servlet.ServletContext;
@@ -57,8 +51,13 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.NamingSchemeResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.webapp.service.integration.jira.JiraIssueManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
+
+import io.prometheus.client.hibernate.HibernateStatisticsCollector;
+import io.prometheus.client.hotspot.DefaultExports;
+import io.prometheus.jmx.JmxCollector;
 
 /**
  * The custom MISO context listener class. On webapp context init, we can do some startup checks, e.g. checking the existence of required
@@ -127,22 +126,17 @@ public class MisoAppListener implements ServletContextListener {
   }
 
   private void loadIssueTrackerManager(Map<String, String> misoProperties, XmlWebApplicationContext context) {
-    if ("true".equals(misoProperties.get("miso.issuetracker.enabled"))) {
+    if (misoProperties.containsKey("miso.issuetracker.tracker")) {
       String trackerType = misoProperties.get("miso.issuetracker.tracker");
-      if (!isStringEmptyOrNull(trackerType)) {
-        List<IssueTrackerManager> managers = context.getBeanFactory().getBeansOfType(IssueTrackerManager.class).values().stream()
-            .filter(mgr -> mgr.getType().equals(trackerType))
-            .collect(Collectors.toList());
-        switch (managers.size()) {
-        case 0:
-          throw new IllegalStateException("No issue tracker available with given type " + trackerType);
-        case 1:
-          ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition("issueTrackerManager");
-          context.getBeanFactory().registerSingleton("issueTrackerManager", managers.get(0));
-          break;
-        default:
-          throw new IllegalStateException("Found multiple IssueTrackerManagers of type " + trackerType);
-        }
+      if ("jira".equals(trackerType)) {
+        IssueTrackerManager issueTracker = new JiraIssueManager();
+        Properties properties = new Properties();
+        properties.putAll(misoProperties);
+        issueTracker.setConfiguration(properties);
+        ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition("issueTrackerManager");
+        context.getBeanFactory().registerSingleton("issueTrackerManager", issueTracker);
+      } else {
+        throw new IllegalArgumentException("Invalid tracker type specified at miso.issuetracker.tracker");
       }
     }
   }
