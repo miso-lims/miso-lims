@@ -388,11 +388,6 @@
         <classifier>jdk15</classifier>
       </dependency>
       <dependency>
-        <groupId>net.sourceforge.fluxion</groupId>
-        <artifactId>fluxion-spi</artifactId>
-        <version>1.0-alpha-3</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-dbcp2</artifactId>
         <version>2.1.1</version>
@@ -695,13 +690,13 @@
         <version>1.0</version>
       </dependency>
       <dependency>
-        <groupId>uk.ac.tgac.fluxion.ajax</groupId>
-        <artifactId>fluxion-ajax-js</artifactId>
+        <groupId>uk.ac.tgac.fluxion.ajax.beans</groupId>
+        <artifactId>fluxion-ajax-beans</artifactId>
         <version>1.0</version>
       </dependency>
       <dependency>
-        <groupId>uk.ac.tgac.fluxion.ajax.beans</groupId>
-        <artifactId>fluxion-ajax-beans</artifactId>
+        <groupId>uk.ac.tgac.fluxion</groupId>
+        <artifactId>fluxion-spi</artifactId>
         <version>1.0</version>
       </dependency>
       <dependency>
@@ -716,6 +711,10 @@
           <exclusion>
             <artifactId>jackson-core</artifactId>
             <groupId>com.fasterxml.core.jackson</groupId>
+          </exclusion>
+          <exclusion>
+            <artifactId>fluxion-spi</artifactId>
+            <groupId>net.sourceforge.fluxion</groupId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -744,95 +743,9 @@
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
       </snapshots>
-      <id>hasbanana-repo</id>
-      <name>hasbanana Maven Repository</name>
-      <url>http://www.hasbanana.com/maven/repo</url>
-    </repository>
-    <repository>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
       <id>tgac-repo</id>
       <name>TGAC Maven Repository</name>
       <url>http://repos.tgac.ac.uk/maven/repo</url>
-    </repository>
-    <repository>
-      <releases>
-        <enabled>false</enabled>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
-      <id>tgac-snapshots-repo</id>
-      <name>TGAC Maven Snapshots Repository</name>
-      <url>http://repos.tgac.ac.uk/maven/miso/snapshots</url>
-    </repository>
-    <repository>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
-      <id>tgac-releases-repo</id>
-      <name>TGAC Maven Releases Repository</name>
-      <url>http://repos.tgac.ac.uk/maven/miso/releases</url>
-    </repository>
-    <repository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>spring-snapshot</id>
-      <name>Spring Portfolio Milestone Repository</name>
-      <url>http://maven.springframework.org/snapshot</url>
-    </repository>
-    <repository>
-      <id>Atlassian Maven Repository</id>
-      <url>https://maven.atlassian.com/public</url>
-    </repository>
-    <repository>
-      <id>spring-maven-release</id>
-      <name>Springframework Maven Repository</name>
-      <url>http://maven.springframework.org/release</url>
-    </repository>
-    <repository>
-      <id>spring-maven-milestone</id>
-      <name>Springframework Maven Repository</name>
-      <url>http://maven.springframework.org/milestone</url>
-    </repository>
-    <repository>
-      <id>springsource-milestone</id>
-      <url>http://repository.springsource.com/maven/bundles/milestone</url>
-    </repository>
-    <repository>
-      <id>springsource-external</id>
-      <url>http://repository.springsource.com/maven/bundles/external</url>
-    </repository>
-    <repository>
-      <id>springsource-snapshot</id>
-      <url>http://repository.springsource.com/maven/bundles/snapshot</url>
-    </repository>
-    <repository>
-      <releases>
-        <enabled>false</enabled>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
-      <id>fluxion-snapshots-repo</id>
-      <name>TGAC Fluxion Snapshots Repository</name>
-      <url>http://repos.tgac.ac.uk/maven/fluxion/snapshots</url>
     </repository>
     <repository>
       <releases>
@@ -873,48 +786,7 @@
       <name>OICR GSI Releases repository</name>
       <url>https://artifacts.oicr.on.ca/artifactory/gsi-release</url>
     </repository>
-    <repository>
-      <id>sonatype-sourceforge-snapshots</id>
-      <name>Sonatype SF Repository</name>
-      <url>http://oss.sonatype.org/content/repositories/sourceforge-snapshots/</url>
-    </repository>
-    <repository>
-      <id>renci.public</id>
-      <url>http://ci-dev.renci.org/nexus/content/repositories/releases</url>
-    </repository>
-    <repository>
-      <id>maven2-repository.dev.java.net</id>
-      <name>Java.net Repository for Maven</name>
-      <url>http://download.java.net/maven/2/</url>
-      <!--<layout>default</layout>-->
-    </repository>
   </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <snapshots>
-        <updatePolicy>never</updatePolicy>
-      </snapshots>
-      <id>apache-snapshots</id>
-      <name>apache snapshots repository</name>
-      <url>http://repository.apache.org/snapshots</url>
-    </pluginRepository>
-    <pluginRepository>
-      <id>Atlassian Maven Repository</id>
-      <url>https://maven.atlassian.com/public</url>
-    </pluginRepository>
-    <pluginRepository>
-      <releases>
-        <updatePolicy>daily</updatePolicy>
-        <checksumPolicy>warn</checksumPolicy>
-      </releases>
-      <snapshots>
-        <updatePolicy>daily</updatePolicy>
-        <checksumPolicy>warn</checksumPolicy>
-      </snapshots>
-      <id>unto.net</id>
-      <url>http://repository.unto.net/maven/</url>
-    </pluginRepository>
-  </pluginRepositories>
   <!-- Required Build Plugins -->
   <build>
     <pluginManagement>
