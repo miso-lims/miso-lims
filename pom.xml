@@ -731,6 +731,19 @@
         <updatePolicy>always</updatePolicy>
       </releases>
       <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+      <id>tgac-repo</id>
+      <name>TGAC Maven Repository</name>
+      <url>http://repos.tgac.ac.uk/maven/repo</url>
+    </repository>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
         <enabled>false</enabled>
         <updatePolicy>always</updatePolicy>
       </snapshots>
