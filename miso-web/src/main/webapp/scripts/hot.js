@@ -278,8 +278,12 @@ var HotUtils = {
               var template = icc['template'];
               var placeholders = template.match(/{\d+}/g);
               for (var placeholder_i = 0; placeholder_i < placeholders.length; placeholder_i++) {
+                var previous = icc['lastContents'][placeholder_i];
                 var placeholder = placeholders[placeholder_i];
-                template = template.replace(placeholder, parseInt(icc['lastContents'][placeholder_i]) + row_i + 1);
+                var incrementedInt = parseInt(previous) + row_i + 1;
+                var incrementedString = previous.startsWith('0') ? ('0').repeat(previous.length - incrementedInt.toString().length) : '';
+                incrementedString += incrementedInt;
+                template = template.replace(placeholder, incrementedString);
               }
               newData.push([currentRow, currentCol, template]);
             }
