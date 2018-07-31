@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -55,7 +56,8 @@ public class BulkPoolPage extends HeaderFooterPage {
     super(driver);
     PageFactory.initElements(driver, this);
     waitWithTimeout()
-        .until(or(titleContains("Create Pools from Dilutions "), titleContains("Edit Pools "), titleContains("Create Pool from Pools ")));
+        .until(or(titleContains("Create Pools from Dilutions "), titleContains("Edit Pools "), titleContains("Create Pool from Pools "),
+            titleContains("Merge Pools ")));
     table = new HandsOnTable(driver);
   }
 
@@ -66,9 +68,10 @@ public class BulkPoolPage extends HeaderFooterPage {
     return new BulkPoolPage(driver);
   }
 
-  public static BulkPoolPage getForMerge(WebDriver driver, String baseUrl, Collection<Long> poolIds) {
+  public static BulkPoolPage getForMerge(WebDriver driver, String baseUrl, List<Long> poolIds, List<Integer> proportions) {
     String ids = Joiner.on(',').join(poolIds);
-    String url = baseUrl + "miso/pool/bulk/merge?ids=" + ids;
+    String proportionsString = Joiner.on(',').join(proportions);
+    String url = baseUrl + "miso/pool/bulk/merge?ids=" + ids + "&proportions=" + proportionsString;
     driver.get(url);
     return new BulkPoolPage(driver);
   }

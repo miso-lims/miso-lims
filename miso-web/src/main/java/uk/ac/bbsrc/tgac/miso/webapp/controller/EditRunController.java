@@ -153,7 +153,7 @@ public class EditRunController {
     if (run != null && run.getId() != Run.UNSAVED_ID) {
       for (SequencerPartitionContainer f : run.getSequencerPartitionContainers()) {
         for (Partition p : f.getPartitions()) {
-          if (p.getPool() != null && p.getPool().getPoolableElementViews().size() > 1) {
+          if (p.getPool() != null && p.getPool().getPoolDilutions().size() > 1) {
             return true;
           }
         }

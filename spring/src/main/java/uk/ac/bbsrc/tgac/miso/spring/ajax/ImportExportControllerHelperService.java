@@ -66,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -206,7 +207,7 @@ public class ImportExportControllerHelperService {
         if (!ss.isEmpty()) {
           if (ss.size() == 1) {
             s = ss.iterator().next();
-            log.info("Got sample: " + s.getAlias());
+            log.info("Got sample: {}", s.getAlias());
           } else {
             throw new InputFormException("Multiple samples retrieved with this alias: '" + salias + "'. Cannot process.");
           }
@@ -239,7 +240,7 @@ public class ImportExportControllerHelperService {
             }
             if (s.getQCs().stream().noneMatch(existing -> existing.getType().getQcTypeId() == sqc.getType().getQcTypeId())) {
               qcService.createQC(sqc);
-              log.info("Added sample QC: " + sqc.toString());
+              log.info("Added sample QC: {}", sqc);
             }
             if (jsonArrayElement.get(7) != null && !isStringEmptyOrNull(jsonArrayElement.getString(7))) {
               s.setQcPassed(Boolean.parseBoolean(jsonArrayElement.getString(7)));
@@ -253,7 +254,7 @@ public class ImportExportControllerHelperService {
                 if (!s.getNotes().contains(note)) {
                   sampleService.addNote(s, note);
                   sampleService.update(s);
-                  log.info("Added sample Note for Well: " + note.toString());
+                  log.info("Added sample Note for Well: {}", note);
                 }
               }
             }
@@ -305,7 +306,7 @@ public class ImportExportControllerHelperService {
           if (!ss.isEmpty()) {
             if (ss.size() == 1) {
               s = ss.iterator().next();
-              log.info("Got sample: " + s.getAlias());
+              log.info("Got sample: {}", s.getAlias());
             } else {
               throw new InputFormException("Multiple samples retrieved with this alias: '" + salias + "'. Cannot process.");
             }
@@ -366,7 +367,7 @@ public class ImportExportControllerHelperService {
                     nfe);
               }
 
-              log.info("Added library: " + library.toString());
+              log.info("Added library: {}", library);
               libraryService.create(library);
               if (jsonArrayElement.get(5) != null && !isStringEmptyOrNull(jsonArrayElement.getString(5))) {
                 try {
@@ -379,7 +380,7 @@ public class ImportExportControllerHelperService {
 
                   if (library.getQCs().stream().noneMatch(existing -> existing.getType().getQcTypeId() == lqc.getType().getQcTypeId())) {
                     qcService.createQC(lqc);
-                    log.info("Added library QC: " + lqc.toString());
+                    log.info("Added library QC: {}", lqc);
                   }
 
                   if (insertSize == 0 && lqc.getResults() == 0) {
@@ -404,7 +405,7 @@ public class ImportExportControllerHelperService {
 
                   if (library.getQCs().stream().noneMatch(existing -> existing.getType().getQcTypeId() == lqc.getType().getQcTypeId())) {
                     qcService.createQC(lqc);
-                    log.info("Added library QC: " + lqc.toString());
+                    log.info("Added library QC: {}", lqc);
                   }
 
                   if (insertSize == 0 && lqc.getResults() == 0) {
@@ -437,7 +438,7 @@ public class ImportExportControllerHelperService {
                 }
               }
 
-              log.info("Added library: " + library.toString());
+              log.info("Added library: {}", library);
               libraryService.create(library);
             }
 
@@ -455,7 +456,7 @@ public class ImportExportControllerHelperService {
                   ldi.setDilutionCreator(user.getLoginName());
                   if (!library.getLibraryDilutions().contains(ldi)) {
                     library.addDilution(ldi);
-                    log.info("Added library dilution: " + ldi.toString());
+                    log.info("Added library dilution: {}", ldi);
                   }
                   dilutionService.create(ldi);
                 } catch (NumberFormatException nfe) {
@@ -464,7 +465,7 @@ public class ImportExportControllerHelperService {
                 }
               }
 
-              log.info("Added library: " + library.toString());
+              log.info("Added library: {}", library);
               libraryService.create(library);
 
               Pattern poolPattern = Pattern.compile("^[IiUu][Pp][Oo]([0-9]*)");
@@ -486,7 +487,7 @@ public class ImportExportControllerHelperService {
                   }
 
                   if (ldiView != null) {
-                    existedPool.getPoolableElementViews().add(ldiView);
+                    existedPool.getPoolDilutions().add(new PoolDilution(existedPool, ldiView));
                   }
                   poolService.save(existedPool);
                 } else {
@@ -501,22 +502,22 @@ public class ImportExportControllerHelperService {
                       pool.setConcentration(0.0);
                     }
                     pools.put(poolName, pool);
-                    log.info("Added pool: " + poolName);
+                    log.info("Added pool: {}", poolName);
                     if (ldiView != null) {
-                      pool.getPoolableElementViews().add(ldiView);
+                      pool.getPoolDilutions().add(new PoolDilution(pool, ldiView));
                     }
                     poolService.save(pool);
                   } else {
                     pool = pools.get(poolName);
                     if (ldiView != null) {
-                      pool.getPoolableElementViews().add(ldiView);
+                      pool.getPoolDilutions().add(new PoolDilution(pool, ldiView));
                       poolService.save(pool);
                     }
                   }
                 }
               }
 
-              log.info("Added library: " + library.toString());
+              log.info("Added library: {}", library);
               libraryService.create(library);
             }
           }

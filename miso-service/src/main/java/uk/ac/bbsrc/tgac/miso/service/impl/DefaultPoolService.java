@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -185,7 +188,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     if (pool.getId() == PoolImpl.UNSAVED_ID) {
       pool.setName(generateTemporaryName());
       loadSecurityProfile(pool);
-      loadPooledElements(pool.getPoolableElementViews(), pool);
+      loadPoolDilutions(pool.getPoolDilutions(), pool);
       setChangeDetails(pool);
       poolStore.save(pool);
 
@@ -213,9 +216,9 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       managed.setDiscarded(pool.isDiscarded());
       managed.setCreationDate(pool.getCreationDate());
 
-      Set<String> originalItems = extractDilutionNames(managed.getPoolableElementViews());
-      loadPooledElements(pool, managed);
-      Set<String> updatedItems = extractDilutionNames(managed.getPoolableElementViews());
+      Set<String> originalItems = extractDilutionNames(managed.getPoolDilutions());
+      loadPoolDilutions(pool, managed);
+      Set<String> updatedItems = extractDilutionNames(managed.getPoolDilutions());
 
       Set<String> added = new TreeSet<>(updatedItems);
       added.removeAll(originalItems);
@@ -279,26 +282,42 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     }
   }
 
-  private void loadPooledElements(Collection<PoolableElementView> source, Pool target) throws IOException {
-    Set<PoolableElementView> pooledElements = new HashSet<>();
-    for (PoolableElementView dilution : source) {
-      PoolableElementView v = poolableElementViewService.get(dilution.getDilutionId());
+  private void loadPoolDilutions(Collection<PoolDilution> source, Pool target) throws IOException {
+    Set<PoolDilution> targetDilutions = target.getPoolDilutions();
+    targetDilutions.removeIf(notInOther(source));
+    Set<PoolDilution> additions = source.stream()
+        .filter(notInOther(targetDilutions))
+        .collect(Collectors.toSet());
+    for (PoolDilution sourcePd : additions) {
+      PoolableElementView v = poolableElementViewService.get(sourcePd.getPoolableElementView().getDilutionId());
       if (v == null) {
         throw new IllegalStateException("Pool contains an unsaved dilution");
       }
-      pooledElements.add(v);
+      targetDilutions.add(new PoolDilution(target, v, sourcePd.getProportion()));
     }
-    target.setPoolableElementViews(pooledElements);
+    for (PoolDilution targetPd : targetDilutions) {
+      PoolDilution sourcePd = source.stream()
+          .filter(spd -> spd.getPoolableElementView().getDilutionId() == targetPd.getPoolableElementView().getDilutionId())
+          .findFirst().orElse(null);
+      if (sourcePd != null) {
+        targetPd.setProportion(sourcePd.getProportion());
+      }
+    }
   }
 
-  private void loadPooledElements(Pool source, Pool target) throws IOException {
-    loadPooledElements(source.getPoolableElementViews(), target);
+  private Predicate<PoolDilution> notInOther(Collection<PoolDilution> otherCollection) {
+    return t -> otherCollection.stream()
+        .noneMatch(other -> other.getPoolableElementView().getDilutionId() == t.getPoolableElementView().getDilutionId());
   }
 
-  private Set<String> extractDilutionNames(Set<PoolableElementView> dilutions) {
+  private void loadPoolDilutions(Pool source, Pool target) throws IOException {
+    loadPoolDilutions(source.getPoolDilutions(), target);
+  }
+
+  private Set<String> extractDilutionNames(Set<PoolDilution> dilutions) {
     Set<String> original = new HashSet<>();
-    for (PoolableElementView dilution : dilutions) {
-      original.add(dilution.getDilutionName());
+    for (PoolDilution dilution : dilutions) {
+      original.add(dilution.getPoolableElementView().getDilutionName());
     }
     return original;
   }

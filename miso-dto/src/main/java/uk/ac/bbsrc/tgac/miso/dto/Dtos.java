@@ -134,6 +134,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
@@ -1403,11 +1404,14 @@ public class Dtos {
     if (from.getVolume() != null) {
       dto.setVolume(from.getVolume().toString());
     }
-    dto.setPlatformType(from.getPlatformType().name());
+    if (from.getPlatformType() != null) {
+      dto.setPlatformType(from.getPlatformType().name());
+    }
     dto.setLongestIndex(from.getLongestIndex());
     dto.setLastModified(formatDateTime(from.getLastModified()));
-    dto.setDilutionCount(from.getPoolableElementViews().size());
-    from.getPoolableElementViews().stream()//
+    dto.setDilutionCount(from.getPoolDilutions().size());
+    from.getPoolDilutions().stream()//
+        .map(PoolDilution::getPoolableElementView)//
         .map(PoolableElementView::getLibraryDnaSize)//
         .filter(Objects::nonNull)//
         .mapToDouble(Long::doubleValue)//
@@ -1415,10 +1419,10 @@ public class Dtos {
         .ifPresent(dto::setInsertSize);
     if (includeContents) {
       Set<DilutionDto> pooledElements = new HashSet<>();
-      for (PoolableElementView ld : from.getPoolableElementViews()) {
-        if (ld != null) {
-          pooledElements.add(asDto(ld));
-        }
+      for (PoolDilution pd : from.getPoolDilutions()) {
+        DilutionDto ldi = asDto(pd.getPoolableElementView());
+        ldi.setProportion(pd.getProportion());
+        pooledElements.add(ldi);
       }
       dto.setPooledElements(pooledElements);
       dto.setDuplicateIndicesSequences(from.getDuplicateIndicesSequences());
@@ -1804,12 +1808,17 @@ public class Dtos {
       to.setVolume(Double.valueOf(dto.getVolume()));
     }
     to.setPlatformType(PlatformType.valueOf(dto.getPlatformType()));
-    to.setPoolableElementViews(dto.getPooledElements().stream().map(dilution -> {
+    to.setPoolDilutions(dto.getPooledElements().stream().map(dilution -> {
       PoolableElementView view = new PoolableElementView();
       view.setDilutionId(dilution.getId());
       view.setDilutionName(dilution.getName());
       view.setDilutionVolumeUsed(dilution.getVolumeUsed() == null ? null : Double.valueOf(dilution.getVolumeUsed()));
-      return view;
+
+      PoolDilution link = new PoolDilution(to, view);
+      if (dilution.getProportion() != null) {
+        link.setProportion(dilution.getProportion());
+      }
+      return link;
     }).collect(Collectors.toSet()));
     to.setQcPassed(dto.getQcPassed());
     to.setBoxPosition((PoolBoxPosition) makeBoxablePosition(dto, to));

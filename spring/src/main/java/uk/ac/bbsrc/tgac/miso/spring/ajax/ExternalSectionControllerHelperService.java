@@ -47,7 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
@@ -272,14 +272,12 @@ public class ExternalSectionControllerHelperService {
 
               if (spc.getPartitions().size() > 0) {
                 for (Partition spp : spc.getPartitions()) {
-                  if (spp.getPool() != null) {
-                    if (spp.getPool().getPoolableElementViews().size() > 0) {
-                      for (PoolableElementView dilution : spp.getPool().getPoolableElementViews()) {
-                        if (dilution.getProjectId().equals(projectId)) {
-                          sb.append("<li>");
-                          sb.append(dilution.getSampleAlias());
-                          sb.append("</li>");
-                        }
+                  if (spp.getPool() != null && !spp.getPool().getPoolDilutions().isEmpty()) {
+                    for (PoolDilution dilution : spp.getPool().getPoolDilutions()) {
+                      if (dilution.getPoolableElementView().getProjectId().equals(projectId)) {
+                        sb.append("<li>");
+                        sb.append(dilution.getPoolableElementView().getSampleAlias());
+                        sb.append("</li>");
                       }
                     }
                   }
