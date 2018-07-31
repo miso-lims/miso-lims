@@ -1,3 +1,5 @@
+-- attachments
+
 DROP TABLE IF EXISTS Project_Attachment;
 DROP TABLE IF EXISTS ServiceRecord_Attachment;
 DROP TABLE IF EXISTS Run_Attachment;
@@ -54,3 +56,20 @@ CREATE TABLE TempValues (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO TempValues(name, val) VALUES('filesDir', '${filesDir}');
+
+
+-- issues
+
+DROP TABLE IF EXISTS Project_Issues;
+
+
+-- pool_proportions
+
+ALTER TABLE Pool_Dilution ADD COLUMN proportion SMALLINT UNSIGNED NOT NULL DEFAULT 1;
+
+
+-- AutoFill_Dual_Index
+
+ALTER TABLE `IndexFamily` ADD COLUMN `uniqueDualIndex` tinyint(1) NOT NULL DEFAULT 0;
+
+

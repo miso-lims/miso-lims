@@ -15,9 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-public class V8520__Attachments implements JdbcMigration {
+public class V0611__Attachments implements JdbcMigration {
 
-  private static final Logger log = LoggerFactory.getLogger(V8520__Attachments.class);
+  private static final Logger log = LoggerFactory.getLogger(V0611__Attachments.class);
 
   private enum EntityType {
     PROJECT("project", "Project", "projectId", "Project_Attachment"),
