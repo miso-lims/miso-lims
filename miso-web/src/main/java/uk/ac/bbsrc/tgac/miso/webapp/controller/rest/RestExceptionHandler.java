@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -64,6 +67,10 @@ public class RestExceptionHandler {
       error.setStatus(Status.BAD_REQUEST);
       error.setData(valException.getErrorsByField());
       error.setDataFormat(DataFormat.VALIDATION);
+    } else if (ExceptionUtils.getRootCause(exception) instanceof IOException
+        && StringUtils.containsIgnoreCase(ExceptionUtils.getRootCauseMessage(exception), "Broken pipe")) {
+      response.setStatus(Status.SERVICE_UNAVAILABLE.getStatusCode());
+      return null;
     } else {
       // Unknown/unexpected exception
       error.setStatus(Status.INTERNAL_SERVER_ERROR);
