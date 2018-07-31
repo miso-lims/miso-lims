@@ -1,3 +1,9 @@
+# 0.2.133
+
+Changes:
+
+ * fix: use java.util.logging instead of slf4j in Flyway migration
+
 # 0.2.132
 
 Changes:
@@ -22,6 +28,10 @@ e.g. `flyway ... -placeholders.filesDir=/storage/miso/files/ migrate`
 CONFIG CHANGE: JIRA Integration can now be configured in `miso.properties`. The `issuetracker.properties`
 file that likely exists in your storage directory may override the values in `miso.properties`. It is
 advised that you delete `issuetracker.properties`, and instead keep the configuration in `miso.properties`
+
+BAD: Flyway migration via Flyway command-line tool fails due to slf4j logger used in Flyway migration.
+Could be remedied by copying slf4j libraries into the flyway/libs dir, but the next release contains a
+simpler fix.
 
 # 0.2.131
 
