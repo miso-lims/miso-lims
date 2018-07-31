@@ -124,10 +124,6 @@
       <classifier>jdk15</classifier>
     </dependency>
     <dependency>
-      <groupId>net.sourceforge.fluxion</groupId>
-      <artifactId>fluxion-spi</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
       <exclusions>
@@ -267,10 +263,6 @@
     <dependency>
       <groupId>uk.ac.bbsrc.tgac.miso</groupId>
       <artifactId>sqlstore</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>uk.ac.tgac.fluxion.ajax</groupId>
-      <artifactId>fluxion-ajax-3</artifactId>
     </dependency>
     <dependency>
       <groupId>uk.ac.tgac.statsdb</groupId>
@@ -577,6 +569,9 @@
                 <location>classpath:db/migration</location>
               </locations>
 	          <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
+              <placeholders>
+                <filesDir>/storage/miso/files/</filesDir>
+              </placeholders>
 	        </configuration>
 	      </plugin>
 	      <plugin>
@@ -840,6 +835,9 @@
                 <location>classpath:db/migration</location>
               </locations>
 	          <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
+              <placeholders>
+                <filesDir>/storage/miso/files/</filesDir>
+              </placeholders>
 	        </configuration>
 	      </plugin>
 	      <plugin>

@@ -7,8 +7,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.annotation.Resource;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +19,13 @@ import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
@@ -29,6 +33,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -36,11 +41,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
+import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 
 @Controller
 @RequestMapping("/box")
@@ -102,22 +111,34 @@ public class EditBoxController {
     return sizes;
   }
 
-  @RequestMapping(value = "/new", method = RequestMethod.GET)
+  @GetMapping(value = "/new")
   public ModelAndView newBox(ModelMap model) throws IOException {
     return setupForm(AbstractBox.UNSAVED_ID, model);
   }
 
-  @RequestMapping(value = "/rest/{boxId}", method = RequestMethod.GET)
+  @GetMapping(value = "/bulk/new")
+  public ModelAndView newBoxes(@RequestParam("quantity") Integer quantity, ModelMap model) throws IOException {
+    if (quantity == null || quantity <= 0) throw new RestException("Must specify quantity of boxes to create", Status.BAD_REQUEST);
+
+    return new BulkCreateBoxBackend(quantity).create(model);
+  }
+
+  @GetMapping(value = "/bulk/edit")
+  public ModelAndView editBoxes(@RequestParam("ids") String boxIds, ModelMap model) throws IOException {
+    return new BulkEditBoxBackend().edit(boxIds, model);
+  }
+
+  @GetMapping(value = "/rest/{boxId}")
   public @ResponseBody Box jsonRest(@PathVariable Long boxId) throws IOException {
     return boxService.get(boxId);
   }
 
-  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  @GetMapping(value = "/rest/changes")
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
     return changeLogService.listAll("Box");
   }
 
-  @RequestMapping(value = "/{boxId}", method = RequestMethod.GET)
+  @GetMapping(value = "/{boxId}")
   public ModelAndView setupForm(@PathVariable Long boxId, ModelMap model) throws IOException {
     try {
       User user = authorizationManager.getCurrentUser();
@@ -164,7 +185,7 @@ public class EditBoxController {
     }
   }
 
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping
   public String processSubmit(@ModelAttribute("box") Box box, ModelMap model, SessionStatus session) throws IOException {
     // The user may have modified the box contents while editing the form. Update the contents.
     if (box.getId() != AbstractBox.UNSAVED_ID) {
@@ -175,5 +196,38 @@ public class EditBoxController {
     session.setComplete();
     model.clear();
     return "redirect:/miso/box/" + box.getId();
+  }
+
+  private final class BulkCreateBoxBackend extends BulkCreateTableBackend<BoxDto> {
+    public BulkCreateBoxBackend(Integer quantity) {
+      super("box", BoxDto.class, "Boxes", new BoxDto(), quantity);
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      // No configuration required for box HandsOnTable
+    }
+  }
+
+  private final class BulkEditBoxBackend extends BulkEditTableBackend<Box, BoxDto> {
+
+    private BulkEditBoxBackend() {
+      super("box", BoxDto.class, "Boxes");
+    }
+
+    @Override
+    protected BoxDto asDto(Box model) {
+      return Dtos.asDto(model, false);
+    }
+
+    @Override
+    protected Stream<Box> load(List<Long> boxIds) throws IOException {
+      return boxService.listByIdList(boxIds).stream();
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+      // No configuration required for box HandsOnTable
+    }
   }
 }

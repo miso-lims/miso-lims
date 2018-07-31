@@ -286,12 +286,14 @@ Project.ui = {
 Project.overview = {
   showProjectOverviewDialog: function(projectId) {
     var self = this;
-    jQuery('#addProjectOverviewDialog').html(
-        "<form>" + "<fieldset class='dialog'><label for='principalInvestigator'>Principal Investigator</label>"
-            + "<input type='text' name='principalInvestigator' id='principalInvestigator' class='text ui-widget-content ui-corner-all' />"
-            + "<label for='numProposedSamples'>No. Proposed Samples</label>"
-            + "<input type='number' min='1' name='numProposedSamples' id='numProposedSamples' class='text ui-widget-content ui-corner-all' />"
-            + "</fieldset></form>");
+    jQuery('#addProjectOverviewDialog')
+        .html(
+            "<form>"
+                + "<fieldset class='dialog'><label for='principalInvestigator'>Principal Investigator</label>"
+                + "<input type='text' name='principalInvestigator' id='principalInvestigator' class='text ui-widget-content ui-corner-all' />"
+                + "<label for='numProposedSamples'>No. Proposed Samples</label>"
+                + "<input type='number' min='1' name='numProposedSamples' id='numProposedSamples' class='text ui-widget-content ui-corner-all' />"
+                + "</fieldset></form>");
 
     jQuery('#addProjectOverviewDialog').dialog({
       width: 400,
@@ -310,7 +312,7 @@ Project.overview = {
 
   addProjectOverview: function(projectId, pi, nsamples) {
     if (nsamples <= 0) {
-     jQuery('<div class="parsley-error">Number of samples must be greater than zero</div>').insertAfter('#numProposedSamples');
+      jQuery('<div class="parsley-error">Number of samples must be greater than zero</div>').insertAfter('#numProposedSamples');
     } else {
       Fluxion.doAjax('projectControllerHelperService', 'addProjectOverview', {
         'projectId': projectId,
@@ -319,9 +321,9 @@ Project.overview = {
         'url': ajaxurl
       }, {
         'doOnSuccess': function() {
-            jQuery('#addProjectOverviewDialog').dialog('close');
-            Utils.page.pageReload();
-          }
+          jQuery('#addProjectOverviewDialog').dialog('close');
+          Utils.page.pageReload();
+        }
       });
     }
   },
@@ -608,186 +610,6 @@ Project.overview = {
     }, {
       'doOnSuccess': Utils.page.pageReload
     });
-  }
-};
-
-Project.issues = {
-  removeIssueBox: function(closespan) {
-    if (confirm("Are you sure you want to unlink this issue from this project?")) {
-      var boxId = jQuery(closespan).parent().attr("id");
-      jQuery('#' + boxId).remove();
-    }
-  },
-
-  importProjectFromIssue: function() {
-    var self = this;
-    var issue = jQuery('#previewKey').val();
-    if (issue !== "undefined" && issue !== "") {
-      Fluxion.doAjax('projectControllerHelperService', 'previewIssues', {
-        'issues': [{
-          "key": issue
-        }],
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': self.importIssue
-      });
-    } else {
-      alert("Please enter a valid Issue Key, e.g. FOO-1");
-    }
-  },
-
-  importIssue: function(json) {
-    if (json.invalidIssues === "undefined" || json.invalidIssues.length === 0 && json.validIssues !== "undefined"
-        && json.validIssues.length > 0) {
-      var key = json.validIssues[0].key;
-      var issue = json.validIssues[0].fields;
-      var issueurl = json.validIssues[0].url;
-      jQuery('#alias').val(issue.summary);
-      jQuery('#description').val(issue.description);
-
-      jQuery('#issues').append("<div id='importbox" + 0 + "' class='simplebox backwhite'>");
-      jQuery('#importbox' + 0)
-          .append(
-              "<button type='button' style='float:right;' class='fg-button ui-state-default ui-corner-all' onclick='Project.issues.removeIssueBox(this);'>Unlink</button>");
-      jQuery('#importbox' + 0).append("<h2 onclick=\"Utils.page.newWindow('" + issueurl + "');\">Issue " + key + "</h2><br/>");
-      jQuery('#importbox' + 0).append("<b>Summary:</b> " + issue.summary + "<br/>");
-      jQuery('#importbox' + 0).append("<b>Description:</b> " + issue.description + "<br/>");
-      jQuery('#importbox' + 0).append(
-          "<b>Reporter:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.reporter.url + "');\">"
-              + issue.reporter.displayName + "</a><br/>");
-      jQuery('#importbox' + 0).append(
-          "<b>Assignee:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.assignee.url + "');\">"
-              + issue.assignee.displayName + "</a><br/>");
-      jQuery('#importbox' + 0).append("<b>Created:</b> " + issue.created + "<br/>");
-      jQuery('#importbox' + 0).append("<b>Updated:</b> " + issue.updated + "<br/>");
-      jQuery('#importbox' + 0).append("<input type='hidden' value='on' name='_issueKeys'/>");
-      jQuery('#importbox' + 0).append("<input type='hidden' name='issueKeys' id='issueKeys0' value='" + key + "'><hr/>");
-      jQuery('#issues').append("</div>");
-    }
-  },
-
-  previewIssueKeys: function() {
-    var self = this;
-    var inKeys = jQuery('#previewKeys').val();
-    if (inKeys !== "undefined" && inKeys !== "") {
-      var issueKeys = inKeys.replace(/[\s]*/, "").split(",");
-      var issues = [];
-      for (var i = 0; i < issueKeys.length; i++) {
-        issues[i] = {
-          "key": issueKeys[i]
-        };
-      }
-
-      Fluxion.doAjax('projectControllerHelperService', 'previewIssues', {
-        'issues': issues,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': self.previewIssues
-      });
-    } else {
-      alert("Please enter a valid Issue Key, or list of keys, e.g. FOO-1,FOO-2,FOO-3");
-    }
-  },
-
-  previewIssues: function(json) {
-    if (json.validIssues !== "undefined" && json.validIssues.length > 0) {
-      for (var i = 0; i < json.validIssues.length; i++) {
-        var key = json.validIssues[i].key;
-        var issueurl = json.validIssues[i].url;
-        var issue = json.validIssues[i].fields;
-        jQuery('#issues').append("<div id='previewbox" + i + "' class='simplebox backwhite'>");
-        jQuery('#previewbox' + i)
-            .append(
-                "<button type='button' style='float:right;' class='fg-button ui-state-default ui-corner-all' onclick='Project.issues.removeIssueBox(this);'>Unlink</button>");
-        jQuery('#previewbox' + i).append("<h2 onclick=\"Utils.page.newWindow('" + issueurl + "');\">Issue " + key + "</h2><br/>");
-        jQuery('#previewbox' + i).append("<b>Summary:</b> " + issue.summary + "<br/>");
-        jQuery('#previewbox' + i).append("<b>Description:</b> " + issue.description + "<br/>");
-        jQuery('#previewbox' + i).append(
-            "<b>Reporter:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.reporter.url + "');\">"
-                + issue.reporter.displayName + "</a><br/>");
-        jQuery('#previewbox' + i).append(
-            "<b>Assignee:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.assignee.url + "');\">"
-                + issue.assignee.displayName + "</a><br/>");
-        jQuery('#previewbox' + i).append("<b>Created:</b> " + issue.created + "<br/>");
-        jQuery('#previewbox' + i).append("<b>Updated:</b> " + issue.updated + "<br/>");
-        jQuery('#previewbox' + i).append("<input type='hidden' name='issueKeys' id='issueKeys" + i + "' value='" + key + "'><hr/>");
-        jQuery('#issues').append("</div>");
-      }
-    }
-
-    jQuery('#issues').append("<input type='hidden' value='on' name='_issueKeys'/>");
-  },
-
-  getProjectIssues: function(projectId) {
-    var self = this;
-    Fluxion.doAjax('projectControllerHelperService', 'getIssues', {
-      'projectId': projectId,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': self.processIssues
-    });
-  },
-
-  processIssues: function(json) {
-    if (json.issues !== "undefined" && json.issues.length > 0) {
-      jQuery('#issues').html("");
-      for (var i = 0; i < json.issues.length; i++) {
-        var key = json.issues[i].key;
-        var issueurl = json.issues[i].url;
-        var issue = json.issues[i].fields;
-        jQuery('#issues').append("<div id='issuebox" + i + "' class='simplebox backwhite'>");
-        jQuery('#issuebox' + i)
-            .append(
-                "<button type='button' style='float:right;' class='fg-button ui-state-default ui-corner-all' onclick='Project.issues.removeIssueBox(this);'>Remove</button>");
-        jQuery('#issuebox' + i).append("<h2 onclick=\"Utils.page.newWindow('" + issueurl + "');\">Issue " + key + "</h2><br/>");
-        jQuery('#issuebox' + i).append("<b>Summary:</b> " + issue.summary + "<br/>");
-        jQuery('#issuebox' + i).append("<b>Description:</b> " + issue.description + "<br/>");
-        jQuery('#issuebox' + i).append(
-            "<b>Reporter:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.reporter.url + "');\">"
-                + issue.reporter.displayName + "</a><br/>");
-        jQuery('#issuebox' + i).append(
-            "<b>Assignee:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.assignee.url + "');\">"
-                + issue.assignee.displayName + "</a><br/>");
-        jQuery('#issuebox' + i).append("<b>Created:</b> " + issue.created + "<br/>");
-        jQuery('#issuebox' + i).append("<b>Updated:</b> " + issue.updated + "<br/>");
-
-        if (issue.issuelinks.length > 0) {
-          jQuery('#issuebox' + i).append("<h4>Links</h4>");
-          for (var j = 0; j < issue.issuelinks.length; j++) {
-            var link = issue.issuelinks[j];
-            jQuery('#issuebox' + i).append(
-                link.type.outward + " <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + link.url + "');\">" + link.url
-                    + "</a><br/>");
-          }
-        }
-
-        if (issue["sub-tasks"].value.length > 0) {
-          jQuery('#issuebox' + i).append("<h4>Subtasks</h4>");
-          for (var k = 0; k < issue.subtasks.length; k++) {
-            var subtask = issue.subtasks[k];
-            jQuery('#issuebox' + i).append(
-                "<a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + subtask.url + "');\">" + subtask.url + "</a><br/>");
-          }
-        }
-
-        jQuery('#issuebox' + i).append("<h4>Comments</h4>");
-        for (var m = 0; m < issue.comment.comments.length; m++) {
-          var comment = issue.comment.comments[m];
-          jQuery('#issuebox' + i).append(
-              "<div id='commentbox" + i + "_" + m + "' class='simplebox backwhite' onclick=\"Utils.page.newWindow('" + comment.url
-                  + "');\">");
-          jQuery('#commentbox' + i + "_" + m).append(
-              "<a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + comment.author.url + "');\">" + comment.author.displayName
-                  + "</a>");
-          jQuery('#commentbox' + i + "_" + m).append(" at " + comment.created + "<br/>");
-          jQuery('#commentbox' + i + "_" + m).append("<pre class='wrap'>" + comment.body + "</pre>");
-        }
-
-        jQuery('#issuebox' + i).append("<input type='hidden' name='issueKeys' id='issueKeys" + i + "' value='" + key + "'" + "><hr/>");
-        jQuery('#issues').append("</div>");
-      }
-    }
-    jQuery('#issues').append("<input type='hidden' value='on' name='_issueKeys'/>");
   }
 };
 

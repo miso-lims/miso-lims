@@ -236,6 +236,9 @@
                 <location>classpath:db/migration</location>
               </locations>
               <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
+              <placeholders>
+                <filesDir>/storage/miso/files/</filesDir>
+              </placeholders>
             </configuration>
           </plugin>
           <plugin>

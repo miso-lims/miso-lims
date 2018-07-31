@@ -41,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
@@ -93,6 +94,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
@@ -133,7 +135,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
@@ -1242,6 +1246,7 @@ public class Dtos {
       dto.setItems(asBoxablesDtos(from.getBoxables()));
     }
     if (from.getStorageLocation() != null) {
+      dto.setStorageLocationBarcode(from.getStorageLocation().getIdentificationBarcode());
       dto.setFreezerDisplayLocation(from.getStorageLocation().getFreezerDisplayLocation());
       dto.setStorageDisplayLocation(from.getStorageLocation().getFullDisplayLocation());
     }
@@ -1281,6 +1286,7 @@ public class Dtos {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     to.setIdentificationBarcode(from.getIdentificationBarcode());
+    to.setLocationBarcode(from.getLocationBarcode() == null ? "" : from.getLocationBarcode());
     return to;
   }
 
@@ -1402,11 +1408,14 @@ public class Dtos {
     if (from.getVolume() != null) {
       dto.setVolume(from.getVolume().toString());
     }
-    dto.setPlatformType(from.getPlatformType().name());
+    if (from.getPlatformType() != null) {
+      dto.setPlatformType(from.getPlatformType().name());
+    }
     dto.setLongestIndex(from.getLongestIndex());
     dto.setLastModified(formatDateTime(from.getLastModified()));
-    dto.setDilutionCount(from.getPoolableElementViews().size());
-    from.getPoolableElementViews().stream()//
+    dto.setDilutionCount(from.getPoolDilutions().size());
+    from.getPoolDilutions().stream()//
+        .map(PoolDilution::getPoolableElementView)//
         .map(PoolableElementView::getLibraryDnaSize)//
         .filter(Objects::nonNull)//
         .mapToDouble(Long::doubleValue)//
@@ -1414,10 +1423,10 @@ public class Dtos {
         .ifPresent(dto::setInsertSize);
     if (includeContents) {
       Set<DilutionDto> pooledElements = new HashSet<>();
-      for (PoolableElementView ld : from.getPoolableElementViews()) {
-        if (ld != null) {
-          pooledElements.add(asDto(ld));
-        }
+      for (PoolDilution pd : from.getPoolDilutions()) {
+        DilutionDto ldi = asDto(pd.getPoolableElementView());
+        ldi.setProportion(pd.getProportion());
+        pooledElements.add(ldi);
       }
       dto.setPooledElements(pooledElements);
       dto.setDuplicateIndicesSequences(from.getDuplicateIndicesSequences());
@@ -1730,6 +1739,7 @@ public class Dtos {
     dto.setMaximumNumber(from.getMaximumNumber());
     dto.setPlatformType(from.getPlatformType() == null ? null : from.getPlatformType().name());
     dto.setFakeSequence(from.hasFakeSequence());
+    dto.setUniqueDualIndex(from.isUniqueDualIndex());
     return dto;
   }
 
@@ -1803,12 +1813,17 @@ public class Dtos {
       to.setVolume(Double.valueOf(dto.getVolume()));
     }
     to.setPlatformType(PlatformType.valueOf(dto.getPlatformType()));
-    to.setPoolableElementViews(dto.getPooledElements().stream().map(dilution -> {
+    to.setPoolDilutions(dto.getPooledElements().stream().map(dilution -> {
       PoolableElementView view = new PoolableElementView();
       view.setDilutionId(dilution.getId());
       view.setDilutionName(dilution.getName());
       view.setDilutionVolumeUsed(dilution.getVolumeUsed() == null ? null : Double.valueOf(dilution.getVolumeUsed()));
-      return view;
+
+      PoolDilution link = new PoolDilution(to, view);
+      if (dilution.getProportion() != null) {
+        link.setProportion(dilution.getProportion());
+      }
+      return link;
     }).collect(Collectors.toSet()));
     to.setQcPassed(dto.getQcPassed());
     to.setBoxPosition((PoolBoxPosition) makeBoxablePosition(dto, to));
@@ -2247,6 +2262,14 @@ public class Dtos {
     return dto;
   }
 
+  public static SampleSpreadSheetDto asDto(SampleSpreadSheets from) {
+    SampleSpreadSheetDto dto = new SampleSpreadSheetDto();
+    dto.setDescription(from.description());
+    dto.setName(from.name());
+    dto.setAllowedClasses(from.allowedClasses());
+    return dto;
+  }
+
   public static DeletionDto asDto(Deletion from) {
     DeletionDto dto = new DeletionDto();
     dto.setId(from.getId());
@@ -2427,4 +2450,25 @@ public class Dtos {
     dto.setCorrespondingFields(from.getCorrespondingFields());
     return dto;
   }
+
+  public static IssueDto asDto(Issue from) {
+    IssueDto dto = new IssueDto();
+    dto.setKey(from.getKey());
+    dto.setSummary(from.getSummary());
+    dto.setUrl(from.getUrl());
+    dto.setStatus(from.getStatus());
+    dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    return dto;
+  }
+
+  public static AttachmentDto asDto(FileAttachment from) {
+    AttachmentDto dto = new AttachmentDto();
+    dto.setId(from.getId());
+    dto.setFilename(from.getFilename());
+    dto.setPath(from.getPath());
+    dto.setCreator(from.getCreator().getLoginName());
+    dto.setCreated(formatDateTime(from.getCreationTime()));
+    return dto;
+  }
+
 }

@@ -1,3 +1,28 @@
+# 0.2.132
+
+Changes:
+
+ * Add Transfer List Download Form
+ * Automatically Fill Second Index For Unique Dual Indexed Kits
+ * Add negative library volume warnings
+ * Add bulk box creation
+ * Improved file attachment interface
+ * Add attachments to pools
+ * Add attachments to runs
+ * Moved run and pool permissions towards bottom of page
+ * Allow specifying proportions of dilutions in pool
+ * Fixed zero-padding when autofilling numbers
+ * JIRA Integration for Projects and Runs
+
+CONFIG CHANGE: Flyway migration now requires an extra parameter (`-placheholders.filesDir`) to identify
+the directory that file attachments are stored in. The value should match what is in your `miso.properties`
+file. By default, this is `/storage/miso/files/`.
+e.g. `flyway ... -placeholders.filesDir=/storage/miso/files/ migrate`
+
+CONFIG CHANGE: JIRA Integration can now be configured in `miso.properties`. The `issuetracker.properties`
+file that likely exists in your storage directory may override the values in `miso.properties`. It is
+advised that you delete `issuetracker.properties`, and instead keep the configuration in `miso.properties`
+
 # 0.2.131
 
 Changes:

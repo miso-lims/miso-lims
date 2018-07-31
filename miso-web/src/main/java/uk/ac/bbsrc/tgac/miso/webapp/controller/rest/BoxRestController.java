@@ -42,6 +42,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -712,6 +714,41 @@ public class BoxRestController extends RestController {
     }
     box.setStorageLocation(storageLocation);
     boxService.save(box);
+  }
+
+  @PostMapping(value = "/box", produces = "application/json")
+  @ResponseBody
+  public BoxDto createBox(@RequestBody BoxDto box, UriComponentsBuilder uriBuilder, HttpServletResponse response)
+      throws IOException {
+    Box boxObj = Dtos.to(box);
+    ValidationResult validation = new ValidationResult();
+    BoxUse use = new BoxUse();
+    BoxSize size = new BoxSize();
+
+    use.setId(box.getUseId());
+    size.setId(box.getSizeId());
+    boxObj.setUse(use);
+    boxObj.setSize(size);
+
+    boxObj.setStorageLocation(storageLocationService.getByBarcode(box.getStorageLocationBarcode()));
+    validation.throwIfInvalid();
+    Long id = boxService.save(boxObj);
+    return Dtos.asDto(boxService.get(id), false);
+  }
+
+  @PutMapping(value = "/box/{boxId}", produces = "application/json")
+  @ResponseBody
+  public BoxDto updateBox(@PathVariable Long boxId, @RequestBody BoxDto box) throws IOException {
+    Box b = Dtos.to(box);
+    b.setId(boxId);
+
+    BoxUse use = new BoxUse();
+    use.setId(box.getUseId());
+
+    b.setUse(use);
+    b.setStorageLocation(storageLocationService.getByBarcode(box.getStorageLocationBarcode()));
+    boxService.save(b);
+    return Dtos.asDto(boxService.get(boxId), false);
   }
 
 }

@@ -165,12 +165,7 @@
 </div>
 
 <div id="content">
-<c:if test="${not empty error}">
-  <br/>
 
-  <div id="flasherror" class="flasherror">${error}</div>
-  <br/>
-</c:if>
 <sec:authorize access="isAuthenticated()">
   <script type="text/javascript">
     jQuery(function () {

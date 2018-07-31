@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,7 +28,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -56,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
@@ -679,15 +678,14 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   private void resolvePoolables(Pool pool) throws IOException {
     PoolableElementViewService svc = serviceManager.getPoolableElementViewService();
-    Set<PoolableElementView> set = Sets.newHashSet();
-    for (PoolableElementView ldi : pool.getPoolableElementViews()) {
-      PoolableElementView resolved = svc.getByPreMigrationId(ldi.getPreMigrationId());
+    for (PoolDilution pd : pool.getPoolDilutions()) {
+      PoolableElementView resolved = svc.getByPreMigrationId(pd.getPoolableElementView().getPreMigrationId());
       if (resolved == null) {
-        throw new IllegalArgumentException("No PoolableElement found with preMigrationId " + ldi.getPreMigrationId());
+        throw new IllegalArgumentException(
+            "No PoolableElement found with preMigrationId " + pd.getPoolableElementView().getPreMigrationId());
       }
-      set.add(resolved);
+      pd.setPoolableElementView(resolved);
     }
-    pool.setPoolableElementViews(set);
   }
 
   private void setPoolModifiedDetails(Pool pool) throws IOException {
@@ -779,8 +777,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
    */
   private void mergePools(Pool fromPool, Pool toPool) throws IOException {
     if (fromPool.getId() == PoolImpl.UNSAVED_ID) {
-      Collection<PoolableElementView> fromPoolables = fromPool.getPoolableElementViews();
-      Collection<PoolableElementView> toPoolables = toPool.getPoolableElementViews();
+      Collection<PoolDilution> fromPoolables = fromPool.getPoolDilutions();
+      Collection<PoolDilution> toPoolables = toPool.getPoolDilutions();
       toPoolables.addAll(fromPoolables);
       setPoolModifiedDetails(toPool);
       serviceManager.getPoolService().save(toPool);

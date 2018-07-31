@@ -10,6 +10,7 @@ public class IndexFamilyDto {
   private String name;
   private String platformType;
   private boolean fakeSequence;
+  private boolean uniqueDualIndex;
 
   public long getId() {
     return id;
@@ -39,6 +40,10 @@ public class IndexFamilyDto {
     return archived;
   }
 
+  public boolean isUniqueDualIndex() {
+    return uniqueDualIndex;
+  }
+
   public void setArchived(boolean archived) {
     this.archived = archived;
   }
@@ -65,5 +70,9 @@ public class IndexFamilyDto {
 
   public void setFakeSequence(boolean fake) {
     this.fakeSequence = fake;
+  }
+
+  public void setUniqueDualIndex(boolean uniqueDualIndex) {
+    this.uniqueDualIndex = uniqueDualIndex;
   }
 }

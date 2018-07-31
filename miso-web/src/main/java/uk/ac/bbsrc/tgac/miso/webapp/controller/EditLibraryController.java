@@ -582,6 +582,7 @@ public class EditLibraryController {
     model.put("libraryDilutionsConfig", mapper.writeValueAsString(config));
     model.put("experiments", experimentService.listAllByLibraryId(library.getId()).stream().map(Dtos::asDto)
         .collect(Collectors.toList()));
+    model.put("libraryDto", library.getId() == LibraryImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(library)));
 
     populateDesigns(model,
         LimsUtils.isDetailedSample(library.getSample()) ? ((DetailedSample) library.getSample()).getSampleClass() : null);

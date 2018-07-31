@@ -28,7 +28,7 @@ ListTarget.box = {
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
-    return [HotUtils.printAction('box'), 
+    return HotTarget.box.getBulkActions(config).concat([HotUtils.printAction('box'), 
     	{
       name: "Delete",
       action: function(items) {
@@ -44,13 +44,32 @@ ListTarget.box = {
           });
         });
       }
-    }];
+    }]);
   },
   createStaticActions: function(config, projectId) {
     return [{
       "name": "Add",
       "handler": function() {
-        window.location = '/miso/box/new';
+        var fields = [{
+          property: 'quantity',
+          type: 'int',
+          label: 'Quantity',
+          value: 1
+        }];
+       
+        Utils.showDialog('Create Boxes', 'Create', fields, function(result) {
+          if (result.quantity < 1) {
+            Utils.showOkDialog('Create Boxes', ["That's a peculiar number of boxes to create."]);
+            return;
+          }
+          if (result.quantity == 1) {
+            window.location = '/miso/box/new';
+            return;
+          }
+          window.location = '/miso/box/bulk/new?' + jQuery.param({
+            quantity: result.quantity,
+          });
+        });
       }
     }];
   },

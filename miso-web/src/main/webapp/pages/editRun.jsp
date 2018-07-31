@@ -252,9 +252,7 @@
 	});
 </script>
 
-<%@ include file="permissions.jsp" %>
 <c:if test="${run.id != 0}">
-  <c:if test="${run.id != 0}">
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">Metrics
     <div id="metrix_arrowclick" class="toggleLeft"></div>
   </div>
@@ -267,7 +265,6 @@
       RunGraph.renderMetrics(${metrics}, ${partitionNames});
     });
   </script>
-  </c:if>
 
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
     <div id="notes_arrowclick" class="toggleLeftDown"></div>
@@ -313,6 +310,10 @@
 </c:if>
 
   <c:if test="${run.id != 0}">
+    <miso:attachments item="${run}"/>
+    <div id="issues">
+      <miso:list-section id="list_issue" name="Related Issues" target="issue" items="${runIssues}" config="{}"/>
+    </div>
     <div id="containers">
       <miso:list-section id="list_container" name="${run.platformType.containerName}" target="container" items="${runContainers}" alwaysShow="true" config="${partitionConfig}"/>
     </div>
@@ -323,6 +324,7 @@
       <miso:list-section id="list_experiment" name="Experiments" target="experiment" alwaysShow="true" items="${experiments}" config="${experimentConfiguration}"/>
     </div>
   </c:if>
+<%@ include file="permissions.jsp" %>
 </form:form>
 <miso:changelog item="${run}"/>
 </div>

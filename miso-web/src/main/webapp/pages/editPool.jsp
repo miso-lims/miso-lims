@@ -69,13 +69,15 @@
     </td>
   </tr>
   <tr>
-    <td colspan="2" id="warnings">
+    <c:if test="${pool.id != 0}">
+      <td colspan="2" id="warnings">
         <script>
             jQuery(document).ready(function() {
                 jQuery('#warnings').append(WarningTarget.pool.headerWarnings(${poolDto}));
             });
         </script>
-    </td>
+      </td>
+    </c:if>
   </tr>
   <tr>
     <td class="h">Name:</td>
@@ -162,10 +164,6 @@
 
 <%@ include file="volumeControl.jspf" %>
 
-<div class="noPrint">
-  <%@ include file="permissions.jsp" %>
-</div>
-
 <br/>
 
 <script type="text/javascript">
@@ -179,7 +177,6 @@
     Validate.attachParsley('#pool-form');
   });
 </script>
-</form:form>
 
 <!--notes start -->
 <c:if test="${pool.id != 0}">
@@ -225,19 +222,22 @@
 <!-- notes end -->
 
 <c:if test="${pool.id != 0}">
+  <miso:attachments item="${pool}"/>
   <miso:qcs id="list_qcs" item="${pool}"/>
   <miso:list-section id="list_order" name="Requested Orders" target="order" alwaysShow="true" items="${orders}" config="{ pool: ${poolDto}, platformType: '${pool.platformType.name()}' }"/>
   <miso:list-section-ajax id="list_completion" name="Order Status" target="completion" config="{ poolId: ${pool.id} }"/>
   <miso:list-section id="list_run" name="Runs" target="run" items="${runs}" config="{ poolId: ${pool.id} }"/>
   <miso:list-section id="list_partition" name="${pool.platformType.pluralPartitionName}" target="partition" items="${partitions}" config="{'showContainer': true, 'showPool': false}"/>
-  <miso:list-section-ajax id="list_included" name="Included Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: false, duplicateIndicesSequences: ${duplicateIndicesSequences}, nearDuplicateIndicesSequences: ${nearDuplicateIndicesSequences}}"/>
+  <miso:list-section id="list_included" name="Included Dilutions" target="poolelement" alwaysShow="true" items="${includedDilutions}" config="{ poolId: ${pool.id}, add: false, duplicateIndicesSequences: ${duplicateIndicesSequences}, nearDuplicateIndicesSequences: ${nearDuplicateIndicesSequences}}"/>
   <div class="noPrint">
     <miso:list-section-ajax id="list_available" name="Available Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: true }"/>
   </div>
 </c:if>
 <div class="noPrint">
+  <%@ include file="permissions.jsp" %>
   <miso:changelog item="${pool}"/>
 </div>
+</form:form>
 
 </div>
 </div>

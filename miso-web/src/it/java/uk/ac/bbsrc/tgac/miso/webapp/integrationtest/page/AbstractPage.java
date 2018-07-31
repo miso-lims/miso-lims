@@ -299,7 +299,7 @@ public abstract class AbstractPage extends AbstractElement {
     cancelButton.click();
   }
 
-  protected String getCurrentUrl() {
+  public String getCurrentUrl() {
     return getDriver().getCurrentUrl();
   }
 

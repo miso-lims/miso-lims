@@ -28,7 +28,7 @@ ListTarget.poolelement = {
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
-    return [{
+    var actions = [{
       'name': config.add ? 'Add' : 'Remove',
       'action': function(elements) {
         var doAction = function() {
@@ -44,85 +44,121 @@ ListTarget.poolelement = {
         }
       }
     }];
+    if (!config.add) {
+      actions.push({
+        name: 'Edit Proportions',
+        action: function(elements) {
+          var fields = [];
+          elements.forEach(function(element) {
+            fields.push({
+              type: 'int',
+              label: element.name + ' (' + element.library.alias + ')',
+              value: element.proportion,
+              property: element.name,
+              required: true
+            });
+          });
+          Utils.showDialog('Edit Proportions', 'OK', fields, function(output) {
+            Utils.ajaxWithDialog('Setting Proportions', 'PUT', '/miso/rest/pool/' + config.poolId + '/proportions', output,
+                Utils.page.pageReload);
+          });
+        }
+      });
+    }
+    return actions;
   },
   createStaticActions: function(config, prodjectId) {
     return [];
   },
   createColumns: function(config, projectId) {
-    return [{
-      'sTitle': 'Dilution Name',
-      'mData': 'id',
-      'include': true,
-      'iSortPriority': 1,
-      'mRender': function(data, type, full) {
-        return full.name;
-      }
-    }, {
-      'sTitle': 'Conc.',
-      'sType': 'natural',
-      'mData': 'concentration',
-      'include': true,
-      'iSortPriority': 0
-    }, {
-      'sTitle': 'Conc. Units',
-      'mData': 'concentrationUnits',
-      'include': true,
-      'iSortPriority': 0
-    }, ListUtils.idHyperlinkColumn("Library Name", "library", "library.id", function(dilution) {
-      return dilution.library.name;
-    }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Library Alias", "library", function(dilution) {
-      return dilution.library.id;
-    }, "library.alias", 0, true), ListUtils.idHyperlinkColumn("Sample Name", "sample", "library.parentSampleId", function(dilution) {
-      return "SAM" + dilution.library.parentSampleId;
-    }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Sample Alias", "sample", function(dilution) {
-      return dilution.library.parentSampleId;
-    }, "library.parentSampleAlias", 0, true, "noPrint"), {
-      "sTitle": "Targeted Sequencing",
-      "mData": "targetedSequencingId",
-      "include": Constants.isDetailedSample,
-      "mRender": ListUtils.render.textFromId(Constants.targetedSequencings, 'alias', '(None)'),
-      "iSortPriority": 0,
-      "bSortable": false
-    }, {
-      'sTitle': 'Indices',
-      'mData': 'indexIds',
-      'include': true,
-      'bSortable': false,
-      'iSortPriority': 0,
-      'mRender': function(data, type, full) {
-        var indices = Constants.indexFamilies.reduce(function(acc, family) {
-          return acc.concat(family.indices.filter(function(index) {
-            return data.indexOf(index.id) != -1;
-          }));
-        }, []).sort(function(a, b) {
-          return a.position - b.position;
-        });
+    return [
+        {
+          'sTitle': 'Dilution Name',
+          'mData': 'name',
+          'include': true,
+          'iSortPriority': 1
+        },
+        {
+          'sTitle': 'Proportion',
+          'sType': 'numeric',
+          'mData': 'proportion',
+          'include': !config.add,
+          'iSortPriority': 0
+        },
+        {
+          'sTitle': 'Conc.',
+          'sType': 'numeric',
+          'mData': 'concentration',
+          'include': true,
+          'iSortPriority': 0
+        },
+        {
+          'sTitle': 'Conc. Units',
+          'mData': 'concentrationUnits',
+          'include': true,
+          'iSortPriority': 0
+        },
+        ListUtils.idHyperlinkColumn("Library Name", "library", "library.id", function(dilution) {
+          return dilution.library.name;
+        }, 0, true, "noPrint"),
+        ListUtils.labelHyperlinkColumn("Library Alias", "library", function(dilution) {
+          return dilution.library.id;
+        }, "library.alias", 0, true),
+        ListUtils.idHyperlinkColumn("Sample Name", "sample", "library.parentSampleId", function(dilution) {
+          return "SAM" + dilution.library.parentSampleId;
+        }, 0, true, "noPrint"),
+        ListUtils.labelHyperlinkColumn("Sample Alias", "sample", function(dilution) {
+          return dilution.library.parentSampleId;
+        }, "library.parentSampleAlias", 0, true, "noPrint"),
+        {
+          "sTitle": "Targeted Sequencing",
+          "mData": "targetedSequencingId",
+          "include": Constants.isDetailedSample,
+          "mRender": ListUtils.render.textFromId(Constants.targetedSequencings, 'alias', '(None)'),
+          "iSortPriority": 0,
+          "bSortable": false
+        },
+        {
+          'sTitle': 'Indices',
+          'mData': 'indexIds',
+          'include': true,
+          'bSortable': false,
+          'iSortPriority': 0,
+          'mRender': function(data, type, full) {
+            var indices = Constants.indexFamilies.reduce(function(acc, family) {
+              return acc.concat(family.indices.filter(function(index) {
+                return data.indexOf(index.id) != -1;
+              }));
+            }, []).sort(function(a, b) {
+              return a.position - b.position;
+            });
 
-        var combined = indices.map(function(index) {
-          return index.sequence;
-        }).join('');
+            var combined = indices.map(function(index) {
+              return index.sequence;
+            }).join('');
 
-        var html = indices.map(function(index) {
-          return index.label;
-        }).join(', ');
+            var html = indices.map(function(index) {
+              return index.label;
+            }).join(', ');
 
-        return WarningTarget.poolelement.tableWarnings(html, combined, config.duplicateIndicesSequences, config.nearDuplicateIndicesSequences);
-      }
-    }, {
-      'sTitle': 'Last Modified',
-      'mData': 'lastModified',
-      'include': true,
-      'iSortPriority': 0,
-      'sClass': 'noPrint'
-    }, {
-      'sTitle': 'Low Quality',
-      'bSortable': false,
-      'mData': 'library.lowQuality',
-      'mRender': function(data, type, full) {
-        return data ? "⚠" : "";
-      },
-      'include': true,
-      'iSortPriority': 0
-    }];
+            return WarningTarget.poolelement.tableWarnings(html, combined, config.duplicateIndicesSequences,
+                config.nearDuplicateIndicesSequences);
+          }
+        }, {
+          'sTitle': 'Last Modified',
+          'mData': 'lastModified',
+          'include': true,
+          'iSortPriority': 0,
+          'sClass': 'noPrint'
+        }, {
+          'sTitle': 'Low Quality',
+          'bSortable': false,
+          'mData': 'library.lowQuality',
+          'mRender': function(data, type, full) {
+            return data ? "⚠" : "";
+          },
+          'include': true,
+          'iSortPriority': 0
+        }];
   }
 };

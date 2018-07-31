@@ -36,12 +36,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -57,17 +55,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
-import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.service.forms.MisoFormsService;
 
@@ -89,10 +84,6 @@ public class UploadController {
   private IndexService tagBarcodeService;
   @Autowired
   private LibraryService libraryService;
-  @Autowired
-  private InstrumentService instrumentService;
-  @Autowired
-  private ServiceRecordService serviceRecordService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -138,25 +129,6 @@ public class UploadController {
       fileItem.transferTo(new File(dir + File.separator + fileItem.getOriginalFilename().replaceAll("\\s", "_")));
     } else {
       throw new IOException("Cannot upload file - check that the directory specified in miso.properties exists and is writable");
-    }
-  }
-
-  public void uploadFile(Object type, String qualifier, MultipartFile fileItem) throws IOException {
-    uploadFile(type.getClass(), qualifier, fileItem);
-  }
-
-  @RequestMapping(value = "/project", method = RequestMethod.POST)
-  @ResponseStatus(HttpStatus.OK)
-  public void uploadProjectDocument(MultipartHttpServletRequest request) throws IOException {
-    String projectId = request.getParameter("projectId");
-    if (projectId == null) {
-      throw new IOException("Cannot upload file - projectId parameter missing or null");
-    } else if (projectService.getProjectById(Long.valueOf(projectId)) == null) {
-      throw new IOException("Cannot upload file - service record does not exist");
-    }
-
-    for (MultipartFile fileItem : getMultipartFiles(request)) {
-      uploadFile(Project.class, projectId, fileItem);
     }
   }
 
@@ -305,20 +277,6 @@ public class UploadController {
       request.getSession(false).setAttribute("barcodes", o);
     } catch (Exception e) {
       log.debug("UPLOAD FAIL:", e);
-    }
-  }
-
-  @RequestMapping(value = "/servicerecord", method = RequestMethod.POST)
-  public void uploadServiceRecordDocument(MultipartHttpServletRequest request) throws IOException {
-    String recordId = request.getParameter("serviceRecordId");
-    if (recordId == null) {
-      throw new IOException("Cannot upload file - serviceRecordId parameter missing or null");
-    } else if (serviceRecordService.get(Long.valueOf(recordId)) == null) {
-      throw new IOException("Cannot upload file - service record does not exist");
-    }
-
-    for (MultipartFile fileItem : getMultipartFiles(request)) {
-      uploadFile(ServiceRecord.class, recordId, fileItem);
     }
   }
 

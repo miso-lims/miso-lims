@@ -223,6 +223,7 @@
             flyway.user=miso
             flyway.password=secret
             flyway.url=jdbc:mysql://localhost:3307/devmisodb
+            flyway.placeholders.filesDir=/storage/miso/files/
            -->
           <user>tgaclims</user>
           <password>tgaclims</password>
@@ -233,6 +234,10 @@
             <location>classpath:db.migration</location>
             <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
           </locations>
+          <placeholderReplacement>true</placeholderReplacement>
+          <placeholders>
+            <filesDir>/storage/miso/files/</filesDir>
+          </placeholders>
         </configuration>
       </plugin>
     </plugins>

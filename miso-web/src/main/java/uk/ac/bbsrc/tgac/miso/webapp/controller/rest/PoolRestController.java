@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -68,6 +70,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -178,8 +181,12 @@ public class PoolRestController extends RestController {
   public PoolDto createPool(@RequestBody PoolDto pool, UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
     Pool poolobj = Dtos.to(pool);
-    if (poolobj.getVolume() == null && poolobj.getPoolableElementViews().stream().allMatch(view -> view.getDilutionVolumeUsed() != null)) {
-      poolobj.setVolume(poolobj.getPoolableElementViews().stream().mapToDouble(view -> view.getDilutionVolumeUsed()).sum());
+    if (poolobj.getVolume() == null && poolobj.getPoolDilutions().stream()
+        .map(PoolDilution::getPoolableElementView)
+        .allMatch(view -> view.getDilutionVolumeUsed() != null)) {
+      poolobj.setVolume(poolobj.getPoolDilutions().stream()
+          .map(PoolDilution::getPoolableElementView)
+          .mapToDouble(PoolableElementView::getDilutionVolumeUsed).sum());
     }
     Long id = poolService.save(poolobj);
     return getPoolById(id);
@@ -197,10 +204,35 @@ public class PoolRestController extends RestController {
   @PutMapping(value = "/{poolId}/contents", produces = "application/json")
   public @ResponseBody PoolDto changePoolContents(@PathVariable Long poolId, @RequestBody PoolChangeRequest request) throws IOException {
     Pool pool = poolService.get(poolId);
-    Stream<PoolableElementView> originalMinusRemoved = pool.getPoolableElementViews().stream()
-        .filter(element -> !request.remove.contains(element.getDilutionId()));
-    Stream<PoolableElementView> added = poolableElementViewService.list(request.add).stream();
-    pool.setPoolableElementViews(Stream.concat(originalMinusRemoved, added).collect(Collectors.toSet()));
+    Stream<PoolDilution> originalMinusRemoved = pool.getPoolDilutions().stream()
+        .filter(element -> !request.remove.contains(element.getPoolableElementView().getDilutionId()));
+    Stream<PoolDilution> added = poolableElementViewService.list(request.add).stream()
+        .map(view -> new PoolDilution(pool, view));
+    pool.setPoolDilutions(Stream.concat(originalMinusRemoved, added).collect(Collectors.toSet()));
+    poolService.save(pool);
+    return Dtos.asDto(poolService.get(poolId), true);
+  }
+
+  @PutMapping(value = "/{poolId}/proportions")
+  public @ResponseBody PoolDto changeProportions(@PathVariable long poolId, @RequestBody Map<String, Integer> proportions)
+      throws IOException {
+    if (proportions == null || proportions.isEmpty()) {
+      throw new RestException("Proportions missing", Status.BAD_REQUEST);
+    }
+    Pool pool = poolService.get(poolId);
+    if (pool == null) {
+      throw new RestException("Pool not found", Status.NOT_FOUND);
+    }
+    for (Entry<String, Integer> entry : proportions.entrySet()) {
+      if (entry.getValue() == null || entry.getValue() < 1) {
+        throw new RestException("Invalid proportion: " + entry.getValue(), Status.BAD_REQUEST);
+      }
+      PoolDilution poolDilution = pool.getPoolDilutions().stream()
+          .filter(pd -> pd.getPoolableElementView().getDilutionName().equals(entry.getKey()))
+          .findFirst()
+          .orElseThrow(() -> new RestException("Invalid dilution name: " + entry.getKey(), Status.BAD_REQUEST));
+      poolDilution.setProportion(entry.getValue());
+    }
     poolService.save(pool);
     return Dtos.asDto(poolService.get(poolId), true);
   }
@@ -213,7 +245,7 @@ public class PoolRestController extends RestController {
     // Determine if this pool transition is allowed for this experiment. If removing a pool, it strictly isn't. If the new pool contains the
     // same library as the experiment, it's fine.
     Predicate<Experiment> isTransitionValid = pool == null ? experiment -> false
-        : experiment -> pool.getPoolableElementViews().stream().map(PoolableElementView::getLibraryId)
+        : experiment -> pool.getPoolDilutions().stream().map(pd -> pd.getPoolableElementView().getLibraryId())
             .anyMatch(id -> id == experiment.getLibrary().getId());
 
     partitionIds.stream()//
@@ -352,7 +384,7 @@ public class PoolRestController extends RestController {
   }
 
   private static Stream<Sample> getSamples(Pool pool) {
-    return pool.getPoolableElementViews().stream().map(PoolableElementView::getSample);
+    return pool.getPoolDilutions().stream().map(pd -> pd.getPoolableElementView().getSample());
   }
 
   private final RelationFinder<Pool> parentFinder = (new RelationFinder<Pool>() {
@@ -390,7 +422,8 @@ public class PoolRestController extends RestController {
 
         @Override
         public Stream<Library> find(Pool model, Consumer<String> emitError) {
-          return model.getPoolableElementViews().stream().map(WhineyFunction.rethrow(v -> libraryService.get(v.getLibraryId())));
+          return model.getPoolDilutions().stream()
+              .map(WhineyFunction.rethrow(pd -> libraryService.get(pd.getPoolableElementView().getLibraryId())));
         }
       })
       .add(new RelationFinder.RelationAdapter<Pool, LibraryDilution, DilutionDto>("Dilution") {
@@ -402,7 +435,8 @@ public class PoolRestController extends RestController {
 
         @Override
         public Stream<LibraryDilution> find(Pool model, Consumer<String> emitError) {
-          return model.getPoolableElementViews().stream().map(WhineyFunction.rethrow(v -> dilutionService.get(v.getDilutionId())));
+          return model.getPoolDilutions().stream()
+              .map(WhineyFunction.rethrow(pd -> dilutionService.get(pd.getPoolableElementView().getDilutionId())));
         }
       });
 

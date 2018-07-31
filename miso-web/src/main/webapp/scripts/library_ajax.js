@@ -96,7 +96,7 @@ var Library = Library || {
 
       // Group ID validation
       jQuery('#groupId').attr('class', 'form-control');
-      jQuery('#groupId').attr('data-parsley-type', 'alphanum');
+      jQuery('#groupId').attr('data-parsley-pattern', Utils.validation.alphanumRegex);
       jQuery('#groupId').attr('data-parsley-maxlength', '100');
 
       // Group Description validation
@@ -254,7 +254,8 @@ Library.ui = {
       var option = document.createElement("option");
       option.value = indices[i].id;
       option.text = indices[i].name;
-      if(!family.fakeSequence) option.text += " (" + indices[i].sequence + ")";
+      if (!family.fakeSequence)
+        option.text += " (" + indices[i].sequence + ")";
       widget.appendChild(option);
     }
     widget.value = selectedId ? selectedId : (position > 1 ? "" : 0);

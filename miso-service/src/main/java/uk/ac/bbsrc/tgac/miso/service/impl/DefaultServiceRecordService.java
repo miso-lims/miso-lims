@@ -4,16 +4,14 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ServiceRecordStore;
+import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -22,13 +20,11 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 @Service
 public class DefaultServiceRecordService implements ServiceRecordService {
 
-  private static final Logger log = LoggerFactory.getLogger(DefaultServiceRecordService.class);
-
   @Autowired
   private AuthorizationManager authorizationManager;
 
   @Autowired
-  private MisoFilesManager misoFilesManager;
+  private FileAttachmentService fileAttachmentService;
 
   @Autowired
   private ServiceRecordStore serviceRecordDao;
@@ -94,25 +90,7 @@ public class DefaultServiceRecordService implements ServiceRecordService {
 
   @Override
   public void afterDelete(ServiceRecord object) {
-    // Attempts to delete all attachments associated with a service record. Does not throw an exception upon failure to delete a file,
-    // but will log any failures
-    long recordId = object.getId();
-    Collection<String> filenames = null;
-
-    try {
-      filenames = misoFilesManager.getFileNames(ServiceRecord.class, String.valueOf(recordId));
-    } catch (IOException e) {
-      log.error("Deleted service record " + recordId + ", but failed to delete attachments", e);
-      return;
-    }
-
-    for (String filename : filenames) {
-      try {
-        misoFilesManager.deleteFile(ServiceRecord.class, String.valueOf(recordId), filename);
-      } catch (IOException e) {
-        log.error("Deleted service record " + recordId + ", but failed to delete attachment: " + filename, e);
-      }
-    }
+    fileAttachmentService.afterDelete(object);
   }
 
 }

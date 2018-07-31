@@ -185,8 +185,11 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public List<Run> listByProjectId(long projectId) throws IOException {
     Criteria idCriteria = currentSession().createCriteria(Run.class, "r");
-    idCriteria.createAlias("r.containers", "container").createAlias("container.partitions", "partition");
-    idCriteria.createAlias("partition.pool", "pool").createAlias("pool.pooledElementViews", "dilution");
+    idCriteria.createAlias("r.containers", "container")
+        .createAlias("container.partitions", "partition")
+        .createAlias("partition.pool", "pool")
+        .createAlias("pool.poolDilutions", "poolDilution")
+        .createAlias("poolDilution.poolableElementView", "dilution");
     idCriteria.add(Restrictions.eq("dilution.projectId", projectId));
     idCriteria.setProjection(Projections.distinct(Projections.property("r.id")));
     @SuppressWarnings("unchecked")
@@ -287,7 +290,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     criteria.createAlias("containers", "container");
     criteria.createAlias("container.partitions", "partition");
     criteria.createAlias("partition.pool", "pool");
-    criteria.createAlias("pool.pooledElementViews", "dilution");
+    criteria.createAlias("pool.poolDilutions", "poolDilution");
+    criteria.createAlias("poolDilution.poolableElementView", "dilution");
     HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
   }
 
@@ -352,7 +356,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     criteria.createAlias("containers", "containers");
     criteria.createAlias("containers.partitions", "partitions");
     criteria.createAlias("partitions.pool", "pool");
-    criteria.createAlias("pool.pooledElementViews", "dilutionForIndex");
+    criteria.createAlias("pool.poolDilutions", "poolDilution");
+    criteria.createAlias("poolDilution.poolableElementView", "dilutionForIndex");
     criteria.createAlias("dilutionForIndex.indices", "indices");
     HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
   }

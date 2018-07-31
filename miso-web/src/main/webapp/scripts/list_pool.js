@@ -52,9 +52,25 @@ ListTarget.pool = {
     });
     actions.push({
       name: "Merge",
-      action: function(items){
-        window.location = window.location.origin + '/miso/pool/bulk/merge?' + jQuery.param({
-          ids: items.map(Utils.array.getId).join(',')
+      action: function(pools) {
+        var fields = pools.map(function(pool) {
+          return {
+            type: 'int',
+            label: pool.alias + " (" + pool.name + ")",
+            value: 1,
+            property: 'pool' + pool.id,
+            required: true
+          };
+        });
+        Utils.showDialog("Merge Proportions", "Merge", fields, function(output) {
+          var ids = pools.map(Utils.array.getId);
+          var proportions = ids.map(function(id) {
+            return output['pool' + id];
+          });
+          window.location = window.location.origin + '/miso/pool/bulk/merge?' + jQuery.param({
+            ids: ids.join(','),
+            proportions: proportions.join(',')
+          });
         });
       }
     });

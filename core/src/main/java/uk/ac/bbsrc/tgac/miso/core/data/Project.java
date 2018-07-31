@@ -44,7 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Project extends Comparable<Project>, SecurableByProfile, Watchable, Nameable, Serializable {
+public interface Project extends Comparable<Project>, SecurableByProfile, Watchable, Nameable, Serializable, Attachable {
 
   /** Field PREFIX */
   public static final String PREFIX = "PRO";
@@ -162,29 +162,6 @@ public interface Project extends Comparable<Project>, SecurableByProfile, Watcha
    *          overviews.
    */
   void setOverviews(Collection<ProjectOverview> overviews);
-
-  /**
-   * Returns the associated issue keys of this Project object.
-   * 
-   * @return Collection<String> issueKeys.
-   */
-  Collection<String> getIssueKeys();
-
-  /**
-   * Registers a collection of issue keys from an issue tracker to this Project object.
-   * 
-   * @param issueKeys
-   *          issueKeys.
-   */
-  void setIssueKeys(Collection<String> issueKeys);
-
-  /**
-   * Registers an issue key from an issue tracker to this Project object.
-   * 
-   * @param issueKey
-   *          issueKey.
-   */
-  void addIssueKey(String issueKey);
 
   Date getLastUpdated();
 

@@ -33,7 +33,7 @@ import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
@@ -51,7 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  */
 public interface Pool
     extends SecurableByProfile, Comparable<Pool>, Barcodable, Watchable, Boxable, Nameable, ChangeLoggable,
-    Serializable, Aliasable, QualityControllable<PoolQC>, Deletable {
+    Serializable, Aliasable, QualityControllable<PoolQC>, Deletable, Attachable {
 
   /**
    * Sets the ID of this Pool object.
@@ -86,14 +86,14 @@ public interface Pool
   public void setAlias(String alias);
 
   /**
-   * Sets the elements of this Pool object.
-   */
-  public void setPoolableElementViews(Set<PoolableElementView> views);
-
-  /**
    * Returns the elements of this Pool object.
    */
-  public Set<PoolableElementView> getPoolableElementViews();
+  public Set<PoolDilution> getPoolDilutions();
+
+  /**
+   * Sets the elements of this Pool object.
+   */
+  public void setPoolDilutions(Set<PoolDilution> poolDilutions);
 
   /**
    * Returns the concentration of this Pool object.

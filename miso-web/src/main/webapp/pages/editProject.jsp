@@ -453,26 +453,9 @@
   Tracked Issues
   <div id="issues_arrowclick" class="toggleLeft"></div>
 </div>
-<div id="issuesdiv" class="note expandable_section" style="display:none;">
-  <c:choose>
-    <c:when test="${project.id != 0}">
-      To link issues to this project please enter your issue keys here, separated by a single comma, e.g. FOO-1,FOO-2,FOO-3:<br/>
-      <input type="text" id="previewKeys" name="previewKeys"/>
-      <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.issues.previewIssueKeys();">
-        Preview Issues
-      </button>
-      <br/>
-    </c:when>
-    <c:otherwise>
-      To import a project from an issue tracker, please enter an Issue Key to form the basis of this project.
-      Enter a SINGLE key, e.g. FOO-1, and click Import to link this project to an external issue.<br/>
-      <input type="text" id="previewKey" name="previewKey"/>
-      <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.issues.importProjectFromIssue();">
-        Import
-      </button>
-    </c:otherwise>
-  </c:choose>
-  <div id="issues"></div>
+<div id="issuesdiv" class="expandable_section" style="display:none;">
+  <div class="note">Tag an issue with the project's short name (${project.shortName}) to have it show up here.</div>
+  <miso:list-section id="list_issue" name="Related Issues" target="issue" items="${projectIssues}" config="{}"/>
 </div>
 
 <%@ include file="permissions.jsp" %>
@@ -498,50 +481,9 @@
     Project Files
     <div id="upload_arrowclick" class="toggleLeft"></div>
   </div>
-  <div id="uploaddiv" class="simplebox expandable_section" style="display:none;">
-    <table class="in">
-      <tr>
-        <td>
-          <form method='post'
-                id='ajax_upload_form'
-                action="<c:url value="/miso/upload/project"/>"
-                enctype="multipart/form-data"
-                target="target_upload"
-                onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Project.ui.projectFileUploadSuccess);">
-            <input type="hidden" name="projectId" value="${project.id}"/>
-            <input type="file" name="file"/>
-            <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-          </form>
-          <iframe id='target_upload' name='target_upload' src='' style='display: none'></iframe>
-          <div id="statusdiv"></div>
-        </td>
-      </tr>
-    </table>
-
-    <div id="projectfiles" style="display:inline-block;">
-      <c:forEach items="${projectFiles}" var="file">
-        <br/>
-        <div id='btnPanel' style='width: 32px;'>
-          <table>
-            <tr>
-              <c:if test="${miso:isAdmin()}">
-                <td class="misoicon" onclick="Project.ui.deleteFile(${project.id}, ${file.key});">
-                  <span class="ui-icon ui-icon-trash"></span>
-                </td>
-              </c:if>
-            </tr>
-          </table>
-      </div>
-      <a class="listbox" href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">
-  
-        <span onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox" style='margin-left: 32px;'>
-            ${file.value}
-        </span>
-      </a>
-      </c:forEach>
-      </div>
-  
-    </div>
+  <div id="uploaddiv" class="expandable_section" style="display:none;">
+    <miso:attachments item="${project}"/>
+  </div>
 </div>
 <br/>
 

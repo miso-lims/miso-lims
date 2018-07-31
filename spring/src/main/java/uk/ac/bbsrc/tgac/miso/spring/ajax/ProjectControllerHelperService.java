@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -190,34 +189,6 @@ public class ProjectControllerHelperService {
     }
   }
 
-  public JSONObject deleteProjectFile(HttpSession session, JSONObject json) {
-    final Long id = json.getLong("id");
-    final Integer hashcode = json.getInt("hashcode");
-    try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      final Project project = projectService.getProjectById(id);
-
-      if (project.getSecurityProfile().userCanWrite(user)) {
-        String filename = null;
-        for (final String s : misoFileManager.getFileNames(Project.class, id.toString())) {
-          if (s.hashCode() == hashcode) {
-            filename = s;
-            break;
-          }
-        }
-        log.info(MessageFormat.format("Attempting to delete file {0}", filename));
-        misoFileManager.deleteFile(Project.class, id.toString(), filename);
-        log.info(MessageFormat.format("{0} deleted", filename));
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError(MessageFormat.format("Cannot delete file id {0}.  Access denied.", id));
-      }
-    } catch (final IOException e) {
-      log.error("delete project file", e);
-      return JSONUtils.SimpleJSONError("Cannot remove file: " + e.getMessage());
-    }
-  }
-
   public JSONObject unlockProjectOverview(HttpSession session, JSONObject json) {
     final Long overviewId = json.getLong("overviewId");
     try {
@@ -245,65 +216,6 @@ public class ProjectControllerHelperService {
     }
     return JSONUtils.SimpleJSONResponse("ok");
   }
-
-  public JSONObject previewIssues(HttpSession session, JSONObject json) {
-    if (issueTrackerManager != null) {
-      final List<JSONObject> issueList = new ArrayList<>();
-      final List<String> errorList = new ArrayList<>();
-      final JSONArray issues = JSONArray.fromObject(json.getString("issues"));
-      for (final JSONObject issueKey : (Iterable<JSONObject>) issues) {
-        JSONObject issue = null;
-        try {
-          issue = issueTrackerManager.getIssue(issueKey.getString("key"));
-          if (issue != null) {
-            issueList.add(issue);
-          } else {
-            errorList.add(issueKey.getString("key"));
-          }
-        } catch (final IOException e) {
-          log.error("preview issues", e);
-          errorList.add(issueKey.getString("key"));
-        }
-      }
-
-      final JSONObject j = new JSONObject();
-      j.put("validIssues", JSONArray.fromObject(issueList));
-      j.put("invalidIssues", JSONArray.fromObject(errorList));
-      return j;
-    } else {
-      return JSONUtils.SimpleJSONError("No issue tracker manager available.");
-    }
-  }
-
-  public JSONObject getIssues(HttpSession session, JSONObject json) {
-    if (issueTrackerManager != null) {
-      final Long projectId = json.getLong("projectId");
-      try {
-        final Project project = projectService.getProjectById(projectId);
-        final JSONObject j = new JSONObject();
-        if (project != null) {
-          final List<JSONObject> issueList = new ArrayList<>();
-
-          if (project.getIssueKeys() != null) {
-            for (final String issueKey : project.getIssueKeys()) {
-              final JSONObject issue = issueTrackerManager.getIssue(issueKey);
-              if (issue != null) {
-                issueList.add(issue);
-              }
-            }
-            j.put("issues", JSONArray.fromObject(issueList));
-          }
-        }
-        return j;
-      } catch (final IOException e) {
-        log.error("get issues", e);
-        return JSONUtils.SimpleJSONError(e.getMessage());
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("No issue tracker manager available.");
-    }
-  }
-
 
   public JSONObject generateSampleDeliveryForm(HttpSession session, JSONObject json) {
     Boolean plate = false;
@@ -380,7 +292,7 @@ public class ProjectControllerHelperService {
             sb.append("Pools: <ul>");
             for (final Pool p : pools) {
               sb.append("<li>").append(p.getName()).append(" (").append(p.getAlias()).append(") - ")
-                  .append(p.getPoolableElementViews().size())
+                  .append(p.getPoolDilutions().size())
                   .append(" dilutions<li>");
             }
             sb.append("</ul><br/>");

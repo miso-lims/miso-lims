@@ -195,7 +195,11 @@ HotTarget.dilution = {
         }, HotTarget.dilution.getLabel);
       },
       allowOnLibraryPage: true
-    }, HotUtils.printAction('dilution'), HotUtils.spreadsheetAction('/miso/rest/librarydilution/spreadsheet', Constants.libraryDilutionSpreadsheets),
+    }, HotUtils.printAction('dilution'), HotUtils.spreadsheetAction('/miso/rest/librarydilution/spreadsheet', Constants.libraryDilutionSpreadsheets, 
+        function(dilutions, spreadsheet){
+      var errors = [];
+      return errors;
+    }),
 
     HotUtils.makeParents('librarydilution', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library()])), 
     HotUtils.makeChildren('librarydilution',[HotUtils.relations.pool()])];

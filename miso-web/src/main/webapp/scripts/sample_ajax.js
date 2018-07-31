@@ -130,7 +130,7 @@ var Sample = Sample
 
           // Group ID validation
           jQuery('#groupId').attr('class', 'form-control');
-          jQuery('#groupId').attr('data-parsley-type', 'alphanum');
+          jQuery('#groupId').attr('data-parsley-pattern', Utils.validation.alphanumRegex);
           jQuery('#groupId').attr('data-parsley-maxlength', '100');
 
           // Group Description validation
@@ -588,9 +588,8 @@ Sample.ui = {
                       .ajax(
                           {
                             url: "/miso/rest/sample/identitiesLookup?exactMatch=true",
-                            data: "{\"identitiesSearches\":" + JSON.stringify([jQuery('#externalNameInput').val()])
-                                + ", \"project\": " + jQuery('#project').val()
-                                + ", \"requestCounter\":1}",
+                            data: "{\"identitiesSearches\":" + JSON.stringify([jQuery('#externalNameInput').val()]) + ", \"project\": "
+                                + jQuery('#project').val() + ", \"requestCounter\":1}",
                             contentType: 'application/json; charset=utf8',
                             dataType: 'json',
                             type: 'POST'

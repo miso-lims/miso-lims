@@ -51,6 +51,15 @@ public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
    */
   Box getByBarcode(String barcode) throws IOException;
 
+  /**
+   * List all Boxes associated with ids from the given id list
+   * 
+   * @return List<Box>
+   * @throws IOException
+   *           when the objects cannot be retrieved
+   */
+  List<Box> getByIdList(List<Long> idList) throws IOException;
+
   BoxUse getUseById(long id) throws IOException;
 
   BoxSize getSizeById(long id) throws IOException;

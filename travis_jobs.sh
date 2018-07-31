@@ -1,13 +1,14 @@
 #!/bin/bash
 set -ev
 
-if [ "$JOB" = "SONAR" ]; then
+if [ "$JOB" = "SONAR_AND_UNIT_TESTS" ]; then
     if [[ ${TRAVIS_PULL_REQUEST_SLUG} == ${TRAVIS_REPO_SLUG} ]] ; then 
+        # Sonar
         mvn org.jacoco:jacoco-maven-plugin:prepare-agent sonar:sonar
     else 
         echo "[WARN] SonarCloud cannot run on pull requests from forks."
     fi
-elif [ "$JOB" = "UNIT_TEST" ]; then
+    # Unit Tests
     mvn -P external clean test
 elif [ "$JOB" = "PLAIN_WEB_IT" ]; then
     cd miso-web

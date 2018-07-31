@@ -147,6 +147,18 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     return (Box) criteria.uniqueResult();
   }
 
+  @Override
+  public List<Box> getByIdList(List<Long> idList) throws IOException {
+    if (idList.isEmpty()) {
+      return Collections.emptyList();
+    }
+    Criteria criteria = currentSession().createCriteria(BoxImpl.class);
+    criteria.add(Restrictions.in("boxId", idList));
+    @SuppressWarnings("unchecked")
+    List<Box> records = criteria.list();
+    return records;
+  }
+
   protected SessionFactory getSessionFactory() {
     return sessionFactory;
   }

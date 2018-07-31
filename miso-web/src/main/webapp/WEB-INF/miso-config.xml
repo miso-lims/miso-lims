@@ -51,6 +51,7 @@
     <property name="fileStorageDirectory" value="${miso.fileStorageDirectory}" />
   </bean>
 
+  <!-- issueTrackerManager is reconfigured in MisoAppListener if applicable -->
   <bean name="issueTrackerManager" class="uk.ac.bbsrc.tgac.miso.core.manager.DummyIssueTrackerManager" />
 
   <bean id="namingSchemeResolverService" name="namingSchemeResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.StaticMappedNamingSchemeResolverService" />

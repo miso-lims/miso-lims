@@ -10,6 +10,10 @@ HotTarget.library = (function() {
   };
 
   var makeIndexColumn = function(config, n) {
+    var dependent = ['indexFamilyName', 'templateAlias', 'boxPosition', 'index' + n + 'Label']
+    if(n > 1){
+      dependent.push('index' + (n - 1) + 'Label')
+    }
     return {
       header: 'Index ' + n,
       data: 'index' + n + 'Label',
@@ -37,7 +41,7 @@ HotTarget.library = (function() {
           return index.label == label && index.position == n;
         }, families[0].indices), 'id');
       },
-      depends: ['indexFamilyName', 'templateAlias', 'boxPosition', 'index' + n + 'Label'],
+      depends: dependent,
       update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
         var indexFamily = null;
         if (flatProperty === 'indexFamilyName' || flatProperty === '*start') {
@@ -75,6 +79,31 @@ HotTarget.library = (function() {
 					if (match) {
 						setData(match.label);
 					}
+        } else if (flatProperty === 'index' + (n - 1) + 'Label' && !Utils.validation.isEmpty(value)){
+          var pt = getPlatformType(flat.platformType);
+          indexFamily = Utils.array.findFirstOrNull(function(family) {
+            return family.name == flat.indexFamilyName && family.platformType == pt;
+          }, Constants.indexFamilies);
+          if(!!indexFamily && indexFamily.uniqueDualIndex){
+            var indexName = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
+              return index.position == n - 1;
+            }).find(function(index){
+              return index.label == value
+            }).name;
+            if(!!indexName) {
+              var dualIndex = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
+                return index.position == n;
+              }).find(function(index){
+                return index.name == indexName;
+              });
+              if(!!dualIndex){
+                setData(dualIndex.label);
+              } else {
+                Utils.showOkDialog('Error', ['There is no dual index for index \'' + indexName + '\'',
+                  'Perhaps an index family is incorrectly marked as having unique dual indices']);
+              }
+            }
+          }
         }
         var readOnly = false;
         if (flat.templateAlias && flat.boxPosition && indexFamily) {
@@ -643,7 +672,11 @@ HotTarget.library = (function() {
             });
           });
         }
-      }, HotUtils.printAction('library'), HotUtils.spreadsheetAction('/miso/rest/library/spreadsheet', Constants.librarySpreadsheets),
+      }, HotUtils.printAction('library'), HotUtils.spreadsheetAction('/miso/rest/library/spreadsheet', Constants.librarySpreadsheets,
+          function(libraries, spreadsheet){
+        var errors = [];
+        return errors;
+      }),
 
       HotUtils.makeParents('library', HotUtils.relationCategoriesForDetailed()), 
       HotUtils.makeChildren('library',[HotUtils.relations.dilution(), HotUtils.relations.pool()])

@@ -26,12 +26,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -92,6 +91,11 @@ public class ProjectImpl implements Project {
   private String alias = "";
   private String shortName;
 
+  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinTable(name = "Project_Attachment", joinColumns = { @JoinColumn(name = "projectId") }, inverseJoinColumns = {
+      @JoinColumn(name = "attachmentId") })
+  private List<FileAttachment> attachments;
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long projectId = UNSAVED_ID;
@@ -104,11 +108,6 @@ public class ProjectImpl implements Project {
 
   @OneToMany(targetEntity = ProjectOverview.class, mappedBy = "project", cascade = CascadeType.ALL)
   private Collection<ProjectOverview> overviews = new HashSet<>();
-
-  @ElementCollection
-  @CollectionTable(name = "Project_Issues", joinColumns = { @JoinColumn(name = "project_projectId") })
-  @Column(name = "issueKey")
-  private Collection<String> issueKeys = new HashSet<>();
 
   @Enumerated(EnumType.STRING)
   private ProgressType progress;
@@ -316,21 +315,6 @@ public class ProjectImpl implements Project {
     this.studies.add(s);
   }
 
-  @Override
-  public Collection<String> getIssueKeys() {
-    return issueKeys;
-  }
-
-  @Override
-  public void setIssueKeys(Collection<String> issueKeys) {
-    this.issueKeys = issueKeys;
-  }
-
-  @Override
-  public void addIssueKey(String issueKey) {
-    this.issueKeys.add(issueKey);
-  }
-
   public void setWatchUsers(Set<User> watchUsers) {
     this.watchUsers = watchUsers;
   }
@@ -369,6 +353,21 @@ public class ProjectImpl implements Project {
   @Override
   public String getWatchableIdentifier() {
     return getName();
+  }
+
+  @Override
+  public List<FileAttachment> getAttachments() {
+    return attachments;
+  }
+
+  @Override
+  public void setAttachments(List<FileAttachment> attachments) {
+    this.attachments = attachments;
+  }
+
+  @Override
+  public String getAttachmentsTarget() {
+    return "project";
   }
 
   @Override

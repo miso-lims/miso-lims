@@ -38,7 +38,9 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
     BOX_LOCATION(By.id("boxLocation"), FieldType.LABEL),
     KIT(By.id("libraryKit"), FieldType.DROPDOWN),
     CONCENTRATION(By.id("initialConcentration"), FieldType.TEXT),
-    ARCHIVED(By.id("archived"), FieldType.CHECKBOX);
+    ARCHIVED(By.id("archived"), FieldType.CHECKBOX),
+
+    WARNINGS(By.className("big-warning"), FieldType.LABEL);
 
     private final By selector;
     private final FieldType type;
