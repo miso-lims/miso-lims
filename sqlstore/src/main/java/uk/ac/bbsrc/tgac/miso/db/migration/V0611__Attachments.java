@@ -8,16 +8,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class V0611__Attachments implements JdbcMigration {
 
-  private static final Logger log = LoggerFactory.getLogger(V0611__Attachments.class);
+  private static final Logger logger = Logger.getLogger(V0611__Attachments.class.getName());
 
   private enum EntityType {
     PROJECT("project", "Project", "projectId", "Project_Attachment"),
@@ -58,7 +58,7 @@ public class V0611__Attachments implements JdbcMigration {
 
   @Override
   public void migrate(Connection connection) throws Exception {
-    log.info("Scanning existing attachments to save in database...");
+    logger.log(Level.INFO, "Scanning existing attachments to save in database...");
 
     this.connection = connection;
     filesDir = getFilesDir();
@@ -70,7 +70,7 @@ public class V0611__Attachments implements JdbcMigration {
     }
     basePath = Paths.get(filesDir);
 
-    log.info("scanning directory {}", filesDir);
+    logger.log(Level.INFO, "scanning directory {0}", filesDir);
     try (PreparedStatement insertStatement = connection.prepareStatement(
         "INSERT INTO Attachment(filename, path, creator, created)"
             + " VALUES (?, ?, (SELECT userId FROM User WHERE loginName = 'admin'), NOW());",
@@ -86,7 +86,7 @@ public class V0611__Attachments implements JdbcMigration {
   private void scanTypeDir(EntityType type, PreparedStatement insertStatement) throws SQLException {
     File dir = new File(filesDir + type.getDirName());
     if (dir.exists()) {
-      log.info("scanning directory {}", dir.getAbsolutePath());
+      logger.log(Level.INFO, "scanning directory {0}", dir.getAbsolutePath());
       try (PreparedStatement getStatement = connection
           .prepareStatement(String.format("SELECT * FROM %s WHERE %s = ?", type.getTable(), type.getPrimaryKey()));
           PreparedStatement joinStatement = connection.prepareStatement(
@@ -100,9 +100,9 @@ public class V0611__Attachments implements JdbcMigration {
 
   private void processObjectDir(EntityType type, File dir, PreparedStatement getStatement, PreparedStatement insertStatement,
       PreparedStatement joinStatement) throws SQLException {
-    log.info("scanning directory {}", dir.getAbsolutePath());
+    logger.log(Level.INFO, "scanning directory {0}", dir.getAbsolutePath());
     if (!dir.isDirectory()) {
-      log.warn("Unexpected non-directory found: {}", dir.getAbsolutePath());
+      logger.log(Level.WARNING, "Unexpected non-directory found: {0}", dir.getAbsolutePath());
     } else {
       long entityId = 0L;
       try {
@@ -111,12 +111,12 @@ public class V0611__Attachments implements JdbcMigration {
         // ignore error - failure handled below
       }
       if (entityId == 0L) {
-        log.warn("Unexpected directory name: {}", dir.getAbsolutePath());
+        logger.log(Level.WARNING, "Unexpected directory name: {0}", dir.getAbsolutePath());
       } else {
         getStatement.setLong(1, entityId);
         try (ResultSet results = getStatement.executeQuery()) {
           if (!results.next()) {
-            log.warn("Found files for non-existant {} {}", type.getTable(), entityId);
+            logger.log(Level.WARNING, "Found files for non-existant {0} {1}", new Object[] { type.getTable(), entityId });
           } else {
             joinStatement.setLong(1, entityId);
             for (File objectFile : dir.listFiles()) {
@@ -130,9 +130,9 @@ public class V0611__Attachments implements JdbcMigration {
 
   private void processFile(File objectFile, PreparedStatement insertStatement, PreparedStatement joinStatement) throws SQLException {
     if (!objectFile.isFile()) {
-      log.warn("Unexpected non-file found: {}", objectFile.getAbsolutePath());
+      logger.log(Level.WARNING, "Unexpected non-file found: {0}", objectFile.getAbsolutePath());
     } else {
-      log.info("processing file {}", objectFile.getAbsolutePath());
+      logger.log(Level.INFO, "processing file {0}", objectFile.getAbsolutePath());
       Path filePath = Paths.get(objectFile.getAbsolutePath());
       String relativePath = File.separator + basePath.relativize(filePath).toString();
 
