@@ -13,8 +13,6 @@ import java.util.logging.Logger;
 
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
 
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
 public class V0611__Attachments implements JdbcMigration {
 
   private static final Logger logger = Logger.getLogger(V0611__Attachments.class.getName());
@@ -62,7 +60,7 @@ public class V0611__Attachments implements JdbcMigration {
 
     this.connection = connection;
     filesDir = getFilesDir();
-    if (LimsUtils.isStringEmptyOrNull(filesDir)) {
+    if (filesDir == null || filesDir.isEmpty()) {
       throw new IllegalStateException("MISO_FILES_DIR not set");
     }
     if (!filesDir.endsWith(File.separator)) {
