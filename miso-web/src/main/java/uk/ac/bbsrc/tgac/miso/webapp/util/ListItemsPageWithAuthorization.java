@@ -22,10 +22,12 @@ public class ListItemsPageWithAuthorization extends ListItemsPage {
 
   @Override
   protected final void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-    User user = securityManager.get().getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    SecurityManager manager = securityManager.get();
+    User user = manager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     config.put("isAdmin", user.isAdmin());
     config.put("isInternal", user.isInternal());
     config.put("isTech", Arrays.asList(user.getRoles()).contains("ROLE_TECH"));
+    config.put("allowCreateUser", manager.canCreateNewUser());
     writeConfigurationExtra(mapper, config);
   }
 

@@ -31,7 +31,7 @@ ListTarget.user = {
     return [];
   },
   createStaticActions: function(config, projectId) {
-    if (config.isAdmin) {
+    if (config.isAdmin && config.allowCreateUser) {
       return [{
         "name": "Add",
         "handler": function() {
