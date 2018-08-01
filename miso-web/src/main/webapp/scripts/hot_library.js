@@ -501,7 +501,7 @@ HotTarget.library = (function() {
             'depends': ['platformType', 'templateAlias'],
             'unpack': function(lib, flat, setCellMeta) {
               flat.libraryTypeAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(lib.libraryTypeId),
-                  Constants.libraryTypes), 'alias');
+                  Constants.libraryTypes), 'alias') || '';
             },
             'pack': function(lib, flat, errorHander) {
               lib.libraryTypeId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array

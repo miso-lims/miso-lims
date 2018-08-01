@@ -1,24 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.net.URI;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DetailedSampleDto extends SampleDto {
 
   private Long parentId;
-  private String parentUrl;
   private String parentAlias;
   private Long parentTissueSampleClassId;
   private Long sampleClassId;
-  private String sampleClassUrl;
   private Long detailedQcStatusId;
-  private String detailedQcStatusUrl;
   private String detailedQcStatusNote;
   private Long subprojectId;
-  private String subprojectUrl;
-  private String prepKitUrl;
   private String groupId;
   private String groupDescription;
   private Boolean isSynthetic;
@@ -36,14 +29,6 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setParentId(Long parentId) {
     this.parentId = parentId;
-  }
-
-  public String getParentUrl() {
-    return parentUrl;
-  }
-
-  public void setParentUrl(String parentUrl) {
-    this.parentUrl = parentUrl;
   }
 
   public String getParentAlias() {
@@ -71,14 +56,6 @@ public class DetailedSampleDto extends SampleDto {
     this.detailedQcStatusId = detailedQcStatusId;
   }
 
-  public String getDetailedQcStatusUrl() {
-    return detailedQcStatusUrl;
-  }
-
-  public void setDetailedQcStatusUrl(String detailedQcStatusUrl) {
-    this.detailedQcStatusUrl = detailedQcStatusUrl;
-  }
-
   public Long getSubprojectId() {
     return subprojectId;
   }
@@ -87,36 +64,12 @@ public class DetailedSampleDto extends SampleDto {
     this.subprojectId = subprojectId;
   }
 
-  public String getSubprojectUrl() {
-    return subprojectUrl;
-  }
-
-  public void setSubprojectUrl(String subprojectUrl) {
-    this.subprojectUrl = subprojectUrl;
-  }
-
   public Long getSampleClassId() {
     return sampleClassId;
   }
 
   public void setSampleClassId(Long sampleClassId) {
     this.sampleClassId = sampleClassId;
-  }
-
-  public String getSampleClassUrl() {
-    return sampleClassUrl;
-  }
-
-  public void setSampleClassUrl(String sampleClassUrl) {
-    this.sampleClassUrl = sampleClassUrl;
-  }
-
-  public String getPrepKitUrl() {
-    return prepKitUrl;
-  }
-
-  public void setPrepKitUrl(String prepKitUrl) {
-    this.prepKitUrl = prepKitUrl;
   }
 
   public String getGroupId() {
@@ -165,24 +118,6 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setIdentityId(Long identityId) {
     this.identityId = identityId;
-  }
-
-  @Override
-  public void writeUrls(URI baseUri) {
-    super.writeUrls(baseUri);
-    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/sample/{id}", getId()));
-    if (getSampleClassId() != null) {
-      setSampleClassUrl(WritableUrls.buildUriPath(baseUri, "/rest/sampleclass/{id}", getSampleClassId()));
-    }
-    if (getDetailedQcStatusId() != null) {
-      setDetailedQcStatusUrl(WritableUrls.buildUriPath(baseUri, "/rest/detailedqcstatus/{id}", getDetailedQcStatusId()));
-    }
-    if (getSubprojectId() != null) {
-      setSubprojectUrl(WritableUrls.buildUriPath(baseUri, "/rest/subproject/{id}", getSubprojectId()));
-    }
-    if (getParentId() != null) {
-      setParentUrl(WritableUrls.buildUriPath(baseUri, "/rest/sample/{id}", getParentId()));
-    }
   }
 
   public String getIdentityConsentLevel() {

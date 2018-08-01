@@ -438,6 +438,33 @@ HotTarget.sample = (function() {
 
           // Detailed sample columns
           {
+            header: 'Subproject',
+            data: 'subprojectAlias',
+            type: 'dropdown',
+            source: ['(None)'],
+            depends: '*start', // This is a dummy value that gets run on page load only
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              var subprojectsSource = Constants.subprojects
+                  .filter(function(subp) { return subp.parentProjectId == sam.projectId; })
+                  .map(function(subp) { return subp.alias; })
+                  .sort();
+              setOptions({
+                'source': (subprojectsSource.length ? subprojectsSource : ['(None)'])
+              });
+            },
+            validator: HotUtils.validator.requiredAutocomplete,
+            include: Constants.isDetailedSample,
+            unpack: function(sam, flat, setCellMeta) {
+              flat.subprojectAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
+                .idPredicate(sam.subprojectId), Constants.subprojects), 'alias')
+                || '';
+            },
+            pack: function(sam, flat, errorHandler) {
+              sam.subprojectId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(
+                  Utils.array.aliasPredicate(flat.subprojectAlias), Constants.subprojects), 'id');
+            }
+          },
+          {
             header: 'Sample Class',
             data: 'sampleClassAlias',
             type: 'text',
