@@ -18,15 +18,18 @@ source code for the exact methods of <a href="https://github.com/TGAC/miso-lims/
 
 ## Indices (also known as Barcodes, Molecular IDs, Tag Barcodes)
 
-An `Index` has a name, a sequence, a position (1 or 2) and is a member of an `Index Family`. An `Index Family` has a name and is associated with a sequencing platform, and can be archived to hide its members when creating new libraries.
+An `Index` has a name, a sequence, a position (1 or 2) and is a member of an `Index Family`. An `Index Family`
+has a name and is associated with a sequencing platform, and can be archived to hide its members when creating new
+libraries. If a family is unique dual-indexed, that means that position 1 and 2 indices with the same name are always
+paired together.
 ```
-addIndexFamily(name, platformType, archived)
+addIndexFamily(name, platformType, archived, uniqueDualIndex)
 addIndex(familyName, name, sequence, position)
 ```
 
 For example, to add a set of Illumina indices named "Custom Indices A," with "Index 1" ACACACAC and "Index 2" GTGTGTGT:
 ```
-CALL addIndexFamily('Custom Indices A', 'ILLUMINA', 0);
+CALL addIndexFamily('Custom Indices A', 'ILLUMINA', 0, 0);
 CALL addIndex('Custom Indices A', 'Index 1', 'ACACACAC', 1);
 CALL addIndex('Custom Indices A', 'Index 2', 'GTGTGTGT', 1);
 ```
