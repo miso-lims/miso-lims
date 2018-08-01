@@ -6,12 +6,13 @@ DROP PROCEDURE IF EXISTS addIndexFamily//
 CREATE PROCEDURE addIndexFamily(
   iName varchar(255),
   iPlatformType varchar(20),
-  iArchived tinyint(1)
+  iArchived tinyint(1),
+  iUniqueDualIndex tinyint(1)
 ) BEGIN
   IF NOT EXISTS (SELECT 1 FROM IndexFamily WHERE name = iName)
   THEN
-    INSERT INTO IndexFamily(name, platformType, archived)
-    VALUES (iName, UPPER(iPlatformType), iArchived);
+    INSERT INTO IndexFamily(name, platformType, archived, uniqueDualIndex)
+    VALUES (iName, UPPER(iPlatformType), iArchived, iUniqueDualIndex);
   END IF;
 END//
 
@@ -30,14 +31,8 @@ CREATE PROCEDURE addIndex(
     SET errorMessage = CONCAT('IndexFamily ''', iFamilyName, ''' not found.');
     SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
   ELSE
-    IF EXISTS (SELECT 1 FROM Indices WHERE indexFamilyId = famId AND sequence = iSequence AND position = iPosition)
-    THEN
-      SET errorMessage = CONCAT('An index with sequence ''', iSequence, ''' at position ', iPosition, ' already exists for indexFamily ', iFamilyName);
-      SIGNAL SQLSTATE '45000' SET message_text = errorMessage; 
-    ELSE
-      INSERT INTO Indices(name, sequence, position, indexFamilyId)
-      VALUES (iName, iSequence, iPosition, famId);
-    END IF;
+    INSERT INTO Indices(name, sequence, position, indexFamilyId)
+    VALUES (iName, iSequence, iPosition, famId);
   END IF;
   
 END//
