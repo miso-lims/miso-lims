@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,11 +35,15 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -104,4 +109,23 @@ public class ContainerRestController extends RestController {
     }
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(platformType));
   }
+
+  @PostMapping(value = "/bulk-delete")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    List<SequencerPartitionContainer> containers = new ArrayList<>();
+    for (Long id : ids) {
+      if (id == null) {
+        throw new RestException("Cannot delete null container", Status.BAD_REQUEST);
+      }
+      SequencerPartitionContainer container = containerService.get(id);
+      if (container == null) {
+        throw new RestException("Container " + id + " not found", Status.BAD_REQUEST);
+      }
+      containers.add(container);
+    }
+    containerService.bulkDelete(containers);
+  }
+
 }
