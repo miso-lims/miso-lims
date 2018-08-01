@@ -414,4 +414,19 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
     return getId() != UNSAVED_ID;
   }
 
+  @Override
+  public String getDeleteType() {
+    return getModel().getPlatformType().getContainerName();
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getIdentificationBarcode() + " (" + getModel().getAlias() + ")";
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    return getSecurityProfile();
+  }
+
 }

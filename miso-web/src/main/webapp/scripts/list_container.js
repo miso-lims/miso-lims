@@ -41,6 +41,23 @@ ListTarget.container = {
     } else {
       actions.push(HotUtils.printAction('container'));
     }
+    actions.push({
+      name: 'Delete',
+      action: function(containers) {
+        var lines = ['Are you sure you wish to delete the following containers? This cannot be undone.',
+            'Note: a Container may only be deleted by its creator or an admin.'];
+        var ids = [];
+        jQuery.each(containers, function(index, container) {
+          lines.push('* ' + container.id + ' (' + container.identificationBarcode + ')');
+          ids.push(container.id);
+        });
+        Utils.showConfirmDialog('Delete Containers', 'Delete', lines, function() {
+          Utils.ajaxWithDialog('Deleting Containers', 'POST', '/miso/rest/container/bulk-delete', ids, function() {
+            window.location = window.location.origin + '/miso/containers';
+          });
+        });
+      }
+    });
     return actions;
   },
   createStaticActions: function(config, projectId) {

@@ -21,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -29,6 +30,8 @@ import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
@@ -39,6 +42,8 @@ public class DefaultContainerService
     implements ContainerService, AuthorizedPaginatedDataSource<SequencerPartitionContainer> {
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private DeletionStore deletionStore;
   @Autowired
   private SequencerPartitionContainerStore containerDao;
   @Autowired
@@ -271,5 +276,27 @@ public class DefaultContainerService
   @Override
   public List<PoreVersion> listPoreVersions() throws IOException {
     return containerDao.listPoreVersions();
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public void authorizeDeletion(SequencerPartitionContainer object) throws IOException {
+    authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
+  @Override
+  public ValidationResult validateDeletion(SequencerPartitionContainer object) {
+    ValidationResult result = new ValidationResult();
+
+    if (object.getRuns() != null && !object.getRuns().isEmpty()) {
+      result.addError(new ValidationError(String.format("Container %s (%s) is used in %d run(s)", object.getId(),
+          object.getIdentificationBarcode(), object.getRuns().size())));
+    }
+
+    return result;
   }
 }
