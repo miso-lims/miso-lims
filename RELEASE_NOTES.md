@@ -1,4 +1,4 @@
-# 0.2.133-oicr
+# 0.2.134
 
 Changes:
 
@@ -9,6 +9,8 @@ Changes:
 Changes:
 
  * fix: use java.util.logging instead of slf4j in Flyway migration
+
+BAD: Flyway migration via Flyway command-line tool still fails. Fixed in 0.2.134.
 
 # 0.2.132
 
