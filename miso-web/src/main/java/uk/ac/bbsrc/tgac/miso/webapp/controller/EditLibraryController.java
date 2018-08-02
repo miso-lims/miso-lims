@@ -77,6 +77,7 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -86,6 +87,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
@@ -591,6 +593,9 @@ public class EditLibraryController {
     model.put("experiments", experimentService.listAllByLibraryId(library.getId()).stream().map(Dtos::asDto)
         .collect(Collectors.toList()));
     model.put("libraryDto", library.getId() == LibraryImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(library, false)));
+
+    model.put("volumeUnits", VolumeUnit.values());
+    model.put("concentrationUnits", ConcentrationUnit.values());
 
     populateDesigns(model,
         LimsUtils.isDetailedSample(library.getSample()) ? ((DetailedSample) library.getSample()).getSampleClass() : null);

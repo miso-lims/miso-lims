@@ -162,8 +162,10 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
     
     assertTrue(String.format("Expected volume to be updated to %f, instead got %f", Double.parseDouble("10.43"), saved.getSample().getVolume()),
         saved.getSample().getVolume().equals(Double.parseDouble("10.43")));
-    assertTrue(String.format("Expected volume units to be updated to %s, instead got %s", "new volume", saved.getSample().getVolumeUnits()),
-        saved.getSample().getVolumeUnits().equals("new volume"));
+    assertTrue(
+        String.format("Expected volume units to be updated to %s, instead got %s", "&#181;L",
+            saved.getSample().getVolumeUnits().getUnits()),
+        saved.getSample().getVolumeUnits().getUnits().equals("&#181;L"));
   }
 
   @Test
@@ -197,9 +199,9 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
             saved.getSample().getConcentration()),
         saved.getSample().getConcentration().equals(Double.parseDouble("24.78")));
     assertTrue(
-        String.format("Expected concentration units to be updated to %s, instead got %s", "new conc",
-            saved.getSample().getConcentrationUnits()),
-        saved.getSample().getConcentrationUnits().equals("new conc"));
+        String.format("Expected concentration units to be updated to %s, instead got %s", "nM",
+            saved.getSample().getConcentrationUnits().getUnits()),
+        saved.getSample().getConcentrationUnits().getUnits().equals("nM"));
   }
   
   private void saveAndAssertSuccess(HandsOnTable table) {

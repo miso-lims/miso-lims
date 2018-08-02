@@ -54,7 +54,9 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String SLIDES_CONSUMED = "Slides Consumed";
     public static final String STR_STATUS = "STR Status";
     public static final String VOLUME = "Volume";
+    public static final String VOLUME_UNITS = "Vol. Units";
     public static final String CONCENTRATION = "Concentration";
+    public static final String CONCENTRATION_UNITS = "Conc. Units";
     public static final String QC_STATUS = "QC Status";
     public static final String DNASE_TREATED = "DNAse";
     public static final String QC_NOTE = "QC Note";

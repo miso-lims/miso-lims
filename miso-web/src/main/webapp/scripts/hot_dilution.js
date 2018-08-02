@@ -43,18 +43,50 @@ HotTarget.dilution = {
           data: 'concentrationUnits',
           type: 'dropdown',
           trimDropdown: false,
-          source: Constants.dilutionConcentrationUnits,
+          source: ['(None)'].concat(Constants.concentrationUnits.map(function(unit){
+            return unit.units;
+          })),
           include: true,
-          validator: HotUtils.validator.requiredAutocomplete,
+          allowHtml: true,
+          validator: Handsontable.validators.AutocompleteValidator,
           unpack: function(obj, flat, setCellMeta) {
-            flat['concentrationUnits'] = obj['concentrationUnits'] || Constants.dilutionConcentrationUnits[0];
+            var units = Constants.concentrationUnits.find(function(unit){
+              return unit.name == obj.concentrationUnits;
+            });
+            flat['concentrationUnits'] = !!units ? units.units : '(None)';
           },
           pack: function(obj, flat, errorHandler) {
-            obj['concentrationUnits'] = flat['concentrationUnits'];
-          },
-          allowHtml: true
+            var units = Constants.concentrationUnits.find(function(unit){
+              return unit.units == flat['concentrationUnits'];
+            });
+            obj['concentrationUnits'] = !!units ? units.name : null;
+          }
         },
         HotUtils.makeColumnForFloat('Volume', true, 'volume', false),
+        {
+          header: 'Vol. Units',
+          data: 'volumeUnits',
+          type: 'dropdown',
+          trimDropdown: false,
+          source: ['(None)'].concat(Constants.volumeUnits.map(function(unit){
+            return unit.units;
+          })),
+          include: true,
+          allowHtml: true,
+          validator: Handsontable.validators.AutocompleteValidator,
+          unpack: function(obj, flat, setCellMeta) {
+            var units = Constants.volumeUnits.find(function(unit){
+              return unit.name == obj.volumeUnits;
+            });
+            flat['volumeUnits'] = !!units ? units.units : '(None)';
+          },
+          pack: function(obj, flat, errorHandler) {
+            var units = Constants.volumeUnits.find(function(unit){
+              return unit.units == flat['volumeUnits'];
+            });
+            obj['volumeUnits'] = !!units ? units.name : null;
+          }
+        },
         HotUtils.makeColumnForFloat('ng Lib. Used', true, 'ngUsed', false),
         HotUtils.makeColumnForFloat('Vol. Lib. Used', true, 'volumeUsed', false),
         {

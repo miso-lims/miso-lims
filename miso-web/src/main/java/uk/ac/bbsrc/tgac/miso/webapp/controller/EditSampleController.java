@@ -71,6 +71,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
@@ -92,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
@@ -704,6 +706,9 @@ public class EditSampleController {
         model.put("samplePurposes", getSamplePurposes(sample));
         populateSampleClasses(model, (DetailedSample) sample);
       }
+
+      model.put("volumeUnits", VolumeUnit.values());
+      model.put("concentrationUnits", ConcentrationUnit.values());
 
       Collection<User> allUsers = securityManager.listAllUsers();
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, allUsers));

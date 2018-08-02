@@ -28,7 +28,9 @@ public class BulkPoolPage extends HeaderFooterPage {
     public static final String DISCARDED = "Discarded";
     public static final String CREATE_DATE = "Creation Date";
     public static final String CONCENTRATION = "Concentration";
+    public static final String CONCENTRATION_UNITS = "Conc. Units";
     public static final String VOLUME = "Volume";
+    public static final String VOLUME_UNITS = "Vol. Units";
     public static final String QC_PASSED = "QC Passed?";
     public static final String READY_TO_RUN = "Ready to Run?";
 

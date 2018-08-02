@@ -342,12 +342,34 @@
   <td><form:input id="dnaSize" path="dnaSize"/></td>
 </tr>
 <tr>
-  <td>Volume<span id="volumeUnits"></span>:</td>
+  <td>Volume:</td>
   <td><form:input id="volume" path="volume"/></td>
 </tr>
 <tr>
-  <td class="h"><label for="initialConcentration">Initial Concentration<span id="concentrationUnits"></span>:</label></td>
+  <td>Volume Units:</td>
+  <td><form:select id="volumeUnits" path="volumeUnits">
+  <option value>(None)</option>
+    <c:forEach var="volumeUnit" items="${volumeUnits}">
+      <option value="${volumeUnit}" <c:if test="${library.volumeUnits == volumeUnit}">selected="selected"</c:if>>
+        ${volumeUnit.units}
+      </option>
+    </c:forEach>
+  </form:select></td>
+</tr>
+<tr>
+  <td class="h"><label for="initialConcentration">Initial Concentration:</label></td>
   <td><form:input id="initialConcentration" path="initialConcentration"/></td>
+</tr>
+<tr>
+  <td>Concentration Units:</td>
+  <td><form:select id="concentrationUnits" path="concentrationUnits">
+  <option value>(None)</option>
+    <c:forEach var="concentrationUnit" items="${concentrationUnits}">
+      <option value="${concentrationUnit}" <c:if test="${library.concentrationUnits == concentrationUnit}">selected="selected"</c:if>>
+        ${concentrationUnit.units}
+      </option>
+    </c:forEach>
+  </form:select></td>
 </tr>
 <tr>
   <td><label for="discarded">Discarded:</label></td>
@@ -407,10 +429,6 @@
   </tr>
 </table>
 </c:if>
-<script type="text/javascript">
-  Utils.ui.updateConcentrationUnits('${library.concentrationUnits}');
-  Utils.ui.updateVolumeUnits('${library.volumeUnits}');
-</script>
 
 <c:choose>
   <c:when

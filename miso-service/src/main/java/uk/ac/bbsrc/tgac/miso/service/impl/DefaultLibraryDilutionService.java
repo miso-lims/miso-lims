@@ -259,6 +259,7 @@ public class DefaultLibraryDilutionService
     target.setTargetedSequencing(source.getTargetedSequencing());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setVolume(source.getVolume());
+    target.setVolumeUnits(source.getVolumeUnits());
     target.setConcentrationUnits(source.getConcentrationUnits());
     target.setNgUsed(source.getNgUsed());
     target.setVolumeUsed(source.getVolumeUsed());

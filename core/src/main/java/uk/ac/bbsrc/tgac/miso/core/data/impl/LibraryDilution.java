@@ -34,6 +34,8 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -54,11 +56,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.DilutionBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
@@ -80,9 +84,6 @@ public class LibraryDilution extends AbstractBoxable
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
 
-  public static final List<String> CONCENTRATION_UNITS = Collections.unmodifiableList(Arrays.asList(
-      "nM", "ng/&#181;l"));
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long dilutionId = LibraryDilution.UNSAVED_ID;
@@ -99,7 +100,12 @@ public class LibraryDilution extends AbstractBoxable
 
   private Double concentration;
 
-  private String concentrationUnits;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = true)
+  private ConcentrationUnit concentrationUnits;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = true)
+  private VolumeUnit volumeUnits;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -216,12 +222,20 @@ public class LibraryDilution extends AbstractBoxable
     this.concentration = concentration;
   }
 
-  public String getConcentrationUnits() {
+  public ConcentrationUnit getConcentrationUnits() {
     return this.concentrationUnits;
   }
 
-  public void setConcentrationUnits(String concentrationUnits) {
+  public void setConcentrationUnits(ConcentrationUnit concentrationUnits) {
     this.concentrationUnits = concentrationUnits;
+  }
+
+  public VolumeUnit getVolumeUnits() {
+    return this.volumeUnits;
+  }
+
+  public void setVolumeUnits(VolumeUnit volumeUnits) {
+    this.volumeUnits = volumeUnits;
   }
 
   @Override
@@ -418,7 +432,8 @@ public class LibraryDilution extends AbstractBoxable
 
   @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), "µL", getConcentrationUnits());
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits().getUnits(),
+        getConcentrationUnits().getUnits());
   }
 
   @Override

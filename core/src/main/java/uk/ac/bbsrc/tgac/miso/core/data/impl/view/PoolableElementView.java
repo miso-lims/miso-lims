@@ -22,10 +22,12 @@ import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.LazyToOne;
 import org.hibernate.annotations.LazyToOneOption;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -44,11 +46,15 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private Double dilutionConcentration;
 
-  private String dilutionConcentrationUnits;
+  @Enumerated(EnumType.STRING)
+  private ConcentrationUnit dilutionConcentrationUnits;
 
   private String dilutionBarcode;
 
   private Double dilutionVolume;
+
+  @Enumerated(EnumType.STRING)
+  private VolumeUnit dilutionVolumeUnits;
 
   private Double dilutionNgUsed;
 
@@ -227,11 +233,11 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     this.dilutionConcentration = dilutionConcentration;
   }
 
-  public String getDilutionConcentrationUnits() {
+  public ConcentrationUnit getDilutionConcentrationUnits() {
     return dilutionConcentrationUnits;
   }
 
-  public void setDilutionConcentrationUnits(String dilutionConcentrationUnits) {
+  public void setDilutionConcentrationUnits(ConcentrationUnit dilutionConcentrationUnits) {
     this.dilutionConcentrationUnits = dilutionConcentrationUnits;
   }
 
@@ -489,6 +495,14 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   public void setDilutionVolume(Double dilutionVolume) {
     this.dilutionVolume = dilutionVolume;
+  }
+
+  public VolumeUnit getDilutionVolumeUnits() {
+    return dilutionVolumeUnits;
+  }
+
+  public void setDilutionVolumeUnits(VolumeUnit dilutionVolumeUnits) {
+    this.dilutionVolumeUnits = dilutionVolumeUnits;
   }
 
   public String getBoxAlias() {

@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -92,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
@@ -360,6 +362,11 @@ public class Dtos {
     if (from.getVolume() != null) {
       dto.setVolume(from.getVolume().toString());
     }
+    dto.setVolumeUnits(from.getVolumeUnits());
+    if (from.getConcentration() != null) {
+      dto.setConcentration(from.getConcentration().toString());
+    }
+    dto.setConcentrationUnits(from.getConcentrationUnits());
     dto.setDiscarded(from.isDiscarded());
     dto.setLastModified(formatDateTime(from.getLastModified()));
 
@@ -410,7 +417,6 @@ public class Dtos {
       dto.setSynthetic(from.isSynthetic());
     }
     dto.setCreationDate(from.getCreationDate() == null ? "" : formatDate(from.getCreationDate()));
-    dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
     dto.setNonStandardAlias(from.hasNonStandardAlias());
     if (from.getDetailedQcStatus() != null) {
       dto.setDetailedQcStatusId(from.getDetailedQcStatus().getId());
@@ -664,7 +670,9 @@ public class Dtos {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     to.setVolume(isStringEmptyOrNull(from.getVolume()) ? null : Double.valueOf(from.getVolume()));
+    to.setVolumeUnits(from.getVolumeUnits());
     to.setConcentration(isStringEmptyOrNull(from.getConcentration()) ? null : Double.valueOf(from.getConcentration()));
+    to.setConcentrationUnits(from.getConcentrationUnits());
     to.setDiscarded(from.isDiscarded());
     if (from.getProjectId() != null) {
       to.setProject(new ProjectImpl());
@@ -1095,6 +1103,7 @@ public class Dtos {
     if (from.getInitialConcentration() != null) {
       dto.setConcentration(from.getInitialConcentration().toString());
     }
+    dto.setConcentrationUnits(from.getConcentrationUnits());
     if (from.getLibrarySelectionType() != null) {
       dto.setLibrarySelectionTypeId(from.getLibrarySelectionType().getId());
     }
@@ -1135,6 +1144,7 @@ public class Dtos {
     if (from.getVolume() != null) {
       dto.setVolume(from.getVolume().toString());
     }
+    dto.setVolumeUnits(from.getVolumeUnits());
     dto.setDnaSize(from.getDnaSize());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     if (from.getQCs() != null && !from.getQCs().isEmpty()) {
@@ -1170,6 +1180,7 @@ public class Dtos {
     to.setDescription(from.getDescription());
     to.setIdentificationBarcode(from.getIdentificationBarcode());
     to.setInitialConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
+    to.setConcentrationUnits(from.getConcentrationUnits());
     to.setLowQuality(from.getLowQuality());
     if (from.getPaired() != null) {
       to.setPaired(from.getPaired());
@@ -1211,6 +1222,7 @@ public class Dtos {
     if (from.getVolume() != null) {
       to.setVolume(Double.valueOf(from.getVolume()));
     }
+    to.setVolumeUnits(from.getVolumeUnits());
     to.setDnaSize(from.getDnaSize());
     if (from.getKitDescriptorId() != null) {
       KitDescriptor kitDescriptor = new KitDescriptor();
@@ -1325,8 +1337,9 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setDilutionUserName(from.getCreator().getFullName());
     dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
-    dto.setVolume(from.getVolume() == null ? null : from.getVolume().toString());
     dto.setConcentrationUnits(from.getConcentrationUnits());
+    dto.setVolume(from.getVolume() == null ? null : from.getVolume().toString());
+    dto.setVolumeUnits(from.getVolumeUnits());
     dto.setNgUsed(from.getNgUsed() == null ? null : from.getNgUsed().toString());
     dto.setVolumeUsed(from.getVolumeUsed() == null ? null : from.getVolumeUsed().toString());
     if (from.getCreationDate() != null) {
@@ -1377,6 +1390,7 @@ public class Dtos {
     dto.setIndexIds(from.getIndices().stream().map(Index::getId).collect(Collectors.toList()));
     dto.setTargetedSequencingId(from.getTargetedSequencingId());
     dto.setVolume(from.getDilutionVolume() == null ? null : from.getDilutionVolume().toString());
+    dto.setVolumeUnits(from.getDilutionVolumeUnits());
     dto.setNgUsed(from.getDilutionNgUsed() == null ? null : from.getDilutionNgUsed().toString());
     dto.setVolumeUsed(from.getDilutionVolumeUsed() == null ? null : from.getDilutionVolumeUsed().toString());
 
@@ -1412,6 +1426,7 @@ public class Dtos {
     to.setConcentrationUnits(from.getConcentrationUnits());
     to.setNgUsed(from.getNgUsed() == null ? null : Double.valueOf(from.getNgUsed()));
     to.setVolume(from.getVolume() == null ? null : Double.valueOf(from.getVolume()));
+    to.setVolumeUnits(from.getVolumeUnits());
     to.setVolumeUsed(from.getVolumeUsed() == null ? null : Double.valueOf(from.getVolumeUsed()));
     to.setLibrary(to(from.getLibrary()));
     to.setCreationDate(parseDate(from.getCreationDate()));
@@ -1431,11 +1446,13 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
+    dto.setConcentrationUnits(from.getConcentrationUnits());
     dto.setQcPassed(from.getQcPassed());
     dto.setCreationDate(formatDate(from.getCreationDate()));
     if (from.getVolume() != null) {
       dto.setVolume(from.getVolume().toString());
     }
+    dto.setVolumeUnits(from.getVolumeUnits());
     if (from.getPlatformType() != null) {
       dto.setPlatformType(from.getPlatformType().name());
     }
@@ -1829,6 +1846,7 @@ public class Dtos {
     to.setId(dto.getId() == null ? PoolImpl.UNSAVED_ID : dto.getId());
     to.setAlias(dto.getAlias());
     to.setConcentration(dto.getConcentration() == null ? null : Double.valueOf(dto.getConcentration()));
+    to.setConcentrationUnits(dto.getConcentrationUnits());
     to.setCreationDate(parseDate(dto.getCreationDate()));
     to.setDescription(dto.getDescription());
     to.setIdentificationBarcode(dto.getIdentificationBarcode());
@@ -1836,6 +1854,7 @@ public class Dtos {
     if (dto.getVolume() != null) {
       to.setVolume(Double.valueOf(dto.getVolume()));
     }
+    to.setVolumeUnits(dto.getVolumeUnits());
     to.setPlatformType(PlatformType.valueOf(dto.getPlatformType()));
     to.setPoolDilutions(dto.getPooledElements().stream().map(dilution -> {
       PoolableElementView view = new PoolableElementView();
@@ -2481,6 +2500,13 @@ public class Dtos {
     return dto;
   }
 
+  public static ConcentrationUnitDto asDto(ConcentrationUnit from) {
+    ConcentrationUnitDto dto = new ConcentrationUnitDto();
+    dto.setName(from);
+    dto.setUnits(from == null ? null : from.getUnits());
+    return dto;
+  }
+
   public static ServiceRecordDto asDto(ServiceRecord from) {
     ServiceRecordDto dto = new ServiceRecordDto();
     dto.setId(from.getId());
@@ -2489,6 +2515,13 @@ public class Dtos {
     dto.setDetails(from.getDetails());
     dto.setReferenceNumber(from.getReferenceNumber());
     dto.setAttachments(from.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    return dto;
+  }
+
+  public static VolumeUnitDto asDto(VolumeUnit from) {
+    VolumeUnitDto dto = new VolumeUnitDto();
+    dto.setName(from);
+    dto.setUnits(from == null ? null : from.getUnits());
     return dto;
   }
 

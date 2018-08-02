@@ -214,29 +214,29 @@ public interface Pool
   /**
    * Returns the concentration units of this Pool object.
    * 
-   * @return String concentrationUnits.
+   * @return ConcentrationUnit concentrationUnits.
    */
-  public String getConcentrationUnits();
+  public ConcentrationUnit getConcentrationUnits();
 
   /**
    * Sets the concentrationUnits of this Pool object.
    * 
    * @param concentrationUnits concentrationUnits.
    */
-  public void setConcentrationUnits(String concentrationUnits);
+  public void setConcentrationUnits(ConcentrationUnit concentrationUnits);
 
   /**
    * Returns the volume units of this Pool object.
    * 
-   * @return String volumeUnits.
+   * @return VolumeUnit volumeUnits.
    */
-  public String getVolumeUnits();
+  public VolumeUnit getVolumeUnits();
 
   /**
    * Sets the volumeUnits of this Pool object.
    * 
    * @param volumeUnits volumeUnits.
    */
-  public void setVolumeUnits(String volumeUnits);
+  public void setVolumeUnits(VolumeUnit volumeUnits);
 
 }

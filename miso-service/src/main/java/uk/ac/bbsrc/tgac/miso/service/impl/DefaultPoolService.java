@@ -208,11 +208,13 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       boxService.throwIfBoxPositionIsFilled(pool);
       managed.setAlias(pool.getAlias());
       managed.setConcentration(pool.getConcentration());
+      managed.setConcentrationUnits(pool.getConcentrationUnits());
       managed.setDescription(pool.getDescription());
       managed.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(pool.getIdentificationBarcode()));
       managed.setPlatformType(pool.getPlatformType());
       managed.setQcPassed(pool.getQcPassed());
       managed.setVolume(pool.getVolume());
+      managed.setVolumeUnits(pool.getVolumeUnits());
       managed.setDiscarded(pool.isDiscarded());
       managed.setCreationDate(pool.getCreationDate());
 

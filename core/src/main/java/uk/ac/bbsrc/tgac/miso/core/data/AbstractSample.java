@@ -33,6 +33,8 @@ import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -115,9 +117,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private Boolean qcPassed;
   private String identificationBarcode;
   private String locationBarcode;
-  private String volumeUnits;
+  @Enumerated(EnumType.STRING)
+  private VolumeUnit volumeUnits;
   private Double concentration;
-  private String concentrationUnits;
+  @Enumerated(EnumType.STRING)
+  private ConcentrationUnit concentrationUnits;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -483,7 +487,8 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits(), getConcentrationUnits());
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits().getUnits(),
+        getConcentrationUnits().getUnits());
   }
 
   @Override
@@ -508,22 +513,22 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public String getVolumeUnits() {
+  public VolumeUnit getVolumeUnits() {
     return volumeUnits;
   }
 
   @Override
-  public void setVolumeUnits(String volumeUnits) {
+  public void setVolumeUnits(VolumeUnit volumeUnits) {
     this.volumeUnits = volumeUnits;
   }
 
   @Override
-  public String getConcentrationUnits() {
+  public ConcentrationUnit getConcentrationUnits() {
     return concentrationUnits;
   }
 
   @Override
-  public void setConcentrationUnits(String concentrationUnits) {
+  public void setConcentrationUnits(ConcentrationUnit concentrationUnits) {
     this.concentrationUnits = concentrationUnits;
   }
 

@@ -125,6 +125,7 @@ var Library = Library || {
       jQuery('#initialConcentration').attr('data-parsley-maxlength', '10');
       jQuery('#initialConcentration').attr('data-parsley-type', 'number');
       jQuery('#initialConcentration').attr('data-parsley-required', generatingAlias && selectedPlatform === 'PacBio');
+      
     }
 
     jQuery('#library-form').parsley();

@@ -6,19 +6,28 @@ public enum QcCorrespondingField {
     @Override
     public void updateField(Pool pool, double value, String units) {
       pool.setConcentration(value);
-      pool.setConcentrationUnits(units);
+      ConcentrationUnit concUnit = ConcentrationUnit.getFromString(units);
+      if (concUnit != null) {
+        pool.setConcentrationUnits(concUnit);
+      }
     }
 
     @Override
     public void updateField(Library library, double value, String units) {
       library.setInitialConcentration(value);
-      library.setConcentrationUnits(units);
+      ConcentrationUnit concUnit = ConcentrationUnit.getFromString(units);
+      if (concUnit != null) {
+        library.setConcentrationUnits(concUnit);
+      }
     }
 
     @Override
     public void updateField(Sample sample, double value, String units) {
       sample.setConcentration(value);
-      sample.setConcentrationUnits(units);
+      ConcentrationUnit concUnit = ConcentrationUnit.getFromString(units);
+      if (concUnit != null) {
+        sample.setConcentrationUnits(concUnit);
+      }
     }
 
   },
@@ -27,19 +36,28 @@ public enum QcCorrespondingField {
     @Override
     public void updateField(Pool pool, double value, String units) {
       pool.setVolume(value);
-      pool.setVolumeUnits(units);
+      VolumeUnit volUnit = VolumeUnit.getFromString(units);
+      if (volUnit != null) {
+        pool.setVolumeUnits(volUnit);
+      }
     }
 
     @Override
     public void updateField(Library library, double value, String units) {
       library.setVolume(value);
-      library.setVolumeUnits(units);
+      VolumeUnit volUnit = VolumeUnit.getFromString(units);
+      if (volUnit != null) {
+        library.setVolumeUnits(volUnit);
+      }
     }
 
     @Override
     public void updateField(Sample sample, double value, String units) {
       sample.setVolume(value);
-      sample.setVolumeUnits(units);
+      VolumeUnit volUnit = VolumeUnit.getFromString(units);
+      if (volUnit != null) {
+        sample.setVolumeUnits(volUnit);
+      }
     }
 
   },
