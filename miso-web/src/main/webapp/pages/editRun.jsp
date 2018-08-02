@@ -312,7 +312,7 @@
   <c:if test="${run.id != 0}">
     <miso:attachments item="${run}"/>
     <div id="issues">
-      <miso:list-section id="list_issue" name="Related Issues" target="issue" items="${runIssues}" config="{}"/>
+      <miso:list-section id="list_issue" name="Related Issues" target="issue" alwaysShow="true" items="${runIssues}" config="{}"/>
     </div>
     <div id="containers">
       <miso:list-section id="list_container" name="${run.platformType.containerName}" target="container" items="${runContainers}" alwaysShow="true" config="${partitionConfig}"/>
