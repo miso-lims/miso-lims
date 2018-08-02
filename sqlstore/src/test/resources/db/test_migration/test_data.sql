@@ -723,3 +723,11 @@ DELETE FROM LibraryTemplate;
 
 INSERT INTO LibraryTemplate(libraryTemplateId, alias, projectId) VALUES
 (1, 'pro1_temp1', 1);
+
+INSERT INTO Workset(worksetId, alias, description, creator, created, lastModifier, lastModified) VALUES
+(1, 'test', 'test workset', 1, '2018-08-08 14:47:00', 1, '2018-08-08 14:47:00');
+
+INSERT INTO Workset_Sample(worksetId, sampleId) VALUES
+(1, 1),
+(1, 2),
+(1, 3);

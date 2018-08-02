@@ -24,7 +24,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage.Tabs;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage.ProjectTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class ListTablesIT extends AbstractIT {
@@ -62,6 +61,8 @@ public class ListTablesIT extends AbstractIT {
   private static final Set<String> arraysColumns = Sets.newHashSet(Columns.ID, Columns.ALIAS, Columns.SERIAL_NUMBER);
   private static final Set<String> arrayRunsColumns = Sets.newHashSet(Columns.ID, Columns.ALIAS, Columns.STATUS, Columns.START_DATE,
       Columns.END_DATE, Columns.LAST_MODIFIED);
+  private static final Set<String> worksetsColumns = Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.DESCRIPTION,
+      Columns.LAST_MODIFIED);
 
   private static final Set<String> poolsTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
   private static final Set<String> ordersTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
@@ -365,6 +366,16 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListArrayRunsColumnSort() throws Exception {
     testColumnsSort(ListTarget.ARRAYRUNS);
+  }
+
+  @Test
+  public void testListWorksetsSetup() throws Exception {
+    testPageSetup(ListTarget.WORKSETS, worksetsColumns);
+  }
+
+  @Test
+  public void testListWorksetsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.WORKSETS);
   }
 
   private void testPageSetup(String listTarget, Set<String> targetColumns) {

@@ -37,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
@@ -90,6 +91,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
@@ -2490,6 +2492,56 @@ public class Dtos {
     dto.setReferenceNumber(from.getReferenceNumber());
     dto.setAttachments(from.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList()));
     return dto;
+  }
+
+  public static WorksetDto asDto(Workset from) {
+    WorksetDto dto = new WorksetDto();
+    dto.setId(from.getId());
+    dto.setAlias(from.getAlias());
+    dto.setDescription(from.getDescription());
+    if (!from.getSamples().isEmpty()) {
+      dto.setSampleIds(from.getSamples().stream().map(Identifiable::getId).collect(Collectors.toList()));
+    }
+    if (!from.getLibraries().isEmpty()) {
+      dto.setLibraryIds(from.getLibraries().stream().map(Identifiable::getId).collect(Collectors.toList()));
+    }
+    if (!from.getDilutions().isEmpty()) {
+      dto.setDilutionIds(from.getDilutions().stream().map(Identifiable::getId).collect(Collectors.toList()));
+    }
+    dto.setCreator(from.getCreator().getFullName());
+    dto.setLastModified(formatDateTime(from.getLastModified()));
+    return dto;
+  }
+
+  public static Workset to(WorksetDto from) {
+    Workset workset = new Workset();
+    if (from.getId() != null) {
+      workset.setId(from.getId());
+    }
+    workset.setAlias(from.getAlias());
+    workset.setDescription(from.getDescription());
+    if (from.getSampleIds() != null && !from.getSampleIds().isEmpty()) {
+      workset.setSamples(from.getSampleIds().stream().map(id -> {
+        Sample s = new SampleImpl();
+        s.setId(id);
+        return s;
+      }).collect(Collectors.toSet()));
+    }
+    if (from.getLibraryIds() != null && !from.getLibraryIds().isEmpty()) {
+      workset.setLibraries(from.getLibraryIds().stream().map(id -> {
+        Library l = new LibraryImpl();
+        l.setId(id);
+        return l;
+      }).collect(Collectors.toSet()));
+    }
+    if (from.getDilutionIds() != null && !from.getDilutionIds().isEmpty()) {
+      workset.setDilutions(from.getDilutionIds().stream().map(id -> {
+        LibraryDilution d = new LibraryDilution();
+        d.setId(id);
+        return d;
+      }).collect(Collectors.toSet()));
+    }
+    return workset;
   }
 
 }

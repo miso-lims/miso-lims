@@ -11,7 +11,7 @@ HotTarget.library = (function() {
 
   var makeIndexColumn = function(config, n) {
     var dependent = ['indexFamilyName', 'templateAlias', 'boxPosition', 'index' + n + 'Label']
-    if(n > 1){
+    if (n > 1) {
       dependent.push('index' + (n - 1) + 'Label')
     }
     return {
@@ -65,7 +65,7 @@ HotTarget.library = (function() {
             'source': indices
           });
           setData(data);
-        } else if (flatProperty === 'index' + n + 'Label'){
+        } else if (flatProperty === 'index' + n + 'Label') {
           var pt = getPlatformType(flat.platformType);
           indexFamily = Utils.array.findFirstOrNull(function(family) {
             return family.name == flat.indexFamilyName && family.platformType == pt;
@@ -73,34 +73,34 @@ HotTarget.library = (function() {
           var indices = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
             return index.position == n;
           });
-        	var match = indices.find(function(index){
-						return index.sequence.toLowerCase() == value.toLowerCase() || index.label.toLowerCase() == value.toLowerCase();
-					});
-					if (match) {
-						setData(match.label);
-					}
-        } else if (flatProperty === 'index' + (n - 1) + 'Label' && !Utils.validation.isEmpty(value)){
+          var match = indices.find(function(index) {
+            return index.sequence.toLowerCase() == value.toLowerCase() || index.label.toLowerCase() == value.toLowerCase();
+          });
+          if (match) {
+            setData(match.label);
+          }
+        } else if (flatProperty === 'index' + (n - 1) + 'Label' && !Utils.validation.isEmpty(value)) {
           var pt = getPlatformType(flat.platformType);
           indexFamily = Utils.array.findFirstOrNull(function(family) {
             return family.name == flat.indexFamilyName && family.platformType == pt;
           }, Constants.indexFamilies);
-          if(!!indexFamily && indexFamily.uniqueDualIndex){
+          if (!!indexFamily && indexFamily.uniqueDualIndex) {
             var indexName = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
               return index.position == n - 1;
-            }).find(function(index){
+            }).find(function(index) {
               return index.label == value
             }).name;
-            if(!!indexName) {
+            if (!!indexName) {
               var dualIndex = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
                 return index.position == n;
-              }).find(function(index){
+              }).find(function(index) {
                 return index.name == indexName;
               });
-              if(!!dualIndex){
+              if (!!dualIndex) {
                 setData(dualIndex.label);
               } else {
                 Utils.showOkDialog('Error', ['There is no dual index for index \'' + indexName + '\'',
-                  'Perhaps an index family is incorrectly marked as having unique dual indices']);
+                    'Perhaps an index family is incorrectly marked as having unique dual indices']);
               }
             }
           }
@@ -375,7 +375,8 @@ HotTarget.library = (function() {
             readOnly: true,
             depends: 'groupId',
             update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if (flatProperty === 'groupId') setData(flat.groupId);
+              if (flatProperty === 'groupId')
+                setData(flat.groupId);
             },
             unpack: function(lib, flat, setCellMeta) {
               flat.effectiveGroupId = lib.effectiveGroupId ? lib.effectiveGroupId : '(None)';
@@ -622,8 +623,7 @@ HotTarget.library = (function() {
               }
             }
           }, HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
-          HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false),
-          {
+          HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false), {
             header: 'Volume',
             data: 'volume',
             type: 'text',
@@ -655,8 +655,7 @@ HotTarget.library = (function() {
                 setData(null);
               }
             }
-          },
-          HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false), ];
+          }, HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false), ];
 
       var spliceIndex = columns.indexOf(columns.filter(function(column) {
         return column.data === 'identificationBarcode';
@@ -707,15 +706,17 @@ HotTarget.library = (function() {
             });
           });
         }
-      }, HotUtils.printAction('library'), HotUtils.spreadsheetAction('/miso/rest/library/spreadsheet', Constants.librarySpreadsheets,
-          function(libraries, spreadsheet){
-        var errors = [];
-        return errors;
-      }),
+      }, HotUtils.printAction('library'),
+          HotUtils.spreadsheetAction('/miso/rest/library/spreadsheet', Constants.librarySpreadsheets, function(libraries, spreadsheet) {
+            var errors = [];
+            return errors;
+          }),
 
-      HotUtils.makeParents('library', HotUtils.relationCategoriesForDetailed()), 
-      HotUtils.makeChildren('library',[HotUtils.relations.dilution(), HotUtils.relations.pool()])
-      ].concat(HotUtils.makeQcActions("Library"));
+          HotUtils.makeParents('library', HotUtils.relationCategoriesForDetailed()),
+          HotUtils.makeChildren('library', [HotUtils.relations.dilution(), HotUtils.relations.pool()])].concat(
+          HotUtils.makeQcActions("Library")).concat(
+          config.worksetId ? [HotUtils.makeRemoveFromWorkset('libraries', config.worksetId)] : [HotUtils.makeAddToWorkset('libraries',
+              'libraryIds')]);
     }
   };
 })();

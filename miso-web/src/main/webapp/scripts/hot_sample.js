@@ -2,7 +2,7 @@
  * Sample-specific Handsontable code
  */
 HotTarget.sample = (function() {
-  
+
   var getSampleClass = function(sample) {
     return Constants.sampleClasses.find(function(sampleClass) {
       return sample.sampleClassId == sampleClass.id;
@@ -491,12 +491,14 @@ HotTarget.sample = (function() {
           {
             header: 'Effective Group ID',
             data: 'effectiveGroupId',
-            include: Constants.isDetailedSample && config.targetSampleClass.alias != 'Identity' && !config.isLibraryReceipt && !config.create,
+            include: Constants.isDetailedSample && config.targetSampleClass.alias != 'Identity' && !config.isLibraryReceipt
+                && !config.create,
             type: 'text',
             readOnly: true,
             depends: 'groupId',
             update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if (flatProperty === 'groupId') setData(flat.groupId);
+              if (flatProperty === 'groupId')
+                setData(flat.groupId);
             },
             unpack: function(sam, flat, setCellMeta) {
               flat.effectiveGroupId = sam.effectiveGroupId ? sam.effectiveGroupId : '(None)';
@@ -841,19 +843,19 @@ HotTarget.sample = (function() {
             }
           },
           HotUtils.printAction('sample'),
-          HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets, function(samples, spreadsheet){
+          HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets, function(samples, spreadsheet) {
             var errors = [];
             var invalidSamples = [];
-            samples.forEach(function(sample){
-              if(!spreadsheet.sheet.allowedClasses.includes(getSampleClass(sample).sampleCategory)){
+            samples.forEach(function(sample) {
+              if (!spreadsheet.sheet.allowedClasses.includes(getSampleClass(sample).sampleCategory)) {
                 invalidSamples.push(sample);
               }
             })
-            if(invalidSamples.length > 0){
+            if (invalidSamples.length > 0) {
               errors.push("Error: Invalid sample class types");
               errors.push("Allowed types: " + spreadsheet.sheet.allowedClasses.join(", "));
               errors.push("Invalid samples:")
-              invalidSamples.forEach(function(sample){
+              invalidSamples.forEach(function(sample) {
                 errors.push("* " + sample.alias + " (" + getSampleClass(sample).alias + ")");
               })
             }
@@ -863,8 +865,10 @@ HotTarget.sample = (function() {
           Constants.isDetailedSample ? HotUtils.makeParents('sample', HotUtils.relationCategoriesForDetailed()) : null,
 
           HotUtils.makeChildren('sample', HotUtils.relationCategoriesForDetailed().concat(
-              [HotUtils.relations.library(), HotUtils.relations.dilution(), HotUtils.relations.pool()]))].concat(HotUtils
-          .makeQcActions("Sample"));
+              [HotUtils.relations.library(), HotUtils.relations.dilution(), HotUtils.relations.pool()]))].concat(
+          HotUtils.makeQcActions("Sample")).concat(
+          config.worksetId ? [HotUtils.makeRemoveFromWorkset('samples', config.worksetId)] : [HotUtils.makeAddToWorkset('samples',
+              'sampleIds')]);
     },
 
     getCustomActions: function(table) {

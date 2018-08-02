@@ -105,7 +105,7 @@ var HotUtils = {
           HotUtils.validator.requiredAutocomplete(value, callback);
         }
       }
-      
+
     },
     /**
      * Custom validator for setting fields to manually be invalid
@@ -972,7 +972,7 @@ var HotUtils = {
           }
         }], function(result) {
           var errors = generateErrors(items, result)
-          if(errors.length >= 1){
+          if (errors.length >= 1) {
             Utils.showOkDialog("Error", errors);
           } else {
             window.location = window.location.origin + url + '?' + jQuery.param({
@@ -1105,6 +1105,98 @@ var HotUtils = {
         }
       }
     };
+  },
+
+  makeAddToWorkset: function(typePlural, idsField) {
+    return {
+      name: 'Add to Workset',
+      action: function(items) {
+        var ids = items.map(Utils.array.getId);
+        Utils.showWizardDialog('Add to Workset', [
+            {
+              name: 'Existing Workset',
+              handler: function() {
+                var doSearch = function() {
+                  var fields = [{
+                    label: 'Workset search',
+                    property: 'query',
+                    type: 'text',
+                    required: true
+                  }]
+                  Utils.showDialog('Add to Existing Workset', 'Search', fields, function(input) {
+                    Utils.ajaxWithDialog('Finding Worksets', 'GET', '/miso/rest/worksets?' + jQuery.param({
+                      q: input.query
+                    }), {}, function(worksets) {
+                      var selectFields = [];
+                      if (!worksets || !worksets.length) {
+                        Utils.showOkDialog('Workset Search', ['No matching worksets found.'], doSearch);
+                      } else {
+                        worksets.forEach(function(workset) {
+                          selectFields.push({
+                            name: workset.alias,
+                            handler: function() {
+                              Utils.ajaxWithDialog('Adding to Workset', 'POST', '/miso/rest/worksets/' + workset.id + '/' + typePlural,
+                                  ids, function() {
+                                    Utils.showOkDialog('Add to Workset', ['The selected ' + typePlural + ' have been added to workset \''
+                                        + workset.alias + '\'.']);
+                                  });
+                            }
+                          });
+                          Utils.showWizardDialog('Add to Existing Workset', selectFields);
+                        });
+                      }
+                    });
+                  });
+                }
+                doSearch();
+              }
+            }, {
+              name: 'New Workset',
+              handler: function() {
+                var fields = [{
+                  label: 'Alias',
+                  property: 'alias',
+                  type: 'text',
+                  required: true
+                }, {
+                  label: 'Description',
+                  property: 'description',
+                  type: 'textarea',
+                  rows: 3,
+                  required: false
+                }];
+                Utils.showDialog('New Workset', 'Create', fields, function(input) {
+                  var workset = {
+                    alias: input.alias,
+                    description: input.description
+                  };
+                  workset[idsField] = ids;
+                  Utils.ajaxWithDialog('Creating Workset', 'POST', '/miso/rest/worksets', workset, function() {
+                    Utils.showOkDialog('Add to Workset', ['New workset \'' + workset.alias + '\' created.']);
+                  });
+                });
+              }
+            }]);
+      }
+    }
+  },
+
+  makeRemoveFromWorkset: function(typePlural, worksetId) {
+    return {
+      name: 'Remove from Workset',
+      action: function(items) {
+        Utils.showConfirmDialog('Remove ' + typePlural, 'Remove',
+            ['Remove these ' + items.length + ' ' + typePlural + ' from the workset?'], function() {
+              var ids = items.map(Utils.array.getId);
+              Utils.ajaxWithDialog('Removing ' + typePlural, 'DELETE', '/miso/rest/worksets/' + worksetId + '/' + typePlural, ids,
+                  function() {
+                    Utils.showOkDialog('Removed', [items.length + ' ' + typePlural + ' removed.'], function() {
+                      Utils.page.pageReload();
+                    });
+                  });
+            });
+      }
+    }
   },
 
   relationCategoriesForDetailed: function() { // Change name to relationCategoriesForDetailed
