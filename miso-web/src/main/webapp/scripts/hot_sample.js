@@ -642,7 +642,18 @@ HotTarget.sample = (function() {
 
           // Aliquot columns
           HotUtils.makeColumnForConstantsList('Purpose', show['Aliquot'] && !config.isLibraryReceipt, 'samplePurposeAlias',
-              'samplePurposeId', 'id', 'alias', Constants.samplePurposes, true)];
+              'samplePurposeId', 'id', 'alias', Constants.samplePurposes, true, {
+            'depends': '*start',
+            'update': function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData){
+              setOptions({
+                'source': Constants.samplePurposes.filter(function(samplePurpose){
+                  return !samplePurpose.archived || sam.samplePurposeId == samplePurpose.id;
+                }).map(function(samplePurpose){
+                  return samplePurpose.alias;
+                })
+              });
+            }
+          })];
 
       if (!config.isLibraryReceipt) {
         var spliceIndex = columns.indexOf(columns.filter(function(column) {

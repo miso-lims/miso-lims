@@ -50,6 +50,9 @@ public class SamplePurposeImpl implements SamplePurpose {
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
+  @Column(nullable = false)
+  private boolean archived;
+
   @Override
   public long getId() {
     return samplePurposeId;
@@ -123,6 +126,16 @@ public class SamplePurposeImpl implements SamplePurpose {
   @Override
   public SecurityProfile getDeletionSecurityProfile() {
     return null;
+  }
+
+  @Override
+  public boolean isArchived() {
+    return archived;
+  }
+
+  @Override
+  public void setArchived(boolean archived) {
+    this.archived = archived;
   }
 
 }
