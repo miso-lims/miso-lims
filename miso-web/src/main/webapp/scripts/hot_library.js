@@ -445,11 +445,7 @@ HotTarget.library = (function() {
             type: 'dropdown',
             readOnly: !create,
             trimDropdown: false,
-            source: Constants.platformTypes.filter(function(pt) {
-              return pt.active || data.reduce(function(acc, lib) {
-                return acc || pt.key == lib.platformType;
-              }, false);
-            }).map(function(pt) {
+            source: Constants.platformTypes.map(function(pt) {
               return pt.key;
             }),
             validator: HotUtils.validator.requiredAutocomplete,
