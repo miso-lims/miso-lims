@@ -322,6 +322,7 @@ HotTarget.sample = (function() {
               };
               
               var existingExternalNames = getExternalNames(value);
+              var renderer = null;
               var newExternalNames = flat['externalName'].toLowerCase().split(",").map(function(name){
                 return name.trim();
               });
@@ -334,7 +335,7 @@ HotTarget.sample = (function() {
               }
               setOptions({
                 'renderer': renderer
-              })
+              });
             }
           },
           {
@@ -621,7 +622,55 @@ HotTarget.sample = (function() {
             include: Constants.isDetailedSample && config.dnaseTreatable
           },
           HotUtils.makeColumnForFloat('Volume', ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt), 'volume'),
+          {
+            header: 'Vol. Units',
+            data: 'volumeUnits',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: ['(None)'].concat(Constants.volumeUnits.map(function(unit){
+              return unit.units;
+            })),
+            include: ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt),
+            allowHtml: true,
+            validator: Handsontable.validators.AutocompleteValidator,
+            unpack: function(obj, flat, setCellMeta) {
+              var units = Constants.volumeUnits.find(function(unit){
+                return unit.name == obj.volumeUnits;
+              });
+              flat['volumeUnits'] = !!units ? units.units : '(None)';
+            },
+            pack: function(obj, flat, errorHandler) {
+              var units = Constants.volumeUnits.find(function(unit){
+                return unit.units == flat['volumeUnits'];
+              });
+              obj['volumeUnits'] = !!units ? units.name : null;
+            }
+          },
           HotUtils.makeColumnForFloat('Concentration', ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt), 'concentration'),
+          {
+            header: 'Conc. Units',
+            data: 'concentrationUnits',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: ['(None)'].concat(Constants.concentrationUnits.map(function(unit){
+              return unit.units;
+            })),
+            include: ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt),
+            allowHtml: true,
+            validator: Handsontable.validators.AutocompleteValidator,
+            unpack: function(obj, flat, setCellMeta) {
+              var units = Constants.concentrationUnits.find(function(unit){
+                return unit.name == obj.concentrationUnits;
+              });
+              flat['concentrationUnits'] = !!units ? units.units : '(None)';
+            },
+            pack: function(obj, flat, errorHandler) {
+              var units = Constants.concentrationUnits.find(function(unit){
+                return unit.units == flat['concentrationUnits'];
+              });
+              obj['concentrationUnits'] = !!units ? units.name : null;
+            }
+          },
 
           // QC status columns for detailed and non-detailed samples
           {

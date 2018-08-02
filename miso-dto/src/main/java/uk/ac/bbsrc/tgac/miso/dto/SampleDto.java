@@ -3,11 +3,15 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import java.net.URI;
 import java.util.List;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
@@ -15,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
@@ -49,7 +54,11 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
   private Long rootSampleClassId;
   private String rootSampleClassUrl;
   private String volume;
+  @Enumerated(EnumType.STRING)
+  private VolumeUnit volumeUnits;
   private String concentration;
+  @Enumerated(EnumType.STRING)
+  private ConcentrationUnit concentrationUnits;
   private Long updatedById;
   private String updatedByUrl;
   private String lastModified;
@@ -267,6 +276,24 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
     if (getRootSampleClassId() != null) {
       setRootSampleClassUrl(WritableUrls.buildUriPath(baseUri, "/rest/sampleclass/{id}", getRootSampleClassId()));
     }
+  }
+
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  public VolumeUnit getVolumeUnits() {
+    return volumeUnits;
+  }
+
+  public void setVolumeUnits(VolumeUnit volumeUnits) {
+    this.volumeUnits = volumeUnits;
+  }
+
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  public ConcentrationUnit getConcentrationUnits() {
+    return concentrationUnits;
+  }
+
+  public void setConcentrationUnits(ConcentrationUnit concentrationUnits) {
+    this.concentrationUnits = concentrationUnits;
   }
 
 }

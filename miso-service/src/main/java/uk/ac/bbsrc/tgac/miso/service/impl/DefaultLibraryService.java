@@ -496,6 +496,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setLocationBarcode(source.getLocationBarcode());
     target.setInitialConcentration(source.getInitialConcentration());
+    target.setConcentrationUnits(source.getConcentrationUnits());
     target.setPlatformType(source.getPlatformType());
     target.setAlias(source.getAlias());
     target.setPaired(source.getPaired());
@@ -507,6 +508,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     } else {
       target.setVolume(source.getVolume());
     }
+    target.setVolumeUnits(source.getVolumeUnits());
     target.setDnaSize(source.getDnaSize());
     target.setLibraryType(source.getLibraryType());
     target.setLibrarySelectionType(source.getLibrarySelectionType());

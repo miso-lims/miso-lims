@@ -3,7 +3,13 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import java.net.URI;
 import java.util.Set;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
+
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class PoolDto extends AbstractBoxableDto implements WritableUrls {
@@ -13,6 +19,8 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
   private String name;
   private String alias;
   private String concentration;
+  @Enumerated(EnumType.STRING)
+  private ConcentrationUnit concentrationUnits;
   private String identificationBarcode;
   private String locationLabel;
   private Boolean qcPassed;
@@ -26,6 +34,8 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
   private String lastModified;
   private String description;
   private String volume;
+  @Enumerated(EnumType.STRING)
+  private VolumeUnit volumeUnits;
   private String platformType;
   private String longestIndex;
   private boolean hasLowQualityLibraries;
@@ -43,6 +53,10 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
 
   public String getConcentration() {
     return concentration;
+  }
+
+  public ConcentrationUnit getConcentrationUnits() {
+    return concentrationUnits;
   }
 
   public String getCreationDate() {
@@ -111,6 +125,10 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setConcentration(String concentration) {
     this.concentration = concentration;
+  }
+
+  public void setConcentrationUnits(ConcentrationUnit concentrationUnits) {
+    this.concentrationUnits = concentrationUnits;
   }
 
   public void setCreationDate(String creationDate) {
@@ -186,6 +204,14 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setVolume(String volume) {
     this.volume = volume;
+  }
+
+  public VolumeUnit getVolumeUnits() {
+    return volumeUnits;
+  }
+
+  public void setVolumeUnits(VolumeUnit volumeUnits) {
+    this.volumeUnits = volumeUnits;
   }
 
   public String getPlatformType() {

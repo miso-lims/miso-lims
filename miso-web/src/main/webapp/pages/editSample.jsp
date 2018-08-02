@@ -259,12 +259,34 @@
     </c:otherwise>
     </c:choose>
     <tr>
-      <td>Volume<span id="volumeUnits"></span>:</td>
+      <td>Volume:</td>
       <td><form:input id="volume" path="volume"/></td>
     </tr>
     <tr>
-      <td class="h">Concentration<span id="concentrationUnits"></span>:</td>
+      <td>Volume Units:</td>
+      <td><form:select id="volumeUnits" path="volumeUnits">
+      <option value>(None)</option>
+        <c:forEach var="volumeUnit" items="${volumeUnits}">
+          <option value="${volumeUnit}" <c:if test="${sample.volumeUnits == volumeUnit}">selected="selected"</c:if>>
+            ${volumeUnit.units}
+          </option>
+        </c:forEach>
+      </form:select></td>
+    </tr>
+    <tr>
+      <td class="h">Concentration:</td>
       <td><form:input id="concentration" path="concentration"/></td>
+    </tr>
+    <tr>
+      <td>Concentration Units:</td>
+      <td><form:select id="concentrationUnits" path="concentrationUnits">
+      <option value>(None)</option>
+        <c:forEach var="concentrationUnit" items="${concentrationUnits}">
+          <option value="${concentrationUnit}" <c:if test="${sample.concentrationUnits == concentrationUnit}">selected="selected"</c:if>>
+            ${concentrationUnit.units}
+          </option>
+        </c:forEach>
+      </form:select></td>
     </tr>
     <tr>
       <td><label for="discarded">Discarded:</label></td>
@@ -689,11 +711,6 @@
   </c:if>
 </div>
 </form:form>
-
-<script type="text/javascript">
-  Utils.ui.updateConcentrationUnits('${sample.concentrationUnits}');
-  Utils.ui.updateVolumeUnits('${sample.volumeUnits}');
-</script>
 
 <c:if test="${sample.id != 0}">
   <miso:qcs id="list_qc" item="${sample}"/>

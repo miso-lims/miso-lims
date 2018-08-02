@@ -38,10 +38,11 @@ public class ListTablesIT extends AbstractIT {
       Columns.WARNINGS);
   private static final Set<String> dilutionsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.LIBRARY_NAME,
       Columns.LIBRARY_ALIAS, Columns.MATRIX_BARCODE, Columns.PLATFORM, Columns.TARGETED_SEQUENCING, Columns.CONCENTRATION,
-      Columns.CONCENTRATION_UNITS, Columns.VOLUME, Columns.NG_USED, Columns.VOLUME_USED, Columns.CREATOR, Columns.CREATION_DATE);
+      Columns.CONCENTRATION_UNITS, Columns.VOLUME, Columns.VOLUME_UNITS, Columns.NG_USED, Columns.VOLUME_USED, Columns.CREATOR,
+      Columns.CREATION_DATE);
   private static final Set<String> poolsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
-      Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.DILUTIONS, Columns.CONCENTRATION, Columns.LOCATION,
-      Columns.AVG_INSERT_SIZE, Columns.LAST_MODIFIED);
+      Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.DILUTIONS, Columns.CONCENTRATION, Columns.CONCENTRATION_UNITS,
+      Columns.LOCATION, Columns.AVG_INSERT_SIZE, Columns.LAST_MODIFIED);
   private static final Set<String> ordersColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
       Columns.PLATFORM, Columns.LONGEST_INDEX, Columns.SEQUENCING_PARAMETERS, Columns.REMAINING, Columns.LAST_MODIFIED);
   private static final Set<String> containersColumns = Sets.newHashSet(Columns.SORT, Columns.ID, Columns.SERIAL_NUMBER,

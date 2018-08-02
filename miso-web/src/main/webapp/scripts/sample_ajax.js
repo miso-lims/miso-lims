@@ -110,6 +110,11 @@ var Sample = Sample
         jQuery('#volume').attr('data-parsley-maxlength', '10');
         jQuery('#volume').attr('data-parsley-type', 'number');
 
+        // Concentration validation
+        jQuery('#concentration').attr('class', 'form-control');
+        jQuery('#concentration').attr('data-parsley-maxlength', '10');
+        jQuery('#concentration').attr('data-parsley-type', 'number');
+
         if (isDetailedSample) {
 
           if (isNewSample) {
@@ -123,10 +128,6 @@ var Sample = Sample
           // SampleClass validation
           jQuery('#sampleClass').attr('class', 'form-control');
           jQuery('#sampleClass').attr('data-parsley-required', 'true');
-
-          // Concentration validation
-          jQuery('#concentration').attr('class', 'form-control');
-          jQuery('#concentration').attr('data-parsley-type', 'number');
 
           // Group ID validation
           jQuery('#groupId').attr('class', 'form-control');

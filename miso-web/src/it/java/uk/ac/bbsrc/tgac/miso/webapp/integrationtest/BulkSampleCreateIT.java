@@ -56,11 +56,12 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   private static final Set<String> curlsColumns = Sets.newHashSet();
 
   // columns specific to creating gDNA stocks
-  private static final Set<String> gDnaStockColumns = Sets.newHashSet(SamColumns.STR_STATUS, SamColumns.VOLUME, SamColumns.CONCENTRATION);
+  private static final Set<String> gDnaStockColumns = Sets.newHashSet(SamColumns.STR_STATUS, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
+      SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
 
   // columns specific to creating RNA stocks
-  private static final Set<String> rnaStockColumns = Sets.newHashSet(SamColumns.STR_STATUS, SamColumns.VOLUME, SamColumns.CONCENTRATION,
-      SamColumns.DNASE_TREATED);
+  private static final Set<String> rnaStockColumns = Sets.newHashSet(SamColumns.STR_STATUS, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
+      SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.DNASE_TREATED);
 
   // columns specific to creating aliquots
   private static final Set<String> aliquotColumns = Sets.newHashSet(SamColumns.PURPOSE);

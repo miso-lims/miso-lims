@@ -116,8 +116,19 @@
     </td>
   </tr>
   <tr>
-    <td class="h">Desired Concentration<span id="concentrationUnits"></span>:*</td>
+    <td class="h">Desired Concentration:</td>
     <td><form:input id="concentration" path="concentration"/></td>
+  </tr>
+  <tr>
+    <td>Concentration Units:</td>
+    <td><form:select id="concentrationUnits" path="concentrationUnits">
+    <option value>(None)</option>
+      <c:forEach var="concentrationUnit" items="${concentrationUnits}">
+        <option value="${concentrationUnit}" <c:if test="${pool.concentrationUnits == concentrationUnit}">selected="selected"</c:if>>
+          ${concentrationUnit.units}
+        </option>
+      </c:forEach>
+    </form:select></td>
   </tr>
   <tr>
     <td class="h">Creation Date:*</td>
@@ -146,8 +157,19 @@
   </tr>
   
   <tr>
-    <td>Volume<span id="volumeUnits"></span>:</td>
+    <td>Volume:</td>
     <td><form:input id="volume" path="volume"/></td>
+  </tr>
+  <tr>
+    <td>Volume Units:</td>
+    <td><form:select id="volumeUnits" path="volumeUnits">
+    <option value>(None)</option>
+      <c:forEach var="volumeUnit" items="${volumeUnits}">
+        <option value="${volumeUnit}" <c:if test="${pool.volumeUnits == volumeUnit}">selected="selected"</c:if>>
+          ${volumeUnit.units}
+        </option>
+      </c:forEach>
+    </form:select></td>
   </tr>
   <tr>
     <td><label for="discarded">Discarded:</label></td>
@@ -165,11 +187,6 @@
 <%@ include file="volumeControl.jspf" %>
 
 <br/>
-
-<script type="text/javascript">
-  Utils.ui.updateConcentrationUnits('${pool.concentrationUnits}');
-  Utils.ui.updateVolumeUnits('${pool.volumeUnits}');
-</script>
 
 <script type="text/javascript">
   jQuery(document).ready(function () {

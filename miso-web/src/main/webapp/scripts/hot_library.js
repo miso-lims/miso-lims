@@ -626,7 +626,56 @@ HotTarget.library = (function() {
                 setData(null);
               }
             }
-          }, HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false), ];
+          },
+          {
+            header: 'Vol. Units',
+            data: 'volumeUnits',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: ['(None)'].concat(Constants.volumeUnits.map(function(unit){
+              return unit.units;
+            })),
+            include: config.showVolume,
+            allowHtml: true,
+            validator: Handsontable.validators.AutocompleteValidator,
+            unpack: function(obj, flat, setCellMeta) {
+              var units = Constants.volumeUnits.find(function(unit){
+                return unit.name == obj.volumeUnits;
+              });
+              flat['volumeUnits'] = !!units ? units.units : '(None)';
+            },
+            pack: function(obj, flat, errorHandler) {
+              var units = Constants.volumeUnits.find(function(unit){
+                return unit.units == flat['volumeUnits'];
+              });
+              obj['volumeUnits'] = !!units ? units.name : null;
+            }
+          },
+          HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false), 
+          {
+            header: 'Conc. Units',
+            data: 'concentrationUnits',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: ['(None)'].concat(Constants.concentrationUnits.map(function(unit){
+              return unit.units;
+            })),
+            include: true,
+            allowHtml: true,
+            validator: Handsontable.validators.AutocompleteValidator,
+            unpack: function(obj, flat, setCellMeta) {
+              var units = Constants.concentrationUnits.find(function(unit){
+                return unit.name == obj.concentrationUnits;
+              });
+              flat['concentrationUnits'] = !!units ? units.units : '(None)';
+            },
+            pack: function(obj, flat, errorHandler) {
+              var units = Constants.concentrationUnits.find(function(unit){
+                return unit.units == flat['concentrationUnits'];
+              });
+              obj['concentrationUnits'] = !!units ? units.name : null;
+            }
+          }]
 
       var spliceIndex = columns.indexOf(columns.filter(function(column) {
         return column.data === 'identificationBarcode';

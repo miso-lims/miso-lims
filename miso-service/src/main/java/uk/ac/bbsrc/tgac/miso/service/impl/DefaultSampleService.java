@@ -721,7 +721,9 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     target.setDescription(source.getDescription());
     target.setDiscarded(source.isDiscarded());
     target.setVolume(source.getVolume());
+    target.setVolumeUnits(source.getVolumeUnits());
     target.setConcentration(source.getConcentration());
+    target.setConcentrationUnits(source.getConcentrationUnits());
     target.setLocationBarcode(source.getLocationBarcode());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     if (isDetailedSample(target)) {

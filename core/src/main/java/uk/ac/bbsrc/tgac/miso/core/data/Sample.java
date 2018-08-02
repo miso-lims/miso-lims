@@ -247,30 +247,30 @@ public interface Sample
   /**
    * Returns the volume units of this Sample object.
    * 
-   * @return String volumeUnits.
+   * @return VolumeUnit volumeUnits.
    */
-  public String getVolumeUnits();
+  public VolumeUnit getVolumeUnits();
 
   /**
    * Sets the volumeUnits of this Sample object.
    * 
    * @param volumeUnits volumeUnits.
    */
-  public void setVolumeUnits(String volumeUnits);
+  public void setVolumeUnits(VolumeUnit volumeUnits);
 
   /**
    * Returns the concentration units of this Sample object.
    * 
-   * @return String concentrationUnits.
+   * @return ConcentrationUnit concentrationUnits.
    */
-  public String getConcentrationUnits();
+  public ConcentrationUnit getConcentrationUnits();
 
   /**
    * Sets the concentrationUnits of this Sample object.
    * 
    * @param concentrationUnits concentrationUnits.
    */
-  public void setConcentrationUnits(String concentrationUnits);
+  public void setConcentrationUnits(ConcentrationUnit concentrationUnits);
 
   /**
    * Returns the concentration of this Sample object.
