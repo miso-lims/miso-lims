@@ -529,6 +529,7 @@ public class Dtos {
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    dto.setArchived(from.isArchived());
     return dto;
   }
 

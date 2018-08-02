@@ -430,8 +430,7 @@ public class EditSampleController {
   @Autowired
   private SamplePurposeService samplePurposeService;
 
-  @ModelAttribute("samplePurposes")
-  public List<SamplePurpose> getSamplePurposes() throws IOException {
+  public List<SamplePurpose> getSamplePurposes(SampleAliquot sample) throws IOException {
     List<SamplePurpose> list = new ArrayList<>(samplePurposeService.getAll());
     Collections.sort(list, new Comparator<SamplePurpose>() {
       @Override
@@ -439,7 +438,9 @@ public class EditSampleController {
         return o1.getAlias().compareTo(o2.getAlias());
       }
     });
-    return list;
+    return list.stream().filter(samPurpose -> !samPurpose.isArchived() ||
+        (sample.getSamplePurpose() != null && sample.getSamplePurpose().getId() == samPurpose.getId()))
+        .collect(Collectors.toList());
   }
 
   @Autowired
@@ -680,6 +681,9 @@ public class EditSampleController {
         model.put("samplePools", pools.stream().map(p -> Dtos.asDto(p, false)).collect(Collectors.toList()));
         model.put("sampleRuns", runDtos);
         model.put("sampleRelations", getRelations(sample));
+        if (sample instanceof SampleAliquot) {
+          model.put("samplePurposes", getSamplePurposes((SampleAliquot) sample));
+        }
         addArrayData(sampleId, model);
       }
 
