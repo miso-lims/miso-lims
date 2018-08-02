@@ -112,6 +112,7 @@ public interface AbstractListPage {
     public static final String INDICES = "indices";
     public static final String ARRAYS = "arrays";
     public static final String ARRAYRUNS = "arrayruns";
+    public static final String WORKSETS = "worksets";
   }
 
   public static class ButtonText {

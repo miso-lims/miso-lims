@@ -1,6 +1,10 @@
 -- fixes BeforeInsertPool trigger created in V0004
 DROP TRIGGER IF EXISTS BeforeInsertPool;
 
+DELETE FROM Workset_Sample;
+DELETE FROM Workset_Library;
+DELETE FROM Workset_Dilution;
+DELETE FROM Workset;
 DELETE FROM BoxPosition;
 DELETE FROM BoxChangeLog;
 DELETE FROM Box;
@@ -84,6 +88,7 @@ DELETE FROM SampleNumberPerProject;
 DELETE FROM Project;
 DELETE FROM ReferenceGenome;
 DELETE FROM Note;
+DELETE FROM Deletion;
 DELETE FROM SecurityProfile_ReadGroup;
 DELETE FROM SecurityProfile_WriteGroup;
 DELETE FROM SecurityProfile_ReadUser;

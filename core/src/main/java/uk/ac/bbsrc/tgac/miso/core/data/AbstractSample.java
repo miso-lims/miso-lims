@@ -429,6 +429,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   public int hashCode() {
     return new HashCodeBuilder(7, 37)
         .appendSuper(super.hashCode())
+        .append(sampleId)
         .append(accession)
         .append(description)
         .append(identificationBarcode)
@@ -450,6 +451,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     AbstractSample other = (AbstractSample) obj;
     return new EqualsBuilder()
         .appendSuper(super.equals(obj))
+        .append(sampleId, other.sampleId)
         .append(accession, other.accession)
         .append(getAlias(), other.getAlias())
         .append(description, other.description)

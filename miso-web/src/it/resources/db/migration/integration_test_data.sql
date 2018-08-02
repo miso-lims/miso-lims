@@ -919,4 +919,20 @@ INSERT INTO QCType(qcTypeId, name, description, qcTarget, units, archived, preci
 INSERT INTO SampleQC(sample_sampleId, creator, date, type, results, created, lastModified) VALUES
 (2201, 1, '2018-07-10', 101, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
 
+INSERT INTO Workset(worksetId, alias, description, creator, created, lastModifier, lastModified) VALUES
+(1, 'Workset One', 'Workset One description', 1, '2018-08-03 13:12:00', 1, '2018-08-03 13:12:00'),
+(2, 'Workset Two', 'Workset Two description', 1, '2018-08-03 13:12:00', 1, '2018-08-03 13:12:00');
 
+INSERT INTO Workset_Sample(worksetId, sampleId) VALUES
+(1, 100001),
+(1, 100002),
+(1, 100003);
+
+INSERT INTO Workset_Library(worksetId, libraryId) VALUES
+(1, 100001),
+(1, 100002),
+(1, 100003);
+
+INSERT INTO Workset_Dilution(worksetId, dilutionId) VALUES
+(1, 120001),
+(1, 120002);

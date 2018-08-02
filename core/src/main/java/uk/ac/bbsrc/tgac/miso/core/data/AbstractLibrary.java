@@ -593,6 +593,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   public int hashCode() {
     return new HashCodeBuilder(3, 33)
         .appendSuper(super.hashCode())
+        .append(libraryId)
         .append(accession)
         .append(getAlias())
         .append(description)
@@ -620,6 +621,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     AbstractLibrary other = (AbstractLibrary) obj;
     return new EqualsBuilder()
         .appendSuper(super.equals(obj))
+        .append(libraryId, other.libraryId)
         .append(accession, other.accession)
         .append(getAlias(), other.getAlias())
         .append(description, other.description)

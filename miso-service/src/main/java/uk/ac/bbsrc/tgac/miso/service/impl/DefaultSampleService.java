@@ -39,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
+import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
@@ -66,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
+import uk.ac.bbsrc.tgac.miso.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -133,6 +135,8 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   private StainService stainService;
   @Autowired
   private BoxService boxService;
+  @Autowired
+  private WorksetService worksetService;
 
   @Autowired
   private NamingScheme namingScheme;
@@ -192,6 +196,10 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   public void setBoxService(BoxService boxService) {
     this.boxService = boxService;
+  }
+
+  public void setWorksetService(WorksetService worksetService) {
+    this.worksetService = worksetService;
   }
 
   public void setNamingScheme(NamingScheme namingScheme) {
@@ -921,6 +929,15 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     }
 
     return result;
+  }
+
+  @Override
+  public void beforeDelete(Sample object) throws IOException {
+    List<Workset> worksets = worksetService.listBySample(object.getId());
+    for (Workset workset : worksets) {
+      workset.getSamples().removeIf(sam -> sam.getId() == object.getId());
+      worksetService.save(workset);
+    }
   }
 
   @Override

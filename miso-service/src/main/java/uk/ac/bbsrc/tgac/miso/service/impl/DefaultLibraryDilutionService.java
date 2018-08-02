@@ -22,6 +22,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
@@ -39,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
+import uk.ac.bbsrc.tgac.miso.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -71,6 +73,8 @@ public class DefaultLibraryDilutionService
   private BoxService boxService;
   @Autowired
   private ChangeLogService changeLogService;
+  @Autowired
+  private WorksetService worksetService;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
@@ -285,6 +289,10 @@ public class DefaultLibraryDilutionService
     this.libraryService = libraryService;
   }
 
+  public void setWorksetService(WorksetService worksetService) {
+    this.worksetService = worksetService;
+  }
+
   @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
@@ -323,6 +331,15 @@ public class DefaultLibraryDilutionService
     }
 
     return result;
+  }
+
+  @Override
+  public void beforeDelete(LibraryDilution object) throws IOException {
+    List<Workset> worksets = worksetService.listByDilution(object.getId());
+    for (Workset workset : worksets) {
+      workset.getDilutions().removeIf(ldi -> ldi.getId() == object.getId());
+      worksetService.save(workset);
+    }
   }
 
   @Override

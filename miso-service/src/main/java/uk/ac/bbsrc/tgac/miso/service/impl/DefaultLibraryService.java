@@ -34,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -53,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -88,6 +90,8 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   private ChangeLogService changeLogService;
   @Autowired
   private BoxService boxService;
+  @Autowired
+  private WorksetService worksetService;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
@@ -626,6 +630,10 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     this.boxService = boxService;
   }
 
+  public void setWorksetService(WorksetService worksetService) {
+    this.worksetService = worksetService;
+  }
+
   public void setAutoGenerateIdBarcodes(Boolean autoGenerateIdBarcodes) {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
   }
@@ -660,6 +668,15 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
           + (object.getLibraryDilutions().size() > 1 ? "s" : "")));
     }
     return result;
+  }
+
+  @Override
+  public void beforeDelete(Library object) throws IOException {
+    List<Workset> worksets = worksetService.listByLibrary(object.getId());
+    for (Workset workset : worksets) {
+      workset.getLibraries().removeIf(lib -> lib.getId() == object.getId());
+      worksetService.save(workset);
+    }
   }
 
   @Override
