@@ -135,7 +135,7 @@ public class ListTablesIT extends AbstractIT {
       creator, modifier);
 
   private static final Set<String> samplesQueries = concatSets(
-      Sets.newHashSet("SAM1", "class:gDNA", "institute:OICR", "inst:OICR", "external:EXT", "ext:EXT", "extern:EXT"),
+      Sets.newHashSet("SAM1", "class:gDNA", "institute:OICR", "inst:OICR", "external:EXT", "ext:EXT", "extern:EXT", "subproject:Mini"),
       createdDates, createdOnDates, receivedDates, creator, modifier, box);
 
   private static final Set<String> librariesQueries = concatSets(

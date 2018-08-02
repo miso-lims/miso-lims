@@ -103,6 +103,10 @@ ListUtils = (function() {
     "kitname": {
       term: "kitname:NAME",
       help: "Checks if an item uses a library, clustering, or multiplexing kit of the specified name. This is a partial match."
+    },
+    "subproject": {
+      term: "subproject:NAME",
+      help: "Checks if an item is tagged with the given subproject"
     }
   };
 

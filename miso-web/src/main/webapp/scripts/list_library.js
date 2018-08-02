@@ -139,7 +139,13 @@ ListTarget.library = {
         }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'],
-        searchTerms['index_name'], searchTerms['index_seq'], searchTerms['institute'], searchTerms['external'], searchTerms['box'], searchTerms['kitname']]
+    const plainSampleTerms = [searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'], 
+      searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box'], searchTerms['kitname']];
+    const detailedSampleTerms = [searchTerms['institute'], searchTerms['external']];
+    if (Constants.isDetailedSample) {
+      return plainSampleTerms.concat(detailedSampleTerms);
+    } else {
+      return plainSampleTerms;
+    }
   }
 };

@@ -147,27 +147,27 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
 
   @Override
   default void restrictPaginationByArchived(Criteria criteria, boolean isArchived, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " is not archivable.");
+    errorHandler.accept(String.format("%s is not archivable.", getFriendlyName()));
   }
 
   @Override
   default void restrictPaginationByArrayed(Criteria criteria, boolean isArrayed, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " cannot be arrayed.");
+    errorHandler.accept(String.format("%s cannot be arrayed.", getFriendlyName()));
   }
 
   @Override
   default void restrictPaginationByBox(Criteria criteria, String name, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " cannot be boxed.");
+    errorHandler.accept(String.format("%s cannot be boxed.", getFriendlyName()));
   }
 
   @Override
   default void restrictPaginationByBoxUse(Criteria criteria, long id, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " has no use.");
+    errorHandler.accept(String.format("%s has no use.", getFriendlyName()));
   }
 
   @Override
   public default void restrictPaginationByClass(Criteria criteria, String name, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " is exempt from class strugle.");
+    errorHandler.accept(String.format("%s is exempt from class strugle.", getFriendlyName()));
   }
 
   @Override
@@ -176,63 +176,63 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     if (property != null) {
       criteria.add(Restrictions.between(property, start, end));
     } else {
-      errorHandler.accept(getFriendlyName() + " has no " + type.name().toLowerCase() + " date.");
+      errorHandler.accept(String.format("%s has no %s date.", getFriendlyName(), type.name().toLowerCase()));
     }
   }
 
   @Override
   default void restrictPaginationByExternalName(Criteria criteria, String name, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " has no external name.");
+    errorHandler.accept(String.format("%s has no external name.", getFriendlyName()));
   }
 
   @Override
   default void restrictPaginationByFulfilled(Criteria criteria, boolean isFulfilled, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " has no fulfillment (nor existential dread).");
+    errorHandler.accept(String.format("%s has no fulfillment (nor existential dread).", getFriendlyName()));
   }
 
   @Override
   public default void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " has no health information.");
+    errorHandler.accept(String.format("%s has no health information.", getFriendlyName()));
   }
 
   @Override
   public default void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " has no indices.");
+    errorHandler.accept(String.format("%s is not indexed.", getFriendlyName()));
   }
 
   @Override
   default void restrictPaginationByInstitute(Criteria criteria, String name, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " has no institute associated with it.");
+    errorHandler.accept(String.format("%s has no institute associated with it.", getFriendlyName()));
   }
 
   @Override
   default void restrictPaginationByInstrumentType(Criteria criteria, InstrumentType type, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " cannot be filtered by instrument type.");
+    errorHandler.accept(String.format("%s cannot be filtered by instrument type.", getFriendlyName()));
   }
 
   @Override
   default void restrictPaginationByKitType(Criteria criteria, KitType type, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " cannot be filtered by pool.");
+    errorHandler.accept(String.format("%s cannot be filtered by pool.", getFriendlyName()));
   }
 
   @Override
   default void restrictPaginationByKitName(Criteria criteria, String name, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " cannot be filtered by kit name.");
+    errorHandler.accept(String.format("%s cannot be filtered by kit name.", getFriendlyName()));
   }
 
   @Override
   default void restrictPaginationByPending(Criteria criteria, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " is not dependable.");
+    errorHandler.accept(String.format("%s is not dependable.", getFriendlyName()));
   }
 
   @Override
   default void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " is not platform-specific.");
+    errorHandler.accept(String.format("%s is not platform-specific.", getFriendlyName()));
   }
 
   @Override
   default void restrictPaginationByPoolId(Criteria criteria, long poolId, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " cannot be filtered by pool.");
+    errorHandler.accept(String.format("%s cannot be filtered by pool.", getFriendlyName()));
   }
 
   @Override
@@ -241,7 +241,7 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     if (column != null) {
       criteria.add(Restrictions.eq(column, projectId));
     } else {
-      errorHandler.accept(getFriendlyName() + " cannot be filtered by project.");
+      errorHandler.accept(String.format("%s cannot be filtered by project.", getFriendlyName()));
     }
   }
 
@@ -254,12 +254,17 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
 
   @Override
   default void restrictPaginationBySequencerId(Criteria criteria, long id, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " cannot be filtered by sequencer.");
+    errorHandler.accept(String.format("%s cannot be filtered by sequencer.", getFriendlyName()));
   }
 
   @Override
   default void restrictPaginationBySequencingParametersId(Criteria criteria, long id, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " cannot be filtered by sequencing parameters.");
+    errorHandler.accept(String.format("%s cannot be filtered by sequencing parameters.", getFriendlyName()));
+  }
+
+  @Override
+  default void restrictPaginationBySubproject(Criteria criteria, String query, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by subproject.", getFriendlyName()));
   }
 
   @Override
@@ -268,7 +273,7 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     if (property != null) {
       criteria.add(Restrictions.ilike(property, userName, MatchMode.START));
     } else {
-      errorHandler.accept(getFriendlyName() + " has no " + (creator ? "creator" : "modifier") + ".");
+      errorHandler.accept(String.format("%s has no %s.", getFriendlyName(), (creator ? "creator" : "modifier")));
     }
   }
 }

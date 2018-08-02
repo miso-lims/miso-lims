@@ -275,7 +275,8 @@ public abstract interface PaginationFilter {
           return box(parts[1]);
         case "kitname":
           return kitName(parts[1]);
-
+        case "subproject":
+          return subproject(parts[1]);
         }
       }
       return query(x);
@@ -420,6 +421,16 @@ public abstract interface PaginationFilter {
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
         sink.restrictPaginationBySequencingParametersId(item, parametersId, errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter subproject(String subproject) {
+    return new PaginationFilter() {
+      
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationBySubproject(item, subproject, errorHandler);
       }
     };
   }
