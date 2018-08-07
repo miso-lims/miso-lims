@@ -30,7 +30,7 @@ public class HibernateLibraryDilutionDao
   // Make sure these match the HiberatePoolableElementViewDao
   private final static String[] SEARCH_PROPERTIES = new String[] { "name", "identificationBarcode", "library.name", "library.alias",
       "library.description" };
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("library");
+  private final static List<String> STANDARD_ALIASES = Arrays.asList("library", "creator", "lastModifier");
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -175,7 +175,7 @@ public class HibernateLibraryDilutionDao
 
   @Override
   public String propertyForUserName(Criteria item, boolean creator) {
-    return creator ? "dilutionUserName" : "derivedInfo.lastModifier.loginName";
+    return creator ? "creator.loginName" : "lastModifier.loginName";
   }
 
   @Override

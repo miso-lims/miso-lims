@@ -29,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateStudyDaoTest extends AbstractDAOTest {
 
@@ -174,4 +175,26 @@ public class HibernateStudyDaoTest extends AbstractDAOTest {
     return s;
   }
 
+  @Test
+  public void testSearch() throws IOException {
+    testSearch(PaginationFilter.query("STU1"));
+  }
+
+  @Test
+  public void testSearchByModifier() throws IOException {
+    testSearch(PaginationFilter.user("admin", false));
+  }
+
+  /**
+   * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
+   * 
+   * @param filter the search filter
+   * @throws IOException
+   */
+  private void testSearch(PaginationFilter filter) throws IOException {
+    // verify Hibernate mappings by ensuring that no exception is thrown
+    assertNotNull(dao.list(err -> {
+      throw new RuntimeException(err);
+    }, 0, 10, true, "name", filter));
+  }
 }

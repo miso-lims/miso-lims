@@ -34,6 +34,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 @Transactional
@@ -521,4 +523,47 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     });
   }
 
+  @Test
+  public void testSearch() throws IOException {
+    testSearch(PaginationFilter.query("IPO1"));
+  }
+
+  @Test
+  public void testSearchByCreated() throws IOException {
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.CREATE));
+  }
+
+  @Test
+  public void testSearchByCreator() throws IOException {
+    testSearch(PaginationFilter.user("admin", true));
+  }
+
+  @Test
+  public void testSearchByModifier() throws IOException {
+    testSearch(PaginationFilter.user("admin", false));
+  }
+
+  @Test
+  public void testSearchByPlatform() throws IOException {
+    testSearch(PaginationFilter.platformType(PlatformType.ILLUMINA));
+  }
+
+  @Test
+  public void testSearchByBox() throws IOException {
+    testSearch(PaginationFilter.box("BOX1"));
+  }
+  
+  /**
+   * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
+   * 
+   * @param filter the search filter
+   * @throws IOException
+   */
+  private void testSearch(PaginationFilter filter) throws IOException {
+    // verify Hibernate mappings by ensuring that no exception is thrown
+    assertNotNull(dao.list(err -> {
+      throw new RuntimeException(err);
+    }, 0, 10, true, "name", filter));
+  }
+  
 }
