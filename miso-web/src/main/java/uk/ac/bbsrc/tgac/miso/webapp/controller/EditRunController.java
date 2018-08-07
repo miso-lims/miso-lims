@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,10 +41,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
@@ -64,7 +67,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
@@ -76,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.webapp.context.ExternalUriBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ExperimentListConfiguration;
 import uk.ac.bbsrc.tgac.miso.webapp.util.JsonArrayCollector;
 import uk.ac.bbsrc.tgac.miso.webapp.util.RunMetricsSource;
@@ -121,6 +124,9 @@ public class EditRunController {
   @Autowired
   private IssueTrackerManager issueTrackerManager;
 
+  @Autowired
+  private ExternalUriBuilder externalUriBuilder;
+
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
@@ -162,7 +168,7 @@ public class EditRunController {
     return false;
   }
 
-  @RequestMapping(value = "/new/{srId}", method = RequestMethod.GET)
+  @GetMapping("/new/{srId}")
   public ModelAndView newUnassignedRun(@PathVariable Long srId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     // clear any existing run in the model
@@ -174,17 +180,17 @@ public class EditRunController {
 
   }
 
-  @RequestMapping(value = "/rest/{runId}", method = RequestMethod.GET)
+  @GetMapping("/rest/{runId}")
   public @ResponseBody Run jsonRest(@PathVariable Long runId) throws IOException {
     return runService.get(runId);
   }
 
-  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  @GetMapping("/rest/changes")
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
     return changeLogService.listAll("Run");
   }
 
-  @RequestMapping(value = "/{runId}", method = RequestMethod.GET)
+  @GetMapping("/{runId}")
   public ModelAndView setupForm(@PathVariable Long runId, ModelMap model) throws IOException {
     Run run = runService.get(runId);
 
@@ -192,7 +198,7 @@ public class EditRunController {
 
   }
 
-  @RequestMapping(value = "/alias/{runAlias}", method = RequestMethod.GET)
+  @GetMapping("/alias/{runAlias}")
   public ModelAndView setupForm(@PathVariable String runAlias, ModelMap model) throws IOException {
     Run run = runService.getRunByAlias(runAlias);
     return setupForm(run, model);
@@ -214,7 +220,7 @@ public class EditRunController {
         model.put("multiplexed", isMultiplexed(run));
         model.put("metrics",
             getSources().filter(Objects::nonNull).map(source -> source.fetchMetrics(run))
-                .filter(metrics -> !LimsUtils.isStringBlankOrNull(metrics))
+                .filter(metrics -> !isStringBlankOrNull(metrics))
                 .collect(new JsonArrayCollector()));
         if (run.getSequencerPartitionContainers().size() == 1) {
           ObjectMapper mapper = new ObjectMapper();
@@ -225,6 +231,7 @@ public class EditRunController {
         } else {
           model.put("partitionNames", "[]");
         }
+        model.put("runReportLinks", externalUriBuilder.getUris(run));
       }
 
       model.put("sequencingParameters",
@@ -283,7 +290,7 @@ public class EditRunController {
     }
   }
 
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping()
   public String processSubmit(@ModelAttribute("run") Run run, ModelMap model, SessionStatus session) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());

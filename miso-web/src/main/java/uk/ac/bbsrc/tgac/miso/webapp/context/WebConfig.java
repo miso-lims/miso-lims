@@ -6,6 +6,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.support.ConfigurableWebBindingInitializer;
@@ -53,6 +54,16 @@ public class WebConfig extends WebMvcConfigurationSupport {
     RequestMappingHandlerAdapter adapter = super.requestMappingHandlerAdapter();
     adapter.setWebBindingInitializer(bindingInitializer());
     return adapter;
+  }
+
+  @Value("${miso.run.report.links:}")
+  private String runReportLinksConfigLine;
+
+  @Bean
+  public ExternalUriBuilder externalUriBuilder() {
+    ExternalUriBuilder externalUriBuilder = new ExternalUriBuilder();
+    externalUriBuilder.setRunReportLinksConfig(runReportLinksConfigLine);
+    return externalUriBuilder;
   }
 
   @Autowired
