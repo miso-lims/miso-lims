@@ -242,7 +242,16 @@
       </script>
     </td>
   </tr>
-
+  <c:if test="${run.id != 0 && !runReportLinks.isEmpty()}">
+  <tr>
+    <td>External Links:</td>
+    <td>
+    <c:forEach items="${runReportLinks}" var="runReportLink">
+      <span><a href="<c:out value="${runReportLink.value}"/>">${runReportLink.key}</a></span><br/>
+    </c:forEach>
+    </td>
+  </tr>
+  </c:if>
 </table>
 
 <script type="text/javascript">
