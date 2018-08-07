@@ -79,11 +79,14 @@ public class TimeShiftingInterceptorTest extends AbstractDAOTest {
     Transaction tx = session.beginTransaction();
     DateFormatter formatter = new DateFormatter("yyyy-MM-dd");
     LibraryDilution ldi = new LibraryDilution();
+    UserImpl user = new UserImpl();
+    user.setId(1L);
+    user.setFullName("me");
     ldi.setConcentration(0D);
     ldi.setLibrary((Library) session.get(LibraryImpl.class, 1L));
     Date date = formatter.parse("2017-02-13", Locale.CANADA);
     ldi.setCreationDate(date);
-    ldi.setDilutionCreator("me");
+    ldi.setCreator(user);
     ldi.setName("Jim");
     ldi.setLastModified(new Date());
     ldi.setLastModifier((User) session.get(UserImpl.class, 1L));

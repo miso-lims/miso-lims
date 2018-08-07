@@ -149,7 +149,7 @@ public class DefaultLibraryDilutionService
   @Override
   public Long create(LibraryDilution dilution) throws IOException {
     loadChildEntities(dilution);
-    dilution.setDilutionCreator(authorizationManager.getCurrentUsername());
+    dilution.setCreator(authorizationManager.getCurrentUser());
     if (dilution.getSecurityProfile() == null) {
       dilution.inheritPermissions(libraryService.get(dilution.getLibrary().getId()));
     }
@@ -307,7 +307,7 @@ public class DefaultLibraryDilutionService
 
   @Override
   public void authorizeDeletion(LibraryDilution object) throws IOException {
-    User creator = securityStore.getUserByFullName(object.getDilutionCreator());
+    User creator = object.getCreator();
     authorizationManager.throwIfNonAdminOrMatchingOwner(creator);
   }
 

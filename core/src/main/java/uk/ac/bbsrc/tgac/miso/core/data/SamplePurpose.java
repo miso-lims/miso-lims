@@ -27,4 +27,8 @@ public interface SamplePurpose extends Serializable, Aliasable, Deletable {
 
   void setLastUpdated(Date lastUpdated);
 
+  boolean isArchived();
+
+  void setArchived(boolean archived);
+
 }

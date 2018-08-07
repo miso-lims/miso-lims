@@ -758,6 +758,12 @@ var HotUtils = {
     td.classList.add('multipleOptions');
     return td;
   },
+  
+  notificationRenderer: function(instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+    td.classList.add('notification');
+    return td;
+  },
 
   makeColumnForConstantsList: function(headerName, include, flatProperty, modelProperty, id, name, items, required, baseobj, sortFunc) {
     var labels = items.sort(sortFunc || Utils.sorting.standardSort(name)).map(function(item) {

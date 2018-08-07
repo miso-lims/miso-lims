@@ -109,7 +109,7 @@ public class JiraIssueManager implements IssueTrackerManager {
   @Override
   public List<Issue> searchIssues(String query) throws IOException {
     Map<String, String> params = new HashMap<>();
-    params.put("jql", "text~'" + query.replaceAll("\\s*", "+") + "'");
+    params.put("jql", "text~'" + query.replaceAll("\\s+", "+") + "'");
     WebResource webResource = prepareWebResource(getRestUri("/search", params));
     return retrieveList(webResource);
   }

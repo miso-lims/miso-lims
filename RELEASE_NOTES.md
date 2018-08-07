@@ -1,4 +1,19 @@
-# 0.2.133-oicr
+# 0.2.135
+
+Changes:
+
+ * Allow adding and editing Library creation date
+ * Add updating identities with new external names when creating children
+ * Add archived Sample Purposes
+ * fixed JIRA search for Run-related tickets
+ * Allow non-unique indices within a family
+ * Make containers deletable
+ * Filter search by subproject
+ * Allow library creation for all platforms
+ * Add description to bulk Pools table
+ * Remove add user button when using LDAP
+
+# 0.2.134
 
 Changes:
 
@@ -9,6 +24,8 @@ Changes:
 Changes:
 
  * fix: use java.util.logging instead of slf4j in Flyway migration
+
+BAD: Flyway migration via Flyway command-line tool still fails. Fixed in 0.2.134.
 
 # 0.2.132
 

@@ -373,6 +373,12 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
+  public void restrictPaginationBySubproject(Criteria criteria, String subproject, Consumer<String> errorHandler) {
+    criteria.createAlias("subproject", "subproject");
+    criteria.add(Restrictions.ilike("subproject.alias", subproject, MatchMode.START));
+  }
+
+  @Override
   public String getFriendlyName() {
     return "Sample";
   }

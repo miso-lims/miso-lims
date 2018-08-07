@@ -14,6 +14,7 @@ public class SamplePurposeDto {
   private Long updatedById;
   private String updatedByUrl;
   private String lastUpdated;
+  private boolean archived;
 
   public Long getId() {
     return id;
@@ -85,6 +86,14 @@ public class SamplePurposeDto {
 
   public void setUpdatedById(Long updatedById) {
     this.updatedById = updatedById;
+  }
+
+  public boolean isArchived() {
+    return archived;
+  }
+
+  public void setArchived(boolean archived) {
+    this.archived = archived;
   }
 
   @Override

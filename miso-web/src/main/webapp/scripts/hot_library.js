@@ -322,6 +322,29 @@ HotTarget.library = (function() {
             validator: HotUtils.validator.optionalTextNoSpecialChars
           }),
           {
+            header: 'Date of creation',
+            data: 'creationDate',
+            type: 'date',
+            dateFormat: 'YYYY-MM-DD',
+            datePickerConfig: {
+              firstDay: 0,
+              numberOfMonths: 1
+            },
+            allowEmpty: true,
+            include: !config.isLibraryReceipt,
+            unpack: function(lib, flat, setCellMeta) {
+              // If creating, default to today's date in format YYYY-MM-DD
+              if (!lib.creationDate && create) {
+                flat.creationDate = Utils.getCurrentDate();
+              } else {
+                flat.creationDate = Utils.valOrNull(lib.creationDate);
+              }
+            },
+            pack: function(lib, flat, errorHandler) {
+              lib.creationDate = flat.creationDate;
+            }
+          },
+          {
             header: 'Date of receipt',
             data: 'receivedDate',
             type: 'date',
@@ -445,11 +468,7 @@ HotTarget.library = (function() {
             type: 'dropdown',
             readOnly: !create,
             trimDropdown: false,
-            source: Constants.platformTypes.filter(function(pt) {
-              return pt.active || data.reduce(function(acc, lib) {
-                return acc || pt.key == lib.platformType;
-              }, false);
-            }).map(function(pt) {
+            source: Constants.platformTypes.map(function(pt) {
               return pt.key;
             }),
             validator: HotUtils.validator.requiredAutocomplete,

@@ -9,9 +9,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 @JsonTypeName(value = SampleIdentity.CATEGORY_NAME)
 public class SampleIdentityDto extends DetailedSampleDto {
 
-  private String externalName;
   private String donorSex;
   private String consentLevel;
+  private String externalName;
 
   public String getExternalName() {
     return externalName;
@@ -39,7 +39,7 @@ public class SampleIdentityDto extends DetailedSampleDto {
 
   @Override
   public String toString() {
-    return "SampleIdentityDto [externalName=" + externalName + ", donorSex=" + donorSex
+    return "SampleIdentityDto [externalName=" + getExternalName() + ", donorSex=" + donorSex
         + ", super=" + super.toString() + "]";
   }
 

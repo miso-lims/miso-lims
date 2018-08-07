@@ -42,6 +42,10 @@ HotTarget.sample = (function() {
       return item.label == flatObj.identityAlias;
     }, flatObj.potentialIdentities);
   };
+  
+  var getExternalNames = function(identityAlias){
+    return identityAlias.replace(/.*--(\s*)/, "").toLowerCase().split(",");
+  }
 
   return {
 
@@ -299,9 +303,35 @@ HotTarget.sample = (function() {
               flat.externalName = Utils.valOrNull(sam.externalName);
             },
             pack: function(sam, flat, errorHandler) {
+              sam.externalNames = flat.externalName;
               if (!getSelectedIdentity(flat)) {
                 sam.externalName = flat.externalName;
               } // else externalName will come from an existing Identity via the Identity Alias column
+            },
+            depends: 'identityAlias',
+            update:function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              if(!value || value == "Delete external name, select a project, then re-enter external name." || value == '(...searching...)'
+                || /First Receipt \(.*\)/.test(value) || !flat['externalName']){
+                setOptions({
+                  'renderer': Handsontable.renderers.TextRenderer
+                });
+                return;
+              };
+              
+              var existingExternalNames = getExternalNames(value);
+              var newExternalNames = flat['externalName'].toLowerCase().split(",").map(function(name){
+                return name.trim();
+              });
+              if(newExternalNames.every(function(externalName){
+                return existingExternalNames.indexOf(externalName) != -1;
+              })){
+                renderer = Handsontable.renderers.TextRenderer;
+              } else {
+                renderer = HotUtils.notificationRenderer;
+              }
+              setOptions({
+                'renderer': renderer
+              })
             }
           },
           {
@@ -642,7 +672,18 @@ HotTarget.sample = (function() {
 
           // Aliquot columns
           HotUtils.makeColumnForConstantsList('Purpose', show['Aliquot'] && !config.isLibraryReceipt, 'samplePurposeAlias',
-              'samplePurposeId', 'id', 'alias', Constants.samplePurposes, true)];
+              'samplePurposeId', 'id', 'alias', Constants.samplePurposes, true, {
+            'depends': '*start',
+            'update': function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData){
+              setOptions({
+                'source': Constants.samplePurposes.filter(function(samplePurpose){
+                  return !samplePurpose.archived || sam.samplePurposeId == samplePurpose.id;
+                }).map(function(samplePurpose){
+                  return samplePurpose.alias;
+                })
+              });
+            }
+          })];
 
       if (!config.isLibraryReceipt) {
         var spliceIndex = columns.indexOf(columns.filter(function(column) {

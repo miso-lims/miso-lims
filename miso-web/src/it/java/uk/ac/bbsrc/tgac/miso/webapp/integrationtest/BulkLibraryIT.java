@@ -42,10 +42,10 @@ public class BulkLibraryIT extends AbstractIT {
       LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.VOLUME, LibColumns.CONCENTRATION);
 
   private static final Set<String> editColumns = Sets.newHashSet(LibColumns.RECEIVE_DATE, LibColumns.SAMPLE_ALIAS,
-      LibColumns.SAMPLE_LOCATION, LibColumns.EFFECTIVE_GROUP_ID);
+      LibColumns.SAMPLE_LOCATION, LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE);
 
   private static final Set<String> propagateColumns = Sets.newHashSet(LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
-      LibColumns.EFFECTIVE_GROUP_ID);
+      LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE);
 
   private static final Set<String> receiptColumns = Sets.newHashSet(SamColumns.SAMPLE_TYPE,
       SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.EXTERNAL_NAME,
@@ -140,7 +140,7 @@ public class BulkLibraryIT extends AbstractIT {
     assertTrue(codes.contains("MR"));
 
     Set<String> platforms = table.getDropdownOptions(LibColumns.PLATFORM, 0);
-    assertEquals(2, platforms.size());
+    assertEquals(6, platforms.size()); // All members of PlatformType
     assertTrue(platforms.contains("Illumina"));
     assertTrue(platforms.contains("PacBio"));
 

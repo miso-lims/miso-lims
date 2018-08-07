@@ -99,9 +99,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
 
   @Override
   public long save(Library library) throws IOException {
-    if (library.getCreationDate() == null) {
-      library.setCreationDate(new Date());
-    }
     long id;
     if (library.getId() == AbstractLibrary.UNSAVED_ID) {
       id = (long) currentSession().save(library);

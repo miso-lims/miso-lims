@@ -495,6 +495,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     target.setPaired(source.getPaired());
     target.setLowQuality(source.isLowQuality());
     target.setDiscarded(source.isDiscarded());
+    target.setCreationDate(source.getCreationDate());
     if (target.isDiscarded()) {
       target.setVolume(0.0);
     } else {

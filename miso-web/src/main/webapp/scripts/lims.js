@@ -473,7 +473,7 @@ var Utils = Utils
       },
 
       showAjaxErrorDialog: function(xhr, textStatus, errorThrown, errorCallback) {
-        var lines = ['Error: ' + errorThrown];
+        var lines = [errorThrown];
         try {
           var responseObj = JSON.parse(xhr.responseText);
           if (responseObj.detail) {
@@ -490,7 +490,7 @@ var Utils = Utils
         } catch (e) {
           // If we got detail, great; if we didn't meh.
         }
-        Utils.showOkDialog(title, lines, errorCallback);
+        Utils.showOkDialog('Error', lines, errorCallback);
       },
 
       ajaxWithDialog: function(title, method, url, data, callback, errorCallback) {
@@ -767,17 +767,17 @@ Utils.ui = {
       element.removeClass('disabled');
     }
   },
-  
+
   updateConcentrationUnits: function(concentrationUnits) {
     var units = Utils.validation.isEmpty(concentrationUnits) ? '' : ' (' + concentrationUnits + ')';
     jQuery('#concentrationUnits').html(units);
   },
-  
+
   updateVolumeUnits: function(volumeUnits) {
     var units = Utils.validation.isEmpty(volumeUnits) ? '' : ' (' + volumeUnits + ')';
     jQuery('#volumeUnits').html(units);
   },
-  
+
 };
 
 Utils.fileUpload = {

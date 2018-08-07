@@ -133,6 +133,16 @@ HotTarget.pool = (function() {
           pool.alias = flat.alias;
         }
       }, {
+        header: 'Description',
+        data: 'description',
+        include: true,
+        unpack: function(pool, flat, setCellMeta) {
+          flat.description = pool.description || null;
+        },
+        pack: function(pool, flat, errorHandler) {
+          pool.description = flat.description;
+        }
+      }, {
         header: 'Matrix Barcode',
         data: 'identificationBarcode',
         validator: HotUtils.validator.optionalTextNoSpecialChars,

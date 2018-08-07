@@ -19,7 +19,7 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
     ALIAS(By.id("alias"), FieldType.TEXT),
     BARCODE(By.id("identificationBarcode"), FieldType.TEXT),
     DESCRIPTION(By.id("description"), FieldType.TEXT),
-    CREATION_DATE(By.id("creationDate"), FieldType.LABEL),
+    CREATION_DATE(By.id("creationdatepicker"), FieldType.DATEPICKER),
     PLATFORM(By.id("platformTypes"), FieldType.DROPDOWN),
     LIBRARY_TYPE(By.id("libraryTypes"), FieldType.DROPDOWN),
     DESIGN(By.id("libraryDesignTypes"), FieldType.DROPDOWN),

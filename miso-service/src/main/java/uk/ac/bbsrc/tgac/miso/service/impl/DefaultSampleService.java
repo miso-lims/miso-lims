@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
@@ -76,6 +78,8 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   private static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
   private static final String ERR_MISSING_PARENT_ID = "Detailed sample is missing parent identifier";
+
+  private static final Pattern COMMA = Pattern.compile(",");
 
   public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, Sample parent, Sample child) {
     if (parent == null && !isDetailedSample(child)) {
@@ -229,6 +233,8 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
       if (!isIdentitySample(sample)) {
+        // Create a copy of the incoming sample's identity
+        SampleIdentity identityCopy = getIdentity(detailed);
         if (detailed.getParent() == null) {
           throw new IllegalArgumentException(ERR_MISSING_PARENT_ID);
         }
@@ -244,6 +250,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
             throw new IOException(e.getMessage(), e);
           }
         }
+        addExternalNames(detailed, identityCopy);
         validateHierarchy(detailed);
       } else {
         if (isUniqueExternalNameWithinProjectRequired() && isExternalNameDuplicatedInProject(sample)) {
@@ -372,6 +379,38 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   }
 
   /**
+   * Adds any external names in the sample's attached identity to the identity stored in the database
+   * 
+   * @param sample
+   * @throws IOException
+   */
+
+  private void addExternalNames(DetailedSample sample, SampleIdentity identityCopy) throws IOException {
+    if (identityCopy == null || identityCopy.getExternalName() == null) return;
+    SampleIdentity identity = (SampleIdentity) get(getIdentity(sample).getId());
+    Set<String> identityExternalNames = SampleIdentityImpl.getSetFromString(identity.getExternalName());
+    Set<String> tempExternalNames = SampleIdentityImpl.getSetFromString(identityCopy.getExternalName());
+    Set<String> lowerCaseIdentityExternalNames = identityExternalNames.stream().map(String::toLowerCase).collect(Collectors.toSet());
+    tempExternalNames.stream().forEach(name -> {
+      try {
+        if (!lowerCaseIdentityExternalNames.contains(name.toLowerCase()) && !(isUniqueExternalNameWithinProjectRequired() &&
+            (identity.getProject() == null
+                || getIdentitiesByExternalNameOrAliasAndProject(name, identity.getProject().getId(), true).size() > 0))) {
+          identityExternalNames.add(name);
+        }
+      } catch (IOException e) {
+        log.error("Failed to retrieve all external names: " + e);
+      }
+    });
+
+    identity.setExternalName(String.join(",", identityExternalNames));
+    if (identityExternalNames.size() > lowerCaseIdentityExternalNames.size()) {
+      setChangeDetails(identity);
+      sampleStore.update(identity);
+    }
+  }
+
+  /**
    * Checks whether the given external name(s) (may be multiple comma-separated names) is required to be unique within a project,
    * then if it actually is unique within a project.
    * This method should be called <b>before</b> saving an Identity.
@@ -476,6 +515,21 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     }
     SampleIdentity identity = findOrCreateIdentity(descendant, (SampleIdentity) parent);
     child.setParent(identity);
+  }
+
+  /**
+   * Finds the identity of a sample by climbing the hierarchy
+   * 
+   * @param sample
+   * @return identity attached to sample or null if no identity is attached
+   * @throws IOException
+   */
+  private SampleIdentity getIdentity(DetailedSample sample) throws IOException {
+    if (sample.getParent() == null) {
+      throw new IllegalArgumentException(ERR_MISSING_PARENT_ID);
+    }
+    SampleIdentity identity = LimsUtils.getParent(SampleIdentity.class, sample);
+    return identity;
   }
 
   private SampleIdentity findOrCreateIdentity(DetailedSample descendant, SampleIdentity identity) throws IOException, MisoNamingException {

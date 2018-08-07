@@ -226,7 +226,13 @@ ListTarget.sample = {
         }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['created'], searchTerms['changed'], searchTerms['received'], searchTerms['creator'], searchTerms['changedby'],
-        searchTerms['class'], searchTerms['institute'], searchTerms['external'], searchTerms['box']]
+    const plainSampleTerms = [searchTerms['created'], searchTerms['changed'], searchTerms['received'], searchTerms['creator'],
+      searchTerms['changedby'], searchTerms['box']];
+    const detailedSampleTerms = [searchTerms['class'], searchTerms['institute'], searchTerms['external'], searchTerms['subproject']];
+    if (Constants.isDetailedSample) {
+      return plainSampleTerms.concat(detailedSampleTerms);
+    } else {
+      return plainSampleTerms;
+    }
   }
 };

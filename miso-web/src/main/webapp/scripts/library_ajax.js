@@ -69,6 +69,12 @@ var Library = Library || {
     jQuery('#receiveddatepicker').attr('data-date-format', 'YYYY-MM-DD');
     jQuery('#receiveddatepicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
     jQuery('#receiveddatepicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+    
+    // Date of Creation validation: ensure date is of correct form
+    jQuery('#creationdatepicker').attr('class', 'form-control');
+    jQuery('#creationdatepicker').attr('data-date-format', 'YYYY-MM-DD');
+    jQuery('#creationdatepicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
+    jQuery('#creationdatepicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
 
     // Library size validation
     jQuery('#dnaSize').attr('class', 'form-control');

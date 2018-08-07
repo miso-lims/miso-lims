@@ -41,7 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  */
 public interface SequencerPartitionContainer
     extends SecurableByProfile, Comparable<SequencerPartitionContainer>, Barcodable, ChangeLoggable, Serializable,
-    QualityControllable<ContainerQC> {
+    QualityControllable<ContainerQC>, Deletable {
 
   public void setId(long id);
 

@@ -11,7 +11,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface ContainerService extends PaginatedDataSource<SequencerPartitionContainer>, BarcodableService<SequencerPartitionContainer> {
+public interface ContainerService extends PaginatedDataSource<SequencerPartitionContainer>, BarcodableService<SequencerPartitionContainer>,
+    DeleterService<SequencerPartitionContainer> {
   @Override
   default EntityType getEntityType() {
     return EntityType.CONTAINER;
