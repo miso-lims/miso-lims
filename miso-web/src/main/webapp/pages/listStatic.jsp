@@ -31,7 +31,14 @@
     </table>
     <script type="text/javascript">
       jQuery(document).ready(function () {
-        document.getElementById('tableTitle').innerText = ${targetType}.name;
+        <c:choose>
+          <c:when test="${empty customTitle}">
+            document.getElementById('tableTitle').innerText = ${targetType}.name;
+          </c:when>
+          <c:otherwise>
+            document.getElementById('tableTitle').innerText = '${customTitle}';
+          </c:otherwise>
+        </c:choose>
         ListUtils.createStaticTable("listingTable", ${targetType}, ${config}, ${data});
       });
     </script>

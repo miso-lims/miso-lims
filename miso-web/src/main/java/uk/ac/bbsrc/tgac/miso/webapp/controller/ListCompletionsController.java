@@ -35,21 +35,26 @@ public class ListCompletionsController {
 
   }
 
+  private static final String MODEL_ATTR_TITLE = "customTitle";
+
   @Autowired
   private InstrumentService instrumentService;
 
   @RequestMapping("/poolorders/active")
   public ModelAndView listActive(ModelMap model) throws IOException {
+    model.addAttribute(MODEL_ATTR_TITLE, "Active Orders");
     return new OrderListPage("active").list(model);
   }
 
   @RequestMapping("/poolorders/all")
   public ModelAndView listAll(ModelMap model) throws IOException {
+    model.addAttribute(MODEL_ATTR_TITLE, "All Orders");
     return new OrderListPage("all").list(model);
   }
 
   @RequestMapping("/poolorders/pending")
   public ModelAndView listPools(ModelMap model) throws IOException {
+    model.addAttribute(MODEL_ATTR_TITLE, "Pending Orders");
     return new OrderListPage("pending").list(model);
   }
 
