@@ -152,11 +152,6 @@ public class ListTablesIT extends AbstractIT {
   private static final Set<String> containersQueries = concatSets(
       Sets.newHashSet("Container"), createdDates, createdOnDates, creator, modifier, platform, kitName);
 
-  private static final Set<String> runsQueries = concatSets(
-      Sets.newHashSet("RUN1", "is:unknown", "is:complete", "is:completed", "is:failed", "is:started",
-          "is:stopped", "is:running", "is:incomplete"),
-      createdDates, createdOnDates, creator, modifier, platform);
-
   private static final Set<String> boxesQueries = Sets.newHashSet("BOX1");
 
   private static final Set<String> sequencersQueries = Sets.newHashSet("Sequencer");
@@ -393,14 +388,6 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListRunsColumnSort() throws Exception {
     testTabbedColumnsSort(ListTarget.RUNS);
-  }
-
-  @Test
-  public void testListRunsSearch() throws Exception {
-    runsQueries.forEach(query -> {
-      testTabbedSearch(ListTarget.RUNS, query);
-      testProjectPageSearch(ProjectTable.RUNS, query);
-    });
   }
 
   @Test
