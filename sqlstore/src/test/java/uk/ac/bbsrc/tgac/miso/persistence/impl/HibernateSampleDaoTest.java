@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
@@ -356,6 +357,69 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     SampleTissue match = dao.getMatchingGhostTissue(tissue);
     assertNotNull(match);
     assertEquals(16L, match.getId());
+  }
+
+  @Test
+  public void testSearch() throws IOException {
+    testSearch(PaginationFilter.query("SAM1"));
+  }
+
+  @Test
+  public void testSearchByClass() throws IOException {
+    testSearch(PaginationFilter.sampleClass("gDNA"));
+  }
+
+  @Test
+  public void testSearchByInstitute() throws IOException {
+    testSearch(PaginationFilter.institute("OICR"));
+  }
+
+  @Test
+  public void testSearchByExternal() throws IOException {
+    testSearch(PaginationFilter.external("EXT"));
+  }
+
+  @Test
+  public void testSearchBySubproject() throws IOException {
+    testSearch(PaginationFilter.subproject("Mini"));
+  }
+
+  @Test
+  public void testSearchByCreated() throws IOException {
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.CREATE));
+  }
+
+  @Test
+  public void testSearchByReceived() throws IOException {
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.RECEIVE));
+  }
+
+  @Test
+  public void testSearchByCreator() throws IOException {
+    testSearch(PaginationFilter.user("admin", true));
+  }
+
+  @Test
+  public void testSearchByModifier() throws IOException {
+    testSearch(PaginationFilter.user("admin", false));
+  }
+
+  @Test
+  public void testSearchByBox() throws IOException {
+    testSearch(PaginationFilter.box("BOX1"));
+  }
+
+  /**
+   * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
+   * 
+   * @param filter the search filter
+   * @throws IOException
+   */
+  private void testSearch(PaginationFilter filter) throws IOException {
+    // verify Hibernate mappings by ensuring that no exception is thrown
+    assertNotNull(dao.list(err -> {
+      throw new RuntimeException(err);
+    }, 0, 10, true, "name", filter));
   }
 
 }

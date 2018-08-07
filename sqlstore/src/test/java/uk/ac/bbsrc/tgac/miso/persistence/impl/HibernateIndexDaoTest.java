@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -71,4 +72,24 @@ public class HibernateIndexDaoTest extends AbstractDAOTest {
     }
     assertEquals(68, totalIlluminaIndices);
   }
+
+  @Test
+  public void testSearch() throws IOException {
+    testSearch(PaginationFilter.query("Index 1"));
+    testSearch(PaginationFilter.query("TGCATGCA"));
+  }
+
+  /**
+   * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
+   * 
+   * @param filter the search filter
+   * @throws IOException
+   */
+  private void testSearch(PaginationFilter filter) throws IOException {
+    // verify Hibernate mappings by ensuring that no exception is thrown
+    assertNotNull(dao.list(err -> {
+      throw new RuntimeException(err);
+    }, 0, 10, true, "name", filter));
+  }
+
 }

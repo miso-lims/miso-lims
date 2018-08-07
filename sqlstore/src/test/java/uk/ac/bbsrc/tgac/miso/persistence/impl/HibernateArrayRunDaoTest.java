@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateArrayRunDaoTest extends AbstractDAOTest {
 
@@ -133,6 +135,24 @@ public class HibernateArrayRunDaoTest extends AbstractDAOTest {
   @Test
   public void testCount() throws Exception {
     assertEquals(1, sut.count());
+  }
+
+  @Test
+  public void testSearch() throws IOException {
+    testSearch(PaginationFilter.query("ArrayRun"));
+  }
+
+  /**
+   * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
+   * 
+   * @param filter the search filter
+   * @throws IOException
+   */
+  private void testSearch(PaginationFilter filter) throws IOException {
+    // verify Hibernate mappings by ensuring that no exception is thrown
+    assertNotNull(sut.list(err -> {
+      throw new RuntimeException(err);
+    }, 0, 10, true, "alias", filter));
   }
 
 }

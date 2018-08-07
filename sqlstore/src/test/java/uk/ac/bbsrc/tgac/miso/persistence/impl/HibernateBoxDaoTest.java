@@ -59,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateBoxDaoTest extends AbstractDAOTest {
 
@@ -394,6 +395,24 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     List<BoxableView> byAlias = dao.getBoxableViewsBySearch("Pool 5");
     assertEquals(1, byAlias.size());
     assertEquals(new BoxableId(EntityType.POOL, 5L), byAlias.get(0).getId());
+  }
+
+  @Test
+  public void testSearch() throws IOException {
+    testSearch(PaginationFilter.query("BOX1"));
+  }
+
+  /**
+   * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
+   * 
+   * @param filter the search filter
+   * @throws IOException
+   */
+  private void testSearch(PaginationFilter filter) throws IOException {
+    // verify Hibernate mappings by ensuring that no exception is thrown
+    assertNotNull(dao.list(err -> {
+      throw new RuntimeException(err);
+    }, 0, 10, true, "name", filter));
   }
 
 }

@@ -306,22 +306,22 @@ INSERT INTO TargetedSequencing_KitDescriptor(targetedSequencingId, kitDescriptor
 (2,2);
 
 DELETE FROM `LibraryDilution`;
-INSERT INTO `LibraryDilution`(`dilutionId`, `concentration`, `library_libraryId`, `identificationBarcode`, `creationDate`, `creator`, `name`, `securityProfile_profileId`) 
-VALUES (1,2,1,'LDI1::TEST_0001_Bn_P_PE_300_WG','2015-08-27',1,'LDI1',1),
-(2,2,2,'LDI2::TEST_0001_Bn_R_PE_300_WG','2015-08-27',1,'LDI2',1),
-(3,2,3,'LDI3::TEST_0002_Bn_P_PE_300_WG','2015-08-27',1,'LDI3',1),
-(4,2,4,'LDI4::TEST_0002_Bn_R_PE_300_WG','2015-08-27',1,'LDI4',1),
-(5,2,5,'LDI5::TEST_0003_Bn_P_PE_300_WG','2015-08-27',1,'LDI5',1),
-(6,2,6,'LDI6::TEST_0003_Bn_R_PE_300_WG','2015-08-27',1,'LDI6',1),
-(7,2,7,'LDI7::TEST_0004_Bn_P_PE_300_WG','2015-08-27',1,'LDI7',1),
-(8,2,8,'LDI8::TEST_0004_Bn_R_PE_300_WG','2015-08-27',1,'LDI8',1),
-(9,2,9,'LDI9::TEST_0005_Bn_P_PE_300_WG','2015-08-27',1,'LDI9',1),
-(10,2,10,'LDI10::TEST_0005_Bn_R_PE_300_WG','2015-08-27',1,'LDI10',1),
-(11,2,11,'LDI11::TEST_0006_Bn_P_PE_300_WG','2015-08-27',1,'LDI11',1),
-(12,2,12,'LDI12::TEST_0006_Bn_R_PE_300_WG','2015-08-27',1,'LDI12',1),
-(13,2,13,'LDI13::TEST_0007_Bn_P_PE_300_WG','2015-08-27',1,'LDI13',1),
-(14,2,14,'LDI14::TEST_0007_Bn_R_PE_300_WG','2015-08-27',1,'LDI14',1),
-(15,2,15,'LDI15::TEST_0001_ALIQUOT_1_PE_300_WG','2018-02-15',1,'LDI15',1);
+INSERT INTO `LibraryDilution`(`dilutionId`, `concentration`, `library_libraryId`, `identificationBarcode`, `creationDate`, `creator`, `lastModifier`, `name`, `securityProfile_profileId`) 
+VALUES (1,2,1,'LDI1::TEST_0001_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI1',1),
+(2,2,2,'LDI2::TEST_0001_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI2',1),
+(3,2,3,'LDI3::TEST_0002_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI3',1),
+(4,2,4,'LDI4::TEST_0002_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI4',1),
+(5,2,5,'LDI5::TEST_0003_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI5',1),
+(6,2,6,'LDI6::TEST_0003_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI6',1),
+(7,2,7,'LDI7::TEST_0004_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI7',1),
+(8,2,8,'LDI8::TEST_0004_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI8',1),
+(9,2,9,'LDI9::TEST_0005_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI9',1),
+(10,2,10,'LDI10::TEST_0005_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI10',1),
+(11,2,11,'LDI11::TEST_0006_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI11',1),
+(12,2,12,'LDI12::TEST_0006_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI12',1),
+(13,2,13,'LDI13::TEST_0007_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI13',1),
+(14,2,14,'LDI14::TEST_0007_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI14',1),
+(15,2,15,'LDI15::TEST_0001_ALIQUOT_1_PE_300_WG','2018-02-15',1,1,'LDI15',1);
 
 DELETE FROM `LibraryQC`;
 INSERT INTO `LibraryQC`(`qcId`, `library_libraryId`, `creator`, `date`, `type`, `results`) VALUES

@@ -444,7 +444,9 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
    */
   private void testSearch(PaginationFilter filter) throws IOException {
     // verify Hibernate mappings by ensuring that no exception is thrown
-    assertNotNull(dao.list(0, 10, true, "name", filter));
+    assertNotNull(dao.list(err -> {
+      throw new RuntimeException(err);
+    }, 0, 10, true, "name", filter));
   }
 
 }

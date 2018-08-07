@@ -26,6 +26,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
@@ -265,4 +267,54 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
     assertNotNull(results);
     assertEquals(1, results.size());
   }
+  
+  @Test
+  public void testSearch() throws IOException {
+    testSearch(PaginationFilter.query("LDI1"));
+  }
+
+  @Test
+  public void testSearchByCreated() throws IOException {
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.CREATE));
+  }
+
+  @Test
+  public void testSearchByCreator() throws IOException {
+    testSearch(PaginationFilter.user("admin", true));
+  }
+
+  @Test
+  public void testSearchByModifier() throws IOException {
+    testSearch(PaginationFilter.user("admin", false));
+  }
+
+  @Test
+  public void testSearchByPlatform() throws IOException {
+    testSearch(PaginationFilter.platformType(PlatformType.ILLUMINA));
+  }
+
+  @Test
+  public void testSearchByIndices() throws IOException {
+    testSearch(PaginationFilter.index("A501"));
+    testSearch(PaginationFilter.index("ACGTACGT"));
+  }
+
+  @Test
+  public void testSearchByBox() throws IOException {
+    testSearch(PaginationFilter.box("BOX1"));
+  }
+
+  /**
+   * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
+   * 
+   * @param filter the search filter
+   * @throws IOException
+   */
+  private void testSearch(PaginationFilter filter) throws IOException {
+    // verify Hibernate mappings by ensuring that no exception is thrown
+    assertNotNull(dao.list(err -> {
+      throw new RuntimeException(err);
+    }, 0, 10, true, "name", filter));
+  }
+
 }
