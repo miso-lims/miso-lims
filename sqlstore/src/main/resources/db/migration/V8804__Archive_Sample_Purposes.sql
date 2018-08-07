@@ -1,1 +1,0 @@
-ALTER TABLE `SamplePurpose` ADD COLUMN `archived` tinyint(1) NOT NULL DEFAULT 0;
