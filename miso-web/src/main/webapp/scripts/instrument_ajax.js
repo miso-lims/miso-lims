@@ -127,26 +127,5 @@ Instrument.ui = {
     if (jQuery("#upgradedInstrument").val() != "" && jQuery("#upgradedInstrument").val() != 0) {
       jQuery("#upgradedInstrumentLink").append("<a href='/miso/instrument/" + jQuery("#upgradedInstrument").val() + "'>View</a>");
     }
-  },
-
-  addServiceRecord: function(isDecommissioned, instrumentId) {
-    if (!isDecommissioned) {
-      window.location = '/miso/instrument/servicerecord/new/' + instrumentId;
-    } else {
-      Utils.showOkDialog('Error adding Service Record', ['Cannot add Service Records to a retired instrument.']);
-    }
-  },
-
-  deleteServiceRecord: function(recordId, successfunc) {
-    if (confirm("Are you sure you really want to delete service record " + recordId + "? This operation is permanent!")) {
-      Fluxion.doAjax('serviceRecordControllerHelperService', 'deleteServiceRecord', {
-        'recordId': recordId,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': function(json) {
-          successfunc();
-        }
-      });
-    }
-  },
+  }
 };

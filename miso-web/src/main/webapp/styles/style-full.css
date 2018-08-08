@@ -2227,3 +2227,9 @@ div#inputError {
   cursor: pointer;
   color: rgb(0,102,204);
 }
+
+ul.unformatted-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}

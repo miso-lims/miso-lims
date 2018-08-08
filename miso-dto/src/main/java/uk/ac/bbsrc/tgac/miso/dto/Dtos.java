@@ -79,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
@@ -2475,6 +2476,17 @@ public class Dtos {
     dto.setPath(from.getPath());
     dto.setCreator(from.getCreator().getLoginName());
     dto.setCreated(formatDateTime(from.getCreationTime()));
+    return dto;
+  }
+
+  public static ServiceRecordDto asDto(ServiceRecord from) {
+    ServiceRecordDto dto = new ServiceRecordDto();
+    dto.setId(from.getId());
+    dto.setServiceDate(formatDate(from.getServiceDate()));
+    dto.setTitle(from.getTitle());
+    dto.setDetails(from.getDetails());
+    dto.setReferenceNumber(from.getReferenceNumber());
+    dto.setAttachments(from.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList()));
     return dto;
   }
 

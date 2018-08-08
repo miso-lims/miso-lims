@@ -33,7 +33,6 @@ var ServiceRecord = ServiceRecord || {
 
     jQuery('#details').attr('data-parsley-maxlength', '65535');
 
-    jQuery('#servicedByName').attr('required', 'true');
     jQuery('#servicedByName').attr('data-parsley-maxlength', '30');
 
     jQuery('#referenceNumber').attr('data-parsley-maxlength', '30');

@@ -108,7 +108,7 @@ public class ServiceRecordPageIT extends AbstractIT {
     fields.put(Field.INSTRUMENT, "NewHiSeq_101");
     fields.put(Field.TITLE, "Test 151");
     fields.put(Field.DETAILS, null);
-    fields.put(Field.SERVICED_BY, "tech");
+    fields.put(Field.SERVICED_BY, null);
     fields.put(Field.REFERENCE_NUMBER, null);
     fields.put(Field.SERVICE_DATE, "2017-09-12");
     fields.put(Field.SHUTDOWN_TIME, null);
@@ -118,6 +118,7 @@ public class ServiceRecordPageIT extends AbstractIT {
     Map<ServiceRecordPage.Field, String> changes = Maps.newLinkedHashMap();
     changes.put(Field.DETAILS, "details");
     changes.put(Field.REFERENCE_NUMBER, "REFERENCE");
+    changes.put(Field.SERVICED_BY, "person");
     changes.put(Field.SHUTDOWN_TIME, "2017-09-10 09:10:00");
     changes.put(Field.RESTORED_TIME, "2017-09-12 12:00:00");
     page1.setFields(changes);
@@ -151,6 +152,7 @@ public class ServiceRecordPageIT extends AbstractIT {
     Map<ServiceRecordPage.Field, String> changes = Maps.newLinkedHashMap();
     changes.put(Field.DETAILS, null);
     changes.put(Field.REFERENCE_NUMBER, null);
+    changes.put(Field.SERVICED_BY, null);
     changes.put(Field.SHUTDOWN_TIME, null);
     changes.put(Field.RESTORED_TIME, null);
     page1.setFields(changes);

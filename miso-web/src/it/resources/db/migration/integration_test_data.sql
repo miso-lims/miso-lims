@@ -346,7 +346,7 @@ INSERT INTO Instrument (instrumentId, name, platformId, serialNumber, dateCommis
 
 INSERT INTO ServiceRecord(recordId, instrumentId, title, details, servicedBy, referenceNumber, serviceDate, shutdownTime, restoredTime) VALUES
   (150, 101, 'Test 150', 'details go here', 'technician1', '12345', '2017-09-05', '2017-09-01 10:00:00', '2017-09-05 10:00:00'),
-  (151, 101, 'Test 151', NULL, 'tech', NULL, '2017-09-12', NULL, NULL),
+  (151, 101, 'Test 151', NULL, NULL, NULL, '2017-09-12', NULL, NULL),
   (152, 101, 'Test 152', 'details to remove', 'technitchin', 'Riffraff', '2017-09-12', '2017-09-11 11:00:00', '2017-09-12 12:00:00');
 
 INSERT INTO Project(projectId, name, alias, shortName, creationDate, description, securityProfile_profileId,

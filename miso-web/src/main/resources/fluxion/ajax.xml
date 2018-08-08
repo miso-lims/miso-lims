@@ -65,9 +65,6 @@
 
   <bean id="importExportControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ImportExportControllerHelperService">
   </bean>
-  
-  <bean id="serviceRecordControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ServiceRecordControllerHelperService">
-  </bean>
 
 </beans>
 
