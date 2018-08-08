@@ -226,48 +226,15 @@
       });
     </script>
     
-    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#records_arrowclick'), 'recordsdiv');">
+    <div id="recordsHider" class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#records_arrowclick'), 'recordsdiv');">
       <c:choose>
         <c:when test="${fn:length(serviceRecords) == 1}">1 Service Record</c:when>
         <c:otherwise>${fn:length(serviceRecords)} Service Records</c:otherwise>
       </c:choose>
       <div id="records_arrowclick" class="toggleLeft"></div>
     </div>
-    <h1>Service Records</h1>
-    <span onclick="Instrument.ui.addServiceRecord(${instrument.dateDecommissioned != null}, ${instrument.id})" 
-          class="sddm fg-button ui-state-default ui-corner-all" id="addServiceRecord">Add Service Record</span>
-
-    <div id="recordsdiv" style="display:none;">
-      <div style="clear:both">
-        <table class="list" id="records_table">
-          <thead>
-            <tr>
-              <th>Service Date</th>
-              <th>Title</th>
-              <th>Serviced By</th>
-              <th>Reference Number</th>
-              <c:if test="${miso:isAdmin()}">
-                <th class="fit">Delete</th>
-              </c:if>
-            </tr>
-          </thead>
-          <tbody>
-            <c:forEach items="${serviceRecords}" var="record">
-              <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                <td>${record.serviceDate}</td>
-                <td><a href='<c:url value="/miso/instrument/servicerecord/${record.id}"/>'>${record.title}</a></td>
-                <td>${record.servicedByName}</td>
-                <td>${record.referenceNumber}</td>
-                <c:if test="${miso:isAdmin()}">
-                  <td class="misoicon" onclick="Instrument.ui.deleteServiceRecord(${record.id}, Utils.page.pageReload);">
-                    <span class="ui-icon ui-icon-trash"></span>
-                  </td>
-                </c:if>
-              </tr>
-            </c:forEach>
-          </tbody>
-        </table>
-      </div>
+    <div id="recordsdiv" class="expandable_section" style="display:none;">
+      <miso:list-section id="list_servicerecords" name="Service Records" target="servicerecord" alwaysShow="true" items="${serviceRecords}" config="{instrumentId: ${instrument.id}, retiredInstrument: ${instrument.dateDecommissioned != null && instrument.upgradedInstrument == null}, userIsAdmin: ${miso:isAdmin()}}"/>
     </div>
     <script type="text/javascript">
       jQuery(document).ready(function () {

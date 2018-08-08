@@ -7,6 +7,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class InstrumentPage extends FormPage<InstrumentPage.Field> {
 
@@ -42,13 +45,16 @@ public class InstrumentPage extends FormPage<InstrumentPage.Field> {
 
   @FindBy(id = "save")
   private WebElement saveButton;
-  @FindBy(id = "addServiceRecord")
-  private WebElement addServiceRecordButton;
+  @FindBy(id = "recordsHider")
+  private WebElement recordsHider;
+
+  private final DataTable serviceRecords;
 
   public InstrumentPage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(titleContains("Instrument "));
+    this.serviceRecords = new DataTable(getDriver(), "list_servicerecords_wrapper");
   }
 
   public static InstrumentPage get(WebDriver driver, String baseUrl, long instrumentId) {
@@ -64,7 +70,12 @@ public class InstrumentPage extends FormPage<InstrumentPage.Field> {
   }
 
   public ServiceRecordPage addServiceRecord() {
-    addServiceRecordButton.click();
+    By records = By.id(serviceRecords.getId());
+    if (!getDriver().findElement(records).isDisplayed()) {
+      recordsHider.click();
+      waitUntil(ExpectedConditions.visibilityOfElementLocated(records));
+    }
+    serviceRecords.clickButton("Add");
     return new ServiceRecordPage(getDriver());
   }
 }

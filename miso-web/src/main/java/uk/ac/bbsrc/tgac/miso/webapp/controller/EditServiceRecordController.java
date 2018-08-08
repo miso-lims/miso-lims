@@ -142,6 +142,7 @@ public class EditServiceRecordController {
     if (instrument == null) throw new NotFoundException("No instrument found for ID " + instrumentId.toString());
     ServiceRecord record = new ServiceRecord();
     record.setInstrument(instrument);
+    record.setServiceDate(new Date());
     model.put(ModelKeys.RECORD.getKey(), record);
     model.put("title", "New Service Record");
     return new ModelAndView("/pages/editServiceRecord.jsp", model);

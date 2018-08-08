@@ -47,6 +47,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
 
@@ -91,7 +92,7 @@ public class EditInstrumentController {
     model.put("preUpgradeInstrument", instrumentService.getByUpgradedInstrumentId(sr.getId()));
 
     model.put("instrument", sr);
-    model.put("serviceRecords", serviceRecords);
+    model.put("serviceRecords", serviceRecords.stream().map(Dtos::asDto).collect(Collectors.toList()));
     model.put("title", "Instrument " + sr.getId());
     String ip = sr.getIpAddress() == null ? "" : sr.getIpAddress();
     model.put("trimmedIpAddress", ip.startsWith("/") ? ip.substring(1) : ip);
