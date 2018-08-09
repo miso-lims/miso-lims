@@ -96,7 +96,7 @@ public class LibraryRestController extends RestController {
   private final JQueryDataTableBackend<Library, LibraryDto> jQueryBackend = new JQueryDataTableBackend<Library, LibraryDto>() {
     @Override
     protected LibraryDto asDto(Library model) {
-      return Dtos.asMinimalDto(model);
+      return Dtos.asDto(model, false);
     }
 
     @Override
@@ -121,16 +121,8 @@ public class LibraryRestController extends RestController {
     if (l == null) {
       throw new RestException("No library found with ID: " + libraryId, Status.NOT_FOUND);
     }
-    LibraryDto dto = Dtos.asDto(l);
+    LibraryDto dto = Dtos.asDto(l, false);
     return dto;
-  }
-
-  @GetMapping(produces = "application/json")
-  @ResponseBody
-  public List<LibraryDto> listAllLibraries() throws IOException {
-    Collection<Library> libraries = libraryService.list();
-    List<LibraryDto> dtos = Dtos.asLibraryDtos(libraries);
-    return dtos;
   }
 
   @PostMapping(produces = "application/json")
@@ -205,7 +197,8 @@ public class LibraryRestController extends RestController {
   @ResponseBody
   public List<LibraryDto> getLibariesInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
-    return PaginationFilter.bulkSearch(names, libraryService, Dtos::asDto, message -> new RestException(message, Status.BAD_REQUEST));
+    return PaginationFilter.bulkSearch(names, libraryService, lib -> Dtos.asDto(lib, false),
+        message -> new RestException(message, Status.BAD_REQUEST));
   }
 
   @GetMapping(value = "/spreadsheet")
@@ -235,7 +228,7 @@ public class LibraryRestController extends RestController {
 
         @Override
         public SampleDto asDto(Sample model) {
-          return Dtos.asDto(model);
+          return Dtos.asDto(model, false);
         }
 
         @Override
@@ -262,7 +255,7 @@ public class LibraryRestController extends RestController {
 
         @Override
         public DilutionDto asDto(LibraryDilution model) {
-          return Dtos.asDto(model);
+          return Dtos.asDto(model, false, false);
         }
 
         @Override
@@ -279,7 +272,7 @@ public class LibraryRestController extends RestController {
 
         @Override
         public PoolDto asDto(Pool model) {
-          return Dtos.asDto(model, false);
+          return Dtos.asDto(model, false, false);
         }
 
         @Override

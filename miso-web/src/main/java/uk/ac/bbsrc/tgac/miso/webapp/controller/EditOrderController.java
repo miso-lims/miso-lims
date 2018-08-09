@@ -33,7 +33,7 @@ public class EditOrderController {
     @Override
     protected PoolOrderDto createDtoFromParent(Pool item) {
       PoolOrderDto dto = new PoolOrderDto();
-      dto.setPool(Dtos.asDto(item, false));
+      dto.setPool(Dtos.asDto(item, false, false));
       return dto;
     }
 

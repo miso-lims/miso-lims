@@ -100,7 +100,7 @@ public class ExperimentListConfiguration {
         .map(group -> {
           StudiesForExperiment result = new StudiesForExperiment();
           result.experiment = new ExperimentDto();
-          result.experiment.setLibrary(Dtos.asDto(group.getKey()));
+          result.experiment.setLibrary(Dtos.asDto(group.getKey(), false));
           result.experiment.setPlatform(platformDto);
           result.experiment.setPartitions(group.getValue());
 
