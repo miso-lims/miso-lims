@@ -6,7 +6,7 @@ Changes:
  * Add updating identities with new external names when creating children (DetailedSample)
  * Add archived Sample Purposes (DetailedSample)
  * Fixed JIRA search for Run-related tickets
- * Allow unique dual-index families to have same name for corresponding indices at positions 1 & 2
+ * Better support for custom combinatorial unique dual indices
  * Make containers deletable
  * Filter search by subproject (DetailedSample)
  * Allow library creation for all platforms
