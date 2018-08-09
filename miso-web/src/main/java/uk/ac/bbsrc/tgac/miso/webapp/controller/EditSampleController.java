@@ -677,14 +677,14 @@ public class EditSampleController {
 
         model.put("projectsDtos", "[]");
 
-        model.put("sampleLibraries", sample.getLibraries().stream().map(Dtos::asDto).collect(Collectors.toList()));
+        model.put("sampleLibraries", sample.getLibraries().stream().map(lib -> Dtos.asDto(lib, false)).collect(Collectors.toList()));
         Set<Pool> pools = sample.getLibraries().stream()
             .flatMap(WhineyFunction.flatRethrow(library -> poolService.listByLibraryId(library.getId())))
             .distinct().collect(Collectors.toSet());
         List<RunDto> runDtos = pools.stream().flatMap(WhineyFunction.flatRethrow(pool -> runService.listByPoolId(pool.getId())))
             .map(Dtos::asDto)
             .collect(Collectors.toList());
-        model.put("samplePools", pools.stream().map(p -> Dtos.asDto(p, false)).collect(Collectors.toList()));
+        model.put("samplePools", pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
         model.put("sampleRuns", runDtos);
         model.put("sampleRelations", getRelations(sample));
         if (sample instanceof SampleAliquot) {
@@ -733,7 +733,7 @@ public class EditSampleController {
     if (LimsUtils.isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
       for (DetailedSample parent = detailed.getParent(); parent != null; parent = parent.getParent()) {
-        relations.add(0, Dtos.asDto(LimsUtils.deproxify(parent)));
+        relations.add(0, Dtos.asDto(LimsUtils.deproxify(parent), false));
       }
       addChildren(relations, detailed.getChildren());
     }
@@ -742,7 +742,7 @@ public class EditSampleController {
 
   private void addChildren(List<SampleDto> relations, Collection<DetailedSample> children) {
     for (DetailedSample child : children) {
-      relations.add(Dtos.asDto(LimsUtils.deproxify(child)));
+      relations.add(Dtos.asDto(LimsUtils.deproxify(child), false));
       addChildren(relations, child.getChildren());
     }
   }
@@ -896,7 +896,7 @@ public class EditSampleController {
 
     @Override
     protected SampleDto asDto(Sample model) {
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, true);
     }
 
     @Override

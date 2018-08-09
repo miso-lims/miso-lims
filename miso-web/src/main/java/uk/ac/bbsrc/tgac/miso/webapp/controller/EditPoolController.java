@@ -189,7 +189,7 @@ public class EditPoolController {
       ObjectMapper mapper = new ObjectMapper();
       model.put("formObj", pool);
       model.put("pool", pool);
-      model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(pool, false)));
+      model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(pool, false, false)));
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
@@ -203,7 +203,7 @@ public class EditPoolController {
       model.put("duplicateIndicesSequences", mapper.writeValueAsString(pool.getDuplicateIndicesSequences()));
       model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(pool.getNearDuplicateIndicesSequences()));
 
-      model.put("includedDilutions", Dtos.asDto(pool, true).getPooledElements());
+      model.put("includedDilutions", Dtos.asDto(pool, true, false).getPooledElements());
 
       List<String> warnings = new ArrayList<>();
       addConsentWarning(pool, warnings);
@@ -284,7 +284,7 @@ public class EditPoolController {
 
     @Override
     protected PoolDto asDto(Pool model) {
-      return Dtos.asDto(model, true);
+      return Dtos.asDto(model, true, true);
     }
 
     @Override

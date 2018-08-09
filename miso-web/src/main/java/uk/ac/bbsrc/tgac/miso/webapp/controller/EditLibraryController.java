@@ -578,17 +578,18 @@ public class EditLibraryController {
     addAdjacentLibraries(library, model);
 
     Collection<Pool> pools = poolService.listByLibraryId(library.getId());
-    model.put("libraryPools", pools.stream().map(p -> Dtos.asDto(p, false)).collect(Collectors.toList()));
+    model.put("libraryPools", pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
     model.put("libraryRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
         .collect(Collectors.toList()));
-    model.put("libraryDilutions", library.getLibraryDilutions().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    model.put("libraryDilutions", library.getLibraryDilutions().stream()
+        .map(ldi -> Dtos.asDto(ldi, false, false)).collect(Collectors.toList()));
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode config = mapper.createObjectNode();
-    config.putPOJO("library", Dtos.asDto(library));
+    config.putPOJO("library", Dtos.asDto(library, false));
     model.put("libraryDilutionsConfig", mapper.writeValueAsString(config));
     model.put("experiments", experimentService.listAllByLibraryId(library.getId()).stream().map(Dtos::asDto)
         .collect(Collectors.toList()));
-    model.put("libraryDto", library.getId() == LibraryImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(library)));
+    model.put("libraryDto", library.getId() == LibraryImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(library, false)));
 
     populateDesigns(model,
         LimsUtils.isDetailedSample(library.getSample()) ? ((DetailedSample) library.getSample()).getSampleClass() : null);
@@ -632,7 +633,7 @@ public class EditLibraryController {
 
     @Override
     protected LibraryDto asDto(Library model) {
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, true);
     }
 
     @Override
@@ -852,7 +853,7 @@ public class EditLibraryController {
     @Override
     protected DilutionDto createDtoFromParent(Library item) {
       DilutionDto dto = new DilutionDto();
-      dto.setLibrary(Dtos.asDto(item));
+      dto.setLibrary(Dtos.asDto(item, false));
       if (item.getSample().getProject().getDefaultTargetedSequencing() != null) {
         dto.setTargetedSequencingId(item.getSample().getProject().getDefaultTargetedSequencing().getId());
       }
@@ -884,7 +885,7 @@ public class EditLibraryController {
 
     @Override
     protected DilutionDto asDto(LibraryDilution model) {
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, true, true);
     }
 
     @Override
@@ -962,7 +963,7 @@ public class EditLibraryController {
     protected PoolDto createDtoFromParent(LibraryDilution item) {
       PoolDto dto = new PoolDto();
       dto.setAlias(item.getLibrary().getAlias() + "_POOL");
-      dto.setPooledElements(Collections.singleton(Dtos.asDto(item)));
+      dto.setPooledElements(Collections.singleton(Dtos.asDto(item, false, false)));
       dto.setPlatformType(item.getLibrary().getPlatformType().name());
       if (item.getVolumeUsed() != null) {
         dto.setVolume(item.getVolumeUsed().toString());
@@ -1023,7 +1024,7 @@ public class EditLibraryController {
           dto.setAlias(commonPrefix + "_POOL");
         }
       }
-      dto.setPooledElements(parents.stream().map(Dtos::asDto).collect(Collectors.toSet()));
+      dto.setPooledElements(parents.stream().map(ldi -> Dtos.asDto(ldi, false, false)).collect(Collectors.toSet()));
       if (dto.getPooledElements().stream().allMatch(element -> element.getVolumeUsed() != null)) {
         dto.setVolume(
             Double.toString(dto.getPooledElements().stream().mapToDouble(element -> Double.parseDouble(element.getVolumeUsed())).sum()));
@@ -1066,7 +1067,7 @@ public class EditLibraryController {
         throw new IllegalArgumentException("Cannot create a pool for multiple platforms: "
             + String.join(", ", platformTypes.stream().map(Enum::name).toArray(CharSequence[]::new)));
       }
-      this.dilutions = ldis.stream().map(Dtos::asDto).collect(Collectors.toList());
+      this.dilutions = ldis.stream().map(ldi -> Dtos.asDto(ldi, false, false)).collect(Collectors.toList());
       this.platformType = platformTypes.get(0);
       this.newBox = newBox;
     }

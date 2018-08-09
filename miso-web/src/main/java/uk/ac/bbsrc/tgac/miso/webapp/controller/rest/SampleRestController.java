@@ -136,7 +136,7 @@ public class SampleRestController extends RestController {
     if (sample == null) {
       throw new RestException("No sample found with ID: " + id, Status.NOT_FOUND);
     } else {
-      SampleDto dto = Dtos.asDto(sample);
+      SampleDto dto = Dtos.asDto(sample, false);
       dto.writeUrls(uriBuilder);
       return dto;
     }
@@ -198,7 +198,7 @@ public class SampleRestController extends RestController {
       throw restException;
     }
 
-    SampleDto created = Dtos.asDto(sampleService.get(id));
+    SampleDto created = Dtos.asDto(sampleService.get(id), false);
     UriComponents uriComponents = b.path("/sample/{id}").buildAndExpand(id);
     created.setUrl(uriComponents.toUri().toString());
     response.setHeader("Location", uriComponents.toUri().toString());
@@ -318,14 +318,15 @@ public class SampleRestController extends RestController {
     } else {
       matches = sampleService.getIdentitiesByExternalNameOrAliasAndProject(identityIdentifier, null, exactMatch);
     }
-    return matches.stream().map(identity -> Dtos.asDto(identity)).collect(Collectors.toSet());
+    return matches.stream().map(identity -> Dtos.asDto(identity, false)).collect(Collectors.toSet());
   }
 
   @PostMapping(value = "/query", produces = { "application/json" })
   @ResponseBody
   public List<SampleDto> getSamplesInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
-    return PaginationFilter.bulkSearch(names, sampleService, Dtos::asDto, message -> new RestException(message, Status.BAD_REQUEST));
+    return PaginationFilter.bulkSearch(names, sampleService, sam -> Dtos.asDto(sam, false),
+        message -> new RestException(message, Status.BAD_REQUEST));
   }
 
   @GetMapping(value = "/spreadsheet")
@@ -371,7 +372,7 @@ public class SampleRestController extends RestController {
 
         @Override
         public LibraryDto asDto(Library model) {
-          return Dtos.asDto(model);
+          return Dtos.asDto(model, false);
         }
 
         @Override
@@ -390,7 +391,7 @@ public class SampleRestController extends RestController {
 
         @Override
         public DilutionDto asDto(LibraryDilution model) {
-          return Dtos.asDto(model);
+          return Dtos.asDto(model, false, false);
         }
 
         @Override
@@ -409,7 +410,7 @@ public class SampleRestController extends RestController {
 
         @Override
         public PoolDto asDto(Pool model) {
-          return Dtos.asDto(model, false);
+          return Dtos.asDto(model, false, false);
         }
 
         @Override
