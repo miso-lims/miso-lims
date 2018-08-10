@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.migration;
 
 import java.util.Collection;
+import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -9,6 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 
 public class MigrationData {
   
@@ -19,6 +21,7 @@ public class MigrationData {
   private Collection<Pool> pools;
   private Collection<Run> runs;
   private Collection<Box> boxes;
+  private Map<String, Map<String, BoxableView>> boxablesByBoxAlias;
 
   /**
    * @return all Projects to be migrated
@@ -93,8 +96,7 @@ public class MigrationData {
   }
 
   /**
-   * @return all Boxes to be migrated, including the Boxables they contain. Note: Saving these will
-   *         likely require that the Boxables have been saved first in order to generate foreign keys
+   * @return all Boxes to be migrated, not including the Boxables they contain
    */
   public Collection<Box> getBoxes() {
     return boxes;
@@ -102,6 +104,19 @@ public class MigrationData {
 
   public void setBoxes(Collection<Box> boxes) {
     this.boxes = boxes;
+  }
+
+  /**
+   * @return all box position data. The key of the outer Map is the box alias. The key of the inner Map
+   *         is the box position. Note: Saving these will likely that the Boxables have been saved first
+   *         in order to generate foreign keys
+   */
+  public Map<String, Map<String, BoxableView>> getBoxablesByBoxAlias() {
+    return boxablesByBoxAlias;
+  }
+
+  public void setBoxablesByBoxAlias(Map<String, Map<String, BoxableView>> boxablesByBoxAlias) {
+    this.boxablesByBoxAlias = boxablesByBoxAlias;
   }
 
 }

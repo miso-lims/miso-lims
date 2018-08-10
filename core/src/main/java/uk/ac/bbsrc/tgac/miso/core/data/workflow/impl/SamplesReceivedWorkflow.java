@@ -13,11 +13,11 @@ import java.util.stream.Stream;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.AbstractWorkflow;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
@@ -221,15 +221,17 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
     qcs.add(qc);
     sample.setQCs(qcs);
     
-    stockBox.setBoxable(stockBoxPositionStep.getPosition(), BoxableView.fromBoxable(sample));
+    BoxPosition stockBp = new BoxPosition(stockBox, stockBoxPositionStep.getPosition(), sample.getEntityType(), sample.getId());
+    stockBox.getBoxPositions().put(stockBoxPositionStep.getPosition(), stockBp);
 
     for (int i = 0; i < aliquotStep.getAliquotQuantity(); i++) {
       SampleAliquot aliquot = workflowExecutor.createAliquotFromParent(sample);
       aliquot.setVolume(((VolumeStep) aliquotHandlingSteps.get(3 * i + 1)).getVolume());
       aliquot.setConcentration(((ConcentrationStep) aliquotHandlingSteps.get(3 * i + 2)).getConcentration());
       workflowExecutor.save(aliquot);
-      aliquotBox.setBoxable(((AliquotBoxPositionStep) aliquotHandlingSteps.get(3 * i)).getPosition(), BoxableView.fromBoxable(aliquot));
-
+      String aliquotPos = ((AliquotBoxPositionStep) aliquotHandlingSteps.get(3 * i)).getPosition();
+      BoxPosition aliquotBp = new BoxPosition(aliquotBox, aliquotPos, aliquot.getEntityType(), aliquot.getId());
+      aliquotBox.getBoxPositions().put(aliquotPos, aliquotBp);
     }
 
     workflowExecutor.save(aliquotBox);

@@ -28,7 +28,7 @@ public abstract class AbstractBox implements Box {
 
   private static final long serialVersionUID = 1L;
 
-  public static final Long UNSAVED_ID = 0L;
+  private static final Long UNSAVED_ID = 0L;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "securityProfile_profileId")
@@ -247,6 +247,64 @@ public abstract class AbstractBox implements Box {
   @Override
   public void setStorageLocation(StorageLocation storageLocation) {
     this.storageLocation = storageLocation;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((alias == null) ? 0 : alias.hashCode());
+    result = prime * result + (int) (boxId ^ (boxId >>> 32));
+    result = prime * result + ((creationTime == null) ? 0 : creationTime.hashCode());
+    result = prime * result + ((creator == null) ? 0 : creator.hashCode());
+    result = prime * result + ((description == null) ? 0 : description.hashCode());
+    result = prime * result + ((identificationBarcode == null) ? 0 : identificationBarcode.hashCode());
+    result = prime * result + ((locationBarcode == null) ? 0 : locationBarcode.hashCode());
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + ((size == null) ? 0 : size.hashCode());
+    result = prime * result + ((storageLocation == null) ? 0 : storageLocation.hashCode());
+    result = prime * result + ((use == null) ? 0 : use.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    AbstractBox other = (AbstractBox) obj;
+    if (alias == null) {
+      if (other.alias != null) return false;
+    } else if (!alias.equals(other.alias)) return false;
+    if (boxId != other.boxId) return false;
+    if (creationTime == null) {
+      if (other.creationTime != null) return false;
+    } else if (!creationTime.equals(other.creationTime)) return false;
+    if (creator == null) {
+      if (other.creator != null) return false;
+    } else if (!creator.equals(other.creator)) return false;
+    if (description == null) {
+      if (other.description != null) return false;
+    } else if (!description.equals(other.description)) return false;
+    if (identificationBarcode == null) {
+      if (other.identificationBarcode != null) return false;
+    } else if (!identificationBarcode.equals(other.identificationBarcode)) return false;
+    if (locationBarcode == null) {
+      if (other.locationBarcode != null) return false;
+    } else if (!locationBarcode.equals(other.locationBarcode)) return false;
+    if (name == null) {
+      if (other.name != null) return false;
+    } else if (!name.equals(other.name)) return false;
+    if (size == null) {
+      if (other.size != null) return false;
+    } else if (!size.equals(other.size)) return false;
+    if (storageLocation == null) {
+      if (other.storageLocation != null) return false;
+    } else if (!storageLocation.equals(other.storageLocation)) return false;
+    if (use == null) {
+      if (other.use != null) return false;
+    } else if (!use.equals(other.use)) return false;
+    return true;
   }
 
 }

@@ -1,11 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -36,14 +34,6 @@ public interface Box extends SecurableByProfile, Barcodable, Locatable, ChangeLo
   public void setName(String name);
 
   /**
-   * Returns the Alias of this Box object.
-   * 
-   * @return String alias.
-   */
-  @Override
-  public String getAlias();
-
-  /**
    * Sets the alias of this Box object.
    * 
    * @param String
@@ -66,62 +56,9 @@ public interface Box extends SecurableByProfile, Barcodable, Locatable, ChangeLo
    */
   public void setDescription(String description);
 
-  /**
-   * Returns the Map representing the Boxables (Samples, Libraries, Pools) of this Box object.
-   * 
-   * @return items
-   */
-  public Map<String, BoxableView> getBoxables();
+  public Map<String, BoxPosition> getBoxPositions();
 
-  /**
-   * Sets the Map of BoxItems of this Box object.
-   * 
-   * @param items
-   * @throws InvalidBoxPositionException
-   */
-  public void setBoxables(Map<String, BoxableView> items);
-
-  /**
-   * Adds a BoxItem to the Box object at the given position.
-   * 
-   * Note: this method is not responsible for any Boxable stored at the given position, it will be replaced by the given item.
-   * 
-   * @param BoxItem
-   *          item, String position.
-   * @throws IllegalArgumentException
-   *           if the given position is not in the correct format IndexOutOfBoundsException if the given Row letter or column value is too
-   *           big for the Box
-   */
-  public void setBoxable(String position, BoxableView item);
-
-  /**
-   * Returns the Boxable at position given.
-   * 
-   * @param String
-   *          position
-   * @return BoxItem at position
-   * @throws IllegalArgumentException
-   *           if the given position is not in the correct format IndexOutOfBoundsException if the given Row letter or column value is too
-   *           big for the Box
-   */
-  public BoxableView getBoxable(String position);
-
-  /**
-   * Removes a Boxable item from the given position
-   * 
-   * @param String
-   *          position
-   * @throws IllegalArgumentException
-   *           if the given position is not in the correct format IndexOutOfBoundsException if the given Row letter or column value is too
-   *           big for the Box
-   */
-  public void removeBoxable(String position);
-
-  /**
-   * Removes ALL Boxable items from the Box
-   * 
-   */
-  public void removeAllBoxables();
+  public void setBoxPositions(Map<String, BoxPosition> boxPositions);
   
   /**
    * @return the maximum number of tubes that can be stored in this box
@@ -188,22 +125,14 @@ public interface Box extends SecurableByProfile, Barcodable, Locatable, ChangeLo
    */
   public void setSize(BoxSize size);
 
-  @Override
-  public String getLocationBarcode();
-
-  @Override
-  public void setLocationBarcode(String barcode);
-
   public StorageLocation getStorageLocation();
 
   public void setStorageLocation(StorageLocation storageLocation);
 
-  /**
-   * Returns the change logs of this Box object.
-   * 
-   * @return Collection<ChangeLog> change logs.
-   */
   @Override
-  public Collection<ChangeLog> getChangeLog();
+  public int hashCode();
+
+  @Override
+  public boolean equals(Object obj);
 
 }

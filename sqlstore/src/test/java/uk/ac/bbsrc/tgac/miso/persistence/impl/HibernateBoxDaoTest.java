@@ -33,7 +33,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,19 +44,19 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
@@ -99,29 +98,18 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     assertEquals(4, box.getSize().getRows());
     assertEquals("boxuse1", box.getUse().getAlias());
     assertEquals(2, box.getTubeCount());
-    // Should be able to get the tube count without initializing boxables
-    assertFalse(Hibernate.isInitialized(box.getBoxables()));
-    BoxableView a1 = box.getBoxable("A01");
+    BoxPosition a1 = box.getBoxPositions().get("A01");
     assertNotNull(a1);
-    assertEquals("SAM15", a1.getName());
-    BoxableView b2 = box.getBoxable("B02");
+    assertEquals(new BoxableId(EntityType.SAMPLE, 15L), a1.getBoxableId());
+    BoxPosition b2 = box.getBoxPositions().get("B02");
     assertNotNull(b2);
-    assertEquals("SAM16", b2.getName());
-    assertTrue(Hibernate.isInitialized(box.getBoxables()));
+    assertEquals(new BoxableId(EntityType.SAMPLE, 16L), b2.getBoxableId());
   }
 
   @Test
   public void testBoxByAlias() throws Exception {
     Box box = dao.getBoxByAlias("box2alias");
     assertEquals(2, box.getId());
-  }
-
-  @Test
-  public void testGetBoxByBarcode() throws Exception {
-    assertNull(dao.getByBarcode("this probably is not a barcode"));
-    Box box = dao.getByBarcode("identificationbarcode1");
-    assertNotNull(box);
-    assertEquals(1L, box.getId());
   }
 
   @Test
@@ -168,56 +156,43 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testEmptyAllTubes() throws Exception {
-    Box box = dao.get(1);
-    User user = (User) sessionFactory.getCurrentSession().get(UserImpl.class, 1L);
-    assertTrue("precondition failed", box.getBoxables().size() > 0);
-    dao.discardAllContents(box, user);
-    assertTrue(box.getBoxables().size() == 0);
-
-  }
-
-  @Test
-  public void testEmptySingleTube() throws Exception {
-
-    Box box = dao.get(1);
-    int count = box.getBoxables().size();
-    User user = (User) sessionFactory.getCurrentSession().get(UserImpl.class, 1L);
-
-    assertTrue("precondition failed", box.getBoxables().size() > 0);
-    assertTrue(box.getBoxables().containsKey("B02"));
-    dao.discardSingleItem(box, "B02", user);
-    Box fetchedBox = dao.get(1);
-    assertEquals(count - 1, fetchedBox.getBoxables().size());
-
-  }
-
-  @Test
   public void testRemoveBoxableFromBox() throws Exception {
     Sample s = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 15L);
-    Box box = dao.get(1);
-    BoxableView item = box.getBoxable("A01");
-    assertNotNull(item);
-    assertEquals(EntityType.SAMPLE, item.getId().getTargetType());
-    assertEquals(s.getId(), item.getId().getTargetId());
+    assertNotNull(s.getBox());
+    assertEquals(1L, s.getBox().getId());
+    assertEquals("A01", s.getBoxPosition());
+    Box box = dao.get(1L);
+    BoxPosition bp = box.getBoxPositions().get("A01");
+    assertNotNull(bp);
+    assertEquals(new BoxableId(s.getEntityType(), s.getId()), bp.getBoxableId());
 
     dao.removeBoxableFromBox(s);
-    Box again = dao.get(1);
-    assertFalse(again.getBoxables().containsValue(item));
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    Box savedBox = dao.get(1);
+    assertFalse(savedBox.getBoxPositions().containsKey("A01"));
+    Sample savedSample = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 15L);
+    assertNull(savedSample.getBox());
+    assertNull(savedSample.getBoxPosition());
   }
 
   @Test
   public void testRemoveBoxableViewFromBox() throws Exception {
     Sample s = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 15L);
     Box box = dao.get(1);
-    BoxableView item = box.getBoxable("A01");
-    assertNotNull(item);
-    assertEquals(EntityType.SAMPLE, item.getId().getTargetType());
-    assertEquals(s.getId(), item.getId().getTargetId());
-
+    BoxPosition bp = box.getBoxPositions().get("A01");
+    assertNotNull(bp);
+    assertEquals(new BoxableId(s.getEntityType(), s.getId()), bp.getBoxableId());
+    BoxableView item = BoxableView.fromBoxable(s);
     dao.removeBoxableFromBox(item);
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
     Box again = dao.get(1);
-    assertFalse(again.getBoxables().containsValue(item));
+    assertFalse(again.getBoxPositions().containsKey("A01"));
   }
 
   @Test
@@ -269,18 +244,22 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     String toPos = "A02";
 
     Box box = dao.get(boxId);
-    BoxableView boxable = box.getBoxable(fromPos);
-    assertNotNull(boxable);
+    BoxPosition fromBp = box.getBoxPositions().get(fromPos);
+    assertNotNull(fromBp);
 
-    box.removeBoxable(fromPos);
+    box.getBoxPositions().remove(fromPos);
     dao.save(box);
 
-    box.setBoxable(toPos, boxable);
+    BoxPosition toBp = new BoxPosition(box, toPos, fromBp.getBoxableId());
+    box.getBoxPositions().put(toPos, toBp);
     dao.save(box);
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
 
     Box again = dao.get(boxId);
-    assertNull(again.getBoxable(fromPos));
-    assertNotNull(again.getBoxable(toPos));
+    assertNull(again.getBoxPositions().get(fromPos));
+    assertNotNull(again.getBoxPositions().get(toPos));
   }
 
   @Test
@@ -295,26 +274,30 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
 
     Box fromBox = dao.get(fromBoxId);
     assertNotNull(fromBox);
-    assertNotNull(fromBox.getBoxable(fromPos));
-    BoxableView boxable = fromBox.getBoxable(fromPos);
-    assertNotNull(boxable);
+    BoxPosition fromBp = fromBox.getBoxPositions().get(fromPos);
+    assertNotNull(fromBp);
 
-    fromBox.removeBoxable(fromPos);
+    fromBox.getBoxPositions().remove(fromPos);
     dao.save(fromBox);
 
     Box toBox = dao.get(toBoxId);
     assertNotNull(toBox);
-    assertNull(toBox.getBoxable(toPos));
-    toBox.setBoxable(toPos, boxable);
+    assertNull(toBox.getBoxPositions().get(toPos));
+
+    BoxPosition toBp = new BoxPosition(toBox, toPos, fromBp.getBoxableId());
+    toBox.getBoxPositions().put(toPos, toBp);
     dao.save(toBox);
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
 
     Box saved = dao.get(toBoxId);
     assertNotNull(saved);
-    assertNotNull(saved.getBoxable(toPos));
+    assertNotNull(saved.getBoxPositions().get(toPos));
 
     Box original = dao.get(fromBoxId);
     assertNotNull(original);
-    assertNull(original.getBoxable(fromPos));
+    assertNull(original.getBoxPositions().get(fromPos));
   }
 
   @Test
@@ -413,6 +396,75 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     assertNotNull(dao.list(err -> {
       throw new RuntimeException(err);
     }, 0, 10, true, "name", filter));
+  }
+
+  @Test
+  public void testLoadBoxPositions() throws IOException {
+    Box box = dao.get(1L);
+    assertEquals(2, box.getBoxPositions().size());
+    for (BoxPosition bp : box.getBoxPositions().values()) {
+      System.out.println(String.format("Box %d pos %s: %s %s", bp.getBox().getId(), bp.getPosition(), bp.getBoxableId().getTargetType(),
+          bp.getBoxableId().getTargetId()));
+    }
+  }
+
+  @Test
+  public void testAddItem() throws IOException {
+    Box box = dao.get(1L);
+    String insertPos = "A02";
+    assertEquals(2, box.getBoxPositions().size());
+    assertFalse(box.getBoxPositions().containsKey(insertPos));
+
+    BoxPosition bp = new BoxPosition(box, insertPos, EntityType.LIBRARY, 1L);
+    box.getBoxPositions().put(insertPos, bp);
+    dao.save(box);
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    Box saved = dao.get(1L);
+    assertEquals(3, saved.getBoxPositions().size());
+    assertTrue(box.getBoxPositions().containsKey(insertPos));
+  }
+
+  @Test
+  public void testRemoveItem() throws IOException {
+    Box box = dao.get(1L);
+    String removePos = "A01";
+    assertEquals(2, box.getBoxPositions().size());
+    assertTrue(box.getBoxPositions().containsKey(removePos));
+
+    box.getBoxPositions().remove(removePos);
+    dao.save(box);
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    Box saved = dao.get(1L);
+    assertEquals(1, saved.getBoxPositions().size());
+    assertFalse(box.getBoxPositions().containsKey(removePos));
+  }
+
+  @Test
+  public void testGetBoxable() throws IOException {
+    Boxable item = dao.getBoxable(new BoxableId(EntityType.SAMPLE, 15L));
+    assertNotNull(item);
+    assertEquals(EntityType.SAMPLE, item.getEntityType());
+    assertEquals(15L, item.getId());
+  }
+
+  @Test
+  public void testSaveBoxable() throws IOException {
+    Boxable item = dao.getBoxable(new BoxableId(EntityType.SAMPLE, 15L));
+    assertFalse(item.isDiscarded());
+    item.setDiscarded(true);
+    dao.saveBoxable(item);
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    Boxable saved = dao.getBoxable(new BoxableId(EntityType.SAMPLE, 15L));
+    assertTrue(saved.isDiscarded());
   }
 
 }

@@ -13,7 +13,7 @@ public interface BoxableDeleterService<T extends Boxable & Deletable> extends De
   @Override
   public default void beforeDelete(T object) throws IOException {
     if (object.getBox() != null) {
-      object.getBox().removeBoxable(object.getBoxPosition());
+      object.getBox().getBoxPositions().remove(object.getBoxPosition());
       getBoxService().save(object.getBox());
     }
   }

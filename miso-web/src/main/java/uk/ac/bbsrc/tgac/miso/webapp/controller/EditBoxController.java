@@ -35,12 +35,12 @@ import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
@@ -111,11 +111,6 @@ public class EditBoxController {
     return sizes;
   }
 
-  @GetMapping(value = "/new")
-  public ModelAndView newBox(ModelMap model) throws IOException {
-    return setupForm(AbstractBox.UNSAVED_ID, model);
-  }
-
   @GetMapping(value = "/bulk/new")
   public ModelAndView newBoxes(@RequestParam("quantity") Integer quantity, ModelMap model) throws IOException {
     if (quantity == null || quantity <= 0) throw new RestException("Must specify quantity of boxes to create", Status.BAD_REQUEST);
@@ -138,21 +133,23 @@ public class EditBoxController {
     return changeLogService.listAll("Box");
   }
 
+  @GetMapping(value = "/new")
+  public ModelAndView newBox(ModelMap model) throws IOException {
+    model.put("title", "New Box");
+    User user = authorizationManager.getCurrentUser();
+    return setupForm(new BoxImpl(user), model);
+  }
+
   @GetMapping(value = "/{boxId}")
   public ModelAndView setupForm(@PathVariable Long boxId, ModelMap model) throws IOException {
+    Box box = boxService.get(boxId);
+    if (box == null) throw new NotFoundException("No box found for ID " + boxId.toString());
+    model.put("title", "Box " + box.getId());
+    return setupForm(box, model);
+  }
+
+  private ModelAndView setupForm(Box box, ModelMap model) throws IOException {
     try {
-      User user = authorizationManager.getCurrentUser();
-      Box box = null;
-
-      if (boxId == AbstractBox.UNSAVED_ID) {
-        box = new BoxImpl(user);
-        model.put("title", "New Box");
-      } else {
-        box = boxService.get(boxId);
-        if (box == null) throw new NotFoundException("No box found for ID " + boxId.toString());
-        model.put("title", "Box " + box.getId());
-      }
-
       model.put("formObj", box);
       model.put("box", box);
 
@@ -163,8 +160,9 @@ public class EditBoxController {
       model.put("boxSizes", boxService.listSizes());
 
       // add JSON
+      Collection<BoxableView> contents = boxService.getBoxContents(box.getId());
       ObjectMapper mapper = new ObjectMapper();
-      model.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(box, true)));
+      model.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDtoWithBoxables(box, contents)));
 
       // add FreezerUrl
       if (box.getStorageLocation() != null) {
@@ -188,9 +186,9 @@ public class EditBoxController {
   @PostMapping
   public String processSubmit(@ModelAttribute("box") Box box, ModelMap model, SessionStatus session) throws IOException {
     // The user may have modified the box contents while editing the form. Update the contents.
-    if (box.getId() != AbstractBox.UNSAVED_ID) {
+    if (box.isSaved()) {
       Box original = boxService.get(box.getId());
-      box.setBoxables(original.getBoxables());
+      box.setBoxPositions(original.getBoxPositions());
     }
     boxService.save(box);
     session.setComplete();

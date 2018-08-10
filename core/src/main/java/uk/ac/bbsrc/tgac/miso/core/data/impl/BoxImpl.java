@@ -3,19 +3,13 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.Hibernate;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.Formula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,9 +17,9 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 
 @Entity
@@ -36,17 +30,9 @@ public class BoxImpl extends AbstractBox {
 
   protected static final Logger log = LoggerFactory.getLogger(BoxImpl.class);
 
-  // The contents of the Box
-  @OneToMany(targetEntity = BoxableView.class, fetch = FetchType.LAZY)
-  @MapKeyColumn(name = "position", unique = true)
-  @JoinTable(name = "BoxPosition", joinColumns = { @JoinColumn(name = "boxId") }, inverseJoinColumns = {
-      @JoinColumn(name = "targetType", referencedColumnName = "targetType"),
-      @JoinColumn(name = "targetId", referencedColumnName = "targetId") })
-  @Fetch(FetchMode.SUBSELECT)
-  private Map<String, BoxableView> boxableViews = new HashMap<>();
-
-  @Formula("(SELECT COUNT(bp.targetId) from BoxPosition bp WHERE bp.boxId = boxId)")
-  private int tubeCountOnLoad;
+  @OneToMany(mappedBy = "box", cascade = CascadeType.ALL, orphanRemoval = true)
+  @MapKeyColumn(name = "position")
+  private Map<String, BoxPosition> boxPositions = new HashMap<>();
 
   /**
    * Construct new Box with defaults, and an empty SecurityProfile
@@ -67,8 +53,7 @@ public class BoxImpl extends AbstractBox {
   @Override
   public boolean isFreePosition(String position) {
     validate(position);
-    if (boxableViews.get(position) == null) return true;
-    return false;
+    return boxPositions.get(position) == null;
   }
 
   @Override
@@ -101,58 +86,20 @@ public class BoxImpl extends AbstractBox {
   
   @Override
   public int getTubeCount() {
-    if (Hibernate.isInitialized(boxableViews)) {
-      return boxableViews.size();
-    } else {
-      return tubeCountOnLoad;
+    return boxPositions.size();
+  }
+
+  @Override
+  public Map<String, BoxPosition> getBoxPositions() {
+    if (boxPositions == null) {
+      boxPositions = new HashMap<>();
     }
+    return boxPositions;
   }
 
   @Override
-  public void setBoxables(Map<String, BoxableView> items) {
-    this.boxableViews = items;
-  }
-
-  @Override
-  public Map<String, BoxableView> getBoxables() {
-    return boxableViews;
-  }
-
-  @Override
-  public void setBoxable(String position, BoxableView item) {
-    validate(position);
-
-    // if already in this box, remove from previous position first
-    if (item.getId().getTargetId() != 0L) {
-      String oldPosition = null;
-      for (Map.Entry<String, BoxableView> entry : boxableViews.entrySet()) {
-        if (entry.getValue().getId().equals(item.getId())) {
-          oldPosition = entry.getKey();
-          break;
-        }
-      }
-      if (oldPosition != null) {
-        boxableViews.remove(oldPosition);
-      }
-    }
-    boxableViews.put(position, item);
-  }
-
-  @Override
-  public BoxableView getBoxable(String position) {
-    validate(position);
-    return boxableViews.get(position);
-  }
-
-  @Override
-  public void removeBoxable(String position) {
-    validate(position);
-    boxableViews.remove(position);
-  }
-
-  @Override
-  public void removeAllBoxables() {
-    boxableViews.clear();
+  public void setBoxPositions(Map<String, BoxPosition> boxPositions) {
+    this.boxPositions = boxPositions;
   }
   
   @Override
