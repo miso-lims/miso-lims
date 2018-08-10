@@ -159,6 +159,13 @@ ListTarget.poolelement = {
           },
           'include': true,
           'iSortPriority': 0
+        }, {
+          "sTitle": "QC Passed",
+          "mData": "library.qcPassed",
+          "include": true,
+          "iSortPriority": 0,
+          "mRender": ListUtils.render.booleanChecks,
+          "bSortable": false
         }];
   }
 };
