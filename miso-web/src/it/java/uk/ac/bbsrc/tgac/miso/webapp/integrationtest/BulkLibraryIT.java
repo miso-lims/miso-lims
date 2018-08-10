@@ -48,7 +48,7 @@ public class BulkLibraryIT extends AbstractIT {
       LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE);
 
   private static final Set<String> receiptColumns = Sets.newHashSet(SamColumns.SAMPLE_TYPE,
-      SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.EXTERNAL_NAME,
+      SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.SUBPROJECT, SamColumns.EXTERNAL_NAME,
       SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.CONSENT, SamColumns.SAMPLE_CLASS,
       SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER,
       SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER, SamColumns.TISSUE_MATERIAL,

@@ -424,6 +424,11 @@ public class Dtos {
     to.setGroupId(nullifyStringIfBlank(from.getGroupId()));
     to.setGroupDescription(nullifyStringIfBlank(from.getGroupDescription()));
     to.setSynthetic(from.getSynthetic());
+    if (from.getSubprojectId() != null) {
+      Subproject subproject = new SubprojectImpl();
+      subproject.setId(from.getSubprojectId());
+      to.setSubproject(subproject);
+    }
     to.setCreationDate(LimsUtils.isStringEmptyOrNull(from.getCreationDate()) ? null : parseDate(from.getCreationDate()));
     if (from.getIdentityId() != null) {
       to.setIdentityId(from.getIdentityId());
