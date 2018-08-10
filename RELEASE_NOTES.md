@@ -3,12 +3,12 @@
 Changes:
 
  * Allow adding and editing Library creation date
- * Add updating identities with new external names when creating children
- * Add archived Sample Purposes
- * fixed JIRA search for Run-related tickets
- * Allow non-unique indices within a family
+ * Add updating identities with new external names when creating children (DetailedSample)
+ * Add archived Sample Purposes (DetailedSample)
+ * Fixed JIRA search for Run-related tickets
+ * Better support for custom combinatorial unique dual indices
  * Make containers deletable
- * Filter search by subproject
+ * Filter search by subproject (DetailedSample)
  * Allow library creation for all platforms
  * Add description to bulk Pools table
  * Remove add user button when using LDAP
@@ -40,7 +40,7 @@ Changes:
  * Add attachments to runs
  * Moved run and pool permissions towards bottom of page
  * Allow specifying proportions of dilutions in pool
- * Fixed zero-padding when autofilling numbers
+ * Fixed zero-padding when autofilling numbers in bulk tables
  * JIRA Integration for Projects and Runs
 
 CONFIG CHANGE: Flyway migration now requires an extra parameter (`-placheholders.filesDir`) to identify
@@ -68,7 +68,7 @@ Changes:
  * Add creation date to detailed sample
  * Move concentration from detailed sample to Sample
  * Automatically update entity field values for auto-updateable QCs
- * Allow setting whether a sample class can be created directly
+ * Allow setting whether a sample class can be created directly (DetailedSample)
  * Allow archiving sample types and sample classes
  * Add search by kit feature
 
