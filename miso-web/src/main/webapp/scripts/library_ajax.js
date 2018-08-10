@@ -265,18 +265,18 @@ Library.ui = {
       widget.appendChild(option);
     }
     widget.value = selectedId ? selectedId : (position > 1 ? "" : 0);
-    if(!!family.uniqueDualIndex){
+    if(family.uniqueDualIndex){
       widget.onchange = function(){
         var currentIndexValue = document.getElementById("index" + position).value;
         var currentIndex = family.indices.find(function(index){
           return index.id == currentIndexValue;
         });
-        if(!!currentIndex){
+        if(currentIndex){
           var nextIndexSelector = document.getElementById("index" + (position + 1));
           var nextIndex = family.indices.find(function(index){
             return index.position == (position + 1) && index.name == currentIndex.name;
           });
-          if(!!nextIndex){
+          if(nextIndex){
             nextIndexSelector.value = nextIndex.id;
           }
         }
