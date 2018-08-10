@@ -436,6 +436,11 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     testSearch(PaginationFilter.platformType(PlatformType.ILLUMINA));
   }
 
+  @Test
+  public void testSearchBySequencingParameters() throws IOException {
+    testSearch(PaginationFilter.sequencingParameters("\"Rapid Run\""));
+  }
+
   /**
    * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
    * 

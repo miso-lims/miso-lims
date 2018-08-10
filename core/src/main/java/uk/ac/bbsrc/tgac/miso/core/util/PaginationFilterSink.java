@@ -51,6 +51,8 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationBySequencerId(T item, long id, Consumer<String> errorHandler);
 
+  public void restrictPaginationBySequencingParametersName(T item, String name, Consumer<String> errorHandler);
+
   public void restrictPaginationBySequencingParametersId(T item, long id, Consumer<String> errorHandler);
 
   public void restrictPaginationBySubproject(T item, String query, Consumer<String> errorHandler);

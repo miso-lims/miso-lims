@@ -120,7 +120,8 @@ ListTarget.run = {
       searchTerms['changedby'],
       searchTerms['platform'],
       searchTerms['index_name'],
-      searchTerms['index_seq']
+      searchTerms['index_seq'],
+      searchTerms['parameters']
     ]
   }
 };

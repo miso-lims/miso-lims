@@ -191,6 +191,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter sequencingParameters(String name) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationBySequencingParametersName(item, name, errorHandler);
+      }
+    };
+  }
+
   /**
    * Search terms are documented in miso-web/src/main/webapp/scripts/list.js
    */
@@ -277,6 +287,10 @@ public abstract interface PaginationFilter {
           return kitName(parts[1]);
         case "subproject":
           return subproject(parts[1]);
+        case "sequencingparameters":
+        case "parameters":
+        case "params":
+          return sequencingParameters(parts[1]);
         }
       }
       return query(x);
