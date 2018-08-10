@@ -23,6 +23,7 @@ AS SELECT
     l.platformType AS platformType,
     l.dnaSize AS libraryDnaSize,
     l.paired AS libraryPaired,
+    l.qcPassed AS libraryQcPassed,
     sel.name AS librarySelectionType,
     strat.name AS libraryStrategyType,
     s.sampleId AS sampleId,

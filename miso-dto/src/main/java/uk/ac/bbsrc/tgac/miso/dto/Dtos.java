@@ -1380,6 +1380,7 @@ public class Dtos {
     if (from.getPlatformType() != null) {
       ldto.setPlatformType(from.getPlatformType().getKey());
     }
+    ldto.setQcPassed(from.getLibraryQcPassed());
     dto.setLibrary(ldto);
 
     Sample sample = from.getSample();
