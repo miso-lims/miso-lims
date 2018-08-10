@@ -87,7 +87,7 @@ FOR EACH ROW
         NEW.pool_poolId,
         'container',
         last_modifier,
-        CONCAT('Added to container ', new_container_serial),
+        CONCAT('Added to container ', new_container_serial, ' (partition ', NEW.partitionNumber, ')'),
         last_modified
       );
     END IF;
