@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -293,6 +294,12 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     criteria.createAlias("pool.poolDilutions", "poolDilution");
     criteria.createAlias("poolDilution.poolableElementView", "dilution");
     HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
+  }
+
+  @Override
+  public void restrictPaginationBySequencingParametersName(Criteria criteria, String name, Consumer<String> errorHandler) {
+    criteria.createAlias("sequencingParameters", "params");
+    criteria.add(Restrictions.ilike("params.name", name, MatchMode.START));
   }
 
   @Override

@@ -263,6 +263,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationBySequencingParametersName(Criteria criteria, String name, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by sequencing parameters.", getFriendlyName()));
+  }
+
+  @Override
   default void restrictPaginationBySubproject(Criteria criteria, String query, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be filtered by subproject.", getFriendlyName()));
   }

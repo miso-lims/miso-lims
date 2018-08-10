@@ -107,6 +107,10 @@ ListUtils = (function() {
     "subproject": {
       term: "subproject:NAME",
       help: "Checks if an item is tagged with the given subproject"
+    },
+    "parameters": {
+      term: "parameters:NAME",
+      help: "Checks if an item has the specified sequencing parameters."
     }
   };
 
