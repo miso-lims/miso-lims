@@ -2233,3 +2233,10 @@ ul.unformatted-list {
   padding: 0;
   margin: 0;
 }
+
+.note-delete-icon {
+  clear: both;
+  position: relative;
+  float: right;
+  margin-top: -4px;
+}

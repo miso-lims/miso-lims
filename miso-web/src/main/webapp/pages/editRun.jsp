@@ -304,7 +304,7 @@
             <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
               <span style="color:#000000">
                 <a href='#' onclick="Run.ui.deleteRunNote('${run.id}', '${note.noteId}');">
-                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span>
+                  <span class="ui-icon ui-icon-trash note-delete-icon"></span>
                 </a>
               </span>
             </c:if>

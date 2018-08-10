@@ -197,7 +197,6 @@
     <th>End Date</th>
     <th># Proposed Samples</th>
     <th># QC Passed Samples</th>
-    <th width="40%">Notes</th>
   </tr>
   </thead>
   <tbody>
@@ -265,26 +264,6 @@
       <script type="text/javascript">
         jQuery("#progressbar${overview.id}").progressbar({ value: ${fn:length(overview.qcPassedSamples) / overview.numProposedSamples * 100} });
       </script>
-    </td>
-    <td>
-      <c:if test="${not overview.locked}">
-        <a onclick="Project.overview.showProjectOverviewNoteDialog(${overview.id});"
-           href="javascript:void(0);" class="add">Add Note</a><br/>
-      </c:if>
-      <c:forEach items="${overview.notes}" var="note" varStatus="n">
-        <div class="exppreview" id="overview-notes-${n.count}">
-          <b>${note.creationDate}</b>: ${note.text}
-          <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
-            <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
-              <span style="color:#000000">
-                <a href='#' onclick="Project.overview.deleteProjectOverviewNote('${overview.id}', '${note.noteId}');">
-                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span>
-                </a>
-              </span>
-            </c:if>
-          </span>
-        </div>
-      </c:forEach>
     </td>
   </tr>
   </tbody>
@@ -363,6 +342,28 @@
     </div>
   </li>
 </ol>
+    
+<div id="overviewnotes" style="clear:both">
+  <c:if test="${not overview.locked}">
+    <a onclick="Project.overview.showProjectOverviewNoteDialog(${overview.id});"
+       href="javascript:void(0);" class="add">Add Note</a><br/><br/>
+  </c:if>
+  <c:if test="${fn:length(overview.notes) > 0}">
+    <div class="note" style="clear:both">
+      <c:forEach items="${overview.notes}" var="note" varStatus="n">
+        <div class="exppreview" id="overview-notes-${n.count}">
+          <b>${note.creationDate}</b>: ${note.text}
+          <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
+            <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
+            <span style="color:#000000"><a href='#' onclick="Project.overview.deleteProjectOverviewNote('${overview.id}', '${note.noteId}');">
+              <span class="ui-icon ui-icon-trash note-delete-icon"></span></a></span>
+            </c:if>
+          </span>
+        </div>
+      </c:forEach>
+    </div>
+  </c:if>
+</div>
 
 <p style="clear:both"/>
 
