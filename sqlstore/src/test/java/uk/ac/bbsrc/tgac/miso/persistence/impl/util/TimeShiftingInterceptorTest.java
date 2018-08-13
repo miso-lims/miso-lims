@@ -86,6 +86,7 @@ public class TimeShiftingInterceptorTest extends AbstractDAOTest {
     ldi.setLibrary((Library) session.get(LibraryImpl.class, 1L));
     Date date = formatter.parse("2017-02-13", Locale.CANADA);
     ldi.setCreationDate(date);
+    ldi.setCreationTime(date);
     ldi.setCreator(user);
     ldi.setName("Jim");
     ldi.setLastModified(new Date());

@@ -233,7 +233,7 @@ SELECT parent.alias name
         ,NULL tissueType 
         ,LEFT(parent.alias, LOCATE('_', parent.alias)-1) project 
         ,0 archived 
-        ,CONVERT(d.creationDate, DATETIME) created 
+        ,d.created created 
         ,NULL createdById 
         ,d.lastUpdated modified 
         ,d.lastModifier modifiedById 

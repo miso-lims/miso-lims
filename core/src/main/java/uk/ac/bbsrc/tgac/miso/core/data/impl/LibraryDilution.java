@@ -58,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.DilutionBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
@@ -74,7 +75,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @Entity
 @Table(name = "LibraryDilution")
 public class LibraryDilution extends AbstractBoxable
-    implements SecurableByProfile, Barcodable, Comparable<LibraryDilution>, Nameable, Boxable, Deletable, Serializable {
+    implements SecurableByProfile, Barcodable, Comparable<LibraryDilution>, Nameable, Boxable, Deletable, Serializable, Timestamped {
 
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
@@ -91,6 +92,10 @@ public class LibraryDilution extends AbstractBoxable
   @Column(nullable = false)
   @Temporal(TemporalType.DATE)
   private Date creationDate;
+
+  @Column(name = "created", nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date creationTime;
 
   private Double concentration;
 
@@ -157,6 +162,7 @@ public class LibraryDilution extends AbstractBoxable
     this.targetedSequencing = targetedSequencing;
   }
 
+  @Override
   public User getLastModifier() {
     return lastModifier;
   }
@@ -184,10 +190,12 @@ public class LibraryDilution extends AbstractBoxable
     this.name = name;
   }
 
+  @Override
   public User getCreator() {
     return creator;
   }
 
+  @Override
   public void setCreator(User creator) {
     this.creator = creator;
   }
@@ -442,6 +450,21 @@ public class LibraryDilution extends AbstractBoxable
 
   public void setVolumeUsed(Double volumeUsed) {
     this.volumeUsed = volumeUsed;
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return creationTime;
+  }
+
+  @Override
+  public void setCreationTime(Date creationTime) {
+    this.creationTime = creationTime;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

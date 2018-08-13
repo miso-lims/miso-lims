@@ -165,6 +165,8 @@ public class DefaultLibraryDilutionService
       library.setVolume(library.getVolume() - dilution.getVolumeUsed());
     }
 
+    dilution.setChangeDetails(authorizationManager.getCurrentUser());
+
     // pre-save field generation
     dilution.setName(generateTemporaryName());
     long savedId = save(dilution).getId();
@@ -191,6 +193,7 @@ public class DefaultLibraryDilutionService
     }
 
     applyChanges(managed, dilution);
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
     loadChildEntities(managed);
     save(managed);
     libraryService.update(library);
