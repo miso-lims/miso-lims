@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -19,7 +20,7 @@ public class LibraryTemplateDto {
 
   private String alias;
 
-  private long projectId;
+  private List<Long> projectIds;
 
   private Double defaultVolume;
 
@@ -55,12 +56,12 @@ public class LibraryTemplateDto {
     this.alias = alias;
   }
 
-  public long getProjectId() {
-    return projectId;
+  public List<Long> getProjectIds() {
+    return projectIds;
   }
 
-  public void setProjectId(long projectId) {
-    this.projectId = projectId;
+  public void setProjectIds(List<Long> projectIds) {
+    this.projectIds = projectIds;
   }
 
   public Double getDefaultVolume() {

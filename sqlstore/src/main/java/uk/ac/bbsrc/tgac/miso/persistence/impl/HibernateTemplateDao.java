@@ -31,6 +31,7 @@ public class HibernateTemplateDao implements TemplateStore {
   public List<LibraryTemplate> listLibraryTemplatesForProject(long projectId) {
     @SuppressWarnings("unchecked")
     List<LibraryTemplate> list = currentSession().createCriteria(LibraryTemplate.class)
+        .createAlias("projects", "project")
         .add(Restrictions.eq("project.id", projectId))
         .list();
     return list;

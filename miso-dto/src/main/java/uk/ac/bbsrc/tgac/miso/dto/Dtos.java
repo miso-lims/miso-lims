@@ -2314,7 +2314,7 @@ public class Dtos {
 
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
-    dto.setProjectId(from.getProject().getId());
+    dto.setProjectIds(from.getProjects().stream().map(Project::getId).collect(Collectors.toList()));
     dto.setDefaultVolume(from.getDefaultVolume());
     if (from.getPlatformType() != null) {
       dto.setPlatformType(from.getPlatformType().getKey());
