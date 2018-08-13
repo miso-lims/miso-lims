@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -697,10 +698,14 @@ public class EditLibraryController {
       templatesByProjectId = results.stream()
           .map(sam -> sam.getProject().getId())
           .distinct()
-          .map(projectId -> templateService.listLibraryTemplatesForProject(projectId))
-          .filter(list -> !list.isEmpty())
-          .map(Dtos::asLibraryTemplateDtos)
-          .collect(Collectors.toMap(list -> list.get(0).getProjectId(), list -> list));
+          .map(projectId -> {
+            Map<Long, List<LibraryTemplateDto>> map = new HashMap<>();
+            map.put(projectId, Dtos.asLibraryTemplateDtos(templateService.listLibraryTemplatesForProject(projectId)));
+            return map;
+          })
+          .filter(map -> !map.values().stream().allMatch(value -> value.isEmpty()))
+          .flatMap(map -> map.entrySet().stream())
+          .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
       SampleClass sampleClass = null;
       boolean hasPlain = false;
