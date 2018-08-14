@@ -13,6 +13,8 @@ Changes:
  * Add description to bulk Pools table
  * Remove add user button when using LDAP
 
+BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
+
 # 0.2.134
 
 Changes:
@@ -26,6 +28,7 @@ Changes:
  * fix: use java.util.logging instead of slf4j in Flyway migration
 
 BAD: Flyway migration via Flyway command-line tool still fails. Fixed in 0.2.134.
+BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
 
 # 0.2.132
 
@@ -55,6 +58,7 @@ advised that you delete `issuetracker.properties`, and instead keep the configur
 BAD: Flyway migration via Flyway command-line tool fails due to slf4j logger used in Flyway migration.
 Could be remedied by copying slf4j libraries into the flyway/libs dir, but the next release contains a
 simpler fix.
+BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
 
 # 0.2.131
 
@@ -71,6 +75,8 @@ Changes:
  * Allow setting whether a sample class can be created directly (DetailedSample)
  * Allow archiving sample types and sample classes
  * Add search by kit feature
+
+BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
 
 # 0.2.130
 
