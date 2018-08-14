@@ -23,7 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
@@ -69,6 +69,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -355,8 +356,11 @@ public class EditSampleController {
     return o1.getAlias().compareTo(o2.getAlias());
   };
 
-  private void populateSampleClasses(ModelMap model) throws IOException {
-    List<SampleClass> sampleClasses = new ArrayList<>(sampleClassService.getAll());
+  private void populateSampleClasses(ModelMap model, DetailedSample sample) throws IOException {
+    List<SampleClass> sampleClasses = sampleClassService.getAll().stream()
+        .filter(sc -> (!sc.isArchived() && sc.isDirectCreationAllowed())
+            || (sample.getSampleClass() != null && sample.getSampleClass().getId().equals(sc.getId())))
+        .collect(Collectors.toList());
     List<SampleClass> tissueClasses = sampleClasses.stream()
         .filter(sc -> SampleTissue.CATEGORY_NAME.equals(sc.getSampleCategory()))
         .collect(Collectors.toList());
@@ -436,16 +440,12 @@ public class EditSampleController {
   @Autowired
   private SamplePurposeService samplePurposeService;
 
-  public List<SamplePurpose> getSamplePurposes(SampleAliquot sample) throws IOException {
-    List<SamplePurpose> list = new ArrayList<>(samplePurposeService.getAll());
-    Collections.sort(list, new Comparator<SamplePurpose>() {
-      @Override
-      public int compare(SamplePurpose o1, SamplePurpose o2) {
-        return o1.getAlias().compareTo(o2.getAlias());
-      }
-    });
-    return list.stream().filter(samPurpose -> !samPurpose.isArchived() ||
-        (sample.getSamplePurpose() != null && sample.getSamplePurpose().getId() == samPurpose.getId()))
+  public List<SamplePurpose> getSamplePurposes(Sample sample) throws IOException {
+    SampleAliquot aliquot = isAliquotSample(sample) ? (SampleAliquot) sample : null;
+    return samplePurposeService.getAll().stream()
+        .filter(samPurpose -> !samPurpose.isArchived() ||
+            (aliquot != null && aliquot.getSamplePurpose() != null && aliquot.getSamplePurpose().getId() == samPurpose.getId()))
+        .sorted(Comparator.comparing(Aliasable::getAlias))
         .collect(Collectors.toList());
   }
 
@@ -687,28 +687,28 @@ public class EditSampleController {
         model.put("samplePools", pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
         model.put("sampleRuns", runDtos);
         model.put("sampleRelations", getRelations(sample));
-        if (sample instanceof SampleAliquot) {
-          model.put("samplePurposes", getSamplePurposes((SampleAliquot) sample));
-        }
         addArrayData(sampleId, model);
       }
 
       model.put("formObj", sample);
       model.put("sample", sample);
       Collection<String> sampleTypes = sampleService.listSampleTypes();
-      if (!sampleTypes.contains(sample.getSampleType())) {
+      if (sample.getSampleType() != null && !sampleTypes.contains(sample.getSampleType())) {
         sampleTypes.add(sample.getSampleType());
       }
       model.put("sampleTypes", sampleTypes);
       if (LimsUtils.isDetailedSample(sample) && LimsUtils.getIdentityConsentLevel((DetailedSample) sample) == ConsentLevel.REVOKED) {
         model.put("warning", "Donor has revoked consent");
       }
+      if (detailedSample) {
+        model.put("samplePurposes", getSamplePurposes(sample));
+        populateSampleClasses(model, (DetailedSample) sample);
+      }
 
       Collection<User> allUsers = securityManager.listAllUsers();
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, allUsers));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, allUsers));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, sample, securityManager.listAllGroups()));
-      populateSampleClasses(model);
 
       return new ModelAndView("/pages/editSample.jsp", model);
     } catch (IOException ex) {
