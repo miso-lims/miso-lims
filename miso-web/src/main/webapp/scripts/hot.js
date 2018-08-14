@@ -137,7 +137,17 @@ var HotUtils = {
     var columns = target.createColumns(config, create, data).filter(function(c) {
       return c.include;
     });
+    
+    if(columns.some(function(c){
+      return c.description;
+    })){
+      jQuery('#hothelpdiv').append('</br>');
+      jQuery('#hothelpdiv').append('<p>Column Descriptions:</p>');
+    }
     columns.forEach(function(c, i) {
+      if(c.description && c.include){
+        jQuery('#hothelpdiv').append('<p>' + c.header + ' - ' + c.description + '</p>');
+      }
       c.hotIndex = i;
     });
     var cellMetaData = [];

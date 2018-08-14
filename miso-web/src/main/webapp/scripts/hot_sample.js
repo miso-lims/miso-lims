@@ -179,6 +179,7 @@ HotTarget.sample = (function() {
               numberOfMonths: 1
             },
             allowEmpty: true,
+            description: 'The date that the sample was received from an external source.',
             include: (!Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity') && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
               // If creating, default to today's date in format YYYY-MM-DD
@@ -299,6 +300,8 @@ HotTarget.sample = (function() {
             data: 'externalName',
             validator: HotUtils.validator.requiredTextNoSpecialChars,
             include: show['Identity'],
+            description: 'Search for multiple external names by separating them with commas. ' +
+                'A coloured background indicates that new external names will be added to the identity upon creation.',
             unpack: function(sam, flat, setCellMeta) {
               flat.externalName = Utils.valOrNull(sam.externalName);
             },
@@ -341,6 +344,7 @@ HotTarget.sample = (function() {
             trimDropdown: false,
             strict: true,
             source: [],
+            description: 'A coloured background indicates that multiple identities correspond to the external name.',
             validator: HotUtils.validator.requiredAutocomplete,
             include: show['Identity'] && config.targetSampleClass.alias != 'Identity'
                 && config.targetSampleClass.sampleCategory != 'Identity',
@@ -519,6 +523,7 @@ HotTarget.sample = (function() {
               numberOfMonths: 1
             },
             allowEmpty: true,
+            description: 'The date that the sample was created.',
             include: Constants.isDetailedSample && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
               flat.creationDate = Utils.valOrNull(sam.creationDate);

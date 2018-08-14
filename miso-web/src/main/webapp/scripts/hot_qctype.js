@@ -74,6 +74,7 @@ HotTarget.qctype = {
         trimDropdown: false,
         validator: HotUtils.validator.requiredAutocomplete,
         source: [''],
+        description: 'The field of the target that the QC\'s value represents, if any.',
         unpack: function(obj, flat, setCellMeta) {
           flat['correspondingField'] = obj['correspondingField'] || null;
         },
@@ -99,17 +100,18 @@ HotTarget.qctype = {
         data: 'autoUpdateField',
         type: 'dropdown',
         trimDropdown: false,
-        source: ['True', 'False'],
+        source: ['Yes', 'No'],
         include: true,
+        description: 'If this is set to yes, the target\'s corresponding field\'s value will be updated every time a QC of this type is created or updated',
         unpack: function(obj, flat, setCellMeta) {
           if (obj['autoUpdateField'] === true) {
-            flat['autoUpdateField'] = 'True';
+            flat['autoUpdateField'] = 'Yes';
           } else {
-            flat['autoUpdateField'] = 'False';
+            flat['autoUpdateField'] = 'No';
           }
         },
         pack: function(obj, flat, errorHandler) {
-          if (flat['autoUpdateField'] === 'True') {
+          if (flat['autoUpdateField'] === 'Yes') {
             obj['autoUpdateField'] = true;
           } else  {
             obj['autoUpdateField'] = false;
@@ -118,7 +120,7 @@ HotTarget.qctype = {
         depends: ['correspondingField', 'resultFormat'],
         update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
           if(Utils.validation.isEmpty(value) || flat['resultFormat'] === 'Yes/No'){
-            setData("False");
+            setData("No");
             setReadOnly(true);
           } else {
             setReadOnly(false);

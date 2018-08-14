@@ -101,6 +101,7 @@ HotTarget.boxable = (function() {
             readOnly: !!config.box,
             trimDropdown: false,
             source: [''],
+            description: 'Searches by Box name, alias, or barcode. (Accepts partial matches)',
             unpack: function(obj, flat, setCellMeta) {
               if (obj.box && obj.box.alias) {
                 flat.boxAlias = obj.box.alias;
