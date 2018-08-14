@@ -696,7 +696,7 @@ public class EditSampleController {
       model.put("formObj", sample);
       model.put("sample", sample);
       Collection<String> sampleTypes = sampleService.listSampleTypes();
-      if (!sampleTypes.contains(sample.getSampleType())) {
+      if (sample.getSampleType() != null && !sampleTypes.contains(sample.getSampleType())) {
         sampleTypes.add(sample.getSampleType());
       }
       model.put("sampleTypes", sampleTypes);
