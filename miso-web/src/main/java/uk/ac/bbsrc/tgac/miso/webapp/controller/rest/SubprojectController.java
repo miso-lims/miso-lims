@@ -59,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SubprojectDto;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
 @RequestMapping("/rest")
@@ -75,6 +76,9 @@ public class SubprojectController extends RestController {
 
   @Autowired
   private ReferenceGenomeService referenceGenomeService;
+
+  @Autowired
+  private MenuController menuController;
 
   @GetMapping(value = "/subproject/{id}", produces = { "application/json" })
   @ResponseBody
@@ -116,6 +120,7 @@ public class SubprojectController extends RestController {
       throws IOException {
     Subproject subproject = Dtos.to(subprojectDto);
     Long id = subprojectService.create(subproject, subprojectDto.getParentProjectId());
+    menuController.refreshConstants();
     return getSubproject(id, uriBuilder, response);
   }
 
@@ -127,17 +132,19 @@ public class SubprojectController extends RestController {
     Subproject subproject = Dtos.to(subprojectDto);
     subproject.setId(id);
     subprojectService.update(subproject);
+    menuController.refreshConstants();
     return getSubproject(id, uriBuilder, response);
   }
 
   @DeleteMapping(value = "/subproject/{id}")
   @ResponseStatus(code = HttpStatus.OK)
-  public void deleteSubproject(@PathVariable(name = "id", required = true) long id, HttpServletResponse response) throws IOException {
+  public void deleteSubproject(@PathVariable(name = "id", required = true) long id) throws IOException {
     Subproject subproject = subprojectService.get(id);
     if (subproject == null) {
       throw new RestException("Subproject " + id + " not found", Status.NOT_FOUND);
     }
     subprojectService.delete(subproject);
+    menuController.refreshConstants();
   }
 
   @GetMapping(value = "/subproject/{id}/groups", produces = { "application/json" })

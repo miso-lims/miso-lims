@@ -33,10 +33,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -45,18 +47,22 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcTypeDto;
 import uk.ac.bbsrc.tgac.miso.service.QcTypeService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
 @RequestMapping("/rest")
 @SessionAttributes("qctype")
 public class QcTypeController extends RestController {
 
+  @Autowired
+  private MenuController menuController;
+
   protected static final Logger log = LoggerFactory.getLogger(QcTypeController.class);
 
   @Autowired
   private QcTypeService qcTypeService;
 
-  @RequestMapping(value = "/qctype/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/qctype/{id}", produces = { "application/json" })
   @ResponseBody
   public QcTypeDto getQcType(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
@@ -69,7 +75,7 @@ public class QcTypeController extends RestController {
     }
   }
 
-  @RequestMapping(value = "/qctypes", method = RequestMethod.GET, produces = { "application/json" })
+  @GetMapping(value = "/qctypes", produces = { "application/json" })
   @ResponseBody
   public Set<QcTypeDto> getQcTypes(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<QcType> qcTypes = (Set<QcType>) qcTypeService.getAll();
@@ -77,24 +83,24 @@ public class QcTypeController extends RestController {
     return qcTypeDtos;
   }
 
-  @RequestMapping(value = "/qctype", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @PostMapping(value = "/qctype", headers = { "Content-type=application/json" })
   @ResponseBody
-  public QcTypeDto createQcType(@RequestBody QcTypeDto qcTypeDto, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response)
+  public QcTypeDto createQcType(@RequestBody QcTypeDto qcTypeDto, UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
     QcType qcType = Dtos.to(qcTypeDto);
     Long id = qcTypeService.create(qcType);
+    menuController.refreshConstants();
     return getQcType(id, uriBuilder, response);
   }
 
-  @RequestMapping(value = "/qctype/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @PutMapping(value = "/qctype/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
-  public QcTypeDto updateSubproject(@PathVariable("id") Long id, @RequestBody QcTypeDto qcTypeDto,
-      UriComponentsBuilder uriBuilder,
+  public QcTypeDto updateSubproject(@PathVariable("id") Long id, @RequestBody QcTypeDto qcTypeDto, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
     QcType qcType = Dtos.to(qcTypeDto);
     qcType.setQcTypeId(id);
     qcTypeService.update(qcType);
+    menuController.refreshConstants();
     return getQcType(id, uriBuilder, response);
   }
 

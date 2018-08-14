@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.TissueOriginDto;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
 @RequestMapping("/rest")
@@ -61,6 +62,9 @@ public class TissueOriginController extends RestController {
 
   @Autowired
   private TissueOriginService tissueOriginService;
+
+  @Autowired
+  private MenuController menuController;
 
   @GetMapping(value = "/tissueorigin/{id}", produces = { "application/json" })
   @ResponseBody
@@ -100,30 +104,32 @@ public class TissueOriginController extends RestController {
 
   @PostMapping(value = "/tissueorigin", headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.CREATED)
-  public @ResponseBody TissueOriginDto createTissueOrigin(@RequestBody TissueOriginDto tissueOriginDto, UriComponentsBuilder b,
-      HttpServletResponse response) throws IOException {
+  public @ResponseBody TissueOriginDto createTissueOrigin(@RequestBody TissueOriginDto tissueOriginDto) throws IOException {
     TissueOrigin tissueOrigin = Dtos.to(tissueOriginDto);
     Long id = tissueOriginService.create(tissueOrigin);
+    menuController.refreshConstants();
     return Dtos.asDto(tissueOriginService.get(id));
   }
 
   @PutMapping(value = "/tissueorigin/{id}", headers = { "Content-type=application/json" })
-  public @ResponseBody TissueOriginDto updateTissueOrigin(@PathVariable("id") Long id, @RequestBody TissueOriginDto tissueOriginDto,
-      HttpServletResponse response) throws IOException {
+  public @ResponseBody TissueOriginDto updateTissueOrigin(@PathVariable("id") Long id, @RequestBody TissueOriginDto tissueOriginDto)
+      throws IOException {
     TissueOrigin tissueOrigin = Dtos.to(tissueOriginDto);
     tissueOrigin.setId(id);
     tissueOriginService.update(tissueOrigin);
+    menuController.refreshConstants();
     return Dtos.asDto(tissueOriginService.get(id));
   }
 
   @DeleteMapping(value = "/tissueorigin/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteTissueOrigin(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+  public void deleteTissueOrigin(@PathVariable("id") Long id) throws IOException {
     TissueOrigin origin = tissueOriginService.get(id);
     if (origin == null) {
       throw new RestException("Tissue Origin " + id + " not found", Status.NOT_FOUND);
     }
     tissueOriginService.delete(origin);
+    menuController.refreshConstants();
   }
 
 }

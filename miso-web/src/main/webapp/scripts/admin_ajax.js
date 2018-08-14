@@ -32,7 +32,7 @@ var Admin = Admin
       },
       regenBarcodes: function() {
         Utils.showConfirmDialog('Barcodes', 'Generate', ['Generate missing barcodes?'], function() {
-          Utils.ajaxWithDialog('Clearing Cache', 'POST', '/miso/rest/admin/barcode/regen', null, function(results) {
+          Utils.ajaxWithDialog('Generating Barcodes', 'POST', '/miso/rest/admin/barcode/regen', null, function(results) {
             Utils.showOkDialog('Cache', results.filter(function(result) {
               return result.count > 0;
             }).map(
@@ -40,6 +40,13 @@ var Admin = Admin
                   return "Regenerated " + result.updated + " barcodes of " + result.blank + " " + result.target + ". " + result.total + " "
                       + result.target + " processed.";
                 }));
+          });
+        });
+      },
+      refreshConstants: function() {
+        Utils.showConfirmDialog('Constants', 'Refresh', ['Refresh constants?'], function() {
+          Utils.ajaxWithDialog('Refreshing Constants', 'POST', '/miso/rest/admin/constants/refresh', null, function(success) {
+            Utils.showOkDialog('Constants', ['Constants refreshed.']);
           });
         });
       },
