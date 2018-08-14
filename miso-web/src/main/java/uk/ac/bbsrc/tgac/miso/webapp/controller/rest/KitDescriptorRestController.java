@@ -34,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.KitDescriptorDto;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
 @RequestMapping("/rest")
@@ -44,6 +45,10 @@ public class KitDescriptorRestController extends RestController {
 
   @Autowired
   private SecurityManager securityManager;
+
+  @Autowired
+  private MenuController menuController;
+
   private final JQueryDataTableBackend<KitDescriptor, KitDescriptorDto> jQueryBackend = new JQueryDataTableBackend<KitDescriptor, KitDescriptorDto>() {
 
     @Override
@@ -95,22 +100,23 @@ public class KitDescriptorRestController extends RestController {
   @PostMapping(value = "/kitdescriptor", headers = { "Content-type=application/json" })
   @ResponseBody
   @ResponseStatus(HttpStatus.CREATED)
-  public void createKitDescriptor(@RequestBody KitDescriptorDto kitDescriptorDto, UriComponentsBuilder uriBuilder) throws IOException {
+  public void createKitDescriptor(@RequestBody KitDescriptorDto kitDescriptorDto) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     KitDescriptor kd = Dtos.to(kitDescriptorDto);
     kd.setId(KitDescriptor.UNSAVED_ID);
     kd.setLastModifier(user);
     kitService.saveKitDescriptor(kd);
+    menuController.refreshConstants();
   }
 
   @PutMapping(value = "/kitdescriptor/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
   @ResponseStatus(HttpStatus.OK)
-  public void updateKitDescriptor(@PathVariable("id") Long id, @RequestBody KitDescriptorDto kitDescriptorDto,
-      UriComponentsBuilder uriBuilder) throws IOException {
+  public void updateKitDescriptor(@PathVariable("id") Long id, @RequestBody KitDescriptorDto kitDescriptorDto) throws IOException {
     KitDescriptor kd = Dtos.to(kitDescriptorDto);
     kd.setId(id);
     kitService.saveKitDescriptor(kd);
+    menuController.refreshConstants();
   }
 
   @GetMapping(value = "/kitdescriptor/dt", produces = "application/json")

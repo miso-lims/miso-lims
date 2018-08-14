@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.TissueMaterialDto;
 import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
 @RequestMapping("/rest")
@@ -61,6 +62,9 @@ public class TissueMaterialController extends RestController {
 
   @Autowired
   private TissueMaterialService tissueMaterialService;
+
+  @Autowired
+  private MenuController menuController;
 
   @GetMapping(value = "/tissuematerial/{id}", produces = { "application/json" })
   @ResponseBody
@@ -104,28 +108,30 @@ public class TissueMaterialController extends RestController {
       HttpServletResponse response) throws IOException {
     TissueMaterial tissueMaterial = Dtos.to(tissueMaterialDto);
     Long id = tissueMaterialService.create(tissueMaterial);
+    menuController.refreshConstants();
     return getTissueMaterial(id, uriBuilder, response);
   }
 
   @PutMapping(value = "/tissuematerial/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
   public TissueMaterialDto updateTissueMaterial(@PathVariable("id") Long id, @RequestBody TissueMaterialDto tissueMaterialDto,
-      UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) throws IOException {
+      UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     TissueMaterial tissueMaterial = Dtos.to(tissueMaterialDto);
     tissueMaterial.setId(id);
     tissueMaterialService.update(tissueMaterial);
+    menuController.refreshConstants();
     return getTissueMaterial(id, uriBuilder, response);
   }
 
   @DeleteMapping(value = "/tissuematerial/{id}")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
-  public void deleteTissueMaterial(@PathVariable(name = "id", required = true) long id, HttpServletResponse response) throws IOException {
+  public void deleteTissueMaterial(@PathVariable(name = "id", required = true) long id) throws IOException {
     TissueMaterial tissueMaterial = tissueMaterialService.get(id);
     if (tissueMaterial == null) {
       throw new RestException("Tissue Material " + id + " not found", Status.NOT_FOUND);
     }
     tissueMaterialService.delete(tissueMaterial);
+    menuController.refreshConstants();
   }
 
 }

@@ -361,4 +361,8 @@ public class MenuController implements ServletContextAware {
     constantsTimestamp.set(constantsJsTime / 1000.0);
     return constantsJs;
   }
+
+  public void refreshConstants() {
+    constantsJsTime = 0;
+  }
 }

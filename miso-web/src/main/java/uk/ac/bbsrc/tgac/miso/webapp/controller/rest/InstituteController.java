@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
@@ -28,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstituteDto;
 import uk.ac.bbsrc.tgac.miso.service.InstituteService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
 @RequestMapping("/rest")
@@ -39,6 +39,9 @@ public class InstituteController extends RestController {
   @Autowired
   private InstituteService instituteService;
   
+  @Autowired
+  private MenuController menuController;
+
   private static InstituteDto writeUrls(InstituteDto instituteDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
     instituteDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/institute/{id}")
@@ -79,27 +82,30 @@ public class InstituteController extends RestController {
   public InstituteDto createInstitute(@RequestBody InstituteDto instituteDto, UriComponentsBuilder uriBuilder) throws IOException {
     Institute institute = Dtos.to(instituteDto);
     Long id = instituteService.create(institute);
+    menuController.refreshConstants();
     return getInstitute(id, uriBuilder);
   }
   
   @PutMapping(value = "/institute/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
-  public InstituteDto updateInstitute(@PathVariable("id") Long id, @RequestBody InstituteDto instituteDto,
-      UriComponentsBuilder uriBuilder) throws IOException {
+  public InstituteDto updateInstitute(@PathVariable("id") Long id, @RequestBody InstituteDto instituteDto, UriComponentsBuilder uriBuilder)
+      throws IOException {
     Institute institute = Dtos.to(instituteDto);
     institute.setId(id);
     instituteService.update(institute);
+    menuController.refreshConstants();
     return getInstitute(id, uriBuilder);
   }
   
   @DeleteMapping(value = "/institute/{id}")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
-  public void deleteInstitute(@PathVariable(name = "id", required = true) long id, HttpServletResponse response) throws IOException {
+  public void deleteInstitute(@PathVariable(name = "id", required = true) long id) throws IOException {
     Institute institute = instituteService.get(id);
     if (institute == null) {
       throw new RestException("Institute " + id + " not found", Status.NOT_FOUND);
     }
     instituteService.delete(institute);
+    menuController.refreshConstants();
   }
   
 }
