@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.component;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.ui.ModelMap;
@@ -10,6 +12,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 @ControllerAdvice("uk.ac.bbsrc.tgac.miso.webapp.controller")
 public class ExceptionHandlerAdvice {
+
+  private static final Logger log = LoggerFactory.getLogger(ExceptionHandlerAdvice.class);
 
   @ExceptionHandler(NotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -26,12 +30,16 @@ public class ExceptionHandlerAdvice {
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ModelAndView showUnknownError(final Exception e) {
+    logException(e);
     return withMessages("Server Error",
         "An unexpected error has occurred. If the problem persists, please report it to your MISO administrators", true);
   }
 
-  private ModelAndView fromExceptionMessage(String genericMessage, Exception e, boolean showBugUrl) {
-    return withMessages(genericMessage, e.getMessage(), showBugUrl);
+  private ModelAndView fromExceptionMessage(String genericMessage, Exception e, boolean possibleBug) {
+    if (possibleBug) {
+      logException(e);
+    }
+    return withMessages(genericMessage, e.getMessage(), possibleBug);
   }
 
   private ModelAndView withMessages(String genericMessage, String specificMessage, boolean showBugUrl) {
@@ -40,6 +48,10 @@ public class ExceptionHandlerAdvice {
     model.addAttribute("specificMessage", specificMessage);
     model.addAttribute("showBugUrl", showBugUrl);
     return new ModelAndView("/pages/handledError.jsp", model);
+  }
+
+  private void logException(Exception e) {
+    log.error("Returning error page for exception", e);
   }
 
 }
