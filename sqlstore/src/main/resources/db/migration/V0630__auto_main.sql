@@ -1,3 +1,5 @@
+-- worksets
+
 DROP TABLE IF EXISTS Workset_Sample;
 DROP TABLE IF EXISTS Workset_Library;
 DROP TABLE IF EXISTS Workset_Dilution;
@@ -40,3 +42,37 @@ CREATE TABLE Workset_Dilution (
   CONSTRAINT fk_dilution_workset FOREIGN KEY (worksetId) REFERENCES Workset (worksetId),
   CONSTRAINT fk_workset_dilution FOREIGN KEY (dilutionId) REFERENCES LibraryDilution (dilutionId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- serviceRecord
+
+ALTER TABLE ServiceRecord MODIFY servicedBy varchar(30) DEFAULT NULL;
+
+
+-- container_description
+
+ALTER TABLE SequencerPartitionContainer ADD COLUMN description varchar(255);
+
+
+-- LibraryTemplate_Multiple_Projects
+
+DROP TABLE IF EXISTS `LibraryTemplate_Project`;
+
+CREATE TABLE `LibraryTemplate_Project` (
+  `libraryTemplateId` bigint(20) NOT NULL,
+  `projectId` bigint(20) NOT NULL,
+  PRIMARY KEY (`libraryTemplateId`,`projectId`),
+  KEY `projectId` (`projectId`),
+  CONSTRAINT `LibraryTemplate_Project_fk_1` 
+   FOREIGN KEY (`libraryTemplateId`) REFERENCES `LibraryTemplate` (`libraryTemplateId`),
+  CONSTRAINT `LibraryTemplate_Project_fk_2` 
+   FOREIGN KEY (`projectId`) REFERENCES `Project` (`projectId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `LibraryTemplate_Project` (`libraryTemplateId`, `projectId`) 
+  SELECT `libraryTemplateId`, `projectId` FROM `LibraryTemplate`;
+
+ALTER TABLE `LibraryTemplate` DROP FOREIGN KEY `fk_libraryTemplate_project`;  
+ALTER TABLE `LibraryTemplate` DROP COLUMN `projectId`;
+
+

@@ -1,3 +1,25 @@
+# 0.2.136
+
+Changes:
+
+ * Added Automatic Box Creation
+ * Added Library QC Status to Pool Page
+ * Added Partition Number to 'Pool Added to Container' Changelog Message
+ * Added Run Look Up By Sequencing Parameters
+ * Added description field to containers
+ * Added links to external services
+ * Added subproject to bulk sample tables (DetailedSample)
+ * Added worksets
+ * Allowed Library Templates to be associated with multiple projects
+ * Automatically Fill Unique Dual Indices On Edit Pages
+ * Fixed Create Sample (single) page
+ * Fixed create container QC error
+ * Fixed create run
+ * Improved Notes Display on Project Overview
+ * Improved performance surrounding boxes
+ * Service Record adjustments
+ * Showed more descriptive titles on Order pages
+
 # 0.2.135
 
 Changes:
