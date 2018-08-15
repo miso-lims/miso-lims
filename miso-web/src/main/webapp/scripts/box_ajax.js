@@ -43,17 +43,12 @@ var Box = Box
                 position: [jQuery(window).width() / 2 - 400 / 2, 50],
                 buttons: {}
               });
-              Fluxion.doAjax('boxControllerHelperService', 'recreateBoxFromPrefix', {
-                'boxId': Box.boxJSON.id,
-                'prefix': prefix,
-                'suffix': suffix,
-                'url': ajaxurl
-              }, {
-                'doOnSuccess': Utils.page.pageReload,
-                'doOnError': function(json) {
-                  Utils.showOkDialog('Error saving box contents', [json.error]);
-                  dialog.dialog('close');
-                }
+              var url = '/miso/rest/boxes/' + Box.boxJSON.id + '/positions/fill-by-pattern?' + jQuery.param({
+                prefix: prefix,
+                suffix: suffix
+              });
+              Utils.ajaxWithDialog('Filling by Pattern', 'POST', url, null, function() {
+                Utils.page.pageReload();
               });
             },
             "Cancel": function() {
@@ -100,18 +95,24 @@ var Box = Box
 
       // Saves entire box (stored in Box.boxJSON)
       saveContents: function(items) {
-        Box.boxJSON.items = items;
-        Fluxion.doAjax('boxControllerHelperService', 'saveBoxContents', {
-          'boxId': Box.boxJSON.id,
-          'items': items,
-          'url': ajaxurl
-        }, {
-          'doOnSuccess': function() {
-            Box.update();
-          },
-          'doOnError': function(json) {
-            Utils.showOkDialog('Error saving box contents', [json.error]);
+        var data = items.map(function(item) {
+          return {
+            position: item.coordinates,
+            searchString: item.identificationBarcode
           }
+        });
+        var url = '/miso/rest/box/' + Box.boxJSON.id + '/bulk-update';
+        
+        jQuery.ajax({
+          url: url,
+          type: 'POST',
+          contentType: 'application/json; charset=utf8',
+          data: data
+        }).success(function(data) {
+          Box.boxJSON.items = items;
+          Box.update();
+        }).fail(function(xhr, textStatus, errorThrown) {
+          showAjaxErrorDialog(xhr, textStatus, errorThrown);
         });
       },
 
@@ -580,17 +581,12 @@ Box.ui = {
       jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
       jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
 
-      Fluxion.doAjax('boxControllerHelperService', 'removeItemFromBox', {
-        'boxId': Box.boxId,
-        'position': selectedPosition,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': Utils.page.pageReload,
-        'doOnError': function(json) {
-          Utils.showOkDialog('Error removing item', [json.error]);
-          jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
-          jQuery('#selectedBarcode').val(selectedItem.identificationBarcode);
-        }
+      var url = '/miso/rest/box/' + Box.boxJSON.id + '/positions/' + selectedPosition;
+      Utils.ajaxWithDialog('Remove item', 'DELETE', url, null, function() {
+        Utils.page.pageReload();
+      }, function() {
+        jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
+        jQuery('#selectedBarcode').val(selectedItem.identificationBarcode);
       });
     }
 
@@ -610,16 +606,11 @@ Box.ui = {
       jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
       jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
 
-      Fluxion.doAjax('boxControllerHelperService', 'discardSingleItem', {
-        'boxId': Box.boxId,
-        'position': selectedPosition,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': Utils.page.pageReload,
-        'doOnError': function(json) {
-          Utils.showOkDialog('Error discarding item', [json.error]);
-          jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
-        }
+      var url = '/miso/rest/box/' + Box.boxJSON.id + '/positions/' + selectedPosition + '/discard';
+      Utils.ajaxWithDialog('Discard item', 'POST', url, null, function() {
+        Utils.page.pageReload();
+      }, function() {
+        jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
       });
     }
 
