@@ -6,36 +6,35 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.User;
+import com.google.common.collect.Lists;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.DilutionBoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.LibraryBoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolBoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleBoxableView;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -50,7 +49,8 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
 
   private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator", "size", "use");
 
-  private static final Logger log = LoggerFactory.getLogger(HibernateBoxDao.class);
+  private static final List<Class<? extends BoxableView>> VIEW_CLASSES = Lists.newArrayList(SampleBoxableView.class,
+      LibraryBoxableView.class, DilutionBoxableView.class, PoolBoxableView.class);
 
   private static String TABLE_NAME = "Box";
 
@@ -72,60 +72,19 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public void discardAllContents(Box box, User currentUser) throws IOException {
-    List<BoxableView> originalContents = new ArrayList<>(box.getBoxables().values());
-    try {
-      box.removeAllBoxables();
-      save(box);
-    } catch (IOException e) {
-      log.debug("Error discarding box", e);
-      throw new IOException("Error discarding box: " + e.getMessage());
-    }
-
-    for (BoxableView boxable : originalContents) {
-      boxable.setDiscarded(true);
-      updateBoxable(boxable, currentUser);
-    }
+  public Boxable getBoxable(BoxableId id) {
+    Class<?> clazz = id.getTargetType().getPersistClass();
+    return (Boxable) currentSession().get(clazz, id.getTargetId());
   }
 
   @Override
-  public void discardSingleItem(Box box, String position, User currentUser) throws IOException {
-    BoxableView target = box.getBoxable(position);
-    target.setDiscarded(true);
-    box.removeBoxable(position);
-    save(box);
-    updateBoxable(target, currentUser);
-  }
-
-  private void updateBoxable(BoxableView view, User currentUser) throws IOException {
-    Boxable boxable = getBoxable(view);
-    applyChanges(view, boxable, currentUser);
+  public void saveBoxable(Boxable boxable) {
     currentSession().update(boxable);
-  }
-
-  private Boxable getBoxable(BoxableView view) {
-    Class<?> clazz = view.getId().getTargetType().getPersistClass();
-    return (Boxable) currentSession().get(clazz, view.getId().getTargetId());
-  }
-
-  private void applyChanges(BoxableView from, Boxable to, User currentUser) {
-    to.setVolume(from.getVolume());
-    to.setDiscarded(from.isDiscarded());
-    to.setLastModified(new Date());
-    to.setLastModifier(currentUser);
   }
 
   @Override
   public Box get(long boxId) throws IOException {
     return (Box) currentSession().get(BoxImpl.class, boxId);
-  }
-
-  @Override
-  public Box getDetached(long boxId) throws IOException {
-    Box box = (Box) currentSession().get(BoxImpl.class, boxId);
-    Hibernate.initialize(box.getBoxables());
-    currentSession().evict(box);
-    return box;
   }
 
   @Override
@@ -138,13 +97,6 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   @Override
   public Map<String, Integer> getBoxColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
-  }
-
-  @Override
-  public Box getByBarcode(String barcode) throws IOException {
-    Criteria criteria = currentSession().createCriteria(BoxImpl.class);
-    criteria.add(Restrictions.eq("identificationBarcode", barcode));
-    return (Box) criteria.uniqueResult();
   }
 
   @Override
@@ -258,49 +210,50 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
 
   @Override
   public void removeBoxableFromBox(Boxable boxable) throws IOException {
-    Long boxId = boxable.getBox() == null ? null : boxable.getBox().getId();
-    removeBoxableFromBox(boxId, boxable.getBoxPosition());
+    boxable.getBox().getBoxPositions().remove(boxable.getBoxPosition());
+    currentSession().save(boxable.getBox());
   }
 
   @Override
   public void removeBoxableFromBox(BoxableView boxable) throws IOException {
-    removeBoxableFromBox(boxable.getBoxId(), boxable.getBoxPosition());
-  }
-
-  private void removeBoxableFromBox(Long boxId, String position) throws IOException {
-    if (boxId == null) {
+    if (boxable.getBoxId() == null) {
       return;
     }
-    Box box = get(boxId);
-    box.removeBoxable(position);
-    Box persisted = (Box) currentSession().merge(box);
-    currentSession().update(persisted);
+    Box box = get(boxable.getBoxId());
+    box.getBoxPositions().remove(boxable.getBoxPosition());
+    currentSession().update(box);
+    // flush required to avoid constraint violation incase item is immediately added to another box or the same one
+    currentSession().flush();
   }
 
   @Override
   public long save(Box box) throws IOException {
-    if (box.getId() == AbstractBox.UNSAVED_ID) {
+    if (!box.isSaved()) {
       return (long) currentSession().save(box);
     } else {
-      // Merge required to allow temporary eviction during update (see getDetached)
-      Box persisted = (Box) currentSession().merge(box);
-      currentSession().update(persisted);
+      currentSession().update(box);
+      // flush required to avoid constraint violation incase removed items are immediately added to another box or the same one
+      currentSession().flush();
       return box.getId();
     }
   }
 
   @Override
   public BoxableView getBoxableView(BoxableId id) throws IOException {
-    return (BoxableView) currentSession().get(BoxableView.class, id);
+    List<BoxableView> results = queryBoxables(Restrictions.eq("id", id));
+    switch (results.size()) {
+    case 0:
+      return null;
+    case 1:
+      return results.get(0);
+    default:
+      throw new IllegalStateException(String.format("More than one Boxable found with ID %s %d", id.getTargetType(), id.getTargetId()));
+    }
   }
 
   @Override
   public List<BoxableView> getBoxableViewsByBarcodeList(Collection<String> barcodes) throws IOException {
-    Criteria criteria = currentSession().createCriteria(BoxableView.class);
-    criteria.add(Restrictions.in("identificationBarcode", barcodes));
-    @SuppressWarnings("unchecked")
-    List<BoxableView> results = criteria.list();
-    return results;
+    return queryBoxables(Restrictions.in("identificationBarcode", barcodes));
   }
 
   @Override
@@ -308,19 +261,40 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     if (ids.isEmpty()) {
       return Collections.emptyList();
     }
-    Criteria criteria = currentSession().createCriteria(BoxableView.class);
-    criteria.add(Restrictions.in("id", ids));
-    @SuppressWarnings("unchecked")
-    List<BoxableView> results = criteria.list();
+    return queryBoxables(Restrictions.in("id", ids));
+  }
+
+  @Override
+  public List<BoxableView> getBoxContents(long boxId) throws IOException {
+    return queryBoxables(Restrictions.eq("boxId", boxId));
+  }
+
+  private List<BoxableView> queryBoxables(Criterion criterion) {
+    List<BoxableView> results = new ArrayList<>();
+    for (Class<? extends BoxableView> clazz : VIEW_CLASSES) {
+      @SuppressWarnings("unchecked")
+      List<BoxableView> partialResults = currentSession().createCriteria(clazz)
+          .add(criterion)
+          .list();
+      results.addAll(partialResults);
+    }
     return results;
   }
 
   @Override
   public BoxableView getBoxableViewByPreMigrationId(Long preMigrationId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(BoxableView.class);
-    criteria.add(Restrictions.eq("preMigrationId", preMigrationId));
-    BoxableView result = (BoxableView) criteria.uniqueResult();
-    return result;
+    if (preMigrationId == null) {
+      throw new NullPointerException("Cannot search for null preMigrationId");
+    }
+    List<BoxableView> results = queryBoxables(Restrictions.eq("preMigrationId", preMigrationId));
+    switch (results.size()) {
+    case 0:
+      return null;
+    case 1:
+      return results.get(0);
+    default:
+      throw new IllegalStateException(String.format("More than one Boxable found with preMigrationId %d", preMigrationId));
+    }
   }
 
   @Override
@@ -328,15 +302,10 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     if (search == null) {
       throw new NullPointerException("No search String provided");
     }
-    Criteria criteria = currentSession().createCriteria(BoxableView.class);
-    criteria.add(Restrictions.or(
+    return queryBoxables(Restrictions.and(Restrictions.or(
         Restrictions.eq("identificationBarcode", search),
         Restrictions.eq("name", search),
-        Restrictions.eq(FIELD_ALIAS, search)));
-    criteria.add(Restrictions.eq("discarded", false));
-    @SuppressWarnings("unchecked")
-    List<BoxableView> results = criteria.list();
-    return results;
+        Restrictions.eq(FIELD_ALIAS, search)), Restrictions.eq("discarded", false)));
   }
 
   public void setJdbcTemplate(JdbcTemplate template) {
@@ -406,22 +375,4 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     criteria.add(Restrictions.eq("use.id", id));
   }
 
-  @Override
-  public void moveItem(Boxable item, User currentUser) {
-    if (item.getBox() == null) {
-      Query removeStatement = currentSession().createSQLQuery("call removeBoxItem(?,?,?)");
-      removeStatement.setLong(0, currentUser.getUserId());
-      removeStatement.setLong(1, item.getId());
-      removeStatement.setString(2, item.getEntityType().name());
-      removeStatement.executeUpdate();
-      return;
-    }
-    Query moveStatement = currentSession().createSQLQuery("call moveBoxItem(?,?,?,?,?)");
-    moveStatement.setLong(0, currentUser.getUserId());
-    moveStatement.setLong(1, item.getBox().getId());
-    moveStatement.setLong(2, item.getId());
-    moveStatement.setString(3, item.getEntityType().name());
-    moveStatement.setString(4, item.getBoxPosition());
-    moveStatement.executeUpdate();
-  }
 }

@@ -169,7 +169,7 @@ public class DefaultLibraryDilutionService
     dilution.setName(generateTemporaryName());
     long savedId = save(dilution).getId();
     libraryService.update(library);
-    boxService.updateBoxableLocation(dilution, null);
+    boxService.updateBoxableLocation(dilution);
     return savedId;
   }
 
@@ -194,7 +194,7 @@ public class DefaultLibraryDilutionService
     loadChildEntities(managed);
     save(managed);
     libraryService.update(library);
-    boxService.updateBoxableLocation(dilution, managed);
+    boxService.updateBoxableLocation(dilution);
   }
 
   @Override

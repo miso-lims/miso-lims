@@ -261,4 +261,44 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
     return change;
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((alias == null) ? 0 : alias.hashCode());
+    result = prime * result + ((creationTime == null) ? 0 : creationTime.hashCode());
+    result = prime * result + ((creator == null) ? 0 : creator.hashCode());
+    result = prime * result + (int) (id ^ (id >>> 32));
+    result = prime * result + ((identificationBarcode == null) ? 0 : identificationBarcode.hashCode());
+    result = prime * result + ((locationUnit == null) ? 0 : locationUnit.hashCode());
+    result = prime * result + ((parentLocation == null) ? 0 : parentLocation.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    StorageLocation other = (StorageLocation) obj;
+    if (alias == null) {
+      if (other.alias != null) return false;
+    } else if (!alias.equals(other.alias)) return false;
+    if (creationTime == null) {
+      if (other.creationTime != null) return false;
+    } else if (!creationTime.equals(other.creationTime)) return false;
+    if (creator == null) {
+      if (other.creator != null) return false;
+    } else if (!creator.equals(other.creator)) return false;
+    if (id != other.id) return false;
+    if (identificationBarcode == null) {
+      if (other.identificationBarcode != null) return false;
+    } else if (!identificationBarcode.equals(other.identificationBarcode)) return false;
+    if (locationUnit != other.locationUnit) return false;
+    if (parentLocation == null) {
+      if (other.parentLocation != null) return false;
+    } else if (!parentLocation.equals(other.parentLocation)) return false;
+    return true;
+  }
+
 }

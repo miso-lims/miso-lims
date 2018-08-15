@@ -5,14 +5,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
@@ -20,16 +18,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * 
  */
 public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
-
-  /**
-   * Retrieve a Box that is disconnected from Hibernate, with its lazy-loading relationships initialized. This is to prevent Hibernate
-   * from dirty-checking and auto-flushing changes, which circumvents the Service layer
-   * 
-   * @param boxId
-   * @return
-   * @throws IOException
-   */
-  public Box getDetached(long boxId) throws IOException;
 
   /**
    * Retrieve a Box from data store given a Box alias.
@@ -40,16 +28,6 @@ public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
    * @throws IOException
    */
   Box getBoxByAlias(String alias) throws IOException;
-
-  /**
-   * Retrieve a Box from data store given a Box barcode
-   * 
-   * @param String
-   *          barcode
-   * @return Box
-   * @throws IOException
-   */
-  Box getByBarcode(String barcode) throws IOException;
 
   /**
    * List all Boxes associated with ids from the given id list
@@ -73,10 +51,6 @@ public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
   Collection<String> listAllBoxUsesStrings() throws IOException;
 
   Collection<BoxSize> listAllBoxSizes() throws IOException;
-
-  void discardSingleItem(Box box, String position, User currentUser) throws IOException;
-
-  void discardAllContents(Box box, User currentUser) throws IOException;
   
   void removeBoxableFromBox(Boxable boxable) throws IOException;
 
@@ -96,6 +70,8 @@ public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
 
   public List<BoxableView> getBoxableViewsByIdList(Collection<BoxableId> ids) throws IOException;
 
+  public List<BoxableView> getBoxContents(long boxId) throws IOException;
+
   /**
    * Finds BoxableViews with identificationBarcode, name, or alias matching the provided search string. Returns exact matches only,
    * and excludes any discarded items
@@ -105,6 +81,8 @@ public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
    */
   public List<BoxableView> getBoxableViewsBySearch(String search);
 
-  public void moveItem(Boxable item, User currentUser);
+  public Boxable getBoxable(BoxableId id);
+
+  public void saveBoxable(Boxable boxable);
 
 }

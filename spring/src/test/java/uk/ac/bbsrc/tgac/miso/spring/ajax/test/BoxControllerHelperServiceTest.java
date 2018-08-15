@@ -24,9 +24,11 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
@@ -34,7 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScan;
@@ -127,22 +128,22 @@ public class BoxControllerHelperServiceTest {
     assertFalse(response.has("error"));
     ArgumentCaptor<Box> saveBox = ArgumentCaptor.forClass(Box.class);
     verify(boxService).save(saveBox.capture());
-    assertEquals(sample.getIdentificationBarcode(), saveBox.getValue().getBoxable("A01").getIdentificationBarcode());
-    assertEquals(library.getIdentificationBarcode(), saveBox.getValue().getBoxable("A02").getIdentificationBarcode());
+    assertEquals(sample.getId(), saveBox.getValue().getBoxPositions().get("A01").getBoxableId());
+    assertEquals(library.getId(), saveBox.getValue().getBoxPositions().get("A02").getBoxableId());
   }
 
   @Test
   public void testRemoveTubeFromBox() throws Exception {
     Box box = makeEmptyBox();
     BoxableView sample = makeSampleView();
-    box.setBoxable("A01", sample);
+    box.getBoxPositions().put("A01", new BoxPosition(box, "A01", sample.getId()));
     when(boxService.get(box.getId())).thenReturn(box);
 
     JSONObject json = new JSONObject();
     json.put("boxId", box.getId());
     json.put("position", "A01");
 
-    assertNotNull(box.getBoxable("A01"));
+    assertNotNull(box.getBoxPositions().get("A01"));
 
     JSONObject response = boxControllerHelperService.removeItemFromBox(null, json);
     assertFalse(response.has("error"));
@@ -150,21 +151,21 @@ public class BoxControllerHelperServiceTest {
 
     ArgumentCaptor<Box> saveBox = ArgumentCaptor.forClass(Box.class);
     verify(boxService).save(saveBox.capture());
-    assertNull(saveBox.getValue().getBoxable("A01"));
+    assertNull(saveBox.getValue().getBoxPositions().get("A01"));
   }
 
   @Test
   public void testEmptySingleTube() throws Exception {
     Box box = makeEmptyBox();
     BoxableView sample = makeSampleView();
-    box.setBoxable("A01", sample);
+    box.getBoxPositions().put("A01", new BoxPosition(box, "A01", sample.getId()));
     when(boxService.get(box.getId())).thenReturn(box);
 
     JSONObject json = new JSONObject();
     json.put("boxId", box.getId());
     json.put("position", "A01");
 
-    assertNotNull(box.getBoxable("A01"));
+    assertNotNull(box.getBoxPositions().get("A01"));
     assertFalse(sample.isDiscarded());
 
     JSONObject response = boxControllerHelperService.discardSingleItem(null, json);

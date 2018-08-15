@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -80,8 +79,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   private static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
   private static final String ERR_MISSING_PARENT_ID = "Detailed sample is missing parent identifier";
-
-  private static final Pattern COMMA = Pattern.compile(",");
 
   public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, Sample parent, Sample child) {
     if (parent == null && !isDetailedSample(child)) {
@@ -278,7 +275,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       sample.setAlias(generateTemporaryName());
     }
     long savedId = save(sample, true).getId();
-    boxService.updateBoxableLocation(sample, null);
+    boxService.updateBoxableLocation(sample);
     return savedId;
   }
 
@@ -702,7 +699,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     }
 
     save(managed, validateAliasUniqueness);
-    boxService.updateBoxableLocation(sample, managed);
+    boxService.updateBoxableLocation(sample);
   }
 
   /**

@@ -68,4 +68,11 @@ public interface User extends Serializable, Comparable<User> {
   void setRoles(String[] roles);
 
   void setFavouriteWorkflows(Set<WorkflowName> favouriteWorkflows);
+
+  @Override
+  public int hashCode();
+
+  @Override
+  public boolean equals(Object obj);
+
 }

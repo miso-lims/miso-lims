@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -31,6 +32,7 @@ import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
@@ -166,7 +168,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     if (mergeRunPools) mergeExistingPartialPools(runs, pools);
     savePools(pools);
     saveRuns(runs);
-    if (data.getBoxes() != null) saveBoxes(data.getBoxes());
+    if (data.getBoxes() != null) saveBoxes(data.getBoxes(), data.getBoxablesByBoxAlias());
   }
 
   public void saveProjects(Collection<Project> projects) throws IOException {
@@ -790,10 +792,11 @@ public class DefaultMigrationTarget implements MigrationTarget {
     fromPool.setId(toPool.getId());
   }
 
-  public void saveBoxes(final Collection<Box> boxes) throws IOException {
+  public void saveBoxes(final Collection<Box> boxes, Map<String, Map<String, BoxableView>> boxablesByBoxAlias) throws IOException {
     log.info("Migrating boxes...");
     for (Box newBox : boxes) {
-      resolveBoxables(newBox);
+      Map<String, BoxableView> viewsByPos = boxablesByBoxAlias.get(newBox.getAlias());
+      resolveBoxables(newBox, viewsByPos);
       Box box = serviceManager.getBoxService().getByAlias(newBox.getAlias());
       if (box == null) {
         saveBox(newBox);
@@ -804,17 +807,21 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.info(boxes.size() + " boxes migrated.");
   }
 
-  private void resolveBoxables(Box box) throws IOException {
+  private void resolveBoxables(Box box, Map<String, BoxableView> viewsByPos) throws IOException {
     BoxStore boxStore = serviceManager.getBoxDao();
     // Resolve boxables linked by preMigrationId
-    for (String pos : box.getBoxables().keySet()) {
-      BoxableView boxable = box.getBoxables().get(pos);
-      if (boxable.getId().getTargetId() == 0L && boxable.getPreMigrationId() != null) {
+    for (String pos : viewsByPos.keySet()) {
+      BoxableView boxable = viewsByPos.get(pos);
+      if (boxable.getId() != null && boxable.getId().getTargetId() != 0L) {
+        box.getBoxPositions().put(pos, new BoxPosition(box, pos, boxable.getId()));
+      } else if (boxable.getPreMigrationId() != null) {
         BoxableView saved = boxStore.getBoxableViewByPreMigrationId(boxable.getPreMigrationId());
         if (saved == null) {
           throw new IllegalArgumentException("No boxable found with preMigrationId " + boxable.getPreMigrationId());
         }
-        box.setBoxable(pos, saved);
+        box.getBoxPositions().put(pos, new BoxPosition(box, pos, saved.getId()));
+      } else {
+        throw new IllegalArgumentException("No ID or preMigrationId specified for Boxable");
       }
     }
   }
@@ -832,14 +839,14 @@ public class DefaultMigrationTarget implements MigrationTarget {
     assertBoxPropertiesMatch(from, to);
     // Because we're already inside the session at this point, the original object must be evicted
     // to allow changes to be observed and changeLogged in the Service layer
-    Hibernate.initialize(to.getBoxables());
+    Hibernate.initialize(to.getBoxPositions());
     sessionFactory.getCurrentSession().evict(to);
-    for (Entry<String, BoxableView> entry : from.getBoxables().entrySet()) {
+    for (Entry<String, BoxPosition> entry : from.getBoxPositions().entrySet()) {
       if (entry.getValue() != null) {
-        if (to.getBoxable(entry.getKey()) != null) {
+        if (to.getBoxPositions().get(entry.getKey()) != null) {
           throw new IllegalStateException(String.format("Box %s position %s is already filled", to.getAlias(), entry.getKey()));
         }
-        to.setBoxable(entry.getKey(), entry.getValue());
+        to.getBoxPositions().put(entry.getKey(), entry.getValue());
       }
     }
     serviceManager.getBoxService().save(to);
