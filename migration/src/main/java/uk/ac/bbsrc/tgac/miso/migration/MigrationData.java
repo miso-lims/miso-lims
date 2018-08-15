@@ -108,7 +108,7 @@ public class MigrationData {
 
   /**
    * @return all box position data. The key of the outer Map is the box alias. The key of the inner Map
-   *         is the box position. Note: Saving these will likely that the Boxables have been saved first
+   *         is the box position. Note: Saving these will require that the Boxables have been saved first
    *         in order to generate foreign keys
    */
   public Map<String, Map<String, BoxableView>> getBoxablesByBoxAlias() {
