@@ -33,6 +33,11 @@ var Container = Container
         jQuery('#identificationBarcode').attr('data-parsley-maxlength', '100');
         jQuery('#identificationBarcode').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
+        // Description input field validation
+        jQuery('#description').attr('class', 'form-control');
+        jQuery('#description').attr('data-parsley-maxlength', '255');
+        jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
         // Received Date validation
         jQuery('#receivedDate').attr('class', 'form-control');
         jQuery('#receivedDate').attr('data-parsley-required', 'true');
