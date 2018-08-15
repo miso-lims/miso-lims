@@ -28,8 +28,7 @@ ListTarget.box = {
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
-    return HotTarget.box.getBulkActions(config).concat([HotUtils.printAction('box'), 
-    	{
+    return HotTarget.box.getBulkActions(config).concat([HotUtils.printAction('box'), {
       name: "Delete",
       action: function(items) {
         var lines = ['Are you sure you wish to delete the following boxes? This cannot be undone.'];
@@ -39,7 +38,7 @@ ListTarget.box = {
           ids.push(box.id);
         });
         Utils.showConfirmDialog('Delete Boxes', 'Delete', lines, function() {
-          Utils.ajaxWithDialog('Deleting Boxes', 'POST', '/miso/rest/boxables/bulk-delete', ids, function() {
+          Utils.ajaxWithDialog('Deleting Boxes', 'POST', '/miso/rest/boxes/bulk-delete', ids, function() {
             window.location = window.location.origin + '/miso/boxes';
           });
         });
@@ -56,7 +55,7 @@ ListTarget.box = {
           label: 'Quantity',
           value: 1
         }];
-       
+
         Utils.showDialog('Create Boxes', 'Create', fields, function(result) {
           if (result.quantity < 1) {
             Utils.showOkDialog('Create Boxes', ["That's a peculiar number of boxes to create."]);
