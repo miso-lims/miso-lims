@@ -297,7 +297,8 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       List<BoxableId> removedIds = new ArrayList<>();
       List<BoxableId> movedWithinBoxIds = movedWithinBox.stream().map(BoxPosition::getBoxableId).collect(Collectors.toList());
       for (Map.Entry<String, BoxPosition> entry : managed.getBoxPositions().entrySet()) {
-        if (box.getBoxPositions().keySet().contains(entry.getKey())) {
+        if (box.getBoxPositions().keySet().contains(entry.getKey())
+            && box.getBoxPositions().get(entry.getKey()).getBoxableId().equals(entry.getValue().getBoxableId())) {
           // Already handled. Only checking for removals at this point
           continue;
         }
@@ -324,7 +325,8 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       }
 
       for (String pos : box.getBoxPositions().keySet()) {
-        if (!managed.getBoxPositions().containsKey(pos)) {
+        if (!managed.getBoxPositions().containsKey(pos)
+            || !managed.getBoxPositions().get(pos).getBoxableId().equals(box.getBoxPositions().get(pos).getBoxableId())) {
           managed.getBoxPositions().put(pos, new BoxPosition(managed, pos, box.getBoxPositions().get(pos).getBoxableId()));
         }
       }
