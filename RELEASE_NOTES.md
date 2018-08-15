@@ -14,12 +14,16 @@ Changes:
  * Remove add user button when using LDAP
 
 BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
+BAD: The Create Run page errors and is unusable.
 
 # 0.2.134
 
 Changes:
 
  * fix: don't use LimsUtils in Flyway migration
+
+BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
+BAD: The Create Run page errors and is unusable.
 
 # 0.2.133
 
@@ -29,6 +33,7 @@ Changes:
 
 BAD: Flyway migration via Flyway command-line tool still fails. Fixed in 0.2.134.
 BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
+BAD: The Create Run page errors and is unusable.
 
 # 0.2.132
 
@@ -59,6 +64,7 @@ BAD: Flyway migration via Flyway command-line tool fails due to slf4j logger use
 Could be remedied by copying slf4j libraries into the flyway/libs dir, but the next release contains a
 simpler fix.
 BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
+BAD: The Create Run page errors and is unusable.
 
 # 0.2.131
 
