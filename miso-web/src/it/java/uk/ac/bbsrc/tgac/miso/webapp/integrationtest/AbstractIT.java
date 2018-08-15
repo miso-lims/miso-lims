@@ -48,7 +48,8 @@ public abstract class AbstractIT {
 
   @BeforeClass
   public static final void setupAbstractClass() {
-    WebDriverManager.chromedriver().setup();
+    // ChromeDriver 2.40 - 2.41 cause random timeouts
+    WebDriverManager.chromedriver().ignoreVersions("2.40", "2.41").setup();
   }
 
   @Before
