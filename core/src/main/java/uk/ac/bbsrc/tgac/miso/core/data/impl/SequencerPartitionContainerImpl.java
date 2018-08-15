@@ -89,6 +89,8 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
    */
   private String identificationBarcode;
 
+  private String description;
+
   @ManyToMany(targetEntity = Run.class, mappedBy = "containers")
   @BatchSize(size = 10)
   private Collection<Run> runs = null;
@@ -219,6 +221,16 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @Override
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
+  }
+
+  @Override
+  public String getDescription() {
+    return description;
+  }
+
+  @Override
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   @Override
