@@ -37,6 +37,7 @@
         <li><a href="<c:url value="/miso/samples"/>">Samples</a></li>
         <li><a href="<c:url value="/miso/libraries"/>">Libraries</a></li>
         <li><a href="<c:url value="/miso/dilutions"/>">Dilutions</a></li>
+        <li><a href="<c:url value="/miso/worksets"/>">Worksets</a></li>
         <li><a href="<c:url value="/miso/pools"/>">Pools</a></li>
         <li><a href="<c:url value="/miso/poolorders/active"/>">Active Orders</a></li>
         <li><a href="<c:url value="/miso/poolorders/all"/>">All Orders</a></li>

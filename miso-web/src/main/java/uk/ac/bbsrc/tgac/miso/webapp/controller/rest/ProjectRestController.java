@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
@@ -141,13 +142,13 @@ public class ProjectRestController extends RestController {
   @GetMapping(value = "{projectId}/libraries", produces = "application/json")
   public @ResponseBody List<LibraryDto> getProjectLibraries(@PathVariable Long projectId) throws IOException {
     Collection<Library> lp = libraryService.listByProjectId(projectId);
-    return Dtos.asLibraryDtos(lp);
+    return lp.stream().map(lib -> Dtos.asDto(lib, false)).collect(Collectors.toList());
   }
 
   @GetMapping(value = "{projectId}/pools", produces = "application/json")
   public @ResponseBody List<PoolDto> getProjectPools(@PathVariable Long projectId) throws IOException {
     Collection<Pool> pp = poolService.listByProjectId(projectId);
-    return Dtos.asPoolDtos(pp, true);
+    return pp.stream().map(pool -> Dtos.asDto(pool, true, false)).collect(Collectors.toList());
   }
 
   @GetMapping(value = "{projectId}/runs", produces = "application/json")

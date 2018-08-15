@@ -82,7 +82,7 @@ public abstract class RelationFinder<M extends Identifiable> {
 
     @Override
     public SampleDto asDto(Sample model) {
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, false);
     }
 
     @Override
@@ -140,7 +140,7 @@ public abstract class RelationFinder<M extends Identifiable> {
 
     @Override
     public SampleDto asDto(DetailedSample model) {
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, false);
     }
 
     @Override

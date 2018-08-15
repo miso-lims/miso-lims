@@ -81,4 +81,29 @@ public class BoxSize implements Serializable {
   public Stream<String> positionStream() {
     return IntStream.range(0, rows * columns).mapToObj(x -> BoxUtils.getPositionString(x / columns, x % columns));
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + columns;
+    result = prime * result + (int) (id ^ (id >>> 32));
+    result = prime * result + rows;
+    result = prime * result + (scannable ? 1231 : 1237);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    BoxSize other = (BoxSize) obj;
+    if (columns != other.columns) return false;
+    if (id != other.id) return false;
+    if (rows != other.rows) return false;
+    if (scannable != other.scannable) return false;
+    return true;
+  }
+
 }

@@ -134,7 +134,7 @@ HotTarget.dilution = {
     var spliceIndex = columns.indexOf(columns.filter(function(column) {
       return column.data === 'identificationBarcode';
     })[0]) + 1;
-    columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns()));
+    columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns(config)));
     return columns;
   },
 
@@ -147,112 +147,135 @@ HotTarget.dilution = {
   },
 
   getBulkActions: function(config) {
-    return [{
-      name: 'Edit',
-      action: function(items) {
-        window.location = window.location.origin + '/miso/library/dilution/bulk/edit?' + jQuery.param({
-          ids: items.map(Utils.array.getId).join(',')
-        });
-      },
-      allowOnLibraryPage: true
-    }, {
-      name: 'Pool together',
-      title: 'Create one pool from many dilutions',
-      action: function(items) {
-        HotUtils.warnIfConsentRevoked(items, function() {
-          window.location = window.location.origin + '/miso/library/dilution/bulk/merge?' + jQuery.param({
-            ids: items.map(Utils.array.getId).join(',')
-          });
-        }, HotTarget.dilution.getLabel);
-      },
-      allowOnLibraryPage: false
-    }, {
-      name: 'Pool separately',
-      title: 'Create a pool for each dilution',
-      action: function(items) {
-        HotUtils.warnIfConsentRevoked(items, function() {
-          window.location = window.location.origin + '/miso/library/dilution/bulk/propagate?' + jQuery.param({
-            ids: items.map(Utils.array.getId).join(',')
-          });
-        }, HotTarget.dilution.getLabel);
-      },
-      allowOnLibraryPage: true
-    }, {
-      name: 'Pool custom',
-      title: 'Divide dilutions into several pools',
-      action: function(items) {
-        HotUtils.warnIfConsentRevoked(items, function() {
-          Utils.showDialog("Create Pools", "Create", [{
-            label: 'Quantity',
-            property: 'quantity',
-            type: 'int'
-          }], function(data) {
-            window.location = window.location.origin + '/miso/library/dilution/bulk/pool?' + jQuery.param({
-              ids: items.map(Utils.array.getId).join(','),
-              quantity: data.quantity
+    return [
+        {
+          name: 'Edit',
+          action: function(items) {
+            window.location = window.location.origin + '/miso/library/dilution/bulk/edit?' + jQuery.param({
+              ids: items.map(Utils.array.getId).join(',')
             });
-          });
-        }, HotTarget.dilution.getLabel);
-      },
-      allowOnLibraryPage: true
-    }, HotUtils.printAction('dilution'), HotUtils.spreadsheetAction('/miso/rest/librarydilution/spreadsheet', Constants.libraryDilutionSpreadsheets, 
-        function(dilutions, spreadsheet){
-      var errors = [];
-      return errors;
-    }),
+          },
+          allowOnLibraryPage: true
+        },
+        {
+          name: 'Pool together',
+          title: 'Create one pool from many dilutions',
+          action: function(items) {
+            HotUtils.warnIfConsentRevoked(items, function() {
+              var fields = [];
+              HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, '/miso/library/dilution/bulk/merge?', function(result) {
+                return {
+                  ids: items.map(Utils.array.getId).join(',')
+                };
+              }, function(result) {
+                return 1;
+              });
+            }, HotTarget.dilution.getLabel);
+          },
+          allowOnLibraryPage: false
+        },
+        {
+          name: 'Pool separately',
+          title: 'Create a pool for each dilution',
+          action: function(items) {
+            HotUtils.warnIfConsentRevoked(items, function() {
+              var fields = [];
+              HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, '/miso/library/dilution/bulk/propagate?',
+                  function(result) {
+                    return {
+                      ids: items.map(Utils.array.getId).join(',')
+                    };
+                  }, function(result) {
+                    return items.length;
+                  });
+            }, HotTarget.dilution.getLabel);
+          },
+          allowOnLibraryPage: true
+        },
+        {
+          name: 'Pool custom',
+          title: 'Divide dilutions into several pools',
+          action: function(items) {
+            HotUtils.warnIfConsentRevoked(items, function() {
+              var fields = [{
+                label: 'Quantity',
+                property: 'quantity',
+                type: 'int',
+              }];
+              HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, '/miso/library/dilution/bulk/pool?', function(result) {
+                console.log(result);
+                return {
+                  ids: items.map(Utils.array.getId).join(','),
+                  quantity: result.quantity
+                };
+              }, function(result) {
+                return result.quantity;
+              })
+            }, HotTarget.dilution.getLabel);
+          },
+          allowOnLibraryPage: true
+        },
+        HotUtils.printAction('dilution'),
+        HotUtils.spreadsheetAction('/miso/rest/librarydilution/spreadsheet', Constants.libraryDilutionSpreadsheets, function(dilutions,
+            spreadsheet) {
+          var errors = [];
+          return errors;
+        }),
 
-    HotUtils.makeParents('librarydilution', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library()])), 
-    HotUtils.makeChildren('librarydilution',[HotUtils.relations.pool()])];
+        HotUtils.makeParents('librarydilution', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library()])),
+        HotUtils.makeChildren('librarydilution', [HotUtils.relations.pool()]),
+        config.worksetId ? HotUtils.makeRemoveFromWorkset('dilutions', config.worksetId) : HotUtils.makeAddToWorkset('dilutions',
+            'dilutionIds')];
   },
 
   confirmSave: function(flatObjects, isCreate, config, table) {
     var deferred = jQuery.Deferred();
-    
+
     var dilutions = table.getDtoData();
-    
+
     var seen = {};
-    var libraries = dilutions.filter(function(dilution){
+    var libraries = dilutions.filter(function(dilution) {
       return !(Utils.validation.isEmpty(dilution.volumeUsed) || dilution.volumeUsed <= 0);
-    }).map(function(dilution){
+    }).map(function(dilution) {
       return dilution.library;
-    }).filter(function(library){
+    }).filter(function(library) {
       return library != null;
-    }).filter(function(library){
+    }).filter(function(library) {
       return seen.hasOwnProperty(library.id) ? false : (seen[library.id] = true);
-    }).map(function(library){
+    }).map(function(library) {
       return jQuery.extend(true, {}, library);
     });
-    
-    if(libraries.length == 0){
+
+    if (libraries.length == 0) {
       deferred.resolve();
       return deferred.promise();
     }
-            
-    dilutions.filter(function(dilution){
+
+    dilutions.filter(function(dilution) {
       return dilution.library != null && dilution.library.volume != null && dilution.volumeUsed != null;
-    }).forEach(function(dilution){
-      libraries.find(function(library){
+    }).forEach(function(dilution) {
+      libraries.find(function(library) {
         return library.id == dilution.library.id;
       }).volume -= dilution.volumeUsed;
     });
-    
-    var overUsedCount = libraries.filter(function(library){
+
+    var overUsedCount = libraries.filter(function(library) {
       return library.volume < 0;
     }).length
-    
-  if(overUsedCount){
-    Utils.showConfirmDialog('Not Enough Library Volume', 'Save', ['Saving will cause ' + overUsedCount
-      + (overUsedCount > 1 ? ' libraries to have negative volumes. ' : ' library to have a negative volume. ')
-      + 'Are you sure you want to proceed?'], function() {
+
+    if (overUsedCount) {
+      Utils.showConfirmDialog('Not Enough Library Volume', 'Save', ['Saving will cause ' + overUsedCount
+          + (overUsedCount > 1 ? ' libraries to have negative volumes. ' : ' library to have a negative volume. ')
+          + 'Are you sure you want to proceed?'], function() {
+        deferred.resolve();
+      }, function() {
+        deferred.reject();
+      });
+    } else {
       deferred.resolve();
-    }, function() {
-      deferred.reject();
-    });
-  } else {
-    deferred.resolve();
-  }
-  return deferred.promise();
-    
+    }
+    return deferred.promise();
+
   }
 
 };

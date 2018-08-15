@@ -30,6 +30,7 @@ public class DataTable extends AbstractElement {
   private static final By processingSelector = By.className("dataTables_processing");
 
   private final WebElement table;
+  private final WebElement toolbar;
   private final List<WebElement> columnHeaders;
   private final List<String> columnHeadings;
   private final WebElement searchBar;
@@ -41,6 +42,7 @@ public class DataTable extends AbstractElement {
     PageFactory.initElements(driver, this);
     WebElement tableWrapper = getDriver().findElement(By.id(tableWrapperId));
     this.table = tableWrapper.findElement(tableSelector);
+    this.toolbar = findElementIfExists(By.xpath(".//div[@id='" + tableWrapperId + "']/preceding::div[contains(@class, 'fg-toolbar')][1]"));
     this.columnHeaders = table.findElements(columnHeadingsSelector).stream().collect(Collectors.toList());
     this.columnHeadings = columnHeaders.stream()
         .map(element -> element.getText().trim())
@@ -177,6 +179,13 @@ public class DataTable extends AbstractElement {
 
   public String getSearchDivId() {
     return searchBarDiv.getAttribute("id");
+  }
+
+  public void clickButton(String text) {
+    if (toolbar == null) {
+      throw new IllegalStateException("This table has no toolbar");
+    }
+    toolbar.findElement(By.linkText(text)).click();
   }
 
 }

@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -39,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
+import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
@@ -66,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
+import uk.ac.bbsrc.tgac.miso.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -78,8 +79,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   private static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
   private static final String ERR_MISSING_PARENT_ID = "Detailed sample is missing parent identifier";
-
-  private static final Pattern COMMA = Pattern.compile(",");
 
   public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, Sample parent, Sample child) {
     if (parent == null && !isDetailedSample(child)) {
@@ -133,6 +132,8 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   private StainService stainService;
   @Autowired
   private BoxService boxService;
+  @Autowired
+  private WorksetService worksetService;
 
   @Autowired
   private NamingScheme namingScheme;
@@ -194,6 +195,10 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     this.boxService = boxService;
   }
 
+  public void setWorksetService(WorksetService worksetService) {
+    this.worksetService = worksetService;
+  }
+
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
@@ -229,6 +234,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   public Long create(Sample sample) throws IOException {
     loadChildEntities(sample);
     authorizationManager.throwIfNotWritable(sample);
+    boxService.throwIfBoxPositionIsFilled(sample);
     setChangeDetails(sample);
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
@@ -269,7 +275,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       sample.setAlias(generateTemporaryName());
     }
     long savedId = save(sample, true).getId();
-    boxService.updateBoxableLocation(sample, null);
+    boxService.updateBoxableLocation(sample);
     return savedId;
   }
 
@@ -680,6 +686,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     Sample managed = get(sample.getId());
     boolean validateAliasUniqueness = !managed.getAlias().equals(sample.getAlias());
     authorizationManager.throwIfNotWritable(managed);
+    boxService.throwIfBoxPositionIsFilled(sample);
     applyChanges(managed, sample);
     setChangeDetails(managed);
     loadChildEntities(managed);
@@ -692,7 +699,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     }
 
     save(managed, validateAliasUniqueness);
-    boxService.updateBoxableLocation(sample, managed);
+    boxService.updateBoxableLocation(sample);
   }
 
   /**
@@ -919,6 +926,15 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     }
 
     return result;
+  }
+
+  @Override
+  public void beforeDelete(Sample object) throws IOException {
+    List<Workset> worksets = worksetService.listBySample(object.getId());
+    for (Workset workset : worksets) {
+      workset.getSamples().removeIf(sam -> sam.getId() == object.getId());
+      worksetService.save(workset);
+    }
   }
 
   @Override

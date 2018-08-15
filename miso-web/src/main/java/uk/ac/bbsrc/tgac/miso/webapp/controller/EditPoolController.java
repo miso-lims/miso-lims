@@ -49,7 +49,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -77,10 +76,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
@@ -123,6 +124,8 @@ public class EditPoolController {
   private PoolOrderService poolOrderService;
   @Autowired
   private ContainerService containerService;
+  @Autowired
+  private BoxService boxService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -136,7 +139,11 @@ public class EditPoolController {
     this.platformService = platformService;
   }
 
-  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  private static class Config {
+    private static final String BOX = "box";
+  }
+
+  @GetMapping(value = "/rest/changes")
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
     return changeLogService.listAll("Pool");
   }
@@ -182,7 +189,7 @@ public class EditPoolController {
       ObjectMapper mapper = new ObjectMapper();
       model.put("formObj", pool);
       model.put("pool", pool);
-      model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(pool, false)));
+      model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(pool, false, false)));
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
@@ -196,7 +203,7 @@ public class EditPoolController {
       model.put("duplicateIndicesSequences", mapper.writeValueAsString(pool.getDuplicateIndicesSequences()));
       model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(pool.getNearDuplicateIndicesSequences()));
 
-      model.put("includedDilutions", Dtos.asDto(pool, true).getPooledElements());
+      model.put("includedDilutions", Dtos.asDto(pool, true, false).getPooledElements());
 
       List<String> warnings = new ArrayList<>();
       addConsentWarning(pool, warnings);
@@ -277,7 +284,7 @@ public class EditPoolController {
 
     @Override
     protected PoolDto asDto(Pool model) {
-      return Dtos.asDto(model, true);
+      return Dtos.asDto(model, true, true);
     }
 
     @Override
@@ -298,10 +305,12 @@ public class EditPoolController {
   private static class BulkMergePoolsBackend extends BulkTableBackend<PoolDto> {
 
     private final PoolService poolService;
+    private final BoxDto newBox;
 
-    public BulkMergePoolsBackend(PoolService poolService) {
+    public BulkMergePoolsBackend(BoxDto newBox, PoolService poolService) {
       super("pool", PoolDto.class);
       this.poolService = poolService;
+      this.newBox = newBox;
     }
 
     protected PoolDto createDtoFromParents(List<Long> parentIds, List<Integer> proportions) throws IOException {
@@ -354,12 +363,14 @@ public class EditPoolController {
         dto.setVolume(Double.toString(parents.stream().mapToDouble(Pool::getVolume).sum()));
       }
 
+      dto.setBox(newBox);
+
       return dto;
     }
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      // no config necessary
+      config.putPOJO(Config.BOX, newBox);
     }
 
     public ModelAndView merge(String parentIdsString, String proportionsString, ModelMap model) throws IOException {
@@ -385,9 +396,9 @@ public class EditPoolController {
   }
 
   @GetMapping(value = "/bulk/merge")
-  public ModelAndView propagatePoolsMerged(@RequestParam("ids") String poolIds, @RequestParam String proportions, ModelMap model)
+  public ModelAndView propagatePoolsMerged(@RequestParam("ids") String poolIds, @RequestParam(value = "boxId", required = false) Long boxId, @RequestParam String proportions, ModelMap model)
       throws IOException {
-    return new BulkMergePoolsBackend(poolService).merge(poolIds, proportions, model);
+    return new BulkMergePoolsBackend((boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null), poolService).merge(poolIds, proportions, model);
   }
 
 }

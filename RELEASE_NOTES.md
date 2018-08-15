@@ -1,23 +1,51 @@
+# 0.2.136
+
+Changes:
+
+ * Added Automatic Box Creation
+ * Added Library QC Status to Pool Page
+ * Added Partition Number to 'Pool Added to Container' Changelog Message
+ * Added Run Look Up By Sequencing Parameters
+ * Added description field to containers
+ * Added links to external services
+ * Added subproject to bulk sample tables (DetailedSample)
+ * Added worksets
+ * Allowed Library Templates to be associated with multiple projects
+ * Automatically Fill Unique Dual Indices On Edit Pages
+ * Fixed Create Sample (single) page
+ * Fixed create container QC error
+ * Fixed create run
+ * Improved Notes Display on Project Overview
+ * Improved performance surrounding boxes
+ * Service Record adjustments
+ * Showed more descriptive titles on Order pages
+
 # 0.2.135
 
 Changes:
 
  * Allow adding and editing Library creation date
- * Add updating identities with new external names when creating children
- * Add archived Sample Purposes
- * fixed JIRA search for Run-related tickets
- * Allow non-unique indices within a family
+ * Add updating identities with new external names when creating children (DetailedSample)
+ * Add archived Sample Purposes (DetailedSample)
+ * Fixed JIRA search for Run-related tickets
+ * Better support for custom combinatorial unique dual indices
  * Make containers deletable
- * Filter search by subproject
+ * Filter search by subproject (DetailedSample)
  * Allow library creation for all platforms
  * Add description to bulk Pools table
  * Remove add user button when using LDAP
+
+BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
+BAD: The Create Run page errors and is unusable.
 
 # 0.2.134
 
 Changes:
 
  * fix: don't use LimsUtils in Flyway migration
+
+BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
+BAD: The Create Run page errors and is unusable.
 
 # 0.2.133
 
@@ -26,6 +54,8 @@ Changes:
  * fix: use java.util.logging instead of slf4j in Flyway migration
 
 BAD: Flyway migration via Flyway command-line tool still fails. Fixed in 0.2.134.
+BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
+BAD: The Create Run page errors and is unusable.
 
 # 0.2.132
 
@@ -40,7 +70,7 @@ Changes:
  * Add attachments to runs
  * Moved run and pool permissions towards bottom of page
  * Allow specifying proportions of dilutions in pool
- * Fixed zero-padding when autofilling numbers
+ * Fixed zero-padding when autofilling numbers in bulk tables
  * JIRA Integration for Projects and Runs
 
 CONFIG CHANGE: Flyway migration now requires an extra parameter (`-placheholders.filesDir`) to identify
@@ -55,6 +85,8 @@ advised that you delete `issuetracker.properties`, and instead keep the configur
 BAD: Flyway migration via Flyway command-line tool fails due to slf4j logger used in Flyway migration.
 Could be remedied by copying slf4j libraries into the flyway/libs dir, but the next release contains a
 simpler fix.
+BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
+BAD: The Create Run page errors and is unusable.
 
 # 0.2.131
 
@@ -68,9 +100,11 @@ Changes:
  * Add creation date to detailed sample
  * Move concentration from detailed sample to Sample
  * Automatically update entity field values for auto-updateable QCs
- * Allow setting whether a sample class can be created directly
+ * Allow setting whether a sample class can be created directly (DetailedSample)
  * Allow archiving sample types and sample classes
  * Add search by kit feature
+
+BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
 
 # 0.2.130
 

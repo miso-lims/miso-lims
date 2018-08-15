@@ -104,6 +104,7 @@ public class BulkLibraryPage extends HeaderFooterPage {
 
   public BulkDilutionPage chainPropagateDilutions() {
     toolbar.findElement(PROPAGATE_BUTTON_TEXT).click();
+    clickOk();
     return new BulkDilutionPage(getDriver());
   }
 

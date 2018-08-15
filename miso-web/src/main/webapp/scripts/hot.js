@@ -105,7 +105,7 @@ var HotUtils = {
           HotUtils.validator.requiredAutocomplete(value, callback);
         }
       }
-      
+
     },
     /**
      * Custom validator for setting fields to manually be invalid
@@ -137,7 +137,17 @@ var HotUtils = {
     var columns = target.createColumns(config, create, data).filter(function(c) {
       return c.include;
     });
+    
+    if(columns.some(function(c){
+      return c.description;
+    })){
+      jQuery('#hothelpdiv').append('</br>');
+      jQuery('#hothelpdiv').append('<p>Column Descriptions:</p>');
+    }
     columns.forEach(function(c, i) {
+      if(c.description && c.include){
+        jQuery('#hothelpdiv').append('<p>' + c.header + ' - ' + c.description + '</p>');
+      }
       c.hotIndex = i;
     });
     var cellMetaData = [];
@@ -972,7 +982,7 @@ var HotUtils = {
           }
         }], function(result) {
           var errors = generateErrors(items, result)
-          if(errors.length >= 1){
+          if (errors.length >= 1) {
             Utils.showOkDialog("Error", errors);
           } else {
             window.location = window.location.origin + url + '?' + jQuery.param({
@@ -1107,6 +1117,98 @@ var HotUtils = {
     };
   },
 
+  makeAddToWorkset: function(typePlural, idsField) {
+    return {
+      name: 'Add to Workset',
+      action: function(items) {
+        var ids = items.map(Utils.array.getId);
+        Utils.showWizardDialog('Add to Workset', [
+            {
+              name: 'Existing Workset',
+              handler: function() {
+                var doSearch = function() {
+                  var fields = [{
+                    label: 'Workset search',
+                    property: 'query',
+                    type: 'text',
+                    required: true
+                  }]
+                  Utils.showDialog('Add to Existing Workset', 'Search', fields, function(input) {
+                    Utils.ajaxWithDialog('Finding Worksets', 'GET', '/miso/rest/worksets?' + jQuery.param({
+                      q: input.query
+                    }), {}, function(worksets) {
+                      var selectFields = [];
+                      if (!worksets || !worksets.length) {
+                        Utils.showOkDialog('Workset Search', ['No matching worksets found.'], doSearch);
+                      } else {
+                        worksets.forEach(function(workset) {
+                          selectFields.push({
+                            name: workset.alias,
+                            handler: function() {
+                              Utils.ajaxWithDialog('Adding to Workset', 'POST', '/miso/rest/worksets/' + workset.id + '/' + typePlural,
+                                  ids, function() {
+                                    Utils.showOkDialog('Add to Workset', ['The selected ' + typePlural + ' have been added to workset \''
+                                        + workset.alias + '\'.']);
+                                  });
+                            }
+                          });
+                          Utils.showWizardDialog('Add to Existing Workset', selectFields);
+                        });
+                      }
+                    });
+                  });
+                }
+                doSearch();
+              }
+            }, {
+              name: 'New Workset',
+              handler: function() {
+                var fields = [{
+                  label: 'Alias',
+                  property: 'alias',
+                  type: 'text',
+                  required: true
+                }, {
+                  label: 'Description',
+                  property: 'description',
+                  type: 'textarea',
+                  rows: 3,
+                  required: false
+                }];
+                Utils.showDialog('New Workset', 'Create', fields, function(input) {
+                  var workset = {
+                    alias: input.alias,
+                    description: input.description
+                  };
+                  workset[idsField] = ids;
+                  Utils.ajaxWithDialog('Creating Workset', 'POST', '/miso/rest/worksets', workset, function() {
+                    Utils.showOkDialog('Add to Workset', ['New workset \'' + workset.alias + '\' created.']);
+                  });
+                });
+              }
+            }]);
+      }
+    }
+  },
+
+  makeRemoveFromWorkset: function(typePlural, worksetId) {
+    return {
+      name: 'Remove from Workset',
+      action: function(items) {
+        Utils.showConfirmDialog('Remove ' + typePlural, 'Remove',
+            ['Remove these ' + items.length + ' ' + typePlural + ' from the workset?'], function() {
+              var ids = items.map(Utils.array.getId);
+              Utils.ajaxWithDialog('Removing ' + typePlural, 'DELETE', '/miso/rest/worksets/' + worksetId + '/' + typePlural, ids,
+                  function() {
+                    Utils.showOkDialog('Removed', [items.length + ' ' + typePlural + ' removed.'], function() {
+                      Utils.page.pageReload();
+                    });
+                  });
+            });
+      }
+    }
+  },
+
   relationCategoriesForDetailed: function() { // Change name to relationCategoriesForDetailed
     return Constants.isDetailedSample ? Constants.sampleCategories.map(function(category) {
       return {
@@ -1172,6 +1274,27 @@ var HotUtils = {
       table.setCellMeta(i, sortColIndex, 'sortFunction', sortFunction);
     }
     table.sort(sortColIndex);
+  },
+  
+  showDialogForBoxCreation: function(title, okButton, fields, pageURL, generateParams, getItemCount){
+    fields.push(ListUtils.createBoxField);
+    Utils.showDialog(title, okButton, fields, function(result) {
+      var params = generateParams(result);
+      if(params == null){
+        return;
+      }
+      var loadPage = function(){
+        window.location = window.location.origin + pageURL + jQuery.param(params);
+      }
+      if (result.createBox){
+        Utils.createBoxDialog(result, getItemCount, function(newBox){
+          params.boxId = newBox.id;
+          loadPage();
+        });
+      } else {
+        loadPage();
+      }
+    }); 
   }
 };
 

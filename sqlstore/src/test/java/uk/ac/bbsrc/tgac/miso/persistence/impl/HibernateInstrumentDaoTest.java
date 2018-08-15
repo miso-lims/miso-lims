@@ -19,6 +19,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateInstrumentDaoTest extends AbstractDAOTest {
 
@@ -77,5 +78,21 @@ public class HibernateInstrumentDaoTest extends AbstractDAOTest {
     assertEquals("instrument name does not match", "SN7001179", instrument.getName());
     assertNull("instrument date commissioned is not null", instrument.getDateCommissioned());
     assertNull("instrument date decommissioned is not null", instrument.getDateDecommissioned());
+  }
+
+  @Test
+  public void testSearch() throws IOException {
+    testSearch(PaginationFilter.query("Sequencer"));
+  }
+
+  /**
+   * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
+   * 
+   * @param filter the search filter
+   * @throws IOException
+   */
+  private void testSearch(PaginationFilter filter) throws IOException {
+    // verify Hibernate mappings by ensuring that no exception is thrown
+    assertNotNull(dao.list(0, 10, true, "name", filter));
   }
 }

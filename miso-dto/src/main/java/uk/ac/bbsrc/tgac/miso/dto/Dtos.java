@@ -29,12 +29,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
@@ -79,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
@@ -87,6 +92,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
@@ -307,7 +313,30 @@ public class Dtos {
     return dto;
   }
 
-  private static SampleDto copySampleFields(Sample from, SampleDto dto, boolean includeBoxables) {
+  public static SampleDto asDto(Sample from, boolean includeBoxPositions) {
+    SampleDto dto = null;
+
+    if (isDetailedSample(from)) {
+      dto = asDetailedSampleDto((DetailedSample) from);
+    } else {
+      dto = new SampleDto();
+    }
+    copySampleFields(from, dto, includeBoxPositions);
+    dto.setAccession(from.getAccession());
+
+    if (from.getQCs() != null && !from.getQCs().isEmpty()) {
+      dto.setQcs(asQcDtos(from.getQCs()));
+    }
+    return dto;
+  }
+
+  public static List<SampleDto> asSampleDtos(Collection<Sample> from, boolean fullIncludingBoxPositions) {
+    return from.stream()
+        .map(sample -> (fullIncludingBoxPositions ? asDto(sample, true) : asMinimalDto(sample)))
+        .collect(Collectors.toList());
+  }
+
+  private static SampleDto copySampleFields(Sample from, SampleDto dto, boolean includeBoxPositions) {
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setDescription(from.getDescription());
@@ -316,7 +345,7 @@ public class Dtos {
     dto.setLocationBarcode(from.getLocationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     if (from.getBox() != null) {
-      dto.setBox(asDto(from.getBox(), includeBoxables));
+      dto.setBox(asDto(from.getBox(), includeBoxPositions));
       dto.setBoxPosition(from.getBoxPosition());
     }
     dto.setSampleType(from.getSampleType());
@@ -424,6 +453,11 @@ public class Dtos {
     to.setGroupId(nullifyStringIfBlank(from.getGroupId()));
     to.setGroupDescription(nullifyStringIfBlank(from.getGroupDescription()));
     to.setSynthetic(from.getSynthetic());
+    if (from.getSubprojectId() != null) {
+      Subproject subproject = new SubprojectImpl();
+      subproject.setId(from.getSubprojectId());
+      to.setSubproject(subproject);
+    }
     to.setCreationDate(LimsUtils.isStringEmptyOrNull(from.getCreationDate()) ? null : parseDate(from.getCreationDate()));
     if (from.getIdentityId() != null) {
       to.setIdentityId(from.getIdentityId());
@@ -606,27 +640,6 @@ public class Dtos {
       to.getSamplePurpose().setId(from.getSamplePurposeId());
     }
     return to;
-  }
-
-  public static SampleDto asDto(Sample from) {
-    SampleDto dto = null;
-
-    if (isDetailedSample(from)) {
-      dto = asDetailedSampleDto((DetailedSample) from);
-    } else {
-      dto = new SampleDto();
-    }
-    copySampleFields(from, dto, true);
-    dto.setAccession(from.getAccession());
-
-    if (from.getQCs() != null && !from.getQCs().isEmpty()) {
-      dto.setQcs(asQcDtos(from.getQCs()));
-    }
-    return dto;
-  }
-
-  public static List<SampleDto> asSampleDtos(Collection<Sample> from, boolean full) {
-    return from.stream().map(sample -> (full ? asDto(sample) : asMinimalDto(sample))).collect(Collectors.toList());
   }
 
   public static Sample to(SampleDto from) {
@@ -1009,7 +1022,7 @@ public class Dtos {
   public static PoolOrderDto asDto(PoolOrder from) {
     PoolOrderDto dto = new PoolOrderDto();
     dto.setId(from.getId());
-    dto.setPool(asDto(from.getPool(), false));
+    dto.setPool(asDto(from.getPool(), false, false));
     dto.setParameters(asDto(from.getSequencingParameter()));
     dto.setPartitions(from.getPartitions());
     dto.setCreatedById(from.getCreatedBy().getUserId());
@@ -1062,7 +1075,7 @@ public class Dtos {
     return dtoList;
   }
 
-  private static LibraryDto asDto(Library from, boolean includeBoxables) {
+  public static LibraryDto asDto(Library from, boolean includeBoxPositions) {
     LibraryDto dto = null;
     if (isDetailedLibrary(from)) {
       dto = asDetailedLibraryDto((DetailedLibrary) from);
@@ -1130,7 +1143,7 @@ public class Dtos {
     dto.setLocationBarcode(from.getLocationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     if (from.getBox() != null) {
-      dto.setBox(asDto(from.getBox(), includeBoxables));
+      dto.setBox(asDto(from.getBox(), includeBoxPositions));
       dto.setBoxPosition(from.getBoxPosition());
     }
     dto.setDiscarded(from.isDiscarded());
@@ -1141,18 +1154,6 @@ public class Dtos {
       dto.setReceivedDate(formatDate(from.getReceivedDate()));
     }
     return dto;
-  }
-
-  public static LibraryDto asDto(Library from) {
-    return asDto(from, true);
-  }
-
-  public static LibraryDto asMinimalDto(Library from) {
-    return asDto(from, false);
-  }
-
-  public static List<LibraryDto> asLibraryDtos(Collection<Library> from) {
-    return from.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
   public static Library to(LibraryDto from) {
@@ -1226,13 +1227,13 @@ public class Dtos {
     return to;
   }
 
-  public static List<BoxDto> asBoxDtos(Collection<Box> boxes, boolean includeBoxables) {
+  public static List<BoxDto> asBoxDtosWithPositions(Collection<Box> boxes) {
     return boxes.stream()
-        .map(box -> asDto(box, includeBoxables))
+        .map(box -> asDto(box, true))
         .collect(Collectors.toList());
   }
 
-  public static BoxDto asDto(Box from, boolean includeBoxables) {
+  public static BoxDto asDto(Box from, boolean includePositions) {
     BoxDto dto = new BoxDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1250,8 +1251,8 @@ public class Dtos {
       dto.setCols(from.getSize().getColumns());
       dto.setScannable(from.getSize().getScannable());
     }
-    if (includeBoxables && from.getBoxables() != null) {
-      dto.setItems(asBoxablesDtos(from.getBoxables()));
+    if (includePositions) {
+      dto.setItems(from.getBoxPositions().values().stream().map(Dtos::asDto).collect(Collectors.toList()));
     }
     if (from.getStorageLocation() != null) {
       dto.setStorageLocationBarcode(from.getStorageLocation().getIdentificationBarcode());
@@ -1262,8 +1263,18 @@ public class Dtos {
     return dto;
   }
 
-  private static List<BoxableDto> asBoxablesDtos(Map<String, BoxableView> boxables) {
-    return boxables.entrySet().stream().map(entry -> asDto(entry.getValue())).collect(Collectors.toList());
+  private static BoxableDto asDto(BoxPosition from) {
+    BoxableDto dto = new BoxableDto();
+    dto.setCoordinates(from.getPosition());
+    dto.setEntityType(from.getBoxableId().getTargetType());
+    dto.setId(from.getBoxableId().getTargetId());
+    return dto;
+  }
+
+  public static BoxDto asDtoWithBoxables(Box from, Collection<BoxableView> boxables) {
+    BoxDto dto = asDto(from, false);
+    dto.setItems(boxables.stream().map(Dtos::asDto).collect(Collectors.toList()));
+    return dto;
   }
 
   public static List<BoxableDto> asBoxableDtos(List<BoxableView> boxables) {
@@ -1295,10 +1306,20 @@ public class Dtos {
     to.setDescription(from.getDescription());
     to.setIdentificationBarcode(from.getIdentificationBarcode());
     to.setLocationBarcode(from.getLocationBarcode() == null ? "" : from.getLocationBarcode());
+    if (from.getUseId() != null) {
+      BoxUse use = new BoxUse();
+      use.setId(from.getUseId());
+      to.setUse(use);
+    }
+    if (from.getSizeId() != null) {
+      BoxSize size = new BoxSize();
+      size.setId(from.getSizeId());
+      to.setSize(size);
+    }
     return to;
   }
 
-  private static DilutionDto asDto(LibraryDilution from, LibraryDto libraryDto, boolean includeBoxables) {
+  private static DilutionDto asDto(LibraryDilution from, LibraryDto libraryDto, boolean includeBoxPositions) {
     DilutionDto dto = new DilutionDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1318,30 +1339,29 @@ public class Dtos {
     }
     dto.setLibrary(libraryDto);
     if (from.getBox() != null) {
-      dto.setBox(asDto(from.getBox(), includeBoxables));
+      dto.setBox(asDto(from.getBox(), includeBoxPositions));
       dto.setBoxPosition(from.getBoxPosition());
     }
     dto.setDiscarded(from.isDiscarded());
     return dto;
   }
 
-  public static DilutionDto asMinimalDto(LibraryDilution from) {
-    Library lib = from.getLibrary();
-    LibraryDto libDto = new LibraryDto();
-    libDto.setId(lib.getId());
-    libDto.setName(lib.getName());
-    libDto.setAlias(lib.getAlias());
-    libDto.setIdentificationBarcode(lib.getIdentificationBarcode());
-    if (lib.getPlatformType() != null) {
-      libDto.setPlatformType(lib.getPlatformType().getKey());
+  public static DilutionDto asDto(LibraryDilution from, boolean includeFullLibrary, boolean includeBoxPositions) {
+    LibraryDto libDto = null;
+    if (includeFullLibrary) {
+      libDto = asDto(from.getLibrary(), false);
+    } else {
+      Library lib = from.getLibrary();
+      libDto = new LibraryDto();
+      libDto.setId(lib.getId());
+      libDto.setName(lib.getName());
+      libDto.setAlias(lib.getAlias());
+      libDto.setIdentificationBarcode(lib.getIdentificationBarcode());
+      if (lib.getPlatformType() != null) {
+        libDto.setPlatformType(lib.getPlatformType().getKey());
+      }
     }
-
-    return asDto(from, libDto, false);
-  }
-
-  public static DilutionDto asDto(LibraryDilution from) {
-    return asDto(from, asDto(from.getLibrary()), true);
-
+    return asDto(from, libDto, includeBoxPositions);
   }
 
   public static DilutionDto asDto(PoolableElementView from) {
@@ -1371,6 +1391,7 @@ public class Dtos {
     if (from.getPlatformType() != null) {
       ldto.setPlatformType(from.getPlatformType().getKey());
     }
+    ldto.setQcPassed(from.getLibraryQcPassed());
     dto.setLibrary(ldto);
 
     Sample sample = from.getSample();
@@ -1403,7 +1424,7 @@ public class Dtos {
     return to;
   }
 
-  public static PoolDto asDto(Pool from, boolean includeContents) {
+  public static PoolDto asDto(Pool from, boolean includeContents, boolean includeBoxPositions) {
     PoolDto dto = new PoolDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1449,16 +1470,12 @@ public class Dtos {
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     if (from.getBox() != null) {
-      dto.setBox(asDto(from.getBox(), true));
+      dto.setBox(asDto(from.getBox(), includeBoxPositions));
       dto.setBoxPosition(from.getBoxPosition());
     }
     dto.setDiscarded(from.isDiscarded());
     dto.setHasLowQualityLibraries(from.getHasLowQualityMembers());
     return dto;
-  }
-
-  public static List<PoolDto> asPoolDtos(Collection<Pool> poolSubset, boolean includeContents) {
-    return poolSubset.stream().map(pool -> asDto(pool, includeContents)).collect(Collectors.toList());
   }
 
   public static RunDto asDto(Run from) {
@@ -1626,7 +1643,7 @@ public class Dtos {
   public static PoolOrderCompletionDto asDto(PoolOrderCompletion from) {
     PoolOrderCompletionDto dto = new PoolOrderCompletionDto();
     dto.setId(from.getPool().getId() + "_" + from.getSequencingParameters().getId());
-    dto.setPool(asDto(from.getPool(), false));
+    dto.setPool(asDto(from.getPool(), false, false));
     dto.setParameters(asDto(from.getSequencingParameters()));
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
     dto.setRemaining(from.getRemaining());
@@ -2007,7 +2024,7 @@ public class Dtos {
     dto.setContainerId(from.getSequencerPartitionContainer().getId());
     dto.setContainerName(from.getSequencerPartitionContainer().getIdentificationBarcode());
     dto.setPartitionNumber(from.getPartitionNumber());
-    dto.setPool(from.getPool() == null ? null : asDto(from.getPool(), includePoolContents));
+    dto.setPool(from.getPool() == null ? null : asDto(from.getPool(), includePoolContents, false));
     return dto;
   }
 
@@ -2027,7 +2044,7 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setName(from.getName());
     dto.setPlatform(asDto(from.getPlatform()));
-    dto.setLibrary(asDto(from.getLibrary()));
+    dto.setLibrary(asDto(from.getLibrary(), false));
     dto.setPartitions(from.getRunPartitions().stream()
         .map(entry -> new ExperimentDto.RunPartitionDto(asDto(entry.getRun()), asDto(entry.getPartition()))).collect(Collectors.toList()));
     dto.setStudy(asDto(from.getStudy()));
@@ -2250,7 +2267,7 @@ public class Dtos {
             .collect(Collectors.groupingBy(Pool::getId)).values().stream()//
             .map(l -> l.get(0))//
             .sorted((a, b) -> a.getAlias().compareTo(b.getAlias()))//
-            .map(p -> asDto(p, false))//
+            .map(p -> asDto(p, false, false))//
             .collect(Collectors.toList()));
     return to;
   }
@@ -2308,7 +2325,7 @@ public class Dtos {
 
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
-    dto.setProjectId(from.getProject().getId());
+    dto.setProjectIds(from.getProjects().stream().map(Project::getId).collect(Collectors.toList()));
     dto.setDefaultVolume(from.getDefaultVolume());
     if (from.getPlatformType() != null) {
       dto.setPlatformType(from.getPlatformType().getKey());
@@ -2476,6 +2493,67 @@ public class Dtos {
     dto.setCreator(from.getCreator().getLoginName());
     dto.setCreated(formatDateTime(from.getCreationTime()));
     return dto;
+  }
+
+  public static ServiceRecordDto asDto(ServiceRecord from) {
+    ServiceRecordDto dto = new ServiceRecordDto();
+    dto.setId(from.getId());
+    dto.setServiceDate(formatDate(from.getServiceDate()));
+    dto.setTitle(from.getTitle());
+    dto.setDetails(from.getDetails());
+    dto.setReferenceNumber(from.getReferenceNumber());
+    dto.setAttachments(from.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    return dto;
+  }
+
+  public static WorksetDto asDto(Workset from) {
+    WorksetDto dto = new WorksetDto();
+    dto.setId(from.getId());
+    dto.setAlias(from.getAlias());
+    dto.setDescription(from.getDescription());
+    if (!from.getSamples().isEmpty()) {
+      dto.setSampleIds(from.getSamples().stream().map(Identifiable::getId).collect(Collectors.toList()));
+    }
+    if (!from.getLibraries().isEmpty()) {
+      dto.setLibraryIds(from.getLibraries().stream().map(Identifiable::getId).collect(Collectors.toList()));
+    }
+    if (!from.getDilutions().isEmpty()) {
+      dto.setDilutionIds(from.getDilutions().stream().map(Identifiable::getId).collect(Collectors.toList()));
+    }
+    dto.setCreator(from.getCreator().getFullName());
+    dto.setLastModified(formatDateTime(from.getLastModified()));
+    return dto;
+  }
+
+  public static Workset to(WorksetDto from) {
+    Workset workset = new Workset();
+    if (from.getId() != null) {
+      workset.setId(from.getId());
+    }
+    workset.setAlias(from.getAlias());
+    workset.setDescription(from.getDescription());
+    if (from.getSampleIds() != null && !from.getSampleIds().isEmpty()) {
+      workset.setSamples(from.getSampleIds().stream().map(id -> {
+        Sample s = new SampleImpl();
+        s.setId(id);
+        return s;
+      }).collect(Collectors.toSet()));
+    }
+    if (from.getLibraryIds() != null && !from.getLibraryIds().isEmpty()) {
+      workset.setLibraries(from.getLibraryIds().stream().map(id -> {
+        Library l = new LibraryImpl();
+        l.setId(id);
+        return l;
+      }).collect(Collectors.toSet()));
+    }
+    if (from.getDilutionIds() != null && !from.getDilutionIds().isEmpty()) {
+      workset.setDilutions(from.getDilutionIds().stream().map(id -> {
+        LibraryDilution d = new LibraryDilution();
+        d.setId(id);
+        return d;
+      }).collect(Collectors.toSet()));
+    }
+    return workset;
   }
 
 }

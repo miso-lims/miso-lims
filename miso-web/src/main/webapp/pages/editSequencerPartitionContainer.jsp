@@ -72,6 +72,10 @@
       <td><span id="model">${container.model.alias}</span></td>
     </tr>
     <tr>
+      <td>Description:</td>
+      <td><form:input id="description" path="description"/></td>
+    </tr>
+    <tr>
       <td>Clustering Kit:</td>
       <td><miso:select id="clusteringKit" path="clusteringKit" items="${clusteringKits}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="" /></td>
     </tr>

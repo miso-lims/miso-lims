@@ -29,6 +29,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,7 @@ import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.service.integration.jira
@@ -108,6 +110,9 @@ public class JiraIssueManager implements IssueTrackerManager {
   
   @Override
   public List<Issue> searchIssues(String query) throws IOException {
+    if (LimsUtils.isStringEmptyOrNull(query)) {
+      return Collections.emptyList();
+    }
     Map<String, String> params = new HashMap<>();
     params.put("jql", "text~'" + query.replaceAll("\\s+", "+") + "'");
     WebResource webResource = prepareWebResource(getRestUri("/search", params));

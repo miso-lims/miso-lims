@@ -89,7 +89,7 @@ public class LibraryDilutionRestController extends RestController {
   @ResponseBody
   public DilutionDto getDilution(@PathVariable Long dilutionId) throws IOException {
     LibraryDilution dilution = dilutionService.get(dilutionId);
-    DilutionDto dilutionDto = Dtos.asMinimalDto(dilution);
+    DilutionDto dilutionDto = Dtos.asDto(dilution, false, false);
     return dilutionDto;
   }
 
@@ -161,7 +161,8 @@ public class LibraryDilutionRestController extends RestController {
   public List<DilutionDto> getLibraryDilutionsInBulk(@RequestBody List<String> names, HttpServletRequest request,
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
-    return PaginationFilter.bulkSearch(names, dilutionService, Dtos::asDto, message -> new RestException(message, Status.BAD_REQUEST));
+    return PaginationFilter.bulkSearch(names, dilutionService, ldi -> Dtos.asDto(ldi, false, false),
+        message -> new RestException(message, Status.BAD_REQUEST));
   }
 
   @GetMapping(value = "/spreadsheet")
@@ -190,7 +191,7 @@ public class LibraryDilutionRestController extends RestController {
 
         @Override
         public SampleDto asDto(Sample model) {
-          return Dtos.asDto(model);
+          return Dtos.asDto(model, false);
         }
 
         @Override
@@ -202,7 +203,7 @@ public class LibraryDilutionRestController extends RestController {
 
         @Override
         public LibraryDto asDto(Library model) {
-          return Dtos.asDto(model);
+          return Dtos.asDto(model, false);
         }
 
         @Override
@@ -229,7 +230,7 @@ public class LibraryDilutionRestController extends RestController {
 
         @Override
         public PoolDto asDto(Pool model) {
-          return Dtos.asDto(model, false);
+          return Dtos.asDto(model, false, false);
         }
 
         @Override

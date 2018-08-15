@@ -1,8 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.*;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,10 +37,10 @@ public class ListTablesIT extends AbstractIT {
       Columns.SAMPLE_NAME, Columns.SAMPLE_ALIAS, Columns.QC_PASSED, Columns.INDEX, Columns.LOCATION, Columns.LAST_MODIFIED,
       Columns.WARNINGS);
   private static final Set<String> dilutionsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.LIBRARY_NAME,
-      Columns.LIBRARY_ALIAS, Columns.MATRIX_BARCODE, Columns.PLATFORM, Columns.TARGETED_SEQUENCING, Columns.DIL_CONCENTRATION,
+      Columns.LIBRARY_ALIAS, Columns.MATRIX_BARCODE, Columns.PLATFORM, Columns.TARGETED_SEQUENCING, Columns.CONCENTRATION,
       Columns.CONCENTRATION_UNITS, Columns.VOLUME, Columns.NG_USED, Columns.VOLUME_USED, Columns.CREATOR, Columns.CREATION_DATE);
   private static final Set<String> poolsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
-      Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.DILUTIONS, Columns.POOL_CONCENTRATION, Columns.LOCATION,
+      Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.DILUTIONS, Columns.CONCENTRATION, Columns.LOCATION,
       Columns.AVG_INSERT_SIZE, Columns.LAST_MODIFIED);
   private static final Set<String> ordersColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
       Columns.PLATFORM, Columns.LONGEST_INDEX, Columns.SEQUENCING_PARAMETERS, Columns.REMAINING, Columns.LAST_MODIFIED);
@@ -62,6 +64,8 @@ public class ListTablesIT extends AbstractIT {
   private static final Set<String> arraysColumns = Sets.newHashSet(Columns.ID, Columns.ALIAS, Columns.SERIAL_NUMBER);
   private static final Set<String> arrayRunsColumns = Sets.newHashSet(Columns.ID, Columns.ALIAS, Columns.STATUS, Columns.START_DATE,
       Columns.END_DATE, Columns.LAST_MODIFIED);
+  private static final Set<String> worksetsColumns = Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.DESCRIPTION,
+      Columns.LAST_MODIFIED);
 
   private static final Set<String> poolsTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
   private static final Set<String> ordersTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
@@ -107,76 +111,6 @@ public class ListTablesIT extends AbstractIT {
     sortOnTab = Collections.unmodifiableMap(preferredTab);
   }
 
-  private static final Set<String> createdDates = Sets.newHashSet("created:2017-02-01", "created:now", "created:hour", "created:thishour",
-      "created:lasthour", "created:today", "created:yesterday", "created:thisweek", "created:lastweek", "created:3hours",
-      "created:365days");
-
-  private static final Set<String> createdOnDates = Sets.newHashSet("createdon:2017-02-01", "createdon:now", "createdon:hour",
-      "createdon:thishour", "createdon:lasthour", "createdon:today", "createdon:yesterday", "createdon:thisweek", "created:lastweek",
-      "createdon:3hours", "createdon:365days");
-
-  private static final Set<String> receivedDates = Sets.newHashSet("received:2017-02-01", "recieved:hour", "receivedon:today",
-      "recievedon:thisweek");
-
-  private static final Set<String> creator = Sets.newHashSet("createdby:admin", "createdby:me", "creator:admin", "creater:admin");
-
-  private static final Set<String> modifier = Sets.newHashSet("changedby:admin", "changedby:me", "modifier:admin", "updater:admin");
-
-  private static final Set<String> platform = Sets.newHashSet("platform:ILLUMINA", "platform:LS454", "platform:SOLID",
-      "platform:IONTORRENT", "platform:PACBIO", "platform:OXFORDNANOPORE");
-
-  private static final Set<String> indices = Sets.newHashSet("index:A501", "index:ACGTACGT");
-
-  private static final Set<String> box = Sets.newHashSet("box:BOX1", "box:box");
-
-  private static final Set<String> kitName = Sets.newHashSet("kitname:\"Test Kit\"");
-
-  private static final Set<String> projectsQueries = concatSets(Sets.newHashSet("PRO1"), createdDates, createdOnDates,
-      creator, modifier);
-
-  private static final Set<String> samplesQueries = concatSets(
-      Sets.newHashSet("SAM1", "class:gDNA", "institute:OICR", "inst:OICR", "external:EXT", "ext:EXT", "extern:EXT", "subproject:Mini"),
-      createdDates, createdOnDates, receivedDates, creator, modifier, box);
-
-  private static final Set<String> librariesQueries = concatSets(
-      Sets.newHashSet("LIB1"), createdDates, createdOnDates, creator, modifier, platform, indices, box, kitName);
-
-  private static final Set<String> dilutionsQueries = concatSets(
-      Sets.newHashSet("LDI1"), createdDates, createdOnDates, creator, modifier, platform, indices, box);
-
-  private static final Set<String> poolsQueries = concatSets(
-      Sets.newHashSet("IPO1"), createdDates, createdOnDates, creator, modifier, platform, box);
-
-  private static final Set<String> ordersQueries = Sets.newHashSet("IPO1", "is:fulfilled", "is:active", "is:order");
-
-  private static final Set<String> containersQueries = concatSets(
-      Sets.newHashSet("Container"), createdDates, createdOnDates, creator, modifier, platform, kitName);
-
-  private static final Set<String> runsQueries = concatSets(
-      Sets.newHashSet("RUN1", "is:unknown", "is:complete", "is:completed", "is:failed", "is:started",
-          "is:stopped", "is:running", "is:incomplete"),
-      createdDates, createdOnDates, creator, modifier, platform);
-
-  private static final Set<String> boxesQueries = Sets.newHashSet("BOX1");
-
-  private static final Set<String> sequencersQueries = Sets.newHashSet("Sequencer");
-
-  private static final Set<String> kitsQueries = concatSets(Sets.newHashSet("Kit"), kitName);
-
-  private static final Set<String> indicesQueries = Sets.newHashSet("Index 1", "TGCATGCA");
-
-  private static final Set<String> studiesQueries = concatSets(Sets.newHashSet("STU1"), modifier);
-
-  private static final Set<String> experimentsQueries = concatSets(
-      Sets.newHashSet("Expt"), createdDates, createdOnDates, creator, modifier);
-
-  private static final Set<String> submissionsQueries = concatSets(
-      Sets.newHashSet("Sub"), createdDates, createdOnDates, creator, modifier);
-
-  private static final Set<String> arrayQueries = Sets.newHashSet("Array");
-
-  private static final Set<String> arrayRunQueries = Sets.newHashSet("ArrayRun");
-
   private static final Comparator<String> standardComparator = (s1, s2) -> s1.compareToIgnoreCase(s2);
 
   /**
@@ -214,6 +148,16 @@ public class ListTablesIT extends AbstractIT {
     }
   };
 
+  private static final Comparator<String> numericComparator = (num1, num2) -> {
+    if (NumberUtils.isCreatable(num1) && NumberUtils.isCreatable(num2)) {
+      double d1 = Double.valueOf(num1);
+      double d2 = Double.valueOf(num2);
+      return Double.compare(d1, d2);
+    } else {
+      return standardComparator.compare(num1, num2);
+    }
+  };
+
   @Before
   public void setup() {
     loginAdmin();
@@ -240,14 +184,6 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
-  public void testListSamplesSearch() throws Exception {
-    samplesQueries.forEach(query -> {
-      testSearch(ListTarget.SAMPLES, query);
-      testProjectPageSearch(ProjectTable.SAMPLES, query);
-    });
-  }
-
-  @Test
   public void testListLibrariesPageSetup() throws Exception {
     // Goal: ensure all expected columns are present and no extra
     testPageSetup(ListTarget.LIBRARIES, librariesColumns);
@@ -257,14 +193,6 @@ public class ListTablesIT extends AbstractIT {
   public void testListLibrariesColumnSort() throws Exception {
     // Goal: ensure all sortable columns can be sorted without errors
     testColumnsSort(ListTarget.LIBRARIES);
-  }
-
-  @Test
-  public void testListLibrariesSearch() throws Exception {
-    librariesQueries.forEach(query -> {
-      testSearch(ListTarget.LIBRARIES, query);
-      testProjectPageSearch(ProjectTable.LIBRARIES, query);
-    });
   }
 
   @Test
@@ -285,14 +213,6 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
-  public void testListDilutionsSearch() throws Exception {
-    dilutionsQueries.forEach(query -> {
-      testSearch(ListTarget.DILUTIONS, query);
-      testProjectPageSearch(ProjectTable.DILUTIONS, query);
-    });
-  }
-
-  @Test
   public void testListPoolsPageSetup() throws Exception {
     // Goal: ensure all expected columns are present and no extra
     testTabbedPageSetup(ListTarget.POOLS, poolsColumns);
@@ -302,14 +222,6 @@ public class ListTablesIT extends AbstractIT {
   public void testListPoolsColumnSort() throws Exception {
     // Goal: ensure all sortable columns can be sorted without errors
     testTabbedColumnsSort(ListTarget.POOLS);
-  }
-
-  @Test
-  public void testListPoolsSearch() throws Exception {
-    poolsQueries.forEach(query -> {
-      testTabbedSearch(ListTarget.POOLS, query);
-      testProjectPageSearch(ProjectTable.POOLS, query);
-    });
   }
 
   @Test
@@ -352,15 +264,6 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
-  public void testListOrdersSearch() throws Exception {
-    ordersQueries.forEach(query -> {
-      testTabbedSearch(ListTarget.ORDERS_ACTIVE, query);
-      testTabbedSearch(ListTarget.ORDERS_ALL, query);
-      testTabbedSearch(ListTarget.ORDERS_PENDING, query);
-    });
-  }
-
-  @Test
   public void testListOrdersWarnings() throws Exception {
     testWarningTabbed(ListTarget.ORDERS_ALL, "no indices", "(MISSING INDEX)", Columns.DESCRIPTION);
     testWarningTabbed(ListTarget.ORDERS_ALL, "similar index", "(NEAR-DUPLICATE INDICES)", Columns.DESCRIPTION);
@@ -379,13 +282,6 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
-  public void testListContainersSearch() throws Exception {
-    containersQueries.forEach(query -> {
-      testTabbedSearch(ListTarget.CONTAINERS, query);
-    });
-  }
-
-  @Test
   public void testListRunsSetup() throws Exception {
     testTabbedPageSetup(ListTarget.RUNS, runsColumns);
   }
@@ -393,14 +289,6 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListRunsColumnSort() throws Exception {
     testTabbedColumnsSort(ListTarget.RUNS);
-  }
-
-  @Test
-  public void testListRunsSearch() throws Exception {
-    runsQueries.forEach(query -> {
-      testTabbedSearch(ListTarget.RUNS, query);
-      testProjectPageSearch(ProjectTable.RUNS, query);
-    });
   }
 
   @Test
@@ -414,13 +302,6 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
-  public void testListBoxesSearch() throws Exception {
-    boxesQueries.forEach(query -> {
-      testTabbedSearch(ListTarget.BOXES, query);
-    });
-  }
-
-  @Test
   public void testListSequencersSetup() throws Exception {
     testPageSetup(ListTarget.INSTRUMENTS, sequencersColumns);
   }
@@ -428,13 +309,6 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListSequencersColumnSort() throws Exception {
     testColumnsSort(ListTarget.INSTRUMENTS);
-  }
-
-  @Test
-  public void testListSequencersSearch() throws Exception {
-    sequencersQueries.forEach(query -> {
-      testSearch(ListTarget.INSTRUMENTS, query);
-    });
   }
 
   @Test
@@ -448,13 +322,6 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
-  public void testListKitsSearch() throws Exception {
-    kitsQueries.forEach(query -> {
-      testTabbedSearch(ListTarget.KITS, query);
-    });
-  }
-
-  @Test
   public void testListIndicesSetup() throws Exception {
     testTabbedPageSetup(ListTarget.INDICES, indicesColumns);
   }
@@ -465,13 +332,6 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
-  public void testListIndicesSearch() throws Exception {
-    indicesQueries.forEach(query -> {
-      testTabbedSearch(ListTarget.INDICES, query);
-    });
-  }
-
-  @Test
   public void testListStudiesSetup() throws Exception {
     testPageSetup(ListTarget.STUDIES, studiesColumns);
   }
@@ -479,14 +339,6 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListStudiesColumnSort() throws Exception {
     testColumnsSort(ListTarget.STUDIES);
-  }
-
-  @Test
-  public void testListStudiesSearch() throws Exception {
-    studiesQueries.forEach(query -> {
-      testSearch(ListTarget.STUDIES, query);
-      testProjectPageSearch(ProjectTable.STUDIES, query);
-    });
   }
 
   @Test
@@ -510,13 +362,6 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
-  public void testListProjectsSearch() throws Exception {
-    projectsQueries.forEach(query -> {
-      testSearch(ListTarget.PROJECTS, query);
-    });
-  }
-
-  @Test
   public void testListArraysSetup() throws Exception {
     testPageSetup(ListTarget.ARRAYS, arraysColumns);
   }
@@ -524,13 +369,6 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListArraysColumnSort() throws Exception {
     testColumnsSort(ListTarget.ARRAYS);
-  }
-
-  @Test
-  public void testListArraysSearch() throws Exception {
-    arrayQueries.forEach(query -> {
-      testSearch(ListTarget.ARRAYS, query);
-    });
   }
 
   @Test
@@ -544,10 +382,13 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
-  public void testListArrayRunsSearch() throws Exception {
-    arrayRunQueries.forEach(query -> {
-      testSearch(ListTarget.ARRAYRUNS, query);
-    });
+  public void testListWorksetsSetup() throws Exception {
+    testPageSetup(ListTarget.WORKSETS, worksetsColumns);
+  }
+
+  @Test
+  public void testListWorksetsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.WORKSETS);
   }
 
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
@@ -600,13 +441,6 @@ public class ListTablesIT extends AbstractIT {
     });
   }
 
-  private void testSearch(String listTarget, String searchTarget) {
-    // confirm that searching by a term returns no errors
-    ListPage page = getList(listTarget);
-    page.getTable().searchFor(searchTarget);
-    assertTrue("error searching " + listTarget + " page for '" + searchTarget + "': ", isStringEmptyOrNull(page.getErrors().getText()));
-  }
-
   private void testProjectPageSearch(String tableWrapperId, String searchTarget) {
     ProjectPage page = ProjectPage.get(getDriver(), getBaseUrl(), 5L);
     DataTable table = page.getTable(tableWrapperId);
@@ -634,19 +468,31 @@ public class ListTablesIT extends AbstractIT {
       // if there are at least two rows, ensure that sort was correct
       if (!table.isTableEmpty() && table.countRows() > 1) {
         int sort1 = compareFirstTwoNonMatchingValues(table, heading);
+        List<String> columnSort1 = getColumn(table, heading);
         // sort the other way
         table.sortByColumn(heading);
         assertTrue("second sort on column '" + heading, isStringEmptyOrNull(page.getErrors().getText()));
         int sort2 = compareFirstTwoNonMatchingValues(table, heading);
+        List<String> columnSort2 = getColumn(table, heading);
 
         // compare results (if either is 0, value of the other can be anything though)
         if (sort1 != 0) {
           assertTrue(
-              heading + " column second sort order should differ from first",
+              heading + " column second sort order should differ from first:"
+                  + " First sort order was <" + String.join(", ", columnSort1) + ">, "
+                  + "Second sort order was <" + String.join(", ", columnSort2) + ">",
               sort2 == 0 || sort1 > 0 != sort2 > 0);
         }
       }
     }
+  }
+
+  private List<String> getColumn(DataTable table, String heading) {
+    List<String> colVals = new ArrayList<>();
+    for (int rowNum = 0; rowNum < table.countRows(); rowNum++) {
+      colVals.add(table.getTextAtCell(heading, rowNum));
+    }
+    return colVals;
   }
 
   private void testWarningNormal(String target, String query, String warning, String column) {
@@ -684,6 +530,8 @@ public class ListTablesIT extends AbstractIT {
     case Columns.NAME:
     case Columns.SAMPLE_NAME:
       return nameNumericComparator;
+    case Columns.CONCENTRATION:
+      return numericComparator;
     default:
       return standardComparator;
     }

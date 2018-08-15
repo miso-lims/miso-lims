@@ -1,6 +1,10 @@
 -- fixes BeforeInsertPool trigger created in V0004
 DROP TRIGGER IF EXISTS BeforeInsertPool;
 
+DELETE FROM Workset_Sample;
+DELETE FROM Workset_Library;
+DELETE FROM Workset_Dilution;
+DELETE FROM Workset;
 DELETE FROM BoxPosition;
 DELETE FROM BoxChangeLog;
 DELETE FROM Box;
@@ -19,6 +23,7 @@ DELETE FROM RunPacBio;
 DELETE FROM RunOxfordNanopore;
 DELETE FROM RunChangeLog;
 DELETE FROM Run;
+DELETE FROM PoolQC;
 DELETE FROM PoolOrder;
 DELETE FROM Pool_Dilution;
 DELETE FROM Pool_Note;
@@ -30,6 +35,7 @@ DELETE FROM ArrayPosition;
 DELETE FROM ArrayChangeLog;
 DELETE FROM Array;
 DELETE FROM ArrayModel;
+DELETE FROM LibraryQC;
 DELETE FROM LibraryDilution;
 DELETE FROM DetailedLibrary;
 DELETE FROM Library_Index;
@@ -84,6 +90,7 @@ DELETE FROM SampleNumberPerProject;
 DELETE FROM Project;
 DELETE FROM ReferenceGenome;
 DELETE FROM Note;
+DELETE FROM Deletion;
 DELETE FROM SecurityProfile_ReadGroup;
 DELETE FROM SecurityProfile_WriteGroup;
 DELETE FROM SecurityProfile_ReadUser;

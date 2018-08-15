@@ -56,11 +56,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.store.InstrumentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateRunDaoTest extends AbstractDAOTest {
@@ -401,4 +405,53 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     run = dao.get(1L);
     assertEquals(0, run.getWatchers().size());
   }
+
+  @Test
+  public void testSearch() throws IOException {
+    testSearch(PaginationFilter.query("RUN1"));
+  }
+
+  @Test
+  public void testSearchByHealth() throws IOException {
+    testSearch(PaginationFilter.health(HealthType.Completed));
+  }
+
+  @Test
+  public void testSearchByCreated() throws IOException {
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.CREATE));
+  }
+
+  @Test
+  public void testSearchByCreator() throws IOException {
+    testSearch(PaginationFilter.user("admin", true));
+  }
+
+  @Test
+  public void testSearchByModifier() throws IOException {
+    testSearch(PaginationFilter.user("admin", false));
+  }
+
+  @Test
+  public void testSearchByPlatform() throws IOException {
+    testSearch(PaginationFilter.platformType(PlatformType.ILLUMINA));
+  }
+
+  @Test
+  public void testSearchBySequencingParameters() throws IOException {
+    testSearch(PaginationFilter.sequencingParameters("\"Rapid Run\""));
+  }
+
+  /**
+   * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
+   * 
+   * @param filter the search filter
+   * @throws IOException
+   */
+  private void testSearch(PaginationFilter filter) throws IOException {
+    // verify Hibernate mappings by ensuring that no exception is thrown
+    assertNotNull(dao.list(err -> {
+      throw new RuntimeException(err);
+    }, 0, 10, true, "name", filter));
+  }
+
 }

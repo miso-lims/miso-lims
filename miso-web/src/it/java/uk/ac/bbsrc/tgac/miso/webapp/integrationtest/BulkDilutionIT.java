@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,8 @@ public class BulkDilutionIT extends AbstractIT {
       DilColumns.TARGETED_SEQUENCING);
 
   private static final String NO_TAR_SEQ = "(None)";
+
+  private static final double EPSILON = 0.000001;
 
   @Before
   public void setup() {
@@ -167,7 +170,7 @@ public class BulkDilutionIT extends AbstractIT {
     fillRow(table, 0, attrs);
 
     assertColumnValues(table, 0, attrs, "pre-save");
-    saveAndAssertSuccessForSavePrompt(table);
+    saveAndAssertSuccess(table, true);
     assertColumnValues(table, 0, attrs, "post-save");
 
     Long newId = getSavedId(table, 0);
@@ -200,8 +203,160 @@ public class BulkDilutionIT extends AbstractIT {
     assertTrue("Expected library volume to be negative, received positive value", savedLib.getVolume() > 0);
   }
 
+  @Test
+  public void testRemoveLibraryVolumeForPropogateOne() {
+    BulkDilutionPage page = BulkDilutionPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(801L));
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> attrs = Maps.newLinkedHashMap();
+    attrs.put(DilColumns.VOLUME_USED, "10.1");
+
+    fillRow(table, 0, attrs);
+
+    assertColumnValues(table, 0, attrs, "pre-save");
+    saveAndAssertSuccess(table);
+    assertColumnValues(table, 0, attrs, "post-save");
+
+    Long newId = getSavedId(table, 0);
+    LibraryDilution saved = (LibraryDilution) getSession().get(LibraryDilution.class, newId);
+    assertDilutionAttributes(attrs, saved);
+
+    LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
+    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 89.9, savedLib.getVolume()),
+        compareDoubles(savedLib.getVolume(), 89.9));
+  }
+
+  @Test
+  public void testRemoveLibraryVolumeForPropogateMany() {
+    BulkDilutionPage page = BulkDilutionPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(802L, 803L));
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> row0 = Maps.newLinkedHashMap();
+    row0.put(DilColumns.VOLUME_USED, "12.34");
+
+    Map<String, String> row1 = Maps.newLinkedHashMap();
+    row1.put(DilColumns.VOLUME_USED, "110.2");
+
+    fillRow(table, 0, row0);
+    fillRow(table, 1, row1);
+
+    assertColumnValues(table, 0, row0, "pre-save row 0");
+    assertColumnValues(table, 1, row1, "pre-save row 1");
+    saveAndAssertSuccess(table, true);
+    assertColumnValues(table, 0, row0, "post-save row 0");
+    assertColumnValues(table, 1, row1, "post-save row 1");
+
+    Long newId0 = getSavedId(table, 0);
+    LibraryDilution saved0 = (LibraryDilution) getSession().get(LibraryDilution.class, newId0);
+    assertDilutionAttributes(row0, saved0);
+
+    Long newId1 = getSavedId(table, 1);
+    LibraryDilution saved1 = (LibraryDilution) getSession().get(LibraryDilution.class, newId1);
+    assertDilutionAttributes(row1, saved1);
+
+    LibraryImpl savedLib0 = (LibraryImpl) getSession().get(LibraryImpl.class, saved0.getLibrary().getId());
+    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 87.66, savedLib0.getVolume()),
+        savedLib0.getVolume() == 87.66);
+
+    LibraryImpl savedLib1 = (LibraryImpl) getSession().get(LibraryImpl.class, saved1.getLibrary().getId());
+    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", -10.2, savedLib1.getVolume()),
+        compareDoubles(savedLib1.getVolume(), -10.2));
+  }
+
+  @Test
+  public void testRemoveLibraryVolumeForEdit() {
+    BulkDilutionPage page = BulkDilutionPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(1001L));
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> attrs = Maps.newLinkedHashMap();
+    attrs.put(DilColumns.VOLUME_USED, "50.2");
+
+    fillRow(table, 0, attrs);
+
+    assertColumnValues(table, 0, attrs, "pre-save");
+    saveAndAssertSuccess(table);
+    assertColumnValues(table, 0, attrs, "post-save");
+
+    Long newId = getSavedId(table, 0);
+    LibraryDilution saved = (LibraryDilution) getSession().get(LibraryDilution.class, newId);
+    assertDilutionAttributes(attrs, saved);
+
+    LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
+    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 49.8, savedLib.getVolume()),
+        compareDoubles(savedLib.getVolume(), 49.8));
+  }
+
+  @Test
+  public void testRemoveLibraryVolumeForEditFromNullVolUsed() {
+    BulkDilutionPage page = BulkDilutionPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(1002L));
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> attrs = Maps.newLinkedHashMap();
+    attrs.put(DilColumns.VOLUME_USED, "32.4");
+
+    fillRow(table, 0, attrs);
+
+    assertColumnValues(table, 0, attrs, "pre-save");
+    saveAndAssertSuccess(table);
+    assertColumnValues(table, 0, attrs, "post-save");
+
+    Long newId = getSavedId(table, 0);
+    LibraryDilution saved = (LibraryDilution) getSession().get(LibraryDilution.class, newId);
+    assertDilutionAttributes(attrs, saved);
+
+    LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
+    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 67.6, savedLib.getVolume()),
+        compareDoubles(savedLib.getVolume(), 67.6));
+  }
+
+  @Test
+  public void testAddLibraryVolumeForEdit() {
+    BulkDilutionPage page = BulkDilutionPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(1003L));
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> attrs = Maps.newLinkedHashMap();
+    attrs.put(DilColumns.VOLUME_USED, "12.2");
+
+    fillRow(table, 0, attrs);
+
+    assertColumnValues(table, 0, attrs, "pre-save");
+    saveAndAssertSuccess(table);
+    assertColumnValues(table, 0, attrs, "post-save");
+
+    Long newId = getSavedId(table, 0);
+    LibraryDilution saved = (LibraryDilution) getSession().get(LibraryDilution.class, newId);
+    assertDilutionAttributes(attrs, saved);
+
+    LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
+    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 87.8, savedLib.getVolume()),
+        compareDoubles(savedLib.getVolume(), 87.8));
+  }
+
+  @Test
+  public void testAddLibraryVolumeForEditToNullVolUsed() {
+    BulkDilutionPage page = BulkDilutionPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(1004L));
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> attrs = Maps.newLinkedHashMap();
+    attrs.put(DilColumns.VOLUME_USED, "");
+
+    fillRow(table, 0, attrs);
+
+    assertColumnValues(table, 0, attrs, "pre-save");
+    saveAndAssertSuccess(table);
+    assertColumnValues(table, 0, attrs, "post-save");
+
+    Long newId = getSavedId(table, 0);
+    LibraryDilution saved = (LibraryDilution) getSession().get(LibraryDilution.class, newId);
+    assertDilutionAttributes(attrs, saved);
+
+    LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
+    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 100.0, savedLib.getVolume()),
+        compareDoubles(savedLib.getVolume(), 100.0));
+  }
+
   private long getSavedId(HandsOnTable table, int rowNum) {
-    return Long.valueOf(table.getText(DilColumns.NAME, 0).substring(3, table.getText(DilColumns.NAME, 0).length()));
+    return Long.valueOf(table.getText(DilColumns.NAME, rowNum).substring(3, table.getText(DilColumns.NAME, 0).length()));
   }
 
   private void fillRow(HandsOnTable table, int rowNum, Map<String, String> attributes) {
@@ -219,38 +374,6 @@ public class BulkDilutionIT extends AbstractIT {
     });
   }
 
-  private void saveAndAssertSuccess(HandsOnTable table) {
-    HandsOnTableSaveResult result = table.save();
-
-    if (result.getItemsSaved() != table.getRowCount()) {
-      log.error(result.printSummary());
-    }
-
-    assertEquals("Save count", table.getRowCount(), result.getItemsSaved());
-    assertTrue("Server error messages", result.getServerErrors().isEmpty());
-    assertTrue("Save error messages", result.getSaveErrors().isEmpty());
-
-    for (int i = 0; i < table.getRowCount(); i++) {
-      assertTrue("Dilution name generation", table.getText(DilColumns.NAME, i).contains("LDI"));
-    }
-  }
-
-  private void saveAndAssertSuccessForSavePrompt(HandsOnTable table) {
-    HandsOnTableSaveResult result = table.save(true);
-
-    if (result.getItemsSaved() != table.getRowCount()) {
-      log.error(result.printSummary());
-    }
-
-    assertEquals("Save count", table.getRowCount(), result.getItemsSaved());
-    assertTrue("Server error messages", result.getServerErrors().isEmpty());
-    assertTrue("Save error messages", result.getSaveErrors().isEmpty());
-
-    for (int i = 0; i < table.getRowCount(); i++) {
-      assertTrue("Dilution name generation", table.getText(DilColumns.NAME, i).contains("LDI"));
-    }
-  }
-
   private void assertDilutionAttributes(Map<String, String> attributes, LibraryDilution dilution) {
     testDilutionAttribute(DilColumns.NAME, attributes, dilution, LibraryDilution::getName);
     testDilutionAttribute(DilColumns.ID_BARCODE, attributes, dilution, LibraryDilution::getIdentificationBarcode);
@@ -259,7 +382,8 @@ public class BulkDilutionIT extends AbstractIT {
     testDilutionAttribute(DilColumns.VOLUME, attributes, dilution, dil -> dil.getVolume().toString());
     testDilutionAttribute(DilColumns.CREATION_DATE, attributes, dilution, dil -> dil.getCreationDate().toString());
     testDilutionAttribute(DilColumns.NG_USED, attributes, dilution, dil -> dil.getNgUsed().toString());
-    testDilutionAttribute(DilColumns.VOLUME_USED, attributes, dilution, dil -> dil.getVolumeUsed().toString());
+    testDilutionAttribute(DilColumns.VOLUME_USED, attributes, dilution,
+        dil -> dil.getVolumeUsed() == null ? "" : dil.getVolumeUsed().toString());
     testDilutionAttribute(DilColumns.TARGETED_SEQUENCING, attributes, dilution, dil -> {
       if (dil.getTargetedSequencing() == null) {
         return null;
@@ -286,5 +410,9 @@ public class BulkDilutionIT extends AbstractIT {
     } else {
       return value == null || value.isEmpty() ? null : value;
     }
+  }
+
+  private boolean compareDoubles(double d1, double d2) {
+    return (Math.abs(d1 - d2) <= EPSILON);
   }
 }

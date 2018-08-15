@@ -45,6 +45,10 @@ public interface SequencerPartitionContainer
 
   public void setId(long id);
 
+  String getDescription();
+
+  void setDescription(String description);
+
   /**
    * Returns the runs of this Container object.
    * 

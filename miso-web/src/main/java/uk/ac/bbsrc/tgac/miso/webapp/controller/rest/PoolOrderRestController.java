@@ -205,6 +205,6 @@ public class PoolOrderRestController extends RestController {
   }
 
   private static PoolPickerEntry orderTransform(PoolOrderCompletion order) {
-    return new PoolPickerEntry(Dtos.asDto(order.getPool(), true), Collections.singletonList(Dtos.asDto(order)));
+    return new PoolPickerEntry(Dtos.asDto(order.getPool(), true, false), Collections.singletonList(Dtos.asDto(order)));
   }
 }

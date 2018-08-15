@@ -81,7 +81,7 @@ public class BulkPoolIT extends AbstractIT {
 
     dilutions.checkBoxForRow(0);
     dilutions.checkBoxForRow(1);
-    String newUrl = listDilutions.clickButtonAndGetUrl(ButtonText.POOL_TOGETHER);
+    String newUrl = listDilutions.clickButtonAndGetUrlWithConfirm(ButtonText.POOL_TOGETHER);
 
     assertTrue(newUrl.contains(BulkPoolPage.POOL_TOGETHER_URL_FRAGMENT));
     List<String> ids = Arrays.asList(newUrl.split("=")[1].split("%2C"));
@@ -101,7 +101,7 @@ public class BulkPoolIT extends AbstractIT {
 
     dilutions.checkBoxForRow(0);
     dilutions.checkBoxForRow(1);
-    String newUrl = listDilutions.clickButtonAndGetUrl(ButtonText.POOL_SEPARATELY);
+    String newUrl = listDilutions.clickButtonAndGetUrlWithConfirm(ButtonText.POOL_SEPARATELY);
 
 
     assertTrue(newUrl.contains(BulkPoolPage.POOL_SEPARATELY_URL_FRAGMENT));
@@ -423,6 +423,137 @@ public class BulkPoolIT extends AbstractIT {
     assertTrue(pool1DilutionIds.contains(Long.valueOf(701L)));
     assertTrue(pool1DilutionIds.contains(Long.valueOf(702L)));
   }
+
+  @Test
+  public void testAutoCalculateVolumePoolTogether() {
+    BulkPoolPage page = BulkPoolPage.getForPoolTogether(getDriver(), getBaseUrl(), Sets.newHashSet(901L, 902L));
+    HandsOnTable table = page.getTable();
+
+    // test default volume
+    Map<String, String> attrs = Maps.newLinkedHashMap();
+    attrs.put(Columns.VOLUME, "36.0");
+    assertColumnValues(table, 0, attrs, "initial volume calculation");
+
+    // test auto-calculation when volume is null
+    attrs.put(Columns.ALIAS, "auto_calculate_pool_together");
+    attrs.put(Columns.BARCODE, "autocalculatepooltogether");
+    attrs.put(Columns.VOLUME, null);
+
+    fillRow(table, 0, attrs);
+
+    saveAndAssertSuccess(table);
+
+    String savedName = assertAndGetSavedName(table, 0);
+    attrs.put(Columns.NAME, savedName);
+    Long savedId = Long.valueOf(savedName.substring(3, savedName.length()));
+
+    Pool saved = (Pool) getSession().get(PoolImpl.class, savedId);
+    attrs.put(Columns.VOLUME, "36.0");
+    assertPoolAttributes(attrs, saved);
+  }
+
+  @Test
+  public void testOverwriteVolumePoolTogether() {
+    // test overwriting auto-calculated volume
+    BulkPoolPage page = BulkPoolPage.getForPoolTogether(getDriver(), getBaseUrl(), Sets.newHashSet(901L, 902L));
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> attrs = Maps.newLinkedHashMap();
+    attrs.put(Columns.ALIAS, "no_auto_calculate_pool_together");
+    attrs.put(Columns.BARCODE, "noautocalculatepooltogether");
+    attrs.put(Columns.VOLUME, "10.0");
+    fillRow(table, 0, attrs);
+
+    saveAndAssertSuccess(table);
+    String savedName = assertAndGetSavedName(table, 0);
+    attrs.put(Columns.NAME, savedName);
+    Long savedId = Long.valueOf(savedName.substring(3, savedName.length()));
+
+    Pool saved = (Pool) getSession().get(PoolImpl.class, savedId);
+    assertPoolAttributes(attrs, saved);
+  }
+
+  @Test
+  public void testAutoCalculateVolumePoolSeparately() {
+    BulkPoolPage page = BulkPoolPage.getForPoolSeparately(getDriver(), getBaseUrl(), Sets.newHashSet(901L, 902L));
+    HandsOnTable table = page.getTable();
+
+    // check default volumes
+    Map<String, String> row0 = Maps.newLinkedHashMap();
+    row0.put(Columns.VOLUME, "14.7");
+    assertColumnValues(table, 0, row0, "row 0 initial volume calculation");
+
+    Map<String, String> row1 = Maps.newLinkedHashMap();
+    row1.put(Columns.VOLUME, "21.3");
+    assertColumnValues(table, 1, row1, "row 1 initial volume calculation");
+
+    // test auto-calculation when volumes are null
+    row0.put(Columns.ALIAS, "auto_calculate_pool_separate_1");
+    row0.put(Columns.BARCODE, "autocalculatepoolseparate1");
+    row0.put(Columns.VOLUME, null);
+
+    fillRow(table, 0, row0);
+
+    row1.put(Columns.ALIAS, "auto_calculate_pool_separate_2");
+    row1.put(Columns.BARCODE, "autocalculatepoolseparate2");
+    row1.put(Columns.VOLUME, null);
+
+    fillRow(table, 1, row1);
+    saveAndAssertSuccess(table);
+
+    String savedName0 = assertAndGetSavedName(table, 0);
+    String savedName1 = assertAndGetSavedName(table, 1);
+
+    row0.put(Columns.NAME, savedName0);
+    row1.put(Columns.NAME, savedName1);
+
+    Long savedId0 = Long.valueOf(savedName0.substring(3, savedName0.length()));
+    Long savedId1 = Long.valueOf(savedName1.substring(3, savedName1.length()));
+
+    row0.put(Columns.VOLUME, "14.7");
+    row1.put(Columns.VOLUME, "21.3");
+
+    Pool saved0 = (Pool) getSession().get(PoolImpl.class, savedId0);
+    assertPoolAttributes(row0, saved0);
+    Pool saved1 = (Pool) getSession().get(PoolImpl.class, savedId1);
+    assertPoolAttributes(row1, saved1);
+  }
+
+  @Test
+  public void testOverwriteVolumePoolSeparately() {
+    // test overwriting auto-calculated volume
+    BulkPoolPage page = BulkPoolPage.getForPoolSeparately(getDriver(), getBaseUrl(), Sets.newHashSet(901L, 902L));
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> row0 = Maps.newLinkedHashMap();
+    row0.put(Columns.ALIAS, "no_auto_calculate_pool_together_1");
+    row0.put(Columns.BARCODE, "noautocalculatepooltogether1");
+    row0.put(Columns.VOLUME, "10.0");
+    fillRow(table, 0, row0);
+
+    Map<String, String> row1 = Maps.newLinkedHashMap();
+    row1.put(Columns.ALIAS, "no_auto_calculate_pool_together_2");
+    row1.put(Columns.BARCODE, "noautocalculatepooltogether2");
+    row1.put(Columns.VOLUME, "10.0");
+    fillRow(table, 1, row1);
+
+    saveAndAssertSuccess(table);
+
+    String savedName0 = assertAndGetSavedName(table, 0);
+    String savedName1 = assertAndGetSavedName(table, 1);
+
+    row0.put(Columns.NAME, savedName0);
+    row1.put(Columns.NAME, savedName1);
+
+    Long savedId0 = Long.valueOf(savedName0.substring(3, savedName0.length()));
+    Long savedId1 = Long.valueOf(savedName1.substring(3, savedName1.length()));
+
+    Pool saved0 = (Pool) getSession().get(PoolImpl.class, savedId0);
+    assertPoolAttributes(row0, saved0);
+    Pool saved1 = (Pool) getSession().get(PoolImpl.class, savedId1);
+    assertPoolAttributes(row1, saved1);
+  }
+
 
   @Test
   public void testEditTwice() throws Exception {

@@ -7,13 +7,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -42,9 +42,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -54,7 +56,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.BoxStorageAmount;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -72,7 +73,6 @@ import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
 @Controller
@@ -81,14 +81,13 @@ public class BoxRestController extends RestController {
 
   private static final Logger log = LoggerFactory.getLogger(BoxRestController.class);
 
+  private static final Comparator<BoxableView> POS_COMPARATOR = (o1, o2) -> o1.getBoxPosition().compareTo(o2.getBoxPosition());
+
   @Autowired
   private BoxService boxService;
 
   @Autowired
   private MisoFilesManager misoFileManager;
-
-  @Autowired
-  private AuthorizationManager authorizationManager;
 
   @Autowired
   private SampleService sampleService;
@@ -143,12 +142,6 @@ public class BoxRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.boxUse(id));
   }
 
-  @GetMapping(value = "/boxes/rest")
-  public @ResponseBody Collection<BoxDto> jsonRest() throws IOException {
-    Collection<Box> boxes = authorizationManager.filterUnreadable(boxService.list());
-    return Dtos.asBoxDtos(boxes, false);
-  }
-
   @PutMapping(value = "/box/{boxId}/position/{position}",  consumes = { "application/json" },
       produces = { "application/json" })
   public @ResponseBody BoxDto setPosition(@PathVariable("boxId") Long boxId, @PathVariable("position") String position,
@@ -167,25 +160,26 @@ public class BoxRestController extends RestController {
     }
     // if the selected item is already in the box, remove it here and add it to the correct position in next step
     if (Long.valueOf(box.getId()).equals(boxable.getBoxId())) {
-      box.removeBoxable(boxable.getBoxPosition());
+      box.getBoxPositions().remove(boxable.getBoxPosition());
     }
     // if an item already exists at this position, its location will be set to unknown.
-    box.setBoxable(position, boxable);
+    box.getBoxPositions().put(position, new BoxPosition(box, position, boxable.getId()));
     boxService.save(box);
     Box saved = boxService.get(boxId);
-    return Dtos.asDto(saved, true);
+    Collection<BoxableView> savedContents = boxService.getBoxContents(boxId);
+    return Dtos.asDtoWithBoxables(saved, savedContents);
   }
 
   @RequestMapping(value = "/boxes/search")
   public @ResponseBody List<BoxDto> search(@RequestParam("q") String search) {
     List<Box> results = boxService.getBySearch(search);
-    return Dtos.asBoxDtos(results, true);
+    return Dtos.asBoxDtosWithPositions(results);
   }
 
   @RequestMapping(value = "/boxes/search/partial")
   public @ResponseBody List<BoxDto> partialSearch(@RequestParam("q") String search, @RequestParam("b") boolean onlyMatchBeginning) {
     List<Box> results = boxService.getByPartialSearch(search, onlyMatchBeginning);
-    return Dtos.asBoxDtos(results, true);
+    return Dtos.asBoxDtosWithPositions(results);
   }
 
   /**
@@ -228,10 +222,11 @@ public class BoxRestController extends RestController {
   private List<List<String>> getBoxContents(Box box) throws IOException {
     List<List<String>> boxContents = new ArrayList<>();
 
-    // Use TreeMap to iterate through the contents of the box in order of box position
-    for (Map.Entry<String, BoxableView> entry : new TreeMap<>(box.getBoxables()).entrySet()) {
-      String position = entry.getKey();
-      BoxableView boxableView = entry.getValue();
+    // iterate through the contents of the box in order of box position
+    List<BoxableView> contents = boxService.getBoxContents(box.getId());
+    contents.sort(POS_COMPARATOR);
+    for (BoxableView boxableView : contents) {
+      String position = boxableView.getBoxPosition();
 
       String name = boxableView.getName();
       String alias = boxableView.getAlias();
@@ -561,8 +556,10 @@ public class BoxRestController extends RestController {
       // Build the diffs for this box
       List<DiffMessage> diffs = new ArrayList<>();
       Box box;
+      Map<String, BoxableView> boxables;
       try {
         box = boxService.get(boxId);
+        boxables = boxService.getBoxContents(boxId).stream().collect(Collectors.toMap(BoxableView::getBoxPosition, Function.identity()));
       } catch (IOException e) {
         throw new RestException("Cannot get the Box: " + e.getMessage(), Status.INTERNAL_SERVER_ERROR);
       }
@@ -571,7 +568,7 @@ public class BoxRestController extends RestController {
             box.getSize().getColumns(), scan.getRowCount(), scan.getColumnCount()), Status.BAD_REQUEST);
 
       box.getSize().positionStream().map(position -> {
-        BoxableView originalItem = box.getBoxables().containsKey(position) ? box.getBoxables().get(position) : null;
+        BoxableView originalItem = boxables.containsKey(position) ? boxables.get(position) : null;
         BoxableView newItem = barcodesByPosition.containsKey(position) && boxablesByBarcode.containsKey(barcodesByPosition.get(position))
             ? boxablesByBarcode.get(barcodesByPosition.get(position)) : null;
         if (originalItem != null && newItem != null &&
@@ -667,20 +664,22 @@ public class BoxRestController extends RestController {
         BoxableView boxable = searchResults.get(0);
         // if the selected item is already in the box, remove it here and add it to the correct position in next step
         if (Long.valueOf(box.getId()).equals(boxable.getBoxId())) {
-          box.removeBoxable(boxable.getBoxPosition());
+          box.getBoxPositions().remove(boxable.getBoxPosition());
         }
         updates.put(item.getPosition(), boxable);
       }
     }
     for (Entry<String, BoxableView> entry : updates.entrySet()) {
       // if an item already exists at this position, its location will be set to unknown.
-      box.setBoxable(entry.getKey(), entry.getValue());
+      BoxPosition bp = new BoxPosition(box, entry.getKey(), entry.getValue().getId());
+      box.getBoxPositions().put(entry.getKey(), bp);
     }
 
     validation.throwIfInvalid();
     boxService.save(box);
     Box updated = boxService.get(boxId);
-    return Dtos.asDto(updated, true);
+    List<BoxableView> updatedContents = boxService.getBoxContents(boxId);
+    return Dtos.asDtoWithBoxables(updated, updatedContents);
   }
 
   @PostMapping(value = "/box/{boxId}/setlocation")

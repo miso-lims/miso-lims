@@ -132,7 +132,7 @@ public class PoolRestController extends RestController {
 
     @Override
     protected PoolDto asDto(Pool model) {
-      return Dtos.asDto(model, false);
+      return Dtos.asDto(model, false, false);
     }
 
     @Override
@@ -167,7 +167,7 @@ public class PoolRestController extends RestController {
     if (p == null) {
       throw new RestException("No pool found with ID: " + poolId, Status.NOT_FOUND);
     }
-    return Dtos.asDto(p, true);
+    return Dtos.asDto(p, true, false);
   }
 
   @GetMapping(value = "{poolId}/runs", produces = "application/json")
@@ -198,7 +198,7 @@ public class PoolRestController extends RestController {
     Pool p = Dtos.to(pool);
     p.setId(poolId);
     poolService.save(p);
-    return Dtos.asDto(poolService.get(poolId), true);
+    return Dtos.asDto(poolService.get(poolId), true, false);
   }
 
   @PutMapping(value = "/{poolId}/contents", produces = "application/json")
@@ -210,7 +210,7 @@ public class PoolRestController extends RestController {
         .map(view -> new PoolDilution(pool, view));
     pool.setPoolDilutions(Stream.concat(originalMinusRemoved, added).collect(Collectors.toSet()));
     poolService.save(pool);
-    return Dtos.asDto(poolService.get(poolId), true);
+    return Dtos.asDto(poolService.get(poolId), true, false);
   }
 
   @PutMapping(value = "/{poolId}/proportions")
@@ -234,7 +234,7 @@ public class PoolRestController extends RestController {
       poolDilution.setProportion(entry.getValue());
     }
     poolService.save(pool);
-    return Dtos.asDto(poolService.get(poolId), true);
+    return Dtos.asDto(poolService.get(poolId), true, false);
   }
 
   @PostMapping(value = "/{poolId}/assign", produces = "application/json")
@@ -315,7 +315,7 @@ public class PoolRestController extends RestController {
 
   public List<PoolDto> serializePools(Collection<Pool> pools, UriComponentsBuilder uriBuilder)
       throws IOException {
-    List<PoolDto> poolDtos = Dtos.asPoolDtos(pools, false);
+    List<PoolDto> poolDtos = pools.stream().map(pool -> Dtos.asDto(pool, false, false)).collect(Collectors.toList());
     for (PoolDto poolDto : poolDtos) {
       poolDto.writeUrls(uriBuilder);
     }
@@ -348,14 +348,14 @@ public class PoolRestController extends RestController {
   private PoolPickerEntry poolTransform(Pool pool) throws IOException {
     List<PoolOrderCompletionDto> completions = poolOrderCompletionService.getByPoolId(pool.getId()).stream()
         .map(Dtos::asDto).collect(Collectors.toList());
-    return new PoolPickerEntry(Dtos.asDto(pool, true), completions);
+    return new PoolPickerEntry(Dtos.asDto(pool, true, false), completions);
   }
 
   @PostMapping(value = "query", produces = { "application/json" })
   @ResponseBody
   public List<PoolDto> getPoolsInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
-    return PaginationFilter.bulkSearch(names, poolService, p -> Dtos.asDto(p, false),
+    return PaginationFilter.bulkSearch(names, poolService, p -> Dtos.asDto(p, false, false),
         message -> new RestException(message, Status.BAD_REQUEST));
   }
 
@@ -404,7 +404,7 @@ public class PoolRestController extends RestController {
 
         @Override
         public SampleDto asDto(Sample model) {
-          return Dtos.asDto(model);
+          return Dtos.asDto(model, false);
         }
 
         @Override
@@ -417,7 +417,7 @@ public class PoolRestController extends RestController {
 
         @Override
         public LibraryDto asDto(Library model) {
-          return Dtos.asDto(model);
+          return Dtos.asDto(model, false);
         }
 
         @Override
@@ -430,7 +430,7 @@ public class PoolRestController extends RestController {
 
         @Override
         public DilutionDto asDto(LibraryDilution model) {
-          return Dtos.asDto(model);
+          return Dtos.asDto(model, false, false);
         }
 
         @Override

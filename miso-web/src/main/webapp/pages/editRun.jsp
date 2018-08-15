@@ -242,7 +242,16 @@
       </script>
     </td>
   </tr>
-
+  <c:if test="${run.id != 0 && !runReportLinks.isEmpty()}">
+  <tr>
+    <td>External Links:</td>
+    <td>
+    <c:forEach items="${runReportLinks}" var="runReportLink">
+      <span><a href="<c:out value="${runReportLink.value}"/>">${runReportLink.key}</a></span><br/>
+    </c:forEach>
+    </td>
+  </tr>
+  </c:if>
 </table>
 
 <script type="text/javascript">
@@ -295,7 +304,7 @@
             <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
               <span style="color:#000000">
                 <a href='#' onclick="Run.ui.deleteRunNote('${run.id}', '${note.noteId}');">
-                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span>
+                  <span class="ui-icon ui-icon-trash note-delete-icon"></span>
                 </a>
               </span>
             </c:if>

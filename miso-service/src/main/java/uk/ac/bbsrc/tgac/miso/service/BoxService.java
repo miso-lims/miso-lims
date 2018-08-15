@@ -10,8 +10,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<Box>, DeleterService<Box> {
@@ -26,7 +26,7 @@ public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<
 
   public Box getByAlias(String alias) throws IOException;
 
-  public Box getByBarcode(String barcode) throws IOException;
+  public List<BoxableView> getBoxContents(long id) throws IOException;
 
   public Map<String, Integer> getColumnSizes() throws IOException;
 
@@ -40,8 +40,6 @@ public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<
   public List<Box> getBySearch(String search);
 
   public List<Box> getByPartialSearch(String search, boolean onlyMatchBeginning);
-
-  public List<Box> list() throws IOException;
 
   public Collection<BoxSize> listSizes() throws IOException;
 
@@ -73,11 +71,13 @@ public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<
    * @param boxable Boxable to update, with its box (id) and boxPosition set accordingly
    * @throws IOException
    */
-  public void updateBoxableLocation(Boxable boxable, Boxable original) throws IOException;
+  public void updateBoxableLocation(Boxable boxable) throws IOException;
+
+  public void throwIfBoxPositionIsFilled(Boxable boxable) throws IOException;
 
   @Override
   public default void beforeDelete(Box object) throws IOException {
-    object.removeAllBoxables();
+    object.getBoxPositions().clear();
     save(object);
   }
 

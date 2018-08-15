@@ -11,7 +11,7 @@ FOR EACH ROW
       lastModifier, 
       CONCAT('QC added: ', (SELECT name FROM QCType WHERE qcTypeId = NEW.type)),
       lastModified
-    FROM SequencerPartitionContainer WHERE container = NEW.containerId;
+    FROM SequencerPartitionContainer WHERE containerId = NEW.containerId;
  //
 
 DROP TRIGGER IF EXISTS ContainerQcUpdate//

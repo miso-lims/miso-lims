@@ -101,7 +101,7 @@
           </td>
         </tr>
         <tr>
-          <td class="h">Serviced By:*</td>
+          <td class="h">Serviced By:</td>
           <td>
             <form:input id="servicedByName" path="servicedByName" name="servicedByName"/><span id="servicedByNameCounter" class="counter"></span>
           </td>

@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateKitDaoTest extends AbstractDAOTest {
 
@@ -192,6 +193,29 @@ public class HibernateKitDaoTest extends AbstractDAOTest {
   public void testGetKitDescriptorColumnSizes() throws IOException {
     Map<String, Integer> columnSizes = dao.getKitDescriptorColumnSizes();
     assertThat(columnSizes, hasEntry("name", 255));
+  }
+
+  @Test
+  public void testSearch() throws IOException {
+    testSearch(PaginationFilter.query("Kit"));
+  }
+
+  @Test
+  public void testSearchByKitName() throws IOException {
+    testSearch(PaginationFilter.kitName("Test Kit"));
+  }
+
+  /**
+   * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
+   * 
+   * @param filter the search filter
+   * @throws IOException
+   */
+  private void testSearch(PaginationFilter filter) throws IOException {
+    // verify Hibernate mappings by ensuring that no exception is thrown
+    assertNotNull(dao.list(err -> {
+      throw new RuntimeException(err);
+    }, 0, 10, true, "name", filter));
   }
 
 }

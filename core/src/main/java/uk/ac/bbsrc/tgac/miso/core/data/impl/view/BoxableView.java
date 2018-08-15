@@ -2,81 +2,25 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 
 import java.io.Serializable;
 
-import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.Immutable;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 
 @Entity
 @Immutable
 @Table(name = "BoxableView")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class BoxableView implements Serializable {
 
   private static final long serialVersionUID = 1L;
-
-  @Embeddable
-  public static class BoxableId implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    @Enumerated(EnumType.STRING)
-    private EntityType targetType;
-    private long targetId;
-
-    public BoxableId() {
-
-    }
-
-    public BoxableId(EntityType targetType, long targetId) {
-      this.targetType = targetType;
-      this.targetId = targetId;
-    }
-
-    public EntityType getTargetType() {
-      return targetType;
-    }
-
-    public void setTargetType(EntityType targetType) {
-      this.targetType = targetType;
-    }
-
-    public long getTargetId() {
-      return targetId;
-    }
-
-    public void setTargetId(long targetId) {
-      this.targetId = targetId;
-    }
-
-    @Override
-    public int hashCode() {
-      return new HashCodeBuilder(71, 49)
-          .append(targetId)
-          .append(targetType)
-          .toHashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (obj == null) return false;
-      if (getClass() != obj.getClass()) return false;
-      BoxableId other = (BoxableId) obj;
-      return new EqualsBuilder()
-          .append(targetId, other.targetId)
-          .append(targetType, other.targetType)
-          .isEquals();
-    }
-  }
 
   @EmbeddedId
   private BoxableId id;

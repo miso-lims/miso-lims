@@ -1,6 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Entity;
@@ -40,9 +42,11 @@ public class LibraryTemplate implements Serializable {
 
   String alias;
 
-  @ManyToOne(targetEntity = ProjectImpl.class)
-  @JoinColumn(name = "projectId", nullable = false)
-  private Project project;
+  @ManyToMany(targetEntity = ProjectImpl.class)
+  @JoinTable(name = "LibraryTemplate_Project", joinColumns = {
+      @JoinColumn(name = "libraryTemplateId", nullable = false) }, inverseJoinColumns = {
+          @JoinColumn(name = "projectId", nullable = false) })
+  private List<Project> projects = new ArrayList<>();
 
   private Double defaultVolume;
 
@@ -97,12 +101,12 @@ public class LibraryTemplate implements Serializable {
     this.alias = alias;
   }
 
-  public Project getProject() {
-    return project;
+  public List<Project> getProjects() {
+    return projects;
   }
 
-  public void setProject(Project project) {
-    this.project = project;
+  public void setProjects(List<Project> projects) {
+    this.projects = projects;
   }
 
   public Double getDefaultVolume() {

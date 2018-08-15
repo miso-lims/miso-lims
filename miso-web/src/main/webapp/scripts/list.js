@@ -107,6 +107,10 @@ ListUtils = (function() {
     "subproject": {
       term: "subproject:NAME",
       help: "Checks if an item is tagged with the given subproject"
+    },
+    "parameters": {
+      term: "parameters:NAME",
+      help: "Checks if an item has the specified sequencing parameters."
     }
   };
 
@@ -611,6 +615,15 @@ ListUtils = (function() {
               || "Unknown";
         };
       },
+    },
+    createBoxField: {
+      property: 'createBox',
+      type: 'select',
+      label: 'Create New Box',
+      values: [false, true],
+      getLabel: function(value){
+        return value ? 'Yes' : 'No';
+      }
     }
   };
 })();

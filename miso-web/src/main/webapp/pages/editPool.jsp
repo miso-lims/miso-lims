@@ -201,18 +201,16 @@
       <c:if test="${fn:length(pool.notes) > 0}">
         <div class="note" style="clear:both">
           <c:forEach items="${pool.notes}" var="note" varStatus="n">
-            <div class="exppreview" id="pool-notes-${n.count}">
-              <b>${note.creationDate}</b>: ${note.text}
-              <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}</span>
+          <div class="exppreview" id="pool-notes-${n.count}">
+            <b>${note.creationDate}</b>: ${note.text}
+              <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
                 <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
-                  <span style="color:#000000">
-                    <a href='#' onclick="Pool.ui.deletePoolNote('${pool.id}', '${note.noteId}');">
-                      <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span>
-                    </a>
-                  </span>
+                <span style="color:#000000"><a href='#' onclick="Pool.ui.deletePoolNote('${pool.id}', '${note.noteId}');">
+                  <span class="ui-icon ui-icon-trash note-delete-icon"></span></a></span>
                 </c:if>
-            </div>
-          </c:forEach>
+              </span>
+          </div>
+        </c:forEach>
         </div>
       </c:if>
       <div id="addNoteDialog" title="Create new Note"></div>

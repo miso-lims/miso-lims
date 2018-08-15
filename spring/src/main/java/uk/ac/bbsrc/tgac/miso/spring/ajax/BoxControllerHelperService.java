@@ -1,7 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -23,6 +25,7 @@ import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
@@ -83,8 +86,9 @@ public class BoxControllerHelperService {
     try {
       Map<String, BoxableView> barcodesToBoxables = boxService.getViewsFromBarcodeList(positionToBarcode.values()).stream()
           .collect(Collectors.toMap(BoxableView::getIdentificationBarcode, Function.identity()));
-      box.setBoxables(positionToBarcode.entrySet().stream()
-          .collect(Collectors.toMap(Map.Entry::getKey, entry -> barcodesToBoxables.get(entry.getValue()))));
+      box.setBoxPositions(positionToBarcode.entrySet().stream()
+          .collect(Collectors.toMap(Map.Entry::getKey,
+              entry -> new BoxPosition(box, entry.getKey(), barcodesToBoxables.get(entry.getValue()).getId()))));
     } catch (IOException e) {
       log.debug("Error getting boxable", e);
       return JSONUtils.SimpleJSONError("Error finding item: " + e.getMessage());
@@ -140,9 +144,9 @@ public class BoxControllerHelperService {
     try {
       Map<String, BoxableView> barcodesToBoxables = boxService.getViewsFromBarcodeList(positionToBarcode.values()).stream()
           .collect(Collectors.toMap(BoxableView::getIdentificationBarcode, Function.identity()));
-      box.setBoxables(positionToBarcode.entrySet().stream().filter(entry -> barcodesToBoxables.containsKey(entry.getValue()))
+      box.setBoxPositions(positionToBarcode.entrySet().stream().filter(entry -> barcodesToBoxables.containsKey(entry.getValue()))
           .collect(Collectors.toMap(Map.Entry::getKey,
-              entry -> barcodesToBoxables.get(entry.getValue()))));
+              entry -> new BoxPosition(box, entry.getKey(), barcodesToBoxables.get(entry.getValue()).getId()))));
     } catch (IOException e) {
       log.debug("Error getting boxable", e);
       return JSONUtils.SimpleJSONError("Error finding item: " + e.getMessage());
@@ -212,15 +216,17 @@ public class BoxControllerHelperService {
     String position = json.getString("position");
     if (!box.isValidPosition(position)) return JSONUtils.SimpleJSONError("Invalid position given!");
 
-    box.removeBoxable(position);
+    box.getBoxPositions().remove(position);
 
     try {
       box.setLastModifier(authorizationManager.getCurrentUser());
       boxService.save(box);
 
       Map<String, Object> response = new HashMap<>();
+      Box updated = boxService.get(boxId);
+      Collection<BoxableView> updatedContents = boxService.getBoxContents(boxId);
       ObjectMapper mapper = new ObjectMapper();
-      response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()), true)));
+      response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDtoWithBoxables(updated, updatedContents)));
       return JSONUtils.JSONObjectResponse(response);
     } catch (IOException e) {
       log.debug("Error removing one boxable item", e);
@@ -269,9 +275,11 @@ public class BoxControllerHelperService {
 
         try {
           boxService.discardSingleItem(box, position);
-          box = boxService.get(boxId);
+          Box updated = boxService.get(boxId);
+          List<BoxableView> updatedContents = boxService.getBoxContents(boxId);
+
           ObjectMapper mapper = new ObjectMapper();
-          response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()), true)));
+          response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDtoWithBoxables(updated, updatedContents)));
         } catch (IOException e) {
           log.debug("Failed to discard single tube", e);
           return JSONUtils.SimpleJSONError("Failed to discard single tube: " + e.getMessage());

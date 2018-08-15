@@ -17,19 +17,7 @@ HotTarget.boxable = (function() {
   var cacheBox = function(box, itemPos) {
     var cached = boxesByAlias[box.alias];
     if (!cached) {
-      var occupied = box.items.map(function(item) {
-        return item.coordinates;
-      });
-      var free = [];
-      for (var row = 0; row < box.rows; row++) {
-        for (var col = 0; col < box.cols; col++) {
-          var pos = String.fromCharCode(65 + row) + (col < 9 ? '0' : '') + (col + 1);
-          if (occupied.indexOf(pos) === -1) {
-            free.push(pos);
-          }
-        }
-      }
-      box.emptyPositions = free;
+      box.emptyPositions = Utils.getEmptyBoxPositions(box);
       boxesByAlias[box.alias] = box;
       cached = box;
     }
@@ -87,13 +75,16 @@ HotTarget.boxable = (function() {
   }
 
   return {
-    makeBoxLocationColumns: function() {
+    makeBoxLocationColumns: function(config) {
+      if(config.box){
+        cacheBox(config.box);
+      }
       return [
           {
             header: 'Box Search',
             data: 'boxSearch',
             allowEmpty: true,
-            include: true,
+            include: !config.box,
             unpack: function(obj, flat, setCellMeta) {
               // search field only
             },
@@ -107,8 +98,10 @@ HotTarget.boxable = (function() {
             type: 'dropdown',
             validator: boxAliasValidator,
             include: true,
+            readOnly: !!config.box,
             trimDropdown: false,
             source: [''],
+            description: 'Searches by Box name, alias, or barcode. (Accepts partial matches)',
             unpack: function(obj, flat, setCellMeta) {
               if (obj.box && obj.box.alias) {
                 flat.boxAlias = obj.box.alias;
@@ -195,19 +188,21 @@ HotTarget.boxable = (function() {
             },
             pack: function(obj, flat, errorHandler) {
               obj.boxPosition = flat.boxPosition;
-              if (flat.boxPosition && !flat.boxAlias) {
+              if (flat.boxPosition && !flat.boxAlias && !config.box) {
                 errorHandler('No box specified for box position');
-              } else if (flat.boxAlias && !flat.boxPosition) {
+              } else if ((flat.boxAlias || !!config.box) && !flat.boxPosition) {
                 errorHandler('Box position missing');
               }
             },
-            depends: 'boxAlias',
+            depends: config.box ? '*start' : 'boxAlias',
             update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              setReadOnly(!value);
-              setOptions({
-                validator: value ? HotUtils.validator.requiredAutocomplete : HotUtils.validator.requiredEmpty
-              });
-              var box = !value ? null : boxesByAlias[value];
+              if(flatProperty != '*start'){
+                setReadOnly(!value);
+                setOptions({
+                  validator: value ? HotUtils.validator.requiredAutocomplete : HotUtils.validator.requiredEmpty
+                });
+              }
+              var box = config.box || (!value ? null : boxesByAlias[value]);
               if (!box) {
                 setData('');
                 setOptions({

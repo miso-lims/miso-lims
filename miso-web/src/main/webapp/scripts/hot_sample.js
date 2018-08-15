@@ -2,7 +2,7 @@
  * Sample-specific Handsontable code
  */
 HotTarget.sample = (function() {
-  
+
   var getSampleClass = function(sample) {
     return Constants.sampleClasses.find(function(sampleClass) {
       return sample.sampleClassId == sampleClass.id;
@@ -179,6 +179,7 @@ HotTarget.sample = (function() {
               numberOfMonths: 1
             },
             allowEmpty: true,
+            description: 'The date that the sample was received from an external source.',
             include: (!Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity') && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
               // If creating, default to today's date in format YYYY-MM-DD
@@ -299,6 +300,8 @@ HotTarget.sample = (function() {
             data: 'externalName',
             validator: HotUtils.validator.requiredTextNoSpecialChars,
             include: show['Identity'],
+            description: 'Search for multiple external names by separating them with commas. ' +
+                'A coloured background indicates that new external names will be added to the identity upon creation.',
             unpack: function(sam, flat, setCellMeta) {
               flat.externalName = Utils.valOrNull(sam.externalName);
             },
@@ -341,6 +344,7 @@ HotTarget.sample = (function() {
             trimDropdown: false,
             strict: true,
             source: [],
+            description: 'A coloured background indicates that multiple identities correspond to the external name.',
             validator: HotUtils.validator.requiredAutocomplete,
             include: show['Identity'] && config.targetSampleClass.alias != 'Identity'
                 && config.targetSampleClass.sampleCategory != 'Identity',
@@ -438,6 +442,40 @@ HotTarget.sample = (function() {
 
           // Detailed sample columns
           {
+            header: 'Subproject',
+            data: 'subprojectAlias',
+            type: 'dropdown',
+            source: ['(None)'],
+            depends: ['*start', 'projectAlias'], // *start is a dummy value that gets run on page load only
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              var projectId = sam.projectId;
+              if (flatProperty === 'projectAlias') {
+                // sample's project has changed
+                projectId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(
+                  Utils.array.aliasPredicate(flat.projectAlias), config.projects), 'id');
+              }  
+              var subprojectsSource = Constants.subprojects
+                  .filter(function(subp) { return subp.parentProjectId == projectId; })
+                  .map(function(subp) { return subp.alias; })
+                  .sort();
+              setOptions({
+                'source': (subprojectsSource.length ? subprojectsSource : ['(None)'])
+              });
+              setData(subprojectsSource.length ? '' : '(None)');
+            },
+            validator: HotUtils.validator.requiredAutocomplete,
+            include: Constants.isDetailedSample,
+            unpack: function(sam, flat, setCellMeta) {
+              flat.subprojectAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
+                .idPredicate(sam.subprojectId), Constants.subprojects), 'alias')
+                || '(None)';
+            },
+            pack: function(sam, flat, errorHandler) {
+              sam.subprojectId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(
+                  Utils.array.aliasPredicate(flat.subprojectAlias), Constants.subprojects), 'id');
+            }
+          },
+          {
             header: 'Sample Class',
             data: 'sampleClassAlias',
             type: 'text',
@@ -457,12 +495,14 @@ HotTarget.sample = (function() {
           {
             header: 'Effective Group ID',
             data: 'effectiveGroupId',
-            include: Constants.isDetailedSample && config.targetSampleClass.alias != 'Identity' && !config.isLibraryReceipt && !config.create,
+            include: Constants.isDetailedSample && config.targetSampleClass.alias != 'Identity' && !config.isLibraryReceipt
+                && !config.create,
             type: 'text',
             readOnly: true,
             depends: 'groupId',
             update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if (flatProperty === 'groupId') setData(flat.groupId);
+              if (flatProperty === 'groupId')
+                setData(flat.groupId);
             },
             unpack: function(sam, flat, setCellMeta) {
               flat.effectiveGroupId = sam.effectiveGroupId ? sam.effectiveGroupId : '(None)';
@@ -485,6 +525,7 @@ HotTarget.sample = (function() {
               numberOfMonths: 1
             },
             allowEmpty: true,
+            description: 'The date that the sample was created.',
             include: Constants.isDetailedSample && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
               flat.creationDate = Utils.valOrNull(sam.creationDate);
@@ -691,7 +732,7 @@ HotTarget.sample = (function() {
         })[0]) + 1;
         if (!Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity') {
           // don't add boxable columns to Identities
-          columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns()));
+          columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns(config)));
         }
       }
 
@@ -740,8 +781,9 @@ HotTarget.sample = (function() {
 
                   return {
                     name: sampleClass.alias,
-                    action: function(replicates) {
+                    action: function(replicates, newBoxId) {
                       window.location = "/miso/sample/bulk/propagate?" + jQuery.param({
+                        boxId: newBoxId,
                         parentIds: idsString,
                         replicates: replicates,
                         sampleClassId: sampleClass.id
@@ -754,8 +796,9 @@ HotTarget.sample = (function() {
                 })) {
                   targets.push({
                     name: "Library",
-                    action: function(replicates) {
+                    action: function(replicates, newBoxId) {
                       var params = {
+                        boxId: newBoxId,
                         ids: idsString,
                         replicates: replicates
                       }
@@ -777,34 +820,47 @@ HotTarget.sample = (function() {
                   type: 'int',
                   label: 'Replicates',
                   value: 1
-                }, targets.length > 1 ? {
+                }, (targets.length > 1 ? {
                   property: 'target',
                   type: 'select',
                   label: 'To',
                   values: targets,
                   getLabel: Utils.array.getName
-                } : null].filter(function(x) {
+                } : null), ListUtils.createBoxField].filter(function(x) {
                   return !!x;
                 }), function(result) {
-                  (result.target || targets[0]).action(result.replicates);
+                  var boxId = null;
+                  var loadPage = function(){
+                    (result.target || targets[0]).action(result.replicates, boxId);
+                  }
+                  if (result.createBox){
+                    Utils.createBoxDialog(result, function(result){
+                      return result.replicates * samples.length;
+                    }, function(newBox) {
+                      boxId = newBox.id;
+                      loadPage();
+                    });
+                  } else {
+                    loadPage();
+                  }
                 });
               });
             }
           },
           HotUtils.printAction('sample'),
-          HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets, function(samples, spreadsheet){
+          HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets, function(samples, spreadsheet) {
             var errors = [];
             var invalidSamples = [];
-            samples.forEach(function(sample){
-              if(!spreadsheet.sheet.allowedClasses.includes(getSampleClass(sample).sampleCategory)){
+            samples.forEach(function(sample) {
+              if (!spreadsheet.sheet.allowedClasses.includes(getSampleClass(sample).sampleCategory)) {
                 invalidSamples.push(sample);
               }
             })
-            if(invalidSamples.length > 0){
+            if (invalidSamples.length > 0) {
               errors.push("Error: Invalid sample class types");
               errors.push("Allowed types: " + spreadsheet.sheet.allowedClasses.join(", "));
               errors.push("Invalid samples:")
-              invalidSamples.forEach(function(sample){
+              invalidSamples.forEach(function(sample) {
                 errors.push("* " + sample.alias + " (" + getSampleClass(sample).alias + ")");
               })
             }
@@ -814,8 +870,10 @@ HotTarget.sample = (function() {
           Constants.isDetailedSample ? HotUtils.makeParents('sample', HotUtils.relationCategoriesForDetailed()) : null,
 
           HotUtils.makeChildren('sample', HotUtils.relationCategoriesForDetailed().concat(
-              [HotUtils.relations.library(), HotUtils.relations.dilution(), HotUtils.relations.pool()]))].concat(HotUtils
-          .makeQcActions("Sample"));
+              [HotUtils.relations.library(), HotUtils.relations.dilution(), HotUtils.relations.pool()]))].concat(
+          HotUtils.makeQcActions("Sample")).concat(
+          config.worksetId ? [HotUtils.makeRemoveFromWorkset('samples', config.worksetId)] : [HotUtils.makeAddToWorkset('samples',
+              'sampleIds')]);
     },
 
     getCustomActions: function(table) {

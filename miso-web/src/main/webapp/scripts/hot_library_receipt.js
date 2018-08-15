@@ -70,8 +70,15 @@ HotTarget.libraryReceipt = (function() {
       }, {
         name: 'Make dilutions',
         action: function(items) {
-          window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate?' + jQuery.param({
-            ids: items.map(Utils.array.getId).join(',')
+          HotUtils.warnIfConsentRevoked(items, function() {
+            var fields = [];
+            HotUtils.showDialogForBoxCreation('Make Dilutions', 'Create', fields, '/miso/library/dilutions/bulk/propagate?', function(result) {
+              return {
+                ids: items.map(Utils.array.getId).join(',')
+              };
+            }, function(result) {
+              return items.length;
+            });
           });
         }
       }, HotUtils.printAction('library'), ].concat(HotUtils.makeQcActions("Library"));

@@ -6,11 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -20,28 +17,26 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.User;
+import com.google.common.base.Functions;
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.BoxStorageAmount;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
-import uk.ac.bbsrc.tgac.miso.core.util.LatencyHistogram;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -56,15 +51,6 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSource<Box> {
-
-  private static final LatencyHistogram updateTime = new LatencyHistogram("miso_box_update_item_time",
-      "The time to update the information associated with a boxable.");
-
-  private static final LatencyHistogram discardTime = new LatencyHistogram("miso_box_discard_item_time",
-      "The time to discard a boxable.");
-
-  private static final LatencyHistogram setTime = new LatencyHistogram("miso_box_set_item_time",
-      "The time to set a boxable.");
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -117,26 +103,44 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   public void discardAllContents(Box box) throws IOException {
     Box managed = get(box.getId());
     authorizationManager.throwIfNotWritable(managed);
-    User currentUser = authorizationManager.getCurrentUser();
-    boxStore.discardAllContents(managed, currentUser);
+    addBoxContentsChangeLog(managed, String.format("Discarded all box contents (%d items)", managed.getBoxPositions().size()));
+    for (BoxPosition bp : managed.getBoxPositions().values()) {
+      discardBoxable(bp.getBoxableId());
+    }
+    managed.getBoxPositions().clear();
+    boxStore.save(managed);
   }
 
   @Override
   public void discardSingleItem(Box box, String position) throws IOException {
-    authorizationManager.throwIfNotWritable(box);
-    User currentUser = authorizationManager.getCurrentUser();
-    boxStore.discardSingleItem(box, position, currentUser);
+    Box managed = boxStore.get(box.getId());
+    authorizationManager.throwIfNotWritable(managed);
+    BoxPosition bp = managed.getBoxPositions().get(position);
+    if (bp == null) {
+      throw new IllegalArgumentException("No item in the specified box position");
+    }
+    Boxable target = boxStore.getBoxable(bp.getBoxableId());
+    addBoxContentsChangeLog(managed, String.format("Discarded %s (%s)", target.getAlias(), target.getName()));
+    discardBoxable(bp.getBoxableId());
+    managed.getBoxPositions().remove(position);
+    boxStore.save(managed);
+  }
+
+  private void discardBoxable(BoxableId id) throws IOException {
+    Boxable target = boxStore.getBoxable(id);
+    discardBoxable(target);
+  }
+
+  private void discardBoxable(Boxable target) throws IOException {
+    target.setDiscarded(true);
+    target.setLastModified(new Date());
+    target.setLastModifier(authorizationManager.getCurrentUser());
+    boxStore.saveBoxable(target);
   }
 
   @Override
   public Box get(long boxId) throws IOException {
     Box o = boxStore.get(boxId);
-    authorizationManager.throwIfNotReadable(o);
-    return o;
-  }
-
-  private Box getDetached(long boxId) throws IOException {
-    Box o = boxStore.getDetached(boxId);
     authorizationManager.throwIfNotReadable(o);
     return o;
   }
@@ -165,14 +169,11 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
     Box o = boxStore.getBoxByAlias(alias);
     authorizationManager.throwIfNotReadable(o);
     return o;
-
   }
 
   @Override
-  public Box getByBarcode(String barcode) throws IOException {
-    Box o = boxStore.getByBarcode(barcode);
-    authorizationManager.throwIfNotReadable(o);
-    return o;
+  public List<BoxableView> getBoxContents(long id) throws IOException {
+    return boxStore.getBoxContents(id);
   }
 
   @Override
@@ -193,12 +194,6 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   @Override
   public Collection<BoxableView> getViewsFromBarcodeList(Collection<String> barcodeList) throws IOException {
     return boxStore.getBoxableViewsByBarcodeList(barcodeList);
-  }
-
-  @Override
-  public List<Box> list() throws IOException {
-    Collection<Box> boxes = boxStore.listAll();
-    return authorizationManager.filterUnreadable(boxes);
   }
 
   @Override
@@ -239,40 +234,40 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
 
   @Override
   public long save(Box box) throws IOException {
-    setChangeDetails(box);
+    box.setChangeDetails(authorizationManager.getCurrentUser());
     if (box.getStorageLocation() != null) {
       box.setStorageLocation(storageLocationService.get(box.getStorageLocation().getId()));
     } else {
       box.setStorageLocation(null);
     }
     loadChildEntities(box);
-    if (box.getId() == AbstractBox.UNSAVED_ID) {
+    if (!box.isSaved()) {
       return saveNewBox(box);
     } else {
-      Box original = boxStore.get(box.getId());
-      authorizationManager.throwIfNotWritable(original);
-      logStorageChange(box, original);
-      validateChange(box, original);
-      applyChanges(box, original);
+      Box managed = boxStore.get(box.getId());
+      authorizationManager.throwIfNotWritable(managed);
+      logStorageChange(box, managed);
+      validateChange(box, managed);
+      applyChanges(box, managed);
       StringBuilder message = new StringBuilder();
 
       // get persisted version of new box contents before change
-      List<BoxableId> ids = box.getBoxables().values()
+      List<BoxableId> ids = box.getBoxPositions().values()
           .stream()
-          .map(b -> b.getId())
+          .map(BoxPosition::getBoxableId)
           .collect(Collectors.toList());
       Map<BoxableId, BoxableView> oldOccupants = boxStore.getBoxableViewsByIdList(ids)
           .stream()
-          .collect(Collectors.toMap(BoxableView::getId, b -> b));
+          .collect(Collectors.toMap(BoxableView::getId, Functions.identity()));
 
       // Process additions/moves
-      Set<BoxableId> handled = Sets.newHashSet();
-      for (Map.Entry<String, BoxableView> entry : box.getBoxables().entrySet()) {
-        BoxableView previousOccupant = original.getBoxable(entry.getKey());
-        BoxableView newOccupant = entry.getValue();
-        handled.add(newOccupant.getId());
+      Set<BoxPosition> movedWithinBox = Sets.newHashSet();
+      List<BoxableView> movedFromOtherBoxes = new ArrayList<>();
+      for (Map.Entry<String, BoxPosition> entry : box.getBoxPositions().entrySet()) {
+        BoxPosition managedPos = managed.getBoxPositions().get(entry.getKey());
+        BoxPosition newPos = entry.getValue();
 
-        if (previousOccupant != null && newOccupant.getId().equals(previousOccupant.getId())) {
+        if (managedPos != null && newPos.getBoxableId().equals(managedPos.getBoxableId())) {
           // Unchanged
           continue;
         }
@@ -280,50 +275,67 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
           message.append("\n");
         }
 
-        BoxableView oldOccupant = oldOccupants.get(newOccupant.getId());
+        BoxableView oldOccupant = oldOccupants.get(newPos.getBoxableId());
         if (oldOccupant.getBoxId() != null) {
           if (oldOccupant.getBoxId().longValue() == box.getId()) {
             // Moved within same box
             message.append(String.format("Relocated %s (%s) from %s to %s", oldOccupant.getAlias(), oldOccupant.getName(),
                 oldOccupant.getBoxPosition(), entry.getKey()));
+            movedWithinBox.add(newPos);
           } else {
             // Moved from a different box
             message.append(String.format("Moved %s (%s) from %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(),
                 oldOccupant.getBoxAlias(), oldOccupant.getBoxName(), entry.getKey()));
-
-            Box oldHome = boxStore.get(oldOccupant.getBoxId());
-            String oldHomeMessage = String.format("Moved %s (%s) to %s (%s)", oldOccupant.getAlias(), oldOccupant.getName(),
-                original.getAlias(), original.getName());
-            addBoxContentsChangeLog(oldHome, oldHomeMessage);
+            movedFromOtherBoxes.add(oldOccupant);
           }
-          boxStore.removeBoxableFromBox(oldOccupant);
         } else {
           message.append(String.format("Added %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(), entry.getKey()));
         }
       }
 
       // Process removals
-      for (Map.Entry<String, BoxableView> entry : original.getBoxables().entrySet()) {
-        if (box.getBoxables().keySet().contains(entry.getKey()) || handled.contains(entry.getValue().getId())) {
+      List<BoxableId> removedIds = new ArrayList<>();
+      List<BoxableId> movedWithinBoxIds = movedWithinBox.stream().map(BoxPosition::getBoxableId).collect(Collectors.toList());
+      for (Map.Entry<String, BoxPosition> entry : managed.getBoxPositions().entrySet()) {
+        if (box.getBoxPositions().keySet().contains(entry.getKey())
+            && box.getBoxPositions().get(entry.getKey()).getBoxableId().equals(entry.getValue().getBoxableId())) {
           // Already handled. Only checking for removals at this point
           continue;
         }
-        if (message.length() > 0) {
-          message.append("\n");
+        removedIds.add(entry.getValue().getBoxableId());
+      }
+      List<BoxableView> removed = boxStore.getBoxableViewsByIdList(removedIds);
+      for (BoxableView v : removed) {
+        if (!movedWithinBoxIds.contains(v.getId())) {
+          if (message.length() > 0) {
+            message.append("\n");
+          }
+          message.append(String.format("Removed %s (%s)", v.getAlias(), v.getName()));
         }
-        BoxableView oldItem = entry.getValue();
-        message.append(String.format("Removed %s (%s)", oldItem.getAlias(), oldItem.getName()));
       }
 
-      // Needs to be a new map to force Hibernate to delete all associations before inserting
-      // (prevent violation of unique constraint when position-swapping two items)
-      original.setBoxables(new HashMap<>(box.getBoxables()));
+      for (BoxableView v : movedFromOtherBoxes) {
+        boxStore.removeBoxableFromBox(v);
+      }
+      
+      movedWithinBox.forEach(bp -> managed.getBoxPositions().remove(bp.getPosition()));
+      removed.forEach(boxable -> managed.getBoxPositions().remove(boxable.getBoxPosition()));
+      if (!movedWithinBox.isEmpty() || !removed.isEmpty()) {
+        boxStore.save(managed);
+      }
+
+      for (String pos : box.getBoxPositions().keySet()) {
+        if (!managed.getBoxPositions().containsKey(pos)
+            || !managed.getBoxPositions().get(pos).getBoxableId().equals(box.getBoxPositions().get(pos).getBoxableId())) {
+          managed.getBoxPositions().put(pos, new BoxPosition(managed, pos, box.getBoxPositions().get(pos).getBoxableId()));
+        }
+      }
 
       if (message.length() > 0) {
-        addBoxContentsChangeLog(original, message.toString());
+        addBoxContentsChangeLog(managed, message.toString());
       }
-      setChangeDetails(original);
-      return boxStore.save(original);
+      managed.setChangeDetails(authorizationManager.getCurrentUser());
+      return boxStore.save(managed);
     }
   }
 
@@ -368,7 +380,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
     try {
       box.setName(generateTemporaryName());
       box.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(box.getSecurityProfile())));
-      setChangeDetails(box);
+      box.setChangeDetails(authorizationManager.getCurrentUser());
       box.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(box.getIdentificationBarcode()));
       validateChange(box, null);
       boxStore.save(box);
@@ -461,62 +473,47 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
     this.securityProfileStore = securityProfileStore;
   }
 
-  /**
-   * Updates all user data and timestamps associated with the change. Existing timestamps will be preserved
-   * if the Box is unsaved, and they are already set
-   * 
-   * @param box the Box to update
-   * @param preserveTimestamps if true, the creationTime and lastModified date are not updated
-   * @throws IOException
-   */
-  private void setChangeDetails(Box box) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    Date now = new Date();
-    box.setLastModifier(user);
-
-    if (box.getId() == Sample.UNSAVED_ID) {
-      box.setCreator(user);
-      if (box.getCreationTime() == null) {
-        box.setCreationTime(now);
-      }
-      if (box.getLastModified() == null) {
-        box.setLastModified(now);
-      }
-    } else {
-      box.setLastModified(now);
-    }
-  }
-
   @Override
-  public void updateBoxableLocation(Boxable boxable, Boxable original) throws IOException {
-    try (AutoCloseable timer = updateTime.start()) {
-      if (original != null && boxable.isDiscarded() == original.isDiscarded()
-          && Objects.equals(boxable.getBoxPosition(), original.getBoxPosition())
-          && Objects.equals(Optional.ofNullable(boxable.getBox()).map(Box::getId),
-              Optional.ofNullable(original.getBox()).map(Box::getId))) {
-        return;
-      }
-      if (boxable.isDiscarded()) {
-        try (AutoCloseable discardTimer = discardTime.start()) {
-          boxable.removeFromBox();
-        }
-      }
-      if (boxable.getBox() != null && boxable.getBoxPosition() == null) {
-        throw new IllegalArgumentException("Box position missing");
-      } else if (boxable.getBoxPosition() != null && (boxable.getBox() == null || boxable.getBox().getId() == AbstractBox.UNSAVED_ID)) {
-        throw new IllegalArgumentException("Box position set, but no box specified");
-      }
-      try (AutoCloseable setTimer = setTime.start()) {
-        boxStore.moveItem(boxable, authorizationManager.getCurrentUser());
-      }
-    } catch (Exception e) {
-      throw new IOException(e);
+  public void updateBoxableLocation(Boxable boxable) throws IOException {
+    Boxable managedOriginal = boxStore.getBoxable(new BoxableId(boxable.getEntityType(), boxable.getId()));
+    if ((boxable.getBox() == null && managedOriginal.getBox() == null)
+        || (boxable.getBox() != null && managedOriginal.getBox() != null && boxable.getBox().getId() == managedOriginal.getBox().getId()
+            && boxable.getBoxPosition().equals(managedOriginal.getBoxPosition()))) {
+      return;
+    }
+    if (managedOriginal.getBox() != null) {
+      Box box = get(managedOriginal.getBox().getId());
+      box.getBoxPositions().remove(managedOriginal.getBoxPosition());
+      addBoxContentsChangeLog(managedOriginal.getBox(),
+          String.format("Removed %s (%s)", managedOriginal.getAlias(), managedOriginal.getName()));
+      box.setChangeDetails(authorizationManager.getCurrentUser());
+      boxStore.save(box);
+    }
+    if (boxable.getBox() != null) {
+      Box managedNew = boxStore.get(boxable.getBox().getId());
+      addBoxContentsChangeLog(managedNew,
+          String.format("Added %s (%s) to %s", boxable.getAlias(), boxable.getName(), boxable.getBoxPosition()));
+      managedNew.getBoxPositions().put(boxable.getBoxPosition(),
+          new BoxPosition(managedNew, boxable.getBoxPosition(), boxable.getEntityType(), boxable.getId()));
+      managedNew.setChangeDetails(authorizationManager.getCurrentUser());
+      boxStore.save(managedNew);
     }
   }
 
   @Override
   public DeletionStore getDeletionStore() {
     return deletionStore;
+  }
+
+  @Override
+  public void throwIfBoxPositionIsFilled(Boxable boxable) throws IOException {
+    if (boxable.getBox() == null || boxable.getBoxPosition() == null) return;
+    Box box = get(boxable.getBox().getId());
+    BoxPosition bp = box.getBoxPositions().get(boxable.getBoxPosition());
+    if (bp == null) return;
+    if (!bp.getBoxableId().equals(new BoxableId(boxable.getEntityType(), boxable.getId()))) {
+      throw new IllegalArgumentException("Box position '" + boxable.getBoxPosition() + "' in box '" + box.getAlias() + "' is not empty");
+    }
   }
 
 }

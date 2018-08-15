@@ -130,6 +130,7 @@ public class DefaultContainerService
   @Override
   public void applyChanges(SequencerPartitionContainer source, SequencerPartitionContainer managed) throws IOException {
     managed.setIdentificationBarcode(source.getIdentificationBarcode());
+    managed.setDescription(source.getDescription());
     managed.setClusteringKit(source.getClusteringKit());
     managed.setMultiplexingKit(source.getMultiplexingKit());
 

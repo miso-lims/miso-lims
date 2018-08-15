@@ -78,6 +78,8 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   @Column(nullable = false)
   private boolean lowQualityLibrary = false;
+  
+  private Boolean libraryQcPassed;
 
   private String librarySelectionType;
 
@@ -532,6 +534,14 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   public void setSample(Sample sample) {
     this.sample = sample;
+  }
+
+  public Boolean getLibraryQcPassed() {
+    return libraryQcPassed;
+  }
+
+  public void setLibraryQcPassed(Boolean libraryQcPassed) {
+    this.libraryQcPassed = libraryQcPassed;
   }
 
   @Override

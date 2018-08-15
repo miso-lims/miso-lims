@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -51,12 +52,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -102,6 +104,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.AlphanumericComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedLibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -110,6 +113,7 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
@@ -166,6 +170,7 @@ public class EditLibraryController {
     private static final String SHOW_VOLUME = "showVolume";
     private static final String TEMPLATES = "templatesByProjectId";
     private static final String SORT = "sort";
+    private static final String BOX = "box";
   }
 
   @Autowired
@@ -205,6 +210,8 @@ public class EditLibraryController {
   private ProjectService projectService;
   @Autowired
   private TemplateService templateService;
+  @Autowired
+  private BoxService boxService;
 
   public NamingScheme getNamingScheme() {
     return namingScheme;
@@ -398,7 +405,7 @@ public class EditLibraryController {
   }
 
   /* HOT */
-  @RequestMapping(value = "indicesJson", method = RequestMethod.GET)
+  @GetMapping(value = "indicesJson")
   public @ResponseBody JSONObject indicesJson(@RequestParam("indexFamily") String indexFamily, @RequestParam("position") String position)
       throws IOException {
     final JSONObject rtn = new JSONObject();
@@ -483,7 +490,7 @@ public class EditLibraryController {
   }
 
   /* HOT */
-  @RequestMapping(value = "libraryTypesJson", method = RequestMethod.GET)
+  @GetMapping(value = "libraryTypesJson")
   public @ResponseBody JSONObject libraryTypesJson(@RequestParam("platform") String platform) throws IOException {
     final JSONObject rtn = new JSONObject();
     final List<String> rtnLibTypes = new ArrayList<>();
@@ -498,7 +505,7 @@ public class EditLibraryController {
   }
 
   /* HOT */
-  @RequestMapping(value = "indexPositionsJson", method = RequestMethod.GET)
+  @GetMapping(value = "indexPositionsJson")
   public @ResponseBody JSONObject indexPositionsJson(@RequestParam("indexFamily") String indexFamily) {
     JSONObject rtn;
     if (!isStringEmptyOrNull(indexFamily)) {
@@ -515,12 +522,12 @@ public class EditLibraryController {
     return rtn;
   }
 
-  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  @GetMapping(value = "/rest/changes")
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
     return changeLogService.listAll("Library");
   }
 
-  @RequestMapping(value = "/new/{sampleId}", method = RequestMethod.GET)
+  @GetMapping(value = "/new/{sampleId}")
   public ModelAndView newAssignedLibrary(@PathVariable Long sampleId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Sample sample = sampleService.get(sampleId);
@@ -543,7 +550,7 @@ public class EditLibraryController {
     return setupForm(user, library, model);
   }
 
-  @RequestMapping(value = "/{libraryId}", method = RequestMethod.GET)
+  @GetMapping(value = "/{libraryId}")
   public ModelAndView setupForm(@PathVariable Long libraryId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Library library = libraryService.get(libraryId);
@@ -552,7 +559,7 @@ public class EditLibraryController {
     return setupForm(user, library, model);
   }
 
-  @RequestMapping(value = "/dilution/{dilutionId}", method = RequestMethod.GET)
+  @GetMapping(value = "/dilution/{dilutionId}")
   public ModelAndView setupFormByDilution(@PathVariable Long dilutionId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     LibraryDilution dilution = dilutionService.get(dilutionId);
@@ -572,17 +579,18 @@ public class EditLibraryController {
     addAdjacentLibraries(library, model);
 
     Collection<Pool> pools = poolService.listByLibraryId(library.getId());
-    model.put("libraryPools", pools.stream().map(p -> Dtos.asDto(p, false)).collect(Collectors.toList()));
+    model.put("libraryPools", pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
     model.put("libraryRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
         .collect(Collectors.toList()));
-    model.put("libraryDilutions", library.getLibraryDilutions().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    model.put("libraryDilutions", library.getLibraryDilutions().stream()
+        .map(ldi -> Dtos.asDto(ldi, false, false)).collect(Collectors.toList()));
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode config = mapper.createObjectNode();
-    config.putPOJO("library", Dtos.asDto(library));
+    config.putPOJO("library", Dtos.asDto(library, false));
     model.put("libraryDilutionsConfig", mapper.writeValueAsString(config));
     model.put("experiments", experimentService.listAllByLibraryId(library.getId()).stream().map(Dtos::asDto)
         .collect(Collectors.toList()));
-    model.put("libraryDto", library.getId() == LibraryImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(library)));
+    model.put("libraryDto", library.getId() == LibraryImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(library, false)));
 
     populateDesigns(model,
         LimsUtils.isDetailedSample(library.getSample()) ? ((DetailedSample) library.getSample()).getSampleClass() : null);
@@ -626,7 +634,7 @@ public class EditLibraryController {
 
     @Override
     protected LibraryDto asDto(Library model) {
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, true);
     }
 
     @Override
@@ -641,13 +649,15 @@ public class EditLibraryController {
     private final SampleService sampleService;
     private final TemplateService templateService;
     private final Consumer<ObjectNode> additionalConfigFunction;
+    private final BoxDto newBox;
 
     public LibraryBulkPropagateBackend(SampleService sampleService, TemplateService templateService,
-        Consumer<ObjectNode> additionalConfigFunction) {
+        Consumer<ObjectNode> additionalConfigFunction, BoxDto newBox) {
       super("library", LibraryDto.class, "Libraries", "Samples");
       this.sampleService = sampleService;
       this.templateService = templateService;
       this.additionalConfigFunction = additionalConfigFunction;
+      this.newBox = newBox;
     }
 
     private Map<Long, List<LibraryTemplateDto>> templatesByProjectId;
@@ -676,6 +686,7 @@ public class EditLibraryController {
       dto.setParentSampleId(item.getId());
       dto.setParentSampleAlias(item.getAlias());
       dto.setParentSampleProjectId(item.getProject().getId());
+      dto.setBox(newBox);
       return dto;
     }
 
@@ -687,10 +698,14 @@ public class EditLibraryController {
       templatesByProjectId = results.stream()
           .map(sam -> sam.getProject().getId())
           .distinct()
-          .map(projectId -> templateService.listLibraryTemplatesForProject(projectId))
-          .filter(list -> !list.isEmpty())
-          .map(Dtos::asLibraryTemplateDtos)
-          .collect(Collectors.toMap(list -> list.get(0).getProjectId(), list -> list));
+          .map(projectId -> {
+            Map<Long, List<LibraryTemplateDto>> map = new HashMap<>();
+            map.put(projectId, Dtos.asLibraryTemplateDtos(templateService.listLibraryTemplatesForProject(projectId)));
+            return map;
+          })
+          .filter(map -> !map.values().stream().allMatch(value -> value.isEmpty()))
+          .flatMap(map -> map.entrySet().stream())
+          .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
       SampleClass sampleClass = null;
       boolean hasPlain = false;
@@ -721,6 +736,7 @@ public class EditLibraryController {
       if (sort != null) {
         config.put(Config.SORT, sort);
       }
+      config.putPOJO(Config.BOX, newBox);
     }
 
     public ModelAndView propagate(String idString, int replicates, String sort, ModelMap model) throws IOException {
@@ -738,22 +754,25 @@ public class EditLibraryController {
     config.put(Config.PROPAGATE, true);
   }
 
-  @RequestMapping(value = "/bulk/propagate", method = RequestMethod.GET)
+  @GetMapping(value = "/bulk/propagate")
   public ModelAndView propagateFromSamples(@RequestParam("ids") String sampleIds, @RequestParam("replicates") int replicates,
-      @RequestParam(name = "sort", required = false) String sort, ModelMap model) throws IOException {
-    return new LibraryBulkPropagateBackend(sampleService, templateService, this::writeLibraryConfiguration)
+      @RequestParam(name = "sort", required = false) String sort, @RequestParam(name = "boxId", required = false) Long boxId,
+      ModelMap model) throws IOException {
+    BoxDto newBox = boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null;
+    return new LibraryBulkPropagateBackend(sampleService, templateService, this::writeLibraryConfiguration, newBox)
         .propagate(sampleIds, replicates, sort, model);
   }
 
-  @RequestMapping(value = "/bulk/edit", method = RequestMethod.GET)
+  @GetMapping(value = "/bulk/edit")
   public ModelAndView editBulkLibraries(@RequestParam("ids") String libraryIds, ModelMap model) throws IOException {
     return libraryBulkEditBackend.edit(libraryIds, model);
   }
 
-  @RequestMapping(value = "/bulk/receive", method = RequestMethod.GET)
+  @GetMapping(value = "/bulk/receive")
   public ModelAndView receiveBulkLibraries(@RequestParam("quantity") Integer quantity,
       @RequestParam(value = "sampleClassId", required = false) Long aliquotClassId,
       @RequestParam(value = "projectId", required = false) Long projectId,
+      @RequestParam(value = "boxId", required = false) Long boxId,
       ModelMap model) throws IOException {
 
     LibraryDto libDto = null;
@@ -778,6 +797,9 @@ public class EditLibraryController {
       libDto = new LibraryDto();
       libDto.setSample(new SampleDto());
     }
+    if (boxId != null) {
+      libDto.setBox(Dtos.asDto(boxService.get(boxId), true));
+    }
 
     return new BulkReceiveLibraryBackend(libDto, quantity, project, aliquotClass, defaultSciName).create(model);
   }
@@ -787,6 +809,7 @@ public class EditLibraryController {
     private final Project project;
     private final SampleClass aliquotClass;
     private final String defaultSciName;
+    private final BoxDto newBox;
 
     public BulkReceiveLibraryBackend(LibraryDto dto, Integer quantity, Project project, SampleClass aliquotClass, String defaultSciName)
         throws IOException {
@@ -795,6 +818,7 @@ public class EditLibraryController {
       this.project = project;
       this.aliquotClass = aliquotClass;
       this.defaultSciName = defaultSciName;
+      newBox = dto.getBox();
     }
 
     @Override
@@ -817,20 +841,28 @@ public class EditLibraryController {
       config.put(Config.SORTABLE_LOCATION, false);
       config.put(Config.PROPAGATE, false);
       config.put(Config.IS_LIBRARY_RECEIPT, true);
+      config.putPOJO(Config.BOX, newBox);
     }
 
   }
 
-  private final BulkPropagateTableBackend<Library, DilutionDto> dilutionBulkPropagateBackend = new BulkPropagateTableBackend<Library, DilutionDto>(
-      "dilution", DilutionDto.class, "Dilutions", "Libraries") {
+  private final class BulkPropagateLibraryBackend extends BulkPropagateTableBackend<Library, DilutionDto> {
+
+    private final BoxDto newBox;
+
+    private BulkPropagateLibraryBackend(BoxDto newBox) {
+      super("dilution", DilutionDto.class, "Dilutions", "Libraries");
+      this.newBox = newBox;
+    }
 
     @Override
     protected DilutionDto createDtoFromParent(Library item) {
       DilutionDto dto = new DilutionDto();
-      dto.setLibrary(Dtos.asDto(item));
+      dto.setLibrary(Dtos.asDto(item, false));
       if (item.getSample().getProject().getDefaultTargetedSequencing() != null) {
         dto.setTargetedSequencingId(item.getSample().getProject().getDefaultTargetedSequencing().getId());
       }
+      dto.setBox(newBox);
       return dto;
     }
 
@@ -841,12 +873,16 @@ public class EditLibraryController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+      config.putPOJO(Config.BOX, newBox);
     }
-  };
+  }
 
-  @RequestMapping(value = "/dilutions/bulk/propagate", method = RequestMethod.GET)
-  public ModelAndView propagateDilutions(@RequestParam("ids") String libraryIds, ModelMap model) throws IOException {
-    return dilutionBulkPropagateBackend.propagate(libraryIds, model);
+  @GetMapping(value = "/dilutions/bulk/propagate")
+  public ModelAndView propagateDilutions(@RequestParam("ids") String libraryIds,
+      @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model) throws IOException {
+    BulkPropagateLibraryBackend bulkPropagateDilutionBackend = new BulkPropagateLibraryBackend(
+        boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null);
+    return bulkPropagateDilutionBackend.propagate(libraryIds, model);
   }
 
   private final BulkEditTableBackend<LibraryDilution, DilutionDto> dilutionBulkEditBackend = new BulkEditTableBackend<LibraryDilution, DilutionDto>(
@@ -854,7 +890,7 @@ public class EditLibraryController {
 
     @Override
     protected DilutionDto asDto(LibraryDilution model) {
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, true, true);
     }
 
     @Override
@@ -867,12 +903,12 @@ public class EditLibraryController {
     }
   };
 
-  @RequestMapping(value = "dilution/bulk/edit", method = RequestMethod.GET)
+  @GetMapping(value = "dilution/bulk/edit")
   public ModelAndView editDilutions(@RequestParam("ids") String dilutionIds, ModelMap model) throws IOException {
     return dilutionBulkEditBackend.edit(dilutionIds, model);
   }
 
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping
   public String processSubmit(@ModelAttribute("library") Library library, ModelMap model, SessionStatus session)
       throws IOException {
     try {
@@ -893,7 +929,7 @@ public class EditLibraryController {
     }
   }
 
-  @RequestMapping(value = "/bulk/create", method = RequestMethod.POST)
+  @PostMapping(value = "/bulk/create")
   public String processBulkSubmit(@RequestBody JSONArray librariesDtos) throws IOException {
     try {
       if (librariesDtos != null && librariesDtos.size() > 0) {
@@ -919,18 +955,25 @@ public class EditLibraryController {
     }
   }
 
-  private final BulkPropagateTableBackend<LibraryDilution, PoolDto> poolBulkPropagateBackend = new BulkPropagateTableBackend<LibraryDilution, PoolDto>(
-      "pool", PoolDto.class, "Pools", "Dilutions") {
-
+  private final class BulkPropagateDilutionBackend extends BulkPropagateTableBackend<LibraryDilution, PoolDto> {
+    
+    private final BoxDto newBox;
+    
+    private BulkPropagateDilutionBackend(BoxDto newBox) {
+      super("pool", PoolDto.class, "Pools", "Dilutions");
+      this.newBox = newBox;
+    }
+    
     @Override
     protected PoolDto createDtoFromParent(LibraryDilution item) {
       PoolDto dto = new PoolDto();
       dto.setAlias(item.getLibrary().getAlias() + "_POOL");
-      dto.setPooledElements(Collections.singleton(Dtos.asDto(item)));
+      dto.setPooledElements(Collections.singleton(Dtos.asDto(item, false, false)));
       dto.setPlatformType(item.getLibrary().getPlatformType().name());
       if (item.getVolumeUsed() != null) {
         dto.setVolume(item.getVolumeUsed().toString());
       }
+      dto.setBox(newBox);
       return dto;
     }
 
@@ -941,16 +984,26 @@ public class EditLibraryController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+      config.putPOJO(Config.BOX, newBox);
     }
-  };
-
-  @RequestMapping(value = "dilution/bulk/propagate", method = RequestMethod.GET)
-  public ModelAndView propagatePoolsIndividual(@RequestParam("ids") String dilutionIds, ModelMap model) throws IOException {
-    return poolBulkPropagateBackend.propagate(dilutionIds, model);
   }
 
-  private final BulkMergeTableBackend<PoolDto> poolBulkMergeBackend = new BulkMergeTableBackend<PoolDto>(
-      "pool", PoolDto.class, "Pools", "Dilutions") {
+  @GetMapping(value = "dilution/bulk/propagate")
+  public ModelAndView propagatePoolsIndividual(@RequestParam("ids") String dilutionIds, 
+      @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model) throws IOException {
+    BulkPropagateDilutionBackend bulkPropagateDilutionBackend = new BulkPropagateDilutionBackend(
+        (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null));
+    return bulkPropagateDilutionBackend.propagate(dilutionIds, model);
+  }
+
+  private final class BulkMergeDilutionBackend extends BulkMergeTableBackend<PoolDto> {
+
+    private final BoxDto newBox;
+
+    private BulkMergeDilutionBackend(BoxDto newBox) {
+      super("pool", PoolDto.class, "Pools", "Dilutions");
+      this.newBox = newBox;
+    }
 
     @Override
     protected PoolDto createDtoFromParents(List<Long> ids) throws IOException {
@@ -976,22 +1029,29 @@ public class EditLibraryController {
           dto.setAlias(commonPrefix + "_POOL");
         }
       }
-      dto.setPooledElements(parents.stream().map(Dtos::asDto).collect(Collectors.toSet()));
+      dto.setPooledElements(parents.stream().map(ldi -> Dtos.asDto(ldi, false, false)).collect(Collectors.toSet()));
       if (dto.getPooledElements().stream().allMatch(element -> element.getVolumeUsed() != null)) {
         dto.setVolume(
             Double.toString(dto.getPooledElements().stream().mapToDouble(element -> Double.parseDouble(element.getVolumeUsed())).sum()));
       }
+
+      dto.setBox(newBox);
+
       return dto;
     }
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+      config.putPOJO(Config.BOX, newBox);
     }
-  };
+  }
 
-  @RequestMapping(value = "dilution/bulk/merge", method = RequestMethod.GET)
-  public ModelAndView propagatePoolsMerged(@RequestParam("ids") String dilutionIds, ModelMap model) throws IOException {
-    return poolBulkMergeBackend.propagate(dilutionIds, model);
+  @GetMapping(value = "dilution/bulk/merge")
+  public ModelAndView propagatePoolsMerged(@RequestParam("ids") String dilutionIds,
+      @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model) throws IOException {
+    BulkMergeDilutionBackend bulkMergeDilutionBackend = new BulkMergeDilutionBackend(
+        (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null));
+    return bulkMergeDilutionBackend.propagate(dilutionIds, model);
   }
 
   private static class BulkCustomPoolTableBackend extends BulkTableBackend<PoolDto> {
@@ -999,8 +1059,10 @@ public class EditLibraryController {
     private final int poolQuantity;
     private final List<DilutionDto> dilutions;
     private final PlatformType platformType;
+    private final BoxDto newBox;
 
-    public BulkCustomPoolTableBackend(int poolQuantity, String idString, LibraryDilutionService dilutionService) throws IOException {
+    public BulkCustomPoolTableBackend(int poolQuantity, String idString, LibraryDilutionService dilutionService,
+        BoxDto newBox) throws IOException {
       super("pool", PoolDto.class);
       this.poolQuantity = poolQuantity;
       List<LibraryDilution> ldis = dilutionService.listByIdList(parseIds(idString));
@@ -1010,26 +1072,32 @@ public class EditLibraryController {
         throw new IllegalArgumentException("Cannot create a pool for multiple platforms: "
             + String.join(", ", platformTypes.stream().map(Enum::name).toArray(CharSequence[]::new)));
       }
-      this.dilutions = ldis.stream().map(Dtos::asDto).collect(Collectors.toList());
+      this.dilutions = ldis.stream().map(ldi -> Dtos.asDto(ldi, false, false)).collect(Collectors.toList());
       this.platformType = platformTypes.get(0);
+      this.newBox = newBox;
     }
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.putPOJO("dilutionsToPool", dilutions);
+      config.putPOJO(Config.BOX, newBox);
     }
 
     public ModelAndView create(ModelMap model) throws IOException {
       PoolDto dto = new PoolDto();
       dto.setPlatformType(this.platformType.name());
+      dto.setBox(newBox);
       return prepare(model, true, "Create Pools from Dilutions", Collections.nCopies(poolQuantity, dto));
     }
 
   }
 
-  @RequestMapping(value = "dilution/bulk/pool", method = RequestMethod.GET)
-  public ModelAndView propagatePoolsCustom(@RequestParam("ids") String dilutionIds, @RequestParam("quantity") int poolQuantity, ModelMap model)
+  @GetMapping(value = "dilution/bulk/pool")
+  public ModelAndView propagatePoolsCustom(@RequestParam("ids") String dilutionIds, @RequestParam("quantity") int poolQuantity,
+      @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model)
       throws IOException {
-    return new BulkCustomPoolTableBackend(poolQuantity, dilutionIds, dilutionService).create(model);
+    BulkCustomPoolTableBackend bulkCustomPoolTableBackend = new BulkCustomPoolTableBackend(poolQuantity, dilutionIds, dilutionService,
+        (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null));
+    return bulkCustomPoolTableBackend.create(model);
   }
 }

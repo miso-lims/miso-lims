@@ -22,8 +22,8 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSampleQCPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSampleQCPage.SamQcColumns;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage.QcColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
 
@@ -31,20 +31,20 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
 
   private static final Logger log = LoggerFactory.getLogger(BulkSampleQCIT.class);
 
-  private static final Set<String> qcColumns = Sets.newHashSet(SamQcColumns.ALIAS, SamQcColumns.DATE, SamQcColumns.TYPE,
-      SamQcColumns.RESULT, SamQcColumns.UNITS);
+  private static final Set<String> qcColumns = Sets.newHashSet(QcColumns.SAMPLE_ALIAS, QcColumns.DATE, QcColumns.TYPE,
+      QcColumns.RESULT, QcColumns.UNITS);
 
   @Before
   public void setup() {
     loginAdmin();
   }
 
-  private BulkSampleQCPage getEditPage(List<Long> ids) {
-    return BulkSampleQCPage.getForEdit(getDriver(), getBaseUrl(), ids);
+  private BulkQCPage getEditPage(List<Long> ids) {
+    return BulkQCPage.getForEditSample(getDriver(), getBaseUrl(), ids);
   }
 
-  private BulkSampleQCPage getAddPage(List<Long> ids, int copies) {
-    return BulkSampleQCPage.getForAdd(getDriver(), getBaseUrl(), ids, copies);
+  private BulkQCPage getAddPage(List<Long> ids, int copies) {
+    return BulkQCPage.getForAddSample(getDriver(), getBaseUrl(), ids, copies);
   }
 
 
@@ -54,7 +54,7 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
     Set<String> expectedHeadings = Sets.newHashSet();
     expectedHeadings.addAll(qcColumns);
 
-    BulkSampleQCPage page = getEditPage(Arrays.asList(2201L));
+    BulkQCPage page = getEditPage(Arrays.asList(2201L));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     assertEquals(expectedHeadings.size(), headings.size());
@@ -70,7 +70,7 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
     Set<String> expectedHeadings = Sets.newHashSet();
     expectedHeadings.addAll(qcColumns);
 
-    BulkSampleQCPage page = getAddPage(Arrays.asList(2201L), 1);
+    BulkQCPage page = getAddPage(Arrays.asList(2201L), 1);
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     assertEquals(expectedHeadings.size(), headings.size());
@@ -83,18 +83,18 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
   @Test
   public void testAddQc() throws Exception {
     // Goal: ensure a sample QC can be added
-    BulkSampleQCPage page = getAddPage(Arrays.asList(2201L), 1);
+    BulkQCPage page = getAddPage(Arrays.asList(2201L), 1);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
-    attrs.put(SamQcColumns.DATE, "2018-07-10");
-    attrs.put(SamQcColumns.TYPE, "test edit qc");
-    attrs.put(SamQcColumns.RESULT, "32.6");
+    attrs.put(QcColumns.DATE, "2018-07-10");
+    attrs.put(QcColumns.TYPE, "test edit qc");
+    attrs.put(QcColumns.RESULT, "32.6");
 
     fillRow(table, 0, attrs);
 
-    assertFalse(table.isWritable(SamQcColumns.ALIAS, 0));
-    assertFalse(table.isWritable(SamQcColumns.UNITS, 0));
+    assertFalse(table.isWritable(QcColumns.SAMPLE_ALIAS, 0));
+    assertFalse(table.isWritable(QcColumns.UNITS, 0));
 
     assertColumnValues(table, 0, attrs, "pre-save");
     saveAndAssertSuccess(table);
@@ -110,18 +110,18 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
   @Test
   public void testEditQc() throws Exception {
     // Goal: ensure a sample QC can be edited
-    BulkSampleQCPage page = getEditPage(Arrays.asList(2201L));
+    BulkQCPage page = getEditPage(Arrays.asList(2201L));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
-    attrs.put(SamQcColumns.DATE, "2018-07-10");
-    attrs.put(SamQcColumns.RESULT, "32.6");
+    attrs.put(QcColumns.DATE, "2018-07-10");
+    attrs.put(QcColumns.RESULT, "32.6");
 
     fillRow(table, 0, attrs);
 
-    assertFalse(table.isWritable(SamQcColumns.ALIAS, 0));
-    assertFalse(table.isWritable(SamQcColumns.UNITS, 0));
-    assertFalse(table.isWritable(SamQcColumns.TYPE, 0));
+    assertFalse(table.isWritable(QcColumns.SAMPLE_ALIAS, 0));
+    assertFalse(table.isWritable(QcColumns.UNITS, 0));
+    assertFalse(table.isWritable(QcColumns.TYPE, 0));
 
     assertColumnValues(table, 0, attrs, "pre-save");
     saveAndAssertSuccess(table);
@@ -137,18 +137,18 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
   @Test
   public void testAutoUpdateVolume() throws Exception {
     // Goal: ensure that volume and volume units are updated by the QC
-    BulkSampleQCPage page = getAddPage(Arrays.asList(2201L), 1);
+    BulkQCPage page = getAddPage(Arrays.asList(2201L), 1);
     HandsOnTable table = page.getTable();
     
     Map<String, String> attrs = Maps.newLinkedHashMap();
-    attrs.put(SamQcColumns.DATE, "2018-07-10");
-    attrs.put(SamQcColumns.TYPE, "update volume qc");
-    attrs.put(SamQcColumns.RESULT, "10.43");
+    attrs.put(QcColumns.DATE, "2018-07-10");
+    attrs.put(QcColumns.TYPE, "update volume qc");
+    attrs.put(QcColumns.RESULT, "10.43");
     
     fillRow(table, 0, attrs);
     
-    assertFalse(table.isWritable(SamQcColumns.ALIAS, 0));
-    assertFalse(table.isWritable(SamQcColumns.UNITS, 0));
+    assertFalse(table.isWritable(QcColumns.SAMPLE_ALIAS, 0));
+    assertFalse(table.isWritable(QcColumns.UNITS, 0));
 
     assertColumnValues(table, 0, attrs, "pre-save");
     saveAndAssertSuccess(table);
@@ -169,18 +169,18 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
   @Test
   public void testAutoUpdateConcentration() throws Exception {
     // Goal: ensure that volume and volume units are updated by the QC
-    BulkSampleQCPage page = getAddPage(Arrays.asList(2201L), 1);
+    BulkQCPage page = getAddPage(Arrays.asList(2201L), 1);
     HandsOnTable table = page.getTable();
     
     Map<String, String> attrs = Maps.newLinkedHashMap();
-    attrs.put(SamQcColumns.DATE, "2018-07-10");
-    attrs.put(SamQcColumns.TYPE, "update concentration qc");
-    attrs.put(SamQcColumns.RESULT, "24.78");
+    attrs.put(QcColumns.DATE, "2018-07-10");
+    attrs.put(QcColumns.TYPE, "update concentration qc");
+    attrs.put(QcColumns.RESULT, "24.78");
     
     fillRow(table, 0, attrs);
     
-    assertFalse(table.isWritable(SamQcColumns.ALIAS, 0));
-    assertFalse(table.isWritable(SamQcColumns.UNITS, 0));
+    assertFalse(table.isWritable(QcColumns.SAMPLE_ALIAS, 0));
+    assertFalse(table.isWritable(QcColumns.UNITS, 0));
 
     assertColumnValues(table, 0, attrs, "pre-save");
     saveAndAssertSuccess(table);
@@ -230,10 +230,10 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
   }
 
   private void assertQCAttributes(Map<String, String> attributes, SampleQC sampleQc) {
-    testQCAttribute(SamQcColumns.DATE, attributes, sampleQc, qc -> qc.getDate().toString());
-    testQCAttribute(SamQcColumns.TYPE, attributes, sampleQc, qc -> qc.getType().getName());
-    testQCAttribute(SamQcColumns.RESULT, attributes, sampleQc, qc -> qc.getResults().toString());
-    testQCAttribute(SamQcColumns.UNITS, attributes, sampleQc, qc -> qc.getType().getUnits());
+    testQCAttribute(QcColumns.DATE, attributes, sampleQc, qc -> qc.getDate().toString());
+    testQCAttribute(QcColumns.TYPE, attributes, sampleQc, qc -> qc.getType().getName());
+    testQCAttribute(QcColumns.RESULT, attributes, sampleQc, qc -> qc.getResults().toString());
+    testQCAttribute(QcColumns.UNITS, attributes, sampleQc, qc -> qc.getType().getUnits());
   }
 
   private <T> void testQCAttribute(String column, Map<String, String> attributes, T object, Function<T, String> getter) {
