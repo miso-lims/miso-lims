@@ -15,7 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 
 @Entity
 @IdClass(BoxPositionId.class)
-public class BoxPosition {
+public class BoxPosition implements Serializable {
 
   public static class BoxPositionId implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -64,6 +64,8 @@ public class BoxPosition {
     }
 
   }
+
+  private static final long serialVersionUID = 1L;
 
   @Id
   @ManyToOne(targetEntity = BoxImpl.class)

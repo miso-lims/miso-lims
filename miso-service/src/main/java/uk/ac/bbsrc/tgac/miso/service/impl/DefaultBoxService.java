@@ -254,7 +254,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       // get persisted version of new box contents before change
       List<BoxableId> ids = box.getBoxPositions().values()
           .stream()
-          .map(b -> b.getBoxableId())
+          .map(BoxPosition::getBoxableId)
           .collect(Collectors.toList());
       Map<BoxableId, BoxableView> oldOccupants = boxStore.getBoxableViewsByIdList(ids)
           .stream()
