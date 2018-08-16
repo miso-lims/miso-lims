@@ -20,6 +20,9 @@ Changes:
  * Service Record adjustments
  * Showed more descriptive titles on Order pages
 
+CONFIG CHANGE: External service links can be added to Run pages. This can be configured in `miso.properties` 
+with the property `miso.run.report.links`.
+
 # 0.2.135
 
 Changes:
