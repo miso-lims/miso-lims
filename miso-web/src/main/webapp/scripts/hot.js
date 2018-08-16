@@ -1136,7 +1136,7 @@ var HotUtils = {
                   Utils.showDialog('Add to Existing Workset', 'Search', fields, function(input) {
                     Utils.ajaxWithDialog('Finding Worksets', 'GET', '/miso/rest/worksets?' + jQuery.param({
                       q: input.query
-                    }), {}, function(worksets) {
+                    }), null, function(worksets) {
                       var selectFields = [];
                       if (!worksets || !worksets.length) {
                         Utils.showOkDialog('Workset Search', ['No matching worksets found.'], doSearch);
