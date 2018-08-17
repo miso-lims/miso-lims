@@ -40,6 +40,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -172,6 +173,12 @@ public class ProjectRestController extends RestController {
       groups.add(sgi.getGroupId());
     }
     return groups;
+  }
+
+  @GetMapping(value = "/picker/search")
+  @ResponseBody
+  public List<ProjectDto> getProjectsBySearch(@RequestParam("query") String query) throws IOException {
+    return projectService.listAllProjectsBySearch(query).stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
 }

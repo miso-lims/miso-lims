@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -120,6 +121,12 @@ public class HibernateLibraryTemplateDao implements LibraryTemplateStore, Hibern
     @SuppressWarnings("unchecked")
     List<LibraryTemplate> records = criteria.list();
     return records;
+  }
+
+  @Override
+  public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
+    criteria.createAlias("projects", "project");
+    criteria.add(Restrictions.eq("project.id", projectId));
   }
 
 }

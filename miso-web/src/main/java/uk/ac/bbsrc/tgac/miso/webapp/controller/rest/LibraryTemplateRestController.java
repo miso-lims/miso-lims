@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,17 +43,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
 import uk.ac.bbsrc.tgac.miso.service.LibraryTemplateService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
@@ -64,6 +69,9 @@ public class LibraryTemplateRestController extends RestController {
 
   @Autowired
   private LibraryTemplateService libraryTemplateService;
+
+  @Autowired
+  private ProjectService projectService;
 
   private final JQueryDataTableBackend<LibraryTemplate, LibraryTemplateDto> jQueryBackend = new JQueryDataTableBackend<LibraryTemplate, LibraryTemplateDto>() {
 
@@ -106,6 +114,13 @@ public class LibraryTemplateRestController extends RestController {
     libraryTemplateService.update(libraryTemplate);
     return Dtos.asDto(libraryTemplateService.get(id));
   }
+  
+  @GetMapping(value = "/dt", produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<LibraryTemplateDto> getLibraryTemplates(HttpServletRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+    return jQueryBackend.get(request, response, uriBuilder);
+  }
 
   @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
@@ -132,4 +147,46 @@ public class LibraryTemplateRestController extends RestController {
     libraryTemplateService.bulkDelete(libraryTemplates);
   }
 
+  @PostMapping(value = "/project/add")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkAddProject(@RequestParam("projectId") Long projectId, @RequestBody List<Long> templateIds)
+      throws IOException {
+    List<LibraryTemplate> templates = templateIds.stream().map(WhineyFunction.rethrow(id -> libraryTemplateService.get(id)))
+        .collect(Collectors.toList());
+    templates.forEach(template -> {
+      try {
+        addProject(template, projectId);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    });
+  }
+
+  private void addProject(LibraryTemplate template, Long projectId) throws IOException {
+    List<Project> projects = template.getProjects();
+    projects.add(projectService.getProjectById(projectId));
+    template.setProjects(projects);
+    libraryTemplateService.update(template);
+  }
+
+  @PostMapping(value = "/project/remove")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkRemoveProject(@RequestParam("projectId") Long projectId, @RequestBody List<Long> templateIds)
+      throws IOException {
+    List<LibraryTemplate> templates = templateIds.stream().map(WhineyFunction.rethrow(id -> libraryTemplateService.get(id)))
+        .collect(Collectors.toList());
+    templates.forEach(template -> {
+      try {
+        removeProject(template, projectId);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    });
+  }
+
+  private void removeProject(LibraryTemplate template, Long projectId) throws IOException {
+    List<Project> projects = template.getProjects();
+    template.setProjects(projects.stream().filter(project -> !projectId.equals(project.getId())).collect(Collectors.toList()));
+    libraryTemplateService.update(template);
+  }
 }
