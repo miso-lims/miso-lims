@@ -210,8 +210,10 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
 
   @Override
   public void removeBoxableFromBox(Boxable boxable) throws IOException {
-    boxable.getBox().getBoxPositions().remove(boxable.getBoxPosition());
-    currentSession().save(boxable.getBox());
+    if (boxable.getBox() != null) {
+      boxable.getBox().getBoxPositions().remove(boxable.getBoxPosition());
+      currentSession().save(boxable.getBox());
+    }
   }
 
   @Override
