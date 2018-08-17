@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -104,7 +105,9 @@ public class EditLibraryTemplateController {
 
     LibraryTemplateDto dto = (isDetailedSampleEnabled() ? new DetailedLibraryTemplateDto() : new LibraryTemplateDto());
     dto.setId(LibraryTemplate.UNSAVED_ID);
-    dto.setProjectId(projectId);
+    List<Long> projectIds = new ArrayList<>();
+    projectIds.add(projectId);
+    dto.setProjectIds(projectIds);
 
     return new BulkCreateLibraryTemplateBackend(dto, quantity).create(model);
   }

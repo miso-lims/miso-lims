@@ -24,7 +24,7 @@
 ListTarget.library_template = {
   name: "Library Templates",
   createUrl: function(config, projectId) {
-    return "/miso/rest/librarytemplate/dt/project/" + projectId;
+    return "/miso/rest/librarytemplate/dt" + (projectId ? '/project/' + projectId : '');
   },
   queryUrl: "/miso/rest/librarytemplate/query",
   createBulkActions: function(config, projectId) {
@@ -44,6 +44,82 @@ ListTarget.library_template = {
         });
       }
     });
+    
+    if(!projectId){
+      actions.push({
+        name: "Add Project",
+        action: function(items) {
+          Utils.showDialog('Search for Project to Add', 'Search', [{
+            type: "text",
+            label: "Search",
+            property: "query",
+            value: ""
+          }, ], function(results) {
+            Utils.ajaxWithDialog('Getting Projects', 'GET', '/miso/rest/project/picker/search?' + jQuery.param({
+              query: results.query
+            }), null, function(response) {
+              var projectActions = [];
+              response.forEach(function(project) {
+                projectActions.push({
+                  name: project.alias,
+                  handler: function(){
+                    var templateIds = items.map(function(template){
+                      return template.id;
+                    });
+                    Utils.ajaxWithDialog("Adding Library Template" + (items.length > 1 ? "s" : "") + " to Project", "POST", 
+                        "/miso/rest/librarytemplate/project/add?" + jQuery.param({
+                          projectId: project.id,
+                        }), templateIds, function(){
+                      Utils.showOkDialog("Add Project", ["Successfully added Library Template" + (items.length > 1 ? "s" : "")
+                        + " to Project " + project.alias], Utils.page.pageReload);
+                    });
+                  }
+                });
+              });
+              Utils.showWizardDialog("Add Project", projectActions);
+            });
+          });
+        }
+      });
+      
+      actions.push({
+        name: "Remove Project",
+        action: function(items){
+          var projectActions = [];
+          var projectIds = {};
+          items.forEach(function(template){
+            template.projectIds.forEach(function(id){
+              if(!projectIds.hasOwnProperty(id)){
+                projectIds[id] = true;
+                jQuery.ajax({
+                  url: '/miso/rest/project/' + id,
+                  type: 'GET',
+                  contentType: 'application/json; charset=utf8',
+                }).success(function(project) {
+                  projectActions.push({
+                    name: project.alias,
+                    handler: function(){
+                      var templateIds = items.map(function(item){
+                        return item.id;
+                      });
+                      Utils.ajaxWithDialog("Removing Library Template " + (items.length > 1 ? "s" : "") + " from Project", "POST",
+                          "/miso/rest/librarytemplate/project/remove?" + jQuery.param({
+                            projectId: id
+                          }), templateIds, function(){
+                        Utils.showOkDialog("Add Project", ["Successfully removed Library Template" + (items.length > 1 ? "s" : "")
+                          + " from Project " + project.alias], Utils.page.pageReload);
+                        });
+                    }
+                  });
+                  Utils.showWizardDialog("Remove Project", projectActions);
+                });
+              }
+            });
+          });
+        }
+      });
+    }
+      
     return actions;
   },
   createStaticActions: function(config, projectId) {

@@ -1,10 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -54,6 +52,7 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
 
   @Override
   public LibraryTemplate get(long id) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     LibraryTemplate libraryTemplate = libraryTemplateStore.get(id);
     return libraryTemplate;
   }
@@ -67,6 +66,7 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
     target.setKitDescriptor(source.getKitDescriptor());
     target.setIndexFamily(source.getIndexFamily());
     target.setDefaultVolume(source.getDefaultVolume());
+    target.setProjects(source.getProjects());
     if (target instanceof DetailedLibraryTemplate) {
       DetailedLibraryTemplate dSource = (DetailedLibraryTemplate) source;
       DetailedLibraryTemplate dTarget = (DetailedLibraryTemplate) target;
@@ -77,15 +77,15 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
 
   @Override
   public void update(LibraryTemplate oldLibraryTemplate) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     LibraryTemplate updatedLibraryTemplate = get(oldLibraryTemplate.getId());
-    authorizationManager.throwIfNotWritable(updatedLibraryTemplate.getProject());
     applyChanges(updatedLibraryTemplate, oldLibraryTemplate);
     libraryTemplateStore.update(updatedLibraryTemplate);
   }
 
   @Override
   public Long create(LibraryTemplate libraryTemplate) throws IOException {
-    authorizationManager.throwIfNotWritable(libraryTemplate.getProject());
+    authorizationManager.throwIfUnauthenticated();
     return libraryTemplateStore.create(libraryTemplate);
   }
 
@@ -102,11 +102,8 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
   @Override
   public List<LibraryTemplate> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
       PaginationFilter... filter) throws IOException {
-    List<LibraryTemplate> templates = libraryTemplateStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
-    List<Project> readableProjects = authorizationManager
-        .filterUnreadable(templates.stream().map(template -> template.getProject()).collect(Collectors.toList()));
-    return templates.stream().filter(template -> readableProjects.stream().map(proj -> proj.getId()).collect(Collectors.toSet())
-        .contains(template.getProject().getId())).collect(Collectors.toList());
+    authorizationManager.throwIfUnauthenticated();
+    return libraryTemplateStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
   @Override
@@ -117,11 +114,8 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
 
   @Override
   public List<LibraryTemplate> listByIdList(List<Long> idList) throws IOException {
-    Collection<LibraryTemplate> templates = libraryTemplateStore.getByIdList(idList);
-    List<Project> readableProjects = authorizationManager
-        .filterUnreadable(templates.stream().map(template -> template.getProject()).collect(Collectors.toList()));
-    return templates.stream().filter(template -> readableProjects.stream().map(proj -> proj.getId()).collect(Collectors.toSet())
-        .contains(template.getProject().getId())).collect(Collectors.toList());
+    authorizationManager.throwIfUnauthenticated();
+    return new ArrayList<>(libraryTemplateStore.getByIdList(idList));
   }
 
   @Override
@@ -131,7 +125,7 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
 
   @Override
   public void authorizeDeletion(LibraryTemplate object) throws IOException {
-    authorizationManager.throwIfNonAdminOrMatchingOwner(object.getProject().getSecurityProfile().getOwner());
+    authorizationManager.throwIfUnauthenticated();
   }
 
 }

@@ -698,11 +698,11 @@ public class EditLibraryController {
       templatesByProjectId = results.stream()
           .map(sam -> sam.getProject().getId())
           .distinct()
-          .map(projectId -> {
+          .map(WhineyFunction.rethrow(projectId -> {
             Map<Long, List<LibraryTemplateDto>> map = new HashMap<>();
             map.put(projectId, Dtos.asLibraryTemplateDtos(libraryTemplateService.listLibraryTemplatesForProject(projectId)));
             return map;
-          })
+          }))
           .filter(map -> !map.values().stream().allMatch(value -> value.isEmpty()))
           .flatMap(map -> map.entrySet().stream())
           .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
