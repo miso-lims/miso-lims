@@ -744,7 +744,7 @@ public class EditLibraryController {
       config.putPOJO(Config.BOX, newBox);
     }
 
-    public ModelAndView propagate(String idString, int replicates, String sort, ModelMap model) throws IOException {
+    public ModelAndView propagate(String idString, String replicates, String sort, ModelMap model) throws IOException {
       this.sort = sort;
       return propagate(idString, replicates, model);
     }
@@ -760,7 +760,7 @@ public class EditLibraryController {
   }
 
   @GetMapping(value = "/bulk/propagate")
-  public ModelAndView propagateFromSamples(@RequestParam("ids") String sampleIds, @RequestParam("replicates") int replicates,
+  public ModelAndView propagateFromSamples(@RequestParam("ids") String sampleIds, @RequestParam("replicates") String replicates,
       @RequestParam(name = "sort", required = false) String sort, @RequestParam(name = "boxId", required = false) Long boxId,
       ModelMap model) throws IOException {
     BoxDto newBox = boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null;

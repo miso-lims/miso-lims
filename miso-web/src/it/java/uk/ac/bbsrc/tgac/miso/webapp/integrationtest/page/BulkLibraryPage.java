@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -78,9 +79,10 @@ public class BulkLibraryPage extends HeaderFooterPage {
     return new BulkLibraryPage(driver);
   }
 
-  public static BulkLibraryPage getForPropagate(WebDriver driver, String baseUrl, Collection<Long> sampleIds, int replicates) {
+  public static BulkLibraryPage getForPropagate(WebDriver driver, String baseUrl, List<Long> sampleIds, List<Integer> replicates) {
     String ids = Joiner.on(',').join(sampleIds);
-    String url = baseUrl + "miso/library/bulk/propagate?ids=" + ids + "&replicates=" + replicates;
+    String replicatesString = Joiner.on(',').join(replicates);
+    String url = baseUrl + "miso/library/bulk/propagate?ids=" + ids + "&replicates=" + replicatesString;
     driver.get(url);
     return new BulkLibraryPage(driver);
   }

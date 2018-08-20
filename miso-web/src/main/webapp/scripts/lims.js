@@ -317,6 +317,15 @@ var Utils = Utils
               showButtonPanel: true,
             });
             break;
+          case 'checkbox':
+            input = document.createElement('INPUT');
+            input.setAttribute('type', 'checkbox');
+            input.checked = field.value;
+            output[field.property] = input.checked;
+            input.onchange = function() {
+              output[field.property] = input.checked;
+            }
+            break;
           case 'compare':
             input = document.createElement('DIV');
             var compareTypeControl = document.createElement('SELECT');
@@ -377,7 +386,7 @@ var Utils = Utils
 
             input.appendChild(compareTypeControl);
             input.appendChild(valueControl);
-            break; 
+            break;
           default:
             throw "Unknown field type: " + field.type;
           }
@@ -422,9 +431,9 @@ var Utils = Utils
         };
         var dialog = jQuery('#dialog').dialog({
           autoOpen: true,
-          height: fields.reduce(function(length, field) {
+          height: Math.min(600, fields.reduce(function(length, field) {
             return length + (field.type == 'textarea' ? field.rows * 20 : 40);
-          }, 200),
+          }, 200)),
           width: 500,
           title: title,
           modal: true,
@@ -595,7 +604,7 @@ var Utils = Utils
         // Zero-pad month and day if necessary
         return yyyy + "-" + (mm < 10 ? "0" + mm : mm) + "-" + (dd < 10 ? "0" + dd : dd);
       },
-      createBoxDialog: function(result, getItemCount, callback){
+      createBoxDialog: function(result, getItemCount, callback) {
         var boxFields = [{
           property: 'alias',
           type: 'text',
@@ -614,7 +623,7 @@ var Utils = Utils
           type: 'select',
           label: 'Box Size',
           values: Constants.boxSizes,
-          getLabel: function(boxSize){
+          getLabel: function(boxSize) {
             return boxSize.scannable ? boxSize.rowsByColumns + " (Scannable)" : boxSize.rowsByColumns;
           },
           required: true
@@ -624,7 +633,7 @@ var Utils = Utils
           label: 'Matrix Barcode',
           value: ''
         }];
-        var createBoxDto = function(boxFields){
+        var createBoxDto = function(boxFields) {
           var box = {};
           box['alias'] = boxFields['alias'];
           box['description'] = boxFields['description'] || '';
@@ -636,20 +645,20 @@ var Utils = Utils
           box['storageLocationBarcode'] = boxFields['storageLocationBarcode'];
           return box;
         }
-        Utils.showDialog('Create Box', 'Create', boxFields, function(boxResult) {             
+        Utils.showDialog('Create Box', 'Create', boxFields, function(boxResult) {
           var box = createBoxDto(boxResult);
           var boxSize = Utils.array.findFirstOrNull(function(size) {
             return size.id == box.sizeId;
           }, Constants.boxSizes);
-          if(getItemCount(result) > boxSize.rows * boxSize.columns){
+          if (getItemCount(result) > boxSize.rows * boxSize.columns) {
             Utils.showOkDialog('Error', ['The box is too small for the number of items.',
-              'If this is intended, please create the box manually before entering the data.']);
+                'If this is intended, please create the box manually before entering the data.']);
             return;
           }
           Utils.ajaxWithDialog('Creating Box', 'POST', '/miso/rest/box', box, callback);
         });
       },
-      getEmptyBoxPositions: function(box){
+      getEmptyBoxPositions: function(box) {
         var occupied = box.items.map(function(item) {
           return item.coordinates;
         });

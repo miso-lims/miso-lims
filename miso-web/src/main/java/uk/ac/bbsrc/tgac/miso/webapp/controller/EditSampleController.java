@@ -773,7 +773,7 @@ public class EditSampleController {
    */
   @GetMapping(value = "/bulk/propagate")
   public ModelAndView propagateBulkSamples(@RequestParam("parentIds") String parentIds, @RequestParam("sampleClassId") Long sampleClassId,
-      @RequestParam("replicates") int replicates, @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model)
+      @RequestParam("replicates") String replicates, @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model)
       throws IOException {
     BulkPropagateSampleBackend bulkPropagateSampleBackend = new BulkPropagateSampleBackend(sampleClassService.get(sampleClassId),
         (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null));

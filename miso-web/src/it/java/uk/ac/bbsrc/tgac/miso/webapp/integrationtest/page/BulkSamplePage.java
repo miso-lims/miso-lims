@@ -5,6 +5,7 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.List;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
@@ -72,7 +73,7 @@ public class BulkSamplePage extends HeaderFooterPage {
 
   private static final String CREATE_URL_FORMAT = "%smiso/sample/bulk/new?quantity=%d&projectId=%s&sampleClassId=%s";
   private static final String EDIT_URL_FORMAT = "%smiso/sample/bulk/edit?ids=%s";
-  private static final String PROPAGATE_URL_FORMAT = "%smiso/sample/bulk/propagate?parentIds=%s&replicates=%d&sampleClassId=%s";
+  private static final String PROPAGATE_URL_FORMAT = "%smiso/sample/bulk/propagate?parentIds=%s&replicates=%s&sampleClassId=%s";
 
   private final HandsOnTable table;
 
@@ -97,10 +98,12 @@ public class BulkSamplePage extends HeaderFooterPage {
     return new BulkSamplePage(driver);
   }
 
-  public static BulkSamplePage getForPropagate(WebDriver driver, String baseUrl, Collection<Long> parentIds, Integer quantity,
+  public static BulkSamplePage getForPropagate(WebDriver driver, String baseUrl, List<Long> parentIds, List<Integer> replicates,
       Long sampleClassId) {
     String ids = Joiner.on(',').join(parentIds);
-    String url = String.format(PROPAGATE_URL_FORMAT, baseUrl, ids, quantity, (sampleClassId == null ? "" : sampleClassId.toString()));
+    String replicatesString = Joiner.on(',').join(replicates);
+    String url = String.format(PROPAGATE_URL_FORMAT, baseUrl, ids, replicatesString,
+        (sampleClassId == null ? "" : sampleClassId.toString()));
     driver.get(url);
     return new BulkSamplePage(driver);
   }

@@ -3,8 +3,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -21,8 +21,8 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     loginAdmin();
   }
 
-  private BulkSamplePage getPropagatePage(Collection<Long> parentIds, Integer quantity, Long sampleClassId) {
-    return BulkSamplePage.getForPropagate(getDriver(), getBaseUrl(), parentIds, quantity, sampleClassId);
+  private BulkSamplePage getPropagatePage(List<Long> parentIds, Integer quantity, Long sampleClassId) {
+    return BulkSamplePage.getForPropagate(getDriver(), getBaseUrl(), parentIds, Arrays.asList(quantity), sampleClassId);
   }
 
   @Test
@@ -378,5 +378,19 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     // verify attributes against what got saved to the database
     assertAllForAliquot(attrs, getIdForRow(table, 0), true, true);
+  }
+
+  @Test
+  public void testPropagateSpecifiedReplicates() {
+    BulkSamplePage page = BulkSamplePage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100003L, 110003L, 120003L),
+        Arrays.asList(1, 2, 3), 15L);
+    HandsOnTable table = page.getTable();
+    assertEquals(6, table.getRowCount());
+    assertEquals("1IPO_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 0));
+    assertEquals("1IPO_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 1));
+    assertEquals("1IPO_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 2));
+    assertEquals("1LIB_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 3));
+    assertEquals("1LIB_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 4));
+    assertEquals("LIBT_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 5));
   }
 }
