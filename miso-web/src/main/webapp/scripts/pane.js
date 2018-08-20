@@ -173,6 +173,7 @@ var Pane = (function() {
         content: contentDiv
       };
     },
+    
     createPane: function(paneId, title) {
       var titleDiv = createTitleDiv(title);
       var contentDiv = createContentDiv();
@@ -186,7 +187,17 @@ var Pane = (function() {
     },
     
     // add specifies any special tiles to be added to the bottom of the pane
-    updateTiles: function(div, transform, url, query, add) {
+    updateTiles: function(div, transform, url, query, add, checkWorkflow) {
+      var workflow = null;
+      if(checkWorkflow){
+        workflow = Constants.workflows.find(function(wkflow){
+          return wkflow.barcode == query;
+        });
+        if(workflow){
+          window.location = window.location.origin + '/miso/workflow/new/' + workflow.workflowName;
+          return;
+        }
+      }
       ajaxCall(function() {
         showLoader(div)
       }, function(results) {
@@ -195,9 +206,9 @@ var Pane = (function() {
         showError(xhr, textStatus, errorThrown, div);
       }, url, query);
     },
-    registerSearchHandlers: function(inputTag, transform, url, outputDiv) {
+    registerSearchHandlers: function(inputTag, transform, url, outputDiv, checkWorkflow) {
       var doSearch = function() {
-        Pane.updateTiles(outputDiv, transform, url, inputTag.value, []);
+        Pane.updateTiles(outputDiv, transform, url, inputTag.value, [], checkWorkflow);
       };
 
       // Wait 100 ms before doing the search to allow the paste buffer to copy into the input field

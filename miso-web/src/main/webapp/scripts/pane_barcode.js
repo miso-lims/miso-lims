@@ -50,7 +50,7 @@ PaneTarget.barcode = (function() {
       var divs = Pane.createSearchPane(paneId, title);
 
       Pane.updateDiv(divs.content, createHelpMessage());
-      Pane.registerSearchHandlers(divs.input, transform, url, divs.content);
+      Pane.registerSearchHandlers(divs.input, transform, url, divs.content, true);
       Pane.setFocusOnReady(divs.input);
     }
   }
