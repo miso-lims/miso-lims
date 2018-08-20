@@ -2380,6 +2380,7 @@ public class Dtos {
     WorkflowNameDto dto = new WorkflowNameDto();
     dto.setWorkflowName(from);
     dto.setDescription(from.getDescription());
+    dto.setBarcode(from.getBarcode());
     return dto;
   }
 

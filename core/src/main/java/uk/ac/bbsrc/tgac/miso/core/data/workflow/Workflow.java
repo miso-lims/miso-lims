@@ -71,6 +71,11 @@ public interface Workflow {
       public final String getDescription() {
         return "Load Sequencer Workflow";
       }
+
+      @Override
+      public final String getBarcode() {
+        return "WORKFLOW_LOAD_SEQUENCER";
+      }
     },
     SAMPLES_RECEIVED {
       @Override
@@ -81,6 +86,11 @@ public interface Workflow {
       @Override
       public final String getDescription() {
         return "Samples Received Workflow";
+      }
+
+      @Override
+      public final String getBarcode() {
+        return "WORKFLOW_SAMPLES_RECEIVED";
       }
     };
 
@@ -93,5 +103,7 @@ public interface Workflow {
     protected abstract Workflow createWorkflow();
 
     public abstract String getDescription();
+
+    public abstract String getBarcode();
   }
 }
