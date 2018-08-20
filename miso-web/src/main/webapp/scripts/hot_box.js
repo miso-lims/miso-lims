@@ -1,6 +1,5 @@
-
 HotTarget.box = (function(box) {
-  
+
   return {
     createUrl: '/miso/rest/box',
     updateUrl: '/miso/rest/box/',
@@ -27,7 +26,7 @@ HotTarget.box = (function(box) {
       }, HotUtils.makeColumnForText('Alias', true, 'alias', {
         validator: HotUtils.validator.requiredTextNoSpecialChars
       }), HotUtils.makeColumnForText('Description', true, 'description', {
-        validator: HotUtils.validator.requiredText
+        validator: HotUtils.validator.optionalTextNoSpecialChars
       }), HotUtils.makeColumnForText('Matrix Barcode', true, 'identificationBarcode', {
         validator: HotUtils.validator.optionalTextNoSpecialChars
       }), HotUtils.makeColumnForConstantsList('Box Use', true, 'use', 'useId', 'id', 'alias', Constants.boxUses, true, {
@@ -45,10 +44,9 @@ HotTarget.box = (function(box) {
           flat.storageLocationBarcode = box.storageLocationBarcode;
         },
         pack: function(box, flat, errorHandler) {
-          box.storageLocationBarcode = flat.storageLocationBarcode;
+          box.storageLocationId = flat.storageLocationId;
         }
-      },
-      {
+      }, {
         header: 'Freezer Location',
         data: 'storageDisplayLocation',
         type: 'text',
@@ -56,49 +54,49 @@ HotTarget.box = (function(box) {
         readOnly: true,
         depends: 'storageLocationBarcode',
         update: function(box, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-          if (Utils.validation.isEmpty(flat.storageLocationBarcode)) {
+          function setDataAndValidator(value, id, validator) {
+            setData(value || '');
+            flat.storageLocationId = id;
             setOptions({
-              validator: HotUtils.validator.requiredEmpty
+              validator: validator
             });
-            setData('');
+          }
+
+          if (flatProperty != 'storageLocationBarcode') {
+            return;
+          }
+          if (Utils.validation.isEmpty(flat.storageLocationBarcode)) {
+            setDataAndValidator(null, null, null);
             return;
           }
           var deferred = jQuery.Deferred();
           setData('(...searching...)');
-          getFreezerLocations();
-          return deferred.promise();
 
-          function getFreezerLocations() {
-            jQuery.ajax({
-              url: '/miso/rest/storagelocations/bybarcode?' + jQuery.param({
-                q: flat.storageLocationBarcode,
-                }),
-              contentType: "application/json; charset=utf8",
-              dataType: "json"
-            }).success(
-              function(data) {
-                setData(data.fullDisplayLocation);
-                setOptions({
-                  validator: HotUtils.validator.requiredText
-                });
-            }).fail(function(response, textStatus, serverStatus) {
-              HotUtils.showServerErrors(response, serverStatus);
-              setData('(Not Found)');
-              setOptions({
-                validator: HotUtils.validator.invalid
-              });
-            }).always(function() {
-              deferred.resolve();
-            });
-          }
+          jQuery.ajax({
+            url: '/miso/rest/storagelocations/bybarcode?' + jQuery.param({
+              q: flat.storageLocationBarcode,
+            }),
+            contentType: "application/json; charset=utf8",
+            dataType: "json"
+          }).success(function(data) {
+            setDataAndValidator(data.fullDisplayLocation, data.id, null);
+          }).fail(function(response, textStatus, serverStatus) {
+            HotUtils.showServerErrors(response, serverStatus);
+            setDataAndValidator('(Not Found)', null, HotUtils.validator.invalid);
+          }).always(function() {
+            deferred.resolve();
+          });
+
+          return deferred.promise();
         },
         unpack: function(box, flat, setCellMeta) {
           flat.storageDisplayLocation = box.storageDisplayLocation;
+          flat.storageLocationId = box.storageLocationId;
         },
         pack: function(box, flat, errorHandler) {
           box.storageDisplayLocation = flat.storageDisplayLocation;
         }
-      },];
+      }, ];
     },
 
     getBulkActions: function(config) {

@@ -344,6 +344,13 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       box.setSize(getSize(box.getSize().getId()));
     }
     box.setUse(getUse(box.getUse().getId()));
+    if (box.getStorageLocation() != null) {
+      if (box.getStorageLocation().getId() > 0L) {
+        box.setStorageLocation(storageLocationService.get(box.getStorageLocation().getId()));
+      } else if (!LimsUtils.isStringEmptyOrNull(box.getStorageLocation().getIdentificationBarcode())) {
+        box.setStorageLocation(storageLocationService.getByBarcode(box.getStorageLocation().getIdentificationBarcode()));
+      }
+    }
   }
 
   /**
@@ -355,6 +362,23 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
    */
   private void validateChange(Box box, Box beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
+
+    if (isStringEmptyOrNull(box.getAlias())) {
+      errors.add(new ValidationError("alias", "Alias cannot be blank"));
+    } else if (beforeChange == null || !box.getAlias().equals(beforeChange.getAlias())) {
+      Box existing = boxStore.getBoxByAlias(box.getAlias());
+      if (existing != null && existing.getId() != box.getId()) {
+        errors.add(new ValidationError("alias", "There is already a box with this alias"));
+      }
+    }
+
+    if (beforeChange == null
+        || (box.getIdentificationBarcode() != null && !box.getIdentificationBarcode().equals(beforeChange.getIdentificationBarcode()))) {
+      Box existing = boxStore.getBoxByBarcode(box.getIdentificationBarcode());
+      if (existing != null && existing.getId() != box.getId()) {
+        errors.add(new ValidationError("identificationBarcode", "There is already a box with this barcode"));
+      }
+    }
 
     if (box.getStorageLocation() != null) {
       if (box.getStorageLocation().getLocationUnit().getBoxStorageAmount() == BoxStorageAmount.NONE) {

@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -53,9 +52,10 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 
 @Controller
 @RequestMapping("/box")
-@SessionAttributes("box")
 public class EditBoxController {
   protected static final Logger log = LoggerFactory.getLogger(EditBoxController.class);
+
+  private static final String MODEL_ATTR_PAGEMODE = "pageMode";
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -136,6 +136,7 @@ public class EditBoxController {
   @GetMapping(value = "/new")
   public ModelAndView newBox(ModelMap model) throws IOException {
     model.put("title", "New Box");
+    model.put(MODEL_ATTR_PAGEMODE, "create");
     User user = authorizationManager.getCurrentUser();
     return setupForm(new BoxImpl(user), model);
   }
@@ -145,6 +146,7 @@ public class EditBoxController {
     Box box = boxService.get(boxId);
     if (box == null) throw new NotFoundException("No box found for ID " + boxId.toString());
     model.put("title", "Box " + box.getId());
+    model.put(MODEL_ATTR_PAGEMODE, "edit");
     return setupForm(box, model);
   }
 

@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
@@ -187,6 +188,9 @@ public class MenuController implements ServletContextAware {
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
 
+  @Resource
+  private Boolean boxScannerEnabled;
+
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
     return autoGenerateIdBarcodes;
@@ -272,6 +276,7 @@ public class MenuController implements ServletContextAware {
     node.put("automaticBarcodes", autoGenerateIdentificationBarcodes());
     node.put("automaticSampleAlias", namingScheme.hasSampleAliasGenerator());
     node.put("automaticLibraryAlias", namingScheme.hasLibraryAliasGenerator());
+    node.put("boxScannerEnabled", boxScannerEnabled);
 
     final Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
 

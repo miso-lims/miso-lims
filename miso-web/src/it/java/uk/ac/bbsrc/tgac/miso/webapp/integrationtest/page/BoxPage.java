@@ -17,8 +17,19 @@ public class BoxPage extends FormPage<BoxPage.Field> {
     BARCODE(By.id("identificationBarcode"), FieldType.TEXT), //
     DESCRIPTION(By.id("description"), FieldType.TEXT), //
     USE(By.id("boxUse"), FieldType.DROPDOWN), //
-    SIZE(By.id("boxSize"), FieldType.DROPDOWN), //
-    LOCATION(By.id("location"), FieldType.TEXT);
+    SIZE(By.id("boxSize"), FieldType.DROPDOWN) {
+      private final By alternateSelector = By.id("boxSizeLabel");
+
+      @Override
+      public String get(WebDriver driver) {
+        WebElement select = driver.findElement(getSelector());
+        if ("select".equals(select.getTagName())) {
+          return super.get(driver);
+        }
+        return driver.findElement(alternateSelector).getText();
+      }
+    }, //
+    LOCATION(By.id("locationBarcode"), FieldType.TEXT);
 
     private final By selector;
     private final FieldType type;
