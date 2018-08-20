@@ -108,7 +108,7 @@ public class PlainSampleITs extends AbstractIT {
   public void testCreatePlainLibrarySetup() {
     // Goal: ensure all expected fields are present and no extra and that dropdowns appear as expected
     // (dropdowns do not render properly when table is broken)
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L), 1);
+    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     assertEquals(libraryColumns.size(), headings.size());
@@ -123,7 +123,7 @@ public class PlainSampleITs extends AbstractIT {
   @Test
   public void testPropagateOnePlainLibrary() {
     // Goal: ensure one library can be saved
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L), 1);
+    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();

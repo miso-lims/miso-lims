@@ -42,8 +42,8 @@ HotTarget.sample = (function() {
       return item.label == flatObj.identityAlias;
     }, flatObj.potentialIdentities);
   };
-  
-  var getExternalNames = function(identityAlias){
+
+  var getExternalNames = function(identityAlias) {
     return identityAlias.replace(/.*--(\s*)/, "").toLowerCase().split(",");
   }
 
@@ -218,7 +218,8 @@ HotTarget.sample = (function() {
                     .concat([sam.sampleType]) : Constants.sampleTypes
               });
             }
-          }, {
+          },
+          {
             header: 'Project',
             data: 'projectAlias',
             type: (config.hasProject ? 'text' : 'dropdown'),
@@ -268,13 +269,13 @@ HotTarget.sample = (function() {
               flat.scientificName = obj.scientificName || config.defaultSciName || null;
             },
             depends: 'projectAlias',
-            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData){
-              if(config.projects){
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              if (config.projects) {
                 console.log(config.projects);
-                var project = config.projects.find(function(proj){
+                var project = config.projects.find(function(proj) {
                   return proj.shortName == flat.projectAlias;
                 });
-                if(project && project.defaultSciName){
+                if (project && project.defaultSciName) {
                   setData(project.defaultSciName);
                 }
               }
@@ -311,8 +312,8 @@ HotTarget.sample = (function() {
             data: 'externalName',
             validator: HotUtils.validator.requiredTextNoSpecialChars,
             include: show['Identity'],
-            description: 'Search for multiple external names by separating them with commas. ' +
-                'A coloured background indicates that new external names will be added to the identity upon creation.',
+            description: 'Search for multiple external names by separating them with commas. '
+                + 'A coloured background indicates that new external names will be added to the identity upon creation.',
             unpack: function(sam, flat, setCellMeta) {
               flat.externalName = Utils.valOrNull(sam.externalName);
             },
@@ -323,23 +324,24 @@ HotTarget.sample = (function() {
               } // else externalName will come from an existing Identity via the Identity Alias column
             },
             depends: 'identityAlias',
-            update:function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if(!value || value == "Delete external name, select a project, then re-enter external name." || value == '(...searching...)'
-                || /First Receipt \(.*\)/.test(value) || !flat['externalName']){
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              if (!value || value == "Delete external name, select a project, then re-enter external name." || value == '(...searching...)'
+                  || /First Receipt \(.*\)/.test(value) || !flat['externalName']) {
                 setOptions({
                   'renderer': Handsontable.renderers.TextRenderer
                 });
                 return;
-              };
-              
+              }
+
               var existingExternalNames = getExternalNames(value);
               var renderer = null;
-              var newExternalNames = flat['externalName'].toLowerCase().split(",").map(function(name){
+              var newExternalNames = flat['externalName'].toLowerCase().split(",").map(function(name) {
                 return name.trim();
               });
-              if(newExternalNames.every(function(externalName){
+              var renderer = null;
+              if (newExternalNames.every(function(externalName) {
                 return existingExternalNames.indexOf(externalName) != -1;
-              })){
+              })) {
                 renderer = Handsontable.renderers.TextRenderer;
               } else {
                 renderer = HotUtils.notificationRenderer;
@@ -463,13 +465,14 @@ HotTarget.sample = (function() {
               var projectId = sam.projectId;
               if (flatProperty === 'projectAlias') {
                 // sample's project has changed
-                projectId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(
-                  Utils.array.aliasPredicate(flat.projectAlias), config.projects), 'id');
-              }  
-              var subprojectsSource = Constants.subprojects
-                  .filter(function(subp) { return subp.parentProjectId == projectId; })
-                  .map(function(subp) { return subp.alias; })
-                  .sort();
+                projectId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.aliasPredicate(flat.projectAlias),
+                    config.projects), 'id');
+              }
+              var subprojectsSource = Constants.subprojects.filter(function(subp) {
+                return subp.parentProjectId == projectId;
+              }).map(function(subp) {
+                return subp.alias;
+              }).sort();
               setOptions({
                 'source': (subprojectsSource.length ? subprojectsSource : ['(None)'])
               });
@@ -478,13 +481,13 @@ HotTarget.sample = (function() {
             validator: HotUtils.validator.requiredAutocomplete,
             include: Constants.isDetailedSample,
             unpack: function(sam, flat, setCellMeta) {
-              flat.subprojectAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
-                .idPredicate(sam.subprojectId), Constants.subprojects), 'alias')
-                || '(None)';
+              flat.subprojectAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(sam.subprojectId),
+                  Constants.subprojects), 'alias')
+                  || '(None)';
             },
             pack: function(sam, flat, errorHandler) {
-              sam.subprojectId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(
-                  Utils.array.aliasPredicate(flat.subprojectAlias), Constants.subprojects), 'id');
+              sam.subprojectId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.aliasPredicate(flat.subprojectAlias),
+                  Constants.subprojects), 'id');
             }
           },
           {
@@ -638,20 +641,20 @@ HotTarget.sample = (function() {
             data: 'volumeUnits',
             type: 'dropdown',
             trimDropdown: false,
-            source: ['(None)'].concat(Constants.volumeUnits.map(function(unit){
+            source: ['(None)'].concat(Constants.volumeUnits.map(function(unit) {
               return unit.units;
             })),
             include: ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt),
             allowHtml: true,
             validator: Handsontable.validators.AutocompleteValidator,
             unpack: function(obj, flat, setCellMeta) {
-              var units = Constants.volumeUnits.find(function(unit){
+              var units = Constants.volumeUnits.find(function(unit) {
                 return unit.name == obj.volumeUnits;
               });
               flat['volumeUnits'] = !!units ? units.units : '(None)';
             },
             pack: function(obj, flat, errorHandler) {
-              var units = Constants.volumeUnits.find(function(unit){
+              var units = Constants.volumeUnits.find(function(unit) {
                 return unit.units == flat['volumeUnits'];
               });
               obj['volumeUnits'] = !!units ? units.name : null;
@@ -663,20 +666,20 @@ HotTarget.sample = (function() {
             data: 'concentrationUnits',
             type: 'dropdown',
             trimDropdown: false,
-            source: ['(None)'].concat(Constants.concentrationUnits.map(function(unit){
+            source: ['(None)'].concat(Constants.concentrationUnits.map(function(unit) {
               return unit.units;
             })),
             include: ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt),
             allowHtml: true,
             validator: Handsontable.validators.AutocompleteValidator,
             unpack: function(obj, flat, setCellMeta) {
-              var units = Constants.concentrationUnits.find(function(unit){
+              var units = Constants.concentrationUnits.find(function(unit) {
                 return unit.name == obj.concentrationUnits;
               });
               flat['concentrationUnits'] = !!units ? units.units : '(None)';
             },
             pack: function(obj, flat, errorHandler) {
-              var units = Constants.concentrationUnits.find(function(unit){
+              var units = Constants.concentrationUnits.find(function(unit) {
                 return unit.units == flat['concentrationUnits'];
               });
               obj['concentrationUnits'] = !!units ? units.name : null;
@@ -774,17 +777,17 @@ HotTarget.sample = (function() {
           // Aliquot columns
           HotUtils.makeColumnForConstantsList('Purpose', show['Aliquot'] && !config.isLibraryReceipt, 'samplePurposeAlias',
               'samplePurposeId', 'id', 'alias', Constants.samplePurposes, true, {
-            'depends': '*start',
-            'update': function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData){
-              setOptions({
-                'source': Constants.samplePurposes.filter(function(samplePurpose){
-                  return !samplePurpose.archived || sam.samplePurposeId == samplePurpose.id;
-                }).map(function(samplePurpose){
-                  return samplePurpose.alias;
-                })
-              });
-            }
-          })];
+                'depends': '*start',
+                'update': function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+                  setOptions({
+                    'source': Constants.samplePurposes.filter(function(samplePurpose) {
+                      return !samplePurpose.archived || sam.samplePurposeId == samplePurpose.id;
+                    }).map(function(samplePurpose) {
+                      return samplePurpose.alias;
+                    })
+                  });
+                }
+              })];
 
       if (!config.isLibraryReceipt) {
         var spliceIndex = columns.indexOf(columns.filter(function(column) {
@@ -879,8 +882,14 @@ HotTarget.sample = (function() {
                   property: 'replicates',
                   type: 'int',
                   label: 'Replicates',
-                  value: 1
-                }, (targets.length > 1 ? {
+                  value: 1,
+                  required: true
+                }, (samples.length > 1 ? {
+                  property: 'customReplication',
+                  type: 'checkbox',
+                  label: 'Specify replicates per sample',
+                  value: false
+                } : null), (targets.length > 1 ? {
                   property: 'target',
                   type: 'select',
                   label: 'To',
@@ -889,19 +898,45 @@ HotTarget.sample = (function() {
                 } : null), ListUtils.createBoxField].filter(function(x) {
                   return !!x;
                 }), function(result) {
-                  var boxId = null;
-                  var loadPage = function(){
-                    (result.target || targets[0]).action(result.replicates, boxId);
-                  }
-                  if (result.createBox){
-                    Utils.createBoxDialog(result, function(result){
-                      return result.replicates * samples.length;
+                  var loadPage = function(boxId, replicates) {
+                    (result.target || targets[0]).action(replicates, boxId);
+                  };
+                  var createBox = function(sampleCount, replicates) {
+                    Utils.createBoxDialog(result, function(result) {
+                      return sampleCount;
                     }, function(newBox) {
-                      boxId = newBox.id;
-                      loadPage();
+                      loadPage(newBox.id, replicates);
                     });
+                  };
+                  if (result.customReplication) {
+                    var replicateFields = [];
+                    for (var i = 0; i < samples.length; i++) {
+                      replicateFields.push({
+                        property: 'replicates' + i,
+                        type: 'int',
+                        label: samples[i].alias,
+                        value: result.replicates,
+                        required: true
+                      });
+                    }
+                    Utils.showDialog('Propagate Samples - Replicates', 'OK', replicateFields, function(replicatesResult) {
+                      var replicates = [];
+                      for ( var key in replicatesResult) {
+                        replicates.push(replicatesResult[key]);
+                      }
+                      var replicatesString = replicates.join(',');
+                      if (result.createBox) {
+                        createBox(replicates.reduce(function(total, num) {
+                          return total + num;
+                        }), replicatesString);
+                      } else {
+                        loadPage(null, replicatesString);
+                      }
+                    });
+                  } else if (result.createBox) {
+                    createBox(result.replicates * samples.length, result.replicates);
                   } else {
-                    loadPage();
+                    loadPage(null, result.replicates);
                   }
                 });
               });
