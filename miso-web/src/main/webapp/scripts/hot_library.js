@@ -79,7 +79,7 @@ HotTarget.library = (function() {
             setData(match.label);
           }
         } else if (flatProperty === 'index' + (n - 1) + 'Label' && !Utils.validation.isEmpty(value)) {
-          var pt = getPlatformType(flat.platformType);
+          var pt = HotUtils.getPlatformType(flat.platformType);
           indexFamily = Utils.array.findFirstOrNull(function(family) {
             return family.name == flat.indexFamilyName && family.platformType == pt;
           }, Constants.indexFamilies);
