@@ -21,6 +21,7 @@ public class BoxDto {
   private String identificationBarcode;
   private String locationBarcode;
   private int tubeCount;
+  private Long storageLocationId;
   private String storageLocationBarcode;
   private String freezerDisplayLocation;
   private String storageDisplayLocation;
@@ -31,6 +32,14 @@ public class BoxDto {
 
   public void setTubeCount(int tubeCount) {
     this.tubeCount = tubeCount;
+  }
+
+  public Long getStorageLocationId() {
+    return storageLocationId;
+  }
+
+  public void setStorageLocationId(Long storageLocationId) {
+    this.storageLocationId = storageLocationId;
   }
 
   public String getAlias() {

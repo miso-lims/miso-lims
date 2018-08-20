@@ -48,7 +48,6 @@ import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -753,17 +752,6 @@ public class BoxRestController extends RestController {
   public BoxDto createBox(@RequestBody BoxDto box, UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
     Box boxObj = Dtos.to(box);
-    ValidationResult validation = new ValidationResult();
-    BoxUse use = new BoxUse();
-    BoxSize size = new BoxSize();
-
-    use.setId(box.getUseId());
-    size.setId(box.getSizeId());
-    boxObj.setUse(use);
-    boxObj.setSize(size);
-
-    boxObj.setStorageLocation(storageLocationService.getByBarcode(box.getStorageLocationBarcode()));
-    validation.throwIfInvalid();
     Long id = boxService.save(boxObj);
     return Dtos.asDto(boxService.get(id), false);
   }
@@ -771,14 +759,13 @@ public class BoxRestController extends RestController {
   @PutMapping(value = "/box/{boxId}", produces = "application/json")
   @ResponseBody
   public BoxDto updateBox(@PathVariable Long boxId, @RequestBody BoxDto box) throws IOException {
+    if (box.getId() == null || !box.getId().equals(boxId)) {
+      throw new RestException("Invalid Box ID", Status.BAD_REQUEST);
+    }
+    Box original = getBox(boxId);
     Box b = Dtos.to(box);
-    b.setId(boxId);
-
-    BoxUse use = new BoxUse();
-    use.setId(box.getUseId());
-
-    b.setUse(use);
-    b.setStorageLocation(storageLocationService.getByBarcode(box.getStorageLocationBarcode()));
+    // reset contents in-case they were changed while the box was being edited
+    b.setBoxPositions(original.getBoxPositions());
     boxService.save(b);
     return Dtos.asDto(boxService.get(boxId), false);
   }

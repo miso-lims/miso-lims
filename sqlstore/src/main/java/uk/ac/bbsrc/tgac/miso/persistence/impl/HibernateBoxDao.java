@@ -44,8 +44,9 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<Box> {
 
   private static final String FIELD_ALIAS = "alias";
+  private static final String FIELD_BARCODE = "identificationBarcode";
 
-  protected static final String[] SEARCH_PROPERTIES = new String[] { "name", FIELD_ALIAS, "identificationBarcode", "locationBarcode" };
+  protected static final String[] SEARCH_PROPERTIES = new String[] { "name", FIELD_ALIAS, FIELD_BARCODE, "locationBarcode" };
 
   private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator", "size", "use");
 
@@ -91,6 +92,13 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   public Box getBoxByAlias(String alias) throws IOException {
     Criteria criteria = currentSession().createCriteria(BoxImpl.class);
     criteria.add(Restrictions.eq(FIELD_ALIAS, alias));
+    return (Box) criteria.uniqueResult();
+  }
+
+  @Override
+  public Box getBoxByBarcode(String barcode) throws IOException {
+    Criteria criteria = currentSession().createCriteria(BoxImpl.class);
+    criteria.add(Restrictions.eq(FIELD_BARCODE, barcode));
     return (Box) criteria.uniqueResult();
   }
 

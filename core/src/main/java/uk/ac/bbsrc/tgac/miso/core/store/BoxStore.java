@@ -29,6 +29,8 @@ public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
    */
   Box getBoxByAlias(String alias) throws IOException;
 
+  Box getBoxByBarcode(String barcode) throws IOException;
+
   /**
    * List all Boxes associated with ids from the given id list
    * 

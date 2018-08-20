@@ -67,12 +67,6 @@ var Box = Box
         Box.prepareScannerDialog.show();
       },
 
-      update: function() {
-        Box.createListingTable();
-        Box.createVisualization();
-        jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
-      },
-
       createVisualization: function() {
         Box.visual.setDisabled(false);
         var selected = (Box.visual.selectedItems && Box.visual.selectedItems.length === 1) ? Box.visual.selectedItems[0] : null;
@@ -88,9 +82,36 @@ var Box = Box
           Box.visual.selectPos(selected.row, selected.col);
         }
       },
-
-      createListingTable: function() {
-        Box.ui.createListingBoxablesTable(Box.boxJSON);
+      
+      updateJson: function() {
+        var box = Box.boxJSON || {};
+        box.alias = jQuery('#alias').val();
+        box.description = jQuery('#description').val();
+        box.identificationBarcode = jQuery('#identificationBarcode').val();
+        box.useId = jQuery('#boxUse').val();
+        box.sizeId = jQuery('#boxSize').val();
+        box.locationBarcode = jQuery('#locationBarcode').val();
+        box.storageLocationId = jQuery('#storageLocation').val();
+        Box.boxJSON = box;
+      },
+      
+      save: function() {
+        var isNew = !Box.boxJSON || !Box.boxJSON.id;
+        Box.updateJson();
+        var url = '/miso/rest/box' + (isNew ? '' : '/' + Box.boxJSON.id);
+        var type = isNew ? 'POST' : 'PUT';
+        
+        jQuery.ajax({
+          url: url,
+          type: type,
+          dataType: 'json',
+          contentType: 'application/json; charset=utf8',
+          data: JSON.stringify(Box.boxJSON)
+        }).success(function(data) {
+          window.location.href = '/miso/box/' + data.id;
+        }).fail(function(response, textStatus, serverStatus) {
+          Validate.displayErrors(JSON.parse(response.responseText), '#box-form');
+        });
       },
 
       // Saves entire box (stored in Box.boxJSON)
@@ -110,41 +131,58 @@ var Box = Box
           data: data
         }).success(function(data) {
           Box.boxJSON.items = items;
-          Box.update();
+          Box.ui.update();
         }).fail(function(xhr, textStatus, errorThrown) {
           showAjaxErrorDialog(xhr, textStatus, errorThrown);
         });
       },
 
       // Validate methods are in parsley_form_validations.js
-      validateBox: function() {
+      validateAndSave: function() {
         Validate.cleanFields('#box-form');
-        jQuery('#box-form').parsley().destroy();
+        Validate.clearErrors('#box-form');
 
         // Alias input field validation
         jQuery('#alias').attr('class', 'form-control');
         jQuery('#alias').attr('data-parsley-required', 'true');
-        jQuery('#alias').attr('data-parsley-maxlength', '100');
+        jQuery('#alias').attr('data-parsley-maxlength', '255');
         jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+        jQuery('#alias').attr('data-parsley-errors-container', '#aliasError');
 
         // Description input field validation
         jQuery('#description').attr('class', 'form-control');
-        jQuery('#description').attr('data-parsley-required', 'true');
-        jQuery('#description').attr('data-parsley-max-length', '250');
+        jQuery('#description').attr('data-parsley-max-length', '255');
         jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+        jQuery('#description').attr('data-parsley-errors-container', '#descriptionError');
+
+        // IdentificationBarcode input field validation
+        jQuery('#identificationBarcode').attr('class', 'form-control');
+        jQuery('#identificationBarcode').attr('data-parsley-max-length', '255');
+        jQuery('#identificationBarcode').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+        jQuery('#identificationBarcode').attr('data-parsley-errors-container', '#identificationBarcodeError');
 
         // BoxUse input field validation
         jQuery('#boxUse').attr('class', 'form-control');
         jQuery('#boxUse').attr('data-parsley-required', 'true');
+        jQuery('#boxUse').attr('data-parsley-errors-container', '#boxUseError');
 
         // BoxSize input field validation
         jQuery('#boxSize').attr('class', 'form-control');
         jQuery('#boxSize').attr('data-parsley-required', 'true');
+        jQuery('#boxSize').attr('data-parsley-errors-container', '#boxSizeError');
+
+        // IdentificationBarcode input field validation
+        jQuery('#locationBarcode').attr('class', 'form-control');
+        jQuery('#locationBarcode').attr('data-parsley-max-length', '255');
+        jQuery('#locationBarcode').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+        jQuery('#locationBarcode').attr('data-parsley-errors-container', '#locationBarcodeError');
 
         jQuery('#box-form').parsley();
         jQuery('#box-form').parsley().validate();
 
-        Validate.updateWarningOrSubmit('#box-form');
+        Validate.updateWarningOrSubmit('#box-form', null, function() {
+          Box.save();
+        });
         return false;
       }
     };
@@ -199,6 +237,34 @@ Box.scan = {
 }
 
 Box.ui = {
+
+  update: function() {
+    Box.ui.createListingBoxablesTable(Box.boxJSON);
+    Box.createVisualization();
+    Box.ui.updateBoxFields();
+    Utils.ui.setDisabled('#updateSelected, #removeSelected, #emptySelected, #resultSelect, #search, #searchField', true);
+  },
+  
+  updateBoxFields: function() {
+    jQuery('#id').text(Box.boxJSON.id || 'Unsaved');
+    jQuery('#name').text(Box.boxJSON.name || 'Unsaved');
+    if (Box.boxJSON.id) {
+      jQuery('#alias').val(Box.boxJSON.alias);
+      jQuery('#description').val(Box.boxJSON.description);
+      jQuery('#identificationBarcode').val(Box.boxJSON.identificationBarcode);
+      jQuery('#boxUse').val(Box.boxJSON.useId);
+      var size = Utils.array.findUniqueOrThrow(function(boxSize) {
+        return boxSize.id === Box.boxJSON.sizeId;
+      }, Constants.boxSizes);
+      jQuery('#boxSizeCell').empty().append('<input id="boxSize" type="hidden" value="' + Box.boxJSON.sizeId + '"/>',
+          '<span id="boxSizeLabel">' + size.rowsByColumns + '</span>',
+          (Constants.boxScannerEnabled ? '<span> (can' + (size.scannable ? '' : 'not')
+              + ' be scanned by your lab\'s bulk scanner)</span>' : ''));
+      jQuery('#locationBarcode').val(Box.boxJSON.locationBarcode);
+      jQuery('#storageLocation').val(Box.boxJSON.storageLocationId);
+      jQuery('#freezerLocation').text(Box.boxJSON.storageDisplayLocation || 'Unknown');
+    }
+  },
 
   onSelectionChanged: function(items, singleBoxable) {
     jQuery('#singlePositionControls').hide();
@@ -326,7 +392,7 @@ Box.ui = {
       var url = '/miso/rest/box/' + Box.boxJSON.id + '/bulk-update';
       Utils.ajaxWithDialog('Update Positions', 'POST', url, data, function(responseData) {
         Box.boxJSON = responseData;
-        Box.update();
+        Box.ui.update();
       });
     };
     if (currentOccupants.length) {
@@ -533,7 +599,7 @@ Box.ui = {
         contentType: 'application/json; charset=utf8'
       }).success(function(data) {
         Box.boxJSON = data;
-        Box.update();
+        Box.ui.update();
         Box.ui.getBulkActions();
         Box.ui.clearBoxableSearchResults();
         jQuery('#searchField').val('');

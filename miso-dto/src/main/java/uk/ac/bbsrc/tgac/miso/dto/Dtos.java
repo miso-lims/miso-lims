@@ -1267,6 +1267,7 @@ public class Dtos {
       dto.setItems(from.getBoxPositions().values().stream().map(Dtos::asDto).collect(Collectors.toList()));
     }
     if (from.getStorageLocation() != null) {
+      dto.setStorageLocationId(from.getStorageLocation().getId());
       dto.setStorageLocationBarcode(from.getStorageLocation().getIdentificationBarcode());
       dto.setFreezerDisplayLocation(from.getStorageLocation().getFreezerDisplayLocation());
       dto.setStorageDisplayLocation(from.getStorageLocation().getFullDisplayLocation());
@@ -1327,6 +1328,16 @@ public class Dtos {
       BoxSize size = new BoxSize();
       size.setId(from.getSizeId());
       to.setSize(size);
+    }
+    if (from.getStorageLocationId() != null) {
+      to.setStorageLocation(new StorageLocation());
+      to.getStorageLocation().setId(from.getStorageLocationId());
+    }
+    if (!isStringEmptyOrNull(from.getStorageLocationBarcode())) {
+      if (to.getStorageLocation() == null) {
+        to.setStorageLocation(new StorageLocation());
+      }
+      to.getStorageLocation().setIdentificationBarcode(from.getStorageLocationBarcode());
     }
     return to;
   }
