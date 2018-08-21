@@ -218,14 +218,7 @@ HotTarget.sample = (function() {
                     .concat([sam.sampleType]) : Constants.sampleTypes
               });
             }
-          },
-          HotUtils.makeColumnForText('Sci. Name', true, 'scientificName', {
-            validator: HotUtils.validator.requiredTextNoSpecialChars,
-            unpack: function(obj, flat, setCellMeta) {
-              flat.scientificName = obj.scientificName || config.defaultSciName || null;
-            }
-          }),
-          {
+          }, {
             header: 'Project',
             data: 'projectAlias',
             type: (config.hasProject ? 'text' : 'dropdown'),
@@ -269,6 +262,24 @@ HotTarget.sample = (function() {
             validator: HotUtils.validator.requiredAutocomplete,
             include: config.create
           },
+          HotUtils.makeColumnForText('Sci. Name', true, 'scientificName', {
+            validator: HotUtils.validator.requiredTextNoSpecialChars,
+            unpack: function(obj, flat, setCellMeta) {
+              flat.scientificName = obj.scientificName || config.defaultSciName || null;
+            },
+            depends: 'projectAlias',
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData){
+              if(config.projects){
+                console.log(config.projects);
+                var project = config.projects.find(function(proj){
+                  return proj.shortName == flat.projectAlias;
+                });
+                if(project && project.defaultSciName){
+                  setData(project.defaultSciName);
+                }
+              }
+            }
+          }),
 
           // Detailed Sample
           // parent columns

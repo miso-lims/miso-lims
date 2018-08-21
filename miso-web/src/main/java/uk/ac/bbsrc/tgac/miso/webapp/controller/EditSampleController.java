@@ -1036,10 +1036,15 @@ public class EditSampleController {
       config.put(Config.HAS_PROJECT, project != null);
       if (project == null) {
         projectService.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
+        config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
       } else {
         config.putPOJO("project", Dtos.asDto(project));
+        if (project.getReferenceGenome() != null && project.getReferenceGenome().getDefaultSciName() != null) {
+          config.put(Config.DEFAULT_SCI_NAME, project.getReferenceGenome().getDefaultSciName());
+        } else {
+          config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
+        }
       }
-      config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
       config.putPOJO(Config.BOX, box);
     }
   };
