@@ -1705,6 +1705,9 @@ public class Dtos {
     dto.setShortName(from.getShortName());
     dto.setDescription(from.getDescription());
     dto.setProgress(from.getProgress().getKey());
+    if (from.getReferenceGenome() != null) {
+      dto.setDefaultSciName(from.getReferenceGenome().getDefaultSciName());
+    }
     return dto;
   }
 

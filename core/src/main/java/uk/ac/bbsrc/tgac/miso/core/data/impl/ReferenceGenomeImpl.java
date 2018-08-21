@@ -25,6 +25,8 @@ public class ReferenceGenomeImpl implements ReferenceGenome {
   @Column(unique = true, nullable = false)
   private String alias;
 
+  private String defaultSciName;
+
   @Override
   public Long getId() {
     return referenceGenomeId;
@@ -66,6 +68,16 @@ public class ReferenceGenomeImpl implements ReferenceGenome {
     return new EqualsBuilder()
         .append(alias, other.alias)
         .isEquals();
+  }
+
+  @Override
+  public String getDefaultSciName() {
+    return defaultSciName;
+  }
+
+  @Override
+  public void setDefaultSciName(String defaultSciName) {
+    this.defaultSciName = defaultSciName;
   }
 
 }

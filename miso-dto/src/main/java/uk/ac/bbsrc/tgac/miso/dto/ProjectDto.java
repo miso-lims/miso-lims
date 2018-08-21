@@ -7,6 +7,7 @@ public class ProjectDto {
   private String shortName;
   private String description;
   private String progress;
+  private String defaultSciName;
 
   public long getId() {
     return id;
@@ -54,5 +55,13 @@ public class ProjectDto {
 
   public void setProgress(String progress) {
     this.progress = progress;
+  }
+
+  public String getDefaultSciName() {
+    return defaultSciName;
+  }
+
+  public void setDefaultSciName(String defaultSciName) {
+    this.defaultSciName = defaultSciName;
   }
 }
