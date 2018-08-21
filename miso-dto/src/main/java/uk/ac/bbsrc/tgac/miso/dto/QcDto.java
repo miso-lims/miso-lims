@@ -9,6 +9,7 @@ public class QcDto {
   private Long id;
   private Double results;
   private QcTypeDto type;
+  private String description;
 
   public String getCreator() {
     return creator;
@@ -38,6 +39,10 @@ public class QcDto {
     return type;
   }
 
+  public String getDescription() {
+    return description;
+  }
+
   public void setCreator(String creator) {
     this.creator = creator;
   }
@@ -64,6 +69,10 @@ public class QcDto {
 
   public void setType(QcTypeDto type) {
     this.type = type;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
 }

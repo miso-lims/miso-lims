@@ -32,7 +32,7 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
   private static final Logger log = LoggerFactory.getLogger(BulkSampleQCIT.class);
 
   private static final Set<String> qcColumns = Sets.newHashSet(QcColumns.SAMPLE_ALIAS, QcColumns.DATE, QcColumns.TYPE,
-      QcColumns.RESULT, QcColumns.UNITS);
+      QcColumns.RESULT, QcColumns.UNITS, QcColumns.DESCRIPTION);
 
   @Before
   public void setup() {

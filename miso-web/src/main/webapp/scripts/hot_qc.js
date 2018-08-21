@@ -134,7 +134,9 @@ HotTarget.qc = function(qcTarget) {
         pack: function(qc, flat, errorHandler) {
           // Do nothing; this never goes to the server
         }
-      }];
+      }, HotUtils.makeColumnForText('Description', true, 'description', {
+        validator: HotUtils.validator.optionalTextNoSpecialChars
+      }),];
     },
 
     getBulkActions: function(config) {

@@ -73,6 +73,8 @@ public abstract class QC implements Serializable, Comparable<QC> {
   @JoinColumn(name = "type")
   private QcType type;
 
+  private String description;
+
   @Override
   public int compareTo(QC o) {
     if (type != null && !type.equals(o.getType())) {
@@ -130,6 +132,10 @@ public abstract class QC implements Serializable, Comparable<QC> {
     return type;
   }
 
+  public String getDescription() {
+    return description;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -138,6 +144,7 @@ public abstract class QC implements Serializable, Comparable<QC> {
     result = prime * result + (int) (qcId ^ (qcId >>> 32));
     result = prime * result + ((results == null) ? 0 : results.hashCode());
     result = prime * result + ((type == null) ? 0 : type.hashCode());
+    result = prime * result + ((description == null) ? 0 : description.hashCode());
     return result;
   }
 
@@ -167,5 +174,9 @@ public abstract class QC implements Serializable, Comparable<QC> {
 
   public void setType(QcType type) {
     this.type = type;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 }

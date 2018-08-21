@@ -1657,6 +1657,7 @@ public class Dtos {
     dto.setResults(from.getResults());
     dto.setEntityId(from.getEntity().getId());
     dto.setEntityAlias(from.getEntity().getAlias());
+    dto.setDescription(from.getDescription());
     return dto;
   }
 
@@ -2037,6 +2038,7 @@ public class Dtos {
     to.setDate(parseDate(dto.getDate()));
     to.setResults(dto.getResults());
     to.setType(to(dto.getType()));
+    to.setDescription(dto.getDescription());
     return to;
   }
 
