@@ -31,7 +31,7 @@ public class BulkLibraryQCIT extends AbstractIT {
   private static final Logger log = LoggerFactory.getLogger(BulkLibraryQCIT.class);
 
   private static final Set<String> qcColumns = Sets.newHashSet(QcColumns.LIBRARY_ALIAS, QcColumns.DATE, QcColumns.TYPE,
-      QcColumns.RESULT, QcColumns.UNITS);
+      QcColumns.RESULT, QcColumns.UNITS, QcColumns.DESCRIPTION);
 
   @Before
   public void setup() {

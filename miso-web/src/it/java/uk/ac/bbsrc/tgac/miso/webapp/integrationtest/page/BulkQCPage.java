@@ -24,6 +24,7 @@ public class BulkQCPage extends HeaderFooterPage {
     public static final String TYPE = "Type";
     public static final String RESULT = "Result";
     public static final String UNITS = "Units";
+    public static final String DESCRIPTION = "Description";
 
     private QcColumns() {
       throw new IllegalStateException("Util class not intended for instantiation");
