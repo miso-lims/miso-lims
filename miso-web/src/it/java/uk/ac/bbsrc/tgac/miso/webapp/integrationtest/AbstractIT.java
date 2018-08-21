@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.assertNotNull;
-import io.github.bonigarcia.wdm.ChromeDriverManager;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +16,6 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -27,6 +25,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.HomePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LoginPage;
+
+import io.github.bonigarcia.wdm.WebDriverManager;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/it-context.xml")
@@ -48,19 +48,17 @@ public abstract class AbstractIT {
 
   @BeforeClass
   public static final void setupAbstractClass() {
-    ChromeDriverManager.getInstance().setup();
+    // ChromeDriver 2.40 - 2.41 cause random timeouts
+    WebDriverManager.chromedriver().ignoreVersions("2.40", "2.41").setup();
   }
 
   @Before
   public final void setupAbstractTest() {
     ChromeOptions opts = new ChromeOptions();
+    opts.setHeadless(true);
     // large width is important so that all columns of handsontables get rendered
-    opts.addArguments("--headless", "--disable-gpu", "--window-size=4000x1440");
-
-    DesiredCapabilities caps = new DesiredCapabilities();
-    caps.setCapability(ChromeOptions.CAPABILITY, opts);
-
-    driver = new ChromeDriver(caps);
+    opts.addArguments("--disable-gpu", "--window-size=4000x1440");
+    driver = new ChromeDriver(opts);
 
     // don't allow page load or script execution to take longer than 10 seconds
     driver.manage().timeouts().pageLoadTimeout(15, TimeUnit.SECONDS);
