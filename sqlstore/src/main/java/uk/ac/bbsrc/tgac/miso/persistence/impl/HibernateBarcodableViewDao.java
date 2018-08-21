@@ -55,6 +55,28 @@ public class HibernateBarcodableViewDao implements BarcodableViewDao {
   }
 
   @Override
+  public List<BarcodableView> searchByAlias(String alias) {
+    if (alias == null)
+      throw new IllegalArgumentException("Alias cannot be null!");
+
+    @SuppressWarnings("unchecked")
+    List<BarcodableView> results = currentSession().createCriteria(BarcodableView.class)
+        .add(Restrictions.eq("alias", alias)).list();
+
+    return results;
+  }
+
+  @Override
+  public List<BarcodableView> searchByAlias(String alias, Collection<EntityType> typeFilter) {
+    if (alias == null)
+      throw new IllegalArgumentException("Alias cannot be null!");
+
+    Predicate<BarcodableView> matchesTypeFilter = barcodableView -> typeFilter.contains(barcodableView.getId().getTargetType());
+
+    return searchByAlias(alias).stream().filter(matchesTypeFilter).collect(toList());
+  }
+
+  @Override
   public List<BarcodableView> search(String query) {
     if (isStringEmptyOrNull(query))
       throw new IllegalArgumentException("Search is empty");

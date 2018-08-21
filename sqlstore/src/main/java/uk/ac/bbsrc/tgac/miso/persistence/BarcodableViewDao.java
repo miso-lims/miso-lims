@@ -1,10 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
-
 import java.util.Collection;
 import java.util.List;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 
 public interface BarcodableViewDao {
   List<BarcodableView> searchByBarcode(String barcode);
@@ -16,4 +16,8 @@ public interface BarcodableViewDao {
    * @param query name, alias, or barcode of a Barcodable entity
    */
   List<BarcodableView> search(String query);
+
+  List<BarcodableView> searchByAlias(String alias);
+
+  List<BarcodableView> searchByAlias(String alias, Collection<Barcodable.EntityType> typeFilter);
 }
