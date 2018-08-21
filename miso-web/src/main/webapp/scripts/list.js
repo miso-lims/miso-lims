@@ -618,12 +618,9 @@ ListUtils = (function() {
     },
     createBoxField: {
       property: 'createBox',
-      type: 'select',
+      type: 'checkbox',
       label: 'Create New Box',
-      values: [false, true],
-      getLabel: function(value){
-        return value ? 'Yes' : 'No';
-      }
+      value: false
     }
   };
 })();
