@@ -113,6 +113,18 @@ ListTarget.pool = {
           "include": true,
           "iSortPriority": 0
         }, {
+          "sTitle": "Conc. Units",
+          "mData": "concentrationUnits",
+          "include": true,
+          "iSortPriority": 0,
+          "bSortable": false,
+          "mRender": function(data, type, full){
+            var units = Constants.concentrationUnits.find(function(unit){
+              return unit.name == data;
+            });
+            return !!units ? units.units : '';
+          }
+        }, {
           "sTitle": "Location",
           "mData": "locationLabel",
           "bSortable": false,

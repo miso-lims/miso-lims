@@ -69,6 +69,7 @@ var Pool = {
     jQuery('#volume').attr('class', 'form-control');
     jQuery('#volume').attr('data-parsley-maxlength', '10');
     jQuery('#volume').attr('data-parsley-type', 'number');
+    
 
     jQuery('#pool-form').parsley();
     jQuery('#pool-form').parsley().validate();

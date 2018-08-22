@@ -49,6 +49,7 @@
         <li><a href="<c:url value="/miso/instruments"/>">Instruments</a></li>
         <li><a href="<c:url value="/miso/boxes"/>">Boxes</a></li>
         <li><a href="<c:url value="/miso/storagelocations"/>">Freezers &amp; Rooms</a></li>
+        <li><a href="<c:url value="/miso/librarytemplates"/>">Library Templates</a></li>
         <li><a href="<c:url value="/miso/kitdescriptors"/>">Kits</a></li>
         <li><a href="<c:url value="/miso/indices"/>">Indices</a></li>
         <li><a href="<c:url value="/miso/studies"/>">Studies</a></li>

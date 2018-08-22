@@ -16,6 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowExecutor;
@@ -95,7 +96,11 @@ public class DefaultWorkflowExecutor implements WorkflowExecutor {
 
     aliquot.setScientificName(sample.getScientificName());
     aliquot.setSampleType(sample.getSampleType());
-    aliquot.setParent(sample);
+
+    DetailedSample parent = new DetailedSampleImpl();
+    parent.setId(sample.getId());
+    aliquot.setParent(parent);
+
     if (sample.getSubproject() != null) aliquot.setSubproject(sample.getSubproject());
     aliquot.setGroupId(sample.getGroupId());
     aliquot.setGroupDescription(sample.getGroupDescription());

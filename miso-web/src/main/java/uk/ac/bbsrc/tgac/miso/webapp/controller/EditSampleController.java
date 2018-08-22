@@ -71,6 +71,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
@@ -92,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
@@ -705,6 +707,9 @@ public class EditSampleController {
         populateSampleClasses(model, (DetailedSample) sample);
       }
 
+      model.put("volumeUnits", VolumeUnit.values());
+      model.put("concentrationUnits", ConcentrationUnit.values());
+
       Collection<User> allUsers = securityManager.listAllUsers();
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, allUsers));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, allUsers));
@@ -768,7 +773,7 @@ public class EditSampleController {
    */
   @GetMapping(value = "/bulk/propagate")
   public ModelAndView propagateBulkSamples(@RequestParam("parentIds") String parentIds, @RequestParam("sampleClassId") Long sampleClassId,
-      @RequestParam("replicates") int replicates, @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model)
+      @RequestParam("replicates") String replicates, @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model)
       throws IOException {
     BulkPropagateSampleBackend bulkPropagateSampleBackend = new BulkPropagateSampleBackend(sampleClassService.get(sampleClassId),
         (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null));
@@ -1031,10 +1036,15 @@ public class EditSampleController {
       config.put(Config.HAS_PROJECT, project != null);
       if (project == null) {
         projectService.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
+        config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
       } else {
         config.putPOJO("project", Dtos.asDto(project));
+        if (project.getReferenceGenome() != null && project.getReferenceGenome().getDefaultSciName() != null) {
+          config.put(Config.DEFAULT_SCI_NAME, project.getReferenceGenome().getDefaultSciName());
+        } else {
+          config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
+        }
       }
-      config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
       config.putPOJO(Config.BOX, box);
     }
   };

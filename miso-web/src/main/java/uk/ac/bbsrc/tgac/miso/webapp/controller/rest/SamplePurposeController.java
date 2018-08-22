@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SamplePurposeDto;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
 @RequestMapping("/rest")
@@ -61,6 +62,9 @@ public class SamplePurposeController extends RestController {
 
   @Autowired
   private SamplePurposeService samplePurposeService;
+
+  @Autowired
+  private MenuController menuController;
 
   @GetMapping(value = "/samplepurpose/{id}", produces = { "application/json" })
   @ResponseBody
@@ -104,28 +108,30 @@ public class SamplePurposeController extends RestController {
       HttpServletResponse response) throws IOException {
     SamplePurpose samplePurpose = Dtos.to(samplePurposeDto);
     Long id = samplePurposeService.create(samplePurpose);
+    menuController.refreshConstants();
     return getSamplePurpose(id, uriBuilder, response);
   }
 
   @PutMapping(value = "/samplepurpose/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
   public SamplePurposeDto updateSamplePurpose(@PathVariable("id") Long id, @RequestBody SamplePurposeDto samplePurposeDto,
-      UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) throws IOException {
+      UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     SamplePurpose samplePurpose = Dtos.to(samplePurposeDto);
     samplePurpose.setId(id);
     samplePurposeService.update(samplePurpose);
+    menuController.refreshConstants();
     return getSamplePurpose(id, uriBuilder, response);
   }
 
   @DeleteMapping(value = "/samplepurpose/{id}")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
-  public void deleteSamplePurpose(@PathVariable(name = "id", required = true) long id, HttpServletResponse response) throws IOException {
+  public void deleteSamplePurpose(@PathVariable(name = "id", required = true) long id) throws IOException {
     SamplePurpose samplePurpose = samplePurposeService.get(id);
     if (samplePurpose == null) {
       throw new RestException("Sample Purpose " + id + " not found", Status.NOT_FOUND);
     }
     samplePurposeService.delete(samplePurpose);
+    menuController.refreshConstants();
   }
 
 }

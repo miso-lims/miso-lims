@@ -71,10 +71,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
@@ -164,8 +166,10 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
-  private String concentrationUnits;
-  private String volumeUnits;
+  @Enumerated(EnumType.STRING)
+  private ConcentrationUnit concentrationUnits;
+  @Enumerated(EnumType.STRING)
+  private VolumeUnit volumeUnits;
 
   @Transient
   // not Hibernate-managed
@@ -495,22 +499,22 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public String getConcentrationUnits() {
-    return this.concentrationUnits;
+  public ConcentrationUnit getConcentrationUnits() {
+    return concentrationUnits;
   }
 
   @Override
-  public void setConcentrationUnits(String concentrationUnits) {
+  public void setConcentrationUnits(ConcentrationUnit concentrationUnits) {
     this.concentrationUnits = concentrationUnits;
   }
 
   @Override
-  public String getVolumeUnits() {
-    return this.volumeUnits;
+  public VolumeUnit getVolumeUnits() {
+    return volumeUnits;
   }
 
   @Override
-  public void setVolumeUnits(String volumeUnits) {
+  public void setVolumeUnits(VolumeUnit volumeUnits) {
     this.volumeUnits = volumeUnits;
   }
 
@@ -628,7 +632,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits(), getConcentrationUnits());
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits().getUnits(),
+        getConcentrationUnits().getUnits());
   }
 
   @Override

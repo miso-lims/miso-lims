@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,8 @@ public class BulkLibraryIT extends AbstractIT {
       LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED, LibColumns.DESCRIPTION,
       LibColumns.GROUP_ID, LibColumns.GROUP_DESC, LibColumns.DESIGN, LibColumns.CODE, LibColumns.PLATFORM, LibColumns.LIBRARY_TYPE,
       LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2,
-      LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.VOLUME, LibColumns.CONCENTRATION);
+      LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.VOLUME, LibColumns.VOLUME_UNITS,
+      LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS);
 
   private static final Set<String> editColumns = Sets.newHashSet(LibColumns.RECEIVE_DATE, LibColumns.SAMPLE_ALIAS,
       LibColumns.SAMPLE_LOCATION, LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE);
@@ -82,7 +84,7 @@ public class BulkLibraryIT extends AbstractIT {
   @Test
   public void testPropagateSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(100004L), 4);
+    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(4));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     assertEquals(commonColumns.size() + propagateColumns.size(), headings.size());
@@ -126,7 +128,7 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Test
   public void testPropagateDropdowns() throws Exception {
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(100004L), 1);
+    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
 
     Set<String> designs = table.getDropdownOptions(LibColumns.DESIGN, 0);
@@ -163,7 +165,7 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Test
   public void testPropagateDependencyCells() {
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(100004L), 1);
+    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
 
     // verify empty options; library type, index family, and kit depend on platform
@@ -229,7 +231,7 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Test
   public void testReadOnlyCells() {
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(100004L), 1);
+    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
 
     assertFalse(table.isWritable(LibColumns.NAME, 0));
@@ -247,7 +249,7 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Test
   public void testPropagate() {
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(100004L), 1);
+    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
@@ -284,7 +286,7 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Test
   public void testPropagateTwoMinimal() {
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(100004L), 2);
+    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(2));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
@@ -552,7 +554,7 @@ public class BulkLibraryIT extends AbstractIT {
   @Test
   public void testPropagateToEditToPropagate() {
     // propagate sample to library
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(100004L), 1);
+    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
@@ -743,6 +745,20 @@ public class BulkLibraryIT extends AbstractIT {
     assertEquals("BOX100001", after.getBox().getName());
     assertEquals("B01", after.getBoxPosition());
     assertFalse(after.isDiscarded());
+  }
+
+  @Test
+  public void testPropagateSpecifiedReplicates() {
+    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L, 110004L, 120004L),
+        Arrays.asList(1, 2, 3));
+    HandsOnTable table = page.getTable();
+    assertEquals(6, table.getRowCount());
+    assertEquals("1IPO_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 0));
+    assertEquals("1IPO_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 1));
+    assertEquals("1IPO_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 2));
+    assertEquals("1LIB_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 3));
+    assertEquals("1LIB_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 4));
+    assertEquals("LIBT_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 5));
   }
 
   private void fillRow(HandsOnTable table, int rowNum, Map<String, String> attributes) {

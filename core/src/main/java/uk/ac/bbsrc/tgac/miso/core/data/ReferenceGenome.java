@@ -12,5 +12,8 @@ public interface ReferenceGenome extends Serializable {
 
   void setAlias(String alias);
 
+  String getDefaultSciName();
+
+  void setDefaultSciName(String defaultSciName);
 
 }

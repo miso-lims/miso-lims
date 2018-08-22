@@ -28,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
 @RequestMapping("/rest/admin")
@@ -108,6 +109,9 @@ public class AdminRestController extends DefaultRestController {
   @Autowired
   private SessionFactory sessionFactory;
 
+  @Autowired
+  private MenuController menuController;
+
   @PostMapping(value = "/cache/clear")
   @ResponseBody
   @ResponseStatus(HttpStatus.OK)
@@ -151,6 +155,14 @@ public class AdminRestController extends DefaultRestController {
     response.add(RegenerationResponse.regenerate("boxes", boxService, boxService::save));
     return response;
 
+  }
+
+  @PostMapping(value = "/constants/refresh")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.OK)
+  public int refreshConstants() {
+    menuController.refreshConstants();
+    return 0;
   }
 
 }

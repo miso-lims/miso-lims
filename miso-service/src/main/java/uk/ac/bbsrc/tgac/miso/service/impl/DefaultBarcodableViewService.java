@@ -38,6 +38,16 @@ public class DefaultBarcodableViewService implements BarcodableViewService {
   }
 
   @Override
+  public List<BarcodableView> searchByAlias(String alias) {
+    return barcodableViewDao.searchByAlias(alias);
+  }
+
+  @Override
+  public List<BarcodableView> searchByAlias(String alias, Collection<EntityType> typeFilter) {
+    return barcodableViewDao.searchByAlias(alias, typeFilter);
+  }
+
+  @Override
   public List<BarcodableView> search(String query) {
     return barcodableViewDao.search(query);
   }

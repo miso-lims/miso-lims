@@ -418,7 +418,7 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
   private static class AliquotBoxStep implements WorkflowStep {
 
     private static final WorkflowStepPrompt PROMPT = new WorkflowStepPrompt(Sets.newHashSet(InputType.BOX),
-        "Scan the barcode of the Box for the Aliquots");
+        "Scan the barcode or alias of the Box for the Aliquots");
 
     private BoxProgressStep boxStep;
 
@@ -600,7 +600,7 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
   private static class StockBoxStep implements WorkflowStep {
 
     private static final WorkflowStepPrompt PROMPT = new WorkflowStepPrompt(Sets.newHashSet(InputType.BOX),
-        "Scan the barcode of the Box for the Stock");
+        "Scan the barcode or alias of the Box for the Stock");
 
     private BoxProgressStep boxStep;
 
@@ -689,7 +689,7 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
   private static class StockStep implements WorkflowStep {
 
     private static final WorkflowStepPrompt PROMPT = new WorkflowStepPrompt(Sets.newHashSet(InputType.SAMPLE_STOCK),
-        "Scan the Stock Barcode");
+        "Scan the Stock barcode or alias");
 
     private SampleProgressStep sampleStep;
 

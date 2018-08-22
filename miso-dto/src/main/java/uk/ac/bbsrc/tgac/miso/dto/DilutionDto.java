@@ -3,7 +3,13 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import java.net.URI;
 import java.util.List;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
+
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 
 public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
 
@@ -12,8 +18,11 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
   private String identificationBarcode;
   private String locationLabel;
   private String concentration;
-  private String concentrationUnits;
+  @Enumerated(EnumType.STRING)
+  private ConcentrationUnit concentrationUnits;
   private String volume;
+  @Enumerated(EnumType.STRING)
+  private VolumeUnit volumeUnits;
   private String creationDate;
   private String dilutionCreatorName;
   private Long targetedSequencingId;
@@ -68,11 +77,12 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
     this.concentration = concentration;
   }
 
-  public String getConcentrationUnits() {
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  public ConcentrationUnit getConcentrationUnits() {
     return concentrationUnits;
   }
 
-  public void setConcentrationUnits(String concentrationUnits) {
+  public void setConcentrationUnits(ConcentrationUnit concentrationUnits) {
     this.concentrationUnits = concentrationUnits;
   }
 
@@ -145,6 +155,15 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setVolume(String volume) {
     this.volume = volume;
+  }
+
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  public VolumeUnit getVolumeUnits() {
+    return volumeUnits;
+  }
+
+  public void setVolumeUnits(VolumeUnit volumeUnit) {
+    this.volumeUnits = volumeUnit;
   }
 
   public String getIdentityConsentLevel() {

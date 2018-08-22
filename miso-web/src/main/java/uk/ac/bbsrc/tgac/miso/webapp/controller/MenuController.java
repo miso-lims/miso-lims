@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
@@ -56,13 +57,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryDilutionSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
@@ -186,6 +188,9 @@ public class MenuController implements ServletContextAware {
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
 
+  @Resource
+  private Boolean boxScannerEnabled;
+
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
     return autoGenerateIdBarcodes;
@@ -271,6 +276,7 @@ public class MenuController implements ServletContextAware {
     node.put("automaticBarcodes", autoGenerateIdentificationBarcodes());
     node.put("automaticSampleAlias", namingScheme.hasSampleAliasGenerator());
     node.put("automaticLibraryAlias", namingScheme.hasLibraryAliasGenerator());
+    node.put("boxScannerEnabled", boxScannerEnabled);
 
     final Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
 
@@ -315,7 +321,8 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "indexFamilies", indexFamilies, Dtos::asDto);
     createArray(mapper, baseUri, node, "qcTypes", qcService.listQcTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "qcTargets", Arrays.asList(QcTarget.values()), Dtos::asDto);
-    createArray(mapper, baseUri, node, "dilutionConcentrationUnits", LibraryDilution.CONCENTRATION_UNITS, Function.identity());
+    createArray(mapper, baseUri, node, "concentrationUnits", Arrays.asList(ConcentrationUnit.values()), Dtos::asDto);
+    createArray(mapper, baseUri, node, "volumeUnits", Arrays.asList(VolumeUnit.values()), Dtos::asDto);
     createArray(mapper, baseUri, node, "partitionQcTypes", partitionQCService.listTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "referenceGenomes", referenceGenomeService.listAllReferenceGenomeTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "spreadsheetFormats", Arrays.asList(SpreadSheetFormat.values()), Dtos::asDto);
@@ -360,5 +367,9 @@ public class MenuController implements ServletContextAware {
     constantsJsTime = System.currentTimeMillis();
     constantsTimestamp.set(constantsJsTime / 1000.0);
     return constantsJs;
+  }
+
+  public void refreshConstants() {
+    constantsJsTime = 0;
   }
 }

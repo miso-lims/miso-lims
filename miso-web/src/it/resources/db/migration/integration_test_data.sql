@@ -435,7 +435,7 @@ INSERT INTO Sample(sampleId, project_projectId, name, alias, securityProfile_pro
 
 INSERT INTO Sample(sampleId, project_projectId, name, alias, securityProfile_profileId, sampleType, scientificName, creator, created,
   lastModifier, lastModified, volume, concentration, volumeUnits, concentrationUnits) VALUES
-  (2201, 2200, 'SAM2201', 'UQC_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2018-07-10 12:53:00', 1, '2018-07-10 12:53:00', 50, 60, 'volumeUnits', 'concentrationUnits');
+  (2201, 2200, 'SAM2201', 'UQC_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2018-07-10 12:53:00', 1, '2018-07-10 12:53:00', 50, 60, NULL, 'NANOGRAMS_PER_MICROLITRE');
 
 INSERT INTO DetailedSample (sampleId, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, concentration, archived) VALUES
 (1, 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, 0),
@@ -655,7 +655,7 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
   volume, concentration, locationBarcode, kitDescriptorId, discarded, volumeUnits, concentrationUnits) VALUES
   (2201, 'LIB2201', 'TIB_0001_nn_n_PE_2201_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
-    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 50, 60, NULL, 1, 0, 'volumeUnits', 'concentrationUnits');
+    1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 50, 60, NULL, 1, 0, NULL, 'NANOGRAMS_PER_MICROLITRE');
 
 INSERT INTO DetailedLibrary(libraryId, archived, libraryDesign, libraryDesignCodeId) VALUES
   (1, 0, 1, 7),
@@ -766,7 +766,7 @@ INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarc
 (804, 4, 4, 'IPO804', 'TEST_BAD_LIBRARY_WARNING', 'ipobar804', 'low quality library', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL);
 
 INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, lastModifier, creator, created, lastModified, qcPassed, volumeUnits, concentrationUnits) VALUES
-(2201, 50, 60, 'IPO2201', 'AUTO_UPDATE_QC', 'ipobar2201', 'autoupdate qc', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL, 'volumeUnits', 'concentrationUnits');
+(2201, 50, 60, 'IPO2201', 'AUTO_UPDATE_QC', 'ipobar2201', 'autoupdate qc', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL, NULL, 'NANOGRAMS_PER_MICROLITRE');
 
 INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
 (1, 1),
@@ -944,14 +944,14 @@ INSERT INTO ArrayRun(arrayRunId, alias, instrumentId, arrayId, health, startDate
 
 INSERT INTO QCType(qcTypeId, name, description, qcTarget, units, archived, precisionAfterDecimal, correspondingField, autoUpdateField) VALUES
 (101, 'test edit qc', '', 'Sample', 'test units', 0, 2, 'NONE', 0),
-(102, 'update volume qc', '', 'Sample', 'new volume', 0, 2, 'VOLUME', 1),
-(103, 'update concentration qc', '', 'Sample', 'new conc', 0, 2, 'CONCENTRATION', 1),
+(102, 'update volume qc', '', 'Sample', '&#181;L', 0, 2, 'VOLUME', 1),
+(103, 'update concentration qc', '', 'Sample', 'nM', 0, 2, 'CONCENTRATION', 1),
 (104, 'test edit qc', '', 'Library', 'test units', 0, 2, 'NONE', 0),
-(105, 'update volume qc', '', 'Library', 'new volume', 0, 2, 'VOLUME', 1),
-(106, 'update concentration qc', '', 'Library', 'new conc', 0, 2, 'CONCENTRATION', 1),
+(105, 'update volume qc', '', 'Library', '&#181;L', 0, 2, 'VOLUME', 1),
+(106, 'update concentration qc', '', 'Library', 'nM', 0, 2, 'CONCENTRATION', 1),
 (107, 'test edit qc', '', 'Pool', 'test units', 0, 2, 'NONE', 0),
-(108, 'update volume qc', '', 'Pool', 'new volume', 0, 2, 'VOLUME', 1),
-(109, 'update concentration qc', '', 'Pool', 'new conc', 0, 2, 'CONCENTRATION', 1);
+(108, 'update volume qc', '', 'Pool', '&#181;L', 0, 2, 'VOLUME', 1),
+(109, 'update concentration qc', '', 'Pool', 'nM', 0, 2, 'CONCENTRATION', 1);
 
 
 INSERT INTO SampleQC(sample_sampleId, creator, date, type, results, created, lastModified) VALUES

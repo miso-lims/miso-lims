@@ -31,7 +31,7 @@ public class BulkLibraryQCIT extends AbstractIT {
   private static final Logger log = LoggerFactory.getLogger(BulkLibraryQCIT.class);
 
   private static final Set<String> qcColumns = Sets.newHashSet(QcColumns.LIBRARY_ALIAS, QcColumns.DATE, QcColumns.TYPE,
-      QcColumns.RESULT, QcColumns.UNITS);
+      QcColumns.RESULT, QcColumns.UNITS, QcColumns.DESCRIPTION);
 
   @Before
   public void setup() {
@@ -161,8 +161,10 @@ public class BulkLibraryQCIT extends AbstractIT {
     
     assertTrue(String.format("Expected volume to be updated to %f, instead got %f", Double.parseDouble("10.43"), saved.getLibrary().getVolume()),
         saved.getLibrary().getVolume().equals(Double.parseDouble("10.43")));
-    assertTrue(String.format("Expected volume units to be updated to %s, instead got %s", "new volume", saved.getLibrary().getVolumeUnits()),
-        saved.getLibrary().getVolumeUnits().equals("new volume"));
+    assertTrue(
+        String.format("Expected volume units to be updated to %s, instead got %s", "&#181;L",
+            saved.getLibrary().getVolumeUnits().getUnits()),
+        saved.getLibrary().getVolumeUnits().getUnits().equals("&#181;L"));
   }
 
   @Test
@@ -196,9 +198,9 @@ public class BulkLibraryQCIT extends AbstractIT {
             saved.getLibrary().getInitialConcentration()),
         saved.getLibrary().getInitialConcentration().equals(Double.parseDouble("24.78")));
     assertTrue(
-        String.format("Expected concentration units to be updated to %s, instead got %s", "new conc",
-            saved.getLibrary().getConcentrationUnits()),
-        saved.getLibrary().getConcentrationUnits().equals("new conc"));
+        String.format("Expected concentration units to be updated to %s, instead got %s", "nM",
+            saved.getLibrary().getConcentrationUnits().getUnits()),
+        saved.getLibrary().getConcentrationUnits().getUnits().equals("nM"));
   }
   
   private void saveAndAssertSuccess(HandsOnTable table) {

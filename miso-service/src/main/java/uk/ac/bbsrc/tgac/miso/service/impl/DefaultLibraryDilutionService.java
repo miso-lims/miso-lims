@@ -165,6 +165,8 @@ public class DefaultLibraryDilutionService
       library.setVolume(library.getVolume() - dilution.getVolumeUsed());
     }
 
+    dilution.setChangeDetails(authorizationManager.getCurrentUser());
+
     // pre-save field generation
     dilution.setName(generateTemporaryName());
     long savedId = save(dilution).getId();
@@ -191,6 +193,7 @@ public class DefaultLibraryDilutionService
     }
 
     applyChanges(managed, dilution);
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
     loadChildEntities(managed);
     save(managed);
     libraryService.update(library);
@@ -256,6 +259,7 @@ public class DefaultLibraryDilutionService
     target.setTargetedSequencing(source.getTargetedSequencing());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setVolume(source.getVolume());
+    target.setVolumeUnits(source.getVolumeUnits());
     target.setConcentrationUnits(source.getConcentrationUnits());
     target.setNgUsed(source.getNgUsed());
     target.setVolumeUsed(source.getVolumeUsed());

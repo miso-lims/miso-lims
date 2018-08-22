@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
@@ -41,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
@@ -71,7 +73,9 @@ public class DetailedSampleBuilder
   private String alias;
   private User lastModifier;
   private Double volume;
-  private String volumeUnits;
+  private VolumeUnit volumeUnits;
+  private Double concentration;
+  private ConcentrationUnit concentrationUnits;
   private boolean discarded = false;
   private boolean isSynthetic = false;
   private boolean nonStandardAlias = false;
@@ -116,8 +120,6 @@ public class DetailedSampleBuilder
   // SampleStock attributes
   private SampleClass stockClass;
   private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
-  private Double concentration;
-  private String concentrationUnits;
   private Boolean dnaseTreated;
 
   // TissueProcessingSample attributes
@@ -493,12 +495,12 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public String getConcentrationUnits() {
+  public ConcentrationUnit getConcentrationUnits() {
     return concentrationUnits;
   }
 
   @Override
-  public void setConcentrationUnits(String concentrationUnits) {
+  public void setConcentrationUnits(ConcentrationUnit concentrationUnits) {
     this.concentrationUnits = concentrationUnits;
   }
 
@@ -706,12 +708,12 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public String getVolumeUnits() {
+  public VolumeUnit getVolumeUnits() {
     return volumeUnits;
   }
 
   @Override
-  public void setVolumeUnits(String volumeUnits) {
+  public void setVolumeUnits(VolumeUnit volumeUnits) {
     this.volumeUnits = volumeUnits;
   }
 

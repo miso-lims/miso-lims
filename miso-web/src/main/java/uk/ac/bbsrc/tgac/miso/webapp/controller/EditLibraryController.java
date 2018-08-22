@@ -77,6 +77,7 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -86,6 +87,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
@@ -121,6 +123,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
@@ -128,7 +131,6 @@ import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
-import uk.ac.bbsrc.tgac.miso.service.TemplateService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkMergeTableBackend;
@@ -209,7 +211,7 @@ public class EditLibraryController {
   @Autowired
   private ProjectService projectService;
   @Autowired
-  private TemplateService templateService;
+  private LibraryTemplateService libraryTemplateService;
   @Autowired
   private BoxService boxService;
 
@@ -592,6 +594,9 @@ public class EditLibraryController {
         .collect(Collectors.toList()));
     model.put("libraryDto", library.getId() == LibraryImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(library, false)));
 
+    model.put("volumeUnits", VolumeUnit.values());
+    model.put("concentrationUnits", ConcentrationUnit.values());
+
     populateDesigns(model,
         LimsUtils.isDetailedSample(library.getSample()) ? ((DetailedSample) library.getSample()).getSampleClass() : null);
     populateDesignCodes(model);
@@ -647,15 +652,15 @@ public class EditLibraryController {
   private static class LibraryBulkPropagateBackend extends BulkPropagateTableBackend<Sample, LibraryDto> {
 
     private final SampleService sampleService;
-    private final TemplateService templateService;
+    private final LibraryTemplateService libraryTemplateService;
     private final Consumer<ObjectNode> additionalConfigFunction;
     private final BoxDto newBox;
 
-    public LibraryBulkPropagateBackend(SampleService sampleService, TemplateService templateService,
+    public LibraryBulkPropagateBackend(SampleService sampleService, LibraryTemplateService libraryTemplateService,
         Consumer<ObjectNode> additionalConfigFunction, BoxDto newBox) {
       super("library", LibraryDto.class, "Libraries", "Samples");
       this.sampleService = sampleService;
-      this.templateService = templateService;
+      this.libraryTemplateService = libraryTemplateService;
       this.additionalConfigFunction = additionalConfigFunction;
       this.newBox = newBox;
     }
@@ -698,11 +703,11 @@ public class EditLibraryController {
       templatesByProjectId = results.stream()
           .map(sam -> sam.getProject().getId())
           .distinct()
-          .map(projectId -> {
+          .map(WhineyFunction.rethrow(projectId -> {
             Map<Long, List<LibraryTemplateDto>> map = new HashMap<>();
-            map.put(projectId, Dtos.asLibraryTemplateDtos(templateService.listLibraryTemplatesForProject(projectId)));
+            map.put(projectId, Dtos.asLibraryTemplateDtos(libraryTemplateService.listLibraryTemplatesForProject(projectId)));
             return map;
-          })
+          }))
           .filter(map -> !map.values().stream().allMatch(value -> value.isEmpty()))
           .flatMap(map -> map.entrySet().stream())
           .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -739,7 +744,7 @@ public class EditLibraryController {
       config.putPOJO(Config.BOX, newBox);
     }
 
-    public ModelAndView propagate(String idString, int replicates, String sort, ModelMap model) throws IOException {
+    public ModelAndView propagate(String idString, String replicates, String sort, ModelMap model) throws IOException {
       this.sort = sort;
       return propagate(idString, replicates, model);
     }
@@ -755,11 +760,11 @@ public class EditLibraryController {
   }
 
   @GetMapping(value = "/bulk/propagate")
-  public ModelAndView propagateFromSamples(@RequestParam("ids") String sampleIds, @RequestParam("replicates") int replicates,
+  public ModelAndView propagateFromSamples(@RequestParam("ids") String sampleIds, @RequestParam("replicates") String replicates,
       @RequestParam(name = "sort", required = false) String sort, @RequestParam(name = "boxId", required = false) Long boxId,
       ModelMap model) throws IOException {
     BoxDto newBox = boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null;
-    return new LibraryBulkPropagateBackend(sampleService, templateService, this::writeLibraryConfiguration, newBox)
+    return new LibraryBulkPropagateBackend(sampleService, libraryTemplateService, this::writeLibraryConfiguration, newBox)
         .propagate(sampleIds, replicates, sort, model);
   }
 

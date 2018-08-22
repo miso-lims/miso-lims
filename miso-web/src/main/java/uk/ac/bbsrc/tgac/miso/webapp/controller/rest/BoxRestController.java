@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,12 +41,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.google.common.collect.ImmutableMap;
+
 import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -57,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.BoxStorageAmount;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
+import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
@@ -81,7 +85,9 @@ public class BoxRestController extends RestController {
 
   private static final Logger log = LoggerFactory.getLogger(BoxRestController.class);
 
-  private static final Comparator<BoxableView> POS_COMPARATOR = (o1, o2) -> o1.getBoxPosition().compareTo(o2.getBoxPosition());
+  private static final Map<String, Function<BoxSize, BiFunction<Integer, Integer, String>>> SUFFIXES = ImmutableMap
+      .<String, Function<BoxSize, BiFunction<Integer, Integer, String>>> builder().put("standard", size -> BoxUtils::getPositionString)
+      .put("numeric", size -> (row, column) -> String.format("%03d", row * size.getColumns() + column)).build();
 
   @Autowired
   private BoxService boxService;
@@ -224,7 +230,7 @@ public class BoxRestController extends RestController {
 
     // iterate through the contents of the box in order of box position
     List<BoxableView> contents = boxService.getBoxContents(box.getId());
-    contents.sort(POS_COMPARATOR);
+    contents.sort(Comparator.comparing(BoxableView::getBoxPosition));
     for (BoxableView boxableView : contents) {
       String position = boxableView.getBoxPosition();
 
@@ -609,13 +615,39 @@ public class BoxRestController extends RestController {
     return !barcode.equals(scan.getNoTubeLabel()) && !barcode.equals(scan.getNoReadLabel());
   }
 
-  @RequestMapping(value = "/box/{boxId}/discard-all")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void discardEntireBox(@PathVariable long boxId) throws IOException {
+  @DeleteMapping("/box/{boxId}/positions/{position}")
+  public @ResponseBody BoxDto removeSingleItem(@PathVariable long boxId, @PathVariable String position) throws IOException {
+    Box box = getBox(boxId);
+    box.getBoxPositions().remove(position);
+    boxService.save(box);
+    return getBoxDtoWithBoxables(boxId);
+  }
+
+  @PostMapping("/box/{boxId}/positions/{position}/discard")
+  public @ResponseBody BoxDto discardSingleItem(@PathVariable long boxId, @PathVariable String position) throws IOException {
+    Box box = getBox(boxId);
+    boxService.discardSingleItem(box, position);
+    return getBoxDtoWithBoxables(boxId);
+  }
+
+  private Box getBox(long boxId) throws IOException {
     Box box = boxService.get(boxId);
     if (box == null) {
       throw new RestException("Box " + boxId + " not found", Status.NOT_FOUND);
     }
+    return box;
+  }
+
+  private BoxDto getBoxDtoWithBoxables(long boxId) throws IOException {
+    Box box = boxService.get(boxId);
+    Collection<BoxableView> boxables = boxService.getBoxContents(boxId);
+    return Dtos.asDtoWithBoxables(box, boxables);
+  }
+
+  @PostMapping(value = "/box/{boxId}/discard-all")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void discardEntireBox(@PathVariable long boxId) throws IOException {
+    Box box = getBox(boxId);
     boxService.discardAllContents(box);
   }
   
@@ -720,17 +752,6 @@ public class BoxRestController extends RestController {
   public BoxDto createBox(@RequestBody BoxDto box, UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
     Box boxObj = Dtos.to(box);
-    ValidationResult validation = new ValidationResult();
-    BoxUse use = new BoxUse();
-    BoxSize size = new BoxSize();
-
-    use.setId(box.getUseId());
-    size.setId(box.getSizeId());
-    boxObj.setUse(use);
-    boxObj.setSize(size);
-
-    boxObj.setStorageLocation(storageLocationService.getByBarcode(box.getStorageLocationBarcode()));
-    validation.throwIfInvalid();
     Long id = boxService.save(boxObj);
     return Dtos.asDto(boxService.get(id), false);
   }
@@ -738,16 +759,56 @@ public class BoxRestController extends RestController {
   @PutMapping(value = "/box/{boxId}", produces = "application/json")
   @ResponseBody
   public BoxDto updateBox(@PathVariable Long boxId, @RequestBody BoxDto box) throws IOException {
+    if (box.getId() == null || !box.getId().equals(boxId)) {
+      throw new RestException("Invalid Box ID", Status.BAD_REQUEST);
+    }
+    Box original = getBox(boxId);
     Box b = Dtos.to(box);
-    b.setId(boxId);
-
-    BoxUse use = new BoxUse();
-    use.setId(box.getUseId());
-
-    b.setUse(use);
-    b.setStorageLocation(storageLocationService.getByBarcode(box.getStorageLocationBarcode()));
+    // reset contents in-case they were changed while the box was being edited
+    b.setBoxPositions(original.getBoxPositions());
     boxService.save(b);
     return Dtos.asDto(boxService.get(boxId), false);
+  }
+
+  @PostMapping(value = "/boxes/bulk-delete")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    List<Box> boxes = new ArrayList<>();
+    for (Long id : ids) {
+      if (id == null) {
+        throw new RestException("Cannot delete null box", Status.BAD_REQUEST);
+      }
+      Box box = boxService.get(id);
+      if (box == null) {
+        throw new RestException("Box " + id + " not found", Status.BAD_REQUEST);
+      }
+      boxes.add(box);
+    }
+    boxService.bulkDelete(boxes);
+  }
+
+  @PostMapping("/boxes/{boxId}/positions/fill-by-pattern")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void recreateBoxFromPrefix(@PathVariable long boxId, @RequestParam(name = "prefix", required = true) String prefix,
+      @RequestParam(name = "suffix", required = true) String suffix) throws IOException {
+    Box box = getBox(boxId);
+    if (!SUFFIXES.containsKey(suffix)) {
+      throw new RestException("Invalid suffix", Status.BAD_REQUEST);
+    }
+    BiFunction<Integer, Integer, String> suffixGenerator = SUFFIXES.get(suffix).apply(box.getSize());
+    Map<String, String> positionToBarcode = new HashMap<>();
+    for (int row = 0; row < box.getSize().getRows(); row++) {
+      for (int column = 0; column < box.getSize().getColumns(); column++) {
+        positionToBarcode.put(BoxUtils.getPositionString(row, column), prefix + suffixGenerator.apply(row, column));
+      }
+    }
+    Map<String, BoxableView> barcodesToBoxables = boxService.getViewsFromBarcodeList(positionToBarcode.values()).stream()
+        .collect(Collectors.toMap(BoxableView::getIdentificationBarcode, Function.identity()));
+    box.setBoxPositions(positionToBarcode.entrySet().stream().filter(entry -> barcodesToBoxables.containsKey(entry.getValue()))
+        .collect(Collectors.toMap(Map.Entry::getKey,
+            entry -> new BoxPosition(box, entry.getKey(), barcodesToBoxables.get(entry.getValue()).getId()))));
+    boxService.save(box);
   }
 
 }

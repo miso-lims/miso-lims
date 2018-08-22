@@ -41,6 +41,10 @@ public class BarcodableProgressStepFactory implements ProgressStepFactory {
     List<BarcodableView> views = barcodableViewService.searchByBarcode(input, getEntityTypes(inputTypes));
 
     if (views.isEmpty()) {
+      views = barcodableViewService.searchByAlias(input, getEntityTypes(inputTypes));
+    }
+
+    if (views.isEmpty()) {
       return null;
     } else if (views.size() == 1) {
       return makeProgressStep(views.get(0));

@@ -73,7 +73,12 @@ ListTarget.qc = function(qcTarget) {
         "mRender": function(data, type, full) {
           return data + " " + full.type.units;
         }
-      }, ];
+      }, {
+        "sTitle": "Description",
+        "mData": "description",
+        "include": true,
+        "iSortPriority": 0,
+      },];
     }
   };
 };

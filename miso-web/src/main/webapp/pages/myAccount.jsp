@@ -45,6 +45,7 @@
             <c:if test="${autoGenerateIdBarcodes}">
               <a href="javascript:void(0);" onclick="Admin.regenBarcodes();">Regenerate All Barcodes</a><br/>
             </c:if>
+            <a href="javascript:void(0);" onclick="Admin.refreshConstants();">Refresh Constants</a><br/>
           </div>
         </div>
       </c:if>

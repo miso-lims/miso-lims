@@ -63,6 +63,9 @@ public class EditKitDescriptorController {
   @Autowired
   private SecurityManager securityManager;
 
+  @Autowired
+  private MenuController menuController;
+
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return kitService.getKitDescriptorColumnSizes();
@@ -119,6 +122,7 @@ public class EditKitDescriptorController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       kitDescriptor.setLastModifier(user);
       kitService.saveKitDescriptor(kitDescriptor);
+      menuController.refreshConstants();
       session.setComplete();
       model.clear();
       return "redirect:/miso/kitdescriptor/" + kitDescriptor.getId();

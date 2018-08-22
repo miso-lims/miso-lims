@@ -1136,7 +1136,7 @@ var HotUtils = {
                   Utils.showDialog('Add to Existing Workset', 'Search', fields, function(input) {
                     Utils.ajaxWithDialog('Finding Worksets', 'GET', '/miso/rest/worksets?' + jQuery.param({
                       q: input.query
-                    }), {}, function(worksets) {
+                    }), null, function(worksets) {
                       var selectFields = [];
                       if (!worksets || !worksets.length) {
                         Utils.showOkDialog('Workset Search', ['No matching worksets found.'], doSearch);
@@ -1276,6 +1276,29 @@ var HotUtils = {
     table.sort(sortColIndex);
   },
   
+  getPlatformType: function(value) {
+    return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(platformType) {
+      return platformType.key == value;
+    }, Constants.platformTypes), 'name');
+  },
+  
+
+  updateFromTemplateOrDesign: function(design, template, idProperty, source, displayProperty, setReadOnly, setData) {
+    var id = null;
+    if (design) {
+      id = design[idProperty];
+    } else if (template) {
+      id = template[idProperty];
+    }
+    if (id) {
+      var change = Utils.array.findFirstOrNull(Utils.array.idPredicate(id), source);
+      if (change) {
+        setData(change[displayProperty]);
+      }
+    }
+    setReadOnly(design || (template && template.idProperty));
+  },
+
   showDialogForBoxCreation: function(title, okButton, fields, pageURL, generateParams, getItemCount){
     fields.push(ListUtils.createBoxField);
     Utils.showDialog(title, okButton, fields, function(result) {
@@ -1296,6 +1319,7 @@ var HotUtils = {
       }
     }); 
   }
+  
 };
 
 HotTarget = {};

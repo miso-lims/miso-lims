@@ -41,14 +41,13 @@
 
 <div id="tab-1">
 
-<form:form id="box-form" data-parsley-validate="" action="/miso/box" method="POST" commandName="box" autocomplete="off" acceptCharset="utf-8">
-<sessionConversation:insertSessionConversationId attributeName="box" />
+<form:form id="box-form" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8">
 <h1>
   <c:choose>
-    <c:when test="${box.id !=0}">Edit</c:when>
-    <c:otherwise>Create</c:otherwise>
+    <c:when test="${pageMode eq 'create'}">Create</c:when>
+    <c:otherwise>Edit</c:otherwise>
   </c:choose> Box
-  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all" onclick="return Box.validateBox();">Save</button>
+  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all" onclick="return Box.validateAndSave();">Save</button>
 </h1>
 <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
   <c:if test="${box.id != 0 && not empty box.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('box', [${box.id}]);">Print Barcode</span></c:if>
@@ -71,72 +70,69 @@
   <table class="in">
     <tr>
       <td class="h">Box ID:</td>
-      <td><span id="id">
-        <c:choose>
-          <c:when test="${box.id != 0}">${box.id}</c:when>
-          <c:otherwise><i>Unsaved</i></c:otherwise>
-        </c:choose>
-      </span></td>
+      <td><span id="id">Unsaved</span></td>
     </tr>
     <tr>
       <td>Name:</td>
-      <td><span id="name">
-        <c:choose>
-          <c:when test="${box.id != 0}">${box.name}</c:when>
-          <c:otherwise><i>Unsaved</i></c:otherwise>
-        </c:choose>
-      </span></td>
+      <td><span id="name">Unsaved</span></td>
     </tr>
     <tr>
-      <td class="h">Alias:</td>
-      <td><form:input id="alias" path="alias" class="validateable"/><span id="aliasCounter" class="counter"></span></td>
+      <td class="h">Alias:*</td>
+      <td>
+        <input type="text" id="alias"/><span id="aliasCounter" class="counter"></span>
+        <div id="aliasError" class="errorContainer"></div>
+      </td>
     </tr>
     <tr>
       <td class="h">Description:</td>
-      <td><form:input id="description" path="description" class="validateable"/><span id="descriptionCounter" class="counter"></span></td>
+      <td>
+        <input type="text" id="description"/><span id="descriptionCounter" class="counter"></span>
+        <div id="descriptionError" class="errorContainer"></div>
+      </td>
     </tr>
     <c:if test="${not autoGenerateIdBarcodes}">
       <tr>
         <td class="h">Matrix Barcode:</td>
-        <td><form:input id="identificationBarcode" path="identificationBarcode" name="identificationBarcode"/></td>
+        <td>
+          <input type="text" id="identificationBarcode"/><span id="identificationBarcodeCounter" class="counter"></span>
+          <div id="identificationBarcodeError" class="errorContainer"></div>
+        </td>
       </tr>
     </c:if>
     <tr>
       <td class="h">Box Use:</td>
-      <td><miso:select id="boxUse" path="use" items="${boxUses}" itemLabel="alias" itemValue="id"/></td>
+      <td>
+        <select id="boxUse">
+          <c:forEach items="${boxUses}" var="use">
+            <option value="${use.id}">${use.alias}</option>
+          </c:forEach>
+        </select>
+        <div id="boxUseError" class="errorContainer"></div>
+      </td>
     </tr>
     <tr>
       <td>Box Size:</td>
-      <c:choose>
-        <c:when test="${box.id == 0}">
-          <td>
-            <c:choose>
-              <c:when test="${scannerEnabled}">
-                <miso:select id="boxSize" path="size" items="${boxSizes}" itemLabel="rowsByColumnsWithScan" itemValue="id"/>
-                ("scannable" means this box can be scanned by the bulk scanner)
-              </c:when>
-             <c:otherwise>
-               <miso:select id="boxSize" path="size" items="${boxSizes}" itemLabel="rowsByColumns" itemValue="id"/>
-             </c:otherwise>
-           </c:choose></td>
-        </c:when>
-        <c:otherwise><td><span id="boxSize">${box.size.getRowsByColumns()}</span> <c:choose><c:when test="${scannerEnabled}">(can ${box.size.scannable ? '':'not '}be scanned by your lab's bulk scanner)</c:when></c:choose></td></c:otherwise>
-      </c:choose>
+      <td id=boxSizeCell>
+        <select id="boxSize">
+          <c:forEach items="${boxSizes}" var="size">
+            <option value="${size.id}">${size.getRowsByColumnsWithScan()}</option>
+          </c:forEach>
+        </select>
+        <div id="boxSizeError" class="errorContainer"></div>
+      </td>
     </tr>
     <tr>
       <td>Location:</td>
-      <td><form:input id="location" path="locationBarcode"/></td>
+      <td>
+        <input type="text" id="locationBarcode"/><span id="locationBarcodeCounter" class="counter"></span>
+        <div id="locationBarcodeError" class="errorContainer"></div>
+      </td>
     </tr>
     <tr>
       <td>Freezer Location:</td>
       <td>
-        <input name="storageLocation" id="storageLocation" type="hidden" value="${empty box.storageLocation ? 0 : box.storageLocation.id}">  
-        <span id="freezerLocation">
-          <c:choose>
-            <c:when test="${not empty box.storageLocation}"><a href="${freezerURL}">${box.storageLocation.getFullDisplayLocation()}</a></c:when>
-            <c:otherwise>Unknown</c:otherwise>
-          </c:choose>
-        </span>
+        <input id="storageLocation" type="hidden">
+        <span id="freezerLocation"></span>
       </td>
     </tr>
     <tr>
@@ -277,18 +273,8 @@
   jQuery(document).ready(function() {
     Box.boxJSON = ${boxJSON};
     Box.boxId = ${box.id};
-    Box.ui.createListingBoxablesTable(Box.boxJSON);
-    Box.visual.create({
-      div: '#boxContentsTable',
-      size: {
-        rows: Box.boxJSON.rows,
-        cols: Box.boxJSON.cols
-      },
-      data: Box.boxJSON.items
-    });
-    jQuery('#updateSelected, #removeSelected, #emptySelected, #resultSelect, #search, #searchField')
-        .prop('disabled', true)
-        .addClass('disabled');
+    Box.ui.update();
+    Utils.ui.setDisabled('#updateSelected, #removeSelected, #emptySelected, #resultSelect, #search, #searchField', true);
   });
 
   jQuery('#searchField').keyup(function(event) {
@@ -331,6 +317,20 @@
       counter: '#descriptionCounter',
       countType: 'characters',
       maxCount: ${maxLengths['description']},
+      countDirection: 'down'
+    });
+
+    jQuery('#identificationBarcode').simplyCountable({
+      counter: '#identificationBarcodeCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['identificationBarcode']},
+      countDirection: 'down'
+    });
+
+    jQuery('#locationBarcode').simplyCountable({
+      counter: '#locationBarcodeCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['locationBarcode']},
       countDirection: 'down'
     });
   });

@@ -113,8 +113,10 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Column(name = "concentration")
   private Double initialConcentration;
 
-  private String concentrationUnits;
-  private String volumeUnits;
+  @Enumerated(EnumType.STRING)
+  private ConcentrationUnit concentrationUnits;
+  @Enumerated(EnumType.STRING)
+  private VolumeUnit volumeUnits;
 
   @ManyToMany(targetEntity = Index.class)
   @JoinTable(name = "Library_Index", joinColumns = {
@@ -653,7 +655,8 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getInitialConcentration(), getVolumeUnits(), getConcentrationUnits());
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getInitialConcentration(), getVolumeUnits().getUnits(),
+        getConcentrationUnits().getUnits());
   }
 
   @Override
@@ -677,22 +680,22 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public String getConcentrationUnits() {
+  public ConcentrationUnit getConcentrationUnits() {
     return concentrationUnits;
   }
 
   @Override
-  public void setConcentrationUnits(String concentrationUnits) {
+  public void setConcentrationUnits(ConcentrationUnit concentrationUnits) {
     this.concentrationUnits = concentrationUnits;
   }
 
   @Override
-  public String getVolumeUnits() {
+  public VolumeUnit getVolumeUnits() {
     return volumeUnits;
   }
 
   @Override
-  public void setVolumeUnits(String volumeUnits) {
+  public void setVolumeUnits(VolumeUnit volumeUnits) {
     this.volumeUnits = volumeUnits;
   }
 

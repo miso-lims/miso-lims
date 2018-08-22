@@ -1,3 +1,21 @@
+# 0.2.137
+
+Changes:
+
+ * Added Description field to QCs
+ * Added a generated creation date field to dilutions
+ * Allowed searching by alias in Workflow inputs
+ * Allowed specifying replicates per sample when propagating
+ * Allowed starting Workflows by scanning the workflow barcode into the Search Widget
+ * Allowed editing Volume and Concentration Units
+ * Allowed users to create Library Templates
+ * Filtered Library Templates by Sample Class of parent (detailed sample)
+ * Fixed a bug in the Samples Received Workflow
+ * Fixed a bug in Workset search
+ * Fixed Institute Defaults changes to take effect immediately
+ * Improved error handling on Edit Box page
+ * Made Samples inherit Scientific Name from Project
+
 # 0.2.136
 
 Changes:
@@ -19,6 +37,9 @@ Changes:
  * Improved performance surrounding boxes
  * Service Record adjustments
  * Showed more descriptive titles on Order pages
+
+CONFIG CHANGE: External service links can be added to Run pages. This can be configured in `miso.properties` 
+with the property `miso.run.report.links`.
 
 # 0.2.135
 

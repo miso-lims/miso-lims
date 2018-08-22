@@ -176,12 +176,31 @@ ListTarget.dilution = {
       "sTitle": "Conc. Units",
       "mData": "concentrationUnits",
       "include": true,
-      "iSortPriority": 0
+      "iSortPriority": 0,
+      "bSortable": false,
+      "mRender": function(data, type, full){
+        var units = Constants.concentrationUnits.find(function(unit){
+          return unit.name == data;
+        });
+        return !!units ? units.units : '';
+      }
     }, {
       "sTitle": "Volume",
       "mData": "volume",
       "include": true,
       "iSortPriority": 0
+    }, {
+      "sTitle": "Vol. Units",
+      "mData": "volumeUnits",
+      "include": true,
+      "iSortPriority": 0,
+      "bSortable": false,
+      "mRender": function(data, type, full){
+        var units = Constants.volumeUnits.find(function(unit){
+          return unit.name == data;
+        });
+        return !!units ? units.units : '';
+      }
     }, {
       "sTitle": "ng Lib. Used",
       "mData": "ngUsed",

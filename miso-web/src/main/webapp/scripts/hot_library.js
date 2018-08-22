@@ -3,10 +3,9 @@
  */
 
 HotTarget.library = (function() {
-  var getPlatformType = function(value) {
-    return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(platformType) {
-      return platformType.key == value;
-    }, Constants.platformTypes), 'name');
+
+  var getDesign = function(name) {
+    return Utils.array.findFirstOrNull(Utils.array.namePredicate(name), Constants.libraryDesigns);
   };
 
   var makeIndexColumn = function(config, n) {
@@ -45,7 +44,7 @@ HotTarget.library = (function() {
       update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
         var indexFamily = null;
         if (flatProperty === 'indexFamilyName' || flatProperty === '*start') {
-          var pt = getPlatformType(flat.platformType);
+          var pt = HotUtils.getPlatformType(flat.platformType);
           indexFamily = Utils.array.findFirstOrNull(function(family) {
             return family.name == flat.indexFamilyName && family.platformType == pt;
           }, Constants.indexFamilies);
@@ -66,7 +65,7 @@ HotTarget.library = (function() {
           });
           setData(data);
         } else if (flatProperty === 'index' + n + 'Label') {
-          var pt = getPlatformType(flat.platformType);
+          var pt = HotUtils.getPlatformType(flat.platformType);
           indexFamily = Utils.array.findFirstOrNull(function(family) {
             return family.name == flat.indexFamilyName && family.platformType == pt;
           }, Constants.indexFamilies);
@@ -80,23 +79,23 @@ HotTarget.library = (function() {
             setData(match.label);
           }
         } else if (flatProperty === 'index' + (n - 1) + 'Label' && !Utils.validation.isEmpty(value)) {
-          var pt = getPlatformType(flat.platformType);
+          var pt = HotUtils.getPlatformType(flat.platformType);
           indexFamily = Utils.array.findFirstOrNull(function(family) {
             return family.name == flat.indexFamilyName && family.platformType == pt;
           }, Constants.indexFamilies);
-          if (!!indexFamily && indexFamily.uniqueDualIndex) {
+          if (indexFamily && indexFamily.uniqueDualIndex) {
             var indexName = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
               return index.position == n - 1;
             }).find(function(index) {
               return index.label == value
             }).name;
-            if (!!indexName) {
+            if (indexName) {
               var dualIndex = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
                 return index.position == n;
               }).find(function(index) {
                 return index.name == indexName;
               });
-              if (!!dualIndex) {
+              if (dualIndex) {
                 setData(dualIndex.label);
               } else {
                 Utils.showOkDialog('Error', ['There is no dual index for index \'' + indexName + '\'',
@@ -107,7 +106,7 @@ HotTarget.library = (function() {
         }
         var readOnly = false;
         if (flat.templateAlias && flat.boxPosition && indexFamily) {
-          var template = getTemplate(config, lib.parentSampleProjectId, flat.templateAlias);
+          var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
           var positionProp = n == 1 ? 'indexOneIds' : 'indexTwoIds';
           if (template.indexFamilyId && template[positionProp] && template[positionProp][flat.boxPosition]) {
             var index = Utils.array.getObjById(template[positionProp][flat.boxPosition], indexFamily.indices);
@@ -122,43 +121,19 @@ HotTarget.library = (function() {
     };
   };
 
-  var getTemplate = function(config, projectId, templateAlias) {
+  var getTemplate = function(config, projectId, parentSampleClassId, templateAlias) {
     if (!config.templatesByProjectId || !config.templatesByProjectId[projectId]) {
       return null;
     }
-    return Utils.array.findFirstOrNull(Utils.array.aliasPredicate(templateAlias), config.templatesByProjectId[projectId]);
-  };
-
-  var getDesign = function(name) {
-    return Utils.array.findFirstOrNull(Utils.array.namePredicate(name), Constants.libraryDesigns);
+    return Utils.array.findFirstOrNull(function(x) {
+      return x.alias == templateAlias && (parentSampleClassId === null || x.designId === null || Constants.libraryDesigns.some(function(l) {
+        return l.id == x.designId && l.sampleClassId == parentSampleClassId;
+      }));
+    }, config.templatesByProjectId[projectId]);
   };
 
   var updateFromTemplate = function(template, idProperty, source, displayProperty, setReadOnly, setData) {
-    var readOnly = false;
-    if (template && template[idProperty]) {
-      var change = Utils.array.findFirstOrNull(Utils.array.idPredicate(template[idProperty]), source);
-      if (change) {
-        setData(change[displayProperty]);
-        readOnly = true;
-      }
-    }
-    setReadOnly(readOnly);
-  };
-
-  var updateFromTemplateOrDesign = function(design, template, idProperty, source, displayProperty, setReadOnly, setData) {
-    var id = null;
-    if (design) {
-      id = design[idProperty];
-    } else if (template) {
-      id = template[idProperty];
-    }
-    if (id) {
-      var change = Utils.array.findFirstOrNull(Utils.array.idPredicate(id), source);
-      if (change) {
-        setData(change[displayProperty]);
-      }
-    }
-    setReadOnly(design || (template && template.idProperty));
+    HotUtils.updateFromTemplateOrDesign(null, template, idProperty, source, displayProperty, setReadOnly, setData);
   };
 
   var checkQcs = function(table) {
@@ -399,7 +374,11 @@ HotTarget.library = (function() {
             update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               if (config.templatesByProjectId && config.templatesByProjectId[lib.parentSampleProjectId]) {
                 setOptions({
-                  'source': ['(None)'].concat(config.templatesByProjectId[lib.parentSampleProjectId].map(function(template) {
+                  'source': ['(None)'].concat(config.templatesByProjectId[lib.parentSampleProjectId].filter(function(x) {
+                    return lib.parentSampleClassId === null || x.designId === null || Constants.libraryDesigns.some(function(l) {
+                      return l.id == x.designId && l.sampleClassId == lib.parentSampleClassId;
+                    });
+                  }).map(function(template) {
                     return template.alias;
                   }))
                 });
@@ -441,7 +420,7 @@ HotTarget.library = (function() {
             depends: ['*start', 'templateAlias'], // *start is a dummy value that gets this run on creation only
             update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               if (flatProperty === 'templateAlias') {
-                var template = getTemplate(config, lib.parentSampleProjectId, value);
+                var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, value);
                 updateFromTemplate(template, 'designId', Constants.libraryDesigns, 'name', setReadOnly, setData);
               } else {
                 // must have been triggered by *start
@@ -458,8 +437,9 @@ HotTarget.library = (function() {
                 depends: ['libraryDesignAlias', 'templateAlias'],
                 update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
                   var design = getDesign(flat.libraryDesignAlias);
-                  var template = getTemplate(config, lib.parentSampleProjectId, flat.templateAlias);
-                  updateFromTemplateOrDesign(design, template, 'designCodeId', Constants.libraryDesignCodes, 'code', setReadOnly, setData);
+                  var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
+                  HotUtils.updateFromTemplateOrDesign(design, template, 'designCodeId', Constants.libraryDesignCodes, 'code', setReadOnly,
+                      setData);
                 },
                 validator: HotUtils.validator.requiredAutocomplete
               }),
@@ -482,7 +462,7 @@ HotTarget.library = (function() {
             },
             depends: 'templateAlias',
             update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              var template = getTemplate(config, lib.parentSampleProjectId, value);
+              var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, value);
               var readOnly = false;
               if (template && template.platformType) {
                 setData(template.platformType);
@@ -502,7 +482,8 @@ HotTarget.library = (function() {
             'depends': ['platformType', 'templateAlias'],
             'unpack': function(lib, flat, setCellMeta) {
               flat.libraryTypeAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(lib.libraryTypeId),
-                  Constants.libraryTypes), 'alias') || '';
+                  Constants.libraryTypes), 'alias')
+                  || '';
             },
             'pack': function(lib, flat, errorHander) {
               lib.libraryTypeId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
@@ -510,7 +491,7 @@ HotTarget.library = (function() {
             },
             update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               if (flatProperty === 'platformType' || flatProperty === '*start') {
-                var pt = getPlatformType(flat.platformType);
+                var pt = HotUtils.getPlatformType(flat.platformType);
                 setOptions({
                   'source': Constants.libraryTypes.filter(function(lt) {
                     return lt.platform == pt && (!lt.archived || lib.libraryTypeId == lt.id);
@@ -520,7 +501,7 @@ HotTarget.library = (function() {
                 });
               }
               if (flat.templateAlias) {
-                var template = getTemplate(config, lib.parentSampleProjectId, flat.templateAlias);
+                var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
                 updateFromTemplate(template, 'libraryTypeId', Constants.libraryTypes, 'alias', setReadOnly, setData);
               } else {
                 setReadOnly(false);
@@ -533,8 +514,9 @@ HotTarget.library = (function() {
                 depends: ['libraryDesignAlias', 'templateAlias'],
                 update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
                   var design = getDesign(flat.libraryDesignAlias);
-                  var template = getTemplate(config, lib.parentSampleProjectId, flat.templateAlias);
-                  updateFromTemplateOrDesign(design, template, 'selectionId', Constants.librarySelections, 'name', setReadOnly, setData);
+                  var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
+                  HotUtils.updateFromTemplateOrDesign(design, template, 'selectionId', Constants.librarySelections, 'name', setReadOnly,
+                      setData);
                 }
               }),
           HotUtils.makeColumnForConstantsList('Strategy', true, 'libraryStrategyTypeAlias', 'libraryStrategyTypeId', 'id', 'name',
@@ -542,8 +524,9 @@ HotTarget.library = (function() {
                 depends: ['libraryDesignAlias', 'templateAlias'],
                 update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
                   var design = getDesign(flat.libraryDesignAlias);
-                  var template = getTemplate(config, lib.parentSampleProjectId, flat.templateAlias);
-                  updateFromTemplateOrDesign(design, template, 'strategyId', Constants.libraryStrategies, 'name', setReadOnly, setData);
+                  var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
+                  HotUtils.updateFromTemplateOrDesign(design, template, 'strategyId', Constants.libraryStrategies, 'name', setReadOnly,
+                      setData);
                 }
               }),
           {
@@ -580,7 +563,7 @@ HotTarget.library = (function() {
                 }
               }
               if (flat.templateAlias) {
-                var template = getTemplate(config, lib.parentSampleProjectId, flat.templateAlias);
+                var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
                 updateFromTemplate(template, 'indexFamilyId', Constants.indexFamilies, 'name', setReadOnly, setData);
               } else {
                 setReadOnly(false);
@@ -616,7 +599,7 @@ HotTarget.library = (function() {
                 });
               }
               if (flat.templateAlias) {
-                var template = getTemplate(config, lib.parentSampleProjectId, flat.templateAlias);
+                var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
                 updateFromTemplate(template, 'kitDescriptorId', Constants.kitDescriptors, 'name', setReadOnly, setData);
               } else {
                 setReadOnly(false);
@@ -648,14 +631,60 @@ HotTarget.library = (function() {
             },
             depends: 'templateAlias',
             update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              var template = getTemplate(config, lib.parentSampleProjectId, value);
+              var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, value);
               if (template && template.defaultVolume) {
                 setData(template.defaultVolume);
               } else {
                 setData(null);
               }
             }
-          }, HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false), ];
+          }, {
+            header: 'Vol. Units',
+            data: 'volumeUnits',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: ['(None)'].concat(Constants.volumeUnits.map(function(unit) {
+              return unit.units;
+            })),
+            include: config.showVolume,
+            allowHtml: true,
+            validator: Handsontable.validators.AutocompleteValidator,
+            unpack: function(obj, flat, setCellMeta) {
+              var units = Constants.volumeUnits.find(function(unit) {
+                return unit.name == obj.volumeUnits;
+              });
+              flat['volumeUnits'] = !!units ? units.units : '(None)';
+            },
+            pack: function(obj, flat, errorHandler) {
+              var units = Constants.volumeUnits.find(function(unit) {
+                return unit.units == flat['volumeUnits'];
+              });
+              obj['volumeUnits'] = !!units ? units.name : null;
+            }
+          }, HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false), {
+            header: 'Conc. Units',
+            data: 'concentrationUnits',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: ['(None)'].concat(Constants.concentrationUnits.map(function(unit) {
+              return unit.units;
+            })),
+            include: true,
+            allowHtml: true,
+            validator: Handsontable.validators.AutocompleteValidator,
+            unpack: function(obj, flat, setCellMeta) {
+              var units = Constants.concentrationUnits.find(function(unit) {
+                return unit.name == obj.concentrationUnits;
+              });
+              flat['concentrationUnits'] = !!units ? units.units : '(None)';
+            },
+            pack: function(obj, flat, errorHandler) {
+              var units = Constants.concentrationUnits.find(function(unit) {
+                return unit.units == flat['concentrationUnits'];
+              });
+              obj['concentrationUnits'] = !!units ? units.name : null;
+            }
+          }]
 
       var spliceIndex = columns.indexOf(columns.filter(function(column) {
         return column.data === 'identificationBarcode';
@@ -690,13 +719,13 @@ HotTarget.library = (function() {
               var params = {
                 ids: items.map(Utils.array.getId).join(',')
               }
-              var loadPage = function(){
+              var loadPage = function() {
                 window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate?' + jQuery.param(params);
               }
-              if (result.createBox){
-                Utils.createBoxDialog(result, function(result){
+              if (result.createBox) {
+                Utils.createBoxDialog(result, function(result) {
                   return items.length;
-                }, function(newBox){
+                }, function(newBox) {
                   params['boxId'] = newBox.id;
                   loadPage();
                 });

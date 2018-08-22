@@ -3,10 +3,16 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import java.net.URI;
 import java.util.List;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
@@ -18,6 +24,8 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
 
   private String alias;
   private String concentration;
+  @Enumerated(EnumType.STRING)
+  private ConcentrationUnit concentrationUnits;
   private String creationDate;
   private String description;
   private String identificationBarcode;
@@ -45,6 +53,8 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
   private String indexFamilyName;
   private String url;
   private String volume;
+  @Enumerated(EnumType.STRING)
+  private VolumeUnit volumeUnits;
   private List<QcDto> qcs;
   private Integer dnaSize;
   private Long kitDescriptorId;
@@ -58,6 +68,11 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
 
   public String getConcentration() {
     return concentration;
+  }
+
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  public ConcentrationUnit getConcentrationUnits() {
+    return concentrationUnits;
   }
 
   public String getCreationDate() {
@@ -176,6 +191,11 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
     return volume;
   }
 
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  public VolumeUnit getVolumeUnits() {
+    return volumeUnits;
+  }
+
   public void setAlias(String alias) {
     this.alias = alias;
   }
@@ -186,6 +206,10 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setCreationDate(String creationDate) {
     this.creationDate = creationDate;
+  }
+
+  public void setConcentrationUnits(ConcentrationUnit concentrationUnits) {
+    this.concentrationUnits = concentrationUnits;
   }
 
   public void setDescription(String description) {
@@ -299,6 +323,10 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setVolume(String volume) {
     this.volume = volume;
+  }
+
+  public void setVolumeUnits(VolumeUnit volumeUnits) {
+    this.volumeUnits = volumeUnits;
   }
 
   public Integer getDnaSize() {
