@@ -21,22 +21,19 @@
  * *********************************************************************
  */
 
-WarningTarget.library = {
-  headerWarnings: function(library){
-    var warnings = [];
-    warnings = Warning.addWarnings([
-      [parseFloat(library.volume) < 0, 'This library has a negative volume!'],
-      [library.identityConsentLevel === 'Revoked', 'Donor has revoked consent']
-      ], warnings);
-    return Warning.generateHeaderWarnings(warnings);
-  },
-  tableWarnings: function(data, type, library){
-    var warnings = [];
-    warnings = Warning.addWarnings([
-      [parseFloat(library.volume) < 0, '(NEGATIVE VOLUME)'],
-      [library.identityConsentLevel === 'Revoked', '(CONSENT REVOKED)']
-      ], warnings);
-    return Warning.generateTableWarnings(data, warnings);
-  },
-  
+WarningTarget.sample = {
+    headerWarnings: function(sample){
+      var warnings = [];
+      warnings = Warning.addWarnings([
+        [sample.identityConsentLevel === 'Revoked', 'Donor has revoked consent']
+        ], warnings);
+      return Warning.generateHeaderWarnings(warnings);
+    },
+    tableWarnings: function(data, type, sample){
+      var warnings = [];
+      warnings = Warning.addWarnings([
+        [sample.identityConsentLevel === 'Revoked', '(CONSENT REVOKED)']
+        ], warnings);
+      return Warning.generateTableWarnings(data, warnings);
+    },
 };

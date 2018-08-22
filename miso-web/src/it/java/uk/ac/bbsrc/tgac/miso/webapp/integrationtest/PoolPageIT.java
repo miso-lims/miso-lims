@@ -289,7 +289,7 @@ public class PoolPageIT extends AbstractIT {
   public void testDilutionTableWarningOnPoolWithError(long id, String warning) {
     PoolPage page = PoolPage.getForEdit(getDriver(), getBaseUrl(), id);
     DataTable table = page.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
-    assertTrue("Dilution table fails to show '" + warning + "' warning", table.doesColumnContainSubstring(Columns.INDICES, warning));
+    assertTrue("Dilution table fails to show '" + warning + "' warning", table.doesColumnContainSubstring(Columns.WARNINGS, warning));
   }
 
   @Test

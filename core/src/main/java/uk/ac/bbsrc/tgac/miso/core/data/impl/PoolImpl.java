@@ -277,7 +277,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public boolean getHasLowQualityMembers() {
-    return poolDilutions.stream().map(PoolDilution::getPoolableElementView).anyMatch(PoolableElementView::isLowQualityLibrary);
+    return poolDilutions.stream().map(PoolDilution::getPoolableElementView).anyMatch(PoolableElementView::isLibraryLowQuality);
   }
 
   @Override

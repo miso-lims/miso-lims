@@ -261,4 +261,5 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
   public void setHasEmptySequence(boolean hasEmptySequence) {
     this.hasEmptySequence = hasEmptySequence;
   }
+
 }

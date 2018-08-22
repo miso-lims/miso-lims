@@ -1410,7 +1410,7 @@ public class Dtos {
     ldto.setName(from.getLibraryName());
     ldto.setAlias(from.getLibraryAlias());
     ldto.setIdentificationBarcode(from.getLibraryBarcode());
-    ldto.setLowQuality(from.isLowQualityLibrary());
+    ldto.setLowQuality(from.isLibraryLowQuality());
     ldto.setParentSampleId(from.getSampleId());
     ldto.setParentSampleAlias(from.getSampleAlias());
     if (from.getPlatformType() != null) {
@@ -1503,6 +1503,7 @@ public class Dtos {
     }
     dto.setDiscarded(from.isDiscarded());
     dto.setHasLowQualityLibraries(from.getHasLowQualityMembers());
+
     return dto;
   }
 
