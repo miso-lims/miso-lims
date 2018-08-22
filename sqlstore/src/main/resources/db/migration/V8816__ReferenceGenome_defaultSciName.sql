@@ -1,1 +1,0 @@
-ALTER TABLE `ReferenceGenome` ADD COLUMN `defaultSciName` varchar(255) DEFAULT NULL;
