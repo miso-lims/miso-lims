@@ -20,7 +20,7 @@ AS SELECT
     l.alias AS libraryAlias,
     l.description AS libraryDescription,
     l.identificationBarcode AS libraryBarcode,
-    l.lowQuality AS lowQualityLibrary,
+    l.lowQuality AS libraryLowQuality,
     l.platformType AS platformType,
     l.dnaSize AS libraryDnaSize,
     l.paired AS libraryPaired,

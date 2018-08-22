@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -82,8 +81,7 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private boolean libraryPaired;
 
-  @Column(nullable = false)
-  private boolean lowQualityLibrary = false;
+  private boolean libraryLowQuality;
   
   private Boolean libraryQcPassed;
 
@@ -177,7 +175,7 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
       if (lib.getLibraryStrategyType() != null) {
         v.setLibraryStrategyType(lib.getLibraryStrategyType().getName());
       }
-      v.setLowQualityLibrary(lib.isLowQuality());
+      v.setLibraryLowQuality(lib.isLowQuality());
       v.setPlatformType(lib.getPlatformType());
       
       Sample sam = lib.getSample();
@@ -361,12 +359,12 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     this.libraryPaired = libraryPaired;
   }
 
-  public boolean isLowQualityLibrary() {
-    return lowQualityLibrary;
+  public boolean isLibraryLowQuality() {
+    return libraryLowQuality;
   }
 
-  public void setLowQualityLibrary(boolean lowQualityLibrary) {
-    this.lowQualityLibrary = lowQualityLibrary;
+  public void setLibraryLowQuality(boolean libraryLowQuality) {
+    this.libraryLowQuality = libraryLowQuality;
   }
 
   public String getLibrarySelectionType() {
@@ -588,7 +586,7 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     result = prime * result + (libraryPaired ? 1231 : 1237);
     result = prime * result + ((librarySelectionType == null) ? 0 : librarySelectionType.hashCode());
     result = prime * result + ((libraryStrategyType == null) ? 0 : libraryStrategyType.hashCode());
-    result = prime * result + (lowQualityLibrary ? 1231 : 1237);
+    result = prime * result + (libraryLowQuality ? 1231 : 1237);
     result = prime * result + ((platformType == null) ? 0 : platformType.hashCode());
     result = prime * result + ((preMigrationId == null) ? 0 : preMigrationId.hashCode());
     result = prime * result + ((projectAlias == null) ? 0 : projectAlias.hashCode());
@@ -685,7 +683,7 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     if (libraryStrategyType == null) {
       if (other.libraryStrategyType != null) return false;
     } else if (!libraryStrategyType.equals(other.libraryStrategyType)) return false;
-    if (lowQualityLibrary != other.lowQualityLibrary) return false;
+    if (libraryLowQuality != other.libraryLowQuality) return false;
     if (platformType != other.platformType) return false;
     if (preMigrationId == null) {
       if (other.preMigrationId != null) return false;

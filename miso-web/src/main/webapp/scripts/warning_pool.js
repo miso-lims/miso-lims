@@ -23,12 +23,21 @@
 
 WarningTarget.pool = {
   headerWarnings: function(pool){
+    var revokedDilutions = [];
+    if(pool.pooledElements){
+      revokedDilutions = pool.pooledElements.filter(function(dilution){
+        return dilution.identityConsentLevel === 'Revoked';
+      }).map(function(dilution){
+        return dilution.name;
+      })
+    }
     var warnings = [];
     warnings = Warning.addWarnings([
       [pool.duplicateIndices, "This pool contains duplicate indices!"],
       [pool.nearDuplicateIndices && !pool.duplicateIndices, "This pool contains near-duplicate indices!"],
       [pool.hasEmptySequence, "This pool contains at least one library with no index!"],
-      [pool.hasLowQualityLibraries, "This pool contains at least one low quality library!"]
+      [pool.hasLowQualityLibraries, "This pool contains at least one low quality library!"],
+      [revokedDilutions.length > 0, "Donor has revoked consent for " + revokedDilutions.toString()]
       ], warnings);
     return Warning.generateHeaderWarnings(warnings);
   },
@@ -38,7 +47,10 @@ WarningTarget.pool = {
       [pool.duplicateIndices, "(DUPLICATE INDICES)"],
       [pool.nearDuplicateIndices && !pool.duplicateIndices, "(NEAR-DUPLICATE INDICES)"],
       [pool.hasEmptySequence, "(MISSING INDEX)"],
-      [pool.hasLowQualityLibraries, "(LOW QUALITY LIBRARIES)"]
+      [pool.hasLowQualityLibraries, "(LOW QUALITY LIBRARIES)"],
+      [pool.pooledElements && pool.pooledElements.some(function(dilution){
+        return dilution.identityConsentLevel === 'Revoked';
+      }), "(CONSENT REVOKED)"]
       ], warnings);
     return Warning.generateTableWarnings(data, warnings);
   },
@@ -48,7 +60,10 @@ WarningTarget.pool = {
       [pool.duplicateIndices, "DUPLICATE INDICES"],
       [pool.nearDuplicateIndices && !pool.duplicateIndices, "NEAR-DUPLICATE INDICES"],
       [pool.hasEmptySequence, "MISSING INDEX"],
-      [pool.hasLowQualityLibraries, "LOW QUALITY LIBRARIES"]
+      [pool.hasLowQualityLibraries, "LOW QUALITY LIBRARIES"],
+      [pool.pooledElements && pool.pooledElements.some(function(dilution){
+        return dilution.identityConsentLevel === 'Revoked';
+      }), "CONSENT REVOKED"]
       ], warnings);
     return Warning.generateTileWarnings(warnings);
   },

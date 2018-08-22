@@ -141,8 +141,7 @@ ListTarget.poolelement = {
               return index.label;
             }).join(', ');
 
-            return WarningTarget.poolelement.tableWarnings(html, combined, config.duplicateIndicesSequences,
-                config.nearDuplicateIndicesSequences);
+            return html;
           }
         }, {
           'sTitle': 'Last Modified',
@@ -165,6 +164,14 @@ ListTarget.poolelement = {
           "include": true,
           "iSortPriority": 0,
           "mRender": ListUtils.render.booleanChecks,
+          "bSortable": false
+        }, {
+          "sTitle": "Warnings",
+          "mData": null,
+          "mRender": WarningTarget.poolelement.tableWarnings(config.duplicateIndicesSequences, config.nearDuplicateIndicesSequences),
+          "include": true,
+          "iSortPriority": 0,
+          "bVisible": true,
           "bSortable": false
         }];
   }

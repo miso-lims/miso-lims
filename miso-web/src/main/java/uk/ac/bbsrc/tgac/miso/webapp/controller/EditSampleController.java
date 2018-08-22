@@ -694,14 +694,13 @@ public class EditSampleController {
 
       model.put("formObj", sample);
       model.put("sample", sample);
+      model.put("sampleDto", sample.getId() == SampleImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(sample, false)));
+
       Collection<String> sampleTypes = sampleService.listSampleTypes();
       if (sample.getSampleType() != null && !sampleTypes.contains(sample.getSampleType())) {
         sampleTypes.add(sample.getSampleType());
       }
       model.put("sampleTypes", sampleTypes);
-      if (LimsUtils.isDetailedSample(sample) && LimsUtils.getIdentityConsentLevel((DetailedSample) sample) == ConsentLevel.REVOKED) {
-        model.put("warning", "Donor has revoked consent");
-      }
       if (detailedSample) {
         model.put("samplePurposes", getSamplePurposes(sample));
         populateSampleClasses(model, (DetailedSample) sample);
