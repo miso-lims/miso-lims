@@ -25,6 +25,7 @@ WarningTarget.dilution = {
     tableWarnings: function(data, type, dilution){
       var warnings = [];
       warnings = Warning.addWarnings([
+        [dilution.subprojectPriority, 'PRIORITY (' + dilution.subprojectAlias + ')'],
         [dilution.identityConsentLevel === 'Revoked', '(CONSENT REVOKED)']
         ], warnings);
       return Warning.generateTableWarnings(data, warnings);

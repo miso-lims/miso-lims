@@ -311,6 +311,10 @@ public class Dtos {
       dto.setSampleClassId(detailed.getSampleClass().getId());
       dto.setCreationDate(detailed.getCreationDate() == null ? "" : formatDate(detailed.getCreationDate()));
       dto.setIdentityConsentLevel(getIdentityConsentLevelString(detailed));
+      if (detailed.getSubproject() != null) {
+        dto.setSubprojectAlias(detailed.getSubproject().getAlias());
+        dto.setSubprojectPriority(detailed.getSubproject().getPriority());
+      }
     }
     return dto;
   }
@@ -395,6 +399,8 @@ public class Dtos {
     }
     if (from.getSubproject() != null) {
       dto.setSubprojectId(from.getSubproject().getId());
+      dto.setSubprojectAlias(from.getSubproject().getAlias());
+      dto.setSubprojectPriority(from.getSubproject().getPriority());
     }
     if (from.getParent() != null) {
       dto.setParentId(from.getParent().getId());
@@ -995,6 +1001,11 @@ public class Dtos {
     }
     if (from.getSample() != null) {
       dto.setIdentityConsentLevel(getIdentityConsentLevelString((DetailedSample) from.getSample()));
+      DetailedSample detailed = (DetailedSample) from.getSample();
+      if (detailed.getSubproject() != null) {
+        dto.setSubprojectAlias(detailed.getSubproject().getAlias());
+        dto.setSubprojectPriority(detailed.getSubproject().getPriority());
+      }
     }
     return dto;
   }
@@ -1421,7 +1432,12 @@ public class Dtos {
 
     Sample sample = from.getSample();
     if (isDetailedSample(sample)) {
-      dto.setIdentityConsentLevel(getIdentityConsentLevelString((DetailedSample) sample));
+      DetailedSample detailed = (DetailedSample) sample;
+      dto.setIdentityConsentLevel(getIdentityConsentLevelString(detailed));
+      if (detailed.getSubproject() != null) {
+        dto.setSubprojectAlias(detailed.getSubproject().getAlias());
+        dto.setSubprojectPriority(detailed.getSubproject().getPriority());
+      }
     }
     return dto;
   }
@@ -1503,6 +1519,7 @@ public class Dtos {
     }
     dto.setDiscarded(from.isDiscarded());
     dto.setHasLowQualityLibraries(from.getHasLowQualityMembers());
+    dto.setPrioritySubprojectAliases(from.getPrioritySubprojectAliases());
 
     return dto;
   }

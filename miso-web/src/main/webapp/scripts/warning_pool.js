@@ -33,6 +33,9 @@ WarningTarget.pool = {
     }
     var warnings = [];
     warnings = Warning.addWarnings([
+      [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0, 'Belongs to high priority subproject'
+        + (pool.prioritySubprojectAliases.length == 1 ? ' \'' + pool.prioritySubprojectAliases[0] + '\'' :
+          's: ' + pool.prioritySubprojectAliases.join(', '))],
       [pool.duplicateIndices, "This pool contains duplicate indices!"],
       [pool.nearDuplicateIndices && !pool.duplicateIndices, "This pool contains near-duplicate indices!"],
       [pool.hasEmptySequence, "This pool contains at least one library with no index!"],
@@ -44,6 +47,8 @@ WarningTarget.pool = {
   tableWarnings: function(data, type, pool){
     var warnings = [];
     warnings = Warning.addWarnings([
+      [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0, 'PRIORITY (' 
+        + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] : 'MULTIPLE') + ')'],
       [pool.duplicateIndices, "(DUPLICATE INDICES)"],
       [pool.nearDuplicateIndices && !pool.duplicateIndices, "(NEAR-DUPLICATE INDICES)"],
       [pool.hasEmptySequence, "(MISSING INDEX)"],
@@ -57,6 +62,9 @@ WarningTarget.pool = {
   tileWarnings: function(pool){
     var warnings = [];
     warnings = Warning.addWarnings([
+      [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0, 'PRIORITY ('
+        + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] :
+          pool.prioritySubprojectAliases.join(', ')) + ')'],
       [pool.duplicateIndices, "DUPLICATE INDICES"],
       [pool.nearDuplicateIndices && !pool.duplicateIndices, "NEAR-DUPLICATE INDICES"],
       [pool.hasEmptySequence, "MISSING INDEX"],

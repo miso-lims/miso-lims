@@ -115,6 +115,12 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private String projectAlias;
 
+  private Long subprojectId;
+
+  private String subprojectAlias;
+
+  private Boolean subprojectPriority;
+
   private String lastModifierName;
 
   private String creatorName;
@@ -285,6 +291,30 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   public void setProjectName(String projectName) {
     this.projectName = projectName;
+  }
+
+  public Long getSubprojectId() {
+    return subprojectId;
+  }
+
+  public void setSubprojectId(Long subprojectId) {
+    this.subprojectId = subprojectId;
+  }
+
+  public String getSubprojectAlias() {
+    return subprojectAlias;
+  }
+
+  public void setSubprojectAlias(String subprojectAlias) {
+    this.subprojectAlias = subprojectAlias;
+  }
+
+  public Boolean getSubprojectPriority() {
+    return subprojectPriority;
+  }
+
+  public void setSubprojectPriority(Boolean subprojectPriority) {
+    this.subprojectPriority = subprojectPriority;
   }
 
   public String getDilutionBarcode() {

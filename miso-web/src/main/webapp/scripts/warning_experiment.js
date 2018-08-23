@@ -33,18 +33,17 @@ WarningTarget.experiment_run_partition = {
     var prettyName = data.name + " (" + data.alias + ")";
     if (type === 'display') {
       var warnings = [];
-      if (data.duplicateIndices) {
-        warnings.push("(DUPLICATE INDICES)");
-      } else if (data.nearDuplicateIndices) {
-        warnings.push("(NEAR-DUPLICATE INDICES)");
-      }
-      if (data.hasLowQualityLibraries) {
-        warnings.push("(LOW QUALITY LIBRARIES)");
-      }
-      if(data.hasEmptySequence){
-        warnings.push("(MISSING INDEX)");
-      }
-
+      warnings = Warning.addWarnings([
+        [data.prioritySubprojectAliases && data.prioritySubprojectAliases.length > 0, 'PRIORITY (' 
+          + (data.prioritySubprojectAliases.length == 1 ? data.prioritySubprojectAliases[0] : 'MULTIPLE') + ')'],
+        [data.duplicateIndices, "(DUPLICATE INDICES)"],
+        [data.nearDuplicateIndices && !data.duplicateIndices, "(NEAR-DUPLICATE INDICES)"],
+        [data.hasEmptySequence, "(MISSING INDEX)"],
+        [data.hasLowQualityLibraries, "(LOW QUALITY LIBRARIES)"],
+        [data.pooledElements && data.pooledElements.some(function(dilution){
+          return dilution.identityConsentLevel === 'Revoked';
+        }), "(CONSENT REVOKED)"]
+        ], warnings);
       return Warning.generateTableWarnings("<a href=\"/miso/pool/" + data.id + "\">" + prettyName + "</a>", warnings);
     } else {
       return prettyName;

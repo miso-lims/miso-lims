@@ -34,6 +34,8 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
   private String ngUsed;
   private String volumeUsed;
   private Integer proportion;
+  private String subprojectAlias;
+  private Boolean subprojectPriority;
 
   public Long getId() {
     return id;
@@ -196,6 +198,22 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setProportion(Integer proportion) {
     this.proportion = proportion;
+  }
+
+  public String getSubprojectAlias() {
+    return subprojectAlias;
+  }
+
+  public void setSubprojectAlias(String subprojectAlias) {
+    this.subprojectAlias = subprojectAlias;
+  }
+
+  public Boolean getSubprojectPriority() {
+    return subprojectPriority;
+  }
+
+  public void setSubprojectPriority(Boolean subprojectPriority) {
+    this.subprojectPriority = subprojectPriority;
   }
 
 }

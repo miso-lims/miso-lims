@@ -25,6 +25,7 @@ WarningTarget.library = {
   headerWarnings: function(library){
     var warnings = [];
     warnings = Warning.addWarnings([
+      [library.subprojectPriority, 'Belongs to high priority subproject \'' + library.subprojectAlias + '\''],
       [parseFloat(library.volume) < 0, 'This library has a negative volume!'],
       [library.identityConsentLevel === 'Revoked', 'Donor has revoked consent']
       ], warnings);
@@ -33,6 +34,7 @@ WarningTarget.library = {
   tableWarnings: function(data, type, library){
     var warnings = [];
     warnings = Warning.addWarnings([
+      [library.subprojectPriority, 'PRIORITY (' + library.subprojectAlias + ')'],
       [parseFloat(library.volume) < 0, '(NEGATIVE VOLUME)'],
       [library.identityConsentLevel === 'Revoked', '(CONSENT REVOKED)']
       ], warnings);

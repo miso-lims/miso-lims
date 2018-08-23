@@ -38,6 +38,7 @@ WarningTarget.poolelement = {
         
         var warnings = [];
         warnings = Warning.addWarnings([
+          [dilution.subprojectPriority, 'PRIORITY (' + dilution.subprojectAlias + ')'],
           [duplicateSequences && duplicateSequences.indexOf(combined) != -1, "(DUPLICATE INDEX)"],
           [nearDuplicateSequences && nearDuplicateSequences.indexOf(combined) != -1 && 
             !(duplicateSequences && duplicateSequences.indexOf(combined) != -1), "(NEAR-DUPLICATE INDEX)"],
