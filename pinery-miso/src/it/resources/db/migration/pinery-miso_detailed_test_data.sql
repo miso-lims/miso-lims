@@ -157,22 +157,22 @@ INSERT INTO TargetedSequencing_KitDescriptor (targetedSequencingId, kitDescripto
 
 -- Sample Hierarchy
 
-INSERT INTO DetailedSample (sampleId, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, concentration, archived) VALUES
-(1, 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, 0),
-(2, 23, 1, NULL, '7357', 'TEST', 1, NULL, NULL, 0),
-(3, 24, 2, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(4, 8, 2, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(5, 10, 3, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(6, 11, 5, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(7, 13, 2, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(8, 15, 6, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(9, 17, 7, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(10, 14, 7, 2, '7357', 'TEST', 1, NULL, NULL, 0),
-(11, 21, 10, 2, '7357', 'TEST', 1, NULL, NULL, 0),
-(12, 18, 9, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(13, 19, 9, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(14, 20, 9, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(15, 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, 1);
+INSERT INTO DetailedSample (sampleId, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, archived) VALUES
+(1, 1, NULL, NULL, NULL, NULL, 1, NULL, 0),
+(2, 23, 1, NULL, '7357', 'TEST', 1, NULL, 0),
+(3, 24, 2, 1, '7357', 'TEST', 1, NULL, 0),
+(4, 8, 2, 1, '7357', 'TEST', 1, NULL, 0),
+(5, 10, 3, 1, '7357', 'TEST', 1, NULL, 0),
+(6, 11, 5, 1, '7357', 'TEST', 1, NULL, 0),
+(7, 13, 2, 1, '7357', 'TEST', 1, NULL, 0),
+(8, 15, 6, 1, '7357', 'TEST', 1, NULL, 0),
+(9, 17, 7, 1, '7357', 'TEST', 1, NULL, 0),
+(10, 14, 7, 2, '7357', 'TEST', 1, NULL, 0),
+(11, 21, 10, 2, '7357', 'TEST', 1, NULL, 0),
+(12, 18, 9, 1, '7357', 'TEST', 1, NULL, 0),
+(13, 19, 9, 1, '7357', 'TEST', 1, NULL, 0),
+(14, 20, 9, 1, '7357', 'TEST', 1, NULL, 0),
+(15, 1, NULL, NULL, NULL, NULL, 1, NULL, 1);
 
 INSERT INTO Identity (sampleId, externalName, donorSex, consentLevel) VALUES
   (1, 'TEST_external_1', 'MALE', 'THIS_PROJECT'),
