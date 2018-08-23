@@ -617,6 +617,14 @@ HotTarget.sample = (function() {
           HotUtils.makeColumnForInt('Slides Consumed', (show['Tissue Processing'] && config.targetSampleClass.alias == 'LCM Tube'),
               'slidesConsumed', HotUtils.validator.requiredPositiveInt),
 
+          // Tissue Processing: Single Cell columns
+          HotUtils.makeColumnForFloat('Initial Cell Conc.', (show['Tissue Processing'] && config.targetSampleClass.alias == 'Single Cell'),
+              'initialCellConcentration', false),
+          HotUtils.makeColumnForText('Digestion', (show['Tissue Processing'] && config.targetSampleClass.alias == 'Single Cell'),
+              'digestion', {
+                validator: HotUtils.validator.requiredTextNoSpecialChars
+              }),
+
           // Stock columns
           HotUtils.makeColumnForEnum('STR Status', show['Stock'] && !config.isLibraryReceipt, true, 'strStatus', Constants.strStatuses,
               null),
@@ -685,6 +693,13 @@ HotTarget.sample = (function() {
               obj['concentrationUnits'] = !!units ? units.name : null;
             }
           },
+          // Stock: Single Cell columns
+          HotUtils.makeColumnForFloat('Target Cell Recovery',
+              (show['Stock'] && config.targetSampleClass.alias == 'Single Cell DNA (stock)'), 'targetCellRecovery', false),
+          HotUtils.makeColumnForFloat('Cell Viability', (show['Stock'] && config.targetSampleClass.alias == 'Single Cell DNA (stock)'),
+              'cellViability', false),
+          HotUtils.makeColumnForFloat('Loading Cell Conc.', (show['Stock'] && config.targetSampleClass.alias == 'Single Cell DNA (stock)'),
+              'loadingCellConcentration', false),
 
           // QC status columns for detailed and non-detailed samples
           {
@@ -787,7 +802,10 @@ HotTarget.sample = (function() {
                     })
                   });
                 }
-              })];
+              }),
+          // Aliquot: Single Cell columns
+          HotUtils.makeColumnForFloat('Input into Library',
+              (show['Aliquot'] && config.targetSampleClass.alias == 'Single Cell DNA (aliquot)'), 'inputIntoLibrary', false)];
 
       if (!config.isLibraryReceipt) {
         var spliceIndex = columns.indexOf(columns.filter(function(column) {

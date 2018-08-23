@@ -240,6 +240,75 @@ FOR EACH ROW
   END IF;
   END//
 
+DROP TRIGGER IF EXISTS SampleSingleCellChange//
+CREATE TRIGGER SampleSingleCellChange BEFORE UPDATE ON SampleSingleCell
+FOR EACH ROW
+  BEGIN
+	DECLARE log_message varchar(500) CHARACTER SET utf8;
+    SET log_message = CONCAT_WS(', ',
+      CASE WHEN (NEW.initialCellConcentration IS NULL) <> (OLD.initialCellConcentration IS NULL) OR NEW.initialCellConcentration <> OLD.initialCellConcentration THEN CONCAT('initial cell concentration: ', COALESCE(OLD.initialCellConcentration, 'n/a'), ' → ', COALESCE(NEW.initialCellConcentration, 'n/a')) END,
+      CASE WHEN NEW.digestion <> OLD.digestion THEN CONCAT('digestion: ', OLD.digestion, ' → ', NEW.digestion) END);
+    IF log_message IS NOT NULL AND log_message <> '' THEN
+      INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
+      SELECT
+        NEW.sampleId,
+        COALESCE(CONCAT_WS(',',
+          CASE WHEN (NEW.initialCellConcentration IS NULL) <> (OLD.initialCellConcentration IS NULL) OR NEW.initialCellConcentration <> OLD.initialCellConcentration THEN 'initialConcentration' END,
+          CASE WHEN NEW.digestion <> OLD.digestion THEN 'digestion' END
+        ), ''),
+        lastModifier,
+        log_message,
+        lastModified
+      FROM Sample WHERE sampleId = NEW.sampleId;
+    END IF;
+  END//
+
+DROP TRIGGER IF EXISTS SampleStockSingleCellChange//
+CREATE TRIGGER SampleStockSingleCellChange BEFORE UPDATE ON SampleStockSingleCell
+FOR EACH ROW
+  BEGIN
+	DECLARE log_message varchar(500) CHARACTER SET utf8;
+    SET log_message = CONCAT_WS(', ',
+      CASE WHEN (NEW.targetCellRecovery IS NULL) <> (OLD.targetCellRecovery IS NULL) OR NEW.targetCellRecovery <> OLD.targetCellRecovery THEN CONCAT('target cell recovery: ', COALESCE(OLD.targetCellRecovery, 'n/a'), ' → ', COALESCE(NEW.targetCellRecovery, 'n/a')) END,
+      CASE WHEN (NEW.cellViability IS NULL) <> (OLD.cellViability IS NULL) OR NEW.cellViability <> OLD.cellViability THEN CONCAT('cell viability: ', COALESCE(OLD.cellViability, 'n/a'), ' → ', COALESCE(NEW.cellViability, 'n/a')) END,
+      CASE WHEN (NEW.loadingCellConcentration IS NULL) <> (OLD.loadingCellConcentration IS NULL) OR NEW.loadingCellConcentration <> OLD.loadingCellConcentration THEN CONCAT('loading cell concentration: ', COALESCE(OLD.loadingCellConcentration, 'n/a'), ' → ', COALESCE(NEW.loadingCellConcentration, 'n/a')) END);
+    IF log_message IS NOT NULL AND log_message <> '' THEN
+      INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
+      SELECT
+        NEW.sampleId,
+        COALESCE(CONCAT_WS(',',
+          CASE WHEN (NEW.targetCellRecovery IS NULL) <> (OLD.targetCellRecovery IS NULL) OR NEW.targetCellRecovery <> OLD.targetCellRecovery THEN 'targetCellRecovery' END,
+          CASE WHEN (NEW.cellViability IS NULL) <> (OLD.cellViability IS NULL) OR NEW.cellViability <> OLD.cellViability THEN 'cellViability' END,
+          CASE WHEN (NEW.loadingCellConcentration IS NULL) <> (OLD.loadingCellConcentration IS NULL) OR NEW.loadingCellConcentration <> OLD.loadingCellConcentration THEN 'loadingCellConcentration' END
+        ), ''),
+        lastModifier,
+        log_message,
+        lastModified
+      FROM Sample WHERE sampleId = NEW.sampleId;
+    END IF;
+  END//
+
+DROP TRIGGER IF EXISTS SampleAliquotSingleCellChange//
+CREATE TRIGGER SampleAliquotSingleCellChange BEFORE UPDATE ON SampleAliquotSingleCell
+FOR EACH ROW
+  BEGIN
+    DECLARE log_message varchar(500) CHARACTER SET utf8;
+    SET log_message = CONCAT_WS(', ',
+      CASE WHEN (NEW.inputIntoLibrary IS NULL) <> (OLD.inputIntoLibrary IS NULL) OR NEW.inputIntoLibrary <> OLD.inputIntoLibrary THEN CONCAT('input into library: ', COALESCE(OLD.inputIntoLibrary, 'n/a'), ' → ', COALESCE(NEW.inputIntoLibrary, 'n/a')) END);
+    IF log_message IS NOT NULL AND log_message <> '' THEN
+      INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
+      SELECT
+        NEW.sampleId,
+        COALESCE(CONCAT_WS(',',
+          CASE WHEN (NEW.inputIntoLibrary IS NULL) <> (OLD.inputIntoLibrary IS NULL) OR NEW.inputIntoLibrary <> OLD.inputIntoLibrary THEN 'inputINtoLibrary' END
+        ), ''),
+        lastModifier,
+        log_message,
+        lastModified
+      FROM Sample WHERE sampleId = NEW.sampleId;
+    END IF;
+  END//
+
 DROP TRIGGER IF EXISTS BeforeInsertSample//
 
 DROP TRIGGER IF EXISTS SampleInsert//

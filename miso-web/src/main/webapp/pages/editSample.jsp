@@ -578,6 +578,9 @@
           </table>
         </div>
         </c:when>
+        <c:when test="${sampleClass eq 'Single Cell' or sampleCategory eq 'new'}">
+        TODO
+        </c:when>
         </c:choose>
       </c:if>
 

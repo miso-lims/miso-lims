@@ -60,10 +60,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -220,12 +223,27 @@ public class LimsUtils {
     return sample instanceof SampleLCMTube;
   }
 
+  public static boolean isProcessingSingleCellSample(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
+    return sample instanceof SampleSingleCell;
+  }
+
   public static boolean isStockSample(Sample sample) {
     return sample instanceof SampleStock || safeCategoryCheck(sample, SampleStock.CATEGORY_NAME);
   }
 
+  public static boolean isStockSingleCellSample(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
+    return sample instanceof SampleStockSingleCell;
+  }
+
   public static boolean isAliquotSample(Sample sample) {
     return sample instanceof SampleAliquot || safeCategoryCheck(sample, SampleAliquot.CATEGORY_NAME);
+  }
+
+  public static boolean isAliquotSingleCellSample(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
+    return sample instanceof SampleAliquotSingleCell;
   }
 
   public static boolean isSampleSlide(DetailedSample sample) {
