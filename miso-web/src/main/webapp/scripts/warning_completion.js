@@ -26,10 +26,15 @@ WarningTarget.completion = {
       var warnings = [];
       var pool = full.pool;
       warnings = Warning.addWarnings([
+        [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0, 'PRIORITY (' 
+          + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] : 'MULTIPLE') + ')'],
         [pool.duplicateIndices, "(DUPLICATE INDICES)"],
         [pool.nearDuplicateIndices && !pool.duplicateIndices, "(NEAR-DUPLICATE INDICES)"],
         [pool.hasEmptySequence, "(MISSING INDEX)"],
-        [pool.hasLowQualityLibraries, "(LOW QUALITY LIBRARIES)"]
+        [pool.hasLowQualityLibraries, "(LOW QUALITY LIBRARIES)"],
+        [pool.pooledElements && pool.pooledElements.some(function(dilution){
+          return dilution.identityConsentLevel === 'Revoked';
+        }), "(CONSENT REVOKED)"]
         ], warnings);
       return Warning.generateTableWarnings(data, warnings);
     }

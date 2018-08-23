@@ -980,7 +980,11 @@ public class EditSampleController {
         dto.setParentAlias(sample.getAlias());
         dto.setParentTissueSampleClassId(sample.getSampleClass().getId());
         dto.setProjectId(sample.getProject().getId());
-        if (sample.getSubproject() != null) dto.setSubprojectId(sample.getSubproject().getId());
+        if (sample.getSubproject() != null) {
+          dto.setSubprojectId(sample.getSubproject().getId());
+          dto.setSubprojectAlias(sample.getSubproject().getAlias());
+          dto.setSubprojectPriority(sample.getSubproject().getPriority());
+        }
         dto.setGroupId(sample.getGroupId());
         dto.setGroupDescription(sample.getGroupDescription());
 

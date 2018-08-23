@@ -656,4 +656,10 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     return getId() != UNSAVED_ID;
   }
 
+  @Override
+  public Set<String> getPrioritySubprojectAliases() {
+    return poolDilutions.stream()
+        .map(PoolDilution::getPoolableElementView).filter(view -> view.getSubprojectPriority() != null && view.getSubprojectPriority())
+        .map(view -> view.getSubprojectAlias()).collect(Collectors.toSet());
+  }
 }

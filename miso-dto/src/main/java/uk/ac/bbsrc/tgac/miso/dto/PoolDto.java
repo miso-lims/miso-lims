@@ -42,6 +42,7 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
   private int dilutionCount;
   private Double insertSize;
   private boolean hasEmptySequence;
+  private Set<String> prioritySubprojectAliases;
 
   public String getAlias() {
     return alias;
@@ -260,6 +261,14 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setHasEmptySequence(boolean hasEmptySequence) {
     this.hasEmptySequence = hasEmptySequence;
+  }
+
+  public Set<String> getPrioritySubprojectAliases() {
+    return prioritySubprojectAliases;
+  }
+
+  public void setPrioritySubprojectAliases(Set<String> prioritySubprojectAliases) {
+    this.prioritySubprojectAliases = prioritySubprojectAliases;
   }
 
 }
