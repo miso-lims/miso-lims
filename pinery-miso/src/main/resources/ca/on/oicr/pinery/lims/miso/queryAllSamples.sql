@@ -16,7 +16,7 @@ SELECT s.alias NAME
         ,s.identificationBarcode tubeBarcode
         ,s.volume volume
         ,s.discarded discarded
-        ,sai.concentration concentration
+        ,s.concentration concentration
         ,s.locationBarcode storageLocation
         ,NULL kitName
         ,NULL kitDescription

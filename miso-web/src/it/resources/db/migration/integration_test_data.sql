@@ -437,29 +437,29 @@ INSERT INTO Sample(sampleId, project_projectId, name, alias, securityProfile_pro
   lastModifier, lastModified, volume, concentration, volumeUnits, concentrationUnits) VALUES
   (2201, 2200, 'SAM2201', 'UQC_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2018-07-10 12:53:00', 1, '2018-07-10 12:53:00', 50, 60, NULL, 'NANOGRAMS_PER_MICROLITRE');
 
-INSERT INTO DetailedSample (sampleId, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, concentration, archived) VALUES
-(1, 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, 0),
-(2, 23, 1, NULL, '7357', 'TEST', 1, NULL, NULL, 0),
-(3, 24, 2, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(4, 8, 2, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(5, 10, 3, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(6, 11, 5, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(7, 13, 2, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(8, 15, 6, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(9, 17, 7, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(10, 14, 7, 2, '7357', 'TEST', 1, NULL, NULL, 0),
-(11, 21, 10, 2, '7357', 'TEST', 1, NULL, NULL, 0),
-(12, 18, 9, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(13, 19, 9, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(14, 20, 9, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(4441, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
-(4442, 23, 4441, 1, NULL, NULL, NULL, NULL, NULL, 0),
-(4443, 24, 4442, 1, NULL, NULL, NULL, NULL, NULL, 0),
-(4444, 10, 4443, 1, NULL, NULL, NULL, NULL, NULL, 0),
-(4445, 14, 4442, 1, NULL, NULL, NULL, NULL, NULL, 0),
-(4446, 13, 4442, 1, NULL, NULL, NULL, NULL, NULL, 0),
-(4447, 17, 4446, 1, NULL, NULL, NULL, NULL, NULL, 0),
-(2201, 23, 4441, 1, NULL, NULL, NULL, NULL, NULL, 0);
+INSERT INTO DetailedSample (sampleId, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, archived) VALUES
+(1, 1, NULL, NULL, NULL, NULL, 1, NULL, 0),
+(2, 23, 1, NULL, '7357', 'TEST', 1, NULL, 0),
+(3, 24, 2, 1, '7357', 'TEST', 1, NULL, 0),
+(4, 8, 2, 1, '7357', 'TEST', 1, NULL, 0),
+(5, 10, 3, 1, '7357', 'TEST', 1, NULL, 0),
+(6, 11, 5, 1, '7357', 'TEST', 1, NULL, 0),
+(7, 13, 2, 1, '7357', 'TEST', 1, NULL, 0),
+(8, 15, 6, 1, '7357', 'TEST', 1, NULL, 0),
+(9, 17, 7, 1, '7357', 'TEST', 1, NULL, 0),
+(10, 14, 7, 2, '7357', 'TEST', 1, NULL, 0),
+(11, 21, 10, 2, '7357', 'TEST', 1, NULL, 0),
+(12, 18, 9, 1, '7357', 'TEST', 1, NULL, 0),
+(13, 19, 9, 1, '7357', 'TEST', 1, NULL, 0),
+(14, 20, 9, 1, '7357', 'TEST', 1, NULL, 0),
+(4441, 1, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(4442, 23, 4441, 1, NULL, NULL, NULL, NULL, 0),
+(4443, 24, 4442, 1, NULL, NULL, NULL, NULL, 0),
+(4444, 10, 4443, 1, NULL, NULL, NULL, NULL, 0),
+(4445, 14, 4442, 1, NULL, NULL, NULL, NULL, 0),
+(4446, 13, 4442, 1, NULL, NULL, NULL, NULL, 0),
+(4447, 17, 4446, 1, NULL, NULL, NULL, NULL, 0),
+(2201, 23, 4441, 1, NULL, NULL, NULL, NULL, 0);
 
 INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId, archived) VALUES
   (100001, 1, NULL, 1, 0),  -- Identity
