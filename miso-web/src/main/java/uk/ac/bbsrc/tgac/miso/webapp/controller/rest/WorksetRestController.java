@@ -29,6 +29,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -37,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.WorksetService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
 @RequestMapping("/rest/worksets")
@@ -50,6 +52,8 @@ public class WorksetRestController extends RestController {
   private LibraryService libraryService;
   @Autowired
   private LibraryDilutionService dilutionService;
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   private final JQueryDataTableBackend<Workset, WorksetDto> jQueryBackend = new JQueryDataTableBackend<Workset, WorksetDto>() {
 
@@ -65,10 +69,17 @@ public class WorksetRestController extends RestController {
 
   };
 
-  @GetMapping(value = "/dt", produces = "application/json")
+  @GetMapping(value = "/dt/all", produces = "application/json")
   public @ResponseBody DataTablesResponseDto<WorksetDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
+  }
+
+  @GetMapping(value = "/dt/mine", produces = "application/json")
+  public @ResponseBody DataTablesResponseDto<WorksetDto> dataTableForUser(HttpServletRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+    String username = authorizationManager.getCurrentUsername();
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.user(username, true));
   }
 
   @GetMapping

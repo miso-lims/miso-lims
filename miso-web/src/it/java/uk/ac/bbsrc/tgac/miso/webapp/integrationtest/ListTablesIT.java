@@ -77,6 +77,7 @@ public class ListTablesIT extends AbstractIT {
   private static final Set<String> kitsTabs = Sets.newHashSet(Tabs.CLUSTERING, Tabs.EXTRACTION, Tabs.LIBRARY, Tabs.MULTIPLEXING,
       Tabs.SEQUENCING);
   private static final Set<String> indicesTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
+  private static final Set<String> worksetsTabs = Sets.newHashSet(Tabs.MINE, Tabs.ALL);
 
   private static final Map<String, Set<String>> tabsForTarget;
   static {
@@ -90,6 +91,7 @@ public class ListTablesIT extends AbstractIT {
     tabs.put(ListTarget.BOXES, boxesTabs);
     tabs.put(ListTarget.KITS, kitsTabs);
     tabs.put(ListTarget.INDICES, indicesTabs);
+    tabs.put(ListTarget.WORKSETS, worksetsTabs);
     tabsForTarget = Collections.unmodifiableMap(tabs);
   }
 
@@ -109,6 +111,7 @@ public class ListTablesIT extends AbstractIT {
     preferredTab.put(ListTarget.BOXES, Tabs.STORAGE);
     preferredTab.put(ListTarget.KITS, Tabs.LIBRARY);
     preferredTab.put(ListTarget.INDICES, Tabs.ILLUMINA);
+    preferredTab.put(ListTarget.WORKSETS, Tabs.MINE);
     sortOnTab = Collections.unmodifiableMap(preferredTab);
   }
 
@@ -384,12 +387,12 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListWorksetsSetup() throws Exception {
-    testPageSetup(ListTarget.WORKSETS, worksetsColumns);
+    testTabbedPageSetup(ListTarget.WORKSETS, worksetsColumns);
   }
 
   @Test
   public void testListWorksetsColumnSort() throws Exception {
-    testColumnsSort(ListTarget.WORKSETS);
+    testTabbedColumnsSort(ListTarget.WORKSETS);
   }
 
   private void testPageSetup(String listTarget, Set<String> targetColumns) {

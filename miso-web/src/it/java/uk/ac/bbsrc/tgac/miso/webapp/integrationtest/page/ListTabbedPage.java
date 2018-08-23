@@ -32,6 +32,8 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
     public static final String LIBRARY = "Library";
     public static final String MULTIPLEXING = "Multiplexing";
     public static final String SEQUENCING = "Sequencing";
+    public static final String MINE = "Mine";
+    public static final String ALL = "All";
   }
 
   @FindBy(className = "dataTables_wrapper")

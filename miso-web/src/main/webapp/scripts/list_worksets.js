@@ -24,7 +24,7 @@
 ListTarget.workset = {
   name: "Worksets",
   createUrl: function(config, projectId) {
-    return '/miso/rest/worksets/dt';
+    return '/miso/rest/worksets/dt/' + config.creator;
   },
   createBulkActions: function(config, projectId) {
     return [{
@@ -59,6 +59,11 @@ ListTarget.workset = {
           sTitle: 'Description',
           mData: 'description',
           include: true,
+          iSortPriority: 0
+        }, {
+          sTitle: 'Creator',
+          mData: 'creator',
+          include: config.creator === 'all',
           iSortPriority: 0
         }, {
           sTitle: "Last Modified",
