@@ -524,7 +524,9 @@ public class MisoClient implements Lims {
         box = temp.getBox();
         boxes.put(box.getId(), box);
       }
-      box.getPositions().add(temp.getBoxPosition());
+      if (temp.getSampleId() != null) {
+        box.getPositions().add(temp.getBoxPosition());
+      }
     }
     return Lists.newArrayList(boxes.values());
   }
@@ -1007,7 +1009,10 @@ public class MisoClient implements Lims {
       pos.setRows(rs.getInt("rows"));
       pos.setColumns(rs.getInt("columns"));
       pos.setPosition(rs.getString("position"));
-      pos.setSampleId(rs.getString("targetType"), rs.getLong("targetId"));
+      String targetType = rs.getString("targetType");
+      if (!rs.wasNull()) {
+        pos.setSampleId(targetType, rs.getLong("targetId"));
+      }
       return pos;
     }
 
