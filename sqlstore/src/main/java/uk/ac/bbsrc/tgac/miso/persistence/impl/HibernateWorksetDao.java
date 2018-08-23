@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 public class HibernateWorksetDao implements WorksetStore, HibernatePaginatedDataSource<Workset> {
 
   private static final String[] SEARCH_PROPERTIES = new String[] { "alias", "description" };
-  private static final List<String> STANDARD_ALIASES = Collections.emptyList();
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("creator", "lastModifier");
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -146,7 +146,7 @@ public class HibernateWorksetDao implements WorksetStore, HibernatePaginatedData
 
   @Override
   public String propertyForUserName(Criteria criteria, boolean creator) {
-    return null;
+    return creator ? "creator.loginName" : "lastModifier.loginName";
   }
 
   @Override
