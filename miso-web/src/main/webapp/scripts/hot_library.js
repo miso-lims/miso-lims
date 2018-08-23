@@ -465,7 +465,7 @@ HotTarget.library = (function() {
               var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, value);
               var readOnly = false;
               if (template && template.platformType) {
-                setData(template.platformType);
+                setData(Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.namePredicate(template.platformType), Constants.platformTypes), 'key'));
                 readOnly = true;
               }
               setReadOnly(readOnly);
