@@ -246,20 +246,9 @@ public interface Library
    */
   public void setPlatformType(String platformName);
 
-  /**
-   * Returns the initialConcentration of this Library object.
-   * 
-   * @return Double initialConcentration.
-   */
-  public Double getInitialConcentration();
+  public Double getConcentration();
 
-  /**
-   * Sets the initialConcentration of this Library object.
-   * 
-   * @param initialConcentration
-   *          initialConcentration.
-   */
-  public void setInitialConcentration(Double initialConcentration);
+  public void setConcentration(Double concentration);
 
   /**
    * Returns the qcPassed of this Library object.

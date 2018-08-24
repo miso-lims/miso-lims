@@ -495,7 +495,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     target.setDescription(source.getDescription());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setLocationBarcode(source.getLocationBarcode());
-    target.setInitialConcentration(source.getInitialConcentration());
+    target.setConcentration(source.getConcentration());
     target.setConcentrationUnits(source.getConcentrationUnits());
     target.setPlatformType(source.getPlatformType());
     target.setAlias(source.getAlias());

@@ -410,7 +410,7 @@ public class LibraryPageIT extends AbstractIT {
     assertAttribute(Field.DISCARDED, expectedValues, Boolean.toString(lib.isDiscarded()));
     assertAttribute(Field.LOCATION, expectedValues, lib.getLocationBarcode());
     assertAttribute(Field.KIT, expectedValues, nullOrGet(lib.getKitDescriptor(), KitDescriptor::getName));
-    assertAttribute(Field.CONCENTRATION, expectedValues, nullOrToString(lib.getInitialConcentration()));
+    assertAttribute(Field.CONCENTRATION, expectedValues, nullOrToString(lib.getConcentration()));
     assertAttribute(Field.ARCHIVED, expectedValues, lib.getArchived().toString());
   }
 

@@ -69,7 +69,7 @@ var Library = Library || {
     jQuery('#receiveddatepicker').attr('data-date-format', 'YYYY-MM-DD');
     jQuery('#receiveddatepicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
     jQuery('#receiveddatepicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
-    
+
     // Date of Creation validation: ensure date is of correct form
     jQuery('#creationdatepicker').attr('class', 'form-control');
     jQuery('#creationdatepicker').attr('data-date-format', 'YYYY-MM-DD');
@@ -121,11 +121,11 @@ var Library = Library || {
       jQuery('#libraryDesignCodes').attr('data-parsley-min', 1);
 
       // Concentration validation
-      jQuery('#initialConcentration').attr('class', 'form-control');
-      jQuery('#initialConcentration').attr('data-parsley-maxlength', '10');
-      jQuery('#initialConcentration').attr('data-parsley-type', 'number');
-      jQuery('#initialConcentration').attr('data-parsley-required', generatingAlias && selectedPlatform === 'PacBio');
-      
+      jQuery('#concentration').attr('class', 'form-control');
+      jQuery('#concentration').attr('data-parsley-maxlength', '10');
+      jQuery('#concentration').attr('data-parsley-type', 'number');
+      jQuery('#concentration').attr('data-parsley-required', generatingAlias && selectedPlatform === 'PacBio');
+
     }
 
     jQuery('#library-form').parsley();
@@ -266,18 +266,18 @@ Library.ui = {
       widget.appendChild(option);
     }
     widget.value = selectedId ? selectedId : (position > 1 ? "" : 0);
-    if(family.uniqueDualIndex){
-      widget.onchange = function(){
+    if (family.uniqueDualIndex) {
+      widget.onchange = function() {
         var currentIndexValue = document.getElementById("index" + position).value;
-        var currentIndex = family.indices.find(function(index){
+        var currentIndex = family.indices.find(function(index) {
           return index.id == currentIndexValue;
         });
-        if(currentIndex){
+        if (currentIndex) {
           var nextIndexSelector = document.getElementById("index" + (position + 1));
-          var nextIndex = family.indices.find(function(index){
+          var nextIndex = family.indices.find(function(index) {
             return index.position == (position + 1) && index.name == currentIndex.name;
           });
-          if(nextIndex){
+          if (nextIndex) {
             nextIndexSelector.value = nextIndex.id;
           }
         }

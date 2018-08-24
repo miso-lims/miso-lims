@@ -110,8 +110,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Column(nullable = false)
   private boolean paired;
 
-  @Column(name = "concentration")
-  private Double initialConcentration;
+  private Double concentration;
 
   @Enumerated(EnumType.STRING)
   private ConcentrationUnit concentrationUnits;
@@ -414,13 +413,13 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public Double getInitialConcentration() {
-    return initialConcentration;
+  public Double getConcentration() {
+    return concentration;
   }
 
   @Override
-  public void setInitialConcentration(Double initialConcentration) {
-    this.initialConcentration = initialConcentration;
+  public void setConcentration(Double concentration) {
+    this.concentration = concentration;
   }
 
   @Override
@@ -601,7 +600,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(description)
         .append(identificationBarcode)
         .append(indices)
-        .append(initialConcentration)
+        .append(concentration)
         .append(librarySelectionType)
         .append(libraryStrategyType)
         .append(libraryType)
@@ -629,7 +628,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(description, other.description)
         .append(identificationBarcode, other.identificationBarcode)
         .append(indices, other.indices)
-        .append(initialConcentration, other.initialConcentration)
+        .append(concentration, other.concentration)
         .append(librarySelectionType, other.librarySelectionType)
         .append(libraryStrategyType, other.libraryStrategyType)
         .append(libraryType, other.libraryType)
@@ -655,7 +654,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getInitialConcentration(), getVolumeUnits().getUnits(),
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits().getUnits(),
         getConcentrationUnits().getUnits());
   }
 

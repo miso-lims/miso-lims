@@ -1100,8 +1100,8 @@ public class Dtos {
     dto.setCreationDate(formatDate(from.getCreationDate()));
     dto.setDescription(from.getDescription());
     dto.setId(from.getId());
-    if (from.getInitialConcentration() != null) {
-      dto.setConcentration(from.getInitialConcentration().toString());
+    if (from.getConcentration() != null) {
+      dto.setConcentration(from.getConcentration().toString());
     }
     dto.setConcentrationUnits(from.getConcentrationUnits());
     if (from.getLibrarySelectionType() != null) {
@@ -1179,7 +1179,7 @@ public class Dtos {
     to.setName(from.getName());
     to.setDescription(from.getDescription());
     to.setIdentificationBarcode(from.getIdentificationBarcode());
-    to.setInitialConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
+    to.setConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
     to.setConcentrationUnits(from.getConcentrationUnits());
     to.setLowQuality(from.getLowQuality());
     if (from.getPaired() != null) {
