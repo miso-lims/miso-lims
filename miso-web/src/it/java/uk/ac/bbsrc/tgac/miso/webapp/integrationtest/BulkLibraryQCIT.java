@@ -20,7 +20,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage.QcColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
@@ -195,8 +194,8 @@ public class BulkLibraryQCIT extends AbstractIT {
     
     assertTrue(
         String.format("Expected concentration to be updated to %f, instead got %f", Double.parseDouble("24.78"),
-            saved.getLibrary().getInitialConcentration()),
-        saved.getLibrary().getInitialConcentration().equals(Double.parseDouble("24.78")));
+            saved.getLibrary().getConcentration()),
+        saved.getLibrary().getConcentration().equals(Double.parseDouble("24.78")));
     assertTrue(
         String.format("Expected concentration units to be updated to %s, instead got %s", "nM",
             saved.getLibrary().getConcentrationUnits().getUnits()),

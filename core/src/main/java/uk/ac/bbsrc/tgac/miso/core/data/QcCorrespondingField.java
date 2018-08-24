@@ -14,7 +14,7 @@ public enum QcCorrespondingField {
 
     @Override
     public void updateField(Library library, double value, String units) {
-      library.setInitialConcentration(value);
+      library.setConcentration(value);
       ConcentrationUnit concUnit = ConcentrationUnit.getFromString(units);
       if (concUnit != null) {
         library.setConcentrationUnits(concUnit);

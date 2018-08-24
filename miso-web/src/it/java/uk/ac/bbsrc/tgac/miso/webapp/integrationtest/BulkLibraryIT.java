@@ -789,7 +789,7 @@ public class BulkLibraryIT extends AbstractIT {
       return lib.getDnaSize() == null ? null : lib.getDnaSize().toString();
     });
     testLibraryAttribute(LibColumns.VOLUME, attributes, library, lib -> lib.getVolume().toString());
-    testLibraryAttribute(LibColumns.CONCENTRATION, attributes, library, lib -> lib.getInitialConcentration().toString());
+    testLibraryAttribute(LibColumns.CONCENTRATION, attributes, library, lib -> lib.getConcentration().toString());
     testLibraryAttribute(LibColumns.RECEIVE_DATE, attributes, library, lib -> {
       return lib.getReceivedDate() == null ? null : LimsUtils.formatDate(lib.getReceivedDate());
     });
