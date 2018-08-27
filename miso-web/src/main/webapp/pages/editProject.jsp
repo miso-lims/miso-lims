@@ -139,6 +139,16 @@
         </form:select>
     </td>
   </tr>
+  <c:if test="${project.id != 0 && !projectReportLinks.isEmpty()}">
+  <tr>
+  	<td>External Links:</td>
+  	<td>
+  	<c:forEach items="${projectReportLinks}" var="projectReportLink">
+  	  <span><a href="<c:out value="${projectReportLink.value}"/>">${projectReportLink.key}</a></span><br/>
+  	</c:forEach>
+  	</td>
+  </tr>
+  </c:if>
 </table>
 
 <script type="text/javascript">

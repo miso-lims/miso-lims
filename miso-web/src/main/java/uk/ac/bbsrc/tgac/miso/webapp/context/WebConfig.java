@@ -56,12 +56,16 @@ public class WebConfig extends WebMvcConfigurationSupport {
     return adapter;
   }
 
+  @Value("${miso.project.report.links:}")
+  private String projectReportLinksConfigLine;
+
   @Value("${miso.run.report.links:}")
   private String runReportLinksConfigLine;
 
   @Bean
   public ExternalUriBuilder externalUriBuilder() {
     ExternalUriBuilder externalUriBuilder = new ExternalUriBuilder();
+    externalUriBuilder.setProjectReportLinksConfig(projectReportLinksConfigLine);
     externalUriBuilder.setRunReportLinksConfig(runReportLinksConfigLine);
     return externalUriBuilder;
   }

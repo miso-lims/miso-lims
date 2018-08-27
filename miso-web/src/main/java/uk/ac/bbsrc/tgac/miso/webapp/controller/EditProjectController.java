@@ -85,6 +85,7 @@ import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
+import uk.ac.bbsrc.tgac.miso.webapp.context.ExternalUriBuilder;
 
 @Controller
 @RequestMapping("/project")
@@ -94,13 +95,12 @@ public class EditProjectController {
 
   @Autowired
   private SecurityManager securityManager;
-
   @Autowired
   private ProjectService projectService;
-
   @Autowired
   private IssueTrackerManager issueTrackerManager;
-
+  @Autowired
+  private ExternalUriBuilder externalUriBuilder;
   @Autowired
   private ReferenceGenomeService referenceGenomeService;
   @Autowired
@@ -265,6 +265,7 @@ public class EditProjectController {
     }
 
     model.put("projectIssues", issues.stream().map(Dtos::asDto).collect(Collectors.toList()));
+    model.put("projectReportLinks", externalUriBuilder.getUris(project));
     model.put("referenceGenome", referenceGenomeService.listAllReferenceGenomeTypes());
 
     Collection<TargetedSequencing> targetedSequencingList = targetedSequencingService.list();
