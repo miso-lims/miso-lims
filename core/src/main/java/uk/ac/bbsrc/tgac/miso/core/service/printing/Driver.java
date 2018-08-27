@@ -7,6 +7,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -89,7 +90,7 @@ public enum Driver {
         sb.append("\n");
       };
       offset.addAndGet(multiline(28, 5, barcodable.getLabelText(), writer));
-      multiline(28, 5 - offset.get(), barcodable.getBarcodeExtraInfo(), writer);
+      multiline(28, 5 - offset.get(), StringEscapeUtils.unescapeHtml(barcodable.getBarcodeExtraInfo()), writer);
       sb.append("A ").append(copies).append("\n");
       return sb.toString();
     }
@@ -120,8 +121,8 @@ public enum Driver {
 
       offset.addAndGet(multiline(9, 4, barcodable.getLabelText(), writer));
       font.set(3);
-      offset.addAndGet(multiline(9, 2, barcodable.getBarcodeSizeInfo(), writer));
-      multiline(9, 7 - offset.get(), barcodable.getBarcodeExtraInfo(), writer);
+      offset.addAndGet(multiline(9, 2, StringEscapeUtils.unescapeHtml(barcodable.getBarcodeSizeInfo()), writer));
+      multiline(9, 7 - offset.get(), StringEscapeUtils.unescapeHtml(barcodable.getBarcodeExtraInfo()), writer);
       sb.append("A ").append(copies).append("\n");
       return sb.toString();
     }
@@ -229,7 +230,7 @@ public enum Driver {
       sb.append(getBarcode(b));
       sb.append("^FS\r\n");
       sb.append("^FT16,112^A0N,20,19^FH\\^FD");
-      appendTruncated(15, b.getBarcodeExtraInfo(), sb::append);
+      appendTruncated(15, StringEscapeUtils.unescapeHtml(b.getBarcodeExtraInfo()), sb::append);
       sb.append("^FS\r\n");
       sb.append("^XZ\n");
       return String.join("", Collections.nCopies(copies, sb.toString()));
@@ -262,7 +263,7 @@ public enum Driver {
       sb.append("^FS\r\n");
       sb.append("^FT76,62^A0N,20,19^FH\\^FD").append(LimsUtils.formatDate(b.getBarcodeDate())).append("^FS\r\n");
       sb.append("^FT76,88^A0N,18,16^FH\\^FD");
-      appendTruncated(12, b.getBarcodeExtraInfo(), sb::append);
+      appendTruncated(12, StringEscapeUtils.unescapeHtml(b.getBarcodeExtraInfo()), sb::append);
       sb.append("^FS\r\n");
       sb.append("^BY40,37^FT25,82^BXN,2,200,0,0,1,~\r\n");
       sb.append("^FH\\^FD");
@@ -301,7 +302,7 @@ public enum Driver {
       }
       sb.append("^FT14,94^A0N,20,19^FH^FD").append(LimsUtils.formatDate(b.getBarcodeDate())).append("^FS\r\n");
       sb.append("^FT13,74^A0N,20,19^FH^FD");
-      appendTruncated(12, b.getBarcodeExtraInfo(), s -> appendZebraEscapedUnicode(sb, s));
+      appendTruncated(12, StringEscapeUtils.unescapeHtml(b.getBarcodeExtraInfo()), s -> appendZebraEscapedUnicode(sb, s));
       sb.append("^FS\r\n");
       sb.append("^BY32,32^FT158,96^BXN,2,200,0,0,1,~\r\n");
       sb.append("^FH\\^FD").append(getBarcode(b)).append("^FS\r\n");
@@ -338,7 +339,7 @@ public enum Driver {
       }
       sb.append("^FT14,94^A0N,20,19^FH^FD").append(LimsUtils.formatDate(b.getBarcodeDate())).append("^FS\r\n");
       sb.append("^FT13,74^A0N,20,19^FH^FD");
-      appendTruncated(12, b.getBarcodeSizeInfo(), s -> appendZebraEscapedUnicode(sb, s));
+      appendTruncated(12, StringEscapeUtils.unescapeHtml(b.getBarcodeSizeInfo()), s -> appendZebraEscapedUnicode(sb, s));
       sb.append("^FS\r\n");
       sb.append("^BY32,32^FT158,96^BXN,2,200,0,0,1,~\r\n");
       sb.append("^FH\\^FD").append(getBarcode(b)).append("^FS\r\n");
