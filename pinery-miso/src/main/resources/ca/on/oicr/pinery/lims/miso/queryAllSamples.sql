@@ -136,7 +136,7 @@ SELECT l.alias NAME
         ,NULL tissueType 
         ,LEFT(l.alias, LOCATE('_', l.alias)-1) project 
         ,lai.archived archived 
-        ,l.creationDate created 
+        ,l.created created 
         ,l.creator createdById 
         ,l.lastModified modified 
         ,l.lastModifier modifiedById 
