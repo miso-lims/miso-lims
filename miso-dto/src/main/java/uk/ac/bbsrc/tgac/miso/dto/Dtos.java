@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -188,8 +189,8 @@ public class Dtos {
   public static TissueOrigin to(TissueOriginDto from) {
     TissueOrigin to = new TissueOriginImpl();
     if (from.getId() != null) to.setId(from.getId());
-    to.setAlias(from.getAlias());
-    to.setDescription(from.getDescription());
+    setString(to::setAlias, from.getAlias());
+    setString(to::setDescription, from.getDescription());
     return to;
   }
 
@@ -213,8 +214,8 @@ public class Dtos {
   public static TissueType to(TissueTypeDto from) {
     TissueType to = new TissueTypeImpl();
     if (from.getId() != null) to.setId(from.getId());
-    to.setAlias(from.getAlias());
-    to.setDescription(from.getDescription());
+    setString(to::setAlias, from.getAlias());
+    setString(to::setDescription, from.getDescription());
     return to;
   }
 
@@ -2674,6 +2675,14 @@ public class Dtos {
       to.setLibraryDesignCode(ldCode);
     }
     return to;
+  }
+
+  private static void setString(Consumer<String> setter, String value) {
+    if (isStringBlankOrNull(value)) {
+      setter.accept(null);
+    } else {
+      setter.accept(value.trim());
+    }
   }
 
 }
