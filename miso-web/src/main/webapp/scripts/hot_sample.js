@@ -641,9 +641,9 @@ HotTarget.sample = (function() {
             data: 'volumeUnits',
             type: 'dropdown',
             trimDropdown: false,
-            source: ['(None)'].concat(Constants.volumeUnits.map(function(unit) {
+            source: Constants.volumeUnits.map(function(unit) {
               return unit.units;
-            })),
+            }),
             include: ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt),
             allowHtml: true,
             validator: Handsontable.validators.AutocompleteValidator,
@@ -651,7 +651,7 @@ HotTarget.sample = (function() {
               var units = Constants.volumeUnits.find(function(unit) {
                 return unit.name == obj.volumeUnits;
               });
-              flat['volumeUnits'] = !!units ? units.units : '(None)';
+              flat['volumeUnits'] = !!units ? units.units : '&#181;L';
             },
             pack: function(obj, flat, errorHandler) {
               var units = Constants.volumeUnits.find(function(unit) {
@@ -666,9 +666,9 @@ HotTarget.sample = (function() {
             data: 'concentrationUnits',
             type: 'dropdown',
             trimDropdown: false,
-            source: ['(None)'].concat(Constants.concentrationUnits.map(function(unit) {
+            source: Constants.concentrationUnits.map(function(unit) {
               return unit.units;
-            })),
+            }),
             include: ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt),
             allowHtml: true,
             validator: Handsontable.validators.AutocompleteValidator,
@@ -676,7 +676,7 @@ HotTarget.sample = (function() {
               var units = Constants.concentrationUnits.find(function(unit) {
                 return unit.name == obj.concentrationUnits;
               });
-              flat['concentrationUnits'] = !!units ? units.units : '(None)';
+              flat['concentrationUnits'] = !!units ? units.units : 'ng/&#181;L';
             },
             pack: function(obj, flat, errorHandler) {
               var units = Constants.concentrationUnits.find(function(unit) {

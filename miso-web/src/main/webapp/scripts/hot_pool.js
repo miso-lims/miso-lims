@@ -175,57 +175,53 @@ HotTarget.pool = (function() {
         pack: function(pool, flat, errorHandler) {
           pool.creationDate = flat.creationDate;
         }
-      }, HotUtils.makeColumnForFloat('Concentration', true, 'concentration', false),
-      {
+      }, HotUtils.makeColumnForFloat('Concentration', true, 'concentration', false), {
         header: 'Conc. Units',
         data: 'concentrationUnits',
         type: 'dropdown',
         trimDropdown: false,
-        source: ['(None)'].concat(Constants.concentrationUnits.map(function(unit){
+        source: Constants.concentrationUnits.map(function(unit) {
           return unit.units;
-        })),
+        }),
         include: true,
         allowHtml: true,
         validator: Handsontable.validators.AutocompleteValidator,
         unpack: function(obj, flat, setCellMeta) {
-          var units = Constants.concentrationUnits.find(function(unit){
+          var units = Constants.concentrationUnits.find(function(unit) {
             return unit.name == obj.concentrationUnits;
           });
-          flat['concentrationUnits'] = !!units ? units.units : '(None)';
+          flat['concentrationUnits'] = !!units ? units.units : 'ng/&#181;L';
         },
         pack: function(obj, flat, errorHandler) {
-          var units = Constants.concentrationUnits.find(function(unit){
+          var units = Constants.concentrationUnits.find(function(unit) {
             return unit.units == flat['concentrationUnits'];
           });
           obj['concentrationUnits'] = !!units ? units.name : null;
         }
-      },
-      HotUtils.makeColumnForFloat('Volume', true, 'volume', false),
-      {
+      }, HotUtils.makeColumnForFloat('Volume', true, 'volume', false), {
         header: 'Vol. Units',
         data: 'volumeUnits',
         type: 'dropdown',
         trimDropdown: false,
-        source: ['(None)'].concat(Constants.volumeUnits.map(function(unit){
+        source: Constants.volumeUnits.map(function(unit) {
           return unit.units;
-        })),
+        }),
         include: true,
         allowHtml: true,
         validator: Handsontable.validators.AutocompleteValidator,
         unpack: function(obj, flat, setCellMeta) {
-          var units = Constants.volumeUnits.find(function(unit){
+          var units = Constants.volumeUnits.find(function(unit) {
             return unit.name == obj.volumeUnits;
           });
-          flat['volumeUnits'] = !!units ? units.units : '(None)';
+          flat['volumeUnits'] = !!units ? units.units : '&#181;L';
         },
         pack: function(obj, flat, errorHandler) {
-          var units = Constants.volumeUnits.find(function(unit){
+          var units = Constants.volumeUnits.find(function(unit) {
             return unit.units == flat['volumeUnits'];
           });
           obj['volumeUnits'] = !!units ? units.name : null;
         }
-      },
-      HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false)];
+      }, HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false)];
 
       var spliceIndex = columns.indexOf(columns.filter(function(column) {
         return column.data === 'identificationBarcode';
@@ -248,31 +244,34 @@ HotTarget.pool = (function() {
     },
 
     getBulkActions: function(config) {
-      return [{
-        name: 'Edit',
-        action: function(items) {
-          window.location = window.location.origin + '/miso/pool/bulk/edit?' + jQuery.param({
-            ids: items.map(Utils.array.getId).join(',')
-          });
-        }
-      }, {
-        name: "Create Orders",
-        excludeOnOrders: true,
-        action: function(pools) {
-          window.location = window.location.origin + '/miso/order/bulk/create?' + jQuery.param({
-            ids: pools.map(Utils.array.getId).join(',')
-          });
-        }
-      },
+      return [
+          {
+            name: 'Edit',
+            action: function(items) {
+              window.location = window.location.origin + '/miso/pool/bulk/edit?' + jQuery.param({
+                ids: items.map(Utils.array.getId).join(',')
+              });
+            }
+          },
+          {
+            name: "Create Orders",
+            excludeOnOrders: true,
+            action: function(pools) {
+              window.location = window.location.origin + '/miso/order/bulk/create?' + jQuery.param({
+                ids: pools.map(Utils.array.getId).join(',')
+              });
+            }
+          },
 
-      HotUtils.printAction('pool'), HotUtils.spreadsheetAction('/miso/rest/pool/spreadsheet', Constants.poolSpreadsheets, 
-          function(pools, spreadsheet){
-        var errors = [];
-        return errors;
-      }),
-      
-      HotUtils.makeParents('pool', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library(), HotUtils.relations.dilution()]))
-      
+          HotUtils.printAction('pool'),
+          HotUtils.spreadsheetAction('/miso/rest/pool/spreadsheet', Constants.poolSpreadsheets, function(pools, spreadsheet) {
+            var errors = [];
+            return errors;
+          }),
+
+          HotUtils.makeParents('pool', HotUtils.relationCategoriesForDetailed().concat(
+              [HotUtils.relations.library(), HotUtils.relations.dilution()]))
+
       ].concat(HotUtils.makeQcActions("Pool"));
     },
 

@@ -68,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
 import uk.ac.bbsrc.tgac.miso.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
@@ -274,6 +275,13 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     if (isStringEmptyOrNull(sample.getAlias()) && namingScheme.hasSampleAliasGenerator()) {
       sample.setAlias(generateTemporaryName());
     }
+    if (sample.getConcentration() == null) {
+      sample.setConcentrationUnits(null);
+    }
+    if (sample.getVolume() == null) {
+      sample.setVolumeUnits(null);
+    }
+    validateChange(sample, null);
     long savedId = save(sample, true).getId();
     boxService.updateBoxableLocation(sample);
     return savedId;
@@ -687,6 +695,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     boolean validateAliasUniqueness = !managed.getAlias().equals(sample.getAlias());
     authorizationManager.throwIfNotWritable(managed);
     boxService.throwIfBoxPositionIsFilled(sample);
+    validateChange(sample, managed);
     applyChanges(managed, sample);
     setChangeDetails(managed);
     loadChildEntities(managed);
@@ -700,6 +709,21 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
     save(managed, validateAliasUniqueness);
     boxService.updateBoxableLocation(sample);
+  }
+
+  private void validateChange(Sample sample, Sample beforeChange) {
+    List<ValidationError> errors = new ArrayList<>();
+
+    if (sample.getConcentration() != null && sample.getConcentrationUnits() == null) {
+      errors.add(new ValidationError("concentrationUnits", "Concentration units must be specified"));
+    }
+    if (sample.getVolume() != null && sample.getVolumeUnits() == null) {
+      errors.add(new ValidationError("volumeUnits", "Volume units must be specified"));
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
+    }
   }
 
   /**
@@ -721,9 +745,9 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     target.setDescription(source.getDescription());
     target.setDiscarded(source.isDiscarded());
     target.setVolume(source.getVolume());
-    target.setVolumeUnits(source.getVolumeUnits());
+    target.setVolumeUnits(target.getVolume() == null ? null : source.getVolumeUnits());
     target.setConcentration(source.getConcentration());
-    target.setConcentrationUnits(source.getConcentrationUnits());
+    target.setConcentrationUnits(target.getConcentration() == null ? null : source.getConcentrationUnits());
     target.setLocationBarcode(source.getLocationBarcode());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     if (isDetailedSample(target)) {

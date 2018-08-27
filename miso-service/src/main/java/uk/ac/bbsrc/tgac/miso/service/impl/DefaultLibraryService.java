@@ -56,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
@@ -170,6 +171,13 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     if (isStringEmptyOrNull(library.getAlias()) && namingScheme.hasLibraryAliasGenerator()) {
       library.setAlias(generateTemporaryName());
     }
+    if (library.getConcentration() == null) {
+      library.setConcentrationUnits(null);
+    }
+    if (library.getVolume() == null) {
+      library.setVolumeUnits(null);
+    }
+    validateChange(library, null);
     long savedId = save(library, true).getId();
     boxService.updateBoxableLocation(library);
     return savedId;
@@ -182,6 +190,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     authorizationManager.throwIfNotWritable(managed);
     boxService.throwIfBoxPositionIsFilled(library);
     boolean validateAliasUniqueness = !managed.getAlias().equals(library.getAlias());
+    validateChange(library, managed);
     applyChanges(managed, library);
     setChangeDetails(managed);
     loadChildEntities(managed);
@@ -496,7 +505,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setLocationBarcode(source.getLocationBarcode());
     target.setConcentration(source.getConcentration());
-    target.setConcentrationUnits(source.getConcentrationUnits());
+    target.setConcentrationUnits(target.getConcentration() == null ? null : source.getConcentrationUnits());
     target.setPlatformType(source.getPlatformType());
     target.setAlias(source.getAlias());
     target.setPaired(source.getPaired());
@@ -508,7 +517,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     } else {
       target.setVolume(source.getVolume());
     }
-    target.setVolumeUnits(source.getVolumeUnits());
+    target.setVolumeUnits(target.getVolume() == null ? null : source.getVolumeUnits());
     target.setDnaSize(source.getDnaSize());
     target.setLibraryType(source.getLibraryType());
     target.setLibrarySelectionType(source.getLibrarySelectionType());
@@ -536,6 +545,21 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       }
       dTarget.setGroupId(dSource.getGroupId());
       dTarget.setGroupDescription(dSource.getGroupDescription());
+    }
+  }
+
+  private void validateChange(Library library, Library beforeChange) {
+    List<ValidationError> errors = new ArrayList<>();
+
+    if (library.getConcentration() != null && library.getConcentrationUnits() == null) {
+      errors.add(new ValidationError("concentrationUnits", "Concentration units must be specified"));
+    }
+    if (library.getVolume() != null && library.getVolumeUnits() == null) {
+      errors.add(new ValidationError("volumeUnits", "Volume units must be specified"));
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
     }
   }
 
