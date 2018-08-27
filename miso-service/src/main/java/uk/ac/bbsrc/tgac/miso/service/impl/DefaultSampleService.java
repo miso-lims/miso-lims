@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
@@ -496,6 +497,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     parent.setSampleType(child.getSampleType());
     parent.setScientificName(child.getScientificName());
     parent.setVolume(0D);
+    parent.setVolumeUnits(VolumeUnit.MICROLITRES);
     parent.setSynthetic(true);
     if (child.getIdentityId() != null) parent.setIdentityId(child.getIdentityId());
     if (isLcmTubeSample(child)) {
