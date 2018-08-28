@@ -185,7 +185,7 @@ HotTarget.pool = (function() {
         }),
         include: true,
         allowHtml: true,
-        validator: Handsontable.validators.AutocompleteValidator,
+        validator: HotUtils.validator.requiredAutocomplete,
         unpack: function(obj, flat, setCellMeta) {
           var units = Constants.concentrationUnits.find(function(unit) {
             return unit.name == obj.concentrationUnits;
@@ -208,7 +208,7 @@ HotTarget.pool = (function() {
         }),
         include: true,
         allowHtml: true,
-        validator: Handsontable.validators.AutocompleteValidator,
+        validator: HotUtils.validator.requiredAutocomplete,
         unpack: function(obj, flat, setCellMeta) {
           var units = Constants.volumeUnits.find(function(unit) {
             return unit.name == obj.volumeUnits;

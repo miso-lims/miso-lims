@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
+import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.saveAndAssertSuccess;
 
 import java.util.List;
 import java.util.Map;
@@ -11,8 +11,6 @@ import java.util.function.Function;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -22,11 +20,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkDilutionPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkDilutionPage.DilColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
 
 public class BulkDilutionIT extends AbstractIT {
-
-  private static final Logger log = LoggerFactory.getLogger(BulkDilutionIT.class);
 
   private static final Set<String> columns = Sets.newHashSet(DilColumns.NAME, DilColumns.ID_BARCODE, DilColumns.BOX_SEARCH,
       DilColumns.BOX_ALIAS, DilColumns.DISCARDED, DilColumns.BOX_POSITION, DilColumns.LIBRARY_ALIAS, DilColumns.CONCENTRATION,

@@ -646,7 +646,7 @@ HotTarget.sample = (function() {
             }),
             include: ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt),
             allowHtml: true,
-            validator: Handsontable.validators.AutocompleteValidator,
+            validator: HotUtils.validator.requiredAutocomplete,
             unpack: function(obj, flat, setCellMeta) {
               var units = Constants.volumeUnits.find(function(unit) {
                 return unit.name == obj.volumeUnits;
@@ -671,7 +671,7 @@ HotTarget.sample = (function() {
             }),
             include: ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt),
             allowHtml: true,
-            validator: Handsontable.validators.AutocompleteValidator,
+            validator: HotUtils.validator.requiredAutocomplete,
             unpack: function(obj, flat, setCellMeta) {
               var units = Constants.concentrationUnits.find(function(unit) {
                 return unit.name == obj.concentrationUnits;
