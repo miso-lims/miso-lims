@@ -1,3 +1,22 @@
+# 0.2.138
+
+Changes:
+
+ * Add project external links
+ * Trim white space from tissue origin and tissue type
+ * Unescape HTML chars for printers
+ * Fixed missing Libraries, empty box NPE in Pinery
+ * Fixed concentration field labels
+ * Add Subproject Priority notices
+ * Add Workset creator columns and tabs
+ * Drop DetailedSample concentration column
+ * Fix Library Templates List page
+ * Migrate Consent Revoked warnings to new warning system
+ * Use platform key in cell value instead of platform name
+
+CONFIG CHANGE: External service links can be added to Project pages. This can be 
+configured in `miso.properties` with the property `miso.project.report.links`.
+
 # 0.2.137
 
 Changes:
