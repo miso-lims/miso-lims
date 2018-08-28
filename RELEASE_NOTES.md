@@ -2,7 +2,7 @@
 
 Changes:
 
- * [maven-release-plugin] prepare for next development iteration
+ * Fix Pinery error
 
 # 0.2.138
 
@@ -22,6 +22,9 @@ Changes:
 
 CONFIG CHANGE: External service links can be added to Project pages. This can be 
 configured in `miso.properties` with the property `miso.project.report.links`.
+
+Bad:
+ * SQL error in Pinery query, but should be a good release for those who don't use Pinery.
 
 # 0.2.137
 
