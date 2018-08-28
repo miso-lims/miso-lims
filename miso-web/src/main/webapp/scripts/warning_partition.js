@@ -34,10 +34,15 @@ WarningTarget.partition = {
     if (type === 'display') {
       var warnings = [];
       warnings = Warning.addWarnings([
+        [data.prioritySubprojectAliases && data.prioritySubprojectAliases.length > 0, 'PRIORITY (' 
+          + (data.prioritySubprojectAliases.length == 1 ? data.prioritySubprojectAliases[0] : 'MULTIPLE') + ')'],
         [data.duplicateIndices, "(DUPLICATE INDICES)"],
         [data.nearDuplicateIndices && !data.duplicateIndices, "(NEAR-DUPLICATE INDICES)"],
         [data.hasEmptySequence, "(MISSING INDEX)"],
-        [data.hasLowQualityLibraries, "(LOW QUALITY LIBRARIES)"]
+        [data.hasLowQualityLibraries, "(LOW QUALITY LIBRARIES)"],
+        [data.pooledElements && data.pooledElements.some(function(dilution){
+          return dilution.identityConsentLevel === 'Revoked';
+        }), "(CONSENT REVOKED)"]
         ], warnings);
       return Warning.generateTableWarnings("<a href=\"/miso/pool/" + data.id + "\">" + prettyName + "</a>", warnings);
     } else {

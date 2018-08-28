@@ -10,12 +10,26 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class ExternalUriBuilder {
+  private final Map<String, String> projectUris = new TreeMap<>();
   private final Map<PlatformType, Map<String, String>> runUris = new TreeMap<>();
+
+  private static final String ID_PLACEHOLDER = "\\{id\\}";
+  private static final String NAME_PLACEHOLDER = "\\{name\\}";
+  private static final String ALIAS_PLACEHOLDER = "\\{alias\\}";
+  private static final String SHORTNAME_PLACEHOLDER = "\\{shortName\\}";
+  private static final String REPLACEHOLDER = "REPLACE";
+
+  public Map<String, String> getUris(Project project) {
+    if (project.getId() == ProjectImpl.UNSAVED_ID || projectUris.isEmpty()) return Collections.emptyMap();
+    return projectUris.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, m -> expandProjectUrl(m.getValue(), project)));
+  }
 
   public Map<String, String> getUris(Run run) {
     if (run.getId() == Run.UNSAVED_ID || runUris.isEmpty() || runUris.get(run.getPlatformType()) == null) return Collections.emptyMap();
@@ -25,30 +39,50 @@ public class ExternalUriBuilder {
         .collect(Collectors.toMap(Map.Entry::getKey, m -> expandRunUrl(m.getValue(), run)));
   }
 
+  private String expandProjectUrl(String uriWithPlaceholders, Project project) {
+    return uriWithPlaceholders.replaceAll(ID_PLACEHOLDER, String.valueOf(project.getId()))
+        .replaceAll(NAME_PLACEHOLDER, project.getName())
+        .replaceAll(SHORTNAME_PLACEHOLDER, project.getShortName());
+  }
+
   private String expandRunUrl(String uriWithPlaceholders, Run run) {
-    return uriWithPlaceholders.replaceAll("\\{id\\}", String.valueOf(run.getId()))
-        .replaceAll("\\{name\\}", run.getName())
-        .replaceAll("\\{alias\\}", run.getAlias());
+    return uriWithPlaceholders.replaceAll(ID_PLACEHOLDER, String.valueOf(run.getId()))
+        .replaceAll(NAME_PLACEHOLDER, run.getName())
+        .replaceAll(ALIAS_PLACEHOLDER, run.getAlias());
+  }
+
+  public void setProjectReportLinksConfig(String projectReportLinksConfigLine) {
+    processProjectLinksConfig(projectReportLinksConfigLine, projectUris);
   }
 
   public void setRunReportLinksConfig(String runReportLinksConfigLine) {
-    processLinksConfig(runReportLinksConfigLine, runUris);
+    processRunLinksConfig(runReportLinksConfigLine, runUris);
   }
 
-  public void processLinksConfig(String linksConfigLine, Map<PlatformType, Map<String, String>> uriMap) {
+  public void processProjectLinksConfig(String linksConfigLine, Map<String, String> uriMap) {
     if (LimsUtils.isStringBlankOrNull(linksConfigLine)) return;
 
-    // linksConfigLine format: <PlatformType,PlatformType>|<link text>|<URI with placeholders>
-    // placeholders can be any of {id}, {name}, {alias}.
-    // multiple run report links can be double-backslash-separated (\\)
-    String[] configStrings = linksConfigLine.split("\\\\");
+    String[] configStrings = linksConfigLine.split("\\\\"); // multiple project report links can be double-backslash-separated (\\)
     for (int i = 0; i < configStrings.length; i++) {
-      String[] configParts = configStrings[i].split("\\|");
-      if (configParts.length != 3) {
-        throw new IllegalArgumentException(
-            String.format("Invalid configuration: expected three link config parts separated by '|' for config string %s but got %d",
-                configStrings[i], configParts.length));
-      }
+      String[] configParts = configStrings[i].split("\\|"); // linksConfigLine format: <link text>|<URI with placeholders>
+      validateConfigLength(configParts, 2);
+
+      String linkText = configParts[0].trim();
+      String uriWithPlaceholders = configParts[1].trim();
+      validateUri(uriWithPlaceholders, Sets.newHashSet(ID_PLACEHOLDER, NAME_PLACEHOLDER, SHORTNAME_PLACEHOLDER));
+
+      uriMap.put(linkText, uriWithPlaceholders);
+    }
+  }
+
+  public void processRunLinksConfig(String linksConfigLine, Map<PlatformType, Map<String, String>> uriMap) {
+    if (LimsUtils.isStringBlankOrNull(linksConfigLine)) return;
+
+    String[] configStrings = linksConfigLine.split("\\\\"); // multiple run report links can be double-backslash-separated (\\)
+    for (int i = 0; i < configStrings.length; i++) {
+      String[] configParts = configStrings[i].split("\\|"); // linksConfigLine format: <PlatformType,PlatformType>|<link text>|<URI with
+                                                            // placeholders>
+      validateConfigLength(configParts, 3);
 
       Set<String> platformTypeStrings = Sets.newHashSet(configParts[0].trim().split(","));
       Set<PlatformType> platformTypes = platformTypeStrings.stream().map(pt -> PlatformType.get(pt.trim())).collect(Collectors.toSet());
@@ -58,15 +92,8 @@ public class ExternalUriBuilder {
       }
       String linkText = configParts[1].trim();
       String uriWithPlaceholders = configParts[2].trim();
-      try {
-        String validateableUri = uriWithPlaceholders.replaceAll("\\{name\\}", "REPLACE")
-            .replaceAll("\\{id\\}", "REPLACE")
-            .replaceAll("\\{alias\\}", "REPLACE");
-        new URI(validateableUri);
-      } catch (URISyntaxException e) {
-        throw new IllegalArgumentException(
-            String.format("Invalid configuration: unable to parse valid URL from external link config %s", configStrings[i]));
-      }
+      validateUri(uriWithPlaceholders, Sets.newHashSet(ID_PLACEHOLDER, NAME_PLACEHOLDER, ALIAS_PLACEHOLDER));
+
       platformTypes.forEach(pt -> {
         if (uriMap.get(pt) == null) {
           Map<String, String> linkAndUri = new TreeMap<>();
@@ -74,6 +101,27 @@ public class ExternalUriBuilder {
         }
         uriMap.get(pt).put(linkText, uriWithPlaceholders);
       });
+    }
+  }
+
+  private void validateConfigLength(String[] configParts, Integer expectedLength) {
+    if (configParts.length != expectedLength) {
+      throw new IllegalArgumentException(
+          String.format("Invalid configuration: expected %d link config parts separated by '|' for config string %s but got %d parts",
+              expectedLength, String.join("|", configParts), configParts.length));
+    }
+  }
+
+  private void validateUri(String uriWithPlaceholders, Set<String> possiblePlaceholders) {
+    String validateableUri = uriWithPlaceholders;
+    for (String placeholder : possiblePlaceholders) {
+      validateableUri = validateableUri.replaceAll(placeholder, REPLACEHOLDER);
+    }
+    try {
+      new URI(validateableUri);
+    } catch (URISyntaxException e) {
+      throw new IllegalArgumentException(
+          String.format("Invalid configuration: unable to parse valid URL from external link config %s", uriWithPlaceholders));
     }
   }
 }

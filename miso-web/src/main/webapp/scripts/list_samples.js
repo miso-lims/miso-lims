@@ -228,6 +228,14 @@ ListTarget.sample = {
           "mData": "lastModified",
           "include": Constants.isDetailedSample,
           "iSortPriority": 2
+        }, {
+          "sTitle": "Warnings",
+          "mData": null,
+          "mRender": WarningTarget.sample.tableWarnings,
+          "include": true,
+          "iSortPriority": 0,
+          "bVisible": true,
+          "bSortable": false
         }];
   },
   searchTermSelector: function(searchTerms) {

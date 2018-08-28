@@ -120,12 +120,15 @@
       </span></td>
     </tr>
     <tr>
-      <td colspan="2">
-        <c:if test="${!empty warning}">
-          <span style="float:right;"><img src="/styles/images/fail.png"/></span>
-          <p class="big-warning">${warning}</p>
-        </c:if>
-      </td>
+      <c:if test="${sample.id != 0}">
+        <td colspan="2" id ="warnings">
+          <script>
+            jQuery(document).ready(function() {
+              jQuery('#warnings').append(WarningTarget.sample.headerWarnings(${sampleDto}));
+            });
+          </script>
+        </td>
+      </c:if>
     </tr>
     <c:if test="${detailedSample && sample.isSynthetic()}"><tr><td colspan="2" style="font-size: 200%; font-weight:bold;">This entity does not exist except for sample tracking purposes!</td></tr></c:if>
     <tr>

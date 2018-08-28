@@ -277,7 +277,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public boolean getHasLowQualityMembers() {
-    return poolDilutions.stream().map(PoolDilution::getPoolableElementView).anyMatch(PoolableElementView::isLowQualityLibrary);
+    return poolDilutions.stream().map(PoolDilution::getPoolableElementView).anyMatch(PoolableElementView::isLibraryLowQuality);
   }
 
   @Override
@@ -656,4 +656,10 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     return getId() != UNSAVED_ID;
   }
 
+  @Override
+  public Set<String> getPrioritySubprojectAliases() {
+    return poolDilutions.stream()
+        .map(PoolDilution::getPoolableElementView).filter(view -> view.getSubprojectPriority() != null && view.getSubprojectPriority())
+        .map(view -> view.getSubprojectAlias()).collect(Collectors.toSet());
+  }
 }

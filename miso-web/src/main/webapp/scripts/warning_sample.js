@@ -21,21 +21,21 @@
  * *********************************************************************
  */
 
-WarningTarget.completion = {
-    tableWarnings: function(data, type, full){
+WarningTarget.sample = {
+    headerWarnings: function(sample){
       var warnings = [];
-      var pool = full.pool;
       warnings = Warning.addWarnings([
-        [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0, 'PRIORITY (' 
-          + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] : 'MULTIPLE') + ')'],
-        [pool.duplicateIndices, "(DUPLICATE INDICES)"],
-        [pool.nearDuplicateIndices && !pool.duplicateIndices, "(NEAR-DUPLICATE INDICES)"],
-        [pool.hasEmptySequence, "(MISSING INDEX)"],
-        [pool.hasLowQualityLibraries, "(LOW QUALITY LIBRARIES)"],
-        [pool.pooledElements && pool.pooledElements.some(function(dilution){
-          return dilution.identityConsentLevel === 'Revoked';
-        }), "(CONSENT REVOKED)"]
+        [sample.subprojectPriority, 'Belongs to high priority subproject \'' + sample.subprojectAlias + '\''],
+        [sample.identityConsentLevel === 'Revoked', 'Donor has revoked consent'],
+        ], warnings);
+      return Warning.generateHeaderWarnings(warnings);
+    },
+    tableWarnings: function(data, type, sample){
+      var warnings = [];
+      warnings = Warning.addWarnings([
+        [sample.subprojectPriority, 'PRIORITY (' + sample.subprojectAlias + ')'],
+        [sample.identityConsentLevel === 'Revoked', '(CONSENT REVOKED)'],
         ], warnings);
       return Warning.generateTableWarnings(data, warnings);
-    }
+    },
 };

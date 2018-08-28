@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -188,8 +189,8 @@ public class Dtos {
   public static TissueOrigin to(TissueOriginDto from) {
     TissueOrigin to = new TissueOriginImpl();
     if (from.getId() != null) to.setId(from.getId());
-    to.setAlias(from.getAlias());
-    to.setDescription(from.getDescription());
+    setString(to::setAlias, from.getAlias());
+    setString(to::setDescription, from.getDescription());
     return to;
   }
 
@@ -213,8 +214,8 @@ public class Dtos {
   public static TissueType to(TissueTypeDto from) {
     TissueType to = new TissueTypeImpl();
     if (from.getId() != null) to.setId(from.getId());
-    to.setAlias(from.getAlias());
-    to.setDescription(from.getDescription());
+    setString(to::setAlias, from.getAlias());
+    setString(to::setDescription, from.getDescription());
     return to;
   }
 
@@ -311,6 +312,10 @@ public class Dtos {
       dto.setSampleClassId(detailed.getSampleClass().getId());
       dto.setCreationDate(detailed.getCreationDate() == null ? "" : formatDate(detailed.getCreationDate()));
       dto.setIdentityConsentLevel(getIdentityConsentLevelString(detailed));
+      if (detailed.getSubproject() != null) {
+        dto.setSubprojectAlias(detailed.getSubproject().getAlias());
+        dto.setSubprojectPriority(detailed.getSubproject().getPriority());
+      }
     }
     return dto;
   }
@@ -395,6 +400,8 @@ public class Dtos {
     }
     if (from.getSubproject() != null) {
       dto.setSubprojectId(from.getSubproject().getId());
+      dto.setSubprojectAlias(from.getSubproject().getAlias());
+      dto.setSubprojectPriority(from.getSubproject().getPriority());
     }
     if (from.getParent() != null) {
       dto.setParentId(from.getParent().getId());
@@ -995,6 +1002,11 @@ public class Dtos {
     }
     if (from.getSample() != null) {
       dto.setIdentityConsentLevel(getIdentityConsentLevelString((DetailedSample) from.getSample()));
+      DetailedSample detailed = (DetailedSample) from.getSample();
+      if (detailed.getSubproject() != null) {
+        dto.setSubprojectAlias(detailed.getSubproject().getAlias());
+        dto.setSubprojectPriority(detailed.getSubproject().getPriority());
+      }
     }
     return dto;
   }
@@ -1100,8 +1112,8 @@ public class Dtos {
     dto.setCreationDate(formatDate(from.getCreationDate()));
     dto.setDescription(from.getDescription());
     dto.setId(from.getId());
-    if (from.getInitialConcentration() != null) {
-      dto.setConcentration(from.getInitialConcentration().toString());
+    if (from.getConcentration() != null) {
+      dto.setConcentration(from.getConcentration().toString());
     }
     dto.setConcentrationUnits(from.getConcentrationUnits());
     if (from.getLibrarySelectionType() != null) {
@@ -1179,7 +1191,7 @@ public class Dtos {
     to.setName(from.getName());
     to.setDescription(from.getDescription());
     to.setIdentificationBarcode(from.getIdentificationBarcode());
-    to.setInitialConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
+    to.setConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
     to.setConcentrationUnits(from.getConcentrationUnits());
     to.setLowQuality(from.getLowQuality());
     if (from.getPaired() != null) {
@@ -1410,7 +1422,7 @@ public class Dtos {
     ldto.setName(from.getLibraryName());
     ldto.setAlias(from.getLibraryAlias());
     ldto.setIdentificationBarcode(from.getLibraryBarcode());
-    ldto.setLowQuality(from.isLowQualityLibrary());
+    ldto.setLowQuality(from.isLibraryLowQuality());
     ldto.setParentSampleId(from.getSampleId());
     ldto.setParentSampleAlias(from.getSampleAlias());
     if (from.getPlatformType() != null) {
@@ -1421,7 +1433,12 @@ public class Dtos {
 
     Sample sample = from.getSample();
     if (isDetailedSample(sample)) {
-      dto.setIdentityConsentLevel(getIdentityConsentLevelString((DetailedSample) sample));
+      DetailedSample detailed = (DetailedSample) sample;
+      dto.setIdentityConsentLevel(getIdentityConsentLevelString(detailed));
+      if (detailed.getSubproject() != null) {
+        dto.setSubprojectAlias(detailed.getSubproject().getAlias());
+        dto.setSubprojectPriority(detailed.getSubproject().getPriority());
+      }
     }
     return dto;
   }
@@ -1503,6 +1520,8 @@ public class Dtos {
     }
     dto.setDiscarded(from.isDiscarded());
     dto.setHasLowQualityLibraries(from.getHasLowQualityMembers());
+    dto.setPrioritySubprojectAliases(from.getPrioritySubprojectAliases());
+
     return dto;
   }
 
@@ -2656,6 +2675,14 @@ public class Dtos {
       to.setLibraryDesignCode(ldCode);
     }
     return to;
+  }
+
+  private static void setString(Consumer<String> setter, String value) {
+    if (isStringBlankOrNull(value)) {
+      setter.accept(null);
+    } else {
+      setter.accept(value.trim());
+    }
   }
 
 }

@@ -20,7 +20,7 @@ AS SELECT
     l.alias AS libraryAlias,
     l.description AS libraryDescription,
     l.identificationBarcode AS libraryBarcode,
-    l.lowQuality AS lowQualityLibrary,
+    l.lowQuality AS libraryLowQuality,
     l.platformType AS platformType,
     l.dnaSize AS libraryDnaSize,
     l.paired AS libraryPaired,
@@ -37,6 +37,9 @@ AS SELECT
     p.name AS projectName,
     p.shortName AS projectShortName,
     p.alias AS projectAlias,
+    sub.subprojectId AS subprojectId,
+    sub.alias AS subprojectAlias,
+    sub.priority AS subprojectPriority,
     box.alias AS boxAlias,
     box.name AS boxName,
     box.identificationBarcode AS boxIdentificationBarcode,
@@ -47,6 +50,8 @@ AS SELECT
     JOIN Library l ON l.libraryId = d.library_libraryId
     JOIN Sample s ON s.sampleId = l.sample_sampleId
     JOIN Project p ON p.projectId = s.project_projectId
+    LEFT JOIN DetailedSample ds ON ds.sampleId = s.sampleId
+    LEFT JOIN Subproject sub ON sub.subprojectId = ds.subprojectId
     LEFT JOIN LibrarySelectionType sel ON sel.librarySelectionTypeId = l.librarySelectionType
     LEFT JOIN LibraryStrategyType strat ON strat.libraryStrategyTypeId = l.libraryStrategyType
     LEFT JOIN DilutionBoxPosition dbp ON dbp.dilutionId = d.dilutionId

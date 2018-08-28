@@ -65,15 +65,11 @@ import net.sf.json.JSONArray;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
@@ -191,7 +187,7 @@ public class EditPoolController {
       ObjectMapper mapper = new ObjectMapper();
       model.put("formObj", pool);
       model.put("pool", pool);
-      model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(pool, false, false)));
+      model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(pool, true, false)));
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
@@ -210,30 +206,10 @@ public class EditPoolController {
       model.put("volumeUnits", VolumeUnit.values());
       model.put("concentrationUnits", ConcentrationUnit.values());
 
-      List<String> warnings = new ArrayList<>();
-      addConsentWarning(pool, warnings);
-      model.addAttribute("warnings", warnings);
-
       return new ModelAndView("/pages/editPool.jsp", model);
     } catch (IOException ex) {
       log.debug("Failed to show pool", ex);
       throw ex;
-    }
-  }
-
-  private void addConsentWarning(Pool pool, List<String> warnings) {
-    List<String> consentRevokedNames = pool.getPoolDilutions()
-        .stream()
-        .map(PoolDilution::getPoolableElementView)
-        .filter(ldi -> {
-          Sample sam = ldi.getSample();
-          return LimsUtils.isDetailedSample(sam) && LimsUtils.getIdentityConsentLevel((DetailedSample) sam) == ConsentLevel.REVOKED;
-        })
-        .map(PoolableElementView::getDilutionName)
-        .collect(Collectors.toList());
-    if (!consentRevokedNames.isEmpty()) {
-      warnings.add("Donor has revoked consent for "
-          + String.join(", ", consentRevokedNames));
     }
   }
 

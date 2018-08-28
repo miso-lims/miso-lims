@@ -17,6 +17,8 @@ public class DetailedLibraryDto extends LibraryDto {
   private String identityConsentLevel;
   private String effectiveGroupId;
   private String effectiveGroupIdSample;
+  private Boolean subprojectPriority;
+  private String subprojectAlias;
 
   public Boolean getArchived() {
     return archived;
@@ -96,6 +98,22 @@ public class DetailedLibraryDto extends LibraryDto {
 
   public void setEffectiveGroupIdSample(String effectiveGroupIdSample) {
     this.effectiveGroupIdSample = effectiveGroupIdSample;
+  }
+
+  public Boolean getSubprojectPriority() {
+    return subprojectPriority;
+  }
+
+  public void setSubprojectPriority(Boolean subprojectPriority) {
+    this.subprojectPriority = subprojectPriority;
+  }
+
+  public String getSubprojectAlias() {
+    return subprojectAlias;
+  }
+
+  public void setSubprojectAlias(String subprojectAlias) {
+    this.subprojectAlias = subprojectAlias;
   }
 
 }

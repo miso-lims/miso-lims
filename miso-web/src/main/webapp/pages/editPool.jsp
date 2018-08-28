@@ -116,7 +116,7 @@
     </td>
   </tr>
   <tr>
-    <td class="h">Desired Concentration:</td>
+    <td class="h">Concentration:</td>
     <td><form:input id="concentration" path="concentration"/></td>
   </tr>
   <tr>

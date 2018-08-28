@@ -22,14 +22,30 @@
  */
 
 WarningTarget.poolelement = {
-    tableWarnings: function(html, combined, duplicateSequences, nearDuplicateSequences){
-      var warnings = [];
-      warnings = Warning.addWarnings([
-        [duplicateSequences && duplicateSequences.indexOf(combined) != -1, "(DUPLICATE INDEX)"],
-        [nearDuplicateSequences && nearDuplicateSequences.indexOf(combined) != -1 && 
-          !(duplicateSequences && duplicateSequences.indexOf(combined) != -1), "(NEAR-DUPLICATE INDEX)"],
-        [Utils.validation.isEmpty(combined), "(NO INDEX)"]
-        ], warnings);
-      return Warning.generateTableWarnings(html, warnings);
+    tableWarnings: function(duplicateSequences, nearDuplicateSequences){
+      return function(data, type, dilution){
+        var indices = Constants.indexFamilies.reduce(function(acc, family) {
+          return acc.concat(family.indices.filter(function(index) {
+            return dilution.indexIds.indexOf(index.id) != -1;
+          }));
+        }, []).sort(function(a, b) {
+          return a.position - b.position;
+        });
+
+        var combined = indices.map(function(index) {
+          return index.sequence;
+        }).join('');
+        
+        var warnings = [];
+        warnings = Warning.addWarnings([
+          [dilution.subprojectPriority, 'PRIORITY (' + dilution.subprojectAlias + ')'],
+          [duplicateSequences && duplicateSequences.indexOf(combined) != -1, "(DUPLICATE INDEX)"],
+          [nearDuplicateSequences && nearDuplicateSequences.indexOf(combined) != -1 && 
+            !(duplicateSequences && duplicateSequences.indexOf(combined) != -1), "(NEAR-DUPLICATE INDEX)"],
+          [Utils.validation.isEmpty(combined), "(NO INDEX)"],
+          [dilution.identityConsentLevel === 'Revoked', '(CONSENT REVOKED)']
+          ], warnings);
+        return Warning.generateTableWarnings(data, warnings);
+      };
     }
 };

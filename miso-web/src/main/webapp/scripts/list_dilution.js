@@ -221,6 +221,14 @@ ListTarget.dilution = {
       "mData": "creationDate",
       "include": true,
       "iSortPriority": 0
+    }, {
+      "sTitle": "Warnings",
+      "mData": null,
+      "mRender": WarningTarget.dilution.tableWarnings,
+      "include": true,
+      "iSortPriority": 0,
+      "bVisible": true,
+      "bSortable": false
     }];
   },
   searchTermSelector: function(searchTerms) {

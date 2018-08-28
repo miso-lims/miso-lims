@@ -12,6 +12,8 @@ public class DetailedSampleDto extends SampleDto {
   private Long detailedQcStatusId;
   private String detailedQcStatusNote;
   private Long subprojectId;
+  private String subprojectAlias;
+  private Boolean subprojectPriority;
   private String groupId;
   private String groupDescription;
   private Boolean isSynthetic;
@@ -62,6 +64,22 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setSubprojectId(Long subprojectId) {
     this.subprojectId = subprojectId;
+  }
+
+  public String getSubprojectAlias() {
+    return subprojectAlias;
+  }
+
+  public void setSubprojectAlias(String subprojectAlias) {
+    this.subprojectAlias = subprojectAlias;
+  }
+
+  public Boolean getSubprojectPriority() {
+    return subprojectPriority;
+  }
+
+  public void setSubprojectPriority(Boolean subprojectPriority) {
+    this.subprojectPriority = subprojectPriority;
   }
 
   public Long getSampleClassId() {

@@ -239,4 +239,11 @@ public interface Pool
    */
   public void setVolumeUnits(VolumeUnit volumeUnits);
 
+  /**
+   * Returns the Aliases of all Subprojects with priority attached to this Pool object.
+   * 
+   * @return Set<String> The aliases of subprojects with priority.
+   */
+  public Set<String> getPrioritySubprojectAliases();
+
 }
