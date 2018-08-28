@@ -1,3 +1,9 @@
+# 0.2.139
+
+Changes:
+
+ * [maven-release-plugin] prepare for next development iteration
+
 # 0.2.138
 
 Changes:
