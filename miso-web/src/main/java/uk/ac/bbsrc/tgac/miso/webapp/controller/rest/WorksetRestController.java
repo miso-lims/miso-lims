@@ -78,7 +78,7 @@ public class WorksetRestController extends RestController {
   @GetMapping(value = "/dt/mine", produces = "application/json")
   public @ResponseBody DataTablesResponseDto<WorksetDto> dataTableForUser(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    String username = authorizationManager.getCurrentUsername();
+    String username = authorizationManager.getCurrentUser().getLoginName();
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.user(username, true));
   }
 
