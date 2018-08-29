@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -94,7 +95,11 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
       waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(html), ExpectedConditions.stalenessOf(errorBox)));
     } else {
       saveButton.click();
-      waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(html), ExpectedConditions.visibilityOf(errorBox)));
+      try {
+        waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(html), ExpectedConditions.visibilityOf(errorBox)));
+      } catch (StaleElementReferenceException e) {
+        waitUntil(ExpectedConditions.stalenessOf(html));
+      }
     }
     if (ExpectedConditions.stalenessOf(html).apply(getDriver())) {
       waitForPageRefresh(html);
