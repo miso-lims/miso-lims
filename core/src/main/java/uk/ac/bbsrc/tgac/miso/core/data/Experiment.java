@@ -105,6 +105,34 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, N
     public void setRun(Run run) {
       this.run = run;
     }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((experiment == null) ? 0 : experiment.hashCode());
+      result = prime * result + ((partition == null) ? 0 : partition.hashCode());
+      result = prime * result + ((run == null) ? 0 : run.hashCode());
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) return true;
+      if (obj == null) return false;
+      if (getClass() != obj.getClass()) return false;
+      RunPartition other = (RunPartition) obj;
+      if (experiment == null) {
+        if (other.experiment != null) return false;
+      } else if (!experiment.equals(other.experiment)) return false;
+      if (partition == null) {
+        if (other.partition != null) return false;
+      } else if (!partition.equals(other.partition)) return false;
+      if (run == null) {
+        if (other.run != null) return false;
+      } else if (!run.equals(other.run)) return false;
+      return true;
+    }
   }
 
   /** Field PREFIX */
