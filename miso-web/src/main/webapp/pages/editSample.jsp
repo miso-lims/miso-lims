@@ -269,7 +269,7 @@
       <td>Volume Units:</td>
       <td><form:select id="volumeUnits" path="volumeUnits">
         <c:forEach var="volumeUnit" items="${volumeUnits}">
-          <option value="${volumeUnit}" <c:if test="${sample.volumeUnits eq volumeUnit or (empty sample.volumeUnits AND volumeUnit.toString() eq 'MICROLITRES')}">selected="selected"</c:if>>
+          <option value="${volumeUnit}" <c:if test="${sample.volumeUnits eq volumeUnit or (empty sample.volumeUnits and volumeUnit.toString() eq 'MICROLITRES')}">selected="selected"</c:if>>
             ${volumeUnit.units}
           </option>
         </c:forEach>
