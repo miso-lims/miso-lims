@@ -21,6 +21,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.annotations.VisibleForTesting;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
@@ -366,6 +367,11 @@ public class DefaultLibraryDilutionService
       workset.getDilutions().removeIf(ldi -> ldi.getId() == object.getId());
       worksetService.save(workset);
     }
+    Box box = object.getBox();
+    if (box != null) {
+      box.getBoxPositions().remove(object.getBoxPosition());
+      boxService.save(box);
+    }
   }
 
   @Override
@@ -377,11 +383,6 @@ public class DefaultLibraryDilutionService
     changeLog.setTime(new Date());
     changeLog.setUser(authorizationManager.getCurrentUser());
     changeLogService.create(changeLog);
-  }
-
-  @Override
-  public BoxService getBoxService() {
-    return boxService;
   }
 
 }

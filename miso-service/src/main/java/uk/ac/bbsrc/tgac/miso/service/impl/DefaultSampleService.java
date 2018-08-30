@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -963,11 +964,11 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       workset.getSamples().removeIf(sam -> sam.getId() == object.getId());
       worksetService.save(workset);
     }
-  }
-
-  @Override
-  public BoxService getBoxService() {
-    return boxService;
+    Box box = object.getBox();
+    if (box != null) {
+      box.getBoxPositions().remove(object.getBoxPosition());
+      boxService.save(box);
+    }
   }
 
   @Override

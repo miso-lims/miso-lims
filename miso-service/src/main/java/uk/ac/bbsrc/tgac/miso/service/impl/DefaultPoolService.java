@@ -24,6 +24,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -404,11 +405,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   }
 
   @Override
-  public BoxService getBoxService() {
-    return boxService;
-  }
-
-  @Override
   public void authorizeDeletion(Pool object) throws IOException {
     authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
   }
@@ -417,7 +413,12 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   public void beforeDelete(Pool object) throws IOException {
     Set<PoolOrder> orders = poolOrderService.getByPool(object.getId());
     poolOrderService.bulkDelete(orders);
-    PoolService.super.beforeDelete(object);
+
+    Box box = object.getBox();
+    if (box != null) {
+      box.getBoxPositions().remove(object.getBoxPosition());
+      boxService.save(box);
+    }
   }
 
   @Override
