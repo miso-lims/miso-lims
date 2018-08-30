@@ -43,7 +43,18 @@ ListTarget.changelog = {
       "sTitle": "Summary",
       "mData": "summary",
       "include": true,
-      "iSortPriority": 0
+      "iSortPriority": 0,
+      "mRender": function(data, type, full) {
+        if (type === 'display' && data.indexOf('\n') > -1) {
+          var html = '<ul class="unformatted-list">';
+          data.split('\n').forEach(function(item) {
+            html += '<li>' + item + '</li>';
+          });
+          html += '</ul>';
+          return html;
+        }
+        return data;
+      }
     }, {
       "sTitle": "Time",
       "mData": "time",
