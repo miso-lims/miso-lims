@@ -24,7 +24,7 @@ Application Server:
 Database Server:
 
 * MySQL 5.7
-* Flyway
+* Flyway 3.2.1 (newer versions may cause issues)
 
 Run Scanner:
 
@@ -92,7 +92,8 @@ need to add a grant privilege to the MISO database from your remote machine:
 
 # Setting Up the Application Server
 
-Download the [Flyway command line tool](https://flywaydb.org/documentation/commandline/) and install it.
+Download the [Flyway command line tool](https://flywaydb.org/download/community) version 3.2.1 and install it.
+Newer versions of Flyway may cause issues, and are not recommended.
 
 The application server needs [Tomcat 8](https://tomcat.apache.org/download-80.cgi).
 
@@ -397,6 +398,12 @@ The same path should be used for `MISO_FILES_DIR` as is set for `miso.fileStorag
     rm -f lib/sqlstore-*.jar
     unzip -xjo $CATALINA_HOME/webapps/ROOT.war 'WEB-INF/lib/sqlstore-*.jar' -d lib
     ./flyway -user=$MISO_DB_USER -password=$MISO_DB_PASS -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration,classpath:uk.ac.bbsrc.tgac.miso.db.migration migrate -placeholders.filesDir=${MISO_FILES_DIR}
+
+`$DB_URL` should be in the same format as in the `ROOT.xml`, except replacing `&amp;` with just `&`:
+
+```
+jdbc:mysql://localhost:3306/lims?autoReconnect=true&zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8
+```
 
 # Monitoring
 
