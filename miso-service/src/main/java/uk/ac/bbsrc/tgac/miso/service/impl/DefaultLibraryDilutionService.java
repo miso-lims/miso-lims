@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -227,7 +228,7 @@ public class DefaultLibraryDilutionService
 
   @Override
   public LibraryDilution getByBarcode(String barcode) throws IOException {
-    LibraryDilution dilution = dilutionDao.getLibraryDilutionByBarcode(barcode);
+    LibraryDilution dilution = dilutionDao.getByBarcode(barcode);
     return (authorizationManager.readCheck(dilution) ? dilution : null);
   }
 
@@ -273,15 +274,12 @@ public class DefaultLibraryDilutionService
     target.setVolumeUsed(source.getVolumeUsed());
   }
 
-  private void validateChange(LibraryDilution dilution, LibraryDilution beforeChange) {
+  private void validateChange(LibraryDilution dilution, LibraryDilution beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
-    if (dilution.getConcentration() != null && dilution.getConcentrationUnits() == null) {
-      errors.add(new ValidationError("concentrationUnits", "Concentration units must be specified"));
-    }
-    if (dilution.getVolume() != null && dilution.getVolumeUnits() == null) {
-      errors.add(new ValidationError("volumeUnits", "Volume units must be specified"));
-    }
+    validateConcentrationUnits(dilution.getConcentration(), dilution.getConcentrationUnits(), errors);
+    validateVolumeUnits(dilution.getVolume(), dilution.getVolumeUnits(), errors);
+    validateBarcodeUniqueness(dilution, beforeChange, dilutionDao::getByBarcode, errors, "dilution");
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);

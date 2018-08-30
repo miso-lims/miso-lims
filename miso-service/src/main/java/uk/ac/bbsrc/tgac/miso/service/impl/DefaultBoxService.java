@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.validateBarcodeUniqueness;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -372,13 +373,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       }
     }
 
-    if (beforeChange == null
-        || (box.getIdentificationBarcode() != null && !box.getIdentificationBarcode().equals(beforeChange.getIdentificationBarcode()))) {
-      Box existing = boxStore.getBoxByBarcode(box.getIdentificationBarcode());
-      if (existing != null && existing.getId() != box.getId()) {
-        errors.add(new ValidationError("identificationBarcode", "There is already a box with this barcode"));
-      }
-    }
+    validateBarcodeUniqueness(box, beforeChange, boxStore::getBoxByBarcode, errors, "box");
 
     if (box.getStorageLocation() != null) {
       if (box.getStorageLocation().getLocationUnit().getBoxStorageAmount() == BoxStorageAmount.NONE) {
