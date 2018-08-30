@@ -27,6 +27,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -703,11 +704,11 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       workset.getLibraries().removeIf(lib -> lib.getId() == object.getId());
       worksetService.save(workset);
     }
-  }
-
-  @Override
-  public BoxService getBoxService() {
-    return boxService;
+    Box box = object.getBox();
+    if (box != null) {
+      box.getBoxPositions().remove(object.getBoxPosition());
+      boxService.save(box);
+    }
   }
 
 }
