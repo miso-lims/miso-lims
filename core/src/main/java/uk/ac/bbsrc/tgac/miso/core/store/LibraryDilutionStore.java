@@ -60,7 +60,7 @@ public interface LibraryDilutionStore
    * @throws IOException
    *           when
    */
-  LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException;
+  LibraryDilution getByBarcode(String barcode) throws IOException;
 
   Collection<LibraryDilution> getByBarcodeList(Collection<String> barcodeList) throws IOException;
 }

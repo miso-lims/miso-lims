@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -257,15 +258,12 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     return savedId;
   }
 
-  private void validateChange(Pool pool, Pool beforeChange) {
+  private void validateChange(Pool pool, Pool beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
-    if (pool.getConcentration() != null && pool.getConcentrationUnits() == null) {
-      errors.add(new ValidationError("concentrationUnits", "Concentration units must be specified"));
-    }
-    if (pool.getVolume() != null && pool.getVolumeUnits() == null) {
-      errors.add(new ValidationError("volumeUnits", "Volume units must be specified"));
-    }
+    validateConcentrationUnits(pool.getConcentration(), pool.getConcentrationUnits(), errors);
+    validateVolumeUnits(pool.getVolume(), pool.getVolumeUnits(), errors);
+    validateBarcodeUniqueness(pool, beforeChange, poolStore::getByBarcode, errors, "pool");
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);

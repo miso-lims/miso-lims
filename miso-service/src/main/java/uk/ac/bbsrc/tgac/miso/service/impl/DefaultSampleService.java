@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -713,15 +714,12 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     boxService.updateBoxableLocation(sample);
   }
 
-  private void validateChange(Sample sample, Sample beforeChange) {
+  private void validateChange(Sample sample, Sample beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
-    if (sample.getConcentration() != null && sample.getConcentrationUnits() == null) {
-      errors.add(new ValidationError("concentrationUnits", "Concentration units must be specified"));
-    }
-    if (sample.getVolume() != null && sample.getVolumeUnits() == null) {
-      errors.add(new ValidationError("volumeUnits", "Volume units must be specified"));
-    }
+    validateConcentrationUnits(sample.getConcentration(), sample.getConcentrationUnits(), errors);
+    validateVolumeUnits(sample.getVolume(), sample.getVolumeUnits(), errors);
+    validateBarcodeUniqueness(sample, beforeChange, sampleStore::getByBarcode, errors, "sample");
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);

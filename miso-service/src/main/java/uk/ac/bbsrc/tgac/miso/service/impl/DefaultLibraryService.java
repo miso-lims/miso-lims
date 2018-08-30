@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -548,15 +549,12 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     }
   }
 
-  private void validateChange(Library library, Library beforeChange) {
+  private void validateChange(Library library, Library beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
-    if (library.getConcentration() != null && library.getConcentrationUnits() == null) {
-      errors.add(new ValidationError("concentrationUnits", "Concentration units must be specified"));
-    }
-    if (library.getVolume() != null && library.getVolumeUnits() == null) {
-      errors.add(new ValidationError("volumeUnits", "Volume units must be specified"));
-    }
+    validateConcentrationUnits(library.getConcentration(), library.getConcentrationUnits(), errors);
+    validateVolumeUnits(library.getVolume(), library.getVolumeUnits(), errors);
+    validateBarcodeUniqueness(library, beforeChange, libraryDao::getByBarcode, errors, "library");
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);

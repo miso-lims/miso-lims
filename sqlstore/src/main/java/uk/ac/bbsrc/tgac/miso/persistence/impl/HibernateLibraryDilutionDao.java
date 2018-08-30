@@ -91,7 +91,7 @@ public class HibernateLibraryDilutionDao
   }
 
   @Override
-  public LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException {
+  public LibraryDilution getByBarcode(String barcode) throws IOException {
     if (barcode == null) throw new IOException("Barcode cannot be null!");
     Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
     criteria.add(Restrictions.eq("identificationBarcode", barcode));
