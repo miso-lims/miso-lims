@@ -215,6 +215,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     tissue.put(SamColumns.EXTERNAL_NAME, "ext1"); // increment
     table.enterText(SamColumns.EXTERNAL_NAME, 0, tissue.get(SamColumns.EXTERNAL_NAME));
 
+    tissue.put(SamColumns.BOX_ALIAS, "Boxxy");
+    tissue.put(SamColumns.BOX_POSITION, "A01");
+    table.enterText(SamColumns.BOX_SEARCH, 0, tissue.get(SamColumns.BOX_ALIAS));
+    table.enterText(SamColumns.BOX_POSITION, 0, tissue.get(SamColumns.BOX_POSITION));
+
     assertIdentityLookupWasSuccessful(table, 0);
 
     saveSingleAndAssertSuccess(table);
