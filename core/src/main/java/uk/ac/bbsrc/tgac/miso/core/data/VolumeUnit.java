@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 
 public enum VolumeUnit {
 
-  MICROLITRE("&#181;L");
+  MICROLITRES("&#181;L");
 
   private final String units;
 

@@ -122,9 +122,8 @@
   <tr>
     <td>Concentration Units:</td>
     <td><form:select id="concentrationUnits" path="concentrationUnits">
-    <option value>(None)</option>
       <c:forEach var="concentrationUnit" items="${concentrationUnits}">
-        <option value="${concentrationUnit}" <c:if test="${pool.concentrationUnits == concentrationUnit}">selected="selected"</c:if>>
+        <option value="${concentrationUnit}" <c:if test="${pool.concentrationUnits eq concentrationUnit or (empty pool.concentrationUnits and concentrationUnit.toString() eq 'NANOGRAMS_PER_MICROLITRE')}">selected="selected"</c:if>>
           ${concentrationUnit.units}
         </option>
       </c:forEach>
@@ -163,9 +162,8 @@
   <tr>
     <td>Volume Units:</td>
     <td><form:select id="volumeUnits" path="volumeUnits">
-    <option value>(None)</option>
       <c:forEach var="volumeUnit" items="${volumeUnits}">
-        <option value="${volumeUnit}" <c:if test="${pool.volumeUnits == volumeUnit}">selected="selected"</c:if>>
+        <option value="${volumeUnit}" <c:if test="${pool.volumeUnits eq volumeUnit or (empty pool.volumeUnits and volumeUnit.toString() eq 'MICROLITRES')}">selected="selected"</c:if>>
           ${volumeUnit.units}
         </option>
       </c:forEach>

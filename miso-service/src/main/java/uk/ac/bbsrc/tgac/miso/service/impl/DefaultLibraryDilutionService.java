@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +33,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
@@ -55,8 +56,6 @@ public class DefaultLibraryDilutionService
 
   @Autowired
   private LibraryDilutionStore dilutionDao;
-  @Autowired
-  private SecurityStore securityStore;
   @Autowired
   private SecurityProfileStore securityProfileStore;
   @Autowired
@@ -160,6 +159,13 @@ public class DefaultLibraryDilutionService
     authorizationManager.throwIfNotWritable(dilution);
     boxService.throwIfBoxPositionIsFilled(dilution);
 
+    if (dilution.getConcentration() == null) {
+      dilution.setConcentrationUnits(null);
+    }
+    if (dilution.getVolume() == null) {
+      dilution.setVolumeUnits(null);
+    }
+
     Library library = dilution.getLibrary();
     if (dilution.getVolumeUsed() != null && library.getVolume() != null) {
       library.setVolume(library.getVolume() - dilution.getVolumeUsed());
@@ -169,6 +175,7 @@ public class DefaultLibraryDilutionService
 
     // pre-save field generation
     dilution.setName(generateTemporaryName());
+    validateChange(dilution, null);
     long savedId = save(dilution).getId();
     libraryService.update(library);
     boxService.updateBoxableLocation(dilution);
@@ -191,7 +198,7 @@ public class DefaultLibraryDilutionService
         library.setVolume(library.getVolume() - dilution.getVolumeUsed());
       }
     }
-
+    validateChange(dilution, managed);
     applyChanges(managed, dilution);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     loadChildEntities(managed);
@@ -255,14 +262,29 @@ public class DefaultLibraryDilutionService
    * @throws IOException
    */
   private void applyChanges(LibraryDilution target, LibraryDilution source) {
-    target.setConcentration(source.getConcentration());
     target.setTargetedSequencing(source.getTargetedSequencing());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setVolume(source.getVolume());
-    target.setVolumeUnits(source.getVolumeUnits());
-    target.setConcentrationUnits(source.getConcentrationUnits());
+    target.setVolumeUnits(target.getVolume() == null ? null : source.getVolumeUnits());
+    target.setConcentration(source.getConcentration());
+    target.setConcentrationUnits(target.getConcentration() == null ? null : source.getConcentrationUnits());
     target.setNgUsed(source.getNgUsed());
     target.setVolumeUsed(source.getVolumeUsed());
+  }
+
+  private void validateChange(LibraryDilution dilution, LibraryDilution beforeChange) {
+    List<ValidationError> errors = new ArrayList<>();
+
+    if (dilution.getConcentration() != null && dilution.getConcentrationUnits() == null) {
+      errors.add(new ValidationError("concentrationUnits", "Concentration units must be specified"));
+    }
+    if (dilution.getVolume() != null && dilution.getVolumeUnits() == null) {
+      errors.add(new ValidationError("volumeUnits", "Volume units must be specified"));
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
+    }
   }
 
   public void setDilutionDao(LibraryDilutionStore dilutionDao) {
