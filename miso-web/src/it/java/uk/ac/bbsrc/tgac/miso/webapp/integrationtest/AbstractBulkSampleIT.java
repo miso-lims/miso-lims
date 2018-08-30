@@ -81,6 +81,8 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
       assertEntityAttribute(SamColumns.RECEIVE_DATE, attributes, sample,
           s -> s.getReceivedDate() == null ? "" : LimsUtils.formatDate(s.getReceivedDate()));
     }
+    assertEntityAttribute(SamColumns.BOX_ALIAS, attributes, sample, s -> s.getBox() == null ? "" : s.getBox().getAlias());
+    assertEntityAttribute(SamColumns.BOX_POSITION, attributes, sample, s -> s.getBoxPosition() == null ? "" : s.getBoxPosition());
   }
 
   protected void assertDetailedSampleAttributes(Map<String, String> attributes, DetailedSample sample) {

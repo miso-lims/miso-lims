@@ -806,6 +806,7 @@ INSERT INTO PoolOrder (poolOrderId, poolId, partitions, parametersId, createdBy,
 
 INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, securityProfile_profileId, lastModifier, creator, created, lastModified) VALUES
 (1, 1, 1, 'BOX1', 'First Box', 1, 1, 1, '2017-07-20 13:01:01', '2017-07-20 13:01:01'),
+(2, 1, 1, 'BOX2', 'Boxxy', 1, 1, 1, '2018-08-30 15:15:00', '2018-08-30 15:15:00'),
 (500, 1, 1, 'BOX500', 'Tubes In Boxes Test', 1, 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00'),
 (501, 1, 1, 'BOX501', 'Second box for Tubes in Boxes test', 1, 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
 (502, 1, 1, 'BOX502', 'Editable box', 1, 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
