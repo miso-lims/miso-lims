@@ -63,7 +63,13 @@ ListTarget.completion = {
     }, 1, !config.poolId), ListUtils.labelHyperlinkColumn("Alias", "pool", function(completion) {
       return completion.pool.id;
     }, "pool.alias", 0, !config.poolId), {
-      "sTitle": "Description",
+      "sTitle": "Order Description",
+      "mData": "description",
+      "bSortable": false,
+      "iSortPriority": 0,
+      "include": !config.poolId
+    }, {
+      "sTitle": "Pool Description",
       "mData": "pool.description",
       "mRender": WarningTarget.completion.tableWarnings,
       "bSortable": false,
