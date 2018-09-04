@@ -1,3 +1,16 @@
+# 0.2.140
+
+Changes:
+
+ * Fixed saving box position of new items
+ * Improve display of multiline box changelog entries
+ * Added validation for duplicate barcodes
+ * Avoid errors when printing barcodes (#1647)
+ * Fixed removing deleted items from boxes
+ * Fixed out-of-order selection on worksets
+ * Set default volume and concentration units (#1632)
+ * Fix List Worksets - Mine tab (#1637)
+
 # 0.2.139
 
 (This is an empty release; please ignore it)
