@@ -134,6 +134,7 @@ public class DetailedSampleBuilder
   private BigDecimal loadingCellConcentration;
 
   // TissueProcessingSample attributes
+  private SampleClass tissueProcessingClass;
   // Slide
   private Integer slides;
   private Integer discards;
@@ -593,6 +594,14 @@ public class DetailedSampleBuilder
     this.consentLevel = consentLevel;
   }
 
+  public void setTissueProcessingClass(SampleClass tissueProcessingClass) {
+    this.tissueProcessingClass = tissueProcessingClass;
+  }
+
+  public SampleClass getTissueProcessingClass() {
+    return tissueProcessingClass;
+  }
+
   @Override
   public Integer getSlides() {
     return slides;
@@ -941,6 +950,12 @@ public class DetailedSampleBuilder
         tissue.setParent(parent);
         tissue.setSampleClass(tissueClass);
         parent = tissue;
+      }
+      if (categoryIndex > 2 && tissueProcessingClass != null) {
+        SampleTissueProcessing tissueProcessing = buildTissueProcessing();
+        tissueProcessing.setParent(parent);
+        tissueProcessing.setSampleClass(tissueProcessingClass);
+        parent = tissueProcessing;
       }
       if (categoryIndex > 3 && stockClass != null) {
         SampleStock stock = buildStock();

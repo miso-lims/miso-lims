@@ -27,6 +27,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,6 +43,7 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -605,6 +607,18 @@ public class EditSampleController {
         setValue(isStringEmptyOrNull(text) ? null : Long.valueOf(text));
       }
     });
+    
+    binder.registerCustomEditor(BigDecimal.class, new PropertyEditorSupport() {
+      @Override
+      public String getAsText() {
+        return StringUtils.strip(((BigDecimal) getValue()).toPlainString(), "0");
+      }
+
+      @Override
+      public void setAsText(String text) {
+        setValue(isStringEmptyOrNull(text) ? null : new BigDecimal(text));
+      }
+    });
   }
 
   @GetMapping(value = "/new")
@@ -882,12 +896,21 @@ public class EditSampleController {
       if (builder.getTissueClass() != null) {
         builder.setTissueClass(sampleClassService.get(builder.getTissueClass().getId()));
       }
-      if (builder.getParent() == null && builder.getSampleClass().getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)) {
-        builder.setStockClass(sampleClassService.inferParentFromChild(builder.getSampleClass().getId(), SampleAliquot.CATEGORY_NAME,
-            SampleStock.CATEGORY_NAME));
-        if (builder.getStockClass() == null) {
-          throw new IllegalStateException(String.format("%s class with id %d has no %s parents", SampleAliquot.CATEGORY_NAME,
-              builder.getSampleClass().getId(), SampleStock.CATEGORY_NAME));
+      if (builder.getParent() == null) {
+        SampleClass stockClass = null;
+        if (builder.getSampleClass().getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)) {
+          stockClass = sampleClassService.inferParentFromChild(builder.getSampleClass().getId(), SampleAliquot.CATEGORY_NAME,
+              SampleStock.CATEGORY_NAME);
+          builder.setStockClass(stockClass);
+          if (builder.getStockClass() == null) {
+            throw new IllegalStateException(String.format("%s class with id %d has no %s parents", SampleAliquot.CATEGORY_NAME,
+                builder.getSampleClass().getId(), SampleStock.CATEGORY_NAME));
+          }
+        } else if (builder.getSampleClass().getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
+          stockClass = builder.getSampleClass();
+        }
+        if (builder.getTissueProcessingClass() == null && stockClass != null) {
+          builder.setTissueProcessingClass(sampleClassService.getRequiredTissueProcessingClass(stockClass.getId()));
         }
       }
       sample = builder.build();

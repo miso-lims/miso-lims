@@ -101,7 +101,8 @@ HotTarget.sample = (function() {
       // If we aren't starting or finished with a tissue processing, hide those
       // columns since we don't really want to show tissue processing unless the
       // user specifically requested it.
-      if (sourceCategory != 'Tissue Processing' && targetCategory != 'Tissue Processing') {
+      if (sourceCategory != 'Tissue Processing' && targetCategory != 'Tissue Processing'
+          && config.targetSampleClass.alias.indexOf('Single Cell') === -1) {
         show['Tissue Processing'] = false;
       }
 
@@ -618,10 +619,10 @@ HotTarget.sample = (function() {
               'slidesConsumed', HotUtils.validator.requiredPositiveInt),
 
           // Tissue Processing: Single Cell columns
-          HotUtils.makeColumnForFloat('Initial Cell Conc.', (show['Tissue Processing'] && config.targetSampleClass.alias == 'Single Cell'),
-              'initialCellConcentration', false),
-          HotUtils.makeColumnForText('Digestion', (show['Tissue Processing'] && config.targetSampleClass.alias == 'Single Cell'),
-              'digestion', {
+          HotUtils.makeColumnForFloat('Initial Cell Conc.', (show['Tissue Processing'] && config.targetSampleClass.alias
+              .indexOf('Single Cell') != -1), 'initialCellConcentration', 14, 10, false, false),
+          HotUtils.makeColumnForText('Digestion',
+              (show['Tissue Processing'] && config.targetSampleClass.alias.indexOf('Single Cell') != -1), 'digestion', {
                 validator: HotUtils.validator.requiredTextNoSpecialChars
               }),
 
@@ -694,12 +695,13 @@ HotTarget.sample = (function() {
             }
           },
           // Stock: Single Cell columns
-          HotUtils.makeColumnForFloat('Target Cell Recovery',
-              (show['Stock'] && config.targetSampleClass.alias == 'Single Cell DNA (stock)'), 'targetCellRecovery', false),
-          HotUtils.makeColumnForFloat('Cell Viability', (show['Stock'] && config.targetSampleClass.alias == 'Single Cell DNA (stock)'),
-              'cellViability', false),
-          HotUtils.makeColumnForFloat('Loading Cell Conc.', (show['Stock'] && config.targetSampleClass.alias == 'Single Cell DNA (stock)'),
-              'loadingCellConcentration', false),
+          HotUtils.makeColumnForDecimal('Target Cell Recovery',
+              (show['Stock'] && config.targetSampleClass.alias.indexOf('Single Cell') != -1), 'targetCellRecovery', 14, 10, false, false),
+          HotUtils.makeColumnForDecimal('Cell Viability', (show['Stock'] && config.targetSampleClass.alias.indexOf('Single Cell') != -1),
+              'cellViability', 14, 10, false, false),
+          HotUtils.makeColumnForDecimal('Loading Cell Conc.',
+              (show['Stock'] && config.targetSampleClass.alias.indexOf('Single Cell') != -1), 'loadingCellConcentration', 14, 10, false,
+              false),
 
           // QC status columns for detailed and non-detailed samples
           {
@@ -804,8 +806,8 @@ HotTarget.sample = (function() {
                 }
               }),
           // Aliquot: Single Cell columns
-          HotUtils.makeColumnForFloat('Input into Library',
-              (show['Aliquot'] && config.targetSampleClass.alias == 'Single Cell DNA (aliquot)'), 'inputIntoLibrary', false)];
+          HotUtils.makeColumnForDecimal('Input into Library',
+              (show['Aliquot'] && config.targetSampleClass.alias.indexOf('Single Cell') != -1), 'inputIntoLibrary', 14, 10, false, false)];
 
       if (!config.isLibraryReceipt) {
         var spliceIndex = columns.indexOf(columns.filter(function(column) {

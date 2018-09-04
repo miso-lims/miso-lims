@@ -578,8 +578,20 @@
           </table>
         </div>
         </c:when>
-        <c:when test="${sampleClass eq 'Single Cell' or sampleCategory eq 'new'}">
-        TODO
+        <c:when test="${sampleClass eq 'Single Cell'}">
+          <div id="singleCellTable">
+            <h2>Tissue Processing</h2>
+            <table class="in">
+              <tr>
+                <td class="h"><label for="initialCellConcentration">Initial Cell Concentration:</label></td>
+                <td><form:input id="initialCellConcentration" path="initialCellConcentration"/></td>
+              </tr>
+              <tr>
+                <td class="h"><label for="digestion">Digestion:*</label></td>
+                <td><form:input id="digestion" path="digestion"/></td>
+              </tr>
+            </table>
+          </div>
         </c:when>
         </c:choose>
       </c:if>
@@ -607,6 +619,20 @@
                 <td><form:checkbox id="DNAseTreated" path="DNAseTreated"/></td>
               </tr>
             </c:if>
+            <c:if test="${sampleClass eq 'Single Cell DNA (stock)'}">
+              <tr>
+                <td class="h"><label for="targetCellRecovery">Target Cell Recovery:</label></td>
+                <td><form:input id="targetCellRecovery" path="targetCellRecovery"/></td>
+              </tr>
+              <tr>
+                <td class="h"><label for="cellViability">Cell Viability:</label></td>
+                <td><form:input id="cellViability" path="cellViability"/></td>
+              </tr>
+              <tr>
+                <td class="h"><label for="loadingCellConcentration">Loading Cell Concentration:</label></td>
+                <td><form:input id="loadingCellConcentration" path="loadingCellConcentration"/></td>
+              </tr>
+            </c:if>
           </table>
         </div>
       </c:if>
@@ -623,6 +649,12 @@
                     itemValue="id" defaultLabel="Unknown" defaultValue=""/>
               </td>
             </tr>
+            <c:if test="${sampleClass eq 'Single Cell DNA (aliquot)'}">
+              <tr>
+                <td class="h"><label for="inputIntoLibrary">Input into Library:</label></td>
+                <td><form:input id="inputIntoLibrary" path="inputIntoLibrary"/></td>
+              </tr>
+            </c:if>
           </table>
         </div>
       </c:if>

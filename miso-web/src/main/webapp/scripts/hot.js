@@ -137,15 +137,15 @@ var HotUtils = {
     var columns = target.createColumns(config, create, data).filter(function(c) {
       return c.include;
     });
-    
-    if(columns.some(function(c){
+
+    if (columns.some(function(c) {
       return c.description;
-    })){
+    })) {
       jQuery('#hothelpdiv').append('</br>');
       jQuery('#hothelpdiv').append('<p>Column Descriptions:</p>');
     }
     columns.forEach(function(c, i) {
-      if(c.description && c.include){
+      if (c.description && c.include) {
         jQuery('#hothelpdiv').append('<p>' + c.header + ' - ' + c.description + '</p>');
       }
       c.hotIndex = i;
@@ -515,13 +515,6 @@ var HotUtils = {
                         anyInvalidCells = false;
                         table
                             .validateCells(function() {
-                              if (anyInvalidCells) {
-                                failed.push('Please fix highlighted cells.');
-                                renderErrors();
-                                setSaveDisabled(false);
-                                ajaxLoader.classList.add('hidden');
-                                return;
-                              }
                               for (var i = 0; i < data.length; i++) {
                                 var errorHandler = function(errorMessage) {
                                   okToSave = false;
@@ -534,6 +527,13 @@ var HotUtils = {
                                   });
                                 });
                                 target.fixUp(data[i], errorHandler);
+                              }
+                              if (anyInvalidCells) {
+                                failed.push('Please fix highlighted cells.');
+                                renderErrors();
+                                setSaveDisabled(false);
+                                ajaxLoader.classList.add('hidden');
+                                return;
                               }
                               if (!okToSave) {
                                 if (failed.length == 0) {
@@ -768,7 +768,7 @@ var HotUtils = {
     td.classList.add('multipleOptions');
     return td;
   },
-  
+
   notificationRenderer: function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     td.classList.add('notification');
@@ -888,6 +888,35 @@ var HotUtils = {
           output = result;
         }
         obj[property] = output;
+      }
+    };
+  },
+
+  makeColumnForDecimal: function(headerName, include, property, precision, scale, required, allowNegative) {
+    var max = Math.pow(10, precision - scale) - Math.pow(0.1, scale);
+    var min = allowNegative ? max * -1 : 0;
+    var regex = new RegExp('^\\d{0,' + (precision - scale) + '}(?:\\.\\d{1,' + scale + '})?$');
+    var validator = function(value, callback) {
+      return callback((Utils.validation.isEmpty(value) && !required)
+          || (Handsontable.helper.isNumeric(value) && regex.test(value) && value > min && value < max));
+    };
+    return {
+      header: headerName,
+      data: property,
+      type: 'text',
+      include: include,
+      unpack: function(obj, flat, setCellMeta) {
+        flat[property] = Utils.valOrNull(obj[property]);
+      },
+      validator: validator,
+      pack: function(obj, flat, errorHandler) {
+        validator(flat[property], function(valid) {
+          if (!valid) {
+            errorHandler(headerName + ' must be a number between ' + min + ' and ' + max);
+          } else {
+            obj[property] = Utils.valOrNull(flat[property]);
+          }
+        });
       }
     };
   },
@@ -1275,13 +1304,12 @@ var HotUtils = {
     }
     table.sort(sortColIndex);
   },
-  
+
   getPlatformType: function(value) {
     return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(platformType) {
       return platformType.key == value;
     }, Constants.platformTypes), 'name');
   },
-  
 
   updateFromTemplateOrDesign: function(design, template, idProperty, source, displayProperty, setReadOnly, setData) {
     var id = null;
@@ -1299,27 +1327,27 @@ var HotUtils = {
     setReadOnly(design || (template && template.idProperty));
   },
 
-  showDialogForBoxCreation: function(title, okButton, fields, pageURL, generateParams, getItemCount){
+  showDialogForBoxCreation: function(title, okButton, fields, pageURL, generateParams, getItemCount) {
     fields.push(ListUtils.createBoxField);
     Utils.showDialog(title, okButton, fields, function(result) {
       var params = generateParams(result);
-      if(params == null){
+      if (params == null) {
         return;
       }
-      var loadPage = function(){
+      var loadPage = function() {
         window.location = window.location.origin + pageURL + jQuery.param(params);
       }
-      if (result.createBox){
-        Utils.createBoxDialog(result, getItemCount, function(newBox){
+      if (result.createBox) {
+        Utils.createBoxDialog(result, getItemCount, function(newBox) {
           params.boxId = newBox.id;
           loadPage();
         });
       } else {
         loadPage();
       }
-    }); 
+    });
   }
-  
+
 };
 
 HotTarget = {};

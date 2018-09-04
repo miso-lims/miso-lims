@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS SampleSingleCell;
+DROP TABLE IF EXISTS SampleStockSingleCell;
+DROP TABLE IF EXISTS SampleAliquotSingleCell;
+
 CREATE TABLE SampleSingleCell (
   sampleId bigint(20) NOT NULL,
   initialCellConcentration DECIMAL(14,10),

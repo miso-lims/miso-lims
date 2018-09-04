@@ -86,6 +86,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
@@ -113,6 +114,7 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
@@ -788,7 +790,8 @@ public class EditLibraryController {
       if (aliquotClass == null) throw new InvalidParameterException("Requested sample class not found");
       DetailedLibraryDto detailedDto = new DetailedLibraryDto();
       libDto = detailedDto;
-      SampleAliquotDto samDto = new SampleAliquotDto();
+      SampleAliquotDto samDto = SampleAliquotSingleCell.SAMPLE_CLASS_NAME.equals(aliquotClass.getAlias()) ? new SampleAliquotSingleCellDto()
+          : new SampleAliquotDto();
       detailedDto.setSample(samDto);
       samDto.setSampleClassId(aliquotClassId);
       detailedDto.setParentSampleClassId(aliquotClassId);

@@ -542,7 +542,16 @@ public class Dtos {
           }
         }
       }
-      if (childDto instanceof SampleStockDto && childDto.getClass() != SampleStockDto.class) {
+      if (childDto instanceof SampleSingleCellRelative && childDto.getClass() != SampleSingleCellDto.class) {
+        SampleStockDto stockDto = (SampleStockDto) childDto;
+        DetailedSample tissueProcessing = toSingleCellSample((SampleSingleCellRelative) childDto);
+        tissueProcessing.setSampleClass(new SampleClassImpl());
+        tissueProcessing.getSampleClass().setId(stockDto.getTissueProcessingClassId());
+        tissueProcessing.setParent(parent);
+        parent = tissueProcessing;
+      }
+      if (childDto instanceof SampleStockDto && childDto.getClass() != SampleStockDto.class
+          && childDto.getClass() != SampleStockSingleCellDto.class) {
         SampleAliquotDto aliquotDto = (SampleAliquotDto) childDto;
         DetailedSample stock = toStockSample((SampleStockDto) childDto);
         stock.setSampleClass(new SampleClassImpl());
@@ -665,8 +674,8 @@ public class Dtos {
 
   private static SampleStock toStockSample(SampleStockDto from) {
     SampleStock to = null;
-    if (from.getClass() == SampleStockSingleCellDto.class) {
-      SampleStockSingleCellDto scFrom = (SampleStockSingleCellDto) from;
+    if (from instanceof SampleStockSingleCellRelative) {
+      SampleStockSingleCellRelative scFrom = (SampleStockSingleCellRelative) from;
       SampleStockSingleCell sc = new SampleStockSingleCellImpl();
       setBigDecimal(sc::setTargetCellRecovery, scFrom.getTargetCellRecovery());
       setBigDecimal(sc::setCellViability, scFrom.getCellViability());
@@ -930,8 +939,8 @@ public class Dtos {
       to = toSlideSample((SampleSlideDto) from);
     } else if (from.getClass() == SampleLCMTubeDto.class) {
       to = toLCMTubeSample((SampleLCMTubeDto) from);
-    } else if (from.getClass() == SampleSingleCellDto.class) {
-      to = toSingleCellSample((SampleSingleCellDto) from);
+    } else if (from instanceof SampleSingleCellRelative) {
+      to = toSingleCellSample((SampleSingleCellRelative) from);
     } else {
       to = new SampleTissueProcessingImpl();
     }
@@ -976,7 +985,7 @@ public class Dtos {
     return dto;
   }
 
-  private static SampleSingleCell toSingleCellSample(SampleSingleCellDto from) {
+  private static SampleSingleCell toSingleCellSample(SampleSingleCellRelative from) {
     SampleSingleCell to = new SampleSingleCellImpl();
     setBigDecimal(to::setInitialCellConcentration, from.getInitialCellConcentration());
     setString(to::setDigestion, from.getDigestion());

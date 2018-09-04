@@ -65,6 +65,12 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String QC_PASSED = "QC Passed?";
     public static final String PARENT_ALIAS = "Parent Alias";
     public static final String PARENT_SAMPLE_CLASS = "Parent Sample Class";
+    public static final String INITIAL_CELL_CONC = "Initial Cell Conc.";
+    public static final String DIGESTION = "Digestion";
+    public static final String TARGET_CELL_RECOVERERY = "Target Cell Recovery";
+    public static final String CELL_VIABILITY = "Cell Viability";
+    public static final String LOADING_CELL_CONC = "Loading Cell Conc.";
+    public static final String INPUT_INTO_LIBRARY = "Input into Library";
 
     private SamColumns() {
       throw new IllegalStateException("Util class not intended for instantiation");
