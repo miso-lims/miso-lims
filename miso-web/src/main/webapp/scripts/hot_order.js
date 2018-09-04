@@ -29,6 +29,16 @@ HotTarget.order = (function() {
         pack: function(order, flat, errorHandler) {
         }
       }, {
+        header: 'Description',
+        data: 'description',
+        include: true,
+        unpack: function(order, flat, setCellMeta) {
+          flat.description = order.description || null;
+        },
+        pack: function(order, flat, errorHandler) {
+          order.description = flat.description;
+        }
+      }, {
         header: 'Platform',
         data: 'platform',
         type: 'dropdown',

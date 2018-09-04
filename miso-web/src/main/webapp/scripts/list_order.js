@@ -97,12 +97,17 @@ ListTarget.order = {
                   label: platformType.pluralPartitionName,
                   property: "count",
                   value: 1
+                }, {
+                  type: "text",
+                  label: "Description",
+                  property: "description"
                 }], function(results) {
 
                   Utils.ajaxWithDialog('Creating Order', 'POST', '/miso/rest/poolorder', {
                     "pool": config.pool,
                     "partitions": results.count,
                     "parameters": results.parameters,
+                    "description": results.description
                   }, Utils.page.pageReload);
                 });
               }
@@ -133,6 +138,11 @@ ListTarget.order = {
       "mData": "partitions",
       "include": true,
       "iSortPriority": 1
+    }, {
+      "sTitle": "Description",
+      "mData": "description",
+      "include": true,
+      "iSortPriority": 0
     }];
   }
 };

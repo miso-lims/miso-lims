@@ -1049,6 +1049,7 @@ public class Dtos {
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    dto.setDescription(from.getDescription());
     return dto;
   }
 
@@ -1062,6 +1063,7 @@ public class Dtos {
     to.setPool(to(from.getPool()));
     to.setSequencingParameter(to(from.getParameters()));
     to.setPartitions(from.getPartitions());
+    to.setDescription(from.getDescription());
     return to;
   }
 
@@ -1692,6 +1694,8 @@ public class Dtos {
     PoolOrderCompletionDto dto = new PoolOrderCompletionDto();
     dto.setId(from.getPool().getId() + "_" + from.getSequencingParameters().getId());
     dto.setPool(asDto(from.getPool(), false, false));
+    // get list of PoolOrders, somehow, to get their descriptions later
+
     dto.setParameters(asDto(from.getSequencingParameters()));
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
     dto.setRemaining(from.getRemaining());

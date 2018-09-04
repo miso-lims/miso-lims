@@ -14,6 +14,7 @@ public class PoolOrderCompletionDto {
   private int started;
   private int stopped;
   private int unknown;
+  private String description;
 
   public int getCompleted() {
     return completed;
@@ -116,6 +117,14 @@ public class PoolOrderCompletionDto {
 
   public void setUnknown(int unknown) {
     this.unknown = unknown;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
 }
