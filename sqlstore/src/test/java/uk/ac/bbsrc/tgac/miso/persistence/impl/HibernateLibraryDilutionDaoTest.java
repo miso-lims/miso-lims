@@ -69,20 +69,20 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
 
   @Test
   public void testGetLibraryDilutionByBarcode() throws IOException {
-    final LibraryDilution ld = dao.getLibraryDilutionByBarcode("LDI2::TEST_0001_Bn_R_PE_300_WG");
+    final LibraryDilution ld = dao.getByBarcode("LDI2::TEST_0001_Bn_R_PE_300_WG");
     assertNotNull(ld);
   }
 
   @Test
   public void testGetLibraryDilutionByBarcodeNone() throws IOException {
-    final LibraryDilution ld = dao.getLibraryDilutionByBarcode("nonexistant barcode");
+    final LibraryDilution ld = dao.getByBarcode("nonexistant barcode");
     assertNull(ld);
   }
 
   @Test
   public void testGetLibraryDilutionByBarcodeNull() throws IOException {
     expectedException.expect(IOException.class);
-    dao.getLibraryDilutionByBarcode(null);
+    dao.getByBarcode(null);
   }
 
   @Test

@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
@@ -418,6 +419,7 @@ public class DefaultSampleServiceTest {
     updated.setScientificName("newSciName");
     updated.setTaxonIdentifier("newTaxonId");
     updated.setVolume(5.5D);
+    updated.setVolumeUnits(VolumeUnit.MICROLITRES);
 
     // unmodifiable
     updated.setName("newName");

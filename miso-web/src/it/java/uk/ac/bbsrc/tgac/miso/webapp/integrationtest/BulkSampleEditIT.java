@@ -238,6 +238,11 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     // make the changes
     editable.forEach((k, v) -> table.enterText(k, 0, v));
 
+    editable.put(SamColumns.BOX_ALIAS, "Boxxy");
+    editable.put(SamColumns.BOX_POSITION, "A01");
+    table.enterText(SamColumns.BOX_SEARCH, 0, editable.get(SamColumns.BOX_ALIAS));
+    table.enterText(SamColumns.BOX_POSITION, 0, editable.get(SamColumns.BOX_POSITION));
+
     saveSingleAndAssertSuccess(table);
 
     // verify that the changes have been saved
@@ -266,9 +271,12 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     empty.put(SamColumns.TISSUE_MATERIAL, "(None)");
     empty.put(SamColumns.REGION, "");
     empty.put(SamColumns.QC_STATUS, "Not Ready");
+    empty.put(SamColumns.BOX_ALIAS, "");
 
     // make the changes
     empty.forEach((k, v) -> newTable.enterText(k, 0, v));
+
+    empty.put(SamColumns.BOX_POSITION, "");
 
     saveSingleAndAssertSuccess(newTable);
 

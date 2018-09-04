@@ -465,7 +465,8 @@ HotTarget.library = (function() {
               var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, value);
               var readOnly = false;
               if (template && template.platformType) {
-                setData(Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.namePredicate(template.platformType), Constants.platformTypes), 'key'));
+                setData(Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.namePredicate(template.platformType),
+                    Constants.platformTypes), 'key'));
                 readOnly = true;
               }
               setReadOnly(readOnly);
@@ -643,17 +644,17 @@ HotTarget.library = (function() {
             data: 'volumeUnits',
             type: 'dropdown',
             trimDropdown: false,
-            source: ['(None)'].concat(Constants.volumeUnits.map(function(unit) {
+            source: Constants.volumeUnits.map(function(unit) {
               return unit.units;
-            })),
+            }),
             include: config.showVolume,
             allowHtml: true,
-            validator: Handsontable.validators.AutocompleteValidator,
+            validator: HotUtils.validator.requiredAutocomplete,
             unpack: function(obj, flat, setCellMeta) {
               var units = Constants.volumeUnits.find(function(unit) {
                 return unit.name == obj.volumeUnits;
               });
-              flat['volumeUnits'] = !!units ? units.units : '(None)';
+              flat['volumeUnits'] = !!units ? units.units : '&#181;L';
             },
             pack: function(obj, flat, errorHandler) {
               var units = Constants.volumeUnits.find(function(unit) {
@@ -666,17 +667,17 @@ HotTarget.library = (function() {
             data: 'concentrationUnits',
             type: 'dropdown',
             trimDropdown: false,
-            source: ['(None)'].concat(Constants.concentrationUnits.map(function(unit) {
+            source: Constants.concentrationUnits.map(function(unit) {
               return unit.units;
-            })),
+            }),
             include: true,
             allowHtml: true,
-            validator: Handsontable.validators.AutocompleteValidator,
+            validator: HotUtils.validator.requiredAutocomplete,
             unpack: function(obj, flat, setCellMeta) {
               var units = Constants.concentrationUnits.find(function(unit) {
                 return unit.name == obj.concentrationUnits;
               });
-              flat['concentrationUnits'] = !!units ? units.units : '(None)';
+              flat['concentrationUnits'] = !!units ? units.units : 'ng/&#181;L';
             },
             pack: function(obj, flat, errorHandler) {
               var units = Constants.concentrationUnits.find(function(unit) {

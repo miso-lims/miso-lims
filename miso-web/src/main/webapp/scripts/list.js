@@ -402,6 +402,12 @@ ListUtils = (function() {
       'fnDrawCallback': function(oSettings) {
         jqTable.removeClass('disabled');
         jQuery('#' + elementId + '_paginate').find('.fg-button').removeClass('fg-button');
+      },
+      'fnPreDrawCallback': function(oSettings) {
+        ListState[elementId].data = [];
+      },
+      'fnRowCallback': function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+        ListState[elementId].data.push(aData);
       }
     });
     optionModifier(options, jqTable, errorMessage, columns);
@@ -481,7 +487,6 @@ ListUtils = (function() {
             'success': function(data, textStatus, xhr) {
               errorMessage.innerText = data.sError;
               errorMessage.style.visibility = data.sError ? "visible" : "hidden";
-              ListState[elementId].data = data.aaData;
               columns.forEach(function(column, index) {
                 if (!column.visibilityFilter) {
                   return;
@@ -497,7 +502,6 @@ ListUtils = (function() {
             'error': function(xhr, statusText, errorThrown) {
               errorMessage.style.visibility = "visible";
               errorMessage.innerText = errorThrown;
-              ListState[elementId].data = [];
               updateSelectedLabel(ListState[elementId]);
               fnCallback({
                 iTotalRecords: 0,
@@ -514,7 +518,6 @@ ListUtils = (function() {
     createStaticTable: function(elementId, target, config, data) {
       initTable(elementId, target, null, config, function(options, jqTable, errorMessage, columns) {
         options.aaData = data;
-        ListState[elementId].data = data;
         errorMessage.style.visibility = "hidden";
       });
     },

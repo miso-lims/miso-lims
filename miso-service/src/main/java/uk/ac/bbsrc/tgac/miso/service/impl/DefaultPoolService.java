@@ -1,8 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -23,10 +25,10 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -44,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
@@ -182,14 +185,21 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     if (pool.isDiscarded()) {
       pool.setVolume(0.0);
     }
+    if (pool.getConcentration() == null) {
+      pool.setConcentrationUnits(null);
+    }
+    if (pool.getVolume() == null) {
+      pool.setVolumeUnits(null);
+    }
 
     long savedId;
-    if (pool.getId() == PoolImpl.UNSAVED_ID) {
+    if (!pool.isSaved()) {
       pool.setName(generateTemporaryName());
       loadSecurityProfile(pool);
       loadPoolDilutions(pool.getPoolDilutions(), pool);
       setChangeDetails(pool);
       boxService.throwIfBoxPositionIsFilled(pool);
+      validateChange(pool, null);
       poolStore.save(pool);
 
       if (autoGenerateIdBarcodes) {
@@ -206,6 +216,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       Pool managed = poolStore.get(pool.getId());
       authorizationManager.throwIfNotWritable(managed);
       boxService.throwIfBoxPositionIsFilled(pool);
+      validateChange(pool, managed);
       managed.setAlias(pool.getAlias());
       managed.setConcentration(pool.getConcentration());
       managed.setConcentrationUnits(pool.getConcentrationUnits());
@@ -246,6 +257,18 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     }
     boxService.updateBoxableLocation(pool);
     return savedId;
+  }
+
+  private void validateChange(Pool pool, Pool beforeChange) throws IOException {
+    List<ValidationError> errors = new ArrayList<>();
+
+    validateConcentrationUnits(pool.getConcentration(), pool.getConcentrationUnits(), errors);
+    validateVolumeUnits(pool.getVolume(), pool.getVolumeUnits(), errors);
+    validateBarcodeUniqueness(pool, beforeChange, poolStore::getByBarcode, errors, "pool");
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
+    }
   }
 
   private void loadSecurityProfile(Pool pool) throws IOException {
@@ -380,11 +403,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   }
 
   @Override
-  public BoxService getBoxService() {
-    return boxService;
-  }
-
-  @Override
   public void authorizeDeletion(Pool object) throws IOException {
     authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
   }
@@ -393,7 +411,12 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   public void beforeDelete(Pool object) throws IOException {
     Set<PoolOrder> orders = poolOrderService.getByPool(object.getId());
     poolOrderService.bulkDelete(orders);
-    PoolService.super.beforeDelete(object);
+
+    Box box = object.getBox();
+    if (box != null) {
+      box.getBoxPositions().remove(object.getBoxPosition());
+      boxService.save(box);
+    }
   }
 
   @Override

@@ -87,4 +87,11 @@ public interface Partition extends Identifiable, Comparable<Partition>, Serializ
    *          pool.
    */
   public void setPool(Pool pool);
+
+  @Override
+  int hashCode();
+
+  @Override
+  boolean equals(Object obj);
+
 }

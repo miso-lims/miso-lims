@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.validateBarcodeUniqueness;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -372,13 +373,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       }
     }
 
-    if (beforeChange == null
-        || (box.getIdentificationBarcode() != null && !box.getIdentificationBarcode().equals(beforeChange.getIdentificationBarcode()))) {
-      Box existing = boxStore.getBoxByBarcode(box.getIdentificationBarcode());
-      if (existing != null && existing.getId() != box.getId()) {
-        errors.add(new ValidationError("identificationBarcode", "There is already a box with this barcode"));
-      }
-    }
+    validateBarcodeUniqueness(box, beforeChange, boxStore::getBoxByBarcode, errors, "box");
 
     if (box.getStorageLocation() != null) {
       if (box.getStorageLocation().getLocationUnit().getBoxStorageAmount() == BoxStorageAmount.NONE) {
@@ -499,11 +494,20 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
 
   @Override
   public void updateBoxableLocation(Boxable boxable) throws IOException {
-    Boxable managedOriginal = boxStore.getBoxable(new BoxableId(boxable.getEntityType(), boxable.getId()));
-    if ((boxable.getBox() == null && managedOriginal.getBox() == null)
-        || (boxable.getBox() != null && managedOriginal.getBox() != null && boxable.getBox().getId() == managedOriginal.getBox().getId()
-            && boxable.getBoxPosition().equals(managedOriginal.getBoxPosition()))) {
+    BoxableId boxableId = new BoxableId(boxable.getEntityType(), boxable.getId());
+    Boxable managedOriginal = boxStore.getBoxable(boxableId);
+    if (boxable.getBox() == null && managedOriginal.getBox() == null) {
       return;
+    }
+    if ((boxable.getBox() != null && managedOriginal.getBox() != null && boxable.getBox().getId() == managedOriginal.getBox().getId()
+        && boxable.getBoxPosition().equals(managedOriginal.getBoxPosition()))) {
+      // Note: for new items, boxable.box.boxPosition[boxable.boxPosition] may not match boxable.boxPosition because it doesn't (and we
+      // don't want it to) cascade update. boxable.boxPosition stays as it is because Hibernate won't overwrite the changes you've made to
+      // the object with the current session. boxable.box should be a refreshed object with the correct, persisted boxPositions though.
+      BoxPosition temp = managedOriginal.getBox().getBoxPositions().get(managedOriginal.getBoxPosition());
+      if (temp != null && temp.getBoxableId().equals(boxableId)) {
+        return;
+      }
     }
     if (managedOriginal.getBox() != null) {
       Box box = get(managedOriginal.getBox().getId());
