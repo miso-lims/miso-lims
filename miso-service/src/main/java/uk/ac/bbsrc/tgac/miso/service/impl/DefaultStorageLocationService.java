@@ -157,6 +157,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
     to.setAlias(from.getAlias());
     to.setIdentificationBarcode(from.getIdentificationBarcode());
     to.setParentLocation(from.getParentLocation());
+    to.setMapUrl(from.getMapUrl());
   }
 
   @Override

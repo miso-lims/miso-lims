@@ -51,20 +51,33 @@ ListTarget.storage_location = {
     }
   },
   createColumns: function(config, projectId) {
-    return [
+    var columns = [
         config.slug == "freezers" ? ListUtils
             .labelHyperlinkColumn("Freezer Name", "freezer", Utils.array.getId, "displayLocation", 1, true) : {
           "sTitle": "Name",
           "mData": "displayLocation",
           "include": true,
           "iSortPriority": 1
-        }
-
-        , {
+        }, {
           "sTitle": "Identification Barcode",
           "mData": "identificationBarcode",
           "include": true,
           "iSortPriority": 0
         }, ];
+    if (config.slug == 'freezers') {
+      columns.push({
+        "sTitle": "Map",
+        "mData": "mapUrl",
+        "include": true,
+        "iSortPriority": 0,
+        "mRender": function(data, type, full) {
+          if (type === 'display' && data) {
+            return "<a href=\"" + data + "\">View Map</a>";
+          }
+          return data || '';
+        }
+      });
+    }
+    return columns;
   }
 };

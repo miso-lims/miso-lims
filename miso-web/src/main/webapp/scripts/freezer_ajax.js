@@ -48,6 +48,11 @@
     $('#identificationBarcode').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
     $('#identificationBarcode').attr('data-parsley-errors-container', '#identificationBarcodeError');
 
+    $('#mapUrl').attr('class', 'form-control');
+    $('#mapUrl').attr('data-parsley-maxlength', '1024');
+    $('#mapUrl').attr('data-parsley-type', 'url');
+    $('#mapUrl').attr('data-parsley-errors-container', '#mapUrlError');
+
     $('#freezer-form').parsley();
     $('#freezer-form').parsley().validate();
 
@@ -215,6 +220,7 @@
       $('#room').val(freezerJson.parentLocationId);
       $('#alias').val(freezerJson.alias);
       $('#identificationBarcode').val(freezerJson.identificationBarcode);
+      $('#mapUrl').val(freezerJson.mapUrl);
       updateVisual();
       updateChangelogs();
     }
@@ -513,6 +519,7 @@
     freezer.parentLocationId = $('#room').val();
     freezer.alias = $('#alias').val();
     freezer.identificationBarcode = $('#identificationBarcode').val();
+    freezer.mapUrl = $('#mapUrl').val();
     freezer.locationUnit = 'FREEZER';
     freezerJson = freezer;
   }
