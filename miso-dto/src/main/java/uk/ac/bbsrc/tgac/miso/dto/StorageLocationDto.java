@@ -17,6 +17,7 @@ public class StorageLocationDto {
   private String fullDisplayLocation;
   private List<StorageLocationDto> childLocations;
   private Set<BoxDto> boxes;
+  private String mapUrl;
 
   public long getId() {
     return id;
@@ -97,6 +98,14 @@ public class StorageLocationDto {
 
   public void setBoxes(Set<BoxDto> set) {
     this.boxes = set;
+  }
+
+  public String getMapUrl() {
+    return mapUrl;
+  }
+
+  public void setMapUrl(String url) {
+    this.mapUrl = url;
   }
 
 }

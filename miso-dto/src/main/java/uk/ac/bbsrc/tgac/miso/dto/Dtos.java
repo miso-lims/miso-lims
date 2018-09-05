@@ -2488,6 +2488,7 @@ public class Dtos {
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setDisplayLocation(from.getDisplayLocation());
     dto.setFullDisplayLocation(from.getFullDisplayLocation());
+    dto.setMapUrl(from.getMapUrl());
     if (includeChildLocations) {
       dto.setChildLocations(from.getChildLocations().stream()
           .map(child -> Dtos.asDto(child, recursive, recursive))
@@ -2503,6 +2504,9 @@ public class Dtos {
     location.setAlias(from.getAlias());
     if (!LimsUtils.isStringEmptyOrNull(from.getIdentificationBarcode())) {
       location.setIdentificationBarcode(from.getIdentificationBarcode());
+    }
+    if (!LimsUtils.isStringEmptyOrNull(from.getMapUrl())) {
+      location.setMapUrl(from.getMapUrl());
     }
     if (from.getParentLocationId() != null) {
       location.setParentLocation(new StorageLocation());
