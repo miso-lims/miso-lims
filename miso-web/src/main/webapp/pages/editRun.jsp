@@ -262,19 +262,6 @@
 </script>
 
 <c:if test="${run.id != 0}">
-  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">Metrics
-    <div id="metrix_arrowclick" class="toggleLeft"></div>
-  </div>
-  <div id="metrix">
-    <h1>Metrics</h1>
-    <div id="metricsdiv"></div>
-  </div>
-  <script type="text/javascript">
-    jQuery(document).ready(function () {
-      RunGraph.renderMetrics(${metrics}, ${partitionNames});
-    });
-  </script>
-
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
     <div id="notes_arrowclick" class="toggleLeftDown"></div>
   </div>
@@ -316,23 +303,33 @@
     <div id="addRunNoteDialog" title="Create new Note"></div>
   </div>
   <br/>
+  
+  <miso:attachments item="${run}"/>
+  <div id="issues">
+    <miso:list-section id="list_issue" name="Related Issues" target="issue" alwaysShow="true" items="${runIssues}" config="{}"/>
+  </div>
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">Metrics
+    <div id="metrix_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div id="metrix">
+    <h1>Metrics</h1>
+    <div id="metricsdiv"></div>
+  </div>
+  <script type="text/javascript">
+    jQuery(document).ready(function () {
+      RunGraph.renderMetrics(${metrics}, ${partitionNames});
+    });
+  </script>
+  <div id="containers">
+    <miso:list-section id="list_container" name="${run.platformType.containerName}" target="container" items="${runContainers}" alwaysShow="true" config="${partitionConfig}"/>
+  </div>
+  <div id="partitions">
+    <miso:list-section id="list_partition" name="${run.platformType.pluralPartitionName}" target="partition" items="${runPartitions}" config="${partitionConfig}"/>
+  </div>
+  <div id="experiments">
+    <miso:list-section id="list_experiment" name="Experiments" target="experiment" alwaysShow="true" items="${experiments}" config="${experimentConfiguration}"/>
+  </div>
 </c:if>
-
-  <c:if test="${run.id != 0}">
-    <miso:attachments item="${run}"/>
-    <div id="issues">
-      <miso:list-section id="list_issue" name="Related Issues" target="issue" alwaysShow="true" items="${runIssues}" config="{}"/>
-    </div>
-    <div id="containers">
-      <miso:list-section id="list_container" name="${run.platformType.containerName}" target="container" items="${runContainers}" alwaysShow="true" config="${partitionConfig}"/>
-    </div>
-    <div id="partitions">
-      <miso:list-section id="list_partition" name="${run.platformType.pluralPartitionName}" target="partition" items="${runPartitions}" config="${partitionConfig}"/>
-    </div>
-    <div id="experiments">
-      <miso:list-section id="list_experiment" name="Experiments" target="experiment" alwaysShow="true" items="${experiments}" config="${experimentConfiguration}"/>
-    </div>
-  </c:if>
 <%@ include file="permissions.jsp" %>
 </form:form>
 <miso:changelog item="${run}"/>
