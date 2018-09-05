@@ -1694,8 +1694,6 @@ public class Dtos {
     PoolOrderCompletionDto dto = new PoolOrderCompletionDto();
     dto.setId(from.getPool().getId() + "_" + from.getSequencingParameters().getId());
     dto.setPool(asDto(from.getPool(), false, false));
-    // get list of PoolOrders, somehow, to get their descriptions later
-
     dto.setParameters(asDto(from.getSequencingParameters()));
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
     dto.setRemaining(from.getRemaining());
