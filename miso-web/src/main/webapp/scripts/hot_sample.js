@@ -101,7 +101,7 @@ HotTarget.sample = (function() {
       // If we aren't starting or finished with a tissue processing, hide those
       // columns since we don't really want to show tissue processing unless the
       // user specifically requested it.
-      if (sourceCategory != 'Tissue Processing' && targetCategory != 'Tissue Processing'
+      if (sourceCategory != 'Tissue Processing' && targetCategory != 'Tissue Processing' && config.targetSampleClass
           && config.targetSampleClass.alias.indexOf('Single Cell') === -1) {
         show['Tissue Processing'] = false;
       }
