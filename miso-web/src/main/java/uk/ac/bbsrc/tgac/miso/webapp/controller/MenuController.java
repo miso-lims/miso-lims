@@ -71,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
+import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
@@ -315,6 +316,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "sampleCategories", SampleClass.CATEGORIES, Function.identity());
     createArray(mapper, baseUri, node, "submissionAction", Arrays.asList(SubmissionActionType.values()), SubmissionActionType::name);
     createArray(mapper, baseUri, node, "containerModels", containerModelService.list(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "spikeIns", libraryService.listSpikeIns(), Dtos::asDto);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);
@@ -358,6 +360,10 @@ public class MenuController implements ServletContextAware {
     ArrayNode strStatuses = node.putArray("strStatuses");
     for (String label : StrStatus.getLabels()) {
       strStatuses.add(label);
+    }
+    ArrayNode dilutionFactors = node.putArray("dilutionFactors");
+    for (String label : DilutionFactor.getLabels()) {
+      dilutionFactors.add(label);
     }
 
     // Save the regenerated file in cache. This has a race condition where multiple concurrent requests could results in regenerating this

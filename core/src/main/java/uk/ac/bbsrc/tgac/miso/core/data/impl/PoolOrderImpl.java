@@ -67,7 +67,7 @@ public class PoolOrderImpl implements PoolOrder, Serializable {
   }
 
   @Override
-  public void setId(Long id) {
+  public void setId(long id) {
     this.poolOrderId = id;
   }
 

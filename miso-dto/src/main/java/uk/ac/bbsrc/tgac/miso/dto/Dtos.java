@@ -16,6 +16,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -57,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
@@ -157,6 +160,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
+import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -1245,6 +1249,9 @@ public class Dtos {
     if (from.getReceivedDate() != null) {
       dto.setReceivedDate(formatDate(from.getReceivedDate()));
     }
+    setId(dto::setSpikeInId, from.getSpikeIn());
+    setString(dto::setSpikeInVolume, from.getSpikeInVolume());
+    setString(dto::setSpikeInDilutionFactor, from.getSpikeInDilutionFactor(), DilutionFactor::getLabel);
     return dto;
   }
 
@@ -1318,6 +1325,9 @@ public class Dtos {
     }
     to.setBoxPosition((LibraryBoxPosition) makeBoxablePosition(from, (LibraryImpl) to));
     to.setDiscarded(from.isDiscarded());
+    setObject(to::setSpikeIn, LibrarySpikeIn::new, from.getSpikeInId());
+    setBigDecimal(to::setSpikeInVolume, from.getSpikeInVolume());
+    setObject(to::setSpikeInDilutionFactor, from.getSpikeInDilutionFactor(), DilutionFactor::get);
     return to;
   }
 
@@ -1711,7 +1721,7 @@ public class Dtos {
 
   public static QcTypeDto asDto(QcType from) {
     QcTypeDto dto = new QcTypeDto();
-    dto.setId(from.getQcTypeId());
+    dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setDescription(from.getDescription());
     dto.setQcTarget(from.getQcTarget());
@@ -1725,7 +1735,7 @@ public class Dtos {
 
   public static QcType to(QcTypeDto from) {
     QcType to = new QcType();
-    if (from.getId() != null) to.setQcTypeId(from.getId());
+    if (from.getId() != null) to.setId(from.getId());
     to.setName(from.getName());
     to.setDescription(from.getDescription());
     to.setQcTarget(from.getQcTarget());
@@ -2752,6 +2762,13 @@ public class Dtos {
     return to;
   }
 
+  public static LibrarySpikeInDto asDto(LibrarySpikeIn from) {
+    LibrarySpikeInDto dto = new LibrarySpikeInDto();
+    dto.setId(from.getId());
+    setString(dto::setAlias, from.getAlias());
+    return dto;
+  }
+
   private static void setBigDecimal(Consumer<BigDecimal> setter, String value) {
     if (isStringEmptyOrNull(value)) {
       setter.accept(null);
@@ -2770,6 +2787,28 @@ public class Dtos {
     } else {
       setter.accept(value.trim());
     }
+  }
+
+  private static <T> void setString(Consumer<String> setter, T value, Function<T, String> lookup) {
+    setter.accept(value == null ? null : lookup.apply(value));
+  }
+
+  private static void setId(Consumer<Long> setter, Identifiable value) {
+    setter.accept(value == null ? null : value.getId());
+  }
+
+  private static <T extends Identifiable> void setObject(Consumer<T> setter, Supplier<T> constructor, Long id) {
+    if (id == null) {
+      setter.accept(null);
+    } else {
+      T obj = constructor.get();
+      obj.setId(id);
+      setter.accept(obj);
+    }
+  }
+
+  private static <T> void setObject(Consumer<T> setter, String value, Function<String, T> lookup) {
+    setter.accept(value == null ? null : lookup.apply(value));
   }
 
 }

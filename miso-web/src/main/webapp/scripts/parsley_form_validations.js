@@ -115,6 +115,18 @@ var Validate = Validate || {
     jQuery(selector).attr('data-parsley-pattern', pattern);
     jQuery(selector).attr('data-parsley-required', required ? 'true' : 'false');
     jQuery(selector).attr('data-parsley-error-message', 'Must be a number between ' + min + ' and ' + max);
+  },
+
+  removeValidation: function(selector) {
+    jQuery(selector).removeAttr('data-parsley-type');
+    jQuery(selector).removeAttr('data-parsley-maxlength');
+    jQuery(selector).removeAttr('data-parsley-range');
+    jQuery(selector).removeAttr('data-parsley-pattern');
+    jQuery(selector).removeAttr('data-parsley-required');
+    jQuery(selector).removeAttr('data-parsley-error-message');
+    jQuery(selector).removeAttr('data-parsley-min');
+    jQuery(selector).removeAttr('data-parsley-max');
+    jQuery(selector).removeAttr('data-date-format');
   }
 
 };

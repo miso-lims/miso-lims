@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +34,7 @@ import com.eaglegenomics.simlims.core.Note;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -58,8 +60,6 @@ public interface Library
   public static final long UNSAVED_ID = 0L;
   /** Field PREFIX */
   public static final String PREFIX = "LIB";
-
-  public void setId(long id);
 
   /**
    * Sets the name of this Library object.
@@ -331,5 +331,17 @@ public interface Library
    * @param volumeUnits volumeUnits.
    */
   public void setVolumeUnits(VolumeUnit volumeUnits);
+
+  public LibrarySpikeIn getSpikeIn();
+
+  public void setSpikeIn(LibrarySpikeIn spikeIn);
+
+  public BigDecimal getSpikeInVolume();
+
+  public void setSpikeInVolume(BigDecimal spikeInVolume);
+
+  public DilutionFactor getSpikeInDilutionFactor();
+
+  public void setSpikeInDilutionFactor(DilutionFactor dilutionFactor);
 
 }

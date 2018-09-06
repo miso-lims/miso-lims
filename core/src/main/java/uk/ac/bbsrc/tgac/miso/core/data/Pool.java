@@ -54,13 +54,6 @@ public interface Pool
     Serializable, Aliasable, QualityControllable<PoolQC>, Deletable, Attachable {
 
   /**
-   * Sets the ID of this Pool object.
-   * 
-   * @param id long.
-   */
-  public void setId(long id);
-
-  /**
    * Sets the name of this Pool object.
    * 
    * @param name name.

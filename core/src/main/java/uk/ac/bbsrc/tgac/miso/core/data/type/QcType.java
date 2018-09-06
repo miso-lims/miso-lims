@@ -51,7 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 public class QcType implements Comparable<QcType>, Serializable, Aliasable {
   private static final long serialVersionUID = 1L;
 
-  public static final Long UNSAVED_ID = 0L;
+  public static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -73,7 +73,8 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable {
    * 
    * @return Long qcTypeId.
    */
-  public Long getQcTypeId() {
+  @Override
+  public long getId() {
     return qcTypeId;
   }
 
@@ -83,7 +84,8 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable {
    * @param qcTypeId
    *          qcTypeId.
    */
-  public void setQcTypeId(Long qcTypeId) {
+  @Override
+  public void setId(long qcTypeId) {
     this.qcTypeId = qcTypeId;
   }
 
@@ -214,8 +216,8 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable {
 
   @Override
   public int hashCode() {
-    if (getQcTypeId() != UNSAVED_ID) {
-      return getQcTypeId().intValue();
+    if (getId() != UNSAVED_ID) {
+      return (int) getId();
     } else {
       int hashcode = -1;
       if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
@@ -232,15 +234,15 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable {
       if (name != 0) return name;
     }
 
-    if (getQcTypeId() < t.getQcTypeId()) return -1;
-    if (getQcTypeId() > t.getQcTypeId()) return 1;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append(getQcTypeId());
+    sb.append(getId());
     sb.append(" : ");
     sb.append(getName());
     sb.append(" : ");
@@ -250,11 +252,6 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable {
     sb.append(" : ");
     sb.append(getUnits());
     return sb.toString();
-  }
-
-  @Override
-  public long getId() {
-    return qcTypeId;
   }
 
   @Override

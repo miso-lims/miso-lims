@@ -89,6 +89,7 @@ public class Printer implements Deletable, Serializable {
     this.enabled = enabled;
   }
 
+  @Override
   public void setId(long printerId) {
     this.printerId = printerId;
   }

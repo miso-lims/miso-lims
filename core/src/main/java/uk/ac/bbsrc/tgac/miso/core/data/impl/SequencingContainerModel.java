@@ -51,6 +51,7 @@ public class SequencingContainerModel implements Serializable, Barcodable {
     return sequencingContainerModelId;
   }
 
+  @Override
   public void setId(long sequencingContainerModelId) {
     this.sequencingContainerModelId = sequencingContainerModelId;
   }

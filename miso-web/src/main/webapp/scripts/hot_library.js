@@ -121,6 +121,58 @@ HotTarget.library = (function() {
     };
   };
 
+  var makeSpikeInDilutionFactorColumn = function() {
+    var column = HotUtils.makeColumnForEnum('Spike-In Dilution Factor', true, true, 'spikeInDilutionFactor', Constants.dilutionFactors,
+        'n/a', 'n/a');
+    var requiredValidator = column.validator;
+    column.depends = "spikeIn";
+    column.update = function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+      if (!value || value === '(None)') {
+        setReadOnly(true);
+        setData('n/a');
+        setOptions({
+          required: false,
+          validator: null
+        });
+      } else {
+        setReadOnly(false);
+        setOptions({
+          required: true,
+          validator: requiredValidator
+        });
+      }
+    };
+    return column;
+  };
+
+  var makeSpikeInVolumeColumn = function() {
+    var column = HotUtils.makeColumnForDecimal('Spike-In Volume', true, 'spikeInVolume', 14, 10, true, false);
+    var requiredValidator = column.validator;
+    var requiredPack = column.pack;
+    column.depends = "spikeIn";
+    column.update = function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+      if (!value || value === '(None)') {
+        setReadOnly(true);
+        setData(null);
+        setOptions({
+          required: false,
+          validator: null
+        });
+        column.pack = function(obj, flat, errorHandler) {
+          obj.spikeInVolume = null;
+        }
+      } else {
+        setReadOnly(false);
+        setOptions({
+          required: true,
+          validator: requiredValidator
+        });
+        column.pack = requiredPack;
+      }
+    }
+    return column;
+  };
+
   var getTemplate = function(config, projectId, parentSampleClassId, templateAlias) {
     if (!config.templatesByProjectId || !config.templatesByProjectId[projectId]) {
       return null;
@@ -606,8 +658,10 @@ HotTarget.library = (function() {
                 setReadOnly(false);
               }
             }
-          }, HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
-          HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false), {
+          },
+          HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
+          HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false),
+          {
             header: 'Volume',
             data: 'volume',
             type: 'text',
@@ -639,7 +693,8 @@ HotTarget.library = (function() {
                 setData(null);
               }
             }
-          }, {
+          },
+          {
             header: 'Vol. Units',
             data: 'volumeUnits',
             type: 'dropdown',
@@ -662,7 +717,9 @@ HotTarget.library = (function() {
               });
               obj['volumeUnits'] = !!units ? units.name : null;
             }
-          }, HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false), {
+          },
+          HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false),
+          {
             header: 'Conc. Units',
             data: 'concentrationUnits',
             type: 'dropdown',
@@ -685,7 +742,24 @@ HotTarget.library = (function() {
               });
               obj['concentrationUnits'] = !!units ? units.name : null;
             }
-          }]
+          },
+          {
+            header: 'Spike-In',
+            data: 'spikeIn',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: ['(None)'].concat(Constants.spikeIns.map(function(spikeIn) {
+              return spikeIn.alias;
+            })),
+            include: true,
+            unpack: function(obj, flat, setCellMeta) {
+              flat.spikeIn = obj.spikeInId == null ? '(None)' : Utils.array.getAliasFromId(obj.spikeInId, Constants.spikeIns);
+            },
+            pack: function(obj, flat, errorHandler) {
+              obj.spikeInId = (Utils.validation.isEmpty(flat.spikeIn) || flat.spikeIn === '(None)') ? null : Utils.array.getIdFromAlias(
+                  flat.spikeIn, Constants.spikeIns);
+            }
+          }, makeSpikeInDilutionFactorColumn(), makeSpikeInVolumeColumn()];
 
       var spliceIndex = columns.indexOf(columns.filter(function(column) {
         return column.data === 'identificationBarcode';

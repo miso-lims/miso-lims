@@ -59,8 +59,6 @@ public interface Project extends Comparable<Project>, SecurableByProfile, Watcha
 
   void setName(String name);
 
-  void setId(long id);
-
   /**
    * Returns the alias of this Project object.
    * 

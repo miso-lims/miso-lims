@@ -39,7 +39,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
  * @since 0.0.2
  */
 public interface Kit extends Comparable<Kit>, Barcodable, Locatable, Serializable {
-  public void setId(long id);
 
   /**
    * Returns the lotNumber of this Kit object.

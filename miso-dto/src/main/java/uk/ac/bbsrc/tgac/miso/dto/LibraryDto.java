@@ -61,6 +61,9 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
   private SampleDto sample;
   private String receivedDate;
   private String sampleBoxPositionLabel;
+  private Long spikeInId;
+  private String spikeInVolume;
+  private String spikeInDilutionFactor;
 
   public String getAlias() {
     return alias;
@@ -367,6 +370,30 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setSampleBoxPositionLabel(String boxPositionLabel) {
     this.sampleBoxPositionLabel = boxPositionLabel;
+  }
+
+  public Long getSpikeInId() {
+    return spikeInId;
+  }
+
+  public void setSpikeInId(Long spikeInId) {
+    this.spikeInId = spikeInId;
+  }
+
+  public String getSpikeInVolume() {
+    return spikeInVolume;
+  }
+
+  public void setSpikeInVolume(String spikeInVolume) {
+    this.spikeInVolume = spikeInVolume;
+  }
+
+  public String getSpikeInDilutionFactor() {
+    return spikeInDilutionFactor;
+  }
+
+  public void setSpikeInDilutionFactor(String spikeInDilutionFactor) {
+    this.spikeInDilutionFactor = spikeInDilutionFactor;
   }
 
   @Override

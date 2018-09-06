@@ -320,7 +320,8 @@ public class ProjectOverview implements Watchable, Nameable, Serializable {
     this.endDate = endDate;
   }
 
-  public void setId(Long overviewId) {
+  @Override
+  public void setId(long overviewId) {
     this.overviewId = overviewId;
   }
 

@@ -84,7 +84,9 @@ INSERT INTO LibraryStrategyType (libraryStrategyTypeId, name, description) VALUE
   (1, 'WGS','WGS desc'),
   (20,'WXS','WXS desc');
 
-DELETE FROM LibraryDesign;
+INSERT INTO LibrarySpikeIn(spikeInId, alias) VALUES
+  (1, 'Spike-In One'),
+  (2, 'Spike-In Two');
 
 INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, kitType, platformType, creator, created, lastModifier, lastModified) VALUES
   (1, 'Test Kit', 1, 'TestCo', '123', 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),

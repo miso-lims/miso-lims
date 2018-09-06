@@ -43,7 +43,8 @@ public class PlainSampleITs extends AbstractIT {
   private static final Set<String> libraryColumns = Sets.newHashSet(LibColumns.NAME, LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
       LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED, LibColumns.CREATION_DATE, LibColumns.PLATFORM,
       LibColumns.LIBRARY_TYPE, LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2,
-      LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS);
+      LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS,
+      LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
 
   private static final Set<String> dilutionColumns = Sets.newHashSet(DilColumns.NAME, DilColumns.LIBRARY_ALIAS, DilColumns.BOX_SEARCH,
       DilColumns.BOX_ALIAS, DilColumns.BOX_POSITION, DilColumns.DISCARDED, DilColumns.CONCENTRATION, DilColumns.CONCENTRATION_UNITS,
@@ -118,6 +119,17 @@ public class PlainSampleITs extends AbstractIT {
     Set<String> platforms = table.getDropdownOptions(LibColumns.PLATFORM, 0);
     assertFalse("Platform dropdown did not render; confirm one active sequencer exists and that table is not broken", platforms.isEmpty());
     assertTrue(platforms.contains("Illumina"));
+    Set<String> spikeIns = table.getDropdownOptions(LibColumns.SPIKE_IN, 0);
+    assertFalse(spikeIns.isEmpty());
+    assertTrue(spikeIns.contains("Spike-In One"));
+    assertFalse(table.isWritable(LibColumns.SPIKE_IN_DILUTION, 0));
+    assertFalse(table.isWritable(LibColumns.SPIKE_IN_VOL, 0));
+    table.enterText(LibColumns.SPIKE_IN, 0, "Spike-In One");
+    assertTrue(table.isWritable(LibColumns.SPIKE_IN_DILUTION, 0));
+    assertTrue(table.isWritable(LibColumns.SPIKE_IN_VOL, 0));
+    Set<String> dilutionFactors = table.getDropdownOptions(LibColumns.SPIKE_IN_DILUTION, 0);
+    assertFalse(dilutionFactors.isEmpty());
+    assertTrue(dilutionFactors.contains("1:100"));
   }
 
   @Test

@@ -344,7 +344,6 @@
 <tr>
   <td>Volume Units:</td>
   <td><form:select id="volumeUnits" path="volumeUnits">
-  <option value>(None)</option>
     <c:forEach var="volumeUnit" items="${volumeUnits}">
       <option value="${volumeUnit}" <c:if test="${library.volumeUnits eq volumeUnit or (empty library.volumeUnits and volumeUnit.toString() eq 'MICROLITRES')}">selected="selected"</c:if>>
         ${volumeUnit.units}
@@ -359,7 +358,6 @@
 <tr>
   <td>Concentration Units:</td>
   <td><form:select id="concentrationUnits" path="concentrationUnits">
-  <option value>(None)</option>
     <c:forEach var="concentrationUnit" items="${concentrationUnits}">
       <option value="${concentrationUnit}" <c:if test="${library.concentrationUnits eq concentrationUnit or (empty library.concentrationUnits and concentrationUnit.toString() eq 'NANOGRAMS_PER_MICROLITRE')}">selected="selected"</c:if>>
         ${concentrationUnit.units}
@@ -388,6 +386,33 @@
       <miso:select id="libraryKit" path="kitDescriptor" items="${prepKits}" itemLabel="name"
           itemValue="id" defaultLabel="SELECT" defaultValue=""/>
     </td>
+  </tr>
+  <tr>
+    <td>Spike-In:</td>
+    <td>
+      <miso:select id="spikeIn" path="spikeIn" items="${spikeIns}" itemLabel="alias"
+          itemValue="id" defaultLabel="None" defaultValue="" onchange="Library.ui.changeSpikeIn()"/>
+      <script>
+        jQuery(document).ready(function() {
+          Library.ui.changeSpikeIn();
+        });
+      </script>
+    </td>
+  </tr>
+  <tr>
+    <td>Spike-In Dilution Factor:</td>
+    <td><form:select id="spikeInDilutionFactor" path="spikeInDilutionFactor">
+    <option value="" <c:if test="${empty library.spikeInDilutionFactor}">selected="selected"</c:if>>n/a</option>
+      <c:forEach var="factor" items="${dilutionFactors}">
+        <option value="${factor}" <c:if test="${library.spikeInDilutionFactor eq factor}">selected="selected"</c:if>>
+          ${factor.label}
+        </option>
+      </c:forEach>
+    </form:select></td>
+  </tr>
+  <tr>
+    <td>Spike-In Volume:</td>
+    <td><form:input id="spikeInVolume" path="spikeInVolume"/></td>
   </tr>
 </table>
 <%@ include file="volumeControl.jspf" %>

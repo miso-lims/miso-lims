@@ -7,8 +7,6 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface Subproject extends Serializable, Aliasable, Deletable {
 
-  void setId(long subprojectId);
-
   void setAlias(String alias);
 
   String getDescription();

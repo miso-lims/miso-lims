@@ -23,10 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,6 +84,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -93,6 +95,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -405,6 +408,29 @@ public class EditLibraryController {
         setValue(isStringEmptyOrNull(text) ? null : Long.valueOf(text));
       }
     });
+    binder.registerCustomEditor(LibrarySpikeIn.class, new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) {
+        if (isStringEmptyOrNull(text)) {
+          setValue(null);
+        } else {
+          LibrarySpikeIn to = new LibrarySpikeIn();
+          to.setId(Long.valueOf(text));
+          setValue(to);
+        }
+      }
+    });
+    binder.registerCustomEditor(BigDecimal.class, new PropertyEditorSupport() {
+      @Override
+      public String getAsText() {
+        return toNiceString((BigDecimal) getValue());
+      }
+
+      @Override
+      public void setAsText(String text) {
+        setValue(isStringEmptyOrNull(text) ? null : new BigDecimal(text));
+      }
+    });
   }
 
   /* HOT */
@@ -597,6 +623,8 @@ public class EditLibraryController {
 
     model.put("volumeUnits", VolumeUnit.values());
     model.put("concentrationUnits", ConcentrationUnit.values());
+    model.put("spikeIns", libraryService.listSpikeIns());
+    model.put("dilutionFactors", DilutionFactor.values());
 
     populateDesigns(model,
         LimsUtils.isDetailedSample(library.getSample()) ? ((DetailedSample) library.getSample()).getSampleClass() : null);
