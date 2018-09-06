@@ -1,14 +1,14 @@
 DROP VIEW IF EXISTS CompletedPartitions;
 CREATE OR REPLACE VIEW RunPartitionsByHealth AS
-  SELECT pool_poolId AS poolId, sequencingParameters_parametersId as parametersId, COUNT(*) AS num_partitions, health AS health, MAX((SELECT MAX(changeTime) FROM RunChangeLog WHERE RunChangeLog.runId = Run.runId)) as lastUpdated
+  SELECT pool_poolId AS poolId, sequencingParameters_parametersId as parametersId, COUNT(*) AS num_partitions, health AS health, MAX((SELECT MAX(changeTime) FROM RunChangeLog WHERE RunChangeLog.runId = Run.runId)) as lastUpdated, NULL AS description
     FROM Run JOIN Run_SequencerPartitionContainer ON Run.runId = Run_SequencerPartitionContainer.Run_runId
      JOIN SequencerPartitionContainer_Partition ON Run_SequencerPartitionContainer.containers_containerId = SequencerPartitionContainer_Partition.container_containerId
      JOIN _Partition ON SequencerPartitionContainer_Partition.partitions_partitionId = _Partition.partitionId
     WHERE sequencingParameters_parametersId IS NOT NULL AND pool_poolId IS NOT NULL
     GROUP BY pool_poolId, sequencingParameters_parametersId, health;
 
-CREATE OR REPLACE VIEW DesiredPartitions AS
-  SELECT poolId, parametersId, SUM(partitions) AS num_partitions, MAX(lastUpdated) as lastUpdated
+CREATE OR REPLACE VIEW DesiredPartitions AS 
+  SELECT poolId, parametersId, SUM(partitions) AS num_partitions, MAX(lastUpdated) as lastUpdated, GROUP_CONCAT(description) as description
     FROM PoolOrder
     GROUP BY poolId, parametersId;
 
@@ -18,13 +18,17 @@ CREATE OR REPLACE VIEW OrderCompletion_Backing AS
     `RunPartitionsByHealth`.`parametersId` AS `parametersId`,
     `RunPartitionsByHealth`.`num_partitions` AS `num_partitions`,
     `RunPartitionsByHealth`.`health` AS `health`,
-    `RunPartitionsByHealth`.`lastUpdated` AS `lastUpdated` from `RunPartitionsByHealth`
+    `RunPartitionsByHealth`.`lastUpdated` AS `lastUpdated`, 
+    `RunPartitionsByHealth`.`description` AS `description` 
+    from `RunPartitionsByHealth`
   ) UNION ALL (SELECT
     `DesiredPartitions`.`poolId` AS `poolId`,
     `DesiredPartitions`.`parametersId` AS `parametersId`,
     `DesiredPartitions`.`num_partitions` AS `num_partitions`,
     'Requested' AS `health`,
-    `DesiredPartitions`.`lastUpdated` AS `lastUpdated` FROM `DesiredPartitions`);
+    `DesiredPartitions`.`lastUpdated` AS `lastUpdated`,
+    `DesiredPartitions`.`description` AS `description` 
+    FROM `DesiredPartitions`);
 
 CREATE OR REPLACE VIEW OrderCompletion AS SELECT
     poolId,
@@ -41,7 +45,8 @@ CREATE OR REPLACE VIEW OrderCompletion AS SELECT
         WHERE _Partition.pool_poolId = OrderCompletion_Backing.poolId
           AND NOT EXISTS(SELECT *
             FROM Run_SequencerPartitionContainer
-            WHERE Run_SequencerPartitionContainer.containers_containerId = SequencerPartitionContainer_Partition.container_containerId)), 0) AS loaded
+            WHERE Run_SequencerPartitionContainer.containers_containerId = SequencerPartitionContainer_Partition.container_containerId)), 0) AS loaded,
+    GROUP_CONCAT(description) as description
   FROM OrderCompletion_Backing
   GROUP BY poolId, parametersId;
 
