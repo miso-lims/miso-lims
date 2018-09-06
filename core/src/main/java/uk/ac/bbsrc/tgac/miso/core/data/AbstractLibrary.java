@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -63,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -186,6 +188,15 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Temporal(TemporalType.DATE)
   private Date receivedDate;
+
+  @ManyToOne
+  @JoinColumn(name = "spikeInId")
+  private LibrarySpikeIn spikeIn;
+
+  private BigDecimal spikeInVolume;
+
+  @Enumerated(EnumType.STRING)
+  private DilutionFactor spikeInDilutionFactor;
 
   @Override
   public Boxable.EntityType getEntityType() {
@@ -696,6 +707,36 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public void setVolumeUnits(VolumeUnit volumeUnits) {
     this.volumeUnits = volumeUnits;
+  }
+
+  @Override
+  public LibrarySpikeIn getSpikeIn() {
+    return spikeIn;
+  }
+
+  @Override
+  public void setSpikeIn(LibrarySpikeIn spikeIn) {
+    this.spikeIn = spikeIn;
+  }
+
+  @Override
+  public BigDecimal getSpikeInVolume() {
+    return spikeInVolume;
+  }
+
+  @Override
+  public void setSpikeInVolume(BigDecimal spikeInVolume) {
+    this.spikeInVolume = spikeInVolume;
+  }
+
+  @Override
+  public DilutionFactor getSpikeInDilutionFactor() {
+    return spikeInDilutionFactor;
+  }
+
+  @Override
+  public void setSpikeInDilutionFactor(DilutionFactor dilutionFactor) {
+    this.spikeInDilutionFactor = dilutionFactor;
   }
 
 }

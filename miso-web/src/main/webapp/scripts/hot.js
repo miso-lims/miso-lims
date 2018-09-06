@@ -961,15 +961,23 @@ var HotUtils = {
     return baseobj;
   },
 
-  makeColumnForEnum: function(headerName, include, required, property, source, defaultValue) {
+  makeColumnForEnum: function(headerName, include, required, property, source, defaultValue, nullValue) {
+    var validator = Handsontable.validators.AutocompleteValidator;
+    if (required) {
+      if (nullValue) {
+        validator = HotUtils.validator.requiredAutocompleteWithNullValue(nullValue);
+      } else {
+        validator = HotUtils.validator.requiredAutocomplete;
+      }
+    }
     return {
       'header': headerName,
       'data': property,
       'type': 'dropdown',
       'trimDropdown': false,
-      'source': source,
+      'source': nullValue ? [nullValue].concat(source) : source,
       'include': include,
-      'validator': (required ? HotUtils.validator.requiredAutocomplete : Handsontable.validators.AutocompleteValidator),
+      'validator': validator,
       'unpack': function(obj, flat, setCellMeta) {
         flat[property] = obj[property] || defaultValue;
       },

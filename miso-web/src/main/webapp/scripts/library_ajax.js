@@ -96,6 +96,16 @@ var Library = Library || {
       jQuery('#index1').removeAttr('data-parsley-min');
     }
 
+    // Spike-in validation
+    if (jQuery('#spikeIn').val()) {
+      jQuery('#spikeInDilutionFactor').attr('class', 'form-control');
+      jQuery('#spikeInDilutionFactor').attr('data-parsley-required', 'true');
+      Validate.makeDecimalField('#spikeInVolume', 14, 10, true, false);
+    } else {
+      Validate.removeValidation('#spikeInDilutionFactor');
+      Validate.removeValidation('#spikeInVolume');
+    }
+
     if (Constants.isDetailedSample) {
       var generatingAlias = Constants.automaticLibraryAlias == true && jQuery('#alias').val().length === 0;
       var selectedPlatform = jQuery('#platformTypes option:selected').text();
@@ -137,6 +147,16 @@ var Library = Library || {
 };
 
 Library.ui = {
+  changeSpikeIn: function() {
+    var spikeIn = jQuery('#spikeIn').val();
+    Utils.ui.setDisabled('#spikeInDilutionFactor', !spikeIn);
+    Utils.ui.setDisabled('#spikeInVolume', !spikeIn);
+    if (!spikeIn) {
+      jQuery('#spikeInDilutionFactor').val(null);
+      jQuery('#spikeInVolume').val(null);
+    }
+  },
+
   changePlatformType: function(originalLibraryTypeId, callback) {
     var platformType = Library.ui.getSelectedPlatformType();
 

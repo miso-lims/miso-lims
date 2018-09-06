@@ -30,8 +30,6 @@ import java.util.Set;
 
 public interface Instrument extends Nameable, Serializable {
 
-  public void setId(Long id);
-
   public void setName(String name);
 
   public void setPlatform(Platform platform);

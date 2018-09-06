@@ -49,6 +49,9 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String CONCENTRATION = "Conc.";
     public static final String CONCENTRATION_UNITS = "Conc. Units";
     public static final String CREATION_DATE = "Date of creation";
+    public static final String SPIKE_IN = "Spike-In";
+    public static final String SPIKE_IN_DILUTION = "Spike-In Dilution Factor";
+    public static final String SPIKE_IN_VOL = "Spike-In Volume";
 
     private LibColumns() {
       throw new IllegalStateException("Util class not intended for instantiation");

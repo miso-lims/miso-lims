@@ -53,7 +53,7 @@ public class DefaultQualityControlService implements QualityControlService {
     qc.setCreationTime(new Date());
     qc.setLastModified(qc.getCreationTime());
 
-    QcType type = qcTypeStore.get(qc.getType().getQcTypeId());
+    QcType type = qcTypeStore.get(qc.getType().getId());
     if (!type.getQcTarget().equals(entity.getQcTarget())) {
       throw new IllegalArgumentException("QC type and entity are mismatched.");
     }
@@ -78,7 +78,7 @@ public class DefaultQualityControlService implements QualityControlService {
     User user = authorizationManager.getCurrentUser();
 
     QC original = handler.get(qc.getId());
-    if (original.getType().getQcTypeId() != qc.getType().getQcTypeId()) {
+    if (original.getType().getId() != qc.getType().getId()) {
       throw new IllegalArgumentException("QC type has changed");
     }
     original.setResults(qc.getResults());

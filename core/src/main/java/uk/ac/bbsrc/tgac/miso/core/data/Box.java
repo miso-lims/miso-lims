@@ -18,14 +18,6 @@ public interface Box extends SecurableByProfile, Barcodable, Locatable, ChangeLo
   public static final String PREFIX = "BOX";
 
   /**
-   * Sets the Id of this Box object.
-   * 
-   * @param long
-   *          id.
-   */
-  public void setId(long id);
-
-  /**
    * Sets the name of this Box object.
    * 
    * @param String

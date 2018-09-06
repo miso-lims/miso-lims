@@ -890,7 +890,7 @@ public class FormUtils {
         sqc.setCreator(u);
         sqc.setDate(new Date());
         sqc.setType(qcService.getQcType(QcTarget.Sample, "QuBit"));
-        if (s.getQCs().stream().noneMatch(existing -> existing.getType().getQcTypeId() == sqc.getType().getQcTypeId())) {
+        if (s.getQCs().stream().noneMatch(existing -> existing.getType().getId() == sqc.getType().getId())) {
           qcService.createQC(sqc);
           log.info("Added sample QC: {}", sqc);
         }
@@ -960,7 +960,7 @@ public class FormUtils {
         QcType lqct = qcService.getQcType(QcTarget.Library, libraryQc);
         if (lqct != null) {
           lqc.setType(qcService.getQcType(QcTarget.Library, libraryQc));
-          if (library.getQCs().stream().noneMatch(existing -> existing.getType().getQcTypeId() == lqc.getType().getQcTypeId())) {
+          if (library.getQCs().stream().noneMatch(existing -> existing.getType().getId() == lqc.getType().getId())) {
             qcService.createQC(lqc);
             log.info("Added library QC: {}", lqc);
           }

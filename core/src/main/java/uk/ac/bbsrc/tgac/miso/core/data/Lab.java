@@ -10,8 +10,6 @@ import com.eaglegenomics.simlims.core.User;
  */
 public interface Lab extends Serializable, Aliasable, Deletable {
 
-  void setId(long id);
-
   void setAlias(String alias);
   
   /**

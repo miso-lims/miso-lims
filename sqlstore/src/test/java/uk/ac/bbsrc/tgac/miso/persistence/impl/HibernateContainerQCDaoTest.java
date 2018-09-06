@@ -36,7 +36,7 @@ public class HibernateContainerQCDaoTest extends AbstractDAOTest {
     container.setId(3L);
     qc.setContainer(container);
     qc.setType(new QcType());
-    qc.getType().setQcTypeId(1L);
+    qc.getType().setId(1L);
     qc.setCreator(new UserImpl());
     qc.getCreator().setUserId(1L);
     qc.setCreationTime(new Date());

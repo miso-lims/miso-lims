@@ -306,7 +306,7 @@ public class ValueTypeLookup {
     Map<String, QcType> mapByName = new UniqueKeyHashMap<>();
     for (QcType qc : qcTypes) {
       mapByName.put(qc.getName(), qc);
-      mapById.put(qc.getQcTypeId(), qc);
+      mapById.put(qc.getId(), qc);
     }
     this.sampleQcTypeById = mapById;
     this.sampleQcTypeByName = mapByName;
@@ -317,7 +317,7 @@ public class ValueTypeLookup {
     Map<String, QcType> mapByName = new UniqueKeyHashMap<>();
     for (QcType qc : qcTypes) {
       mapByName.put(qc.getName(), qc);
-      mapById.put(qc.getQcTypeId(), qc);
+      mapById.put(qc.getId(), qc);
     }
     this.libraryQcTypeById = mapById;
     this.libraryQcTypeByName = mapByName;
@@ -676,7 +676,7 @@ public class ValueTypeLookup {
    */
   public QcType resolveForSample(QcType qcType) {
     if (qcType == null) return null;
-    if (qcType.getQcTypeId() != QcType.UNSAVED_ID) return sampleQcTypeById.get(qcType.getQcTypeId());
+    if (qcType.getId() != QcType.UNSAVED_ID) return sampleQcTypeById.get(qcType.getId());
     if (qcType.getName() != null) return sampleQcTypeByName.get(qcType.getName());
     return null;
   }
@@ -693,7 +693,7 @@ public class ValueTypeLookup {
    */
   public QcType resolveForLibrary(QcType qcType) {
     if (qcType == null) return null;
-    if (qcType.getQcTypeId() != QcType.UNSAVED_ID) return libraryQcTypeById.get(qcType.getQcTypeId());
+    if (qcType.getId() != QcType.UNSAVED_ID) return libraryQcTypeById.get(qcType.getId());
     if (qcType.getName() != null) return libraryQcTypeByName.get(qcType.getName());
     return null;
   }
@@ -806,7 +806,7 @@ public class ValueTypeLookup {
     for (SampleQC qc : sample.getQCs()) {
       QcType type = resolveForSample(qc.getType());
       if (type == null)
-        throw new IOException(String.format("QcType not found: id=%d, name=%s", qc.getType().getQcTypeId(), qc.getType().getName()));
+        throw new IOException(String.format("QcType not found: id=%d, name=%s", qc.getType().getId(), qc.getType().getName()));
       qc.setType(type);
     }
 
@@ -947,7 +947,7 @@ public class ValueTypeLookup {
     for (LibraryQC qc : library.getQCs()) {
       QcType type = resolveForLibrary(qc.getType());
       if (type == null)
-        throw new IOException(String.format("QcType not found: id=%d, name=%s", qc.getType().getQcTypeId(), qc.getType().getName()));
+        throw new IOException(String.format("QcType not found: id=%d, name=%s", qc.getType().getId(), qc.getType().getName()));
       qc.setType(type);
     }
     if (LimsUtils.isDetailedLibrary(library)) {

@@ -62,6 +62,7 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
       @JoinColumn(name = "attachmentId") })
   private List<FileAttachment> attachments;
 
+  @Override
   public void setId(long id) {
     this.recordId = id;
   }

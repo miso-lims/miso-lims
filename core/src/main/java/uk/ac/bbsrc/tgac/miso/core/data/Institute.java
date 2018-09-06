@@ -7,8 +7,6 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface Institute extends Serializable, Aliasable, Deletable {
 
-  void setId(long id);
-
   void setAlias(String alias);
 
   User getCreatedBy();

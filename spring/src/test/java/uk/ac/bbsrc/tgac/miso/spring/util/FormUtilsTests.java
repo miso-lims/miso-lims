@@ -255,7 +255,7 @@ public class FormUtilsTests {
   
   public void mockSampleQcTypeByName() throws Exception {
     QcType qt = new QcType();
-    qt.setQcTypeId(1L);
+    qt.setId(1L);
     qt.setName("QuBit");
     qt.setDescription("Quantitation of DNA, RNA and protein, manufacturered by Invitrogen");
     qt.setUnits("ng/&#181;l");
@@ -265,7 +265,7 @@ public class FormUtilsTests {
 
   public void mockLibraryQcTypeByName() throws Exception {
     QcType qt = new QcType();
-    qt.setQcTypeId(2L);
+    qt.setId(2L);
     qt.setName("Bioanalyzer");
     qt.setDescription("Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent");
     qt.setUnits("nM");

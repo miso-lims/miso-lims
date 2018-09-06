@@ -34,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
+import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
@@ -334,6 +335,16 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   }
 
   @Override
+  public List<LibrarySpikeIn> listSpikeIns() throws IOException {
+    return libraryDao.listSpikeIns();
+  }
+
+  @Override
+  public LibrarySpikeIn getSpikeIn(long spikeInId) throws IOException {
+    return libraryDao.getSpikeIn(spikeInId);
+  }
+
+  @Override
   public void addNote(Library library, Note note) throws IOException {
     Library managed = libraryDao.get(library.getId());
     authorizationManager.throwIfNotWritable(managed);
@@ -451,6 +462,9 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     if (library.getKitDescriptor() != null) {
       library.setKitDescriptor(kitService.getKitDescriptorById(library.getKitDescriptor().getId()));
     }
+    if (library.getSpikeIn() != null) {
+      library.setSpikeIn(getSpikeIn(library.getSpikeIn().getId()));
+    }
     if (isDetailedLibrary(library)) {
       DetailedLibrary lai = (DetailedLibrary) library;
       if (lai.getLibraryDesignCode() != null) {
@@ -533,6 +547,14 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       target.setKitDescriptor(null);
     }
     target.setReceivedDate(source.getReceivedDate());
+    target.setSpikeIn(source.getSpikeIn());
+    if (target.getSpikeIn() == null) {
+      target.setSpikeInDilutionFactor(null);
+      target.setSpikeInVolume(null);
+    } else {
+      target.setSpikeInDilutionFactor(source.getSpikeInDilutionFactor());
+      target.setSpikeInVolume(source.getSpikeInVolume());
+    }
 
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;
@@ -556,6 +578,15 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     validateConcentrationUnits(library.getConcentration(), library.getConcentrationUnits(), errors);
     validateVolumeUnits(library.getVolume(), library.getVolumeUnits(), errors);
     validateBarcodeUniqueness(library, beforeChange, libraryDao::getByBarcode, errors, "library");
+
+    if (library.getSpikeIn() != null) {
+      if (library.getSpikeInDilutionFactor() == null) {
+        errors.add(new ValidationError("spikeInDilutionFactor", "Spike-in dilution factor must be specified"));
+      }
+      if (library.getSpikeInVolume() == null) {
+        errors.add(new ValidationError("spikeInVolume", "Spike-in volume must be specified"));
+      }
+    }
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);

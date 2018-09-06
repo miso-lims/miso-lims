@@ -79,7 +79,7 @@ public class HibernatePoolQcDaoTest extends AbstractDAOTest {
     qc.setCreator(mockUser);
     qc.setDate(new Date());
     QcType type = new QcType();
-    type.setQcTypeId(8L);
+    type.setId(8L);
     qc.setType(type);
     qc.setCreationTime(new Date());
     qc.setLastModified(new Date());
@@ -88,7 +88,7 @@ public class HibernatePoolQcDaoTest extends AbstractDAOTest {
     PoolQC saved = (PoolQC) dao.get(autoIncrementId);
     nextAutoIncrementId++;
     assertEquals(qc.getCreator(), saved.getCreator());
-    assertEquals(qc.getType().getQcTypeId(), saved.getType().getQcTypeId());
+    assertEquals(qc.getType().getId(), saved.getType().getId());
   }
   
   @Test
@@ -104,7 +104,7 @@ public class HibernatePoolQcDaoTest extends AbstractDAOTest {
     pool.setId(1L);
     qc.setPool(pool);
     QcType type = new QcType();
-    type.setQcTypeId(101L);
+    type.setId(101L);
     qc.setType(type);
     assertEquals(1L, dao.save(qc));
     PoolQC saved = (PoolQC) dao.get(1L);

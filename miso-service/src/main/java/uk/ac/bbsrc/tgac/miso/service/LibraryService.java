@@ -10,6 +10,7 @@ import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -74,6 +75,10 @@ public interface LibraryService extends PaginatedDataSource<Library>, Barcodable
   LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException;
 
   Collection<LibraryStrategyType> listLibraryStrategyTypes() throws IOException;
+
+  List<LibrarySpikeIn> listSpikeIns() throws IOException;
+
+  LibrarySpikeIn getSpikeIn(long spikeInId) throws IOException;
 
   void addNote(Library library, Note note) throws IOException;
 

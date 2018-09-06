@@ -85,7 +85,7 @@ public abstract class AbstractInstrument implements Instrument {
   private Date lastServicedDate;
 
   @Override
-  public void setId(Long id) {
+  public void setId(long id) {
     this.id = id;
   }
 

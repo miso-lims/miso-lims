@@ -31,6 +31,7 @@ import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -228,5 +229,9 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
    * @throws IOException
    */
   Library getByPreMigrationId(Long preMigrationId) throws IOException;
+
+  List<LibrarySpikeIn> listSpikeIns() throws IOException;
+
+  LibrarySpikeIn getSpikeIn(long spikeInId) throws IOException;
 
 }

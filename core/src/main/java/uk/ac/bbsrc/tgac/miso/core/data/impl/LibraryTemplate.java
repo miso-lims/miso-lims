@@ -93,6 +93,7 @@ public class LibraryTemplate implements Serializable, Deletable {
     return libraryTemplateId;
   }
 
+  @Override
   public void setId(long libraryTemplateId) {
     this.libraryTemplateId = libraryTemplateId;
   }

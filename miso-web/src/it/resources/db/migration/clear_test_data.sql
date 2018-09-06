@@ -44,6 +44,7 @@ DELETE FROM LibraryChangeLog;
 DELETE FROM Library;
 DELETE FROM LibraryDesign;
 DELETE FROM LibraryDesignCode;
+DELETE FROM LibrarySpikeIn;
 DELETE FROM SampleQC;
 DELETE FROM SampleAliquotSingleCell;
 DELETE FROM SampleAliquot;
