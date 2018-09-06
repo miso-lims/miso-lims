@@ -8,7 +8,7 @@ CREATE OR REPLACE VIEW RunPartitionsByHealth AS
     GROUP BY pool_poolId, sequencingParameters_parametersId, health;
 
 CREATE OR REPLACE VIEW DesiredPartitions AS 
-  SELECT poolId, parametersId, SUM(partitions) AS num_partitions, MAX(lastUpdated) as lastUpdated, GROUP_CONCAT(description) as description
+  SELECT poolId, parametersId, SUM(partitions) AS num_partitions, MAX(lastUpdated) as lastUpdated, GROUP_CONCAT(description SEPARATOR ', ') as description
     FROM PoolOrder
     GROUP BY poolId, parametersId;
 
@@ -46,7 +46,7 @@ CREATE OR REPLACE VIEW OrderCompletion AS SELECT
           AND NOT EXISTS(SELECT *
             FROM Run_SequencerPartitionContainer
             WHERE Run_SequencerPartitionContainer.containers_containerId = SequencerPartitionContainer_Partition.container_containerId)), 0) AS loaded,
-    GROUP_CONCAT(description) as description
+    GROUP_CONCAT(description SEPARATOR ', ') as description
   FROM OrderCompletion_Backing
   GROUP BY poolId, parametersId;
 
