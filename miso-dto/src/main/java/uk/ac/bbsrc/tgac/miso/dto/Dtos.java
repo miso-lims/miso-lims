@@ -1049,6 +1049,7 @@ public class Dtos {
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    dto.setDescription(from.getDescription());
     return dto;
   }
 
@@ -1062,6 +1063,7 @@ public class Dtos {
     to.setPool(to(from.getPool()));
     to.setSequencingParameter(to(from.getParameters()));
     to.setPartitions(from.getPartitions());
+    to.setDescription(from.getDescription());
     return to;
   }
 

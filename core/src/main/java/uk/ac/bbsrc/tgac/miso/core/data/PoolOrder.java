@@ -36,4 +36,7 @@ public interface PoolOrder extends Deletable {
 
   public void setLastUpdated(Date lastUpdated);
 
+  public String getDescription();
+
+  public void setDescription(String description);
 }

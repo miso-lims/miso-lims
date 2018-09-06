@@ -23,9 +23,10 @@ public class BulkOrderPage extends HeaderFooterPage {
     public static final String PLATFORM = "Platform";
     public static final String PARAMETERS = "Sequencing Parameters";
     public static final String PARTITIONS = "Partitions";
+    public static final String DESCRIPTION = "Description";
 
     public static List<String> all() {
-      return Lists.newArrayList(NAME, ALIAS, PLATFORM, PARAMETERS, PARTITIONS);
+      return Lists.newArrayList(NAME, ALIAS, PLATFORM, PARAMETERS, PARTITIONS, DESCRIPTION);
     }
 
     private Columns() {
