@@ -19,7 +19,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.StringUtils;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
@@ -2755,11 +2754,7 @@ public class Dtos {
   }
 
   private static void setString(Consumer<String> setter, BigDecimal value) {
-    if (value == null) {
-      setter.accept(null);
-    } else {
-      setter.accept(StringUtils.strip(value.toPlainString(), "0"));
-    }
+    setter.accept(toNiceString(value));
   }
 
   private static void setString(Consumer<String> setter, String value) {

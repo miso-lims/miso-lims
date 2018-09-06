@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,6 +43,7 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,6 +100,20 @@ public class LimsUtils {
 
   public static String nullifyStringIfBlank(String s) {
     return (isStringBlankOrNull(s) ? null : s);
+  }
+
+  public static String toNiceString(BigDecimal num) {
+    if (num == null) {
+      return null;
+    }
+    String nice = StringUtils.strip(num.toPlainString(), "0");
+    if (nice.startsWith(".")) {
+      nice = "0" + nice;
+    }
+    if (nice.endsWith(".")) {
+      nice = nice.substring(0, nice.length() - 1);
+    }
+    return nice;
   }
 
   /**

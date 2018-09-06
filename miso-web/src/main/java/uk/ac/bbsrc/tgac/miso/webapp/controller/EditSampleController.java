@@ -27,7 +27,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,7 +42,6 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -598,25 +596,6 @@ public class EditSampleController {
           tm.setId(Long.valueOf(text));
           setValue(tm);
         }
-      }
-    });
-
-    binder.registerCustomEditor(Long.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        setValue(isStringEmptyOrNull(text) ? null : Long.valueOf(text));
-      }
-    });
-    
-    binder.registerCustomEditor(BigDecimal.class, new PropertyEditorSupport() {
-      @Override
-      public String getAsText() {
-        return StringUtils.strip(((BigDecimal) getValue()).toPlainString(), "0");
-      }
-
-      @Override
-      public void setAsText(String text) {
-        setValue(isStringEmptyOrNull(text) ? null : new BigDecimal(text));
       }
     });
   }
