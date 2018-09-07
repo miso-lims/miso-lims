@@ -1705,6 +1705,7 @@ public class Dtos {
     dto.setStopped(from.get(HealthType.Stopped));
     dto.setUnknown(from.get(HealthType.Unknown));
     dto.setLoaded(from.getLoaded());
+    dto.setDescription(from.getDescription());
     return dto;
   }
 
