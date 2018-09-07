@@ -314,10 +314,13 @@ public class BulkPoolIT extends AbstractIT {
     row0.put(Columns.CONCENTRATION, null);
     row0.put(Columns.VOLUME, null);
     row0.put(Columns.QC_PASSED, "Unknown");
+    row0.put(Columns.CONCENTRATION, "4.0");
+    row0.put(Columns.CONCENTRATION_UNITS, "ng/L");
     assertColumnValues(table, 0, row0, "row 0 default values");
 
     Map<String, String> row1 = Maps.newLinkedHashMap(row0);
     row1.put(Columns.ALIAS, "IPOT_0001_Pa_P_PE_252_WG_POOL");
+    row1.put(Columns.CONCENTRATION, "3.0");
     assertColumnValues(table, 1, row1, "row 1 default values");
 
     // enter pool data
