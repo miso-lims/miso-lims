@@ -223,6 +223,7 @@ HotTarget.sample = (function() {
             header: 'Project',
             data: 'projectAlias',
             type: (config.hasProject ? 'text' : 'dropdown'),
+            trimDropdown: false,
             source: (function() {
               if ((!config.projects || config.projects.length == 0) && config.create && !config.propagate && !config.hasProject) {
                 /* projects list failed to generate when it should have, and we can't proceed. Notify the user. */
