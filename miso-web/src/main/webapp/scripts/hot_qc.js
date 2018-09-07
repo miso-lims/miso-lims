@@ -46,6 +46,7 @@ HotTarget.qc = function(qcTarget) {
         header: 'Type',
         data: 'typeName',
         type: 'dropdown',
+        trimDropdown: false,
         allowHtml: true,
         source: Constants.qcTypes.filter(function(qcType) {
           return qcType.qcTarget == qcTarget && !qcType.archived;
@@ -136,7 +137,7 @@ HotTarget.qc = function(qcTarget) {
         }
       }, HotUtils.makeColumnForText('Description', true, 'description', {
         validator: HotUtils.validator.optionalTextNoSpecialChars
-      }),];
+      })];
     },
 
     getBulkActions: function(config) {
