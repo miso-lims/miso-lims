@@ -92,6 +92,7 @@ public interface AbstractListPage {
     public static final String VOLUME_USED = "Vol. Lib. Used";
     public static final String WARNINGS = "Warnings";
     public static final String POOL_DESCRIPTION = "Pool Description";
+    public static final String ORDER_DESCRIPTION = "Order Description";
   }
 
   public static class ListTarget {
