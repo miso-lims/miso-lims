@@ -365,7 +365,7 @@ Build the application using:
 There will be two important build artefacts:
 
 * `miso-web/target/ROOT.war`
-* `runscanner/runscanner-*.war`
+* `runscanner/target/runscanner-*.war`
 
 <a name="upgrading"/>
 
