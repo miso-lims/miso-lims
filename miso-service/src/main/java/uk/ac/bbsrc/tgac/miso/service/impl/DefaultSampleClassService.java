@@ -95,7 +95,8 @@ public class DefaultSampleClassService implements SampleClassService {
           String.format("Sample class %s is not a valid %s class.", childClassId, childCategory));
     }
     List<SampleClass> parentClasses = sampleValidRelationshipDao.getSampleValidRelationship().stream()
-        .filter(relationship -> !relationship.getArchived() && relationship.getChild().getId() == childClass.getId()
+        .filter(relationship -> !relationship.getArchived() && !relationship.getParent().isArchived()
+            && relationship.getChild().getId() == childClass.getId()
             && relationship.getParent().getSampleCategory().equals(parentCategory))
         .map(SampleValidRelationship::getParent).collect(Collectors.toList());
     switch (parentClasses.size()) {
