@@ -893,6 +893,10 @@ public class EditLibraryController {
         dto.setTargetedSequencingId(item.getSample().getProject().getDefaultTargetedSequencing().getId());
       }
       dto.setBox(newBox);
+      if (item.getConcentration() != null) {
+        dto.setConcentration(item.getConcentration().toString());
+        dto.setConcentrationUnits(item.getConcentrationUnits());
+      }
       return dto;
     }
 
@@ -1004,6 +1008,10 @@ public class EditLibraryController {
         dto.setVolume(item.getVolumeUsed().toString());
       }
       dto.setBox(newBox);
+      if (item.getConcentration() != null) {
+        dto.setConcentration(item.getConcentration().toString());
+        dto.setConcentrationUnits(item.getConcentrationUnits());
+      }
       return dto;
     }
 
