@@ -61,7 +61,12 @@ ListTarget.study = {
         }
       }, ];
     } else {
-      return [];
+      return [{
+          "name": "Add",
+          "handler": function() {
+            window.location = "/miso/study/new";
+          }
+        },];
     }
   },
   createColumns: function(config, projectId) {
