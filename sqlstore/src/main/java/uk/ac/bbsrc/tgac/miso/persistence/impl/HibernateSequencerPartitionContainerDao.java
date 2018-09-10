@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -228,19 +227,6 @@ public class HibernateSequencerPartitionContainerDao
   @Override
   public void update(Partition partition) {
     currentSession().update(partition);
-  }
-
-  @Override
-  public FlowCellVersion getFlowCellVersion(long id) {
-    return (FlowCellVersion) currentSession().get(FlowCellVersion.class, id);
-  }
-
-  @Override
-  public List<FlowCellVersion> listFlowCellVersions() {
-    Criteria criteria = currentSession().createCriteria(FlowCellVersion.class);
-    @SuppressWarnings("unchecked")
-    List<FlowCellVersion> results = criteria.list();
-    return results;
   }
 
   @Override

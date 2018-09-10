@@ -17,10 +17,6 @@ public class OxfordNanoporeContainer extends SequencerPartitionContainerImpl {
   private static final long serialVersionUID = 1L;
 
   @ManyToOne
-  @JoinColumn(name = "flowCellVersionId")
-  private FlowCellVersion flowCellVersion;
-
-  @ManyToOne
   @JoinColumn(name = "poreVersionId")
   private PoreVersion poreVersion;
 
@@ -30,14 +26,6 @@ public class OxfordNanoporeContainer extends SequencerPartitionContainerImpl {
 
   @Temporal(TemporalType.TIMESTAMP)
   private Date returnedDate;
-
-  public FlowCellVersion getFlowCellVersion() {
-    return flowCellVersion;
-  }
-
-  public void setFlowCellVersion(FlowCellVersion flowCellVersion) {
-    this.flowCellVersion = flowCellVersion;
-  }
 
   public PoreVersion getPoreVersion() {
     return poreVersion;
@@ -67,7 +55,6 @@ public class OxfordNanoporeContainer extends SequencerPartitionContainerImpl {
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((flowCellVersion == null) ? 0 : flowCellVersion.hashCode());
     result = prime * result + ((poreVersion == null) ? 0 : poreVersion.hashCode());
     result = prime * result + ((receivedDate == null) ? 0 : receivedDate.hashCode());
     result = prime * result + ((returnedDate == null) ? 0 : returnedDate.hashCode());
@@ -80,9 +67,6 @@ public class OxfordNanoporeContainer extends SequencerPartitionContainerImpl {
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
     OxfordNanoporeContainer other = (OxfordNanoporeContainer) obj;
-    if (flowCellVersion == null) {
-      if (other.flowCellVersion != null) return false;
-    } else if (!flowCellVersion.equals(other.flowCellVersion)) return false;
     if (poreVersion == null) {
       if (other.poreVersion != null) return false;
     } else if (!poreVersion.equals(other.poreVersion)) return false;
