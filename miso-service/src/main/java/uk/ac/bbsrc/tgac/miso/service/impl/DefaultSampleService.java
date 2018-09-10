@@ -833,7 +833,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       ((SampleSlide) target).setStain(((SampleSlide) source).getStain());
     } else if (source instanceof SampleLCMTube) {
       ((SampleLCMTube) target).setSlidesConsumed(((SampleLCMTube) source).getSlidesConsumed());
-    } else if (source instanceof SampleStockSingleCell) {
+    } else if (source instanceof SampleSingleCell) {
       ((SampleSingleCell) target).setInitialCellConcentration(((SampleSingleCell) source).getInitialCellConcentration());
       ((SampleSingleCell) target).setDigestion(((SampleSingleCell) source).getDigestion());
     }

@@ -619,7 +619,7 @@ HotTarget.sample = (function() {
               'slidesConsumed', HotUtils.validator.requiredPositiveInt),
 
           // Tissue Processing: Single Cell columns
-          HotUtils.makeColumnForFloat('Initial Cell Conc.', (show['Tissue Processing'] && config.targetSampleClass.alias
+          HotUtils.makeColumnForDecimal('Initial Cell Conc.', (show['Tissue Processing'] && config.targetSampleClass.alias
               .indexOf('Single Cell') != -1), 'initialCellConcentration', 14, 10, false, false),
           HotUtils.makeColumnForText('Digestion',
               (show['Tissue Processing'] && config.targetSampleClass.alias.indexOf('Single Cell') != -1), 'digestion', {
