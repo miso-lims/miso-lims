@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,13 +29,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
@@ -49,7 +53,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 
 public class DetailedSampleBuilder
-    implements DetailedSample, SampleAliquot, SampleStock, SampleTissue, SampleTissueProcessing, SampleSlide, SampleLCMTube, SampleIdentity {
+    implements DetailedSample, SampleAliquot, SampleAliquotSingleCell, SampleStock, SampleStockSingleCell, SampleTissue,
+    SampleTissueProcessing, SampleSlide, SampleLCMTube, SampleSingleCell, SampleIdentity {
 
   private static final long serialVersionUID = 1L;
 
@@ -116,13 +121,20 @@ public class DetailedSampleBuilder
 
   // AnalyteAliquot attributes
   private SamplePurpose samplePurpose;
+  // Single Cell DNA (aliquot)
+  private BigDecimal inputIntoLibrary;
 
   // SampleStock attributes
   private SampleClass stockClass;
   private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
   private Boolean dnaseTreated;
+  // Single Cell DNA (stock)
+  private BigDecimal targetCellRecovery;
+  private BigDecimal cellViability;
+  private BigDecimal loadingCellConcentration;
 
   // TissueProcessingSample attributes
+  private SampleClass tissueProcessingClass;
   // Slide
   private Integer slides;
   private Integer discards;
@@ -130,6 +142,9 @@ public class DetailedSampleBuilder
   private Stain stain;
   // LCM Tube
   private Integer slidesConsumed;
+  // Single Cell
+  private BigDecimal initialCellConcentration;
+  private String digestion;
 
   public DetailedSampleBuilder() {
     this(null);
@@ -579,6 +594,14 @@ public class DetailedSampleBuilder
     this.consentLevel = consentLevel;
   }
 
+  public void setTissueProcessingClass(SampleClass tissueProcessingClass) {
+    this.tissueProcessingClass = tissueProcessingClass;
+  }
+
+  public SampleClass getTissueProcessingClass() {
+    return tissueProcessingClass;
+  }
+
   @Override
   public Integer getSlides() {
     return slides;
@@ -820,6 +843,66 @@ public class DetailedSampleBuilder
     this.creationDate = creationDate;
   }
 
+  @Override
+  public BigDecimal getInitialCellConcentration() {
+    return initialCellConcentration;
+  }
+
+  @Override
+  public void setInitialCellConcentration(BigDecimal initialCellConcentration) {
+    this.initialCellConcentration = initialCellConcentration;
+  }
+
+  @Override
+  public String getDigestion() {
+    return digestion;
+  }
+
+  @Override
+  public void setDigestion(String digestion) {
+    this.digestion = digestion;
+  }
+
+  @Override
+  public BigDecimal getTargetCellRecovery() {
+    return targetCellRecovery;
+  }
+
+  @Override
+  public void setTargetCellRecovery(BigDecimal targetCellRecovery) {
+    this.targetCellRecovery = targetCellRecovery;
+  }
+
+  @Override
+  public BigDecimal getCellViability() {
+    return cellViability;
+  }
+
+  @Override
+  public void setCellViability(BigDecimal cellViability) {
+    this.cellViability = cellViability;
+  }
+
+  @Override
+  public BigDecimal getLoadingCellConcentration() {
+    return loadingCellConcentration;
+  }
+
+  @Override
+  public void setLoadingCellConcentration(BigDecimal loadingCellConcentration) {
+    this.loadingCellConcentration = loadingCellConcentration;
+  }
+
+  @Override
+  public BigDecimal getInputIntoLibrary() {
+    return inputIntoLibrary;
+  }
+
+  @Override
+  public void setInputIntoLibrary(BigDecimal inputIntoLibrary) {
+    this.inputIntoLibrary = inputIntoLibrary;
+  }
+
   public DetailedSample build() {
     if (sampleClass == null || sampleClass.getSampleCategory() == null) {
       throw new NullPointerException("Missing sample class or category");
@@ -834,30 +917,13 @@ public class DetailedSampleBuilder
       sample = buildTissue();
       break;
     case SampleTissueProcessing.CATEGORY_NAME:
-      if (sampleClass.getAlias().equals(SampleSlide.SAMPLE_CLASS_NAME)) {
-        SampleSlide slide = new SampleSlideImpl();
-        slide.setSlides(slides);
-        slide.setDiscards(discards);
-        slide.setThickness(thickness);
-        slide.setStain(stain);
-        sample = slide;
-      } else if (sampleClass.getAlias().equals(SampleLCMTube.SAMPLE_CLASS_NAME)) {
-        SampleLCMTube lcmTube = new SampleLCMTubeImpl();
-        lcmTube.setSlidesConsumed(slidesConsumed);
-        sample = lcmTube;
-      } else {
-        SampleTissueProcessing processing = new SampleTissueProcessingImpl();
-        sample = processing;
-      }
+      sample = buildTissueProcessing();
       break;
     case SampleStock.CATEGORY_NAME:
-      SampleStock stock = buildStock();
-      sample = stock;
+      sample = buildStock();
       break;
     case SampleAliquot.CATEGORY_NAME:
-      SampleAliquot aliquot = new SampleAliquotImpl();
-      aliquot.setSamplePurpose(samplePurpose);
-      sample = aliquot;
+      sample = buildAliquot();
       break;
     default:
       throw new IllegalArgumentException("Unknown sample category: " + sampleClass.getSampleCategory());
@@ -884,6 +950,12 @@ public class DetailedSampleBuilder
         tissue.setParent(parent);
         tissue.setSampleClass(tissueClass);
         parent = tissue;
+      }
+      if (categoryIndex > 2 && tissueProcessingClass != null) {
+        SampleTissueProcessing tissueProcessing = buildTissueProcessing();
+        tissueProcessing.setParent(parent);
+        tissueProcessing.setSampleClass(tissueProcessingClass);
+        parent = tissueProcessing;
       }
       if (categoryIndex > 3 && stockClass != null) {
         SampleStock stock = buildStock();
@@ -944,11 +1016,55 @@ public class DetailedSampleBuilder
     return identity;
   }
 
+  private SampleAliquot buildAliquot() {
+    SampleAliquot aliquot = null;
+    if (sampleClass.getAlias().equals(SampleAliquotSingleCell.SAMPLE_CLASS_NAME)) {
+      SampleAliquotSingleCell sc = new SampleAliquotSingleCellImpl();
+      sc.setInputIntoLibrary(inputIntoLibrary);
+      aliquot = sc;
+    } else {
+      aliquot = new SampleAliquotImpl();
+    }
+    aliquot.setSamplePurpose(samplePurpose);
+    return aliquot;
+  }
+
   private SampleStock buildStock() {
-    SampleStock stock = new SampleStockImpl();
+    SampleStock stock = null;
+    if (sampleClass.getAlias().equals(SampleStockSingleCell.SAMPLE_CLASS_NAME)) {
+      SampleStockSingleCell sc = new SampleStockSingleCellImpl();
+      sc.setTargetCellRecovery(targetCellRecovery);
+      sc.setCellViability(cellViability);
+      sc.setLoadingCellConcentration(loadingCellConcentration);
+      stock = sc;
+    } else {
+      stock = new SampleStockImpl();
+    }
     stock.setStrStatus(strStatus);
     stock.setDNAseTreated(dnaseTreated);
     return stock;
+  }
+
+  private SampleTissueProcessing buildTissueProcessing() {
+    if (sampleClass.getAlias().equals(SampleSlide.SAMPLE_CLASS_NAME)) {
+      SampleSlide slide = new SampleSlideImpl();
+      slide.setSlides(slides);
+      slide.setDiscards(discards);
+      slide.setThickness(thickness);
+      slide.setStain(stain);
+      return slide;
+    } else if (sampleClass.getAlias().equals(SampleLCMTube.SAMPLE_CLASS_NAME)) {
+      SampleLCMTube lcmTube = new SampleLCMTubeImpl();
+      lcmTube.setSlidesConsumed(slidesConsumed);
+      return lcmTube;
+    } else if (sampleClass.getAlias().equals(SampleSingleCell.SAMPLE_CLASS_NAME)) {
+      SampleSingleCell sc = new SampleSingleCellImpl();
+      sc.setInitialCellConcentration(initialCellConcentration);
+      sc.setDigestion(digestion);
+      return sc;
+    } else {
+      return new SampleTissueProcessingImpl();
+    }
   }
 
   private SampleTissue buildTissue() {

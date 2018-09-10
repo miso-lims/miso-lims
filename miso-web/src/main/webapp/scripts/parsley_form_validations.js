@@ -102,6 +102,19 @@ var Validate = Validate || {
     jQuery(formSelector).parsley().destroy();
     jQuery(formSelector + ' .generalErrors').empty();
     jQuery(formSelector + ' .errorContainer').empty();
+  },
+
+  makeDecimalField: function(selector, precision, scale, required, allowNegative) {
+    jQuery(selector).attr('class', 'form-control');
+    jQuery(selector).attr('data-parsley-type', 'number');
+    jQuery(selector).attr('data-parsley-maxlength', precision + 1);
+    var max = Math.pow(10, precision - scale) - Math.pow(0.1, scale);
+    var min = allowNegative ? max * -1 : 0;
+    jQuery(selector).attr('data-parsley-range', '[' + min + ', ' + max + ']')
+    var pattern = '\\d{0,' + (precision - scale) + '}(?:\\.\\d{1,' + scale + '})?';
+    jQuery(selector).attr('data-parsley-pattern', pattern);
+    jQuery(selector).attr('data-parsley-required', required ? 'true' : 'false');
+    jQuery(selector).attr('data-parsley-error-message', 'Must be a number between ' + min + ' and ' + max);
   }
 
 };

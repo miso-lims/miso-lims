@@ -30,11 +30,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
@@ -780,19 +783,33 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
         applyTissueProcessingChanges((SampleTissueProcessing) target, (SampleTissueProcessing) source);
       }
       if (isAliquotSample(target)) {
-        SampleAliquot saTarget = (SampleAliquot) target;
-        SampleAliquot saSource = (SampleAliquot) source;
-        saTarget.setSamplePurpose(saSource.getSamplePurpose());
+        applyAliquotChanges((SampleAliquot) target, (SampleAliquot) source);
       }
       if (isStockSample(target)) {
-        SampleStock ssTarget = (SampleStock) target;
-        SampleStock ssSource = (SampleStock) source;
-        ssTarget.setStrStatus(ssSource.getStrStatus());
-        ssTarget.setDNAseTreated(ssSource.getDNAseTreated());
+        applyStockChanges((SampleStock) target, (SampleStock) source);
       }
     } else {
       target.setQcPassed(source.getQcPassed());
     }
+  }
+
+  private void applyAliquotChanges(SampleAliquot target, SampleAliquot source) {
+    source = deproxify(source);
+    if (source instanceof SampleAliquotSingleCell) {
+      ((SampleAliquotSingleCell) target).setInputIntoLibrary(((SampleAliquotSingleCell) source).getInputIntoLibrary());
+    }
+    target.setSamplePurpose(source.getSamplePurpose());
+  }
+
+  private void applyStockChanges(SampleStock target, SampleStock source) {
+    source = deproxify(source);
+    if (source instanceof SampleStockSingleCell) {
+      ((SampleStockSingleCell) target).setTargetCellRecovery(((SampleStockSingleCell) source).getTargetCellRecovery());
+      ((SampleStockSingleCell) target).setCellViability(((SampleStockSingleCell) source).getCellViability());
+      ((SampleStockSingleCell) target).setLoadingCellConcentration(((SampleStockSingleCell) source).getLoadingCellConcentration());
+    }
+    target.setStrStatus(source.getStrStatus());
+    target.setDNAseTreated(source.getDNAseTreated());
   }
 
   private void applyTissueChanges(SampleTissue target, SampleTissue source) {
@@ -816,6 +833,9 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       ((SampleSlide) target).setStain(((SampleSlide) source).getStain());
     } else if (source instanceof SampleLCMTube) {
       ((SampleLCMTube) target).setSlidesConsumed(((SampleLCMTube) source).getSlidesConsumed());
+    } else if (source instanceof SampleSingleCell) {
+      ((SampleSingleCell) target).setInitialCellConcentration(((SampleSingleCell) source).getInitialCellConcentration());
+      ((SampleSingleCell) target).setDigestion(((SampleSingleCell) source).getDigestion());
     }
   }
 

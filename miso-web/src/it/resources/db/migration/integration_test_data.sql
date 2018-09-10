@@ -23,7 +23,10 @@ INSERT INTO SampleClass (sampleClassId, alias, sampleCategory, suffix, dnaseTrea
 (18, 'smRNA',               'Aliquot',           'SM_', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (19, 'mRNA',                'Aliquot',           'MR_', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (20, 'rRNA_depleted',       'Aliquot',           'WT_', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(21, 'cDNA (aliquot)',      'Aliquot',           'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
+(21, 'cDNA (aliquot)',      'Aliquot',           'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(25, 'Single Cell',         'Tissue Processing', 'SC',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(26, 'Single Cell DNA (stock)',   'Stock',       'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(27, 'Single Cell DNA (aliquot)', 'Aliquot',     'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
 
 INSERT INTO SampleValidRelationship (parentId, childId, createdBy, creationDate, updatedBy, lastUpdated, archived) VALUES
 ( 8, 11, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
@@ -61,7 +64,10 @@ INSERT INTO SampleValidRelationship (parentId, childId, createdBy, creationDate,
 (24, 10, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
 (24, 11, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
 (24, 13, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
-(23, 24, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0);
+(23, 24, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
+(23, 25, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
+(25, 26, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
+(26, 27, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0);
 
 INSERT INTO TissueMaterial(tissueMaterialId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Fresh Frozen', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
@@ -200,7 +206,8 @@ INSERT INTO LibraryDesignCode (libraryDesignCodeId, code, description) VALUES
   (6, 'TS','Targeted Sequencing'),
   (7, 'WG','Whole Genome'),
   (8, 'WT','Whole Transcriptome'),
-  (16,'TR','Total RNA');
+  (16,'TR','Total RNA'),
+  (17, 'SC', 'Single Cell');
 
 INSERT INTO LibraryDesign (libraryDesignId, name, sampleClassId, librarySelectionType, libraryStrategyType, libraryDesignCodeId) VALUES
   (1, 'WG',                   15, 3, 1, 7),
@@ -218,7 +225,9 @@ INSERT INTO LibraryDesign (libraryDesignId, name, sampleClassId, librarySelectio
   (14,'MR',                   19,11,19, 4),
   (15,'SM',                   18,20,19, 5),
   (16,'WT',                   20,11,19, 8),
-  (17,'TR',                   17,11,19,16);
+  (17,'TR',                   17,11,19,16),
+  (18,'Single Cell',          27, 1,19,17),
+  (19,'Single Cell CNV',      27, 2, 1,17);
 
 INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, kitType, platformType, creator, created, lastModifier, lastModified) VALUES
   (1, 'Test Kit', 1, 'TestCo', '123', 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),

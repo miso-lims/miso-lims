@@ -137,7 +137,7 @@ public class BulkLibraryIT extends AbstractIT {
     assertTrue(designs.contains("AS"));
 
     Set<String> codes = table.getDropdownOptions(LibColumns.CODE, 0);
-    assertEquals(9, codes.size());
+    assertEquals(10, codes.size());
     assertTrue(codes.contains("EX"));
     assertTrue(codes.contains("MR"));
 

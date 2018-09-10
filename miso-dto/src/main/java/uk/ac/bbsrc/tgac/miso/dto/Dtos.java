@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -71,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
@@ -78,8 +80,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
@@ -115,6 +119,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
@@ -122,8 +127,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
@@ -440,10 +447,10 @@ public class Dtos {
       to = toTissueSample((SampleTissueDto) from);
     } else if (from instanceof SampleTissueProcessingDto) {
       to = toTissueProcessingSample((SampleTissueProcessingDto) from);
-    } else if (from.getClass() == SampleStockDto.class) {
-      to = toStockSample((SampleStockDto) from);
-    } else if (from.getClass() == SampleAliquotDto.class) {
+    } else if (from instanceof SampleAliquotDto) {
       to = toAliquotSample((SampleAliquotDto) from);
+    } else if (from instanceof SampleStockDto) {
+      to = toStockSample((SampleStockDto) from);
     } else {
       to = new DetailedSampleImpl();
     }
@@ -534,7 +541,16 @@ public class Dtos {
           }
         }
       }
-      if (childDto instanceof SampleStockDto && childDto.getClass() != SampleStockDto.class) {
+      if (childDto instanceof SampleSingleCellRelative && childDto.getClass() != SampleSingleCellDto.class) {
+        SampleStockDto stockDto = (SampleStockDto) childDto;
+        DetailedSample tissueProcessing = toSingleCellSample((SampleSingleCellRelative) childDto);
+        tissueProcessing.setSampleClass(new SampleClassImpl());
+        tissueProcessing.getSampleClass().setId(stockDto.getTissueProcessingClassId());
+        tissueProcessing.setParent(parent);
+        parent = tissueProcessing;
+      }
+      if (childDto instanceof SampleStockDto && childDto.getClass() != SampleStockDto.class
+          && childDto.getClass() != SampleStockSingleCellDto.class) {
         SampleAliquotDto aliquotDto = (SampleAliquotDto) childDto;
         DetailedSample stock = toStockSample((SampleStockDto) childDto);
         stock.setSampleClass(new SampleClassImpl());
@@ -623,7 +639,15 @@ public class Dtos {
   }
 
   private static SampleAliquotDto asAliquotSampleDto(SampleAliquot from) {
-    SampleAliquotDto dto = new SampleAliquotDto();
+    SampleAliquotDto dto = null;
+    if (isAliquotSingleCellSample(from)) {
+      SampleAliquotSingleCell scFrom = (SampleAliquotSingleCell) from;
+      SampleAliquotSingleCellDto sc = new SampleAliquotSingleCellDto();
+      setString(sc::setInputIntoLibrary, scFrom.getInputIntoLibrary());
+      dto = sc;
+    } else {
+      dto = new SampleAliquotDto();
+    }
     if (from.getSamplePurpose() != null) {
       dto.setSamplePurposeId(from.getSamplePurpose().getId());
     }
@@ -631,14 +655,34 @@ public class Dtos {
   }
 
   private static SampleStockDto asStockSampleDto(SampleStock from) {
-    SampleStockDto dto = new SampleStockDto();
+    SampleStockDto dto = null;
+    if (isStockSingleCellSample(from)) {
+      SampleStockSingleCell scFrom = (SampleStockSingleCell) from;
+      SampleStockSingleCellDto sc = new SampleStockSingleCellDto();
+      setString(sc::setTargetCellRecovery, scFrom.getTargetCellRecovery());
+      setString(sc::setCellViability, scFrom.getCellViability());
+      setString(sc::setLoadingCellConcentration, scFrom.getLoadingCellConcentration());
+      dto = sc;
+    } else {
+      dto = new SampleStockDto();
+    }
     dto.setStrStatus(from.getStrStatus().getLabel());
     dto.setDnaseTreated(from.getDNAseTreated());
     return dto;
   }
 
   private static SampleStock toStockSample(SampleStockDto from) {
-    SampleStock to = new SampleStockImpl();
+    SampleStock to = null;
+    if (from instanceof SampleStockSingleCellRelative) {
+      SampleStockSingleCellRelative scFrom = (SampleStockSingleCellRelative) from;
+      SampleStockSingleCell sc = new SampleStockSingleCellImpl();
+      setBigDecimal(sc::setTargetCellRecovery, scFrom.getTargetCellRecovery());
+      setBigDecimal(sc::setCellViability, scFrom.getCellViability());
+      setBigDecimal(sc::setLoadingCellConcentration, scFrom.getLoadingCellConcentration());
+      to = sc;
+    } else {
+      to = new SampleStockImpl();
+    }
     if (from.getStrStatus() != null) {
       to.setStrStatus(from.getStrStatus());
     }
@@ -647,7 +691,15 @@ public class Dtos {
   }
 
   private static SampleAliquot toAliquotSample(SampleAliquotDto from) {
-    SampleAliquot to = new SampleAliquotImpl();
+    SampleAliquot to = null;
+    if (from.getClass() == SampleAliquotSingleCellDto.class) {
+      SampleAliquotSingleCellDto scFrom = (SampleAliquotSingleCellDto) from;
+      SampleAliquotSingleCell sc = new SampleAliquotSingleCellImpl();
+      setBigDecimal(sc::setInputIntoLibrary, scFrom.getInputIntoLibrary());
+      to = sc;
+    } else {
+      to = new SampleAliquotImpl();
+    }
     if (from.getSamplePurposeId() != null) {
       to.setSamplePurpose(new SamplePurposeImpl());
       to.getSamplePurpose().setId(from.getSamplePurposeId());
@@ -867,17 +919,17 @@ public class Dtos {
   }
 
   private static SampleTissueProcessingDto asTissueProcessingSampleDto(SampleTissueProcessing from) {
-    SampleTissueProcessingDto dto = null;
     from = deproxify(from);
 
-    if (from instanceof SampleSlideImpl) {
-      dto = asSlideSampleDto((SampleSlide) from);
-    } else if (from.getClass() == SampleLCMTubeImpl.class) {
-      dto = asLCMTubeSampleDto((SampleLCMTube) from);
+    if (isSampleSlide(from)) {
+      return asSlideSampleDto((SampleSlide) from);
+    } else if (isLcmTubeSample(from)) {
+      return asLCMTubeSampleDto((SampleLCMTube) from);
+    } else if (isProcessingSingleCellSample(from)) {
+      return asSingleCellSampleDto((SampleSingleCell) from);
     } else {
-      dto = new SampleTissueProcessingDto();
+      return new SampleTissueProcessingDto();
     }
-    return dto;
   }
 
   private static SampleTissueProcessing toTissueProcessingSample(SampleTissueProcessingDto from) {
@@ -886,6 +938,8 @@ public class Dtos {
       to = toSlideSample((SampleSlideDto) from);
     } else if (from.getClass() == SampleLCMTubeDto.class) {
       to = toLCMTubeSample((SampleLCMTubeDto) from);
+    } else if (from instanceof SampleSingleCellRelative) {
+      to = toSingleCellSample((SampleSingleCellRelative) from);
     } else {
       to = new SampleTissueProcessingImpl();
     }
@@ -917,10 +971,24 @@ public class Dtos {
     return to;
   }
 
+  private static SampleSingleCellDto asSingleCellSampleDto(SampleSingleCell from) {
+    SampleSingleCellDto dto = new SampleSingleCellDto();
+    setString(dto::setInitialCellConcentration, from.getInitialCellConcentration());
+    setString(dto::setDigestion, from.getDigestion());
+    return dto;
+  }
+
   private static SampleLCMTubeDto asLCMTubeSampleDto(SampleLCMTube from) {
     SampleLCMTubeDto dto = new SampleLCMTubeDto();
     dto.setSlidesConsumed(from.getSlidesConsumed());
     return dto;
+  }
+
+  private static SampleSingleCell toSingleCellSample(SampleSingleCellRelative from) {
+    SampleSingleCell to = new SampleSingleCellImpl();
+    setBigDecimal(to::setInitialCellConcentration, from.getInitialCellConcentration());
+    setString(to::setDigestion, from.getDigestion());
+    return to;
   }
 
   private static SampleLCMTube toLCMTubeSample(SampleLCMTubeDto from) {
@@ -2682,6 +2750,18 @@ public class Dtos {
       to.setLibraryDesignCode(ldCode);
     }
     return to;
+  }
+
+  private static void setBigDecimal(Consumer<BigDecimal> setter, String value) {
+    if (isStringEmptyOrNull(value)) {
+      setter.accept(null);
+    } else {
+      setter.accept(new BigDecimal(value));
+    }
+  }
+
+  private static void setString(Consumer<String> setter, BigDecimal value) {
+    setter.accept(toNiceString(value));
   }
 
   private static void setString(Consumer<String> setter, String value) {

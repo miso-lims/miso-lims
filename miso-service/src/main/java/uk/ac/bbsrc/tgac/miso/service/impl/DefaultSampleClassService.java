@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,6 +16,8 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleValidRelationshipDao;
@@ -86,10 +89,7 @@ public class DefaultSampleClassService implements SampleClassService {
 
   @Override
   public SampleClass inferParentFromChild(long childClassId, String childCategory, String parentCategory) {
-    SampleClass childClass = sampleClassDao.getSampleClass(childClassId);
-    if (childClass == null) {
-      throw new IllegalArgumentException("Invalid sample class " + childClassId);
-    }
+    SampleClass childClass = getNotNullClass(childClassId);
     if (!childClass.getSampleCategory().equals(childCategory)) {
       throw new IllegalArgumentException(
           String.format("Sample class %s is not a valid %s class.", childClassId, childCategory));
@@ -98,14 +98,46 @@ public class DefaultSampleClassService implements SampleClassService {
         .filter(relationship -> !relationship.getArchived() && relationship.getChild().getId() == childClass.getId()
             && relationship.getParent().getSampleCategory().equals(parentCategory))
         .map(SampleValidRelationship::getParent).collect(Collectors.toList());
-    switch (parentClasses.size()) {
+    return singleResult(parentClasses, childClass, parentCategory);
+  }
+
+  @Override
+  public SampleClass getRequiredTissueProcessingClass(Long childClassId) throws IOException {
+    SampleClass stockClass = getNotNullClass(childClassId);
+    List<SampleValidRelationship> relationships = sampleValidRelationshipDao.getSampleValidRelationship();
+    if (relationships.stream().anyMatch(relationship -> !relationship.getArchived()
+        && relationship.getChild().getId().equals(childClassId)
+        && relationship.getParent().getSampleCategory().equals(SampleTissue.CATEGORY_NAME))) {
+      return null;
+    }
+    List<SampleClass> parentClasses = relationships.stream().filter(relationship -> !relationship.getArchived()
+        && relationship.getChild().getId().equals(childClassId)
+        && relationship.getParent().getSampleCategory().equals(SampleTissueProcessing.CATEGORY_NAME))
+        .map(SampleValidRelationship::getParent)
+        .collect(Collectors.toList());
+    return singleResult(parentClasses, stockClass, SampleTissueProcessing.CATEGORY_NAME);
+  }
+
+  private SampleClass getNotNullClass(Long sampleClassId) {
+    if (sampleClassId == null) {
+      throw new NullPointerException("Class ID not provided");
+    }
+    SampleClass sampleClass = sampleClassDao.getSampleClass(sampleClassId);
+    if (sampleClass == null) {
+      throw new IllegalArgumentException("Invalid sample class " + sampleClassId);
+    }
+    return sampleClass;
+  }
+
+  private SampleClass singleResult(Collection<SampleClass> classes, SampleClass child, String parentCategory) {
+    switch (classes.size()) {
     case 0:
       return null;
     case 1:
-      return parentClasses.get(0);
+      return classes.iterator().next();
     default:
       throw new IllegalStateException(
-          String.format("%s class %s (%d) has multiple %s parents.", childCategory, childClass.getAlias(), childClassId, parentCategory));
+          String.format("SampleClass %s has multiple %s parents.", child.getAlias(), parentCategory));
     }
   }
 

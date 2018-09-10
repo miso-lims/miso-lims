@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,6 +43,7 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,10 +62,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -95,6 +100,20 @@ public class LimsUtils {
 
   public static String nullifyStringIfBlank(String s) {
     return (isStringBlankOrNull(s) ? null : s);
+  }
+
+  public static String toNiceString(BigDecimal num) {
+    if (num == null) {
+      return null;
+    }
+    String nice = StringUtils.strip(num.toPlainString(), "0");
+    if (nice.startsWith(".")) {
+      nice = "0" + nice;
+    }
+    if (nice.endsWith(".")) {
+      nice = nice.substring(0, nice.length() - 1);
+    }
+    return nice;
   }
 
   /**
@@ -220,12 +239,27 @@ public class LimsUtils {
     return sample instanceof SampleLCMTube;
   }
 
+  public static boolean isProcessingSingleCellSample(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
+    return sample instanceof SampleSingleCell;
+  }
+
   public static boolean isStockSample(Sample sample) {
     return sample instanceof SampleStock || safeCategoryCheck(sample, SampleStock.CATEGORY_NAME);
   }
 
+  public static boolean isStockSingleCellSample(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
+    return sample instanceof SampleStockSingleCell;
+  }
+
   public static boolean isAliquotSample(Sample sample) {
     return sample instanceof SampleAliquot || safeCategoryCheck(sample, SampleAliquot.CATEGORY_NAME);
+  }
+
+  public static boolean isAliquotSingleCellSample(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
+    return sample instanceof SampleAliquotSingleCell;
   }
 
   public static boolean isSampleSlide(DetailedSample sample) {
