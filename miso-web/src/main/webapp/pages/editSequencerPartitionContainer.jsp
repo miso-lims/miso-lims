@@ -86,10 +86,6 @@
     
     <c:if test="${miso:instanceOf(container, 'uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer')}">
       <tr>
-        <td>Flow Cell Version:</td>
-        <td><miso:select id="flowCellVersion" path="flowCellVersion" items="${flowCellVersions}" itemLabel="alias" itemValue="id" defaultLabel="(Unknown)" defaultValue="" /></td>
-      </tr>
-      <tr>
         <td>Pore Version:</td>
         <td><miso:select id="poreVersion" path="poreVersion" items="${poreVersions}" itemLabel="alias" itemValue="id" defaultLabel="(Unknown)" defaultValue="" /></td>
       </tr>

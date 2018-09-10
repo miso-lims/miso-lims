@@ -29,7 +29,6 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
@@ -107,11 +106,6 @@ public interface SequencerPartitionContainerStore extends PaginatedDataSource<Se
   Partition getPartitionById(long partitionId);
 
   public void update(Partition partition);
-
-  public FlowCellVersion getFlowCellVersion(long id);
-
-  public List<FlowCellVersion> listFlowCellVersions();
-
   public PoreVersion getPoreVersion(long id);
 
   public List<PoreVersion> listPoreVersions();

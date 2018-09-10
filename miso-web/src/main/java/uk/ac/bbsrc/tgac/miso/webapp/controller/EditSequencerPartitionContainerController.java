@@ -47,7 +47,6 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
@@ -82,19 +81,6 @@ public class EditSequencerPartitionContainerController {
    */
   @InitBinder
   public void includeForeignKeys(WebDataBinder binder) {
-    binder.registerCustomEditor(FlowCellVersion.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) {
-        if (text.isEmpty()) {
-          setValue(null);
-        } else {
-          FlowCellVersion v = new FlowCellVersion();
-          v.setId(Long.valueOf(text));
-          setValue(v);
-        }
-      }
-    });
-
     binder.registerCustomEditor(PoreVersion.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) {
@@ -172,7 +158,6 @@ public class EditSequencerPartitionContainerController {
         kitService.listKitDescriptorsByType(KitType.MULTIPLEXING).stream()
             .filter(descriptor -> descriptor.getPlatformType() == container.getModel().getPlatformType())
             .sorted(KitDescriptor::sortByName).collect(Collectors.toList()));
-    model.put("flowCellVersions", containerService.listFlowCellVersions());
     model.put("poreVersions", containerService.listPoreVersions());
     return new ModelAndView("/pages/editSequencerPartitionContainer.jsp", model);
   }
