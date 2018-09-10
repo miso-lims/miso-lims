@@ -89,8 +89,15 @@
       <tr>
         <td class="h">Project Name:</td>
         <td>
-          <input type="hidden" value="${study.project.id}" name="project" id="project"/>
-          <a href='<c:url value="/miso/project/${study.project.id}"/>'><span id="projectName">${study.project.name}</span></a>
+        <c:choose>
+          <c:when test="${study.project != null}">
+            <input type="hidden" value="${study.project.id}" name="project" id="project"/>
+            <a href='<c:url value="/miso/project/${study.project.id}"/>'><span id="projectName">${study.project.name}</span></a>
+          </c:when>
+          <c:otherwise>
+            <miso:select id="project" path="project" items="${projects}" itemLabel="name" itemValue="id"/>
+          </c:otherwise>
+        </c:choose>
         </td>
       </tr>
       <tr>

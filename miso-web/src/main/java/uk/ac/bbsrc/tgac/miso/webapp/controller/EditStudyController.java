@@ -36,6 +36,7 @@ import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -105,8 +106,33 @@ public class EditStudyController {
   public Collection<StudyType> populateStudyTypes() throws IOException {
     return studyService.listTypes();
   }
+  
+  @ModelAttribute("projects")
+  public Collection<Project> populateProjects() throws IOException {
+    return projectService.listAllProjects();
+  }
 
-  @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
+  // put list of projects into Model object
+  @GetMapping(value = "/new")
+  public ModelAndView newStudy(ModelMap model) throws IOException {
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    Study study = new StudyImpl(user);
+    // Project project; // get Project obj from dropdown
+    //
+    // if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
+    // SecurityProfile sp = new SecurityProfile(user);
+    // LimsUtils.inheritUsersAndGroups(study, project.getSecurityProfile());
+    // sp.setOwner(user);
+    // study.setSecurityProfile(sp);
+    // } else {
+    // study.inheritPermissions(project);
+    // }
+
+    authorizationManager.throwIfNotWritable(study);
+	    return setupForm(study, user, "New Study", model);
+  }
+
+  @GetMapping(value = "/new/{projectId}")
   public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Study study = new StudyImpl(user);
