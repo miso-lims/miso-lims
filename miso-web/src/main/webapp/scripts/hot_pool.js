@@ -68,7 +68,7 @@ HotTarget.pool = (function() {
         data: 'pool',
         include: true,
         type: 'dropdown',
-        trimDropDown: false,
+        trimDropdown: false,
         validator: HotUtils.validator.requiredAutocomplete,
         unpack: function(dil, flat, setCellMeta) {
           flat.pool = dil.pool;
