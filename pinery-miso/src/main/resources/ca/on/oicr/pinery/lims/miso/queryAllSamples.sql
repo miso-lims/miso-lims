@@ -134,7 +134,7 @@ SELECT l.alias NAME
         ,lt.platformType sampleType_platform 
         ,lt.description sampleType_description 
         ,NULL tissueType 
-        ,LEFT(l.alias, LOCATE('_', l.alias)-1) project 
+        ,sp.shortName project 
         ,lai.archived archived 
         ,l.created created 
         ,l.creator createdById 
@@ -183,6 +183,7 @@ SELECT l.alias NAME
         ,NULL slides_consumed
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
+LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
 LEFT JOIN DetailedLibrary lai ON lai.libraryId = l.libraryId
 LEFT JOIN KitDescriptor kd ON kd.kitDescriptorId = l.kitDescriptorId
 LEFT JOIN LibraryDesignCode ldc ON lai.libraryDesignCodeId = ldc.libraryDesignCodeId
@@ -231,7 +232,7 @@ SELECT parent.alias name
         ,lt.platformType sampleType_platform 
         ,lt.description sampleType_description 
         ,NULL tissueType 
-        ,LEFT(parent.alias, LOCATE('_', parent.alias)-1) project 
+        ,sp.shortName project 
         ,0 archived 
         ,d.created created 
         ,NULL createdById 
@@ -280,6 +281,8 @@ SELECT parent.alias name
         ,NULL slides_consumed
 FROM LibraryDilution d 
 JOIN Library parent ON parent.libraryId = d.library_libraryId 
+JOIN Sample s ON s.sampleId = parent.sample_sampleId
+JOIN Project sp ON sp.projectId = s.project_projectId
 JOIN LibraryType lt ON lt.libraryTypeId = parent.libraryType 
 LEFT JOIN DetailedLibrary lai ON lai.libraryId = parent.libraryId 
 LEFT JOIN LibraryDesignCode ldc ON lai.libraryDesignCodeId = ldc.libraryDesignCodeId
