@@ -43,8 +43,6 @@ public interface SequencerPartitionContainer
     extends SecurableByProfile, Comparable<SequencerPartitionContainer>, Barcodable, ChangeLoggable, Serializable,
     QualityControllable<ContainerQC>, Deletable {
 
-  public void setId(long id);
-
   String getDescription();
 
   void setDescription(String description);

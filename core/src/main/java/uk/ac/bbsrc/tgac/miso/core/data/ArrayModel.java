@@ -28,6 +28,7 @@ public class ArrayModel implements Serializable, Aliasable {
     return id;
   }
 
+  @Override
   public void setId(long id) {
     this.id = id;
   }

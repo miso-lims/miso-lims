@@ -238,7 +238,7 @@ public class ImportExportControllerHelperService {
             } else {
               sqc.setType(qcService.getQcType(QcTarget.Sample, "QuBit"));
             }
-            if (s.getQCs().stream().noneMatch(existing -> existing.getType().getQcTypeId() == sqc.getType().getQcTypeId())) {
+            if (s.getQCs().stream().noneMatch(existing -> existing.getType().getId() == sqc.getType().getId())) {
               qcService.createQC(sqc);
               log.info("Added sample QC: {}", sqc);
             }
@@ -378,7 +378,7 @@ public class ImportExportControllerHelperService {
                   lqc.setDate(new Date());
                   lqc.setType(qcService.getQcType(QcTarget.Library, "Qubit"));
 
-                  if (library.getQCs().stream().noneMatch(existing -> existing.getType().getQcTypeId() == lqc.getType().getQcTypeId())) {
+                  if (library.getQCs().stream().noneMatch(existing -> existing.getType().getId() == lqc.getType().getId())) {
                     qcService.createQC(lqc);
                     log.info("Added library QC: {}", lqc);
                   }
@@ -403,7 +403,7 @@ public class ImportExportControllerHelperService {
                   lqc.setResults(Double.valueOf(jsonArrayElement.getString(7)));
                   lqc.setType(qcService.getQcType(QcTarget.Library, "Bioanalyzer"));
 
-                  if (library.getQCs().stream().noneMatch(existing -> existing.getType().getQcTypeId() == lqc.getType().getQcTypeId())) {
+                  if (library.getQCs().stream().noneMatch(existing -> existing.getType().getId() == lqc.getType().getId())) {
                     qcService.createQC(lqc);
                     log.info("Added library QC: {}", lqc);
                   }

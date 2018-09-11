@@ -7,8 +7,6 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface TissueMaterial extends Serializable, Aliasable, Deletable {
 
-  void setId(long tissueMaterialId);
-
   void setAlias(String alias);
 
   User getCreatedBy();

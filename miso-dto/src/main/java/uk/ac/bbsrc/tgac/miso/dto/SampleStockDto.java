@@ -9,9 +9,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 @JsonTypeName(value = SampleStock.CATEGORY_NAME)
 public class SampleStockDto extends SampleTissueDto {
 
+  private Long tissueProcessingClassId;
   private String concentration;
   private String strStatus;
   private Boolean dnaseTreated;
+
+  public Long getTissueProcessingClassId() {
+    return tissueProcessingClassId;
+  }
+
+  public void setTissueProcessingClassId(Long tissueProcessingClassId) {
+    this.tissueProcessingClassId = tissueProcessingClassId;
+  }
 
   @Override
   public String getConcentration() {

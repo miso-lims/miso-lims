@@ -26,10 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -183,6 +180,7 @@ public class LibraryDilution extends AbstractBoxable
     return dilutionId;
   }
 
+  @Override
   public void setId(long id) {
     this.dilutionId = id;
   }

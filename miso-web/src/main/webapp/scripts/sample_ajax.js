@@ -214,14 +214,27 @@ var Sample = Sample
               jQuery('#slidesConsumed').attr('data-parsley-type', 'digits');
               jQuery('#slidesConsumed').attr('data-parsley-required', 'true');
               break;
+            case 'Single Cell':
+              Validate.makeDecimalField('#initialCellConcentration', 14, 10, false, false);
+
+              jQuery('#digestion').attr('class', 'form-control');
+              jQuery('#digestion').attr('data-parsley-maxlength', '255');
+              jQuery('#digestion').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+              jQuery('#digestion').attr('data-parsley-required', 'true');
+              break;
             }
             break;
           case 'Stock':
-            // fall-though to aliquot case (identical restrictions)
+            Validate.makeDecimalField('#targetCellRecovery', 14, 10, false, false);
+            Validate.makeDecimalField('#cellViability', 14, 10, false, false);
+            Validate.makeDecimalField('#loadingCellConcentration', 14, 10, false, false);
+            // fall-though to aliquot case (include same restrictions)
           case 'Aliquot':
             // TissueClass validation
             jQuery('#tissueClass').attr('class', 'form-control');
             jQuery('#tissueClass').attr('data-parsley-required', 'true');
+
+            Validate.makeDecimalField('#inputIntoLibrary', 14, 10, false, false);
             break;
           }
         }

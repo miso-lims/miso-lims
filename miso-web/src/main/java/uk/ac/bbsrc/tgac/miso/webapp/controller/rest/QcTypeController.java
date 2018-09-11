@@ -98,7 +98,7 @@ public class QcTypeController extends RestController {
   public QcTypeDto updateSubproject(@PathVariable("id") Long id, @RequestBody QcTypeDto qcTypeDto, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
     QcType qcType = Dtos.to(qcTypeDto);
-    qcType.setQcTypeId(id);
+    qcType.setId(id);
     qcTypeService.update(qcType);
     menuController.refreshConstants();
     return getQcType(id, uriBuilder, response);

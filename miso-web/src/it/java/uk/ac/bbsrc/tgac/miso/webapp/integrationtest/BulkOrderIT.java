@@ -57,6 +57,7 @@ public class BulkOrderIT extends AbstractIT {
     changes.put(Columns.PLATFORM, "Illumina HiSeq 2500");
     changes.put(Columns.PARAMETERS, "1x151");
     changes.put(Columns.PARTITIONS, "3");
+    changes.put(Columns.DESCRIPTION, "test");
     fillRow(table, 0, changes);
 
     changes.putAll(attrs);
@@ -73,6 +74,7 @@ public class BulkOrderIT extends AbstractIT {
     assertEquals(1, orders.size());
     assertEquals(changes.get(Columns.PARAMETERS), orders.get(0).getSequencingParameter().getName());
     assertEquals(Integer.valueOf(3), orders.get(0).getPartitions());
+    assertEquals("test", orders.get(0).getDescription());
   }
 
 }

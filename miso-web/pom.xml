@@ -663,6 +663,12 @@
               <excludes>
                 <exclude>**/PlainSampleITs.java</exclude>
               </excludes>
+              <properties>
+                <property>
+                  <name>listener</name>
+                  <value>uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestListener</value>
+                </property>
+              </properties>
             </configuration>
           </plugin>
         </plugins>

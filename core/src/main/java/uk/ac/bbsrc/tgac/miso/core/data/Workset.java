@@ -77,6 +77,7 @@ public class Workset implements Serializable, Aliasable, Timestamped, Deletable 
     return id;
   }
 
+  @Override
   public void setId(long id) {
     this.id = id;
   }

@@ -15,7 +15,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -158,7 +157,6 @@ public class DefaultContainerService
   }
 
   public void applyOxfordNanoporeChanges(OxfordNanoporeContainer source, OxfordNanoporeContainer managed) {
-    managed.setFlowCellVersion(source.getFlowCellVersion());
     managed.setPoreVersion(source.getPoreVersion());
     managed.setReceivedDate(source.getReceivedDate());
     managed.setReturnedDate(source.getReturnedDate());
@@ -193,9 +191,6 @@ public class DefaultContainerService
     }
     if (LimsUtils.isOxfordNanoporeContainer(container)) {
       OxfordNanoporeContainer ontContainer = (OxfordNanoporeContainer) container;
-      if (ontContainer.getFlowCellVersion() != null) {
-        ontContainer.setFlowCellVersion(containerDao.getFlowCellVersion(ontContainer.getFlowCellVersion().getId()));
-      }
       if (ontContainer.getPoreVersion() != null) {
         ontContainer.setPoreVersion(containerDao.getPoreVersion(ontContainer.getPoreVersion().getId()));
       }
@@ -257,16 +252,6 @@ public class DefaultContainerService
     original.setPool(pool);
     setChangeDetails(original.getSequencerPartitionContainer());
     containerDao.save(original.getSequencerPartitionContainer());
-  }
-
-  @Override
-  public FlowCellVersion getFlowCellVersion(long id) throws IOException {
-    return containerDao.getFlowCellVersion(id);
-  }
-
-  @Override
-  public List<FlowCellVersion> listFlowCellVersions() throws IOException {
-    return containerDao.listFlowCellVersions();
   }
 
   @Override

@@ -4,22 +4,31 @@ import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
+import java.math.BigDecimal;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -42,6 +51,9 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   protected static final long rAliquotClassId = 17L;
   protected static final long cAliquotClassId = 21L;
   protected static final long mRnaClassId = 19L;
+  protected static final long singleCellClassId = 25;
+  protected static final long singleCellStockClassId = 26;
+  protected static final long singleCellAliquotClassId = 27;
 
   protected void saveSingleAndAssertSuccess(HandsOnTable table) {
     HandsOnTableSaveResult result = table.save();
@@ -135,6 +147,11 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertEntityAttribute(SamColumns.SLIDES_CONSUMED, attributes, sample, s -> s.getSlidesConsumed().toString());
   }
 
+  protected void assertSingleCellAttributes(Map<String, String> attributes, SampleSingleCell sample) {
+    assertEntityAttribute(SamColumns.INITIAL_CELL_CONC, attributes, sample, s -> emptyIfNull(s.getInitialCellConcentration()));
+    assertEntityAttribute(SamColumns.DIGESTION, attributes, sample, s -> s.getDigestion());
+  }
+
   protected void assertAnalyteAttributes(Map<String, String> attributes, DetailedSample sample) {
     assertEntityAttribute(SamColumns.VOLUME, attributes, sample, s -> s.getVolume() == null ? "" : s.getVolume().toString());
     assertEntityAttribute(SamColumns.CONCENTRATION, attributes, sample,
@@ -145,12 +162,22 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertEntityAttribute(SamColumns.STR_STATUS, attributes, sample, s -> s.getStrStatus().getLabel());
   }
 
+  protected void assertSingleCellStockAttributes(Map<String, String> attributes, SampleStockSingleCell sample) {
+    assertEntityAttribute(SamColumns.TARGET_CELL_RECOVERERY, attributes, sample, s -> emptyIfNull(s.getTargetCellRecovery()));
+    assertEntityAttribute(SamColumns.CELL_VIABILITY, attributes, sample, s -> emptyIfNull(s.getCellViability()));
+    assertEntityAttribute(SamColumns.LOADING_CELL_CONC, attributes, sample, s -> emptyIfNull(s.getLoadingCellConcentration()));
+  }
+
   protected void assertRnaStockSampleAttributes(Map<String, String> attributes, SampleStock sample) {
     assertEntityAttribute(SamColumns.DNASE_TREATED, attributes, sample, s -> getQcPassedString(s.getDNAseTreated()));
   }
 
   protected void assertAliquotAttributes(Map<String, String> attributes, SampleAliquot sample) {
     assertEntityAttribute(SamColumns.PURPOSE, attributes, sample, s -> s.getSamplePurpose().getAlias());
+  }
+
+  protected void assertSingleCellAliquotAttributes(Map<String, String> attributes, SampleAliquotSingleCell sample) {
+    assertEntityAttribute(SamColumns.INPUT_INTO_LIBRARY, attributes, sample, s -> emptyIfNull(s.getInputIntoLibrary()));
   }
 
   protected void assertAllForIdentity(Map<String, String> identity, Long sampleId, boolean newlyCreated) {
@@ -195,6 +222,19 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     }
   }
 
+  protected void assertAllForSingleCell(Map<String, String> singleCell, long sampleId, boolean newlyCreated) {
+    SampleSingleCell target = (SampleSingleCell) getSession().get(SampleSingleCellImpl.class, sampleId);
+
+    assertPlainSampleAttributes(singleCell, target, newlyCreated);
+    assertDetailedSampleAttributes(singleCell, target);
+    assertSingleCellAttributes(singleCell, target);
+
+    if (newlyCreated) {
+      SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, target);
+      assertTissueAttributes(singleCell, tissueParent);
+    }
+  }
+
   protected void assertAllForTissueProcessing(Map<String, String> tproc, Long sampleId, boolean newlyCreated) {
     SampleTissueProcessing target = (SampleTissueProcessing) getSession().get(SampleTissueProcessingImpl.class, sampleId);
 
@@ -228,6 +268,27 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     }
   }
 
+  protected void assertAllForSingleCellStock(Map<String, String> stock, Long sampleId, boolean newlyCreated) {
+    SampleStockSingleCell target = (SampleStockSingleCell) getSession().get(SampleStockSingleCellImpl.class, sampleId);
+
+    assertPlainSampleAttributes(stock, target, newlyCreated);
+    assertDetailedSampleAttributes(stock, target);
+    assertStockAttributes(stock, target);
+    assertAnalyteAttributes(stock, target);
+    assertSingleCellStockAttributes(stock, target);
+
+    if (newlyCreated) {
+      SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, target);
+      assertTissueAttributes(stock, tissueParent);
+
+      SampleSingleCell singleCellParent = LimsUtils.getParent(SampleSingleCell.class, target);
+      assertSingleCellAttributes(stock, singleCellParent);
+
+      SampleIdentity identityAncestor = LimsUtils.getParent(SampleIdentity.class, target);
+      assertIdentityAttributes(stock, identityAncestor);
+    }
+  }
+
   protected void assertAllForAliquot(Map<String, String> aliquot, Long sampleId, boolean newlyCreated, boolean isRNA) {
     SampleAliquot target = (SampleAliquot) getSession().get(SampleAliquotImpl.class, sampleId);
 
@@ -248,8 +309,33 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     }
   }
 
+  protected void assertAllForSingleCellAliquot(Map<String, String> aliquot, Long sampleId, boolean newlyCreated) {
+    SampleAliquotSingleCell target = (SampleAliquotSingleCell) getSession().get(SampleAliquotSingleCellImpl.class, sampleId);
+
+    assertPlainSampleAttributes(aliquot, target, newlyCreated);
+    assertDetailedSampleAttributes(aliquot, target);
+    assertAnalyteAttributes(aliquot, target);
+    assertAliquotAttributes(aliquot, target);
+    assertSingleCellAliquotAttributes(aliquot, target);
+
+    if (newlyCreated) {
+      SampleStockSingleCell stockParent = LimsUtils.getParent(SampleStockSingleCell.class, target);
+      assertSingleCellStockAttributes(aliquot, stockParent);
+
+      SampleSingleCell singleCellParent = LimsUtils.getParent(SampleSingleCell.class, target);
+      assertSingleCellAttributes(aliquot, singleCellParent);
+
+      SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, target);
+      assertTissueAttributes(aliquot, tissueParent);
+    }
+  }
+
   protected Long getIdForRow(HandsOnTable table, Integer row) {
     String newId = table.getText(SamColumns.NAME, row).substring(3, table.getText(SamColumns.NAME, 0).length());
     return Long.valueOf(newId);
+  }
+
+  private String emptyIfNull(BigDecimal value) {
+    return value == null ? "" : StringUtils.strip(value.toPlainString(), "0");
   }
 }

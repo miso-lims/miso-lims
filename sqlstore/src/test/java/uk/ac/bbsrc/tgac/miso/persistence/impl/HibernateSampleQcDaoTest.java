@@ -93,7 +93,7 @@ public class HibernateSampleQcDaoTest extends AbstractDAOTest {
     newSampleQC.setSample(new SampleImpl());
     newSampleQC.getSample().setId(1L);
     newSampleQC.setType(new QcType());
-    newSampleQC.getType().setQcTypeId(1L);
+    newSampleQC.getType().setId(1L);
     newSampleQC.setCreator(new UserImpl());
     newSampleQC.getCreator().setUserId(1L);
     newSampleQC.setCreationTime(new Date());

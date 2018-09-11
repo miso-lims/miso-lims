@@ -192,6 +192,7 @@ public class SampleClassImpl implements SampleClass {
     }
     return relationships.stream()
         .filter(relationship -> !relationship.getArchived()
+            && !relationship.getParent().isArchived()
             && relationship.getChild().getId().equals(from.getId())
             && !checked.contains(relationship.getParent().getId()))
         .anyMatch(relationship -> hasPathToDnaseTreatable(relationship.getParent(), checked, relationships));

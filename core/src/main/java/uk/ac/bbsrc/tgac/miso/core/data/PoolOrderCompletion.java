@@ -116,6 +116,8 @@ public class PoolOrderCompletion implements Serializable {
 
   private int loaded;
 
+  private String description;
+
   public int get(HealthType health) {
     if (items.containsKey(health)) {
       return items.get(health);
@@ -150,6 +152,10 @@ public class PoolOrderCompletion implements Serializable {
     return parameters;
   }
 
+  public String getDescription() {
+    return description;
+  }
+
   public void setItems(Map<HealthType, Integer> items) {
     this.items = items;
   }
@@ -168,5 +174,9 @@ public class PoolOrderCompletion implements Serializable {
 
   public void setRemaining(int remaining) {
     this.remaining = remaining;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 }

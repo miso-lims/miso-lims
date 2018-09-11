@@ -210,24 +210,47 @@ public class SampleRestController extends RestController {
    * 
    * @param sampleDto
    * @return
+   * @throws IOException
    */
-  public Sample buildHierarchy(SampleDto sampleDto) {
+  public Sample buildHierarchy(SampleDto sampleDto) throws IOException {
     if (sampleDto instanceof SampleAliquotDto) {
       SampleAliquotDto dto = (SampleAliquotDto) sampleDto;
       // Some hierarchies have two Aliquot levels
       dto.setParentAliquotClassId(inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleAliquot.CATEGORY_NAME,
           SampleAliquot.CATEGORY_NAME, true));
       Long topAliquotClassId = dto.getParentAliquotClassId() == null ? dto.getSampleClassId() : dto.getParentAliquotClassId();
-      dto.setStockClassId(inferIntermediateSampleClassId(dto, topAliquotClassId, SampleAliquot.CATEGORY_NAME, SampleStock.CATEGORY_NAME,
-          false));
-      // infer grandparent tissue class
-      dto.setParentTissueSampleClassId(inferIntermediateSampleClassId(dto, dto.getStockClassId(),
-          SampleStock.CATEGORY_NAME, SampleTissue.CATEGORY_NAME, false));
+      dto.setStockClassId(
+          inferIntermediateSampleClassId(dto, topAliquotClassId, SampleAliquot.CATEGORY_NAME, SampleStock.CATEGORY_NAME, false));
+      if (dto.getParentId() == null) {
+        // infer tissue processing class if necessary
+        SampleClass processingClass = sampleClassService.getRequiredTissueProcessingClass(dto.getStockClassId());
+        if (processingClass != null) {
+          dto.setTissueProcessingClassId(processingClass.getId());
+          // infer tissue class
+          dto.setParentTissueSampleClassId(inferIntermediateSampleClassId(dto, dto.getTissueProcessingClassId(),
+              SampleTissueProcessing.CATEGORY_NAME, SampleTissue.CATEGORY_NAME, false));
+        } else {
+          // infer tissue class
+          dto.setParentTissueSampleClassId(inferIntermediateSampleClassId(dto, dto.getStockClassId(),
+              SampleStock.CATEGORY_NAME, SampleTissue.CATEGORY_NAME, false));
+        }
+      }
     } else if (sampleDto instanceof SampleStockDto) {
-      DetailedSampleDto dto = (DetailedSampleDto) sampleDto;
-      dto.setParentTissueSampleClassId(
-          inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleStock.CATEGORY_NAME,
-              SampleTissue.CATEGORY_NAME, false));
+      // infer tissue processing class if necessary
+      SampleStockDto dto = (SampleStockDto) sampleDto;
+      SampleClass processingClass = sampleClassService.getRequiredTissueProcessingClass(dto.getSampleClassId());
+      if (processingClass != null) {
+        dto.setTissueProcessingClassId(processingClass.getId());
+        // infer tissue class
+        dto.setParentTissueSampleClassId(
+            inferIntermediateSampleClassId(dto, dto.getTissueProcessingClassId(), SampleTissueProcessing.CATEGORY_NAME,
+                SampleTissue.CATEGORY_NAME, false));
+      } else {
+        // infer tissue class
+        dto.setParentTissueSampleClassId(
+            inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleStock.CATEGORY_NAME,
+                SampleTissue.CATEGORY_NAME, false));
+      }
     } else if (sampleDto instanceof SampleTissueProcessingDto) {
       DetailedSampleDto dto = (DetailedSampleDto) sampleDto;
       Long topProcessingClassId = dto.getSampleClassId();

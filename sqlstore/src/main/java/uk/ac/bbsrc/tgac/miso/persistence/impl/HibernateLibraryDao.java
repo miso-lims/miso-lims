@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -345,6 +346,18 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
     criteria.add(Restrictions.eq("preMigrationId", preMigrationId));
     return (Library) criteria.uniqueResult();
+  }
+
+  @Override
+  public List<LibrarySpikeIn> listSpikeIns() throws IOException {
+    @SuppressWarnings("unchecked")
+    List<LibrarySpikeIn> results = currentSession().createCriteria(LibrarySpikeIn.class).list();
+    return results;
+  }
+
+  @Override
+  public LibrarySpikeIn getSpikeIn(long spikeInId) throws IOException {
+    return (LibrarySpikeIn) currentSession().get(LibrarySpikeIn.class, spikeInId);
   }
 
   public SessionFactory getSessionFactory() {

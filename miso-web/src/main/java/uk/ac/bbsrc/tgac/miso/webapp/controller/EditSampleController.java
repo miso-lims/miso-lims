@@ -79,13 +79,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
@@ -118,11 +121,14 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
 import uk.ac.bbsrc.tgac.miso.dto.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleIdentityDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleLCMTubeDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleSlideDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleStockSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.service.ArrayRunService;
@@ -592,13 +598,6 @@ public class EditSampleController {
         }
       }
     });
-
-    binder.registerCustomEditor(Long.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        setValue(isStringEmptyOrNull(text) ? null : Long.valueOf(text));
-      }
-    });
   }
 
   @GetMapping(value = "/new")
@@ -804,7 +803,7 @@ public class EditSampleController {
       if (target == null || target.getSampleCategory() == null) {
         throw new RestException("Cannot find sample class with ID " + sampleClassId, Status.NOT_FOUND);
       }
-      template = getCorrectDetailedSampleDto(target, sampleClassId);
+      template = getCorrectDetailedSampleDto(target);
     } else {
       if (detailedSample) throw new RestException("Must specify sample class of samples to create", Status.BAD_REQUEST);
       template = new SampleDto();
@@ -825,7 +824,7 @@ public class EditSampleController {
     return new BulkCreateSampleBackend(template.getClass(), template, quantity, project, target).create(model);
   }
 
-  private DetailedSampleDto getCorrectDetailedSampleDto(SampleClass target, Long sampleClassId) {
+  private static DetailedSampleDto getCorrectDetailedSampleDto(SampleClass target) {
     // need to instantiate the correct DetailedSampleDto class to get the correct fields
     final DetailedSampleDto detailedTemplate;
     switch (target.getSampleCategory()) {
@@ -840,20 +839,30 @@ public class EditSampleController {
         detailedTemplate = new SampleSlideDto();
       } else if (SampleLCMTube.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
         detailedTemplate = new SampleLCMTubeDto();
+      } else if (SampleSingleCell.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
+        detailedTemplate = new SampleSingleCellDto();
       } else {
         detailedTemplate = new SampleTissueProcessingDto();
       }
       break;
     case SampleStock.CATEGORY_NAME:
-      detailedTemplate = new SampleStockDto();
+      if (SampleStockSingleCell.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
+        detailedTemplate = new SampleStockSingleCellDto();
+      } else {
+        detailedTemplate = new SampleStockDto();
+      }
       break;
     case SampleAliquot.CATEGORY_NAME:
-      detailedTemplate = new SampleAliquotDto();
+      if (SampleAliquotSingleCell.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
+        detailedTemplate = new SampleAliquotSingleCellDto();
+      } else {
+        detailedTemplate = new SampleAliquotDto();
+      }
       break;
     default:
-      throw new RestException("Unknown category for sample class with ID " + sampleClassId, Status.BAD_REQUEST);
+      throw new RestException("Unknown category for sample class with ID " + target.getId(), Status.BAD_REQUEST);
     }
-    detailedTemplate.setSampleClassId(sampleClassId);
+    detailedTemplate.setSampleClassId(target.getId());
     return detailedTemplate;
   }
 
@@ -866,12 +875,21 @@ public class EditSampleController {
       if (builder.getTissueClass() != null) {
         builder.setTissueClass(sampleClassService.get(builder.getTissueClass().getId()));
       }
-      if (builder.getParent() == null && builder.getSampleClass().getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)) {
-        builder.setStockClass(sampleClassService.inferParentFromChild(builder.getSampleClass().getId(), SampleAliquot.CATEGORY_NAME,
-            SampleStock.CATEGORY_NAME));
-        if (builder.getStockClass() == null) {
-          throw new IllegalStateException(String.format("%s class with id %d has no %s parents", SampleAliquot.CATEGORY_NAME,
-              builder.getSampleClass().getId(), SampleStock.CATEGORY_NAME));
+      if (builder.getParent() == null) {
+        SampleClass stockClass = null;
+        if (builder.getSampleClass().getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)) {
+          stockClass = sampleClassService.inferParentFromChild(builder.getSampleClass().getId(), SampleAliquot.CATEGORY_NAME,
+              SampleStock.CATEGORY_NAME);
+          builder.setStockClass(stockClass);
+          if (builder.getStockClass() == null) {
+            throw new IllegalStateException(String.format("%s class with id %d has no %s parents", SampleAliquot.CATEGORY_NAME,
+                builder.getSampleClass().getId(), SampleStock.CATEGORY_NAME));
+          }
+        } else if (builder.getSampleClass().getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
+          stockClass = builder.getSampleClass();
+        }
+        if (builder.getTissueProcessingClass() == null && stockClass != null) {
+          builder.setTissueProcessingClass(sampleClassService.getRequiredTissueProcessingClass(stockClass.getId()));
         }
       }
       sample = builder.build();
@@ -945,35 +963,9 @@ public class EditSampleController {
 
     @Override
     protected SampleDto createDtoFromParent(Sample item) {
-      DetailedSampleDto dto;
       if (LimsUtils.isDetailedSample(item)) {
         DetailedSample sample = (DetailedSample) item;
-        if (targetSampleClass == null) {
-          throw new IllegalArgumentException("Target sample class not set!");
-        } else {
-          switch (targetSampleClass.getSampleCategory()) {
-          case SampleTissue.CATEGORY_NAME:
-            dto = new SampleTissueDto();
-            break;
-          case SampleTissueProcessing.CATEGORY_NAME:
-            if (targetSampleClass.getAlias().equals("Slide")) {
-              dto = new SampleSlideDto();
-            } else if (targetSampleClass.getAlias().equals("LCM Tube")) {
-              dto = new SampleLCMTubeDto();
-            } else {
-              dto = new SampleTissueProcessingDto();
-            }
-            break;
-          case SampleStock.CATEGORY_NAME:
-            dto = new SampleStockDto();
-            break;
-          case SampleAliquot.CATEGORY_NAME:
-            dto = new SampleAliquotDto();
-            break;
-          default:
-            throw new IllegalArgumentException("Cannot determine sample category");
-          }
-        }
+        DetailedSampleDto dto = EditSampleController.getCorrectDetailedSampleDto(targetSampleClass);
         dto.setScientificName(sample.getScientificName());
         dto.setSampleType(sample.getSampleType());
         dto.setParentId(sample.getId());
@@ -987,15 +979,12 @@ public class EditSampleController {
         }
         dto.setGroupId(sample.getGroupId());
         dto.setGroupDescription(sample.getGroupDescription());
-
-        dto.setSampleClassId(targetSampleClass.getId());
         sourceSampleClass = sample.getSampleClass();
-
         dto.setBox(newBox);
+        return dto;
       } else {
         throw new IllegalArgumentException("Cannot create plain samples from other plain samples!");
       }
-      return dto;
     }
 
     @Override

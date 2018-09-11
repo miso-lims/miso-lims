@@ -490,7 +490,7 @@ public class ValueTypeLookupTest {
 
   private QcType makeQcType(Long id, String name) {
     QcType qc = new QcType();
-    qc.setQcTypeId(id == null ? QcType.UNSAVED_ID : id);
+    qc.setId(id == null ? QcType.UNSAVED_ID : id);
     qc.setName(name);
     return qc;
   }

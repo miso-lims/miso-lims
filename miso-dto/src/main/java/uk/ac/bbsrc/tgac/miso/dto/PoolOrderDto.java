@@ -12,6 +12,8 @@ public class PoolOrderDto {
   private String updatedByUrl;
   private String lastUpdated;
   private String url;
+  private String description;
+
 
   public Long getId() {
     return id;
@@ -99,6 +101,14 @@ public class PoolOrderDto {
 
   public void setUrl(String url) {
     this.url = url;
+  }
+
+  public String getDescription(){
+    return description;
+  }
+
+  public void setDescription(String description){
+    this.description = description;
   }
 
 }

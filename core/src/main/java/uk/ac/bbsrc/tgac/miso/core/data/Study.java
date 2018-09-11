@@ -41,8 +41,6 @@ public interface Study extends SecurableByProfile, Comparable<Study>, Deletable,
   /** Field PREFIX */
   public static final String PREFIX = "STU";
 
-  public void setId(long id);
-
   /**
    * Returns the project of this Study object.
    * 
@@ -156,10 +154,12 @@ public interface Study extends SecurableByProfile, Comparable<Study>, Deletable,
   /**
    * Returns the user who last modified this item.
    */
+  @Override
   public User getLastModifier();
 
   /**
    * Sets the user who last modified this item. It should always be set to the current user on save.
    */
+  @Override
   public void setLastModifier(User user);
 }

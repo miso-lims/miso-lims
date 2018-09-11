@@ -55,6 +55,9 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   // columns specific to creating curls
   private static final Set<String> curlsColumns = Sets.newHashSet();
 
+  // columns specific to creating single cells (tissue processing)
+  private static final Set<String> singleCellColumns = Sets.newHashSet(SamColumns.INITIAL_CELL_CONC, SamColumns.DIGESTION);
+
   // columns specific to creating gDNA stocks
   private static final Set<String> gDnaStockColumns = Sets.newHashSet(SamColumns.STR_STATUS, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
       SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
@@ -63,8 +66,13 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   private static final Set<String> rnaStockColumns = Sets.newHashSet(SamColumns.STR_STATUS, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
       SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.DNASE_TREATED);
 
+  private static final Set<String> singleCellStockColumns = Sets.newHashSet(SamColumns.TARGET_CELL_RECOVERERY, SamColumns.CELL_VIABILITY,
+      SamColumns.LOADING_CELL_CONC);
+
   // columns specific to creating aliquots
   private static final Set<String> aliquotColumns = Sets.newHashSet(SamColumns.PURPOSE);
+
+  private static final Set<String> singleCellAliquotColumns = Sets.newHashSet(SamColumns.INPUT_INTO_LIBRARY);
 
   @Before
   public void setup() {
@@ -93,13 +101,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(tissueColumns);
 
     BulkSamplePage page = getCreatePage(1, null, tissueClassId);
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(expectedHeadings.size(), headings.size());
-    for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
+    assertTableSetup(page.getTable(), expectedHeadings, 1);
   }
 
   @Test
@@ -338,13 +340,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(slideColumns);
 
     BulkSamplePage page = getCreatePage(1, null, slideClassId);
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(expectedHeadings.size(), headings.size());
-    for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
+    assertTableSetup(page.getTable(), expectedHeadings, 1);
   }
 
   @Test
@@ -466,13 +462,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(curlsColumns);
 
     BulkSamplePage page = getCreatePage(1, null, curlsClassId);
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(expectedHeadings.size(), headings.size());
-    for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
+    assertTableSetup(page.getTable(), expectedHeadings, 1);
   }
 
   @Test
@@ -564,6 +554,63 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   }
 
   @Test
+  public void testCreateSingleCellSetup() throws Exception {
+    // Goal: ensure all expected fields are present and no extra
+    Set<String> expectedHeadings = Sets.newHashSet();
+    expectedHeadings.addAll(identityColumns);
+    expectedHeadings.addAll(tissueColumns);
+    expectedHeadings.addAll(singleCellColumns);
+
+    BulkSamplePage page = getCreatePage(1, null, singleCellClassId);
+    assertTableSetup(page.getTable(), expectedHeadings, 1);
+  }
+
+  @Test
+  public void testCreateOneSingleCell() throws Exception {
+    // Goal: ensure one Single Cell can be saved
+    BulkSamplePage page = getCreatePage(1, null, singleCellClassId);
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> singleCell = new HashMap<>();
+    singleCell.put(SamColumns.DESCRIPTION, "Description");
+    singleCell.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    singleCell.put(SamColumns.ID_BARCODE, "105");
+    singleCell.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
+    singleCell.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
+    singleCell.put(SamColumns.PROJECT, "PRO1");
+    singleCell.put(SamColumns.EXTERNAL_NAME, "ext5");
+    singleCell.put(SamColumns.GROUP_ID, "1");
+    singleCell.put(SamColumns.GROUP_DESCRIPTION, "Test one");
+    singleCell.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
+    singleCell.put(SamColumns.TISSUE_TYPE, "P (Primary tumour)");
+    singleCell.put(SamColumns.PASSAGE_NUMBER, "");
+    singleCell.put(SamColumns.TIMES_RECEIVED, "1");
+    singleCell.put(SamColumns.TUBE_NUMBER, "1");
+    singleCell.put(SamColumns.LAB, "BioBank (University Health Network)");
+    singleCell.put(SamColumns.SECONDARY_ID, "tube id 1");
+    singleCell.put(SamColumns.TISSUE_MATERIAL, "FFPE");
+    singleCell.put(SamColumns.REGION, "Medulla oblongata");
+    singleCell.put(SamColumns.QC_STATUS, "Ready");
+    singleCell.put(SamColumns.INITIAL_CELL_CONC, "12.34");
+    singleCell.put(SamColumns.DIGESTION, "abcde");
+
+    singleCell.forEach((k, v) -> table.enterText(k, 0, v));
+    // need to enter this here, after project is entered otherwise identity lookup fails
+    singleCell.put(SamColumns.EXTERNAL_NAME, "ext5"); // increment
+    table.enterText(SamColumns.EXTERNAL_NAME, 0, singleCell.get(SamColumns.EXTERNAL_NAME));
+
+    assertIdentityLookupWasSuccessful(table, 0);
+
+    saveSingleAndAssertSuccess(table);
+
+    singleCell.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
+    singleCell.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+
+    // verify attributes against what got saved to the database
+    assertAllForSingleCell(singleCell, getIdForRow(table, 0), true);
+  }
+
+  @Test
   public void testCreateGdnaStockSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
     Set<String> expectedHeadings = Sets.newHashSet();
@@ -572,13 +619,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(gDnaStockColumns);
 
     BulkSamplePage page = getCreatePage(1, null, gStockClassId);
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(expectedHeadings.size(), headings.size());
-    for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
+    assertTableSetup(page.getTable(), expectedHeadings, 1);
   }
 
   @Test
@@ -690,6 +731,70 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   }
 
   @Test
+  public void testCreateSingleCellStockSetup() throws Exception {
+    // Goal: ensure all expected fields are present and no extra
+    Set<String> expectedHeadings = Sets.newHashSet();
+    expectedHeadings.addAll(identityColumns);
+    expectedHeadings.addAll(tissueColumns);
+    expectedHeadings.addAll(singleCellColumns);
+    expectedHeadings.addAll(gDnaStockColumns);
+    expectedHeadings.addAll(singleCellStockColumns);
+
+    BulkSamplePage page = getCreatePage(1, null, singleCellStockClassId);
+    assertTableSetup(page.getTable(), expectedHeadings, 1);
+  }
+
+  @Test
+  public void testCreateOneSingleCellStock() throws Exception {
+    // Goal: ensure one Single Cell DNA (stock) can be saved
+    BulkSamplePage page = getCreatePage(1, null, singleCellStockClassId);
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> stock = new HashMap<>();
+    stock.put(SamColumns.DESCRIPTION, "Description");
+    stock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    stock.put(SamColumns.ID_BARCODE, "107"); // increment
+    stock.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
+    stock.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
+    stock.put(SamColumns.PROJECT, "PRO1");
+    stock.put(SamColumns.GROUP_ID, "1");
+    stock.put(SamColumns.GROUP_DESCRIPTION, "Test one");
+    stock.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
+    stock.put(SamColumns.TISSUE_TYPE, "P (Primary tumour)");
+    stock.put(SamColumns.PASSAGE_NUMBER, "");
+    stock.put(SamColumns.TIMES_RECEIVED, "1");
+    stock.put(SamColumns.TUBE_NUMBER, "1");
+    stock.put(SamColumns.LAB, "BioBank (University Health Network)");
+    stock.put(SamColumns.SECONDARY_ID, "tube id 1");
+    stock.put(SamColumns.TISSUE_MATERIAL, "FFPE");
+    stock.put(SamColumns.REGION, "Medulla oblongata");
+    stock.put(SamColumns.STR_STATUS, "Submitted");
+    stock.put(SamColumns.VOLUME, "10.0");
+    stock.put(SamColumns.CONCENTRATION, "3.75");
+    stock.put(SamColumns.QC_STATUS, "Ready");
+    stock.put(SamColumns.INITIAL_CELL_CONC, "12.34");
+    stock.put(SamColumns.DIGESTION, "abcde");
+    stock.put(SamColumns.TARGET_CELL_RECOVERERY, "23.45");
+    stock.put(SamColumns.CELL_VIABILITY, "34.56");
+    stock.put(SamColumns.LOADING_CELL_CONC, "45.67");
+
+    stock.forEach((k, v) -> table.enterText(k, 0, v));
+    // need to enter this here, after project is entered otherwise identity lookup fails
+    stock.put(SamColumns.EXTERNAL_NAME, "ext7"); // increment
+    table.enterText(SamColumns.EXTERNAL_NAME, 0, stock.get(SamColumns.EXTERNAL_NAME));
+
+    assertIdentityLookupWasSuccessful(table, 0);
+
+    saveSingleAndAssertSuccess(table);
+
+    stock.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
+    stock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+
+    // verify attributes against what got saved to the database
+    assertAllForSingleCellStock(stock, getIdForRow(table, 0), true);
+  }
+
+  @Test
   public void testCreateRnaStockSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
     Set<String> expectedHeadings = Sets.newHashSet();
@@ -698,13 +803,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(rnaStockColumns);
 
     BulkSamplePage page = getCreatePage(1, null, rStockClassId);
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(expectedHeadings.size(), headings.size());
-    for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
+    assertTableSetup(page.getTable(), expectedHeadings, 1);
   }
 
   @Test
@@ -828,13 +927,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(aliquotColumns);
 
     BulkSamplePage page = getCreatePage(1, null, gAliquotClassId);
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(expectedHeadings.size(), headings.size());
-    for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
+    assertTableSetup(page.getTable(), expectedHeadings, 1);
   }
 
   @Test
@@ -896,7 +989,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     // verify attributes against what got saved to the database
     assertAllForAliquot(gDnaAliquot, getIdForRow(table, 0), true, false);
-
   }
 
   @Test
@@ -950,6 +1042,73 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   }
 
   @Test
+  public void testCreateSingleCellAliquotSetup() throws Exception {
+    // Goal: ensure all expected fields are present and no extra
+    Set<String> expectedHeadings = Sets.newHashSet();
+    expectedHeadings.addAll(identityColumns);
+    expectedHeadings.addAll(tissueColumns);
+    expectedHeadings.addAll(singleCellColumns);
+    expectedHeadings.addAll(gDnaStockColumns);
+    expectedHeadings.addAll(singleCellStockColumns);
+    expectedHeadings.addAll(aliquotColumns);
+    expectedHeadings.addAll(singleCellAliquotColumns);
+
+    BulkSamplePage page = getCreatePage(1, null, singleCellAliquotClassId);
+    assertTableSetup(page.getTable(), expectedHeadings, 1);
+  }
+
+  @Test
+  public void testCreateOneSingleCellAliquotNoProject() throws Exception {
+    // Goal: ensure one Single Cell DNA (aliquot) can be saved
+    BulkSamplePage page = getCreatePage(1, null, singleCellAliquotClassId);
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> aliquot = new HashMap<>();
+    aliquot.put(SamColumns.DESCRIPTION, "Description");
+    aliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    aliquot.put(SamColumns.ID_BARCODE, "111"); // increment
+    aliquot.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
+    aliquot.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
+    aliquot.put(SamColumns.PROJECT, "PRO1");
+    aliquot.put(SamColumns.GROUP_ID, "1");
+    aliquot.put(SamColumns.GROUP_DESCRIPTION, "Test one");
+    aliquot.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
+    aliquot.put(SamColumns.TISSUE_TYPE, "P (Primary tumour)");
+    aliquot.put(SamColumns.PASSAGE_NUMBER, "");
+    aliquot.put(SamColumns.TIMES_RECEIVED, "1");
+    aliquot.put(SamColumns.TUBE_NUMBER, "1");
+    aliquot.put(SamColumns.LAB, "BioBank (University Health Network)");
+    aliquot.put(SamColumns.SECONDARY_ID, "tube id 1");
+    aliquot.put(SamColumns.TISSUE_MATERIAL, "FFPE");
+    aliquot.put(SamColumns.REGION, "Medulla oblongata");
+    aliquot.put(SamColumns.STR_STATUS, "Submitted");
+    aliquot.put(SamColumns.VOLUME, "10.0");
+    aliquot.put(SamColumns.CONCENTRATION, "3.75");
+    aliquot.put(SamColumns.QC_STATUS, "Ready");
+    aliquot.put(SamColumns.PURPOSE, "Library");
+    aliquot.put(SamColumns.INITIAL_CELL_CONC, "12.34");
+    aliquot.put(SamColumns.DIGESTION, "abcde");
+    aliquot.put(SamColumns.TARGET_CELL_RECOVERERY, "23.45");
+    aliquot.put(SamColumns.CELL_VIABILITY, "34.56");
+    aliquot.put(SamColumns.LOADING_CELL_CONC, "45.67");
+
+    aliquot.forEach((k, v) -> table.enterText(k, 0, v));
+    // need to enter this here, after project is entered otherwise identity lookup fails
+    aliquot.put(SamColumns.EXTERNAL_NAME, "ext11"); // increment
+    table.enterText(SamColumns.EXTERNAL_NAME, 0, aliquot.get(SamColumns.EXTERNAL_NAME));
+
+    assertIdentityLookupWasSuccessful(table, 0);
+
+    saveSingleAndAssertSuccess(table);
+
+    aliquot.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
+    aliquot.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+
+    // verify attributes against what got saved to the database
+    assertAllForSingleCellAliquot(aliquot, getIdForRow(table, 0), true);
+  }
+
+  @Test
   public void testCreateRnaAliquotSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
     Set<String> expectedHeadings = Sets.newHashSet();
@@ -959,13 +1118,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(aliquotColumns);
 
     BulkSamplePage page = getCreatePage(1, null, rAliquotClassId);
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(expectedHeadings.size(), headings.size());
-    for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
+    assertTableSetup(page.getTable(), expectedHeadings, 1);
   }
 
   @Test
@@ -1070,13 +1223,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   public void testCreateIdentitySetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
     BulkSamplePage page = getCreatePage(1, null, identityClassId);
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(identityColumns.size(), headings.size());
-    for (String col : identityColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
+    assertTableSetup(page.getTable(), identityColumns, 1);
   }
 
   @Test
@@ -1199,6 +1346,15 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   private void assertIdentityLookupWasSuccessful(HandsOnTable table, int rowNum) {
     table.waitForSearch(SamColumns.IDENTITY_ALIAS, rowNum);
     assertEquals("identity lookup was successful", "First Receipt (PRO1)", table.getText(SamColumns.IDENTITY_ALIAS, 0));
+  }
+
+  private void assertTableSetup(HandsOnTable table, Set<String> expectedHeadings, int expectedRows) {
+    List<String> headings = table.getColumnHeadings();
+    assertEquals(expectedHeadings.size(), headings.size());
+    for (String col : expectedHeadings) {
+      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+    }
+    assertEquals(expectedRows, table.getRowCount());
   }
 
 }

@@ -57,8 +57,6 @@ public interface Sample
 
   public static final String CONCENTRATION_UNITS = "ng/µL";
 
-  public void setId(long id);
-
   /**
    * Returns the accession of this Sample object.
    * 

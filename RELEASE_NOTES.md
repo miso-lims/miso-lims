@@ -1,3 +1,17 @@
+# 0.2.141
+
+Changes:
+
+ * Corrected project shortname for libraries and dilutions in Pinery
+ * Converted ONT FlowCellVersions into container models
+ * Set default concentration for dilutions and single-dilution pools
+ * Fixed trimmed dropdowns to display full text
+ * Added options for Library spike-ins
+ * Reordered tables on the Run page
+ * Added Single Cell Sample Classes (detailed sample mode)
+ * Added floor map link for storage locations
+ * Added 'description' field to orders
+
 # 0.2.140
 
 Changes:

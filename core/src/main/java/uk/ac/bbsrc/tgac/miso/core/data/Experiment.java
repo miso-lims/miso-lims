@@ -342,6 +342,7 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, N
     this.description = description;
   }
 
+  @Override
   public void setId(long id) {
     this.experimentId = id;
   }

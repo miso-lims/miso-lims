@@ -6,8 +6,6 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface PoolOrder extends Deletable {
 
-  public void setId(Long id);
-
   public Pool getPool();
 
   public void setPool(Pool pool);
@@ -36,4 +34,7 @@ public interface PoolOrder extends Deletable {
 
   public void setLastUpdated(Date lastUpdated);
 
+  public String getDescription();
+
+  public void setDescription(String description);
 }

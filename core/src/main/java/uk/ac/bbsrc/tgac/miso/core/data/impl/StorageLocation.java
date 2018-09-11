@@ -43,14 +43,14 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
   }
 
   public enum LocationUnit {
-    ROOM("Room", Collections.emptySet(), BoxStorageAmount.NONE),
-    FREEZER("Freezer", Sets.newHashSet(ROOM), BoxStorageAmount.NONE),
-    SHELF("Shelf", Sets.newHashSet(FREEZER), BoxStorageAmount.NONE),
-    RACK("Rack", Sets.newHashSet(SHELF), BoxStorageAmount.NONE),
-    STACK("Stack", Sets.newHashSet(FREEZER, SHELF, RACK), BoxStorageAmount.NONE),
-    STACK_POSITION("Slot", Sets.newHashSet(STACK), BoxStorageAmount.SINGLE),
-    LOOSE_STORAGE("Loose Storage", Sets.newHashSet(SHELF), BoxStorageAmount.MULTIPLE),
-    TRAY_RACK("Tray Rack", Sets.newHashSet(SHELF), BoxStorageAmount.NONE),
+    ROOM("Room", Collections.emptySet(), BoxStorageAmount.NONE), //
+    FREEZER("Freezer", Sets.newHashSet(ROOM), BoxStorageAmount.NONE), //
+    SHELF("Shelf", Sets.newHashSet(FREEZER), BoxStorageAmount.NONE), //
+    RACK("Rack", Sets.newHashSet(SHELF), BoxStorageAmount.NONE), //
+    STACK("Stack", Sets.newHashSet(FREEZER, SHELF, RACK), BoxStorageAmount.NONE), //
+    STACK_POSITION("Slot", Sets.newHashSet(STACK), BoxStorageAmount.SINGLE), //
+    LOOSE_STORAGE("Loose Storage", Sets.newHashSet(SHELF), BoxStorageAmount.MULTIPLE), //
+    TRAY_RACK("Tray Rack", Sets.newHashSet(SHELF), BoxStorageAmount.NONE), //
     TRAY("Tray", Sets.newHashSet(TRAY_RACK), BoxStorageAmount.MULTIPLE);
 
     private final String displayName;
@@ -117,11 +117,14 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
   @OneToMany(targetEntity = StorageLocationChangeLog.class, mappedBy = "storageLocation", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
+  private String mapUrl;
+
   @Override
   public long getId() {
     return id;
   }
 
+  @Override
   public void setId(long id) {
     this.id = id;
   }
@@ -194,11 +197,12 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
   public String getFullDisplayLocation() {
     return (getParentLocation() == null ? "" : getParentLocation().getFullDisplayLocation() + ", ") + getDisplayLocation();
   }
-  
+
   public String getFreezerDisplayLocation() {
     return ((getParentLocation() == null || getParentLocation().getLocationUnit() == LocationUnit.FREEZER
         || getParentLocation().getLocationUnit() == LocationUnit.ROOM) ? ""
-        : getParentLocation().getFreezerDisplayLocation() + ", ") + getDisplayLocation();
+            : getParentLocation().getFreezerDisplayLocation() + ", ")
+        + getDisplayLocation();
   }
 
   @Override
@@ -272,6 +276,7 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
     result = prime * result + ((identificationBarcode == null) ? 0 : identificationBarcode.hashCode());
     result = prime * result + ((locationUnit == null) ? 0 : locationUnit.hashCode());
     result = prime * result + ((parentLocation == null) ? 0 : parentLocation.hashCode());
+    result = prime * result + ((mapUrl == null) ? 0 : mapUrl.hashCode());
     return result;
   }
 
@@ -298,7 +303,18 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
     if (parentLocation == null) {
       if (other.parentLocation != null) return false;
     } else if (!parentLocation.equals(other.parentLocation)) return false;
+    if (mapUrl == null) {
+      if (other.mapUrl != null) return false;
+    } else if (!mapUrl.equals(other.mapUrl)) return false;
     return true;
+  }
+
+  public String getMapUrl() {
+    return mapUrl;
+  }
+
+  public void setMapUrl(String url) {
+    this.mapUrl = url;
   }
 
 }

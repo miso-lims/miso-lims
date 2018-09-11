@@ -41,7 +41,7 @@ public class BulkLibraryIT extends AbstractIT {
       LibColumns.GROUP_ID, LibColumns.GROUP_DESC, LibColumns.DESIGN, LibColumns.CODE, LibColumns.PLATFORM, LibColumns.LIBRARY_TYPE,
       LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2,
       LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.VOLUME, LibColumns.VOLUME_UNITS,
-      LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS);
+      LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS, LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
 
   private static final Set<String> editColumns = Sets.newHashSet(LibColumns.RECEIVE_DATE, LibColumns.SAMPLE_ALIAS,
       LibColumns.SAMPLE_LOCATION, LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE);
@@ -137,7 +137,7 @@ public class BulkLibraryIT extends AbstractIT {
     assertTrue(designs.contains("AS"));
 
     Set<String> codes = table.getDropdownOptions(LibColumns.CODE, 0);
-    assertEquals(9, codes.size());
+    assertEquals(10, codes.size());
     assertTrue(codes.contains("EX"));
     assertTrue(codes.contains("MR"));
 
@@ -348,6 +348,9 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.SIZE, "251");
     attrs.put(LibColumns.VOLUME, "2.5");
     attrs.put(LibColumns.CONCENTRATION, "10.0");
+    attrs.put(LibColumns.SPIKE_IN, "Spike-In One");
+    attrs.put(LibColumns.SPIKE_IN_DILUTION, "1:10");
+    attrs.put(LibColumns.SPIKE_IN_VOL, "12.34");
     assertColumnValues(table, 0, attrs, "loaded");
 
     Map<String, String> changes = Maps.newLinkedHashMap();
@@ -363,6 +366,9 @@ public class BulkLibraryIT extends AbstractIT {
     changes.put(LibColumns.SIZE, "241");
     changes.put(LibColumns.VOLUME, "1.88");
     changes.put(LibColumns.CONCENTRATION, "12.34");
+    changes.put(LibColumns.SPIKE_IN, "Spike-In Two");
+    changes.put(LibColumns.SPIKE_IN_DILUTION, "1:1000");
+    changes.put(LibColumns.SPIKE_IN_VOL, "43.21");
     fillRow(table, 0, changes);
 
     // unchanged
@@ -409,6 +415,9 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.SIZE, "252");
     attrs.put(LibColumns.VOLUME, "4.0");
     attrs.put(LibColumns.CONCENTRATION, "6.3");
+    attrs.put(LibColumns.SPIKE_IN, "Spike-In One");
+    attrs.put(LibColumns.SPIKE_IN_DILUTION, "1:10");
+    attrs.put(LibColumns.SPIKE_IN_VOL, "12.34");
     assertColumnValues(table, 0, attrs, "loaded");
 
     // make changes
@@ -424,11 +433,14 @@ public class BulkLibraryIT extends AbstractIT {
     changes.put(LibColumns.SIZE, "241");
     changes.put(LibColumns.VOLUME, "1.88");
     changes.put(LibColumns.CONCENTRATION, "12.34");
+    changes.put(LibColumns.SPIKE_IN, "(None)");
     fillRow(table, 0, changes);
 
     // set based on other changes
     changes.put(LibColumns.INDEX_1, NO_INDEX);
     changes.put(LibColumns.INDEX_2, NO_INDEX);
+    changes.put(LibColumns.SPIKE_IN_DILUTION, "n/a");
+    changes.put(LibColumns.SPIKE_IN_VOL, "");
 
     // unchanged
     attrs.forEach((key, val) -> {
@@ -469,6 +481,9 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.SIZE, null);
     attrs.put(LibColumns.VOLUME, null);
     attrs.put(LibColumns.CONCENTRATION, null);
+    attrs.put(LibColumns.SPIKE_IN, "(None)");
+    attrs.put(LibColumns.SPIKE_IN_DILUTION, "n/a");
+    attrs.put(LibColumns.SPIKE_IN_VOL, null);
     assertColumnValues(table, 0, attrs, "loaded");
 
     Map<String, String> changes = Maps.newLinkedHashMap();
@@ -482,6 +497,9 @@ public class BulkLibraryIT extends AbstractIT {
     changes.put(LibColumns.SIZE, "253");
     changes.put(LibColumns.VOLUME, "18.0");
     changes.put(LibColumns.CONCENTRATION, "7.6");
+    changes.put(LibColumns.SPIKE_IN, "Spike-In Two");
+    changes.put(LibColumns.SPIKE_IN_DILUTION, "1:100");
+    changes.put(LibColumns.SPIKE_IN_VOL, "123.4567890");
     fillRow(table, 0, changes);
 
     // changed because of design

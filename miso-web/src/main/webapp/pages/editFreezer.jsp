@@ -82,6 +82,13 @@
         <div id="identificationBarcodeError" class="errorContainer"></div>
       </td>
     </tr>
+    <tr>
+      <td class="h">Map URL:</td>
+      <td>
+        <input type="text" id="mapUrl"/><span id="mapUrlCounter" class="counter"></span>
+        <div id="mapUrlError" class="errorContainer"></div>
+      </td>
+    </tr>
   </table>
 </div>
 
@@ -98,6 +105,13 @@ jQuery(document).ready(function() {
     counter: '#identificationBarcodeCounter',
     countType: 'characters',
     maxCount: ${maxLengths['identificationBarcode']},
+    countDirection: 'down'
+  });
+
+  jQuery('#mapUrl').simplyCountable({
+    counter: '#mapUrlCounter',
+    countType: 'characters',
+    maxCount: ${maxLengths['mapUrl']},
     countDirection: 'down'
   });
 });

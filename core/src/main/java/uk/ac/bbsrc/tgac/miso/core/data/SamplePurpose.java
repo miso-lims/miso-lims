@@ -7,8 +7,6 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface SamplePurpose extends Serializable, Aliasable, Deletable {
 
-  void setId(long samplePurposeId);
-
   void setAlias(String alias);
 
   User getCreatedBy();

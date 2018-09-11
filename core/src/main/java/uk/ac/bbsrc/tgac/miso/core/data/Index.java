@@ -117,6 +117,7 @@ public class Index implements Nameable, Serializable {
     this.family = family;
   }
 
+  @Override
   public void setId(long id) {
     this.indexId = id;
   }

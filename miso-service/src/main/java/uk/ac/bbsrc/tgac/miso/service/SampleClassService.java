@@ -16,8 +16,10 @@ public interface SampleClassService {
 
   Set<SampleClass> getAll() throws IOException;
 
-  public SampleClass inferParentFromChild(long childClassId, String childCategory, String parentCategory);
+  SampleClass inferParentFromChild(long childClassId, String childCategory, String parentCategory);
 
   List<SampleClass> listByCategory(String sampleCategory) throws IOException;
+
+  SampleClass getRequiredTissueProcessingClass(Long childClassId) throws IOException;
 
 }

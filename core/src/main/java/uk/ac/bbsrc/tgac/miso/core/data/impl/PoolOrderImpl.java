@@ -58,13 +58,16 @@ public class PoolOrderImpl implements PoolOrder, Serializable {
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
+  @Column(nullable = true, length = 255, name = "description")
+  private String description;
+
   @Override
   public long getId() {
     return poolOrderId;
   }
 
   @Override
-  public void setId(Long id) {
+  public void setId(long id) {
     this.poolOrderId = id;
   }
 
@@ -136,6 +139,16 @@ public class PoolOrderImpl implements PoolOrder, Serializable {
   @Override
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
+  }
+
+  @Override
+  public String getDescription(){
+    return description;
+  }
+
+  @Override
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   @Override

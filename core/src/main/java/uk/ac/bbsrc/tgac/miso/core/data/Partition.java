@@ -51,14 +51,6 @@ public interface Partition extends Identifiable, Comparable<Partition>, Serializ
   void setSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer);
 
   /**
-   * Sets the id of this Partition object.
-   * 
-   * @param id
-   *          id.
-   */
-  void setId(long id);
-
-  /**
    * Returns the partitionNumber, relative to the parent SequencerPartitionContainer, of this Partition object.
    * 
    * @return Integer partitionNumber.
