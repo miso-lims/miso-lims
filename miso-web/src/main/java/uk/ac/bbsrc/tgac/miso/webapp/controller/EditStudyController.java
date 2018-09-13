@@ -119,7 +119,7 @@ public class EditStudyController {
     Study study = new StudyImpl(user);
 
     authorizationManager.throwIfNotWritable(study);
-	    return setupForm(study, user, "New Study", model);
+    return setupForm(study, user, "New Study", model);
   }
 
   @GetMapping(value = "/new/{projectId}")
