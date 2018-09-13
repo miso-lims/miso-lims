@@ -64,10 +64,8 @@ public class EditUserController {
 
   @Autowired
   private SecurityManager securityManager;
-
   @Autowired
   private AuthorizationManager authorizationManager;
-
   @Autowired
   private PasswordCodecService passwordCodecService;
 

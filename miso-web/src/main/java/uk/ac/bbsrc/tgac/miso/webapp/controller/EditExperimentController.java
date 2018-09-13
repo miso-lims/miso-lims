@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -56,6 +55,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
 @RequestMapping("/experiment")
@@ -66,6 +66,8 @@ public class EditExperimentController {
   @Autowired
   private ExperimentService experimentService;
 
+  @Autowired
+  private AuthorizationManager authorizationManager;
   @Autowired
   private SecurityManager securityManager;
 
@@ -83,14 +85,10 @@ public class EditExperimentController {
     return "redirect:/miso/experiment/" + experiment.getId();
   }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
   @RequestMapping(value = "/{experimentId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long experimentId, ModelMap model) throws IOException {
     Experiment experiment = experimentService.get(experimentId);
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     if (experiment == null) throw new NotFoundException("No experiment found for ID " + experimentId.toString());
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode consumableConfig = mapper.createObjectNode();

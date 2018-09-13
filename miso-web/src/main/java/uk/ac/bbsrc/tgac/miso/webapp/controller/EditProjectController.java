@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
@@ -85,6 +84,7 @@ import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ExternalUriBuilder;
 
 @Controller
@@ -93,6 +93,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.context.ExternalUriBuilder;
 public class EditProjectController {
   private static final Logger log = LoggerFactory.getLogger(EditProjectController.class);
 
+  @Autowired
+  private AuthorizationManager authorizationManager;
   @Autowired
   private SecurityManager securityManager;
   @Autowired
@@ -117,10 +119,6 @@ public class EditProjectController {
   private LibraryDilutionService dilutionService;
   @Autowired
   private StudyService studyService;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -246,7 +244,7 @@ public class EditProjectController {
   @GetMapping("/{projectId}")
   public ModelAndView setupForm(@PathVariable Long projectId, ModelMap model) throws IOException {
     List<Issue> issues = Collections.emptyList();
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     Project project = null;
     if (projectId == ProjectImpl.UNSAVED_ID) {
       project = new ProjectImpl(user);

@@ -49,7 +49,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
@@ -135,6 +134,7 @@ import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkMergeTableBackend;
@@ -180,8 +180,9 @@ public class EditLibraryController {
   }
 
   @Autowired
+  private AuthorizationManager authorizationManager;
+  @Autowired
   private SecurityManager securityManager;
-
   @Autowired
   private IndexService indexService;
   @Autowired
@@ -225,10 +226,6 @@ public class EditLibraryController {
 
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
 
   public void setIndexService(IndexService indexService) {
@@ -558,7 +555,7 @@ public class EditLibraryController {
 
   @GetMapping(value = "/new/{sampleId}")
   public ModelAndView newAssignedLibrary(@PathVariable Long sampleId, ModelMap model) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     Sample sample = sampleService.get(sampleId);
     Library library = (isDetailedSampleEnabled() ? new DetailedLibraryImpl() : new LibraryImpl());
     library.setSample(sample);
@@ -581,7 +578,7 @@ public class EditLibraryController {
 
   @GetMapping(value = "/{libraryId}")
   public ModelAndView setupForm(@PathVariable Long libraryId, ModelMap model) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     Library library = libraryService.get(libraryId);
     if (library == null) throw new NotFoundException("No library found for ID " + libraryId.toString());
     model.put("title", "Library " + library.getId());
@@ -590,7 +587,7 @@ public class EditLibraryController {
 
   @GetMapping(value = "/dilution/{dilutionId}")
   public ModelAndView setupFormByDilution(@PathVariable Long dilutionId, ModelMap model) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     LibraryDilution dilution = dilutionService.get(dilutionId);
     model.put("title", "Library " + dilution.getLibrary().getId());
     return setupForm(user, dilution.getLibrary(), model);
