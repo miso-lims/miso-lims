@@ -90,7 +90,7 @@
         <td class="h">Project Name:</td>
         <td>
         <c:choose>
-          <c:when test="${study.project != null}">
+          <c:when test="${not empty study.project}">
             <input type="hidden" value="${study.project.id}" name="project" id="project"/>
             <a href='<c:url value="/miso/project/${study.project.id}"/>'><span id="projectName">${study.project.name}</span></a>
           </c:when>
@@ -136,8 +136,6 @@
             <td>Permissions</td>
             <td><i>Inherited from project </i><a
                 href='<c:url value="/miso/project/${project.id}"/>'>${study.project.name}</a>
-              <input type="hidden" value="${study.project.securityProfile.profileId}"
-                     name="securityProfile" id="securityProfile"/>
             </td>
           </tr>
           </table>
