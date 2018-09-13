@@ -112,7 +112,6 @@ public class EditStudyController {
     return projectService.listAllProjects();
   }
 
-  // put list of projects into Model object
   @GetMapping(value = "/new")
   public ModelAndView newStudy(ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
