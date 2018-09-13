@@ -39,8 +39,8 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
@@ -117,16 +117,6 @@ public class EditStudyController {
   public ModelAndView newStudy(ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Study study = new StudyImpl(user);
-    // Project project; // get Project obj from dropdown
-    //
-    // if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
-    // SecurityProfile sp = new SecurityProfile(user);
-    // LimsUtils.inheritUsersAndGroups(study, project.getSecurityProfile());
-    // sp.setOwner(user);
-    // study.setSecurityProfile(sp);
-    // } else {
-    // study.inheritPermissions(project);
-    // }
 
     authorizationManager.throwIfNotWritable(study);
 	    return setupForm(study, user, "New Study", model);
@@ -152,7 +142,7 @@ public class EditStudyController {
     return setupForm(study, user, "New Study", model);
   }
 
-  @RequestMapping(value = "/{studyId}", method = RequestMethod.GET)
+  @GetMapping(value = "/{studyId}")
   public ModelAndView setupForm(@PathVariable Long studyId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Study study = studyService.get(studyId);
@@ -172,7 +162,7 @@ public class EditStudyController {
     return new ModelAndView("/pages/editStudy.jsp", model);
   }
 
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping
   public String processSubmit(@ModelAttribute("study") Study study, ModelMap model, SessionStatus session) throws IOException {
     studyService.save(study);
     session.setComplete();
