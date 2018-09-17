@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -78,6 +79,24 @@ public class EditStudyController {
   @Autowired
   private StudyService studyService;
 
+  /**
+   * Retrieves from miso.properties whether detailed sample mode has been enabled
+   * 
+   * TODO: Should this be moved further up hierarchy to avoid getting this value in every Controller that needs it?
+   */
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
+
+  /**
+   * Gets status of detailed sample mode
+   * 
+   * @return whether detailed sample mode has been enabled by miso.properties
+   */
+  @ModelAttribute("detailedSample")
+  private Boolean isDetailedSampleEnabled() {
+    return detailedSample;
+  }
+
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
   }
@@ -107,9 +126,22 @@ public class EditStudyController {
     return studyService.listTypes();
   }
   
+  /**
+   * Populates 'projects' model attribute with list of projects sorted by name if in plain sample mode, by shortname if in detailed
+   * sample mode.
+   * 
+   * TODO: Would any other parts of MISO benefit from this sorting? Should this be moved where other Controllers can access it?
+   * 
+   * @return Collection of Project sorted by name if in plain sample mode, by shortname if in detailed sample mode
+   * @throws IOException upon failure to access Projects
+   */
   @ModelAttribute("projects")
   public Collection<Project> populateProjects() throws IOException {
-    return projectService.listAllProjects();
+    if (detailedSample) {
+      return projectService.listAllProjectsByShortname();
+    } else {
+      return projectService.listAllProjects();
+    }
   }
 
   @GetMapping(value = "/new")

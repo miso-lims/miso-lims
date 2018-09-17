@@ -28,6 +28,8 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -158,6 +160,24 @@ public class DefaultProjectService implements ProjectService {
   @Override
   public Collection<Project> listAllProjectsWithLimit(long limit) throws IOException {
     return authorizationManager.filterUnreadable(projectStore.listAllWithLimit(limit));
+  }
+
+  @Override
+  public Collection<Project> listAllProjectsByShortname() throws IOException {
+    List<Project> sortedProjects = (ArrayList<Project>) projectStore.listAll();
+
+    Collections.sort(sortedProjects,
+        /**
+         * Uses String.compareTo to alphabetically sort Projects by shortname
+         */
+        new Comparator<Project>() {
+          @Override
+          public int compare(Project p1, Project p2) {
+            return p1.getShortName().compareTo(p2.getShortName());
+          }
+        });
+
+    return authorizationManager.filterUnreadable(sortedProjects);
   }
 
   private Collection<Group> loadManagedGroups(Collection<Group> original) throws IOException {

@@ -63,6 +63,15 @@ public interface ProjectService {
 
   public Collection<Project> listAllProjectsBySearch(String query) throws IOException;
 
+  /**
+   * Obtain a list of all the projects the user has access to, sorted alphabetically by shortname.
+   * Used for displaying lists in Detailed Sample mode.
+   * 
+   * @return Collection of Projects sorted alphabetically by shortname.
+   * @throws IOException upon failure to access Projects
+   */
+  public Collection<Project> listAllProjectsByShortname() throws IOException;
+
   public Collection<ProjectOverview> listAllOverviewsByProjectId(long projectId) throws IOException;
 
   // DELETES
