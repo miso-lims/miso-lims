@@ -81,8 +81,6 @@ public class EditStudyController {
 
   /**
    * Retrieves from miso.properties whether detailed sample mode has been enabled
-   * 
-   * TODO: Should this be moved further up hierarchy to avoid getting this value in every Controller that needs it?
    */
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -129,8 +127,6 @@ public class EditStudyController {
   /**
    * Populates 'projects' model attribute with list of projects sorted by name if in plain sample mode, by shortname if in detailed
    * sample mode.
-   * 
-   * TODO: Would any other parts of MISO benefit from this sorting? Should this be moved where other Controllers can access it?
    * 
    * @return Collection of Project sorted by name if in plain sample mode, by shortname if in detailed sample mode
    * @throws IOException upon failure to access Projects
