@@ -34,10 +34,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
@@ -78,13 +79,13 @@ public class EditKitDescriptorController {
     this.kitService = kitService;
   }
 
-  @RequestMapping(value = "/new", method = RequestMethod.GET)
+  @GetMapping(value = "/new")
   public ModelAndView setupForm(ModelMap model) throws IOException {
     model.addAttribute("kitDescriptor", null);
     return setupForm(KitDescriptor.UNSAVED_ID, model);
   }
 
-  @RequestMapping(value = "/{kitDescriptorId}", method = RequestMethod.GET)
+  @GetMapping(value = "/{kitDescriptorId}")
   public ModelAndView setupForm(@PathVariable Long kitDescriptorId, ModelMap model) throws IOException {
     try {
       KitDescriptor kitDescriptor = null;
@@ -108,7 +109,7 @@ public class EditKitDescriptorController {
     }
   }
 
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping
   public ModelAndView processSubmit(@ModelAttribute("kitDescriptor") KitDescriptor kitDescriptor, ModelMap model, SessionStatus session)
       throws IOException {
     try {

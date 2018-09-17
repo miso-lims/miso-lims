@@ -36,10 +36,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
@@ -69,7 +70,7 @@ public class EditSubmissionController {
     return submissionService.getColumnSizes();
   }
 
-  @RequestMapping(value = "/new", method = RequestMethod.GET)
+  @GetMapping(value = "/new")
   public ModelAndView newSubmission(@QueryParam("experimentIds") String experimentIds, ModelMap model) throws IOException {
     Submission submission = new Submission();
     submission.setExperiments(COMMA.splitAsStream(experimentIds).map(Long::parseLong).map(WhineyFunction.rethrow(experimentService::get))
@@ -78,7 +79,7 @@ public class EditSubmissionController {
     return setupForm(submission, "New Submission", model);
   }
 
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping
   public ModelAndView processSubmit(@ModelAttribute("submission") Submission submission, ModelMap model, SessionStatus session)
       throws IOException {
     try {
@@ -94,7 +95,7 @@ public class EditSubmissionController {
     }
   }
 
-  @RequestMapping(value = "/{submissionId}", method = RequestMethod.GET)
+  @GetMapping(value = "/{submissionId}")
   public ModelAndView setupForm(@PathVariable Long submissionId, ModelMap model) throws IOException {
     Submission submission = submissionService.get(submissionId);
     return setupForm(submission, "Submission " + submissionId, model);

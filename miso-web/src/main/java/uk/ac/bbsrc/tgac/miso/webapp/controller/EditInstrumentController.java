@@ -32,10 +32,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
@@ -73,7 +74,7 @@ public class EditInstrumentController {
     return instrumentService.getColumnSizes();
   }
 
-  @RequestMapping("/{instrumentId}")
+  @GetMapping("/{instrumentId}")
   public ModelAndView viewInstrument(@PathVariable(value = "instrumentId") Long instrumentId, ModelMap model) throws IOException {
     User user = authorizationManager.getCurrentUser();
     Instrument sr = instrumentService.get(instrumentId);
@@ -94,7 +95,7 @@ public class EditInstrumentController {
     return new ModelAndView("/pages/editInstrument.jsp", model);
   }
 
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping
   public ModelAndView processSubmit(@ModelAttribute("instrument") Instrument sr, ModelMap model, SessionStatus session)
       throws IOException {
     Long srId = null;

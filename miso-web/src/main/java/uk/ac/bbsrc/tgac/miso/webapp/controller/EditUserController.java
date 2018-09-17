@@ -40,10 +40,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
@@ -105,7 +105,7 @@ public class EditUserController {
     return securityManager.isPasswordMutable();
   }
 
-  @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
+  @GetMapping(value = "/user/{userId}")
   public ModelAndView userForm(@PathVariable Long userId, ModelMap model, HttpServletRequest request)
       throws SecurityException, IOException {
     try {
@@ -129,7 +129,7 @@ public class EditUserController {
     }
   }
 
-  @RequestMapping(value = "/admin/user/new", method = RequestMethod.GET)
+  @GetMapping(value = "/admin/user/new")
   public ModelAndView newSetupForm(ModelMap model, HttpServletRequest request) throws IOException {
     if (securityManager.canCreateNewUser()) {
       return adminSetupForm(UserImpl.UNSAVED_ID, model, request);
@@ -138,7 +138,7 @@ public class EditUserController {
         "Cannot add users through the MISO interface.");
   }
 
-  @RequestMapping(value = "/admin/user/{userId}", method = RequestMethod.GET)
+  @GetMapping(value = "/admin/user/{userId}")
   public ModelAndView adminSetupForm(@PathVariable Long userId, ModelMap model, HttpServletRequest request) throws IOException {
     try {
       model.put("user", userId == UserImpl.UNSAVED_ID ? new UserImpl() : securityManager.getUserById(userId));
@@ -152,7 +152,7 @@ public class EditUserController {
     }
   }
 
-  @RequestMapping(value = "/admin/user", method = RequestMethod.POST)
+  @PostMapping(value = "/admin/user")
   public String adminProcessSubmit(@ModelAttribute("user") User user, ModelMap model, SessionStatus session, HttpServletRequest request)
       throws IOException {
     if (!authorizationManager.isAdminUser()) {
@@ -185,7 +185,7 @@ public class EditUserController {
     }
   }
 
-  @RequestMapping(value = "/user", method = RequestMethod.POST)
+  @PostMapping(value = "/user")
   public ModelAndView processSubmit(@ModelAttribute("user") User user, ModelMap model, SessionStatus session, HttpServletRequest request)
       throws IOException {
     User original = authorizationManager.getCurrentUser();

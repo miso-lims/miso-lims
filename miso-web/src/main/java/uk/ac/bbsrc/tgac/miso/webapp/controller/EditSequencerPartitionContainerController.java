@@ -37,11 +37,12 @@ import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
@@ -98,7 +99,7 @@ public class EditSequencerPartitionContainerController {
     binder.registerCustomEditor(Date.class, "returnedDate", new CustomDateEditor(LimsUtils.getDateFormat(), true));
   }
 
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping
   public ModelAndView processSubmit(@ModelAttribute("container") SequencerPartitionContainer container, ModelMap model,
       SessionStatus session)
       throws IOException {
@@ -123,7 +124,7 @@ public class EditSequencerPartitionContainerController {
     this.runService = runService;
   }
 
-  @RequestMapping(value = "/new/{modelId}", method = RequestMethod.GET)
+  @GetMapping(value = "/new/{modelId}")
   public ModelAndView setupNewForm(@PathVariable("modelId") Long modelId, ModelMap model)
       throws IOException {
     SequencingContainerModel containerModel = containerModelService.get(modelId);
@@ -139,7 +140,7 @@ public class EditSequencerPartitionContainerController {
     return setupForm(container, model);
   }
 
-  @RequestMapping(value = "/{containerId}", method = RequestMethod.GET)
+  @GetMapping(value = "/{containerId}")
   public ModelAndView setupEditForm(@PathVariable Long containerId, ModelMap model) throws IOException {
     SequencerPartitionContainer container = containerService.get(containerId);
     model.put("title", container.getModel().getPlatformType().getContainerName() + " " + containerId);
