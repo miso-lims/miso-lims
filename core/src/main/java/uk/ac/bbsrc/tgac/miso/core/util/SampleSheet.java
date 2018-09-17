@@ -13,7 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 
 public enum SampleSheet {
-  CASAVA_1_7 {
+  CASAVA_1_7("CASAVA 1.7") {
     @Override
     protected Stream<String> getColumns() {
       return Stream.of("FCID", "Lane", "SampleID", "SampleRef", "Index", "Description", "Control", "Recipe", "Operator");
@@ -33,7 +33,7 @@ public enum SampleSheet {
       output[8] = userName;
     }
   },
-  CASAVA_1_8 {
+  CASAVA_1_8("CASAVA 1.8") {
     @Override
     protected Stream<String> getColumns() {
       return Stream.concat(SampleSheet.CASAVA_1_7.getColumns(), Stream.of("Project"));
@@ -45,6 +45,15 @@ public enum SampleSheet {
       output[9] = dilution.getProjectAlias().replaceAll("\\s", "");
     }
   };
+  private final String alias;
+
+  private SampleSheet(String alias) {
+    this.alias = alias;
+  }
+
+  public String alias() {
+    return alias;
+  }
 
   private Stream<String> createRowsForPartition(User user, List<String> columns, Partition partition) {
     return partition.getPool().getPoolDilutions().stream()//

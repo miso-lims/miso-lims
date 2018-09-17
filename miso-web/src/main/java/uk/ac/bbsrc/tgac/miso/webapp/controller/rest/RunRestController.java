@@ -174,29 +174,18 @@ public class RunRestController extends RestController {
     return Dtos.asDto(r);
   }
 
-  @GetMapping(value = "/{runId}/samplesheet")
-  public HttpEntity<String> getSampleSheetForRun(@PathVariable Long runId, HttpServletResponse response) throws IOException {
+  @GetMapping(value = "/{runId}/samplesheet/{sheet}")
+  public HttpEntity<String> getSampleSheetForRun(@PathVariable(name = "runId") Long runId, @PathVariable(name = "sheet") String sheet,
+      HttpServletResponse response) throws IOException {
     Run run = runService.get(runId);
-    return getSampleSheetForRun(run, SampleSheet.CASAVA_1_8, response);
+    return getSampleSheetForRun(run, SampleSheet.valueOf(sheet), response);
   }
 
-  @GetMapping(value = "/{runId}/oldsamplesheet")
-  public HttpEntity<String> getOldSampleSheetForRun(@PathVariable Long runId, HttpServletResponse response) throws IOException {
-    Run run = runService.get(runId);
-    return getSampleSheetForRun(run, SampleSheet.CASAVA_1_7, response);
-  }
-
-  @GetMapping(value = "/alias/{runAlias}/samplesheet")
-  public HttpEntity<String> getSampleSheetForRunByAlias(@PathVariable String runAlias, HttpServletResponse response) throws IOException {
+  @GetMapping(value = "/alias/{runAlias}/samplesheet/{sheet}")
+  public HttpEntity<String> getSampleSheetForRunByAlias(@PathVariable(name = "runAlias") String runAlias,
+      @PathVariable(name = "sheet") String sheet, HttpServletResponse response) throws IOException {
     Run run = runService.getRunByAlias(runAlias);
-    return getSampleSheetForRun(run, SampleSheet.CASAVA_1_8, response);
-  }
-
-  @GetMapping(value = "/alias/{runAlias}/oldsamplesheet")
-  public HttpEntity<String> getOldSampleSheetForRunByAlias(@PathVariable String runAlias, HttpServletResponse response)
-      throws IOException {
-    Run run = runService.getRunByAlias(runAlias);
-    return getSampleSheetForRun(run, SampleSheet.CASAVA_1_7, response);
+    return getSampleSheetForRun(run, SampleSheet.valueOf(sheet), response);
   }
 
   private HttpEntity<String> getSampleSheetForRun(Run run, SampleSheet casavaVersion, HttpServletResponse response) throws IOException {
