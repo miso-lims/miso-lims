@@ -288,7 +288,8 @@ public class EditProjectController {
   }
 
   @PostMapping
-  public String processSubmit(@ModelAttribute("project") Project project, ModelMap model, SessionStatus session, HttpServletRequest request)
+  public ModelAndView processSubmit(@ModelAttribute("project") Project project, ModelMap model, SessionStatus session,
+      HttpServletRequest request)
       throws IOException {
     try {
       projectService.saveProject(project);
@@ -297,7 +298,7 @@ public class EditProjectController {
       }
       session.setComplete();
       model.clear();
-      return "redirect:/miso/project/" + project.getId();
+      return new ModelAndView("redirect:/miso/project/" + project.getId(), model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save project", ex);

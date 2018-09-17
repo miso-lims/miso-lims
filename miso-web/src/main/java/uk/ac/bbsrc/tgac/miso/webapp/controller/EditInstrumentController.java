@@ -95,7 +95,7 @@ public class EditInstrumentController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("instrument") Instrument sr, ModelMap model, SessionStatus session)
+  public ModelAndView processSubmit(@ModelAttribute("instrument") Instrument sr, ModelMap model, SessionStatus session)
       throws IOException {
     Long srId = null;
     if (sr.getId() == InstrumentImpl.UNSAVED_ID) {
@@ -106,7 +106,7 @@ public class EditInstrumentController {
     }
     session.setComplete();
     model.clear();
-    return "redirect:/miso/instrument/" + srId;
+    return new ModelAndView("redirect:/miso/instrument/" + srId, model);
   }
 
 }

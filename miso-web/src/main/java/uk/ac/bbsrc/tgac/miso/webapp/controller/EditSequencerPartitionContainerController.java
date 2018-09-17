@@ -99,13 +99,14 @@ public class EditSequencerPartitionContainerController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("container") SequencerPartitionContainer container, ModelMap model, SessionStatus session)
+  public ModelAndView processSubmit(@ModelAttribute("container") SequencerPartitionContainer container, ModelMap model,
+      SessionStatus session)
       throws IOException {
     try {
       SequencerPartitionContainer saved = containerService.save(container);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/container/" + saved.getId();
+      return new ModelAndView("redirect:/miso/container/" + saved.getId(), model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save container", ex);

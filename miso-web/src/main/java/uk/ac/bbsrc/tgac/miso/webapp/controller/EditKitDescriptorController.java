@@ -109,14 +109,14 @@ public class EditKitDescriptorController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("kitDescriptor") KitDescriptor kitDescriptor, ModelMap model, SessionStatus session)
+  public ModelAndView processSubmit(@ModelAttribute("kitDescriptor") KitDescriptor kitDescriptor, ModelMap model, SessionStatus session)
       throws IOException {
     try {
       kitService.saveKitDescriptor(kitDescriptor);
       menuController.refreshConstants();
       session.setComplete();
       model.clear();
-      return "redirect:/miso/kitdescriptor/" + kitDescriptor.getId();
+      return new ModelAndView("redirect:/miso/kitdescriptor/" + kitDescriptor.getId(), model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save Kit Descriptor", ex);

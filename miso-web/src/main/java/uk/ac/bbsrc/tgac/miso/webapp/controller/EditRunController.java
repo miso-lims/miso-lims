@@ -288,8 +288,8 @@ public class EditRunController {
     }
   }
 
-  @PostMapping()
-  public String processSubmit(@ModelAttribute("run") Run run, ModelMap model, SessionStatus session) throws IOException {
+  @PostMapping
+  public ModelAndView processSubmit(@ModelAttribute("run") Run run, ModelMap model, SessionStatus session) throws IOException {
     try {
       User user = authorizationManager.getCurrentUser();
       for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
@@ -309,7 +309,7 @@ public class EditRunController {
 
       session.setComplete();
       model.clear();
-      return "redirect:/miso/run/" + runId;
+      return new ModelAndView("redirect:/miso/run/" + runId, model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save run", ex);

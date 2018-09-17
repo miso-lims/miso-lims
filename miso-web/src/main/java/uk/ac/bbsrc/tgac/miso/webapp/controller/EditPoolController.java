@@ -229,7 +229,7 @@ public class EditPoolController {
   }
 
   @PostMapping
-  public String processSubmit(@ModelAttribute("pool") Pool pool, ModelMap model, SessionStatus session)
+  public ModelAndView processSubmit(@ModelAttribute("pool") Pool pool, ModelMap model, SessionStatus session)
       throws IOException {
     try {
       // The pooled elements may have been modified asynchronously while the form was being edited. Since they can't be edited by form,
@@ -242,7 +242,7 @@ public class EditPoolController {
       poolService.save(pool);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/pool/" + pool.getId();
+      return new ModelAndView("redirect:/miso/pool/" + pool.getId(), model);
     } catch (IOException ex) {
       log.debug("Failed to save pool", ex);
       throw ex;

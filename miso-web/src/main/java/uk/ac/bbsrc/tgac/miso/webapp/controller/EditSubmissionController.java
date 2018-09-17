@@ -79,13 +79,13 @@ public class EditSubmissionController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("submission") Submission submission, ModelMap model, SessionStatus session)
+  public ModelAndView processSubmit(@ModelAttribute("submission") Submission submission, ModelMap model, SessionStatus session)
       throws IOException {
     try {
       submissionService.save(submission);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/submission/" + submission.getId();
+      return new ModelAndView("redirect:/miso/submission/" + submission.getId(), model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save submission", ex);

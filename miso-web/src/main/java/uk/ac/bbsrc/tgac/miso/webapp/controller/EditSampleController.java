@@ -860,7 +860,7 @@ public class EditSampleController {
   }
 
   @PostMapping
-  public String processSubmit(@ModelAttribute("sample") Sample sample, ModelMap model, SessionStatus session)
+  public ModelAndView processSubmit(@ModelAttribute("sample") Sample sample, ModelMap model, SessionStatus session)
       throws IOException {
     if (sample instanceof DetailedSampleBuilder) {
       DetailedSampleBuilder builder = (DetailedSampleBuilder) sample;
@@ -895,7 +895,7 @@ public class EditSampleController {
       }
       session.setComplete();
       model.clear();
-      return "redirect:/miso/sample/" + sample.getId();
+      return new ModelAndView("redirect:/miso/sample/" + sample.getId(), model);
     } catch (IOException ex) {
       log.debug("Failed to save sample", ex);
       throw ex;

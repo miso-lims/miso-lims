@@ -186,7 +186,7 @@ public class EditUserController {
   }
 
   @RequestMapping(value = "/user", method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("user") User user, ModelMap model, SessionStatus session, HttpServletRequest request)
+  public ModelAndView processSubmit(@ModelAttribute("user") User user, ModelMap model, SessionStatus session, HttpServletRequest request)
       throws IOException {
     User original = authorizationManager.getCurrentUser();
     if (!original.getUserId().equals(user.getUserId())) {
@@ -204,6 +204,6 @@ public class EditUserController {
     securityManager.saveUser(user);
     session.setComplete();
     model.clear();
-    return "redirect:/miso/myAccount";
+    return new ModelAndView("redirect:/miso/myAccount", model);
   }
 }

@@ -182,10 +182,10 @@ public class EditStudyController {
   }
 
   @PostMapping
-  public String processSubmit(@ModelAttribute("study") Study study, ModelMap model, SessionStatus session) throws IOException {
+  public ModelAndView processSubmit(@ModelAttribute("study") Study study, ModelMap model, SessionStatus session) throws IOException {
     studyService.save(study);
     session.setComplete();
     model.clear();
-    return "redirect:/miso/study/" + study.getId();
+    return new ModelAndView("redirect:/miso/study/" + study.getId(), model);
   }
 }

@@ -78,12 +78,12 @@ public class EditExperimentController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("experiment") Experiment experiment, ModelMap model, SessionStatus session)
+  public ModelAndView processSubmit(@ModelAttribute("experiment") Experiment experiment, ModelMap model, SessionStatus session)
       throws IOException {
     experimentService.save(experiment);
     session.setComplete();
     model.clear();
-    return "redirect:/miso/experiment/" + experiment.getId();
+    return new ModelAndView("redirect:/miso/experiment/" + experiment.getId(), model);
   }
 
   @GetMapping(value = "/{experimentId}")

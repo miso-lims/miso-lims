@@ -940,7 +940,7 @@ public class EditLibraryController {
   }
 
   @PostMapping
-  public String processSubmit(@ModelAttribute("library") Library library, ModelMap model, SessionStatus session)
+  public ModelAndView processSubmit(@ModelAttribute("library") Library library, ModelMap model, SessionStatus session)
       throws IOException {
     try {
       if (library.getId() == AbstractLibrary.UNSAVED_ID) {
@@ -951,7 +951,7 @@ public class EditLibraryController {
 
       session.setComplete();
       model.clear();
-      return "redirect:/miso/library/" + library.getId();
+      return new ModelAndView("redirect:/miso/library/" + library.getId(), model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save library", ex);
