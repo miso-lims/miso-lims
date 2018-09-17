@@ -95,7 +95,8 @@
             <a href='<c:url value="/miso/project/${study.project.id}"/>'><span id="projectName">${study.project.name}</span></a>
           </c:when>
           <c:otherwise>
-            <miso:select id="project" path="project" items="${projects}" itemLabel="name" itemValue="id"/>
+            <miso:select id="project" path="project" items="${projects}" itemLabel="${detailedSample? \"shortName\" : \"name\"}" 
+              itemValue="id"/>
           </c:otherwise>
         </c:choose>
         </td>
