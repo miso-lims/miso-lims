@@ -146,7 +146,7 @@ public class EditStudyController {
 
   @GetMapping(value = "/new")
   public ModelAndView newStudy(ModelMap model) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     Study study = new StudyImpl(user);
 
     authorizationManager.throwIfNotWritable(study);
