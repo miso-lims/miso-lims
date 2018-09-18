@@ -53,16 +53,13 @@ ListTarget.study = {
     }
   },
   createStaticActions: function(config, projectId) {
-    if (projectId) {
-      return [{
-        "name": "Add",
-        "handler": function() {
-          window.location = "/miso/study/new/" + projectId;
-        }
-      }, ];
-    } else {
-      return [];
-    }
+    // If a projectId was provided, add that to the URL so it fills in the page with the project's info
+    return [{
+      "name": "Add",
+      "handler": function() {
+        window.location = "/miso/study/new" + (projectId ? '/' + projectId : '')
+      }
+    }]
   },
   createColumns: function(config, projectId) {
     return [ListUtils.idHyperlinkColumn("Name", "study", "id", Utils.array.getName, 1, true),
