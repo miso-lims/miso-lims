@@ -28,7 +28,6 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -197,7 +196,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       pool.setName(generateTemporaryName());
       loadSecurityProfile(pool);
       loadPoolDilutions(pool.getPoolDilutions(), pool);
-      setChangeDetails(pool);
+      pool.setChangeDetails(authorizationManager.getCurrentUser());
       boxService.throwIfBoxPositionIsFilled(pool);
       validateChange(pool, null);
       poolStore.save(pool);
@@ -238,6 +237,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       Set<String> removed = new TreeSet<>(originalItems);
       removed.removeAll(updatedItems);
 
+      managed.setChangeDetails(authorizationManager.getCurrentUser());
       if (!added.isEmpty() || !removed.isEmpty()) {
         StringBuilder message = new StringBuilder();
         message.append("Items");
@@ -245,14 +245,13 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
         LimsUtils.appendSet(message, removed, "removed");
 
         PoolChangeLog changeLog = new PoolChangeLog();
-        changeLog.setPool(pool);
+        changeLog.setPool(managed);
         changeLog.setColumnsChanged("contents");
         changeLog.setSummary(message.toString());
         changeLog.setTime(new Date());
-        changeLog.setUser(pool.getLastModifier());
+        changeLog.setUser(managed.getLastModifier());
         changeLogService.create(changeLog);
       }
-      setChangeDetails(managed);
       savedId = poolStore.save(managed);
     }
     boxService.updateBoxableLocation(pool);
@@ -279,32 +278,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       pool.getSecurityProfile().setProfileId(securityProfileStore.save(pool.getSecurityProfile()));
     }
     pool.setSecurityProfile(securityProfileStore.get(pool.getSecurityProfile().getProfileId()));
-  }
-
-  /**
-   * Updates all user data and timestamps associated with the change. Existing timestamps will be preserved
-   * if the Pool is unsaved, and they are already set
-   * 
-   * @param pool the Pool to update
-   * @param preserveTimestamps if true, the creationTime and lastModified date are not updated
-   * @throws IOException
-   */
-  private void setChangeDetails(Pool pool) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    Date now = new Date();
-    pool.setLastModifier(user);
-
-    if (pool.getId() == Sample.UNSAVED_ID) {
-      pool.setCreator(user);
-      if (pool.getCreationTime() == null) {
-        pool.setCreationTime(now);
-      }
-      if (pool.getLastModified() == null) {
-        pool.setLastModified(now);
-      }
-    } else {
-      pool.setLastModified(now);
-    }
   }
 
   private void loadPoolDilutions(Collection<PoolDilution> source, Pool target) throws IOException {

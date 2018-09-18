@@ -1,3 +1,12 @@
+# 0.2.142
+
+Changes:
+
+ * Add Create button to Studies list (#1663)
+ * Fixed user name for pool dilution change logs entries
+ * Fixed creating stacks in freezers
+ * Fixed start of x-axis in some run metrics graphs
+
 # 0.2.141
 
 Changes:

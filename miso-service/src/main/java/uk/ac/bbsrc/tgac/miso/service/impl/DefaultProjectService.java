@@ -160,6 +160,18 @@ public class DefaultProjectService implements ProjectService {
     return authorizationManager.filterUnreadable(projectStore.listAllWithLimit(limit));
   }
 
+  @Override
+  public Collection<Project> listAllProjectsByShortname() throws IOException {
+    List<Project> sortedProjects = (ArrayList<Project>) projectStore.listAll();
+
+    /**
+     * Uses String.compareTo to alphabetically sort Projects by shortname
+     */
+    sortedProjects.sort((Project p1, Project p2) -> p1.getShortName().compareTo(p2.getShortName()));
+
+    return authorizationManager.filterUnreadable(sortedProjects);
+  }
+
   private Collection<Group> loadManagedGroups(Collection<Group> original) throws IOException {
     if (original == null)
       return null;

@@ -89,8 +89,19 @@
       <tr>
         <td class="h">Project Name:</td>
         <td>
-          <input type="hidden" value="${study.project.id}" name="project" id="project"/>
-          <a href='<c:url value="/miso/project/${study.project.id}"/>'><span id="projectName">${study.project.name}</span></a>
+        <!-- When opening a new study without a known project ID (i.e., from the Studies page), dropdown should display project name when
+        in plain sample mode, shortname when in detailed sample mode. ${projects} will come in sorted based on these attributes from
+        EditStudyController. -->
+        <c:choose>
+          <c:when test="${not empty study.project}">
+            <input type="hidden" value="${study.project.id}" name="project" id="project"/>
+            <a href='<c:url value="/miso/project/${study.project.id}"/>'><span id="projectName">${study.project.name}</span></a>
+          </c:when>
+          <c:otherwise>
+            <miso:select id="project" path="project" items="${projects}" itemLabel="${detailedSample? \"shortName\" : \"name\" }" 
+              itemValue="id"/>
+          </c:otherwise>
+        </c:choose>
         </td>
       </tr>
       <tr>
@@ -129,8 +140,6 @@
             <td>Permissions</td>
             <td><i>Inherited from project </i><a
                 href='<c:url value="/miso/project/${project.id}"/>'>${study.project.name}</a>
-              <input type="hidden" value="${study.project.securityProfile.profileId}"
-                     name="securityProfile" id="securityProfile"/>
             </td>
           </tr>
           </table>

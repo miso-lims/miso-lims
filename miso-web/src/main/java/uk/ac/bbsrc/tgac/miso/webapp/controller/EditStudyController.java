@@ -32,14 +32,16 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
@@ -77,6 +79,22 @@ public class EditStudyController {
   @Autowired
   private StudyService studyService;
 
+  /**
+   * Retrieves from miso.properties whether detailed sample mode has been enabled
+   */
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
+
+  /**
+   * Gets status of detailed sample mode
+   * 
+   * @return whether detailed sample mode has been enabled by miso.properties
+   */
+  @ModelAttribute("detailedSample")
+  private Boolean isDetailedSampleEnabled() {
+    return detailedSample;
+  }
+
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
   }
@@ -105,8 +123,33 @@ public class EditStudyController {
   public Collection<StudyType> populateStudyTypes() throws IOException {
     return studyService.listTypes();
   }
+  
+  /**
+   * Populates 'projects' model attribute with list of projects sorted by name if in plain sample mode, by shortname if in detailed
+   * sample mode.
+   * 
+   * @return Collection of Project sorted by name if in plain sample mode, by shortname if in detailed sample mode
+   * @throws IOException upon failure to access Projects
+   */
+  @ModelAttribute("projects")
+  public Collection<Project> populateProjects() throws IOException {
+    if (detailedSample) {
+      return projectService.listAllProjectsByShortname();
+    } else {
+      return projectService.listAllProjects();
+    }
+  }
 
-  @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
+  @GetMapping(value = "/new")
+  public ModelAndView newStudy(ModelMap model) throws IOException {
+    User user = authorizationManager.getCurrentUser();
+    Study study = new StudyImpl(user);
+
+    authorizationManager.throwIfNotWritable(study);
+    return setupForm(study, user, "New Study", model);
+  }
+
+  @GetMapping(value = "/new/{projectId}")
   public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Study study = new StudyImpl(user);
@@ -126,7 +169,7 @@ public class EditStudyController {
     return setupForm(study, user, "New Study", model);
   }
 
-  @RequestMapping(value = "/{studyId}", method = RequestMethod.GET)
+  @GetMapping(value = "/{studyId}")
   public ModelAndView setupForm(@PathVariable Long studyId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Study study = studyService.get(studyId);
@@ -146,7 +189,7 @@ public class EditStudyController {
     return new ModelAndView("/pages/editStudy.jsp", model);
   }
 
-  @RequestMapping(method = RequestMethod.POST)
+  @PostMapping
   public String processSubmit(@ModelAttribute("study") Study study, ModelMap model, SessionStatus session) throws IOException {
     studyService.save(study);
     session.setComplete();
