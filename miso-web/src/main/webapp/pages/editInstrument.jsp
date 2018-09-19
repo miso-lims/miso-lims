@@ -69,7 +69,12 @@
       
       <h2>Instrument Information</h2>
       
-      <c:if test="${instrument.isOutOfService()}"><p class="big-warning">Out of Service</p></c:if>
+      <c:choose>
+        <c:when test="${instrument.isOutOfService()}"><p class="big-warning">Out of Service</p></c:when>
+        <c:when test="${not empty instrument.getOutOfServicePositions()}">
+          <p class="big-warning">${instrument.getOutOfServicePositionsLabel()} out of service</p>
+        </c:when>
+      </c:choose>
 
       <table class="in">
         <tr>
@@ -236,7 +241,7 @@
       <div id="records_arrowclick" class="toggleLeft"></div>
     </div>
     <div id="recordsdiv" class="expandable_section" style="display:none;">
-      <miso:list-section id="list_servicerecords" name="Service Records" target="servicerecord" alwaysShow="true" items="${serviceRecords}" config="{instrumentId: ${instrument.id}, retiredInstrument: ${instrument.dateDecommissioned != null && instrument.upgradedInstrument == null}, userIsAdmin: ${miso:isAdmin()}}"/>
+      <miso:list-section id="list_servicerecords" name="Service Records" target="servicerecord" alwaysShow="true" items="${serviceRecords}" config="{instrumentId: ${instrument.id}, retiredInstrument: ${instrument.dateDecommissioned != null && instrument.upgradedInstrument == null}, hasPositions: ${not empty instrument.platform.positions}, userIsAdmin: ${miso:isAdmin()}}"/>
     </div>
     <script type="text/javascript">
       jQuery(document).ready(function () {

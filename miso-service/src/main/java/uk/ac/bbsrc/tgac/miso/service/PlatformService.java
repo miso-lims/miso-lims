@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public interface PlatformService {
@@ -15,4 +16,6 @@ public interface PlatformService {
   Collection<PlatformType> listActivePlatformTypes() throws IOException;
 
   Collection<String> listDistinctPlatformTypeNames() throws IOException;
+
+  PlatformPosition getPlatformPosition(long positionId) throws IOException;
 }

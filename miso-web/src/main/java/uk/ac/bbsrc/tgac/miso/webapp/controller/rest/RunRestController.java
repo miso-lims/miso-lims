@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -57,9 +56,12 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
@@ -72,6 +74,7 @@ import uk.ac.bbsrc.tgac.miso.dto.RunDto;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 
 /**
  * A controller to handle all REST requests for Runs
@@ -248,7 +251,8 @@ public class RunRestController extends RestController {
 
   @PostMapping(value = "{runId}/add", produces = "application/json")
   @ResponseStatus(code = HttpStatus.OK)
-  public void addContainerByBarcode(@PathVariable Long runId, @RequestParam("barcode") String barcode) throws IOException {
+  public void addContainerByBarcode(@PathVariable Long runId, @RequestParam("position") String position,
+      @RequestParam("barcode") String barcode) throws IOException {
     Run run = runService.get(runId);
     Collection<SequencerPartitionContainer> containers = containerService
         .listByBarcode(barcode);
@@ -259,13 +263,23 @@ public class RunRestController extends RestController {
       throw new RestException("Multiple containers with this barcode.", Status.BAD_REQUEST);
     }
     SequencerPartitionContainer container = containers.iterator().next();
+    Platform runPlatform = run.getSequencer().getPlatform();
     if (container.getModel().getPlatforms().stream()
-        .noneMatch(platform -> platform.getId() == run.getSequencer().getPlatform().getId())) {
+        .noneMatch(platform -> platform.getId() == runPlatform.getId())) {
       throw new RestException(String.format("Container model '%s' (%s) is not compatible with %s (%s) run",
           container.getModel().getAlias(), container.getModel().getPlatformType(), run.getSequencer().getPlatform().getInstrumentModel(),
           run.getSequencer().getPlatform().getPlatformType()), Status.BAD_REQUEST);
     }
-    run.addSequencerPartitionContainer(container);
+    RunPosition runPos = new RunPosition();
+    runPos.setRun(run);
+    runPos.setContainer(container);
+    if (!LimsUtils.isStringEmptyOrNull(position)) {
+      runPos.setPosition(runPlatform.getPositions().stream()
+          .filter(pos -> pos.getAlias().equals(position))
+          .findFirst().orElseThrow(() -> new ValidationException(
+              String.format("Platform %s does not have a position %s", runPlatform.getInstrumentModel(), position))));
+    }
+    run.getRunPositions().add(runPos);
     runService.update(run);
   }
 
@@ -273,8 +287,7 @@ public class RunRestController extends RestController {
   @ResponseStatus(code = HttpStatus.OK)
   public void removeContainer(@PathVariable Long runId, @RequestBody List<Long> containerIds) throws IOException {
     Run run = runService.get(runId);
-    run.setSequencerPartitionContainers(run.getSequencerPartitionContainers().stream()
-        .filter(container -> !containerIds.contains(container.getId())).collect(Collectors.toList()));
+    run.getRunPositions().removeIf(rp -> containerIds.contains(rp.getContainer().getId()));
     runService.update(run);
   }
 

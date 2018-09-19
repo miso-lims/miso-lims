@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,6 +33,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
@@ -70,6 +72,9 @@ public class Platform implements Comparable<Platform>, Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long platformId = Platform.UNSAVED_ID;
+
+  @OneToMany(mappedBy = "platform")
+  private Set<PlatformPosition> positions;
 
   public Long getId() {
     return platformId;
@@ -121,6 +126,10 @@ public class Platform implements Comparable<Platform>, Serializable {
 
   public void setInstrumentType(InstrumentType instrumentType) {
     this.instrumentType = instrumentType;
+  }
+
+  public Set<PlatformPosition> getPositions() {
+    return positions;
   }
 
   /**

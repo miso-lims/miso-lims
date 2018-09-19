@@ -65,6 +65,11 @@ var Tile = {
     status.setAttribute("src", "/styles/images/tile-ok.svg");
     return status;
   },
+  statusMaybe: function() {
+    var status = document.createElement("IMG");
+    status.setAttribute("src", "/styles/images/tile-maybe.svg");
+    return status;
+  },
   statusBad: function() {
     var status = document.createElement("IMG");
     status.setAttribute("src", "/styles/images/tile-bad.svg");

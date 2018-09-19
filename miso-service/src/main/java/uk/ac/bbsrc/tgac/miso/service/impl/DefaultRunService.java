@@ -3,9 +3,11 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +33,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
@@ -39,11 +40,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
@@ -60,9 +64,12 @@ import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
@@ -114,6 +121,8 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   private PoolService poolService;
   @Autowired
   private ContainerModelService containerModelService;
+  @Autowired
+  private PlatformService platformService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -257,10 +266,10 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   public void update(Run run) throws IOException {
     Run managed = get(run.getId());
     authorizationManager.throwIfNotWritable(managed);
+    loadChildEntities(run);
     saveContainers(run);
     applyChanges(managed, run);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
-    loadChildEntities(managed);
     save(managed);
   }
 
@@ -291,13 +300,8 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   private void saveContainers(Run run) throws IOException {
-    List<SequencerPartitionContainer> containers = run.getSequencerPartitionContainers();
-    if (containers != null && !containers.isEmpty()) {
-      List<SequencerPartitionContainer> savedContainers = Lists.newArrayList();
-      for (SequencerPartitionContainer container : containers) {
-        savedContainers.add(containerService.save(container));
-      }
-      run.setSequencerPartitionContainers(savedContainers);
+    for (RunPosition runPos : run.getRunPositions()) {
+      runPos.setContainer(containerService.save(runPos.getContainer()));
     }
   }
 
@@ -329,20 +333,34 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   private void validateChanges(Run before, Run changed) throws IOException {
+    List<ValidationError> errors = new ArrayList<>();
+
     if (!changed.getHealth().isDone()) {
       changed.setCompletionDate(null);
     } else if (changed.getCompletionDate() == null) {
-      throw new IllegalArgumentException("Completion date missing for finished run");
+      errors.add(new ValidationError("completionDate", "Completion date must be provided for finished run"));
     }
     if (before != null) {
       if (before.getCompletionDate() != null && changed.getCompletionDate() != null
           && !changed.getCompletionDate().equals(before.getCompletionDate()) && !authorizationManager.isAdminUser()) {
-        throw new IllegalArgumentException("Only admin may change completion date");
+        errors.add(new ValidationError("completionDate", "Only admin may change completion date"));
       }
       if (before.getStartDate() != null && changed.getStartDate() != null
           && !changed.getStartDate().equals(before.getStartDate()) && !authorizationManager.isAdminUser()) {
-        throw new IllegalArgumentException("Only admin may change start date");
+        errors.add(new ValidationError("completionDate", "Only admin may change start date"));
       }
+    }
+
+    Platform platform = changed.getSequencer().getPlatform();
+    for (RunPosition position : changed.getRunPositions()) {
+      if (position.getPosition() != null && !platform.getPositions().contains(position.getPosition())) {
+        errors.add(new ValidationError(
+            String.format("Platform %s does not have a position %s", platform.getInstrumentModel(), position.getPosition())));
+      }
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
     }
   }
 
@@ -358,8 +376,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     target.setMetrics(source.getMetrics());
 
     makeContainerChangesChangeLog(target, target.getSequencerPartitionContainers(), source.getSequencerPartitionContainers());
-    target.setSequencerPartitionContainers(source.getSequencerPartitionContainers());
-
+    applyContainerChanges(target, source);
     target.setSequencingParameters(source.getSequencingParameters());
     target.setSequencer(source.getSequencer());
     if (isIlluminaRun(target)) {
@@ -371,6 +388,42 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     } else if (isOxfordNanoporeRun(target)) {
       applyOxfordNanoporeChanges((OxfordNanoporeRun) target, (OxfordNanoporeRun) source);
     }
+  }
+
+  private void applyContainerChanges(Run target, Run source) {
+    Iterator<RunPosition> iterator = target.getRunPositions().iterator();
+    while (iterator.hasNext()) {
+      RunPosition existingPos = iterator.next();
+      if (!source.getRunPositions().stream().anyMatch(rp -> isSamePosition(rp, existingPos))) {
+        iterator.remove();
+      }
+    }
+    for (RunPosition sourcePos : source.getRunPositions()) {
+      RunPosition existingPos = target.getRunPositions().stream()
+          .filter(rp -> isSamePosition(rp, sourcePos))
+          .findFirst().orElse(null);
+      if (existingPos == null) {
+        RunPosition newPos = new RunPosition();
+        newPos.setRun(target);
+        newPos.setContainer(sourcePos.getContainer());
+        newPos.setPosition(sourcePos.getPosition());
+        target.getRunPositions().add(newPos);
+      } else {
+        existingPos.setContainer(sourcePos.getContainer());
+      }
+    }
+  }
+
+  private static boolean isSamePosition(RunPosition pos1, RunPosition pos2) {
+    String pos1Alias = pos1.getPosition() == null ? null : pos1.getPosition().getAlias();
+    String pos2Alias = pos2.getPosition() == null ? null : pos2.getPosition().getAlias();
+    if (pos1Alias == null && pos2Alias == null) {
+      return true;
+    }
+    if (pos1Alias == null) {
+      return false;
+    }
+    return pos1Alias.equals(pos2Alias);
   }
 
   private void applyIlluminaChanges(IlluminaRun target, IlluminaRun source) {
@@ -491,9 +544,13 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     this.runDao = runDao;
   }
 
+  public void setPlatformService(PlatformService platformService) {
+    this.platformService = platformService;
+  }
+
   @Override
   public boolean processNotification(Run source, int laneCount, String containerModel, String containerSerialNumber, String sequencerName,
-      Predicate<SequencingParameters> filterParameters, GetLaneContents getLaneContents)
+      Predicate<SequencingParameters> filterParameters, GetLaneContents getLaneContents, String positionName)
       throws IOException, MisoNamingException {
     final Date now = new Date();
     User user = securityManager.getUserByLoginName("notification");
@@ -541,7 +598,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
           + " for run " + source.getAlias() + "; used fallback container model instead.");
     }
 
-    isMutated |= updateContainerFromNotification(target, user, model, containerSerialNumber, getLaneContents);
+    isMutated |= updateContainerFromNotification(target, user, model, containerSerialNumber, getLaneContents, positionName);
     isMutated |= updateHealthFromNotification(source, target, user);
 
     switch (source.getPlatformType()) {
@@ -662,9 +719,16 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   private boolean updateContainerFromNotification(final Run target, User user, SequencingContainerModel containerModel,
-      String containerSerialNumber, final GetLaneContents getLaneContents) throws IOException {
+      String containerSerialNumber, final GetLaneContents getLaneContents, String positionName) throws IOException {
     final Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(containerSerialNumber);
     int laneCount = containerModel.getPartitionCount();
+    PlatformPosition position = null;
+    if (!isStringEmptyOrNull(positionName)) {
+      position = target.getSequencer().getPlatform().getPositions().stream()
+          .filter(pos -> positionName.equals(pos.getAlias()))
+          .findFirst().orElseThrow(() -> new IllegalArgumentException(String.format("Unknown position '%s' for platform '%s'", positionName,
+              target.getSequencer().getPlatform().getInstrumentModel())));
+    }
     switch (containers.size()) {
     case 0:
       SequencerPartitionContainer newContainer = new SequencerPartitionContainerImpl(user);
@@ -676,7 +740,13 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
           .mapToObj(i -> new PartitionImpl(newContainer, i + 1))
           .collect(Collectors.toList()));
       updatePartitionContents(getLaneContents, newContainer);
-      target.setSequencerPartitionContainers(Collections.singletonList(containerService.create(newContainer)));
+
+      RunPosition newRunPos = new RunPosition();
+      newRunPos.setRun(target);
+      newRunPos.setContainer(newContainer);
+      newRunPos.setPosition(position);
+      target.getRunPositions().clear();
+      target.getRunPositions().add(newRunPos);
       return true;
     case 1:
       SequencerPartitionContainer container = containers.iterator().next();
@@ -685,7 +755,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
             containerSerialNumber, container.getPartitions().size(), laneCount));
       }
       if (target.getSequencerPartitionContainers().stream().noneMatch(c -> c.getId() == container.getId())) {
-        target.getSequencerPartitionContainers().add(container);
+        target.addSequencerPartitionContainer(container, position);
         updatePartitionContents(getLaneContents, container);
         return true;
       }

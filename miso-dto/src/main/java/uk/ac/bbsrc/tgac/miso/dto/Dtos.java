@@ -65,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
@@ -124,6 +125,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
@@ -1260,7 +1262,7 @@ public class Dtos {
     }
     setId(dto::setSpikeInId, from.getSpikeIn());
     setString(dto::setSpikeInVolume, from.getSpikeInVolume());
-    setString(dto::setSpikeInDilutionFactor, from.getSpikeInDilutionFactor(), DilutionFactor::getLabel);
+    setString(dto::setSpikeInDilutionFactor, maybeGetProperty(from.getSpikeInDilutionFactor(), DilutionFactor::getLabel));
     return dto;
   }
 
@@ -1700,6 +1702,17 @@ public class Dtos {
     return asContainerDtos(containerSubset, includeContainerPartitions, includePoolContents);
   }
 
+  public static RunPositionDto asDto(RunPosition from) {
+    RunPositionDto dto = new RunPositionDto();
+    setId(dto::setPositionId, from.getPosition());
+    setString(dto::setPositionAlias, maybeGetProperty(from.getPosition(), PlatformPosition::getAlias));
+    setId(dto::setId, from.getContainer());
+    setString(dto::setIdentificationBarcode, maybeGetProperty(from.getContainer(), SequencerPartitionContainer::getIdentificationBarcode));
+    setObject(dto::setContainerModel, from.getContainer().getModel(), Dtos::asDto);
+    setDateTimeString(dto::setLastModified, maybeGetProperty(from.getContainer(), SequencerPartitionContainer::getLastModified));
+    return dto;
+  }
+
   public static ContainerModelDto asDto(SequencingContainerModel from) {
     ContainerModelDto dto = new ContainerModelDto();
     dto.setId(from.getId());
@@ -1804,6 +1817,9 @@ public class Dtos {
     dto.setInstrumentModel(from.getInstrumentModel());
     dto.setNumContainers(from.getNumContainers());
     dto.setInstrumentType(from.getInstrumentType().name());
+    if (from.getPositions() != null) {
+      dto.setPositions(from.getPositions().stream().map(PlatformPosition::getAlias).collect(Collectors.toList()));
+    }
     return dto;
   }
 
@@ -2417,26 +2433,34 @@ public class Dtos {
   public static InstrumentStatusDto asDto(InstrumentStatus from) {
     InstrumentStatusDto to = new InstrumentStatusDto();
     to.setInstrument(asDto(from.getInstrument()));
-    to.setRun(from.getRun() == null ? null : asDto(from.getRun()));
-    to.setPools(from.getRun() == null ? Collections.emptyList()
-        : from.getRun().getSequencerPartitionContainers().stream()//
-            .flatMap(c -> c.getPartitions().stream())//
-            .map(Partition::getPool)
-            .filter(Objects::nonNull)//
-            .collect(Collectors.groupingBy(Pool::getId)).values().stream()//
-            .map(l -> l.get(0))//
-            .sorted((a, b) -> a.getAlias().compareTo(b.getAlias()))//
-            .map(p -> asDto(p, false, false))//
-            .collect(Collectors.toList()));
-    to.setOutOfService(from.isOutOfService());
-    if (to.isOutOfService()) {
-      Date date = from.getInstrument().getServiceRecords().stream()
-          .filter(sr -> sr.isOutOfService() && sr.getStartTime() != null && sr.getEndTime() == null)
-          .map(ServiceRecord::getStartTime)
-          .min(Date::compareTo)
+
+    List<InstrumentPositionStatusDto> posDtos = new ArrayList<>();
+    from.getPositions().forEach((pos, run) -> {
+      InstrumentPositionStatusDto posDto = new InstrumentPositionStatusDto();
+      posDto.setPosition(pos.getAlias());
+      posDto.setRun(run == null ? null : asDto(run));
+      posDto.setPools(run == null ? Collections.emptyList()
+          : run.getSequencerPartitionContainers().stream()//
+              .flatMap(c -> c.getPartitions().stream())//
+              .map(Partition::getPool)//
+              .filter(Objects::nonNull)//
+              .collect(Collectors.groupingBy(Pool::getId)).values().stream()//
+              .map(l -> l.get(0))//
+              .sorted((a, b) -> a.getAlias().compareTo(b.getAlias()))//
+              .map(p -> asDto(p, false, false))//
+              .collect(Collectors.toList()));
+      ServiceRecord instrumentOutOfServiceRecord = from.getInstrument().getServiceRecords().stream()
+          .filter(sr -> sr.isOutOfService() && sr.getStartTime() != null && sr.getEndTime() == null
+              && (sr.getPosition() == null || sr.getPosition().getAlias().equals(pos.getAlias())))
+          .min(Comparator.comparing(ServiceRecord::getStartTime))
           .orElse(null);
-      to.setOutOfServiceTime(formatDateTime(date));
-    }
+      if (instrumentOutOfServiceRecord != null) {
+        posDto.setOutOfService(true);
+        posDto.setOutOfServiceTime(formatDateTime(instrumentOutOfServiceRecord.getStartTime()));
+      }
+      posDtos.add(posDto);
+    });
+    to.setPositions(posDtos);
     return to;
   }
 
@@ -2649,9 +2673,9 @@ public class Dtos {
     setId(dto::setId, from);
     setString(dto::setFilename, from.getFilename());
     setString(dto::setPath, from.getPath());
-    setString(dto::setCategory, from.getCategory(), AttachmentCategory::getAlias);
-    setString(dto::setCreator, from.getCreator(), User::getLoginName);
-    setString(dto::setCreated, from.getCreationTime());
+    setString(dto::setCategory, maybeGetProperty(from.getCategory(), AttachmentCategory::getAlias));
+    setString(dto::setCreator, maybeGetProperty(from.getCreator(), User::getLoginName));
+    setDateString(dto::setCreated, from.getCreationTime());
     return dto;
   }
 
@@ -2664,11 +2688,12 @@ public class Dtos {
 
   public static ServiceRecordDto asDto(ServiceRecord from) {
     ServiceRecordDto dto = new ServiceRecordDto();
-    dto.setId(from.getId());
-    dto.setServiceDate(formatDate(from.getServiceDate()));
-    dto.setTitle(from.getTitle());
-    dto.setDetails(from.getDetails());
-    dto.setReferenceNumber(from.getReferenceNumber());
+    setId(dto::setId, from);
+    setDateString(dto::setServiceDate, from.getServiceDate());
+    setString(dto::setTitle, from.getTitle());
+    setString(dto::setDetails, from.getDetails());
+    setString(dto::setReferenceNumber, from.getReferenceNumber());
+    setString(dto::setPosition, maybeGetProperty(from.getPosition(), PlatformPosition::getAlias));
     dto.setAttachments(from.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList()));
     return dto;
   }
@@ -2820,11 +2845,7 @@ public class Dtos {
   }
 
   private static void setBigDecimal(Consumer<BigDecimal> setter, String value) {
-    if (isStringEmptyOrNull(value)) {
-      setter.accept(null);
-    } else {
-      setter.accept(new BigDecimal(value));
-    }
+    setter.accept(isStringEmptyOrNull(value) ? null : new BigDecimal(value));
   }
 
   private static void setString(Consumer<String> setter, BigDecimal value) {
@@ -2832,19 +2853,15 @@ public class Dtos {
   }
 
   private static void setString(Consumer<String> setter, String value) {
-    if (isStringBlankOrNull(value)) {
-      setter.accept(null);
-    } else {
-      setter.accept(value.trim());
-    }
+    setter.accept(isStringBlankOrNull(value) ? null : value.trim());
   }
 
-  private static void setString(Consumer<String> setter, Date value) {
+  private static void setDateString(Consumer<String> setter, Date value) {
     setter.accept(value == null ? null : formatDate(value));
   }
 
-  private static <T> void setString(Consumer<String> setter, T value, Function<T, String> lookup) {
-    setter.accept(value == null ? null : lookup.apply(value));
+  private static void setDateTimeString(Consumer<String> setter, Date value) {
+    setter.accept(value == null ? null : formatDateTime(value));
   }
 
   private static void setLong(Consumer<Long> setter, Long value, boolean nullOk) {
@@ -2871,6 +2888,14 @@ public class Dtos {
 
   private static <T> void setObject(Consumer<T> setter, String value, Function<String, T> lookup) {
     setter.accept(value == null ? null : lookup.apply(value));
+  }
+
+  private static <S, R> void setObject(Consumer<R> setter, S value, Function<S, R> transform) {
+    setter.accept(value == null ? null : transform.apply(value));
+  }
+
+  private static <S, R> R maybeGetProperty(S object, Function<S, R> getter) {
+    return object == null ? null : getter.apply(object);
   }
 
   /**
@@ -2912,4 +2937,5 @@ public class Dtos {
   public static IlluminaChemistry getMisoIlluminaChemistryFromRunscanner(ca.on.oicr.gsi.runscanner.dto.type.IlluminaChemistry rsType) {
     return IlluminaChemistry.valueOf(rsType.name());
   }
+
 }
