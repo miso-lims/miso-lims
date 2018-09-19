@@ -165,14 +165,9 @@ public class EditSampleController {
   private final ObjectMapper mapper = new ObjectMapper();
 
   @Autowired
-  private SecurityManager securityManager;
-
-  @Autowired
   private ProjectService projectService;
-
   @Autowired
   private NamingScheme namingScheme;
-
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -192,11 +187,9 @@ public class EditSampleController {
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
+  private SecurityManager securityManager;
+  @Autowired
   private BoxService boxService;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -867,7 +860,7 @@ public class EditSampleController {
   }
 
   @PostMapping
-  public String processSubmit(@ModelAttribute("sample") Sample sample, ModelMap model, SessionStatus session)
+  public ModelAndView processSubmit(@ModelAttribute("sample") Sample sample, ModelMap model, SessionStatus session)
       throws IOException {
     if (sample instanceof DetailedSampleBuilder) {
       DetailedSampleBuilder builder = (DetailedSampleBuilder) sample;
@@ -902,7 +895,7 @@ public class EditSampleController {
       }
       session.setComplete();
       model.clear();
-      return "redirect:/miso/sample/" + sample.getId();
+      return new ModelAndView("redirect:/miso/sample/" + sample.getId(), model);
     } catch (IOException ex) {
       log.debug("Failed to save sample", ex);
       throw ex;

@@ -40,18 +40,18 @@ import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
@@ -82,8 +82,6 @@ public class EditServiceRecordController {
   private InstrumentService instrumentService;
   @Autowired
   private ServiceRecordService serviceRecordService;
-  @Autowired
-  private FilesManager filesManager;
 
   @Value("${miso.timeCorrection.uiZone:}")
   private String uiZone;
@@ -114,17 +112,13 @@ public class EditServiceRecordController {
       return value == null ? "" : LimsUtils.formatDateTime(value);
     }
   };
-
-  public void setFilesManager(FilesManager filesManager) {
-    this.filesManager = filesManager;
-  }
   
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return serviceRecordService.getColumnSizes();
   }
 
-  @RequestMapping(value = "/{recordId}", method = RequestMethod.GET)
+  @GetMapping(value = "/{recordId}")
   public ModelAndView viewServiceRecord(@PathVariable(value = "recordId") Long recordId, ModelMap model) throws IOException {
     ServiceRecord sr = serviceRecordService.get(recordId);
     if (sr != null) {
@@ -136,7 +130,7 @@ public class EditServiceRecordController {
     return new ModelAndView("/pages/editServiceRecord.jsp", model);
   }
   
-  @RequestMapping(value = "/new/{instrumentId}", method = RequestMethod.GET)
+  @GetMapping(value = "/new/{instrumentId}")
   public ModelAndView newServiceRecord(@PathVariable(value = "instrumentId") Long instrumentId, ModelMap model) throws IOException {
     Instrument instrument = instrumentService.get(instrumentId);
     if (instrument == null) throw new NotFoundException("No instrument found for ID " + instrumentId.toString());
@@ -148,8 +142,8 @@ public class EditServiceRecordController {
     return new ModelAndView("/pages/editServiceRecord.jsp", model);
   }
   
-  @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("serviceRecord") ServiceRecord record, ModelMap model, SessionStatus session)
+  @PostMapping
+  public ModelAndView processSubmit(@ModelAttribute("serviceRecord") ServiceRecord record, ModelMap model, SessionStatus session)
       throws IOException {
     Long recordId = null;
     if (record.getId() == ServiceRecord.UNSAVED_ID) {
@@ -160,7 +154,7 @@ public class EditServiceRecordController {
     }
     session.setComplete();
     model.clear();
-    return "redirect:/miso/instrument/servicerecord/" + recordId;
+    return new ModelAndView("redirect:/miso/instrument/servicerecord/" + recordId, model);
   }
   
   @InitBinder

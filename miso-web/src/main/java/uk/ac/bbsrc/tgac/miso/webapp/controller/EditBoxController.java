@@ -186,7 +186,7 @@ public class EditBoxController {
   }
 
   @PostMapping
-  public String processSubmit(@ModelAttribute("box") Box box, ModelMap model, SessionStatus session) throws IOException {
+  public ModelAndView processSubmit(@ModelAttribute("box") Box box, ModelMap model, SessionStatus session) throws IOException {
     // The user may have modified the box contents while editing the form. Update the contents.
     if (box.isSaved()) {
       Box original = boxService.get(box.getId());
@@ -195,7 +195,7 @@ public class EditBoxController {
     boxService.save(box);
     session.setComplete();
     model.clear();
-    return "redirect:/miso/box/" + box.getId();
+    return new ModelAndView("redirect:/miso/box/" + box.getId(), model);
   }
 
   private final class BulkCreateBoxBackend extends BulkCreateTableBackend<BoxDto> {

@@ -30,19 +30,18 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
@@ -50,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
 @RequestMapping("/instrument")
@@ -57,17 +57,13 @@ import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
 public class EditInstrumentController {
 
   @Autowired
-  private SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @Autowired
   private InstrumentService instrumentService;
 
   @Autowired
   private ServiceRecordService serviceRecordService;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
 
   public void setInstrumentService(InstrumentService instrumentService) {
     this.instrumentService = instrumentService;
@@ -78,9 +74,9 @@ public class EditInstrumentController {
     return instrumentService.getColumnSizes();
   }
 
-  @RequestMapping("/{instrumentId}")
+  @GetMapping("/{instrumentId}")
   public ModelAndView viewInstrument(@PathVariable(value = "instrumentId") Long instrumentId, ModelMap model) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     Instrument sr = instrumentService.get(instrumentId);
     Collection<ServiceRecord> serviceRecords = serviceRecordService.listByInstrument(instrumentId);
 
@@ -99,8 +95,8 @@ public class EditInstrumentController {
     return new ModelAndView("/pages/editInstrument.jsp", model);
   }
 
-  @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("instrument") Instrument sr, ModelMap model, SessionStatus session)
+  @PostMapping
+  public ModelAndView processSubmit(@ModelAttribute("instrument") Instrument sr, ModelMap model, SessionStatus session)
       throws IOException {
     Long srId = null;
     if (sr.getId() == InstrumentImpl.UNSAVED_ID) {
@@ -111,7 +107,7 @@ public class EditInstrumentController {
     }
     session.setComplete();
     model.clear();
-    return "redirect:/miso/instrument/" + srId;
+    return new ModelAndView("redirect:/miso/instrument/" + srId, model);
   }
 
 }

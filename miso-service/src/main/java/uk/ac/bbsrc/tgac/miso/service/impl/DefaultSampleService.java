@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -242,7 +241,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     loadChildEntities(sample);
     authorizationManager.throwIfNotWritable(sample);
     boxService.throwIfBoxPositionIsFilled(sample);
-    setChangeDetails(sample);
+    sample.setChangeDetails(authorizationManager.getCurrentUser());
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
       if (!isIdentitySample(sample)) {
@@ -425,7 +424,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
     identity.setExternalName(String.join(",", identityExternalNames));
     if (identityExternalNames.size() > lowerCaseIdentityExternalNames.size()) {
-      setChangeDetails(identity);
+      identity.setChangeDetails(authorizationManager.getCurrentUser());
       sampleStore.update(identity);
     }
   }
@@ -597,7 +596,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
         .donorSex(identity.getDonorSex()).consentLevel(identity.getConsentLevel()).build();
     identitySample.setAlias(namingScheme.generateSampleAlias(identitySample));
 
-    setChangeDetails(identitySample);
+    identitySample.setChangeDetails(authorizationManager.getCurrentUser());
     identitySample.inheritPermissions(sample.getProject());
     return (SampleIdentity) save(identitySample, true);
   }
@@ -670,32 +669,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     }
   }
 
-  /**
-   * Updates all user data and timestamps associated with the change. Existing timestamps will be preserved
-   * if the Sample is unsaved, and they are already set
-   * 
-   * @param sample the Sample to update
-   * @param preserveTimestamps if true, the creationTime and lastModified date are not updated
-   * @throws IOException
-   */
-  private void setChangeDetails(Sample sample) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    Date now = new Date();
-    sample.setLastModifier(user);
-
-    if (sample.getId() == Sample.UNSAVED_ID) {
-      sample.setCreator(user);
-      if (sample.getCreationTime() == null) {
-        sample.setCreationTime(now);
-        sample.setLastModified(now);
-      } else if (sample.getLastModified() == null) {
-        sample.setLastModified(now);
-      }
-    } else {
-      sample.setLastModified(now);
-    }
-  }
-
   @Override
   public void update(Sample sample) throws IOException {
     Sample managed = get(sample.getId());
@@ -704,7 +677,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     boxService.throwIfBoxPositionIsFilled(sample);
     validateChange(sample, managed);
     applyChanges(managed, sample);
-    setChangeDetails(managed);
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
     loadChildEntities(managed);
     if (isDetailedSample(managed)) {
       DetailedSample detailedUpdated = (DetailedSample) managed;
