@@ -33,7 +33,7 @@ ListTarget.library_template = {
       name: "Delete",
       action: function(items) {
         var lines = ['Are you sure you wish to delete the following library templates? This cannot be undone.',
-          'Note: a library template may only be deleted by the project owner or an admin.'];
+            'Note: a library template may only be deleted by the project owner or an admin.'];
         var ids = [];
         jQuery.each(items, function(index, librarytemplate) {
           lines.push('* ' + librarytemplate.alias);
@@ -44,8 +44,8 @@ ListTarget.library_template = {
         });
       }
     });
-    
-    if(!projectId){
+
+    if (!projectId) {
       actions.push({
         name: "Add Project",
         action: function(items) {
@@ -62,17 +62,17 @@ ListTarget.library_template = {
               response.forEach(function(project) {
                 projectActions.push({
                   name: project.alias,
-                  handler: function(){
-                    var templateIds = items.map(function(template){
+                  handler: function() {
+                    var templateIds = items.map(function(template) {
                       return template.id;
                     });
-                    Utils.ajaxWithDialog("Adding Library Template" + (items.length > 1 ? "s" : "") + " to Project", "POST", 
+                    Utils.ajaxWithDialog("Adding Library Template" + (items.length > 1 ? "s" : "") + " to Project", "POST",
                         "/miso/rest/librarytemplate/project/add?" + jQuery.param({
                           projectId: project.id,
-                        }), templateIds, function(){
-                      Utils.showOkDialog("Add Project", ["Successfully added Library Template" + (items.length > 1 ? "s" : "")
-                        + " to Project " + project.alias], Utils.page.pageReload);
-                    });
+                        }), templateIds, function() {
+                          Utils.showOkDialog("Add Project", ["Successfully added Library Template" + (items.length > 1 ? "s" : "")
+                              + " to Project " + project.alias], Utils.page.pageReload);
+                        });
                   }
                 });
               });
@@ -81,45 +81,46 @@ ListTarget.library_template = {
           });
         }
       });
-      
+
       actions.push({
         name: "Remove Project",
-        action: function(items){
+        action: function(items) {
           var projectActions = [];
           var projectIds = {};
-          items.forEach(function(template){
-            template.projectIds.forEach(function(id){
-              if(!projectIds.hasOwnProperty(id)){
+          items.forEach(function(template) {
+            template.projectIds.forEach(function(id) {
+              if (!projectIds.hasOwnProperty(id)) {
                 projectIds[id] = true;
                 jQuery.ajax({
                   url: '/miso/rest/project/' + id,
                   type: 'GET',
                   contentType: 'application/json; charset=utf8',
-                }).success(function(project) {
-                  projectActions.push({
-                    name: project.alias,
-                    handler: function(){
-                      var templateIds = items.map(function(item){
-                        return item.id;
+                }).success(
+                    function(project) {
+                      projectActions.push({
+                        name: project.alias,
+                        handler: function() {
+                          var templateIds = items.map(function(item) {
+                            return item.id;
+                          });
+                          Utils.ajaxWithDialog("Removing Library Template " + (items.length > 1 ? "s" : "") + " from Project", "POST",
+                              "/miso/rest/librarytemplate/project/remove?" + jQuery.param({
+                                projectId: id
+                              }), templateIds, function() {
+                                Utils.showOkDialog("Add Project", ["Successfully removed Library Template" + (items.length > 1 ? "s" : "")
+                                    + " from Project " + project.alias], Utils.page.pageReload);
+                              });
+                        }
                       });
-                      Utils.ajaxWithDialog("Removing Library Template " + (items.length > 1 ? "s" : "") + " from Project", "POST",
-                          "/miso/rest/librarytemplate/project/remove?" + jQuery.param({
-                            projectId: id
-                          }), templateIds, function(){
-                        Utils.showOkDialog("Add Project", ["Successfully removed Library Template" + (items.length > 1 ? "s" : "")
-                          + " from Project " + project.alias], Utils.page.pageReload);
-                        });
-                    }
-                  });
-                  Utils.showWizardDialog("Remove Project", projectActions);
-                });
+                      Utils.showWizardDialog("Remove Project", projectActions);
+                    });
               }
             });
           });
         }
       });
     }
-      
+
     return actions;
   },
   createStaticActions: function(config, projectId) {
@@ -130,7 +131,8 @@ ListTarget.library_template = {
           property: 'quantity',
           type: 'int',
           label: 'Quantity',
-          value: 1
+          value: 1,
+          required: true
         }];
 
         Utils.showDialog('Create Library Templates', 'Create', fields, function(result) {
@@ -147,79 +149,94 @@ ListTarget.library_template = {
     }];
   },
   createColumns: function(config, projectId) {
-    
-    var stringIdPredicate = function(id){
+
+    var stringIdPredicate = function(id) {
       return function(item) {
         return !Utils.validation.isEmpty(id) && item.id == id;
       };
     }
-    
-    return [{
+
+    return [
+        {
           "sTitle": "Alias",
           "mData": "alias",
           "include": true,
           "iSortPriority": 0
-        }, {
+        },
+        {
           "sTitle": "Library Design",
           "mData": "designId",
           "include": Constants.isDetailedSample,
           "iSortPriority": 0,
-          "mRender": function(data, type, full){
-            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.libraryDesigns), 'name') || '';
+          "mRender": function(data, type, full) {
+            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.libraryDesigns), 'name')
+                || '';
           },
           "bSortable": false
-        }, {
+        },
+        {
           "sTitle": "Library Code",
           "mData": "designCodeId",
           "include": Constants.isDetailedSample,
           "iSortPriority": 0,
-          "mRender": function(data, type, full){
-            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.libraryDesignCodes), 'code') || '';
+          "mRender": function(data, type, full) {
+            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.libraryDesignCodes), 'code')
+                || '';
           },
           "bSortable": false
-        }, {
+        },
+        {
           "sTitle": "Library Type",
           "mData": "libraryTypeId",
           "include": true,
           "iSortPriority": 0,
-          "mRender": function(data, type, full){
-            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.libraryTypes), 'alias') || '';
+          "mRender": function(data, type, full) {
+            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.libraryTypes), 'alias')
+                || '';
           },
           "bSortable": false
-        }, {
+        },
+        {
           "sTitle": "Library Selection Type",
           "mData": "selectionTypeId",
           "include": true,
           "iSortPriority": 0,
-          "mRender": function(data, type, full){
-            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.librarySelections), 'name') || '';
+          "mRender": function(data, type, full) {
+            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.librarySelections), 'name')
+                || '';
           },
           "bSortable": false
-        }, {
+        },
+        {
           "sTitle": "Library Strategy Type",
           "mData": "strategyTypeId",
           "include": true,
           "iSortPriority": 0,
-          "mRender": function(data, type, full){
-            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.libraryStrategies), 'name') || '';
+          "mRender": function(data, type, full) {
+            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.libraryStrategies), 'name')
+                || '';
           },
           "bSortable": false
-        }, {
+        },
+        {
           "sTitle": "Kit",
           "mData": "kitDescriptorId",
           "include": true,
           "iSortPriority": 0,
-          "mRender": function(data, type, full){
-            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.kitDescriptors), 'name') || '';
+          "mRender": function(data, type, full) {
+            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.kitDescriptors), 'name')
+                || '';
           },
           "bSortable": false
-        }, {
+        },
+        {
           "sTitle": "Index Family",
           "mData": "indexFamilyId",
           "include": true,
           "iSortPriority": 0,
-          "mRender": function(data, type, full){
-            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.indexFamilies), 'name') || '';
+          "mRender": function(data, type, full) {
+            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.indexFamilies), 'name')
+                || '';
           },
           "bSortable": false
         }, {
@@ -228,7 +245,7 @@ ListTarget.library_template = {
           "include": true,
           "iSortPriority": 0,
           "bSortable": false,
-          "mRender": function(data, type, full){
+          "mRender": function(data, type, full) {
             return data || '';
           }
         }, {
@@ -237,7 +254,7 @@ ListTarget.library_template = {
           "include": true,
           "iSortPriority": 0,
           "bSortable": false,
-          "mRender": function(data, type, full){
+          "mRender": function(data, type, full) {
             return data || '';
           }
         }];

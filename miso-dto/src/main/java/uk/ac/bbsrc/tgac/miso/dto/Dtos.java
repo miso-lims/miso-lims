@@ -2710,13 +2710,15 @@ public class Dtos {
       to.setDefaultVolume(from.getDefaultVolume());
     }
 
-    List<Project> projects = new ArrayList<>();
-    from.getProjectIds().stream().forEach(id -> {
-      Project project = new ProjectImpl();
-      project.setId(id);
-      projects.add(project);
-    });
-    to.setProjects(projects);
+    if (from.getProjectIds() != null) {
+      List<Project> projects = new ArrayList<>();
+      from.getProjectIds().stream().forEach(id -> {
+        Project project = new ProjectImpl();
+        project.setId(id);
+        projects.add(project);
+      });
+      to.setProjects(projects);
+    }
 
     if (from.getLibraryTypeId() != null) {
       LibraryType libraryType = new LibraryType();
