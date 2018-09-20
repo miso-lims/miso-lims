@@ -58,14 +58,10 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
 import uk.ac.bbsrc.tgac.miso.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
 @RequestMapping("/rest/librarytemplate")
 public class LibraryTemplateRestController extends RestController {
-
-  @Autowired
-  private AuthorizationManager authorizationManager;
 
   @Autowired
   private LibraryTemplateService libraryTemplateService;
