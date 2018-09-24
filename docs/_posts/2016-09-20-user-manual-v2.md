@@ -81,6 +81,8 @@ order: 1
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="My Projects Tab" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Help Tab" %}
+{% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Quick Help" %}
 
 
 {% assign section = section | plus: 1 %}

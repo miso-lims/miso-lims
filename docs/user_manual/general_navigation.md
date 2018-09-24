@@ -192,7 +192,8 @@ This allows you to quickly move to the next step of your process.
 
 In any of the bulk tables, you can autofill a column by setting a value in the top row, selecting that cell, and then
 either dragging the fill handle to include all of the cells that you would like to copy the value to, or simply
-double-clicking the fill handle to autofill to the bottom of the column.
+double-clicking the fill handle to autofill to the bottom of the column. The fill handle is the little square at the
+bottom right of the selected cell(s).
 
 If you wish to increment a number within the column, you can do that by entering the first two cell values, selecting
 both of those cells, and then using the fill handle in the same manner. For example, if you wished to set Pool aliases
@@ -262,6 +263,20 @@ toolbar to create a new project.
 
 The "Help" tab at the top of the screen will link you to the MISO user tutorials, where you can learn more about how to
 use MISO by working through a number of exercises.
+
+{% include userman-toplink.md %}
+
+
+
+{% assign sub = sub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Quick Help" %}
+
+{% assign figure = figure | plus: 1 %}
+Many pages in MISO include a Quick Help section. This section is hidden by default, but can be show by clicking the
+"Quick Help" heading near the top of the screen (see figure {{figure}}). The Quick Help section displays tips and
+details to help you work with the page.
+
+{% include userman-figure.md num=figure cap="Quick Help" img="general-nav-quick-help.png" %}
 
 {% include userman-toplink.md %}
 
