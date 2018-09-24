@@ -3,7 +3,7 @@ layout: page
 title: "Advanced Search Syntax"
 category: usr
 date: 2018-02-16
-order: 2
+order: 3
 ---
 
 Many search boxes in MISO have GMail-style search using the syntax on this page.
