@@ -45,12 +45,11 @@ ListUtils = (function() {
     },
     "runstatus": {
       term: "is:RUNSTATUS",
-      help: 'Match based on a run\'s "health".  ' +
-      'RUNSTATUS may be one of: ' +
-      'fulfilled, active, unknown, started, running, stopped, incomplete, failed, or completed.  ' +
-      'For order completions, this means that the order includes at least one run with this status.  ' +
-      '"incomplete" matches when a run\'s health ' +
-      '(or an order completion with a run of this health) is any of running, started, or stopped'
+      help: 'Match based on a run\'s "health".  ' + 'RUNSTATUS may be one of: '
+          + 'fulfilled, active, unknown, started, running, stopped, incomplete, failed, or completed.  '
+          + 'For order completions, this means that the order includes at least one run with this status.  '
+          + '"incomplete" matches when a run\'s health '
+          + '(or an order completion with a run of this health) is any of running, started, or stopped'
     },
     "created": {
       term: "created:DATE",
@@ -115,24 +114,18 @@ ListUtils = (function() {
   };
 
   var makeTooltipHelp = function(target) {
-    return "Search syntax: <br/><br/>"
-      + target.searchTermSelector(searchTerms).map(function(term) {
-        return term["term"];
-      }).join('<br/>');
+    return "Search syntax: <br/><br/>" + target.searchTermSelector(searchTerms).map(function(term) {
+      return term["term"];
+    }).join('<br/>');
   };
 
   var makeSearchTooltip = function(searchDivId, target) {
     var searchTooltipId = "searchHelpTooltip_" + target.name.replace(/\s/g, '');
 
     jQuery("#" + searchDivId).append(
-      '<div id="' + searchTooltipId + '" class="tooltip"> ' +
-      '  <span>' +
-      '   <img id="searchHelpQuestionMark" src="/styles/images/question_mark.png"' +
-      '  </span>' +
-      '  <span class="tooltiptext">' +
-      makeTooltipHelp(target) +
-      '  </span>' +
-      '</div>');
+        '<div id="' + searchTooltipId + '" class="tooltip"> ' + '  <span>'
+            + '   <img id="searchHelpQuestionMark" src="/styles/images/question_mark.png"' + '  </span>' + '  <span class="tooltiptext">'
+            + makeTooltipHelp(target) + '  </span>' + '</div>');
 
     return searchTooltipId;
   };
@@ -149,65 +142,39 @@ ListUtils = (function() {
   };
 
   var makePopupTable = function(target) {
-    return '<table class="searchHelpTable">' +
-      '  <caption><h2>Search Terms</h2></caption>' +
-      '  <thead>' +
-      '    <tr><th>Syntax</th><th>Meaning</th></tr>' +
-      '  </thead>' +
-      makePopupTableBody(target) +
-      '</table>';
+    return '<table class="searchHelpTable">' + '  <caption><h2>Search Terms</h2></caption>' + '  <thead>'
+        + '    <tr><th>Syntax</th><th>Meaning</th></tr>' + '  </thead>' + makePopupTableBody(target) + '</table>';
   };
 
-  var dateGrammar = '<table class="searchHelpTable">' +
-    '  <caption><h2>DATE Format</h2></caption>' +
-    '  <thead>' +
-    '    <tr><th>Format</th><th>Behaviour</th></tr>' +
-    '  </thead>' +
-    '  <tr><td>lasthour</td><td>Filter from 1 hour ago to the current time.</td></tr>' +
-    '  <tr><td>today</td><td>Anything that happened on the current calendar day.</td></tr>' +
-    '  <tr><td>yesterday</td><td>Filter for anything on the last calendar day.</td></tr>' +
-    '  <tr><td>thisweek</td><td>Filter from Monday 00:00:00 of the current week to the present time.</td></tr>' +
-    '  <tr><td>lastweek</td><td>Filter from Monday 00:00:00 of the previous week to Sunday 23:59:59 of the previous week.</td></tr>' +
-    '  <tr><td><i>N</i>hours</td><td>Filter for anything from the current time to <i>N</i> hours ago.</td></tr>' +
-    '  <tr><td><i>N</i>days</td><td>Filter for anything from the current time to <i>N</i>*24 hours ago.</td></tr>' +
-    '  <tr><td>YYYY-MM-DD</td><td>Search from YYYY-MM-DD 00:00:00 to YYYY-MM-DD 23:59:59</td></tr>' +
-    '</table>';
+  var dateGrammar = '<table class="searchHelpTable">' + '  <caption><h2>DATE Format</h2></caption>' + '  <thead>'
+      + '    <tr><th>Format</th><th>Behaviour</th></tr>' + '  </thead>'
+      + '  <tr><td>lasthour</td><td>Filter from 1 hour ago to the current time.</td></tr>'
+      + '  <tr><td>today</td><td>Anything that happened on the current calendar day.</td></tr>'
+      + '  <tr><td>yesterday</td><td>Filter for anything on the last calendar day.</td></tr>'
+      + '  <tr><td>thisweek</td><td>Filter from Monday 00:00:00 of the current week to the present time.</td></tr>'
+      + '  <tr><td>lastweek</td><td>Filter from Monday 00:00:00 of the previous week to Sunday 23:59:59 of the previous week.</td></tr>'
+      + '  <tr><td><i>N</i>hours</td><td>Filter for anything from the current time to <i>N</i> hours ago.</td></tr>'
+      + '  <tr><td><i>N</i>days</td><td>Filter for anything from the current time to <i>N</i>*24 hours ago.</td></tr>'
+      + '  <tr><td>YYYY-MM-DD</td><td>Search from YYYY-MM-DD 00:00:00 to YYYY-MM-DD 23:59:59</td></tr>' + '</table>';
 
-  var userGrammar = '<table class="searchHelpTable">' +
-    '  <caption><h2>USER Format</h2></caption>' +
-    '  <thead>' +
-    '    <tr><th>Format</th><th>Behaviour</th></tr>' +
-    '  </thead>' +
-    '  <tr><td>me</td><td>Searches for the current user.</td></tr>' +
-    '  <tr><td>Anything else</td><td>Assumed to be the user\'s login name (not their human name).' +
-    '    This starts searching from the beginning, so “jrh” will match “jrhacker”, but “hacker” will not match “jrhacker”.</td></tr>' +
-    '</table>';
+  var userGrammar = '<table class="searchHelpTable">' + '  <caption><h2>USER Format</h2></caption>' + '  <thead>'
+      + '    <tr><th>Format</th><th>Behaviour</th></tr>' + '  </thead>' + '  <tr><td>me</td><td>Searches for the current user.</td></tr>'
+      + '  <tr><td>Anything else</td><td>Assumed to be the user\'s login name (not their human name).'
+      + '    This starts searching from the beginning, so “jrh” will match “jrhacker”, but “hacker” will not match “jrhacker”.</td></tr>'
+      + '</table>';
 
   var makePopupHelp = function(target) {
-    return '<h1>Search Syntax</h1>' +
-      '<p>' +
-      '  This search box supports case-sensitive search syntax.' +
-      '  Multiple searches can be separated by spaces (not AND).' +
-      '  If a filter does not apply, it is ignored.' +
-      '  Any other search term is taken as a regular query and matched against the current fields for each item.' +
-      '  To search for a term with spaces, surround the entire term in quotation marks.' +
-      '</p>' +
-      '<br/>' +
-      makePopupTable(target) +
-      "<br/>" +
-      dateGrammar +
-      "<br/>" +
-      userGrammar;
+    return '<h1>Search Syntax</h1>' + '<p>' + '  This search box supports case-sensitive search syntax.'
+        + '  Multiple searches can be separated by spaces (not AND).' + '  If a filter does not apply, it is ignored.'
+        + '  Any other search term is taken as a regular query and matched against the current fields for each item.'
+        + '  To search for a term with spaces, surround the entire term in quotation marks.' + '</p>' + '<br/>' + makePopupTable(target)
+        + "<br/>" + dateGrammar + "<br/>" + userGrammar;
   };
 
   var makePopupElement = function(parentId, popupId, popupCloseId, target) {
     jQuery("#" + parentId).append(
-      '<div id="' + popupId + '" class="popup">' +
-      '  <div class="popup-inner">' +
-      makePopupHelp(target) +
-      '    <a id="' + popupCloseId + '" class="popup-close" href="#">x</a>' +
-      '  </div>' +
-      '</div>');
+        '<div id="' + popupId + '" class="popup">' + '  <div class="popup-inner">' + makePopupHelp(target) + '    <a id="' + popupCloseId
+            + '" class="popup-close" href="#">x</a>' + '  </div>' + '</div>');
   };
 
   var registerPopupOpen = function(triggerId, popupId) {
@@ -269,7 +236,8 @@ ListUtils = (function() {
           }) ? " checked=\"checked\"" : "";
 
           return "<input type=\"checkbox\" id=\"" + elementId + "_toggle" + data
-              + "\" onclick='ListUtils._checkEventHandler(this.checked, event, " + JSON.stringify(data) + ", \"" + elementId + "\")'" + checked + ">";
+              + "\" onclick='ListUtils._checkEventHandler(this.checked, event, " + JSON.stringify(data) + ", \"" + elementId + "\")'"
+              + checked + ">";
         }
       });
       if (staticActions.length > 0) {
@@ -402,6 +370,7 @@ ListUtils = (function() {
       'fnDrawCallback': function(oSettings) {
         jqTable.removeClass('disabled');
         jQuery('#' + elementId + '_paginate').find('.fg-button').removeClass('fg-button');
+        updateSelectedLabel(ListState[elementId]);
       },
       'fnPreDrawCallback': function(oSettings) {
         ListState[elementId].data = [];
