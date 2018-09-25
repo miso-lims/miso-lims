@@ -48,9 +48,12 @@
   <button type="button" id="save" onclick="return Run.validateRun();" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
-  <c:if test="${run.id != 0 && miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
-    <a href="<c:url value='/miso/rest/run/${run.id}/samplesheet'/>" class="ui-button ui-state-default">Sample Sheet (1.8)</a>
-    <a href="<c:url value='/miso/rest/run/${run.id}/oldsamplesheet'/>" class="ui-button ui-state-default">Sample Sheet (1.7)</a>
+  <c:if test="${run.id != 0}">
+    <c:forEach items="<%=uk.ac.bbsrc.tgac.miso.core.util.SampleSheet.values()%>" var="sheet">
+      <c:if test="${sheet.allowedFor(run)}">
+        <a href="<c:url value='/miso/rest/run/${run.id}/samplesheet/${sheet.name()}'/>" class="ui-button ui-state-default">Download Sample Sheet (${sheet.alias()})</a>
+      </c:if>
+    </c:forEach>
     <span></span>
   </c:if>
   <c:choose>

@@ -242,7 +242,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     authorizationManager.throwIfNotWritable(run);
     validateChanges(null, run);
     saveContainers(run);
-    setChangeDetails(run);
+    run.setChangeDetails(authorizationManager.getCurrentUser());
     loadChildEntities(run);
 
     run.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(run.getSecurityProfile())));
@@ -255,13 +255,13 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
 
   @Override
   public void update(Run run) throws IOException {
-    Run updatedRun = get(run.getId());
-    authorizationManager.throwIfNotWritable(updatedRun);
+    Run managed = get(run.getId());
+    authorizationManager.throwIfNotWritable(managed);
     saveContainers(run);
-    applyChanges(updatedRun, run);
-    setChangeDetails(updatedRun);
-    loadChildEntities(updatedRun);
-    save(updatedRun);
+    applyChanges(managed, run);
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
+    loadChildEntities(managed);
+    save(managed);
   }
 
   private Run save(Run run) throws IOException {
@@ -394,30 +394,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   private void applyOxfordNanoporeChanges(OxfordNanoporeRun target, OxfordNanoporeRun source) {
     target.setMinKnowVersion(isStringEmptyOrNull(source.getMinKnowVersion()) ? null : source.getMinKnowVersion());
     target.setProtocolVersion(isStringEmptyOrNull(source.getProtocolVersion()) ? null : source.getProtocolVersion());
-  }
-
-  /**
-   * Updates all timestamps and user data associated with the change
-   * 
-   * @param run the Run to update
-   * @throws IOException
-   */
-  private void setChangeDetails(Run run) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    Date now = new Date();
-    run.setLastModifier(user);
-
-    if (run.getId() == Run.UNSAVED_ID) {
-      run.setCreator(user);
-      if (run.getCreationTime() == null) {
-        run.setCreationTime(now);
-        run.setLastModified(now);
-      } else if (run.getLastModified() == null) {
-        run.setLastModified(now);
-      }
-    } else {
-      run.setLastModified(now);
-    }
   }
 
   /**
@@ -594,7 +570,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
 
     isMutated |= updateSequencingParameters(target, user, filterParameters, sequencer);
 
-    setChangeDetails(target);
+    target.setChangeDetails(user);
     if (isNew) {
       target.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(target.getSecurityProfile())));
       target.setName(generateTemporaryName());

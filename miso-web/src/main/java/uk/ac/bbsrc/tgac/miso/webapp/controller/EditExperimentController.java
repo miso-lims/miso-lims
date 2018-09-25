@@ -33,13 +33,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
@@ -56,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
 @RequestMapping("/experiment")
@@ -67,6 +68,8 @@ public class EditExperimentController {
   private ExperimentService experimentService;
 
   @Autowired
+  private AuthorizationManager authorizationManager;
+  @Autowired
   private SecurityManager securityManager;
 
   @ModelAttribute("maxLengths")
@@ -74,23 +77,19 @@ public class EditExperimentController {
     return experimentService.getColumnSizes();
   }
 
-  @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("experiment") Experiment experiment, ModelMap model, SessionStatus session)
+  @PostMapping
+  public ModelAndView processSubmit(@ModelAttribute("experiment") Experiment experiment, ModelMap model, SessionStatus session)
       throws IOException {
     experimentService.save(experiment);
     session.setComplete();
     model.clear();
-    return "redirect:/miso/experiment/" + experiment.getId();
+    return new ModelAndView("redirect:/miso/experiment/" + experiment.getId(), model);
   }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @RequestMapping(value = "/{experimentId}", method = RequestMethod.GET)
+  @GetMapping(value = "/{experimentId}")
   public ModelAndView setupForm(@PathVariable Long experimentId, ModelMap model) throws IOException {
     Experiment experiment = experimentService.get(experimentId);
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     if (experiment == null) throw new NotFoundException("No experiment found for ID " + experimentId.toString());
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode consumableConfig = mapper.createObjectNode();

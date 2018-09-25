@@ -4,7 +4,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -12,8 +11,6 @@ import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
@@ -114,7 +111,7 @@ public class DefaultArrayRunService implements ArrayRunService {
   }
 
   private long create(ArrayRun arrayRun) throws IOException {
-    setChangeDetails(arrayRun);
+    arrayRun.setChangeDetails(authorizationManager.getCurrentUser());
     validateChange(arrayRun, null);
     return arrayRunStore.save(arrayRun);
   }
@@ -123,7 +120,7 @@ public class DefaultArrayRunService implements ArrayRunService {
     ArrayRun managed = get(arrayRun.getId());
     validateChange(arrayRun, managed);
     applyChanges(arrayRun, managed);
-    setChangeDetails(managed);
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
     return arrayRunStore.save(managed);
   }
 
@@ -216,31 +213,6 @@ public class DefaultArrayRunService implements ArrayRunService {
     to.setHealth(from.getHealth());
     to.setStartDate(from.getStartDate());
     to.setCompletionDate(from.getCompletionDate());
-  }
-
-  /**
-   * Updates all user data and timestamps associated with the change. Existing timestamps will be preserved
-   * if the Array Run is unsaved, and they are already set
-   * 
-   * @param arrayRun the Array Run to update
-   * @throws IOException
-   */
-  private void setChangeDetails(ArrayRun arrayRun) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    Date now = new Date();
-    arrayRun.setLastModifier(user);
-
-    if (arrayRun.getId() == Array.UNSAVED_ID) {
-      arrayRun.setCreator(user);
-      if (arrayRun.getCreationTime() == null) {
-        arrayRun.setCreationTime(now);
-      }
-      if (arrayRun.getLastModified() == null) {
-        arrayRun.setLastModified(now);
-      }
-    } else {
-      arrayRun.setLastModified(now);
-    }
   }
 
   @Override

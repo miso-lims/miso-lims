@@ -100,14 +100,16 @@ public class EditLibraryTemplateController {
 
   @GetMapping(value = "/bulk/new")
   public ModelAndView receiveBulkLibraries(@RequestParam("quantity") Integer quantity,
-      @RequestParam("projectId") Long projectId,
+      @RequestParam(value = "projectId", required = false) Long projectId,
       ModelMap model) throws IOException {
 
     LibraryTemplateDto dto = (isDetailedSampleEnabled() ? new DetailedLibraryTemplateDto() : new LibraryTemplateDto());
     dto.setId(LibraryTemplate.UNSAVED_ID);
-    List<Long> projectIds = new ArrayList<>();
-    projectIds.add(projectId);
-    dto.setProjectIds(projectIds);
+    if (projectId != null) {
+      List<Long> projectIds = new ArrayList<>();
+      projectIds.add(projectId);
+      dto.setProjectIds(projectIds);
+    }
 
     return new BulkCreateLibraryTemplateBackend(dto, quantity).create(model);
   }

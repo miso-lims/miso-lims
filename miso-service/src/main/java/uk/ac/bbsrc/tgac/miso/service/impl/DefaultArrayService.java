@@ -4,7 +4,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +13,6 @@ import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
@@ -97,7 +94,7 @@ public class DefaultArrayService implements ArrayService {
   }
 
   private long create(Array array) throws IOException {
-    setChangeDetails(array);
+    array.setChangeDetails(authorizationManager.getCurrentUser());
     validateChange(array, null);
     return arrayStore.save(array);
   }
@@ -106,7 +103,7 @@ public class DefaultArrayService implements ArrayService {
     Array managed = get(array.getId());
     validateChange(array, managed);
     applyChanges(array, managed);
-    setChangeDetails(managed);
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
     return arrayStore.save(managed);
   }
 
@@ -194,31 +191,6 @@ public class DefaultArrayService implements ArrayService {
         toSamples.put(key, val);
       }
     });
-  }
-
-  /**
-   * Updates all user data and timestamps associated with the change. Existing timestamps will be preserved
-   * if the Array is unsaved, and they are already set
-   * 
-   * @param array the Array to update
-   * @throws IOException
-   */
-  private void setChangeDetails(Array array) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    Date now = new Date();
-    array.setLastModifier(user);
-
-    if (array.getId() == Array.UNSAVED_ID) {
-      array.setCreator(user);
-      if (array.getCreationTime() == null) {
-        array.setCreationTime(now);
-      }
-      if (array.getLastModified() == null) {
-        array.setLastModified(now);
-      }
-    } else {
-      array.setLastModified(now);
-    }
   }
 
   @Override

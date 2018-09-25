@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
@@ -113,7 +112,7 @@ public class DefaultKitService implements KitService {
       original.setDescription(kitDescriptor.getDescription());
       kitDescriptor = original;
     }
-    setChangeDetails(kitDescriptor);
+    kitDescriptor.setChangeDetails(authorizationManager.getCurrentUser());
     return kitStore.saveKitDescriptor(kitDescriptor);
   }
 
@@ -148,30 +147,6 @@ public class DefaultKitService implements KitService {
   @Override
   public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException {
     return kitStore.getKitDescriptorColumnSizes();
-  }
-
-  /**
-   * Updates all timestamps and user data associated with the change
-   * 
-   * @param sample the Sample to update
-   * @throws IOException
-   */
-  private void setChangeDetails(KitDescriptor kitDescriptor) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    Date now = new Date();
-    kitDescriptor.setLastModifier(user);
-
-    if (kitDescriptor.getId() == KitDescriptor.UNSAVED_ID) {
-      kitDescriptor.setCreator(user);
-      if (kitDescriptor.getCreationTime() == null) {
-        kitDescriptor.setCreationTime(now);
-        kitDescriptor.setLastModified(now);
-      } else if (kitDescriptor.getLastModified() == null) {
-        kitDescriptor.setLastModified(now);
-      }
-    } else {
-      kitDescriptor.setLastModified(now);
-    }
   }
 
   @Override

@@ -1,8 +1,18 @@
+# 0.2.143
+
+Changes:
+
+ * Fixed selected items count on page size change
+ * Fixed creating Library Templates
+ * Added BCL2FASTQ sample sheet
+ * Added Cell Ranger sample sheet
+ * Allow multiple sample sheet types
+
 # 0.2.142
 
 Changes:
 
- * Add Create button to Studies list (#1663)
+ * Add Create button to Studies list
  * Fixed user name for pool dilution change logs entries
  * Fixed creating stacks in freezers
  * Fixed start of x-axis in some run metrics graphs

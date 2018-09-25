@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,14 +67,11 @@ public class EditStudyController {
   protected static final Logger log = LoggerFactory.getLogger(EditStudyController.class);
 
   @Autowired
-  private SecurityManager securityManager;
-
-  @Autowired
   private AuthorizationManager authorizationManager;
-
+  @Autowired
+  private SecurityManager securityManager;
   @Autowired
   private ProjectService projectService;
-
   @Autowired
   private StudyService studyService;
 
@@ -97,10 +93,6 @@ public class EditStudyController {
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
 
   public Project populateProject(@PathVariable Long projectId) throws IOException {
@@ -151,7 +143,7 @@ public class EditStudyController {
 
   @GetMapping(value = "/new/{projectId}")
   public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     Study study = new StudyImpl(user);
     Project project = projectService.getProjectById(projectId);
     study.setProject(project);
@@ -171,7 +163,7 @@ public class EditStudyController {
 
   @GetMapping(value = "/{studyId}")
   public ModelAndView setupForm(@PathVariable Long studyId, ModelMap model) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     Study study = studyService.get(studyId);
     if (study == null) throw new NotFoundException("No study found for ID " + studyId.toString());
 
@@ -190,10 +182,10 @@ public class EditStudyController {
   }
 
   @PostMapping
-  public String processSubmit(@ModelAttribute("study") Study study, ModelMap model, SessionStatus session) throws IOException {
+  public ModelAndView processSubmit(@ModelAttribute("study") Study study, ModelMap model, SessionStatus session) throws IOException {
     studyService.save(study);
     session.setComplete();
     model.clear();
-    return "redirect:/miso/study/" + study.getId();
+    return new ModelAndView("redirect:/miso/study/" + study.getId(), model);
   }
 }
