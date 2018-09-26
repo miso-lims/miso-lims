@@ -28,6 +28,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -204,6 +205,50 @@ public class WorksetRestController extends RestController {
       worksets.add(workset);
     }
     worksetService.bulkDelete(worksets);
+  }
+
+  private static class MergeWorksetsRequestData {
+
+    private List<Long> ids;
+    private String alias;
+    private String description;
+
+    public List<Long> getIds() {
+      return ids;
+    }
+
+    public String getAlias() {
+      return alias;
+    }
+
+    public String getDescription() {
+      return description;
+    }
+
+  }
+
+  @PostMapping("/merge")
+  @ResponseStatus(HttpStatus.CREATED)
+  public @ResponseBody WorksetDto mergeWorksets(@RequestBody(required = true) MergeWorksetsRequestData data) throws IOException {
+    Workset workset = new Workset();
+    if (LimsUtils.isStringEmptyOrNull(data.getAlias())) {
+      throw new RestException("No alias provided for new workset", Status.BAD_REQUEST);
+    }
+    workset.setAlias(data.getAlias());
+    if (!LimsUtils.isStringEmptyOrNull(data.getDescription())) {
+      workset.setDescription(data.getDescription());
+    }
+    for (Long id : data.getIds()) {
+      Workset child = worksetService.get(id);
+      if (child == null) {
+        throw new RestException("No workset found with ID: " + id, Status.BAD_REQUEST);
+      }
+      workset.getSamples().addAll(child.getSamples());
+      workset.getLibraries().addAll(child.getLibraries());
+      workset.getDilutions().addAll(child.getDilutions());
+    }
+    worksetService.save(workset);
+    return Dtos.asDto(workset);
   }
 
 }
