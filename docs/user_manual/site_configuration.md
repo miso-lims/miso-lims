@@ -61,7 +61,7 @@ some fields in order to enforce these naming schemes:
 * All item names
 * Sample alias
 * Library alias
-* Project ShortName
+* Project short name
 
 It may also be possible to auto-generate aliases for your samples and/or libraries.
 
@@ -133,8 +133,7 @@ It is possible to set a default value for some fields to save users from repetit
 configured, it will be filled in automatically when creating new items. The user is still free to change the value if
 they would like.
 
-The only field that can currently be configured with a default value is sample scientific name. This setting only
-affects the bulk entry form.
+The only field that can currently be configured with a default value is sample scientific name.
 
 {% include userman-toplink.md %}
 
