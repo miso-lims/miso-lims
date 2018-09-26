@@ -105,3 +105,8 @@ table, th, td {
 th, td {
     padding: 6px;
 }
+
+img.userman-figure {
+    border: 1px solid grey;
+    padding: 4px;
+}

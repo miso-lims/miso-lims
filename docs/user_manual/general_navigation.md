@@ -17,8 +17,8 @@ depending on the item you clicked, or perform some other action.
 
 {% include userman-figure.md num=figure cap="Home screen widgets" img="general-nav-widgets.png" %}
 
-Individual widgets are described in more detail in the <a href="home_screen_widgets.html">Home Screen Widgets</a>
-section.
+Individual widgets are described in more detail in the [Home Screen Widgets section](home_screen_widgets.html)
+
 
 {% include userman-toplink.md %}
 
@@ -232,7 +232,7 @@ working with items in MISO and the lab. Individual tools are documented in more 
 Clicking the "My Account" tab at the top of the screen will take you to a page showing your name and the groups that
 you belong to. There is an Edit link that will open a page showing more of your user details. Depending on your site
 configuration, you may be able to edit some of these details and reset your password from this page. See
-[Authentication](site_configuration.html#authentication) for more details.
+[Authentication](site_configuration.html#logging_in) for more details.
 
 If you are a MISO administrator, an Administration section will also appear on the My Account tab. The Clear Cache
 action should not be necessary, but can be used to help troubleshoot bugs. The Refresh Constants action can be used to
