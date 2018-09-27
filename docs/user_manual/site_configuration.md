@@ -116,9 +116,11 @@ scan entire boxes of tubes at once. These bulk scanners must be configured by yo
 
 {% assign figure = figure | plus: 1 %}
 If you are generating reports for projects or runs outside of MISO, it may be possible to automatically link to them
-from the MISO Project and Run pages. For projects, it must be possible to generate the report's URL given the project's
-ID, name, and short name. For runs, it must be possible to generate the report's URL given the run's ID, name, and
-alias. The report links will appear in the External Links section of the Run or Project page (see figure {{figure}}).
+from the MISO Project and Run pages. For projects, it must be possible to generate the report URL using the project's
+ID, name, and/or short name. For runs, it must be possible to generate the report URL using the run's ID, name, and/or
+alias. For example, you could create links to http://www.example.com/projects/{project-id}/stats or
+http://www.example.com/runreports/{run-alias}.html. The report links will appear in the External Links section of the
+Run or Project page (see figure {{figure}}).
 
 {% include userman-figure.md num=figure cap="Report links" img="site-config-external-links.png" %}
 
