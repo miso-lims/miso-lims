@@ -24,7 +24,7 @@ HotTarget.libraryTemplate = (function() {
     createColumns: function(config, create, data) {
       var platformTypes = Constants.platformTypes.filter(function(pt) {
         return pt.active || data.reduce(function(acc, libTemp) {
-          return acc || pt.key == libTemp.platformType;
+          return acc || pt.name == libTemp.platformType;
         }, false);
       }).map(function(pt) {
         return pt.key;
@@ -52,10 +52,11 @@ HotTarget.libraryTemplate = (function() {
           validator: HotUtils.validator.requiredAutocomplete,
           include: true,
           unpack: function(libTemp, flat, setCellMeta) {
-            flat.platformType = libTemp.platformType || none;
+            flat.platformType = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.namePredicate(libTemp.platformType),
+                Constants.platformTypes), 'key') || none;
           },
           pack: function(libTemp, flat, errorHandler) {
-            libTemp.platformType = flat.platformType == none ? null : flat.platformType;
+            libTemp.platformType = flat.platformType == none ? null : HotUtils.getPlatformType(flat.platformType);
           },
         }, {
           header: 'Type',
