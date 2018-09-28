@@ -11,29 +11,17 @@ order: 1
 {% assign section-title = "Site Configuration" %}
 {% include userman-toc-link.md section=section section-title=section-title %}
 {% assign sub = 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Authentication" %}
-{% assign subsub = 1 %}
-{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="JDBC" %}
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="LDAP" %}
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Active Directory" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Logging In" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Storage Directories" %}
-{% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Issue Tracker and Bug Reports" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Issue Trackers" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Naming Schemes" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Taxon Lookup" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Time Zones" %}
-{% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="RunScanner" %}
-{% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Automatic Barcode Generation" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="VisionMate Scanners" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Barcode Scanners" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Report Links" %}
 {% assign sub = sub | plus: 1 %}
