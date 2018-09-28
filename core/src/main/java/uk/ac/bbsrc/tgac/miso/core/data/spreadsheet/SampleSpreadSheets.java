@@ -44,9 +44,11 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forDouble("Concentration (ng/uL)", Sample::getConcentration), //
       Column.forDouble("Total (ng)",
           (sam -> (sam.getVolume() != null && sam.getConcentration() != null) ? sam.getVolume() * sam.getConcentration() : null)), //
-      Column.forString("Subproject", detailedSample(SampleIdentity.class,
-          (dsam -> dsam.getSubproject() != null ? dsam.getSubproject().getAlias() : ""), "")));
-
+      Column.forString("Subproject",
+          (sam-> (LimsUtils.isDetailedSample(sam) && ((DetailedSample) sam).getSubproject() != null ? 
+              ((DetailedSample) sam).getSubproject().getAlias() : "")))
+	);
+  
   private static <S extends DetailedSample, T> Function<Sample, T> detailedSample(Class<S> clazz, Function<S, T> function, T defaultValue) {
     return s -> {
       if (clazz.isInstance(s)) {
