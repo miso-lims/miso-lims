@@ -1890,7 +1890,7 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setArchived(from.getArchived());
     if (includeChildren) {
-      dto.setIndices(from.getIndices().stream().map(x -> asDto(x, false)).collect(Collectors.toList()));
+      dto.setIndices(from.getIndices().stream().map(x -> asDto(x, true)).collect(Collectors.toList()));
     }
     dto.setMaximumNumber(from.getMaximumNumber());
     dto.setPlatformType(from.getPlatformType() == null ? null : from.getPlatformType().name());

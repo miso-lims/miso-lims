@@ -87,7 +87,7 @@ HotTarget.library = (function() {
             var indexName = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
               return index.position == n - 1;
             }).find(function(index) {
-              return index.label == value
+              return index.label == value || index.sequence == value;
             }).name;
             if (indexName) {
               var dualIndex = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
