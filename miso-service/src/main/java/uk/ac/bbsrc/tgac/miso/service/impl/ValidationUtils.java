@@ -26,13 +26,13 @@ public class ValidationUtils {
   }
 
   public static void validateConcentrationUnits(Double concentration, ConcentrationUnit units, Collection<ValidationError> errors) {
-    if (concentration != null && units == null) {
+    if (concentration != null && concentration > 0D && units == null) {
       errors.add(new ValidationError("concentrationUnits", "Concentration units must be specified"));
     }
   }
 
   public static void validateVolumeUnits(Double volume, VolumeUnit units, Collection<ValidationError> errors) {
-    if (volume != null && units == null) {
+    if (volume != null && volume > 0D && units == null) {
       errors.add(new ValidationError("volumeUnits", "Volume units must be specified"));
     }
   }
