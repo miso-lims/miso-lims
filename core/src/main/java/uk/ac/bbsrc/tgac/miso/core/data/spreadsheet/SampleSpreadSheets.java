@@ -40,8 +40,8 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       }), "Other")), //
       Column.forString("Barcode", Sample::getIdentificationBarcode), //
       Column.forString("External Identifier",  detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
-      Column.forDouble("Volume (uL)", Sample::getVolume), //
-      Column.forDouble("Concentration (ng/uL)", Sample::getConcentration), //
+      Column.forDouble("VOL (uL)", Sample::getVolume), //
+      Column.forDouble("[] (ng/uL)", Sample::getConcentration), //
       Column.forDouble("Total (ng)",
           (sam -> (sam.getVolume() != null && sam.getConcentration() != null) ? sam.getVolume() * sam.getConcentration() : null)), //
       Column.forString("Subproject",
