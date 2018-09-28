@@ -39,6 +39,7 @@ public interface AbstractListPage {
     public static final String STATUS = "Status";
     public static final String START_DATE = "Start Date";
     public static final String END_DATE = "End Date";
+    public static final String ITEMS = "Items";
     public static final String ITEMS_CAPACITY = "Items/Capacity";
     public static final String SIZE = "Size";
     public static final String KIT_NAME = "Kit Name";
