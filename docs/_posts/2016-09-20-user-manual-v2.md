@@ -77,6 +77,8 @@ order: 1
 {% assign section-title = "Barcode Label Printers" %}
 {% include userman-toc-link.md section=section section-title=section-title %}
 {% assign sub = 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Printers List" %}
+{% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding Printers" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Disabling/Enabling Printers" %}

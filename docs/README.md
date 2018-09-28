@@ -19,19 +19,11 @@ The project is configured to run on Github, so build and serve the website like 
     jekyll build ; jekyll serve --baseurl ''
 
 
-## Deploying to gh-pages
+## Deploying to GitHub Pages
 
-First, build the site locally without modifying baseurl.
-
-    jekyll build
-
-
-Add and commit the _site subdirectory and then push the subtree to gh-pages from the root directory.
-
-    git add docs/_site/* && git commit -m "Rebuilding the website"
-    git subtree push --prefix docs/_site oicr gh-pages    
-
-For troubleshooting, see [Deploying a subfolder to Github Pages](https://gist.github.com/cobyism/4730490).
+The [TGAC/miso-lims](https://github.com/TGAC/miso-lims/) repository on GitHub is configured to deploy the `docs`
+subdirectory of the `master` branch to GitHub Pages automatically:
+[http://tgac.github.io/miso-lims/](http://tgac.github.io/miso-lims/)
 
 
 ## Cheat sheet
