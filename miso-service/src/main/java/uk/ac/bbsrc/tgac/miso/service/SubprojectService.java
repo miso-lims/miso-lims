@@ -13,4 +13,6 @@ public interface SubprojectService extends DeleterService<Subproject> {
 
   Set<Subproject> getAll() throws IOException;
 
+  Set<Subproject> getByProjectId(Long projectId) throws IOException;
+
 }

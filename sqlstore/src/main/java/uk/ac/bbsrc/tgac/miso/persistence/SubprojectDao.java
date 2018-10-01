@@ -8,6 +8,8 @@ public interface SubprojectDao {
 
   List<Subproject> getSubproject();
 
+  List<Subproject> getByProjectId(Long projectId);
+
   Subproject getSubproject(Long id);
 
   Long addSubproject(Subproject subproject);

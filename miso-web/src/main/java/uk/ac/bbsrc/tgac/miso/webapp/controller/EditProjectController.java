@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
@@ -66,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -83,6 +86,7 @@ import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ExternalUriBuilder;
@@ -119,6 +123,8 @@ public class EditProjectController {
   private LibraryDilutionService dilutionService;
   @Autowired
   private StudyService studyService;
+  @Autowired
+  private SubprojectService subprojectService;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -148,6 +154,14 @@ public class EditProjectController {
   public void initBinder(WebDataBinder binder) {
     CustomDateEditor cde = new CustomDateEditor(LimsUtils.getDateFormat(), true);
     binder.registerCustomEditor(Date.class, cde);
+  }
+
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
+
+  @ModelAttribute("detailedSample")
+  private Boolean isDetailedSampleEnabled() {
+    return detailedSample;
   }
 
   @ModelAttribute("maxLengths")
@@ -254,6 +268,8 @@ public class EditProjectController {
       if (project == null) {
         throw new NotFoundException("No project found for ID " + projectId.toString());
       }
+      Collection<Subproject> subprojects = subprojectService.getByProjectId(projectId);
+      model.put("subprojects", Dtos.asDtos(new HashSet<>(subprojects)));
       model.put("title", "Project " + projectId);
       try {
         issues = issueTrackerManager.getIssuesByTag(project.getShortName());

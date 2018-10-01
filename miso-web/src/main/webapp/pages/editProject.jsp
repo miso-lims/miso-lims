@@ -139,7 +139,20 @@
         </form:select>
     </td>
   </tr>
-  <c:if test="${project.id != 0 && !projectReportLinks.isEmpty()}">
+  <c:if test="${project.id != 0}">
+  <c:if test="${detailedSample}">
+  <tr>
+    <td>Subprojects:</td>
+    <td>
+    <c:forEach items="${subprojects}" var="subproject">
+      <button class="ui-state-default ui-state-hover small-gap-right clickable-non-link"
+        onclick="Utils.ui.filterTable('project_samples', 'subproject', '${subproject.alias}'); return false;">${subproject.alias}</button>
+    </c:forEach>
+    <br/><a href="<c:url value='/miso/subproject/bulk/new?quantity=1'/>">Add new subproject</a>
+    </td>
+  </tr>
+  </c:if>
+  <c:if test="${!projectReportLinks.isEmpty()}">
   <tr>
   	<td>External Links:</td>
   	<td>
@@ -148,6 +161,7 @@
   	</c:forEach>
   	</td>
   </tr>
+  </c:if>
   </c:if>
 </table>
 
@@ -502,7 +516,7 @@
   Studies
 <div id="studies_section_arrowclick" class="toggleLeft"></div>
 </div>
-<div id="studies_section" class="expandable_section">
+<div id="studies_section" class="expandable_section" style="display:none;">
   <miso:list-section-ajax id="project_studies" name="Studies" target="study" project="${project}" config="{ isAdmin : ${miso:isAdmin()} }"/>
 </div>
 

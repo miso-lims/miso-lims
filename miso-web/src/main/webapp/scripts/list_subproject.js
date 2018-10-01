@@ -53,29 +53,36 @@ ListTarget.subproject = {
     }] : [];
   },
   createColumns: function(config, projectId) {
-    return [{
-      "sTitle": "Alias",
-      "mData": "alias",
-      "include": true,
-      "iSortPriority": 1
-    }, {
-      "sTitle": "Project",
-      "mData": "parentProjectId",
-      "include": true,
-      "iSortPriority": 0,
-      "mRender": ListUtils.render.textFromId(config.projects, 'alias')
-    }, {
-      "sTitle": "Priority",
-      "mData": "priority",
-      "include": true,
-      "iSortPriority": 0,
-      "mRender": ListUtils.render.booleanChecks
-    }, {
-      "sTitle": "Reference Genome",
-      "mData": "referenceGenomeId",
-      "include": true,
-      "iSortPriority": 0,
-      "mRender": ListUtils.render.textFromId(Constants.referenceGenomes, 'alias')
-    }, ];
+    return [
+        {
+          "sTitle": "Alias",
+          "mData": "alias",
+          "include": true,
+          "iSortPriority": 1
+        },
+        {
+          "sTitle": "Project",
+          "mData": "parentProjectId",
+          "include": true,
+          "iSortPriority": 0,
+          "mRender": function(data, type, full) {
+            var projectAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(data), config.projects),
+                'alias')
+                || "Unknown";
+            return "<a href=\"/miso/project/" + data + "\">" + projectAlias + "</a>";
+          }
+        }, {
+          "sTitle": "Priority",
+          "mData": "priority",
+          "include": true,
+          "iSortPriority": 0,
+          "mRender": ListUtils.render.booleanChecks
+        }, {
+          "sTitle": "Reference Genome",
+          "mData": "referenceGenomeId",
+          "include": true,
+          "iSortPriority": 0,
+          "mRender": ListUtils.render.textFromId(Constants.referenceGenomes, 'alias')
+        }, ];
   }
 };

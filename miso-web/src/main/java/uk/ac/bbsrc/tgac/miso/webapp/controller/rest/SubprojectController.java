@@ -98,7 +98,7 @@ public class SubprojectController extends RestController {
   @ResponseBody
   public Set<SubprojectDto> getSubprojects(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<Subproject> subprojects = subprojectService.getAll();
-    Set<SubprojectDto> subprojectDtos = Dtos.asSubprojectDtos(subprojects);
+    Set<SubprojectDto> subprojectDtos = Dtos.asDtos(subprojects);
     for (SubprojectDto subprojectDto : subprojectDtos) {
       subprojectDto.writeUrls(uriBuilder);
     }
