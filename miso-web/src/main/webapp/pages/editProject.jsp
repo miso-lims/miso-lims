@@ -522,7 +522,7 @@
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#samples_section_arrowclick'), 'samples_section');">
   Samples
-<div id="samples_section_arrowclick" class="toggleLeft"></div>
+<div id="samples_section_arrowclick" class="toggleLeftDown"></div>
 </div>
 <div id="samples_section" class="expandable_section">
   <miso:list-section-ajax id="project_samples" name="Samples" target="sample" project="${project}" config="{}"/>
@@ -530,7 +530,7 @@
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#libraries_section_arrowclick'), 'libraries_section');">
   Libraries
-<div id="libraries_section_arrowclick" class="toggleLeft"></div>
+<div id="libraries_section_arrowclick" class="toggleLeftDown"></div>
 </div>
 <div id="libraries_section" class="expandable_section">
   <miso:list-section-ajax id="project_libraries" name="Libraries" target="library" project="${project}" config="{}"/>
@@ -538,7 +538,7 @@
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#librarytemplates_section_arrowclick'), 'librarytemplates_section');">
   Library Templates
-<div id="librarytemplates_section_arrowclick" class="toggleLeft"></div>
+<div id="librarytemplates_section_arrowclick" class="toggleLeftDown"></div>
 </div>
 <div id="librarytemplates_section" class="expandable_section">
   <miso:list-section-ajax id="project_librarytemplates" name="Library Templates" target="library_template" project="${project}" config="{}"/>
@@ -546,7 +546,7 @@
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#dilutions_section_arrowclick'), 'dilutions_section');">
   Dilutions
-<div id="dilutions_section_arrowclick" class="toggleLeft"></div>
+<div id="dilutions_section_arrowclick" class="toggleLeftDown"></div>
 </div>
 <div id="dilutions_section" class="expandable_section">
   <miso:list-section-ajax id="project_dilutions" name="Dilutions" target="dilution" project="${project}" config="{}"/>
@@ -554,7 +554,7 @@
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#pools_section_arrowclick'), 'pools_section');">
   Pools
-<div id="pools_section_arrowclick" class="toggleLeft"></div>
+<div id="pools_section_arrowclick" class="toggleLeftDown"></div>
 </div>
 <div id="pools_section" class="expandable_section">
   <miso:list-section-ajax id="project_pools" name="Pools" target="pool" project="${project}" config="{}"/>
@@ -562,7 +562,7 @@
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#runs_section_arrowclick'), 'runs_section');">
   Runs
-<div id="runs_section_arrowclick" class="toggleLeft"></div>
+<div id="runs_section_arrowclick" class="toggleLeftDown"></div>
 </div>
 <div id="runs_section" class="expandable_section">
   <miso:list-section-ajax id="project_runs" name="Runs" target="run" project="${project}" config="{}"/>
@@ -570,7 +570,7 @@
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#arrayruns_section_arrowclick'), 'arrayruns_section');">
   Array Runs
-<div id="arrayruns_section_arrowclick" class="toggleLeft"></div>
+<div id="arrayruns_section_arrowclick" class="toggleLeftDown"></div>
 </div>
 <div id="arrayruns_section" class="expandable_section">
   <miso:list-section-ajax id="project_arrayruns" name="Array Runs" target="arrayrun" project="${project}" config="{}"/>
@@ -578,7 +578,7 @@
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#arraysamples_section_arrowclick'), 'arraysamples_section');">
   Arrayed Samples
-<div id="arraysamples_section_arrowclick" class="toggleLeft"></div>
+<div id="arraysamples_section_arrowclick" class="toggleLeftDown"></div>
 </div>
 <div id="arraysamples_section" class="expandable_section">
   <miso:list-section-ajax id="project_arraysamples" name="Arrayed Samples" target="sample" project="${project}" config="{arrayed: true}"/>

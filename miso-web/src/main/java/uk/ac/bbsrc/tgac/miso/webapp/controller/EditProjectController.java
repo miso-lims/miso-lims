@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,7 +37,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
@@ -156,14 +154,6 @@ public class EditProjectController {
     binder.registerCustomEditor(Date.class, cde);
   }
 
-  @Value("${miso.detailed.sample.enabled}")
-  private Boolean detailedSample;
-
-  @ModelAttribute("detailedSample")
-  private Boolean isDetailedSampleEnabled() {
-    return detailedSample;
-  }
-
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return projectService.getProjectColumnSizes();
@@ -269,7 +259,7 @@ public class EditProjectController {
         throw new NotFoundException("No project found for ID " + projectId.toString());
       }
       Collection<Subproject> subprojects = subprojectService.getByProjectId(projectId);
-      model.put("subprojects", Dtos.asDtos(new HashSet<>(subprojects)));
+      model.put("subprojects", Dtos.asSubprojectDtos(subprojects));
       model.put("title", "Project " + projectId);
       try {
         issues = issueTrackerManager.getIssuesByTag(project.getShortName());

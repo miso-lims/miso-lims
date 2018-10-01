@@ -69,7 +69,11 @@ ListTarget.subproject = {
             var projectAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(data), config.projects),
                 'alias')
                 || "Unknown";
-            return "<a href=\"/miso/project/" + data + "\">" + projectAlias + "</a>";
+            if (type === 'display') {
+              return "<a href=\"/miso/project/" + data + "\">" + projectAlias + "</a>";
+            } else {
+              return projectAlias;
+            }
           }
         }, {
           "sTitle": "Priority",
