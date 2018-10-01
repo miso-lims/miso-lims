@@ -90,3 +90,15 @@ ListTarget.subproject = {
         }, ];
   }
 };
+
+var Subproject = Subproject || {
+  filterSamples: function(samplesArrowClickId, samplesTableId, subprojectAlias) {
+    var expandableSection = jQuery('#' + samplesTableId).closest('.expandable_section');
+    if (expandableSection.is(':hidden')) {
+      // make it visible
+      jQuery('#' + samplesArrowClickId).closest('.sectionDivider').click();
+    }
+    Utils.ui.filterTable(samplesTableId, 'subproject', subprojectAlias);
+    expandableSection[0].scrollIntoView();
+  }
+};
