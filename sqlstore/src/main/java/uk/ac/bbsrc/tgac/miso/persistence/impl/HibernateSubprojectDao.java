@@ -78,4 +78,13 @@ public class HibernateSubprojectDao implements SubprojectDao {
         .uniqueResult();
   }
 
+  @Override
+  public List<Subproject> getByProjectId(Long projectId) {
+    @SuppressWarnings("unchecked")
+    List<Subproject> subprojects = currentSession().createCriteria(SubprojectImpl.class)
+        .add(Restrictions.eq("parentProject.id", projectId))
+        .list();
+    return subprojects;
+  }
+
 }

@@ -846,6 +846,11 @@ Utils.ui = {
     }
   },
 
+  filterTable: function(tableId, searchTerm, queryTarget) {
+    var queryString = (searchTerm ? searchTerm + ':' : '') + '\"' + queryTarget + '\"';
+    jQuery('#' + tableId).dataTable().fnFilter(queryString); // regrettably ugly
+    jQuery('#' + tableId + '_filter input').val(queryString);
+  }
 };
 
 Utils.fileUpload = {

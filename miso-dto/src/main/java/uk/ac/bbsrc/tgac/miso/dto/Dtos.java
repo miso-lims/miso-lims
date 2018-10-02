@@ -245,7 +245,7 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<SubprojectDto> asSubprojectDtos(Set<Subproject> from) {
+  public static Set<SubprojectDto> asSubprojectDtos(Collection<Subproject> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 

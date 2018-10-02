@@ -53,29 +53,52 @@ ListTarget.subproject = {
     }] : [];
   },
   createColumns: function(config, projectId) {
-    return [{
-      "sTitle": "Alias",
-      "mData": "alias",
-      "include": true,
-      "iSortPriority": 1
-    }, {
-      "sTitle": "Project",
-      "mData": "parentProjectId",
-      "include": true,
-      "iSortPriority": 0,
-      "mRender": ListUtils.render.textFromId(config.projects, 'alias')
-    }, {
-      "sTitle": "Priority",
-      "mData": "priority",
-      "include": true,
-      "iSortPriority": 0,
-      "mRender": ListUtils.render.booleanChecks
-    }, {
-      "sTitle": "Reference Genome",
-      "mData": "referenceGenomeId",
-      "include": true,
-      "iSortPriority": 0,
-      "mRender": ListUtils.render.textFromId(Constants.referenceGenomes, 'alias')
-    }, ];
+    return [
+        {
+          "sTitle": "Alias",
+          "mData": "alias",
+          "include": true,
+          "iSortPriority": 1
+        },
+        {
+          "sTitle": "Project",
+          "mData": "parentProjectId",
+          "include": true,
+          "iSortPriority": 0,
+          "mRender": function(data, type, full) {
+            var projectAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(data), config.projects),
+                'alias')
+                || "Unknown";
+            if (type === 'display') {
+              return "<a href=\"/miso/project/" + data + "\">" + projectAlias + "</a>";
+            } else {
+              return projectAlias;
+            }
+          }
+        }, {
+          "sTitle": "Priority",
+          "mData": "priority",
+          "include": true,
+          "iSortPriority": 0,
+          "mRender": ListUtils.render.booleanChecks
+        }, {
+          "sTitle": "Reference Genome",
+          "mData": "referenceGenomeId",
+          "include": true,
+          "iSortPriority": 0,
+          "mRender": ListUtils.render.textFromId(Constants.referenceGenomes, 'alias')
+        }, ];
+  }
+};
+
+var Subproject = Subproject || {
+  filterSamples: function(samplesArrowClickId, samplesTableId, subprojectAlias) {
+    var expandableSection = jQuery('#' + samplesTableId).closest('.expandable_section');
+    if (expandableSection.is(':hidden')) {
+      // make it visible
+      jQuery('#' + samplesArrowClickId).closest('.sectionDivider').click();
+    }
+    Utils.ui.filterTable(samplesTableId, 'subproject', subprojectAlias);
+    expandableSection[0].scrollIntoView();
   }
 };
