@@ -133,13 +133,13 @@ order: 1
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Labs and Institutes🔹" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="DetailedQcStatus🔹" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Detailed QC Status🔹" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Stains🔹" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Library Types" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Library Designs" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Library Designs🔹" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Library Selection Types" %}
 {% assign sub = sub | plus: 1 %}
