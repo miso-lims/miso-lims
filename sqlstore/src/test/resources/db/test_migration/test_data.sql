@@ -1,3 +1,12 @@
+DELETE FROM AttachmentCategory;
+INSERT INTO AttachmentCategory(categoryId, alias) VALUES
+(1, 'Category One'),
+(2, 'Category Two');
+
+DELETE FROM Attachment;
+INSERT INTO Attachment (attachmentId, filename, path, creator, created, categoryId) VALUES
+(1, 'file1.txt', '/path/1234567890', 1, '2018-10-02 12:29:00', 1);
+
 DELETE FROM Indices;
 DELETE FROM IndexFamily;
 INSERT INTO IndexFamily(indexFamilyId, platformType, name) VALUES

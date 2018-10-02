@@ -27,7 +27,16 @@ ListTarget.attachment = (function() {
     dialogArea.empty();
 
     var form = jQuery('<form id="uploadForm">');
-    form.append(jQuery('<input id="fileInput" type="file" name="file">'));
+    form.append(jQuery('<p><input id="fileInput" type="file" name="file"></p>'));
+    var select = jQuery('<select id="attachmentCategory" type="text" name="attachmentCategory">');
+    [{
+      id: 0,
+      alias: 'Misc.'
+    }].concat(Constants.attachmentCategories).forEach(function(category) {
+      select.append(jQuery('<option value="' + category.id + '">' + category.alias + '</option>'));
+    });
+    var p = jQuery('<p>').append(jQuery('<label for="attachmentCategory">Category:</label>')).append(select);
+    form.append(p);
     dialogArea.append(form);
 
     var dialog = dialogArea.dialog({
@@ -43,6 +52,12 @@ ListTarget.attachment = (function() {
             if (!jQuery('#fileInput').val()) {
               alert('No file selected!');
               return;
+            }
+            var url = '/miso/attachments/' + entityType + '/' + entityId;
+            if (jQuery('#attachmentCategory').val()) {
+              url += '?' + jQuery.param({
+                categoryId: jQuery('#attachmentCategory').val()
+              });
             }
             var formData = new FormData(jQuery('#uploadForm')[0]);
             dialog.dialog("close");
@@ -63,7 +78,7 @@ ListTarget.attachment = (function() {
             });
 
             jQuery.ajax({
-              url: '/miso/attachments/' + entityType + '/' + entityId,
+              url: url,
               type: 'POST',
               data: formData,
               cache: false,
@@ -117,6 +132,15 @@ ListTarget.attachment = (function() {
                 return '<a href="/miso/attachments/' + config.entityType + '/' + config.entityId + '/' + full.id + '">' + data + '</a>';
               }
               return data;
+            }
+          },
+          {
+            sTitle: 'Category',
+            mData: 'category',
+            include: true,
+            iSortPriority: 0,
+            mRender: function(data, type, full) {
+              return data ? data : 'Misc.';
             }
           },
           {

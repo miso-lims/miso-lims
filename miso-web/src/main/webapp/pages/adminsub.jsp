@@ -76,6 +76,7 @@
           <li><a href="<c:url value="/miso/subproject/list"/>">Subprojects</a></li>
           <li><a href="<c:url value="/miso/institute/list"/>">Institutes</a></li>
           <li><a href="<c:url value="/miso/lab/list"/>">Labs</a></li>
+          <li><a href="<c:url value="/miso/attachmentcategories/list"/>">Attachment Categories</a></li>
       </ul>
     </c:if>
 	

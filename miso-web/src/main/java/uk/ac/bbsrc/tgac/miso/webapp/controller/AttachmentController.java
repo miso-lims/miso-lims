@@ -20,12 +20,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Attachable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
+import uk.ac.bbsrc.tgac.miso.service.AttachmentCategoryService;
 import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ServerErrorException;
 
@@ -38,20 +41,28 @@ public class AttachmentController {
   @Autowired
   private FileAttachmentService fileAttachmentService;
 
+  @Autowired
+  private AttachmentCategoryService attachmentCategoryService;
+
   @Value("${miso.fileStorageDirectory}")
   private String fileStorageDirectory;
 
   @PostMapping(value = "/{entityType}/{entityId}")
   @ResponseStatus(HttpStatus.OK)
-  public void acceptUpload(@PathVariable String entityType, @PathVariable long entityId, MultipartHttpServletRequest request)
+  public void acceptUpload(@PathVariable String entityType, @PathVariable long entityId, @RequestParam(required = false) Long categoryId,
+      MultipartHttpServletRequest request)
       throws IOException {
     Attachable item = fileAttachmentService.get(entityType, entityId);
     if (item == null) {
       throw new NotFoundException(entityType + " not found");
     }
+    AttachmentCategory category = null;
+    if (categoryId != null) {
+      category = attachmentCategoryService.get(categoryId);
+    }
 
     for (MultipartFile fileItem : getMultipartFiles(request)) {
-      fileAttachmentService.add(item, fileItem);
+      fileAttachmentService.add(item, fileItem, category);
     }
   }
 
