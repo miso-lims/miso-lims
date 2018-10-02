@@ -1,3 +1,17 @@
+# 0.2.144
+
+Changes:
+
+ * added Subprojects to Project page
+ * display number of items in workset on List Worksets page
+ * allow merging worksets
+ * fixed bug where menu links to admin-only pages were visible to non-admin users
+ * fixed bug where the transfer list was showing the Identity's subproject instead of the sample's subproject
+ * fixed bug where volume required units even when zero
+ * fixed bug where reloaded library templates have incorrect platform
+ * fixed bug where second index of unique dual index families was not automatically selected
+ * added feature list and first few chapters of new user manual
+
 # 0.2.143
 
 Changes:

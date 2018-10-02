@@ -275,7 +275,15 @@ public class Scheduler {
   }
 
   public Set<File> getUnreadableDirectories() {
-    return unreadableDirectories.getRejects();
+    Set<File> unreadables;
+
+    if (getScanLastStarted() != null) {
+      unreadables = unreadableDirectories.getRejects();
+    } else {
+      unreadables = Collections.emptySet();
+    }
+
+    return unreadables;
   }
 
   public boolean isConfigurationGood() {

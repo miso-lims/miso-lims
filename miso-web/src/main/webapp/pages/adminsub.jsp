@@ -21,6 +21,9 @@
   ~ **********************************************************************
   --%>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="miso" uri="http://miso.tgac.bbsrc.ac.uk/tags/form" %>
+
 <div id="subcontent">
   <!--
 	<h2>Sample Processing</h2>
@@ -84,11 +87,11 @@
         <li><a href="<c:url value="/miso/submissions"/>">Submissions</a></li>
     </ul>
 
-	<if test="${miso:isAdmin()}">
+	<c:if test="${miso:isAdmin()}">
 	  <h2>User Administration</h2>
       <ul class="bullets">
         <li><a href="<c:url value="/miso/admin/users"/>">Users</a></li>
         <li><a href="<c:url value="/miso/admin/groups"/>">Groups</a></li>
       </ul>
-    </if>
+    </c:if>
 </div>

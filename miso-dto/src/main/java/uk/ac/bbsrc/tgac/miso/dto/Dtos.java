@@ -245,7 +245,7 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<SubprojectDto> asSubprojectDtos(Set<Subproject> from) {
+  public static Set<SubprojectDto> asSubprojectDtos(Collection<Subproject> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
@@ -1890,7 +1890,7 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setArchived(from.getArchived());
     if (includeChildren) {
-      dto.setIndices(from.getIndices().stream().map(x -> asDto(x, false)).collect(Collectors.toList()));
+      dto.setIndices(from.getIndices().stream().map(x -> asDto(x, true)).collect(Collectors.toList()));
     }
     dto.setMaximumNumber(from.getMaximumNumber());
     dto.setPlatformType(from.getPlatformType() == null ? null : from.getPlatformType().name());
@@ -2462,7 +2462,7 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setProjectIds(from.getProjects().stream().map(Project::getId).collect(Collectors.toList()));
     dto.setDefaultVolume(from.getDefaultVolume());
-    dto.setPlatformType(from.getPlatformType() != null ? from.getPlatformType().toString() : null);
+    dto.setPlatformType(from.getPlatformType() != null ? from.getPlatformType().name() : null);
     dto.setLibraryTypeId(from.getLibraryType() != null ? from.getLibraryType().getId() : null);
     dto.setSelectionTypeId(from.getLibrarySelectionType() != null ? from.getLibrarySelectionType().getId() : null);
     dto.setStrategyTypeId(from.getLibraryStrategyType() != null ? from.getLibraryStrategyType().getId() : null);
@@ -2705,7 +2705,7 @@ public class Dtos {
     }
     if (from.getId() != null) to.setId(from.getId());
     to.setAlias(from.getAlias());
-    to.setPlatformType(PlatformType.get(from.getPlatformType()));
+    to.setPlatformType(PlatformType.valueOf(from.getPlatformType()));
     if (from.getDefaultVolume() != null) {
       to.setDefaultVolume(from.getDefaultVolume());
     }
