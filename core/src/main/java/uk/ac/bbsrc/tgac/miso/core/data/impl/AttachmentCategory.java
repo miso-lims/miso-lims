@@ -21,18 +21,18 @@ public class AttachmentCategory implements Aliasable, Deletable, Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long id = UNSAVED_ID;
+  private long categoryId = UNSAVED_ID;
 
   private String alias;
 
   @Override
   public long getId() {
-    return id;
+    return categoryId;
   }
 
   @Override
   public void setId(long id) {
-    this.id = id;
+    this.categoryId = id;
   }
 
   @Override
@@ -45,7 +45,7 @@ public class AttachmentCategory implements Aliasable, Deletable, Serializable {
   }
 
   public boolean isSaved() {
-    return id != UNSAVED_ID;
+    return categoryId != UNSAVED_ID;
   }
 
   @Override
@@ -68,7 +68,7 @@ public class AttachmentCategory implements Aliasable, Deletable, Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((alias == null) ? 0 : alias.hashCode());
-    result = prime * result + (int) (id ^ (id >>> 32));
+    result = prime * result + (int) (categoryId ^ (categoryId >>> 32));
     return result;
   }
 
@@ -81,7 +81,7 @@ public class AttachmentCategory implements Aliasable, Deletable, Serializable {
     if (alias == null) {
       if (other.alias != null) return false;
     } else if (!alias.equals(other.alias)) return false;
-    if (id != other.id) return false;
+    if (categoryId != other.categoryId) return false;
     return true;
   }
 

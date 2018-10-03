@@ -56,10 +56,9 @@ public class DefaultAttachmentCategoryService implements AttachmentCategoryServi
   private void validateChange(AttachmentCategory category, AttachmentCategory beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
-    if (beforeChange == null || !category.getAlias().equals(beforeChange.getAlias())) {
-      if (attachmentCategoryStore.getByAlias(category.getAlias()) != null) {
-        errors.add(new ValidationError("alias", "There is already an attachment category with that alias"));
-      }
+    if ((beforeChange == null || !category.getAlias().equals(beforeChange.getAlias()))
+        && attachmentCategoryStore.getByAlias(category.getAlias()) != null) {
+      errors.add(new ValidationError("alias", "There is already an attachment category with that alias"));
     }
 
     if (!errors.isEmpty()) {
