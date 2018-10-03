@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Attachable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.store.AttachableStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -97,7 +98,7 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   }
 
   @Override
-  public void add(Attachable object, MultipartFile file) throws IOException {
+  public void add(Attachable object, MultipartFile file, AttachmentCategory category) throws IOException {
     Attachable managed = attachableStore.getManaged(object);
     String saveFilename = Long.toString(new Date().getTime());
     String relativeDir = makeRelativeDir(object.getAttachmentsTarget(), object.getId());
@@ -117,6 +118,7 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
       FileAttachment attachment = new FileAttachment();
       attachment.setFilename(file.getOriginalFilename());
       attachment.setPath(relativeDir + File.separator + saveFilename);
+      attachment.setCategory(category);
       attachment.setCreator(authorizationManager.getCurrentUser());
       attachment.setCreationTime(new Date());
       managed.getAttachments().add(attachment);

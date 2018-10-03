@@ -5,6 +5,7 @@ public class AttachmentDto {
   private long id;
   private String filename;
   private String path;
+  private String category;
   private String creator;
   private String created;
 
@@ -30,6 +31,14 @@ public class AttachmentDto {
 
   public void setPath(String path) {
     this.path = path;
+  }
+
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
   }
 
   public String getCreator() {

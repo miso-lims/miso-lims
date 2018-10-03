@@ -14,8 +14,10 @@ import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+
 @Entity(name = "Attachment")
-public class FileAttachment implements Serializable {
+public class FileAttachment implements Identifiable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -25,6 +27,10 @@ public class FileAttachment implements Serializable {
   private String filename;
   private String path;
 
+  @ManyToOne
+  @JoinColumn(name = "categoryId", nullable = true)
+  private AttachmentCategory category;
+
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false)
   private User creator;
@@ -32,10 +38,12 @@ public class FileAttachment implements Serializable {
   @Temporal(TemporalType.TIMESTAMP)
   private Date created;
 
+  @Override
   public long getId() {
     return attachmentId;
   }
 
+  @Override
   public void setId(long attachmentId) {
     this.attachmentId = attachmentId;
   }
@@ -54,6 +62,14 @@ public class FileAttachment implements Serializable {
 
   public void setPath(String path) {
     this.path = path;
+  }
+
+  public AttachmentCategory getCategory() {
+    return this.category;
+  }
+
+  public void setCategory(AttachmentCategory category) {
+    this.category = category;
   }
 
   public User getCreator() {
