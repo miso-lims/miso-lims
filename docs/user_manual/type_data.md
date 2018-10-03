@@ -47,8 +47,11 @@ Sample categories are used to group sample classes into levels. Sample categorie
 and ghost samples.
 
 {% assign figure = 1 %}
-Sample classes, and the relationships between them, can be customized to suit your requirements. Figure {{figure}}
-shows the sample hierarchy used at OICR.
+Sample classes, and the relationships between them define the sample hierarchy. Both the classes and relationships can
+be customized to suit your requirements. Figure {{figure}} shows the sample hierarchy used at OICR. Sample
+relationships have a parent and child class. This means that if you have a sample of the parent class, you can
+propagate a sample of the child class. In figure {{figure}}, the relationships are illustrated using arrows that point
+from the child class to the parent class.
 
 {% include userman-figure.md num=figure cap="OICR sample hierarchy" img="type-data-sample-hierarchy.png" %}
 
@@ -143,8 +146,8 @@ tissue origin if the option has not been used by any existing samples.
 
 Note: This item only applies if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
 
-Tissue Type is a classifier for tissue samples. It may be used to identify the use of the sample. For example, tissue
-types at OICR include the following (and others).
+Tissue Type is a classifier for tissue samples. It may be used to categorize the sample. For example, tissue types at
+OICR include the following (and others).
 
 * Reference Tissue: Reference or non-tumour, non-diseased tissue sample. Typically used as a donor-specific comparison
   to a diseased tissue, usually a cancer
@@ -204,9 +207,8 @@ Available institutes can be viewed on the Institutes list page. To get there, cl
 Defaults list near the bottom of the menu on the left side of the screen. All operations affecting institutes will be
 started from this page.
 
-Available labs can be viewed on the Institutes list page. To get there, click "Labs" in the Institute Defaults list
-near the bottom of the menu on the left side of the screen. All operations affecting institutes will be started from
-this page.
+Available labs can be viewed on the Labs list page. To get there, click "Labs" in the Institute Defaults list near the
+bottom of the menu on the left side of the screen. All operations affecting labs will be started from this page.
 
 To add a new institute, click the "Add" button in the toolbar at the top of the table on the Institutes list page. In
 the dialog, enter the quantity of new institutes that you would like to create and click the "Create" button. This will
@@ -220,13 +222,13 @@ If you wish to create a new lab in a new institute, you must add the institute f
 "Save" button at the top right to confirm.
 
 To edit an existing lab or institute, go to the appropriate list page, check the checkboxes next to the items you wish
-to modify, and clock the "Edit" button in the toolbar at the top of the table. This will take you to the corresponding
+to modify, and click the "Edit" button in the toolbar at the top of the table. This will take you to the corresponding
 bulk Edit page, which is identical to the bulk Create page. Make the changes you would like, then click the "Save"
 button at the top right to confirm. Keep in mind that any changes will affect all samples that are already using the
 affected lab or institute.
 
 To delete a lab or institute, go to the appropriate list page, check the checkboxes next to the items you wish
-to modify, and clock the "Delete" button in the toolbar at the top of the table. You will only be allowed to delete a
+to modify, and click the "Delete" button in the toolbar at the top of the table. You will only be allowed to delete a
 lab if it has not been used by any existing samples. You will only be allowed to delete an institute if it has no labs
 associated with it. This means that if you want to delete an institute, you will first have to delete all of its labs.
 
@@ -330,8 +332,12 @@ MISO are:
 * Multiplexing kit - used for sequencing containers
 * Extraction kit - not currently used in MISO
 
-Modifications to kit descriptors can only be made via direct access to the MISO database. As such, they must be
-performed by a MISO adminstrator.
+The Kits list page shows all of the available kit descriptors. To get there, click the "Kits" link in the Tracking list
+in the menu on the left side of the screen. This page is broken into tabs for the different kit types.
+
+To add a new kit descriptor, click the "Add" button in the toolbar at the top of the table on the Kits list page. This
+will take you to the Create Kit Descriptor page. Enter all of the kit details, then click the "Save" button at the top
+right to create the kit descriptor.
 
 {% include userman-toplink.md %}
 
@@ -344,15 +350,18 @@ Indices, also known as barcodes or primers, are sequences that are added to libr
 library each individual DNA fragment came from in a multiplexed pool. An index family is a collection of these indices
 that are intended to be used together. Index sequences should all be unique within an index family.
 
-Some index families are dual-indexed. This means that two indices will be added to each library. This increases the
-possibilities for unique sequences. Some dual-indexed families have an index 1 and index 2 that are always matched
-together. These are referred to as "unique dual index" families within MISO.
+Some index families are dual-indexed. This means that one or two indices can be added to each library. This increases
+the possibilities for unique sequences. Some dual-indexed families have an index 1 and index 2 that are always matched
+together. These are referred to as "unique dual index" families within MISO. In other index families, any index 1 may
+be matched with any index 2.
 
 Index families may be archived if they are no longer needed. This will prevent them from showing up in the options when
 creating new libraries.
 
-Modifications to indices and index families can only be made via direct access to the MISO database. As such, they must
-be performed by a MISO adminstrator.
+Indices can be viewed on the Indices list page. To get there, click "Indices" in the Tracking list in the menu on the
+left side of the screen. The page is broken into tabs for each platform type. Modifications to indices and index
+families can only be made via direct access to the MISO database. As such, they must be performed by a MISO
+adminstrator.
 
 {% include userman-toplink.md %}
 
@@ -373,7 +382,7 @@ made via direct access to the MISO database. As such, they must be performed by 
 
 Targeted sequencing allows specific sections of the genome to be sequenced resulting in more depth and lower cost. The
 targeted sequencing value specified on a library dilution should be associated with a .bed file that will be used for
-analysis and QC.
+analysis and QC, though this file is not tracked within MISO.
 
 Targeted sequencing values may be archived if they are no longer needed. This will prevent them from showing up in the
 options when creating new library dilutions.
@@ -405,7 +414,7 @@ right to confirm.
 To edit existing QC types, go to the QC Types list page, check the checkboxes next to the QC types that you would like
 to modify, and then click the “Edit” button in the toolbar at the top of the table. This will take you to the bulk Edit
 QC Type page, which is identical to the Create QC Type page. Keep in mind that any changes you make will affect all
-samples that are already using the affected tissue origins.
+samples that are already using the affected QC types.
 
 {% include userman-toplink.md %}
 
@@ -418,8 +427,8 @@ A box in MISO describes a physical container that holds multiple samples, librar
 define the possible dimensions of these boxes. A box size may be marked as scannable. This means that the box can be
 scanned using a bulk barcode scanner (see [Barcode Scanners](site_configuration.html#barcode_scanners)).
 
-Modifications to box uses can only be made via direct access to the MISO database. As such, they must be performed by a
-MISO adminstrator.
+Modifications to box sizes can only be made via direct access to the MISO database. As such, they must be performed by
+a MISO adminstrator.
 
 {% include userman-toplink.md %}
 
@@ -429,7 +438,7 @@ MISO adminstrator.
 {% include userman-heading.md section=page.section sub=sub title="Box Uses" %}
 
 A box in MISO describes a physical container that holds multiple samples, libraries, dilutions, and/or pools. Box uses
-are used to categorize these boxes. the Boxes list page is broken into tabs - one for each box use.
+are used to categorize these boxes. The Boxes list page is broken into tabs - one for each box use.
 
 Modifications to box uses can only be made via direct access to the MISO database. As such, they must be performed by a
 MISO adminstrator.
@@ -441,7 +450,7 @@ MISO adminstrator.
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Platforms" %}
 
-Platforms describe the the models of instruments registered in MISO. These can be broken into three categories:
+Platforms describe the models of instruments registered in MISO. These can be broken into three categories:
 
 * Sequencers: Used for sequencer runs
 * Array scanners: Used for array runs
