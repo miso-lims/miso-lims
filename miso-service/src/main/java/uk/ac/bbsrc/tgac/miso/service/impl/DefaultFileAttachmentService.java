@@ -25,6 +25,7 @@ import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -47,6 +48,9 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   private RunService runService;
 
   @Autowired
+  private SampleService sampleService;
+
+  @Autowired
   private ServiceRecordService serviceRecordService;
 
   @Autowired
@@ -61,6 +65,7 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
     entityFetchers.put("pool", WhineyFunction.rethrow(id -> poolService.get(id)));
     entityFetchers.put("project", WhineyFunction.rethrow(id -> projectService.getProjectById(id)));
     entityFetchers.put("run", WhineyFunction.rethrow(id -> runService.get(id)));
+    entityFetchers.put("sample", WhineyFunction.rethrow(id -> sampleService.get(id)));
     entityFetchers.put("servicerecord", WhineyFunction.rethrow(id -> serviceRecordService.get(id)));
   }
 
@@ -74,6 +79,10 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
 
   public void setRunService(RunService runService) {
     this.runService = runService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
   public void setServiceRecordService(ServiceRecordService serviceRecordService) {

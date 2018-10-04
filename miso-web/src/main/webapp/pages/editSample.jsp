@@ -744,6 +744,7 @@
       <div id="addSampleNoteDialog" title="Create new Note"></div>
     </div>
     <br/>
+    <miso:attachments item="${sample}"/>
   </c:if>
 </div>
 </form:form>
