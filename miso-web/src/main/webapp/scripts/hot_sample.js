@@ -545,7 +545,11 @@ HotTarget.sample = (function() {
             description: 'The date that the sample was created.',
             include: Constants.isDetailedSample && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
-              flat.creationDate = Utils.valOrNull(sam.creationDate);
+              if (!sam.creationDate && config.propagate) {
+                flat.creationDate = Utils.getCurrentDate();
+              } else {
+                flat.creationDate = Utils.valOrNull(sam.creationDate);
+              }
             },
             pack: function(sam, flat, errorHandler) {
               sam.creationDate = flat.creationDate;
