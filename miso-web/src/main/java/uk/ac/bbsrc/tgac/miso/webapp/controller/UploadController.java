@@ -137,7 +137,7 @@ public class UploadController {
     String projectId = request.getParameter("projectId");
     if (projectId == null) {
       throw new IOException("Cannot upload file - projectId parameter missing or null");
-    } else if (projectService.getProjectById(Long.valueOf(projectId)) == null) {
+    } else if (projectService.get(Long.valueOf(projectId)) == null) {
       throw new IOException("Cannot upload file - project does not exist");
     }
 
@@ -163,7 +163,7 @@ public class UploadController {
     String projectId = request.getParameter("projectId");
     if (projectId == null) {
       throw new IOException("Cannot upload file - projectId parameter missing or null");
-    } else if (projectService.getProjectById(Long.valueOf(projectId)) == null) {
+    } else if (projectService.get(Long.valueOf(projectId)) == null) {
       throw new IOException("Cannot upload file - project does not exist");
     }
 

@@ -110,7 +110,7 @@ public class ExternalRestController extends RestController {
   public String jsonRestProjectList(Long projectId) throws IOException {
     StringBuilder sb = new StringBuilder();
 
-    Project p = projectService.getProjectById(projectId);
+    Project p = projectService.get(projectId);
     sb.append("'id':'" + projectId + "'");
     sb.append(",");
     sb.append("'name':'" + p.getName() + "'");
@@ -124,7 +124,7 @@ public class ExternalRestController extends RestController {
   public @ResponseBody String jsonRestProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     StringBuilder sb = new StringBuilder();
 
-    Project p = projectService.getProjectById(projectId);
+    Project p = projectService.get(projectId);
     if (p == null) {
       throw new RestException("No project found with ID: " + projectId, Status.NOT_FOUND);
     }

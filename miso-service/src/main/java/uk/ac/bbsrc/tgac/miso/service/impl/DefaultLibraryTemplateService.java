@@ -108,7 +108,7 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
 
   @Override
   public List<LibraryTemplate> listLibraryTemplatesForProject(long projectId) throws IOException {
-    authorizationManager.throwIfNotReadable(projectService.getProjectById(projectId));
+    authorizationManager.throwIfNotReadable(projectService.get(projectId));
     return libraryTemplateStore.listLibraryTemplatesForProject(projectId);
   }
 

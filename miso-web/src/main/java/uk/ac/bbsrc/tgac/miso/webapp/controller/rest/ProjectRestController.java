@@ -121,7 +121,7 @@ public class ProjectRestController extends RestController {
 
   @GetMapping(value = "{projectId}", produces = "application/json")
   public @ResponseBody ProjectDto getProjectById(@PathVariable Long projectId) throws IOException {
-    Project project = projectService.getProjectById(projectId);
+    Project project = projectService.get(projectId);
     if (project == null) {
       throw new RestException("No project found with ID: " + projectId, Status.NOT_FOUND);
     }

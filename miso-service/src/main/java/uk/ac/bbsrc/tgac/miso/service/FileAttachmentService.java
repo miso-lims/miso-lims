@@ -10,7 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 
 public interface FileAttachmentService {
 
-  public Attachable get(String entityType, long entityId);
+  public Attachable get(String entityType, long entityId) throws IOException;
 
   public void add(Attachable object, MultipartFile file, AttachmentCategory category) throws IOException;
 

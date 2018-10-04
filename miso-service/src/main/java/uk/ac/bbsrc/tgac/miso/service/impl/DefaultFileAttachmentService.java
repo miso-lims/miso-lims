@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +19,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.store.AttachableStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
@@ -39,58 +39,49 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   private AttachableStore attachableStore;
 
   @Autowired
-  private PoolService poolService;
-
-  @Autowired
-  private ProjectService projectService;
-
-  @Autowired
-  private RunService runService;
-
-  @Autowired
-  private SampleService sampleService;
-
-  @Autowired
-  private ServiceRecordService serviceRecordService;
-
-  @Autowired
   private AuthorizationManager authorizationManager;
 
   @Value("${miso.fileStorageDirectory}")
   private String fileStorageDirectory;
 
-  private final Map<String, Function<Long, Attachable>> entityFetchers = new HashMap<>();
-
-  public DefaultFileAttachmentService() {
-    entityFetchers.put("pool", WhineyFunction.rethrow(id -> poolService.get(id)));
-    entityFetchers.put("project", WhineyFunction.rethrow(id -> projectService.getProjectById(id)));
-    entityFetchers.put("run", WhineyFunction.rethrow(id -> runService.get(id)));
-    entityFetchers.put("sample", WhineyFunction.rethrow(id -> sampleService.get(id)));
-    entityFetchers.put("servicerecord", WhineyFunction.rethrow(id -> serviceRecordService.get(id)));
-  }
+  private final Map<String, ProviderService<? extends Attachable>> entityProviders = new HashMap<>();
 
   public void setAttachableStore(AttachableStore attachableStore) {
     this.attachableStore = attachableStore;
   }
 
-  public void setProjectService(ProjectService projectService) {
-    this.projectService = projectService;
-  }
-
-  public void setRunService(RunService runService) {
-    this.runService = runService;
-  }
-
-  public void setSampleService(SampleService sampleService) {
-    this.sampleService = sampleService;
-  }
-
-  public void setServiceRecordService(ServiceRecordService serviceRecordService) {
-    this.serviceRecordService = serviceRecordService;
-  }
-
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
+  }
+
+  @Autowired
+  public void setLibraryService(LibraryService libraryService) {
+    entityProviders.put("library", libraryService);
+  }
+
+  @Autowired
+  public void setPoolService(PoolService poolService) {
+    entityProviders.put("pool", poolService);
+  }
+
+  @Autowired
+  public void setProjectService(ProjectService projectService) {
+    entityProviders.put("project", projectService);
+  }
+
+  @Autowired
+  public void setRunService(RunService runService) {
+    entityProviders.put("run", runService);
+  }
+
+  @Autowired
+  public void setSampleService(SampleService sampleService) {
+    entityProviders.put("sample", sampleService);
+  }
+
+  @Autowired
+  public void setServiceRecordService(ServiceRecordService serviceRecordService) {
+    entityProviders.put("servicerecord", serviceRecordService);
   }
 
   public void setFileStorageDirectory(String fileStorageDirectory) {
@@ -98,12 +89,12 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   }
 
   @Override
-  public Attachable get(String entityType, long entityId) {
-    Function<Long, Attachable> fetcher = entityFetchers.get(entityType);
-    if (fetcher == null) {
+  public Attachable get(String entityType, long entityId) throws IOException {
+    ProviderService<? extends Attachable> provider = entityProviders.get(entityType);
+    if (provider == null) {
       throw new IllegalArgumentException("Unknown entity type: " + entityType);
     }
-    return fetcher.apply(entityId);
+    return provider.get(entityId);
   }
 
   @Override

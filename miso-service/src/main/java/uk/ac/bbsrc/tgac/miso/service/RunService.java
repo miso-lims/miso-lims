@@ -14,7 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface RunService extends PaginatedDataSource<Run> {
+public interface RunService extends ProviderService<Run>, PaginatedDataSource<Run> {
 
   Collection<Run> list() throws IOException;
 
@@ -31,15 +31,6 @@ public interface RunService extends PaginatedDataSource<Run> {
   Collection<Run> listByContainerId(long containerId) throws IOException;
 
   Collection<Run> listByInstrumentId(long instrumentId) throws IOException;
-
-  /**
-   * Throws AuthorizationException if user is not authorized to read the retrieved run.
-   * 
-   * @param runId
-   * @return
-   * @throws IOException
-   */
-  Run get(long runId) throws IOException;
 
   /**
    * Throws AuthorizationException if user is not authorized to read the retrieved run.

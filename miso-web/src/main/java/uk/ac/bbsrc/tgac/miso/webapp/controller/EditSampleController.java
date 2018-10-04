@@ -300,7 +300,7 @@ public class EditSampleController {
     if (p != null && p.getId() == projectId) {
       if (p.getSamples().isEmpty()) {
         // if p was lazy loaded then it doesn't have samples.
-        p = projectService.getProjectById(p.getId());
+        p = projectService.get(p.getId());
       }
       if (!p.getSamples().isEmpty()) {
         Map<String, Sample> ret = new HashMap<>();
@@ -624,7 +624,7 @@ public class EditSampleController {
         model.put("title", "New Sample");
 
         if (projectId != null) {
-          Project project = projectService.getProjectById(projectId);
+          Project project = projectService.get(projectId);
           if (project == null) throw new NotFoundException("No project found for ID " + projectId.toString());
           model.addAttribute("project", project);
           sample.setProject(project);
@@ -806,7 +806,7 @@ public class EditSampleController {
     if (projectId == null) {
       project = null;
     } else {
-      project = projectService.getProjectById(projectId);
+      project = projectService.get(projectId);
       template.setProjectId(projectId);
     }
 

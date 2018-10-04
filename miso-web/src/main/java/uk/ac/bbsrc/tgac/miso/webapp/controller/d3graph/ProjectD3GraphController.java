@@ -82,7 +82,7 @@ public class ProjectD3GraphController {
   public @ResponseBody JSONObject d3graphRest(@PathVariable Long projectId) throws IOException {
 
     try {
-      Project p = projectService.getProjectById(projectId);
+      Project p = projectService.get(projectId);
       JSONObject projectJSON = new JSONObject();
       projectJSON.put("name", p.getName());
       projectJSON.put("show", "PROJECT");

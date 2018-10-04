@@ -378,7 +378,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterByPrefixedId<Project>(Project.class, Project.PREFIX) {
       @Override
       public Project resolveById(long id) throws Exception {
-        return projectService.getProjectById(id);
+        return projectService.get(id);
       }
     }.register(binder);
 

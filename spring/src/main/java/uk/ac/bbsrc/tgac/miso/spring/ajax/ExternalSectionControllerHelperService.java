@@ -124,7 +124,7 @@ public class ExternalSectionControllerHelperService {
       Long projectId = json.getLong("projectId");
       StringBuilder projectSb = new StringBuilder();
       StringBuilder sampleQcSb = new StringBuilder();
-      Project project = projectService.getProjectById(projectId);
+      Project project = projectService.get(projectId);
       projectSb.append("<div class='report'>");
       projectSb.append("<b>Project Name: </b> " + project.getName());
       projectSb.append("<br/><br/>");
