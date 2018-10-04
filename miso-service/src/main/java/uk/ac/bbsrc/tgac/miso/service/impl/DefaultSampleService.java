@@ -509,6 +509,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       Integer slides = parentSlides.getSlides() == null ? 0 : parentSlides.getSlides();
       slides += ((SampleLCMTube) child).getSlidesConsumed();
       parentSlides.setSlides(slides);
+      parentSlides.setDiscards(0);
       if (parentSlides.getId() != SampleImpl.UNSAVED_ID) {
         update(parentSlides);
       }
