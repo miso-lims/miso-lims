@@ -160,7 +160,7 @@ public class LibraryTemplateRestController extends RestController {
 
   private void addProject(LibraryTemplate template, Long projectId) throws IOException {
     List<Project> projects = template.getProjects();
-    projects.add(projectService.getProjectById(projectId));
+    projects.add(projectService.get(projectId));
     template.setProjects(projects);
     libraryTemplateService.update(template);
   }

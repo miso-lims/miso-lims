@@ -254,7 +254,7 @@ public class EditProjectController {
       project = new ProjectImpl(user);
       model.put("title", "New Project");
     } else {
-      project = projectService.getProjectById(projectId);
+      project = projectService.get(projectId);
       if (project == null) {
         throw new NotFoundException("No project found for ID " + projectId.toString());
       }

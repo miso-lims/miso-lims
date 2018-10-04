@@ -33,7 +33,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 
-public interface ProjectService {
+public interface ProjectService extends ProviderService<Project> {
 
   // SAVES
   public long saveProject(Project project) throws IOException;
@@ -44,9 +44,6 @@ public interface ProjectService {
 
 
   // GETS
-
-  public Project getProjectById(long projectId) throws IOException;
-
   public Project getProjectByAlias(String projectAlias) throws IOException;
 
   public Project getProjectByShortName(String projectShortName) throws IOException;

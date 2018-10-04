@@ -108,7 +108,7 @@ public class DefaultProjectService implements ProjectService {
 
   // GETS
   @Override
-  public Project getProjectById(long projectId) throws IOException {
+  public Project get(long projectId) throws IOException {
     Project project = projectStore.get(projectId);
     authorizationManager.throwIfNotReadable(project);
     return project;

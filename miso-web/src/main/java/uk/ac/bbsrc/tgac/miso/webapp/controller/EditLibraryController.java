@@ -804,7 +804,7 @@ public class EditLibraryController {
     LibraryDto libDto = null;
     Project project = null;
     if (projectId != null) {
-      project = projectService.getProjectById(projectId);
+      project = projectService.get(projectId);
       if (project == null) throw new InvalidParameterException("No project found for ID " + projectId.toString());
     }
 

@@ -78,7 +78,7 @@ public class AttachmentController {
 
   @GetMapping(value = "/{entityType}/{entityId}/{fileId}")
   public void downloadAttachment(@PathVariable String entityType, @PathVariable long entityId, @PathVariable long fileId,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws IOException {
     Attachable item = fileAttachmentService.get(entityType, entityId);
     if (item == null) {
       throw new NotFoundException(entityType + " not found");

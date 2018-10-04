@@ -744,12 +744,12 @@
       <div id="addSampleNoteDialog" title="Create new Note"></div>
     </div>
     <br/>
-    <miso:attachments item="${sample}"/>
   </c:if>
 </div>
 </form:form>
 
 <c:if test="${sample.id != 0}">
+  <miso:attachments item="${sample}"/>
   <miso:qcs id="list_qc" item="${sample}"/>
 
   <c:if test="${ !detailedSample or detailedSample and sampleCategory eq 'Aliquot' }">
