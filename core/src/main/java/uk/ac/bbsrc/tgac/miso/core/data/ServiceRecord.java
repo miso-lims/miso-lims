@@ -57,7 +57,7 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
   @Temporal(TemporalType.TIMESTAMP)
   private Date restoredTime;
 
-  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
   @JoinTable(name = "ServiceRecord_Attachment", joinColumns = { @JoinColumn(name = "recordId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
   private List<FileAttachment> attachments;

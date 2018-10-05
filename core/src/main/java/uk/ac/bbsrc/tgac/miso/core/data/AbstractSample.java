@@ -145,7 +145,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @PrimaryKeyJoinColumn
   private SampleBoxPosition boxPosition;
 
-  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Sample_Attachment", joinColumns = { @JoinColumn(name = "sampleId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
   private List<FileAttachment> attachments;

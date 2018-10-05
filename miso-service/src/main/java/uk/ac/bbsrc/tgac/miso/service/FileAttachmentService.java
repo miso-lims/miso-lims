@@ -14,6 +14,8 @@ public interface FileAttachmentService {
 
   public void add(Attachable object, MultipartFile file, AttachmentCategory category) throws IOException;
 
+  public void addLink(Attachable object, FileAttachment attachment) throws IOException;
+
   public void delete(Attachable object, FileAttachment attachment) throws IOException;
 
   /**

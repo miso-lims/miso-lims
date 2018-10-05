@@ -180,7 +180,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @JoinTable(name = "Pool_Watcher", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = { @JoinColumn(name = "userId") })
   private Set<User> watchUsers = new HashSet<>();
 
-  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Pool_Attachment", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
   private List<FileAttachment> attachments;

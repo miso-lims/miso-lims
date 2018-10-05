@@ -132,6 +132,17 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   }
 
   @Override
+  public void addLink(Attachable object, FileAttachment attachment) throws IOException {
+    Attachable managedObject = attachableStore.getManaged(object);
+    FileAttachment managedAttachment = attachableStore.getAttachment(attachment.getId());
+    if (managedAttachment == null) {
+      throw new IllegalArgumentException("Attachment not found");
+    }
+    managedObject.getAttachments().add(managedAttachment);
+    attachableStore.save(managedObject);
+  }
+
+  @Override
   public void delete(Attachable object, FileAttachment attachment) throws IOException {
     if (!object.getAttachments().contains(attachment)) {
       throw new IllegalArgumentException("Attachment does not belong to this object");
@@ -153,10 +164,12 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
       }
     }
 
-    managed.getAttachments().remove(attachment);
+    managed.getAttachments().remove(managedAttachment);
     attachableStore.save(managed);
 
-    if (file.exists()) {
+    // Only delete the file if it is not attached to any other items
+    if (file.exists() && attachableStore.getUsage(managedAttachment) == 1) {
+      attachableStore.delete(managedAttachment);
       deleteFileOrLog(file, managed, managedAttachment);
     }
   }

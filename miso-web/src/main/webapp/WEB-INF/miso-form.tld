@@ -394,6 +394,12 @@
             <required>true</required>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
+        <attribute>
+            <description>ID of the project that the item belongs to</description>
+            <name>projectId</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
         <dynamic-attributes>false</dynamic-attributes>
     </tag>
 

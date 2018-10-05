@@ -162,7 +162,7 @@ public abstract class Run
   @JoinTable(name = "Run_Watcher", joinColumns = { @JoinColumn(name = "runId") }, inverseJoinColumns = { @JoinColumn(name = "userId") })
   private Set<User> watchUsers = new HashSet<>();
 
-  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Run_Attachment", joinColumns = { @JoinColumn(name = "runId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
   private List<FileAttachment> attachments;

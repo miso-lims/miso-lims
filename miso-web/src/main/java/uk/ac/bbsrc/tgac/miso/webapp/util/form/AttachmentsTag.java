@@ -16,13 +16,17 @@ public class AttachmentsTag extends RequestContextAwareTag {
 
   private Object item;
 
+  private Long projectId;
+
   @Override
   protected int doStartTagInternal() throws Exception {
     Attachable attachable = (Attachable) this.item;
     ObjectMapper mapper = new ObjectMapper();
 
+    String projectConfig = projectId == null ? "" : (", projectId: " + projectId);
     pageContext.getOut().append(String.format(
-        "<br/><h1>Attachments</h1><table id='attachments' class='display no-border ui-widget-content'></table><script type='text/javascript'>jQuery(document).ready(function () { ListUtils.createStaticTable('attachments', ListTarget.attachment, {entityType: '%1$s', entityId: %2$s}, %3$s);});</script>",
+        "<br/><h1>Attachments</h1><table id='attachments' class='display no-border ui-widget-content'></table><script type='text/javascript'>jQuery(document).ready(function () { ListUtils.createStaticTable('attachments', ListTarget.attachment, {entityType: '%1$s', entityId: %2$s"
+            + projectConfig + "}, %3$s);});</script>",
         attachable.getAttachmentsTarget(), attachable.getId(),
         mapper.writeValueAsString(attachable.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList()))));
     return SKIP_BODY;
@@ -34,6 +38,14 @@ public class AttachmentsTag extends RequestContextAwareTag {
 
   public void setItem(Object item) {
     this.item = item;
+  }
+
+  public Long getProjectId() {
+    return projectId;
+  }
+
+  public void setProjectId(Long projectId) {
+    this.projectId = projectId;
   }
 
 }

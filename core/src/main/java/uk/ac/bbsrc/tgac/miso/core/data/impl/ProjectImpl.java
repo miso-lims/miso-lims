@@ -91,7 +91,7 @@ public class ProjectImpl implements Project {
   private String alias = "";
   private String shortName;
 
-  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Project_Attachment", joinColumns = { @JoinColumn(name = "projectId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
   private List<FileAttachment> attachments;

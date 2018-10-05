@@ -199,7 +199,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Enumerated(EnumType.STRING)
   private DilutionFactor spikeInDilutionFactor;
 
-  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Library_Attachment", joinColumns = { @JoinColumn(name = "libraryId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
   private List<FileAttachment> attachments;
