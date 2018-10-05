@@ -1182,6 +1182,7 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setParentSampleId(from.getSample().getId());
     dto.setParentSampleAlias(from.getSample().getAlias());
+    dto.setParentSampleProjectId(from.getSample().getProject().getId());
     if (from.getSample() instanceof DetailedSample) {
       dto.setParentSampleClassId(((DetailedSample) from.getSample()).getSampleClass().getId());
     }
