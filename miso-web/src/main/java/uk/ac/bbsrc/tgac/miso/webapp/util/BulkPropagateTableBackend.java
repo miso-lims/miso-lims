@@ -10,6 +10,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * Create a Handsontable for propagating a particular entity type
@@ -54,7 +55,7 @@ public abstract class BulkPropagateTableBackend<ParentModel extends Identifiable
    */
   public final ModelAndView propagate(String idString, int replicates, ModelMap model) throws IOException {
       if (replicates < 1) throw new IllegalArgumentException("Invalid number of replicates.");
-    List<Long> ids = parseIds(idString);
+    List<Long> ids = LimsUtils.parseIds(idString);
     List<Dto> dtos = loadParents(ids).map(this::createDtoFromParent).flatMap(dto -> Stream.generate(() -> dto).limit(replicates))
         .collect(Collectors.toList());
     return prepare(model, true, "Create " + name + " from " + parentName, dtos);
@@ -71,7 +72,7 @@ public abstract class BulkPropagateTableBackend<ParentModel extends Identifiable
     if (replicates.size() == 1) {
       return propagate(idString, replicates.get(0), model);
     }
-    List<Long> ids = parseIds(idString);
+    List<Long> ids = LimsUtils.parseIds(idString);
     if (ids.size() != replicates.size()) {
       throw new IllegalArgumentException("Invalid number of replicates.");
     }

@@ -2,9 +2,12 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,27 +103,11 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   @Override
   public void add(Attachable object, MultipartFile file, AttachmentCategory category) throws IOException {
     Attachable managed = attachableStore.getManaged(object);
-    String saveFilename = Long.toString(new Date().getTime());
     String relativeDir = makeRelativeDir(object.getAttachmentsTarget(), object.getId());
-    File saveDir = new File(makeFullPath(relativeDir));
-    File targetFile = new File(saveDir, saveFilename);
-    while (targetFile.exists()) {
-      saveFilename = Long.toString(Long.valueOf(saveFilename) + 1);
-      targetFile = new File(saveDir, saveFilename);
-    }
-    if (LimsUtils.checkDirectory(saveDir, true)) {
-      file.transferTo(targetFile);
-    } else {
-      throw new IOException("Cannot upload file - check that the directory specified in miso.properties exists and is writable");
-    }
+    File targetFile = storeFile(relativeDir, file);
 
     try {
-      FileAttachment attachment = new FileAttachment();
-      attachment.setFilename(file.getOriginalFilename());
-      attachment.setPath(relativeDir + File.separator + saveFilename);
-      attachment.setCategory(category);
-      attachment.setCreator(authorizationManager.getCurrentUser());
-      attachment.setCreationTime(new Date());
+      FileAttachment attachment = makeAttachment(file, relativeDir, targetFile, category);
       managed.getAttachments().add(attachment);
       attachableStore.save(managed);
     } catch (Exception e) {
@@ -132,6 +119,56 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   }
 
   @Override
+  public void addShared(Collection<Attachable> objects, MultipartFile file, AttachmentCategory category) throws IOException {
+    List<Attachable> managed = objects.stream().map(attachableStore::getManaged).collect(Collectors.toList());
+    if (managed.stream().map(Attachable::getAttachmentsTarget).distinct().count() > 1L) {
+      throw new IllegalArgumentException("Target objects are not all the same type");
+    }
+    String relativeDir = makeRelativeSharedDir(managed.get(0).getAttachmentsTarget());
+    File targetFile = storeFile(relativeDir, file);
+
+    try {
+      FileAttachment attachment = makeAttachment(file, relativeDir, targetFile, category);
+      for (Attachable item : managed) {
+        item.getAttachments().add(attachment);
+        attachableStore.save(item);
+      }
+    } catch (Exception e) {
+      if (!targetFile.delete()) {
+        log.error("Failed to save attachment, but file was still saved: {}", targetFile.getAbsolutePath());
+      }
+      throw e;
+    }
+  }
+
+  private File storeFile(String relativeDir, MultipartFile file) throws IOException {
+    String saveFilename = Long.toString(new Date().getTime());
+    File saveDir = new File(makeFullPath(relativeDir));
+    File targetFile = new File(saveDir, saveFilename);
+    while (targetFile.exists()) {
+      saveFilename = Long.toString(Long.valueOf(saveFilename) + 1);
+      targetFile = new File(saveDir, saveFilename);
+    }
+    if (LimsUtils.checkDirectory(saveDir, true)) {
+      file.transferTo(targetFile);
+    } else {
+      throw new IOException("Cannot upload file - check that the directory specified in miso.properties exists and is writable");
+    }
+    return targetFile;
+  }
+
+  private FileAttachment makeAttachment(MultipartFile sourceFile, String relativeDir, File targetFile, AttachmentCategory category)
+      throws IOException {
+    FileAttachment attachment = new FileAttachment();
+    attachment.setFilename(sourceFile.getOriginalFilename());
+    attachment.setPath(relativeDir + File.separator + targetFile.getName());
+    attachment.setCategory(category);
+    attachment.setCreator(authorizationManager.getCurrentUser());
+    attachment.setCreationTime(new Date());
+    return attachment;
+  }
+
+  @Override
   public void addLink(Attachable object, FileAttachment attachment) throws IOException {
     Attachable managedObject = attachableStore.getManaged(object);
     FileAttachment managedAttachment = attachableStore.getAttachment(attachment.getId());
@@ -140,6 +177,19 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
     }
     managedObject.getAttachments().add(managedAttachment);
     attachableStore.save(managedObject);
+  }
+
+  @Override
+  public void addLinks(Collection<Attachable> objects, FileAttachment attachment) throws IOException {
+    List<Attachable> managed = objects.stream().map(attachableStore::getManaged).collect(Collectors.toList());
+    FileAttachment managedAttachment = attachableStore.getAttachment(attachment.getId());
+    if (managedAttachment == null) {
+      throw new IllegalArgumentException("Attachment not found");
+    }
+    for (Attachable item : managed) {
+      item.getAttachments().add(managedAttachment);
+      attachableStore.save(item);
+    }
   }
 
   @Override
@@ -202,6 +252,10 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
 
   private String makeRelativeDir(String entityType, long entityId) {
     return File.separator + entityType + File.separator + entityId;
+  }
+
+  private String makeRelativeSharedDir(String entityType) {
+    return File.separator + entityType + File.separator + "shared";
   }
 
   private String makeFullPath(String relativePath) {

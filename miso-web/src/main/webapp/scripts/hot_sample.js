@@ -992,8 +992,34 @@ HotTarget.sample = (function() {
           HotUtils.makeChildren('sample', HotUtils.relationCategoriesForDetailed().concat(
               [HotUtils.relations.library(), HotUtils.relations.dilution(), HotUtils.relations.pool()]))].concat(
           HotUtils.makeQcActions("Sample")).concat(
-          config.worksetId ? [HotUtils.makeRemoveFromWorkset('samples', config.worksetId)] : [HotUtils.makeAddToWorkset('samples',
-              'sampleIds')]);
+          [
+              config.worksetId ? HotUtils.makeRemoveFromWorkset('samples', config.worksetId) : HotUtils.makeAddToWorkset('samples',
+                  'sampleIds'), {
+                name: 'Attach File',
+                action: function(samples) {
+                  var ids = samples.map(Utils.array.getId).join(",");
+                  var projects = samples.map(function(sample) {
+                    return sample.projectId;
+                  }).filter(function(projectId, index, array) {
+                    return array.indexOf(projectId) === index;
+                  });
+                  if (projects.length > 1) {
+                    ListTarget.attachment.showUploadDialog('sample', 'shared', ids);
+                  } else {
+                    Utils.showWizardDialog('Attach File', [{
+                      name: 'Upload New File',
+                      handler: function() {
+                        ListTarget.attachment.showUploadDialog('sample', 'shared', ids);
+                      }
+                    }, {
+                      name: 'Link Project File',
+                      handler: function() {
+                        ListTarget.attachment.showLinkDialog('sample', 'shared', projects[0], ids);
+                      }
+                    }]);
+                  }
+                }
+              }]);
     },
 
     getCustomActions: function(table) {

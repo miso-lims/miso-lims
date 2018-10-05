@@ -28,8 +28,10 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import uk.ac.bbsrc.tgac.miso.core.data.Attachable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.AttachmentCategoryService;
 import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ServerErrorException;
 
 @Controller
@@ -48,7 +50,7 @@ public class AttachmentController {
   private String fileStorageDirectory;
 
   @PostMapping(value = "/{entityType}/{entityId}")
-  @ResponseStatus(HttpStatus.OK)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   public void acceptUpload(@PathVariable String entityType, @PathVariable long entityId, @RequestParam(required = false) Long categoryId,
       MultipartHttpServletRequest request)
       throws IOException {
@@ -56,13 +58,31 @@ public class AttachmentController {
     if (item == null) {
       throw new NotFoundException(entityType + " not found");
     }
-    AttachmentCategory category = null;
-    if (categoryId != null) {
-      category = attachmentCategoryService.get(categoryId);
-    }
+    AttachmentCategory category = getCategory(categoryId);
 
     for (MultipartFile fileItem : getMultipartFiles(request)) {
       fileAttachmentService.add(item, fileItem, category);
+    }
+  }
+
+  @PostMapping(value = "/{entityType}/shared")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void acceptSharedUpload(@PathVariable String entityType, @RequestParam String entityIds,
+      @RequestParam(required = false) Long categoryId, MultipartHttpServletRequest request)
+      throws IOException {
+    List<Attachable> items = new ArrayList<>();
+    for (Long id : LimsUtils.parseIds(entityIds)) {
+      Attachable item = fileAttachmentService.get(entityType, id);
+      if (item == null) {
+        throw new ClientErrorException(String.format("%s %d not found", entityType, id));
+      } else {
+        items.add(item);
+      }
+    }
+    AttachmentCategory category = getCategory(categoryId);
+
+    for (MultipartFile fileItem : getMultipartFiles(request)) {
+      fileAttachmentService.addShared(items, fileItem, category);
     }
   }
 
@@ -74,6 +94,17 @@ public class AttachmentController {
       }
     });
     return files;
+  }
+
+  private AttachmentCategory getCategory(Long categoryId) throws IOException {
+    if (categoryId == null) {
+      return null;
+    }
+    AttachmentCategory category = attachmentCategoryService.get(categoryId);
+    if (category == null) {
+      throw new ClientErrorException("Attachment category not found");
+    }
+    return category;
   }
 
   @GetMapping(value = "/{entityType}/{entityId}/{fileId}")
