@@ -104,6 +104,35 @@ ListTarget.attachment = (function() {
     });
   };
 
+  var showLinkDialog = function(entityType, entityId, projectId) {
+    var url = '/miso/rest/project/' + projectId + '/files';
+    Utils.ajaxWithDialog('Retrieving Project Files', 'GET', url, null, function(attachments) {
+      if (!attachments.length) {
+        Utils.showOkDialog('Link Project File', ['Project has no attachments to link.']);
+        return;
+      }
+
+      var attachmentIds = attachments.map(Utils.array.getId);
+      Utils.showDialog('Link Project File', 'Link', [{
+        label: 'File',
+        type: 'select',
+        required: true,
+        values: attachmentIds,
+        getLabel: function(value) {
+          return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(value), attachments).filename;
+        },
+        property: 'attachmentId'
+      }], function(output) {
+        var url = '/miso/rest/attachments/' + entityType + '/' + entityId + '/files?' + jQuery.param({
+          fromEntityType: 'project',
+          fromEntityId: projectId,
+          attachmentId: output.attachmentId
+        });
+        Utils.ajaxWithDialog('Linking File', 'POST', url, null, Utils.page.pageReload);
+      });
+    });
+  };
+
   return {
     name: "Attachments",
     createUrl: function(config, projectId) {
@@ -115,8 +144,20 @@ ListTarget.attachment = (function() {
     createStaticActions: function(config, projectId) {
       return [{
         name: 'Upload',
-        handler: function() {
+        handler: !config.projectId ? function() {
           showUploadDialog(config.entityType, config.entityId);
+        } : function() {
+          Utils.showWizardDialog('Attach File', [{
+            name: 'Upload new file',
+            handler: function() {
+              showUploadDialog(config.entityType, config.entityId);
+            }
+          }, {
+            name: 'Link project file',
+            handler: function() {
+              showLinkDialog(config.entityType, config.entityId, config.projectId);
+            }
+          }]);
         }
       }];
     },
