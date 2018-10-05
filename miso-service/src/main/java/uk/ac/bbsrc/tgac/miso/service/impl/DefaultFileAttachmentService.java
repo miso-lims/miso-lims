@@ -171,24 +171,31 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   @Override
   public void addLink(Attachable object, FileAttachment attachment) throws IOException {
     Attachable managedObject = attachableStore.getManaged(object);
-    FileAttachment managedAttachment = attachableStore.getAttachment(attachment.getId());
-    if (managedAttachment == null) {
-      throw new IllegalArgumentException("Attachment not found");
-    }
-    managedObject.getAttachments().add(managedAttachment);
-    attachableStore.save(managedObject);
+    FileAttachment managedAttachment = getManaged(attachment);
+    addLinkIfNecessary(managedObject, managedAttachment);
   }
 
   @Override
   public void addLinks(Collection<Attachable> objects, FileAttachment attachment) throws IOException {
     List<Attachable> managed = objects.stream().map(attachableStore::getManaged).collect(Collectors.toList());
+    FileAttachment managedAttachment = getManaged(attachment);
+    for (Attachable item : managed) {
+      addLinkIfNecessary(item, managedAttachment);
+    }
+  }
+
+  private FileAttachment getManaged(FileAttachment attachment) {
     FileAttachment managedAttachment = attachableStore.getAttachment(attachment.getId());
     if (managedAttachment == null) {
       throw new IllegalArgumentException("Attachment not found");
     }
-    for (Attachable item : managed) {
-      item.getAttachments().add(managedAttachment);
-      attachableStore.save(item);
+    return managedAttachment;
+  }
+
+  private void addLinkIfNecessary(Attachable managedObject, FileAttachment managedAttachment) {
+    if (!managedObject.getAttachments().contains(managedAttachment)) {
+      managedObject.getAttachments().add(managedAttachment);
+      attachableStore.save(managedObject);
     }
   }
 

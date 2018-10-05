@@ -819,8 +819,11 @@ HotTarget.library = (function() {
           HotUtils.makeParents('library', HotUtils.relationCategoriesForDetailed()),
           HotUtils.makeChildren('library', [HotUtils.relations.dilution(), HotUtils.relations.pool()])].concat(
           HotUtils.makeQcActions("Library")).concat(
-          config.worksetId ? [HotUtils.makeRemoveFromWorkset('libraries', config.worksetId)] : [HotUtils.makeAddToWorkset('libraries',
-              'libraryIds')]);
+          [
+              config.worksetId ? HotUtils.makeRemoveFromWorkset('libraries', config.worksetId) : HotUtils.makeAddToWorkset('libraries',
+                  'libraryIds'), HotUtils.makeAttachFile('library', function(library) {
+                return library.parentSampleProjectId;
+              })]);
     }
   };
 })();
