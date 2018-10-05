@@ -352,7 +352,7 @@ public class EditPoolController {
     }
 
     public ModelAndView merge(String parentIdsString, String proportionsString, ModelMap model) throws IOException {
-      List<Long> parentIds = parseIds(parentIdsString);
+      List<Long> parentIds = LimsUtils.parseIds(parentIdsString);
       List<Integer> proportions = parseProportions(proportionsString);
       List<PoolDto> dtos = Lists.newArrayList(createDtoFromParents(parentIds, proportions));
       return prepare(model, true, "Merge Pools", dtos);

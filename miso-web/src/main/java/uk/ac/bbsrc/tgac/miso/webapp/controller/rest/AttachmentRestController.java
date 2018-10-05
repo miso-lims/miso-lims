@@ -1,6 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -16,7 +18,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Attachable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 
 @Controller
 @RequestMapping("/rest/attachments")
@@ -25,7 +29,7 @@ public class AttachmentRestController extends RestController {
   @Autowired
   private FileAttachmentService fileAttachmentService;
 
-  @PostMapping("/{entityType}/{entityId}/files")
+  @PostMapping("/{entityType}/{entityId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void linkFile(@PathVariable String entityType, @PathVariable long entityId,
       @RequestParam(name = "fromEntityType", required = true) String fromEntityType,
@@ -33,11 +37,35 @@ public class AttachmentRestController extends RestController {
       @RequestParam(name = "attachmentId", required = true) long attachmentId) throws IOException {
     Attachable item = getAttachable(entityType, entityId, true);
     // This lookup will ensure that the user has read access to the source item (and its attachments)
-    Attachable sourceItem = getAttachable(fromEntityType, fromEntityId, true);
+    Attachable sourceItem = getAttachable(fromEntityType, fromEntityId, false);
     FileAttachment attachment = sourceItem.getAttachments().stream()
         .filter(att -> att.getId() == attachmentId)
         .findFirst().orElseThrow(() -> new RestException("Attachment not found", Status.BAD_REQUEST));
     fileAttachmentService.addLink(item, attachment);
+  }
+
+  @PostMapping("/{entityType}/shared")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkLinkFile(@PathVariable String entityType,
+      @RequestParam(name = "fromEntityType", required = true) String fromEntityType,
+      @RequestParam(name = "fromEntityId", required = true) long fromEntityId,
+      @RequestParam(name = "attachmentId", required = true) long attachmentId,
+      @RequestParam(name = "entityIds", required = true) String entityIds) throws IOException {
+    List<Attachable> items = new ArrayList<>();
+    for (Long id : LimsUtils.parseIds(entityIds)) {
+      Attachable item = fileAttachmentService.get(entityType, id);
+      if (item == null) {
+        throw new ClientErrorException(String.format("%s %d not found", entityType, id));
+      } else {
+        items.add(item);
+      }
+    }
+    // This lookup will ensure that the user has read access to the source item (and its attachments)
+    Attachable sourceItem = getAttachable(fromEntityType, fromEntityId, false);
+    FileAttachment attachment = sourceItem.getAttachments().stream()
+        .filter(att -> att.getId() == attachmentId)
+        .findFirst().orElseThrow(() -> new RestException("Attachment not found", Status.BAD_REQUEST));
+    fileAttachmentService.addLinks(items, attachment);
   }
 
   @DeleteMapping("/{entityType}/{entityId}/{fileId}")

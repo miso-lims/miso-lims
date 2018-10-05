@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.QcDto;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
@@ -32,7 +33,7 @@ public abstract class BulkQcTable extends BulkTableBackend<QcDto> {
   public final ModelAndView display(String idString, ModelMap model) throws IOException {
 
     return prepare(model, create, verb + " " + qcTarget + " QCs",
-        parseIds(idString).stream().flatMap(WhineyFunction.rethrow(this::load))
+        LimsUtils.parseIds(idString).stream().flatMap(WhineyFunction.rethrow(this::load))
             .collect(Collectors.toList()));
   }
 

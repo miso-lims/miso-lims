@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,7 +15,11 @@ public interface FileAttachmentService {
 
   public void add(Attachable object, MultipartFile file, AttachmentCategory category) throws IOException;
 
+  public void addShared(Collection<Attachable> objects, MultipartFile file, AttachmentCategory category) throws IOException;
+
   public void addLink(Attachable object, FileAttachment attachment) throws IOException;
+
+  public void addLinks(Collection<Attachable> objects, FileAttachment attachment) throws IOException;
 
   public void delete(Attachable object, FileAttachment attachment) throws IOException;
 
