@@ -51,7 +51,7 @@ Sample classes, and the relationships between them define the sample hierarchy. 
 be customized to suit your requirements. Figure {{figure}} shows the sample hierarchy used at OICR. Sample
 relationships have a parent and child class. This means that if you have a sample of the parent class, you can
 propagate a sample of the child class. In figure {{figure}}, the relationships are illustrated using arrows that point
-from the child class to the parent class.
+from the parent class to the child class.
 
 {% include userman-figure.md num=figure cap="OICR sample hierarchy" img="type-data-sample-hierarchy.png" %}
 
