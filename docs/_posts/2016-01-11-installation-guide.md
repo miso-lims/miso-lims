@@ -23,7 +23,7 @@ Application Server:
 
 Database Server:
 
-* MySQL 5.7
+* MySQL 5.7.7
 * Flyway 3.2.1 (newer versions may cause issues)
 
 Run Scanner:

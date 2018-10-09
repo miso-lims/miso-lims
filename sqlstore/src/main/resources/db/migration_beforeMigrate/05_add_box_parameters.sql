@@ -8,9 +8,9 @@ CREATE PROCEDURE addBoxSize(
   iColumns int,
   iScannable tinyint(1)
 ) BEGIN
-  IF NOT EXISTS (SELECT 1 FROM BoxSize WHERE rows = iRows AND columns = iColumns AND scannable = iScannable)
+  IF NOT EXISTS (SELECT 1 FROM BoxSize WHERE `rows` = iRows AND `columns` = iColumns AND scannable = iScannable)
   THEN
-    INSERT INTO BoxSize(rows, columns, scannable)
+    INSERT INTO BoxSize(`rows`, `columns`, scannable)
     VALUES (iRows, iColumns, iScannable);
   END IF;
 END//
