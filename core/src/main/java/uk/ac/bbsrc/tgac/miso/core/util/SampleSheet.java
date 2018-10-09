@@ -48,7 +48,7 @@ public enum SampleSheet {
       Optional<Index> firstIndex = dilution.getIndices().stream().filter(i -> i.getPosition() == 1).findFirst();
       output[2] = firstIndex.map(Index::getName).orElse("");
       output[3] = firstIndex.map(Index::getSequence).orElse("");
-      Optional<Index> secondIndex = dilution.getIndices().stream().filter(i -> i.getPosition() == 1).findFirst();
+      Optional<Index> secondIndex = dilution.getIndices().stream().filter(i -> i.getPosition() == 2).findFirst();
       output[4] = secondIndex.map(Index::getName).orElse("");
       output[5] = secondIndex.map(Index::getSequence).orElse("");
     }
