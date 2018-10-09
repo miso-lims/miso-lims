@@ -109,4 +109,5 @@ th, td {
 img.userman-figure {
     border: 1px solid grey;
     padding: 4px;
+    max-width: 100%;
 }
