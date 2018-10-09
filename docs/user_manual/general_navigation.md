@@ -60,9 +60,16 @@ pages.
 
 Several of the list pages have a "Select by names" feature which is represented by a button in the toolbar that looks
 like a clipboard (📋). Clicking this button will open a dialog which prompts you to enter names, aliases, or barcodes.
-This allows you to search for multiple items at once, using any of those attributes. When the results are displayed,
-you will be given the option of which to do with the selected items. These will be the same options as are available
-in the list page's toolbar.
+This allows you to search for multiple items at once, using any of those attributes. Enter the names, aliases, or
+barcodes, one per line, then click the "Search" button. You will be given the option of what to do with the selected
+items. These will be the same options as are available in the list page's toolbar, with two additions:
+
+* **View Selected**: shows the name and alias of each selected item. You can click "OK" after viewing the list to
+  return to the options menu with the samples still selected
+* **Select in list**: closes the dialog, but selects the items in the list so that you can continue to work with them
+
+This feature is useful if you have a list of names, aliases, or barcodes that you can copy from a spreadsheet, or if
+you have several barcoded items that you can scan into the dialog.
 
 {% include userman-toplink.md %}
 
@@ -108,10 +115,28 @@ column heading again to reverse the sorting order.
 {% include userman-heading.md section=page.section sub=sub subsub=subsub title="Finding Related Items" %}
 
 Several tables (Samples, Libraries, Dilutions, and Pools) have toolbar buttons labelled "Parents" and "Children." These
-allow you to find items related to the ones you have selected. For instance, you can select a number of Dilutions on
+allow you to find items related to the ones you have selected. For instance, you can select a number of dilutions on
 the Dilutions list page, click "Parents," and choose "Library" from the dialog. This will select all of the Libraries
-from which the selected Dilutions were propagated. You can then select an action to perform on the Libraries. This will
-be the same set of options that are available on the Libraries list page.
+from which the selected Dilutions were propagated. You can then select an action to perform on the libraries. This will
+be the same set of options that are available on the Libraries list page. One item is said to be the "parent" of
+another if the other item was created using the first. A library is the parent of a library dilution because the
+dilution was made from the library.
+
+Here is a list of all the related item types that can be selected using the "Parents" and "Children" buttons where
+lower-numbered items are parents of the higher-numbered items:
+
+1. Samples
+1. Libraries
+1. Library Dilutions
+1. Pools
+
+If your site uses detailed sample mode, samples are broken into several additional types:
+
+1. Identity Samples
+1. Tissue Samples
+1. Tissue Processing Samples
+1. Stock Samples
+1. Aliquot Samples
 
 {% include userman-toplink.md %}
 

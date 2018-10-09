@@ -83,6 +83,8 @@ order: 1
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Disabling/Enabling Printers" %}
 {% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Printing Barcodes" %}
+{% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Deleting Printers" %}
 
 
@@ -228,6 +230,8 @@ order: 1
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Notes" %}
 {% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Attaching Files" %}
+{% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Propagating Samples to Samples🔹" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Propagating Samples to Libraries" %}
@@ -240,9 +244,7 @@ order: 1
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Finding Related Items" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding Sample QCs" %}
-{% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Editing Sample QCs" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Sample QCs" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding Samples to a Workset" %}
 {% assign sub = sub | plus: 1 %}
@@ -572,6 +574,15 @@ order: 1
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Creating an Array Run" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Editing an Array Run" %}
+
+
+{% assign section = section | plus: 1 %}
+{% assign section-title = "QCs" %}
+{% include userman-toc-link.md section=section section-title=section-title %}
+{% assign sub = 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding QCs" %}
+{% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Editing QCs" %}
 
 
 {% assign section = section | plus: 1 %}
