@@ -847,7 +847,7 @@ insert into TargetedResequencing (alias, description, kitDescriptorId, createdBy
 
 -- box_size_use
 --StartNoTest
-INSERT INTO BoxSize (rows, columns, scannable) VALUES (9, 9, false);
+INSERT INTO BoxSize (`rows`, `columns`, scannable) VALUES (9, 9, false);
 
 INSERT INTO BoxUse (`alias`)  VALUES ('Storage');
 INSERT INTO BoxUse (`alias`)  VALUES ('Libraries');

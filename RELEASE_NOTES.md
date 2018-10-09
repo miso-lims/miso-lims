@@ -1,3 +1,9 @@
+# 0.2.146
+
+Changes:
+
+ * Update stored procedures to be compatible with desired MySQL version
+
 # 0.2.145
 
 Changes:
