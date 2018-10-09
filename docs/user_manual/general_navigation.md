@@ -140,6 +140,21 @@ work with the related items.
 
 
 {% assign subsub = 1 %}
+{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Collapsible Sections" %}
+
+{% assign figure = 1 %}
+Some of the single item edit pages can get quite long if there is a lot of related information. To help shorten the
+pages, some sections may be collapsed. To expand these, click anywhere within the heading line of the collapsed
+section. Click on the heading line again to collapse the section once more. Figure {{figure}} shows some collapsed
+sections.
+
+{% include userman-figure.md num=figure cap="Collapsed page sections" img="general-nav-collapsed-sections.png" %}
+
+{% include userman-toplink.md %}
+
+
+
+{% assign subsub = subsub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub subsub=subsub title="Change Logs" %}
 
 Many of the single item edit pages include a Changes table at the very bottom. This is a log of changes that have been
