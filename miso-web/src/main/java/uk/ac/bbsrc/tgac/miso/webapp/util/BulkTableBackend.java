@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.util;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.ui.ModelMap;
@@ -24,15 +23,6 @@ public abstract class BulkTableBackend<Dto> {
     super();
     this.targetType = targetType;
     this.dtoClass = dtoClass;
-  }
-
-  protected static List<Long> parseIds(String idString) {
-    String[] split = idString.split(",");
-    List<Long> ids = new ArrayList<>();
-    for (int i = 0; i < split.length; i++) {
-      ids.add(Long.parseLong(split[i]));
-    }
-    return ids;
   }
 
   /**

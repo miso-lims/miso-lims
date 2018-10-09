@@ -132,7 +132,7 @@ public class ProjectControllerHelperService {
     final Integer numProposedSamples = json.getInt("numProposedSamples");
 
     try {
-      final Project project = projectService.getProjectById(projectId);
+      final Project project = projectService.get(projectId);
       final ProjectOverview overview = new ProjectOverview();
       overview.setNumProposedSamples(numProposedSamples);
       overview.setPrincipalInvestigator(principalInvestigator);
@@ -251,7 +251,7 @@ public class ProjectControllerHelperService {
       try {
         final File f = misoFileManager.getNewFile(Project.class, projectId.toString(),
             "BulkInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
-        FormUtils.createSampleInputSpreadsheet(projectService.getProjectById(projectId).getSamples(), f);
+        FormUtils.createSampleInputSpreadsheet(projectService.get(projectId).getSamples(), f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
       } catch (final Exception e) {
         e.printStackTrace();

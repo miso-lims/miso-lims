@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -103,6 +104,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
@@ -1180,6 +1182,7 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setParentSampleId(from.getSample().getId());
     dto.setParentSampleAlias(from.getSample().getAlias());
+    dto.setParentSampleProjectId(from.getSample().getProject().getId());
     if (from.getSample() instanceof DetailedSample) {
       dto.setParentSampleClassId(((DetailedSample) from.getSample()).getSampleClass().getId());
     }
@@ -2613,11 +2616,12 @@ public class Dtos {
 
   public static AttachmentDto asDto(FileAttachment from) {
     AttachmentDto dto = new AttachmentDto();
-    dto.setId(from.getId());
-    dto.setFilename(from.getFilename());
-    dto.setPath(from.getPath());
-    dto.setCreator(from.getCreator().getLoginName());
-    dto.setCreated(formatDateTime(from.getCreationTime()));
+    setId(dto::setId, from);
+    setString(dto::setFilename, from.getFilename());
+    setString(dto::setPath, from.getPath());
+    setString(dto::setCategory, from.getCategory(), AttachmentCategory::getAlias);
+    setString(dto::setCreator, from.getCreator(), User::getLoginName);
+    setString(dto::setCreated, from.getCreationTime());
     return dto;
   }
 
@@ -2771,6 +2775,20 @@ public class Dtos {
     return dto;
   }
 
+  public static AttachmentCategoryDto asDto(AttachmentCategory from) {
+    AttachmentCategoryDto dto = new AttachmentCategoryDto();
+    dto.setId(from.getId());
+    setString(dto::setAlias, from.getAlias());
+    return dto;
+  }
+
+  public static AttachmentCategory to(AttachmentCategoryDto from) {
+    AttachmentCategory to = new AttachmentCategory();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
   private static void setBigDecimal(Consumer<BigDecimal> setter, String value) {
     if (isStringEmptyOrNull(value)) {
       setter.accept(null);
@@ -2791,8 +2809,20 @@ public class Dtos {
     }
   }
 
+  private static void setString(Consumer<String> setter, Date value) {
+    setter.accept(value == null ? null : formatDate(value));
+  }
+
   private static <T> void setString(Consumer<String> setter, T value, Function<T, String> lookup) {
     setter.accept(value == null ? null : lookup.apply(value));
+  }
+
+  private static void setLong(Consumer<Long> setter, Long value, boolean nullOk) {
+    Long effectiveValue = value;
+    if (effectiveValue == null) {
+      effectiveValue = nullOk ? null : 0L;
+    }
+    setter.accept(effectiveValue);
   }
 
   private static void setId(Consumer<Long> setter, Identifiable value) {

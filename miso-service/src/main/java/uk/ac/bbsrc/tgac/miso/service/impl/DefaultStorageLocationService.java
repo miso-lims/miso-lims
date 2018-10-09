@@ -127,6 +127,13 @@ public class DefaultStorageLocationService implements StorageLocationService {
   private void validateChange(StorageLocation storage, StorageLocation beforeChange) {
     List<ValidationError> errors = new ArrayList<>();
 
+    if (storage.getIdentificationBarcode() != null
+        && (beforeChange == null || !storage.getIdentificationBarcode().equals(beforeChange.getIdentificationBarcode()))
+        && storageLocationStore.getByBarcode(storage.getIdentificationBarcode()) != null) {
+      errors.add(new ValidationError("identificationBarcode",
+          String.format("There is already a storage location with this barcode (%s)", storage.getIdentificationBarcode())));
+    }
+
     validateLocationUnitRelationships(storage, errors);
 
     if (!errors.isEmpty()) {

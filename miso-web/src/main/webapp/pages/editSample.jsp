@@ -749,6 +749,7 @@
 </form:form>
 
 <c:if test="${sample.id != 0}">
+  <miso:attachments item="${sample}" projectId="${sample.project.id}"/>
   <miso:qcs id="list_qc" item="${sample}"/>
 
   <c:if test="${ !detailedSample or detailedSample and sampleCategory eq 'Aliquot' }">

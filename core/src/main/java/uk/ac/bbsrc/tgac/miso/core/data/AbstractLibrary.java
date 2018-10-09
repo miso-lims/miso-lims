@@ -58,6 +58,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -197,6 +198,11 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Enumerated(EnumType.STRING)
   private DilutionFactor spikeInDilutionFactor;
+
+  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "Library_Attachment", joinColumns = { @JoinColumn(name = "libraryId") }, inverseJoinColumns = {
+      @JoinColumn(name = "attachmentId") })
+  private List<FileAttachment> attachments;
 
   @Override
   public Boxable.EntityType getEntityType() {
@@ -737,6 +743,21 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public void setSpikeInDilutionFactor(DilutionFactor dilutionFactor) {
     this.spikeInDilutionFactor = dilutionFactor;
+  }
+
+  @Override
+  public List<FileAttachment> getAttachments() {
+    return attachments;
+  }
+
+  @Override
+  public void setAttachments(List<FileAttachment> attachments) {
+    this.attachments = attachments;
+  }
+
+  @Override
+  public String getAttachmentsTarget() {
+    return "library";
   }
 
 }

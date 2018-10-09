@@ -1,3 +1,19 @@
+# 0.2.145
+
+Changes:
+
+ * Attachments: 
+    * Add ability to categorize attachments
+    * Add ability to (bulk) attach files to samples and libraries
+    * Add ability to link project attachmetns to samples and libraries
+ * Update transfer list fields in downloadable sheet
+ * Default propagated sample creation date to today (DetailedSample mode)
+ * Improve error message for duplicate barcode on storage locations
+ * Add type data section of user manual
+ * Bug fixes:
+    * Sample sheets now display correct index 2 sequences
+    * Ghost slides no longer save incorrectly (DetailedSample mode)
+
 # 0.2.144
 
 Changes:

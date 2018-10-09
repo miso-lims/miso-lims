@@ -7,6 +7,8 @@ import java.util.List;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+
 /**
  * Create a Handsontable for propagating a particular entity type
  *
@@ -36,7 +38,7 @@ public abstract class BulkMergeTableBackend<Dto> extends BulkTableBackend<Dto> {
    * @param idString a comma-delimited list of parent IDs
    */
   public final ModelAndView propagate(String idString, ModelMap model) throws IOException {
-    List<Long> ids = parseIds(idString);
+    List<Long> ids = LimsUtils.parseIds(idString);
     return prepare(model, true, "Create " + name + " from " + parentName,
         Collections.singletonList(createDtoFromParents(ids)));
   }

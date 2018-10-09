@@ -2,10 +2,12 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +18,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Attachable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.store.AttachableStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -37,50 +42,49 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   private AttachableStore attachableStore;
 
   @Autowired
-  private PoolService poolService;
-
-  @Autowired
-  private ProjectService projectService;
-
-  @Autowired
-  private RunService runService;
-
-  @Autowired
-  private ServiceRecordService serviceRecordService;
-
-  @Autowired
   private AuthorizationManager authorizationManager;
 
   @Value("${miso.fileStorageDirectory}")
   private String fileStorageDirectory;
 
-  private final Map<String, Function<Long, Attachable>> entityFetchers = new HashMap<>();
-
-  public DefaultFileAttachmentService() {
-    entityFetchers.put("pool", WhineyFunction.rethrow(id -> poolService.get(id)));
-    entityFetchers.put("project", WhineyFunction.rethrow(id -> projectService.getProjectById(id)));
-    entityFetchers.put("run", WhineyFunction.rethrow(id -> runService.get(id)));
-    entityFetchers.put("servicerecord", WhineyFunction.rethrow(id -> serviceRecordService.get(id)));
-  }
+  private final Map<String, ProviderService<? extends Attachable>> entityProviders = new HashMap<>();
 
   public void setAttachableStore(AttachableStore attachableStore) {
     this.attachableStore = attachableStore;
   }
 
-  public void setProjectService(ProjectService projectService) {
-    this.projectService = projectService;
-  }
-
-  public void setRunService(RunService runService) {
-    this.runService = runService;
-  }
-
-  public void setServiceRecordService(ServiceRecordService serviceRecordService) {
-    this.serviceRecordService = serviceRecordService;
-  }
-
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
+  }
+
+  @Autowired
+  public void setLibraryService(LibraryService libraryService) {
+    entityProviders.put("library", libraryService);
+  }
+
+  @Autowired
+  public void setPoolService(PoolService poolService) {
+    entityProviders.put("pool", poolService);
+  }
+
+  @Autowired
+  public void setProjectService(ProjectService projectService) {
+    entityProviders.put("project", projectService);
+  }
+
+  @Autowired
+  public void setRunService(RunService runService) {
+    entityProviders.put("run", runService);
+  }
+
+  @Autowired
+  public void setSampleService(SampleService sampleService) {
+    entityProviders.put("sample", sampleService);
+  }
+
+  @Autowired
+  public void setServiceRecordService(ServiceRecordService serviceRecordService) {
+    entityProviders.put("servicerecord", serviceRecordService);
   }
 
   public void setFileStorageDirectory(String fileStorageDirectory) {
@@ -88,19 +92,57 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   }
 
   @Override
-  public Attachable get(String entityType, long entityId) {
-    Function<Long, Attachable> fetcher = entityFetchers.get(entityType);
-    if (fetcher == null) {
+  public Attachable get(String entityType, long entityId) throws IOException {
+    ProviderService<? extends Attachable> provider = entityProviders.get(entityType);
+    if (provider == null) {
       throw new IllegalArgumentException("Unknown entity type: " + entityType);
     }
-    return fetcher.apply(entityId);
+    return provider.get(entityId);
   }
 
   @Override
-  public void add(Attachable object, MultipartFile file) throws IOException {
+  public void add(Attachable object, MultipartFile file, AttachmentCategory category) throws IOException {
     Attachable managed = attachableStore.getManaged(object);
-    String saveFilename = Long.toString(new Date().getTime());
     String relativeDir = makeRelativeDir(object.getAttachmentsTarget(), object.getId());
+    File targetFile = storeFile(relativeDir, file);
+
+    try {
+      FileAttachment attachment = makeAttachment(file, relativeDir, targetFile, category);
+      managed.getAttachments().add(attachment);
+      attachableStore.save(managed);
+    } catch (Exception e) {
+      if (!targetFile.delete()) {
+        log.error("Failed to save attachment, but file was still saved: {}", targetFile.getAbsolutePath());
+      }
+      throw e;
+    }
+  }
+
+  @Override
+  public void addShared(Collection<Attachable> objects, MultipartFile file, AttachmentCategory category) throws IOException {
+    List<Attachable> managed = objects.stream().map(attachableStore::getManaged).collect(Collectors.toList());
+    if (managed.stream().map(Attachable::getAttachmentsTarget).distinct().count() > 1L) {
+      throw new IllegalArgumentException("Target objects are not all the same type");
+    }
+    String relativeDir = makeRelativeSharedDir(managed.get(0).getAttachmentsTarget());
+    File targetFile = storeFile(relativeDir, file);
+
+    try {
+      FileAttachment attachment = makeAttachment(file, relativeDir, targetFile, category);
+      for (Attachable item : managed) {
+        item.getAttachments().add(attachment);
+        attachableStore.save(item);
+      }
+    } catch (Exception e) {
+      if (!targetFile.delete()) {
+        log.error("Failed to save attachment, but file was still saved: {}", targetFile.getAbsolutePath());
+      }
+      throw e;
+    }
+  }
+
+  private File storeFile(String relativeDir, MultipartFile file) throws IOException {
+    String saveFilename = Long.toString(new Date().getTime());
     File saveDir = new File(makeFullPath(relativeDir));
     File targetFile = new File(saveDir, saveFilename);
     while (targetFile.exists()) {
@@ -112,20 +154,48 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
     } else {
       throw new IOException("Cannot upload file - check that the directory specified in miso.properties exists and is writable");
     }
+    return targetFile;
+  }
 
-    try {
-      FileAttachment attachment = new FileAttachment();
-      attachment.setFilename(file.getOriginalFilename());
-      attachment.setPath(relativeDir + File.separator + saveFilename);
-      attachment.setCreator(authorizationManager.getCurrentUser());
-      attachment.setCreationTime(new Date());
-      managed.getAttachments().add(attachment);
-      attachableStore.save(managed);
-    } catch (Exception e) {
-      if (!targetFile.delete()) {
-        log.error("Failed to save attachment, but file was still saved: {}", targetFile.getAbsolutePath());
-      }
-      throw e;
+  private FileAttachment makeAttachment(MultipartFile sourceFile, String relativeDir, File targetFile, AttachmentCategory category)
+      throws IOException {
+    FileAttachment attachment = new FileAttachment();
+    attachment.setFilename(sourceFile.getOriginalFilename());
+    attachment.setPath(relativeDir + File.separator + targetFile.getName());
+    attachment.setCategory(category);
+    attachment.setCreator(authorizationManager.getCurrentUser());
+    attachment.setCreationTime(new Date());
+    return attachment;
+  }
+
+  @Override
+  public void addLink(Attachable object, FileAttachment attachment) throws IOException {
+    Attachable managedObject = attachableStore.getManaged(object);
+    FileAttachment managedAttachment = getManaged(attachment);
+    addLinkIfNecessary(managedObject, managedAttachment);
+  }
+
+  @Override
+  public void addLinks(Collection<Attachable> objects, FileAttachment attachment) throws IOException {
+    List<Attachable> managed = objects.stream().map(attachableStore::getManaged).collect(Collectors.toList());
+    FileAttachment managedAttachment = getManaged(attachment);
+    for (Attachable item : managed) {
+      addLinkIfNecessary(item, managedAttachment);
+    }
+  }
+
+  private FileAttachment getManaged(FileAttachment attachment) {
+    FileAttachment managedAttachment = attachableStore.getAttachment(attachment.getId());
+    if (managedAttachment == null) {
+      throw new IllegalArgumentException("Attachment not found");
+    }
+    return managedAttachment;
+  }
+
+  private void addLinkIfNecessary(Attachable managedObject, FileAttachment managedAttachment) {
+    if (!managedObject.getAttachments().contains(managedAttachment)) {
+      managedObject.getAttachments().add(managedAttachment);
+      attachableStore.save(managedObject);
     }
   }
 
@@ -151,10 +221,12 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
       }
     }
 
-    managed.getAttachments().remove(attachment);
+    managed.getAttachments().remove(managedAttachment);
     attachableStore.save(managed);
 
-    if (file.exists()) {
+    // Only delete the file if it is not attached to any other items
+    if (file.exists() && attachableStore.getUsage(managedAttachment) == 1) {
+      attachableStore.delete(managedAttachment);
       deleteFileOrLog(file, managed, managedAttachment);
     }
   }
@@ -187,6 +259,10 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
 
   private String makeRelativeDir(String entityType, long entityId) {
     return File.separator + entityType + File.separator + entityId;
+  }
+
+  private String makeRelativeSharedDir(String entityType) {
+    return File.separator + entityType + File.separator + "shared";
   }
 
   private String makeFullPath(String relativePath) {

@@ -20,13 +20,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Attachable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.AttachmentCategoryService;
 import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ServerErrorException;
 
 @Controller
@@ -38,20 +43,46 @@ public class AttachmentController {
   @Autowired
   private FileAttachmentService fileAttachmentService;
 
+  @Autowired
+  private AttachmentCategoryService attachmentCategoryService;
+
   @Value("${miso.fileStorageDirectory}")
   private String fileStorageDirectory;
 
   @PostMapping(value = "/{entityType}/{entityId}")
-  @ResponseStatus(HttpStatus.OK)
-  public void acceptUpload(@PathVariable String entityType, @PathVariable long entityId, MultipartHttpServletRequest request)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void acceptUpload(@PathVariable String entityType, @PathVariable long entityId, @RequestParam(required = false) Long categoryId,
+      MultipartHttpServletRequest request)
       throws IOException {
     Attachable item = fileAttachmentService.get(entityType, entityId);
     if (item == null) {
       throw new NotFoundException(entityType + " not found");
     }
+    AttachmentCategory category = getCategory(categoryId);
 
     for (MultipartFile fileItem : getMultipartFiles(request)) {
-      fileAttachmentService.add(item, fileItem);
+      fileAttachmentService.add(item, fileItem, category);
+    }
+  }
+
+  @PostMapping(value = "/{entityType}/shared")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void acceptSharedUpload(@PathVariable String entityType, @RequestParam String entityIds,
+      @RequestParam(required = false) Long categoryId, MultipartHttpServletRequest request)
+      throws IOException {
+    List<Attachable> items = new ArrayList<>();
+    for (Long id : LimsUtils.parseIds(entityIds)) {
+      Attachable item = fileAttachmentService.get(entityType, id);
+      if (item == null) {
+        throw new ClientErrorException(String.format("%s %d not found", entityType, id));
+      } else {
+        items.add(item);
+      }
+    }
+    AttachmentCategory category = getCategory(categoryId);
+
+    for (MultipartFile fileItem : getMultipartFiles(request)) {
+      fileAttachmentService.addShared(items, fileItem, category);
     }
   }
 
@@ -65,9 +96,20 @@ public class AttachmentController {
     return files;
   }
 
+  private AttachmentCategory getCategory(Long categoryId) throws IOException {
+    if (categoryId == null) {
+      return null;
+    }
+    AttachmentCategory category = attachmentCategoryService.get(categoryId);
+    if (category == null) {
+      throw new ClientErrorException("Attachment category not found");
+    }
+    return category;
+  }
+
   @GetMapping(value = "/{entityType}/{entityId}/{fileId}")
   public void downloadAttachment(@PathVariable String entityType, @PathVariable long entityId, @PathVariable long fileId,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws IOException {
     Attachable item = fileAttachmentService.get(entityType, entityId);
     if (item == null) {
       throw new NotFoundException(entityType + " not found");

@@ -515,6 +515,7 @@
 </form:form>
 <br/>
 <c:if test="${library.id != 0}">
+  <miso:attachments item="${library}" projectId="${library.sample.project.id}"/>
   <miso:qcs id="list_qcs" item="${library}"/>
   <miso:list-section id="list_dilution" name="Dilutions" target="dilution" items="${libraryDilutions}" config="${libraryDilutionsConfig}"/>
   <miso:list-section id="list_pool" name="Pools" target="pool" items="${libraryPools}"/>

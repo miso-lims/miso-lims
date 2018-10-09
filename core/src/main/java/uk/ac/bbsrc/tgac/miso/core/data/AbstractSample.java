@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
@@ -57,6 +58,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -142,6 +144,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @OneToOne(optional = true)
   @PrimaryKeyJoinColumn
   private SampleBoxPosition boxPosition;
+
+  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "Sample_Attachment", joinColumns = { @JoinColumn(name = "sampleId") }, inverseJoinColumns = {
+      @JoinColumn(name = "attachmentId") })
+  private List<FileAttachment> attachments;
 
   @Override
   public EntityType getEntityType() {
@@ -540,6 +547,21 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setConcentration(Double concentration) {
     this.concentration = concentration;
+  }
+
+  @Override
+  public List<FileAttachment> getAttachments() {
+    return attachments;
+  }
+
+  @Override
+  public void setAttachments(List<FileAttachment> attachments) {
+    this.attachments = attachments;
+  }
+
+  @Override
+  public String getAttachmentsTarget() {
+    return "sample";
   }
 
 }

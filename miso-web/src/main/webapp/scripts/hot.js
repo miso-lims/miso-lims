@@ -1246,6 +1246,31 @@ var HotUtils = {
     }
   },
 
+  makeAttachFile: function(entityType, getProjectId) {
+    return {
+      name: 'Attach File',
+      action: function(items) {
+        var ids = items.map(Utils.array.getId).join(",");
+        var projects = Utils.array.deduplicateNumeric(items.map(getProjectId));
+        if (projects.length > 1) {
+          ListTarget.attachment.showUploadDialog(entityType, 'shared', ids);
+        } else {
+          Utils.showWizardDialog('Attach File', [{
+            name: 'Upload New File',
+            handler: function() {
+              ListTarget.attachment.showUploadDialog(entityType, 'shared', ids);
+            }
+          }, {
+            name: 'Link Project File',
+            handler: function() {
+              ListTarget.attachment.showLinkDialog(entityType, 'shared', projects[0], ids);
+            }
+          }]);
+        }
+      }
+    }
+  },
+
   relationCategoriesForDetailed: function() { // Change name to relationCategoriesForDetailed
     return Constants.isDetailedSample ? Constants.sampleCategories.map(function(category) {
       return {

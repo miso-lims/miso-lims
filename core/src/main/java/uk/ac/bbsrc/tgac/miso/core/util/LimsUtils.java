@@ -116,6 +116,15 @@ public class LimsUtils {
     return nice;
   }
 
+  public static List<Long> parseIds(String idString) {
+    String[] split = idString.split(",");
+    List<Long> ids = new ArrayList<>();
+    for (int i = 0; i < split.length; i++) {
+      ids.add(Long.parseLong(split[i]));
+    }
+    return ids;
+  }
+
   /**
    * Checks that a directory exists. This method will attempt to create the directory if it doesn't exist and if the attemptMkdir flag is
    * true

@@ -21,6 +21,12 @@ public class ExceptionHandlerAdvice {
     return fromExceptionMessage("Page Not Found", e, false);
   }
 
+  @ExceptionHandler(ClientErrorException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ModelAndView showClientError(final ServerErrorException e) {
+    return fromExceptionMessage("Bad Request", e, true);
+  }
+
   @ExceptionHandler(ServerErrorException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ModelAndView showServerError(final ServerErrorException e) {

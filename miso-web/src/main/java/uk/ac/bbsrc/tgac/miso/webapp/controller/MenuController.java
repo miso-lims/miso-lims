@@ -84,6 +84,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PlatformDto;
 import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
+import uk.ac.bbsrc.tgac.miso.service.AttachmentCategoryService;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
@@ -180,6 +181,8 @@ public class MenuController implements ServletContextAware {
   private StudyService studyService;
   @Autowired
   private ContainerModelService containerModelService;
+  @Autowired
+  private AttachmentCategoryService attachmentCategoryService;
 
   @Autowired
   private NamingScheme namingScheme;
@@ -317,6 +320,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "submissionAction", Arrays.asList(SubmissionActionType.values()), SubmissionActionType::name);
     createArray(mapper, baseUri, node, "containerModels", containerModelService.list(), Dtos::asDto);
     createArray(mapper, baseUri, node, "spikeIns", libraryService.listSpikeIns(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "attachmentCategories", attachmentCategoryService.list(), Dtos::asDto);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);

@@ -1151,4 +1151,19 @@ public class DetailedSampleBuilder
     return false;
   }
 
+  @Override
+  public List<FileAttachment> getAttachments() {
+    throw new UnsupportedOperationException("Cannot attach files to non-persisted builder object");
+  }
+
+  @Override
+  public void setAttachments(List<FileAttachment> attachments) {
+    throw new UnsupportedOperationException("Cannot attach files to non-persisted builder object");
+  }
+
+  @Override
+  public String getAttachmentsTarget() {
+    throw new UnsupportedOperationException("Cannot attach files to non-persisted builder object");
+  }
+
 }

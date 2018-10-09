@@ -8,6 +8,8 @@ import java.util.stream.Stream;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+
 /**
  * Create a Handsontable for editing a particular entity type
  *
@@ -33,7 +35,7 @@ public abstract class BulkEditTableBackend<Model, Dto> extends BulkTableBackend<
    * @param idString A comma-delimited string of entity IDs.
    */
   public final ModelAndView edit(String idString, ModelMap model) throws IOException {
-    List<Long> ids = parseIds(idString);
+    List<Long> ids = LimsUtils.parseIds(idString);
     return prepare(model, false, "Edit " + name, load(ids).map(this::asDto).collect(Collectors.toList()));
   }
 

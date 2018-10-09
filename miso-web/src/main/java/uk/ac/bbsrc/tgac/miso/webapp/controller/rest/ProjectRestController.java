@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
+import uk.ac.bbsrc.tgac.miso.dto.AttachmentDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
@@ -121,7 +122,7 @@ public class ProjectRestController extends RestController {
 
   @GetMapping(value = "{projectId}", produces = "application/json")
   public @ResponseBody ProjectDto getProjectById(@PathVariable Long projectId) throws IOException {
-    Project project = projectService.getProjectById(projectId);
+    Project project = projectService.get(projectId);
     if (project == null) {
       throw new RestException("No project found with ID: " + projectId, Status.NOT_FOUND);
     }
@@ -179,6 +180,16 @@ public class ProjectRestController extends RestController {
   @ResponseBody
   public List<ProjectDto> getProjectsBySearch(@RequestParam("query") String query) throws IOException {
     return projectService.listAllProjectsBySearch(query).stream().map(Dtos::asDto).collect(Collectors.toList());
+  }
+
+  @GetMapping(value = "/{projectId}/files")
+  public @ResponseBody List<AttachmentDto> getAttachments(@PathVariable(name = "projectId", required = true) long projectId)
+      throws IOException {
+    Project project = projectService.get(projectId);
+    if (project == null) {
+      throw new RestException("Project not found", Status.NOT_FOUND);
+    }
+    return project.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
 }

@@ -27,7 +27,6 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
   
   TRANSFER_LIST("Transfer List", //
       Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
-      Column.forString("Name", Sample::getName), //
       Column.forString("Alias", Sample::getAlias),
       Column.forString("Type", detailedSample(SampleStock.class, (sam -> {
         if (sam.getSampleClass().getAlias().contains("DNA")) {
@@ -38,7 +37,6 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
           return "Other";
         }
       }), "Other")), //
-      Column.forString("Barcode", Sample::getIdentificationBarcode), //
       Column.forString("External Identifier",  detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
       Column.forDouble("VOL (uL)", Sample::getVolume), //
       Column.forDouble("[] (ng/uL)", Sample::getConcentration), //
@@ -46,7 +44,9 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
           (sam -> (sam.getVolume() != null && sam.getConcentration() != null) ? sam.getVolume() * sam.getConcentration() : null)), //
       Column.forString("Subproject",
           (sam-> (LimsUtils.isDetailedSample(sam) && ((DetailedSample) sam).getSubproject() != null ? 
-              ((DetailedSample) sam).getSubproject().getAlias() : "")))
+              ((DetailedSample) sam).getSubproject().getAlias() : ""))), //
+      Column.forString("Group ID", effectiveGroupIdProperty(DetailedSample::getGroupId)), //
+      Column.forString("Group Description", effectiveGroupIdProperty(DetailedSample::getGroupDescription))
 	);
   
   private static <S extends DetailedSample, T> Function<Sample, T> detailedSample(Class<S> clazz, Function<S, T> function, T defaultValue) {
@@ -61,6 +61,18 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
         }
       }
       return defaultValue;
+    };
+  }
+
+  private static Function<Sample, String> effectiveGroupIdProperty(Function<DetailedSample, String> getter) {
+    return s -> {
+      if (LimsUtils.isDetailedSample(s)) {
+        DetailedSample parent = ((DetailedSample) s).getEffectiveGroupIdSample().orElse(null);
+        if (parent != null) {
+          return getter.apply(parent);
+        }
+      }
+      return "";
     };
   }
 
