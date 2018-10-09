@@ -38,6 +38,7 @@ import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -191,7 +192,7 @@ public class EditRunController {
   @GetMapping("/{runId}")
   public ModelAndView setupForm(@PathVariable Long runId, ModelMap model) throws IOException {
     Run run = runService.get(runId);
-
+    if (run == null) throw new NotFoundException("No run found with ID " + runId);
     return setupForm(run, model);
 
   }
@@ -199,8 +200,8 @@ public class EditRunController {
   @GetMapping("/alias/{runAlias}")
   public ModelAndView setupForm(@PathVariable String runAlias, ModelMap model) throws IOException {
     Run run = runService.getRunByAlias(runAlias);
+    if (run == null) throw new NotFoundException("No run found with alias " + runAlias);
     return setupForm(run, model);
-
   }
 
   public ModelAndView setupForm(Run run, ModelMap model) throws IOException {
