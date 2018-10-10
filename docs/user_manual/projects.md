@@ -5,10 +5,10 @@ section: 6
 ---
 
 
-A project contains information about a set of studies that may comprise many different samples, experiments and
-sequencer runs. Each study and sample in MISO belongs to a specific project. By association, a sample's libraries and
-dilutions belong to the same project. Projects can also have overviews, which hold information about a project
-proposal.
+A project is a grouping of samples, libraries, sequencer runs, and other related items. Each sample in MISO belongs to
+a specific project. By association, a sample's libraries and dilutions belong to the same project. Some other items,
+such as pools and sequencer runs, may include items from multiple projects. Projects can also have overviews, which
+hold information about a project's design and status.
 
 
 
@@ -66,7 +66,7 @@ compatible with the library kit, it will not be selected automatically, nor will
 The "Permissions" section of the Create Project page contains several options for controlling who has access to the
 project. These permissions will also affect the project's samples, studies, and other related items.
 
-The project's owner is the person who should have full control over the project. They will be ranted full read/write
+The project's owner is the person who should have full control over the project. They will be granted full read/write
 access to the project and all related items regardless of the other permissions set on the project.
 
 If the checkbox beside "Allow all internal users access?" is checked, then all users with the Internal role will also
@@ -112,7 +112,7 @@ right of the Edit Project page will also save changes to any of the project's ov
 
 To specify which samples this overview is meant to track, click the "Add Sample Group" link at the bottom right of the
 project overview box. This will open a list where you can select the samples. Click the "Group Selected" button at the
-top of the list after you are done making your selections. After adding a sample group, the "# QC Passed SAmples" field
+top of the list after you are done making your selections. After adding a sample group, the "# QC Passed Samples" field
 will be updated to show a count of how many of these samples passed QC.
 
 When the samples have passed a particular step, come back to the Edit Project page and click the checkbox under that
@@ -183,7 +183,7 @@ in several places. They may also specify a different reference genome than the p
 
 The subprojects within a project are listed near the bottom of the "Project Information" section of the Edit Project
 page. Clicking on a subproject name will take you to the project's samples list and filter it to show only the selected
-subproject. You can reset the table to show all of the project's samples by clearing the search box a tthe top right of
+subproject. You can reset the table to show all of the project's samples by clearing the search box at the top right of
 the table and pressing the Enter key.
 
 To view a list of all subprojects in all projects, click the "Subprojects" link in the Institute Defaults list in the
