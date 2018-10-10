@@ -59,6 +59,11 @@ ListTarget.index = {
       "include": true,
       "iSortPriority": 0,
       "mData": "sequence"
+    }, {
+      "sTitle": "Position",
+      "include": true,
+      "iSortPriority": 1,
+      "mData": "position"
     }];
   }
 };
