@@ -270,6 +270,8 @@ order: 1
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Notes" %}
 {% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Attaching Files" %}
+{% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Propagating Libraries to Library Dilutions" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Printing Barcodes" %}
@@ -280,9 +282,7 @@ order: 1
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Finding Related Items" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding Library QCs" %}
-{% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Editing Library QCs" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Library QCs" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding Libraries to a Workset" %}
 {% assign sub = sub | plus: 1 %}
