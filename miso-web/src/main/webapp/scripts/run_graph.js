@@ -165,7 +165,7 @@ var RunGraph = (function() {
               },
               xAxis: {
                 allowDecimals: false,
-                floor: xStart,
+                floor: 0,
               },
               yAxis: {
                 floor: 0,
@@ -185,7 +185,8 @@ var RunGraph = (function() {
                   animation: false,
                   tooltip: {
                     valueDecimals: 2
-                  }
+                  },
+                  pointStart: xStart
                 }
               },
               series: metric.series
