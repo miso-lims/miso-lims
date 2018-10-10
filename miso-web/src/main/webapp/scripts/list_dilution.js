@@ -94,7 +94,7 @@ ListTarget.dilution = {
             required: true
           });
         }
-        
+
         fields.push(ListUtils.createBoxField)
 
         Utils.showDialog("Create Dilution", "Create", fields, function(dil) {
@@ -109,13 +109,13 @@ ListTarget.dilution = {
             "creationDate": dil.creationDate,
             "targetedSequencingId": dil.targetedSequencing && dil.targetedSequencing.id != 0 ? dil.targetedSequencing.id : null
           }
-          var makeDilution = function(){
+          var makeDilution = function() {
             Utils.ajaxWithDialog('Saving Dilution', 'POST', '/miso/rest/librarydilution', newDil, Utils.page.pageReload);
           }
-          if (dil.createBox){
-            Utils.createBoxDialog(dil, function(result){
+          if (dil.createBox) {
+            Utils.createBoxDialog(dil, function(result) {
               return 1;
-            }, function(newBox){
+            }, function(newBox) {
               var boxFields = [{
                 property: 'position',
                 type: 'select',
@@ -146,16 +146,19 @@ ListTarget.dilution = {
       "mRender": function(data, type, full) {
         return "<a href=\"/miso/library/" + full.library.id + "\">" + full.name + "</a>";
       }
+    }, {
+      "sTitle": "Warnings",
+      "mData": null,
+      "mRender": WarningTarget.dilution.tableWarnings,
+      "include": true,
+      "iSortPriority": 0,
+      "bVisible": true,
+      "bSortable": false
     }, ListUtils.idHyperlinkColumn("Library Name", "library", "library.id", function(dilution) {
       return dilution.library.name;
     }, 0, !config.library), ListUtils.labelHyperlinkColumn("Library Alias", "library", function(dilution) {
       return dilution.library.id;
     }, "library.alias", 0, !config.library), {
-      "sTitle": "Matrix Barcode",
-      "mData": "identificationBarcode",
-      "include": true,
-      "iSortPriority": 0
-    }, {
       "sTitle": "Platform",
       "mData": "library.platformType",
       "include": true,
@@ -168,38 +171,36 @@ ListTarget.dilution = {
       "iSortPriority": 0,
       "bSortable": false
     }, {
-      "sTitle": "Concentration",
-      "mData": "concentration",
-      "include": true,
-      "iSortPriority": 0
-    }, {
-      "sTitle": "Conc. Units",
-      "mData": "concentrationUnits",
-      "include": true,
-      "iSortPriority": 0,
-      "bSortable": false,
-      "mRender": function(data, type, full){
-        var units = Constants.concentrationUnits.find(function(unit){
-          return unit.name == data;
-        });
-        return !!units ? units.units : '';
-      }
-    }, {
       "sTitle": "Volume",
       "mData": "volume",
       "include": true,
-      "iSortPriority": 0
+      "iSortPriority": 0,
+      "mRender": function(data, type, full) {
+        if (type === 'display' && !!data) {
+          var units = Constants.volumeUnits.find(function(unit) {
+            return unit.name == full.volumeUnits;
+          });
+          if (!!units) {
+            return data + ' ' + units.units;
+          }
+        }
+        return data;
+      }
     }, {
-      "sTitle": "Vol. Units",
-      "mData": "volumeUnits",
+      "sTitle": "Concentration",
+      "mData": "concentration",
       "include": true,
       "iSortPriority": 0,
-      "bSortable": false,
-      "mRender": function(data, type, full){
-        var units = Constants.volumeUnits.find(function(unit){
-          return unit.name == data;
-        });
-        return !!units ? units.units : '';
+      "mRender": function(data, type, full) {
+        if (type === 'display' && !!data) {
+          var units = Constants.concentrationUnits.find(function(unit) {
+            return unit.name == full.concentrationUnits;
+          });
+          if (!!units) {
+            return data + ' ' + units.units;
+          }
+        }
+        return data;
       }
     }, {
       "sTitle": "ng Lib. Used",
@@ -212,6 +213,11 @@ ListTarget.dilution = {
       "include": true,
       "iSortPriority": 0
     }, {
+      "sTitle": "Matrix Barcode",
+      "mData": "identificationBarcode",
+      "include": true,
+      "iSortPriority": 0
+    }, {
       "sTitle": "Creator",
       "mData": "dilutionUserName",
       "include": true,
@@ -221,14 +227,6 @@ ListTarget.dilution = {
       "mData": "creationDate",
       "include": true,
       "iSortPriority": 0
-    }, {
-      "sTitle": "Warnings",
-      "mData": null,
-      "mRender": WarningTarget.dilution.tableWarnings,
-      "include": true,
-      "iSortPriority": 0,
-      "bVisible": true,
-      "bSortable": false
     }];
   },
   searchTermSelector: function(searchTerms) {
