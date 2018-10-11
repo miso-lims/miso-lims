@@ -4,7 +4,10 @@ CREATE OR REPLACE VIEW RunPartitionsByHealth AS
     FROM Run JOIN Run_SequencerPartitionContainer ON Run.runId = Run_SequencerPartitionContainer.Run_runId
      JOIN SequencerPartitionContainer_Partition ON Run_SequencerPartitionContainer.containers_containerId = SequencerPartitionContainer_Partition.container_containerId
      JOIN _Partition ON SequencerPartitionContainer_Partition.partitions_partitionId = _Partition.partitionId
+     LEFT JOIN Run_Partition_QC rpqc ON rpqc.runId = Run.runId AND rpqc.partitionId = _Partition.partitionId
+     LEFT JOIN PartitionQCType qct ON qct.partitionQcTypeId = rpqc.partitionQcTypeId
     WHERE sequencingParameters_parametersId IS NOT NULL AND pool_poolId IS NOT NULL
+    AND (qct.orderFulfilled IS NULL OR qct.orderFulfilled = TRUE)
     GROUP BY pool_poolId, sequencingParameters_parametersId, health;
 
 CREATE OR REPLACE VIEW DesiredPartitions AS 
