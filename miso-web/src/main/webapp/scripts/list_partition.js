@@ -28,9 +28,9 @@ ListTarget.partition = {
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
-  	if(!config.showPool){
-  		return [];
-  	}
+    if (!config.showPool) {
+      return [];
+    }
     var maxDilutions = 5;
     var platformType = Utils.array.findFirstOrNull(function(pt) {
       return pt.name == config.platformType;
@@ -267,7 +267,7 @@ ListTarget.partition = {
       "mData": "qcType",
       "include": config.runId,
       "iSortPriority": 0,
-      "mRender": ListUtils.render.textFromId(Constants.partitionQcTypes, 'description', '(Unset)')
+      "mRender": ListUtils.render.textFromId(Constants.partitionQcTypes, 'detailedLabel', '(Unset)')
     }, {
       "sTitle": "QC Note",
       "mData": "qcNotes",
