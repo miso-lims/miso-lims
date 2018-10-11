@@ -2171,6 +2171,8 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setDescription(from.getDescription());
     dto.setNoteRequired(from.isNoteRequired());
+    dto.setOrderFulfilled(from.isOrderFulfilled());
+    dto.setAnalysisSkipped(from.isAnalysisSkipped());
     return dto;
   }
 
