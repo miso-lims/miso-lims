@@ -258,9 +258,5 @@ ListTarget.library_template = {
             return data || '';
           }
         }];
-  },
-  searchTermSelector: function(searchTerms) {
-    return [searchTerms['fulfilled'], searchTerms['active'], searchTerms['created'], searchTerms['changed'], searchTerms['creator'],
-        searchTerms['changedby'], searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box']]
   }
 };

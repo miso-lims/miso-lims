@@ -15,7 +15,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryTemplateStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
@@ -32,9 +31,6 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
 
   @Autowired
   private AuthorizationManager authorizationManager;
-
-  @Autowired
-  private SecurityProfileStore securityProfileDao;
 
   @Autowired
   private DeletionStore deletionStore;
