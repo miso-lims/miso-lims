@@ -941,7 +941,7 @@ var HotUtils = {
     }
   },
 
-  makeColumnForText: function(headerName, include, property, baseobj) {
+  makeColumnForText: function(headerName, include, property, baseobj, defaultValue) {
     baseobj.header = headerName;
     baseobj.data = property;
     baseobj.type = 'text';
@@ -949,6 +949,9 @@ var HotUtils = {
     if (!baseobj.hasOwnProperty('unpack')) {
       baseobj.unpack = function(obj, flat, setCellMeta) {
         flat[property] = Utils.valOrNull(obj[property]);
+        if (flat[property] == null) {
+          flat[property] = Utils.valOrNull(defaultValue);
+        }
       };
     }
     baseobj.pack = function(obj, flat, errorHandler) {
