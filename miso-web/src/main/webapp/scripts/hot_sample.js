@@ -232,7 +232,7 @@ HotTarget.sample = (function() {
                 serverErrorMessages.innerHTML = '<p>Failed to generate list of projects. Please notify your MISO administrators.</p>';
                 document.getElementById('errors').classList.remove('hidden');
                 /* throw an error to keep the table from generating */
-                throw 'Server error generating list of projects';
+                throw new Error('Server error generating list of projects');
               }
               var comparator = Constants.isDetailedSample ? 'shortName' : 'id';
               var label = Constants.isDetailedSample ? 'shortName' : 'name';
@@ -273,7 +273,6 @@ HotTarget.sample = (function() {
             depends: 'projectAlias',
             update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               if (config.projects) {
-                console.log(config.projects);
                 var project = config.projects.find(function(proj) {
                   return proj.shortName == flat.projectAlias;
                 });

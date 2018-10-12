@@ -24,13 +24,13 @@
 ListTarget.partition = {
   name: "Partition",
   createUrl: function(config, projectId) {
-    throw "Can only be created statically";
+    throw new Error("Can only be created statically");
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
-  	if(!config.showPool){
-  		return [];
-  	}
+    if (!config.showPool) {
+      return [];
+    }
     var maxDilutions = 5;
     var platformType = Utils.array.findFirstOrNull(function(pt) {
       return pt.name == config.platformType;

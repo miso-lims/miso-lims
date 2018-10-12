@@ -25,7 +25,7 @@ ListTarget.attachment = (function() {
   return {
     name: "Attachments",
     createUrl: function(config, projectId) {
-      throw "Static data only";
+      throw new Error("Static data only");
     },
     createBulkActions: function(config, projectId) {
       return [];

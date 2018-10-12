@@ -236,7 +236,7 @@
         return location.locationUnit === 'STACK';
       });
       if (shelves.length + stacks.length != freezerJson.childLocations.length) {
-        throw 'Unexpected location units';
+        throw new Error('Unexpected location units');
       }
       shelves.sort(compareLocations).forEach(function(shelf) {
         addShelf(shelf, table);
@@ -288,7 +288,7 @@
         return location.locationUnit === 'LOOSE_STORAGE';
       }).sort(compareLocations));
       if (shelfItems.length != shelf.childLocations.length) {
-        throw 'Unexpected location units';
+        throw new Error('Unexpected location units');
       }
       shelfItems.forEach(function(item) {
         addShelfItem(item, cell);
@@ -338,7 +338,7 @@
       displayEditStorageComponentControls(storage);
       break;
     default:
-      throw 'Unexpected location unit';
+      throw new Error('Unexpected location unit');
     }
 
     $('#levelTwoStorageContainer').show();
@@ -394,7 +394,7 @@
     case 'TRAY':
       return getUnorganizedStorageSelectFunction(node, true, assignBox);
     default:
-      throw 'Unexpected box location';
+      throw new Error('Unexpected box location');
     }
   }
 
@@ -428,7 +428,7 @@
     var table = $('#levelTwoStorageLayout');
     rack.childLocations.sort(compareLocations).forEach(function(tray) {
       if (tray.locationUnit != 'TRAY') {
-        throw 'Unexpected location unit';
+        throw new Error('Unexpected location unit');
       }
       var row = $('<tr>');
       var cell = $('<td>');
@@ -450,14 +450,14 @@
     var stackHeight = rack.childLocations[0].childLocations.length;
     rack.childLocations.sort(compareLocations).forEach(function(stack) {
       if (stack.locationUnit != 'STACK') {
-        throw 'Unexpected location unit';
+        throw new Error('Unexpected location unit');
       }
       if (stack.childLocations.length != stackHeight) {
-        throw 'Uneven stack heights within rack';
+        throw new Error('Uneven stack heights within rack');
       }
       stack.childLocations.sort(compareLocations).reverse().forEach(function(stackpos) {
         if (stackpos.locationUnit != 'STACK_POSITION') {
-          throw 'Unexpected location unit';
+          throw new Error('Unexpected location unit');
         }
       });
     });
@@ -489,7 +489,7 @@
     var table = $('#levelTwoStorageLayout');
     stack.childLocations.sort(compareLocations).reverse().forEach(function(stackpos) {
       if (stackpos.locationUnit != 'STACK_POSITION') {
-        throw 'Unexpected location unit';
+        throw new Error('Unexpected location unit');
       }
       var row = $('<tr>');
       var cell = $('<td>').text(stackpos.displayLocation + ' (' + (stackpos.boxes[0] ? stackpos.boxes[0].alias : 'empty') + ')');

@@ -172,7 +172,7 @@
         if (byId.length === 1) {
           run.array = byId[0];
         } else {
-          throw 'couldn\'t find array in search results';
+          throw new Error('couldn\'t find array in search results');
         }
       }
     }
