@@ -24,7 +24,7 @@
 ListTarget.experiment = {
   name: "Experiments",
   createUrl: function(config, projectId) {
-    throw "Experiments must be provided statically";
+    throw new Error("Experiments must be provided statically");
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {

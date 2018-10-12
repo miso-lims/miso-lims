@@ -24,7 +24,7 @@
 ListTarget.institute = {
   name: "Institutes",
   createUrl: function(config, projectId) {
-    throw "Must be provided statically";
+    throw new Error("Must be provided statically");
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {

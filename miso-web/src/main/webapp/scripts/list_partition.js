@@ -24,7 +24,7 @@
 ListTarget.partition = {
   name: "Partition",
   createUrl: function(config, projectId) {
-    throw "Can only be created statically";
+    throw new Error("Can only be created statically");
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {

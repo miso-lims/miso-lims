@@ -24,7 +24,7 @@
 ListTarget.experiment_run_partition = {
   name: "Run + Partition",
   createUrl: function(config, projectId) {
-    throw "Must be created statically.";
+    throw new Error("Must be created statically.");
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
@@ -34,38 +34,32 @@ ListTarget.experiment_run_partition = {
     return [];
   },
   createColumns: function(config, projectId) {
-    return [
-        ListUtils.idHyperlinkColumn("Run Name", "run", "run.id", function(pair) {
-          return pair.run.name;
-        }, 1, true),
-        ListUtils.labelHyperlinkColumn("Run Alias", "run", function(pair) {
-          return pair.run.id;
-        }, "run.alias", 0, true),
-        {
-          "sTitle": "Status",
-          "mData": "run.status",
-          "mRender": function(data, type, full) {
-            return data || "";
-          },
-          "include": true,
-          "iSortPriority": 0
-        },
-        ListUtils.labelHyperlinkColumn("Container", "container", function(pair) {
-          return pair.partition.containerId;
-        }, "partition.containerName", 0, true),
-        {
-          "sTitle": "Number",
-          "mData": "partition.partitionNumber",
-          "include": true,
-          "iSortPriority": 1,
-          "bSortDirection": true
-        },
-        {
-          "sTitle": "Pool",
-          "mData": "partition.pool",
-          "include": true,
-          "iSortPriority": 0,
-          "mRender": WarningTarget.experiment_run_partition.tableWarnings
-        }, ];
+    return [ListUtils.idHyperlinkColumn("Run Name", "run", "run.id", function(pair) {
+      return pair.run.name;
+    }, 1, true), ListUtils.labelHyperlinkColumn("Run Alias", "run", function(pair) {
+      return pair.run.id;
+    }, "run.alias", 0, true), {
+      "sTitle": "Status",
+      "mData": "run.status",
+      "mRender": function(data, type, full) {
+        return data || "";
+      },
+      "include": true,
+      "iSortPriority": 0
+    }, ListUtils.labelHyperlinkColumn("Container", "container", function(pair) {
+      return pair.partition.containerId;
+    }, "partition.containerName", 0, true), {
+      "sTitle": "Number",
+      "mData": "partition.partitionNumber",
+      "include": true,
+      "iSortPriority": 1,
+      "bSortDirection": true
+    }, {
+      "sTitle": "Pool",
+      "mData": "partition.pool",
+      "include": true,
+      "iSortPriority": 0,
+      "mRender": WarningTarget.experiment_run_partition.tableWarnings
+    }, ];
   }
 };

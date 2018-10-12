@@ -808,7 +808,7 @@ Box.ui = {
     var locationId = jQuery('#freezerLocationSelect').val();
     if (locationId == -1) {
       if (!Box.ui.parentFreezerLocation) {
-        throw 'No location selected';
+        throw new Error('No location selected');
       }
       return Box.ui.parentFreezerLocation;
     }
