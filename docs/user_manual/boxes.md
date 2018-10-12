@@ -290,18 +290,19 @@ available for all item types.
   * _Make dilutions_: bulk propagate dilutions (only available for libraries)
 	* _Pool together_, _Pool separately_, _Pool custom_: [methods for creating pools](pools.html#pools_list)
 	  (only available for dilutions)
-  * _Create Orders_: bulk create orders for selected pools (only available for pools)
-  * _Print Barcode(s)_: print barcodes to a barcode printer
+  * _Create Orders_: bulk create orders for selected pools (only available for pools). See the [Orders
+    section](orders.html) for more information.
+  * _Print Barcode(s)_: print barcodes to a barcode printer. See the 
+    [Printing Barcodes section](barcode_label_printers.html#printing_barcodes) for more information.
   * _Download_: download one or more spreadsheets for this type of item, if available
-  * _Parents_: act upon the selected items' parents (you choose whether the parents are samples, libraries,
-    dilutions) if available
-  * _Children_: act upon the selected items' children (you choose whether the children are libraries,
-    dilutions, pools) if available
-  * _Add QCs_: add QCs to each of the selected items (not available for dilutions)
-  * _Edit QCs_: edit existing QCs on each of the selected items (not available for dilutions)
-  * _Add to Workset_: add these items to a new or existing workset (see [Worksets section](worksets.html) for
-    more information)
-  * _Attach File_: attach a single file to all of the selected items (not available for dilutions)
+  * _Parents_, _Children_: find items related to the selected items. See 
+    [Finding Related Items](general_navigation.html#finding_related_items) for more information.
+  * _Add QCs_, _Edit QCs_: quanlity control measures can be added to or edited for selected items. See
+    the [QCs section](qcs.html) for more information.
+  * _Add to Workset_: add these items to a new or existing workset. See the [Worksets section](worksets.html) 
+    for more information.
+  * _Attach File_: attach a single file to all of the selected items (not available for dilutions). See the
+    [Attachments section](attachments.html) for more information.
 
 
 {% include userman-toplink.md %}
