@@ -775,12 +775,13 @@ var HotUtils = {
     return td;
   },
 
-  makeColumnForConstantsList: function(headerName, include, flatProperty, modelProperty, id, name, items, required, baseobj, sortFunc) {
+  makeColumnForConstantsList: function(headerName, include, flatProperty, modelProperty, id, name, items, required, baseobj, sortFunc,
+      nullLabel) {
     var labels = items.sort(sortFunc || Utils.sorting.standardSort(name)).map(function(item) {
       return item[name];
     });
     if (!required)
-      labels.unshift('(None)');
+      labels.unshift(nullLabel || '(None)');
     if (!baseobj)
       baseobj = {};
     baseobj.header = headerName;
@@ -796,7 +797,7 @@ var HotUtils = {
     baseobj.unpack = function(obj, flat, setCellMeta) {
       flat[flatProperty] = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
         return item[id] == obj[modelProperty];
-      }, items), name) || (required ? null : '(None)');
+      }, items), name) || (required ? null : nullLabel || '(None)');
     };
     baseobj.pack = function(obj, flat, errorHandler) {
       obj[modelProperty] = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
