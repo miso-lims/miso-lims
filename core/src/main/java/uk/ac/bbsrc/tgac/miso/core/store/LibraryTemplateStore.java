@@ -15,6 +15,8 @@ public interface LibraryTemplateStore extends PaginatedDataSource<LibraryTemplat
 
   void update(LibraryTemplate libraryTemplate) throws IOException;
 
+  List<LibraryTemplate> list() throws IOException;
+
   List<LibraryTemplate> listLibraryTemplatesForProject(long projectId);
 
   Collection<LibraryTemplate> getByIdList(List<Long> idList) throws IOException;

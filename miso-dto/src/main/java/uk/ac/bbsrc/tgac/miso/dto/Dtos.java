@@ -2709,7 +2709,7 @@ public class Dtos {
     }
     if (from.getId() != null) to.setId(from.getId());
     to.setAlias(from.getAlias());
-    to.setPlatformType(PlatformType.valueOf(from.getPlatformType()));
+    setObject(to::setPlatformType, from.getPlatformType(), PlatformType::valueOf);
     if (from.getDefaultVolume() != null) {
       to.setDefaultVolume(from.getDefaultVolume());
     }

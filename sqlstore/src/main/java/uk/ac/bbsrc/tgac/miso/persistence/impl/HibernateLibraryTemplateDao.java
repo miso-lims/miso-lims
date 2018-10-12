@@ -102,6 +102,13 @@ public class HibernateLibraryTemplateDao implements LibraryTemplateStore, Hibern
   }
 
   @Override
+  public List<LibraryTemplate> list() throws IOException {
+    @SuppressWarnings("unchecked")
+    List<LibraryTemplate> list = currentSession().createCriteria(LibraryTemplate.class).list();
+    return list;
+  }
+
+  @Override
   public List<LibraryTemplate> listLibraryTemplatesForProject(long projectId) {
     @SuppressWarnings("unchecked")
     List<LibraryTemplate> list = currentSession().createCriteria(LibraryTemplate.class)

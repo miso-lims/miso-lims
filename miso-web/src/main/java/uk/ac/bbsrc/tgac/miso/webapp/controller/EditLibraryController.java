@@ -93,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -828,7 +829,7 @@ public class EditLibraryController {
       libDto.setBox(Dtos.asDto(boxService.get(boxId), true));
     }
 
-    return new BulkReceiveLibraryBackend(libDto, quantity, project, aliquotClass, defaultSciName).create(model);
+    return new BulkReceiveLibraryBackend(libDto, quantity, project, aliquotClass, defaultSciName, libraryTemplateService).create(model);
   }
 
   private final class BulkReceiveLibraryBackend extends BulkCreateTableBackend<LibraryDto> {
@@ -837,14 +838,16 @@ public class EditLibraryController {
     private final SampleClass aliquotClass;
     private final String defaultSciName;
     private final BoxDto newBox;
+    private final LibraryTemplateService libraryTemplateService;
 
-    public BulkReceiveLibraryBackend(LibraryDto dto, Integer quantity, Project project, SampleClass aliquotClass, String defaultSciName)
-        throws IOException {
+    public BulkReceiveLibraryBackend(LibraryDto dto, Integer quantity, Project project, SampleClass aliquotClass, String defaultSciName,
+        LibraryTemplateService libraryTemplateService) {
       super("libraryReceipt", LibraryDto.class, "Libraries", dto, quantity);
       if (isDetailedSampleEnabled() && aliquotClass == null) throw new InvalidParameterException("Aliquot class cannot be null");
       this.project = project;
       this.aliquotClass = aliquotClass;
       this.defaultSciName = defaultSciName;
+      this.libraryTemplateService = libraryTemplateService;
       newBox = dto.getBox();
     }
 
@@ -856,10 +859,23 @@ public class EditLibraryController {
       }
       config.put("create", true);
       config.put("hasProject", project != null);
+      Map<Long, List<LibraryTemplateDto>> templatesByProjectId = new HashMap<>();
       if (project == null) {
         projectService.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
+        List<LibraryTemplate> templates = libraryTemplateService.list();
+        for (LibraryTemplate template : templates) {
+          LibraryTemplateDto dto = Dtos.asDto(template);
+          for (Project tempProject : template.getProjects()) {
+            if (!templatesByProjectId.containsKey(tempProject.getId())) {
+              templatesByProjectId.put(tempProject.getId(), new ArrayList<>());
+            }
+            templatesByProjectId.get(tempProject.getId()).add(dto);
+          }
+        }
       } else {
         config.putPOJO("project", Dtos.asDto(project));
+        templatesByProjectId.put(project.getId(),
+            Dtos.asLibraryTemplateDtos(libraryTemplateService.listLibraryTemplatesForProject(project.getId())));
       }
       config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
       config.put(Config.SHOW_DESCRIPTION, showDescription);
@@ -869,6 +885,7 @@ public class EditLibraryController {
       config.put(Config.PROPAGATE, false);
       config.put(Config.IS_LIBRARY_RECEIPT, true);
       config.putPOJO(Config.BOX, newBox);
+      config.putPOJO(Config.TEMPLATES, templatesByProjectId);
     }
 
   }
