@@ -211,7 +211,6 @@ record any number of details about the item. For more information on working wit
 In addition to creating and editing single items, it is often useful to work with many items at once. MISO provides
 many bulk create/edit pages to facilitate this (see figure {{figure}}). These bulk pages feature a spreadsheet-like
 interface with features similar to popular spreadsheet software.
-
 {% include userman-figure.md num=figure cap="Bulk propagate dilutions page" img="general-nav-bulk-page.png" %}
 
 Any cells that are invalid will be highlighted in red. This includes any required cells which are left blank. Upon
@@ -220,8 +219,10 @@ that has been successfully saved will be disabled, and can no longer be modified
 at the top of the table to indicate why any item failed to save. You are then able to make any necessary changes to the
 remaining items before attempting to save again.
 
-After successfully saving all rows, the table toolbar will include options for continuing work with the same items.
-This allows you to quickly move to the next step of your process.
+After successfully saving all rows, the table toolbar will include the same
+options as the tool bar of the appropriate list page. This allows continuing
+work with the same items by moving through propagation steps for the same
+items.
 
 {% include userman-toplink.md %}
 
