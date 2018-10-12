@@ -35,7 +35,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * Provides model access to the underlying MISO LibraryType lookup table. These types should match the SRA submission schema for Library
+ * Provides model access to the underlying MISO LibraryType lookup table. These types should match the ENA submission schema for Library
  * types.
  * <p/>
  * See:

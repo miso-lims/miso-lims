@@ -623,18 +623,8 @@ order: 1
 
 
 {% assign section = section | plus: 1 %}
-{% assign section-title = "SRA" %}
+{% assign section-title = "European Nucleotide Archive Support" %}
 {% include userman-toc-link.md section=section section-title=section-title %}
-{% assign sub = 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Experiments" %}
-{% assign subsub = 1 %}
-{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Experiments List" %}
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Creating an Experiment" %}
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Editing an Experiment" %}
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Adding Consumables to an Experiment" %}
 
 {% assign sub = 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Studies" %}
@@ -645,7 +635,18 @@ order: 1
 {% assign subsub = subsub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Deleting Studies" %}
 
-{% assign sub = 1 %}
+{% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Experiments" %}
+{% assign subsub = 1 %}
+{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Experiments List" %}
+{% assign subsub = subsub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Creating an Experiment" %}
+{% assign subsub = subsub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Editing an Experiment" %}
+{% assign subsub = subsub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Adding Consumables to an Experiment" %}
+
+{% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Submissions" %}
 {% assign subsub = 1 %}
 {% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Submissions List" %}

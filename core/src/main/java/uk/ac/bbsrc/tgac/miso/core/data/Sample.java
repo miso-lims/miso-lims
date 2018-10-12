@@ -41,7 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * NCBI
  * Taxonomy database.
  * <p/>
- * Sample properties are specified mainly by the SRA schema requirements, e.g. they have a Sample type string based on an SRA enumeration.
  * 
  * @author Rob Davey
  * @since 0.0.2
