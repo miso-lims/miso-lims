@@ -32,8 +32,8 @@ message will be displayed at the top of the screen explaining the problem(s). Yo
 appropriate adjustments and click the "Save" button to try again.
 
 
-It is also possible to create a box when creating samples, when propagating libraries or samples (if Detailed Sample mode
-is enabled), and when receiving libraries.
+It is also possible to create a box when creating samples, when propagating libraries or samples (if detailed
+sample mode is enabled), and when receiving libraries.
 
 1. Click the appropriate box and fill out how many items to create/receive/propagate:
 	* Creating samples: Go to the Samples list page and click "Create" in the toolbar at the top left of the
