@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -45,9 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * A Library is the first step in constructing sequenceable material from an initial {@link Sample}. A Library is then diluted down to a
  * {@link LibraryDilution}, and put in a {@link Pool}, which is then sequenced.
  * <p/>
- * Library properties are specified mainly by the SRA schema requirements, i.e. they have a {@link LibraryType}, a
- * {@link LibraryStrategyType} and a {@link LibrarySelectionType} which are SRA enumerations. Libraries also have a target {@link Platform}
- * and can be uniquely identified via {@link Index} objects for multiplexing purposes.
+ * Libraries also have a target {@link Platform} and can be uniquely identified via {@link Index} objects for multiplexing purposes.
  * 
  * @author Rob Davey
  * @since 0.0.2

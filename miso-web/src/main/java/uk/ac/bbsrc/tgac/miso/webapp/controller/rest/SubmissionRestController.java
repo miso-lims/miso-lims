@@ -22,7 +22,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
-import uk.ac.bbsrc.tgac.miso.core.util.EraSubmissionPreparation;
+import uk.ac.bbsrc.tgac.miso.core.util.EnaSubmissionPreparation;
 import uk.ac.bbsrc.tgac.miso.service.SubmissionService;
 
 @Controller
@@ -46,6 +46,6 @@ public class SubmissionRestController extends RestController {
     response.setHeader("Content-Disposition",
         "attachment; filename="
             + String.format("SUBMISSON%d-%s.zip", submission.getId(), new SimpleDateFormat("yyyy-MM-dd").format(new Date())));
-    return new EraSubmissionPreparation(submission, user, centreName, SubmissionActionType.valueOf(action)).toBytes();
+    return new EnaSubmissionPreparation(submission, user, centreName, SubmissionActionType.valueOf(action)).toBytes();
   }
 }

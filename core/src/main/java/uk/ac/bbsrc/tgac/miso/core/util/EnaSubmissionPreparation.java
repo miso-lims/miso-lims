@@ -45,7 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 
-public class EraSubmissionPreparation {
+public class EnaSubmissionPreparation {
   private abstract class ChildSubmissionFile {
     public String fileName() {
       return String.format("%s_%s_%s.xml", submission.getAlias(), name(), DF_TIMESTAMP.format(submission.getSubmissionDate()));
@@ -412,7 +412,7 @@ public class EraSubmissionPreparation {
 
   private final User user;
 
-  public EraSubmissionPreparation(Submission submission, User user, String centreName, SubmissionActionType submissionAction) {
+  public EnaSubmissionPreparation(Submission submission, User user, String centreName, SubmissionActionType submissionAction) {
     super();
     this.submission = submission;
     this.user = user;
