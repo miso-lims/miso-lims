@@ -109,7 +109,7 @@ Contents diagram (see figure {{figure}}), enter the item's name, alias, or barco
 click "Lookup". 
 
 {% include userman-figure.md num=figure cap="Additional information when one position is selected"
-img="one-position-selected.md" %}
+img="one-position-selected.png" %}
 
 Once the search completes, any matching items found will be in the "Results" dropdown. Select the target item
 from the dropdown and click "Update Position". After the update completes, the information about the item in
@@ -199,8 +199,8 @@ option available.
 
 To scan a box, first open the box scanner software on the computer (outside of MISO). Then, go to the Edit Box
 page by clicking the box name in the Boxes list page. The Contents section header has an Options menu on the
-far right of the header; hover over it to reveal the menu, and click "Scan with <scannerName>", where
-`<scannerName>` is a box scanner that your MISO is configured for. If "Scan with <scannerName>" is not visible
+far right of the header; hover over it to reveal the menu, and click "Scan with \<scannerName\>", where
+`\<scannerName\>` is a box scanner that your MISO is configured for. If "Scan with \<scannerName\>" is not visible
 in the list, your box may not be scannable or MISO may not be configured to use this box scanner.
 
 Wait until the Scan dialog box prompts you to place the box on the scanner. It will automatically scan the box. 
@@ -212,15 +212,15 @@ Once a successful scan is made, review the changes that would be made (see figur
 
 If there are any errors with the scan, the scan will need to be retried until there are no errors. Possible
 sources of error are:
- * the scanning software is not open
+ * The scanning software is not open
     * This will cause a "could not find the scanner" error message. Open the scanner software on the computer
       and rescan.
- * a "No Read" scan result for a tube
+ * A "No Read" scan result for a tube
     * This is often caused by dust on the scanner surface or frost on the tubes. Clean the scanner surface
       and/or tube bottoms and rescan.
- * a barcode is scanned which is not associated with an item in MISO
+ * A barcode is scanned which is not associated with an item in MISO
     * Ensure that the tube barcode is correctly associated with an item in MISO.
- * the network is down or MISO cannot connect to the scanner
+ * The network is down or MISO cannot connect to the scanner
     * Fix these problems first, then rescan.
 
 {% include userman-toplink.md %}
@@ -249,13 +249,13 @@ a plate position rather than a physical barcode. Plate position barcodes must fo
   * The item's barcode must be made up of two parts: a prefix representing the box + a box position suffix.
   * The prefix for the box must be unique, but it does not have to match any of the box attributes (name,
     alias, matrix barcode).
-	* The box position suffix must be in one of two formats: "standard" (A01, F12, where the letter represents
+  * The box position suffix must be in one of two formats: "standard" (A01, F12, where the letter represents
 	  the row and the number represents the column) or "numeric" (001, 002, etc. moving in rows from the top
 left)
-		* Note that for the "standard" format, column numbers less than 10 must have a 0 (zero) added to the
+    * Note that for the "standard" format, column numbers less than 10 must have a 0 (zero) added to the
 			beginning of the number. Column 1 would be represented as "01", column 2 would be "02", etc. This
 matches the column numbers on the box Contents diagram.
-		* Note that for the "numeric" format, 001 is the position in the first row, first column, 002 is the
+    * Note that for the "numeric" format, 001 is the position in the first row, first column, 002 is the
 		  position in the first row, second column, etc. Numbering moves from left to right filling a row, and
 then continues from left to right on the next row, etc.
 So for example, an item with barcode "FIRST-BOX-A01" would correspond to the first row, first column, and an
