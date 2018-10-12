@@ -1361,7 +1361,7 @@ var HotUtils = {
         setData(change[displayProperty]);
       }
     }
-    setReadOnly(design || (template && template.idProperty));
+    setReadOnly(design || (template && template[idProperty]));
   },
 
   showDialogForBoxCreation: function(title, okButton, fields, pageURL, generateParams, getItemCount) {

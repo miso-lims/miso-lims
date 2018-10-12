@@ -96,6 +96,11 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
   }
 
   @Override
+  public List<LibraryTemplate> list() throws IOException {
+    return libraryTemplateStore.list();
+  }
+
+  @Override
   public List<LibraryTemplate> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
       PaginationFilter... filter) throws IOException {
     authorizationManager.throwIfUnauthenticated();

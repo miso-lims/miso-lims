@@ -173,6 +173,21 @@ HotTarget.library = (function() {
     return column;
   };
 
+  var getProjectId = function(library, flat, config) {
+    if (library.parentSampleProjectId) {
+      return library.parentSampleProjectId;
+    } else if (flat.sample && flat.sample.projectAlias) {
+      return Utils.array.findUniqueOrThrow(function(project) {
+        if (Constants.isDetailedSample) {
+          return project.shortName === flat.sample.projectAlias;
+        } else {
+          return project.name === flat.sample.projectAlias;
+        }
+      }, config.projects).id;
+    }
+    return null;
+  }
+
   var getTemplate = function(config, projectId, parentSampleClassId, templateAlias) {
     if (!config.templatesByProjectId || !config.templatesByProjectId[projectId]) {
       return null;
@@ -422,19 +437,36 @@ HotTarget.library = (function() {
             type: 'dropdown',
             trimDropdown: false,
             source: ['(None)'],
-            depends: '*start', // This is a dummy value that gets this run on creation only
+            depends: ['*start', 'sample.projectAlias'], // *start is a dummy value that gets this run on creation only
             update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if (config.templatesByProjectId && config.templatesByProjectId[lib.parentSampleProjectId]) {
-                setOptions({
-                  'source': ['(None)'].concat(config.templatesByProjectId[lib.parentSampleProjectId].filter(function(x) {
-                    return lib.parentSampleClassId === null || x.designId === null || Constants.libraryDesigns.some(function(l) {
-                      return l.id == x.designId && l.sampleClassId == lib.parentSampleClassId;
-                    });
-                  }).map(function(template) {
-                    return template.alias;
-                  }))
-                });
+              var projectId = null;
+              if (config.templatesByProjectId) {
+                if (flatProperty === 'sample.projectAlias') {
+                  projectId = Utils.array.findUniqueOrThrow(function(project) {
+                    if (Constants.isDetailedSample) {
+                      return project.shortName === value;
+                    } else {
+                      return project.name === value;
+                    }
+                  }, config.projects).id;
+                } else if (lib.parentSampleProjectId) {
+                  projectId = lib.parentSampleProjectId;
+                }
               }
+              var templates = ['(None)'];
+              if (projectId && config.templatesByProjectId[projectId]) {
+                templates = templates.concat(config.templatesByProjectId[projectId].filter(function(x) {
+                  return lib.parentSampleClassId === null || x.designId === null || Constants.libraryDesigns.some(function(l) {
+                    return l.id == x.designId && l.sampleClassId == lib.parentSampleClassId;
+                  });
+                }).map(function(template) {
+                  return template.alias;
+                }));
+              }
+              setOptions({
+                source: templates
+              });
+              setData('(None)');
             },
             include: config.templatesByProjectId,
             unpack: function(lib, flat, setCellMeta) {
@@ -472,7 +504,8 @@ HotTarget.library = (function() {
             depends: ['*start', 'templateAlias'], // *start is a dummy value that gets this run on creation only
             update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               if (flatProperty === 'templateAlias') {
-                var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, value);
+                var projectId = getProjectId(lib, flat, config);
+                var template = getTemplate(config, projectId, lib.parentSampleClassId, value);
                 updateFromTemplate(template, 'designId', Constants.libraryDesigns, 'name', setReadOnly, setData);
               } else {
                 // must have been triggered by *start
@@ -489,7 +522,8 @@ HotTarget.library = (function() {
                 depends: ['libraryDesignAlias', 'templateAlias'],
                 update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
                   var design = getDesign(flat.libraryDesignAlias);
-                  var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
+                  var projectId = getProjectId(lib, flat, config);
+                  var template = getTemplate(config, projectId, lib.parentSampleClassId, flat.templateAlias);
                   HotUtils.updateFromTemplateOrDesign(design, template, 'designCodeId', Constants.libraryDesignCodes, 'code', setReadOnly,
                       setData);
                 },
@@ -514,7 +548,8 @@ HotTarget.library = (function() {
             },
             depends: 'templateAlias',
             update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, value);
+              var projectId = getProjectId(lib, flat, config);
+              var template = getTemplate(config, projectId, lib.parentSampleClassId, value);
               var readOnly = false;
               if (template && template.platformType) {
                 setData(Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.namePredicate(template.platformType),
@@ -554,7 +589,8 @@ HotTarget.library = (function() {
                 });
               }
               if (flat.templateAlias) {
-                var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
+                var projectId = getProjectId(lib, flat, config);
+                var template = getTemplate(config, projectId, lib.parentSampleClassId, flat.templateAlias);
                 updateFromTemplate(template, 'libraryTypeId', Constants.libraryTypes, 'alias', setReadOnly, setData);
               } else {
                 setReadOnly(false);
@@ -567,7 +603,8 @@ HotTarget.library = (function() {
                 depends: ['libraryDesignAlias', 'templateAlias'],
                 update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
                   var design = getDesign(flat.libraryDesignAlias);
-                  var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
+                  var projectId = getProjectId(lib, flat, config);
+                  var template = getTemplate(config, projectId, lib.parentSampleClassId, flat.templateAlias);
                   HotUtils.updateFromTemplateOrDesign(design, template, 'selectionId', Constants.librarySelections, 'name', setReadOnly,
                       setData);
                 }
@@ -577,7 +614,8 @@ HotTarget.library = (function() {
                 depends: ['libraryDesignAlias', 'templateAlias'],
                 update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
                   var design = getDesign(flat.libraryDesignAlias);
-                  var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
+                  var projectId = getProjectId(lib, flat, config);
+                  var template = getTemplate(config, projectId, lib.parentSampleClassId, flat.templateAlias);
                   HotUtils.updateFromTemplateOrDesign(design, template, 'strategyId', Constants.libraryStrategies, 'name', setReadOnly,
                       setData);
                 }
@@ -616,7 +654,8 @@ HotTarget.library = (function() {
                 }
               }
               if (flat.templateAlias) {
-                var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
+                var projectId = getProjectId(lib, flat, config);
+                var template = getTemplate(config, projectId, lib.parentSampleClassId, flat.templateAlias);
                 updateFromTemplate(template, 'indexFamilyId', Constants.indexFamilies, 'name', setReadOnly, setData);
               } else {
                 setReadOnly(false);
@@ -652,7 +691,8 @@ HotTarget.library = (function() {
                 });
               }
               if (flat.templateAlias) {
-                var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
+                var projectId = getProjectId(lib, flat, config);
+                var template = getTemplate(config, projectId, lib.parentSampleClassId, flat.templateAlias);
                 updateFromTemplate(template, 'kitDescriptorId', Constants.kitDescriptors, 'name', setReadOnly, setData);
               } else {
                 setReadOnly(false);
@@ -686,7 +726,8 @@ HotTarget.library = (function() {
             },
             depends: 'templateAlias',
             update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, value);
+              var projectId = getProjectId(lib, flat, config);
+              var template = getTemplate(config, projectId, lib.parentSampleClassId, value);
               if (template && template.defaultVolume) {
                 setData(template.defaultVolume);
               } else {
