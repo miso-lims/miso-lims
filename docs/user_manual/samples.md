@@ -12,7 +12,7 @@ section: 7
 MISO can be configured with a naming scheme appropriate for your organization. For more details about this
 configuration, see [Naming Scheme](site_configuration.html#naming_schemes) in the Site Configuration section.
 
-For samples, the naming scheme specifies whether or not duplicate aliases are allowed, and may also specifies a pattern
+For samples, the naming scheme specifies whether or not duplicate aliases are allowed, and may also specify a pattern
 that all sample aliases must follow. If such a pattern is specified, then the aliases will be compared to this pattern
 whenever saving a sample. If the alias does not follow the pattern specified by the naming scheme, of if there is a
 duplicate alias when not allowed, the save will fail and a validation message will state the cause.
