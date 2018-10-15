@@ -4,14 +4,27 @@ title: "15. Boxes"
 section: 15
 ---
 
+A Box represents a physical box or plate and can be used to track where an item is stored. There are several
+important box properties:
+  * Box size: the number of rows and columns in the box.
+    * The `scannable` property of a box is also stored in the box size. A box is scannable if it can be read
+      by a bulk barcode scanner.
+    * New box sizes must be added by MISO administrators.
+  * Box use: what the box items will be used for. Values can include "DNA", "RNA", "Library", "Slide",
+    "Sequencing", "Storage", and more.
+    * The [Boxes List](#boxes-list) page contains separate tabs for each box use.
+    * New box uses must be added by MISO administrators.
+  * Location: a user-provided description of where the box is kept.
+  * Freezer location: boxes can be stored in [freezers](freezers_and_rooms.html) in order to precisely track
+    their locations.
 
 {% assign sub = 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Boxes List" %}
 
 To get to the Boxes list page, click "Boxes" in the Tracking list in the menu on the left side of the screen.
-The list page has different tabs for each Box Use in MISO, and boxes can be found under their Box Use tab.
-Each box will only be listed under one Box Use tab, and searching for a box only searches the current tab. The
-toolbar at the top of each tab includes many controls for working with boxes.
+Boxes are categorized by tabs, with one tab for each box use. Each box will only be listed under one box use
+tab, and searching for a box only searches the current tab. The toolbar at the top of each table includes many
+controls for working with boxes.
 
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Creating Boxes" %}
@@ -24,10 +37,10 @@ then click the "Save" button at the top right of the screen when you are done. I
 message will be displayed underneath the invalid fields. You can then make appropriate adjustments and click
 the "Save" button to try again.
 
-If you chose to create more than one box, you will be taken to the bulk Create Boxes page. Enter all of the
-boxes information and then click the "Save" button at the top right of the screen when you are done. For
-additional information regarding some of the fields in the table, or for information on how to work with the
-bulk table, check the Quick Help section near the top of the screen. If any of the boxes fail to save, a
+If you chose to create more than one box, you will be taken to the bulk Create Boxes page. For additional
+information regarding some of the fields in the table, or for information on how to work with the bulk table,
+check the Quick Help section near the top of the screen. Enter all of the boxes' information and then click
+the "Save" button at the top right of the screen when you are done. If any of the boxes fail to save, a
 message will be displayed at the top of the screen explaining the problem(s). You can then make the
 appropriate adjustments and click the "Save" button to try again.
 
@@ -36,15 +49,15 @@ It is also possible to create a box when creating samples, when propagating libr
 sample mode is enabled), and when receiving libraries.
 
 1. Click the appropriate box and fill out how many items to create/receive/propagate:
-	* Creating samples: Go to the Samples list page and click "Create" in the toolbar at the top left of the
-		table. In the Create Samples dialog box that opens, check "Create New Box", fill out the rest of the
-fields in the dialog, and click "Create".
-  * Propagating samples or libraries: Go to the Samples list page. Check the box next to the desired parent
-		samples and click "Propagate" in the toolbar at the top left of the table. In the Propagate dialog box
-that opens, check "Create New Box", fill out the rest of the fields in the dialog, and click "Propagate".
-  * Receiving libraries: Go to the Libraries list page and click "Receive" in the toolbar at the top left of
-    the table. In the Receive Libraries dialog box that opens, check "Create New Box", fill out the rest of
-the fields in the dialog, and click "Receive".
+    * Creating samples: Go to the Samples list page and click "Create" in the toolbar at the top of the
+		  table. In the Create Samples dialog box that opens, check "Create New Box", fill out the rest of the
+      fields in the dialog, and click "Create".
+    * Propagating samples or libraries: Go to the Samples list page. Check the box next to the desired parent
+		  samples and click "Propagate" in the toolbar at the top of the table. In the Propagate dialog box
+      that opens, check "Create New Box", fill out the rest of the fields in the dialog, and click "Propagate".
+    * Receiving libraries: Go to the Libraries list page and click "Receive" in the toolbar at the top of
+      the table. In the Receive Libraries dialog box that opens, check "Create New Box", fill out the rest of
+      the fields in the dialog, and click "Receive".
 1. The open dialog box displays Create Box fields. Fill out the fields and click "Create".
 1. The bulk create/propagate/receive items page will open, and the Box Alias field will be filled in with the
 	 alias of the newly-created box. Continue creating/propagating/receiving items as per usual.
@@ -56,13 +69,26 @@ the fields in the dialog, and click "Receive".
 {% include userman-heading.md section=page.section sub=sub title="Editing Boxes" %}
 
 Boxes can be edited individually or in bulk. Bulk editing is convenient when you have several boxes to modify
-at once.
+at once. Editing individual boxes is sometimes preferable because it allows you to modify the box contents as
+well as the box attributes.
 
-Editing individual boxes is sometimes preferable because it provides a few additional options. This page also
-displays a diagram of the box contents, as well as a table of the box contents (see figure {{figure}}). If no
-positions in the Contents diagram are selected, the table will contain all box contents items. If one or more
-positions in the Contents diagram are selected, the table will be filtered to display only those items, and
-available actions for those items will be displayed at the top of the table.
+Most box fields can be edited, with the exception of the box ID, name, and size.
+
+To select boxes for bulk editing, click on the Boxes link in the Tracking menu on the left side of the page.
+Select the boxes you wish to edit and click "Edit" in the toolbar at the top of the table.
+
+To edit a single box, click on the Boxes link in the Tracking menu on the left side of the page, and click on
+the target box's name or alias.
+
+Freezer location can be changed on the Edit Box page by scanning the desired freezer location's barcode or
+selecting the desired freezer location from the dropdown menu, and clicking "Set". Freezer location can be
+changed on the bulk edit boxes page by scanning the freezer location barcode into the Freezer Location Barcode
+cell; the Freezer Location cell will update automatically with the appropriate freezer location details.
+
+On the Edit Box page, if no positions are selected in the Contents diagram (figure {{figure}}), the table will
+contain all box contents items. If one or more positions in the Contents diagram are selected, the table will
+be filtered to display only those items, and available actions for those items will be displayed at the top of
+the table.
 
 {% include userman-figure.md num=figure cap="Contents diagram and table" img="contents-diagram-and-table.png"
 %}
@@ -81,16 +107,16 @@ Contents diagram. If multiple positions are selected, the information displayed 
 search boxes for quickly adding items to those positions.
 
 To select a single position, click on a circle in the Contents diagram. The circle will become brighter to
-indicate that it is selected. To unselect a single position, press Ctrl (Windows, Linus) or Command (Mac)
+indicate that it is selected. To unselect a single position, hold Ctrl (Windows, Linux) or Command (Mac)
 while you click a selected circle.
 
-To select multiple positions, press Ctrl (Windows, Linux) or Command (Mac) while you click on the target
-circles in the Contents diagram. To unselect multiple positions, press Ctrl (Windows, Linux) or Command (Mac)
+To select multiple positions, hold Ctrl (Windows, Linux) or Command (Mac) while you click on the target
+circles in the Contents diagram. To unselect multiple positions, hold Ctrl (Windows, Linux) or Command (Mac)
 while you click on the circles you wish to unselect. The circles will become less bright to indicate that they
 are not selected.
 
 To select an entire row or column, click on the row or column header. To select multiple rows or columns,
-press Ctrl (Windows, Linux) or Command (Mac) while you click on the target row or column headers.
+hold Ctrl (Windows, Linux) or Command (Mac) while you click on the target row or column headers.
 
 To select all odd columns, click the "Select Odd Columns" button below the Contents diagram.
 To select all even columns, click the "Select Even Columns" button below the Contents diagram.
@@ -104,9 +130,9 @@ near the Search field.
 {% assign figure = figure | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Adding a Single Item to a Box" %}
 
-Select the target position in the Contents diagram. In the information section that appears adjacent to the
-Contents diagram (see figure {{figure}}), enter the item's name, alias, or barcode into the "Search" field and
-click "Lookup". 
+On the Edit Box page, select the target position in the Contents diagram. In the information section that
+appears adjacent to the Contents diagram (see figure {{figure}}), scan the item's barcode, or type its name,
+alias, or barcode into the "Search" field and press the Enter key or click "Lookup". 
 
 {% include userman-figure.md num=figure cap="Additional information when one position is selected"
 img="one-position-selected.png" %}
@@ -125,17 +151,16 @@ new box before or after saving the new item to the target position.
 {% assign figure = figure | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Adding Multiple Items to a Box" %}
 
-To add multiple items to a box, go to the Edit Box page by clicking on the box name in the Boxes list page.
-Select the target positions in the Contents diagram. Find the Position and Search rows adjacent to the
-Contents diagram (see figure {{figure}}), and enter the target item's name, alias, or barcode into the Search
-field for the target position. 
+On the Edit Box page, select the target positions in the Contents diagram. Find the Position and Search rows
+adjacent to the Contents diagram (see figure {{figure}}), and scan each target item's barcode or type its
+name, alias, or barcode into the Search field for its target position. 
 
 {% include userman-figure.md num=figure cap="Additional information when multiple positions are selected"
 img="multiple-positions-selected.png" %}
 
-Once all Search fields are filled out, click "Update" below the last search field. If the target
-position already contains an item, a dialog box will name the items that already in those positions and ask
-you to confirm that you wish to replace them with the items matching your search terms. If any items to be
+Once all Search fields are filled out, click "Update" below the last search field. If any of the target
+positions already contains an item, a dialog box will name the items that already occupy those positions and
+ask you to confirm that you wish to replace them with the items matching your search terms. If any items to be
 replaced are not being re-added to a different position in the box, they will be removed from the box. Click
 "Replace" to continue, or "Cancel" to cancel the update and select new positions.
 
@@ -151,14 +176,13 @@ Multiple items can also be added to a box using the [Scanning a box](#scanning_a
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Removing a Single Item from a Box" %}
 
-A single item can be removed from a box, which removes its Location value. It is advised to scan it into
-another box or location position soon in order to keep tracking its location in MISO.
+A single item can be removed from a box. It is advised to scan it into another box or location position soon
+in order to keep tracking its location in MISO.
 
-To remove a single item from a box, go to the Edit Box page by clicking on the box name in the Boxes list
-page. Select the target position in the Contents diagram. In the information section that appears adjacent to
-the diagram, click "Remove Item". In the dialog box that appears, click "Remove" to confirm that you wish to
-remove this item from the box. The page will refresh, and the target position will be empty in the Contents
-diagram.
+Go to the Edit Box page and select the target position in the Contents diagram. In the information section
+that appears adjacent to the diagram, click "Remove Item". In the dialog box that appears, click "Remove" to
+confirm that you wish to remove this item from the box. The page will refresh, and the target position will be
+empty in the Contents diagram.
 
 {% include userman-toplink.md %}
 
@@ -166,14 +190,13 @@ diagram.
 {% include userman-heading.md section=page.section sub=sub title="Discarding a Single Item from a Box" %}
 
 A single item can be discarded from a box to indicate that the item no longer needs to be tracked. When an
-item is discarded, its volume will be set to "0", discarded will be set to True, and its location will be
+item is discarded, its volume will be set to "0", discarded will be set to true, and its location will be
 shown as "EMPTY". Discarded items can not be added to boxes.
 
-To discard a single item from a box, go to the Edit Box page by clicking on the box name in the Boxes list
-page. Select the target position in the Contents diagram. In the information section that appears adjacent to
-the diagram, click "Discard Item". In the dialog box that appears, click "Discard" to confirm that you wish to
-discard this item from the box. The page will refresh, and the target position will be empty in the Contents
-diagram.
+Go to the Edit Box page and select the target position in the Contents diagram. In the information section
+that appears adjacent to the diagram, click "Discard Item". In the dialog box that appears, click "Discard" to
+confirm that you wish to discard this item from the box. The page will refresh, and the target position will
+be empty in the Contents diagram.
 
 {% include userman-toplink.md %}
 
@@ -181,7 +204,7 @@ diagram.
 {% include userman-heading.md section=page.section sub=sub title="Discarding All Items from a Box" %}
 
 It is possible to discard all of the items from a box in a single operation. To do this, go to the Edit Box
-page by clicking on the box name in the Boxes list page. The Contents section header has an Options menu on
+page by clicking on the box name in the Boxes list page. The Contents section heading has an Options menu on
 the far right of the header; hover over it to reveal the menu, and click "Discard All Contents". In the
 Discard All Contents dialog box that appears, click "Discard" to continue discarding all items from the box.
 The page will refresh and the box will be empty.
@@ -194,13 +217,13 @@ The page will refresh and the box will be empty.
 
 If your MISO is configured to use a box scanner, then the box contents can be updated in one operation using
 that box scanner (at the time of this writing, only the Thermo Fisher VisionMate High Speed Barcode Reader
-is supported). A MISO box must be `scannable` (part of the Box Size attribute) in order to have the scanning
+is supported). A MISO box must be scannable (part of the box size attribute) in order to have the scanning
 option available.
 
 To scan a box, first open the box scanner software on the computer (outside of MISO). Then, go to the Edit Box
 page by clicking the box name in the Boxes list page. The Contents section header has an Options menu on the
-far right of the header; hover over it to reveal the menu, and click "Scan with \<scannerName\>", where
-`\<scannerName\>` is a box scanner that your MISO is configured for. If "Scan with \<scannerName\>" is not visible
+far right of the header; hover over it to reveal the menu, and click "Scan with \<scanner-name\>", where
+\<scanner-name\> is a box scanner that your MISO is configured for. If "Scan with \<scanner-name\>" is not visible
 in the list, your box may not be scannable or MISO may not be configured to use this box scanner.
 
 Wait until the Scan dialog box prompts you to place the box on the scanner. It will automatically scan the box. 
@@ -241,10 +264,10 @@ Sometimes it may be helpful to assign user-generated barcodes to items (especial
 barcoded tubes), and these user-generated barcodes can be used to quickly put items into boxes.
 
 For example, a plate can be represented in MISO as a non-scannable box. Adding items to this plate in MISO
-allows for easy tracking of which item is in which plate position. Since items in a plate do not have a tube
-barcode it is possible to [add a single item to a plate](#adding_a_single_item_to_a_box) or even to
-[add multiple items to a plate](#adding_multiple_items_to_a_box), but it can be tedious to fill an
-entire plate this way. Instead, these items can be edited to have a Matrix Barcode attribute which represents
+allows for easy tracking of which item is in which plate position. Items in a plate do not have a tube
+barcode and while it is possible to [add a single item to a plate](#adding_a_single_item_to_a_box) or even to
+[add multiple items to a plate](#adding_multiple_items_to_a_box), it can be tedious to fill an
+entire plate this way. Instead, these items can be edited to have a matrix barcode attribute which represents
 a plate position rather than a physical barcode. Plate position barcodes must follow a specific pattern:
   * The item's barcode must be made up of two parts: a prefix representing the box + a box position suffix.
   * The prefix for the box must be unique, but it does not have to match any of the box attributes (name,
@@ -255,11 +278,15 @@ left)
     * Note that for the "standard" format, column numbers less than 10 must have a 0 (zero) added to the
 			beginning of the number. Column 1 would be represented as "01", column 2 would be "02", etc. This
 matches the column numbers on the box Contents diagram.
+      * So for example, an item with barcode "FIRST-BOX-A01" would correspond to the first row, first column,
+				and an item with barcode "FIRST-BOX-B04" would correspond to the second row, fourth column of the same
+        box.
     * Note that for the "numeric" format, 001 is the position in the first row, first column, 002 is the
 		  position in the first row, second column, etc. Numbering moves from left to right filling a row, and
-then continues from left to right on the next row, etc.
-So for example, an item with barcode "FIRST-BOX-A01" would correspond to the first row, first column, and an
-item with barcode "FIRST-BOX-B04" would correspond to the second row, fourth column of the same box.
+      then continues from left to right on the next row, etc.
+      * So for example, an item with barcode "FIRST-BOX-001" would correspond to the first row, first column,
+        and an item with barcode "FIRST-BOX-016" would correspond to the second row, fourth column of the same
+        box.
 
 Before filling by barcode pattern on the Edit Box page, the items must first be saved with the barcodes
 representing the box positions, as above.
@@ -282,28 +309,9 @@ Actions can be performed on all selected items in a box.
 First, go to the Edit Box page by clicking on the box name in the Boxes list page. 
 [Select the target positions](#selecting-positions-within-a-box) of the items you wish to act upon.
 In the toolbar at the top of the contents table, several actions are available for the selected items,
-provided that they are all of the same type (sample, library, dilution, pool). Note that not all actions are
-available for all item types.
-
-  * _Edit_: bulk edit the items
-  * _Propagate_: bulk propagate samples or libraries (only avialable for samples)
-  * _Make dilutions_: bulk propagate dilutions (only available for libraries)
-	* _Pool together_, _Pool separately_, _Pool custom_: [methods for creating pools](pools.html#pools_list)
-	  (only available for dilutions)
-  * _Create Orders_: bulk create orders for selected pools (only available for pools). See the [Orders
-    section](orders.html) for more information.
-  * _Print Barcode(s)_: print barcodes to a barcode printer. See the 
-    [Printing Barcodes section](barcode_label_printers.html#printing_barcodes) for more information.
-  * _Download_: download one or more spreadsheets for this type of item, if available
-  * _Parents_, _Children_: find items related to the selected items. See 
-    [Finding Related Items](general_navigation.html#finding_related_items) for more information.
-  * _Add QCs_, _Edit QCs_: quanlity control measures can be added to or edited for selected items. See
-    the [QCs section](qcs.html) for more information.
-  * _Add to Workset_: add these items to a new or existing workset. See the [Worksets section](worksets.html) 
-    for more information.
-  * _Attach File_: attach a single file to all of the selected items (not available for dilutions). See the
-    [Attachments section](attachments.html) for more information.
-
+provided that they are all of the same type (sample, library, dilution, pool). The actions available are the
+same as those found on the [Samples](samples.html#samples-list), [Libraries](libraries.html#libraries-list),
+[Dilutions](library_dilutions.html#dilutions-list), and [Pools](pools.html#pools-list) list pages.
 
 {% include userman-toplink.md %}
 
@@ -322,7 +330,8 @@ details on how to do this.
 To delete boxes, go to the Boxes list, check the checkbox(es) next to the box(es) that you wish to delete, and
 click the "Delete" button in the toolbar at the top of the table. A box can be deleted while it still has
 items in it; in this case, the items will be removed from the box and their location will be unknown to MISO.
-It is recommended that you add them to a new box if you wish their location to be tracked in MISO.
+It is recommended that you add them to a new box if you wish their location to be tracked in MISO. Any user
+can delete a box.
 
 {% include userman-toplink.md %}
 
