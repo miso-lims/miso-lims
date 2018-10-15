@@ -530,9 +530,11 @@ HotTarget.sample = (function() {
           },
           HotUtils.makeColumnForText('Group ID', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupId', {
             validator: HotUtils.validator.optionalTextAlphanumeric
-          }, config.targetSampleClass.alias === 'LCM Tube' && !config.edit ? config.defaultLcmTubeGroupId : null),
+          }, config.targetSampleClass && config.targetSampleClass.alias === 'LCM Tube' && !config.edit ? config.defaultLcmTubeGroupId
+              : null),
           HotUtils.makeColumnForText('Group Desc.', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupDescription', {},
-              config.targetSampleClass.alias === 'LCM Tube' && !config.edit ? config.defaultLcmTubeGroupDescription : null),
+              config.targetSampleClass && config.targetSampleClass.alias === 'LCM Tube' && !config.edit
+                  ? config.defaultLcmTubeGroupDescription : null),
           {
             header: 'Date of Creation',
             data: 'creationDate',
