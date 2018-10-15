@@ -14,7 +14,7 @@ configuration, see [Naming Scheme](site_configuration.html#naming_schemes) in th
 
 For libraries, the naming scheme specifies whether or not duplicate aliases are allowed, and may also specify a pattern
 that all library aliases must follow. If such a pattern is specified, then the aliases will be compared to this pattern
-whenever saving a library. If the alias does not follow the pattern specified by the naming scheme, of if there is a
+whenever saving a library. If the alias does not follow the pattern specified by the naming scheme, or if there is a
 duplicate alias when not allowed, the save will fail and a validation message will state the cause.
 
 The naming scheme may also specify a library alias generator. This means that users will not have to choose library
