@@ -31,7 +31,7 @@ ListTarget.attachmentcategory = {
     return HotTarget.attachmentcategory.getBulkActions(config);
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [{
+    return [{
       "name": "Add",
       "handler": function() {
 
@@ -51,7 +51,7 @@ ListTarget.attachmentcategory = {
           });
         });
       }
-    }] : [];
+    }];
   },
   createColumns: function(config, projectId) {
     return [{
