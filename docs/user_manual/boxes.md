@@ -115,8 +115,8 @@ circles in the Contents diagram. To unselect multiple positions, hold Ctrl (Wind
 while you click on the circles you wish to unselect. The circles will become less bright to indicate that they
 are not selected.
 
-To select an entire row or column, click on the row or column header. To select multiple rows or columns,
-hold Ctrl (Windows, Linux) or Command (Mac) while you click on the target row or column headers.
+To select an entire row or column, click on the row or column heading. To select multiple rows or columns,
+hold Ctrl (Windows, Linux) or Command (Mac) while you click on the target row or column headings.
 
 To select all odd columns, click the "Select Odd Columns" button below the Contents diagram.
 To select all even columns, click the "Select Even Columns" button below the Contents diagram.
@@ -205,7 +205,7 @@ be empty in the Contents diagram.
 
 It is possible to discard all of the items from a box in a single operation. To do this, go to the Edit Box
 page by clicking on the box name in the Boxes list page. The Contents section heading has an Options menu on
-the far right of the header; hover over it to reveal the menu, and click "Discard All Contents". In the
+the far right of the heading; hover over it to reveal the menu, and click "Discard All Contents". In the
 Discard All Contents dialog box that appears, click "Discard" to continue discarding all items from the box.
 The page will refresh and the box will be empty.
 
@@ -221,8 +221,8 @@ is supported). A MISO box must be scannable (part of the box size attribute) in 
 option available.
 
 To scan a box, first open the box scanner software on the computer (outside of MISO). Then, go to the Edit Box
-page by clicking the box name in the Boxes list page. The Contents section header has an Options menu on the
-far right of the header; hover over it to reveal the menu, and click "Scan with \<scanner-name\>", where
+page by clicking the box name in the Boxes list page. The Contents section heading has an Options menu on the
+far right of the heading; hover over it to reveal the menu, and click "Scan with \<scanner-name\>", where
 \<scanner-name\> is a box scanner that your MISO is configured for. If "Scan with \<scanner-name\>" is not visible
 in the list, your box may not be scannable or MISO may not be configured to use this box scanner.
 
@@ -251,8 +251,8 @@ sources of error are:
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Exporting Box Information" %}
 
-Go to the Edit Box page by clicking on the box name in the Boxes list page. The Contents section header has an
-Options menu on the far right of the header; hover over it to reveal the menu, and click "Export Box to Excel".
+Go to the Edit Box page by clicking on the box name in the Boxes list page. The Contents section heading has an
+Options menu on the far right of the heading; hover over it to reveal the menu, and click "Export Box to Excel".
 The Excel spreadsheet containing information about the box contents and their positions will be downloaded.
 
 {% include userman-toplink.md %}
@@ -290,8 +290,8 @@ matches the column numbers on the box Contents diagram.
 
 Before filling by barcode pattern on the Edit Box page, the items must first be saved with the barcodes
 representing the box positions, as above.
-Then, go to the Edit Box page by clicking on the box name in the Boxes list page. The Contents section header
-has an Options menu on the far right of the header; hover over it to reveal the menu, and click "Fill by
+Then, go to the Edit Box page by clicking on the box name in the Boxes list page. The Contents section heading 
+has an Options menu on the far right of the heading; hover over it to reveal the menu, and click "Fill by
 Barcode Pattern".
 
 In the Fill by Barcode Pattern dialog box that appears, enter the prefix (from our example above, that would
