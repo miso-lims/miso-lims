@@ -16,7 +16,7 @@ org.eclipse.wst.jsdt.core.formatter.alignment_for_arguments_in_qualified_allocat
 org.eclipse.wst.jsdt.core.formatter.alignment_for_assignment=0
 org.eclipse.wst.jsdt.core.formatter.alignment_for_binary_expression=16
 org.eclipse.wst.jsdt.core.formatter.alignment_for_compact_if=16
-org.eclipse.wst.jsdt.core.formatter.alignment_for_conditional_expression=80
+org.eclipse.wst.jsdt.core.formatter.alignment_for_conditional_expression=16
 org.eclipse.wst.jsdt.core.formatter.alignment_for_enum_constants=0
 org.eclipse.wst.jsdt.core.formatter.alignment_for_expressions_in_array_initializer=16
 org.eclipse.wst.jsdt.core.formatter.alignment_for_multiple_fields=16
