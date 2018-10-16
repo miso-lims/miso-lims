@@ -75,15 +75,4 @@ public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<
 
   public void throwIfBoxPositionIsFilled(Boxable boxable) throws IOException;
 
-  @Override
-  public default void beforeDelete(Box object) throws IOException {
-    object.getBoxPositions().clear();
-    save(object);
-  }
-
-  @Override
-  public default void authorizeDeletion(Box object) throws IOException {
-    getAuthorizationManager().throwIfNotWritable(object);
-  }
-
 }
