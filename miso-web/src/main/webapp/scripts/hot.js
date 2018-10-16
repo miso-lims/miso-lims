@@ -529,7 +529,8 @@ var HotUtils = {
                                 target.fixUp(data[i], errorHandler);
                               }
                               if (anyInvalidCells) {
-                                failed.push('Please fix highlighted cells.');
+                                failed.push('Please fix highlighted cells. See the Quick Help section (above) for additional information '
+                                    + 'regarding specific fields.');
                                 renderErrors();
                                 setSaveDisabled(false);
                                 ajaxLoader.classList.add('hidden');
