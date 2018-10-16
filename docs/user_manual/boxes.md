@@ -4,16 +4,15 @@ title: "15. Boxes"
 section: 15
 ---
 
-A Box represents a physical box or plate and can be used to track where an item is stored. There are several
-important box properties:
-  * Box size: the number of rows and columns in the box.
+A Box represents a physical storage container with defined positions, and can be used to track where samples,
+libraries, dilutions, and/or pools are stored. There are several important box properties:
+  * Box size: the number of rows and columns in the box. See [Type Data](type_data.html#box_sizes) for more
+    information.
     * The `scannable` property of a box is also stored in the box size. A box is scannable if it can be read
       by a bulk barcode scanner.
-    * New box sizes must be added by MISO administrators.
   * Box use: what the box items will be used for. Values can include "DNA", "RNA", "Library", "Slide",
-    "Sequencing", "Storage", and more.
+    "Sequencing", "Storage", and more. See [Type Data](type_data.html#box_uses) for more information.
     * The [Boxes List](#boxes-list) page contains separate tabs for each box use.
-    * New box uses must be added by MISO administrators.
   * Location: a user-provided description of where the box is kept.
   * Freezer location: boxes can be stored in [freezers](freezers_and_rooms.html) in order to precisely track
     their locations.
@@ -74,11 +73,10 @@ well as the box attributes.
 
 Most box fields can be edited, with the exception of the box ID, name, and size.
 
-To select boxes for bulk editing, click on the Boxes link in the Tracking menu on the left side of the page.
-Select the boxes you wish to edit and click "Edit" in the toolbar at the top of the table.
+To select boxes for bulk editing, go to the [Boxes list page](#boxes-list), select the boxes you wish to edit,
+and click "Edit" in the toolbar at the top of the table.
 
-To edit a single box, click on the Boxes link in the Tracking menu on the left side of the page, and click on
-the target box's name or alias.
+To edit a single box, go to the [Boxes list page](#boxes-list) and click on the target box's name or alias.
 
 Freezer location can be changed on the Edit Box page by scanning the desired freezer location's barcode or
 selecting the desired freezer location from the dropdown menu, and clicking "Set". Freezer location can be
@@ -278,15 +276,15 @@ left)
     * Note that for the "standard" format, column numbers less than 10 must have a 0 (zero) added to the
 			beginning of the number. Column 1 would be represented as "01", column 2 would be "02", etc. This
 matches the column numbers on the box Contents diagram.
-      * So for example, an item with barcode "FIRST-BOX-A01" would correspond to the first row, first column,
-				and an item with barcode "FIRST-BOX-B04" would correspond to the second row, fourth column of the same
-        box.
+			* So for example, an item with barcode "FIRST-BOX-A01" in an 8x12 box would be intended for the first
+				row, first column, and an item with barcode "FIRST-BOX-B04" would be intended for the second row,
+        fourth column of the same box.
     * Note that for the "numeric" format, 001 is the position in the first row, first column, 002 is the
 		  position in the first row, second column, etc. Numbering moves from left to right filling a row, and
       then continues from left to right on the next row, etc.
-      * So for example, an item with barcode "FIRST-BOX-001" would correspond to the first row, first column,
-        and an item with barcode "FIRST-BOX-016" would correspond to the second row, fourth column of the same
-        box.
+			* So for example, an item with barcode "FIRST-BOX-001" in an 8x12 box would be intended for the first
+				row, first column, and an item with barcode "FIRST-BOX-016" would be intended for the second row,
+        fourth column of the same box.
 
 Before filling by barcode pattern on the Edit Box page, the items must first be saved with the barcodes
 representing the box positions, as above.
@@ -330,8 +328,8 @@ details on how to do this.
 To delete boxes, go to the Boxes list, check the checkbox(es) next to the box(es) that you wish to delete, and
 click the "Delete" button in the toolbar at the top of the table. A box can be deleted while it still has
 items in it; in this case, the items will be removed from the box and their location will be unknown to MISO.
-It is recommended that you add them to a new box if you wish their location to be tracked in MISO. Any user
-can delete a box.
+It is recommended that you add them to a new box if you wish their location to be tracked in MISO. A box can
+only be deleted by its creator or a MISO admin user.
 
 {% include userman-toplink.md %}
 
