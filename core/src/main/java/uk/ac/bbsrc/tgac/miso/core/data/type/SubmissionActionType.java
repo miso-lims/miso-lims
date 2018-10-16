@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Enum representing all potential submission action types. These types should match the SRA submission schema for submission actions.
+ * Enum representing all potential submission action types. These types should match the ENA submission schema for submission actions.
  * 
  * @author Rob Davey
  * @since 0.0.2
@@ -41,7 +41,7 @@ public enum SubmissionActionType {
   /** Field key */
   private String key;
   /** Field lookup */
-  private static final Map<String, SubmissionActionType> lookup = new HashMap<String, SubmissionActionType>();
+  private static final Map<String, SubmissionActionType> lookup = new HashMap<>();
 
   static {
     for (SubmissionActionType s : EnumSet.allOf(SubmissionActionType.class))
@@ -84,7 +84,7 @@ public enum SubmissionActionType {
    * @return ArrayList<String> keys.
    */
   public static ArrayList<String> getKeys() {
-    ArrayList<String> keys = new ArrayList<String>();
+    ArrayList<String> keys = new ArrayList<>();
     for (SubmissionActionType h : SubmissionActionType.values()) {
       keys.add(h.getKey());
     }

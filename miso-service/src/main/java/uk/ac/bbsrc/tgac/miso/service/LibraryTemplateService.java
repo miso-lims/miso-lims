@@ -16,6 +16,8 @@ public interface LibraryTemplateService extends PaginatedDataSource<LibraryTempl
   @Override
   LibraryTemplate get(long id) throws IOException;
 
+  List<LibraryTemplate> list() throws IOException;
+
   List<LibraryTemplate> listLibraryTemplatesForProject(long projectId) throws IOException;
 
   @Override

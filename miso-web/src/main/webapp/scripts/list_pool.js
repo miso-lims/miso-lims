@@ -67,12 +67,12 @@ ListTarget.pool = {
           var ids = pools.map(Utils.array.getId);
           var proportions = ids.map(function(id) {
             return output['pool' + id];
-          });          
+          });
           return {
             ids: ids.join(','),
             proportions: proportions.join(',')
           };
-        }, function(result){
+        }, function(result) {
           return 1;
         });
       }
@@ -111,18 +111,17 @@ ListTarget.pool = {
           "sTitle": "Concentration",
           "mData": "concentration",
           "include": true,
-          "iSortPriority": 0
-        }, {
-          "sTitle": "Conc. Units",
-          "mData": "concentrationUnits",
-          "include": true,
           "iSortPriority": 0,
-          "bSortable": false,
-          "mRender": function(data, type, full){
-            var units = Constants.concentrationUnits.find(function(unit){
-              return unit.name == data;
-            });
-            return !!units ? units.units : '';
+          "mRender": function(data, type, full) {
+            if (type === 'display' && !!data) {
+              var units = Constants.concentrationUnits.find(function(unit) {
+                return unit.name == full.concentrationUnits;
+              });
+              if (!!units) {
+                return data + ' ' + units.units;
+              }
+            }
+            return data;
           }
         }, {
           "sTitle": "Location",

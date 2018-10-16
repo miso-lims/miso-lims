@@ -94,6 +94,7 @@ public interface AbstractListPage {
     public static final String WARNINGS = "Warnings";
     public static final String POOL_DESCRIPTION = "Pool Description";
     public static final String ORDER_DESCRIPTION = "Order Description";
+    public static final String POSITION = "Position";
   }
 
   public static class ListTarget {

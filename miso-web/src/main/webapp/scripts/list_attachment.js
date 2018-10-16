@@ -25,7 +25,7 @@ ListTarget.attachment = (function() {
   return {
     name: "Attachments",
     createUrl: function(config, projectId) {
-      throw "Static data only";
+      throw new Error("Static data only");
     },
     createBulkActions: function(config, projectId) {
       return [];
@@ -173,8 +173,7 @@ ListTarget.attachment = (function() {
                 contentType: false,
                 processData: false
               }).success(function(data) {
-                dialog.dialog("close");
-                Utils.page.pageReload();
+                Utils.showOkDialog('Attach File', ['File upload successful'], Utils.page.pageReload);
               }).fail(function(xhr, textStatus, errorThrown) {
                 dialog.dialog("close");
                 Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);
@@ -219,7 +218,9 @@ ListTarget.attachment = (function() {
             params.entityIds = sharedIds;
           }
           var url = '/miso/rest/attachments/' + entityType + '/' + entityId + '?' + jQuery.param(params);
-          Utils.ajaxWithDialog('Linking File', 'POST', url, null, Utils.page.pageReload);
+          Utils.ajaxWithDialog('Linking File', 'POST', url, null, function() {
+            Utils.showOkDialog('Link Project File', ['File link successful'], Utils.page.pageReload);
+          });
         });
       });
     }

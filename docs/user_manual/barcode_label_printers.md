@@ -56,6 +56,19 @@ The "Available" column shows which printers are enabled and disabled. An "✘" m
 
 
 {% assign sub = sub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Printing Barcodes" %}
+
+A "Print Barcode(s)" button appears in the toolbar at the top of the list page for every barcodable item type in MISO,
+including samples, libraries, dilutions, pools, and others. To print barcodes, go to the appropriate list page, check
+the checkboxes next to the items for which you would like to print barcode labels, and click this button. In the dialog
+that appears, choose the printer you would like to use, and the number of copies of each label that you would like to
+print. Click "Print" to confirm and print the labels.
+
+{% include userman-toplink.md %}
+
+
+
+{% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Deleting Printers" %}
 
 To delete a printer, go to the Printers list page, check the checkbox beside the printer you'd like to delete, and

@@ -77,29 +77,19 @@ ListTarget.poolelement = {
       'include': true,
       'iSortPriority': 1
     }, {
+      "sTitle": "Warnings",
+      "mData": null,
+      "mRender": WarningTarget.poolelement.tableWarnings(config.duplicateIndicesSequences, config.nearDuplicateIndicesSequences),
+      "include": true,
+      "iSortPriority": 0,
+      "bVisible": true,
+      "bSortable": false
+    }, {
       'sTitle': 'Proportion',
       'sType': 'numeric',
       'mData': 'proportion',
       'include': !config.add,
       'iSortPriority': 0
-    }, {
-      'sTitle': 'Conc.',
-      'sType': 'numeric',
-      'mData': 'concentration',
-      'include': true,
-      'iSortPriority': 0
-    }, {
-      'sTitle': 'Conc. Units',
-      'mData': 'concentrationUnits',
-      'include': true,
-      'iSortPriority': 0,
-      "bSortable": false,
-      "mRender": function(data, type, full) {
-        var units = Constants.concentrationUnits.find(function(unit) {
-          return unit.name == data;
-        });
-        return !!units ? units.units : '';
-      }
     }, ListUtils.idHyperlinkColumn("Library Name", "library", "library.id", function(dilution) {
       return dilution.library.name;
     }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Library Alias", "library", function(dilution) {
@@ -109,6 +99,23 @@ ListTarget.poolelement = {
     }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Sample Alias", "sample", function(dilution) {
       return dilution.library.parentSampleId;
     }, "library.parentSampleAlias", 0, true, "noPrint"), {
+      'sTitle': 'Conc.',
+      'sType': 'numeric',
+      'mData': 'concentration',
+      'include': true,
+      'iSortPriority': 0,
+      'mRender': function(data, type, full) {
+        if (type === 'display' && !!data) {
+          var units = Constants.concentrationUnits.find(function(unit) {
+            return unit.name == full.concentrationUnits;
+          });
+          if (!!units) {
+            return data + ' ' + units.units;
+          }
+        }
+        return data;
+      }
+    }, {
       "sTitle": "Targeted Sequencing",
       "mData": "targetedSequencingId",
       "include": Constants.isDetailedSample,
@@ -161,14 +168,6 @@ ListTarget.poolelement = {
       "include": true,
       "iSortPriority": 0,
       "mRender": ListUtils.render.booleanChecks,
-      "bSortable": false
-    }, {
-      "sTitle": "Warnings",
-      "mData": null,
-      "mRender": WarningTarget.poolelement.tableWarnings(config.duplicateIndicesSequences, config.nearDuplicateIndicesSequences),
-      "include": true,
-      "iSortPriority": 0,
-      "bVisible": true,
       "bSortable": false
     }];
   }

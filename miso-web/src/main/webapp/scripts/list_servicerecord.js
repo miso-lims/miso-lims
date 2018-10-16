@@ -24,7 +24,7 @@
 ListTarget.servicerecord = {
   name: "Service Records",
   createUrl: function(config, projectId) {
-    throw "Service records must be specified statically.";
+    throw new Error("Service records must be specified statically.");
   },
   createBulkActions: function(config, projectId) {
     return config.userIsAdmin ? [{

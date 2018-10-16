@@ -25,7 +25,7 @@ ListTarget.qc = function(qcTarget) {
   return {
     name: qcTarget + " QCs",
     createUrl: function(config, projectId) {
-      throw "QCs can only be generated statically";
+      throw new Error("QCs can only be generated statically");
     },
     queryUrl: null,
     createBulkActions: function(config, projectId) {
@@ -78,7 +78,7 @@ ListTarget.qc = function(qcTarget) {
         "mData": "description",
         "include": true,
         "iSortPriority": 0,
-      },];
+      }, ];
     }
   };
 };

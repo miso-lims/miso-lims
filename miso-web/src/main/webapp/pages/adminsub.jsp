@@ -82,7 +82,7 @@
       </ul>
     </c:if>
 	
-    <h2>SRA</h2>
+    <h2>ENA</h2>
     <ul class="bullets">
         <li><a href="<c:url value="/miso/experiments"/>">Experiments</a></li>
         <li><a href="<c:url value="/miso/submissions"/>">Submissions</a></li>

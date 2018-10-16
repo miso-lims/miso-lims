@@ -24,14 +24,14 @@
 ListTarget.attachmentcategory = {
   name: "Attachment Categories",
   createUrl: function(config, projectId) {
-    throw "Must be provided statically";
+    throw new Error("Must be provided statically");
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
     return HotTarget.attachmentcategory.getBulkActions(config);
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [{
+    return [{
       "name": "Add",
       "handler": function() {
 
@@ -51,7 +51,7 @@ ListTarget.attachmentcategory = {
           });
         });
       }
-    }] : [];
+    }];
   },
   createColumns: function(config, projectId) {
     return [{

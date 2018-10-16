@@ -24,7 +24,7 @@
 ListTarget.project = {
   name: "Projects",
   createUrl: function(config, projectId) {
-    throw "Static display only";
+    throw new Error("Static display only");
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {

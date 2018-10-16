@@ -2171,6 +2171,8 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setDescription(from.getDescription());
     dto.setNoteRequired(from.isNoteRequired());
+    dto.setOrderFulfilled(from.isOrderFulfilled());
+    dto.setAnalysisSkipped(from.isAnalysisSkipped());
     return dto;
   }
 
@@ -2709,7 +2711,7 @@ public class Dtos {
     }
     if (from.getId() != null) to.setId(from.getId());
     to.setAlias(from.getAlias());
-    to.setPlatformType(PlatformType.valueOf(from.getPlatformType()));
+    setObject(to::setPlatformType, from.getPlatformType(), PlatformType::valueOf);
     if (from.getDefaultVolume() != null) {
       to.setDefaultVolume(from.getDefaultVolume());
     }

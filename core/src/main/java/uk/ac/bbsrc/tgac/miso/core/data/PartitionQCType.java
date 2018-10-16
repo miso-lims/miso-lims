@@ -12,36 +12,56 @@ import javax.persistence.Table;
 public class PartitionQCType implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  @Column(nullable = false)
+  @Id
+  private long partitionQcTypeId;
 
+  @Column(nullable = false)
   private String description;
 
   private boolean noteRequired;
 
-  @Id
-  private long partitionQcTypeId;
+  private boolean orderFulfilled;
 
-  public String getDescription() {
-    return description;
-  }
+  private boolean analysisSkipped;
 
   public long getId() {
     return partitionQcTypeId;
-  }
-
-  public boolean isNoteRequired() {
-    return noteRequired;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
   }
 
   public void setId(long partitionQcTypeId) {
     this.partitionQcTypeId = partitionQcTypeId;
   }
 
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public boolean isNoteRequired() {
+    return noteRequired;
+  }
+
   public void setNoteRequired(boolean noteRequired) {
     this.noteRequired = noteRequired;
   }
+
+  public boolean isOrderFulfilled() {
+    return orderFulfilled;
+  }
+
+  public void setOrderFulfilled(boolean orderFulfillment) {
+    this.orderFulfilled = orderFulfillment;
+  }
+
+  public boolean isAnalysisSkipped() {
+    return analysisSkipped;
+  }
+
+  public void setAnalysisSkipped(boolean analysisSkipped) {
+    this.analysisSkipped = analysisSkipped;
+  }
+
 }

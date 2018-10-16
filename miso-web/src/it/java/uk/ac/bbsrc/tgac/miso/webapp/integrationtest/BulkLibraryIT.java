@@ -54,7 +54,7 @@ public class BulkLibraryIT extends AbstractIT {
       SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.CONSENT, SamColumns.SAMPLE_CLASS,
       SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER,
       SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER, SamColumns.TISSUE_MATERIAL,
-      SamColumns.REGION, LibColumns.RECEIVE_DATE);
+      SamColumns.REGION, LibColumns.RECEIVE_DATE, LibColumns.TEMPLATE);
 
   private static final String NO_INDEX_FAMILY = "No indices";
   private static final String NO_INDEX = "No index";

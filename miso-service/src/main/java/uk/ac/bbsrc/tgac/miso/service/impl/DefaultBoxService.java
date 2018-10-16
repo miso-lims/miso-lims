@@ -544,4 +544,15 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
     }
   }
 
+  @Override
+  public void beforeDelete(Box object) throws IOException {
+    object.getBoxPositions().clear();
+    save(object);
+  }
+
+  @Override
+  public void authorizeDeletion(Box object) throws IOException {
+    authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
 }

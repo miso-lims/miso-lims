@@ -24,7 +24,7 @@
 ListTarget.order = {
   name: "Pool Orders",
   createUrl: function(config, projectId) {
-    throw "Orders can only be shown statically.";
+    throw new Error("Orders can only be shown statically.");
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {

@@ -388,7 +388,7 @@ var Utils = Utils
             input.appendChild(valueControl);
             break;
           default:
-            throw "Unknown field type: " + field.type;
+            throw new Error("Unknown field type: " + field.type);
           }
           p.appendChild(input);
           dialogArea.appendChild(p);
@@ -968,7 +968,7 @@ Utils.array = {
   findUniqueOrThrow: function(predicate, referenceCollection) {
     var results = referenceCollection.filter(predicate);
     if (results.length != 1) {
-      throw 'element not found';
+      throw new Error('element not found');
     } else {
       return results[0];
     }
@@ -1056,7 +1056,7 @@ Utils.sorting = {
       } else if (typeof first == 'string' && typeof second == 'string') {
         return first.localeCompare(second);
       } else if (typeof first == 'function' || typeof second == 'function') {
-        throw 'Cannot compare function definitions; both are special in their own way';
+        throw new Error('Cannot compare function definitions; both are special in their own way');
       } else {
         // mixed case; make a best guess
         return ('' + first).localeCompare('' + second);

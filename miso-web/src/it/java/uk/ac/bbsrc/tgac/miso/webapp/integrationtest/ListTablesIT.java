@@ -11,7 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Before;
@@ -25,7 +26,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ListTa
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage.Tabs;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class ListTablesIT extends AbstractIT {
@@ -36,12 +36,11 @@ public class ListTablesIT extends AbstractIT {
       Columns.SAMPLE_NAME, Columns.SAMPLE_ALIAS, Columns.QC_PASSED, Columns.INDEX, Columns.LOCATION, Columns.LAST_MODIFIED,
       Columns.WARNINGS);
   private static final Set<String> dilutionsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.LIBRARY_NAME,
-      Columns.LIBRARY_ALIAS, Columns.MATRIX_BARCODE, Columns.PLATFORM, Columns.TARGETED_SEQUENCING, Columns.CONCENTRATION,
-      Columns.CONCENTRATION_UNITS, Columns.VOLUME, Columns.VOLUME_UNITS, Columns.NG_USED, Columns.VOLUME_USED, Columns.CREATOR,
-      Columns.CREATION_DATE, Columns.WARNINGS);
+      Columns.LIBRARY_ALIAS, Columns.MATRIX_BARCODE, Columns.PLATFORM, Columns.TARGETED_SEQUENCING, Columns.CONCENTRATION, Columns.VOLUME,
+      Columns.NG_USED, Columns.VOLUME_USED, Columns.CREATOR, Columns.CREATION_DATE, Columns.WARNINGS);
   private static final Set<String> poolsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
-      Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.DILUTIONS, Columns.CONCENTRATION, Columns.CONCENTRATION_UNITS,
-      Columns.LOCATION, Columns.AVG_INSERT_SIZE, Columns.LAST_MODIFIED);
+      Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.DILUTIONS, Columns.CONCENTRATION, Columns.LOCATION, Columns.AVG_INSERT_SIZE,
+      Columns.LAST_MODIFIED);
   private static final Set<String> ordersColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.ORDER_DESCRIPTION,
 		  Columns.POOL_DESCRIPTION, Columns.PLATFORM, Columns.LONGEST_INDEX, Columns.SEQUENCING_PARAMETERS, Columns.REMAINING, 
 		  Columns.LAST_MODIFIED);
@@ -55,7 +54,7 @@ public class ListTablesIT extends AbstractIT {
       Columns.COMMISSIONED, Columns.DECOMMISSIONED, Columns.SERIAL_NUMBER);
   private static final Set<String> kitsColumns = Sets.newHashSet(Columns.KIT_NAME, Columns.VERSION, Columns.MANUFACTURER,
       Columns.PART_NUMBER, Columns.STOCK_LEVEL, Columns.PLATFORM);
-  private static final Set<String> indicesColumns = Sets.newHashSet(Columns.FAMILY, Columns.INDEX_NAME, Columns.SEQUENCE);
+  private static final Set<String> indicesColumns = Sets.newHashSet(Columns.FAMILY, Columns.INDEX_NAME, Columns.SEQUENCE, Columns.POSITION);
   private static final Set<String> studiesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
       Columns.TYPE);
   private static final Set<String> printersColumns = Sets.newHashSet(Columns.SORT, Columns.PRINTER, Columns.DRIVER, Columns.BACKEND,
@@ -161,6 +160,20 @@ public class ListTablesIT extends AbstractIT {
       return standardComparator.compare(num1, num2);
     }
   };
+
+  private static final Comparator<String> numericIgnoreUnitsComparator = (num1, num2) -> {
+    return numericComparator.compare(removeUnits(num1), removeUnits(num2));
+  };
+
+  private static final Pattern numberWithUnits = Pattern.compile("^(-?\\d+(?:\\.\\d+)?)(?: .+)?$");
+
+  private static String removeUnits(String num) {
+    Matcher m1 = numberWithUnits.matcher(num);
+    if (!m1.matches()) {
+      throw new IllegalArgumentException("Input does not match expected pattern: " + num);
+    }
+    return m1.group(1);
+  }
 
   @Before
   public void setup() {
@@ -445,24 +458,6 @@ public class ListTablesIT extends AbstractIT {
     });
   }
 
-  private void testProjectPageSearch(String tableWrapperId, String searchTarget) {
-    ProjectPage page = ProjectPage.get(getDriver(), getBaseUrl(), 5L);
-    DataTable table = page.getTable(tableWrapperId);
-    table.searchFor(searchTarget);
-    assertTrue(
-        "error searching project page '" + tableWrapperId + "' table with search bar '" + table.getSearchDivId() + "' for '" + searchTarget
-            + " (" + page.getVisibleErrors().size() + "): "
-            + page.getVisibleErrors().stream().map(error -> error.getText()).collect(Collectors.joining(";")),
-        page.getVisibleErrors().isEmpty());
-  }
-
-  private void testTabbedSearch(String listTarget, String searchTarget) {
-    // confirm that searching by a term returns no errors
-    ListTabbedPage page = getTabbedList(listTarget);
-    page.getTable().searchFor(searchTarget);
-    assertTrue("error searching " + listTarget + " page for '" + searchTarget + "': ", isStringEmptyOrNull(page.getErrors().getText()));
-  }
-
   private void sortColumns(DataTable table, AbstractListPage page) {
     List<String> headings = table.getSortableColumnHeadings();
     for (String heading : headings) {
@@ -535,7 +530,7 @@ public class ListTablesIT extends AbstractIT {
     case Columns.SAMPLE_NAME:
       return nameNumericComparator;
     case Columns.CONCENTRATION:
-      return numericComparator;
+      return numericIgnoreUnitsComparator;
     default:
       return standardComparator;
     }

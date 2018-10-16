@@ -32,8 +32,7 @@ ListTarget.library_template = {
     actions.push({
       name: "Delete",
       action: function(items) {
-        var lines = ['Are you sure you wish to delete the following library templates? This cannot be undone.',
-            'Note: a library template may only be deleted by the project owner or an admin.'];
+        var lines = ['Are you sure you wish to delete the following library templates? This cannot be undone.'];
         var ids = [];
         jQuery.each(items, function(index, librarytemplate) {
           lines.push('* ' + librarytemplate.alias);
@@ -258,9 +257,5 @@ ListTarget.library_template = {
             return data || '';
           }
         }];
-  },
-  searchTermSelector: function(searchTerms) {
-    return [searchTerms['fulfilled'], searchTerms['active'], searchTerms['created'], searchTerms['changed'], searchTerms['creator'],
-        searchTerms['changedby'], searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box']]
   }
 };

@@ -37,10 +37,10 @@ administrators.
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Issue Trackers" %}
 
-MISO integrates with issue trackers in order to display and link to issues from within MISO. The only currently-
-supported issue tracker is JIRA. If JIRA integration is configured for your site, you will see a list of related
-issues on the Project page and the Run page. These lists are described in more detail in the [Projects](projects.html)
-and [Sequencer Runs](sequencer_runs.html) sections.
+MISO integrates with issue trackers in order to display and link to issues from within MISO. The only
+currently-supported issue tracker is JIRA. If JIRA integration is configured for your site, you will see a list of
+related issues on the Project page and the Run page. These lists are described in more detail in the
+[Projects](projects.html) and [Sequencer Runs](sequencer_runs.html) sections.
 
 {% assign figure = 1 %}
 MISO may also be configured to take bug reports. If it is, a "Report a problem" link will appear near the top right of
