@@ -1,3 +1,19 @@
+# 0.2.147
+
+Changes:
+
+ * Add reference to Quick Help in HOT validation error message
+ * Allow use of library templates when receiving libraries
+ * Factor lane QCs to indicate whether ordering and analysis need to be redone
+ * Confirm success after file upload/link
+ * Allow all users to create attachment categories
+ * Add properties for default LCM Tube group ID/desc
+ * Improve label for unspecified attributes in library template
+ * Removed incorrect search help from Library Templates page
+ * Fix Cluster PF chart x-axis lane numbering
+ * Show position on List Indices table
+ * Rearraged dilution columns, combined measure+unit columns
+
 # 0.2.146
 
 Changes:
