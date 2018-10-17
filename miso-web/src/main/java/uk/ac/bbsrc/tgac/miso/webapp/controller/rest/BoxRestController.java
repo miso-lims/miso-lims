@@ -630,6 +630,25 @@ public class BoxRestController extends RestController {
     return getBoxDtoWithBoxables(boxId);
   }
 
+  @PostMapping("/box/{boxId}/bulk-remove")
+  public @ResponseBody BoxDto removeMultipleItems(@PathVariable long boxId, @RequestBody List<String> positions) throws IOException {
+    Box box = getBox(boxId);
+    for (String position : positions) {
+      box.getBoxPositions().remove(position);
+    }
+    boxService.save(box);
+    return getBoxDtoWithBoxables(boxId);
+  }
+
+  @PostMapping("/box/{boxId}/bulk-discard")
+  public @ResponseBody BoxDto discardMultipleItems(@PathVariable long boxId, @RequestBody List<String> positions) throws IOException {
+    Box box = getBox(boxId);
+    for (String position : positions) {
+      boxService.discardSingleItem(box, position);
+    }
+    return getBoxDtoWithBoxables(boxId);
+  }
+
   private Box getBox(long boxId) throws IOException {
     Box box = boxService.get(boxId);
     if (box == null) {
