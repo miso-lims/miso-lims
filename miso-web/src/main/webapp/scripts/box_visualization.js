@@ -172,9 +172,9 @@
 
       var tBody = jQuery('<tBody>');
       var tRow = jQuery('<tr>');
-      var emptyCornerCell = jQuery('<th>');
-      emptyCornerCell.css('width', '30px');
-      emptyCornerCell.css('height', '30px');
+      var emptyCornerCell = jQuery('<th>').text('#');
+      emptyCornerCell.addClass('boxVisColHeader boxVisRowHeader');
+      emptyCornerCell.click(self.selectAll);
       tRow.append(emptyCornerCell);
 
       var makeColSelectEventData = function(col) {
@@ -236,6 +236,19 @@
         }
       }
       callSelectionChanged(self.selectedItems);
+    };
+    
+    self.selectAll = function(event) {
+      if (!self.isMultiSelectEnabled()) {
+        return;
+      }
+      var items = [];
+      for (var row = 1; row <= self.size.rows; row++) {
+        for (var col = 1; col <= self.size.cols; col++) {
+          items.push(self.position[row][col]);
+        }
+      }
+      toggleGroupSelection(event, items);
     };
 
     self.selectRow = function(event) {
