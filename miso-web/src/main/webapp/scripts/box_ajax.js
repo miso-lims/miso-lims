@@ -435,8 +435,14 @@ Box.ui = {
             }).css("width", "100%");
     jQuery("#toolbar")
         .append(
-            '<button style=\"margin-left:5px;\" class=\"fg-button ui-state-default ui-corner-all\" id="listAllItems" onclick="Box.ui.filterTableByBoxPositions();">List all Box Contents</button>');
+            '<button style=\"margin-left:5px;\" class=\"fg-button ui-state-default ui-corner-all\" id="listAllItems" onclick="Box.ui.selectNone();">List all Box Contents</button>');
     Box.ui.getBulkActions();
+  },
+  
+  selectNone: function() {
+    Box.visual.clearSelection();
+    Box.ui.filterTableByBoxPositions();
+    Box.ui.onSelectionChanged([]);
   },
 
   filterTableByBoxPositions: function(positionStrings) {
