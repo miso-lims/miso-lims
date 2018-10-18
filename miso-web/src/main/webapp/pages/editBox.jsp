@@ -197,6 +197,7 @@
   <div class="note">
     Hold down Ctrl (Windows, Linux) or Command (Mac) to select multiple positions.
     Click a row or column header to select the entire row or column.
+    Click the '#' at the top left to select all positions.
   </div>
   <div style="float:left;margin:20px;">
     <div id="boxContentsTable" class="unselectable" style="margin-bottom:10px;"></div>
