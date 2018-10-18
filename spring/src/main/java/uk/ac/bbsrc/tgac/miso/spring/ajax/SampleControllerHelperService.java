@@ -49,7 +49,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
@@ -172,16 +171,6 @@ public class SampleControllerHelperService {
     } catch (IOException e) {
       log.error("cannot set receipt date for sample", e);
       return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot set receipt date for sample");
-    }
-  }
-
-  public JSONObject lookupNCBIScientificName(HttpSession session, JSONObject json) {
-    String taxon = TaxonomyUtils.checkScientificNameAtNCBI(json.getString("scientificName"));
-    if (taxon != null) {
-      return JSONUtils.SimpleJSONResponse("NCBI taxon is valid");
-    } else {
-      return JSONUtils.SimpleJSONError(
-          "This scientific name is not of a known taxonomy. You may have problems when trying to submit this data to public repositories.");
     }
   }
 

@@ -61,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.TissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
@@ -146,6 +147,9 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
+
+  @Value("${miso.taxonLookupEnabled:false")
+  private boolean taxonLookupEnabled;
 
   private Boolean uniqueExternalNameWithinProjectRequired = true;
 
@@ -698,6 +702,11 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     validateConcentrationUnits(sample.getConcentration(), sample.getConcentrationUnits(), errors);
     validateVolumeUnits(sample.getVolume(), sample.getVolumeUnits(), errors);
     validateBarcodeUniqueness(sample, beforeChange, sampleStore::getByBarcode, errors, "sample");
+    if (taxonLookupEnabled) {
+      if (TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName()) == null) {
+        errors.add(new ValidationError("scientificName", "This scientific name is not of a known taxonomy"));
+      }
+    }
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);

@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -89,6 +90,9 @@ public class UploadController {
   @Autowired
   private QualityControlService qcService;
 
+  @Value("${miso.taxonLookupEnabled:false")
+  private boolean taxonLookupEnabled;
+
   public void setTagBarcodeService(IndexService tagBarcodeService) {
     this.tagBarcodeService = tagBarcodeService;
   }
@@ -141,15 +145,13 @@ public class UploadController {
       throw new IOException("Cannot upload file - project does not exist");
     }
 
-    boolean taxonCheck = (Boolean) request.getSession().getServletContext().getAttribute("taxonLookupEnabled");
-
     try {
       for (MultipartFile fileItem : getMultipartFiles(request)) {
         uploadFile(Project.class, projectId, fileItem);
         File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         List<Sample> samples = FormUtils.importSampleDeliveryForm(f);
         log.info("Importing samples from form: " + samples.toString());
-        misoFormsService.importSampleDeliveryFormSamples(samples, taxonCheck);
+        misoFormsService.importSampleDeliveryFormSamples(samples, taxonLookupEnabled);
       }
       return "redirect:/miso/project/" + projectId;
     } catch (Exception e) {
