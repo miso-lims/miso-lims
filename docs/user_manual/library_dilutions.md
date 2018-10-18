@@ -5,6 +5,10 @@ section: 9
 ---
 
 
+A library dilution is a portion of library, or an entire library, which may or may not have been diluted in preparation
+for pooling or adding to a sequencing container. Only dilutions can be added to pools in MISO, and only pools can be
+added to sequencing containers. This means that you will need to create a dilution in MISO even if the library is being
+pooled as is, or if it is being added directly to a sequencing container.
 
 {% assign sub = 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Dilutions List" %}
@@ -119,7 +123,7 @@ Excel (xlsx), Open Document (odt), and comma-delimited (csv) formats.
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Selecting Dilutions by Search" %}
 
-If you have a list of dilutions names or barcodes, or library names, aliases, or barcodes, you can use this list to
+If you have a list of dilution names or barcodes, or library names, aliases, or barcodes, you can use this list to
 select and act upon the dilutions instead of having to search for and select them manually. For more information on
 this feature, see the
 [General Navigation section - Selecting by Search](general_navigation.html#selecting_by_search).
@@ -156,7 +160,7 @@ this feature, see the [Worksets section](worksets.html).
 To delete dilutions, go to the Dilutions list, check the checkboxes next to the dilutions that you wish to delete, and
 click the "Delete" button in the toolbar at the top of the table. A dilution can only be deleted if it has not been
 added to any pools. If the dilution has been added to any pools, either these pools must be deleted, or the dilution
-must be removed from them before the dilutions can be deleted. A dilutions can only be deleted by its creator or a MISO
+must be removed from them before the dilutions can be deleted. A dilution can only be deleted by its creator or a MISO
 administrator.
 
 {% include userman-toplink.md %}
