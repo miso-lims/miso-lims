@@ -118,7 +118,7 @@ LEFT JOIN (
             AND sqc.type = maxQpcrDates.type
         GROUP BY sqc.sample_sampleId
         ) newestQpcr ON newestQpcr.sample_sampleId = s.sampleId
-LEFT JOIN SampleQC qpcr ON qpcr.qcId = newestQpcr.qcId
+LEFT JOIN SampleQC qpcr ON qpcr.qcId = newestQpcr.qcId    
 LEFT JOIN BoxPosition pos ON pos.targetId = s.sampleId 
         AND pos.targetType LIKE 'Sample%' 
 LEFT JOIN Box box ON box.boxId = pos.boxId 
@@ -202,6 +202,21 @@ LEFT JOIN (
             AND lqc.type = maxQubitDates.type
         GROUP BY lqc.library_libraryId
         ) newestQubit ON newestQubit.library_libraryId = l.libraryId
+LEFT JOIN LibraryQC qubit ON qubit.qcId = newestQubit.qcId
+LEFT JOIN (
+        SELECT lqc.library_libraryId, MAX(lqc.qcId) AS qcId
+        FROM (
+            SELECT library_libraryId, type, MAX(date) AS maxDate
+            FROM LibraryQC
+            JOIN QCType ON QCType.qcTypeId = LibraryQC.type
+            WHERE QCType.name = 'PDAC Confirmed'
+            GROUP By library_libraryId, type
+            ) maxPdacDates
+        JOIN LibraryQC lqc ON lqc.library_libraryId = maxPdacDates.library_libraryId
+            AND lqc.date = maxPdacDates.maxDate
+            AND lqc.type = maxPdacDates.type
+        GROUP BY lqc.library_libraryId
+        ) newestPdac ON newestPdac.library_libraryId = l.libraryId
 LEFT JOIN LibraryQC qubit ON qubit.qcId = newestQubit.qcId
 LEFT JOIN ( 
         SELECT library_libraryId 
