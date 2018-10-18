@@ -8,9 +8,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Immutable;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 
 @Entity
+@Immutable
 @Table(name = "InstrumentStats")
 public class InstrumentStatus implements Serializable {
 
@@ -26,6 +29,8 @@ public class InstrumentStatus implements Serializable {
   @ManyToOne
   @JoinColumn(name = "runId", nullable = true)
   private Run run;
+
+  private boolean outOfService;
 
   public long getId() {
     return id;
@@ -49,5 +54,13 @@ public class InstrumentStatus implements Serializable {
 
   public void setRun(Run run) {
     this.run = run;
+  }
+
+  public boolean isOutOfService() {
+    return outOfService;
+  }
+
+  public void setOutOfService(boolean outOfService) {
+    this.outOfService = outOfService;
   }
 }

@@ -99,7 +99,7 @@ ListTarget.instrument = {
       "sTitle": "Status",
       "mData": "status",
       "include": true,
-      "iSortPriority": 0
+      "bSortable": false
     }, {
       "sTitle": "Serial Number",
       "mData": "serialNumber",

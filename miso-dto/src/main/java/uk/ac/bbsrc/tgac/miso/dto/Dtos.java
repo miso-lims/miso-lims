@@ -2420,6 +2420,7 @@ public class Dtos {
             .sorted((a, b) -> a.getAlias().compareTo(b.getAlias()))//
             .map(p -> asDto(p, false, false))//
             .collect(Collectors.toList()));
+    to.setOutOfService(from.isOutOfService());
     return to;
   }
 
