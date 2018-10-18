@@ -148,7 +148,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
-  @Value("${miso.taxonLookupEnabled:false}")
+  @Value("${miso.taxonLookup.enabled:false}")
   private boolean taxonLookupEnabled;
 
   private Boolean uniqueExternalNameWithinProjectRequired = true;
@@ -702,7 +702,9 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     validateConcentrationUnits(sample.getConcentration(), sample.getConcentrationUnits(), errors);
     validateVolumeUnits(sample.getVolume(), sample.getVolumeUnits(), errors);
     validateBarcodeUniqueness(sample, beforeChange, sampleStore::getByBarcode, errors, "sample");
-    if (taxonLookupEnabled && TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName()) == null) {
+
+    if (taxonLookupEnabled && (beforeChange == null || !sample.getScientificName().equals(beforeChange.getScientificName()))
+        && TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName()) == null) {
       errors.add(new ValidationError("scientificName", "This scientific name is not of a known taxonomy"));
     }
 

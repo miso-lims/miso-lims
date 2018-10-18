@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -32,20 +31,17 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
@@ -58,42 +54,26 @@ import org.w3c.dom.NodeList;
  * @since 0.1.4
  */
 public class TaxonomyUtils {
-  private static final Logger log = LoggerFactory.getLogger(TaxonomyUtils.class);
 
-  private static final String ncbiEntrezUtilsURL = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?";
+  private static final String ncbiEntrezUtilsURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=";
 
-  public static String checkScientificNameAtNCBI(String scientificName) {
+  public static String checkScientificNameAtNCBI(String scientificName) throws IOException {
+    String query = ncbiEntrezUtilsURL + URLEncoder.encode(scientificName, "UTF-8");
+    final HttpClient httpclient = HttpClientBuilder.create().build();
+    HttpGet httpget = new HttpGet(query);
+    HttpResponse response = httpclient.execute(httpget);
+    String out = parseEntity(response.getEntity());
+    DocumentBuilder docBuilder;
     try {
-      String query = ncbiEntrezUtilsURL + "db=taxonomy&term=" + URLEncoder.encode(scientificName, "UTF-8");
-      final HttpClient httpclient = HttpClientBuilder.create().build();
-      HttpGet httpget = new HttpGet(query);
-      try {
-        HttpResponse response = httpclient.execute(httpget);
-        String out = parseEntity(response.getEntity());
-        log.info(out);
-        try {
-          DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-          Document d = docBuilder.newDocument();
-
-          TransformerFactory.newInstance().newTransformer().transform(new StreamSource(new UnicodeReader(out)), new DOMResult(d));
-
-          NodeList nl = d.getElementsByTagName("Id");
-          for (int i = 0; i < nl.getLength(); i++) {
-            Element e = (Element) nl.item(i);
-            return e.getTextContent();
-          }
-        } catch (ParserConfigurationException e) {
-          log.error("check scientific name at NCBI", e);
-        } catch (TransformerException e) {
-          log.error("check scientific name at NCBI", e);
-        }
-      } catch (ClientProtocolException e) {
-        log.error("check scientific name at NCBI", e);
-      } catch (IOException e) {
-        log.error("check scientific name at NCBI", e);
+      docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+      Document d = docBuilder.newDocument();
+      TransformerFactory.newInstance().newTransformer().transform(new StreamSource(new UnicodeReader(out)), new DOMResult(d));
+      NodeList nl = d.getElementsByTagName("Id");
+      if (nl.getLength() > 0) {
+        return nl.item(0).getTextContent();
       }
-    } catch (UnsupportedEncodingException e) {
-      log.error("check scientific name at NCBI", e);
+    } catch (ParserConfigurationException | TransformerException | TransformerFactoryConfigurationError e) {
+      throw new IOException("Taxon lookup error", e);
     }
     return null;
   }

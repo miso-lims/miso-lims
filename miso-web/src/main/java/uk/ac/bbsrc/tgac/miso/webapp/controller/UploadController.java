@@ -90,7 +90,7 @@ public class UploadController {
   @Autowired
   private QualityControlService qcService;
 
-  @Value("${miso.taxonLookupEnabled:false}")
+  @Value("${miso.taxonLookup.enabled:false}")
   private boolean taxonLookupEnabled;
 
   public void setTagBarcodeService(IndexService tagBarcodeService) {
