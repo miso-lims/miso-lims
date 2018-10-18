@@ -245,6 +245,9 @@
     <p class="warning" id="warningMessages"></p>
   </div>
   <div id="bulkPositionControls" style="float:left;padding:20px;">
+    <button class="ui-state-default" onclick="Box.ui.bulkRemoveItems();">Remove Selected</button>
+    <button class="ui-state-default" onclick="Box.ui.bulkDiscardItems();">Discard Selected</button>
+    <br/><br/>
     <table id="bulkUpdateTable">
       <thead>
         <tr>

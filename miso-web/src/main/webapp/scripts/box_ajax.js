@@ -372,6 +372,35 @@ Box.ui = {
     var table = jQuery('#listingBoxesTable').dataTable();
     table.fnFilter(alias, 5);
   },
+  
+  bulkRemoveItems: function() {
+    Utils.showConfirmDialog('Remove Items', 'Remove', ['Are you sure you wish to set location to unknown for all selected items? You should '
+      + 're-home them as soon as possible.'], function() {
+      var positions = Box.ui.getSelectedPositions();
+      var url = '/miso/rest/box/' + Box.boxJSON.id + '/bulk-remove';
+      Utils.ajaxWithDialog('Remove Items', 'POST', url, positions, function(responseData) {
+        Box.boxJSON = responseData;
+        Box.ui.update();
+      });
+    });
+  },
+  
+  bulkDiscardItems: function() {
+    Utils.showConfirmDialog('Discard Items', 'Discard', ['Are you sure you wish to set discard all selected items?'], function() {
+      var positions = Box.ui.getSelectedPositions();
+      var url = '/miso/rest/box/' + Box.boxJSON.id + '/bulk-discard';
+      Utils.ajaxWithDialog('Discard Items', 'POST', url, positions, function(responseData) {
+        Box.boxJSON = responseData;
+        Box.ui.update();
+      });
+    });
+  },
+  
+  getSelectedPositions: function() {
+    return jQuery.map(jQuery('#bulkUpdateTable tbody input'), function(input) {
+      return jQuery(input).data('position');
+    });
+  },
 
   bulkUpdatePositions: function() {
     var data = [];
