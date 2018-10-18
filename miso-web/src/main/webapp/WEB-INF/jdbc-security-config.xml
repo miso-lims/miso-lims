@@ -34,7 +34,6 @@
   <security:global-method-security secured-annotations="enabled" />
 
   <!-- don't want to have a SS filter here as the userless REST auth should have taken care of that -->
-  <security:http pattern="/miso/consumer/**" security="none" />
   <security:http pattern="/miso/rest/**" security="none" />
 
   <security:http pattern="/styles/**" security="none" /><!-- filters="none"/> -->
