@@ -148,7 +148,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
-  @Value("${miso.taxonLookupEnabled:false")
+  @Value("${miso.taxonLookupEnabled:false}")
   private boolean taxonLookupEnabled;
 
   private Boolean uniqueExternalNameWithinProjectRequired = true;
@@ -422,7 +422,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
           identityExternalNames.add(name);
         }
       } catch (IOException e) {
-        log.error("Failed to retrieve all external names: " + e);
+        log.error("Failed to retrieve all external names", e);
       }
     });
 
@@ -702,10 +702,8 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     validateConcentrationUnits(sample.getConcentration(), sample.getConcentrationUnits(), errors);
     validateVolumeUnits(sample.getVolume(), sample.getVolumeUnits(), errors);
     validateBarcodeUniqueness(sample, beforeChange, sampleStore::getByBarcode, errors, "sample");
-    if (taxonLookupEnabled) {
-      if (TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName()) == null) {
-        errors.add(new ValidationError("scientificName", "This scientific name is not of a known taxonomy"));
-      }
+    if (taxonLookupEnabled && TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName()) == null) {
+      errors.add(new ValidationError("scientificName", "This scientific name is not of a known taxonomy"));
     }
 
     if (!errors.isEmpty()) {

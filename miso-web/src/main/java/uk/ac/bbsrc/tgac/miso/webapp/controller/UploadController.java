@@ -90,7 +90,7 @@ public class UploadController {
   @Autowired
   private QualityControlService qcService;
 
-  @Value("${miso.taxonLookupEnabled:false")
+  @Value("${miso.taxonLookupEnabled:false}")
   private boolean taxonLookupEnabled;
 
   public void setTagBarcodeService(IndexService tagBarcodeService) {
@@ -129,7 +129,7 @@ public class UploadController {
     File dir = new File(
         filesManager.getFileStorageDirectory() + File.separator + type.getSimpleName().toLowerCase() + File.separator + qualifier);
     if (LimsUtils.checkDirectory(dir, true)) {
-      log.info("Attempting to store " + dir.toString() + File.separator + fileItem.getOriginalFilename());
+      log.info("Attempting to store {}", dir.toString() + File.separator + fileItem.getOriginalFilename());
       fileItem.transferTo(new File(dir + File.separator + fileItem.getOriginalFilename().replaceAll("\\s", "_")));
     } else {
       throw new IOException("Cannot upload file - check that the directory specified in miso.properties exists and is writable");
@@ -150,7 +150,7 @@ public class UploadController {
         uploadFile(Project.class, projectId, fileItem);
         File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         List<Sample> samples = FormUtils.importSampleDeliveryForm(f);
-        log.info("Importing samples from form: " + samples.toString());
+        log.info("Importing samples from form: {}", samples.toString());
         misoFormsService.importSampleDeliveryFormSamples(samples, taxonLookupEnabled);
       }
       return "redirect:/miso/project/" + projectId;

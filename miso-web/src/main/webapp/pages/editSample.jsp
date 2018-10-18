@@ -228,7 +228,7 @@
     </tr>
     <c:choose>
     <c:when test="${not detailedSample}">
-	  <tr bgcolor="yellow">
+	  <tr style="background-color:yellow;">
 	    <td>QC Passed:</td>
 	    <td>
 	      <form:radiobutton path="qcPassed" value="" label="Unknown"/>
