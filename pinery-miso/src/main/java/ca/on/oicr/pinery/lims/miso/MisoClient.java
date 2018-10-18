@@ -986,6 +986,7 @@ public class MisoClient implements Lims {
       p.setArchivedCount(rs.getInt("archivedCount"));
       p.setEarliest(rs.getTimestamp("earliest"));
       p.setLatest(rs.getTimestamp("latest"));
+      p.setActive(rs.getBoolean("active"));
 
       return p;
     }
