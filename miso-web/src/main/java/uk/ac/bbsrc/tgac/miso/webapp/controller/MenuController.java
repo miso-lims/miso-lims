@@ -229,21 +229,13 @@ public class MenuController implements ServletContextAware {
   }
 
   @RequestMapping("/mainMenu")
-  public ModelAndView mainMenu(ModelMap model) {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      model.put("title", "Home");
-      ObjectMapper mapper = new ObjectMapper();
-      model.put("favouriteWorkflows",
-          user.getFavouriteWorkflows().stream().map(Dtos::asDto).map(dto -> mapper.valueToTree(dto)).collect(Collectors.toList()));
-      if (Arrays.asList(user.getRoles()).contains("ROLE_EXTERNAL") && !Arrays.asList(user.getRoles()).contains("ROLE_INTERNAL")) {
-        return new ModelAndView("/pages/external/externalMain.jsp", model);
-      } else {
-        return new ModelAndView("/pages/mainMenu.jsp", model);
-      }
-    } catch (IOException e) {
-      return new ModelAndView("/login.jsp", model);
-    }
+  public ModelAndView mainMenu(ModelMap model) throws IOException {
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    model.put("title", "Home");
+    ObjectMapper mapper = new ObjectMapper();
+    model.put("favouriteWorkflows",
+        user.getFavouriteWorkflows().stream().map(Dtos::asDto).map(dto -> mapper.valueToTree(dto)).collect(Collectors.toList()));
+    return new ModelAndView("/pages/mainMenu.jsp", model);
   }
 
   @Override
