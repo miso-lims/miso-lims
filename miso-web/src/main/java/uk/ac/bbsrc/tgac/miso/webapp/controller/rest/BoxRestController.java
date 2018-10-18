@@ -634,7 +634,9 @@ public class BoxRestController extends RestController {
   public @ResponseBody BoxDto removeMultipleItems(@PathVariable long boxId, @RequestBody List<String> positions) throws IOException {
     Box box = getBox(boxId);
     for (String position : positions) {
-      box.getBoxPositions().remove(position);
+      if (box.getBoxPositions().containsKey(position)) {
+        box.getBoxPositions().remove(position);
+      }
     }
     boxService.save(box);
     return getBoxDtoWithBoxables(boxId);
@@ -644,7 +646,9 @@ public class BoxRestController extends RestController {
   public @ResponseBody BoxDto discardMultipleItems(@PathVariable long boxId, @RequestBody List<String> positions) throws IOException {
     Box box = getBox(boxId);
     for (String position : positions) {
-      boxService.discardSingleItem(box, position);
+      if (box.getBoxPositions().containsKey(position)) {
+        boxService.discardSingleItem(box, position);
+      }
     }
     return getBoxDtoWithBoxables(boxId);
   }
