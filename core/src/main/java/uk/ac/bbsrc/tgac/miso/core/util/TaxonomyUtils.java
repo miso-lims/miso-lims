@@ -25,6 +25,8 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -57,25 +59,29 @@ public class TaxonomyUtils {
 
   private static final String ncbiEntrezUtilsURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=";
 
+  private static final Map<String, String> taxonomyCache = new HashMap<>();
+
   public static String checkScientificNameAtNCBI(String scientificName) throws IOException {
-    String query = ncbiEntrezUtilsURL + URLEncoder.encode(scientificName, "UTF-8");
-    final HttpClient httpclient = HttpClientBuilder.create().build();
-    HttpGet httpget = new HttpGet(query);
-    HttpResponse response = httpclient.execute(httpget);
-    String out = parseEntity(response.getEntity());
-    DocumentBuilder docBuilder;
-    try {
-      docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      Document d = docBuilder.newDocument();
-      TransformerFactory.newInstance().newTransformer().transform(new StreamSource(new UnicodeReader(out)), new DOMResult(d));
-      NodeList nl = d.getElementsByTagName("Id");
-      if (nl.getLength() > 0) {
-        return nl.item(0).getTextContent();
+    if (!taxonomyCache.containsKey(scientificName)) {
+      String query = ncbiEntrezUtilsURL + URLEncoder.encode(scientificName, "UTF-8");
+      final HttpClient httpclient = HttpClientBuilder.create().build();
+      HttpGet httpget = new HttpGet(query);
+      HttpResponse response = httpclient.execute(httpget);
+      String out = parseEntity(response.getEntity());
+      DocumentBuilder docBuilder;
+      try {
+        docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document d = docBuilder.newDocument();
+        TransformerFactory.newInstance().newTransformer().transform(new StreamSource(new UnicodeReader(out)), new DOMResult(d));
+        NodeList nl = d.getElementsByTagName("Id");
+        if (nl.getLength() > 0) {
+          taxonomyCache.put(scientificName, nl.item(0).getTextContent());
+        }
+      } catch (ParserConfigurationException | TransformerException | TransformerFactoryConfigurationError e) {
+        throw new IOException("Taxon lookup error", e);
       }
-    } catch (ParserConfigurationException | TransformerException | TransformerFactoryConfigurationError e) {
-      throw new IOException("Taxon lookup error", e);
     }
-    return null;
+    return taxonomyCache.get(scientificName);
   }
 
   private static String parseEntity(HttpEntity entity) throws IOException {

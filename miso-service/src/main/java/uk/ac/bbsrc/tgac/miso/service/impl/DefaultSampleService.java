@@ -704,7 +704,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     validateBarcodeUniqueness(sample, beforeChange, sampleStore::getByBarcode, errors, "sample");
 
     if (taxonLookupEnabled && (beforeChange == null || !sample.getScientificName().equals(beforeChange.getScientificName()))
-        && TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName()) == null) {
+        && (sample.getScientificName() == null || TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName()) == null)) {
       errors.add(new ValidationError("scientificName", "This scientific name is not of a known taxonomy"));
     }
 
