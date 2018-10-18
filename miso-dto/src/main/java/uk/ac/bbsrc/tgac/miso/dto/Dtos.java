@@ -2086,6 +2086,17 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setPlatform(asDto(from.getPlatform()));
     dto.setSerialNumber(from.getSerialNumber());
+    if (from.getDateDecommissioned() == null) {
+      if (from.isOutOfService()) {
+        dto.setStatus("Out of Service");
+      } else {
+        dto.setStatus("Production");
+      }
+    } else if (from.getUpgradedInstrument() != null) {
+      dto.setStatus("Upgraded");
+    } else {
+      dto.setStatus("Retired");
+    }
     return dto;
   }
 

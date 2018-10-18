@@ -15,6 +15,8 @@ public class InstrumentDto {
   
   private String serialNumber;
 
+  private String status;
+
   public String getDateCommissioned() {
     return dateCommissioned;
   }
@@ -43,6 +45,10 @@ public class InstrumentDto {
     return serialNumber;
   }
 
+  public String getStatus() {
+    return status;
+  }
+
   public void setDateCommissioned(String dateCommissioned) {
     this.dateCommissioned = dateCommissioned;
   }
@@ -69,6 +75,10 @@ public class InstrumentDto {
 
   public void setSerialNumber(String serialNumber) {
     this.serialNumber = serialNumber;
+  }
+
+  public void setStatus(String status) {
+    this.status = status;
   }
 
 }

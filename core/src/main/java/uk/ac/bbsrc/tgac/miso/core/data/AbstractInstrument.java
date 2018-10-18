@@ -232,4 +232,13 @@ public abstract class AbstractInstrument implements Instrument {
     this.serviceRecords = serviceRecords;
   }
 
+  @Override
+  public boolean isOutOfService() {
+    if (getServiceRecords() == null) {
+      return false;
+    }
+    return getServiceRecords().stream().anyMatch(sr -> sr.isOutOfService() && sr.getEndTime() == null && sr.getStartTime() != null
+        && sr.getStartTime().before(new Date()));
+  }
+
 }

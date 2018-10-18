@@ -172,7 +172,7 @@ public class ServiceRecordPageIT extends AbstractIT {
     assertAttribute(Field.TITLE, expectedValues, sr.getTitle());
     assertAttribute(Field.DETAILS, expectedValues, sr.getDetails());
     assertAttribute(Field.SERVICE_DATE, expectedValues, formatDate(sr.getServiceDate()));
-    assertAttribute(Field.SHUTDOWN_TIME, expectedValues, formatDateTime(sr.getShutdownTime()));
-    assertAttribute(Field.RESTORED_TIME, expectedValues, formatDateTime(sr.getRestoredTime()));
+    assertAttribute(Field.SHUTDOWN_TIME, expectedValues, formatDateTime(sr.getStartTime()));
+    assertAttribute(Field.RESTORED_TIME, expectedValues, formatDateTime(sr.getEndTime()));
   }
 }

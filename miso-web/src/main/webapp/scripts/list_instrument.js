@@ -96,13 +96,8 @@ ListTarget.instrument = {
       "include": true,
       "iSortPriority": 0
     }, {
-      "sTitle": "Commissioned",
-      "mData": "dateCommissioned",
-      "include": true,
-      "iSortPriority": 0
-    }, {
-      "sTitle": "Decommissioned",
-      "mData": "dateDecommissioned",
+      "sTitle": "Status",
+      "mData": "status",
       "include": true,
       "iSortPriority": 0
     }, {
