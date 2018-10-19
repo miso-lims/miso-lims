@@ -9,6 +9,7 @@ SELECT s.alias NAME
         ,tt.alias tissueType
         ,p.shortName project
         ,sai.archived archived
+        ,ds.creationDate inLabCreationDate
         ,s.created created
         ,s.creator createdById
         ,s.lastModified modified
@@ -118,7 +119,7 @@ LEFT JOIN (
             AND sqc.type = maxQpcrDates.type
         GROUP BY sqc.sample_sampleId
         ) newestQpcr ON newestQpcr.sample_sampleId = s.sampleId
-LEFT JOIN SampleQC qpcr ON qpcr.qcId = newestQpcr.qcId    
+LEFT JOIN SampleQC qpcr ON qpcr.qcId = newestQpcr.qcId
 LEFT JOIN BoxPosition pos ON pos.targetId = s.sampleId 
         AND pos.targetType LIKE 'Sample%' 
 LEFT JOIN Box box ON box.boxId = pos.boxId 
@@ -136,6 +137,7 @@ SELECT l.alias NAME
         ,NULL tissueType 
         ,sp.shortName project 
         ,lai.archived archived 
+        ,l.creationDate inLabCreationDate
         ,l.created created 
         ,l.creator createdById 
         ,l.lastModified modified 
@@ -217,7 +219,7 @@ LEFT JOIN (
             AND lqc.type = maxPdacDates.type
         GROUP BY lqc.library_libraryId
         ) newestPdac ON newestPdac.library_libraryId = l.libraryId
-LEFT JOIN LibraryQC qubit ON qubit.qcId = newestQubit.qcId
+LEFT JOIN LibraryQC pdac ON pdac.qcId = newestPdac.qcId
 LEFT JOIN ( 
         SELECT library_libraryId 
                 ,sequence 
@@ -249,6 +251,7 @@ SELECT parent.alias name
         ,NULL tissueType 
         ,sp.shortName project 
         ,0 archived 
+        ,d.creationDate inLabCreationDate
         ,d.created created 
         ,NULL createdById 
         ,d.lastUpdated modified 
