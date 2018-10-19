@@ -2421,6 +2421,14 @@ public class Dtos {
             .map(p -> asDto(p, false, false))//
             .collect(Collectors.toList()));
     to.setOutOfService(from.isOutOfService());
+    if (to.isOutOfService()) {
+      Date date = from.getInstrument().getServiceRecords().stream()
+          .filter(sr -> sr.isOutOfService() && sr.getStartTime() != null && sr.getEndTime() == null)
+          .map(ServiceRecord::getStartTime)
+          .min(Date::compareTo)
+          .orElse(null);
+      to.setOutOfServiceTime(formatDateTime(date));
+    }
     return to;
   }
 

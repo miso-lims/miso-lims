@@ -7,6 +7,7 @@ public class InstrumentStatusDto {
   private List<PoolDto> pools;
   private RunDto run;
   private boolean outOfService;
+  private String outOfServiceTime;
 
   public InstrumentDto getInstrument() {
     return instrument;
@@ -38,6 +39,14 @@ public class InstrumentStatusDto {
 
   public void setOutOfService(boolean outOfService) {
     this.outOfService = outOfService;
+  }
+
+  public String getOutOfServiceTime() {
+    return outOfServiceTime;
+  }
+
+  public void setOutOfServiceTime(String outOfServiceTime) {
+    this.outOfServiceTime = outOfServiceTime;
   }
 
 }
