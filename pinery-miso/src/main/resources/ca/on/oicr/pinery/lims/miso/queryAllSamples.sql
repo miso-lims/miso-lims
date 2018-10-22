@@ -9,7 +9,7 @@ SELECT s.alias NAME
         ,tt.alias tissueType
         ,p.shortName project
         ,sai.archived archived
-        ,ds.creationDate inLabCreationDate
+        ,sai.creationDate inLabCreationDate
         ,s.created created
         ,s.creator createdById
         ,s.lastModified modified
@@ -55,6 +55,7 @@ SELECT s.alias NAME
         ,slide.discards discards
         ,stain.name stain
         ,lcm.slidesConsumed slides_consumed
+        ,NULL pdac
 FROM Sample s
 LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId 
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = sai.detailedQcStatusId 
@@ -183,6 +184,7 @@ SELECT l.alias NAME
         ,NULL discards
         ,NULL stain
         ,NULL slides_consumed
+        ,pdac.results pdac
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
@@ -297,6 +299,7 @@ SELECT parent.alias name
         ,NULL discards
         ,NULL stain
         ,NULL slides_consumed
+        ,NULL pdac
 FROM LibraryDilution d 
 JOIN Library parent ON parent.libraryId = d.library_libraryId 
 JOIN Sample s ON s.sampleId = parent.sample_sampleId
