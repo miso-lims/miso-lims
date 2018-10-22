@@ -57,13 +57,13 @@ import org.w3c.dom.NodeList;
  */
 public class TaxonomyUtils {
 
-  private static final String ncbiEntrezUtilsURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=";
+  private static final String NCBI_ENTREZ_UTILS_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=";
 
   private static final Map<String, String> taxonomyCache = new HashMap<>();
 
   public static String checkScientificNameAtNCBI(String scientificName) throws IOException {
     if (!taxonomyCache.containsKey(scientificName)) {
-      String query = ncbiEntrezUtilsURL + URLEncoder.encode(scientificName, "UTF-8");
+      String query = NCBI_ENTREZ_UTILS_URL + URLEncoder.encode(scientificName, "UTF-8");
       final HttpClient httpclient = HttpClientBuilder.create().build();
       HttpGet httpget = new HttpGet(query);
       HttpResponse response = httpclient.execute(httpget);

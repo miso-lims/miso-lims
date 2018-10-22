@@ -150,7 +150,7 @@ public class UploadController {
         uploadFile(Project.class, projectId, fileItem);
         File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         List<Sample> samples = FormUtils.importSampleDeliveryForm(f);
-        log.info("Importing samples from form: {}", samples.toString());
+        log.info("Importing samples from form: {}", samples);
         misoFormsService.importSampleDeliveryFormSamples(samples, taxonLookupEnabled);
       }
       return "redirect:/miso/project/" + projectId;
