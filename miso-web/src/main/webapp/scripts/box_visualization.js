@@ -172,9 +172,8 @@
 
       var tBody = jQuery('<tBody>');
       var tRow = jQuery('<tr>');
-      var emptyCornerCell = jQuery('<th>').text('#');
+      var emptyCornerCell = jQuery('<th>');
       emptyCornerCell.addClass('boxVisColHeader boxVisRowHeader');
-      emptyCornerCell.click(self.selectAll);
       tRow.append(emptyCornerCell);
 
       var makeColSelectEventData = function(col) {
@@ -248,7 +247,10 @@
           items.push(self.position[row][col]);
         }
       }
-      toggleGroupSelection(event, items);
+      items.forEach(function(item) {
+        self.select(item, true);
+      });
+      callSelectionChanged(self.selectedItems);
     };
 
     self.selectRow = function(event) {
