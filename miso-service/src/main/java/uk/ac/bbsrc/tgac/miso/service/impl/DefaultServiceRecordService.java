@@ -66,6 +66,7 @@ public class DefaultServiceRecordService implements ServiceRecordService {
     target.setReferenceNumber(source.getReferenceNumber());
     target.setServiceDate(source.getServiceDate());
     target.setStartTime(source.getStartTime());
+    target.setOutOfService(source.isOutOfService());
     target.setEndTime(source.getEndTime());
   }
 

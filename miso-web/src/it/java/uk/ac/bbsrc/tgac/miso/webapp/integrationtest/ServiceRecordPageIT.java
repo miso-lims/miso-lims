@@ -45,8 +45,9 @@ public class ServiceRecordPageIT extends AbstractIT {
     fields.put(Field.SERVICED_BY, "Technician");
     fields.put(Field.REFERENCE_NUMBER, "123456");
     fields.put(Field.SERVICE_DATE, "2017-09-01");
-    fields.put(Field.SHUTDOWN_TIME, "2017-08-31 16:00:00");
-    fields.put(Field.RESTORED_TIME, "2017-09-01 09:00:00");
+    fields.put(Field.START_TIME, "2017-08-31 16:00:00");
+    fields.put(Field.OUT_OF_SERVICE, "true");
+    fields.put(Field.END_TIME, "2017-09-01 09:00:00");
     page.setFields(fields);
 
     assertFieldValues("pre-save", fields, page);
@@ -75,8 +76,8 @@ public class ServiceRecordPageIT extends AbstractIT {
     fields.put(Field.SERVICED_BY, "technician1");
     fields.put(Field.REFERENCE_NUMBER, "12345");
     fields.put(Field.SERVICE_DATE, "2017-09-05");
-    fields.put(Field.SHUTDOWN_TIME, "2017-09-01 10:00:00");
-    fields.put(Field.RESTORED_TIME, "2017-09-05 10:00:00");
+    fields.put(Field.START_TIME, "2017-09-01 10:00:00");
+    fields.put(Field.END_TIME, "2017-09-05 10:00:00");
     assertFieldValues("initial values", fields, page1);
     
     Map<ServiceRecordPage.Field, String> changes = Maps.newLinkedHashMap();
@@ -85,8 +86,8 @@ public class ServiceRecordPageIT extends AbstractIT {
     changes.put(Field.SERVICED_BY, "new technician");
     changes.put(Field.REFERENCE_NUMBER, "54321");
     changes.put(Field.SERVICE_DATE, "2017-09-09");
-    changes.put(Field.SHUTDOWN_TIME, "2012-01-01 01:00:00");
-    changes.put(Field.RESTORED_TIME, "2017-12-12 23:59:59");
+    changes.put(Field.START_TIME, "2012-01-01 01:00:00");
+    changes.put(Field.END_TIME, "2017-12-12 23:59:59");
     page1.setFields(changes);
     
     fields.putAll(changes);
@@ -111,16 +112,18 @@ public class ServiceRecordPageIT extends AbstractIT {
     fields.put(Field.SERVICED_BY, null);
     fields.put(Field.REFERENCE_NUMBER, null);
     fields.put(Field.SERVICE_DATE, "2017-09-12");
-    fields.put(Field.SHUTDOWN_TIME, null);
-    fields.put(Field.RESTORED_TIME, null);
+    fields.put(Field.START_TIME, null);
+    fields.put(Field.OUT_OF_SERVICE, "false");
+    fields.put(Field.END_TIME, null);
     assertFieldValues("initial values", fields, page1);
 
     Map<ServiceRecordPage.Field, String> changes = Maps.newLinkedHashMap();
     changes.put(Field.DETAILS, "details");
     changes.put(Field.REFERENCE_NUMBER, "REFERENCE");
     changes.put(Field.SERVICED_BY, "person");
-    changes.put(Field.SHUTDOWN_TIME, "2017-09-10 09:10:00");
-    changes.put(Field.RESTORED_TIME, "2017-09-12 12:00:00");
+    changes.put(Field.START_TIME, "2017-09-10 09:10:00");
+    changes.put(Field.OUT_OF_SERVICE, "true");
+    changes.put(Field.END_TIME, "2017-09-12 12:00:00");
     page1.setFields(changes);
 
     fields.putAll(changes);
@@ -145,16 +148,18 @@ public class ServiceRecordPageIT extends AbstractIT {
     fields.put(Field.SERVICED_BY, "technitchin");
     fields.put(Field.REFERENCE_NUMBER, "Riffraff");
     fields.put(Field.SERVICE_DATE, "2017-09-12");
-    fields.put(Field.SHUTDOWN_TIME, "2017-09-11 11:00:00");
-    fields.put(Field.RESTORED_TIME, "2017-09-12 12:00:00");
+    fields.put(Field.START_TIME, "2017-09-11 11:00:00");
+    fields.put(Field.OUT_OF_SERVICE, "true");
+    fields.put(Field.END_TIME, "2017-09-12 12:00:00");
     assertFieldValues("initial values", fields, page1);
 
     Map<ServiceRecordPage.Field, String> changes = Maps.newLinkedHashMap();
     changes.put(Field.DETAILS, null);
     changes.put(Field.REFERENCE_NUMBER, null);
     changes.put(Field.SERVICED_BY, null);
-    changes.put(Field.SHUTDOWN_TIME, null);
-    changes.put(Field.RESTORED_TIME, null);
+    changes.put(Field.START_TIME, null);
+    changes.put(Field.OUT_OF_SERVICE, "false");
+    changes.put(Field.END_TIME, null);
     page1.setFields(changes);
 
     fields.putAll(changes);
@@ -172,7 +177,7 @@ public class ServiceRecordPageIT extends AbstractIT {
     assertAttribute(Field.TITLE, expectedValues, sr.getTitle());
     assertAttribute(Field.DETAILS, expectedValues, sr.getDetails());
     assertAttribute(Field.SERVICE_DATE, expectedValues, formatDate(sr.getServiceDate()));
-    assertAttribute(Field.SHUTDOWN_TIME, expectedValues, formatDateTime(sr.getStartTime()));
-    assertAttribute(Field.RESTORED_TIME, expectedValues, formatDateTime(sr.getEndTime()));
+    assertAttribute(Field.START_TIME, expectedValues, formatDateTime(sr.getStartTime()));
+    assertAttribute(Field.END_TIME, expectedValues, formatDateTime(sr.getEndTime()));
   }
 }
