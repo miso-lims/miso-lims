@@ -56,6 +56,7 @@ SELECT s.alias NAME
         ,stain.name stain
         ,lcm.slidesConsumed slides_consumed
         ,NULL pdac
+        ,sai.isSynthetic isSynthetic
 FROM Sample s
 LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId 
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = sai.detailedQcStatusId 
@@ -185,6 +186,7 @@ SELECT l.alias NAME
         ,NULL stain
         ,NULL slides_consumed
         ,pdac.results pdac
+        ,NULL isSynthetic
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
@@ -300,6 +302,7 @@ SELECT parent.alias name
         ,NULL stain
         ,NULL slides_consumed
         ,NULL pdac
+        ,NULL isSynthetic
 FROM LibraryDilution d 
 JOIN Library parent ON parent.libraryId = d.library_libraryId 
 JOIN Sample s ON s.sampleId = parent.sample_sampleId
