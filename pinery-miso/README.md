@@ -33,7 +33,7 @@ from these. Clients can then use the flatfile webapp instead, to reduce strain o
 
 2. Stop tomcat
 
-3. Configure database connection. Copy the [properties file](src/main/resources/miso.properties) to
+3. Configure database connection. Copy the [properties file](src/main/resources/pinery-miso.properties) to
    `${CATALINA_HOME}/conf/Catalina/localhost/` and modify it as appropriate. Since this is a
    read-only service, the database user only requires read access.
 
