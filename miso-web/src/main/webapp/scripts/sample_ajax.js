@@ -243,19 +243,6 @@ var Sample = Sample
         jQuery('#sample-form').parsley().validate();
 
         Validate.updateWarningOrSubmit('#sample-form');
-      },
-
-      validateNCBITaxon: function() {
-        Fluxion.doAjax('sampleControllerHelperService', 'lookupNCBIScientificName', {
-          'scientificName': jQuery('#scientificName').val(),
-          'url': ajaxurl
-        }, {
-          'doOnSuccess': jQuery('#scientificName').removeClass().addClass("ok"),
-          'doOnError': function(json) {
-            jQuery('#scientificName').removeClass().addClass("error");
-            alert(json.error);
-          }
-        });
       }
     };
 
