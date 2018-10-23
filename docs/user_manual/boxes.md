@@ -116,6 +116,7 @@ are not selected.
 To select an entire row or column, click on the row or column heading. To select multiple rows or columns,
 hold Ctrl (Windows, Linux) or Command (Mac) while you click on the target row or column headings.
 
+To select all positions, click the "Select All" button below the Contents diagram.
 To select all odd columns, click the "Select Odd Columns" button below the Contents diagram.
 To select all even columns, click the "Select Even Columns" button below the Contents diagram.
 

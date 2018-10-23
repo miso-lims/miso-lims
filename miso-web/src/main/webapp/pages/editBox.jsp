@@ -201,6 +201,7 @@
   <div style="float:left;margin:20px;">
     <div id="boxContentsTable" class="unselectable" style="margin-bottom:10px;"></div>
     <div>
+      <button class="ui-state-default" onclick="Box.visual.selectAll()">Select All</button>
       <button class="ui-state-default" onclick="Box.visual.selectOddColumns()">Select Odd Columns</button>
       <button class="ui-state-default" onclick="Box.visual.selectEvenColumns()">Select Even Columns</button>
     </div>
