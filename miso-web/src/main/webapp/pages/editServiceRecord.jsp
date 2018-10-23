@@ -122,20 +122,24 @@
           </td>
         </tr>
         <tr>
-          <td class="h">Instrument Shutdown Time:</td>
+          <td class="h">Issue Start Time:</td>
           <td>
-            <form:input path="shutdownTime" id="shutdownTime" placeholder="YYYY-MM-DD HH:mm"/>
+            <form:input path="startTime" id="startTime" placeholder="YYYY-MM-DD HH:mm"/>
             <script type="text/javascript">
-              Utils.ui.addDateTimePicker("shutdownTime");
+              Utils.ui.addDateTimePicker("startTime");
             </script>
           </td>
         </tr>
         <tr>
-          <td class="h">Instrument Restored Time:</td>
+          <td class="h">Instrument out of service?</td>
+          <td><form:checkbox id="outOfService" path="outOfService"/></td>
+        </tr>
+        <tr>
+          <td class="h">Issue End Time:</td>
           <td>
-            <form:input path="restoredTime" id="restoredTime" placeholder="YYYY-MM-DD HH:mm"/>
+            <form:input path="endTime" id="endTime" placeholder="YYYY-MM-DD HH:mm"/>
             <script type="text/javascript">
-              Utils.ui.addDateTimePicker("restoredTime");
+              Utils.ui.addDateTimePicker("endTime");
             </script>
           </td>
         </tr>

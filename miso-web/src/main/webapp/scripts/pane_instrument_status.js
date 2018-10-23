@@ -27,12 +27,26 @@ PaneTarget.instrument_status = (function() {
 
   var transform = function(data) {
     var isRunning = data.run && data.run.status === 'Running';
-    return Tile.make([
-      Tile.titleAndStatus(data.instrument.name, isRunning ? Tile.statusBusy() : Tile.statusOk()),
-      Tile.lines(data.run ? [
-        data.run.name + ' (' + data.run.alias + ')',
-        (isRunning ? ("Busy since " + data.run.startDate) : ("Idle since " + data.run.endDate))
-        + (data.run.progress ? (" " + data.run.progress) : "")] : ["Idle"], false)], function() {
+    var status = null;
+    var details = [];
+    if (data.run) {
+      details.push(data.run.name + ' (' + data.run.alias + ')');
+    }
+    if (isRunning) {
+      status = Tile.statusBusy();
+      details.push("Busy since " + data.run.startDate + (data.run.progress ? (" " + data.run.progress) : ""));
+    } else if (data.outOfService) {
+      status = Tile.statusBad();
+      details.push("Out of service since " + data.outOfServiceTime);
+    } else {
+      status = Tile.statusOk();
+      if (data.run) {
+        details.push("Idle since " + data.run.endDate);
+      } else {
+        details.push("Idle");
+      }
+    }
+    return Tile.make([Tile.titleAndStatus(data.instrument.name, status), Tile.lines(details)], function() {
       Utils.showWizardDialog(data.instrument.name, [{
         "name": "View Instrument (" + data.instrument.name + ")",
         "handler": function() {

@@ -52,10 +52,12 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
   private Date serviceDate;
 
   @Temporal(TemporalType.TIMESTAMP)
-  private Date shutdownTime;
+  private Date startTime;
 
   @Temporal(TemporalType.TIMESTAMP)
-  private Date restoredTime;
+  private Date endTime;
+
+  private boolean outOfService = true;
 
   @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
   @JoinTable(name = "ServiceRecord_Attachment", joinColumns = { @JoinColumn(name = "recordId") }, inverseJoinColumns = {
@@ -120,20 +122,28 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
     return serviceDate;
   }
 
-  public void setShutdownTime(Date date) {
-    this.shutdownTime = date;
+  public void setStartTime(Date date) {
+    this.startTime = date;
   }
 
-  public Date getShutdownTime() {
-    return shutdownTime;
+  public Date getStartTime() {
+    return startTime;
   }
 
-  public void setRestoredTime(Date date) {
-    this.restoredTime = date;
+  public void setEndTime(Date date) {
+    this.endTime = date;
   }
 
-  public Date getRestoredTime() {
-    return restoredTime;
+  public Date getEndTime() {
+    return endTime;
+  }
+
+  public void setOutOfService(boolean outOfService) {
+    this.outOfService = outOfService;
+  }
+
+  public boolean isOutOfService() {
+    return this.outOfService;
   }
 
   @Override

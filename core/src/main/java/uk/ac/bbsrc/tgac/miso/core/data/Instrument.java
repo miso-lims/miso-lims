@@ -109,4 +109,6 @@ public interface Instrument extends Nameable, Serializable {
 
   public void setServiceRecords(Set<ServiceRecord> serviceRecords);
 
+  public boolean isOutOfService();
+
 }
