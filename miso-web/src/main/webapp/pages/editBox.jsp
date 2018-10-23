@@ -201,6 +201,7 @@
   <div style="float:left;margin:20px;">
     <div id="boxContentsTable" class="unselectable" style="margin-bottom:10px;"></div>
     <div>
+      <button class="ui-state-default" onclick="Box.visual.selectAll()">Select All</button>
       <button class="ui-state-default" onclick="Box.visual.selectOddColumns()">Select Odd Columns</button>
       <button class="ui-state-default" onclick="Box.visual.selectEvenColumns()">Select Even Columns</button>
     </div>
@@ -244,7 +245,10 @@
     </table>
     <p class="warning" id="warningMessages"></p>
   </div>
-  <div id="bulkPositionControls" style="float:left;padding:20px;">
+  <div id="bulkPositionControls" style="float:left; padding:10px; margin:20px; border:1px solid darkgrey; max-height:340px; overflow-y:scroll;">
+    <button class="ui-state-default" onclick="Box.ui.bulkRemoveItems();">Remove Selected</button>
+    <button class="ui-state-default" onclick="Box.ui.bulkDiscardItems();">Discard Selected</button>
+    <br/><br/>
     <table id="bulkUpdateTable">
       <thead>
         <tr>

@@ -9,6 +9,7 @@ SELECT s.alias NAME
         ,tt.alias tissueType
         ,p.shortName project
         ,sai.archived archived
+        ,sai.creationDate inLabCreationDate
         ,s.created created
         ,s.creator createdById
         ,s.lastModified modified
@@ -54,6 +55,8 @@ SELECT s.alias NAME
         ,slide.discards discards
         ,stain.name stain
         ,lcm.slidesConsumed slides_consumed
+        ,NULL pdac
+        ,sai.isSynthetic isSynthetic
 FROM Sample s
 LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId 
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = sai.detailedQcStatusId 
@@ -136,6 +139,7 @@ SELECT l.alias NAME
         ,NULL tissueType 
         ,sp.shortName project 
         ,lai.archived archived 
+        ,l.creationDate inLabCreationDate
         ,l.created created 
         ,l.creator createdById 
         ,l.lastModified modified 
@@ -181,6 +185,8 @@ SELECT l.alias NAME
         ,NULL discards
         ,NULL stain
         ,NULL slides_consumed
+        ,pdac.results pdac
+        ,NULL isSynthetic
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
@@ -203,6 +209,21 @@ LEFT JOIN (
         GROUP BY lqc.library_libraryId
         ) newestQubit ON newestQubit.library_libraryId = l.libraryId
 LEFT JOIN LibraryQC qubit ON qubit.qcId = newestQubit.qcId
+LEFT JOIN (
+        SELECT lqc.library_libraryId, MAX(lqc.qcId) AS qcId
+        FROM (
+            SELECT library_libraryId, type, MAX(date) AS maxDate
+            FROM LibraryQC
+            JOIN QCType ON QCType.qcTypeId = LibraryQC.type
+            WHERE QCType.name = 'PDAC Confirmed'
+            GROUP By library_libraryId, type
+            ) maxPdacDates
+        JOIN LibraryQC lqc ON lqc.library_libraryId = maxPdacDates.library_libraryId
+            AND lqc.date = maxPdacDates.maxDate
+            AND lqc.type = maxPdacDates.type
+        GROUP BY lqc.library_libraryId
+        ) newestPdac ON newestPdac.library_libraryId = l.libraryId
+LEFT JOIN LibraryQC pdac ON pdac.qcId = newestPdac.qcId
 LEFT JOIN ( 
         SELECT library_libraryId 
                 ,sequence 
@@ -234,6 +255,7 @@ SELECT parent.alias name
         ,NULL tissueType 
         ,sp.shortName project 
         ,0 archived 
+        ,d.creationDate inLabCreationDate
         ,d.created created 
         ,NULL createdById 
         ,d.lastUpdated modified 
@@ -279,6 +301,8 @@ SELECT parent.alias name
         ,NULL discards
         ,NULL stain
         ,NULL slides_consumed
+        ,NULL pdac
+        ,NULL isSynthetic
 FROM LibraryDilution d 
 JOIN Library parent ON parent.libraryId = d.library_libraryId 
 JOIN Sample s ON s.sampleId = parent.sample_sampleId

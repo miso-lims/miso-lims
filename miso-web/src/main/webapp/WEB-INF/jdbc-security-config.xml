@@ -34,7 +34,6 @@
   <security:global-method-security secured-annotations="enabled" />
 
   <!-- don't want to have a SS filter here as the userless REST auth should have taken care of that -->
-  <security:http pattern="/miso/consumer/**" security="none" />
   <security:http pattern="/miso/rest/**" security="none" />
 
   <security:http pattern="/styles/**" security="none" /><!-- filters="none"/> -->
@@ -57,9 +56,6 @@
     <security:intercept-url pattern="/miso/fluxion.ajax" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
     <security:intercept-url pattern="/miso/admin/**" access="hasRole('ROLE_ADMIN')" />
     <security:intercept-url pattern="/miso/tech/**" access="hasRole('ROLE_TECH')" />
-    <security:intercept-url pattern="/miso/activity/**" access="hasRole('ROLE_INTERNAL')" />
-    <security:intercept-url pattern="/miso/protocols/**/results" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
-    <security:intercept-url pattern="/miso/external/**" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
     <security:intercept-url pattern="/miso/mainMenu" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
 
     <security:intercept-url pattern="/miso/**" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />

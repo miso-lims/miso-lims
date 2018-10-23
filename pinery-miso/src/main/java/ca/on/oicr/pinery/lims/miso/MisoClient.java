@@ -808,6 +808,26 @@ public class MisoClient implements Lims {
       SOURCE_TEMPLATE_TYPE("library_design_code", "Source Template Type"),
       SUBPROJECT("subproject", "Sub-project"),
       INSTITUTE("institute", "Institute"),
+      CREATION_DATE("inLabCreationDate", "In-lab Creation Date"),
+      PDAC_CONFIRMED("pdac", "PDAC Confirmed") {
+        @Override
+        public String extractStringValueFrom(ResultSet rs) throws SQLException {
+          int pdacConfirmed = rs.getInt("pdac");
+          if (!rs.wasNull()) {
+            if (pdacConfirmed == 1) return "True";
+            if (pdacConfirmed == 0) return "False";
+          }
+          return null;
+        }
+      },
+      SYNTHETIC("isSynthetic", "Synthetic") {
+        @Override
+        public String extractStringValueFrom(ResultSet rs) throws SQLException {
+          boolean isSynthetic = rs.getBoolean("isSynthetic");
+          if (!rs.wasNull() && isSynthetic) return "True";
+          return null;
+        }
+      },
       STAIN("stain", "Stain"),
       SLIDES("slides", "Slides"),
       DISCARDS("discards", "Discards"),

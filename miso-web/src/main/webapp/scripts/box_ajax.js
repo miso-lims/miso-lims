@@ -372,6 +372,35 @@ Box.ui = {
     var table = jQuery('#listingBoxesTable').dataTable();
     table.fnFilter(alias, 5);
   },
+  
+  bulkRemoveItems: function() {
+    Utils.showConfirmDialog('Remove Items', 'Remove', ['Are you sure you wish to set location to unknown for all selected items? You should '
+      + 're-home them as soon as possible.'], function() {
+      var positions = Box.ui.getSelectedPositions();
+      var url = '/miso/rest/box/' + Box.boxJSON.id + '/bulk-remove';
+      Utils.ajaxWithDialog('Remove Items', 'POST', url, positions, function(responseData) {
+        Box.boxJSON = responseData;
+        Box.ui.update();
+      });
+    });
+  },
+  
+  bulkDiscardItems: function() {
+    Utils.showConfirmDialog('Discard Items', 'Discard', ['Are you sure you wish to set discard all selected items?'], function() {
+      var positions = Box.ui.getSelectedPositions();
+      var url = '/miso/rest/box/' + Box.boxJSON.id + '/bulk-discard';
+      Utils.ajaxWithDialog('Discard Items', 'POST', url, positions, function(responseData) {
+        Box.boxJSON = responseData;
+        Box.ui.update();
+      });
+    });
+  },
+  
+  getSelectedPositions: function() {
+    return jQuery.map(jQuery('#bulkUpdateTable tbody input'), function(input) {
+      return jQuery(input).data('position');
+    });
+  },
 
   bulkUpdatePositions: function() {
     var data = [];
@@ -435,8 +464,14 @@ Box.ui = {
             }).css("width", "100%");
     jQuery("#toolbar")
         .append(
-            '<button style=\"margin-left:5px;\" class=\"fg-button ui-state-default ui-corner-all\" id="listAllItems" onclick="Box.ui.filterTableByBoxPositions();">List all Box Contents</button>');
+            '<button style=\"margin-left:5px;\" class=\"fg-button ui-state-default ui-corner-all\" id="listAllItems" onclick="Box.ui.selectNone();">List all Box Contents</button>');
     Box.ui.getBulkActions();
+  },
+  
+  selectNone: function() {
+    Box.visual.clearSelection();
+    Box.ui.filterTableByBoxPositions();
+    Box.ui.onSelectionChanged([]);
   },
 
   filterTableByBoxPositions: function(positionStrings) {

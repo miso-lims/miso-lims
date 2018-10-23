@@ -68,6 +68,8 @@
       </div>
       
       <h2>Instrument Information</h2>
+      
+      <c:if test="${instrument.isOutOfService()}"><p class="big-warning">Out of Service</p></c:if>
 
       <table class="in">
         <tr>
@@ -155,7 +157,7 @@
                 <label><input type="radio" name="status" value="upgraded" onchange="Instrument.ui.showStatusRows();" <c:if test="${instrument.dateDecommissioned != null && instrument.upgradedInstrument != null}">checked</c:if>/> Upgraded</label>
               </c:when>
               <c:otherwise>
-                <span name="status">
+                <span id="status">
                 <c:choose>
                   <c:when test="${instrument.dateDecommissioned == null}">Production</c:when>
                   <c:when test="${instrument.dateDecommissioned != null && instrument.upgradedInstrument == null}">Retired</c:when>

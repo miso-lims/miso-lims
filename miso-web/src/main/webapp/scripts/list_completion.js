@@ -156,7 +156,7 @@ ListTarget.completion = {
       "include": true,
       "mRender": function(data, type, full) {
         if (type === 'display') {
-          return (data - full.loaded) + (full.loaded ? '*' : '');
+          return Math.max(0, data - full.loaded) + (full.loaded ? '*' : '');
         }
         return data;
       }

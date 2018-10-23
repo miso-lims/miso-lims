@@ -173,8 +173,7 @@
       var tBody = jQuery('<tBody>');
       var tRow = jQuery('<tr>');
       var emptyCornerCell = jQuery('<th>');
-      emptyCornerCell.css('width', '30px');
-      emptyCornerCell.css('height', '30px');
+      emptyCornerCell.addClass('boxVisColHeader boxVisRowHeader');
       tRow.append(emptyCornerCell);
 
       var makeColSelectEventData = function(col) {
@@ -235,6 +234,22 @@
           self.unselect(items[i], true);
         }
       }
+      callSelectionChanged(self.selectedItems);
+    };
+    
+    self.selectAll = function(event) {
+      if (!self.isMultiSelectEnabled()) {
+        return;
+      }
+      var items = [];
+      for (var row = 1; row <= self.size.rows; row++) {
+        for (var col = 1; col <= self.size.cols; col++) {
+          items.push(self.position[row][col]);
+        }
+      }
+      items.forEach(function(item) {
+        self.select(item, true);
+      });
       callSelectionChanged(self.selectedItems);
     };
 

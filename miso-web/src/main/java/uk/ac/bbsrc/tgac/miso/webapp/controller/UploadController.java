@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -89,6 +90,9 @@ public class UploadController {
   @Autowired
   private QualityControlService qcService;
 
+  @Value("${miso.taxonLookup.enabled:false}")
+  private boolean taxonLookupEnabled;
+
   public void setTagBarcodeService(IndexService tagBarcodeService) {
     this.tagBarcodeService = tagBarcodeService;
   }
@@ -125,7 +129,7 @@ public class UploadController {
     File dir = new File(
         filesManager.getFileStorageDirectory() + File.separator + type.getSimpleName().toLowerCase() + File.separator + qualifier);
     if (LimsUtils.checkDirectory(dir, true)) {
-      log.info("Attempting to store " + dir.toString() + File.separator + fileItem.getOriginalFilename());
+      log.info("Attempting to store {}", dir.toString() + File.separator + fileItem.getOriginalFilename());
       fileItem.transferTo(new File(dir + File.separator + fileItem.getOriginalFilename().replaceAll("\\s", "_")));
     } else {
       throw new IOException("Cannot upload file - check that the directory specified in miso.properties exists and is writable");
@@ -141,15 +145,13 @@ public class UploadController {
       throw new IOException("Cannot upload file - project does not exist");
     }
 
-    boolean taxonCheck = (Boolean) request.getSession().getServletContext().getAttribute("taxonLookupEnabled");
-
     try {
       for (MultipartFile fileItem : getMultipartFiles(request)) {
         uploadFile(Project.class, projectId, fileItem);
         File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         List<Sample> samples = FormUtils.importSampleDeliveryForm(f);
-        log.info("Importing samples from form: " + samples.toString());
-        misoFormsService.importSampleDeliveryFormSamples(samples, taxonCheck);
+        log.info("Importing samples from form: {}", samples);
+        misoFormsService.importSampleDeliveryFormSamples(samples, taxonLookupEnabled);
       }
       return "redirect:/miso/project/" + projectId;
     } catch (Exception e) {
