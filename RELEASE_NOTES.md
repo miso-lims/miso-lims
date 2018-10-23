@@ -1,3 +1,18 @@
+# 0.2.148
+
+Changes:
+
+ * track instruments out of service based on service records
+ * added select all control for box diagram
+ * limited height of bulk selection controls on box page
+ * added controls to bulk remove and discard box items
+ * deselect items in box diagram when listing all contents
+ * fix taxon lookup for bulk sample table
+ * added creation date, isSynthetic, and PDAC attributes to Pinery-MISO samples
+ * added Library Dilutions section of user manual
+ * added Orders section of user manual
+ * removed broken and unused pages
+
 # 0.2.147
 
 Changes:
