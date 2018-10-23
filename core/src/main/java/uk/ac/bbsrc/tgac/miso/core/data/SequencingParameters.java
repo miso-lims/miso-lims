@@ -21,6 +21,8 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
+import ca.on.oicr.gsi.runscanner.rs.dto.type.IlluminaChemistry;
+
 @Entity
 @Table(name = "SequencingParameters")
 

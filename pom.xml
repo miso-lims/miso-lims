@@ -122,7 +122,6 @@
     <module>miso-service</module>
     <module>sqlstore</module>
     <module>miso-dto</module>
-    <module>runscanner</module>
     <module>miso-external-web</module>
     <module>pinery-miso</module>
   </modules>
@@ -171,6 +170,11 @@
   </properties>
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>ca.on.oicr.gsi.runscanner</groupId>
+        <artifactId>runscanner</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+      </dependency>
       <dependency>
         <groupId>org.kohsuke.metainf-services</groupId>
         <artifactId>metainf-services</artifactId>
@@ -657,9 +661,14 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-        <artifactId>runscanner</artifactId>
-        <version>${project.version}</version>
+       <groupId>ca.on.oicr.gsi.runscanner</groupId>
+        <artifactId>scanner</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>ca.on.oicr.gsi.runscanner</groupId>
+        <artifactId>rs-dto</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>uk.ac.bbsrc.tgac.miso</groupId>

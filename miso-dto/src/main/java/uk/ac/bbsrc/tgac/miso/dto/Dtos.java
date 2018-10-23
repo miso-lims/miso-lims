@@ -179,6 +179,11 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
+import ca.on.oicr.gsi.runscanner.rs.dto.IlluminaNotificationDto;
+import ca.on.oicr.gsi.runscanner.rs.dto.LS454NotificationDto;
+import ca.on.oicr.gsi.runscanner.rs.dto.NotificationDto;
+import ca.on.oicr.gsi.runscanner.rs.dto.SolidNotificationDto;
+
 @SuppressWarnings("squid:S3776") // make Sonar ignore cognitive complexity warnings for this file
 public class Dtos {
 
@@ -1911,7 +1916,7 @@ public class Dtos {
   }
 
   public static Run to(NotificationDto from, User user) {
-    final Run to = from.getPlatformType().createRun(user);
+    final Run to = PlatformType.fromRunscanner(from.getPlatformType()).createRun(user);
     setCommonRunValues(from, to);
 
     switch (to.getPlatformType()) {
@@ -1945,7 +1950,7 @@ public class Dtos {
   private static void setCommonRunValues(NotificationDto from, Run to) {
     to.setAlias(from.getRunAlias());
     to.setFilePath(from.getSequencerFolderPath());
-    to.setHealth(from.getHealthType());
+    to.setHealth(HealthType.fromRunscanner(from.getHealthType()));
     to.setStartDate(LimsUtils.toBadDate(from.getStartDate()));
     to.setCompletionDate(LimsUtils.toBadDate(from.getCompletionDate()));
     to.setMetrics(from.getMetrics());

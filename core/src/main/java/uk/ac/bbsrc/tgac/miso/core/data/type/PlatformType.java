@@ -188,4 +188,27 @@ public enum PlatformType {
     return pluralPartitionName;
   }
 
+  /**
+   * Converts between runscanner's Platform and miso's PlatformType.
+   * 
+   * @param rsplatform runscanner's Platform
+   * @return equivalent PlatformType
+   */
+  public static PlatformType fromRunscanner(ca.on.oicr.gsi.runscanner.rs.dto.type.Platform rsplatform) {
+    switch (rsplatform) {
+    case ILLUMINA:
+      return ILLUMINA;
+    case IONTORRENT:
+      return IONTORRENT;
+    case LS454:
+      return LS454;
+    case OXFORDNANOPORE:
+      return OXFORDNANOPORE;
+    case PACBIO:
+      return PACBIO;
+    case SOLID:
+      return SOLID;
+    }
+    return null;
+  }
 }

@@ -35,6 +35,10 @@
   <packaging>jar</packaging>
   <name>MISO Core</name>
   <dependencies>
+  	<dependency>
+  		<groupId>ca.on.oicr.gsi.runscanner</groupId>
+  		<artifactId>rs-dto</artifactId>
+  	</dependency>
     <dependency>
       <groupId>ca.on.oicr.gsi</groupId>
       <artifactId>oscore</artifactId>

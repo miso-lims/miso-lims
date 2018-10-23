@@ -1,16 +1,27 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
+
+import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+
+import ca.on.oicr.gsi.runscanner.rs.dto.IlluminaNotificationDto;
+import ca.on.oicr.gsi.runscanner.rs.dto.NotificationDto;
+import ca.on.oicr.gsi.runscanner.rs.dto.PacBioNotificationDto;
+import ca.on.oicr.gsi.runscanner.rs.dto.type.HealthType;
 
 public class DtosTest {
 
@@ -129,6 +140,56 @@ public class DtosTest {
     assertTrue(LimsUtils.isIdentitySample(tissue.getParent()));
     SampleIdentity identity = (SampleIdentity) tissue.getParent();
     assertEquals("externalName", identity.getExternalName());
+  }
+
+  // TODO: Can the code repetition be reduced here?
+  @Test
+  public void testConvertToUtilDate_Illumina() throws ParseException {
+    NotificationDto dto = fullyPopulatedIlluminaNotificationDto("RUN_B");
+    Run run = Dtos.to(dto, null);
+    assertThat(dto.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE), is(LimsUtils.formatDate(run.getStartDate())));
+  }
+
+  @Test
+  public void testConvertToUtilDate_PacBio() throws ParseException {
+    NotificationDto dto = fullyPopulatedPacBioNotificationDto("RUN_B");
+    Run run = Dtos.to(dto, null);
+    assertThat(dto.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE), is(LimsUtils.formatDate(run.getStartDate())));
+  }
+
+  static IlluminaNotificationDto fullyPopulatedIlluminaNotificationDto(String sequencerName) {
+    IlluminaNotificationDto notificationDto = new IlluminaNotificationDto();
+    notificationDto.setRunAlias("TEST_RUN_NAME");
+    notificationDto.setSequencerFolderPath("/sequencers/TEST_RUN_FOLDER");
+    notificationDto.setContainerSerialNumber("CONTAINER_ID");
+    notificationDto.setSequencerName(sequencerName);
+    notificationDto.setLaneCount(8);
+    notificationDto.setHealthType(HealthType.RUNNING);
+    notificationDto.setStartDate(LocalDateTime.of(2017, 2, 23, 0, 0));
+    notificationDto.setCompletionDate(LocalDateTime.of(2017, 2, 27, 0, 0));
+    notificationDto.setPairedEndRun(true);
+    notificationDto.setSoftware("Fido Opus SEAdog Standard Interface Layer");
+    notificationDto.setRunBasesMask("y151,I8,y151");
+    notificationDto.setNumCycles(20);
+    notificationDto.setImgCycle(19);
+    notificationDto.setScoreCycle(18);
+    notificationDto.setCallCycle(17);
+    return notificationDto;
+  }
+
+  static PacBioNotificationDto fullyPopulatedPacBioNotificationDto(String sequencerName) {
+    PacBioNotificationDto notificationDto = new PacBioNotificationDto();
+    notificationDto.setRunAlias("TEST_RUN_NAME");
+    notificationDto.setSequencerFolderPath("/sequencers/TEST_RUN_FOLDER");
+    notificationDto.setContainerSerialNumber("CONTAINER_ID");
+    notificationDto.setSequencerName(sequencerName);
+    notificationDto.setLaneCount(8);
+    notificationDto.setHealthType(HealthType.RUNNING);
+    notificationDto.setStartDate(LocalDateTime.of(2017, 2, 23, 0, 0));
+    notificationDto.setCompletionDate(LocalDateTime.of(2017, 2, 27, 0, 0));
+    notificationDto.setPairedEndRun(true);
+    notificationDto.setSoftware("Fido Opus SEAdog Standard Interface Layer");
+    return notificationDto;
   }
 
 }
