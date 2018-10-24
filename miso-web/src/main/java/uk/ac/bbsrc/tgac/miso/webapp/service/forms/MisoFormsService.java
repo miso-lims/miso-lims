@@ -38,7 +38,6 @@ import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
-import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 /**
@@ -54,13 +53,7 @@ public class MisoFormsService {
   private static final Logger log = LoggerFactory.getLogger(MisoFormsService.class);
 
   @Autowired
-  private ProjectService projectService;
-  @Autowired
   private SampleService sampleService;
-
-  public void setProjectService(ProjectService projectService) {
-    this.projectService = projectService;
-  }
 
   public void setSampleService(SampleService sampleService) {
     this.sampleService = sampleService;

@@ -2091,6 +2091,17 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setPlatform(asDto(from.getPlatform()));
     dto.setSerialNumber(from.getSerialNumber());
+    if (from.getDateDecommissioned() == null) {
+      if (from.isOutOfService()) {
+        dto.setStatus("Out of Service");
+      } else {
+        dto.setStatus("Production");
+      }
+    } else if (from.getUpgradedInstrument() != null) {
+      dto.setStatus("Upgraded");
+    } else {
+      dto.setStatus("Retired");
+    }
     return dto;
   }
 
@@ -2414,6 +2425,15 @@ public class Dtos {
             .sorted((a, b) -> a.getAlias().compareTo(b.getAlias()))//
             .map(p -> asDto(p, false, false))//
             .collect(Collectors.toList()));
+    to.setOutOfService(from.isOutOfService());
+    if (to.isOutOfService()) {
+      Date date = from.getInstrument().getServiceRecords().stream()
+          .filter(sr -> sr.isOutOfService() && sr.getStartTime() != null && sr.getEndTime() == null)
+          .map(ServiceRecord::getStartTime)
+          .min(Date::compareTo)
+          .orElse(null);
+      to.setOutOfServiceTime(formatDateTime(date));
+    }
     return to;
   }
 

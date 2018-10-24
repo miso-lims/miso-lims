@@ -18,8 +18,9 @@ public class ServiceRecordPage extends FormPage<ServiceRecordPage.Field> {
     SERVICED_BY(By.id("servicedByName"), FieldType.TEXT), //
     REFERENCE_NUMBER(By.id("referenceNumber"), FieldType.TEXT), //
     SERVICE_DATE(By.id("serviceDatePicker"), FieldType.DATEPICKER), //
-    SHUTDOWN_TIME(By.id("shutdownTime"), FieldType.DATEPICKER), //
-    RESTORED_TIME(By.id("restoredTime"), FieldType.DATEPICKER);
+    START_TIME(By.id("startTime"), FieldType.DATEPICKER), //
+    OUT_OF_SERVICE(By.id("outOfService"), FieldType.CHECKBOX), //
+    END_TIME(By.id("endTime"), FieldType.DATEPICKER);
 
     private final By selector;
     private final FieldType type;

@@ -101,9 +101,6 @@ public class MisoAppListener implements ServletContextListener {
     context.getServletContext().setAttribute("miso.baseDirectory", baseStoragePath);
     String fileStoragePath = misoProperties.get("miso.fileStorageDirectory");
 
-    String taxonLookupEnabled = misoProperties.get("miso.taxonLookup.enabled");
-    context.getServletContext().setAttribute("taxonLookupEnabled", Boolean.parseBoolean(taxonLookupEnabled));
-
     Map<String, String> dirchecks = MisoWebUtils.checkStorageDirectories(baseStoragePath, fileStoragePath);
     if (dirchecks.keySet().contains("error")) {
       throw new IllegalStateException(dirchecks.get("error"));
@@ -155,7 +152,7 @@ public class MisoAppListener implements ServletContextListener {
     NamingScheme scheme = resolver.getNamingScheme(currentPropertyValue);
     if (scheme == null) throw new IllegalArgumentException("Failed to load naming scheme '" + currentPropertyValue + "'");
     SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(scheme);
-    log.info("Replacing default namingScheme with " + scheme.getClass().getSimpleName());
+    log.info("Replacing default namingScheme with {}", scheme.getClass().getSimpleName());
     schemeHolder.setActualNamingScheme(scheme);
 
     applyGenerator("miso.naming.generator.nameable.name", misoProperties, resolver::getNameGenerator, scheme::setNameGenerator);
@@ -217,6 +214,6 @@ public class MisoAppListener implements ServletContextListener {
    */
   @Override
   public void contextDestroyed(ServletContextEvent event) {
-    log.info("MISO Application Context Destroyed: " + new Date());
+    log.info("MISO Application Context Destroyed: {}", new Date());
   }
 }

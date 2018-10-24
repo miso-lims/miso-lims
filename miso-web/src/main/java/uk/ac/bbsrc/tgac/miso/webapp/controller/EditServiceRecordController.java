@@ -159,8 +159,8 @@ public class EditServiceRecordController {
   
   @InitBinder
   public void initBinder(WebDataBinder binder) {
-    binder.registerCustomEditor(Date.class, "shutdownTime", timestampEditor);
-    binder.registerCustomEditor(Date.class, "restoredTime", timestampEditor);
+    binder.registerCustomEditor(Date.class, "startTime", timestampEditor);
+    binder.registerCustomEditor(Date.class, "endTime", timestampEditor);
   }
 
 }
