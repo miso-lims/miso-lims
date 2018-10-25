@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
+
 import ca.on.oicr.gsi.visionmate.RackType;
 import ca.on.oicr.gsi.visionmate.RackType.Manufacturer;
 import ca.on.oicr.gsi.visionmate.Scan;
@@ -23,11 +24,11 @@ import ca.on.oicr.gsi.visionmate.VisionMateClient;
  */
 public class VisionMateScanner implements BoxScanner {
   
-  private static final int defaultCommunicationTimeout = 10000; // 10 sec
-  private static final int maxCommunicationTimeout = 60000; // 1 min
+  private static final int defaultCommunicationTimeout = 10_000; // 10 sec
+  private static final int maxCommunicationTimeout = 60_000; // 1 min
   
-  private static final int defaultScanTimeout = 15000; // 15 sec
-  private static final int maxScanTimeout = 300000; // 5 min
+  private static final int defaultScanTimeout = 30_000; // 30 sec
+  private static final int maxScanTimeout = 300_000; // 5 min
   
   private final VisionMateClient client;
   private final int scanTimeout;

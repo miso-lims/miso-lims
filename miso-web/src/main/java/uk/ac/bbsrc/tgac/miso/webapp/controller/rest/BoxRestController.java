@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -729,6 +730,12 @@ public class BoxRestController extends RestController {
       BoxPosition bp = new BoxPosition(box, entry.getKey(), entry.getValue().getId());
       box.getBoxPositions().put(entry.getKey(), bp);
     }
+    Iterator<String> posIterator = box.getBoxPositions().keySet().iterator();
+    posIterator.forEachRemaining(pos -> {
+      if (!updates.containsKey(pos)) {
+        posIterator.remove();
+      }
+    });
 
     validation.throwIfInvalid();
     boxService.save(box);
