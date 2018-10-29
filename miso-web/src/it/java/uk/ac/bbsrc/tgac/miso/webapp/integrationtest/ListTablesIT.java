@@ -193,10 +193,11 @@ public class ListTablesIT extends AbstractIT {
     // Goal: ensure all expected columns are present and no extra
     ListPage page = ListPage.getListPage(getDriver(), getBaseUrl(), "tools/indexdistance");
     DataTable table = page.getTable();
+    Set<String> expected = indicesColumns;
+    expected.add(Columns.SORT); // Checkbox column
+    expected.add(Columns.PLATFORM); // Platform column
     List<String> headings = table.getColumnHeadings();
-    headings.add(Columns.SORT); // Checkbox column
-    headings.add(Columns.PLATFORM); // Platform column
-    assertEquals("number of columns", indicesColumns.size(), headings.size());
+    assertEquals("number of columns", expected.size(), headings.size());
     for (String col : indicesColumns) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
