@@ -5,8 +5,6 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,8 +19,6 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
-import ca.on.oicr.gsi.runscanner.rs.dto.type.IlluminaChemistry;
-
 @Entity
 @Table(name = "SequencingParameters")
 
@@ -30,9 +26,6 @@ public class SequencingParameters implements Serializable
 {
 
   private static final long serialVersionUID = 1L;
-
-  @Enumerated(EnumType.STRING)
-  private IlluminaChemistry chemistry;
 
   @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "createdBy", nullable = false)
@@ -63,10 +56,6 @@ public class SequencingParameters implements Serializable
   @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "updatedBy", nullable = false)
   private User updatedBy;
-
-  public IlluminaChemistry getChemistry() {
-    return chemistry;
-  }
 
   public User getCreatedBy() {
     return createdBy;
@@ -103,10 +92,6 @@ public class SequencingParameters implements Serializable
 
   public boolean isPaired() {
     return paired;
-  }
-
-  public void setChemistry(IlluminaChemistry chemistry) {
-    this.chemistry = chemistry;
   }
 
   public void setCreatedBy(User createdBy) {
