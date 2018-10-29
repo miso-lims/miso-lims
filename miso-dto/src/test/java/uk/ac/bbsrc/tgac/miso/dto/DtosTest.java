@@ -142,7 +142,6 @@ public class DtosTest {
     assertEquals("externalName", identity.getExternalName());
   }
 
-  // TODO: Can the code repetition be reduced here?
   @Test
   public void testConvertToUtilDate_Illumina() throws ParseException {
     NotificationDto dto = fullyPopulatedIlluminaNotificationDto("RUN_B");
