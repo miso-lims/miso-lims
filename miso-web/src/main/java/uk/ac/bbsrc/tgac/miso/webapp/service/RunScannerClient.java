@@ -104,11 +104,11 @@ public class RunScannerClient {
             isMatchingSequencingParameters = params -> params.getPlatform().getPlatformType() == PlatformType.ILLUMINA &&
                 Math.abs(params.getReadLength() - ((IlluminaNotificationDto) dto).getReadLength()) < 2
                 && params.isPaired() == ((IlluminaNotificationDto) dto).isPairedEndRun()
-                && params.getChemistry() == ((IlluminaNotificationDto) dto).getChemistry();
+                && params.getChemistry() == Dtos.getMisoIlluminaChemistryFromRunscanner(((IlluminaNotificationDto) dto).getChemistry());
             break;
           default:
-            isMatchingSequencingParameters = params -> params.getPlatform().getPlatformType() == PlatformType
-                .fromRunscanner(dto.getPlatformType());
+            isMatchingSequencingParameters = params -> params.getPlatform()
+                .getPlatformType() == Dtos.getMisoPlatformTypeFromRunscanner(dto.getPlatformType());
             break;
           }
 
@@ -167,5 +167,4 @@ public class RunScannerClient {
     WHITESPACE.splitAsStream(urls).map(url -> !url.isEmpty() && !servers.containsKey(url))
         .forEach(url -> servers.put(urls, new ProgressiveRequestDto()));
   }
-
 }
