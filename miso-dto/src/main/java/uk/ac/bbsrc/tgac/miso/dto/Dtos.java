@@ -180,10 +180,10 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-import ca.on.oicr.gsi.runscanner.rs.dto.IlluminaNotificationDto;
-import ca.on.oicr.gsi.runscanner.rs.dto.LS454NotificationDto;
-import ca.on.oicr.gsi.runscanner.rs.dto.NotificationDto;
-import ca.on.oicr.gsi.runscanner.rs.dto.SolidNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.LS454NotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.SolidNotificationDto;
 
 @SuppressWarnings("squid:S3776") // make Sonar ignore cognitive complexity warnings for this file
 public class Dtos {
@@ -2877,8 +2877,8 @@ public class Dtos {
    * @param rsType Runscanner Platform
    * @return equivalent MISO PlatformType
    */
-  public static PlatformType getMisoPlatformTypeFromRunscanner(ca.on.oicr.gsi.runscanner.rs.dto.type.Platform rsType) {
-    return PlatformType.valueOf(toMisoFormat(rsType.name()));
+  public static PlatformType getMisoPlatformTypeFromRunscanner(ca.on.oicr.gsi.runscanner.dto.type.Platform rsType) {
+    return PlatformType.valueOf(rsType.name());
   }
 
   /**
@@ -2887,7 +2887,7 @@ public class Dtos {
    * @param rsType Runscanner HealthType
    * @return equivalent MISO HealthType
    */
-  public static HealthType getMisoHealthTypeFromRunscanner(ca.on.oicr.gsi.runscanner.rs.dto.type.HealthType rsType) {
+  public static HealthType getMisoHealthTypeFromRunscanner(ca.on.oicr.gsi.runscanner.dto.type.HealthType rsType) {
     return HealthType.valueOf(toMisoFormat(rsType.name()));
   }
 
@@ -2907,7 +2907,7 @@ public class Dtos {
    * @param rsType Runscanner IlluminaChemistry
    * @return equivalent MISO IlluminaChemistry
    */
-  public static IlluminaChemistry getMisoIlluminaChemistryFromRunscanner(ca.on.oicr.gsi.runscanner.rs.dto.type.IlluminaChemistry rsType) {
+  public static IlluminaChemistry getMisoIlluminaChemistryFromRunscanner(ca.on.oicr.gsi.runscanner.dto.type.IlluminaChemistry rsType) {
     return IlluminaChemistry.valueOf(rsType.name());
   }
 }

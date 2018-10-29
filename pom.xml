@@ -656,13 +656,8 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
-       <groupId>ca.on.oicr.gsi.runscanner</groupId>
-        <artifactId>scanner</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-      </dependency>
-      <dependency>
         <groupId>ca.on.oicr.gsi.runscanner</groupId>
-        <artifactId>rs-dto</artifactId>
+        <artifactId>runscanner-dto</artifactId>
         <version>0.0.1-SNAPSHOT</version>
       </dependency>
       <dependency>

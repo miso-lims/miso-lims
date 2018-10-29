@@ -40,7 +40,7 @@
   <dependencies>
   	<dependency>
         <groupId>ca.on.oicr.gsi.runscanner</groupId>
-        <artifactId>rs-dto</artifactId>
+        <artifactId>runscanner-dto</artifactId>
       </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>

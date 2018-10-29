@@ -32,10 +32,10 @@ import uk.ac.bbsrc.tgac.miso.core.util.LatencyHistogram;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 
-import ca.on.oicr.gsi.runscanner.rs.dto.IlluminaNotificationDto;
-import ca.on.oicr.gsi.runscanner.rs.dto.NotificationDto;
-import ca.on.oicr.gsi.runscanner.rs.dto.ProgressiveRequestDto;
-import ca.on.oicr.gsi.runscanner.rs.dto.ProgressiveResponseDto;
+import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.ProgressiveRequestDto;
+import ca.on.oicr.gsi.runscanner.dto.ProgressiveResponseDto;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;

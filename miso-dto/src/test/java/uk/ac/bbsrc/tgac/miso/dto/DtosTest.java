@@ -18,10 +18,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-import ca.on.oicr.gsi.runscanner.rs.dto.IlluminaNotificationDto;
-import ca.on.oicr.gsi.runscanner.rs.dto.NotificationDto;
-import ca.on.oicr.gsi.runscanner.rs.dto.PacBioNotificationDto;
-import ca.on.oicr.gsi.runscanner.rs.dto.type.HealthType;
+import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.PacBioNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.type.HealthType;
 
 public class DtosTest {
 
