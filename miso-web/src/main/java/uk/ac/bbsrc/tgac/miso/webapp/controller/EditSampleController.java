@@ -662,6 +662,10 @@ public class EditSampleController {
             model.put("effectiveGroupId", effective.get().getGroupId());
             model.put("effectiveGroupIdSample", effective.get().getAlias());
           }
+          if (!isIdentitySample(sample)) {
+            SampleIdentity identity = getParent(SampleIdentity.class, (DetailedSample) sample);
+            model.put("effectiveExternalName", identity.getExternalName());
+          }
         }
         model.put("title", "Sample " + sampleId);
 
