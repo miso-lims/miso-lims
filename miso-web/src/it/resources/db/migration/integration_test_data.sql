@@ -503,9 +503,9 @@ INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId
   (304, 15, NULL, 1, 0),
   (305, 15, NULL, 1, 0),
   (501, 1, NULL, 1, 0),
-  (502, 23, NULL, 1, 0),
-  (503, 11, NULL, 1, 0),
-  (504, 15, NULL, 1, 0);
+  (502, 23, 501, 1, 0),
+  (503, 11, 502, 1, 0),
+  (504, 15, 503, 1, 0);
 
 INSERT INTO Identity (sampleId, externalName, donorSex, consentLevel) VALUES
   (1, 'TEST_external_1', 'MALE', 'THIS_PROJECT'),
