@@ -5,6 +5,11 @@ category: usr
 date: 2018-09-20
 order: 1
 ---
+
+<strong style="color:red; font-size:2em;">Document under construction<strong>
+
+This user manual is a work in progress, so parts of it may be missing until it has been completed.
+
 🔹 = item only applicable to Detailed Sample mode
 
 {% assign section = 1 %}

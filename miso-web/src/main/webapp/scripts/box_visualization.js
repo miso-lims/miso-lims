@@ -574,7 +574,7 @@
         buttons: {
           "Save": function() {
             if (results.errors.length == 0 || confirm("Do you want to save changes even though there are scanning errors?")) {
-              Box.saveContents(self.results.items);
+              Box.saveContents(results.items);
               jQuery('#dialogDialog').dialog('close');
             }
           },

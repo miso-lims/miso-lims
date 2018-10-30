@@ -128,12 +128,12 @@ var Box = Box
           url: url,
           type: 'POST',
           contentType: 'application/json; charset=utf8',
-          data: data
+          data: JSON.stringify(data)
         }).success(function(data) {
           Box.boxJSON.items = items;
           Box.ui.update();
         }).fail(function(xhr, textStatus, errorThrown) {
-          showAjaxErrorDialog(xhr, textStatus, errorThrown);
+          Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);
         });
       },
 
