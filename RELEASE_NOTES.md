@@ -1,3 +1,12 @@
+# 0.2.149
+
+Changes:
+
+ * Fixed box scanning
+ * Added warning of incomplete user manual
+ * Added Deletions section of user manual
+ * Fixed Identity Search tool (DetailedSample mode)
+
 # 0.2.148
 
 Changes:
