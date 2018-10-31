@@ -234,7 +234,9 @@ public class EditRunController {
       }
 
       model.put("sequencingParameters",
-          sequencingParametersService.getForPlatform((long) run.getSequencer().getPlatform().getId()));
+          sequencingParametersService.getForPlatform((long) run.getSequencer().getPlatform().getId()).stream()
+              .sorted((sp1, sp2) -> sp1.getName().compareTo(sp2.getName()))
+              .collect(Collectors.toList()));
 
       model.put("runContainers", run.getSequencerPartitionContainers().stream().map(Dtos::asDto).collect(Collectors.toList()));
       model.put("runPartitions", run.getSequencerPartitionContainers().stream().flatMap(container -> container.getPartitions().stream())
