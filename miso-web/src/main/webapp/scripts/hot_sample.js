@@ -995,8 +995,8 @@ HotTarget.sample = (function() {
               [HotUtils.relations.library(), HotUtils.relations.dilution(), HotUtils.relations.pool()]))].concat(
           HotUtils.makeQcActions("Sample")).concat(
           [
-              config.worksetId ? HotUtils.makeRemoveFromWorkset('samples', config.worksetId) : HotUtils.makeAddToWorkset('samples',
-                  'sampleIds'), HotUtils.makeAttachFile('sample', function(sample) {
+              config && config.worksetId ? HotUtils.makeRemoveFromWorkset('samples', config.worksetId) : HotUtils.makeAddToWorkset(
+                  'samples', 'sampleIds'), HotUtils.makeAttachFile('sample', function(sample) {
                 return sample.projectId;
               })]);
     },

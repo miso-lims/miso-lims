@@ -189,6 +189,33 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
+  public void testIndexDistanceToolSetup() throws Exception {
+    // Goal: ensure all expected columns are present and no extra
+    ListPage page = ListPage.getListPage(getDriver(), getBaseUrl(), "tools/indexdistance");
+    DataTable table = page.getTable();
+    Set<String> expected = indicesColumns;
+    expected.add(Columns.SORT); // Checkbox column
+    expected.add(Columns.PLATFORM); // Platform column
+    List<String> headings = table.getColumnHeadings();
+    assertEquals("number of columns", expected.size(), headings.size());
+    for (String col : indicesColumns) {
+      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+    }
+  }
+
+  @Test
+  public void testIdentitySearchToolSetup() throws Exception {
+    // Goal: ensure all expected columns are present and no extra
+    ListPage page = ListPage.getListPage(getDriver(), getBaseUrl(), "tools/identitysearch");
+    DataTable table = page.getTable();
+    List<String> headings = table.getColumnHeadings();
+    assertEquals("number of columns", samplesColumns.size(), headings.size());
+    for (String col : samplesColumns) {
+      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+    }
+  }
+
+  @Test
   public void testListSamplesPageSetup() throws Exception {
     // Goal: ensure all expected columns are present and no extra
     testPageSetup(ListTarget.SAMPLES, samplesColumns);
