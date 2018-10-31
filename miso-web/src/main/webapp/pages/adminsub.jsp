@@ -61,6 +61,7 @@
     <h2>Tools</h2>
     <ul class="bullets">
         <li><a href="<c:url value="/miso/tools/indexdistance"/>">Index Distance</a></li>
+        <li><a href="<c:url value="/miso/tools/indexsearch"/>">Index Search</a></li>
         <c:if test="${detailedSample}">
         <li><a href="<c:url value="/miso/tools/identitysearch"/>">Identity Search</a></li>
         </c:if>
