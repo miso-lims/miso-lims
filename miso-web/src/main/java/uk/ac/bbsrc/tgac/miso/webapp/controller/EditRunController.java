@@ -28,6 +28,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
@@ -63,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
@@ -235,7 +237,7 @@ public class EditRunController {
 
       model.put("sequencingParameters",
           sequencingParametersService.getForPlatform((long) run.getSequencer().getPlatform().getId()).stream()
-              .sorted((sp1, sp2) -> sp1.getName().compareTo(sp2.getName()))
+              .sorted(Comparator.comparing(SequencingParameters::getName))
               .collect(Collectors.toList()));
 
       model.put("runContainers", run.getSequencerPartitionContainers().stream().map(Dtos::asDto).collect(Collectors.toList()));
