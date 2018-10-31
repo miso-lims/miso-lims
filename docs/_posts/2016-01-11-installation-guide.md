@@ -299,7 +299,7 @@ without it, sequencer runs must be added manually.
 
 Please see the Run Scanner readme for setup instructions.
 
-Once complete, edit `$CATALINA_HOME/conf/Catalina/localhost/miso.properties` of the MISO Tomcat server and set `miso.runscanner.urls` to the URL of the Run Scanner instance. It is possible to set up multiple run scanners managing different sequencers and add all the URLs to `miso.properties`. Restart MISO.
+Once complete, edit `$CATALINA_HOME/conf/Catalina/localhost/miso.properties` of the MISO Tomcat server and set `miso.runscanner.urls` to the URL of the Run Scanner instance. It is possible to set up multiple run scanners managing different sequencers and add all the URLs to `miso.properties`. If you are adding Run Scanner to a previously-established MISO environment, restart MISO.
 
 
 # Building the Application
