@@ -227,7 +227,7 @@ public class EditRunController {
           ObjectMapper mapper = new ObjectMapper();
           model.put("partitionNames", mapper.writeValueAsString(
               run.getSequencerPartitionContainers().get(0).getPartitions().stream()
-                  .sorted((a, b) -> a.getPartitionNumber() - b.getPartitionNumber())
+                  .sorted(Comparator.comparing(Partition::getPartitionNumber))
                   .map(partition -> partition.getPool() == null ? "N/A" : partition.getPool().getAlias()).collect(Collectors.toList())));
         } else {
           model.put("partitionNames", "[]");
@@ -237,7 +237,7 @@ public class EditRunController {
 
       model.put("sequencingParameters",
           sequencingParametersService.getForPlatform((long) run.getSequencer().getPlatform().getId()).stream()
-              .sorted(Comparator.comparing(SequencingParameters::getName))
+              .sorted(SequencingParameters.nameComparator)
               .collect(Collectors.toList()));
 
       model.put("runContainers", run.getSequencerPartitionContainers().stream().map(Dtos::asDto).collect(Collectors.toList()));

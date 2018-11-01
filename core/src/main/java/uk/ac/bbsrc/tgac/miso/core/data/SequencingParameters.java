@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -24,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 @Entity
 @Table(name = "SequencingParameters")
 
-public class SequencingParameters implements Serializable
+public class SequencingParameters implements Serializable, Comparable<SequencingParameters>
 {
 
   private static final long serialVersionUID = 1L;
@@ -141,6 +142,34 @@ public class SequencingParameters implements Serializable
 
   public void setUpdatedBy(User updatedBy) {
     this.updatedBy = updatedBy;
+  }
+
+  public static Comparator<SequencingParameters> nameComparator = (sp1, sp2) -> sp1.compareTo(sp2);
+
+  @Override
+  public int compareTo(SequencingParameters other) {
+    // v4 2x126, v4, Rapid Run, 10X, Custom, v3, other
+    if (!(other instanceof SequencingParameters)) return -1;
+    if (name.startsWith("v4")) {
+      if ("v4 2×126".equals(name)) return -1;
+      if ("v4 2×126".equals(other.name)) return 1;
+      if (other.name.startsWith("v4")) return other.name.compareTo(name);
+      return -1; // v4 > everything else
+    } else if (name.startsWith("Rapid Run")) {
+      if (other.name.startsWith("v4")) return 1;
+      if (other.name.startsWith("Rapid Run")) return other.name.compareTo(name);
+      return -1; // Rapid Run > everything else
+    } else if (name.startsWith("10X")) {
+      if (other.name.startsWith("v4") || other.name.startsWith("Rapid Run")) return 1;
+      if (other.name.startsWith("10X")) return other.name.compareTo(name);
+      return -1; // 10X > everything else
+    } else if (name.startsWith("v3")) {
+      if (other.name.startsWith("v4") || other.name.startsWith("Rapid Run") || other.name.startsWith("10X")) return 1;
+      if (other.name.startsWith("v3")) return other.name.compareTo(name);
+      return -1; // v3 > everything else
+    } else {
+      return other.name.compareTo(name);
+    }
   }
 
 }
