@@ -332,7 +332,7 @@ MISO are:
 * Multiplexing kit - used for sequencing containers
 * Extraction kit - not currently used in MISO
 
-The Kits list page shows all of the available kit descriptors. To get there, click the "Kits" link in the Tracking list
+The Kits list page shows all of the available kit descriptors. To get there, click the "Kits" link in the Misc list
 in the menu on the left side of the screen. This page is broken into tabs for the different kit types.
 
 To add a new kit descriptor, click the "Add" button in the toolbar at the top of the table on the Kits list page. This
@@ -358,7 +358,7 @@ be matched with any index 2.
 Index families may be archived if they are no longer needed. This will prevent them from showing up in the options when
 creating new libraries.
 
-Indices can be viewed on the Indices list page. To get there, click "Indices" in the Tracking list in the menu on the
+Indices can be viewed on the Indices list page. To get there, click "Indices" in the Misc list in the menu on the
 left side of the screen. The page is broken into tabs for each platform type. Modifications to indices and index
 families can only be made via direct access to the MISO database. As such, they must be performed by a MISO
 adminstrator.

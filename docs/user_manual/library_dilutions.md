@@ -13,7 +13,7 @@ pooled as is, or if it is being added directly to a sequencing container.
 {% assign sub = 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Dilutions List" %}
 
-To get to the main Dilutions list page, click "Dilutions" in the Tracking list in the menu on the left side of the
+To get to the main Dilutions list page, click "Dilutions" in the Preparation list in the menu on the left side of the
 screen. This list includes all dilutions from all projects in MISO. The toolbar at the top of the table includes many
 controls for working with dilutions.
 
