@@ -20,7 +20,7 @@ libraries, dilutions, and/or pools are stored. There are several important box p
 {% assign sub = 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Boxes List" %}
 
-To get to the Boxes list page, click "Boxes" in the Tracking list in the menu on the left side of the screen.
+To get to the Boxes list page, click "Boxes" in the Preparation list in the menu on the left side of the screen.
 Boxes are categorized by tabs, with one tab for each box use. Each box will only be listed under one box use
 tab, and searching for a box only searches the current tab. The toolbar at the top of each table includes many
 controls for working with boxes.

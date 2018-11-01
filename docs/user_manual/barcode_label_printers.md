@@ -12,7 +12,7 @@ required to do this. Printing barcode labels to label printers does require some
 {% assign sub = 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Printers List" %}
 
-The Printers list can be accessed by clicking the "Printers" link from the Tracking list at the left side of the
+The Printers list can be accessed by clicking the "Printers" link from the Misc list at the left side of the
 screen. The page shows all of the label printers that are configured for use in MISO. At the top of the table, you will
 find controls for adding, deleting, disabling, and enabling printers.
 

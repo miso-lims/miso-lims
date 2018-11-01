@@ -26,72 +26,86 @@
 
 <div id="subcontent">
 	<h2>Sample Processing</h2>
-	<ul class="bullets">
-		<li><a href="<c:url value="/miso/sample/receipt"/>">Receive
-				Samples</a></li>
-		<li><a href="<c:url value="/miso/importexport"/>">Import &amp;
-				Export</a></li>
-	</ul>
+	<div class="menu">
+		<a href="<c:url value="/miso/sample/receipt"/>">Receive
+				Samples</a>
+		<a href="<c:url value="/miso/importexport"/>">Import &amp;
+				Export</a>
+	</div>
 
-    <h2>Tracking</h2>
-    <ul class="bullets">
-        <li><a href="<c:url value="/miso/samples"/>">Samples</a></li>
-        <li><a href="<c:url value="/miso/libraries"/>">Libraries</a></li>
-        <li><a href="<c:url value="/miso/dilutions"/>">Dilutions</a></li>
-        <li><a href="<c:url value="/miso/worksets"/>">Worksets</a></li>
-        <li><a href="<c:url value="/miso/pools"/>">Pools</a></li>
-        <li><a href="<c:url value="/miso/poolorders/active"/>">Active Orders</a></li>
-        <li><a href="<c:url value="/miso/poolorders/all"/>">All Orders</a></li>
-        <li><a href="<c:url value="/miso/poolorders/pending"/>">Pending Orders</a></li>
-        <li><a href="<c:url value="/miso/containers"/>">Sequencing Containers</a></li>
-        <li><a href="<c:url value="/miso/runs"/>">Sequencer Runs</a></li>
-        <li><a href="<c:url value="/miso/arrays"/>">Arrays</a></li>
-        <li><a href="<c:url value="/miso/arrayruns"/>">Array Runs</a></li>
-        <li><a href="<c:url value="/miso/instruments"/>">Instruments</a></li>
-        <li><a href="<c:url value="/miso/boxes"/>">Boxes</a></li>
-        <li><a href="<c:url value="/miso/storagelocations"/>">Freezers &amp; Rooms</a></li>
-        <li><a href="<c:url value="/miso/librarytemplates"/>">Library Templates</a></li>
-        <li><a href="<c:url value="/miso/kitdescriptors"/>">Kits</a></li>
-        <li><a href="<c:url value="/miso/indices"/>">Indices</a></li>
-        <li><a href="<c:url value="/miso/studies"/>">Studies</a></li>
-        <li><a href="<c:url value="/miso/printers"/>">Printers</a></li>
-        <li><a href="<c:url value="/miso/deletions"/>">Deletions</a></li>
-    </ul>
+    <h2>Preparation</h2>
+    <div class="menu">
+        <a href="<c:url value="/miso/samples"/>">Samples</a>
+        <a href="<c:url value="/miso/libraries"/>">Libraries</a>
+        <a href="<c:url value="/miso/dilutions"/>">Dilutions</a>
+        <a href="<c:url value="/miso/worksets"/>">Worksets</a>
+        <a href="<c:url value="/miso/pools"/>">Pools</a>
+        <a href="<c:url value="/miso/boxes"/>">Boxes</a>
+    </div>
+
+    <h2>Instrument Runs</h2>
+    <div class="menu">
+        <a href="<c:url value="/miso/poolorders/active"/>">Orders</a>
+          <a class="submenu" href="<c:url value="/miso/poolorders/all"/>">All</a>
+          <a class="submenu" href="<c:url value="/miso/poolorders/active"/>">Active</a>
+          <a class="submenu" href="<c:url value="/miso/poolorders/pending"/>">Pending</a>
+        
+        <a href="<c:url value="/miso/runs"/>">Sequencing</a>
+          <a class="submenu" href="<c:url value="/miso/containers"/>">Containers</a>
+          <a class="submenu" href="<c:url value="/miso/runs"/>">Runs</a>
+        
+        <a href="<c:url value="/miso/arrayruns"/>">Array Scanning</a>
+            <a class="submenu" href="<c:url value="/miso/arrays"/>">Arrays</a>
+            <a class="submenu" href="<c:url value="/miso/arrayruns"/>">Runs</a>
+        
+        <a href="<c:url value="/miso/instruments"/>">Instruments</a>
+    </div>
 
     <h2>Tools</h2>
-    <ul class="bullets">
-        <li><a href="<c:url value="/miso/tools/indexdistance"/>">Index Distance</a></li>
-        <li><a href="<c:url value="/miso/tools/indexsearch"/>">Index Search</a></li>
+    <div class="menu">
+        <a href="<c:url value="/miso/tools/indexdistance"/>">Index Distance</a>
+        <a href="<c:url value="/miso/tools/indexsearch"/>">Index Search</a>
         <c:if test="${detailedSample}">
-        <li><a href="<c:url value="/miso/tools/identitysearch"/>">Identity Search</a></li>
+        <a href="<c:url value="/miso/tools/identitysearch"/>">Identity Search</a>
         </c:if>
-    </ul>
+    </div>
+
+    <h2>Misc</h2>
+    <div class="menu">
+      <a href="<c:url value="/miso/storagelocations"/>">Freezers &amp; Rooms</a>
+      <a href="<c:url value="/miso/librarytemplates"/>">Library Templates</a>
+      <a href="<c:url value="/miso/kitdescriptors"/>">Kits</a>
+      <a href="<c:url value="/miso/indices"/>">Indices</a>
+      <a href="<c:url value="/miso/printers"/>">Printers</a>
+      <a href="<c:url value="/miso/deletions"/>">Deletion Log</a>
+    </div>
 
     <c:if test="${detailedSample}">
       <h2>Institute Defaults</h2>
-      <ul class="bullets">
-          <li><a href="<c:url value="/miso/tissuematerial/list"/>">Tissue Materials</a></li>
-          <li><a href="<c:url value="/miso/tissueorigin/list"/>">Tissue Origins</a></li>
-          <li><a href="<c:url value="/miso/samplepurpose/list"/>">Sample Purposes</a></li>
-          <li><a href="<c:url value="/miso/qctype/list"/>">QC Types</a></li>
-          <li><a href="<c:url value="/miso/subproject/list"/>">Subprojects</a></li>
-          <li><a href="<c:url value="/miso/institute/list"/>">Institutes</a></li>
-          <li><a href="<c:url value="/miso/lab/list"/>">Labs</a></li>
-          <li><a href="<c:url value="/miso/attachmentcategories/list"/>">Attachment Categories</a></li>
-      </ul>
+      <div class="menu">
+        <a href="<c:url value="/miso/tissuematerial/list"/>">Tissue Materials</a>
+        <a href="<c:url value="/miso/tissueorigin/list"/>">Tissue Origins</a>
+        <a href="<c:url value="/miso/samplepurpose/list"/>">Sample Purposes</a>
+        <a href="<c:url value="/miso/qctype/list"/>">QC Types</a>
+        <a href="<c:url value="/miso/subproject/list"/>">Subprojects</a>
+        <a href="<c:url value="/miso/institute/list"/>">Institutes</a>
+        <a href="<c:url value="/miso/lab/list"/>">Labs</a>
+        <a href="<c:url value="/miso/attachmentcategories/list"/>">Attachment Categories</a>
+      </div>
     </c:if>
 	
     <h2>ENA</h2>
-    <ul class="bullets">
-        <li><a href="<c:url value="/miso/experiments"/>">Experiments</a></li>
-        <li><a href="<c:url value="/miso/submissions"/>">Submissions</a></li>
-    </ul>
+    <div class="menu">
+        <a href="<c:url value="/miso/studies"/>">Studies</a>
+        <a href="<c:url value="/miso/experiments"/>">Experiments</a>
+        <a href="<c:url value="/miso/submissions"/>">Submissions</a>
+    </div>
 
 	<c:if test="${miso:isAdmin()}">
 	  <h2>User Administration</h2>
-      <ul class="bullets">
-        <li><a href="<c:url value="/miso/admin/users"/>">Users</a></li>
-        <li><a href="<c:url value="/miso/admin/groups"/>">Groups</a></li>
-      </ul>
+      <div class="menu">
+        <a href="<c:url value="/miso/admin/users"/>">Users</a>
+        <a href="<c:url value="/miso/admin/groups"/>">Groups</a>
+      </div>
     </c:if>
 </div>
