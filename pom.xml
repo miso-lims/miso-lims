@@ -658,7 +658,7 @@
       <dependency>
         <groupId>ca.on.oicr.gsi.runscanner</groupId>
         <artifactId>runscanner-dto</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>1.0.0</version>
       </dependency>
       <dependency>
         <groupId>uk.ac.bbsrc.tgac.miso</groupId>
@@ -889,6 +889,7 @@
             <include>**/*Tests.java</include>
           </includes>
           <skipTests>${skipUTs}</skipTests>
+          <useSystemClassLoader>false</useSystemClassLoader>
         </configuration>
       </plugin>
       <plugin>
