@@ -1,8 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -144,31 +146,50 @@ public class SequencingParameters implements Serializable, Comparable<Sequencing
     this.updatedBy = updatedBy;
   }
 
-  public static Comparator<SequencingParameters> nameComparator = (sp1, sp2) -> sp1.compareTo(sp2);
+  private static final List<String> sortOrder = getSortOrder();
+  private static List<String> getSortOrder() {
+    List<String> order = new ArrayList<>();
+    order.add("v4 2×126");
+    order.add("v4");
+    order.add("Rapid Run");
+    order.add("10X");
+    order.add("v3");
+    order.add("High"); // NextSeq
+    order.add("Mid"); // NextSeq
+    order.add("Nano"); // MiSeq
+    order.add("Micro"); // MiSeq
+    order.add("Custom"); // All
+    order.add("Sequencing"); // Oxford Nanopore
+    order.add("Configuration"); // Oxford Nanopore
+    order.add("Control"); // Oxford Nanopore
+    order.add("Platform"); // Oxford Nanopore
+    return Collections.unmodifiableList(order);
+  }
 
   @Override
   public int compareTo(SequencingParameters other) {
-    // v4 2x126, v4, Rapid Run, 10X, Custom, v3, other
-    if (!(other instanceof SequencingParameters)) return -1;
-    if (name.startsWith("v4")) {
-      if ("v4 2×126".equals(name)) return -1;
-      if ("v4 2×126".equals(other.name)) return 1;
-      if (other.name.startsWith("v4")) return other.name.compareTo(name);
-      return -1; // v4 > everything else
-    } else if (name.startsWith("Rapid Run")) {
-      if (other.name.startsWith("v4")) return 1;
-      if (other.name.startsWith("Rapid Run")) return other.name.compareTo(name);
-      return -1; // Rapid Run > everything else
-    } else if (name.startsWith("10X")) {
-      if (other.name.startsWith("v4") || other.name.startsWith("Rapid Run")) return 1;
-      if (other.name.startsWith("10X")) return other.name.compareTo(name);
-      return -1; // 10X > everything else
-    } else if (name.startsWith("v3")) {
-      if (other.name.startsWith("v4") || other.name.startsWith("Rapid Run") || other.name.startsWith("10X")) return 1;
-      if (other.name.startsWith("v3")) return other.name.compareTo(name);
-      return -1; // v3 > everything else
+    Integer thisSortKey = null;
+    for (int i = 0; i < sortOrder.size(); i++) {
+      if (name.startsWith(sortOrder.get(i))) {
+        thisSortKey = i;
+        break;
+      }
+    }
+    if (thisSortKey == null) thisSortKey = 100;
+
+    Integer otherSortKey = null;
+    for (int i = 0; i < sortOrder.size(); i++) {
+      if (other.name.startsWith(sortOrder.get(i))) {
+        otherSortKey = i;
+        break;
+      }
+    }
+    if (otherSortKey == null) otherSortKey = 100;
+
+    if (thisSortKey == otherSortKey) {
+      return name.compareTo(other.name);
     } else {
-      return other.name.compareTo(name);
+      return thisSortKey - otherSortKey;
     }
   }
 

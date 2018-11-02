@@ -64,7 +64,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
@@ -237,7 +236,7 @@ public class EditRunController {
 
       model.put("sequencingParameters",
           sequencingParametersService.getForPlatform((long) run.getSequencer().getPlatform().getId()).stream()
-              .sorted(SequencingParameters.nameComparator)
+              .sorted()
               .collect(Collectors.toList()));
 
       model.put("runContainers", run.getSequencerPartitionContainers().stream().map(Dtos::asDto).collect(Collectors.toList()));
