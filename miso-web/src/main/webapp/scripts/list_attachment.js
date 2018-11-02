@@ -36,8 +36,8 @@ ListTarget.attachment = (function() {
         handler: !config.projectId ? function() {
           ListTarget.attachment.showUploadDialog(config.entityType, config.entityId);
         } : function() {
-          Utils.showWizardDialog('Attach File', [{
-            name: 'Upload new file',
+          Utils.showWizardDialog('Attach Files', [{
+            name: 'Upload new files',
             handler: function() {
               ListTarget.attachment.showUploadDialog(config.entityType, config.entityId);
             }
@@ -113,7 +113,7 @@ ListTarget.attachment = (function() {
       dialogArea.empty();
 
       var form = jQuery('<form id="uploadForm">');
-      form.append(jQuery('<p><input id="fileInput" type="file" name="file"></p>'));
+      form.append(jQuery('<p><input id="fileInput" type="file" name="files" multiple="multiple"></p>'));
       var select = jQuery('<select id="attachmentCategory" type="text" name="attachmentCategory">');
       [{
         id: 0,
@@ -128,7 +128,7 @@ ListTarget.attachment = (function() {
       var dialog = dialogArea.dialog({
         autoOpen: true,
         width: 500,
-        title: 'Attach File',
+        title: 'Attach Files',
         modal: true,
         buttons: {
           upload: {
@@ -173,7 +173,7 @@ ListTarget.attachment = (function() {
                 contentType: false,
                 processData: false
               }).success(function(data) {
-                Utils.showOkDialog('Attach File', ['File upload successful'], Utils.page.pageReload);
+                Utils.showOkDialog('Attach Files', ['File upload successful'], Utils.page.pageReload);
               }).fail(function(xhr, textStatus, errorThrown) {
                 dialog.dialog("close");
                 Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);
