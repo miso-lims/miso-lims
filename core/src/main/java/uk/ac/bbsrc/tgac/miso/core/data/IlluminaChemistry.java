@@ -8,5 +8,6 @@ public enum IlluminaChemistry {
   NS_MID, //
   NS_HIGH, //
   HISEQ_X, //
+  NOVASEQ, //
   UNKNOWN;
 }
