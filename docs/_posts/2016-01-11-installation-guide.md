@@ -405,6 +405,9 @@ The same path should be used for `MISO_FILES_DIR` as is set for `miso.fileStorag
 jdbc:mysql://localhost:3306/lims?autoReconnect=true&zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8
 ```
 
+If you encounter errors migrating the database, make sure that you are using the recommended version of Flyway (see above).
+There are known issues with using newer Flyway versions with the MISO migrations.
+
 # Monitoring
 
 The main MISO application and Run Scanner can be monitored using [Prometheus](http://prometheus.io/).
