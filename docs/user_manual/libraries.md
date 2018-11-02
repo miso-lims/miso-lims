@@ -191,7 +191,7 @@ you to see a more detailed view of the library.
 {% assign subsub = 1 %}
 {% include userman-heading.md section=page.section sub=sub subsub=subsub title="Editing a Single Library" %}
 
-To get to the single Edit Library page, click on the library's name or alias in the Samples list. Links to the Edit
+To get to the single Edit Library page, click on the library's name or alias in the Libraries list. Links to the Edit
 Library page appear on several pages for related items as well, including:
 
 * Library Name and Library Alias columns of the Dilutions tables on the Edit Pool page
