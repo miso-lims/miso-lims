@@ -63,7 +63,7 @@ working with these items are available in the toolbars at the top of each table.
 
 Samples, libraries, and dilutions can be added to worksets. To add any of these items, go to the respective list page,
 select the items that you wish to add to the workset, and click the "Add to Workset" button in the toolbar at the top
-of the table. In the dialog that appears, select "Exiting Workset." Enter the alias of the workset you'd like to add
+of the table. In the dialog that appears, select "Existing Workset." Enter the alias of the workset you'd like to add
 the items to and click the "Search" button. In the search results, click the alias of the workset that you'd like to
 add the items to.
 
