@@ -10,8 +10,9 @@ section: 11
 {% include userman-heading.md section=page.section sub=sub title="Pools List" %}
 
 To get to the main Pools list page, click "Pools" in the Preparation list in the menu on the left side of the screen.
-This list includes all pools from all projects in MISO. The toolbar at the top of the table includes many controls for
-working with pools.
+This list includes all pools from all projects in MISO. The list is divided into tabs for the different sequencing
+platforms. Only platforms for which there are active sequencers are included. The toolbar at the top of the table
+includes many controls for working with pools.
 
 You can find a similar list in the Pools section of the Edit Project page. The list on the Edit Project page only
 includes pools that contain libraries belonging to the project being viewed/edited. This list has the same controls as
@@ -27,6 +28,9 @@ on the main Pools list page.
 Clicking the "Add" button in the toolbar at the top of the Pools list will take you to the Create Pool page. Here, you
 can enter all of the pool information and then click the "Save" button at the top right to save the pool. After saving,
 you will be taken to the single Edit Pool page, where you can add dilutions and further modify the pool.
+
+It is also possible to create pools with dilutions already in them. See
+[Creating Pools from Dilutions](#creating_pools_from_dilutions) below.
 
 {% include userman-toplink.md %}
 
