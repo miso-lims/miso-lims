@@ -293,7 +293,7 @@ to allow duplicate library aliases. A custom validator must be specified for thi
 property to be enabled - the naming scheme’s default validator will not be altered.
 
 # Setting Up the Run Scanner
-Run Scanner is a webservice that scans the paths containing
+[Run Scanner](https://github.com/oicr-gsi/runscanner) is a webservice that scans the paths containing
 sequencer output. It is not required for a functioning MISO install, but
 without it, sequencer runs must be added manually.
 
