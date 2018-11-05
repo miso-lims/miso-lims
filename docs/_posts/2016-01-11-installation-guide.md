@@ -12,6 +12,8 @@ MISO requires some configuration directly in the source code. While we plan to
 change this over time, running an instance of MISO will require building and
 deploying a fork of the code base with customisations.
 
+<a name="prerequisites"/>
+
 ## Prerequisites
 For each service, which may be put on the same machine, the following tools are
 required:
@@ -405,8 +407,10 @@ The same path should be used for `MISO_FILES_DIR` as is set for `miso.fileStorag
 jdbc:mysql://localhost:3306/lims?autoReconnect=true&zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8
 ```
 
-If you encounter errors migrating the database, make sure that you are using the recommended version of Flyway (see above).
-There are known issues with using newer Flyway versions with the MISO migrations.
+If you encounter errors migrating the database, make sure that you are using the recommended version of Flyway (see
+[Prerequisites](#prerequisites)). There are known issues with using newer Flyway versions with the MISO migrations.
+As Flyway has changed their checksum calculations in newer versions and we don't want to break completed migrations
+for existing users, there are no plans to support newer versions of Flyway at this time.
 
 # Monitoring
 
