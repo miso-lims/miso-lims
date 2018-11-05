@@ -98,7 +98,7 @@ the top of the table. Further details of this process will be discussed in
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Printing Barcodes" %}
 
-Barcode labels can be printed for a series of libraries from the Libraries list. See the
+Barcode labels can be printed for a series of dilutions from the Dilutions list. See the
 [Barcode Label Printers section - Printing Barcodes](barcode_label_printers.html#printing_barcodes) for details on how
 to do this.
 
@@ -107,7 +107,7 @@ to do this.
 
 
 {% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Downloading Dilutions Information" %}
+{% include userman-heading.md section=page.section sub=sub title="Downloading Dilution Information" %}
 
 It is sometimes useful to have dilution information in spreadsheet form for use outside of MISO. To download dilution
 data, go to the Dilutions list, check the checkboxes next to the dilutions that you would like to export, and click the
