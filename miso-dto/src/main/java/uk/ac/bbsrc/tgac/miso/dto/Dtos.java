@@ -45,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
@@ -178,6 +179,11 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+
+import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.LS454NotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.SolidNotificationDto;
 
 @SuppressWarnings("squid:S3776") // make Sonar ignore cognitive complexity warnings for this file
 public class Dtos {
@@ -1911,7 +1917,7 @@ public class Dtos {
   }
 
   public static Run to(NotificationDto from, User user) {
-    final Run to = from.getPlatformType().createRun(user);
+    final Run to = getMisoPlatformTypeFromRunscanner(from.getPlatformType()).createRun(user);
     setCommonRunValues(from, to);
 
     switch (to.getPlatformType()) {
@@ -1945,7 +1951,7 @@ public class Dtos {
   private static void setCommonRunValues(NotificationDto from, Run to) {
     to.setAlias(from.getRunAlias());
     to.setFilePath(from.getSequencerFolderPath());
-    to.setHealth(from.getHealthType());
+    to.setHealth(getMisoHealthTypeFromRunscanner(from.getHealthType()));
     to.setStartDate(LimsUtils.toBadDate(from.getStartDate()));
     to.setCompletionDate(LimsUtils.toBadDate(from.getCompletionDate()));
     to.setMetrics(from.getMetrics());
@@ -2865,4 +2871,43 @@ public class Dtos {
     setter.accept(value == null ? null : lookup.apply(value));
   }
 
+  /**
+   * Converts from Runscanner's Platform to MISO's PlatformType.
+   * 
+   * @param rsType Runscanner Platform
+   * @return equivalent MISO PlatformType
+   */
+  public static PlatformType getMisoPlatformTypeFromRunscanner(ca.on.oicr.gsi.runscanner.dto.type.Platform rsType) {
+    return PlatformType.valueOf(rsType.name());
+  }
+
+  /**
+   * Converts from Runscanner's HealthType to MISO's HealthType
+   * 
+   * @param rsType Runscanner HealthType
+   * @return equivalent MISO HealthType
+   */
+  public static HealthType getMisoHealthTypeFromRunscanner(ca.on.oicr.gsi.runscanner.dto.type.HealthType rsType) {
+    return HealthType.valueOf(toMisoFormat(rsType.name()));
+  }
+
+  /**
+   * Converts ABCD to Abcd for compatibility with MISO's enum formatting.
+   * 
+   * @param name Value of a Runscanner enum, all caps
+   * @return name made Upper Camel Case
+   */
+  private static String toMisoFormat(String name) {
+    return name.substring(0, 1) + name.substring(1).toLowerCase();
+  }
+
+  /**
+   * Converts from Runscanner's IlluminaChemistry to MISO's IlluminaChemistry
+   * 
+   * @param rsType Runscanner IlluminaChemistry
+   * @return equivalent MISO IlluminaChemistry
+   */
+  public static IlluminaChemistry getMisoIlluminaChemistryFromRunscanner(ca.on.oicr.gsi.runscanner.dto.type.IlluminaChemistry rsType) {
+    return IlluminaChemistry.valueOf(rsType.name());
+  }
 }

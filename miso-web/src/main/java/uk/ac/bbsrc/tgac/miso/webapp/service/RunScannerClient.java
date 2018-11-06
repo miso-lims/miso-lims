@@ -1,16 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.webapp.service;
 
-import io.prometheus.client.Counter;
-import io.prometheus.client.Gauge;
-
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Semaphore;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -25,13 +24,21 @@ import org.springframework.web.client.RestTemplate;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.SuperuserAuthentication;
 import uk.ac.bbsrc.tgac.miso.core.util.LatencyHistogram;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
-import uk.ac.bbsrc.tgac.miso.dto.ProgressiveRequestDto;
-import uk.ac.bbsrc.tgac.miso.dto.ProgressiveResponseDto;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
+
+import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.ProgressiveRequestDto;
+import ca.on.oicr.gsi.runscanner.dto.ProgressiveResponseDto;
+
+import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
 
 @Service
 public class RunScannerClient {
@@ -89,8 +96,35 @@ public class RunScannerClient {
       }
       for (NotificationDto dto : results) {
         try (AutoCloseable timer = saveTime.start()) {
+
+          // Determine whether the SequencingParameters are of the correct type
+          Predicate<SequencingParameters> isMatchingSequencingParameters;
+          switch (dto.getPlatformType()) {
+          case ILLUMINA:
+            isMatchingSequencingParameters = params -> params.getPlatform().getPlatformType() == PlatformType.ILLUMINA &&
+                Math.abs(params.getReadLength() - ((IlluminaNotificationDto) dto).getReadLength()) < 2
+                && params.isPaired() == ((IlluminaNotificationDto) dto).isPairedEndRun()
+                && params.getChemistry() == Dtos.getMisoIlluminaChemistryFromRunscanner(((IlluminaNotificationDto) dto).getChemistry());
+            break;
+          default:
+            isMatchingSequencingParameters = params -> params.getPlatform()
+                .getPlatformType() == Dtos.getMisoPlatformTypeFromRunscanner(dto.getPlatformType());
+            break;
+          }
+
+          GetLaneContents laneContents = new GetLaneContents() {
+            /**
+             * Get getLaneContents implementation from DTO.
+             * Illumina DTOs have a unique implementation of getLaneContents.
+             */
+            @Override
+            public Optional<String> getLaneContents(int lane) {
+              return dto.getLaneContents(lane);
+            }
+          };
+
           (runService.processNotification(Dtos.to(dto, user), dto.getLaneCount(), dto.getContainerModel(), dto.getContainerSerialNumber(),
-              dto.getSequencerName(), dto, dto) ? saveNew : saveUpdate).inc();
+              dto.getSequencerName(), isMatchingSequencingParameters, laneContents) ? saveNew : saveUpdate).inc();
           saveCount.inc();
           badRuns.remove(dto.getRunAlias());
         } catch (Exception e) {
@@ -133,5 +167,4 @@ public class RunScannerClient {
     WHITESPACE.splitAsStream(urls).map(url -> !url.isEmpty() && !servers.containsKey(url))
         .forEach(url -> servers.put(urls, new ProgressiveRequestDto()));
   }
-
 }

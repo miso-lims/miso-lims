@@ -12,7 +12,6 @@ env:
     - JOB=PLAIN_WEB_IT
     - JOB=BULK_WEB_IT
     - JOB=OTHER_WEB_IT
-    - JOB=RUNSCANNER_TEST
     - JOB=PINERY_IT
 
 git:
