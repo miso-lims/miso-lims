@@ -1,3 +1,17 @@
+# 0.2.150
+
+Changes:
+
+ * Partially reorganised navigation menu
+ * Allowed attaching multiple files at once
+ * Sorted sequencing parameters dropdown
+ * Added Index Search tool
+ * Added external names to descendant Edit Sample and Library pages (Detailed Sample)
+ * Added NovaSeq chemistry
+ * Added Pools section of user manual
+ * Added Worksets section of user manual
+ * Separated Runscanner into its own repository
+
 # 0.2.149
 
 Changes:
