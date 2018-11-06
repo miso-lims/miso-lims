@@ -187,5 +187,4 @@ public enum PlatformType {
   public String getPluralPartitionName() {
     return pluralPartitionName;
   }
-
 }

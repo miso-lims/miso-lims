@@ -122,7 +122,6 @@
     <module>miso-service</module>
     <module>sqlstore</module>
     <module>miso-dto</module>
-    <module>runscanner</module>
     <module>miso-external-web</module>
     <module>pinery-miso</module>
   </modules>
@@ -657,9 +656,9 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-        <artifactId>runscanner</artifactId>
-        <version>${project.version}</version>
+        <groupId>ca.on.oicr.gsi.runscanner</groupId>
+        <artifactId>runscanner-dto</artifactId>
+        <version>1.0.0</version>
       </dependency>
       <dependency>
         <groupId>uk.ac.bbsrc.tgac.miso</groupId>
@@ -890,6 +889,7 @@
             <include>**/*Tests.java</include>
           </includes>
           <skipTests>${skipUTs}</skipTests>
+          <useSystemClassLoader>false</useSystemClassLoader>
         </configuration>
       </plugin>
       <plugin>

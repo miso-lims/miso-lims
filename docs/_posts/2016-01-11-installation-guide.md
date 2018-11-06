@@ -12,6 +12,8 @@ MISO requires some configuration directly in the source code. While we plan to
 change this over time, running an instance of MISO will require building and
 deploying a fork of the code base with customisations.
 
+<a name="prerequisites"/>
+
 ## Prerequisites
 For each service, which may be put on the same machine, the following tools are
 required:
@@ -25,13 +27,6 @@ Database Server:
 
 * MySQL 5.7.7
 * Flyway 3.2.1 (newer versions may cause issues)
-
-Run Scanner:
-
-* JDK 8
-* Tomcat 8
-* C++ build environment
-* jsoncpp
 
 Development Machine(s):
 
@@ -300,60 +295,14 @@ to allow duplicate library aliases. A custom validator must be specified for thi
 property to be enabled - the naming scheme’s default validator will not be altered.
 
 # Setting Up the Run Scanner
-The run scanner is a webservice that scans the paths containing
+[Run Scanner](https://github.com/oicr-gsi/runscanner) is a webservice that scans the paths containing
 sequencer output. It is not required for a functioning MISO install, but
 without it, sequencer runs must be added manually.
 
-Run Scanner must be hosted on a separate server from MISO. Create a file called `ROOT.xml`
-in the following directory `$CATALINA_HOME/conf/Catalina/localhost` on that server (create
-the directory if necessary), and populate it with the following information:
+Please see the Run Scanner readme for setup instructions.
 
-    <Context>
-       <Parameter name="runscanner.configFile" value="/etc/runscanner.json" override="false"/>
-    </Context>
+Once complete, edit `$CATALINA_HOME/conf/Catalina/localhost/miso.properties` of the MISO Tomcat server and set `miso.runscanner.urls` to the URL of the Run Scanner instance. It is possible to set up multiple run scanners managing different sequencers and add all the URLs to `miso.properties`. If you are adding Run Scanner to a previously-established MISO environment, restart MISO.
 
-In `/etc/runscanner.json`, or another path of your choosing, put JSON data describing your instruments. You will need one record for each instrument:
-
-    {
-      "path": "/some/directory/where/sequencer/writes",
-      "platformType": "ILLUMINA",
-      "name": "default",
-      "timeZone": "America/Toronto",
-      "parameters": {}
-    }
-
-The JSON file then contains a list of instruments:
-
-    [
-      {
-        "path": "/srv/sequencer/hiseq2500_1",
-        "platformType": "ILLUMINA",
-        "name": "default",
-        "timeZone": "America/Toronto",
-        "parameters": {}
-      },
-      {
-        "path": "/srv/sequencer/hiseq2500_2",
-        "platformType": "ILLUMINA",
-        "name": "default",
-        "timeZone": "America/Toronto",
-        "parameters": {}
-      }
-    ]
-
-The name/platform-type combination decide what scanner is used to interpret the sequencer's results. A list of supported scanners can be found on the status page or the debugging interface below.
-
-The parameters are set based on the processor. Currently, PACBIO/default requires `address` to be set to the URL of the PacBio machine.
-
-If you intend to scan Illumina runs, you will have to build `runscanner-illumina` and install it. See `runscanner-illumina/README.md` for instructions.
-
-Start Tomcat on this machine.
-
-Edit `$CATALINA_HOME/conf/Catalina/localhost/miso.properties` of the MISO Tomcat server and set `miso.runscanner.urls` to the URL of the Run Scanner instance. Restart MISO.
-
-It is possible to set up multiple run scanners managing different sequencers and add all the URLs to `miso.properties`.
-
-You can view the run scanner's state from the main page of the Run Scanner server.
 
 # Building the Application
 
@@ -362,10 +311,7 @@ Build the application using:
 
     mvn clean package -P external
 
-There will be two important build artefacts:
-
-* `miso-web/target/ROOT.war`
-* `runscanner/target/runscanner-*.war`
+There will be an important build artefact: `miso-web/target/ROOT.war`
 
 <a name="upgrading"/>
 
@@ -405,6 +351,11 @@ The same path should be used for `MISO_FILES_DIR` as is set for `miso.fileStorag
 jdbc:mysql://localhost:3306/lims?autoReconnect=true&zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8
 ```
 
+If you encounter errors migrating the database, make sure that you are using the recommended version of Flyway (see
+[Prerequisites](#prerequisites)). There are known issues with using newer Flyway versions with the MISO migrations.
+As Flyway has changed their checksum calculations in newer versions and we don't want to break completed migrations
+for existing users, there are no plans to support newer versions of Flyway at this time.
+
 # Monitoring
 
 The main MISO application and Run Scanner can be monitored using [Prometheus](http://prometheus.io/).
@@ -413,3 +364,4 @@ Available metrics can be obtained at at `http://<miso-URL>/metrics` (note: no `/
 # Next steps
 
 After MISO is installed, refer to the [Admin Manual](admin-guide) for tips on maintaining and running MISO.
+

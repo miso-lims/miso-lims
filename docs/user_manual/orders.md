@@ -20,11 +20,11 @@ of the generic term "partitions".
 {% include userman-heading.md section=page.section sub=sub section-title=section-title title="Active Orders List" %}
 
 The active orders page shows the orders that still require sequencing to be
-performed. From the "Tracking" list, click "Active Orders". There are tabs for
+performed. From the "Instrument Runs" list, click "Orders - Active". There are tabs for
 each of the sequencing instrument platforms active in MISO.
 
 There are columns for the number of matching partitions in different states. The
-"Remaining" column indicates the number of "Requested" paritions minus all the
+"Remaining" column indicates the number of "Requested" partitions minus all the
 partitions from runs that have completed successfully or are currently running.
 If the remaining number is marked with an asterisk, then pending partitions
 have been subtracted from this number. See the _Pending Orders List_ below.
@@ -36,14 +36,14 @@ zero.
 {% include userman-heading.md section=page.section sub=sub section-title=section-title title="All Orders List" %}
 
 This page shows all orders, including ones that are complete. The format is
-similar to the "Active Orders" list. From the "Tracking List", click "All
-Orders".
+similar to the "Active Orders" list. From the "Instrument Runs" list, click
+"Orders - All".
 
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub section-title=section-title title="Pending Orders List" %}
 
-The pending order page is similar to the "Active Orders" list. From the
-"Tracking List", click "Pending Orders". If a pool has been added to a
+The pending order page is similar to the "Orders - Active" list. From the
+"Instrument Runs" list, click "Orders - Pending". If a pool has been added to a
 sequencing container, but that container has not been run, it is in a limbo
 between being sequenced and not. This state is called _pending_ since the pool
 has been loaded on a flow cell but not yet associated with the status of a

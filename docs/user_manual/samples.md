@@ -28,7 +28,7 @@ alias by typing it in manually if they would like.
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Samples List" %}
 
-To get to the main Samples list page, click "Samples" in the Tracking list in the menu on the left side of the screen.
+To get to the main Samples list page, click "Samples" in the Preparation list in the menu on the left side of the screen.
 This list includes all samples from all projects in MISO. The toolbar at the top of the table includes many controls
 for working with samples.
 

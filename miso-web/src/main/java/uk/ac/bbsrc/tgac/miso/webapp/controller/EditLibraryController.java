@@ -89,6 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -647,6 +648,8 @@ public class EditLibraryController {
       }
       model.put("effectiveGroupId", effectiveGroupId);
       model.put("effectiveGroupIdSample", effectiveGroupIdSampleAlias);
+      SampleIdentity identity = getParent(SampleIdentity.class, (DetailedSample) detailed.getSample());
+      model.put("effectiveExternalName", identity.getExternalName());
     }
     return new ModelAndView("/pages/editLibrary.jsp", model);
   }

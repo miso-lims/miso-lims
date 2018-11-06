@@ -480,9 +480,9 @@ INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId
   (100003, 11, NULL, 1, 0), -- gDNA (stock)
   (100004, 15, NULL, 1, 0), -- gDNA (aliquot)
   (110001, 1, NULL, 1, 0),  -- Identity
-  (110002, 23, NULL, 1, 0), -- Tissue
-  (110003, 11, NULL, 1, 0), -- gDNA (stock)
-  (110004, 15, NULL, 1, 0), -- gDNA (aliquot)
+  (110002, 23, 110001, 1, 0), -- Tissue
+  (110003, 11, 110002, 1, 0), -- gDNA (stock)
+  (110004, 15, 110003, 1, 0), -- gDNA (aliquot)
   (120001, 1, NULL, 1, 0),  -- Identity
   (120002, 23, NULL, 1, 0), -- Tissue
   (120003, 11, NULL, 1, 0), -- gDNA (stock)
@@ -503,9 +503,9 @@ INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId
   (304, 15, NULL, 1, 0),
   (305, 15, NULL, 1, 0),
   (501, 1, NULL, 1, 0),
-  (502, 23, NULL, 1, 0),
-  (503, 11, NULL, 1, 0),
-  (504, 15, NULL, 1, 0);
+  (502, 23, 501, 1, 0),
+  (503, 11, 502, 1, 0),
+  (504, 15, 503, 1, 0);
 
 INSERT INTO Identity (sampleId, externalName, donorSex, consentLevel) VALUES
   (1, 'TEST_external_1', 'MALE', 'THIS_PROJECT'),

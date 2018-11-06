@@ -25,7 +25,7 @@ studies exist in MISO solely for ENA support.
 {% assign subsub = 1 %}
 {% include userman-heading.md sub=sub subsub=subsub section=page.section title="Studies List" %}
 
-The studies list can be accessed by clicking the "Studies" link from the Tracking list at the left side of the
+The studies list can be accessed by clicking the "Studies" link from the ENA list at the left side of the
 screen. The page shows all of the studies from all projects. At the top of the
 table, you will find controls for adding, and deleting studies.
 
@@ -68,11 +68,11 @@ Experiments can be seen in several places:
 
 * From the "ENA" section on the left, choose "Experiments" to view all
   experiments. This shows all experiments.
-* From the "Tracking" section on the left, choose "Studies", then select the study
+* From the "ENA" section on the left, choose "Studies", then select the study
   of interest. This shows experiments associated with this study.
-* From the "Tracking" section on the left, choose "Sequencer Runs", then select the
+* From the "Instrument Runs" section on the left, choose "Sequencing Runs", then select the
   run of interest. This shows experiments associated with this sequencing run.
-* From the "Tracking" section on the left, choose "Libraries", then select the
+* From the "Preparation" section on the left, choose "Libraries", then select the
   library of interest. This shows experiments associated with this library.
 
 In any of the Experiment lists, you can click on an experiment name or alias to
@@ -81,7 +81,7 @@ get to the Edit Experiment page.
 {% assign subsub = subsub | plus: 1 %}
 {% include userman-heading.md sub=sub subsub=subsub section=page.section title="Creating an Experiment" %}
 
-From the "Tracking" section on the left, choose "Sequencer Runs", and then
+From the "Instrument Runs" section on the left, choose "Sequencer Runs", and then
 select the sequencer run of interest. If pools have not already been assigned
 to partitions, assign them. From the "Experiment" table, choose "Create New". If the
 "Create New" button does not appear, it is because either there are no pools

@@ -419,6 +419,12 @@
             </form:select>
           </td>
         </tr>
+        <c:if test="${not empty effectiveExternalName}">
+          <tr>
+            <td class="h">External Names:</td>
+            <td>${effectiveExternalName}</td>
+          </tr>
+        </c:if>
         <tr>
         <td class="h">Effective Group ID:</td>
         <td>

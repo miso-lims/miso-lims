@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Attachable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
@@ -52,15 +51,14 @@ public class AttachmentController {
   @PostMapping(value = "/{entityType}/{entityId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void acceptUpload(@PathVariable String entityType, @PathVariable long entityId, @RequestParam(required = false) Long categoryId,
-      MultipartHttpServletRequest request)
-      throws IOException {
+      @RequestParam("files") MultipartFile files[]) throws IOException {
     Attachable item = fileAttachmentService.get(entityType, entityId);
     if (item == null) {
       throw new NotFoundException(entityType + " not found");
     }
     AttachmentCategory category = getCategory(categoryId);
 
-    for (MultipartFile fileItem : getMultipartFiles(request)) {
+    for (MultipartFile fileItem : files) {
       fileAttachmentService.add(item, fileItem, category);
     }
   }
@@ -68,7 +66,7 @@ public class AttachmentController {
   @PostMapping(value = "/{entityType}/shared")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void acceptSharedUpload(@PathVariable String entityType, @RequestParam String entityIds,
-      @RequestParam(required = false) Long categoryId, MultipartHttpServletRequest request)
+      @RequestParam(required = false) Long categoryId, @RequestParam("files") MultipartFile files[])
       throws IOException {
     List<Attachable> items = new ArrayList<>();
     for (Long id : LimsUtils.parseIds(entityIds)) {
@@ -81,19 +79,9 @@ public class AttachmentController {
     }
     AttachmentCategory category = getCategory(categoryId);
 
-    for (MultipartFile fileItem : getMultipartFiles(request)) {
+    for (MultipartFile fileItem : files) {
       fileAttachmentService.addShared(items, fileItem, category);
     }
-  }
-
-  private List<MultipartFile> getMultipartFiles(MultipartHttpServletRequest request) {
-    List<MultipartFile> files = new ArrayList<>();
-    request.getFileMap().forEach((key, fileItem) -> {
-      if (fileItem.getSize() > 0) {
-        files.add(fileItem);
-      }
-    });
-    return files;
   }
 
   private AttachmentCategory getCategory(Long categoryId) throws IOException {

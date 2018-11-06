@@ -382,14 +382,9 @@ public class EditSampleController {
 
   @ModelAttribute("tissueOrigins")
   public List<TissueOrigin> getTissueOrigins() throws IOException {
-    List<TissueOrigin> list = new ArrayList<>(tissueOriginService.getAll());
-    Collections.sort(list, new Comparator<TissueOrigin>() {
-      @Override
-      public int compare(TissueOrigin o1, TissueOrigin o2) {
-        return o1.getAlias().compareTo(o2.getAlias());
-      }
-    });
-    return list;
+    return tissueOriginService.getAll().stream()
+        .sorted(Comparator.comparing(TissueOrigin::getAlias))
+        .collect(Collectors.toList());
   }
 
   @Autowired
@@ -397,15 +392,10 @@ public class EditSampleController {
 
   @ModelAttribute("tissueTypes")
   public List<TissueType> getTissueTypes() throws IOException {
-    List<TissueType> list = new ArrayList<>(tissueTypeService.getAll());
-    Collections.sort(list, new Comparator<TissueType>() {
-      @Override
-      public int compare(TissueType o1, TissueType o2) {
-        // reverse comparison as most frequently used tissue types are at bottom of alphabet
-        return o2.getAlias().compareTo(o1.getAlias());
-      }
-    });
-    return list;
+    return tissueTypeService.getAll().stream()
+        .sorted(Comparator.comparing(TissueType::getAlias).reversed()) // reverse comparison as most frequently used tissue types are at
+                                                                       // bottom of alphabet
+        .collect(Collectors.toList());
   }
 
   @Autowired
@@ -434,14 +424,9 @@ public class EditSampleController {
 
   @ModelAttribute("labs")
   public List<Lab> getLabs() throws IOException {
-    List<Lab> list = new ArrayList<>(labService.getAll());
-    Collections.sort(list, new Comparator<Lab>() {
-      @Override
-      public int compare(Lab o1, Lab o2) {
-        return o1.getAlias().compareTo(o2.getAlias());
-      }
-    });
-    return list;
+    return labService.getAll().stream()
+        .sorted(Comparator.comparing(Lab::getAlias))
+        .collect(Collectors.toList());
   }
 
   @Autowired
@@ -461,14 +446,9 @@ public class EditSampleController {
 
   @ModelAttribute("tissueMaterials")
   public List<TissueMaterial> getTissueMaterials() throws IOException {
-    List<TissueMaterial> list = new ArrayList<>(tissueMaterialService.getAll());
-    Collections.sort(list, new Comparator<TissueMaterial>() {
-      @Override
-      public int compare(TissueMaterial o1, TissueMaterial o2) {
-        return o1.getAlias().compareTo(o2.getAlias());
-      }
-    });
-    return list;
+    return tissueMaterialService.getAll().stream()
+        .sorted(Comparator.comparing(TissueMaterial::getAlias))
+        .collect(Collectors.toList());
   }
 
   @ModelAttribute("strStatusOptions")
@@ -661,6 +641,10 @@ public class EditSampleController {
           if (effective.isPresent()) {
             model.put("effectiveGroupId", effective.get().getGroupId());
             model.put("effectiveGroupIdSample", effective.get().getAlias());
+          }
+          if (!isIdentitySample(sample)) {
+            SampleIdentity identity = getParent(SampleIdentity.class, (DetailedSample) sample);
+            model.put("effectiveExternalName", identity.getExternalName());
           }
         }
         model.put("title", "Sample " + sampleId);

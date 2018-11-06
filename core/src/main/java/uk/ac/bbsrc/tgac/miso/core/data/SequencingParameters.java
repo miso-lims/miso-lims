@@ -1,7 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 @Entity
 @Table(name = "SequencingParameters")
 
-public class SequencingParameters implements Serializable
+public class SequencingParameters implements Serializable, Comparable<SequencingParameters>
 {
 
   private static final long serialVersionUID = 1L;
@@ -141,6 +144,53 @@ public class SequencingParameters implements Serializable
 
   public void setUpdatedBy(User updatedBy) {
     this.updatedBy = updatedBy;
+  }
+
+  private static final List<String> sortOrder = getSortOrder();
+  private static List<String> getSortOrder() {
+    List<String> order = new ArrayList<>();
+    order.add("v4 2×126");
+    order.add("v4");
+    order.add("Rapid Run");
+    order.add("10X");
+    order.add("v3");
+    order.add("High"); // NextSeq
+    order.add("Mid"); // NextSeq
+    order.add("Nano"); // MiSeq
+    order.add("Micro"); // MiSeq
+    order.add("Custom"); // All
+    order.add("Sequencing"); // Oxford Nanopore
+    order.add("Configuration"); // Oxford Nanopore
+    order.add("Control"); // Oxford Nanopore
+    order.add("Platform"); // Oxford Nanopore
+    return Collections.unmodifiableList(order);
+  }
+
+  @Override
+  public int compareTo(SequencingParameters other) {
+    Integer thisSortKey = null;
+    for (int i = 0; i < sortOrder.size(); i++) {
+      if (name.startsWith(sortOrder.get(i))) {
+        thisSortKey = i;
+        break;
+      }
+    }
+    if (thisSortKey == null) thisSortKey = 100;
+
+    Integer otherSortKey = null;
+    for (int i = 0; i < sortOrder.size(); i++) {
+      if (other.name.startsWith(sortOrder.get(i))) {
+        otherSortKey = i;
+        break;
+      }
+    }
+    if (otherSortKey == null) otherSortKey = 100;
+
+    if (thisSortKey == otherSortKey) {
+      return name.compareTo(other.name);
+    } else {
+      return thisSortKey - otherSortKey;
+    }
   }
 
 }

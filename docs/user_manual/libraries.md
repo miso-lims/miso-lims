@@ -28,7 +28,7 @@ alias by typing it in manually if they would like.
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Libraries List" %}
 
-To get to the main Libraries list page, click "Libraries" in the Tracking list in the menu on the left side of the
+To get to the main Libraries list page, click "Libraries" in the Preparation list in the menu on the left side of the
 screen. This list includes all libraries from all projects in MISO. The toolbar at the top of the table includes many
 controls for working with libraries.
 
@@ -105,7 +105,7 @@ possible to associate a library template with multiple projects.
 
 The Edit Project page includes a list of Library Templates associated with the project being viewed/edited.
 
-The main Library Templates list can be accessed by clicking the "Library Templates" link in the Tracking menu on the
+The main Library Templates list can be accessed by clicking the "Library Templates" link in the Misc menu on the
 left side of the screen. This list includes all the library templates that have been created in MISO, and includes some
 extra capabilities not included on the project-specific list.
 
@@ -191,7 +191,7 @@ you to see a more detailed view of the library.
 {% assign subsub = 1 %}
 {% include userman-heading.md section=page.section sub=sub subsub=subsub title="Editing a Single Library" %}
 
-To get to the single Edit Library page, click on the library's name or alias in the Samples list. Links to the Edit
+To get to the single Edit Library page, click on the library's name or alias in the Libraries list. Links to the Edit
 Library page appear on several pages for related items as well, including:
 
 * Library Name and Library Alias columns of the Dilutions tables on the Edit Pool page

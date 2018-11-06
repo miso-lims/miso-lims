@@ -28,7 +28,7 @@ Individual widgets are described in more detail in the [Home Screen Widgets sect
 {% include userman-heading.md section=page.section sub=sub title="List Pages" %}
 
 You can access the list pages by clicking links in the menu on the left side of the screen. For example, to access the
-Samples list, click "Samples" in the Tracking list. These list pages all have similar features and behaviours, as
+Samples list, click "Samples" in the Preparation list. These list pages all have similar features and behaviours, as
 described below.
 
 A dropdown at the top of the table allows you to choose how many entries are shown on a single page. Controls at the

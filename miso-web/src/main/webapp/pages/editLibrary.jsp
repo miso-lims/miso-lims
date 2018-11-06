@@ -423,6 +423,10 @@
 <h2>Details</h2>
 <table class="in">
   <tr>
+    <td class="h">External Names:</td>
+    <td>${effectiveExternalName}</td>
+  </tr>
+  <tr>
     <td class="h">Effective Group ID:</td>
     <td id="effectiveGroupId">
       <c:choose>

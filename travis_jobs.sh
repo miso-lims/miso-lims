@@ -19,10 +19,6 @@ elif [ "$JOB" = "BULK_WEB_IT" ]; then
 elif [ "$JOB" = "OTHER_WEB_IT" ]; then
     cd miso-web
     mvn -P external clean verify -DskipUTs=true -DskipITs=false -Dit.test='!PlainSampleITs, !Bulk*'
-elif [ "$JOB" = "RUNSCANNER_TEST" ]; then
-    pushd runscanner-illumina && ./build-illumina-interop && autoreconf -i && ./configure && make && popd;
-    cd runscanner
-    PATH=$PATH:$(pwd)/../runscanner-illumina mvn -P external clean test -DskipIllumina=false
 elif [ "$JOB" = "PINERY_IT" ]; then
     cd pinery-miso
     mvn clean verify -DskipUTs=true -DskipITs=false

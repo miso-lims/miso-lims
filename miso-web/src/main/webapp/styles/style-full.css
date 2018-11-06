@@ -180,28 +180,28 @@ div.lowquality div {
     font-size: 12px;
 }
 
-ul.bullets {
-    margin: 1em 0;
+div.menu {
+    margin: 0;
+    margin-bottom: 0.8em;
 }
 
-ul.bullets li {
-    margin-left: -0.5em;
-    margin-bottom: 0.5em;
-    background: url(images/bullet.gif) left no-repeat;
+div.menu a {
+    color: #444;
+    text-decoration: none;
+    display: block;
+    padding: 0.4em 0.5em;
     padding-left: 1em;
-    list-style: none;
+    margin: 0;
 }
 
-ul.shorterbullets {
-    margin: 1em 0;
+div.menu a:hover {
+   color: #F0F0FF;
+   background-color: #444;
 }
 
-ul.shorterbullets li {
-    margin-left: -2em;
-    margin-bottom: 0.5em;
-    background: url(images/bullet.gif) left no-repeat;
-    padding-left: 1em;
-    list-style: none;
+div.menu a.submenu {
+   padding: 0.1em 0.5em;
+   padding-left: 2.5em;
 }
 
 table.list {

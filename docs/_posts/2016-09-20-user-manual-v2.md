@@ -347,6 +347,8 @@ This user manual is a work in progress, so parts of it may be missing until it h
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Removing Items from a Workset" %}
 {% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Merging Worksets" %}
+{% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Deleting Worksets" %}
 
 
@@ -384,9 +386,7 @@ This user manual is a work in progress, so parts of it may be missing until it h
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Finding Related Items" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding Pool QCs" %}
-{% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Editing Pool QCs" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Pool QCs" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Deleting Pools" %}
 {% assign sub = sub | plus: 1 %}
