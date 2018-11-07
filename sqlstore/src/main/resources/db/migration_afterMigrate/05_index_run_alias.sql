@@ -27,6 +27,7 @@ CREATE PROCEDURE createRunAliasIndex () BEGIN
 
 END //
 CALL createRunAliasIndex()//
+DROP PROCEDURE createRunAliasIndex//
 
 DELIMITER ;
 -- EndNoTest
