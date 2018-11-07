@@ -623,6 +623,7 @@ public class MisoClient implements Lims {
       r.setReadLength(AttributeKey.READ_LENGTH.extractStringValueFrom(rs));
       r.setRunDirectory(rs.getString("filePath"));
       r.setRunBasesMask(rs.getString("runBasesMask"));
+      r.setSequencingParameters(rs.getString("sequencingParameters"));
 
       return r;
     }
