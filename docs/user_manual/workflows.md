@@ -7,17 +7,15 @@ section: 24
 
 Workflows are series of pre-defined steps that transition one or more items from a defined starting status to
 a defined end status. They represent a series of steps which would be completed in the lab in order to do some
-amount of work.
+amount of work. They are designed to simplify input by allowing for barcode scanning wherever possible.
 
 {% assign sub = 1 %}
 {% assign figure = 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Workflows Widget" %}
 
-To get to the Workflows widget, click on either the MISO logo or the Home tab in the top left of the page.
-This will take you to the Home page, which contains the Workflows widget. The Workflows (figure {{figure}})
-widget displays your incomplete workflows, favourite workflows, an option to begin a new workflow, and an
-option to manage favourite workflows. Once a workflow is complete, it no longer appears in the Workflows
-widget.
+The Workflows widget is accessible on the MISO Home Screen. The Workflows (figure {{figure}}) widget displays
+your incomplete workflows, favourite workflows, an option to begin a new workflow, and an option to manage
+favourite workflows. Once a workflow is complete, it no longer appears in the Workflows widget.
 
 {% include userman-figure.md num=figure cap="Workflows widget" img="workflows-widget.png" %}
 {% include userman-toplink.md %}
@@ -29,17 +27,17 @@ widget.
 If you perform a workflow frequently, you may wish to add it to your favourite workflows. This will allow you
 to begin a new workflow of this type by clicking a single item in the Workflows widget.
 
-To add a new workflow to your favourites, go to the Home page. Click the "Edit Favourite Workflows" item at
-the bottom of the Workflows widget. In the dialog box which opens, click the "Add ... to Favourites" link,
-where "..." is the name of the workflow you wish to add. The Home page will reload, and a "Begin New ...
-Workflow" item will be added to the Workflows widget (figure {{figure}}).
+To add a new workflow to your favourites, go to the Workflows widget and click the "Edit Favourite Workflows"
+item at the bottom of the widget. In the dialog box which opens, click the "Add ... to Favourites" link, where
+"..." is the name of the workflow you wish to add. The Home page will reload, and a "Begin New ... Workflow"
+item will be added to the Workflows widget (figure {{figure}}).
 
 {% include userman-figure.md num=figure cap="Workflows widget with favourite workflow added"
 img="new-favourite-workflow.png" %}
 
-To remove a workflow from your favourites, go to the Home page. Click the "Edit Favourite Workflows" item at
-the bottom of the Workflows widget. In the dialog box which opens, click the "Remove ... from Favourites"
-link, where "..." is the name of the workflow you wish to remove. The Home page will reload, and the Workflows
+To remove a workflow from your favourites, go to the Workflows widget and click the "Edit Favourite Workflows"
+item at the bottom of the widget. In the dialog box which opens, click the "Remove ... from Favourites" link,
+where "..." is the name of the workflow you wish to remove. The Home page will reload, and the Workflows
 widget will no longer contain a "Begin New ... Workflow" item.
 
 {% include userman-toplink.md %}
@@ -47,9 +45,8 @@ widget will no longer contain a "Begin New ... Workflow" item.
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Beginning a New Workflow" %}
 
-To begin a new workflow, go to the Home page. If the workflow you wish to begin is one of your favourite
-workflows, click on the "Begin New ... Workflow" item in the Workflows widget, where "..." is the name of the
-workflow.
+To begin a new workflow, go to the Workflows widget. If the workflow you wish to begin is one of your favourite
+workflows, click on the "Begin New ... Workflow" item in the widget, where "..." is the name of the workflow.
 
 If the workflow you wish to begin is not one of your favourite workflows, click on the "Begin New Workflow"
 item in the Workflows widget. In the dialog box which opens, click the name of the workflow you wish to begin.
@@ -86,7 +83,7 @@ or saved to MISO until the entire workflow is completed.
 If you navigate away from the workflow page before completing the workflow, it is possible to re-enter the
 workflow where you left off.
 
-To resume an incomplete workflow, go to the Home page. In the workflows widget, click on the incomplete
-workflow you wish to resume. You will be brought to the workflow page at the same step as you had left it.
+To resume an incomplete workflow, go to the Workflows widget and click on the incomplete workflow you wish to
+resume. You will be brought to the workflow page at the same step as you had left it.
 
 {% include userman-toplink.md %}
