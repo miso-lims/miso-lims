@@ -1,3 +1,5 @@
+-- add_run_alias_index
+
 -- StartNoTest
 DELIMITER //
 
@@ -31,3 +33,5 @@ DROP PROCEDURE createRunAliasIndex//
 
 DELIMITER ;
 -- EndNoTest
+
+

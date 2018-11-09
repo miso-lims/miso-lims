@@ -1,3 +1,11 @@
+# 0.2.151
+
+Changes:
+
+ * Updated Run Scanner version (1.0.1)
+ * Fixed applying library template indices
+ * Add db index on run alias (#1744)
+
 # 0.2.150
 
 Changes:
@@ -11,6 +19,14 @@ Changes:
  * Added Pools section of user manual
  * Added Worksets section of user manual
  * Separated Runscanner into its own repository
+
+NOTE: Run Scanner has been moved to its own repository. It is no longer necessary to redeploy Run Scanner
+every time you redeploy MISO; however, a MISO version will specify compatibilty with a specific Run Scanner
+version, so when this compatibility changes, the new version of Run Scanner will need to be used.
+Compatibility changes should be noted in these release notes. Run Scanner can now be found here:
+https://github.com/oicr-gsi/runscanner
+
+BAD: Depended on incompatible version of Run Scanner
 
 # 0.2.149
 
