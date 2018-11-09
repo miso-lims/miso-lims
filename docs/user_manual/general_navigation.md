@@ -5,8 +5,15 @@ section: 2
 ---
 
 
-
 {% assign sub = 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Home Screen" %}
+The Home Screen or Home Page is the main page of MISO, and contains [widgets](#home-screen-widgets) and links
+to other areas of MISO. To get to the Home Screen, click on either the MISO logo or the "Home" tab, both in
+the top left corner of all MISO pages.
+
+{% include userman-toplink.md %}
+
+{% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Home Screen Widgets" %}
 
 {% assign figure = 1 %}
