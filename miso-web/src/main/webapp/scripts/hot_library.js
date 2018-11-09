@@ -42,12 +42,11 @@ HotTarget.library = (function() {
       },
       depends: dependent,
       update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-        var indexFamily = null;
+        var pt = HotUtils.getPlatformType(flat.platformType);
+        var indexFamily = Utils.array.findFirstOrNull(function(family) {
+          return family.name == flat.indexFamilyName && family.platformType == pt;
+        }, Constants.indexFamilies);
         if (flatProperty === 'indexFamilyName' || flatProperty === '*start') {
-          var pt = HotUtils.getPlatformType(flat.platformType);
-          indexFamily = Utils.array.findFirstOrNull(function(family) {
-            return family.name == flat.indexFamilyName && family.platformType == pt;
-          }, Constants.indexFamilies);
           var indices = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
             return index.position == n;
           }).map(function(index) {
@@ -65,10 +64,6 @@ HotTarget.library = (function() {
           });
           setData(data);
         } else if (flatProperty === 'index' + n + 'Label') {
-          var pt = HotUtils.getPlatformType(flat.platformType);
-          indexFamily = Utils.array.findFirstOrNull(function(family) {
-            return family.name == flat.indexFamilyName && family.platformType == pt;
-          }, Constants.indexFamilies);
           var indices = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
             return index.position == n;
           });
@@ -79,10 +74,6 @@ HotTarget.library = (function() {
             setData(match.label);
           }
         } else if (flatProperty === 'index' + (n - 1) + 'Label' && !Utils.validation.isEmpty(value)) {
-          var pt = HotUtils.getPlatformType(flat.platformType);
-          indexFamily = Utils.array.findFirstOrNull(function(family) {
-            return family.name == flat.indexFamilyName && family.platformType == pt;
-          }, Constants.indexFamilies);
           if (indexFamily && indexFamily.uniqueDualIndex) {
             var indexName = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
               return index.position == n - 1;

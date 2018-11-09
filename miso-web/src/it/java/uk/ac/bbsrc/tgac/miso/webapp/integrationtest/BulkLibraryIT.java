@@ -494,9 +494,6 @@ public class BulkLibraryIT extends AbstractIT {
     changes.put(LibColumns.SIZE, "253");
     changes.put(LibColumns.VOLUME, "18.0");
     changes.put(LibColumns.CONCENTRATION, "7.6");
-    changes.put(LibColumns.SPIKE_IN, "Spike-In Two");
-    changes.put(LibColumns.SPIKE_IN_DILUTION, "1:100");
-    changes.put(LibColumns.SPIKE_IN_VOL, "123.4567890");
     fillRow(table, 0, changes);
 
     // changed because of design
