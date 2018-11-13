@@ -29,6 +29,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.CacheControl;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -259,11 +262,11 @@ public class MenuController implements ServletContextAware {
 
   @RequestMapping(path = "/constants.js")
   @ResponseBody
-  public String constantsScript(HttpServletResponse response, final UriComponentsBuilder uriBuilder) throws IOException {
+  public ResponseEntity<String> constantsScript(HttpServletResponse response, final UriComponentsBuilder uriBuilder) throws IOException {
     response.setContentType("application/javascript");
     // Use a cached copy and only update every
     if (constantsJs != null && (System.currentTimeMillis() - constantsJsTime) < 15 * 60 * 1000) {
-      return constantsJs;
+      return ResponseEntity.ok().cacheControl(CacheControl.maxAge(15, TimeUnit.MINUTES)).body(constantsJs);
     }
     URI baseUri = uriBuilder.build().toUri();
     ObjectMapper mapper = new ObjectMapper();
@@ -368,7 +371,7 @@ public class MenuController implements ServletContextAware {
     constantsJs = "Constants = " + mapper.writeValueAsString(node) + ";";
     constantsJsTime = System.currentTimeMillis();
     constantsTimestamp.set(constantsJsTime / 1000.0);
-    return constantsJs;
+    return ResponseEntity.ok().cacheControl(CacheControl.maxAge(15, TimeUnit.MINUTES)).body(constantsJs);
   }
 
   public void refreshConstants() {

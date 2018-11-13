@@ -1,3 +1,11 @@
+# 0.2.152
+
+Changes:
+
+ * Export sequencing parameters via Pinery (#1746)
+ * Add Pinery project active flag
+ * Cache constants file for 15 minutes (#1751)
+
 # 0.2.151
 
 Changes:
