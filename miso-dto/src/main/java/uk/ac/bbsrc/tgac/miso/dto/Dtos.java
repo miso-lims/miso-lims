@@ -398,6 +398,10 @@ public class Dtos {
     dto.setDiscarded(from.isDiscarded());
     dto.setLastModified(formatDateTime(from.getLastModified()));
 
+    dto.setDistributed(from.isDistributed());
+    dto.setDistributionDate(formatDate(from.getDistributionDate()));
+    dto.setDistributionRecipient(from.getDistributionRecipient());
+
     return dto;
 
   }
@@ -754,6 +758,10 @@ public class Dtos {
       to.getProject().setId(from.getProjectId());
     }
     to.setBoxPosition((SampleBoxPosition) makeBoxablePosition(from, (SampleImpl) to));
+
+    to.setDistributed(from.isDistributed());
+    to.setDistributionDate(parseDate(from.getDistributionDate()));
+    to.setDistributionRecipient(from.getDistributionRecipient());
     return to;
   }
 
@@ -1266,6 +1274,9 @@ public class Dtos {
     setId(dto::setSpikeInId, from.getSpikeIn());
     setString(dto::setSpikeInVolume, from.getSpikeInVolume());
     setString(dto::setSpikeInDilutionFactor, maybeGetProperty(from.getSpikeInDilutionFactor(), DilutionFactor::getLabel));
+    dto.setDistributed(from.isDistributed());
+    setString(dto::setDistributionDate, formatDate(from.getDistributionDate()));
+    setString(dto::setDistributionRecipient, from.getDistributionRecipient());
     return dto;
   }
 
@@ -1342,6 +1353,9 @@ public class Dtos {
     setObject(to::setSpikeIn, LibrarySpikeIn::new, from.getSpikeInId());
     setBigDecimal(to::setSpikeInVolume, from.getSpikeInVolume());
     setObject(to::setSpikeInDilutionFactor, from.getSpikeInDilutionFactor(), DilutionFactor::get);
+    to.setDistributed(from.isDistributed());
+    to.setDistributionDate(parseDate(from.getDistributionDate()));
+    to.setDistributionRecipient(from.getDistributionRecipient());
     return to;
   }
 

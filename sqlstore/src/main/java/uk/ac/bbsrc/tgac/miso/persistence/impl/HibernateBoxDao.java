@@ -233,6 +233,8 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     box.getBoxPositions().remove(boxable.getBoxPosition());
     currentSession().update(box);
     // flush required to avoid constraint violation incase item is immediately added to another box or the same one
+    // NOTE: this flush will cause ALL Hibernate-managed items to be saved to the db in their current state, even if their `save` method
+    // hasn't explicitly been called yet
     currentSession().flush();
   }
 
@@ -243,6 +245,8 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     } else {
       currentSession().update(box);
       // flush required to avoid constraint violation incase removed items are immediately added to another box or the same one
+      // NOTE: this flush will cause ALL Hibernate-managed items to be saved to the db in their current state, even if their `save` method
+      // hasn't explicitly been called yet
       currentSession().flush();
       return box.getId();
     }

@@ -305,9 +305,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
    * @throws IOException
    */
   private Sample save(Sample sample, boolean validateAliasUniqueness) throws IOException {
-    if (sample.isDiscarded()) {
-      sample.setVolume(0.0);
-    }
     if (sample instanceof DetailedSample && ((DetailedSample) sample).getDetailedQcStatus() != null) {
       ((DetailedSample) sample).setQcPassed(((DetailedSample) sample).getDetailedQcStatus().getStatus());
     }
@@ -677,12 +674,14 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   @Override
   public void update(Sample sample) throws IOException {
     Sample managed = get(sample.getId());
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
+    Box originalBox = managed.getBox();
+    String originalBoxPosition = managed.getBoxPosition();
     boolean validateAliasUniqueness = !managed.getAlias().equals(sample.getAlias());
     authorizationManager.throwIfNotWritable(managed);
     boxService.throwIfBoxPositionIsFilled(sample);
     validateChange(sample, managed);
     applyChanges(managed, sample);
-    managed.setChangeDetails(authorizationManager.getCurrentUser());
     loadChildEntities(managed);
     if (isDetailedSample(managed)) {
       DetailedSample detailedUpdated = (DetailedSample) managed;
@@ -693,7 +692,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     }
 
     save(managed, validateAliasUniqueness);
-    boxService.updateBoxableLocation(sample);
+    applyBoxChanges(managed, originalBox, originalBoxPosition);
   }
 
   private void validateChange(Sample sample, Sample beforeChange) throws IOException {
@@ -706,6 +705,18 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     if (taxonLookupEnabled && (beforeChange == null || !sample.getScientificName().equals(beforeChange.getScientificName()))
         && (sample.getScientificName() == null || TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName()) == null)) {
       errors.add(new ValidationError("scientificName", "This scientific name is not of a known taxonomy"));
+    }
+
+    if (sample.isDistributed()) {
+      if (sample.getDistributionDate() == null)
+        errors.add(new ValidationError("distributionDate", "Distribution date must be recorded for distributed sample"));
+      if (isStringEmptyOrNull(sample.getDistributionRecipient()))
+        errors.add(new ValidationError("distributionRecipient", "Distribution recipient must be recorded for distributed sample"));
+    } else {
+      if (sample.getDistributionDate() != null)
+        errors.add(new ValidationError("distributionDate", "Distribution date should be empty since sample is not distributed"));
+      if (sample.getDistributionRecipient() != null)
+        errors.add(new ValidationError("distributionRecipient", "Distribution recipient should be empty since sample is not distributed"));
     }
 
     if (!errors.isEmpty()) {
@@ -731,12 +742,26 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     target.setAlias(source.getAlias());
     target.setDescription(source.getDescription());
     target.setDiscarded(source.isDiscarded());
-    target.setVolume(source.getVolume());
+    if (target.isDiscarded()) {
+      target.setVolume(0.0);
+    } else {
+      target.setVolume(source.getVolume());
+    }
     target.setVolumeUnits(target.getVolume() == null ? null : source.getVolumeUnits());
     target.setConcentration(source.getConcentration());
     target.setConcentrationUnits(target.getConcentration() == null ? null : source.getConcentrationUnits());
     target.setLocationBarcode(source.getLocationBarcode());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
+    target.setDistributed(source.isDistributed());
+    target.setDistributionDate(source.getDistributionDate());
+    target.setDistributionRecipient(source.getDistributionRecipient());
+    if (target.isDistributed()) {
+      target.setLocationBarcode("SENT TO: " + target.getDistributionRecipient());
+      target.setVolume(0.0);
+    } else {
+      target.setLocationBarcode(source.getLocationBarcode());
+    }
+
     if (isDetailedSample(target)) {
       DetailedSample dTarget = (DetailedSample) target;
       DetailedSample dSource = (DetailedSample) source;
@@ -774,6 +799,14 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     } else {
       target.setQcPassed(source.getQcPassed());
     }
+  }
+
+  private void applyBoxChanges(Sample managed, Box originalBox, String originalBoxPosition) throws IOException {
+    if (originalBox == null) return; // it wasn't in a box so we don't need to make box changes
+    if (!managed.isDistributed() && !managed.isDiscarded()) return; // no need to make box changes
+    managed.setBoxPosition(null);
+    originalBox.getBoxPositions().remove(originalBoxPosition);
+    boxService.save(originalBox);
   }
 
   private void applyAliquotChanges(SampleAliquot target, SampleAliquot source) {

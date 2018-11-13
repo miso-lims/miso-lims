@@ -188,17 +188,19 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   @Override
   public void update(Library library) throws IOException {
     Library managed = get(library.getId());
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
     List<Index> originalIndices = new ArrayList<>(managed.getIndices());
+    Box originalBox = managed.getBox();
+    String originalBoxPosition = managed.getBoxPosition();
     authorizationManager.throwIfNotWritable(managed);
     boxService.throwIfBoxPositionIsFilled(library);
     boolean validateAliasUniqueness = !managed.getAlias().equals(library.getAlias());
     validateChange(library, managed);
     applyChanges(managed, library);
-    managed.setChangeDetails(authorizationManager.getCurrentUser());
     loadChildEntities(managed);
     makeChangeLogForIndices(originalIndices, managed.getIndices(), managed);
     save(managed, validateAliasUniqueness);
-    boxService.updateBoxableLocation(library);
+    applyBoxChanges(managed, originalBox, originalBoxPosition);
   }
 
   @Override
@@ -494,7 +496,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   private void applyChanges(Library target, Library source) throws IOException {
     target.setDescription(source.getDescription());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
-    target.setLocationBarcode(source.getLocationBarcode());
     target.setConcentration(source.getConcentration());
     target.setConcentrationUnits(target.getConcentration() == null ? null : source.getConcentrationUnits());
     target.setPlatformType(source.getPlatformType());
@@ -530,6 +531,15 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       target.setSpikeInDilutionFactor(source.getSpikeInDilutionFactor());
       target.setSpikeInVolume(source.getSpikeInVolume());
     }
+    target.setDistributed(source.isDistributed());
+    target.setDistributionDate(source.getDistributionDate());
+    target.setDistributionRecipient(source.getDistributionRecipient());
+    if (target.isDistributed()) {
+      target.setLocationBarcode("SENT TO: " + target.getDistributionRecipient());
+      target.setVolume(0.0);
+    } else {
+      target.setLocationBarcode(source.getLocationBarcode());
+    }
 
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;
@@ -547,6 +557,14 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     }
   }
 
+  private void applyBoxChanges(Library managed, Box originalBox, String originalBoxPosition) throws IOException {
+    if (originalBox == null) return; // it wasn't in a box so we don't need to make box changes
+    if (!managed.isDistributed() && !managed.isDiscarded()) return; // no need to make box changes
+    managed.setBoxPosition(null);
+    originalBox.getBoxPositions().remove(originalBoxPosition);
+    boxService.save(originalBox);
+  }
+
   private void validateChange(Library library, Library beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
@@ -561,6 +579,18 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       if (library.getSpikeInVolume() == null) {
         errors.add(new ValidationError("spikeInVolume", "Spike-in volume must be specified"));
       }
+    }
+
+    if (library.isDistributed()) {
+      if (library.getDistributionDate() == null)
+        errors.add(new ValidationError("distributionDate", "Distribution date must be recorded for distributed library"));
+      if (isStringEmptyOrNull(library.getDistributionRecipient()))
+        errors.add(new ValidationError("distributionRecipient", "Distribution recipient must be recorded for distributed library"));
+    } else {
+      if (library.getDistributionDate() != null)
+        errors.add(new ValidationError("distributionDate", "Distribution date should be empty since library is not distributed"));
+      if (library.getDistributionRecipient() != null)
+        errors.add(new ValidationError("distributionRecipient", "Distribution recipient should be empty since library is not distributed"));
     }
 
     if (!errors.isEmpty()) {

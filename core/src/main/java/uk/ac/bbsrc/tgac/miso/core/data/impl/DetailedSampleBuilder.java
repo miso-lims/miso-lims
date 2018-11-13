@@ -87,6 +87,9 @@ public class DetailedSampleBuilder
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
   private Collection<SampleQC> sampleQCs = new TreeSet<>();
   private Collection<Note> notes = new HashSet<>();
+  private boolean distributed;
+  private Date distributionDate;
+  private String distributionRecipient;
 
   // DetailedSample attributes
   private DetailedSample parent;
@@ -367,6 +370,36 @@ public class DetailedSampleBuilder
   @Override
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public boolean isDistributed() {
+    return distributed;
+  }
+
+  @Override
+  public void setDistributed(boolean distributed) {
+    this.distributed = distributed;
+  }
+
+  @Override
+  public Date getDistributionDate() {
+    return distributionDate;
+  }
+
+  @Override
+  public void setDistributionDate(Date distributionDate) {
+    this.distributionDate = distributionDate;
+  }
+
+  @Override
+  public String getDistributionRecipient() {
+    return distributionRecipient;
+  }
+
+  @Override
+  public void setDistributionRecipient(String distributionRecipient) {
+    this.distributionRecipient = distributionRecipient;
   }
 
   @Override

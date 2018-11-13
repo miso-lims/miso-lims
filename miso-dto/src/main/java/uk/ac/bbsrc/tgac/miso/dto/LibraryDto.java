@@ -64,6 +64,9 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
   private Long spikeInId;
   private String spikeInVolume;
   private String spikeInDilutionFactor;
+  private boolean distributed;
+  private String distributionDate;
+  private String distributionRecipient;
 
   public String getAlias() {
     return alias;
@@ -84,6 +87,30 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
 
   public String getDescription() {
     return description;
+  }
+
+  public boolean isDistributed() {
+    return distributed;
+  }
+
+  public void setDistributed(boolean distributed) {
+    this.distributed = distributed;
+  }
+
+  public String getDistributionDate() {
+    return distributionDate;
+  }
+
+  public void setDistributionDate(String distributionDate) {
+    this.distributionDate = distributionDate;
+  }
+
+  public String getDistributionRecipient() {
+    return distributionRecipient;
+  }
+
+  public void setDistributionRecipient(String distributionRecipient) {
+    this.distributionRecipient = distributionRecipient;
   }
 
   public Long getId() {

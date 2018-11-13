@@ -71,6 +71,9 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
   private String qcDv200;
   private String qcRin;
   private List<QcDto> qcs;
+  private boolean distributed;
+  private String distributionDate;
+  private String distributionRecipient;
 
   public Long getId() {
     return id;
@@ -300,6 +303,30 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setConcentrationUnits(ConcentrationUnit concentrationUnits) {
     this.concentrationUnits = concentrationUnits;
+  }
+
+  public boolean isDistributed() {
+    return distributed;
+  }
+
+  public void setDistributed(boolean distributed) {
+    this.distributed = distributed;
+  }
+
+  public String getDistributionDate() {
+    return distributionDate;
+  }
+
+  public void setDistributionDate(String distributionDate) {
+    this.distributionDate = distributionDate;
+  }
+
+  public String getDistributionRecipient() {
+    return distributionRecipient;
+  }
+
+  public void setDistributionRecipient(String distributionRecipient) {
+    this.distributionRecipient = distributionRecipient;
   }
 
 }

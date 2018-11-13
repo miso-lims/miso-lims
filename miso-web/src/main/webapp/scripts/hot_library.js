@@ -791,7 +791,93 @@ HotTarget.library = (function() {
               obj.spikeInId = (Utils.validation.isEmpty(flat.spikeIn) || flat.spikeIn === '(None)') ? null : Utils.array.getIdFromAlias(
                   flat.spikeIn, Constants.spikeIns);
             }
-          }, makeSpikeInDilutionFactorColumn(), makeSpikeInVolumeColumn()];
+          }, makeSpikeInDilutionFactorColumn(), makeSpikeInVolumeColumn(), {
+            header: 'Distributed',
+            data: 'distributed',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: ['True', 'False'],
+            include: !config.create && !config.propagate,
+            unpack: function(lib, flat, setCellMeta) {
+              if (lib.distributed === true) {
+                flat.distributed = 'True';
+              } else {
+                flat.distributed = 'False';
+              }
+            },
+            pack: function(lib, flat, errorHandler) {
+              if (flat.distributed === 'True') {
+                lib.distributed = true;
+              } else {
+                lib.distributed = false;
+              }
+            }
+          }, {
+            header: 'Distribution Date',
+            data: 'distributionDate',
+            type: 'date',
+            dateFormat: 'YYYY-MM-DD',
+            datePickerConfig: {
+              firstDay: 0,
+              numberOfMonths: 1
+            },
+            allowEmpty: true,
+            description: 'The date that the library was sent to an external recipient.',
+            include: !config.create && !config.propagate,
+            depends: 'distributed',
+            update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              if (value === 'True') {
+                setReadOnly(false);
+                setOptions({
+                  required: true,
+                  validator: HotUtils.validator.requiredTextNoSpecialChars
+                });
+              } else {
+                setReadOnly(true);
+                setOptions({
+                  validator: HotUtils.validator.requiredEmpty
+                });
+                setData(null);
+              }
+            },
+            unpack: function(lib, flat, setCellMeta) {
+              if (lib.distributionDate) {
+                flat.distributionDate = Utils.valOrNull(lib.distributionDate);
+              }
+            },
+            pack: function(lib, flat, errorHandler) {
+              lib.distributionDate = flat.distributionDate;
+            }
+          }, {
+            header: 'Distribution Recipient',
+            data: 'distributionRecipient',
+            type: 'text',
+            include: !config.create && !config.propagate,
+            depends: 'distributed',
+            update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              if (value === 'True') {
+                setOptions({
+                  required: true,
+                  validator: HotUtils.validator.requiredTextNoSpecialChars
+                });
+                setReadOnly(false);
+              } else {
+                setOptions({
+                  validator: HotUtils.validator.requiredEmpty
+                });
+                setData(null);
+                setReadOnly(true);
+              }
+            },
+            unpack: function(lib, flat, setCellMeta) {
+              if (lib.distributionRecipient) {
+                flat.distributionRecipient = Utils.valOrNull(lib.distributionRecipient);
+              }
+            },
+            pack: function(lib, flat, errorHandler) {
+              lib.distributionRecipient = flat.distributionRecipient;
+            }
+          }];
 
       var spliceIndex = columns.indexOf(columns.filter(function(column) {
         return column.data === 'identificationBarcode';
