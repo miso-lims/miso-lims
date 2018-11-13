@@ -1,3 +1,9 @@
+# 0.2.153
+
+Changes:
+
+ * Fix pinery-miso Spring version
+
 # 0.2.152
 
 Changes:
@@ -5,6 +11,10 @@ Changes:
  * Export sequencing parameters via Pinery (#1746)
  * Add Pinery project active flag
  * Cache constants file for 15 minutes (#1751)
+
+Bad:
+
+ * Incorrect Spring library in Pinery MISO
 
 # 0.2.151
 

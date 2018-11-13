@@ -15,6 +15,7 @@
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
     <pinery.version>2.2.1</pinery.version>
+    <spring-version>5.1.1.RELEASE</spring-version>
   </properties>
 
   <dependencies>
