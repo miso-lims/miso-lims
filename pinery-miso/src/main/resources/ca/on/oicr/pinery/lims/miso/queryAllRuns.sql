@@ -12,6 +12,7 @@ SELECT DISTINCT r.alias
   ,updateLog.changeTime
   ,sp.paired AS paired
   ,sp.readLength AS read_length
+  ,sp.name AS sequencingParameters
   ,ri.runBasesMask AS runBasesMask
 FROM Run AS r  
 LEFT JOIN SequencingParameters AS sp ON sp.parametersId = r.sequencingParameters_parametersId 
