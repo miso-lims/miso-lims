@@ -38,14 +38,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
- * A Platform describes metadata about potentially any hardware item, but is usully linked to a sequencer implementation.
+ * A Platform describes metadata about potentially any hardware item, but is usually linked to a sequencer implementation.
  * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @Entity
 @Table(name = "Platform")
-
 public class Platform implements Comparable<Platform>, Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -66,6 +65,9 @@ public class Platform implements Comparable<Platform>, Serializable {
   private String instrumentModel;
 
   private int numContainers;
+
+  @Enumerated(EnumType.STRING)
+  private InstrumentDataManglingPolicy dataManglingPolicy;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -160,6 +162,14 @@ public class Platform implements Comparable<Platform>, Serializable {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;
+  }
+
+  public InstrumentDataManglingPolicy getDataManglingPolicy() {
+    return dataManglingPolicy;
+  }
+
+  public void setDataManglingPolicy(InstrumentDataManglingPolicy dataManglingPolicy) {
+    this.dataManglingPolicy = dataManglingPolicy;
   }
 
 }

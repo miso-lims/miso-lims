@@ -3,7 +3,11 @@ SELECT part.partitionId
   ,bc1.sequence barcode
   ,bc2.sequence barcode_two
   ,tr.alias targeted_sequencing 
-FROM _Partition part 
+  ,(SELECT DISTINCT dataManglingPolicy FROM Platform JOIN SequencingContainerModel_Platform ON SequencingContainerModel_Platform.platformId = Platform.platformId WHERE SequencingContainerModel_Platform.sequencingContainerModelId = scm.sequencingContainerModelId) dataManglingPolicy
+FROM SequencingContainerModel scm
+JOIN SequencerPartitionContainer spc ON scm.sequencingContainerModelId = spc.sequencingContainerModelId
+JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
+JOIN _Partition part ON part.partitionId = spcp.partitions_partitionId
 JOIN Pool pool ON pool.poolId = part.pool_poolId 
 JOIN Pool_Dilution ele ON ele.pool_poolId = pool.poolId 
 JOIN LibraryDilution ld ON ld.dilutionId = ele.dilution_dilutionId 

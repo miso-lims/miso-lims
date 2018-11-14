@@ -95,8 +95,6 @@ public class MisoClient implements Lims {
   // RunSample queries
   private static final String QUERY_ALL_RUN_SAMPLES = getResourceAsString("queryAllRunSamples.sql");
   private static final String QUERY_RUN_SAMPLES_BY_RUN_ID = QUERY_ALL_RUN_SAMPLES
-      + " JOIN SequencerPartitionContainer_Partition spcp ON spcp.partitions_partitionId = part.partitionId"
-      + " JOIN SequencerPartitionContainer spc ON spc.containerId = spcp.container_containerId"
       + " JOIN Run_SequencerPartitionContainer rcpc ON rcpc.containers_containerId = spc.containerId" + " WHERE rcpc.Run_runId = ?";
 
   // Sample queries
@@ -252,7 +250,8 @@ public class MisoClient implements Lims {
   }
 
   private Sample addChildren(Sample parent) {
-    List<String> children = template.query(QUERY_SAMPLE_CHILD_IDS_BY_SAMPLE_ID, new Object[] { parent.getId(), parent.getId() }, idListMapper);
+    List<String> children = template.query(QUERY_SAMPLE_CHILD_IDS_BY_SAMPLE_ID, new Object[] { parent.getId(), parent.getId() },
+        idListMapper);
     if (!children.isEmpty()) {
       parent.setChildren(new HashSet<>(children));
     }
@@ -742,30 +741,20 @@ public class MisoClient implements Lims {
      */
     public enum AttributeKey {
 
-      SAMPLE_CATEGORY("sample_category", "Sample Category"),
-      RECEIVE_DATE("receive_date", "Receive Date") {
+      SAMPLE_CATEGORY("sample_category", "Sample Category"), RECEIVE_DATE("receive_date", "Receive Date") {
         @Override
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
           return rs.getDate(getSqlKey()) == null ? null : rs.getDate(getSqlKey()).toString();
         }
       },
-      EXTERNAL_NAME("external_name", "External Name"),
-      SEX("sex", "Sex") {
+      EXTERNAL_NAME("external_name", "External Name"), SEX("sex", "Sex") {
         @Override
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
           String str = rs.getString(getSqlKey());
           return WordUtils.capitalizeFully(str);
         }
       },
-      TISSUE_ORIGIN("tissue_origin", "Tissue Origin"),
-      TISSUE_TYPE("tissueType", "Tissue Type"),
-      TISSUE_PREPARATION("tissue_preparation", "Tissue Preparation"),
-      TISSUE_REGION("tissue_region", "Region"),
-      TUBE_ID("tube_id", "Tube Id"),
-      GROUP_ID("group_id", "Group ID"),
-      GROUP_DESCRIPTION("group_id_description", "Group Description"),
-      ORGANISM("organism", "Organism"),
-      PURPOSE("purpose", "Purpose") {
+      TISSUE_ORIGIN("tissue_origin", "Tissue Origin"), TISSUE_TYPE("tissueType", "Tissue Type"), TISSUE_PREPARATION("tissue_preparation", "Tissue Preparation"), TISSUE_REGION("tissue_region", "Region"), TUBE_ID("tube_id", "Tube Id"), GROUP_ID("group_id", "Group ID"), GROUP_DESCRIPTION("group_id_description", "Group Description"), ORGANISM("organism", "Organism"), PURPOSE("purpose", "Purpose") {
         @Override
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
           String str = rs.getString(getSqlKey());
@@ -785,12 +774,7 @@ public class MisoClient implements Lims {
           return str == null ? null : StrStatus.valueOf(str).getValue();
         }
       },
-      QPCR_PERCENTAGE_HUMAN("qpcr_percentage_human", "qPCR %"),
-      QUBIT_CONCENTRATION("qubit_concentration", "Qubit (ng/uL)"),
-      NANODROP_CONCENTRATION("nanodrop_concentration", "Nanodrop (ng/uL)"),
-      BARCODE("barcode", "Barcode"),
-      BARCODE_TWO("barcode_two", "Barcode Two"),
-      READ_LENGTH("read_length", "Read Length") {
+      QPCR_PERCENTAGE_HUMAN("qpcr_percentage_human", "qPCR %"), QUBIT_CONCENTRATION("qubit_concentration", "Qubit (ng/uL)"), NANODROP_CONCENTRATION("nanodrop_concentration", "Nanodrop (ng/uL)"), BARCODE("barcode", "Barcode"), BARCODE_TWO("barcode_two", "Barcode Two"), READ_LENGTH("read_length", "Read Length") {
         private static final String PAIRED_KEY = "paired";
 
         @Override
@@ -805,12 +789,7 @@ public class MisoClient implements Lims {
           return null;
         }
       },
-      TARGETED_RESEQUENCING("targeted_sequencing", "Targeted Resequencing"),
-      SOURCE_TEMPLATE_TYPE("library_design_code", "Source Template Type"),
-      SUBPROJECT("subproject", "Sub-project"),
-      INSTITUTE("institute", "Institute"),
-      CREATION_DATE("inLabCreationDate", "In-lab Creation Date"),
-      PDAC_CONFIRMED("pdac", "PDAC Confirmed") {
+      TARGETED_RESEQUENCING("targeted_sequencing", "Targeted Resequencing"), SOURCE_TEMPLATE_TYPE("library_design_code", "Source Template Type"), SUBPROJECT("subproject", "Sub-project"), INSTITUTE("institute", "Institute"), CREATION_DATE("inLabCreationDate", "In-lab Creation Date"), PDAC_CONFIRMED("pdac", "PDAC Confirmed") {
         @Override
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
           int pdacConfirmed = rs.getInt("pdac");
@@ -829,10 +808,7 @@ public class MisoClient implements Lims {
           return null;
         }
       },
-      STAIN("stain", "Stain"),
-      SLIDES("slides", "Slides"),
-      DISCARDS("discards", "Discards"),
-      SLIDES_CONSUMED("slides_consumed", "Slides Consumed");
+      STAIN("stain", "Stain"), SLIDES("slides", "Slides"), DISCARDS("discards", "Discards"), SLIDES_CONSUMED("slides_consumed", "Slides Consumed");
 
       private final String sqlKey;
       private final String attributeKey;
@@ -901,6 +877,53 @@ public class MisoClient implements Lims {
   }
 
   private static class RunSampleRowMapper implements RowMapper<MisoRunSample> {
+    private char complement(char nt) {
+      switch (nt) {
+      case 'A':
+        return 'T';
+      case 'C':
+        return 'G';
+      case 'G':
+        return 'C';
+      case 'T':
+      case 'U':
+        return 'C';
+      case 'R':
+        return 'Y';
+      case 'Y':
+        return 'R';
+      case 'S':
+        return 'S';
+      case 'W':
+        return 'W';
+      case 'K':
+        return 'M';
+      case 'M':
+        return 'K';
+      case 'B': // CGT
+        return 'V';
+      case 'D': // AGT
+        return 'H';
+      case 'H':// ACT
+        return 'D';
+      case 'V':// ACG
+        return 'B';
+      case 'N':
+        return 'N';
+      default:
+        return nt;
+      }
+    }
+
+    public String reverseComplement(String index) {
+      if (index == null)
+        return null;
+      StringBuilder buffer = new StringBuilder(index.length());
+      for (int i = index.length() - 1; i >= 0; i++) {
+        buffer.append(complement(Character.toUpperCase(index.charAt(i))));
+      }
+      return buffer.toString();
+    }
 
     @Override
     public MisoRunSample mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -909,7 +932,9 @@ public class MisoClient implements Lims {
       s.setId(rs.getString("dilutionId"));
       s.setPartitionId(rs.getInt("partitionId"));
       s.setBarcode(AttributeKey.BARCODE.extractStringValueFrom(rs));
-      s.setBarcodeTwo(AttributeKey.BARCODE_TWO.extractStringValueFrom(rs));
+      String barcode2 = AttributeKey.BARCODE_TWO.extractStringValueFrom(rs);
+      boolean reverseComplement2 = rs.getString("dataManglingPolicy").equals("RC_I5");
+      s.setBarcodeTwo(reverseComplement2 ? reverseComplement(barcode2) : barcode2);
 
       Attribute att = AttributeKey.TARGETED_RESEQUENCING.extractAttributeFrom(rs);
       if (att != null) {
