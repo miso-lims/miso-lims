@@ -2,8 +2,10 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -11,6 +13,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
@@ -31,10 +34,10 @@ public enum SampleSheet {
 
     @Override
     protected String header(Run run) {
-      IlluminaRun r = (IlluminaRun) run;
+      final IlluminaRun r = (IlluminaRun) run;
       String reads = "";
       if (r.getSequencingParameters() != null) {
-        String readLength = Integer.toString(r.getSequencingParameters().getReadLength());
+        final String readLength = Integer.toString(r.getSequencingParameters().getReadLength());
         reads = String.format("[Reads]\n%s\n%s\n\n", readLength,
             r.getSequencingParameters().isPaired() ? readLength : "");
       }
@@ -42,15 +45,19 @@ public enum SampleSheet {
     }
 
     @Override
-    protected void makeColumns(Partition partition, PoolableElementView dilution, String userName, String[] output) {
+    protected void makeColumns(Run run, Partition partition, PoolableElementView dilution, String userName, String[] output) {
       output[0] = dilution.getLibraryName();
       output[1] = dilution.getLibraryAlias();
-      Optional<Index> firstIndex = dilution.getIndices().stream().filter(i -> i.getPosition() == 1).findFirst();
+      final Optional<Index> firstIndex = dilution.getIndices().stream().filter(i -> i.getPosition() == 1).findFirst();
       output[2] = firstIndex.map(Index::getName).orElse("");
       output[3] = firstIndex.map(Index::getSequence).orElse("");
-      Optional<Index> secondIndex = dilution.getIndices().stream().filter(i -> i.getPosition() == 2).findFirst();
+      final Optional<Index> secondIndex = dilution.getIndices().stream().filter(i -> i.getPosition() == 2).findFirst();
       output[4] = secondIndex.map(Index::getName).orElse("");
-      output[5] = secondIndex.map(Index::getSequence).orElse("");
+      output[5] = secondIndex.map(Index::getSequence)
+          .map(run.getSequencer().getInstrumentModel().getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
+              ? SampleSheet::reverseComplement
+              : Function.identity())
+          .orElse("");
     }
 
   },
@@ -71,13 +78,22 @@ public enum SampleSheet {
     }
 
     @Override
-    protected void makeColumns(Partition p, PoolableElementView dilution, String userName, String[] output) {
+    protected void makeColumns(Run run, Partition p, PoolableElementView dilution, String userName, String[] output) {
       output[0] = p.getSequencerPartitionContainer().getIdentificationBarcode();
       output[1] = p.getPartitionNumber().toString();
       output[2] = String.format("%d_%s_%s", p.getSequencerPartitionContainer().getId(), dilution.getLibraryName(),
           dilution.getDilutionName());
       output[3] = dilution.getSampleAlias().replaceAll("\\s", "");
-      output[4] = dilution.getIndices().stream().map(Index::getSequence).collect(Collectors.joining("-"));
+      output[4] = dilution.getIndices().stream()//
+          .sorted(Comparator.comparingInt(Index::getPosition))//
+          .map(i -> {
+            if (run.getSequencer().getInstrumentModel().getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
+                && i.getPosition() == 2) {
+              return reverseComplement(i.getSequence());
+            }
+            return i.getSequence();
+          })//
+          .collect(Collectors.joining("-"));
       output[5] = dilution.getLibraryDescription();
       output[6] = "N";
       output[7] = "NA";
@@ -102,8 +118,8 @@ public enum SampleSheet {
     }
 
     @Override
-    protected void makeColumns(Partition partition, PoolableElementView dilution, String userName, String[] output) {
-      SampleSheet.CASAVA_1_7.makeColumns(partition, dilution, userName, output);
+    protected void makeColumns(Run run, Partition partition, PoolableElementView dilution, String userName, String[] output) {
+      SampleSheet.CASAVA_1_7.makeColumns(run, partition, dilution, userName, output);
       output[9] = dilution.getProjectAlias().replaceAll("\\s", "");
     }
   },
@@ -124,12 +140,63 @@ public enum SampleSheet {
     }
 
     @Override
-    protected void makeColumns(Partition partition, PoolableElementView dilution, String userName, String[] output) {
+    protected void makeColumns(Run run, Partition partition, PoolableElementView dilution, String userName, String[] output) {
       output[0] = dilution.getDilutionName();
       output[1] = dilution.getIndices().stream().findFirst().map(Index::getSequence).orElse("");
       output[2] = dilution.getProjectShortName();
     }
   };
+  private static char complement(char nt) {
+    switch (nt) {
+    case 'A':
+      return 'T';
+    case 'C':
+      return 'G';
+    case 'G':
+      return 'C';
+    case 'T':
+    case 'U':
+      return 'A';
+    // Below are all the degenerate nucleotides. I hope we never need these and if we had one, the edit distance calculations would have
+    // to be the changed.
+    case 'R': // AG
+      return 'Y';
+    case 'Y': // CT
+      return 'R';
+    case 'S': // CG
+      return 'S';
+    case 'W': // AT
+      return 'W';
+    case 'K': // GT
+      return 'M';
+    case 'M': // AC
+      return 'K';
+    case 'B': // CGT
+      return 'V';
+    case 'D': // AGT
+      return 'H';
+    case 'H':// ACT
+      return 'D';
+    case 'V':// ACG
+      return 'B';
+    case 'N':
+      return 'N';
+    default:
+      return nt;
+    }
+  }
+
+  public static String reverseComplement(String index) {
+    if (index == null) {
+      return null;
+    }
+    final StringBuilder buffer = new StringBuilder(index.length());
+    for (int i = index.length() - 1; i >= 0; i--) {
+      buffer.append(complement(Character.toUpperCase(index.charAt(i))));
+    }
+    return buffer.toString();
+  }
+
   private final String alias;
 
   private SampleSheet(String alias) {
@@ -142,12 +209,12 @@ public enum SampleSheet {
 
   public abstract boolean allowedFor(Run run);
 
-  private Stream<String> createRowsForPartition(User user, List<String> columns, Partition partition) {
+  private Stream<String> createRowsForPartition(Run run, User user, List<String> columns, Partition partition) {
     return partition.getPool().getPoolDilutions().stream()//
         .map(PoolDilution::getPoolableElementView)
         .map(dilution -> {
           final String[] output = new String[columns.size()];
-          makeColumns(partition, dilution, user.getLoginName(), output);
+          makeColumns(run, partition, dilution, user.getLoginName(), output);
           return String.join(",", output);
         });
   }
@@ -159,7 +226,7 @@ public enum SampleSheet {
         run.getSequencerPartitionContainers().stream()//
             .flatMap(container -> container.getPartitions().stream())//
             .filter(partition -> partition.getPool() != null)//
-            .flatMap(partition -> createRowsForPartition(user, columns, partition)))
+            .flatMap(partition -> createRowsForPartition(run, user, columns, partition)))
         .collect(Collectors.joining("\n"));
   }
 
@@ -167,5 +234,5 @@ public enum SampleSheet {
 
   protected abstract String header(Run run);
 
-  protected abstract void makeColumns(Partition partition, PoolableElementView dilution, String userName, String[] output);
+  protected abstract void makeColumns(Run run, Partition partition, PoolableElementView dilution, String userName, String[] output);
 }
