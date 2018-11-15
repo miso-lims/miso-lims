@@ -115,13 +115,18 @@ var Box = Box
       },
 
       // Saves entire box (stored in Box.boxJSON)
-      saveContents: function(items) {
+      saveContents: function(items, emptyPositions) {
         var data = items.map(function(item) {
           return {
             position: item.coordinates,
             searchString: item.identificationBarcode
           }
-        });
+        }).concat(emptyPositions.map(function(position) {
+           return {
+             position: position,
+             searchString: null
+           };
+        }));
         var url = '/miso/rest/box/' + Box.boxJSON.id + '/bulk-update';
         
         jQuery.ajax({
