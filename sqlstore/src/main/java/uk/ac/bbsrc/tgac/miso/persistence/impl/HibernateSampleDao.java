@@ -253,7 +253,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
         }).flatMap(list -> list.stream())
         .distinct()
         .collect(Collectors.toSet());
-    
+
     // filter out those with a non-exact external name match
     if (exactMatch) {
       return filterOnlyExactExternalNameMatches(records, query);
@@ -356,8 +356,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   @Override
   public void restrictPaginationByClass(Criteria criteria, String name, Consumer<String> errorHandler) {
     criteria.createAlias("sampleClass", "sampleClass");
-    criteria.add(Restrictions.or(Restrictions.ilike("sampleClass.alias", name, MatchMode.ANYWHERE),
-        Restrictions.ilike("sampleClass.sampleCategory", name, MatchMode.START)));
+    criteria.add(Restrictions.ilike("sampleClass.alias", name, MatchMode.ANYWHERE));
   }
 
   @Override
