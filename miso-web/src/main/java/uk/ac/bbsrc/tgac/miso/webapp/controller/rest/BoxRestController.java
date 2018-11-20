@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -134,14 +133,14 @@ public class BoxRestController extends RestController {
     this.boxScanners = boxScanners;
   }
 
-  @GetMapping(value = "/box/dt",  produces = "application/json")
+  @GetMapping(value = "/box/dt", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<BoxDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
-  @GetMapping(value = "/box/dt/use/{id}",  produces = "application/json")
+  @GetMapping(value = "/box/dt/use/{id}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<BoxDto> dataTableByUse(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response,
@@ -149,8 +148,7 @@ public class BoxRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.boxUse(id));
   }
 
-  @PutMapping(value = "/box/{boxId}/position/{position}",  consumes = { "application/json" },
-      produces = { "application/json" })
+  @PutMapping(value = "/box/{boxId}/position/{position}", consumes = { "application/json" }, produces = { "application/json" })
   public @ResponseBody BoxDto setPosition(@PathVariable("boxId") Long boxId, @PathVariable("position") String position,
       @RequestParam("entity") String entity) throws IOException {
     BoxableId id = parseEntityIdentifier(entity);
@@ -205,7 +203,7 @@ public class BoxRestController extends RestController {
     }
   }
 
-  private JSONObject exportBoxContentsForm(Long boxId) throws IOException  {
+  private JSONObject exportBoxContentsForm(Long boxId) throws IOException {
     Box box = boxService.get(boxId);
 
     List<List<String>> boxContents = getBoxContents(box);
@@ -255,7 +253,7 @@ public class BoxRestController extends RestController {
   private String findExternalName(BoxableView boxableView) throws IOException {
     DetailedSample detailedSample;
 
-    switch(boxableView.getId().getTargetType()) {
+    switch (boxableView.getId().getTargetType()) {
     case SAMPLE:
       detailedSample = (DetailedSample) extractSample(boxableView);
       break;
@@ -444,6 +442,7 @@ public class BoxRestController extends RestController {
   }
 
   public static class ScanResultsDto {
+    private List<String> emptyPositions;
     private List<BoxableDto> items;
     private List<ErrorMessage> errors;
     private List<DiffMessage> diffs;
@@ -488,6 +487,14 @@ public class BoxRestController extends RestController {
 
     public void setColumns(int columns) {
       this.columns = columns;
+    }
+
+    public List<String> getEmptyPositions() {
+      return emptyPositions;
+    }
+
+    public void setEmptyPositions(List<String> emptyPositions) {
+      this.emptyPositions = emptyPositions;
     }
   }
 
@@ -577,7 +584,8 @@ public class BoxRestController extends RestController {
       box.getSize().positionStream().map(position -> {
         BoxableView originalItem = boxables.containsKey(position) ? boxables.get(position) : null;
         BoxableView newItem = barcodesByPosition.containsKey(position) && boxablesByBarcode.containsKey(barcodesByPosition.get(position))
-            ? boxablesByBarcode.get(barcodesByPosition.get(position)) : null;
+            ? boxablesByBarcode.get(barcodesByPosition.get(position))
+            : null;
         if (originalItem != null && newItem != null &&
             !newItem.getIdentificationBarcode().equals(originalItem.getIdentificationBarcode())) {
           DiffMessage dto = new DiffMessage();
@@ -601,6 +609,10 @@ public class BoxRestController extends RestController {
       }).filter(Objects::nonNull);
 
       ScanResultsDto scanResults = new ScanResultsDto();
+      scanResults.setEmptyPositions(barcodesByPosition.entrySet().stream()//
+          .filter(entry -> !isRealBarcode(scan, entry.getValue()))//
+          .map(Entry::getKey)//
+          .collect(Collectors.toList()));
       scanResults.setItems(items);
       scanResults.setErrors(errors);
       scanResults.setDiffs(diffs);
@@ -674,11 +686,11 @@ public class BoxRestController extends RestController {
     Box box = getBox(boxId);
     boxService.discardAllContents(box);
   }
-  
+
   public static class BulkUpdateRequestItem {
     private String position;
     private String searchString;
-    
+
     public String getPosition() {
       return position;
     }
@@ -690,15 +702,16 @@ public class BoxRestController extends RestController {
     public String getSearchString() {
       return searchString;
     }
-    
+
     public void setSearchString(String searchString) {
       this.searchString = searchString;
     }
 
   }
-  
+
   @PostMapping(value = "/box/{boxId}/bulk-update")
-  public @ResponseBody BoxDto bulkUpdatePositions(@PathVariable long boxId, @RequestBody List<BulkUpdateRequestItem> items) throws IOException {
+  public @ResponseBody BoxDto bulkUpdatePositions(@PathVariable long boxId, @RequestBody List<BulkUpdateRequestItem> items)
+      throws IOException {
     Box box = boxService.get(boxId);
     if (box == null) {
       throw new RestException("Box " + boxId + " not found", Status.NOT_FOUND);
@@ -708,6 +721,10 @@ public class BoxRestController extends RestController {
     for (BulkUpdateRequestItem item : items) {
       if (!box.isValidPosition(item.getPosition())) {
         validation.addError(new ValidationError("Invalid position given: " + item.getPosition()));
+      }
+      if (item.getSearchString() == null) {
+        box.getBoxPositions().remove(item.getPosition());
+        continue;
       }
       List<BoxableView> searchResults = boxService.getBoxableViewsBySearch(item.getSearchString());
       if (searchResults == null || searchResults.isEmpty()) {
@@ -730,12 +747,6 @@ public class BoxRestController extends RestController {
       BoxPosition bp = new BoxPosition(box, entry.getKey(), entry.getValue().getId());
       box.getBoxPositions().put(entry.getKey(), bp);
     }
-    Iterator<String> posIterator = box.getBoxPositions().keySet().iterator();
-    posIterator.forEachRemaining(pos -> {
-      if (!updates.containsKey(pos)) {
-        posIterator.remove();
-      }
-    });
 
     validation.throwIfInvalid();
     boxService.save(box);

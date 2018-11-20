@@ -1,3 +1,11 @@
+# 0.2.154
+
+Changes:
+
+ * Updated runscanner version (1.1.0)
+ * Restrict class search on sample to only use SampleClass alias, not category name
+ * Fixed bug where box contents were deleted when updating multiple positions
+
 # 0.2.153
 
 Changes:
