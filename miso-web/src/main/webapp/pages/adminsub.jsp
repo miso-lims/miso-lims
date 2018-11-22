@@ -76,6 +76,8 @@
       <a href="<c:url value="/miso/librarytemplates"/>">Library Templates</a>
       <a href="<c:url value="/miso/kitdescriptors"/>">Kits</a>
       <a href="<c:url value="/miso/indices"/>">Indices</a>
+      <a href="<c:url value="/miso/qctype/list"/>">QC Types</a>
+      <a href="<c:url value="/miso/attachmentcategories/list"/>">Attachment Categories</a>
       <a href="<c:url value="/miso/printers"/>">Printers</a>
       <a href="<c:url value="/miso/deletions"/>">Deletion Log</a>
     </div>
@@ -86,11 +88,9 @@
         <a href="<c:url value="/miso/tissuematerial/list"/>">Tissue Materials</a>
         <a href="<c:url value="/miso/tissueorigin/list"/>">Tissue Origins</a>
         <a href="<c:url value="/miso/samplepurpose/list"/>">Sample Purposes</a>
-        <a href="<c:url value="/miso/qctype/list"/>">QC Types</a>
         <a href="<c:url value="/miso/subproject/list"/>">Subprojects</a>
         <a href="<c:url value="/miso/institute/list"/>">Institutes</a>
         <a href="<c:url value="/miso/lab/list"/>">Labs</a>
-        <a href="<c:url value="/miso/attachmentcategories/list"/>">Attachment Categories</a>
       </div>
     </c:if>
 	
