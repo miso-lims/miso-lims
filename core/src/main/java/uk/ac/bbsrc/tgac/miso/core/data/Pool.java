@@ -239,4 +239,10 @@ public interface Pool
    */
   public Set<String> getPrioritySubprojectAliases();
 
+  @Override
+  public int hashCode();
+
+  @Override
+  public boolean equals(Object obj);
+
 }

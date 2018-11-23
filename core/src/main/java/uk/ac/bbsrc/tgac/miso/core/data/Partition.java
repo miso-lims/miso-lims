@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * A Partition represents a compartment on a {@link SequencerPartitionContainer} on a sequencing platform, e.g. a lane on Illumina, a
@@ -79,6 +80,14 @@ public interface Partition extends Identifiable, Comparable<Partition>, Serializ
    *          pool.
    */
   public void setPool(Pool pool);
+
+  public BigDecimal getLoadingConcentration();
+
+  public void setLoadingConcentration(BigDecimal loadingConcentration);
+
+  public ConcentrationUnit getLoadingConcentrationUnits();
+
+  public void setLoadingConcentrationUnits(ConcentrationUnit loadingConcentrationUnits);
 
   @Override
   int hashCode();

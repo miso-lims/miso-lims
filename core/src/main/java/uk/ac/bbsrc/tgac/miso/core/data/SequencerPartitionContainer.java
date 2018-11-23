@@ -104,4 +104,10 @@ public interface SequencerPartitionContainer
 
   public void setModel(SequencingContainerModel model);
 
+  @Override
+  public int hashCode();
+
+  @Override
+  public boolean equals(Object obj);
+
 }
