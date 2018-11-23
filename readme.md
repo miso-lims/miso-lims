@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/TGAC/miso-lims.svg?branch=develop)](https://travis-ci.org/TGAC/miso-lims) [![Quality Gate](https://sonarqube.com/api/badges/gate?key=uk.ac.bbsrc.tgac.miso:miso:sonarqube)](https://sonarqube.com/dashboard?id=uk.ac.bbsrc.tgac.miso%3Amiso%3Asonarqube) [![DOI](https://zenodo.org/badge/4726428.svg)](https://zenodo.org/badge/latestdoi/4726428)
+[![Build Status](https://travis-ci.org/TGAC/miso-lims.svg?branch=develop)](https://travis-ci.org/TGAC/miso-lims) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=uk.ac.bbsrc.tgac.miso:miso&metric=alert_status)](https://sonarcloud.io/dashboard?id=uk.ac.bbsrc.tgac.miso:miso) [![DOI](https://zenodo.org/badge/4726428.svg)](https://zenodo.org/badge/latestdoi/4726428)
 
 
 # MISO: An open source LIMS for small-to-large scale sequencing centres
