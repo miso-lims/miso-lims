@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data.spreadsheet;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -7,6 +8,8 @@ import java.util.function.Function;
 
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.odftoolkit.odfdom.doc.table.OdfTableCell;
+
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public abstract class Column<T> {
 
@@ -60,6 +63,68 @@ public abstract class Column<T> {
       @Override
       void setODF(OdfTableCell cell, T value) {
         cell.setDoubleValue(transform.apply(value));
+      }
+    };
+  }
+
+  public static <T> Column<T> forInteger(String name, Function<T, Integer> transform) {
+    return new Column<T>(name) {
+
+      @Override
+      void appendCsv(StringBuilder builder, T value) {
+        Integer result = transform.apply(value);
+        if (result != null) {
+          builder.append(result.doubleValue());
+        }
+      }
+
+      @Override
+      void setExcel(XSSFCell cell, T value) {
+        Integer result = transform.apply(value);
+        if (result != null) {
+          cell.setCellValue(result);
+        }
+      }
+
+      @Override
+      void setODF(OdfTableCell cell, T value) {
+        Integer result = transform.apply(value);
+        if (result == null) {
+          cell.setStringValue("");
+        } else {
+          cell.setStringValue(result.toString());
+        }
+      }
+    };
+  }
+
+  public static <T> Column<T> forBigDecimal(String name, Function<T, BigDecimal> transform) {
+    return new Column<T>(name) {
+
+      @Override
+      void appendCsv(StringBuilder builder, T value) {
+        BigDecimal result = transform.apply(value);
+        if (result != null) {
+          builder.append(LimsUtils.toNiceString(result));
+        }
+      }
+
+      @Override
+      void setExcel(XSSFCell cell, T value) {
+        BigDecimal result = transform.apply(value);
+        if (result != null) {
+          cell.setCellValue(LimsUtils.toNiceString(result));
+        }
+      }
+
+      @Override
+      void setODF(OdfTableCell cell, T value) {
+        BigDecimal result = transform.apply(value);
+        if (result == null) {
+          cell.setStringValue("");
+        } else {
+          cell.setStringValue(LimsUtils.toNiceString(result));
+        }
       }
     };
   }
