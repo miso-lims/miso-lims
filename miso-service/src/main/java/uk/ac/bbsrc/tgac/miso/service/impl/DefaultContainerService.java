@@ -231,7 +231,7 @@ public class DefaultContainerService
     containerDao.save(original.getSequencerPartitionContainer());
   }
 
-  private void validateChange(Partition partition, Partition beforeChange) throws IOException {
+  private void validateChange(Partition partition, Partition beforeChange) {
     List<ValidationError> errors = new ArrayList<>();
 
     ValidationUtils.validateConcentrationUnits(partition.getLoadingConcentration(), partition.getLoadingConcentrationUnits(),
