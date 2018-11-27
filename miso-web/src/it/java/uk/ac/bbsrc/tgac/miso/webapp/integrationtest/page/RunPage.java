@@ -174,7 +174,9 @@ public class RunPage extends FormPage<RunPage.Field> {
       if (assignFirstPool) clickFirstPoolTile(true, searchText);
       break;
     }
-    setLoadingConcentration(loadingConcentration, units);
+    if (assignFirstPool) {
+      setLoadingConcentration(loadingConcentration, units);
+    }
   }
 
   public void searchForPools(boolean assignFirstPool, List<Integer> partitions, String option, String searchText) {
