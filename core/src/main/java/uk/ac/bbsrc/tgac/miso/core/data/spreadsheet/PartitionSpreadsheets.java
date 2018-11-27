@@ -9,7 +9,7 @@ public enum PartitionSpreadsheets implements Spreadsheet<Partition> {
 
   LOADING_CONCENTRATIONS("Loading Concentrations", //
       Column.forString("Container", p -> p.getSequencerPartitionContainer().getAlias()), //
-      Column.forInteger("Number", Partition::getPartitionNumber), //
+      Column.forInteger("Partition", Partition::getPartitionNumber), //
       Column.forString("Pool", p -> p.getPool() == null ? null : p.getPool().getAlias()), //
       Column.forBigDecimal("Loading Concentration", Partition::getLoadingConcentration), //
       Column.forString("Units",

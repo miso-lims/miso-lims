@@ -74,7 +74,7 @@ public abstract class Column<T> {
       void appendCsv(StringBuilder builder, T value) {
         Integer result = transform.apply(value);
         if (result != null) {
-          builder.append(result.doubleValue());
+          builder.append(result.toString());
         }
       }
 
@@ -82,7 +82,7 @@ public abstract class Column<T> {
       void setExcel(XSSFCell cell, T value) {
         Integer result = transform.apply(value);
         if (result != null) {
-          cell.setCellValue(result);
+          cell.setCellValue(result.toString());
         }
       }
 
