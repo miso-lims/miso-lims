@@ -1,9 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
+
 public class PartitionDto {
   private Long containerId;
   private String containerName;
   private Long id;
+  private String loadingConcentration;
+  private ConcentrationUnit loadingConcentrationUnits;
   private int partitionNumber;
   private PoolDto pool;
   private String qcNotes;
@@ -19,6 +23,14 @@ public class PartitionDto {
 
   public Long getId() {
     return id;
+  }
+
+  public String getLoadingConcentration() {
+    return loadingConcentration;
+  }
+
+  public ConcentrationUnit getLoadingConcentrationUnits() {
+    return loadingConcentrationUnits;
   }
 
   public int getPartitionNumber() {
@@ -47,6 +59,14 @@ public class PartitionDto {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public void setLoadingConcentration(String loadingConcentration) {
+    this.loadingConcentration = loadingConcentration;
+  }
+
+  public void setLoadingConcentrationUnits(ConcentrationUnit loadingConcentrationUnits) {
+    this.loadingConcentrationUnits = loadingConcentrationUnits;
   }
 
   public void setPartitionNumber(int partitionNumber) {

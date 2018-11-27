@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -123,11 +124,16 @@ public class MisoWebUtils {
   public static <T> HttpEntity<byte[]> generateSpreadsheet(WhineyFunction<Long, T> fetcher, Function<String, Spreadsheet<T>> formatLibrary,
       HttpServletRequest request,
       HttpServletResponse response) {
+    Stream<T> input = COMMA.splitAsStream(request.getParameter("ids")).map(Long::parseLong).map(WhineyFunction.rethrow(fetcher));
+    return generateSpreadsheet(input, formatLibrary, request, response);
+  }
+
+  public static <T> HttpEntity<byte[]> generateSpreadsheet(Stream<T> input, Function<String, Spreadsheet<T>> formatLibrary,
+      HttpServletRequest request, HttpServletResponse response) {
     Spreadsheet<T> spreadsheet = formatLibrary.apply(request.getParameter("sheet"));
     SpreadSheetFormat formatter = SpreadSheetFormat.valueOf(request.getParameter("format"));
     HttpHeaders headers = makeHttpHeaders(spreadsheet, formatter, response);
-    return new HttpEntity<>(formatter.generate(
-        COMMA.splitAsStream(request.getParameter("ids")).map(Long::parseLong).map(WhineyFunction.rethrow(fetcher)), spreadsheet), headers);
+    return new HttpEntity<>(formatter.generate(input, spreadsheet), headers);
   }
 
   public static HttpEntity<byte[]> generateSpreadsheet(List<String> headers, List<List<String>> data,

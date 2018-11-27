@@ -2180,6 +2180,8 @@ public class Dtos {
     dto.setContainerName(from.getSequencerPartitionContainer().getIdentificationBarcode());
     dto.setPartitionNumber(from.getPartitionNumber());
     dto.setPool(from.getPool() == null ? null : asDto(from.getPool(), includePoolContents, false));
+    setString(dto::setLoadingConcentration, from.getLoadingConcentration());
+    dto.setLoadingConcentrationUnits(from.getLoadingConcentrationUnits());
     return dto;
   }
 

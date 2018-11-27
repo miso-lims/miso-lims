@@ -23,8 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,6 +37,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -69,7 +74,12 @@ public class PartitionImpl implements Partition {
 
   @ManyToOne(targetEntity = PoolImpl.class)
   @JoinColumn(name = "pool_poolId")
-  Pool pool = null;
+  private Pool pool = null;
+
+  private BigDecimal loadingConcentration;
+
+  @Enumerated(EnumType.STRING)
+  private ConcentrationUnit loadingConcentrationUnits;
 
   public PartitionImpl() {
   }
@@ -120,22 +130,54 @@ public class PartitionImpl implements Partition {
     this.pool = pool;
   }
 
+  @Override
+  public BigDecimal getLoadingConcentration() {
+    return loadingConcentration;
+  }
+
+  @Override
+  public void setLoadingConcentration(BigDecimal loadingConcentration) {
+    this.loadingConcentration = loadingConcentration;
+  }
+
+  @Override
+  public ConcentrationUnit getLoadingConcentrationUnits() {
+    return loadingConcentrationUnits;
+  }
+
+  @Override
+  public void setLoadingConcentrationUnits(ConcentrationUnit loadingConcentrationUnits) {
+    this.loadingConcentrationUnits = loadingConcentrationUnits;
+  }
+
   /**
    * Equivalency is based on getProjectId() if set, otherwise on name, description and creation date.
    */
   @Override
   public boolean equals(Object obj) {
+    if (this == obj) return true;
     if (obj == null) return false;
-    if (obj == this) return true;
-    if (!(obj instanceof Partition)) return false;
-    Partition them = (Partition) obj;
+    if (getClass() != obj.getClass()) return false;
+    PartitionImpl other = (PartitionImpl) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getId() == PartitionImpl.UNSAVED_ID || them.getId() == PartitionImpl.UNSAVED_ID) {
-      return getPartitionNumber().equals(them.getPartitionNumber())
-          && getSequencerPartitionContainer().equals(them.getSequencerPartitionContainer());
+    if (getId() == PartitionImpl.UNSAVED_ID || other.getId() == PartitionImpl.UNSAVED_ID) {
+      if (loadingConcentration == null) {
+        if (other.loadingConcentration != null) return false;
+      } else if (!loadingConcentration.equals(other.loadingConcentration)) return false;
+      if (loadingConcentrationUnits != other.loadingConcentrationUnits) return false;
+      if (partitionNumber == null) {
+        if (other.partitionNumber != null) return false;
+      } else if (!partitionNumber.equals(other.partitionNumber)) return false;
+      if (pool == null) {
+        if (other.pool != null) return false;
+      } else if (!pool.equals(other.pool)) return false;
+      if (sequencerPartitionContainer == null) {
+        if (other.sequencerPartitionContainer != null) return false;
+      } else if (!sequencerPartitionContainer.equals(other.sequencerPartitionContainer)) return false;
+      return true;
     } else {
-      return this.getId() == them.getId();
+      return this.getId() == other.getId();
     }
   }
 
@@ -148,6 +190,8 @@ public class PartitionImpl implements Partition {
       int hashcode = -1;
       if (getPartitionNumber() != null) hashcode = PRIME * hashcode + getPartitionNumber().hashCode();
       if (getSequencerPartitionContainer() != null) hashcode = PRIME * hashcode + getSequencerPartitionContainer().hashCode();
+      if (getLoadingConcentration() != null) hashcode = PRIME * hashcode + getLoadingConcentration().hashCode();
+      if (getLoadingConcentrationUnits() != null) hashcode = PRIME * hashcode + getLoadingConcentrationUnits().hashCode();
       return hashcode;
     }
   }

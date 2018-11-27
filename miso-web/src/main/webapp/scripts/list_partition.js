@@ -36,7 +36,7 @@ ListTarget.partition = {
       return pt.name == config.platformType;
     }, Constants.platformTypes);
 
-    var showPoolTiles = function(response, assignCallback, backHandler) {
+    var showPoolTiles = function(response, setConcentrationCallback, backHandler) {
       var dialogArea = document.getElementById('dialog');
       while (dialogArea.hasChildNodes()) {
         dialogArea.removeChild(dialogArea.lastChild);
@@ -76,7 +76,9 @@ ListTarget.partition = {
 
         dialogArea.appendChild(Tile.make(tileParts, function() {
           dialog.dialog("close");
-          assignCallback(item.pool);
+          setConcentrationCallback(item.pool, function() {
+            showPoolTiles(response, setConcentrationCallback, backHandler);
+          });
           return false;
         }));
       });
@@ -117,10 +119,10 @@ ListTarget.partition = {
       });
     };
 
-    var assignFromRest = function(url, name, assignCallback, backHandler) {
+    var assignFromRest = function(url, name, setConcentrationCallback, backHandler) {
       var handler = function() {
         Utils.ajaxWithDialog('Getting Pools', 'GET', url, null, function(response) {
-          showPoolTiles(response, assignCallback, backHandler);
+          showPoolTiles(response, setConcentrationCallback, backHandler);
         });
       };
       return {
@@ -132,10 +134,17 @@ ListTarget.partition = {
     var actions = [{
       name: "Assign Pool",
       action: function(partitions) {
-        var assign = function(pool) {
+        var assign = function(pool, concentration, units) {
           var doAssign = function() {
-            Utils.ajaxWithDialog('Assigning Pool', 'POST', '/miso/rest/pool/' + (pool ? pool.id : 0) + '/assign', partitions
-                .map(Utils.array.getId), Utils.page.pageReload);
+            var data = {
+              partitionIds: partitions.map(Utils.array.getId),
+            }
+            if (concentration) {
+              data.concentration = concentration;
+              data.units = units;
+            }
+            Utils.ajaxWithDialog('Assigning Pool', 'POST', '/miso/rest/pool/' + (pool ? pool.id : 0) + '/assign', data,
+                Utils.page.pageReload);
           };
           if (pool) {
             HotUtils.warnIfConsentRevoked(pool.pooledElements, function() {
@@ -144,6 +153,31 @@ ListTarget.partition = {
           } else {
             doAssign();
           }
+        };
+        var setConcentration = function(pool, backHandler) {
+          Utils.showDialog('Set Loading Concentration', 'OK', [{
+            label: 'Loading Concentration',
+            property: 'loadingConcentration',
+            type: 'float',
+            value: ''
+          }, {
+            label: 'Units',
+            property: 'loadingConcentrationUnits',
+            type: 'select',
+            values: Constants.concentrationUnits,
+            getLabel: function(concentrationUnit) {
+              return concentrationUnit.units.replace('&#181;', 'µ');
+            }
+          }], function(output) {
+            var conc = output.loadingConcentration;
+            var units;
+            if (conc) {
+              units = output.loadingConcentrationUnits.name;
+              assign(pool, conc, units);
+            } else {
+              assign(pool, null, null);
+            }
+          }, backHandler)
         };
         var makeSearch = function(defaultQuery, backHandler) {
           return function() {
@@ -157,7 +191,7 @@ ListTarget.partition = {
                 platform: platformType.name,
                 query: results.query
               }), null, function(response) {
-                showPoolTiles(response, assign, makeSearch(results.query, backHandler));
+                showPoolTiles(response, setConcentration, makeSearch(results.query, backHandler));
               });
             }, backHandler);
 
@@ -181,12 +215,13 @@ ListTarget.partition = {
           platform: platformType.name,
           seqParamsId: config.sequencingParametersId,
           fulfilled: false
-        }), 'Outstanding Orders (Matched Chemistry)', assign, assignDialog) : null,
+        }), 'Outstanding Orders (Matched Chemistry)', setConcentration, assignDialog) : null,
             assignFromRest('/miso/rest/poolorder/picker/active?' + jQuery.param({
               platform: platformType.name
-            }), 'Outstanding Orders (All)', assign, assignDialog), assignFromRest('/miso/rest/pool/picker/recent?' + jQuery.param({
+            }), 'Outstanding Orders (All)', setConcentration, assignDialog),
+            assignFromRest('/miso/rest/pool/picker/recent?' + jQuery.param({
               platform: platformType.name
-            }), 'Recently Modified', assign, assignDialog), ].filter(function(x) {
+            }), 'Recently Modified', setConcentration, assignDialog), ].filter(function(x) {
           return x;
         });
         assignDialog();
@@ -261,6 +296,22 @@ ListTarget.partition = {
             return "";
           }
         }
+      }
+    }, {
+      "sTitle": "Loading Conc.",
+      "mData": "loadingConcentration",
+      "include": true,
+      "iSortPriority": 0,
+      "mRender": function(data, type, full) {
+        if (type === 'display' && !!data) {
+          var units = Constants.concentrationUnits.find(function(unit) {
+            return unit.name == full.loadingConcentrationUnits;
+          });
+          if (!!units) {
+            return data + ' ' + units.units;
+          }
+        }
+        return data;
       }
     }, {
       "sTitle": "QC Status",

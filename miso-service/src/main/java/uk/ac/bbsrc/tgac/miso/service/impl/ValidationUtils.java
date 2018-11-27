@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
@@ -22,6 +23,13 @@ public class ValidationUtils {
         && (beforeChange == null || !barcodable.getIdentificationBarcode().equals(beforeChange.getIdentificationBarcode()))
         && lookupByBarcode.apply(barcodable.getIdentificationBarcode()) != null) {
       errors.add(new ValidationError("identificationBarcode", String.format("There is already a %s with this barcode", typeLabel)));
+    }
+  }
+
+  public static void validateConcentrationUnits(BigDecimal concentration, ConcentrationUnit units, String field, String label,
+      Collection<ValidationError> errors) {
+    if (concentration != null && units == null) {
+      errors.add(new ValidationError(field, label + " units must be specified"));
     }
   }
 

@@ -70,6 +70,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryDilutionSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PartitionSpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
@@ -331,6 +332,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "librarySpreadsheets", Arrays.asList(LibrarySpreadSheets.values()), Dtos::asDto);
     createArray(mapper, baseUri, node, "libraryDilutionSpreadsheets", Arrays.asList(LibraryDilutionSpreadSheets.values()), Dtos::asDto);
     createArray(mapper, baseUri, node, "poolSpreadsheets", Arrays.asList(PoolSpreadSheets.values()), Dtos::asDto);
+    createArray(mapper, baseUri, node, "partitionSpreadsheets", Arrays.asList(PartitionSpreadsheets.values()), Dtos::asDto);
     createArray(mapper, baseUri, node, "workflows", Arrays.asList(WorkflowName.values()), Dtos::asDto);
 
     ArrayNode platformTypes = node.putArray("platformTypes");
