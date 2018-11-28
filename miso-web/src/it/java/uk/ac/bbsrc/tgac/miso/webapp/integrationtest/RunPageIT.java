@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.*;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -15,12 +16,14 @@ import org.junit.Test;
 
 import com.google.common.collect.Maps;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage.Field;
@@ -218,14 +221,20 @@ public class RunPageIT extends AbstractIT {
     List<String> page1Pools = page1.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
     assertEquals(0, page1Pools.stream().filter(val -> val.contains(poolAlias)).collect(Collectors.toList()).size());
 
-    RunPage page2 = page1.assignPools(Arrays.asList(0, 1), PoolSearch.SEARCH, poolAlias);
+    BigDecimal concentration = new BigDecimal("12.34");
+    RunPage page2 = page1.assignPools(Arrays.asList(0, 1), PoolSearch.SEARCH, poolAlias, concentration,
+        ConcentrationUnit.NANOMOLAR);
     List<String> columnValues = page2.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
     assertEquals(2, columnValues.stream().filter(val -> val.contains(poolAlias)).collect(Collectors.toList()).size());
 
     Run run = (Run) getSession().get(Run.class, 5004L);
     assertEquals(1, run.getSequencerPartitionContainers().size());
     run.getSequencerPartitionContainers().get(0).getPartitions()
-        .forEach(partition -> assertNotNull(partition.getPool()));
+        .forEach(partition -> {
+          assertNotNull(partition.getPool());
+          assertEquals(LimsUtils.toNiceString(concentration), LimsUtils.toNiceString(partition.getLoadingConcentration()));
+          assertEquals(ConcentrationUnit.NANOMOLAR, partition.getLoadingConcentrationUnits());
+        });
   }
 
   @Test
@@ -267,7 +276,9 @@ public class RunPageIT extends AbstractIT {
     List<String> page1Pools = page1.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
     assertEquals(1, page1Pools.stream().filter(val -> val.contains(firstPool)).collect(Collectors.toList()).size());
 
-    RunPage page2 = page1.assignPools(Arrays.asList(0), PoolSearch.SEARCH, secondPool);
+    BigDecimal concentration = new BigDecimal("11.22");
+    RunPage page2 = page1.assignPools(Arrays.asList(0), PoolSearch.SEARCH, secondPool, concentration,
+        ConcentrationUnit.NANOGRAMS_PER_MICROLITRE);
     List<String> page2Pools = page2.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
     assertEquals(1, page2Pools.stream().filter(val -> val.contains(secondPool)).collect(Collectors.toList()).size());
 
@@ -277,6 +288,8 @@ public class RunPageIT extends AbstractIT {
         .forEach(partition -> {
           assertNotNull(partition.getPool());
           assertEquals(secondPool, partition.getPool().getName());
+          assertEquals(LimsUtils.toNiceString(concentration), LimsUtils.toNiceString(partition.getLoadingConcentration()));
+          assertEquals(ConcentrationUnit.NANOGRAMS_PER_MICROLITRE, partition.getLoadingConcentrationUnits());
         });
   }
 

@@ -61,6 +61,14 @@ ListTarget.servicerecord = {
     }, ListUtils.labelHyperlinkColumn('Title', 'instrument/servicerecord', Utils.array.getId, function(record) {
       return record.title;
     }, 0, true), {
+      sTitle: 'Position',
+      mData: 'position',
+      include: config.hasPositions,
+      iSortPriority: 0,
+      mRender: function(data, type, full) {
+        return data || 'n/a';
+      }
+    }, {
       sTitle: 'Reference Number',
       mData: 'referenceNumber',
       include: true,

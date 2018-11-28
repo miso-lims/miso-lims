@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -58,6 +59,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -70,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
@@ -237,9 +240,39 @@ public class PoolRestController extends RestController {
     return Dtos.asDto(poolService.get(poolId), true, false);
   }
 
+  public static class AssignPoolDto {
+    private List<Long> partitionIds;
+    private String concentration;
+    private ConcentrationUnit units;
+
+    public List<Long> getPartitionIds() {
+      return partitionIds;
+    }
+
+    public void setPartitionIds(List<Long> partitionIds) {
+      this.partitionIds = partitionIds;
+    }
+
+    public String getConcentration() {
+      return concentration;
+    }
+
+    public void setConcentration(String concentration) {
+      this.concentration = concentration;
+    }
+
+    public ConcentrationUnit getUnits() {
+      return units;
+    }
+
+    public void setUnits(ConcentrationUnit units) {
+      this.units = units;
+    }
+  }
+
   @PostMapping(value = "/{poolId}/assign", produces = "application/json")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
-  public void assignPool(@PathVariable Long poolId, @RequestBody List<Long> partitionIds) throws IOException {
+  public void assignPool(@PathVariable Long poolId, @RequestBody AssignPoolDto request) throws IOException {
     Pool pool = poolId == 0 ? null : poolService.get(poolId);
 
     // Determine if this pool transition is allowed for this experiment. If removing a pool, it strictly isn't. If the new pool contains the
@@ -248,10 +281,11 @@ public class PoolRestController extends RestController {
         : experiment -> pool.getPoolDilutions().stream().map(pd -> pd.getPoolableElementView().getLibraryId())
             .anyMatch(id -> id == experiment.getLibrary().getId());
 
-    partitionIds.stream()//
+    request.getPartitionIds().stream()//
         .map(WhineyFunction.rethrow(containerService::getPartition))//
         .peek(WhineyConsumer.rethrow(partition -> {
-          for (Run run : partition.getSequencerPartitionContainer().getRuns()) {
+          for (RunPosition runPos : partition.getSequencerPartitionContainer().getRunPositions()) {
+            Run run = runPos.getRun();
             // Check that we aren't going to hose any existing experiments through this reassignment
             boolean relatedExperimentsOkay = experimentService.listAllByRunId(run.getId()).stream()//
                 .flatMap(experiment -> experiment.getRunPartitions().stream())//
@@ -274,6 +308,13 @@ public class PoolRestController extends RestController {
                 Status.BAD_REQUEST);
           }
           partition.setPool(pool);
+          if (request.getConcentration() != null) {
+            partition.setLoadingConcentration(new BigDecimal(request.getConcentration()));
+            partition.setLoadingConcentrationUnits(request.getUnits());
+          } else {
+            partition.setLoadingConcentration(null);
+            partition.setLoadingConcentrationUnits(null);
+          }
         }))//
         .forEach(WhineyConsumer.rethrow(containerService::update));
     if (pool != null) {

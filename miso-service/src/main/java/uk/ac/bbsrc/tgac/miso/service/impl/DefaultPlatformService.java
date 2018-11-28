@@ -9,12 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
-import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -56,6 +57,11 @@ public class DefaultPlatformService implements PlatformService {
       }
     }
     return activePlatformTypes;
+  }
+
+  @Override
+  public PlatformPosition getPlatformPosition(long positionId) throws IOException {
+    return platformDao.getPlatformPosition(positionId);
   }
 
   public void setPlatformDao(PlatformStore platformDao) {

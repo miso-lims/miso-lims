@@ -9,6 +9,7 @@ public class ServiceRecordDto {
   private String title;
   private String details;
   private String referenceNumber;
+  private String position;
   private List<AttachmentDto> attachments;
 
   public long getId() {
@@ -49,6 +50,14 @@ public class ServiceRecordDto {
 
   public void setReferenceNumber(String referenceNumber) {
     this.referenceNumber = referenceNumber;
+  }
+
+  public String getPosition() {
+    return position;
+  }
+
+  public void setPosition(String position) {
+    this.position = position;
   }
 
   public List<AttachmentDto> getAttachments() {

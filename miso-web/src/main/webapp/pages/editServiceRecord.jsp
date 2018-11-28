@@ -101,6 +101,13 @@
           </td>
         </tr>
         <tr>
+          <td class="h">Position Affected:</td>
+          <td>
+            <miso:select id="position" path="position" items="${serviceRecord.instrument.platform.positions}" itemLabel="alias"
+                      itemValue="id" defaultLabel="n/a" defaultValue=""/>
+          </td>
+        </tr>
+        <tr>
           <td class="h">Serviced By:</td>
           <td>
             <form:input id="servicedByName" path="servicedByName" name="servicedByName"/><span id="servicedByNameCounter" class="counter"></span>

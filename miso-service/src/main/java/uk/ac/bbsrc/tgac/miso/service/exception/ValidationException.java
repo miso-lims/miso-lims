@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.exception;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,6 +19,17 @@ public class ValidationException extends RuntimeException {
   public ValidationException(List<ValidationError> errors) {
     super("Validation failed");
     this.errors = errors;
+  }
+
+  /**
+   * Constructs a ValidationException containing a single general validation error
+   * 
+   * @param message the general error message
+   */
+  public ValidationException(String message) {
+    super("Validation failed");
+    this.errors = new ArrayList<>();
+    this.errors.add(new ValidationError(message));
   }
 
   /**

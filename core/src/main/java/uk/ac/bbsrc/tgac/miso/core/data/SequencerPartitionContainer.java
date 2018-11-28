@@ -24,10 +24,11 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -47,12 +48,7 @@ public interface SequencerPartitionContainer
 
   void setDescription(String description);
 
-  /**
-   * Returns the runs of this Container object.
-   * 
-   * @return Collection<Run> run.
-   */
-  Collection<Run> getRuns();
+  Set<RunPosition> getRunPositions();
 
   /**
    * Returns the {@link Run} with
@@ -103,5 +99,11 @@ public interface SequencerPartitionContainer
   public SequencingContainerModel getModel();
 
   public void setModel(SequencingContainerModel model);
+
+  @Override
+  public int hashCode();
+
+  @Override
+  public boolean equals(Object obj);
 
 }

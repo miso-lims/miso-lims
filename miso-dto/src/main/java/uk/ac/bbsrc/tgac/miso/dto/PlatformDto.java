@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.List;
 
 public class PlatformDto {
   private boolean active;
@@ -14,6 +15,8 @@ public class PlatformDto {
   private String platformType;
 
   private String instrumentType;
+
+  private List<String> positions;
 
   public String getDescription() {
     return description;
@@ -70,6 +73,14 @@ public class PlatformDto {
 
   public void setInstrumentType(String instrumentType) {
     this.instrumentType = instrumentType;
+  }
+
+  public List<String> getPositions() {
+    return positions;
+  }
+
+  public void setPositions(List<String> positions) {
+    this.positions = positions;
   }
 
 }

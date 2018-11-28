@@ -39,6 +39,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 
@@ -112,6 +113,11 @@ public class HibernatePlatformDao implements PlatformStore {
     @SuppressWarnings("unchecked")
     List<PlatformType> records = criteria.list();
     return records;
+  }
+
+  @Override
+  public PlatformPosition getPlatformPosition(long positionId) throws IOException {
+    return (PlatformPosition) currentSession().get(PlatformPosition.class, positionId);
   }
 
   public JdbcTemplate getJdbcTemplate() {

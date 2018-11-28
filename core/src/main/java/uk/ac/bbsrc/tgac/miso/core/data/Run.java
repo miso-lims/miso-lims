@@ -26,11 +26,11 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -59,7 +59,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -97,11 +97,8 @@ public abstract class Run
   @Temporal(TemporalType.DATE)
   private Date completionDate;
 
-  @ManyToMany(targetEntity = SequencerPartitionContainerImpl.class)
-  @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
-      @JoinColumn(name = "Run_runId") }, inverseJoinColumns = {
-          @JoinColumn(name = "containers_containerId") })
-  private List<SequencerPartitionContainer> containers = new ArrayList<>();
+  @OneToMany(mappedBy = "run", orphanRemoval = true, cascade = CascadeType.ALL)
+  private Set<RunPosition> runPositions;
 
   private String description;
   private String filePath;
@@ -189,16 +186,13 @@ public abstract class Run
     this.notes.add(note);
   }
 
-  public void addSequencerPartitionContainer(SequencerPartitionContainer f) {
+  public void addSequencerPartitionContainer(SequencerPartitionContainer f, PlatformPosition position) {
     f.setSecurityProfile(getSecurityProfile());
-    if (f.getId() == 0L && f.getIdentificationBarcode() == null) {
-      // can't validate it so add it anyway. this will only usually be the case for new run population.
-      this.containers.add(f);
-    } else {
-      if (!this.containers.contains(f)) {
-        this.containers.add(f);
-      }
-    }
+    RunPosition rp = new RunPosition();
+    rp.setRun(this);
+    rp.setContainer(f);
+    rp.setPosition(position);
+    getRunPositions().add(rp);
   }
 
   @Override
@@ -327,8 +321,14 @@ public abstract class Run
   }
 
   public List<SequencerPartitionContainer> getSequencerPartitionContainers() {
-    if (this.containers != null) Collections.sort(this.containers);
-    return containers;
+    return getRunPositions().stream().map(RunPosition::getContainer).collect(Collectors.toList());
+  }
+
+  public Set<RunPosition> getRunPositions() {
+    if (runPositions == null) {
+      runPositions = new HashSet<>();
+    }
+    return runPositions;
   }
 
   public Instrument getSequencer() {
@@ -392,7 +392,7 @@ public abstract class Run
   }
 
   public boolean isFull() {
-    return containers.size() >= sequencer.getPlatform().getNumContainers();
+    return getRunPositions().size() >= sequencer.getPlatform().getNumContainers();
   }
 
   @Override
@@ -448,10 +448,6 @@ public abstract class Run
   @Override
   public void setSecurityProfile(SecurityProfile securityProfile) {
     this.securityProfile = securityProfile;
-  }
-
-  public void setSequencerPartitionContainers(List<SequencerPartitionContainer> containers) {
-    this.containers = containers;
   }
 
   public void setSequencer(Instrument sequencer) {

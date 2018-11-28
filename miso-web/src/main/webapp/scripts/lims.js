@@ -291,8 +291,8 @@ var Utils = Utils
           case 'int':
             input = document.createElement('INPUT');
             input.setAttribute('type', 'text');
-            input.value = field.value || 0;
-            output[field.property] = field.value || 0;
+            input.value = field.hasOwnProperty('value') ? field.value : 0;
+            output[field.property] = field.hasOwnProperty('value') ? field.value : 0;
             input.onchange = function() {
               output[field.property] = parseInt(input.value);
             };
@@ -300,8 +300,8 @@ var Utils = Utils
           case 'float':
             input = document.createElement('INPUT');
             input.setAttribute('type', 'text');
-            input.value = field.value || 0;
-            output[field.property] = field.value || 0;
+            input.value = field.hasOwnProperty('value') ? field.value : 0;
+            output[field.property] = field.hasOwnProperty('value') ? field.value : 0;
             input.onchange = function() {
               output[field.property] = parseFloat(input.value);
             };

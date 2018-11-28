@@ -67,6 +67,7 @@ DELETE FROM IndexFamily;
 DELETE FROM SequencingParameters;
 DELETE FROM Instrument WHERE upgradedInstrumentId IS NOT NULL;
 DELETE FROM Instrument;
+DELETE FROM PlatformPosition;
 DELETE FROM Platform;
 DELETE FROM StudyChangeLog;
 DELETE FROM Study;

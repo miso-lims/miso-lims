@@ -115,7 +115,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     currentSession().flush();
 
     Criteria criteria = currentSession().createCriteria(Run.class, "r");
-    criteria.createAlias("r.containers", "spc");
+    criteria.createAlias("runPositions", "runPos");
+    criteria.createAlias("runPos.container", "spc");
     criteria.add(Restrictions.eq("spc.id", containerId));
     criteria.addOrder(Order.desc("startDate"));
     criteria.setMaxResults(1);
@@ -129,7 +130,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     currentSession().flush();
 
     Criteria criteria = currentSession().createCriteria(Run.class);
-    criteria.createAlias("containers", "spc");
+    criteria.createAlias("runPositions", "runPos");
+    criteria.createAlias("runPos.container", "spc");
     criteria.add(Restrictions.eq("spc.id", containerId));
     criteria.addOrder(Order.desc("id"));
     criteria.setMaxResults(1);
@@ -155,10 +157,12 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public List<Run> listByPoolId(long poolId) throws IOException {
     Criteria idCriteria = currentSession().createCriteria(Run.class);
-    idCriteria.createAlias("containers", "spc").createAlias("spc.partitions", "partition");
-    idCriteria.createAlias("partition.pool", "pool");
-    idCriteria.add(Restrictions.eq("pool.id", poolId));
-    idCriteria.setProjection(Projections.distinct(Projections.property("id")));
+    idCriteria.createAlias("runPositions", "runPos")
+        .createAlias("runPos.container", "spc")
+        .createAlias("spc.partitions", "partition")
+        .createAlias("partition.pool", "pool")
+        .add(Restrictions.eq("pool.id", poolId))
+        .setProjection(Projections.distinct(Projections.property("id")));
     @SuppressWarnings("unchecked")
     List<Long> ids = idCriteria.list();
     if (ids.isEmpty()) return Collections.emptyList();
@@ -176,7 +180,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     currentSession().flush();
 
     Criteria criteria = currentSession().createCriteria(Run.class);
-    criteria.createAlias("containers", "spc");
+    criteria.createAlias("runPositions", "runPos");
+    criteria.createAlias("runPos.container", "spc");
     criteria.add(Restrictions.eq("spc.id", containerId));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
@@ -186,8 +191,9 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public List<Run> listByProjectId(long projectId) throws IOException {
     Criteria idCriteria = currentSession().createCriteria(Run.class, "r");
-    idCriteria.createAlias("r.containers", "container")
-        .createAlias("container.partitions", "partition")
+    idCriteria.createAlias("runPositions", "runPos")
+        .createAlias("runPos.container", "spc")
+        .createAlias("spc.partitions", "partition")
         .createAlias("partition.pool", "pool")
         .createAlias("pool.poolDilutions", "poolDilution")
         .createAlias("poolDilution.poolableElementView", "dilution");
@@ -288,8 +294,9 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
-    criteria.createAlias("containers", "container");
-    criteria.createAlias("container.partitions", "partition");
+    criteria.createAlias("runPositions", "runPos");
+    criteria.createAlias("runPos.container", "spc");
+    criteria.createAlias("spc.partitions", "partition");
     criteria.createAlias("partition.pool", "pool");
     criteria.createAlias("pool.poolDilutions", "poolDilution");
     criteria.createAlias("poolDilution.poolableElementView", "dilution");
@@ -360,9 +367,10 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
-    criteria.createAlias("containers", "containers");
-    criteria.createAlias("containers.partitions", "partitions");
-    criteria.createAlias("partitions.pool", "pool");
+    criteria.createAlias("runPositions", "runPos");
+    criteria.createAlias("runPos.container", "spc");
+    criteria.createAlias("spc.partitions", "partition");
+    criteria.createAlias("partition.pool", "pool");
     criteria.createAlias("pool.poolDilutions", "poolDilution");
     criteria.createAlias("poolDilution.poolableElementView", "dilutionForIndex");
     criteria.createAlias("dilutionForIndex.indices", "indices");

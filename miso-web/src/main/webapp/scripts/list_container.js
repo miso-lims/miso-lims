@@ -35,12 +35,15 @@ ListTarget.container = {
         action: function(containers) {
           Utils.ajaxWithDialog('Removing', 'POST', '/miso/rest/run/' + config.runId + '/remove', containers.map(Utils.array.getId),
               Utils.page.pageReload);
-
         }
       });
     } else {
       actions.push(HotUtils.printAction('container'));
     }
+    actions.push(HotUtils.spreadsheetAction('/miso/rest/container/spreadsheet', Constants.partitionSpreadsheets, function(containers,
+        spreadsheet) {
+      return [];
+    }));
     actions.push({
       name: 'Delete',
       action: function(containers) {

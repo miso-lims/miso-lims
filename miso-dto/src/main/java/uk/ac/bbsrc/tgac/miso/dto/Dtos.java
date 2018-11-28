@@ -21,6 +21,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang.NotImplementedException;
 
 import com.eaglegenomics.simlims.core.Group;
@@ -65,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
@@ -124,6 +127,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
@@ -188,7 +192,7 @@ import ca.on.oicr.gsi.runscanner.dto.SolidNotificationDto;
 @SuppressWarnings("squid:S3776") // make Sonar ignore cognitive complexity warnings for this file
 public class Dtos {
 
-  public static TissueOriginDto asDto(TissueOrigin from) {
+  public static TissueOriginDto asDto(@Nonnull TissueOrigin from) {
     TissueOriginDto dto = new TissueOriginDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
@@ -201,7 +205,7 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<TissueOriginDto> asTissueOriginDtos(Set<TissueOrigin> from) {
+  public static Set<TissueOriginDto> asTissueOriginDtos(@Nonnull Set<TissueOrigin> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
@@ -213,7 +217,7 @@ public class Dtos {
     return to;
   }
 
-  public static TissueTypeDto asDto(TissueType from) {
+  public static TissueTypeDto asDto(@Nonnull TissueType from) {
     TissueTypeDto dto = new TissueTypeDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
@@ -226,11 +230,11 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<TissueTypeDto> asTissueTypeDtos(Set<TissueType> from) {
+  public static Set<TissueTypeDto> asTissueTypeDtos(@Nonnull Set<TissueType> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
-  public static TissueType to(TissueTypeDto from) {
+  public static TissueType to(@Nonnull TissueTypeDto from) {
     TissueType to = new TissueTypeImpl();
     if (from.getId() != null) to.setId(from.getId());
     setString(to::setAlias, from.getAlias());
@@ -238,7 +242,7 @@ public class Dtos {
     return to;
   }
 
-  public static SubprojectDto asDto(Subproject from) {
+  public static SubprojectDto asDto(@Nonnull Subproject from) {
     SubprojectDto dto = new SubprojectDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
@@ -253,11 +257,11 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<SubprojectDto> asSubprojectDtos(Collection<Subproject> from) {
+  public static Set<SubprojectDto> asSubprojectDtos(@Nonnull Collection<Subproject> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
-  public static Subproject to(SubprojectDto from) {
+  public static Subproject to(@Nonnull SubprojectDto from) {
     Subproject to = new SubprojectImpl();
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
@@ -266,7 +270,7 @@ public class Dtos {
     return to;
   }
 
-  public static SampleClassDto asDto(SampleClass from) {
+  public static SampleClassDto asDto(@Nonnull SampleClass from) {
     SampleClassDto dto = new SampleClassDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
@@ -282,11 +286,11 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<SampleClassDto> asSampleClassDtos(Set<SampleClass> from) {
+  public static Set<SampleClassDto> asSampleClassDtos(@Nonnull Set<SampleClass> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
-  public static SampleClass to(SampleClassDto from) {
+  public static SampleClass to(@Nonnull SampleClassDto from) {
     SampleClass to = new SampleClassImpl();
     to.setAlias(from.getAlias());
     to.setSampleCategory(from.getSampleCategory());
@@ -297,7 +301,7 @@ public class Dtos {
     return to;
   }
 
-  public static DetailedQcStatusDto asDto(DetailedQcStatus from) {
+  public static DetailedQcStatusDto asDto(@Nonnull DetailedQcStatus from) {
     DetailedQcStatusDto dto = new DetailedQcStatusDto();
     dto.setId(from.getId());
     dto.setStatus(from.getStatus());
@@ -310,11 +314,11 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<DetailedQcStatusDto> asDetailedQcStatusDtos(Set<DetailedQcStatus> from) {
+  public static Set<DetailedQcStatusDto> asDetailedQcStatusDtos(@Nonnull Set<DetailedQcStatus> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
-  public static DetailedQcStatus to(DetailedQcStatusDto from) {
+  public static DetailedQcStatus to(@Nonnull DetailedQcStatusDto from) {
     DetailedQcStatus to = new DetailedQcStatusImpl();
     to.setStatus(from.getStatus());
     to.setDescription(from.getDescription());
@@ -322,7 +326,7 @@ public class Dtos {
     return to;
   }
 
-  public static SampleDto asMinimalDto(Sample from) {
+  public static SampleDto asMinimalDto(@Nonnull Sample from) {
     DetailedSampleDto dto = new DetailedSampleDto();
     copySampleFields(from, dto, false);
 
@@ -339,7 +343,7 @@ public class Dtos {
     return dto;
   }
 
-  public static SampleDto asDto(Sample from, boolean includeBoxPositions) {
+  public static SampleDto asDto(@Nonnull Sample from, boolean includeBoxPositions) {
     SampleDto dto = null;
 
     if (isDetailedSample(from)) {
@@ -356,13 +360,13 @@ public class Dtos {
     return dto;
   }
 
-  public static List<SampleDto> asSampleDtos(Collection<Sample> from, boolean fullIncludingBoxPositions) {
+  public static List<SampleDto> asSampleDtos(@Nonnull Collection<Sample> from, boolean fullIncludingBoxPositions) {
     return from.stream()
         .map(sample -> (fullIncludingBoxPositions ? asDto(sample, true) : asMinimalDto(sample)))
         .collect(Collectors.toList());
   }
 
-  private static SampleDto copySampleFields(Sample from, SampleDto dto, boolean includeBoxPositions) {
+  private static SampleDto copySampleFields(@Nonnull Sample from, @Nonnull SampleDto dto, boolean includeBoxPositions) {
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setDescription(from.getDescription());
@@ -398,7 +402,7 @@ public class Dtos {
 
   }
 
-  private static DetailedSampleDto asDetailedSampleDto(DetailedSample from) {
+  private static DetailedSampleDto asDetailedSampleDto(@Nonnull DetailedSample from) {
     DetailedSampleDto dto = null;
     if (isIdentitySample(from)) {
       dto = asIdentitySampleDto((SampleIdentity) from);
@@ -451,7 +455,7 @@ public class Dtos {
     return dto;
   }
 
-  private static DetailedSample toDetailedSample(DetailedSampleDto from) {
+  private static DetailedSample toDetailedSample(@Nonnull DetailedSampleDto from) {
     DetailedSample to = null;
     if (from.getClass() == SampleIdentityDto.class) {
       to = toIdentitySample((SampleIdentityDto) from);
@@ -521,7 +525,7 @@ public class Dtos {
    *          the DTO to take parent details from
    * @return the parent details from the DTO, or null if there are none. A returned sample will also include its own parent if applicable.
    */
-  private static DetailedSample getParent(DetailedSampleDto childDto) {
+  private static DetailedSample getParent(@Nonnull DetailedSampleDto childDto) {
     DetailedSample parent = null;
     if (childDto.getParentId() != null) {
       parent = new DetailedSampleImpl();
@@ -582,7 +586,7 @@ public class Dtos {
     return parent;
   }
 
-  public static TissueMaterialDto asDto(TissueMaterial from) {
+  public static TissueMaterialDto asDto(@Nonnull TissueMaterial from) {
     TissueMaterialDto dto = new TissueMaterialDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
@@ -593,17 +597,17 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<TissueMaterialDto> asTissueMaterialDtos(Set<TissueMaterial> from) {
+  public static Set<TissueMaterialDto> asTissueMaterialDtos(@Nonnull Set<TissueMaterial> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
-  public static TissueMaterial to(TissueMaterialDto from) {
+  public static TissueMaterial to(@Nonnull TissueMaterialDto from) {
     TissueMaterial to = new TissueMaterialImpl();
     to.setAlias(from.getAlias());
     return to;
   }
 
-  public static SamplePurposeDto asDto(SamplePurpose from) {
+  public static SamplePurposeDto asDto(@Nonnull SamplePurpose from) {
     SamplePurposeDto dto = new SamplePurposeDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
@@ -615,17 +619,17 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<SamplePurposeDto> asSamplePurposeDtos(Set<SamplePurpose> from) {
+  public static Set<SamplePurposeDto> asSamplePurposeDtos(@Nonnull Set<SamplePurpose> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
-  public static SamplePurpose to(SamplePurposeDto from) {
+  public static SamplePurpose to(@Nonnull SamplePurposeDto from) {
     SamplePurpose to = new SamplePurposeImpl();
     to.setAlias(from.getAlias());
     return to;
   }
 
-  public static SampleGroupDto asDto(SampleGroupId from) {
+  public static SampleGroupDto asDto(@Nonnull SampleGroupId from) {
     SampleGroupDto dto = new SampleGroupDto();
     dto.setId(from.getId());
     dto.setGroupId(from.getGroupId());
@@ -639,18 +643,18 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<SampleGroupDto> asSampleGroupDtos(Set<SampleGroupId> from) {
+  public static Set<SampleGroupDto> asSampleGroupDtos(@Nonnull Set<SampleGroupId> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
-  public static SampleGroupId to(SampleGroupDto from) {
+  public static SampleGroupId to(@Nonnull SampleGroupDto from) {
     SampleGroupId to = new SampleGroupImpl();
     to.setGroupId(from.getGroupId());
     to.setDescription(from.getDescription());
     return to;
   }
 
-  private static SampleAliquotDto asAliquotSampleDto(SampleAliquot from) {
+  private static SampleAliquotDto asAliquotSampleDto(@Nonnull SampleAliquot from) {
     SampleAliquotDto dto = null;
     if (isAliquotSingleCellSample(from)) {
       SampleAliquotSingleCell scFrom = (SampleAliquotSingleCell) from;
@@ -666,7 +670,7 @@ public class Dtos {
     return dto;
   }
 
-  private static SampleStockDto asStockSampleDto(SampleStock from) {
+  private static SampleStockDto asStockSampleDto(@Nonnull SampleStock from) {
     SampleStockDto dto = null;
     if (isStockSingleCellSample(from)) {
       SampleStockSingleCell scFrom = (SampleStockSingleCell) from;
@@ -683,7 +687,7 @@ public class Dtos {
     return dto;
   }
 
-  private static SampleStock toStockSample(SampleStockDto from) {
+  private static SampleStock toStockSample(@Nonnull SampleStockDto from) {
     SampleStock to = null;
     if (from instanceof SampleStockSingleCellRelative) {
       SampleStockSingleCellRelative scFrom = (SampleStockSingleCellRelative) from;
@@ -702,7 +706,7 @@ public class Dtos {
     return to;
   }
 
-  private static SampleAliquot toAliquotSample(SampleAliquotDto from) {
+  private static SampleAliquot toAliquotSample(@Nonnull SampleAliquotDto from) {
     SampleAliquot to = null;
     if (from.getClass() == SampleAliquotSingleCellDto.class) {
       SampleAliquotSingleCellDto scFrom = (SampleAliquotSingleCellDto) from;
@@ -719,7 +723,7 @@ public class Dtos {
     return to;
   }
 
-  public static Sample to(SampleDto from) {
+  public static Sample to(@Nonnull SampleDto from) {
     Sample to = null;
     if (from instanceof DetailedSampleDto) {
       to = toDetailedSample((DetailedSampleDto) from);
@@ -753,7 +757,8 @@ public class Dtos {
     return to;
   }
 
-  private static <T extends AbstractBoxableDto, U extends AbstractBoxable> AbstractBoxPosition makeBoxablePosition(T from, U to) {
+  private static <T extends AbstractBoxableDto, U extends AbstractBoxable> AbstractBoxPosition makeBoxablePosition(@Nonnull T from,
+      @Nonnull U to) {
     if (from.getBox() != null && (from.getBox().getId() != null || !isStringEmptyOrNull(from.getBoxPosition()))) {
       AbstractBoxPosition bp = to.getEntityType().makeBoxPosition();
       bp.setBox(to(from.getBox()));
@@ -763,7 +768,7 @@ public class Dtos {
     return null;
   }
 
-  private static SampleIdentityDto asIdentitySampleDto(SampleIdentity from) {
+  private static SampleIdentityDto asIdentitySampleDto(@Nonnull SampleIdentity from) {
     SampleIdentityDto dto = new SampleIdentityDto();
     dto.setExternalName(from.getExternalName());
     dto.setDonorSex(from.getDonorSex().getLabel());
@@ -775,7 +780,7 @@ public class Dtos {
     return dto;
   }
 
-  private static SampleIdentity toIdentitySample(SampleIdentityDto from) {
+  private static SampleIdentity toIdentitySample(@Nonnull SampleIdentityDto from) {
     SampleIdentity to = new SampleIdentityImpl();
     to.setExternalName(from.getExternalName());
     if (from.getDonorSex() != null) {
@@ -787,7 +792,7 @@ public class Dtos {
     return to;
   }
 
-  public static SampleNumberPerProjectDto asDto(SampleNumberPerProject from) {
+  public static SampleNumberPerProjectDto asDto(@Nonnull SampleNumberPerProject from) {
     SampleNumberPerProjectDto dto = new SampleNumberPerProjectDto();
     dto.setId(from.getId());
     dto.setProjectId(from.getProject().getId());
@@ -800,18 +805,18 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<SampleNumberPerProjectDto> asSampleNumberPerProjectDtos(Set<SampleNumberPerProject> from) {
+  public static Set<SampleNumberPerProjectDto> asSampleNumberPerProjectDtos(@Nonnull Set<SampleNumberPerProject> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
-  public static SampleNumberPerProject to(SampleNumberPerProjectDto from) {
+  public static SampleNumberPerProject to(@Nonnull SampleNumberPerProjectDto from) {
     SampleNumberPerProject to = new SampleNumberPerProjectImpl();
     to.setHighestSampleNumber(from.getHighestSampleNumber());
     to.setPadding(from.getPadding());
     return to;
   }
 
-  public static SampleValidRelationshipDto asDto(SampleValidRelationship from) {
+  public static SampleValidRelationshipDto asDto(@Nonnull SampleValidRelationship from) {
     SampleValidRelationshipDto dto = new SampleValidRelationshipDto();
     dto.setId(from.getId());
     dto.setParentId(from.getParent().getId());
@@ -824,16 +829,16 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<SampleValidRelationshipDto> asSampleValidRelationshipDtos(Set<SampleValidRelationship> from) {
+  public static Set<SampleValidRelationshipDto> asSampleValidRelationshipDtos(@Nonnull Set<SampleValidRelationship> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
-  public static SampleValidRelationship to(SampleValidRelationshipDto from) {
+  public static SampleValidRelationship to(@Nonnull SampleValidRelationshipDto from) {
     SampleValidRelationship to = new SampleValidRelationshipImpl();
     return to;
   }
 
-  public static InstituteDto asDto(Institute from) {
+  public static InstituteDto asDto(@Nonnull Institute from) {
     InstituteDto dto = new InstituteDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
@@ -844,17 +849,17 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<InstituteDto> asInstituteDtos(Set<Institute> from) {
+  public static Set<InstituteDto> asInstituteDtos(@Nonnull Set<Institute> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
-  public static Institute to(InstituteDto from) {
+  public static Institute to(@Nonnull InstituteDto from) {
     Institute to = new InstituteImpl();
     to.setAlias(from.getAlias());
     return to;
   }
 
-  public static LabDto asDto(Lab from) {
+  public static LabDto asDto(@Nonnull Lab from) {
     LabDto dto = new LabDto();
     dto.setId(from.getId());
     dto.setInstituteId(from.getInstitute().getId());
@@ -868,17 +873,17 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<LabDto> asLabDtos(Collection<Lab> from) {
+  public static Set<LabDto> asLabDtos(@Nonnull Collection<Lab> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
-  public static Lab to(LabDto from) {
+  public static Lab to(@Nonnull LabDto from) {
     Lab to = new LabImpl();
     to.setAlias(from.getAlias());
     return to;
   }
 
-  private static SampleTissueDto asTissueSampleDto(SampleTissue from) {
+  private static SampleTissueDto asTissueSampleDto(@Nonnull SampleTissue from) {
     SampleTissueDto dto = new SampleTissueDto();
     dto.setPassageNumber(from.getPassageNumber());
     dto.setTimesReceived(from.getTimesReceived());
@@ -900,7 +905,7 @@ public class Dtos {
     return dto;
   }
 
-  private static SampleTissue toTissueSample(SampleTissueDto from) {
+  private static SampleTissue toTissueSample(@Nonnull SampleTissueDto from) {
     SampleTissue to = new SampleTissueImpl();
     to.setPassageNumber(from.getPassageNumber());
     to.setTimesReceived(from.getTimesReceived());
@@ -930,7 +935,7 @@ public class Dtos {
     return to;
   }
 
-  private static SampleTissueProcessingDto asTissueProcessingSampleDto(SampleTissueProcessing from) {
+  private static SampleTissueProcessingDto asTissueProcessingSampleDto(@Nonnull SampleTissueProcessing from) {
     from = deproxify(from);
 
     if (isSampleSlide(from)) {
@@ -944,7 +949,7 @@ public class Dtos {
     }
   }
 
-  private static SampleTissueProcessing toTissueProcessingSample(SampleTissueProcessingDto from) {
+  private static SampleTissueProcessing toTissueProcessingSample(@Nonnull SampleTissueProcessingDto from) {
     SampleTissueProcessing to = null;
     if (from.getClass() == SampleSlideDto.class) {
       to = toSlideSample((SampleSlideDto) from);
@@ -958,7 +963,7 @@ public class Dtos {
     return to;
   }
 
-  private static SampleSlideDto asSlideSampleDto(SampleSlide from) {
+  private static SampleSlideDto asSlideSampleDto(@Nonnull SampleSlide from) {
     SampleSlideDto dto = new SampleSlideDto();
     dto.setSlides(from.getSlides());
     dto.setDiscards(from.getDiscards());
@@ -968,7 +973,7 @@ public class Dtos {
     return dto;
   }
 
-  private static SampleSlide toSlideSample(SampleSlideDto from) {
+  private static SampleSlide toSlideSample(@Nonnull SampleSlideDto from) {
     SampleSlide to = new SampleSlideImpl();
     to.setSlides(from.getSlides());
     to.setDiscards(from.getDiscards());
@@ -983,33 +988,33 @@ public class Dtos {
     return to;
   }
 
-  private static SampleSingleCellDto asSingleCellSampleDto(SampleSingleCell from) {
+  private static SampleSingleCellDto asSingleCellSampleDto(@Nonnull SampleSingleCell from) {
     SampleSingleCellDto dto = new SampleSingleCellDto();
     setString(dto::setInitialCellConcentration, from.getInitialCellConcentration());
     setString(dto::setDigestion, from.getDigestion());
     return dto;
   }
 
-  private static SampleLCMTubeDto asLCMTubeSampleDto(SampleLCMTube from) {
+  private static SampleLCMTubeDto asLCMTubeSampleDto(@Nonnull SampleLCMTube from) {
     SampleLCMTubeDto dto = new SampleLCMTubeDto();
     dto.setSlidesConsumed(from.getSlidesConsumed());
     return dto;
   }
 
-  private static SampleSingleCell toSingleCellSample(SampleSingleCellRelative from) {
+  private static SampleSingleCell toSingleCellSample(@Nonnull SampleSingleCellRelative from) {
     SampleSingleCell to = new SampleSingleCellImpl();
     setBigDecimal(to::setInitialCellConcentration, from.getInitialCellConcentration());
     setString(to::setDigestion, from.getDigestion());
     return to;
   }
 
-  private static SampleLCMTube toLCMTubeSample(SampleLCMTubeDto from) {
+  private static SampleLCMTube toLCMTubeSample(@Nonnull SampleLCMTubeDto from) {
     SampleLCMTube to = new SampleLCMTubeImpl();
     to.setSlidesConsumed(from.getSlidesConsumed());
     return to;
   }
 
-  public static KitDescriptorDto asDto(KitDescriptor from) {
+  public static KitDescriptorDto asDto(@Nonnull KitDescriptor from) {
     KitDescriptorDto dto = new KitDescriptorDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1022,11 +1027,11 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<KitDescriptorDto> asKitDescriptorDtos(Collection<KitDescriptor> from) {
+  public static Set<KitDescriptorDto> asKitDescriptorDtos(@Nonnull Collection<KitDescriptor> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
-  public static KitDescriptor to(KitDescriptorDto from) {
+  public static KitDescriptor to(@Nonnull KitDescriptorDto from) {
     KitDescriptor to = new KitDescriptor();
     if (from.getId() != null) to.setId(from.getId());
     to.setName(from.getName());
@@ -1039,7 +1044,7 @@ public class Dtos {
     return to;
   }
 
-  public static LibraryDesignCodeDto asDto(LibraryDesignCode from) {
+  public static LibraryDesignCodeDto asDto(@Nonnull LibraryDesignCode from) {
     LibraryDesignCodeDto dto = new LibraryDesignCodeDto();
     dto.setId(from.getId());
     dto.setCode(from.getCode());
@@ -1048,7 +1053,7 @@ public class Dtos {
     return dto;
   }
 
-  public static LibraryDesignCode to(LibraryDesignCodeDto from) {
+  public static LibraryDesignCode to(@Nonnull LibraryDesignCodeDto from) {
     LibraryDesignCode to = new LibraryDesignCode();
     if (from.getId() != null) to.setId(from.getId());
     to.setCode(from.getCode());
@@ -1057,7 +1062,7 @@ public class Dtos {
     return to;
   }
 
-  private static DetailedLibraryDto asDetailedLibraryDto(DetailedLibrary from) {
+  private static DetailedLibraryDto asDetailedLibraryDto(@Nonnull DetailedLibrary from) {
     DetailedLibraryDto dto = new DetailedLibraryDto();
     if (from.getLibraryDesign() != null) {
       dto.setLibraryDesignId(from.getLibraryDesign().getId());
@@ -1091,7 +1096,7 @@ public class Dtos {
     return dto;
   }
 
-  private static String getIdentityConsentLevelString(DetailedSample sample) {
+  private static String getIdentityConsentLevelString(@Nonnull DetailedSample sample) {
     ConsentLevel level = getIdentityConsentLevel(sample);
     return level == null ? null : level.getLabel();
   }
@@ -1119,7 +1124,7 @@ public class Dtos {
     return to;
   }
 
-  public static PoolOrderDto asDto(PoolOrder from) {
+  public static PoolOrderDto asDto(@Nonnull PoolOrder from) {
     PoolOrderDto dto = new PoolOrderDto();
     dto.setId(from.getId());
     dto.setPool(asDto(from.getPool(), false, false));
@@ -1133,11 +1138,11 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<PoolOrderDto> asPoolOrderDtos(Collection<PoolOrder> from) {
+  public static Set<PoolOrderDto> asPoolOrderDtos(@Nonnull Collection<PoolOrder> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
-  public static PoolOrder to(PoolOrderDto from) {
+  public static PoolOrder to(@Nonnull PoolOrderDto from) {
     PoolOrder to = new PoolOrderImpl();
     if (from.getId() != null) to.setId(from.getId());
     to.setPool(to(from.getPool()));
@@ -1147,7 +1152,7 @@ public class Dtos {
     return to;
   }
 
-  public static SequencingParametersDto asDto(SequencingParameters from) {
+  public static SequencingParametersDto asDto(@Nonnull SequencingParameters from) {
     SequencingParametersDto dto = new SequencingParametersDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1155,7 +1160,7 @@ public class Dtos {
     return dto;
   }
 
-  public static SequencingParameters to(SequencingParametersDto from) {
+  public static SequencingParameters to(@Nonnull SequencingParametersDto from) {
     SequencingParameters to = new SequencingParameters();
     to.setId(from.getId());
     to.setName(from.getName());
@@ -1165,7 +1170,7 @@ public class Dtos {
     return to;
   }
 
-  public static List<SequencingParametersDto> asSequencingParametersDtos(Collection<SequencingParameters> from) {
+  public static List<SequencingParametersDto> asSequencingParametersDtos(@Nonnull Collection<SequencingParameters> from) {
     List<SequencingParametersDto> dtoList = from.stream().map(Dtos::asDto).collect(Collectors.toList());
     Collections.sort(dtoList, new Comparator<SequencingParametersDto>() {
 
@@ -1177,7 +1182,7 @@ public class Dtos {
     return dtoList;
   }
 
-  public static LibraryDto asDto(Library from, boolean includeBoxPositions) {
+  public static LibraryDto asDto(@Nonnull Library from, boolean includeBoxPositions) {
     LibraryDto dto = null;
     if (isDetailedLibrary(from)) {
       dto = asDetailedLibraryDto((DetailedLibrary) from);
@@ -1260,11 +1265,11 @@ public class Dtos {
     }
     setId(dto::setSpikeInId, from.getSpikeIn());
     setString(dto::setSpikeInVolume, from.getSpikeInVolume());
-    setString(dto::setSpikeInDilutionFactor, from.getSpikeInDilutionFactor(), DilutionFactor::getLabel);
+    setString(dto::setSpikeInDilutionFactor, maybeGetProperty(from.getSpikeInDilutionFactor(), DilutionFactor::getLabel));
     return dto;
   }
 
-  public static Library to(LibraryDto from) {
+  public static Library to(@Nonnull LibraryDto from) {
     Library to = null;
     if (from instanceof DetailedLibraryDto) {
       to = toDetailedLibrary((DetailedLibraryDto) from);
@@ -1340,13 +1345,13 @@ public class Dtos {
     return to;
   }
 
-  public static List<BoxDto> asBoxDtosWithPositions(Collection<Box> boxes) {
+  public static List<BoxDto> asBoxDtosWithPositions(@Nonnull Collection<Box> boxes) {
     return boxes.stream()
         .map(box -> asDto(box, true))
         .collect(Collectors.toList());
   }
 
-  public static BoxDto asDto(Box from, boolean includePositions) {
+  public static BoxDto asDto(@Nonnull Box from, boolean includePositions) {
     BoxDto dto = new BoxDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1377,7 +1382,7 @@ public class Dtos {
     return dto;
   }
 
-  private static BoxableDto asDto(BoxPosition from) {
+  private static BoxableDto asDto(@Nonnull BoxPosition from) {
     BoxableDto dto = new BoxableDto();
     dto.setCoordinates(from.getPosition());
     dto.setEntityType(from.getBoxableId().getTargetType());
@@ -1385,19 +1390,19 @@ public class Dtos {
     return dto;
   }
 
-  public static BoxDto asDtoWithBoxables(Box from, Collection<BoxableView> boxables) {
+  public static BoxDto asDtoWithBoxables(@Nonnull Box from, @Nonnull Collection<BoxableView> boxables) {
     BoxDto dto = asDto(from, false);
     dto.setItems(boxables.stream().map(Dtos::asDto).collect(Collectors.toList()));
     return dto;
   }
 
-  public static List<BoxableDto> asBoxableDtos(List<BoxableView> boxables) {
+  public static List<BoxableDto> asBoxableDtos(@Nonnull List<BoxableView> boxables) {
     return boxables.stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList());
   }
 
-  public static BoxableDto asDto(BoxableView from) {
+  public static BoxableDto asDto(@Nonnull BoxableView from) {
     BoxableDto dto = new BoxableDto();
     dto.setId(from.getId().getTargetId());
     dto.setAlias(from.getAlias());
@@ -1413,7 +1418,7 @@ public class Dtos {
     return dto;
   }
 
-  public static Box to(BoxDto from) {
+  public static Box to(@Nonnull BoxDto from) {
     Box to = new BoxImpl();
     if (from.getId() != null) to.setId(from.getId());
     to.setAlias(from.getAlias());
@@ -1443,7 +1448,7 @@ public class Dtos {
     return to;
   }
 
-  private static DilutionDto asDto(LibraryDilution from, LibraryDto libraryDto, boolean includeBoxPositions) {
+  private static DilutionDto asDto(@Nonnull LibraryDilution from, @Nonnull LibraryDto libraryDto, boolean includeBoxPositions) {
     DilutionDto dto = new DilutionDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1471,7 +1476,7 @@ public class Dtos {
     return dto;
   }
 
-  public static DilutionDto asDto(LibraryDilution from, boolean includeFullLibrary, boolean includeBoxPositions) {
+  public static DilutionDto asDto(@Nonnull LibraryDilution from, boolean includeFullLibrary, boolean includeBoxPositions) {
     LibraryDto libDto = null;
     if (includeFullLibrary) {
       libDto = asDto(from.getLibrary(), false);
@@ -1489,7 +1494,7 @@ public class Dtos {
     return asDto(from, libDto, includeBoxPositions);
   }
 
-  public static DilutionDto asDto(PoolableElementView from) {
+  public static DilutionDto asDto(@Nonnull PoolableElementView from) {
     DilutionDto dto = new DilutionDto();
     dto.setId(from.getDilutionId());
     dto.setName(from.getDilutionName());
@@ -1532,7 +1537,7 @@ public class Dtos {
     return dto;
   }
 
-  public static LibraryDilution to(DilutionDto from) {
+  public static LibraryDilution to(@Nonnull DilutionDto from) {
     LibraryDilution to = new LibraryDilution();
     if (from.getId() != null) to.setId(from.getId());
     if (!isStringEmptyOrNull(from.getName())) {
@@ -1556,7 +1561,7 @@ public class Dtos {
     return to;
   }
 
-  public static PoolDto asDto(Pool from, boolean includeContents, boolean includeBoxPositions) {
+  public static PoolDto asDto(@Nonnull Pool from, boolean includeContents, boolean includeBoxPositions) {
     PoolDto dto = new PoolDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1614,11 +1619,12 @@ public class Dtos {
     return dto;
   }
 
-  public static RunDto asDto(Run from) {
+  public static RunDto asDto(@Nonnull Run from) {
     return asDto(from, false, false, false);
   }
 
-  public static RunDto asDto(Run from, boolean includeContainers, boolean includeContainerPartitions, boolean includePoolContents) {
+  public static RunDto asDto(@Nonnull Run from, boolean includeContainers, boolean includeContainerPartitions,
+      boolean includePoolContents) {
     RunDto dto = new RunDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1663,11 +1669,11 @@ public class Dtos {
     return runSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  public static ContainerDto asDto(SequencerPartitionContainer from) {
+  public static ContainerDto asDto(@Nonnull SequencerPartitionContainer from) {
     return asDto(from, false, false);
   }
 
-  public static ContainerDto asDto(SequencerPartitionContainer from, boolean includePartitions, boolean includePoolContents) {
+  public static ContainerDto asDto(@Nonnull SequencerPartitionContainer from, boolean includePartitions, boolean includePoolContents) {
     ContainerDto dto = new ContainerDto();
     dto.setId(from.getId());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
@@ -1695,12 +1701,23 @@ public class Dtos {
     return dto;
   }
 
-  public static List<ContainerDto> asContainerDtos(Collection<SequencerPartitionContainer> containerSubset,
+  public static List<ContainerDto> asContainerDtos(@Nonnull Collection<SequencerPartitionContainer> containerSubset,
       boolean includeContainerPartitions, boolean includePoolContents) {
     return asContainerDtos(containerSubset, includeContainerPartitions, includePoolContents);
   }
 
-  public static ContainerModelDto asDto(SequencingContainerModel from) {
+  public static RunPositionDto asDto(@Nonnull RunPosition from) {
+    RunPositionDto dto = new RunPositionDto();
+    setId(dto::setPositionId, from.getPosition());
+    setString(dto::setPositionAlias, maybeGetProperty(from.getPosition(), PlatformPosition::getAlias));
+    setId(dto::setId, from.getContainer());
+    setString(dto::setIdentificationBarcode, maybeGetProperty(from.getContainer(), SequencerPartitionContainer::getIdentificationBarcode));
+    setObject(dto::setContainerModel, from.getContainer().getModel(), Dtos::asDto);
+    setDateTimeString(dto::setLastModified, maybeGetProperty(from.getContainer(), SequencerPartitionContainer::getLastModified));
+    return dto;
+  }
+
+  public static ContainerModelDto asDto(@Nonnull SequencingContainerModel from) {
     ContainerModelDto dto = new ContainerModelDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
@@ -1712,7 +1729,7 @@ public class Dtos {
     return dto;
   }
 
-  public static List<PartitionDto> asPartitionDtos(Collection<Partition> partitionSubset, boolean includePoolContents) {
+  public static List<PartitionDto> asPartitionDtos(@Nonnull Collection<Partition> partitionSubset, boolean includePoolContents) {
     List<PartitionDto> dtoList = new ArrayList<>();
     for (Partition partition : partitionSubset) {
       dtoList.add(asDto(partition, includePoolContents));
@@ -1720,15 +1737,15 @@ public class Dtos {
     return dtoList;
   }
 
-  public static List<ContainerModelDto> asDtos(Collection<SequencingContainerModel> models) {
+  public static List<ContainerModelDto> asDtos(@Nonnull Collection<SequencingContainerModel> models) {
     return models.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  public static Set<QcTypeDto> asQcTypeDtos(Set<QcType> from) {
+  public static Set<QcTypeDto> asQcTypeDtos(@Nonnull Set<QcType> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
-  public static QcTypeDto asDto(QcType from) {
+  public static QcTypeDto asDto(@Nonnull QcType from) {
     QcTypeDto dto = new QcTypeDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1742,7 +1759,7 @@ public class Dtos {
     return dto;
   }
 
-  public static QcType to(QcTypeDto from) {
+  public static QcType to(@Nonnull QcTypeDto from) {
     QcType to = new QcType();
     if (from.getId() != null) to.setId(from.getId());
     to.setName(from.getName());
@@ -1756,7 +1773,7 @@ public class Dtos {
     return to;
   }
 
-  public static QcDto asDto(QC from) {
+  public static QcDto asDto(@Nonnull QC from) {
     QcDto dto = new QcDto();
     dto.setId(from.getId());
     dto.setDate(formatDate(from.getDate()));
@@ -1769,15 +1786,15 @@ public class Dtos {
     return dto;
   }
 
-  public static List<QcDto> asQcDtos(Collection<? extends QC> qcSubset) {
+  public static List<QcDto> asQcDtos(@Nonnull Collection<? extends QC> qcSubset) {
     return qcSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  public static List<QcTypeDto> asQcTypeDtos(Collection<QcType> qcTypeSubset) {
+  public static List<QcTypeDto> asQcTypeDtos(@Nonnull Collection<QcType> qcTypeSubset) {
     return qcTypeSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  public static PoolOrderCompletionDto asDto(PoolOrderCompletion from) {
+  public static PoolOrderCompletionDto asDto(@Nonnull PoolOrderCompletion from) {
     PoolOrderCompletionDto dto = new PoolOrderCompletionDto();
     dto.setId(from.getPool().getId() + "_" + from.getSequencingParameters().getId());
     dto.setPool(asDto(from.getPool(), false, false));
@@ -1796,7 +1813,7 @@ public class Dtos {
     return dto;
   }
 
-  public static PlatformDto asDto(Platform from) {
+  public static PlatformDto asDto(@Nonnull Platform from) {
     PlatformDto dto = new PlatformDto();
     dto.setId(from.getId());
     dto.setPlatformType(from.getPlatformType().name());
@@ -1804,10 +1821,13 @@ public class Dtos {
     dto.setInstrumentModel(from.getInstrumentModel());
     dto.setNumContainers(from.getNumContainers());
     dto.setInstrumentType(from.getInstrumentType().name());
+    if (from.getPositions() != null) {
+      dto.setPositions(from.getPositions().stream().map(PlatformPosition::getAlias).collect(Collectors.toList()));
+    }
     return dto;
   }
 
-  public static Platform to(PlatformDto from) {
+  public static Platform to(@Nonnull PlatformDto from) {
     Platform to = new Platform();
     to.setId(from.getId());
     to.setPlatformType(PlatformType.get(from.getPlatformType()));
@@ -1818,7 +1838,7 @@ public class Dtos {
     return to;
   }
 
-  public static ProjectDto asDto(Project from) {
+  public static ProjectDto asDto(@Nonnull Project from) {
     ProjectDto dto = new ProjectDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1832,11 +1852,11 @@ public class Dtos {
     return dto;
   }
 
-  public static List<ProjectDto> asProjectDtos(Collection<Project> from) {
+  public static List<ProjectDto> asProjectDtos(@Nonnull Collection<Project> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  public static LibraryDesignDto asDto(LibraryDesign from) {
+  public static LibraryDesignDto asDto(@Nonnull LibraryDesign from) {
     LibraryDesignDto dto = new LibraryDesignDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1847,7 +1867,7 @@ public class Dtos {
     return dto;
   }
 
-  public static LibraryTypeDto asDto(LibraryType from) {
+  public static LibraryTypeDto asDto(@Nonnull LibraryType from) {
     LibraryTypeDto dto = new LibraryTypeDto();
     dto.setId(from.getId());
     dto.setAlias(from.getDescription());
@@ -1856,7 +1876,7 @@ public class Dtos {
     return dto;
   }
 
-  public static LibrarySelectionTypeDto asDto(LibrarySelectionType from) {
+  public static LibrarySelectionTypeDto asDto(@Nonnull LibrarySelectionType from) {
     LibrarySelectionTypeDto dto = new LibrarySelectionTypeDto();
     dto.setId(from.getId());
     dto.setAlias(from.getDescription());
@@ -1864,7 +1884,7 @@ public class Dtos {
     return dto;
   }
 
-  public static LibraryStrategyTypeDto asDto(LibraryStrategyType from) {
+  public static LibraryStrategyTypeDto asDto(@Nonnull LibraryStrategyType from) {
     LibraryStrategyTypeDto dto = new LibraryStrategyTypeDto();
     dto.setId(from.getId());
     dto.setDescription(from.getDescription());
@@ -1872,11 +1892,11 @@ public class Dtos {
     return dto;
   }
 
-  public static IndexDto asDto(Index from) {
+  public static IndexDto asDto(@Nonnull Index from) {
     return asDto(from, true);
   }
 
-  public static IndexDto asDto(Index from, boolean includeFamily) {
+  public static IndexDto asDto(@Nonnull Index from, boolean includeFamily) {
     IndexDto dto = new IndexDto();
     dto.setId(from.getId());
     dto.setLabel(from.getLabel());
@@ -1889,11 +1909,11 @@ public class Dtos {
     return dto;
   }
 
-  public static IndexFamilyDto asDto(IndexFamily from) {
+  public static IndexFamilyDto asDto(@Nonnull IndexFamily from) {
     return asDto(from, true);
   }
 
-  private static IndexFamilyDto asDto(IndexFamily from, boolean includeChildren) {
+  private static IndexFamilyDto asDto(@Nonnull IndexFamily from, boolean includeChildren) {
     IndexFamilyDto dto = new IndexFamilyDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1908,7 +1928,7 @@ public class Dtos {
     return dto;
   }
 
-  public static StainDto asDto(Stain from) {
+  public static StainDto asDto(@Nonnull Stain from) {
     StainDto dto = new StainDto();
     dto.setId(from.getId());
     dto.setCategory(from.getCategory() == null ? null : from.getCategory().getName());
@@ -1916,7 +1936,7 @@ public class Dtos {
     return dto;
   }
 
-  public static Run to(NotificationDto from, User user) {
+  public static Run to(@Nonnull NotificationDto from, User user) {
     final Run to = getMisoPlatformTypeFromRunscanner(from.getPlatformType()).createRun(user);
     setCommonRunValues(from, to);
 
@@ -1939,7 +1959,7 @@ public class Dtos {
     return to;
   }
 
-  private static void setIlluminaRunValues(IlluminaNotificationDto from, IlluminaRun to) {
+  private static void setIlluminaRunValues(@Nonnull IlluminaNotificationDto from, @Nonnull IlluminaRun to) {
     to.setPairedEnd(from.isPairedEndRun());
     to.setNumCycles(from.getNumCycles());
     to.setImgCycle(from.getImgCycle());
@@ -1948,7 +1968,7 @@ public class Dtos {
     to.setRunBasesMask(from.getRunBasesMask());
   }
 
-  private static void setCommonRunValues(NotificationDto from, Run to) {
+  private static void setCommonRunValues(@Nonnull NotificationDto from, @Nonnull Run to) {
     to.setAlias(from.getRunAlias());
     to.setFilePath(from.getSequencerFolderPath());
     to.setHealth(getMisoHealthTypeFromRunscanner(from.getHealthType()));
@@ -1957,7 +1977,7 @@ public class Dtos {
     to.setMetrics(from.getMetrics());
   }
 
-  public static TargetedSequencingDto asDto(TargetedSequencing from) {
+  public static TargetedSequencingDto asDto(@Nonnull TargetedSequencing from) {
     TargetedSequencingDto dto = new TargetedSequencingDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
@@ -1965,7 +1985,7 @@ public class Dtos {
     return dto;
   }
 
-  public static Pool to(PoolDto dto) {
+  public static Pool to(@Nonnull PoolDto dto) {
     PoolImpl to = new PoolImpl();
     to.setId(dto.getId() == null ? PoolImpl.UNSAVED_ID : dto.getId());
     to.setAlias(dto.getAlias());
@@ -1997,7 +2017,7 @@ public class Dtos {
     return to;
   }
 
-  public static PrinterBackendDto asDto(Backend from) {
+  public static PrinterBackendDto asDto(@Nonnull Backend from) {
     PrinterBackendDto dto = new PrinterBackendDto();
     dto.setId(from.ordinal());
     dto.setName(from.name());
@@ -2005,14 +2025,14 @@ public class Dtos {
     return dto;
   }
 
-  public static PrinterDriverDto asDto(Driver from) {
+  public static PrinterDriverDto asDto(@Nonnull Driver from) {
     PrinterDriverDto dto = new PrinterDriverDto();
     dto.setId(from.ordinal());
     dto.setName(from.name());
     return dto;
   }
 
-  public static PrinterDto asDto(Printer from) {
+  public static PrinterDto asDto(@Nonnull Printer from) {
     PrinterDto dto = new PrinterDto();
     dto.setId(from.getId());
     dto.setAvailable(from.isEnabled());
@@ -2023,7 +2043,7 @@ public class Dtos {
     return dto;
   }
 
-  public static Printer to(PrinterDto dto) throws JsonProcessingException {
+  public static Printer to(@Nonnull PrinterDto dto) throws JsonProcessingException {
     Printer to = new Printer();
     to.setId(dto.getId());
     to.setBackend(Backend.valueOf(dto.getBackend()));
@@ -2035,7 +2055,7 @@ public class Dtos {
     return to;
   }
 
-  public static StudyDto asDto(Study from) {
+  public static StudyDto asDto(@Nonnull Study from) {
     StudyDto dto = new StudyDto();
     dto.setId(from.getId());
     dto.setAccession(from.getAccession());
@@ -2047,14 +2067,14 @@ public class Dtos {
     return dto;
   }
 
-  public static StudyTypeDto asDto(StudyType from) {
+  public static StudyTypeDto asDto(@Nonnull StudyType from) {
     StudyTypeDto dto = new StudyTypeDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
     return dto;
   }
 
-  public static ChangeLogDto asDto(ChangeLog from) {
+  public static ChangeLogDto asDto(@Nonnull ChangeLog from) {
     ChangeLogDto dto = new ChangeLogDto();
     dto.setSummary(from.getSummary());
     dto.setTime(formatDateTime(from.getTime()));
@@ -2062,7 +2082,7 @@ public class Dtos {
     return dto;
   }
 
-  public static UserDto asDto(User from) {
+  public static UserDto asDto(@Nonnull User from) {
     UserDto dto = new UserDto();
     dto.setId(from.getUserId());
     dto.setActive(from.isActive());
@@ -2075,7 +2095,7 @@ public class Dtos {
     return dto;
   }
 
-  public static GroupDto asDto(Group from) {
+  public static GroupDto asDto(@Nonnull Group from) {
     GroupDto dto = new GroupDto();
     dto.setId(from.getGroupId());
     dto.setDescription(from.getDescription());
@@ -2083,7 +2103,7 @@ public class Dtos {
     return dto;
   }
 
-  public static InstrumentDto asDto(Instrument from) {
+  public static InstrumentDto asDto(@Nonnull Instrument from) {
     InstrumentDto dto = new InstrumentDto();
     dto.setId(from.getId());
     dto.setDateCommissioned(formatDate(from.getDateCommissioned()));
@@ -2106,7 +2126,7 @@ public class Dtos {
     return dto;
   }
 
-  public static Instrument to(InstrumentDto dto) {
+  public static Instrument to(@Nonnull InstrumentDto dto) {
     Instrument to = new InstrumentImpl();
     to.setId(dto.getId());
     to.setDateCommissioned(parseDate(dto.getDateCommissioned()));
@@ -2118,7 +2138,7 @@ public class Dtos {
     return to;
   }
 
-  public static QC to(QcDto dto) {
+  public static QC to(@Nonnull QcDto dto) {
     QC to;
     switch (dto.getType().getQcTarget()) {
     case Library:
@@ -2162,28 +2182,30 @@ public class Dtos {
     return to;
   }
 
-  public static ReferenceGenomeDto asDto(ReferenceGenome from) {
+  public static ReferenceGenomeDto asDto(@Nonnull ReferenceGenome from) {
     ReferenceGenomeDto dto = new ReferenceGenomeDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     return dto;
   }
 
-  public static PartitionDto asDto(Partition from) {
+  public static PartitionDto asDto(@Nonnull Partition from) {
     return asDto(from, false);
   }
 
-  public static PartitionDto asDto(Partition from, boolean includePoolContents) {
+  public static PartitionDto asDto(@Nonnull Partition from, boolean includePoolContents) {
     PartitionDto dto = new PartitionDto();
     dto.setId(from.getId());
     dto.setContainerId(from.getSequencerPartitionContainer().getId());
     dto.setContainerName(from.getSequencerPartitionContainer().getIdentificationBarcode());
     dto.setPartitionNumber(from.getPartitionNumber());
     dto.setPool(from.getPool() == null ? null : asDto(from.getPool(), includePoolContents, false));
+    setString(dto::setLoadingConcentration, from.getLoadingConcentration());
+    dto.setLoadingConcentrationUnits(from.getLoadingConcentrationUnits());
     return dto;
   }
 
-  public static PartitionQCTypeDto asDto(PartitionQCType from) {
+  public static PartitionQCTypeDto asDto(@Nonnull PartitionQCType from) {
     PartitionQCTypeDto dto = new PartitionQCTypeDto();
     dto.setId(from.getId());
     dto.setDescription(from.getDescription());
@@ -2193,7 +2215,7 @@ public class Dtos {
     return dto;
   }
 
-  public static ExperimentDto asDto(Experiment from) {
+  public static ExperimentDto asDto(@Nonnull Experiment from) {
     ExperimentDto dto = new ExperimentDto();
     dto.setId(from.getId());
     dto.setAccession(from.getAccession());
@@ -2209,7 +2231,7 @@ public class Dtos {
     return dto;
   }
 
-  public static KitConsumableDto asDto(Kit from) {
+  public static KitConsumableDto asDto(@Nonnull Kit from) {
     KitConsumableDto dto = new KitConsumableDto();
     dto.setId(from.getId());
     dto.setDate(formatDate(from.getKitDate()));
@@ -2218,7 +2240,7 @@ public class Dtos {
     return dto;
   }
 
-  public static Kit to(KitConsumableDto dto) {
+  public static Kit to(@Nonnull KitConsumableDto dto) {
     Kit to = new KitImpl();
     if (dto.getId() != null) {
       to.setId(dto.getId());
@@ -2229,7 +2251,7 @@ public class Dtos {
     return to;
   }
 
-  public static Experiment to(ExperimentDto dto) {
+  public static Experiment to(@Nonnull ExperimentDto dto) {
     Experiment to = new Experiment();
     to.setId(dto.getId());
     to.setAlias(dto.getAlias());
@@ -2248,25 +2270,25 @@ public class Dtos {
     return to;
   }
 
-  public static Study to(StudyDto dto) {
+  public static Study to(@Nonnull StudyDto dto) {
     Study to = new StudyImpl();
     to.setId(dto.getId());
     return to;
   }
 
-  public static Run to(RunDto dto) {
+  public static Run to(@Nonnull RunDto dto) {
     Run to = PlatformType.get(dto.getPlatformType()).createRun(null);
     to.setId(dto.getId());
     return to;
   }
 
-  public static Partition to(PartitionDto dto) {
+  public static Partition to(@Nonnull PartitionDto dto) {
     Partition to = new PartitionImpl();
     to.setId(dto.getId());
     return to;
   }
 
-  public static SubmissionDto asDto(Submission from) {
+  public static SubmissionDto asDto(@Nonnull Submission from) {
     SubmissionDto dto = new SubmissionDto();
     dto.setId(from.getId());
     dto.setAccession(from.getAccession());
@@ -2280,7 +2302,7 @@ public class Dtos {
     return dto;
   }
 
-  public static ArrayDto asDto(Array from) {
+  public static ArrayDto asDto(@Nonnull Array from) {
     ArrayDto dto = new ArrayDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
@@ -2301,11 +2323,11 @@ public class Dtos {
     return dto;
   }
 
-  private static List<ArraySampleDto> asArraySampleDtos(Map<String, Sample> arraySamples) {
+  private static List<ArraySampleDto> asArraySampleDtos(@Nonnull Map<String, Sample> arraySamples) {
     return arraySamples.entrySet().stream().map(entry -> asArraySampleDto(entry.getKey(), entry.getValue())).collect(Collectors.toList());
   }
 
-  private static ArraySampleDto asArraySampleDto(String position, Sample sample) {
+  private static ArraySampleDto asArraySampleDto(String position, @Nonnull Sample sample) {
     ArraySampleDto dto = new ArraySampleDto();
     dto.setCoordinates(position);
     dto.setId(sample.getId());
@@ -2315,7 +2337,7 @@ public class Dtos {
     return dto;
   }
 
-  public static Array to(ArrayDto from) {
+  public static Array to(@Nonnull ArrayDto from) {
     Array array = new Array();
     if (from.getId() != null) {
       array.setId(from.getId());
@@ -2349,7 +2371,7 @@ public class Dtos {
     return samples;
   }
 
-  public static ArrayRunDto asDto(ArrayRun from) {
+  public static ArrayRunDto asDto(@Nonnull ArrayRun from) {
     ArrayRunDto dto = new ArrayRunDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
@@ -2381,7 +2403,7 @@ public class Dtos {
         .collect(Collectors.toList());
   }
 
-  public static final ArrayRun to(ArrayRunDto from) {
+  public static final ArrayRun to(@Nonnull ArrayRunDto from) {
     ArrayRun run = new ArrayRun();
     if (from.getId() != null) {
       run.setId(from.getId());
@@ -2412,47 +2434,55 @@ public class Dtos {
     return run;
   }
 
-  public static InstrumentStatusDto asDto(InstrumentStatus from) {
+  public static InstrumentStatusDto asDto(@Nonnull InstrumentStatus from) {
     InstrumentStatusDto to = new InstrumentStatusDto();
     to.setInstrument(asDto(from.getInstrument()));
-    to.setRun(from.getRun() == null ? null : asDto(from.getRun()));
-    to.setPools(from.getRun() == null ? Collections.emptyList()
-        : from.getRun().getSequencerPartitionContainers().stream()//
-            .flatMap(c -> c.getPartitions().stream())//
-            .map(Partition::getPool)
-            .filter(Objects::nonNull)//
-            .collect(Collectors.groupingBy(Pool::getId)).values().stream()//
-            .map(l -> l.get(0))//
-            .sorted((a, b) -> a.getAlias().compareTo(b.getAlias()))//
-            .map(p -> asDto(p, false, false))//
-            .collect(Collectors.toList()));
-    to.setOutOfService(from.isOutOfService());
-    if (to.isOutOfService()) {
-      Date date = from.getInstrument().getServiceRecords().stream()
-          .filter(sr -> sr.isOutOfService() && sr.getStartTime() != null && sr.getEndTime() == null)
-          .map(ServiceRecord::getStartTime)
-          .min(Date::compareTo)
+
+    List<InstrumentPositionStatusDto> posDtos = new ArrayList<>();
+    from.getPositions().forEach((pos, run) -> {
+      InstrumentPositionStatusDto posDto = new InstrumentPositionStatusDto();
+      posDto.setPosition(pos.getAlias());
+      posDto.setRun(run == null ? null : asDto(run));
+      posDto.setPools(run == null ? Collections.emptyList()
+          : run.getSequencerPartitionContainers().stream()//
+              .flatMap(c -> c.getPartitions().stream())//
+              .map(Partition::getPool)//
+              .filter(Objects::nonNull)//
+              .collect(Collectors.groupingBy(Pool::getId)).values().stream()//
+              .map(l -> l.get(0))//
+              .sorted((a, b) -> a.getAlias().compareTo(b.getAlias()))//
+              .map(p -> asDto(p, false, false))//
+              .collect(Collectors.toList()));
+      ServiceRecord instrumentOutOfServiceRecord = from.getInstrument().getServiceRecords().stream()
+          .filter(sr -> sr.isOutOfService() && sr.getStartTime() != null && sr.getEndTime() == null
+              && (sr.getPosition() == null || sr.getPosition().getAlias().equals(pos.getAlias())))
+          .min(Comparator.comparing(ServiceRecord::getStartTime))
           .orElse(null);
-      to.setOutOfServiceTime(formatDateTime(date));
-    }
+      if (instrumentOutOfServiceRecord != null) {
+        posDto.setOutOfService(true);
+        posDto.setOutOfServiceTime(formatDateTime(instrumentOutOfServiceRecord.getStartTime()));
+      }
+      posDtos.add(posDto);
+    });
+    to.setPositions(posDtos);
     return to;
   }
 
-  public static SpreadsheetFormatDto asDto(SpreadSheetFormat from) {
+  public static SpreadsheetFormatDto asDto(@Nonnull SpreadSheetFormat from) {
     SpreadsheetFormatDto dto = new SpreadsheetFormatDto();
     dto.setName(from.name());
     dto.setDescription(from.description());
     return dto;
   }
 
-  public static SpreadsheetDto asDto(Spreadsheet<?> from) {
+  public static SpreadsheetDto asDto(@Nonnull Spreadsheet<?> from) {
     SpreadsheetDto dto = new SpreadsheetDto();
     dto.setDescription(from.description());
     dto.setName(from.name());
     return dto;
   }
 
-  public static SampleSpreadSheetDto asDto(SampleSpreadSheets from) {
+  public static SampleSpreadSheetDto asDto(@Nonnull SampleSpreadSheets from) {
     SampleSpreadSheetDto dto = new SampleSpreadSheetDto();
     dto.setDescription(from.description());
     dto.setName(from.name());
@@ -2460,7 +2490,7 @@ public class Dtos {
     return dto;
   }
 
-  public static DeletionDto asDto(Deletion from) {
+  public static DeletionDto asDto(@Nonnull Deletion from) {
     DeletionDto dto = new DeletionDto();
     dto.setId(from.getId());
     dto.setTargetType(from.getTargetType());
@@ -2471,7 +2501,7 @@ public class Dtos {
     return dto;
   }
 
-  public static BarcodableDto asDto(BarcodableView from) {
+  public static BarcodableDto asDto(@Nonnull BarcodableView from) {
     BarcodableDto dto = new BarcodableDto();
     dto.setId(from.getId().getTargetId());
     dto.setEntityType(from.getId().getTargetType().toString());
@@ -2481,7 +2511,7 @@ public class Dtos {
     return dto;
   }
 
-  public static LibraryTemplateDto asDto(LibraryTemplate from) {
+  public static LibraryTemplateDto asDto(@Nonnull LibraryTemplate from) {
     LibraryTemplateDto dto = null;
     if (from instanceof DetailedLibraryTemplate) {
       dto = asDetailedLibraryTemplateDto((DetailedLibraryTemplate) from);
@@ -2512,18 +2542,18 @@ public class Dtos {
     return dto;
   }
 
-  private static DetailedLibraryTemplateDto asDetailedLibraryTemplateDto(DetailedLibraryTemplate from) {
+  private static DetailedLibraryTemplateDto asDetailedLibraryTemplateDto(@Nonnull DetailedLibraryTemplate from) {
     DetailedLibraryTemplateDto dto = new DetailedLibraryTemplateDto();
     dto.setDesignId(from.getLibraryDesign() != null ? from.getLibraryDesign().getId() : null);
     dto.setDesignCodeId(from.getLibraryDesignCode() != null ? from.getLibraryDesignCode().getId() : null);
     return dto;
   }
 
-  public static List<LibraryTemplateDto> asLibraryTemplateDtos(Collection<LibraryTemplate> from) {
+  public static List<LibraryTemplateDto> asLibraryTemplateDtos(@Nonnull Collection<LibraryTemplate> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  public static WorkflowNameDto asDto(WorkflowName from) {
+  public static WorkflowNameDto asDto(@Nonnull WorkflowName from) {
     WorkflowNameDto dto = new WorkflowNameDto();
     dto.setWorkflowName(from);
     dto.setDescription(from.getDescription());
@@ -2531,7 +2561,7 @@ public class Dtos {
     return dto;
   }
 
-  public static WorkflowStateDto asDto(Workflow from) {
+  public static WorkflowStateDto asDto(@Nonnull Workflow from) {
     WorkflowStateDto dto = new WorkflowStateDto();
     dto.setName(from.getProgress().getWorkflowName().getDescription());
     dto.setWorkflowId(from.getProgress().getId());
@@ -2549,7 +2579,7 @@ public class Dtos {
     return dto;
   }
 
-  public static WorkflowStateDto asDto(Workflow from, int stepNumber) {
+  public static WorkflowStateDto asDto(@Nonnull Workflow from, int stepNumber) {
     WorkflowStateDto dto = new WorkflowStateDto();
     dto.setName(from.getProgress().getWorkflowName().getDescription());
     dto.setWorkflowId(from.getProgress().getId());
@@ -2573,7 +2603,7 @@ public class Dtos {
     return dto;
   }
 
-  public static StorageLocationDto asDto(StorageLocation from, boolean includeChildLocations, boolean recursive) {
+  public static StorageLocationDto asDto(@Nonnull StorageLocation from, boolean includeChildLocations, boolean recursive) {
     StorageLocationDto dto = new StorageLocationDto();
     dto.setId(from.getId());
     if (from.getParentLocation() != null) {
@@ -2607,7 +2637,7 @@ public class Dtos {
     return dto;
   }
 
-  public static StorageLocation to(StorageLocationDto from) {
+  public static StorageLocation to(@Nonnull StorageLocationDto from) {
     StorageLocation location = new StorageLocation();
     location.setId(from.getId());
     location.setAlias(from.getAlias());
@@ -2625,14 +2655,14 @@ public class Dtos {
     return location;
   }
 
-  public static QcTargetDto asDto(QcTarget from) {
+  public static QcTargetDto asDto(@Nonnull QcTarget from) {
     QcTargetDto dto = new QcTargetDto();
     dto.setQcTarget(from);
     dto.setCorrespondingFields(from.getCorrespondingFields());
     return dto;
   }
 
-  public static IssueDto asDto(Issue from) {
+  public static IssueDto asDto(@Nonnull Issue from) {
     IssueDto dto = new IssueDto();
     dto.setKey(from.getKey());
     dto.setSummary(from.getSummary());
@@ -2642,14 +2672,14 @@ public class Dtos {
     return dto;
   }
 
-  public static AttachmentDto asDto(FileAttachment from) {
+  public static AttachmentDto asDto(@Nonnull FileAttachment from) {
     AttachmentDto dto = new AttachmentDto();
     setId(dto::setId, from);
     setString(dto::setFilename, from.getFilename());
     setString(dto::setPath, from.getPath());
-    setString(dto::setCategory, from.getCategory(), AttachmentCategory::getAlias);
-    setString(dto::setCreator, from.getCreator(), User::getLoginName);
-    setString(dto::setCreated, from.getCreationTime());
+    setString(dto::setCategory, maybeGetProperty(from.getCategory(), AttachmentCategory::getAlias));
+    setString(dto::setCreator, maybeGetProperty(from.getCreator(), User::getLoginName));
+    setDateString(dto::setCreated, from.getCreationTime());
     return dto;
   }
 
@@ -2660,13 +2690,14 @@ public class Dtos {
     return dto;
   }
 
-  public static ServiceRecordDto asDto(ServiceRecord from) {
+  public static ServiceRecordDto asDto(@Nonnull ServiceRecord from) {
     ServiceRecordDto dto = new ServiceRecordDto();
-    dto.setId(from.getId());
-    dto.setServiceDate(formatDate(from.getServiceDate()));
-    dto.setTitle(from.getTitle());
-    dto.setDetails(from.getDetails());
-    dto.setReferenceNumber(from.getReferenceNumber());
+    setId(dto::setId, from);
+    setDateString(dto::setServiceDate, from.getServiceDate());
+    setString(dto::setTitle, from.getTitle());
+    setString(dto::setDetails, from.getDetails());
+    setString(dto::setReferenceNumber, from.getReferenceNumber());
+    setString(dto::setPosition, maybeGetProperty(from.getPosition(), PlatformPosition::getAlias));
     dto.setAttachments(from.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList()));
     return dto;
   }
@@ -2678,7 +2709,7 @@ public class Dtos {
     return dto;
   }
 
-  public static WorksetDto asDto(Workset from) {
+  public static WorksetDto asDto(@Nonnull Workset from) {
     WorksetDto dto = new WorksetDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
@@ -2697,7 +2728,7 @@ public class Dtos {
     return dto;
   }
 
-  public static Workset to(WorksetDto from) {
+  public static Workset to(@Nonnull WorksetDto from) {
     Workset workset = new Workset();
     if (from.getId() != null) {
       workset.setId(from.getId());
@@ -2728,7 +2759,7 @@ public class Dtos {
     return workset;
   }
 
- public static LibraryTemplate to(LibraryTemplateDto from) {
+  public static LibraryTemplate to(@Nonnull LibraryTemplateDto from) {
     LibraryTemplate to = null;
     if (from instanceof DetailedLibraryTemplateDto) {
       to = toDetailedLibraryTemplate((DetailedLibraryTemplateDto) from);
@@ -2796,56 +2827,48 @@ public class Dtos {
     return to;
   }
 
-  public static LibrarySpikeInDto asDto(LibrarySpikeIn from) {
+  public static LibrarySpikeInDto asDto(@Nonnull LibrarySpikeIn from) {
     LibrarySpikeInDto dto = new LibrarySpikeInDto();
     dto.setId(from.getId());
     setString(dto::setAlias, from.getAlias());
     return dto;
   }
 
-  public static AttachmentCategoryDto asDto(AttachmentCategory from) {
+  public static AttachmentCategoryDto asDto(@Nonnull AttachmentCategory from) {
     AttachmentCategoryDto dto = new AttachmentCategoryDto();
     dto.setId(from.getId());
     setString(dto::setAlias, from.getAlias());
     return dto;
   }
 
-  public static AttachmentCategory to(AttachmentCategoryDto from) {
+  public static AttachmentCategory to(@Nonnull AttachmentCategoryDto from) {
     AttachmentCategory to = new AttachmentCategory();
     setLong(to::setId, from.getId(), false);
     setString(to::setAlias, from.getAlias());
     return to;
   }
 
-  private static void setBigDecimal(Consumer<BigDecimal> setter, String value) {
-    if (isStringEmptyOrNull(value)) {
-      setter.accept(null);
-    } else {
-      setter.accept(new BigDecimal(value));
-    }
+  private static void setBigDecimal(@Nonnull Consumer<BigDecimal> setter, String value) {
+    setter.accept(isStringEmptyOrNull(value) ? null : new BigDecimal(value));
   }
 
-  private static void setString(Consumer<String> setter, BigDecimal value) {
+  private static void setString(@Nonnull Consumer<String> setter, BigDecimal value) {
     setter.accept(toNiceString(value));
   }
 
-  private static void setString(Consumer<String> setter, String value) {
-    if (isStringBlankOrNull(value)) {
-      setter.accept(null);
-    } else {
-      setter.accept(value.trim());
-    }
+  private static void setString(@Nonnull Consumer<String> setter, String value) {
+    setter.accept(isStringBlankOrNull(value) ? null : value.trim());
   }
 
-  private static void setString(Consumer<String> setter, Date value) {
+  private static void setDateString(@Nonnull Consumer<String> setter, Date value) {
     setter.accept(value == null ? null : formatDate(value));
   }
 
-  private static <T> void setString(Consumer<String> setter, T value, Function<T, String> lookup) {
-    setter.accept(value == null ? null : lookup.apply(value));
+  private static void setDateTimeString(@Nonnull Consumer<String> setter, Date value) {
+    setter.accept(value == null ? null : formatDateTime(value));
   }
 
-  private static void setLong(Consumer<Long> setter, Long value, boolean nullOk) {
+  private static void setLong(@Nonnull Consumer<Long> setter, Long value, boolean nullOk) {
     Long effectiveValue = value;
     if (effectiveValue == null) {
       effectiveValue = nullOk ? null : 0L;
@@ -2853,11 +2876,11 @@ public class Dtos {
     setter.accept(effectiveValue);
   }
 
-  private static void setId(Consumer<Long> setter, Identifiable value) {
+  private static void setId(@Nonnull Consumer<Long> setter, Identifiable value) {
     setter.accept(value == null ? null : value.getId());
   }
 
-  private static <T extends Identifiable> void setObject(Consumer<T> setter, Supplier<T> constructor, Long id) {
+  private static <T extends Identifiable> void setObject(@Nonnull Consumer<T> setter, @Nonnull Supplier<T> constructor, Long id) {
     if (id == null) {
       setter.accept(null);
     } else {
@@ -2867,8 +2890,16 @@ public class Dtos {
     }
   }
 
-  private static <T> void setObject(Consumer<T> setter, String value, Function<String, T> lookup) {
+  private static <T> void setObject(@Nonnull Consumer<T> setter, String value, @Nonnull Function<String, T> lookup) {
     setter.accept(value == null ? null : lookup.apply(value));
+  }
+
+  private static <S, R> void setObject(@Nonnull Consumer<R> setter, S value, @Nonnull Function<S, R> transform) {
+    setter.accept(value == null ? null : transform.apply(value));
+  }
+
+  private static <S, R> R maybeGetProperty(S object, @Nonnull Function<S, R> getter) {
+    return object == null ? null : getter.apply(object);
   }
 
   /**
@@ -2877,7 +2908,7 @@ public class Dtos {
    * @param rsType Runscanner Platform
    * @return equivalent MISO PlatformType
    */
-  public static PlatformType getMisoPlatformTypeFromRunscanner(ca.on.oicr.gsi.runscanner.dto.type.Platform rsType) {
+  public static PlatformType getMisoPlatformTypeFromRunscanner(@Nonnull ca.on.oicr.gsi.runscanner.dto.type.Platform rsType) {
     return PlatformType.valueOf(rsType.name());
   }
 
@@ -2887,7 +2918,7 @@ public class Dtos {
    * @param rsType Runscanner HealthType
    * @return equivalent MISO HealthType
    */
-  public static HealthType getMisoHealthTypeFromRunscanner(ca.on.oicr.gsi.runscanner.dto.type.HealthType rsType) {
+  public static HealthType getMisoHealthTypeFromRunscanner(@Nonnull ca.on.oicr.gsi.runscanner.dto.type.HealthType rsType) {
     return HealthType.valueOf(toMisoFormat(rsType.name()));
   }
 
@@ -2897,7 +2928,7 @@ public class Dtos {
    * @param name Value of a Runscanner enum, all caps
    * @return name made Upper Camel Case
    */
-  private static String toMisoFormat(String name) {
+  private static String toMisoFormat(@Nonnull String name) {
     return name.substring(0, 1) + name.substring(1).toLowerCase();
   }
 
@@ -2907,7 +2938,9 @@ public class Dtos {
    * @param rsType Runscanner IlluminaChemistry
    * @return equivalent MISO IlluminaChemistry
    */
-  public static IlluminaChemistry getMisoIlluminaChemistryFromRunscanner(ca.on.oicr.gsi.runscanner.dto.type.IlluminaChemistry rsType) {
+  public static IlluminaChemistry getMisoIlluminaChemistryFromRunscanner(
+      @Nonnull ca.on.oicr.gsi.runscanner.dto.type.IlluminaChemistry rsType) {
     return IlluminaChemistry.valueOf(rsType.name());
   }
+
 }

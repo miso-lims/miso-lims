@@ -111,4 +111,14 @@ public interface Instrument extends Nameable, Serializable {
 
   public boolean isOutOfService();
 
+  public Set<PlatformPosition> getOutOfServicePositions();
+
+  public String getOutOfServicePositionsLabel();
+
+  @Override
+  int hashCode();
+
+  @Override
+  boolean equals(Object obj);
+
 }

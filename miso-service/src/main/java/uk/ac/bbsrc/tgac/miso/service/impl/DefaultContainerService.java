@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -220,10 +222,37 @@ public class DefaultContainerService
   public void update(Partition partition) throws IOException {
     Partition original = containerDao.getPartitionById(partition.getId());
     authorizationManager.throwIfNotWritable(original.getSequencerPartitionContainer());
-    Pool pool = partition.getPool() == null ? null : poolService.get(partition.getPool().getId());
-    original.setPool(pool);
+    if (partition.getPool() != null) {
+      partition.setPool(poolService.get(partition.getPool().getId()));
+    }
+    validateChange(partition, original);
+    applyChanges(original, partition);
     original.getSequencerPartitionContainer().setChangeDetails(authorizationManager.getCurrentUser());
     containerDao.save(original.getSequencerPartitionContainer());
+  }
+
+  private void validateChange(Partition partition, Partition beforeChange) {
+    List<ValidationError> errors = new ArrayList<>();
+
+    ValidationUtils.validateConcentrationUnits(partition.getLoadingConcentration(), partition.getLoadingConcentrationUnits(),
+        "loadingConcentration", "Loading Concentration", errors);
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
+    }
+  }
+
+  private void applyChanges(Partition target, Partition source) {
+    target.setPool(source.getPool());
+    target.setLoadingConcentration(source.getLoadingConcentration());
+    target.setLoadingConcentrationUnits(source.getLoadingConcentrationUnits());
+
+    if (target.getPool() == null) {
+      target.setLoadingConcentration(null);
+    }
+    if (target.getLoadingConcentration() == null) {
+      target.setLoadingConcentrationUnits(null);
+    }
   }
 
   @Override
@@ -250,9 +279,9 @@ public class DefaultContainerService
   public ValidationResult validateDeletion(SequencerPartitionContainer object) {
     ValidationResult result = new ValidationResult();
 
-    if (object.getRuns() != null && !object.getRuns().isEmpty()) {
+    if (object.getRunPositions() != null && !object.getRunPositions().isEmpty()) {
       result.addError(new ValidationError(String.format("Container %s (%s) is used in %d run(s)", object.getId(),
-          object.getIdentificationBarcode(), object.getRuns().size())));
+          object.getIdentificationBarcode(), object.getRunPositions().size())));
     }
 
     return result;

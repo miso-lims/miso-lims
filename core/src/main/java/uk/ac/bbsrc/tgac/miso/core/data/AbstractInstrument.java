@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -29,6 +29,7 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -190,22 +191,22 @@ public abstract class AbstractInstrument implements Instrument {
         + ", dateDecommissioned=" + dateDecommissioned
         + ", upgradedInstrument=" + (upgradedInstrument == null ? null : upgradedInstrument.getId()) + "]";
   }
-  
+
   @Override
   public boolean isActive() {
     return dateDecommissioned == null;
   }
-  
+
   @Override
   public void setLastServicedDate(Date date) {
     this.lastServicedDate = date;
   }
-  
+
   @Override
   public Date getLastServicedDate() {
     return lastServicedDate;
   }
-  
+
   @OneToMany(targetEntity = Run.class, mappedBy = "sequencer")
   private Set<Run> runs = new HashSet<>();
 
@@ -238,7 +239,90 @@ public abstract class AbstractInstrument implements Instrument {
       return false;
     }
     return getServiceRecords().stream().anyMatch(sr -> sr.isOutOfService() && sr.getEndTime() == null && sr.getStartTime() != null
-        && sr.getStartTime().before(new Date()));
+        && sr.getStartTime().before(new Date()) && sr.getPosition() == null);
+  }
+
+  @Override
+  public Set<PlatformPosition> getOutOfServicePositions() {
+    if (isOutOfService()) {
+      return getPlatform().getPositions();
+    }
+    return getPlatform().getPositions().stream()
+        .filter(pos -> getServiceRecords().stream().anyMatch(sr -> sr.isOutOfService() && sr.getEndTime() == null
+            && sr.getStartTime() != null && sr.getStartTime().before(new Date()) && sr.getPosition().getAlias().equals(pos.getAlias())))
+        .collect(Collectors.toSet());
+  }
+
+  @Override
+  public String getOutOfServicePositionsLabel() {
+    if (isOutOfService()) {
+      return "All positions";
+    }
+    Set<PlatformPosition> positions = getOutOfServicePositions();
+    if (positions.isEmpty()) {
+      return null;
+    } else {
+      return "Position" + (positions.size() == 1 ? "" : "a") + " "
+          + positions.stream().map(PlatformPosition::getAlias).collect(Collectors.joining(", "));
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((dateCommissioned == null) ? 0 : dateCommissioned.hashCode());
+    result = prime * result + ((dateDecommissioned == null) ? 0 : dateDecommissioned.hashCode());
+    result = prime * result + (int) (id ^ (id >>> 32));
+    result = prime * result + ((ip == null) ? 0 : ip.hashCode());
+    result = prime * result + ((lastServicedDate == null) ? 0 : lastServicedDate.hashCode());
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + ((platform == null) ? 0 : platform.hashCode());
+    result = prime * result + ((runs == null) ? 0 : runs.hashCode());
+    result = prime * result + ((serialNumber == null) ? 0 : serialNumber.hashCode());
+    result = prime * result + ((serviceRecords == null) ? 0 : serviceRecords.hashCode());
+    result = prime * result + ((upgradedInstrument == null) ? 0 : upgradedInstrument.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    AbstractInstrument other = (AbstractInstrument) obj;
+    if (dateCommissioned == null) {
+      if (other.dateCommissioned != null) return false;
+    } else if (!dateCommissioned.equals(other.dateCommissioned)) return false;
+    if (dateDecommissioned == null) {
+      if (other.dateDecommissioned != null) return false;
+    } else if (!dateDecommissioned.equals(other.dateDecommissioned)) return false;
+    if (id != other.id) return false;
+    if (ip == null) {
+      if (other.ip != null) return false;
+    } else if (!ip.equals(other.ip)) return false;
+    if (lastServicedDate == null) {
+      if (other.lastServicedDate != null) return false;
+    } else if (!lastServicedDate.equals(other.lastServicedDate)) return false;
+    if (name == null) {
+      if (other.name != null) return false;
+    } else if (!name.equals(other.name)) return false;
+    if (platform == null) {
+      if (other.platform != null) return false;
+    } else if (!platform.equals(other.platform)) return false;
+    if (runs == null) {
+      if (other.runs != null) return false;
+    } else if (!runs.equals(other.runs)) return false;
+    if (serialNumber == null) {
+      if (other.serialNumber != null) return false;
+    } else if (!serialNumber.equals(other.serialNumber)) return false;
+    if (serviceRecords == null) {
+      if (other.serviceRecords != null) return false;
+    } else if (!serviceRecords.equals(other.serviceRecords)) return false;
+    if (upgradedInstrument == null) {
+      if (other.upgradedInstrument != null) return false;
+    } else if (!upgradedInstrument.equals(other.upgradedInstrument)) return false;
+    return true;
   }
 
 }

@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,8 +11,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.Select;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class RunPage extends FormPage<RunPage.Field> {
@@ -146,11 +150,12 @@ public class RunPage extends FormPage<RunPage.Field> {
     return new RunPage(getDriver());
   }
 
-  public void searchForPools(boolean assignFirstPool, List<Integer> partitions, String option, String searchText) {
+  public void searchForPools(boolean assignFirstPool, List<Integer> partitions, String option, String searchText,
+      BigDecimal loadingConcentration, ConcentrationUnit units) {
     checkLaneBoxesAndSelectOption(partitions, "Assign Pool", option);
     switch (option) {
     case PoolSearch.NO_POOL:
-      break;
+      return;
     case PoolSearch.SEARCH:
       waitUntil(textToBe(By.className("ui-dialog-title"), "Search for Pool to Assign"));
       dialog.findElement(By.tagName("input")).sendKeys(searchText);
@@ -169,13 +174,36 @@ public class RunPage extends FormPage<RunPage.Field> {
       if (assignFirstPool) clickFirstPoolTile(true, searchText);
       break;
     }
+    if (assignFirstPool) {
+      setLoadingConcentration(loadingConcentration, units);
+    }
+  }
+
+  public void searchForPools(boolean assignFirstPool, List<Integer> partitions, String option, String searchText) {
+    searchForPools(assignFirstPool, partitions, option, searchText, null, null);
+  }
+
+  private void setLoadingConcentration(BigDecimal concentration, ConcentrationUnit units) {
+    waitUntil(textToBe(By.className("ui-dialog-title"), "Set Loading Concentration"));
+    if (concentration != null) {
+      dialog.findElement(By.tagName("input")).sendKeys(LimsUtils.toNiceString(concentration));
+      Select unitsDropdown = new Select(dialog.findElement(By.tagName("select")));
+      unitsDropdown.selectByVisibleText(units.getUnits().replace("&#181;", "µ"));
+    }
+    clickOk();
+  }
+
+  public RunPage assignPools(List<Integer> partitions, String option, String searchText, BigDecimal loadingConcentration,
+      ConcentrationUnit units) {
+    WebElement html = getHtmlElement();
+    searchForPools(true, partitions, option, searchText, loadingConcentration, units);
+    // setLoadingConcentration();
+    waitForPageRefresh(html);
+    return new RunPage(getDriver());
   }
 
   public RunPage assignPools(List<Integer> partitions, String option, String searchText) {
-    WebElement html = getHtmlElement();
-    searchForPools(true, partitions, option, searchText);
-    waitForPageRefresh(html);
-    return new RunPage(getDriver());
+    return assignPools(partitions, option, searchText, null, null);
   }
 
   public RunPage setPartitionQC(List<Integer> partitions, String option, String noteText) {
