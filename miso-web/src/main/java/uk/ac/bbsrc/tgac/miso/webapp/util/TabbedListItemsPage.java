@@ -19,24 +19,20 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 
 public class TabbedListItemsPage {
 
-  public static TabbedListItemsPage createForPlatformType(String targetType, InstrumentService sequencerService)
+  public static TabbedListItemsPage createForPlatformType(String targetType, PlatformService platformService)
       throws IOException {
-    return new TabbedListItemsPage(targetType, "platformType", getPlatformTypes(sequencerService), PlatformType::getKey,
+    return new TabbedListItemsPage(targetType, "platformType", getPlatformTypes(platformService), PlatformType::getKey,
         PlatformType::name);
   }
 
-  public static Stream<PlatformType> getPlatformTypes(InstrumentService sequencerService) throws IOException {
-    Set<PlatformType> platforms = sequencerService.list(0, 0, true, "id", PaginationFilter.archived(false),
-        PaginationFilter.instrumentType(InstrumentType.SEQUENCER)).stream()
-        .map(sr -> sr.getPlatform().getPlatformType()).collect(Collectors.toSet());
+  public static Stream<PlatformType> getPlatformTypes(PlatformService platformService) throws IOException {
+    Set<PlatformType> platforms = platformService.listActivePlatformTypes();
 
     if (platforms.size() > 0) {
       return platforms.stream();

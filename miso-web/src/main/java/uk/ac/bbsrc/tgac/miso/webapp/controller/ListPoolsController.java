@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 /**
@@ -46,7 +46,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 @Controller
 public class ListPoolsController {
   @Autowired
-  private InstrumentService sequencerService;
+  private PlatformService platformService;
 
   @ModelAttribute("title")
   public String title() {
@@ -54,7 +54,7 @@ public class ListPoolsController {
   }
   @RequestMapping("/pools")
   public ModelAndView listPools(ModelMap model) throws IOException {
-    return TabbedListItemsPage.createForPlatformType("pool", sequencerService)
+    return TabbedListItemsPage.createForPlatformType("pool", platformService)
         .list(model);
   }
 

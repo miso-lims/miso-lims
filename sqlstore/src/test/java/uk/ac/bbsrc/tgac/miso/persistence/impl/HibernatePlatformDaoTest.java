@@ -26,6 +26,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -179,5 +180,13 @@ public class HibernatePlatformDaoTest extends AbstractDAOTest {
     platform.setInstrumentModel(instrumentModel);
     platform.setPlatformType(PlatformType.get("PacBio"));
     return platform;
+  }
+
+  @Test
+  public void testListActivePlatformTypes() throws Exception {
+    Set<PlatformType> platformTypes = dao.listActivePlatformTypes();
+    assertEquals(1, platformTypes.size());
+    assertFalse(platformTypes.contains(PlatformType.SOLID));
+    assertTrue(platformTypes.contains(PlatformType.ILLUMINA));
   }
 }

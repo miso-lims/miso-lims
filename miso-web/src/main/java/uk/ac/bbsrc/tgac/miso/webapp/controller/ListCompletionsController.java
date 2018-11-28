@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 @Controller
@@ -23,7 +23,7 @@ public class ListCompletionsController {
     private final String slug;
 
     public OrderListPage(String slug) throws IOException {
-      super("completion", "platform", getPlatformTypes(instrumentService), PlatformType::getKey,
+      super("completion", "platform", getPlatformTypes(platformService), PlatformType::getKey,
           PlatformType::name);
       this.slug = slug;
     }
@@ -38,7 +38,7 @@ public class ListCompletionsController {
   private static final String MODEL_ATTR_TITLE = "customTitle";
 
   @Autowired
-  private InstrumentService instrumentService;
+  private PlatformService platformService;
 
   @RequestMapping("/poolorders/active")
   public ModelAndView listActive(ModelMap model) throws IOException {
