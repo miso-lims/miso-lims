@@ -394,7 +394,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     Iterator<RunPosition> iterator = target.getRunPositions().iterator();
     while (iterator.hasNext()) {
       RunPosition existingPos = iterator.next();
-      if (!source.getRunPositions().stream().anyMatch(rp -> isSamePosition(rp, existingPos))) {
+      if (source.getRunPositions().stream().noneMatch(rp -> isSamePosition(rp, existingPos))) {
         iterator.remove();
       }
     }

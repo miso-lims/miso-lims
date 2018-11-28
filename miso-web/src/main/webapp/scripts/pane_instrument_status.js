@@ -103,7 +103,6 @@ PaneTarget.instrument_status = (function() {
     }
     lines.push(status + (statusDate ? (' since ' + statusDate) : ''));
 
-    var dateProperty = (positionCount === busyCount) ? 'startDate' : 'endDate';
     return Tile.make([Tile.titleAndStatus(data.instrument.name, statusFunction()), Tile.lines(lines, false)], function() {
       var links = [{
         name: "View Instrument (" + data.instrument.name + ")",

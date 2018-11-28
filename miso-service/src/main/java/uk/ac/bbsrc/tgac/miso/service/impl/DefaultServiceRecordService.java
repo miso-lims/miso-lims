@@ -82,7 +82,7 @@ public class DefaultServiceRecordService implements ServiceRecordService {
     target.setEndTime(source.getEndTime());
   }
 
-  private void validateChange(ServiceRecord record, ServiceRecord beforeChange) throws IOException {
+  private void validateChange(ServiceRecord record, ServiceRecord beforeChange) {
     List<ValidationError> errors = new ArrayList<>();
 
     if (record.getPosition() != null && findPosition(record.getPosition().getId(), record.getInstrument()) == null) {
