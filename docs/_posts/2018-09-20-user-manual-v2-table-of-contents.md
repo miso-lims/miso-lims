@@ -490,9 +490,7 @@ This user manual is a work in progress, so parts of it may be missing until it h
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Assigning Pools to a Container" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding Container QCs" %}
-{% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Editing Container QCs" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Container QCs" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Printing Barcodes" %}
 {% assign sub = sub | plus: 1 %}
