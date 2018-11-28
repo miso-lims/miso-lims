@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.LongConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -2357,7 +2356,7 @@ public class Dtos {
     return array;
   }
 
-  private static Map<String, Sample> toArraySamples(@Nonnull List<ArraySampleDto> dtos) {
+  private static Map<String, Sample> toArraySamples(List<ArraySampleDto> dtos) {
     Map<String, Sample> samples = new HashMap<>();
     if (dtos != null) {
       for (ArraySampleDto dto : dtos) {
@@ -2869,7 +2868,7 @@ public class Dtos {
     setter.accept(value == null ? null : formatDateTime(value));
   }
 
-  private static void setLong(@Nonnull LongConsumer setter, Long value, boolean nullOk) {
+  private static void setLong(@Nonnull Consumer<Long> setter, Long value, boolean nullOk) {
     Long effectiveValue = value;
     if (effectiveValue == null) {
       effectiveValue = nullOk ? null : 0L;
@@ -2877,7 +2876,7 @@ public class Dtos {
     setter.accept(effectiveValue);
   }
 
-  private static void setId(@Nonnull LongConsumer setter, Identifiable value) {
+  private static void setId(@Nonnull Consumer<Long> setter, Identifiable value) {
     setter.accept(value == null ? null : value.getId());
   }
 
