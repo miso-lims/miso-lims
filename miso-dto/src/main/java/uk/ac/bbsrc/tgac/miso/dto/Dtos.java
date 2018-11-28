@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.LongConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -1101,7 +1102,7 @@ public class Dtos {
     return level == null ? null : level.getLabel();
   }
 
-  public static DetailedLibrary toDetailedLibrary(@Nonnull DetailedLibraryDto from) {
+  public static DetailedLibrary toDetailedLibrary(DetailedLibraryDto from) {
     if (from == null) return null;
     DetailedLibrary to = new DetailedLibraryImpl();
     if (from.getLibraryDesignId() != null) {
@@ -2683,7 +2684,7 @@ public class Dtos {
     return dto;
   }
 
-  public static ConcentrationUnitDto asDto(@Nonnull ConcentrationUnit from) {
+  public static ConcentrationUnitDto asDto(ConcentrationUnit from) {
     ConcentrationUnitDto dto = new ConcentrationUnitDto();
     dto.setName(from);
     dto.setUnits(from == null ? null : from.getUnits());
@@ -2702,7 +2703,7 @@ public class Dtos {
     return dto;
   }
 
-  public static VolumeUnitDto asDto(@Nonnull VolumeUnit from) {
+  public static VolumeUnitDto asDto(VolumeUnit from) {
     VolumeUnitDto dto = new VolumeUnitDto();
     dto.setName(from);
     dto.setUnits(from == null ? null : from.getUnits());
@@ -2811,7 +2812,7 @@ public class Dtos {
     return to;
   }
 
-  public static DetailedLibraryTemplate toDetailedLibraryTemplate(@Nonnull DetailedLibraryTemplateDto from) {
+  public static DetailedLibraryTemplate toDetailedLibraryTemplate(DetailedLibraryTemplateDto from) {
     if (from == null) return null;
     DetailedLibraryTemplate to = new DetailedLibraryTemplate();
     if (from.getDesignId() != null) {
@@ -2868,7 +2869,7 @@ public class Dtos {
     setter.accept(value == null ? null : formatDateTime(value));
   }
 
-  private static void setLong(@Nonnull Consumer<Long> setter, Long value, boolean nullOk) {
+  private static void setLong(@Nonnull LongConsumer setter, Long value, boolean nullOk) {
     Long effectiveValue = value;
     if (effectiveValue == null) {
       effectiveValue = nullOk ? null : 0L;
@@ -2876,7 +2877,7 @@ public class Dtos {
     setter.accept(effectiveValue);
   }
 
-  private static void setId(@Nonnull Consumer<Long> setter, Identifiable value) {
+  private static void setId(@Nonnull LongConsumer setter, Identifiable value) {
     setter.accept(value == null ? null : value.getId());
   }
 
