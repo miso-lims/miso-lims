@@ -1,3 +1,5 @@
+-- sequencer_positions
+
 DROP VIEW IF EXISTS InstrumentStats;
 
 DROP TABLE IF EXISTS PlatformPosition;
@@ -100,3 +102,11 @@ SET rspc.positionId = (
 WHERE (p.instrumentModel LIKE 'Illumina HiSeq%' OR p.instrumentModel LIKE 'Illumina NovaSeq%')
 AND alias REGEXP '^[0-9]{6}_.*_[0-9]{4}_B.*$';
 -- EndNoTest
+
+
+-- loading_concentration
+
+ALTER TABLE _Partition ADD COLUMN loadingConcentration DECIMAL(14,10);
+ALTER TABLE _Partition ADD COLUMN loadingConcentrationUnits varchar(30);
+
+

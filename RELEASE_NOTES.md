@@ -1,3 +1,10 @@
+# 0.2.155
+
+Changes:
+
+ * Support multiple simultaneous runs per sequencer (#1756)
+ * Added partition loading concentration and spreadsheet downloads (#1760)
+
 # 0.2.154
 
 Changes:
