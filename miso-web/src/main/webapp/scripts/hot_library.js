@@ -796,17 +796,17 @@ HotTarget.library = (function() {
             data: 'distributed',
             type: 'dropdown',
             trimDropdown: false,
-            source: ['True', 'False'],
+            source: ['Sent Out', 'No'],
             include: !config.create && !config.propagate,
             unpack: function(lib, flat, setCellMeta) {
               if (lib.distributed === true) {
-                flat.distributed = 'True';
+                flat.distributed = 'Sent Out';
               } else {
-                flat.distributed = 'False';
+                flat.distributed = 'No';
               }
             },
             pack: function(lib, flat, errorHandler) {
-              if (flat.distributed === 'True') {
+              if (flat.distributed === 'Sent Out') {
                 lib.distributed = true;
               } else {
                 lib.distributed = false;
@@ -826,7 +826,7 @@ HotTarget.library = (function() {
             include: !config.create && !config.propagate,
             depends: 'distributed',
             update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if (value === 'True') {
+              if (value === 'Sent Out') {
                 setReadOnly(false);
                 setOptions({
                   required: true,
@@ -855,7 +855,7 @@ HotTarget.library = (function() {
             include: !config.create && !config.propagate,
             depends: 'distributed',
             update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if (value === 'True') {
+              if (value === 'Sent Out') {
                 setOptions({
                   required: true,
                   validator: HotUtils.validator.requiredTextNoSpecialChars

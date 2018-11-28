@@ -682,6 +682,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     boxService.throwIfBoxPositionIsFilled(sample);
     validateChange(sample, managed);
     applyChanges(managed, sample);
+    applyBoxChanges(managed, originalBox, originalBoxPosition);
     loadChildEntities(managed);
     if (isDetailedSample(managed)) {
       DetailedSample detailedUpdated = (DetailedSample) managed;
@@ -692,7 +693,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     }
 
     save(managed, validateAliasUniqueness);
-    applyBoxChanges(managed, originalBox, originalBoxPosition);
   }
 
   private void validateChange(Sample sample, Sample beforeChange) throws IOException {

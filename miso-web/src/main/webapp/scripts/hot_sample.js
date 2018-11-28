@@ -824,17 +824,17 @@ HotTarget.sample = (function() {
             data: 'distributed',
             type: 'dropdown',
             trimDropdown: false,
-            source: ['True', 'False'],
+            source: ['Sent Out', 'No'],
             include: !config.create && (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
               if (sam.distributed === true) {
-                flat.distributed = 'True';
+                flat.distributed = 'Sent Out';
               } else {
-                flat.distributed = 'False';
+                flat.distributed = 'No';
               }
             },
             pack: function(sam, flat, errorHandler) {
-              if (flat.distributed === 'True') {
+              if (flat.distributed === 'Sent Out') {
                 sam.distributed = true;
               } else {
                 sam.distributed = false;
@@ -853,7 +853,7 @@ HotTarget.sample = (function() {
             include: !config.create && (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
             depends: 'distributed',
             update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if (value === 'True') {
+              if (value === 'Sent Out') {
                 setReadOnly(false);
                 setOptions({
                   required: true,
@@ -882,7 +882,7 @@ HotTarget.sample = (function() {
             include: !config.create && (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
             depends: 'distributed',
             update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if (value === 'True') {
+              if (value === 'Sent Out') {
                 setOptions({
                   required: true,
                   validator: HotUtils.validator.requiredTextNoSpecialChars

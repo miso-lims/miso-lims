@@ -197,10 +197,11 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     boolean validateAliasUniqueness = !managed.getAlias().equals(library.getAlias());
     validateChange(library, managed);
     applyChanges(managed, library);
+    // applyBoxChanges(managed, originalBox, originalBoxPosition);
     loadChildEntities(managed);
     makeChangeLogForIndices(originalIndices, managed.getIndices(), managed);
     save(managed, validateAliasUniqueness);
-    applyBoxChanges(managed, originalBox, originalBoxPosition);
+    boxService.updateBoxableLocation(library);
   }
 
   @Override
@@ -537,6 +538,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     if (target.isDistributed()) {
       target.setLocationBarcode("SENT TO: " + target.getDistributionRecipient());
       target.setVolume(0.0);
+      target.setBoxPosition(null);
     } else {
       target.setLocationBarcode(source.getLocationBarcode());
     }

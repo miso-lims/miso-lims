@@ -367,7 +367,7 @@ public class BulkLibraryIT extends AbstractIT {
     changes.put(LibColumns.SIZE, "241");
     changes.put(LibColumns.VOLUME, "1.88");
     changes.put(LibColumns.CONCENTRATION, "12.34");
-    changes.put(LibColumns.DISTRIBUTED, "True");
+    changes.put(LibColumns.DISTRIBUTED, "Sent Out");
     changes.put(LibColumns.DISTRIBUTION_DATE, "2018-11-14");
     changes.put(LibColumns.DISTRIBUTION_RECIPIENT, "Outside Lab");
     fillRow(table, 0, changes);
