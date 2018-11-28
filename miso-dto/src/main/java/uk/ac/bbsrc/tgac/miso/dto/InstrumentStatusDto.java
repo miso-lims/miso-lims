@@ -4,49 +4,22 @@ import java.util.List;
 
 public class InstrumentStatusDto {
   private InstrumentDto instrument;
-  private List<PoolDto> pools;
-  private RunDto run;
-  private boolean outOfService;
-  private String outOfServiceTime;
+  private List<InstrumentPositionStatusDto> positions;
 
   public InstrumentDto getInstrument() {
     return instrument;
-  }
-
-  public List<PoolDto> getPools() {
-    return pools;
-  }
-
-  public RunDto getRun() {
-    return run;
   }
 
   public void setInstrument(InstrumentDto instrument) {
     this.instrument = instrument;
   }
 
-  public void setPools(List<PoolDto> pools) {
-    this.pools = pools;
+  public List<InstrumentPositionStatusDto> getPositions() {
+    return positions;
   }
 
-  public void setRun(RunDto run) {
-    this.run = run;
-  }
-
-  public boolean isOutOfService() {
-    return outOfService;
-  }
-
-  public void setOutOfService(boolean outOfService) {
-    this.outOfService = outOfService;
-  }
-
-  public String getOutOfServiceTime() {
-    return outOfServiceTime;
-  }
-
-  public void setOutOfServiceTime(String outOfServiceTime) {
-    this.outOfServiceTime = outOfServiceTime;
+  public void setPositions(List<InstrumentPositionStatusDto> positions) {
+    this.positions = positions;
   }
 
 }

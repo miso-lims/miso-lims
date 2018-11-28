@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
@@ -283,7 +284,8 @@ public class PoolRestController extends RestController {
     request.getPartitionIds().stream()//
         .map(WhineyFunction.rethrow(containerService::getPartition))//
         .peek(WhineyConsumer.rethrow(partition -> {
-          for (Run run : partition.getSequencerPartitionContainer().getRuns()) {
+          for (RunPosition runPos : partition.getSequencerPartitionContainer().getRunPositions()) {
+            Run run = runPos.getRun();
             // Check that we aren't going to hose any existing experiments through this reassignment
             boolean relatedExperimentsOkay = experimentService.listAllByRunId(run.getId()).stream()//
                 .flatMap(experiment -> experiment.getRunPartitions().stream())//

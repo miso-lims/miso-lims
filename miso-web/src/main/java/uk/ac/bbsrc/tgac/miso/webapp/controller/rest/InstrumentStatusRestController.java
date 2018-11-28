@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentStatusDto;
@@ -43,6 +46,10 @@ import uk.ac.bbsrc.tgac.miso.service.InstrumentStatusService;
 @RequestMapping("/rest/instrumentstatus")
 public class InstrumentStatusRestController extends RestController {
 
+  private enum RunningPositions {
+    NONE, SOME, ALL; // Note: order is important - ordinals used for sorting
+  }
+
   @Autowired
   private InstrumentStatusService instrumentStatusService;
 
@@ -51,23 +58,51 @@ public class InstrumentStatusRestController extends RestController {
   public List<InstrumentStatusDto> listAll() throws IOException {
     return instrumentStatusService.list().stream()//
         .sorted((a, b) -> {
-          boolean aRunning = a.getRun() == null ? false : (a.getRun().getHealth() == HealthType.Running);
-          boolean bRunning = b.getRun() == null ? false : (b.getRun().getHealth() == HealthType.Running);
-          Date aDate;
-          Date bDate;
+          RunningPositions aRunning = checkRunning(a);
+          RunningPositions bRunning = checkRunning(b);
           if (aRunning != bRunning) {
-            return (bRunning ? 1 : 0) - (aRunning ? 1 : 0);
-          } else if (aRunning && bRunning) {
-            aDate = a.getRun().getStartDate();
-            bDate = b.getRun().getStartDate();
-          } else {
-            aDate = a.getRun() == null || a.getRun().getCompletionDate() == null ? new Date(0L) : a.getRun().getCompletionDate();
-            bDate = b.getRun() == null || b.getRun().getCompletionDate() == null ? new Date(0L) : b.getRun().getCompletionDate();
+            return bRunning.ordinal() - aRunning.ordinal();
+          }
+          Date aDate = getCompareDate(a);
+          Date bDate = getCompareDate(b);
+          if (bDate == null) {
+            return -1;
+          } else if (aDate == null) {
+            return 1;
           }
           return bDate.compareTo(aDate);
         })//
         .map(Dtos::asDto)//
         .collect(Collectors.toList());
+  }
+
+  private static RunningPositions checkRunning(InstrumentStatus status) {
+    Predicate<Run> running = run -> run != null && run.getHealth() == HealthType.Running;
+    if (status.getPositions().values().stream().allMatch(running)) {
+      return RunningPositions.ALL;
+    } else if (status.getPositions().values().stream().anyMatch(running)) {
+      return RunningPositions.SOME;
+    } else {
+      return RunningPositions.NONE;
+    }
+  }
+
+  private static Date getCompareDate(InstrumentStatus status) {
+    Date latest = null;
+    for (Run run : status.getPositions().values()) {
+      if (run == null) {
+        continue;
+      }
+      Date runDate = getCompareDate(run);
+      if (latest == null || runDate.after(latest)) {
+        latest = runDate;
+      }
+    }
+    return latest;
+  }
+
+  private static Date getCompareDate(Run run) {
+    return run.getCompletionDate() == null ? run.getStartDate() : run.getCompletionDate();
   }
 
 }

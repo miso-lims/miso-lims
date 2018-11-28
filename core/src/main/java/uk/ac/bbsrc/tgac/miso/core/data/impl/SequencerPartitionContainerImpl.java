@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
@@ -40,15 +41,12 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.hibernate.annotations.BatchSize;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -91,9 +89,8 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   private String description;
 
-  @ManyToMany(targetEntity = Run.class, mappedBy = "containers")
-  @BatchSize(size = 10)
-  private Collection<Run> runs = null;
+  @OneToMany(mappedBy = "container")
+  private Set<RunPosition> runPositions;
 
   @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.PERSIST)
   @JoinColumn(name = "securityProfile_profileId")
@@ -247,17 +244,14 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   }
 
   @Override
-  public Collection<Run> getRuns() {
-    return runs;
-  }
-
-  public void setRuns(Collection<Run> runs) {
-    this.runs = runs;
+  public Set<RunPosition> getRunPositions() {
+    return runPositions;
   }
 
   @Override
   public Run getLastRun() {
-    return getRuns().stream().filter(r -> r.getStartDate() != null).max((a, b) -> a.getStartDate().compareTo(b.getStartDate()))
+    return getRunPositions().stream().map(RunPosition::getRun).filter(r -> r.getStartDate() != null)
+        .max((a, b) -> a.getStartDate().compareTo(b.getStartDate()))
         .orElse(null);
   }
 

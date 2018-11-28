@@ -72,6 +72,7 @@ public interface RunService extends ProviderService<Run>, PaginatedDataSource<Ru
    * @throws MisoNamingException
    */
   boolean processNotification(Run run, int laneCount, String containerModel, String containerSerialNumber, String instrumentName,
-      Predicate<SequencingParameters> filterParameters, GetLaneContents laneContents) throws IOException, MisoNamingException;
+      Predicate<SequencingParameters> filterParameters, GetLaneContents laneContents, String positionName)
+      throws IOException, MisoNamingException;
 
 }

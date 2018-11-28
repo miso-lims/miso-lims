@@ -324,7 +324,7 @@
     });
   </script>
   <div id="containers">
-    <miso:list-section id="list_container" name="${run.platformType.containerName}" target="container" items="${runContainers}" alwaysShow="true" config="${partitionConfig}"/>
+    <miso:list-section id="list_container" name="${run.platformType.containerName}" target="run_position" items="${runPositions}" alwaysShow="true" config="${partitionConfig}"/>
   </div>
   <div id="partitions">
     <miso:list-section id="list_partition" name="${run.platformType.pluralPartitionName}" target="partition" items="${runPartitions}" config="${partitionConfig}"/>

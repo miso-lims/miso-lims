@@ -239,7 +239,7 @@ public class EditRunController {
               .sorted()
               .collect(Collectors.toList()));
 
-      model.put("runContainers", run.getSequencerPartitionContainers().stream().map(Dtos::asDto).collect(Collectors.toList()));
+      model.put("runPositions", run.getRunPositions().stream().map(Dtos::asDto).collect(Collectors.toList()));
       model.put("runPartitions", run.getSequencerPartitionContainers().stream().flatMap(container -> container.getPartitions().stream())
           .map(WhineyFunction.rethrow(partition -> {
             PartitionDto dto = Dtos.asDto(partition);

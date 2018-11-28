@@ -99,7 +99,8 @@ public class HibernateSequencerPartitionContainerDao
     currentSession().flush();
 
     Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
-    criteria.createAlias("runs", "run");
+    criteria.createAlias("runPositions", "runPos");
+    criteria.createAlias("runPos.run", "run");
     criteria.add(Restrictions.eq("run.id", runId));
     @SuppressWarnings("unchecked")
     List<SequencerPartitionContainer> records = criteria.list();

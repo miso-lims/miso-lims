@@ -59,6 +59,10 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
 
   private boolean outOfService = true;
 
+  @ManyToOne
+  @JoinColumn(name = "positionId")
+  private PlatformPosition position;
+
   @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
   @JoinTable(name = "ServiceRecord_Attachment", joinColumns = { @JoinColumn(name = "recordId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
@@ -144,6 +148,14 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
 
   public boolean isOutOfService() {
     return this.outOfService;
+  }
+
+  public PlatformPosition getPosition() {
+    return position;
+  }
+
+  public void setPosition(PlatformPosition position) {
+    this.position = position;
   }
 
   @Override

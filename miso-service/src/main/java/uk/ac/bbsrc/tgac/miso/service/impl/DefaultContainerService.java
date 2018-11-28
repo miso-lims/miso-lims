@@ -279,9 +279,9 @@ public class DefaultContainerService
   public ValidationResult validateDeletion(SequencerPartitionContainer object) {
     ValidationResult result = new ValidationResult();
 
-    if (object.getRuns() != null && !object.getRuns().isEmpty()) {
+    if (object.getRunPositions() != null && !object.getRunPositions().isEmpty()) {
       result.addError(new ValidationError(String.format("Container %s (%s) is used in %d run(s)", object.getId(),
-          object.getIdentificationBarcode(), object.getRuns().size())));
+          object.getIdentificationBarcode(), object.getRunPositions().size())));
     }
 
     return result;
