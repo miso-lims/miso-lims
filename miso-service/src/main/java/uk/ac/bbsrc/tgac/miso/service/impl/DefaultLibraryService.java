@@ -535,7 +535,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     if (target.isDistributed()) {
       target.setLocationBarcode("SENT TO: " + target.getDistributionRecipient());
       target.setVolume(0.0);
-      target.setBoxPosition(null);
     } else {
       target.setLocationBarcode(source.getLocationBarcode());
     }
