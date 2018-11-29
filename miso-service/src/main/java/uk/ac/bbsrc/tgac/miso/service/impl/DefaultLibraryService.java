@@ -190,14 +190,11 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     Library managed = get(library.getId());
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     List<Index> originalIndices = new ArrayList<>(managed.getIndices());
-    Box originalBox = managed.getBox();
-    String originalBoxPosition = managed.getBoxPosition();
     authorizationManager.throwIfNotWritable(managed);
     boxService.throwIfBoxPositionIsFilled(library);
     boolean validateAliasUniqueness = !managed.getAlias().equals(library.getAlias());
     validateChange(library, managed);
     applyChanges(managed, library);
-    // applyBoxChanges(managed, originalBox, originalBoxPosition);
     loadChildEntities(managed);
     makeChangeLogForIndices(originalIndices, managed.getIndices(), managed);
     save(managed, validateAliasUniqueness);
@@ -559,20 +556,13 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     }
   }
 
-  private void applyBoxChanges(Library managed, Box originalBox, String originalBoxPosition) throws IOException {
-    if (originalBox == null) return; // it wasn't in a box so we don't need to make box changes
-    if (!managed.isDistributed() && !managed.isDiscarded()) return; // no need to make box changes
-    managed.setBoxPosition(null);
-    originalBox.getBoxPositions().remove(originalBoxPosition);
-    boxService.save(originalBox);
-  }
-
   private void validateChange(Library library, Library beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
     validateConcentrationUnits(library.getConcentration(), library.getConcentrationUnits(), errors);
     validateVolumeUnits(library.getVolume(), library.getVolumeUnits(), errors);
     validateBarcodeUniqueness(library, beforeChange, libraryDao::getByBarcode, errors, "library");
+    validateDistributionFields(library.isDistributed(), library.getDistributionDate(), library.getDistributionRecipient(), errors);
 
     if (library.getSpikeIn() != null) {
       if (library.getSpikeInDilutionFactor() == null) {
@@ -581,18 +571,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       if (library.getSpikeInVolume() == null) {
         errors.add(new ValidationError("spikeInVolume", "Spike-in volume must be specified"));
       }
-    }
-
-    if (library.isDistributed()) {
-      if (library.getDistributionDate() == null)
-        errors.add(new ValidationError("distributionDate", "Distribution date must be recorded for distributed library"));
-      if (isStringEmptyOrNull(library.getDistributionRecipient()))
-        errors.add(new ValidationError("distributionRecipient", "Distribution recipient must be recorded for distributed library"));
-    } else {
-      if (library.getDistributionDate() != null)
-        errors.add(new ValidationError("distributionDate", "Distribution date should be empty since library is not distributed"));
-      if (library.getDistributionRecipient() != null)
-        errors.add(new ValidationError("distributionRecipient", "Distribution recipient should be empty since library is not distributed"));
     }
 
     if (!errors.isEmpty()) {

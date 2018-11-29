@@ -699,22 +699,11 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     validateConcentrationUnits(sample.getConcentration(), sample.getConcentrationUnits(), errors);
     validateVolumeUnits(sample.getVolume(), sample.getVolumeUnits(), errors);
     validateBarcodeUniqueness(sample, beforeChange, sampleStore::getByBarcode, errors, "sample");
+    validateDistributionFields(sample.isDistributed(), sample.getDistributionDate(), sample.getDistributionRecipient(), errors);
 
     if (taxonLookupEnabled && (beforeChange == null || !sample.getScientificName().equals(beforeChange.getScientificName()))
         && (sample.getScientificName() == null || TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName()) == null)) {
       errors.add(new ValidationError("scientificName", "This scientific name is not of a known taxonomy"));
-    }
-
-    if (sample.isDistributed()) {
-      if (sample.getDistributionDate() == null)
-        errors.add(new ValidationError("distributionDate", "Distribution date must be recorded for distributed sample"));
-      if (isStringEmptyOrNull(sample.getDistributionRecipient()))
-        errors.add(new ValidationError("distributionRecipient", "Distribution recipient must be recorded for distributed sample"));
-    } else {
-      if (sample.getDistributionDate() != null)
-        errors.add(new ValidationError("distributionDate", "Distribution date should be empty since sample is not distributed"));
-      if (sample.getDistributionRecipient() != null)
-        errors.add(new ValidationError("distributionRecipient", "Distribution recipient should be empty since sample is not distributed"));
     }
 
     if (!errors.isEmpty()) {
