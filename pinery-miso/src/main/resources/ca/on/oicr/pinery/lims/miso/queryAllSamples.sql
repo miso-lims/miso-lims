@@ -57,6 +57,8 @@ SELECT s.alias NAME
         ,lcm.slidesConsumed slides_consumed
         ,NULL pdac
         ,sai.isSynthetic isSynthetic
+        ,s.distributed distributed
+        ,s.distributionDate distribution_date
 FROM Sample s
 LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId 
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = sai.detailedQcStatusId 
@@ -187,6 +189,8 @@ SELECT l.alias NAME
         ,NULL slides_consumed
         ,pdac.results pdac
         ,NULL isSynthetic
+        ,l.distributed distributed
+        ,l.distributionDate distribution_date
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
@@ -303,6 +307,8 @@ SELECT parent.alias name
         ,NULL slides_consumed
         ,NULL pdac
         ,NULL isSynthetic
+        ,NULL distributed
+        ,NULL distribution_date
 FROM LibraryDilution d 
 JOIN Library parent ON parent.libraryId = d.library_libraryId 
 JOIN Sample s ON s.sampleId = parent.sample_sampleId

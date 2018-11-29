@@ -832,6 +832,15 @@ public class MisoClient implements Lims {
       STAIN("stain", "Stain"),
       SLIDES("slides", "Slides"),
       DISCARDS("discards", "Discards"),
+      DISTRIBUTED("distributed", "Distributed") {
+        @Override
+        public String extractStringValueFrom(ResultSet rs) throws SQLException {
+          boolean distributed = rs.getBoolean("distributed");
+          if (!rs.wasNull() && distributed) return "True";
+          return null;
+        }
+      },
+      DISTRIBUTION_DATE("distribution_date", "Distribution Date"),
       SLIDES_CONSUMED("slides_consumed", "Slides Consumed");
 
       private final String sqlKey;
