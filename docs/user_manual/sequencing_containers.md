@@ -38,7 +38,7 @@ container model. You will then be taken to the Create Container page, where you 
 Click the Save button at the top right when you are done to save the container and go to the Edit Container page. Here
 you can add pools and further modify the container.
 
-If you are using Run Scanner, MISO will automatically create any unexisting containers for runs that it reports. If a
+If you are using Run Scanner, MISO will automatically create any non-existant containers for runs that it reports. If a
 container with a serial number matching the one reported for the run already exists, it will be used instead.
 
 {% include userman-toplink.md %}
