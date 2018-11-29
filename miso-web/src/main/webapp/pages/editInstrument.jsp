@@ -116,18 +116,6 @@
             </c:choose>
           </td>
         </tr>
-        <tr>
-          <td>IP Address:*</td>
-          <td>
-            <c:choose>
-              <c:when test="${miso:isAdmin()}">
-                <input type="text" id="ipAddress" name="ipAddress" value="${trimmedIpAddress}" class="validateable"/>
-                <input type="hidden" value="on" name="_ipAddress"/>
-              </c:when>
-              <c:otherwise><span id="ipAddress">${trimmedIpAddress}</span></c:otherwise>
-            </c:choose>
-          </td>
-        </tr>
         <c:if test="${preUpgradeInstrument != null}">
           <tr>
             <td class="h">Upgraded From:</td>

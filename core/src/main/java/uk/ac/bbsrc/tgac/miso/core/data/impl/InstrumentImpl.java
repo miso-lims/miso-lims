@@ -38,9 +38,8 @@ public class InstrumentImpl extends AbstractInstrument implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  public InstrumentImpl(String name, String ip, Platform platform) {
+  public InstrumentImpl(String name, Platform platform) {
     setName(name);
-    setIpAddress(ip);
     setPlatform(platform);
   }
 
@@ -52,6 +51,5 @@ public class InstrumentImpl extends AbstractInstrument implements Serializable {
   public InstrumentImpl() {
     setPlatform(null);
     setName(null);
-    setIpAddress(null);
   }
 }

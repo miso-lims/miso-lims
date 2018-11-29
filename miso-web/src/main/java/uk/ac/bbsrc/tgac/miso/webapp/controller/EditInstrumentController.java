@@ -90,8 +90,6 @@ public class EditInstrumentController {
     model.put("instrument", sr);
     model.put("serviceRecords", serviceRecords.stream().map(Dtos::asDto).collect(Collectors.toList()));
     model.put("title", "Instrument " + sr.getId());
-    String ip = sr.getIpAddress() == null ? "" : sr.getIpAddress();
-    model.put("trimmedIpAddress", ip.startsWith("/") ? ip.substring(1) : ip);
     return new ModelAndView("/pages/editInstrument.jsp", model);
   }
 

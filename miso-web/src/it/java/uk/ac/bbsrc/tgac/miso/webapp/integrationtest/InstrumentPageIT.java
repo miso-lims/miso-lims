@@ -34,7 +34,6 @@ public class InstrumentPageIT extends AbstractIT {
     fields.put(Field.ID, "102");
     fields.put(Field.PLATFORM, "Illumina - Illumina HiSeq 2500");
     fields.put(Field.NAME, "OldHiSeq_102");
-    fields.put(Field.IP_ADDRESS, "127.0.0.1");
     fields.put(Field.COMMISSIONED, "2017-01-01");
     fields.put(Field.STATUS, "upgraded");
     fields.put(Field.DECOMMISSIONED, "2017-02-01");
@@ -84,7 +83,6 @@ public class InstrumentPageIT extends AbstractIT {
     fields.put(Field.PLATFORM, "Illumina - Illumina HiSeq 2500");
     fields.put(Field.SERIAL_NUMBER, "100");
     fields.put(Field.NAME, "HiSeq_100");
-    fields.put(Field.IP_ADDRESS, "127.0.0.1");
     fields.put(Field.STATUS, "production");
     assertFieldValues("loaded", fields, page);
 
@@ -93,7 +91,6 @@ public class InstrumentPageIT extends AbstractIT {
     changes.put(Field.NAME, "HiSeq_changed_100");
     changes.put(Field.SERIAL_NUMBER, "100100");
     changes.put(Field.COMMISSIONED, "2017-01-31");
-    changes.put(Field.IP_ADDRESS, "127.0.0.5");
     changes.put(Field.STATUS, "retired");
     changes.put(Field.DECOMMISSIONED, "2017-10-31");
     page.setFields(changes);
@@ -120,8 +117,6 @@ public class InstrumentPageIT extends AbstractIT {
     assertAttribute(Field.NAME, expectedValues, sr.getName());
     assertAttribute(Field.PLATFORM, expectedValues, sr.getPlatform().getNameAndModel());
     assertAttribute(Field.SERIAL_NUMBER, expectedValues, sr.getSerialNumber());
-    assertAttribute(Field.IP_ADDRESS, expectedValues,
-        (sr.getIpAddress() == null ? "" : sr.getIpAddress().toString()));
     assertAttribute(Field.COMMISSIONED, expectedValues, dateFormatter.print(sr.getDateCommissioned().getTime()));
     assertAttribute(Field.STATUS, expectedValues,
         (sr.getUpgradedInstrument() != null ? "Upgraded" : (sr.getDateDecommissioned() != null ? "Retired" : "Production"))

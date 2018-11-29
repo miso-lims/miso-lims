@@ -50,7 +50,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstrumentDao;
@@ -59,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
@@ -506,7 +506,7 @@ public class ValueTypeLookupTest {
   }
 
   private Instrument makeSequencer(Long id, String name) {
-    Instrument seq = new InstrumentImpl(name, null, null);
+    Instrument seq = new InstrumentImpl(name, null);
     seq.setId(id == null ? AbstractInstrument.UNSAVED_ID : id);
     return seq;
   }

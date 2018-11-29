@@ -23,9 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,17 +41,12 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 
 @MappedSuperclass
 public abstract class AbstractInstrument implements Instrument {
 
   private static final long serialVersionUID = 1L;
-
-  private static final Logger log = LoggerFactory.getLogger(AbstractInstrument.class);
 
   public static final Long UNSAVED_ID = 0L;
 
@@ -69,8 +61,6 @@ public abstract class AbstractInstrument implements Instrument {
   @ManyToOne(targetEntity = Platform.class)
   @JoinColumn(name = "platformId", nullable = false)
   private Platform platform;
-
-  private String ip;
 
   private String serialNumber;
   @Temporal(TemporalType.DATE)
@@ -116,26 +106,6 @@ public abstract class AbstractInstrument implements Instrument {
   }
 
   @Override
-  public void setIpAddress(String ip) {
-    if (ip == null) {
-      this.ip = null;
-    } else {
-      try {
-        InetAddress inet = InetAddress.getByName(ip);
-        this.ip = (inet != null ? inet.getHostAddress() : null);
-      } catch (IOException e) {
-        log.error("Error getting InetAddress from given ip " + ip, e);
-        throw new IllegalArgumentException("Error getting InetAddress from given ip " + ip, e);
-      }
-    }
-  }
-
-  @Override
-  public String getIpAddress() {
-    return this.ip;
-  }
-
-  @Override
   public void setSerialNumber(String serialNumber) {
     this.serialNumber = serialNumber;
   }
@@ -176,16 +146,10 @@ public abstract class AbstractInstrument implements Instrument {
   }
 
   @Override
-  public String getFQDN() throws UnknownHostException {
-    return getIpAddress() == null ? null : InetAddress.getByName(getIpAddress()).getCanonicalHostName();
-  }
-
-  @Override
   public String toString() {
     return "AbstractInstrument [id=" + id
         + ", name=" + name
         + ", platform=" + platform.getId()
-        + ", ip=" + ip
         + ", serialNumber=" + serialNumber
         + ", dateCommissioned=" + dateCommissioned
         + ", dateDecommissioned=" + dateDecommissioned
@@ -274,7 +238,6 @@ public abstract class AbstractInstrument implements Instrument {
     result = prime * result + ((dateCommissioned == null) ? 0 : dateCommissioned.hashCode());
     result = prime * result + ((dateDecommissioned == null) ? 0 : dateDecommissioned.hashCode());
     result = prime * result + (int) (id ^ (id >>> 32));
-    result = prime * result + ((ip == null) ? 0 : ip.hashCode());
     result = prime * result + ((lastServicedDate == null) ? 0 : lastServicedDate.hashCode());
     result = prime * result + ((name == null) ? 0 : name.hashCode());
     result = prime * result + ((platform == null) ? 0 : platform.hashCode());
@@ -298,9 +261,6 @@ public abstract class AbstractInstrument implements Instrument {
       if (other.dateDecommissioned != null) return false;
     } else if (!dateDecommissioned.equals(other.dateDecommissioned)) return false;
     if (id != other.id) return false;
-    if (ip == null) {
-      if (other.ip != null) return false;
-    } else if (!ip.equals(other.ip)) return false;
     if (lastServicedDate == null) {
       if (other.lastServicedDate != null) return false;
     } else if (!lastServicedDate.equals(other.lastServicedDate)) return false;
