@@ -675,14 +675,11 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   public void update(Sample sample) throws IOException {
     Sample managed = get(sample.getId());
     managed.setChangeDetails(authorizationManager.getCurrentUser());
-    Box originalBox = managed.getBox();
-    String originalBoxPosition = managed.getBoxPosition();
     boolean validateAliasUniqueness = !managed.getAlias().equals(sample.getAlias());
     authorizationManager.throwIfNotWritable(managed);
     boxService.throwIfBoxPositionIsFilled(sample);
     validateChange(sample, managed);
     applyChanges(managed, sample);
-    applyBoxChanges(managed, originalBox, originalBoxPosition);
     loadChildEntities(managed);
     if (isDetailedSample(managed)) {
       DetailedSample detailedUpdated = (DetailedSample) managed;
@@ -693,6 +690,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     }
 
     save(managed, validateAliasUniqueness);
+    boxService.updateBoxableLocation(sample);
   }
 
   private void validateChange(Sample sample, Sample beforeChange) throws IOException {
@@ -758,6 +756,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     if (target.isDistributed()) {
       target.setLocationBarcode("SENT TO: " + target.getDistributionRecipient());
       target.setVolume(0.0);
+      target.setBoxPosition(null);
     } else {
       target.setLocationBarcode(source.getLocationBarcode());
     }
@@ -799,14 +798,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     } else {
       target.setQcPassed(source.getQcPassed());
     }
-  }
-
-  private void applyBoxChanges(Sample managed, Box originalBox, String originalBoxPosition) throws IOException {
-    if (originalBox == null) return; // it wasn't in a box so we don't need to make box changes
-    if (!managed.isDistributed() && !managed.isDiscarded()) return; // no need to make box changes
-    managed.setBoxPosition(null);
-    originalBox.getBoxPositions().remove(originalBoxPosition);
-    boxService.save(originalBox);
   }
 
   private void applyAliquotChanges(SampleAliquot target, SampleAliquot source) {
