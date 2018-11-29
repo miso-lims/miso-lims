@@ -25,8 +25,7 @@ toolbar at the top of the table contains a control for adding new instruments.
 {% include userman-heading.md section=page.section sub=sub title="Creating an Instrument" %}
 
 Click the "Add" button in the toolbar at the top of the Instruments list to add a new instrument to MISO. Fill out the
-instrument details in the dialog that appears. If the instrument doesn't have a hostname or IP address, you can enter
-"localhost" to satisfy this requirement. When you are done, click the "Add" button to create the instrument.
+instrument details in the dialog that appears. When you are done, click the "Add" button to create the instrument.
 
 {% include userman-toplink.md %}
 
