@@ -44,7 +44,8 @@ public class BulkLibraryIT extends AbstractIT {
       LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS, LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
 
   private static final Set<String> editColumns = Sets.newHashSet(LibColumns.RECEIVE_DATE, LibColumns.SAMPLE_ALIAS,
-      LibColumns.SAMPLE_LOCATION, LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE);
+      LibColumns.SAMPLE_LOCATION, LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE, LibColumns.DISTRIBUTED,
+      LibColumns.DISTRIBUTION_DATE, LibColumns.DISTRIBUTION_RECIPIENT);
 
   private static final Set<String> propagateColumns = Sets.newHashSet(LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
       LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE);
@@ -366,6 +367,9 @@ public class BulkLibraryIT extends AbstractIT {
     changes.put(LibColumns.SIZE, "241");
     changes.put(LibColumns.VOLUME, "1.88");
     changes.put(LibColumns.CONCENTRATION, "12.34");
+    changes.put(LibColumns.DISTRIBUTED, "Sent Out");
+    changes.put(LibColumns.DISTRIBUTION_DATE, "2018-11-14");
+    changes.put(LibColumns.DISTRIBUTION_RECIPIENT, "Outside Lab");
     fillRow(table, 0, changes);
 
     // unchanged
@@ -382,6 +386,7 @@ public class BulkLibraryIT extends AbstractIT {
 
     saveAndAssertSuccess(table);
     assertColumnValues(table, 0, changes, "post-save");
+    changes.put(LibColumns.VOLUME, "0.0");
     DetailedLibrary lib = (DetailedLibrary) getSession().get(LibraryImpl.class, 100001L);
     assertDetailedLibraryAttributes(changes, lib);
   }

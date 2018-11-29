@@ -53,6 +53,9 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String SPIKE_IN_DILUTION = "Spike-In Dilution Factor";
     public static final String SPIKE_IN_VOL = "Spike-In Volume";
     public static final String TEMPLATE = "Template";
+    public static final String DISTRIBUTED = "Distributed";
+    public static final String DISTRIBUTION_DATE = "Distribution Date";
+    public static final String DISTRIBUTION_RECIPIENT = "Distribution Recipient";
 
     private LibColumns() {
       throw new IllegalStateException("Util class not intended for instantiation");

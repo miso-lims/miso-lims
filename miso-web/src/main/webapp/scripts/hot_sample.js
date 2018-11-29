@@ -47,6 +47,10 @@ HotTarget.sample = (function() {
     return identityAlias.replace(/.*--(\s*)/, "").toLowerCase().split(",");
   }
 
+  var isTargetIdentity = function(config) {
+    return config && config.targetSampleClass && config.targetSampleClass.alias == 'Identity';
+  }
+
   return {
 
     createUrl: '/miso/rest/sample',
@@ -181,7 +185,7 @@ HotTarget.sample = (function() {
             },
             allowEmpty: true,
             description: 'The date that the sample was received from an external source.',
-            include: (!Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity') && !config.isLibraryReceipt,
+            include: (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
               // If creating, default to today's date in format YYYY-MM-DD
               if (!sam.receivedDate && config.create) {
@@ -195,7 +199,7 @@ HotTarget.sample = (function() {
             }
           },
           HotUtils.makeColumnForText('Matrix Barcode', !Constants.automaticBarcodes && !config.isLibraryReceipt
-              && (!Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity'), 'identificationBarcode', {
+              && (!Constants.isDetailedSample || !isTargetIdentity(config)), 'identificationBarcode', {
             validator: HotUtils.validator.optionalTextNoSpecialChars
           }),
           {
@@ -361,8 +365,7 @@ HotTarget.sample = (function() {
             source: [],
             description: 'A coloured background indicates that multiple identities correspond to the external name.',
             validator: HotUtils.validator.requiredAutocomplete,
-            include: show['Identity'] && config.targetSampleClass.alias != 'Identity'
-                && config.targetSampleClass.sampleCategory != 'Identity',
+            include: show['Identity'] && !isTargetIdentity(config),
             depends: 'externalName',
             update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               var deferred = jQuery.Deferred();
@@ -511,8 +514,7 @@ HotTarget.sample = (function() {
           {
             header: 'Effective Group ID',
             data: 'effectiveGroupId',
-            include: Constants.isDetailedSample && config.targetSampleClass.alias != 'Identity' && !config.isLibraryReceipt
-                && !config.create,
+            include: Constants.isDetailedSample && !isTargetIdentity(config) && !config.isLibraryReceipt && !config.create,
             type: 'text',
             readOnly: true,
             depends: 'groupId',
@@ -814,13 +816,101 @@ HotTarget.sample = (function() {
               }),
           // Aliquot: Single Cell columns
           HotUtils.makeColumnForDecimal('Input into Library',
-              (show['Aliquot'] && config.targetSampleClass.alias.indexOf('Single Cell') != -1), 'inputIntoLibrary', 14, 10, false, false)];
+              (show['Aliquot'] && config.targetSampleClass.alias.indexOf('Single Cell') != -1), 'inputIntoLibrary', 14, 10, false, false),
+
+          // Distribution to collaborator or outside destination
+          {
+            header: 'Distributed',
+            data: 'distributed',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: ['Sent Out', 'No'],
+            include: !config.create && (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
+            unpack: function(sam, flat, setCellMeta) {
+              if (sam.distributed === true) {
+                flat.distributed = 'Sent Out';
+              } else {
+                flat.distributed = 'No';
+              }
+            },
+            pack: function(sam, flat, errorHandler) {
+              if (flat.distributed === 'Sent Out') {
+                sam.distributed = true;
+              } else {
+                sam.distributed = false;
+              }
+            }
+          }, {
+            header: 'Distribution Date',
+            data: 'distributionDate',
+            type: 'date',
+            dateFormat: 'YYYY-MM-DD',
+            datePickerConfig: {
+              firstDay: 0,
+              numberOfMonths: 1
+            },
+            allowEmpty: true,
+            include: !config.create && (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
+            depends: 'distributed',
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              if (value === 'Sent Out') {
+                setReadOnly(false);
+                setOptions({
+                  required: true,
+                  validator: HotUtils.validator.requiredTextNoSpecialChars
+                });
+              } else {
+                setReadOnly(true);
+                setOptions({
+                  validator: HotUtils.validator.requiredEmpty
+                });
+                setData(null);
+              }
+            },
+            unpack: function(sam, flat, setCellMeta) {
+              if (sam.distributionDate) {
+                flat.distributionDate = Utils.valOrNull(sam.distributionDate);
+              }
+            },
+            pack: function(sam, flat, errorHandler) {
+              sam.distributionDate = flat.distributionDate;
+            }
+          }, {
+            header: 'Distribution Recipient',
+            data: 'distributionRecipient',
+            type: 'text',
+            include: !config.create && (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
+            depends: 'distributed',
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              if (value === 'Sent Out') {
+                setOptions({
+                  required: true,
+                  validator: HotUtils.validator.requiredTextNoSpecialChars
+                });
+                setReadOnly(false);
+              } else {
+                setOptions({
+                  validator: HotUtils.validator.requiredEmpty
+                });
+                setData(null);
+                setReadOnly(true);
+              }
+            },
+            unpack: function(sam, flat, setCellMeta) {
+              if (sam.distributionRecipient) {
+                flat.distributionRecipient = Utils.valOrNull(sam.distributionRecipient);
+              }
+            },
+            pack: function(sam, flat, errorHandler) {
+              sam.distributionRecipient = flat.distributionRecipient;
+            }
+          }];
 
       if (!config.isLibraryReceipt) {
         var spliceIndex = columns.indexOf(columns.filter(function(column) {
           return column.data === 'identificationBarcode';
         })[0]) + 1;
-        if (!Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity') {
+        if (!Constants.isDetailedSample || !isTargetIdentity(config)) {
           // don't add boxable columns to Identities
           columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns(config)));
         }

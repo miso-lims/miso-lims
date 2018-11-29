@@ -18,11 +18,14 @@ FOR EACH ROW
     CASE WHEN NEW.sampleType <> OLD.sampleType THEN CONCAT('type: ', OLD.sampleType, ' → ', NEW.sampleType) END,
     CASE WHEN NEW.scientificName <> OLD.scientificName THEN CONCAT('scientific name: ', OLD.scientificName, ' → ', NEW.scientificName) END,
     CASE WHEN (NEW.taxonIdentifier IS NULL) <> (OLD.taxonIdentifier IS NULL) OR NEW.taxonIdentifier <> OLD.taxonIdentifier THEN CONCAT('taxon: ', COALESCE(OLD.taxonIdentifier, 'n/a'), ' → ', COALESCE(NEW.taxonIdentifier, 'n/a')) END,
-    CASE WHEN NEW.discarded <> OLD.discarded THEN CONCAT('discarded: ', OLD.discarded, ' → ', NEW.discarded) END,
-     CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN CONCAT('concentration: ', COALESCE(OLD.concentration, 'n/a'), ' → ', COALESCE(NEW.concentration, 'n/a')) END, 
+    CASE WHEN NEW.discarded <> OLD.discarded THEN CONCAT('discarded: ', IF(OLD.discarded = 0, 'No', 'Yes'), ' → ', IF(NEW.discarded = 0, 'No', 'Yes')) END,
+    CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN CONCAT('concentration: ', COALESCE(OLD.concentration, 'n/a'), ' → ', COALESCE(NEW.concentration, 'n/a')) END, 
     CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(OLD.volume, 'n/a'), ' → ', COALESCE(NEW.volume, 'n/a')) END,
     CASE WHEN (NEW.concentrationUnits IS NULL) <> (OLD.concentrationUnits IS NULL) OR NEW.concentrationUnits <> OLD.concentrationUnits THEN CONCAT(NEW.name, ' concentration units: ', COALESCE(OLD.concentrationUnits, 'n/a'), ' → ', COALESCE(NEW.concentrationUnits, 'n/a')) END,
-    CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT(NEW.name, ' volume units: ', COALESCE(OLD.volumeUnits, 'n/a'), ' → ', COALESCE(NEW.volumeUnits, 'n/a')) END);
+    CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT(NEW.name, ' volume units: ', COALESCE(OLD.volumeUnits, 'n/a'), ' → ', COALESCE(NEW.volumeUnits, 'n/a')) END,
+    CASE WHEN NEW.distributed <> OLD.distributed THEN CONCAT('distributed: ', IF(OLD.distributed = 0, 'No', 'Yes'), ' → ', IF(NEW.distributed = 0, 'No', 'Yes')) END,
+    CASE WHEN (NEW.distributionDate IS NULL) <> (OLD.distributionDate IS NULL) OR NEW.distributionDate <> OLD.distributionDate THEN CONCAT('distribution date: ', COALESCE(OLD.distributionDate, 'n/a'), ' → ', COALESCE(NEW.distributionDate, 'n/a')) END,
+    CASE WHEN (NEW.distributionRecipient IS NULL) <> (OLD.distributionRecipient IS NULL) OR NEW.distributionRecipient <> OLD.distributionRecipient THEN CONCAT('distribution recipient: ', COALESCE(OLD.distributionRecipient, 'n/a'), ' → ', COALESCE(NEW.distributionRecipient, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.sampleId,
@@ -42,7 +45,10 @@ FOR EACH ROW
         CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN 'concentration' END,
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN 'volume' END,
         CASE WHEN (NEW.concentrationUnits IS NULL) <> (OLD.concentrationUnits IS NULL) OR NEW.concentrationUnits <> OLD.concentrationUnits THEN CONCAT(NEW.name, ' concentrationUnits') END,
-        CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT(NEW.name, ' volumeUnits') END
+        CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT(NEW.name, ' volumeUnits') END,
+        CASE WHEN NEW.distributed <> OLD.distributed THEN 'distributed' END,
+        CASE WHEN (NEW.distributionDate IS NULL) <> (OLD.distributionDate IS NULL) OR NEW.distributionDate <> OLD.distributionDate THEN 'distributionDate' END,
+        CASE WHEN (NEW.distributionRecipient IS NULL) <> (OLD.distributionRecipient IS NULL) OR NEW.distributionRecipient <> OLD.distributionRecipient THEN 'distributionRecipient' END
   ), ''),
       NEW.lastModifier,
       log_message,

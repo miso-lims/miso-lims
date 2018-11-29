@@ -136,6 +136,22 @@ var Library = Library || {
       jQuery('#concentration').attr('data-parsley-type', 'number');
       jQuery('#concentration').attr('data-parsley-required', generatingAlias && selectedPlatform === 'PacBio');
 
+      // Distribution validation
+      if (jQuery('#distributed').prop('checked')) {
+        // need date and destination distribution info as well
+        jQuery('#distributionDatePicker').attr('data-parsley-required', 'true');
+        jQuery('#distributionDatePicker').attr('data-date-format', 'YYYY-MM-DD');
+        jQuery('#distributionDatePicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
+        jQuery('#distributionDatePicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+        jQuery('#distributionRecipient').attr('data-parsley-required', 'true');
+        jQuery('#distributionRecipient').attr('data-parsley-maxlength', '255');
+        jQuery('#distributionRecipient').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+      } else {
+        // should have no date or destination distribution info for undistributed samples
+        jQuery('#distributionDatePicker').attr('data-parsley-maxlength', '0');
+        jQuery('#distributionRecipient').attr('data-parsley-maxlength', '0');
+      }
+
     }
 
     jQuery('#library-form').parsley();
@@ -304,6 +320,22 @@ Library.ui = {
       };
     }
     container.appendChild(widget);
+  },
+
+  /**
+   * Enable or disable distribution date & recipient, depending on if distributed is checked
+   */
+  distributionChanged: function() {
+    var isDistributed = document.getElementById('distributed').checked;
+    if (isDistributed) {
+      document.getElementById('distributionDatePicker').removeAttribute('disabled');
+      document.getElementById('distributionRecipient').removeAttribute('disabled');
+    } else {
+      document.getElementById('distributionDatePicker').setAttribute('value', '');
+      document.getElementById('distributionDatePicker').setAttribute('disabled', 'disabled');
+      document.getElementById('distributionRecipient').setAttribute('value', '');
+      document.getElementById('distributionRecipient').setAttribute('disabled', 'disabled');
+    }
   },
 
   showLibraryNoteDialog: function(libraryId) {

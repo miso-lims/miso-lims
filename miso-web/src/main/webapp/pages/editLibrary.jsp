@@ -175,16 +175,6 @@
 <tr>
   <td>Description:</td>
   <td>
-    <%-- FIX MISO-107
-    <c:choose>
-      <c:when test='${not empty library.sample}'>
-        <form:input path="description" value="${library.sample.description}" class="validateable"/>
-      </c:when>
-      <c:otherwise>
-        <form:input path="description" class="validateable"/>
-      </c:otherwise>
-    </c:choose>
-    --%>
     <form:input id="description" path="description" class="validateable"/>
     <span id="descriptionCounter" class="counter"></span></td>
 </tr>
@@ -338,6 +328,10 @@
   <td><form:input id="dnaSize" path="dnaSize"/></td>
 </tr>
 <tr>
+  <td><label for="discarded">Discarded:</label></td>
+  <td><form:checkbox id="discarded" path="discarded"/></td>
+</tr>
+<tr>
   <td>Volume:</td>
   <td><form:input id="volume" path="volume"/></td>
 </tr>
@@ -366,8 +360,23 @@
   </form:select></td>
 </tr>
 <tr>
-  <td><label for="discarded">Discarded:</label></td>
-  <td><form:checkbox id="discarded" path="discarded"/></td>
+  <td><label for="distributed">Distributed:</label></td>
+  <td><form:checkbox id="distributed" path="distributed" onchange="Library.ui.distributionChanged()" /></td>
+</tr>
+<tr>
+  <td><label for="distributionDate">Distribution Date:</label></td>
+  <td>
+    <form:input path="distributionDate" id="distributionDatePicker" placeholder="YYYY-MM-DD"/>
+  </td>
+</tr>
+<tr>
+  <td><label for="distributionRecipient">Distribution Recipient:</label></td>
+  <td><form:input id="distributionRecipient" path="distributionRecipient"/>
+    <script type="text/javascript">
+      Library.ui.distributionChanged();
+      Utils.ui.addDatePicker("distributionDatePicker");
+    </script>
+  </td>
 </tr>
 <tr>
   <td class="h"><label for="locationBarcode">Location:</label></td>

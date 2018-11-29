@@ -188,13 +188,13 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   @Override
   public void update(Library library) throws IOException {
     Library managed = get(library.getId());
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
     List<Index> originalIndices = new ArrayList<>(managed.getIndices());
     authorizationManager.throwIfNotWritable(managed);
     boxService.throwIfBoxPositionIsFilled(library);
     boolean validateAliasUniqueness = !managed.getAlias().equals(library.getAlias());
     validateChange(library, managed);
     applyChanges(managed, library);
-    managed.setChangeDetails(authorizationManager.getCurrentUser());
     loadChildEntities(managed);
     makeChangeLogForIndices(originalIndices, managed.getIndices(), managed);
     save(managed, validateAliasUniqueness);
@@ -494,7 +494,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   private void applyChanges(Library target, Library source) throws IOException {
     target.setDescription(source.getDescription());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
-    target.setLocationBarcode(source.getLocationBarcode());
     target.setConcentration(source.getConcentration());
     target.setConcentrationUnits(target.getConcentration() == null ? null : source.getConcentrationUnits());
     target.setPlatformType(source.getPlatformType());
@@ -530,6 +529,16 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       target.setSpikeInDilutionFactor(source.getSpikeInDilutionFactor());
       target.setSpikeInVolume(source.getSpikeInVolume());
     }
+    target.setDistributed(source.isDistributed());
+    target.setDistributionDate(source.getDistributionDate());
+    target.setDistributionRecipient(source.getDistributionRecipient());
+    if (target.isDistributed()) {
+      target.setLocationBarcode("SENT TO: " + target.getDistributionRecipient());
+      target.setVolume(0.0);
+      target.setBoxPosition(null);
+    } else {
+      target.setLocationBarcode(source.getLocationBarcode());
+    }
 
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;
@@ -553,6 +562,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     validateConcentrationUnits(library.getConcentration(), library.getConcentrationUnits(), errors);
     validateVolumeUnits(library.getVolume(), library.getVolumeUnits(), errors);
     validateBarcodeUniqueness(library, beforeChange, libraryDao::getByBarcode, errors, "library");
+    validateDistributionFields(library.isDistributed(), library.getDistributionDate(), library.getDistributionRecipient(), errors);
 
     if (library.getSpikeIn() != null) {
       if (library.getSpikeInDilutionFactor() == null) {
