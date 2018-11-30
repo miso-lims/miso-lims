@@ -34,6 +34,10 @@ ListTarget.run_position = {
             Utils.page.pageReload);
       }
     });
+    actions.push(HotUtils.spreadsheetAction('/miso/rest/container/spreadsheet', Constants.partitionSpreadsheets, function(containers,
+        spreadsheet) {
+      return [];
+    }));
     return actions;
   },
   createStaticActions: function(config, projectId) {
