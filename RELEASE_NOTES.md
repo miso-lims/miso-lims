@@ -5,6 +5,9 @@ Changes:
  * Support multiple simultaneous runs per sequencer (#1756)
  * Added partition loading concentration and spreadsheet downloads (#1760)
 
+Bad:
+ * Could not save new runs from runscanner
+
 # 0.2.154
 
 Changes:

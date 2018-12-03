@@ -628,6 +628,9 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     isMutated |= updateSequencingParameters(target, user, filterParameters, sequencer);
 
     target.setChangeDetails(user);
+    for (RunPosition pos : target.getRunPositions()) {
+      containerService.save(pos.getContainer());
+    }
     if (isNew) {
       target.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(target.getSecurityProfile())));
       target.setName(generateTemporaryName());
