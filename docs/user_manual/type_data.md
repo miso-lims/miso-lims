@@ -448,16 +448,17 @@ MISO adminstrator.
 
 
 {% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Platforms" %}
+{% include userman-heading.md section=page.section sub=sub title="Instrument Models" %}
 
-Platforms describe the models of instruments registered in MISO. These can be broken into three categories:
+Instrument models describe the instrument types that can be registered in MISO. These can be broken into three
+categories:
 
 * Sequencers: Used for sequencer runs
 * Array scanners: Used for array runs
 * Others: Not used within MISO; however, they may be registered in order to track service records or for other purposes
 
-Modifications to platforms can only be made via direct access to the MISO database. As such, they must be performed by
-a MISO adminstrator.
+Modifications to instrument models can only be made via direct access to the MISO database. As such, they must be
+performed by a MISO adminstrator.
 
 {% include userman-toplink.md %}
 
@@ -466,10 +467,10 @@ a MISO adminstrator.
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Sequencing Container Models" %}
 
-Most sequencing platforms may be run with different sequencing container models. Some models may also be used by
-multiple platforms. A sequencing container must specify its model, and this is used to determine which runs the
-container can be attached to. Modifications to sequencing container models can only be made via direct access to the
-MISO database. As such, they must be performed by a MISO adminstrator.
+Most instrument models may be run with different sequencing container models. Some sequencing container models may also
+be used by multiple instrument models. A sequencing container must specify its model, and this is used to determine
+which runs the container can be attached to. Modifications to sequencing container models can only be made via direct
+access to the MISO database. As such, they must be performed by a MISO adminstrator.
 
 {% include userman-toplink.md %}
 

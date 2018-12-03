@@ -308,7 +308,7 @@ the Libraries list. For more information on this feature, see the
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Library QCs" %}
 
-Any number of quality control measures may be recorded for a sample. For more information on this feature, see the
+Any number of quality control measures may be recorded for a library. For more information on this feature, see the
 [QCs section](qcs.html).
 
 {% include userman-toplink.md %}

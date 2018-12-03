@@ -11,8 +11,8 @@ section: 11
 
 To get to the main Pools list page, click "Pools" in the Preparation list in the menu on the left side of the screen.
 This list includes all pools from all projects in MISO. The list is divided into tabs for the different sequencing
-platforms. Only platforms for which there are active sequencers are included. The toolbar at the top of the table
-includes many controls for working with pools.
+platforms. Only platforms for which there are active sequencers or existing libraries or pools are included. The
+toolbar at the top of the table includes many controls for working with pools.
 
 You can find a similar list in the Pools section of the Edit Project page. The list on the Edit Project page only
 includes pools that contain libraries belonging to the project being viewed/edited. This list has the same controls as
