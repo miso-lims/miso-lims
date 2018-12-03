@@ -1411,7 +1411,6 @@ public class MisoServiceManager {
   public void setDefaultPlatformService() {
     DefaultPlatformService service = new DefaultPlatformService();
     service.setPlatformDao(platformDao);
-    service.setInstrumentService(instrumentService);
     setPlatformService(service);
   }
 
