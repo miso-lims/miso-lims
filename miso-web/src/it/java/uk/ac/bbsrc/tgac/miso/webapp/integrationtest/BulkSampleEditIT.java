@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
@@ -283,6 +284,25 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
     // verify that the changes have been saved
     assertAllForTissue(empty, getIdForRow(newTable, 0), false);
+  }
+
+  @Test
+  public void testDistributeTissueEffects() throws Exception {
+    // Goal: ensure the editable fields change based on whether a sample is distributed
+    BulkSamplePage page = getEditPage(Arrays.asList(205L));
+    HandsOnTable table = page.getTable();
+
+    assertEquals(table.getText(SamColumns.DISTRIBUTED, 0), "No");
+    assertFalse(LimsUtils.isStringEmptyOrNull(table.getText(SamColumns.BOX_ALIAS, 0)));
+    assertFalse(LimsUtils.isStringEmptyOrNull(table.getText(SamColumns.BOX_POSITION, 0)));
+    assertFalse(table.isWritable(SamColumns.DISTRIBUTION_DATE, 0));
+    assertFalse(table.isWritable(SamColumns.DISTRIBUTION_RECIPIENT, 0));
+
+    table.enterText(SamColumns.DISTRIBUTED, 0, "Sent Out");
+    assertTrue(LimsUtils.isStringEmptyOrNull(table.getText(SamColumns.BOX_ALIAS, 0)));
+    assertTrue(LimsUtils.isStringEmptyOrNull(table.getText(SamColumns.BOX_POSITION, 0)));
+    assertTrue(table.isWritable(SamColumns.DISTRIBUTION_DATE, 0));
+    assertTrue(table.isWritable(SamColumns.DISTRIBUTION_RECIPIENT, 0));
   }
 
   @Test

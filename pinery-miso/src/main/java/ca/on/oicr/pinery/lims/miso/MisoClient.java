@@ -813,7 +813,7 @@ public class MisoClient implements Lims {
       PDAC_CONFIRMED("pdac", "PDAC Confirmed") {
         @Override
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
-          int pdacConfirmed = rs.getInt("pdac");
+          int pdacConfirmed = rs.getInt(getSqlKey());
           if (!rs.wasNull()) {
             if (pdacConfirmed == 1) return "True";
             if (pdacConfirmed == 0) return "False";
@@ -824,7 +824,7 @@ public class MisoClient implements Lims {
       SYNTHETIC("isSynthetic", "Synthetic") {
         @Override
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
-          boolean isSynthetic = rs.getBoolean("isSynthetic");
+          boolean isSynthetic = rs.getBoolean(getSqlKey());
           if (!rs.wasNull() && isSynthetic) return "True";
           return null;
         }
@@ -832,6 +832,15 @@ public class MisoClient implements Lims {
       STAIN("stain", "Stain"),
       SLIDES("slides", "Slides"),
       DISCARDS("discards", "Discards"),
+      DISTRIBUTED("distributed", "Distributed") {
+        @Override
+        public String extractStringValueFrom(ResultSet rs) throws SQLException {
+          boolean distributed = rs.getBoolean(getSqlKey());
+          if (!rs.wasNull() && distributed) return "True";
+          return null;
+        }
+      },
+      DISTRIBUTION_DATE("distribution_date", "Distribution Date"),
       SLIDES_CONSUMED("slides_consumed", "Slides Consumed");
 
       private final String sqlKey;

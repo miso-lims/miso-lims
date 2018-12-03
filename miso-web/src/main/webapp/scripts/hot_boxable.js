@@ -118,7 +118,7 @@ HotTarget.boxable = (function() {
                 obj.box.id = null;
               }
             },
-            depends: 'boxSearch',
+            depends: ['boxSearch', 'distributed'],
             update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               var applyChanges = function(source, autoSelect) {
                 setOptions({
@@ -126,8 +126,7 @@ HotTarget.boxable = (function() {
                 });
                 setData(source.length > 1 && !autoSelect ? 'SELECT' : source[0]);
               };
-
-              if (!value) {
+              if (!value || (flatProperty == 'distributed' && value == 'Sent Out')) {
                 applyChanges([''], false);
                 return;
               }
