@@ -76,7 +76,7 @@ You will be given several options for selecting a pool.
 * Choose "Search" to search for the pool by ID, name, alias, or barcode
 * Choose "Outstanding Orders (All)" to select from pools that have an active order
 * Choose "Outstanding Orders (Matched Chemistry)" to select from pools that have active orders with sequencing
-  parameters matching those of the run (only available on the Edit Run page
+  parameters matching those of the run (only available on the Edit Run page)
 * Choose "Recently modified" to choose from pools that have been recently created or edited
 
 After choosing a pool, you can set the loading concentration, or leave it blank. Click the OK button to finish.
