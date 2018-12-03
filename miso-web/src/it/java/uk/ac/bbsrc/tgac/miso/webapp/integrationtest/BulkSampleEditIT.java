@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
@@ -286,87 +287,22 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
   }
 
   @Test
-  public void testDistributeTissue() throws Exception {
-    // Goal: ensure a tissue can be put in a box and then distributed and saved which should remove it from the box
-    BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Tissue")));
+  public void testDistributeTissueEffects() throws Exception {
+    // Goal: ensure the editable fields change based on whether a sample is distributed
+    BulkSamplePage page = getEditPage(Arrays.asList(205L));
     HandsOnTable table = page.getTable();
 
-    Map<String, String> editable = new HashMap<>();
-    editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2");
-    editable.put(SamColumns.DESCRIPTION, "changed description");
-    editable.put(SamColumns.RECEIVE_DATE, "2016-07-17");
-    editable.put(SamColumns.ID_BARCODE, "3001"); // increment
-    editable.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
-    editable.put(SamColumns.SCIENTIFIC_NAME, "Mus musculus");
-    editable.put(SamColumns.GROUP_ID, "2");
-    editable.put(SamColumns.GROUP_DESCRIPTION, "Test two");
-    editable.put(SamColumns.TISSUE_ORIGIN, "Pa (Pancreas)");
-    editable.put(SamColumns.TISSUE_TYPE, "M (Metastatic tumour)");
-    editable.put(SamColumns.PASSAGE_NUMBER, "13");
-    editable.put(SamColumns.TIMES_RECEIVED, "2");
-    editable.put(SamColumns.TUBE_NUMBER, "2");
-    editable.put(SamColumns.LAB, "BioBank (University Health Network)");
-    editable.put(SamColumns.SECONDARY_ID, "changed tube");
-    editable.put(SamColumns.TISSUE_MATERIAL, "Blood");
-    editable.put(SamColumns.REGION, "Pancreatic duct");
-    editable.put(SamColumns.QC_STATUS, "Waiting: Receive Tissue");
-    editable.put(SamColumns.DISTRIBUTED, "No");
+    assertEquals(table.getText(SamColumns.DISTRIBUTED, 0), "No");
+    assertFalse(LimsUtils.isStringEmptyOrNull(table.getText(SamColumns.BOX_ALIAS, 0)));
+    assertFalse(LimsUtils.isStringEmptyOrNull(table.getText(SamColumns.BOX_POSITION, 0)));
+    assertFalse(table.isWritable(SamColumns.DISTRIBUTION_DATE, 0));
+    assertFalse(table.isWritable(SamColumns.DISTRIBUTION_RECIPIENT, 0));
 
-    // make the changes
-    editable.forEach((k, v) -> table.enterText(k, 0, v));
-
-    editable.put(SamColumns.BOX_ALIAS, "Boxxy");
-    editable.put(SamColumns.BOX_POSITION, "A01");
-    table.enterText(SamColumns.BOX_SEARCH, 0, editable.get(SamColumns.BOX_ALIAS));
-    table.enterText(SamColumns.BOX_POSITION, 0, editable.get(SamColumns.BOX_POSITION));
-
-    saveSingleAndAssertSuccess(table);
-
-    // verify that the changes have been saved
-    assertAllForTissue(editable, getIdForRow(table, 0), false);
-
-    // now, reload the page and empty all optional fields
-    BulkSamplePage newPage = getEditPage(Arrays.asList(getSampleId("Tissue")));
-    HandsOnTable newTable = newPage.getTable();
-
-    Map<String, String> distributed = new HashMap<>();
-    distributed.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2");
-    distributed.put(SamColumns.DESCRIPTION, "");
-    distributed.put(SamColumns.RECEIVE_DATE, "");
-    distributed.put(SamColumns.ID_BARCODE, ""); // increment
-    distributed.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
-    distributed.put(SamColumns.SCIENTIFIC_NAME, "Mus musculus");
-    distributed.put(SamColumns.GROUP_ID, "");
-    distributed.put(SamColumns.GROUP_DESCRIPTION, "");
-    distributed.put(SamColumns.TISSUE_ORIGIN, "Pa (Pancreas)");
-    distributed.put(SamColumns.TISSUE_TYPE, "M (Metastatic tumour)");
-    distributed.put(SamColumns.PASSAGE_NUMBER, "");
-    distributed.put(SamColumns.TIMES_RECEIVED, "2");
-    distributed.put(SamColumns.TUBE_NUMBER, "2");
-    distributed.put(SamColumns.LAB, "(None)");
-    distributed.put(SamColumns.SECONDARY_ID, "");
-    distributed.put(SamColumns.TISSUE_MATERIAL, "(None)");
-    distributed.put(SamColumns.REGION, "");
-    distributed.put(SamColumns.QC_STATUS, "Not Ready");
-
-    // make the changes
-    distributed.forEach((k, v) -> newTable.enterText(k, 0, v));
-    // because apparently order of operations matters
-    newTable.enterText(SamColumns.DISTRIBUTED, 0, "Sent Out");
-    newTable.enterText(SamColumns.DISTRIBUTION_DATE, 0, "2018-11-29");
-    newTable.enterText(SamColumns.DISTRIBUTION_RECIPIENT, 0, "Dr. Doctor");
-    distributed.put(SamColumns.DISTRIBUTED, "Sent Out");
-    distributed.put(SamColumns.DISTRIBUTION_DATE, "2018-11-29");
-    distributed.put(SamColumns.DISTRIBUTION_RECIPIENT, "Dr. Doctor");
-
-    saveSingleAndAssertSuccess(newTable);
-
-    // these changes should be caused by setting Distributed to "Sent Out"
-    distributed.put(SamColumns.BOX_ALIAS, "");
-    distributed.put(SamColumns.BOX_POSITION, "");
-
-    // verify that the changes have been saved
-    assertAllForTissue(distributed, getIdForRow(newTable, 0), false);
+    table.enterText(SamColumns.DISTRIBUTED, 0, "Sent Out");
+    assertTrue(LimsUtils.isStringEmptyOrNull(table.getText(SamColumns.BOX_ALIAS, 0)));
+    assertTrue(LimsUtils.isStringEmptyOrNull(table.getText(SamColumns.BOX_POSITION, 0)));
+    assertTrue(table.isWritable(SamColumns.DISTRIBUTION_DATE, 0));
+    assertTrue(table.isWritable(SamColumns.DISTRIBUTION_RECIPIENT, 0));
   }
 
   @Test
