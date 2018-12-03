@@ -118,7 +118,7 @@ INSERT INTO SequencingContainerModel (sequencingContainerModelId, alias, identif
 INSERT INTO SequencingContainerModel_Platform (sequencingContainerModelId, platformId) VALUES
 (1, 2);
 
-INSERT INTO Instrument (instrumentId, name, platformId, ip) VALUES
+INSERT INTO Instrument (instrumentId, name, platformId) VALUES
   (1, 'T2000', 1),
   (2, 'TMS1', 2),
   (3, 'TPB2', 3),
