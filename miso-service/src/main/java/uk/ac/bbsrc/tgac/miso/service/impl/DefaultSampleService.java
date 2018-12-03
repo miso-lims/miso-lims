@@ -411,20 +411,17 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     Set<String> identityExternalNames = SampleIdentityImpl.getSetFromString(identity.getExternalName());
     Set<String> tempExternalNames = SampleIdentityImpl.getSetFromString(identityCopy.getExternalName());
     Set<String> lowerCaseIdentityExternalNames = identityExternalNames.stream().map(String::toLowerCase).collect(Collectors.toSet());
-    tempExternalNames.stream().forEach(name -> {
-      try {
-        if (!lowerCaseIdentityExternalNames.contains(name.toLowerCase()) && !(isUniqueExternalNameWithinProjectRequired() &&
-            (identity.getProject() == null
-                || getIdentitiesByExternalNameOrAliasAndProject(name, identity.getProject().getId(), true).size() > 0))) {
-          identityExternalNames.add(name);
-        }
-      } catch (IOException e) {
-        log.error("Failed to retrieve all external names", e);
-      }
-    });
 
-    identity.setExternalName(String.join(",", identityExternalNames));
+    for (String name : tempExternalNames) {
+      if (!lowerCaseIdentityExternalNames.contains(name.toLowerCase()) && !(isUniqueExternalNameWithinProjectRequired() &&
+          (identity.getProject() == null
+              || getIdentitiesByExternalNameOrAliasAndProject(name, identity.getProject().getId(), true).size() > 0))) {
+        identityExternalNames.add(name);
+      }
+    }
+
     if (identityExternalNames.size() > lowerCaseIdentityExternalNames.size()) {
+      identity.setExternalName(String.join(",", identityExternalNames));
       identity.setChangeDetails(authorizationManager.getCurrentUser());
       sampleStore.update(identity);
     }
