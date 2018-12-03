@@ -32,7 +32,7 @@ public class InstrumentPageIT extends AbstractIT {
     // check initial values
     Map<Field, String> fields = Maps.newLinkedHashMap();
     fields.put(Field.ID, "102");
-    fields.put(Field.PLATFORM, "Illumina - Illumina HiSeq 2500");
+    fields.put(Field.INSTRUMENT_MODEL, "Illumina - Illumina HiSeq 2500");
     fields.put(Field.NAME, "OldHiSeq_102");
     fields.put(Field.COMMISSIONED, "2017-01-01");
     fields.put(Field.STATUS, "upgraded");
@@ -80,7 +80,7 @@ public class InstrumentPageIT extends AbstractIT {
     Map<Field, String> fields = Maps.newLinkedHashMap();
     fields.put(Field.ID, "100");
     fields.put(Field.COMMISSIONED, "2017-01-01");
-    fields.put(Field.PLATFORM, "Illumina - Illumina HiSeq 2500");
+    fields.put(Field.INSTRUMENT_MODEL, "Illumina - Illumina HiSeq 2500");
     fields.put(Field.SERIAL_NUMBER, "100");
     fields.put(Field.NAME, "HiSeq_100");
     fields.put(Field.STATUS, "production");
@@ -115,7 +115,7 @@ public class InstrumentPageIT extends AbstractIT {
   private static void assertInstrumentAttributes(Map<Field, String> expectedValues, Instrument sr) {
     assertAttribute(Field.ID, expectedValues, Long.toString(sr.getId()));
     assertAttribute(Field.NAME, expectedValues, sr.getName());
-    assertAttribute(Field.PLATFORM, expectedValues, sr.getInstrumentModel().getPlatformAndAlias());
+    assertAttribute(Field.INSTRUMENT_MODEL, expectedValues, sr.getInstrumentModel().getPlatformAndAlias());
     assertAttribute(Field.SERIAL_NUMBER, expectedValues, sr.getSerialNumber());
     assertAttribute(Field.COMMISSIONED, expectedValues, dateFormatter.print(sr.getDateCommissioned().getTime()));
     assertAttribute(Field.STATUS, expectedValues,

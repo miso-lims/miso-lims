@@ -52,13 +52,13 @@ HotTarget.order = (function() {
         },
         depends: '*start',
         update: function(order, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-          var platforms = Constants.instrumentModels.filter(function(model) {
+          var instrumentModels = Constants.instrumentModels.filter(function(model) {
             return model.platformType == order.pool.platformType && model.active;
           }).map(function(model) {
             return model.alias;
           }).sort();
           setOptions({
-            source: platforms
+            source: instrumentModels
           });
         }
       }, {
@@ -78,7 +78,7 @@ HotTarget.order = (function() {
         },
         pack: function(order, flat, errorHandler) {
           order.parameters = Utils.array.findFirstOrNull(function(param) {
-            return param.name == flat.sequencingParameters && param.platform.instrumentModel == flat.platform;
+            return param.name == flat.sequencingParameters && param.instrumentModel.alias == flat.instrumentModel;
           }, Constants.sequencingParameters);
         },
         depends: 'instrumentModel',

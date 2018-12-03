@@ -78,7 +78,7 @@ ListTarget.order = {
       return [{
         name: "Create",
         handler: function() {
-          Utils.showWizardDialog('Create Order', Constants.instrumentModel.filter(function(instrumentModel) {
+          Utils.showWizardDialog('Create Order', Constants.instrumentModels.filter(function(instrumentModel) {
             return instrumentModel.platformType == platformType.name && instrumentModel.active;
           }).map(function(instrumentModel) {
             return {

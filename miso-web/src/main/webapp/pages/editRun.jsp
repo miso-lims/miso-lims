@@ -114,11 +114,11 @@
   </c:if>
   <tr>
     <td>Platform:</td>
-    <td><span id="platform">${run.sequencer.platform.platformType.key}</span></td>
+    <td><span id="platform">${run.sequencer.instrumentModel.platformType.key}</span></td>
   </tr>
   <tr>
     <td>Sequencer:</td>
-    <td><a id="sequencer" href='<c:url value="/miso/instrument/${run.sequencer.id}"/>'>${run.sequencer.name} - ${run.sequencer.platform.instrumentModel}</a></td>
+    <td><a id="sequencer" href='<c:url value="/miso/instrument/${run.sequencer.id}"/>'>${run.sequencer.name} - ${run.sequencer.instrumentModel.alias}</a></td>
   </tr>
   <tr>
     <td></td>

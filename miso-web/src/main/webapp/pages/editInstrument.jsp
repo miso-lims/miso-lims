@@ -88,11 +88,11 @@
         </tr>
         <tr>
           <td class="h">Instrument Type:</td>
-          <td><span id="instrumentType">${instrument.platform.instrumentType.label}</span></td>
+          <td><span id="instrumentType">${instrument.instrumentModel.instrumentType.label}</span></td>
         </tr>
         <tr>
-          <td class="h">Platform:</td>
-          <td><span id="platform">${instrument.platform.nameAndModel}</span></td>
+          <td class="h">Instrument Model:</td>
+          <td><span id="instrumentModel">${instrument.instrumentModel.platformAndAlias}</span></td>
         </tr>
         <tr>
           <td class="h">Serial Number:</td>
@@ -229,7 +229,7 @@
       <div id="records_arrowclick" class="toggleLeft"></div>
     </div>
     <div id="recordsdiv" class="expandable_section" style="display:none;">
-      <miso:list-section id="list_servicerecords" name="Service Records" target="servicerecord" alwaysShow="true" items="${serviceRecords}" config="{instrumentId: ${instrument.id}, retiredInstrument: ${instrument.dateDecommissioned != null && instrument.upgradedInstrument == null}, hasPositions: ${not empty instrument.platform.positions}, userIsAdmin: ${miso:isAdmin()}}"/>
+      <miso:list-section id="list_servicerecords" name="Service Records" target="servicerecord" alwaysShow="true" items="${serviceRecords}" config="{instrumentId: ${instrument.id}, retiredInstrument: ${instrument.dateDecommissioned != null && instrument.upgradedInstrument == null}, hasPositions: ${not empty instrument.instrumentModel.positions}, userIsAdmin: ${miso:isAdmin()}}"/>
     </div>
     <script type="text/javascript">
       jQuery(document).ready(function () {
@@ -255,7 +255,7 @@
     
     
     <br/>
-    <c:if test="${instrument.platform.instrumentType eq 'SEQUENCER'}">
+    <c:if test="${instrument.instrumentModel.instrumentType eq 'SEQUENCER'}">
       <a id="runs"></a>
       <div class="sectionDivider">Runs
       </div>
