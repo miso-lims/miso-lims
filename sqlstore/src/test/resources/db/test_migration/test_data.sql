@@ -462,10 +462,10 @@ INSERT INTO SequencingParameters (parametersId, name, platformId, readLength, pa
 (2, 'Rapid Run 2x151', 16, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN');
 
 DELETE FROM `Instrument`;
-INSERT INTO `Instrument`(`instrumentId`, `name`, `ip`, `platformId`)
-VALUES (1,'SN7001179','localhost',16),
-(2,'h1180','localhost',16),
-(3, 'iScan_1', 'localhost', 30);
+INSERT INTO `Instrument`(`instrumentId`, `name`, `platformId`) VALUES
+(1, 'SN7001179', 16),
+(2, 'h1180', 16),
+(3, 'iScan_1', 30);
 
 DELETE FROM `ServiceRecord`;
 INSERT INTO `ServiceRecord`(`recordId`, `instrumentId`, `title`, `details`, `servicedBy`, `referenceNumber`, `serviceDate`, `startTime`, `endTime`)

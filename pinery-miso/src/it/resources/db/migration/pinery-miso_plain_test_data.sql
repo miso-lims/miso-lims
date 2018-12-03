@@ -119,10 +119,10 @@ INSERT INTO SequencingContainerModel_Platform (sequencingContainerModelId, platf
 (1, 2);
 
 INSERT INTO Instrument (instrumentId, name, platformId, ip) VALUES
-  (1, 'T2000', 1, '127.0.0.1'),
-  (2, 'TMS1', 2, '127.0.0.1'),
-  (3, 'TPB2', 3, '127.0.0.1'),
-  (4, 'T2001', 1, '127.0.0.1');
+  (1, 'T2000', 1),
+  (2, 'TMS1', 2),
+  (3, 'TPB2', 3),
+  (4, 'T2001', 1);
 
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Human hg19 random');
 

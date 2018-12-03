@@ -128,8 +128,8 @@ INSERT INTO SequencingParameters (parametersId, name, platformId, readLength, pa
   (3, '1x151', 1, 151, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V4'),
   (4, 'Micro 2x151', 2, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V3');
 
-INSERT INTO Instrument (instrumentId, name, platformId, ip) VALUES
-  (1, 'T2500', 1, '127.0.0.1');
+INSERT INTO Instrument (instrumentId, name, platformId) VALUES
+  (1, 'T2500', 1);
 
 INSERT INTO Project(projectId, name, alias, shortName, creationDate, description, securityProfile_profileId,
   progress, referenceGenomeId, lastUpdated) VALUES
