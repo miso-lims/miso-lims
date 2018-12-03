@@ -33,7 +33,7 @@ like to create a container. From the toolbar at the top of the table, click the 
 will be labelled differently depending on the selected platform. For example, it will be "Add Flow Cell" on the
 Illumina tab.
 
-In the dialog that appears, choose the platform that the container will be run on. Next, choose the sequencing
+In the dialog that appears, choose the instrument model that the container will be run on. Next, choose the sequencing
 container model. You will then be taken to the Create Container page, where you can complete the container's details.
 Click the Save button at the top right when you are done to save the container and go to the Edit Container page. Here
 you can add pools and further modify the container.

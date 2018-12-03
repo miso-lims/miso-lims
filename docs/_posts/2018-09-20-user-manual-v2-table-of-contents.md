@@ -170,7 +170,7 @@ This user manual is a work in progress, so parts of it may be missing until it h
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Box Uses" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Platforms" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Instrument Models" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Sequencing Container Models" %}
 {% assign sub = sub | plus: 1 %}
