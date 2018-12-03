@@ -54,7 +54,7 @@ public class BulkOrderIT extends AbstractIT {
 
     // make changes
     Map<String, String> changes = Maps.newLinkedHashMap();
-    changes.put(Columns.PLATFORM, "Illumina HiSeq 2500");
+    changes.put(Columns.INSTRUMENT_MODEL, "Illumina HiSeq 2500");
     changes.put(Columns.PARAMETERS, "1x151");
     changes.put(Columns.PARTITIONS, "3");
     changes.put(Columns.DESCRIPTION, "test");
