@@ -54,7 +54,7 @@ public class DefaultPoolOrderService implements PoolOrderService {
 
     User user = authorizationManager.getCurrentUser();
     poolOrder.setPool(pool);
-    poolOrder.setSequencingParameter(sequencingParametersService.get(poolOrder.getSequencingParameter().getId()));
+    poolOrder.setSequencingParameters(sequencingParametersService.get(poolOrder.getSequencingParameter().getId()));
     poolOrder.setCreatedBy(user);
     poolOrder.setUpdatedBy(user);
     return poolOrderDao.addPoolOrder(poolOrder);

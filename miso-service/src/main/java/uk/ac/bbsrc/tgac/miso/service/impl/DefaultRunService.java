@@ -40,8 +40,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
@@ -64,7 +64,7 @@ import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
-import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
@@ -122,7 +122,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   @Autowired
   private ContainerModelService containerModelService;
   @Autowired
-  private PlatformService platformService;
+  private InstrumentModelService platformService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -351,11 +351,11 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       }
     }
 
-    Platform platform = changed.getSequencer().getPlatform();
+    InstrumentModel platform = changed.getSequencer().getInstrumentModel();
     for (RunPosition position : changed.getRunPositions()) {
       if (position.getPosition() != null && !platform.getPositions().contains(position.getPosition())) {
         errors.add(new ValidationError(
-            String.format("Platform %s does not have a position %s", platform.getInstrumentModel(), position.getPosition())));
+            String.format("Platform %s does not have a position %s", platform.getAlias(), position.getPosition())));
       }
     }
 
@@ -544,7 +544,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     this.runDao = runDao;
   }
 
-  public void setPlatformService(PlatformService platformService) {
+  public void setPlatformService(InstrumentModelService platformService) {
     this.platformService = platformService;
   }
 
@@ -588,7 +588,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     }
     target.setSequencer(sequencer);
 
-    SequencingContainerModel model = containerModelService.find(sequencer.getPlatform(), containerModel, laneCount);
+    SequencingContainerModel model = containerModelService.find(sequencer.getInstrumentModel(), containerModel, laneCount);
     if (model == null) {
       throw new IllegalArgumentException(
           "Could not find container or fallback for parameters: model=" + containerModel + ", lanes=" + laneCount);
@@ -708,7 +708,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       final Instrument sequencer) throws IOException {
     // If the sequencing parameters haven't been updated by a human, see if we can find exactly one that matches.
     if (!target.didSomeoneElseChangeColumn("parameters", user)) {
-      List<SequencingParameters> possibleParameters = sequencingParametersService.getForPlatform(sequencer.getPlatform().getId()).stream()
+      List<SequencingParameters> possibleParameters = sequencingParametersService.getForInstrumentModel(sequencer.getInstrumentModel().getId()).stream()
           .filter(parameters -> !parameters.getName().startsWith("Custom")).filter(filterParameters).collect(Collectors.toList());
       if (possibleParameters.size() == 1) {
         if (target.getSequencingParameters() == null
@@ -725,12 +725,12 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       String containerSerialNumber, final GetLaneContents getLaneContents, String positionName) throws IOException {
     final Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(containerSerialNumber);
     int laneCount = containerModel.getPartitionCount();
-    PlatformPosition position = null;
+    InstrumentPosition position = null;
     if (!isStringEmptyOrNull(positionName)) {
-      position = target.getSequencer().getPlatform().getPositions().stream()
+      position = target.getSequencer().getInstrumentModel().getPositions().stream()
           .filter(pos -> positionName.equals(pos.getAlias()))
           .findFirst().orElseThrow(() -> new IllegalArgumentException(String.format("Unknown position '%s' for platform '%s'", positionName,
-              target.getSequencer().getPlatform().getInstrumentModel())));
+              target.getSequencer().getInstrumentModel().getAlias())));
     }
     switch (containers.size()) {
     case 0:

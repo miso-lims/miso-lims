@@ -39,8 +39,8 @@ HotTarget.order = (function() {
           order.description = flat.description;
         }
       }, {
-        header: 'Platform',
-        data: 'platform',
+        header: 'Instrument Model',
+        data: 'instrumentModel',
         type: 'dropdown',
         trimDropdown: false,
         validator: HotUtils.validator.requiredAutocomplete,
@@ -52,10 +52,10 @@ HotTarget.order = (function() {
         },
         depends: '*start',
         update: function(order, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-          var platforms = Constants.platforms.filter(function(platform) {
-            return platform.platformType == order.pool.platformType && platform.active;
-          }).map(function(platform) {
-            return platform.instrumentModel;
+          var platforms = Constants.instrumentModels.filter(function(model) {
+            return model.platformType == order.pool.platformType && model.active;
+          }).map(function(model) {
+            return model.alias;
           }).sort();
           setOptions({
             source: platforms
@@ -81,15 +81,15 @@ HotTarget.order = (function() {
             return param.name == flat.sequencingParameters && param.platform.instrumentModel == flat.platform;
           }, Constants.sequencingParameters);
         },
-        depends: 'platform',
+        depends: 'instrumentModel',
         update: function(order, flat, flatProperty, value, setReadOnly, setOptions, setData) {
           var params = null;
           if (value) {
-            var platform = Utils.array.findFirstOrNull(function(platform) {
-              return platform.instrumentModel == value;
-            }, Constants.platforms);
+            var instrumentModel = Utils.array.findFirstOrNull(function(instrumentModel) {
+              return instrumentModel.alias == value;
+            }, Constants.instrumentModels);
             params = Constants.sequencingParameters.filter(function(parameters) {
-              return parameters.platform.id == platform.id;
+              return parameters.instrumentModel.id == instrumentModel.id;
             }).map(function(parameters) {
               return parameters.name;
             }).sort();

@@ -398,7 +398,42 @@ VALUES (1,2),
 (1,1),
 (2,3);
 
-INSERT INTO `Experiment`(`experimentId`, `name`, `description`, `accession`, `title`, `securityProfile_profileId`, `study_studyId`, `alias`, `platform_platformId`,`lastModifier`, lastModified, creator, created, `library_libraryId`) 
+DELETE FROM `PoolQC`;
+INSERT INTO `PoolQC`(`qcId`, `pool_poolId`, `creator`, `date`, `type`, `results`)
+VALUES (1,1,1,'2016-03-18',1,12.3),
+(2,1,1,'2016-03-18',1,45.6),
+(3,2,1,'2016-03-18',1,7.89);
+
+INSERT INTO `PoolChangeLog`(`poolId`, `columnsChanged`, `userId`, `message`, `changeTime`)
+VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
+(1, 'alias', 1, 'Poll 1 -> Pool 1', '2016-06-07 13:13:30'),
+(2, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:51'),
+(3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
+(4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55'),
+(5, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:57'),
+(6, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:59'),
+(7, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:01'),
+(8, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:03'),
+(9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
+(10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07');
+
+DELETE FROM Experiment;
+DELETE FROM SequencingParameters;
+DELETE FROM InstrumentModel;
+INSERT INTO InstrumentModel(instrumentModelId, platform, alias, description, numContainers, instrumentType) VALUES
+(16, 'ILLUMINA', 'Illumina HiSeq 2000', '4-channel flowgram', 1, 'SEQUENCER'),
+(30, 'ILLUMINA', 'Illumina iScan', NULL, 1, 'ARRAY_SCANNER');
+
+INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, paired, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
+(2, 'Rapid Run 2x151', 16, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN');
+
+DELETE FROM `Instrument`;
+INSERT INTO `Instrument`(`instrumentId`, `name`, `instrumentModelId`) VALUES
+(1, 'SN7001179', 16),
+(2, 'h1180', 16),
+(3, 'iScan_1', 30);
+
+INSERT INTO `Experiment`(`experimentId`, `name`, `description`, `accession`, `title`, `securityProfile_profileId`, `study_studyId`, `alias`, `instrumentModelId`,`lastModifier`, lastModified, creator, created, `library_libraryId`) 
 VALUES
 (1,'EXP1','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_1',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 1),
 (2,'EXP2','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_2',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 2),
@@ -432,40 +467,6 @@ VALUES
 (30,'EXP30','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,3,'EXP_AUTOGEN_STU1_Other_30',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9),
 (31,'EXP31','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,4,'EXP_AUTOGEN_STU1_Other_31',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9),
 (32,'EXP32','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,5,'EXP_AUTOGEN_STU1_Other_32',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9);
-
-DELETE FROM `PoolQC`;
-INSERT INTO `PoolQC`(`qcId`, `pool_poolId`, `creator`, `date`, `type`, `results`)
-VALUES (1,1,1,'2016-03-18',1,12.3),
-(2,1,1,'2016-03-18',1,45.6),
-(3,2,1,'2016-03-18',1,7.89);
-
-INSERT INTO `PoolChangeLog`(`poolId`, `columnsChanged`, `userId`, `message`, `changeTime`)
-VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
-(1, 'alias', 1, 'Poll 1 -> Pool 1', '2016-06-07 13:13:30'),
-(2, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:51'),
-(3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
-(4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55'),
-(5, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:57'),
-(6, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:59'),
-(7, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:01'),
-(8, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:03'),
-(9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
-(10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07');
-
-DELETE FROM SequencingParameters;
-DELETE FROM Platform;
-INSERT INTO Platform(platformId, name, instrumentModel, description, numContainers, instrumentType) VALUES
-(16, 'ILLUMINA', 'Illumina HiSeq 2000', '4-channel flowgram', 1, 'SEQUENCER'),
-(30, 'ILLUMINA', 'Illumina iScan', NULL, 1, 'ARRAY_SCANNER');
-
-INSERT INTO SequencingParameters (parametersId, name, platformId, readLength, paired, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
-(2, 'Rapid Run 2x151', 16, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN');
-
-DELETE FROM `Instrument`;
-INSERT INTO `Instrument`(`instrumentId`, `name`, `platformId`) VALUES
-(1, 'SN7001179', 16),
-(2, 'h1180', 16),
-(3, 'iScan_1', 30);
 
 DELETE FROM `ServiceRecord`;
 INSERT INTO `ServiceRecord`(`recordId`, `instrumentId`, `title`, `details`, `servicedBy`, `referenceNumber`, `serviceDate`, `startTime`, `endTime`)
@@ -526,14 +527,14 @@ VALUES (1,1,1),
 (32,8,NULL);
 
 DELETE FROM `SequencerPartitionContainer`;
-DELETE FROM SequencingContainerModel_Platform;
+DELETE FROM SequencingContainerModel_InstrumentModel;
 DELETE FROM SequencingContainerModel;
 INSERT INTO SequencingContainerModel (sequencingContainerModelId, alias, identificationBarcode, partitionCount, platformType, fallback) VALUES
 (1, 'Generic 8-Lane Illumina Flow Cell', NULL, 8, 'ILLUMINA', 1),
 (2, 'Generic 2-Lane Illumina Flow Cell', NULL, 2, 'ILLUMINA', 1),
 (3, 'HiSeq PE Flow Cell v4', '12345678', 8, 'ILLUMINA', 0);
 
-INSERT INTO SequencingContainerModel_Platform (sequencingContainerModelId, platformId) VALUES
+INSERT INTO SequencingContainerModel_InstrumentModel (sequencingContainerModelId, instrumentModelId) VALUES
 (1, 16),
 (2, 16),
 (3, 16);

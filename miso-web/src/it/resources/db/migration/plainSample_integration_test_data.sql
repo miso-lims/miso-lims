@@ -117,18 +117,18 @@ INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
   (11, 2, 'B03',      'GGGCCC', 2),
   (12, 2, 'B04',      'TTTAAA', 2);
 
-INSERT INTO Platform (platformId, name, instrumentModel, numContainers, instrumentType) VALUES
+INSERT INTO InstrumentModel (instrumentModelId, platform, alias, numContainers, instrumentType) VALUES
   (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1, 'SEQUENCER'),
   (2, 'ILLUMINA', 'Illumina MiSeq', 1, 'SEQUENCER'),
   (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER');
   
-INSERT INTO SequencingParameters (parametersId, name, platformId, readLength, paired, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
+INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, paired, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
   (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),
   (2, 'Rapid Run 2x151', 1, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN'),
   (3, '1x151', 1, 151, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V4'),
   (4, 'Micro 2x151', 2, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V3');
 
-INSERT INTO Instrument (instrumentId, name, platformId) VALUES
+INSERT INTO Instrument (instrumentId, name, instrumentModelId) VALUES
   (1, 'T2500', 1);
 
 INSERT INTO Project(projectId, name, alias, shortName, creationDate, description, securityProfile_profileId,

@@ -64,7 +64,7 @@ import net.sf.json.JSONArray;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -81,7 +81,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
-import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
@@ -114,7 +114,7 @@ public class EditPoolController {
   @Autowired
   private ChangeLogService changeLogService;
   @Autowired
-  private PlatformService platformService;
+  private InstrumentModelService platformService;
   @Autowired
   private PoolService poolService;
   @Autowired
@@ -130,7 +130,7 @@ public class EditPoolController {
     this.runService = runService;
   }
 
-  public void setPlatformService(PlatformService platformService) {
+  public void setPlatformService(InstrumentModelService platformService) {
     this.platformService = platformService;
   }
 
@@ -210,18 +210,18 @@ public class EditPoolController {
     }
   }
 
-  private Collection<Platform> getFilteredPlatforms(PlatformType platformType) throws IOException {
-    List<Platform> selected = new ArrayList<>();
-    for (Platform p : platformService.list()) {
-      if (p.getPlatformType() == platformType && !sequencingParametersService.getForPlatform(p.getId()).isEmpty()) {
+  private Collection<InstrumentModel> getFilteredPlatforms(PlatformType platformType) throws IOException {
+    List<InstrumentModel> selected = new ArrayList<>();
+    for (InstrumentModel p : platformService.list()) {
+      if (p.getPlatformType() == platformType && !sequencingParametersService.getForInstrumentModel(p.getId()).isEmpty()) {
         selected.add(p);
       }
     }
-    Collections.sort(selected, new Comparator<Platform>() {
+    Collections.sort(selected, new Comparator<InstrumentModel>() {
 
       @Override
-      public int compare(Platform o1, Platform o2) {
-        return o1.getNameAndModel().compareTo(o2.getNameAndModel());
+      public int compare(InstrumentModel o1, InstrumentModel o2) {
+        return o1.getPlatformAndAlias().compareTo(o2.getPlatformAndAlias());
       }
 
     });

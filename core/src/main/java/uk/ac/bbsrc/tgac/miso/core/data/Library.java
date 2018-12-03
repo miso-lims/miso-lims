@@ -45,7 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * A Library is the first step in constructing sequenceable material from an initial {@link Sample}. A Library is then diluted down to a
  * {@link LibraryDilution}, and put in a {@link Pool}, which is then sequenced.
  * <p/>
- * Libraries also have a target {@link Platform} and can be uniquely identified via {@link Index} objects for multiplexing purposes.
+ * Libraries also have a target {@link InstrumentModel} and can be uniquely identified via {@link Index} objects for multiplexing purposes.
  * 
  * @author Rob Davey
  * @since 0.0.2

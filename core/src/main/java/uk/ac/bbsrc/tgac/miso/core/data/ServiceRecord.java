@@ -61,7 +61,7 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
 
   @ManyToOne
   @JoinColumn(name = "positionId")
-  private PlatformPosition position;
+  private InstrumentPosition position;
 
   @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
   @JoinTable(name = "ServiceRecord_Attachment", joinColumns = { @JoinColumn(name = "recordId") }, inverseJoinColumns = {
@@ -150,11 +150,11 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
     return this.outOfService;
   }
 
-  public PlatformPosition getPosition() {
+  public InstrumentPosition getPosition() {
     return position;
   }
 
-  public void setPosition(PlatformPosition position) {
+  public void setPosition(InstrumentPosition position) {
     this.position = position;
   }
 

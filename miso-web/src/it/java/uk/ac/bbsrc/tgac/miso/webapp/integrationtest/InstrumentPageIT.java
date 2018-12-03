@@ -115,7 +115,7 @@ public class InstrumentPageIT extends AbstractIT {
   private static void assertInstrumentAttributes(Map<Field, String> expectedValues, Instrument sr) {
     assertAttribute(Field.ID, expectedValues, Long.toString(sr.getId()));
     assertAttribute(Field.NAME, expectedValues, sr.getName());
-    assertAttribute(Field.PLATFORM, expectedValues, sr.getPlatform().getNameAndModel());
+    assertAttribute(Field.PLATFORM, expectedValues, sr.getInstrumentModel().getPlatformAndAlias());
     assertAttribute(Field.SERIAL_NUMBER, expectedValues, sr.getSerialNumber());
     assertAttribute(Field.COMMISSIONED, expectedValues, dateFormatter.print(sr.getDateCommissioned().getTime()));
     assertAttribute(Field.STATUS, expectedValues,

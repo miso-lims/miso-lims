@@ -97,14 +97,14 @@ ListTarget.container = {
     return [{
       "name": "Add " + platformType.containerName,
       "handler": function() {
-        var platforms = Constants.platforms.filter(function(p) {
+        var instrumentModels = Constants.instrumentModels.filter(function(p) {
           return p.platformType === config.platformType && p.instrumentType === 'SEQUENCER' && p.active;
-        }).sort(Utils.sorting.standardSort('instrumentModel')).map(function(platform) {
+        }).sort(Utils.sorting.standardSort('alias')).map(function(instrumentModel) {
           return {
-            name: platform.instrumentModel,
+            name: instrumentModel.alias,
             handler: function() {
               var models = Constants.containerModels.filter(function(m) {
-                return (m.platformIds.indexOf(platform.id) !== -1 && !m.archived);
+                return (m.instrumentModelIds.indexOf(instrumentModel.id) !== -1 && !m.archived);
               }).sort(Utils.sorting.standardSort('alias')).map(function(model) {
                 return {
                   name: model.alias,
@@ -117,7 +117,7 @@ ListTarget.container = {
             }
           }
         });
-        Utils.showWizardDialog("Add " + platformType.containerName, platforms);
+        Utils.showWizardDialog("Add " + platformType.containerName, instrumentModels);
       }
     }, ];
   },

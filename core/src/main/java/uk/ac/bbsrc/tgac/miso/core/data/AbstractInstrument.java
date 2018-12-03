@@ -58,9 +58,9 @@ public abstract class AbstractInstrument implements Instrument {
   @Column(nullable = false)
   private String name;
 
-  @ManyToOne(targetEntity = Platform.class)
-  @JoinColumn(name = "platformId", nullable = false)
-  private Platform platform;
+  @ManyToOne(targetEntity = InstrumentModel.class)
+  @JoinColumn(name = "instrumentModelId", nullable = false)
+  private InstrumentModel instrumentModel;
 
   private String serialNumber;
   @Temporal(TemporalType.DATE)
@@ -96,13 +96,13 @@ public abstract class AbstractInstrument implements Instrument {
   }
 
   @Override
-  public void setPlatform(Platform platform) {
-    this.platform = platform;
+  public void setInstrumentModel(InstrumentModel instrumentModel) {
+    this.instrumentModel = instrumentModel;
   }
 
   @Override
-  public Platform getPlatform() {
-    return this.platform;
+  public InstrumentModel getInstrumentModel() {
+    return this.instrumentModel;
   }
 
   @Override
@@ -149,7 +149,7 @@ public abstract class AbstractInstrument implements Instrument {
   public String toString() {
     return "AbstractInstrument [id=" + id
         + ", name=" + name
-        + ", platform=" + platform.getId()
+        + ", instrumentModel=" + instrumentModel.getId()
         + ", serialNumber=" + serialNumber
         + ", dateCommissioned=" + dateCommissioned
         + ", dateDecommissioned=" + dateDecommissioned
@@ -207,11 +207,11 @@ public abstract class AbstractInstrument implements Instrument {
   }
 
   @Override
-  public Set<PlatformPosition> getOutOfServicePositions() {
+  public Set<InstrumentPosition> getOutOfServicePositions() {
     if (isOutOfService()) {
-      return getPlatform().getPositions();
+      return getInstrumentModel().getPositions();
     }
-    return getPlatform().getPositions().stream()
+    return getInstrumentModel().getPositions().stream()
         .filter(pos -> getServiceRecords().stream().anyMatch(sr -> sr.isOutOfService() && sr.getEndTime() == null
             && sr.getStartTime() != null && sr.getStartTime().before(new Date()) && sr.getPosition().getAlias().equals(pos.getAlias())))
         .collect(Collectors.toSet());
@@ -222,12 +222,12 @@ public abstract class AbstractInstrument implements Instrument {
     if (isOutOfService()) {
       return "All positions";
     }
-    Set<PlatformPosition> positions = getOutOfServicePositions();
+    Set<InstrumentPosition> positions = getOutOfServicePositions();
     if (positions.isEmpty()) {
       return null;
     } else {
       return "Position" + (positions.size() == 1 ? "" : "a") + " "
-          + positions.stream().map(PlatformPosition::getAlias).collect(Collectors.joining(", "));
+          + positions.stream().map(InstrumentPosition::getAlias).collect(Collectors.joining(", "));
     }
   }
 
@@ -240,7 +240,7 @@ public abstract class AbstractInstrument implements Instrument {
     result = prime * result + (int) (id ^ (id >>> 32));
     result = prime * result + ((lastServicedDate == null) ? 0 : lastServicedDate.hashCode());
     result = prime * result + ((name == null) ? 0 : name.hashCode());
-    result = prime * result + ((platform == null) ? 0 : platform.hashCode());
+    result = prime * result + ((instrumentModel == null) ? 0 : instrumentModel.hashCode());
     result = prime * result + ((runs == null) ? 0 : runs.hashCode());
     result = prime * result + ((serialNumber == null) ? 0 : serialNumber.hashCode());
     result = prime * result + ((serviceRecords == null) ? 0 : serviceRecords.hashCode());
@@ -267,9 +267,9 @@ public abstract class AbstractInstrument implements Instrument {
     if (name == null) {
       if (other.name != null) return false;
     } else if (!name.equals(other.name)) return false;
-    if (platform == null) {
-      if (other.platform != null) return false;
-    } else if (!platform.equals(other.platform)) return false;
+    if (instrumentModel == null) {
+      if (other.instrumentModel != null) return false;
+    } else if (!instrumentModel.equals(other.instrumentModel)) return false;
     if (runs == null) {
       if (other.runs != null) return false;
     } else if (!runs.equals(other.runs)) return false;

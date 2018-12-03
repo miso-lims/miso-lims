@@ -27,7 +27,7 @@ public class HibernateArrayRunDao implements ArrayRunStore, HibernatePaginatedDa
 
   private static final String[] SEARCH_PROPERTIES = new String[] { "alias", "description" };
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator", "instrument", "instrument.platform");
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator", "instrument", "instrument.instrumentModel");
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -145,7 +145,7 @@ public class HibernateArrayRunDao implements ArrayRunStore, HibernatePaginatedDa
 
   @Override
   public String propertyForSortColumn(String original) {
-    if ("platformType".equals(original)) return "platform.platformType";
+    if ("platformType".equals(original)) return "instrumentModel.platformType";
     if ("status".equals(original)) return "health";
     return original;
   }

@@ -21,18 +21,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
-import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 
 public class TabbedListItemsPage {
 
-  public static TabbedListItemsPage createForPlatformType(String targetType, PlatformService platformService)
+  public static TabbedListItemsPage createForPlatformType(String targetType, InstrumentModelService instrumentModelService)
       throws IOException {
-    return new TabbedListItemsPage(targetType, "platformType", getPlatformTypes(platformService), PlatformType::getKey,
+    return new TabbedListItemsPage(targetType, "platformType", getPlatformTypes(instrumentModelService), PlatformType::getKey,
         PlatformType::name);
   }
 
-  public static Stream<PlatformType> getPlatformTypes(PlatformService platformService) throws IOException {
-    Set<PlatformType> platforms = platformService.listActivePlatformTypes();
+  public static Stream<PlatformType> getPlatformTypes(InstrumentModelService instrumentModelService) throws IOException {
+    Set<PlatformType> platforms = instrumentModelService.listActivePlatformTypes();
 
     if (platforms.size() > 0) {
       return platforms.stream();

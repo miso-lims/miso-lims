@@ -30,7 +30,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDilutionDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePlatformDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstrumentModelDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolOrderDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolableElementViewDao;
@@ -68,7 +68,7 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryService;
-import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPlatformService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultInstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolableElementViewService;
@@ -111,7 +111,7 @@ public class MisoServiceManager {
   private HibernatePoolDao poolDao;
   private HibernateExperimentDao experimentDao;
   private HibernateKitDao kitDao;
-  private HibernatePlatformDao platformDao;
+  private HibernateInstrumentModelDao platformDao;
   private HibernateStudyDao studyDao;
   private HibernateRunDao runDao;
   private HibernateSequencerPartitionContainerDao sequencerPartitionContainerDao;
@@ -132,7 +132,7 @@ public class MisoServiceManager {
   private DefaultLibraryDesignService libraryDesignService;
   private DefaultLibraryDesignCodeService libraryDesignCodeService;
   private DefaultLibraryDilutionService dilutionService;
-  private DefaultPlatformService platformService;
+  private DefaultInstrumentModelService platformService;
   private DefaultSampleNumberPerProjectService sampleNumberPerProjectService;
   private DefaultSampleValidRelationshipService sampleValidRelationshipService;
   private DefaultReferenceGenomeService referenceGenomeService;
@@ -798,17 +798,17 @@ public class MisoServiceManager {
     if (kitService != null) kitService.setKitStore(kitDao);
   }
 
-  public HibernatePlatformDao getPlatformDao() {
+  public HibernateInstrumentModelDao getPlatformDao() {
     return platformDao;
   }
 
-  public void setPlatformDao(HibernatePlatformDao platformDao) {
+  public void setPlatformDao(HibernateInstrumentModelDao platformDao) {
     this.platformDao = platformDao;
     updatePlatformDaoDependencies();
   }
 
   public void setDefaultPlatformDao() {
-    HibernatePlatformDao dao = new HibernatePlatformDao();
+    HibernateInstrumentModelDao dao = new HibernateInstrumentModelDao();
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
     setPlatformDao(dao);
@@ -1399,17 +1399,17 @@ public class MisoServiceManager {
     if (runService != null) runService.setContainerService(containerService);
   }
 
-  public DefaultPlatformService getPlatformService() {
+  public DefaultInstrumentModelService getPlatformService() {
     return platformService;
   }
 
-  public void setPlatformService(DefaultPlatformService service) {
+  public void setPlatformService(DefaultInstrumentModelService service) {
     this.platformService = service;
     updatePlatformServiceDependencies();
   }
 
   public void setDefaultPlatformService() {
-    DefaultPlatformService service = new DefaultPlatformService();
+    DefaultInstrumentModelService service = new DefaultInstrumentModelService();
     service.setPlatformDao(platformDao);
     setPlatformService(service);
   }

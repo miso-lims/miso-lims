@@ -30,7 +30,7 @@ public class HibernateInstrumentDaoTest extends AbstractDAOTest {
   private JdbcTemplate template;
 
   @Mock
-  private HibernatePlatformDao platformDAO;
+  private HibernateInstrumentModelDao platformDAO;
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -49,7 +49,7 @@ public class HibernateInstrumentDaoTest extends AbstractDAOTest {
   @Test
   public void testListAll() throws IOException {
     Collection<Instrument> instruments = dao.listAll();
-    assertEquals(PlatformType.ILLUMINA, instruments.iterator().next().getPlatform().getPlatformType());
+    assertEquals(PlatformType.ILLUMINA, instruments.iterator().next().getInstrumentModel().getPlatformType());
   }
 
   @Test

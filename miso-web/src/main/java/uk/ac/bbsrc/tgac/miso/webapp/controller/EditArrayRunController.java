@@ -72,7 +72,7 @@ public class EditArrayRunController {
 
   private List<Instrument> getArrayScanners() throws IOException {
     return instrumentService.list().stream()
-        .filter(inst -> inst.getPlatform().getInstrumentType() == InstrumentType.ARRAY_SCANNER)
+        .filter(inst -> inst.getInstrumentModel().getInstrumentType() == InstrumentType.ARRAY_SCANNER)
         .collect(Collectors.toList());
   }
 

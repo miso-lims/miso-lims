@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPositionStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
-import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.store.InstrumentStatusStore;
 
@@ -60,9 +60,9 @@ public class HibernateInstrumentStatusDao implements InstrumentStatusStore {
       }
       InstrumentStatus existing = statusByInstrumentId.get(position.getInstrument().getId());
       if (position.getPosition() == null) {
-        PlatformPosition nullPosition = new PlatformPosition();
+        InstrumentPosition nullPosition = new InstrumentPosition();
         nullPosition.setAlias("n/a");
-        nullPosition.setPlatform(position.getInstrument().getPlatform());
+        nullPosition.setInstrumentModel(position.getInstrument().getInstrumentModel());
         position.setPosition(nullPosition);
       }
       if (existing.getPositions().containsKey(position.getPosition())) {

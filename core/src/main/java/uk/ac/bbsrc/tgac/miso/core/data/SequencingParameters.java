@@ -55,9 +55,9 @@ public class SequencingParameters implements Serializable, Comparable<Sequencing
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long parametersId;
 
-  @ManyToOne(targetEntity = Platform.class)
-  @JoinColumn(name = "platformId")
-  private Platform platform;
+  @ManyToOne(targetEntity = InstrumentModel.class)
+  @JoinColumn(name = "instrumentModelId")
+  private InstrumentModel instrumentModel;
   @Column(nullable = false)
   private int readLength;
 
@@ -89,8 +89,8 @@ public class SequencingParameters implements Serializable, Comparable<Sequencing
     return name;
   }
 
-  public Platform getPlatform() {
-    return platform;
+  public InstrumentModel getInstrumentModel() {
+    return instrumentModel;
   }
 
 
@@ -134,8 +134,8 @@ public class SequencingParameters implements Serializable, Comparable<Sequencing
     this.paired = paired;
   }
 
-  public void setPlatform(Platform platform) {
-    this.platform = platform;
+  public void setInstrumentModel(InstrumentModel instrumentModel) {
+    this.instrumentModel = instrumentModel;
   }
 
   public void setReadLength(int readLength) {

@@ -61,7 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
@@ -92,7 +92,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
@@ -132,7 +132,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   @Autowired
   private IndexService indexService;
   @Autowired
-  private PlatformService platformService;
+  private InstrumentModelService platformService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -513,9 +513,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
     }.register(binder);
 
-    new BindingConverterById<Platform>(Platform.class) {
+    new BindingConverterById<InstrumentModel>(InstrumentModel.class) {
       @Override
-      public Platform resolveById(long id) throws Exception {
+      public InstrumentModel resolveById(long id) throws Exception {
         return platformService.get(id);
       }
     }.register(binder);
@@ -640,7 +640,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     this.containerService = containerService;
   }
 
-  public void setPlatformService(PlatformService platformService) {
+  public void setPlatformService(InstrumentModelService platformService) {
     this.platformService = platformService;
   }
 

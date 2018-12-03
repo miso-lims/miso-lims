@@ -78,7 +78,7 @@ public class DefaultInstrumentService implements InstrumentService {
   }
 
   private void applyChanges(Instrument target, Instrument source) {
-    target.setPlatform(source.getPlatform());
+    target.setInstrumentModel(source.getInstrumentModel());
     target.setName(source.getName());
     target.setSerialNumber(source.getSerialNumber());
     target.setDateCommissioned(source.getDateCommissioned());

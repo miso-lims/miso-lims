@@ -23,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
@@ -999,7 +999,7 @@ public class ValueTypeLookup {
           run.getSequencer() == null ? null : run.getSequencer().getId(),
           run.getSequencer() == null ? null : run.getSequencer().getName()));
     }
-    Platform platform = sequencer.getPlatform();
+    InstrumentModel platform = sequencer.getInstrumentModel();
     PlatformType platformType = platform.getPlatformType();
     run.setSequencer(sequencer);
     if (run.getSequencerPartitionContainers() != null) {

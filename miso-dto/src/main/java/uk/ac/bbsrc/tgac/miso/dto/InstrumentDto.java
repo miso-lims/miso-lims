@@ -11,7 +11,7 @@ public class InstrumentDto {
   
   private String name;
   
-  private PlatformDto platform;
+  private InstrumentModelDto instrumentModel;
   
   private String serialNumber;
 
@@ -37,8 +37,8 @@ public class InstrumentDto {
     return name;
   }
 
-  public PlatformDto getPlatform() {
-    return platform;
+  public InstrumentModelDto getInstrumentModel() {
+    return instrumentModel;
   }
 
   public String getSerialNumber() {
@@ -69,8 +69,8 @@ public class InstrumentDto {
     this.name = name;
   }
 
-  public void setPlatform(PlatformDto platform) {
-    this.platform = platform;
+  public void setInstrumentModel(InstrumentModelDto instrumentModel) {
+    this.instrumentModel = instrumentModel;
   }
 
   public void setSerialNumber(String serialNumber) {
