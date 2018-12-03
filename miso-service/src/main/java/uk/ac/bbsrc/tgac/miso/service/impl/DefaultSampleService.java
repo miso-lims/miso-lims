@@ -760,30 +760,32 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       dTarget.setQcPassed(dSource.getQcPassed());
       dTarget.setSubproject(dSource.getSubproject());
       if (isIdentitySample(target)) {
-        SampleIdentity iTarget = (SampleIdentity) target;
-        SampleIdentity iSource = (SampleIdentity) source;
-        if (!iSource.getExternalName().equals(iTarget.getExternalName())) {
-          confirmExternalNameUniqueForProjectIfRequired(iSource.getExternalName(), iTarget);
-        }
-        iTarget.setExternalName(iSource.getExternalName());
-        iTarget.setDonorSex(iSource.getDonorSex());
-        iTarget.setConsentLevel(iSource.getConsentLevel());
-      }
-      if (isTissueSample(target)) {
+        applyIdentityChanges((SampleIdentity) target, (SampleIdentity) source);
+      } else if (isTissueSample(target)) {
         applyTissueChanges((SampleTissue) target, (SampleTissue) source);
-      }
-      if (isTissueProcessingSample(target)) {
+      } else if (isTissueProcessingSample(target)) {
         applyTissueProcessingChanges((SampleTissueProcessing) target, (SampleTissueProcessing) source);
-      }
-      if (isAliquotSample(target)) {
+      } else if (isAliquotSample(target)) {
         applyAliquotChanges((SampleAliquot) target, (SampleAliquot) source);
-      }
-      if (isStockSample(target)) {
+      } else if (isStockSample(target)) {
         applyStockChanges((SampleStock) target, (SampleStock) source);
       }
     } else {
       target.setQcPassed(source.getQcPassed());
     }
+  }
+
+  private void applyIdentityChanges(SampleIdentity target, SampleIdentity source) throws IOException {
+    if (!source.getExternalName().equals(target.getExternalName())) {
+      confirmExternalNameUniqueForProjectIfRequired(source.getExternalName(), target);
+      Set<String> sourceExternalNames = SampleIdentityImpl.getSetFromString(source.getExternalName());
+      Set<String> targetExternalNames = SampleIdentityImpl.getSetFromString(target.getExternalName());
+      if (!sourceExternalNames.containsAll(targetExternalNames) || !targetExternalNames.containsAll(sourceExternalNames)) {
+        target.setExternalName(source.getExternalName());
+      }
+    }
+    target.setDonorSex(source.getDonorSex());
+    target.setConsentLevel(source.getConsentLevel());
   }
 
   private void applyAliquotChanges(SampleAliquot target, SampleAliquot source) {
