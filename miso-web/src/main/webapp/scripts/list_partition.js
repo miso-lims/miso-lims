@@ -164,9 +164,8 @@ ListTarget.partition = {
             label: 'Units',
             property: 'loadingConcentrationUnits',
             type: 'select',
-            values: Constants.concentrationUnits.sort(function(a, b) {
-              return a.units == 'nM' ? -1 : a.units.compareTo(b.units);
-            }),
+            value: 'nM',
+            values: Constants.concentrationUnits,
             getLabel: function(concentrationUnit) {
               return concentrationUnit.units.replace('&#181;', 'µ');
             }
