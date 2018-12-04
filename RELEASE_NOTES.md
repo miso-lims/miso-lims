@@ -1,3 +1,19 @@
+# 0.2.156
+
+Changes:
+
+ * updated to use Run Scanner v1.2.1
+ * renamed 'platform' to 'instrument model'
+ * fixed unneccessary reordering of external names
+ * removed instrument IP address field
+ * fixed missing platform tabs on list pages
+ * set partition loading concentration default units to nM
+ * added distribution info to Pinery
+ * added Sequencing Containers section to user manual
+ * added Instruments section to user manual
+ * fixed error with saving new runs from runscanner
+ * added Sample & Library distribution fields
+
 # 0.2.155
 
 Changes:

@@ -1,3 +1,21 @@
+-- distribution
+
+ALTER TABLE Sample ADD COLUMN distributed BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE Sample ADD COLUMN distributionDate DATE DEFAULT NULL;
+ALTER TABLE Sample ADD COLUMN distributionRecipient VARCHAR(250) DEFAULT NULL;
+
+ALTER TABLE Library ADD COLUMN distributed BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE Library ADD COLUMN distributionDate DATE DEFAULT NULL;
+ALTER TABLE Library ADD COLUMN distributionRecipient VARCHAR(250) DEFAULT NULL;
+
+
+-- remove_instrument_ip
+
+ALTER TABLE Instrument DROP COLUMN ip;
+
+
+-- rename_platform
+
 ALTER TABLE Platform RENAME TO InstrumentModel;
 
 ALTER TABLE InstrumentModel CHANGE COLUMN platformId instrumentModelId bigint(20) NOT NULL AUTO_INCREMENT;
@@ -35,3 +53,5 @@ DROP FUNCTION IF EXISTS toIpAddressBlob;
 DROP FUNCTION IF EXISTS toHexString;
 DROP PROCEDURE IF EXISTS addPlatform;
 -- EndNoTest
+
+
