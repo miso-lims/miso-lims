@@ -9,7 +9,7 @@ DELETE FROM _Partition;
 DELETE FROM Run_SequencerPartitionContainer;
 DELETE FROM SequencerPartitionContainerChangeLog;
 DELETE FROM SequencerPartitionContainer;
-DELETE FROM SequencingContainerModel_Platform;
+DELETE FROM SequencingContainerModel_InstrumentModel;
 DELETE FROM SequencingContainerModel;
 DELETE FROM RunIllumina;
 DELETE FROM RunIonTorrent;
@@ -67,8 +67,9 @@ DELETE FROM IndexFamily;
 DELETE FROM SequencingParameters;
 DELETE FROM Instrument WHERE upgradedInstrumentId IS NOT NULL;
 DELETE FROM Instrument;
-DELETE FROM PlatformPosition;
-DELETE FROM Platform;
+DELETE FROM InstrumentPosition;
+DELETE FROM Experiment;
+DELETE FROM InstrumentModel;
 DELETE FROM StudyChangeLog;
 DELETE FROM Study;
 DELETE FROM ProjectOverview;
@@ -101,12 +102,12 @@ INSERT INTO SecurityProfile_WriteUser(SecurityProfile_profileId, writeUser_userI
 INSERT INTO SecurityProfile_ReadGroup(SecurityProfile_profileId, readGroup_groupId) VALUES (1, 1);
 INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_groupId) VALUES (1, 1);
 
-INSERT INTO Platform (platformId, name, instrumentModel, numContainers, instrumentType) VALUES
+INSERT INTO InstrumentModel (instrumentModelId, platform, alias, numContainers, instrumentType) VALUES
   (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1, 'SEQUENCER'),
   (2, 'ILLUMINA', 'Illumina MiSeq', 1, 'SEQUENCER'),
   (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER');
   
-INSERT INTO SequencingParameters (parametersId, name, platformId, readLength, paired, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
+INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, paired, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
   (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),
   (2, 'Rapid Run 2x151', 1, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN'),
   (3, '1x151', 1, 151, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V4'),
@@ -115,14 +116,14 @@ INSERT INTO SequencingParameters (parametersId, name, platformId, readLength, pa
 INSERT INTO SequencingContainerModel (sequencingContainerModelId, alias, identificationBarcode, partitionCount, platformType, fallback) VALUES
 (1, 'Generic 1-Lane Illumina Flow Cell', NULL, 1, 'ILLUMINA', 1);
 
-INSERT INTO SequencingContainerModel_Platform (sequencingContainerModelId, platformId) VALUES
+INSERT INTO SequencingContainerModel_InstrumentModel (sequencingContainerModelId, instrumentModelId) VALUES
 (1, 2);
 
-INSERT INTO Instrument (instrumentId, name, platformId, ip) VALUES
-  (1, 'T2000', 1, '127.0.0.1'),
-  (2, 'TMS1', 2, '127.0.0.1'),
-  (3, 'TPB2', 3, '127.0.0.1'),
-  (4, 'T2001', 1, '127.0.0.1');
+INSERT INTO Instrument (instrumentId, name, instrumentModelId) VALUES
+  (1, 'T2000', 1),
+  (2, 'TMS1', 2),
+  (3, 'TPB2', 3),
+  (4, 'T2001', 1);
 
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Human hg19 random');
 

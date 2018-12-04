@@ -26,6 +26,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -39,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public class HibernatePlatformDaoTest extends AbstractDAOTest {
@@ -55,7 +56,7 @@ public class HibernatePlatformDaoTest extends AbstractDAOTest {
   private SessionFactory sessionFactory;
 
   @InjectMocks
-  private HibernatePlatformDao dao;
+  private HibernateInstrumentModelDao dao;
 
   @Before
   public void setup() throws IOException {
@@ -66,7 +67,7 @@ public class HibernatePlatformDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListAll() throws IOException {
-    List<Platform> platforms = dao.listAll();
+    List<InstrumentModel> platforms = dao.listAll();
     assertTrue(platforms.size() > 0);
   }
 
@@ -83,84 +84,84 @@ public class HibernatePlatformDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListbyName() throws IOException {
-    List<Platform> platforms = dao.listByName("Illumina");
+    List<InstrumentModel> platforms = dao.listByPlatformType("Illumina");
     assertTrue(platforms.size() > 0);
   }
 
   @Test
   public void testListbyNameNone() throws IOException {
-    List<Platform> platforms = dao.listByName("Futurism");
+    List<InstrumentModel> platforms = dao.listByPlatformType("Futurism");
     assertEquals(0, platforms.size());
   }
 
   @Test
   public void testListByNameEmpty() throws IOException {
-    List<Platform> platforms = dao.listByName("");
+    List<InstrumentModel> platforms = dao.listByPlatformType("");
     assertEquals(0, platforms.size());
   }
 
   @Test
   public void testListByNameNull() throws IOException {
-    List<Platform> platforms = dao.listByName(null);
+    List<InstrumentModel> platforms = dao.listByPlatformType(null);
     assertEquals(0, platforms.size());
   }
 
   @Test
   public void testGetByModel() throws IOException {
-    Platform platform = dao.getByModel("Illumina HiSeq 2000");
+    InstrumentModel platform = dao.getByAlias("Illumina HiSeq 2000");
     assertNotNull(platform);
   }
 
   @Test
   public void testGetByModelNone() throws IOException {
-    Platform platform = dao.getByModel("Coco Rocha");
+    InstrumentModel platform = dao.getByAlias("Coco Rocha");
     assertNull(platform);
   }
 
   @Test
   public void testGetByModelEmpty() throws IOException {
-    Platform platform = dao.getByModel("");
+    InstrumentModel platform = dao.getByAlias("");
     assertNull(platform);
   }
 
   @Test
   public void testGetByModelNull() throws IOException {
-    Platform platform = dao.getByModel(null);
+    InstrumentModel platform = dao.getByAlias(null);
     assertNull(platform);
   }
 
   @Test
   public void testGet() throws IOException {
-    Platform platform = dao.get(16L);
+    InstrumentModel platform = dao.get(16L);
     assertNotNull(platform);
   }
 
   @Test
   public void testGetNone() throws IOException {
-    Platform platform = dao.get(-9999L);
+    InstrumentModel platform = dao.get(-9999L);
     assertNull(platform);
   }
 
   @Test
   public void testSaveEdit() throws IOException {
-    Platform oldPlatform = dao.get(16L);
+    InstrumentModel oldPlatform = dao.get(16L);
 
     oldPlatform.setPlatformType(oldPlatform.getPlatformType());
-    oldPlatform.setInstrumentModel("Illumina HiSeq 2500");
+    oldPlatform.setAlias("Illumina HiSeq 2500");
     oldPlatform.setDescription("4-channel flow cell");
 
     assertEquals(16L, dao.save(oldPlatform));
-    Platform savedPlatform = dao.get(16L);
+    InstrumentModel savedPlatform = dao.get(16L);
     assertNotNull(savedPlatform);
     assertEquals(oldPlatform.getId(), savedPlatform.getId());
-    assertEquals(oldPlatform.getInstrumentModel(), savedPlatform.getInstrumentModel());
+    assertEquals(oldPlatform.getAlias(), savedPlatform.getAlias());
     assertEquals(oldPlatform.getDescription(), savedPlatform.getDescription());
     assertEquals(oldPlatform.getPlatformType(), savedPlatform.getPlatformType());
   }
 
   @Test
   public void testSaveNew() throws IOException {
-    Platform newPlatform = makePlatform("PacBio", "Mystery container", 1);
+    InstrumentModel newPlatform = makePlatform("PacBio", "Mystery container", 1);
     Long newId = dao.save(newPlatform);
     assertNotNull(dao.get(newId));
 
@@ -173,11 +174,19 @@ public class HibernatePlatformDaoTest extends AbstractDAOTest {
     dao.save(null);
   }
 
-  Platform makePlatform(String instrumentModel, String description, Integer numContainers) {
-    Platform platform = new Platform();
+  InstrumentModel makePlatform(String instrumentModel, String description, Integer numContainers) {
+    InstrumentModel platform = new InstrumentModel();
     platform.setDescription(description);
-    platform.setInstrumentModel(instrumentModel);
+    platform.setAlias(instrumentModel);
     platform.setPlatformType(PlatformType.get("PacBio"));
     return platform;
+  }
+
+  @Test
+  public void testListActivePlatformTypes() throws Exception {
+    Set<PlatformType> platformTypes = dao.listActivePlatformTypes();
+    assertEquals(1, platformTypes.size());
+    assertFalse(platformTypes.contains(PlatformType.SOLID));
+    assertTrue(platformTypes.contains(PlatformType.ILLUMINA));
   }
 }

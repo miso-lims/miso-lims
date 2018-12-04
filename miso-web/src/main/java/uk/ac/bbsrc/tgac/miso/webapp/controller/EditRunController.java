@@ -59,9 +59,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -73,10 +73,10 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
-import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -112,7 +112,7 @@ public class EditRunController {
   @Autowired
   private RunService runService;
   @Autowired
-  private PlatformService platformService;
+  private InstrumentModelService platformService;
   @Autowired
   private PartitionQCService partitionQCService;
 
@@ -151,7 +151,7 @@ public class EditRunController {
   }
 
   @ModelAttribute("platforms")
-  public Collection<Platform> populatePlatforms() throws IOException {
+  public Collection<InstrumentModel> populatePlatforms() throws IOException {
     return platformService.list();
   }
 
@@ -174,7 +174,7 @@ public class EditRunController {
     // clear any existing run in the model
     model.addAttribute("run", null);
     Instrument instrument = instrumentService.get(srId);
-    Run run = instrument.getPlatform().getPlatformType().createRun(user);
+    Run run = instrument.getInstrumentModel().getPlatformType().createRun(user);
     run.setSequencer(instrument);
     return setupForm(run, model);
 
@@ -235,7 +235,7 @@ public class EditRunController {
       }
 
       model.put("sequencingParameters",
-          sequencingParametersService.getForPlatform((long) run.getSequencer().getPlatform().getId()).stream()
+          sequencingParametersService.getForInstrumentModel((long) run.getSequencer().getInstrumentModel().getId()).stream()
               .sorted()
               .collect(Collectors.toList()));
 
@@ -268,7 +268,7 @@ public class EditRunController {
       ObjectMapper mapper = new ObjectMapper();
       ObjectNode partitionConfig = mapper.createObjectNode();
       partitionConfig.put("platformType", run.getPlatformType().name());
-      partitionConfig.put("platformId", run.getSequencer().getPlatform().getId());
+      partitionConfig.put("instrumentModelId", run.getSequencer().getInstrumentModel().getId());
       partitionConfig.put("runId", run.getId());
       partitionConfig.put("isFull", run.isFull());
       partitionConfig.put("showContainer", true);
@@ -280,7 +280,7 @@ public class EditRunController {
               .collect(Collectors.toList()));
       model.put("experimentConfiguration",
           mapper.writeValueAsString(
-              new ExperimentListConfiguration(experimentService, libraryService, run.getSequencer().getPlatform(),
+              new ExperimentListConfiguration(experimentService, libraryService, run.getSequencer().getInstrumentModel(),
                   run)));
 
       return new ModelAndView("/pages/editRun.jsp", model);

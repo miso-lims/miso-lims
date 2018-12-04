@@ -64,7 +64,7 @@ public class RunD3CalendarController {
         runsArray.add(JSONObject.fromObject(
             "{'ID':'" + r.getId() + "','Name':'" + r.getName() + "','Start':'" + (r.getStartDate())
                 + "','Stop':'" + (r.getCompletionDate()) + "','Instrument':'"
-                + r.getSequencer().getId() + "','InstrumentName':'" + r.getSequencer().getPlatform().getInstrumentModel()
+                + r.getSequencer().getId() + "','InstrumentName':'" + r.getSequencer().getInstrumentModel().getAlias()
                 + "','Health':'" + (r.getHealth() != null ? r.getHealth().getKey() : "")
                 + "','Description':'" + r.getDescription() + "'}"));
       }

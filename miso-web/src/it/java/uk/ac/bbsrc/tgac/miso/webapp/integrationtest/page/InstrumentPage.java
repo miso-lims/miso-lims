@@ -15,10 +15,9 @@ public class InstrumentPage extends FormPage<InstrumentPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
     ID(By.id("instrumentId"), FieldType.LABEL), //
-    PLATFORM(By.id("platform"), FieldType.LABEL), //
+    INSTRUMENT_MODEL(By.id("instrumentModel"), FieldType.LABEL), //
     SERIAL_NUMBER(By.id("serialNumber"), FieldType.TEXT), //
     NAME(By.id("name"), FieldType.TEXT), //
-    IP_ADDRESS(By.id("ipAddress"), FieldType.TEXT), //
     COMMISSIONED(By.id("datecommissionedpicker"), FieldType.DATEPICKER), //
     DECOMMISSIONED(By.id("datedecommissionedpicker"), FieldType.DATEPICKER), //
     STATUS(By.name("status"), FieldType.RADIO), //

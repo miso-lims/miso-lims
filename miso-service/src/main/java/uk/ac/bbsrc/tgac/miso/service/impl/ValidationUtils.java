@@ -1,8 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Date;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
@@ -42,6 +45,21 @@ public class ValidationUtils {
   public static void validateVolumeUnits(Double volume, VolumeUnit units, Collection<ValidationError> errors) {
     if (volume != null && volume > 0D && units == null) {
       errors.add(new ValidationError("volumeUnits", "Volume units must be specified"));
+    }
+  }
+
+  public static void validateDistributionFields(boolean isDistributed, Date distributionDate, String distributionRecipient,
+      Collection<ValidationError> errors) {
+    if (isDistributed) {
+      if (distributionDate == null)
+        errors.add(new ValidationError("distributionDate", "Distribution date must be recorded for distributed item"));
+      if (isStringEmptyOrNull(distributionRecipient))
+        errors.add(new ValidationError("distributionRecipient", "Distribution recipient must be recorded for distributed item"));
+    } else {
+      if (distributionDate != null)
+        errors.add(new ValidationError("distributionDate", "Distribution date should be empty since item is not distributed"));
+      if (distributionRecipient != null)
+        errors.add(new ValidationError("distributionRecipient", "Distribution recipient should be empty since item is not distributed"));
     }
   }
 

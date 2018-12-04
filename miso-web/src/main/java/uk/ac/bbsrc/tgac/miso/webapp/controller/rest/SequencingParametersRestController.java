@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
-import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 
 @Controller
@@ -35,7 +35,7 @@ public class SequencingParametersRestController extends RestController {
   @Autowired
   private SequencingParametersService sequencingParametersService;
   @Autowired
-  private PlatformService platformService;
+  private InstrumentModelService platformService;
 
   @GetMapping(value = "/sequencingparameters/{id}", produces = { "application/json" })
   @ResponseBody
@@ -66,13 +66,13 @@ public class SequencingParametersRestController extends RestController {
   public SequencingParametersDto createSequencingParameters(@RequestBody SequencingParametersDto sequencingParamtersDto,
       UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
-    Platform platform = platformService.get(sequencingParamtersDto.getPlatform().getId());
+    InstrumentModel platform = platformService.get(sequencingParamtersDto.getInstrumentModel().getId());
     if (platform == null) {
-      throw new RestException("No platform found with ID: " + sequencingParamtersDto.getPlatform().getId(), Status.BAD_REQUEST);
+      throw new RestException("No platform found with ID: " + sequencingParamtersDto.getInstrumentModel().getId(), Status.BAD_REQUEST);
     }
     SequencingParameters sp = new SequencingParameters();
     sp.setName(sequencingParamtersDto.getName());
-    sp.setPlatform(platform);
+    sp.setInstrumentModel(platform);
     Long id = sequencingParametersService.create(sp);
     return Dtos.asDto(sequencingParametersService.get(id));
   }

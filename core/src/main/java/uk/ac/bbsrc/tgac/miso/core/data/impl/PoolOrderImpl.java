@@ -97,7 +97,7 @@ public class PoolOrderImpl implements PoolOrder, Serializable {
   }
 
   @Override
-  public void setSequencingParameter(SequencingParameters parameters) {
+  public void setSequencingParameters(SequencingParameters parameters) {
     this.parameters = parameters;
   }
 

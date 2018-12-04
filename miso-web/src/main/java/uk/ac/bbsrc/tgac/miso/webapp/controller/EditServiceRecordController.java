@@ -51,7 +51,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
-import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
@@ -162,13 +162,13 @@ public class EditServiceRecordController {
   public void initBinder(WebDataBinder binder) {
     binder.registerCustomEditor(Date.class, "startTime", timestampEditor);
     binder.registerCustomEditor(Date.class, "endTime", timestampEditor);
-    binder.registerCustomEditor(PlatformPosition.class, new PropertyEditorSupport() {
+    binder.registerCustomEditor(InstrumentPosition.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) {
         if (LimsUtils.isStringEmptyOrNull(text)) {
           setValue(null);
         } else {
-          PlatformPosition pos = new PlatformPosition();
+          InstrumentPosition pos = new InstrumentPosition();
           pos.setId(Long.valueOf(text));
           setValue(pos);
         }

@@ -30,7 +30,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractInstrument;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 
 @Entity
 @Table(name = "Instrument")
@@ -38,10 +38,9 @@ public class InstrumentImpl extends AbstractInstrument implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  public InstrumentImpl(String name, String ip, Platform platform) {
+  public InstrumentImpl(String name, InstrumentModel instrumentModel) {
     setName(name);
-    setIpAddress(ip);
-    setPlatform(platform);
+    setInstrumentModel(instrumentModel);
   }
 
   /**
@@ -50,8 +49,7 @@ public class InstrumentImpl extends AbstractInstrument implements Serializable {
    * @throws IOException
    */
   public InstrumentImpl() {
-    setPlatform(null);
+    setInstrumentModel(null);
     setName(null);
-    setIpAddress(null);
   }
 }

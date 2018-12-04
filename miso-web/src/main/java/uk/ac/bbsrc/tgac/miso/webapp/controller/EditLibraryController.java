@@ -129,7 +129,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryTemplateService;
-import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
@@ -173,6 +173,7 @@ public class EditLibraryController {
     private static final String IS_LIBRARY_RECEIPT = "isLibraryReceipt";
     private static final String DEFAULT_SCI_NAME = "defaultSciName";
     private static final String PROPAGATE = "propagate";
+    private static final String EDIT = "edit";
     private static final String SHOW_LIBRARY_ALIAS = "showLibraryAlias";
     private static final String SHOW_DESCRIPTION = "showDescription";
     private static final String SHOW_VOLUME = "showVolume";
@@ -204,7 +205,7 @@ public class EditLibraryController {
   @Autowired
   private RunService runService;
   @Autowired
-  private PlatformService platformService;
+  private InstrumentModelService platformService;
   @Autowired
   private PoolService poolService;
   @Autowired
@@ -670,6 +671,7 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.put(Config.SORTABLE_LOCATION, true);
+      config.put(Config.EDIT, true);
       writeLibraryConfiguration(config);
     }
   };
@@ -767,6 +769,7 @@ public class EditLibraryController {
         config.put(Config.SORT, sort);
       }
       config.putPOJO(Config.BOX, newBox);
+      config.put(Config.PROPAGATE, true);
     }
 
     public ModelAndView propagate(String idString, String replicates, String sort, ModelMap model) throws IOException {
@@ -781,7 +784,6 @@ public class EditLibraryController {
     config.put(Config.SHOW_VOLUME, showVolume);
     config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
     config.put(Config.SORTABLE_LOCATION, true);
-    config.put(Config.PROPAGATE, true);
   }
 
   @GetMapping(value = "/bulk/propagate")

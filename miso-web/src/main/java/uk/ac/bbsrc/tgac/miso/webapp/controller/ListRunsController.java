@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 @Controller
@@ -40,11 +40,11 @@ public class ListRunsController {
   protected static final Logger log = LoggerFactory.getLogger(ListRunsController.class);
 
   @Autowired
-  private InstrumentService sequencerService;
+  private InstrumentModelService instrumentModelService;
 
   @RequestMapping("/runs")
   public ModelAndView listRuns(ModelMap model) throws Exception {
-    return TabbedListItemsPage.createForPlatformType("run", sequencerService).list(model);
+    return TabbedListItemsPage.createForPlatformType("run", instrumentModelService).list(model);
   }
 
   @ModelAttribute("title")

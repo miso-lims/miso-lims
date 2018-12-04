@@ -9,7 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition.RunPositionId;
@@ -82,7 +82,7 @@ public class RunPosition implements Serializable {
 
   @ManyToOne
   @JoinColumn(name = "positionId")
-  private PlatformPosition position;
+  private InstrumentPosition position;
 
   public Run getRun() {
     return run;
@@ -100,11 +100,11 @@ public class RunPosition implements Serializable {
     this.container = container;
   }
 
-  public PlatformPosition getPosition() {
+  public InstrumentPosition getPosition() {
     return position;
   }
 
-  public void setPosition(PlatformPosition position) {
+  public void setPosition(InstrumentPosition position) {
     this.position = position;
   }
 

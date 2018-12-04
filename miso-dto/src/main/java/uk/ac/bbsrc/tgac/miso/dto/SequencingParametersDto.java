@@ -3,7 +3,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 public class SequencingParametersDto {
   private Long id;
   private String name;
-  private PlatformDto platform;
+  private InstrumentModelDto instrumentModel;
   private Long createdById;
   private String createdByUrl;
   private String creationDate;
@@ -28,12 +28,12 @@ public class SequencingParametersDto {
     this.name = name;
   }
 
-  public PlatformDto getPlatform() {
-    return platform;
+  public InstrumentModelDto getInstrumentModel() {
+    return instrumentModel;
   }
 
-  public void setPlatform(PlatformDto platform) {
-    this.platform = platform;
+  public void setInstrumentModel(InstrumentModelDto instrumentModel) {
+    this.instrumentModel = instrumentModel;
   }
 
   public Long getCreatedById() {

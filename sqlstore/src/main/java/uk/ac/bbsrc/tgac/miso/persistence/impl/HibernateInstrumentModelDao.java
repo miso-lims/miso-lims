@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -35,13 +36,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
+import com.google.common.collect.Sets;
+
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
+import uk.ac.bbsrc.tgac.miso.core.store.InstrumentModelStore;
 
 /**
  * uk.ac.bbsrc.tgac.miso.hibernate.persistence.impl
@@ -52,9 +56,9 @@ import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernatePlatformDao implements PlatformStore {
+public class HibernateInstrumentModelDao implements InstrumentModelStore {
 
-  protected static final Logger log = LoggerFactory.getLogger(HibernatePlatformDao.class);
+  protected static final Logger log = LoggerFactory.getLogger(HibernateInstrumentModelDao.class);
 
   @Autowired
   private JdbcTemplate template;
@@ -67,48 +71,48 @@ public class HibernatePlatformDao implements PlatformStore {
   }
 
   @Override
-  public long save(Platform platform) throws IOException {
+  public long save(InstrumentModel platform) throws IOException {
     return (long) currentSession().save(platform);
   }
 
   @Override
-  public Platform get(long id) throws IOException {
-    return (Platform) currentSession().get(Platform.class, id);
+  public InstrumentModel get(long id) throws IOException {
+    return (InstrumentModel) currentSession().get(InstrumentModel.class, id);
   }
 
   @Override
-  public List<Platform> listAll() throws IOException {
-    Criteria criteria = currentSession().createCriteria(Platform.class);
+  public List<InstrumentModel> listAll() throws IOException {
+    Criteria criteria = currentSession().createCriteria(InstrumentModel.class);
     @SuppressWarnings("unchecked")
-    List<Platform> records = criteria.list();
+    List<InstrumentModel> records = criteria.list();
     return records;
   }
 
   @Override
   public int count() throws IOException {
-    Criteria criteria = currentSession().createCriteria(Platform.class);
+    Criteria criteria = currentSession().createCriteria(InstrumentModel.class);
     return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
   }
 
   @Override
-  public Platform getByModel(String model) throws IOException {
-    Criteria criteria = currentSession().createCriteria(Platform.class);
-    criteria.add(Restrictions.eq("instrumentModel", model));
-    return (Platform) criteria.uniqueResult();
+  public InstrumentModel getByAlias(String alias) throws IOException {
+    Criteria criteria = currentSession().createCriteria(InstrumentModel.class);
+    criteria.add(Restrictions.eq("alias", alias));
+    return (InstrumentModel) criteria.uniqueResult();
   }
 
   @Override
-  public List<Platform> listByName(String name) throws IOException {
-    Criteria criteria = currentSession().createCriteria(Platform.class);
-    criteria.add(Restrictions.eq("platformType", PlatformType.get(name)));
+  public List<InstrumentModel> listByPlatformType(String platformType) throws IOException {
+    Criteria criteria = currentSession().createCriteria(InstrumentModel.class);
+    criteria.add(Restrictions.eq("platformType", PlatformType.get(platformType)));
     @SuppressWarnings("unchecked")
-    List<Platform> records = criteria.list();
+    List<InstrumentModel> records = criteria.list();
     return records;
   }
 
   @Override
   public List<PlatformType> listDistinctPlatformNames() throws IOException {
-    Criteria criteria = currentSession().createCriteria(Platform.class);
+    Criteria criteria = currentSession().createCriteria(InstrumentModel.class);
     criteria.setProjection(Projections.distinct(Projections.property("platformType")));
     @SuppressWarnings("unchecked")
     List<PlatformType> records = criteria.list();
@@ -116,8 +120,18 @@ public class HibernatePlatformDao implements PlatformStore {
   }
 
   @Override
-  public PlatformPosition getPlatformPosition(long positionId) throws IOException {
-    return (PlatformPosition) currentSession().get(PlatformPosition.class, positionId);
+  public InstrumentPosition getInstrumentPosition(long positionId) throws IOException {
+    return (InstrumentPosition) currentSession().get(InstrumentPosition.class, positionId);
+  }
+
+  private static final RowMapper<PlatformType> platformTypeMapper = (rs, rowNum) -> {
+    String plat = rs.getString("platform");
+    return PlatformType.valueOf(plat);
+  };
+
+  @Override
+  public Set<PlatformType> listActivePlatformTypes() throws IOException {
+    return Sets.newHashSet(getJdbcTemplate().query("SELECT platform FROM ActivePlatformTypes", platformTypeMapper));
   }
 
   public JdbcTemplate getJdbcTemplate() {

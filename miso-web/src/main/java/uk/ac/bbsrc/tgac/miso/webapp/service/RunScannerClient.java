@@ -101,13 +101,13 @@ public class RunScannerClient {
           Predicate<SequencingParameters> isMatchingSequencingParameters;
           switch (dto.getPlatformType()) {
           case ILLUMINA:
-            isMatchingSequencingParameters = params -> params.getPlatform().getPlatformType() == PlatformType.ILLUMINA &&
+            isMatchingSequencingParameters = params -> params.getInstrumentModel().getPlatformType() == PlatformType.ILLUMINA &&
                 Math.abs(params.getReadLength() - ((IlluminaNotificationDto) dto).getReadLength()) < 2
                 && params.isPaired() == ((IlluminaNotificationDto) dto).isPairedEndRun()
                 && params.getChemistry() == Dtos.getMisoIlluminaChemistryFromRunscanner(((IlluminaNotificationDto) dto).getChemistry());
             break;
           default:
-            isMatchingSequencingParameters = params -> params.getPlatform()
+            isMatchingSequencingParameters = params -> params.getInstrumentModel()
                 .getPlatformType() == Dtos.getMisoPlatformTypeFromRunscanner(dto.getPlatformType());
             break;
           }

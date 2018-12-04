@@ -23,9 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,17 +41,12 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 
 @MappedSuperclass
 public abstract class AbstractInstrument implements Instrument {
 
   private static final long serialVersionUID = 1L;
-
-  private static final Logger log = LoggerFactory.getLogger(AbstractInstrument.class);
 
   public static final Long UNSAVED_ID = 0L;
 
@@ -66,11 +58,9 @@ public abstract class AbstractInstrument implements Instrument {
   @Column(nullable = false)
   private String name;
 
-  @ManyToOne(targetEntity = Platform.class)
-  @JoinColumn(name = "platformId", nullable = false)
-  private Platform platform;
-
-  private String ip;
+  @ManyToOne(targetEntity = InstrumentModel.class)
+  @JoinColumn(name = "instrumentModelId", nullable = false)
+  private InstrumentModel instrumentModel;
 
   private String serialNumber;
   @Temporal(TemporalType.DATE)
@@ -106,33 +96,13 @@ public abstract class AbstractInstrument implements Instrument {
   }
 
   @Override
-  public void setPlatform(Platform platform) {
-    this.platform = platform;
+  public void setInstrumentModel(InstrumentModel instrumentModel) {
+    this.instrumentModel = instrumentModel;
   }
 
   @Override
-  public Platform getPlatform() {
-    return this.platform;
-  }
-
-  @Override
-  public void setIpAddress(String ip) {
-    if (ip == null) {
-      this.ip = null;
-    } else {
-      try {
-        InetAddress inet = InetAddress.getByName(ip);
-        this.ip = (inet != null ? inet.getHostAddress() : null);
-      } catch (IOException e) {
-        log.error("Error getting InetAddress from given ip " + ip, e);
-        throw new IllegalArgumentException("Error getting InetAddress from given ip " + ip, e);
-      }
-    }
-  }
-
-  @Override
-  public String getIpAddress() {
-    return this.ip;
+  public InstrumentModel getInstrumentModel() {
+    return this.instrumentModel;
   }
 
   @Override
@@ -176,16 +146,10 @@ public abstract class AbstractInstrument implements Instrument {
   }
 
   @Override
-  public String getFQDN() throws UnknownHostException {
-    return getIpAddress() == null ? null : InetAddress.getByName(getIpAddress()).getCanonicalHostName();
-  }
-
-  @Override
   public String toString() {
     return "AbstractInstrument [id=" + id
         + ", name=" + name
-        + ", platform=" + platform.getId()
-        + ", ip=" + ip
+        + ", instrumentModel=" + instrumentModel.getId()
         + ", serialNumber=" + serialNumber
         + ", dateCommissioned=" + dateCommissioned
         + ", dateDecommissioned=" + dateDecommissioned
@@ -243,11 +207,11 @@ public abstract class AbstractInstrument implements Instrument {
   }
 
   @Override
-  public Set<PlatformPosition> getOutOfServicePositions() {
+  public Set<InstrumentPosition> getOutOfServicePositions() {
     if (isOutOfService()) {
-      return getPlatform().getPositions();
+      return getInstrumentModel().getPositions();
     }
-    return getPlatform().getPositions().stream()
+    return getInstrumentModel().getPositions().stream()
         .filter(pos -> getServiceRecords().stream().anyMatch(sr -> sr.isOutOfService() && sr.getEndTime() == null
             && sr.getStartTime() != null && sr.getStartTime().before(new Date()) && sr.getPosition().getAlias().equals(pos.getAlias())))
         .collect(Collectors.toSet());
@@ -258,12 +222,12 @@ public abstract class AbstractInstrument implements Instrument {
     if (isOutOfService()) {
       return "All positions";
     }
-    Set<PlatformPosition> positions = getOutOfServicePositions();
+    Set<InstrumentPosition> positions = getOutOfServicePositions();
     if (positions.isEmpty()) {
       return null;
     } else {
       return "Position" + (positions.size() == 1 ? "" : "a") + " "
-          + positions.stream().map(PlatformPosition::getAlias).collect(Collectors.joining(", "));
+          + positions.stream().map(InstrumentPosition::getAlias).collect(Collectors.joining(", "));
     }
   }
 
@@ -274,10 +238,9 @@ public abstract class AbstractInstrument implements Instrument {
     result = prime * result + ((dateCommissioned == null) ? 0 : dateCommissioned.hashCode());
     result = prime * result + ((dateDecommissioned == null) ? 0 : dateDecommissioned.hashCode());
     result = prime * result + (int) (id ^ (id >>> 32));
-    result = prime * result + ((ip == null) ? 0 : ip.hashCode());
     result = prime * result + ((lastServicedDate == null) ? 0 : lastServicedDate.hashCode());
     result = prime * result + ((name == null) ? 0 : name.hashCode());
-    result = prime * result + ((platform == null) ? 0 : platform.hashCode());
+    result = prime * result + ((instrumentModel == null) ? 0 : instrumentModel.hashCode());
     result = prime * result + ((runs == null) ? 0 : runs.hashCode());
     result = prime * result + ((serialNumber == null) ? 0 : serialNumber.hashCode());
     result = prime * result + ((serviceRecords == null) ? 0 : serviceRecords.hashCode());
@@ -298,18 +261,15 @@ public abstract class AbstractInstrument implements Instrument {
       if (other.dateDecommissioned != null) return false;
     } else if (!dateDecommissioned.equals(other.dateDecommissioned)) return false;
     if (id != other.id) return false;
-    if (ip == null) {
-      if (other.ip != null) return false;
-    } else if (!ip.equals(other.ip)) return false;
     if (lastServicedDate == null) {
       if (other.lastServicedDate != null) return false;
     } else if (!lastServicedDate.equals(other.lastServicedDate)) return false;
     if (name == null) {
       if (other.name != null) return false;
     } else if (!name.equals(other.name)) return false;
-    if (platform == null) {
-      if (other.platform != null) return false;
-    } else if (!platform.equals(other.platform)) return false;
+    if (instrumentModel == null) {
+      if (other.instrumentModel != null) return false;
+    } else if (!instrumentModel.equals(other.instrumentModel)) return false;
     if (runs == null) {
       if (other.runs != null) return false;
     } else if (!runs.equals(other.runs)) return false;

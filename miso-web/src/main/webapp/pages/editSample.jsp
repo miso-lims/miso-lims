@@ -259,6 +259,10 @@
     </c:otherwise>
     </c:choose>
     <tr>
+      <td><label for="discarded">Discarded:</label></td>
+      <td><form:checkbox id="discarded" path="discarded"/></td>
+    </tr>
+    <tr>
       <td>Volume:</td>
       <td><form:input id="volume" path="volume"/></td>
     </tr>
@@ -287,8 +291,23 @@
       </form:select></td>
     </tr>
     <tr>
-      <td><label for="discarded">Discarded:</label></td>
-      <td><form:checkbox id="discarded" path="discarded"/></td>
+      <td><label for="distributed">Distributed:</label></td>
+      <td><form:checkbox id="distributed" path="distributed" onchange="Sample.ui.distributionChanged()" /></td>
+    </tr>
+    <tr>
+      <td><label for="distributionDate">Distribution Date:</label></td>
+      <td>
+        <form:input path="distributionDate" id="distributionDatePicker" placeholder="YYYY-MM-DD"/>
+      </td>
+    </tr>
+    <tr>
+      <td><label for="distributionRecipient">Distribution Recipient:</label></td>
+      <td><form:input id="distributionRecipient" path="distributionRecipient"/>
+        <script type="text/javascript">
+          Sample.ui.distributionChanged();
+          Utils.ui.addDatePicker("distributionDatePicker");
+        </script>
+      </td>
     </tr>
     <tr>
       <td class="h"><label for="locationBarcode">Location:</label></td>

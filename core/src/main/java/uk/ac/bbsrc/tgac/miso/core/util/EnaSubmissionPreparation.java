@@ -234,13 +234,13 @@ public class EnaSubmissionPreparation {
 
       xmlDesign.appendChild(libraryDescriptor);
 
-      if (experiment.getPlatform() != null && experiment.getPlatform().getPlatformType().getSraName() != null) {
+      if (experiment.getInstrumentModel() != null && experiment.getInstrumentModel().getPlatformType().getSraName() != null) {
         Element platform = xml.getOwnerDocument().createElementNS(null, "PLATFORM");
-        Element type = xml.getOwnerDocument().createElementNS(null, experiment.getPlatform().getPlatformType().getSraName());
+        Element type = xml.getOwnerDocument().createElementNS(null, experiment.getInstrumentModel().getPlatformType().getSraName());
         platform.appendChild(type);
 
         Element model = xml.getOwnerDocument().createElementNS(null, "INSTRUMENT_MODEL");
-        model.setTextContent(experiment.getPlatform().getInstrumentModel());
+        model.setTextContent(experiment.getInstrumentModel().getAlias());
         type.appendChild(model);
         xml.appendChild(platform);
       }

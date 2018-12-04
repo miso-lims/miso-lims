@@ -65,7 +65,7 @@ ListTarget.partition = {
           return order.remaining > 0;
         }).map(
             function(order) {
-              return order.parameters.platform.instrumentModel + " " + order.parameters.name + ": " + order.remaining + " "
+              return order.parameters.instrumentModel.alias + " " + order.parameters.name + ": " + order.remaining + " "
                   + (order.remaining == 1 ? platformType.partitionName : platformType.pluralPartitionName) + " remaining";
             });
 
@@ -164,6 +164,7 @@ ListTarget.partition = {
             label: 'Units',
             property: 'loadingConcentrationUnits',
             type: 'select',
+            value: 'nM',
             values: Constants.concentrationUnits,
             getLabel: function(concentrationUnit) {
               return concentrationUnit.units.replace('&#181;', 'µ');

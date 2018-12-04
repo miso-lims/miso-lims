@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
-import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Set;
 
@@ -32,23 +31,13 @@ public interface Instrument extends Nameable, Serializable {
 
   public void setName(String name);
 
-  public void setPlatform(Platform platform);
+  public void setInstrumentModel(InstrumentModel instrumentModel);
 
-  public Platform getPlatform();
+  public InstrumentModel getInstrumentModel();
   
   public void setSerialNumber(String serialNumber);
   
   public String getSerialNumber();
-
-  public void setIpAddress(String ip);
-
-  public String getIpAddress();
-
-  /**
-   * @return instrument's fully qualified domain name
-   * @throws UnknownHostException
-   */
-  public String getFQDN() throws UnknownHostException;
 
   /**
    * Sets the date when use of this instrument began
@@ -111,7 +100,7 @@ public interface Instrument extends Nameable, Serializable {
 
   public boolean isOutOfService();
 
-  public Set<PlatformPosition> getOutOfServicePositions();
+  public Set<InstrumentPosition> getOutOfServicePositions();
 
   public String getOutOfServicePositionsLabel();
 

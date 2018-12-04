@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
-import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ServiceRecordStore;
@@ -94,8 +94,8 @@ public class DefaultServiceRecordService implements ServiceRecordService {
     }
   }
 
-  private PlatformPosition findPosition(long id, Instrument instrument) {
-    return instrument.getPlatform().getPositions().stream()
+  private InstrumentPosition findPosition(long id, Instrument instrument) {
+    return instrument.getInstrumentModel().getPositions().stream()
         .filter(p -> p.getId() == id)
         .findFirst().orElse(null);
   }

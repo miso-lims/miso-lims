@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pair;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -15,8 +15,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto.RunPartitionDto;
+import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
-import uk.ac.bbsrc.tgac.miso.dto.PlatformDto;
 import uk.ac.bbsrc.tgac.miso.dto.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.StudyDto;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
@@ -69,9 +69,10 @@ public class ExperimentListConfiguration {
   private final List<StudiesForExperiment> studiesForExperiment;
   private final long runId;
 
-  public ExperimentListConfiguration(ExperimentService experimentService, LibraryService libraryService, Platform platform, Run run) {
+  public ExperimentListConfiguration(ExperimentService experimentService, LibraryService libraryService, InstrumentModel instrumentModel,
+      Run run) {
     runId = run.getId();
-    PlatformDto platformDto = Dtos.asDto(platform);
+    InstrumentModelDto instrumentModelDto = Dtos.asDto(instrumentModel);
     RunDto runDto = Dtos.asDto(run);
 
     // Gather all the libraries in this run and then build a map from library to all the partitions that hold it in this run
@@ -101,7 +102,7 @@ public class ExperimentListConfiguration {
           StudiesForExperiment result = new StudiesForExperiment();
           result.experiment = new ExperimentDto();
           result.experiment.setLibrary(Dtos.asDto(group.getKey(), false));
-          result.experiment.setPlatform(platformDto);
+          result.experiment.setInstrumentModel(instrumentModelDto);
           result.experiment.setPartitions(group.getValue());
 
           result.studies = group.getKey().getSample().getProject().getStudies().stream().map(Dtos::asDto).collect(Collectors.toList());
@@ -113,7 +114,7 @@ public class ExperimentListConfiguration {
     addToExperiment = libraryGroups.entrySet().stream()
         .<AddRequest> flatMap(WhineyFunction.rethrow(group -> //
         experimentService.listAllByLibraryId(group.getKey().getId()).stream()//
-            .filter(experiment -> experiment.getPlatform().getId().equals(run.getSequencer().getPlatform().getId()))
+            .filter(experiment -> experiment.getInstrumentModel().getId().equals(run.getSequencer().getInstrumentModel().getId()))
             .flatMap(experiment -> group.getValue().stream()//
                 .filter(partition -> experiment.getRunPartitions().stream().noneMatch(rp -> rp.getPartition().equals(partition)))
                 .map(partition -> {

@@ -20,13 +20,13 @@ public class BulkOrderPage extends HeaderFooterPage {
   public static class Columns {
     public static final String NAME = "Pool Name";
     public static final String ALIAS = "Pool Alias";
-    public static final String PLATFORM = "Platform";
+    public static final String INSTRUMENT_MODEL = "Instrument Model";
     public static final String PARAMETERS = "Sequencing Parameters";
     public static final String PARTITIONS = "Partitions";
     public static final String DESCRIPTION = "Description";
 
     public static List<String> all() {
-      return Lists.newArrayList(NAME, ALIAS, PLATFORM, PARAMETERS, PARTITIONS, DESCRIPTION);
+      return Lists.newArrayList(NAME, ALIAS, INSTRUMENT_MODEL, PARAMETERS, PARTITIONS, DESCRIPTION);
     }
 
     private Columns() {

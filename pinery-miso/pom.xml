@@ -191,7 +191,12 @@
                       <port>mysql.port:3306</port>
                     </ports>
                     <wait>
-                      <time>10000</time>
+                      <tcp>
+                        <ports>
+                          <port>3306</port>
+                        </ports>
+                      </tcp>
+                      <time>30000</time>
                     </wait>
                   </run>
                 </image>

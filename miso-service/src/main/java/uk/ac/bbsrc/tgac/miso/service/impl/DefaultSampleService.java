@@ -305,9 +305,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
    * @throws IOException
    */
   private Sample save(Sample sample, boolean validateAliasUniqueness) throws IOException {
-    if (sample.isDiscarded()) {
-      sample.setVolume(0.0);
-    }
     if (sample instanceof DetailedSample && ((DetailedSample) sample).getDetailedQcStatus() != null) {
       ((DetailedSample) sample).setQcPassed(((DetailedSample) sample).getDetailedQcStatus().getStatus());
     }
@@ -414,20 +411,17 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     Set<String> identityExternalNames = SampleIdentityImpl.getSetFromString(identity.getExternalName());
     Set<String> tempExternalNames = SampleIdentityImpl.getSetFromString(identityCopy.getExternalName());
     Set<String> lowerCaseIdentityExternalNames = identityExternalNames.stream().map(String::toLowerCase).collect(Collectors.toSet());
-    tempExternalNames.stream().forEach(name -> {
-      try {
-        if (!lowerCaseIdentityExternalNames.contains(name.toLowerCase()) && !(isUniqueExternalNameWithinProjectRequired() &&
-            (identity.getProject() == null
-                || getIdentitiesByExternalNameOrAliasAndProject(name, identity.getProject().getId(), true).size() > 0))) {
-          identityExternalNames.add(name);
-        }
-      } catch (IOException e) {
-        log.error("Failed to retrieve all external names", e);
-      }
-    });
 
-    identity.setExternalName(String.join(",", identityExternalNames));
+    for (String name : tempExternalNames) {
+      if (!lowerCaseIdentityExternalNames.contains(name.toLowerCase()) && !(isUniqueExternalNameWithinProjectRequired() &&
+          (identity.getProject() == null
+              || getIdentitiesByExternalNameOrAliasAndProject(name, identity.getProject().getId(), true).size() > 0))) {
+        identityExternalNames.add(name);
+      }
+    }
+
     if (identityExternalNames.size() > lowerCaseIdentityExternalNames.size()) {
+      identity.setExternalName(String.join(",", identityExternalNames));
       identity.setChangeDetails(authorizationManager.getCurrentUser());
       sampleStore.update(identity);
     }
@@ -677,12 +671,12 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   @Override
   public void update(Sample sample) throws IOException {
     Sample managed = get(sample.getId());
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
     boolean validateAliasUniqueness = !managed.getAlias().equals(sample.getAlias());
     authorizationManager.throwIfNotWritable(managed);
     boxService.throwIfBoxPositionIsFilled(sample);
     validateChange(sample, managed);
     applyChanges(managed, sample);
-    managed.setChangeDetails(authorizationManager.getCurrentUser());
     loadChildEntities(managed);
     if (isDetailedSample(managed)) {
       DetailedSample detailedUpdated = (DetailedSample) managed;
@@ -702,6 +696,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     validateConcentrationUnits(sample.getConcentration(), sample.getConcentrationUnits(), errors);
     validateVolumeUnits(sample.getVolume(), sample.getVolumeUnits(), errors);
     validateBarcodeUniqueness(sample, beforeChange, sampleStore::getByBarcode, errors, "sample");
+    validateDistributionFields(sample.isDistributed(), sample.getDistributionDate(), sample.getDistributionRecipient(), errors);
 
     if (taxonLookupEnabled && (beforeChange == null || !sample.getScientificName().equals(beforeChange.getScientificName()))
         && (sample.getScientificName() == null || TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName()) == null)) {
@@ -731,12 +726,26 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     target.setAlias(source.getAlias());
     target.setDescription(source.getDescription());
     target.setDiscarded(source.isDiscarded());
-    target.setVolume(source.getVolume());
+    if (target.isDiscarded()) {
+      target.setVolume(0.0);
+    } else {
+      target.setVolume(source.getVolume());
+    }
     target.setVolumeUnits(target.getVolume() == null ? null : source.getVolumeUnits());
     target.setConcentration(source.getConcentration());
     target.setConcentrationUnits(target.getConcentration() == null ? null : source.getConcentrationUnits());
     target.setLocationBarcode(source.getLocationBarcode());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
+    target.setDistributed(source.isDistributed());
+    target.setDistributionDate(source.getDistributionDate());
+    target.setDistributionRecipient(source.getDistributionRecipient());
+    if (target.isDistributed()) {
+      target.setLocationBarcode("SENT TO: " + target.getDistributionRecipient());
+      target.setVolume(0.0);
+    } else {
+      target.setLocationBarcode(source.getLocationBarcode());
+    }
+
     if (isDetailedSample(target)) {
       DetailedSample dTarget = (DetailedSample) target;
       DetailedSample dSource = (DetailedSample) source;
@@ -750,30 +759,32 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       dTarget.setQcPassed(dSource.getQcPassed());
       dTarget.setSubproject(dSource.getSubproject());
       if (isIdentitySample(target)) {
-        SampleIdentity iTarget = (SampleIdentity) target;
-        SampleIdentity iSource = (SampleIdentity) source;
-        if (!iSource.getExternalName().equals(iTarget.getExternalName())) {
-          confirmExternalNameUniqueForProjectIfRequired(iSource.getExternalName(), iTarget);
-        }
-        iTarget.setExternalName(iSource.getExternalName());
-        iTarget.setDonorSex(iSource.getDonorSex());
-        iTarget.setConsentLevel(iSource.getConsentLevel());
-      }
-      if (isTissueSample(target)) {
+        applyIdentityChanges((SampleIdentity) target, (SampleIdentity) source);
+      } else if (isTissueSample(target)) {
         applyTissueChanges((SampleTissue) target, (SampleTissue) source);
-      }
-      if (isTissueProcessingSample(target)) {
+      } else if (isTissueProcessingSample(target)) {
         applyTissueProcessingChanges((SampleTissueProcessing) target, (SampleTissueProcessing) source);
-      }
-      if (isAliquotSample(target)) {
+      } else if (isAliquotSample(target)) {
         applyAliquotChanges((SampleAliquot) target, (SampleAliquot) source);
-      }
-      if (isStockSample(target)) {
+      } else if (isStockSample(target)) {
         applyStockChanges((SampleStock) target, (SampleStock) source);
       }
     } else {
       target.setQcPassed(source.getQcPassed());
     }
+  }
+
+  private void applyIdentityChanges(SampleIdentity target, SampleIdentity source) throws IOException {
+    if (!source.getExternalName().equals(target.getExternalName())) {
+      confirmExternalNameUniqueForProjectIfRequired(source.getExternalName(), target);
+      Set<String> sourceExternalNames = SampleIdentityImpl.getSetFromString(source.getExternalName());
+      Set<String> targetExternalNames = SampleIdentityImpl.getSetFromString(target.getExternalName());
+      if (!sourceExternalNames.containsAll(targetExternalNames) || !targetExternalNames.containsAll(sourceExternalNames)) {
+        target.setExternalName(source.getExternalName());
+      }
+    }
+    target.setDonorSex(source.getDonorSex());
+    target.setConsentLevel(source.getConsentLevel());
   }
 
   private void applyAliquotChanges(SampleAliquot target, SampleAliquot source) {

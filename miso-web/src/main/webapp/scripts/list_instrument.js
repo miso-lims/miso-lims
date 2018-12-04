@@ -48,11 +48,11 @@ ListTarget.instrument = {
           }, {
             property: "platform",
             type: "select",
-            values: Constants.platforms.sort(function(a, b) {
-              return a.platformType.localeCompare(b.platformType) || a.instrumentModel.localeCompare(b.instrumentModel);
+            values: Constants.instrumentModels.sort(function(a, b) {
+              return a.platformType.localeCompare(b.platformType) || a.alias.localeCompare(b.alias);
             }),
-            getLabel: function(platform) {
-              return platform.platformType + " - " + platform.instrumentModel;
+            getLabel: function(instrumentModel) {
+              return instrumentModel.platformType + " - " + instrumentModel.alias;
             },
             label: "Platform",
             required: true
@@ -62,11 +62,6 @@ ListTarget.instrument = {
             label: "Serial Number",
             required: true
           }, {
-            property: "ip",
-            type: "text",
-            label: "Hostname/IP Address",
-            required: true
-          }, {
             property: "dateCommissioned",
             type: "date",
             label: "Date Commissioned",
@@ -74,7 +69,6 @@ ListTarget.instrument = {
           }], function(instrument) {
             instrument.id = 0;
             Utils.ajaxWithDialog('Saving Instrument', 'POST', '/miso/rest/instrument', instrument, Utils.page.pageReload);
-
           });
 
         }
@@ -86,13 +80,13 @@ ListTarget.instrument = {
   createColumns: function(config, projectId) {
     return [ListUtils.labelHyperlinkColumn("Instrument Name", "instrument", Utils.array.getId, "name", 1, true), {
       "sTitle": "Platform",
-      "mData": "platform.platformType",
+      "mData": "instrumentModel.platformType",
       "include": true,
       "iSortPriority": 0,
       "mRender": ListUtils.render.platformType
     }, {
-      "sTitle": "Model",
-      "mData": "platform.instrumentModel",
+      "sTitle": "Instrument Model",
+      "mData": "instrumentModel.alias",
       "include": true,
       "iSortPriority": 0
     }, {

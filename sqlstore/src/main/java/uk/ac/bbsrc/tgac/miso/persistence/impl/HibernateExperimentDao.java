@@ -106,7 +106,6 @@ public class HibernateExperimentDao implements ExperimentStore {
   }
 
   @Override
-  @CoverageIgnore
   public List<Experiment> listBySearch(String query) {
     Criteria criteria = currentSession().createCriteria(Experiment.class);
     criteria.add(DbUtils.searchRestrictions(query, false, "name", "alias", "description"));

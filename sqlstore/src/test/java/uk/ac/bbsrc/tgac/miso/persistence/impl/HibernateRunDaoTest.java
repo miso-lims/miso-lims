@@ -156,18 +156,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListByPlatformId() throws IOException {
-    List<Run> runs = dao.listByPlatformId(16L);
-    assertEquals(4, runs.size());
-  }
-
-  @Test
-  public void testListByPlatformIdNone() throws IOException {
-    List<Run> runs = dao.listByPlatformId(9999L);
-    assertEquals(0, runs.size());
-  }
-
-  @Test
   public void testListByStatusCompleted() throws IOException {
     List<Run> runs = dao.listByStatus("Completed");
     assertEquals(3, runs.size());

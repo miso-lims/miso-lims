@@ -46,7 +46,7 @@ public class ExperimentDto {
 
   private List<RunPartitionDto> partitions;
 
-  private PlatformDto platform;
+  private InstrumentModelDto instrumentModel;
 
   private StudyDto study;
 
@@ -80,8 +80,8 @@ public class ExperimentDto {
     return partitions;
   }
 
-  public PlatformDto getPlatform() {
-    return platform;
+  public InstrumentModelDto getInstrumentModel() {
+    return instrumentModel;
   }
 
   public StudyDto getStudy() {
@@ -120,8 +120,8 @@ public class ExperimentDto {
     this.partitions = partitions;
   }
 
-  public void setPlatform(PlatformDto platform) {
-    this.platform = platform;
+  public void setInstrumentModel(InstrumentModelDto instrumentModel) {
+    this.instrumentModel = instrumentModel;
   }
 
   public void setStudy(StudyDto study) {

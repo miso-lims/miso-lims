@@ -149,14 +149,14 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
     return InstrumentImpl.class;
   }
 
-  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "platform.instrumentModel" };
+  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "instrumentModel.alias" };
 
   @Override
   public String[] getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("platform");
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("instrumentModel");
 
   @Override
   public Iterable<String> listAliases() {
@@ -180,7 +180,7 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
 
   @Override
   public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("platform.platformType", platformType));
+    criteria.add(Restrictions.eq("instrumentModel.platformType", platformType));
   }
 
   @Override
@@ -190,7 +190,7 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
 
   @Override
   public void restrictPaginationByInstrumentType(Criteria criteria, InstrumentType type, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("platform.instrumentType", type));
+    criteria.add(Restrictions.eq("instrumentModel.instrumentType", type));
   }
 
 }

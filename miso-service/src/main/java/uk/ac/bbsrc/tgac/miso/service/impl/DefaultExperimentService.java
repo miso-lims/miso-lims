@@ -30,7 +30,7 @@ import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
@@ -49,7 +49,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
-  private PlatformService platformService;
+  private InstrumentModelService platformService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
@@ -118,7 +118,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
       }
       if (experiment.getId() == Experiment.UNSAVED_ID) {
         experiment.setName(DbUtils.generateTemporaryName());
-        experiment.setPlatform(platformService.get(experiment.getPlatform().getId()));
+        experiment.setInstrumentModel(platformService.get(experiment.getInstrumentModel().getId()));
         experiment.setLibrary(libraryService.get(experiment.getLibrary().getId()));
         experiment.setStudy(studyService.get(experiment.getStudy().getId()));
         experiment.setChangeDetails(authorizationManager.getCurrentUser());
@@ -149,7 +149,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
       original.setAlias(experiment.getAlias());
       original.setDescription(experiment.getDescription());
       original.setName(experiment.getName());
-      original.setPlatform(platformService.get(experiment.getPlatform().getId()));
+      original.setInstrumentModel(platformService.get(experiment.getInstrumentModel().getId()));
       original.setLibrary(libraryService.get(experiment.getLibrary().getId()));
       original.setStudy(studyService.get(experiment.getStudy().getId()));
       original.setSecurityProfile(securityStore.getSecurityProfileById(experiment.getSecurityProfile().getProfileId()));
@@ -185,7 +185,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
     this.kitService = kitService;
   }
 
-  public void setPlatformService(PlatformService platformService) {
+  public void setPlatformService(InstrumentModelService platformService) {
     this.platformService = platformService;
   }
 

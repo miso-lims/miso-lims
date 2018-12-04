@@ -142,7 +142,7 @@ public class DefaultArrayRunService implements ArrayRunService {
     }
     if (arrayRun.getInstrument() == null) {
       errors.add(new ValidationError("instrument", "An instrument must be selected"));
-    } else if (arrayRun.getInstrument().getPlatform().getInstrumentType() != InstrumentType.ARRAY_SCANNER) {
+    } else if (arrayRun.getInstrument().getInstrumentModel().getInstrumentType() != InstrumentType.ARRAY_SCANNER) {
       errors.add(new ValidationError("instrument", "Instrument must be an array scanner"));
     }
 

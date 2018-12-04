@@ -56,7 +56,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
@@ -263,12 +263,12 @@ public class RunRestController extends RestController {
       throw new RestException("Multiple containers with this barcode.", Status.BAD_REQUEST);
     }
     SequencerPartitionContainer container = containers.iterator().next();
-    Platform runPlatform = run.getSequencer().getPlatform();
-    if (container.getModel().getPlatforms().stream()
+    InstrumentModel runPlatform = run.getSequencer().getInstrumentModel();
+    if (container.getModel().getInstrumentModels().stream()
         .noneMatch(platform -> platform.getId() == runPlatform.getId())) {
       throw new RestException(String.format("Container model '%s' (%s) is not compatible with %s (%s) run",
-          container.getModel().getAlias(), container.getModel().getPlatformType(), run.getSequencer().getPlatform().getInstrumentModel(),
-          run.getSequencer().getPlatform().getPlatformType()), Status.BAD_REQUEST);
+          container.getModel().getAlias(), container.getModel().getPlatformType(), run.getSequencer().getInstrumentModel().getAlias(),
+          run.getSequencer().getInstrumentModel().getPlatformType()), Status.BAD_REQUEST);
     }
     RunPosition runPos = new RunPosition();
     runPos.setRun(run);
@@ -277,7 +277,7 @@ public class RunRestController extends RestController {
       runPos.setPosition(runPlatform.getPositions().stream()
           .filter(pos -> pos.getAlias().equals(position))
           .findFirst().orElseThrow(() -> new ValidationException(
-              String.format("Platform %s does not have a position %s", runPlatform.getInstrumentModel(), position))));
+              String.format("Platform %s does not have a position %s", runPlatform.getAlias(), position))));
     }
     run.getRunPositions().add(runPos);
     runService.update(run);

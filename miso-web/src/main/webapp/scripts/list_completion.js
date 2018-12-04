@@ -76,8 +76,8 @@ ListTarget.completion = {
       "iSortPriority": 0,
       "include": !config.poolId
     }, {
-      "sTitle": "Platform",
-      "mData": "parameters.platform.instrumentModel",
+      "sTitle": "Instrument Model",
+      "mData": "parameters.instrumentModel.alias",
       "bSortable": false,
       "iSortPriority": 0,
       "include": true

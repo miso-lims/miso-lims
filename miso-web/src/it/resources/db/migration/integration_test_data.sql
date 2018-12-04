@@ -289,13 +289,13 @@ INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
   (13, 3, 'Index 01', 'AAAAAC', 1),
   (14, 3, 'Index 02', 'AAAAGT', 1);
 
-INSERT INTO Platform (platformId, name, instrumentModel, numContainers, instrumentType) VALUES
+INSERT INTO InstrumentModel (instrumentModelId, platform, alias, numContainers, instrumentType) VALUES
   (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1, 'SEQUENCER'),
   (2, 'ILLUMINA', 'Illumina MiSeq', 1, 'SEQUENCER'),
   (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER'),
   (4, 'ILLUMINA', 'Illumina iScan', 1, 'ARRAY_SCANNER');
   
-INSERT INTO SequencingParameters (parametersId, name, platformId, readLength, paired, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
+INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, paired, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
   (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),
   (2, 'Rapid Run 2x151', 1, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN'),
   (3, '1x151', 1, 151, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V4'),
@@ -322,7 +322,7 @@ INSERT INTO SequencingContainerModel (sequencingContainerModelId, alias, identif
 (18, 'Generic 15-SMRT-Cell PacBio 8Pac', NULL, 15, 'PACBIO', 1),
 (19, 'Generic 16-SMRT-Cell PacBio 8Pac', NULL, 16, 'PACBIO', 1);
 
-INSERT INTO SequencingContainerModel_Platform (platformId, sequencingContainerModelId) VALUES
+INSERT INTO SequencingContainerModel_InstrumentModel (instrumentModelId, sequencingContainerModelId) VALUES
 (1, 1),
 (1, 2),
 (2, 3),
@@ -343,19 +343,19 @@ INSERT INTO SequencingContainerModel_Platform (platformId, sequencingContainerMo
 (3, 18),
 (3, 19);
 
-INSERT INTO Instrument (instrumentId, name, platformId, ip) VALUES
-  (1, 'T2000', 1, '127.0.0.1'),
-  (2, 'TMS1', 2, '127.0.0.1'),
-  (3, 'TPB2', 3, '127.0.0.1'),
-  (4, 'iScan1', 4, NULL);
+INSERT INTO Instrument (instrumentId, name, instrumentModelId) VALUES
+  (1, 'T2000', 1),
+  (2, 'TMS1', 2),
+  (3, 'TPB2', 3),
+  (4, 'iScan1', 4);
   
-INSERT INTO Instrument (instrumentId, name, platformId, serialNumber, dateCommissioned, dateDecommissioned, upgradedInstrumentId, ip) VALUES
-  (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL, '127.0.0.1'),
-  (101, 'NewHiSeq_101', 1, '101', '2017-02-01', NULL, NULL, '127.0.0.1'),
-  (102, 'OldHiSeq_102', 1, '102', '2017-01-01', '2017-02-01', 101, '127.0.0.1'),
-  (200, 'HiSeq_200', 1, '200', '2017-01-01', NULL, NULL, '127.0.0.1'),
-  (5001, 'PacBio_SR_5001', 3, '5001', '2017-09-21', NULL, NULL, '127.0.0.1'),
-  (5002, 'HiSeq_SR_5002', 1, '5002', '2017-02-01', NULL, NULL, '127.0.0.1');
+INSERT INTO Instrument (instrumentId, name, instrumentModelId, serialNumber, dateCommissioned, dateDecommissioned, upgradedInstrumentId) VALUES
+  (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL),
+  (101, 'NewHiSeq_101', 1, '101', '2017-02-01', NULL, NULL),
+  (102, 'OldHiSeq_102', 1, '102', '2017-01-01', '2017-02-01', 101),
+  (200, 'HiSeq_200', 1, '200', '2017-01-01', NULL, NULL),
+  (5001, 'PacBio_SR_5001', 3, '5001', '2017-09-21', NULL, NULL),
+  (5002, 'HiSeq_SR_5002', 1, '5002', '2017-02-01', NULL, NULL);
 
 INSERT INTO ServiceRecord(recordId, instrumentId, title, details, servicedBy, referenceNumber, serviceDate, startTime, endTime, outOfService) VALUES
   (150, 101, 'Test 150', 'details go here', 'technician1', '12345', '2017-09-05', '2017-09-01 10:00:00', '2017-09-05 10:00:00', 0),
