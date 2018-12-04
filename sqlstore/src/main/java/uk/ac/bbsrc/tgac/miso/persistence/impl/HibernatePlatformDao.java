@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -35,8 +36,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
@@ -118,6 +122,16 @@ public class HibernatePlatformDao implements PlatformStore {
   @Override
   public PlatformPosition getPlatformPosition(long positionId) throws IOException {
     return (PlatformPosition) currentSession().get(PlatformPosition.class, positionId);
+  }
+
+  private static final RowMapper<PlatformType> platformTypeMapper = (rs, rowNum) -> {
+    String plat = rs.getString("platform");
+    return PlatformType.valueOf(plat);
+  };
+
+  @Override
+  public Set<PlatformType> listActivePlatformTypes() throws IOException {
+    return Sets.newHashSet(getJdbcTemplate().query("SELECT platform FROM ActivePlatformTypes", platformTypeMapper));
   }
 
   public JdbcTemplate getJdbcTemplate() {

@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
@@ -13,7 +14,7 @@ public interface PlatformService {
 
   Collection<Platform> list() throws IOException;
 
-  Collection<PlatformType> listActivePlatformTypes() throws IOException;
+  Set<PlatformType> listActivePlatformTypes() throws IOException;
 
   Collection<String> listDistinctPlatformTypeNames() throws IOException;
 

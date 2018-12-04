@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
@@ -69,4 +70,7 @@ public interface PlatformStore extends Store<Platform> {
   List<PlatformType> listDistinctPlatformNames() throws IOException;
 
   PlatformPosition getPlatformPosition(long positionId) throws IOException;
+
+  Set<PlatformType> listActivePlatformTypes() throws IOException;
+
 }
