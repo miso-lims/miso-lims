@@ -1,0 +1,1 @@
+ALTER TABLE Instrument DROP COLUMN ip;

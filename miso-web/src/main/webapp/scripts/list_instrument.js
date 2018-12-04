@@ -62,11 +62,6 @@ ListTarget.instrument = {
             label: "Serial Number",
             required: true
           }, {
-            property: "ip",
-            type: "text",
-            label: "Hostname/IP Address",
-            required: true
-          }, {
             property: "dateCommissioned",
             type: "date",
             label: "Date Commissioned",
@@ -74,7 +69,6 @@ ListTarget.instrument = {
           }], function(instrument) {
             instrument.id = 0;
             Utils.ajaxWithDialog('Saving Instrument', 'POST', '/miso/rest/instrument', instrument, Utils.page.pageReload);
-
           });
 
         }

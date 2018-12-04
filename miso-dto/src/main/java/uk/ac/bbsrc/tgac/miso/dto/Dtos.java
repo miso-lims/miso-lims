@@ -2122,7 +2122,6 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setDateCommissioned(formatDate(from.getDateCommissioned()));
     dto.setDateDecommissioned(formatDate(from.getDateDecommissioned()));
-    dto.setIp(from.getIpAddress());
     dto.setName(from.getName());
     dto.setPlatform(asDto(from.getPlatform()));
     dto.setSerialNumber(from.getSerialNumber());
@@ -2145,7 +2144,6 @@ public class Dtos {
     to.setId(dto.getId());
     to.setDateCommissioned(parseDate(dto.getDateCommissioned()));
     to.setDateDecommissioned(parseDate(dto.getDateDecommissioned()));
-    to.setIpAddress(dto.getIp());
     to.setName(dto.getName());
     to.setPlatform(to(dto.getPlatform()));
     to.setSerialNumber(dto.getSerialNumber());

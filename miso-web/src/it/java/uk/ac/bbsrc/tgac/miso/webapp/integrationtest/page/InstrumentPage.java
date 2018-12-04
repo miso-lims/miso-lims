@@ -18,7 +18,6 @@ public class InstrumentPage extends FormPage<InstrumentPage.Field> {
     PLATFORM(By.id("platform"), FieldType.LABEL), //
     SERIAL_NUMBER(By.id("serialNumber"), FieldType.TEXT), //
     NAME(By.id("name"), FieldType.TEXT), //
-    IP_ADDRESS(By.id("ipAddress"), FieldType.TEXT), //
     COMMISSIONED(By.id("datecommissionedpicker"), FieldType.DATEPICKER), //
     DECOMMISSIONED(By.id("datedecommissionedpicker"), FieldType.DATEPICKER), //
     STATUS(By.name("status"), FieldType.RADIO), //

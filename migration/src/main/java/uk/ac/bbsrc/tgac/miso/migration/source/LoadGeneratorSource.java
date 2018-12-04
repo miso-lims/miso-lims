@@ -473,7 +473,7 @@ public class LoadGeneratorSource implements MigrationSource {
     run.setAlias(RUN_DATE_STRING + "_LoadTest_" + runNumPadded + "_" + runBarcode);
     run.setDescription(runBarcode);
 
-    Instrument sequencer = new InstrumentImpl(null, null, null);
+    Instrument sequencer = new InstrumentImpl();
     sequencer.setId(runSequencerId);
     run.setSequencer(sequencer);
 
