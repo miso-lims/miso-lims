@@ -21,7 +21,7 @@ import org.mockito.stubbing.Answer;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -32,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -46,7 +46,7 @@ public class DefaultExperimentServiceTest {
   @Mock
   private ExperimentStore experimentStore;
   @Mock
-  private PlatformService platformService;
+  private InstrumentModelService platformService;
   @Mock
   private LibraryService libraryService;
   @Mock
@@ -68,8 +68,8 @@ public class DefaultExperimentServiceTest {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
-    experiment.setPlatform(new Platform());
-    experiment.getPlatform().setId(2L);
+    experiment.setInstrumentModel(new InstrumentModel());
+    experiment.getInstrumentModel().setId(2L);
     experiment.setLibrary(new LibraryImpl());
     experiment.getLibrary().setId(3L);
     experiment.setSecurityProfile(new SecurityProfile());
@@ -90,7 +90,7 @@ public class DefaultExperimentServiceTest {
     }).when(authorizationManager).throwIfNotWritable(any(SecurableByProfile.class));
 
     when(experimentStore.save(experiment)).thenReturn(expectedReturn);
-    when(platformService.get(experiment.getPlatform().getId())).thenReturn(experiment.getPlatform());
+    when(platformService.get(experiment.getInstrumentModel().getId())).thenReturn(experiment.getInstrumentModel());
     when(libraryService.get(experiment.getLibrary().getId())).thenReturn(experiment.getLibrary());
     when(studyService.get(experiment.getStudy().getId())).thenReturn(experiment.getStudy());
     when(securityProfileStore.get(experiment.getSecurityProfile().getProfileId())).thenReturn(experiment.getSecurityProfile());

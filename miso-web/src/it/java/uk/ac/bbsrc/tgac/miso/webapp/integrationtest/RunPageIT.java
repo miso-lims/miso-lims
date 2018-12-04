@@ -482,7 +482,7 @@ public class RunPageIT extends AbstractIT {
     assertAttribute(Field.ALIAS, expectedValues, run.getAlias());
     assertAttribute(Field.PLATFORM, expectedValues, run.getPlatformType().getKey());
     assertAttribute(Field.SEQUENCER, expectedValues,
-        run.getSequencer().getName() + " - " + run.getSequencer().getPlatform().getInstrumentModel());
+        run.getSequencer().getName() + " - " + run.getSequencer().getInstrumentModel().getAlias());
     assertAttribute(Field.SEQ_PARAMS, expectedValues, nullOrGet(run.getSequencingParameters(), SequencingParameters::getName));
     assertAttribute(Field.DESCRIPTION, expectedValues, nullOrToString(run.getDescription()));
     assertAttribute(Field.FILE_PATH, expectedValues, run.getFilePath());

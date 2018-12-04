@@ -12,7 +12,7 @@ FOR EACH ROW
       'New order: ',
       NEW.partitions,
       ' of ',
-      COALESCE((SELECT CONCAT(Platform.instrumentModel, ' ', SequencingParameters.name) FROM SequencingParameters JOIN Platform ON SequencingParameters.platformId = Platform.platformId WHERE SequencingParameters.parametersId = NEW.parametersId), 'n/a')))//
+      COALESCE((SELECT CONCAT(InstrumentModel.alias, ' ', SequencingParameters.name) FROM SequencingParameters JOIN InstrumentModel ON SequencingParameters.instrumentModelId = InstrumentModel.instrumentModelId WHERE SequencingParameters.parametersId = NEW.parametersId), 'n/a')))//
 
 DROP TRIGGER IF EXISTS PoolOrderDelete//
 CREATE TRIGGER PoolOrderDelete AFTER DELETE ON PoolOrder
@@ -25,7 +25,7 @@ FOR EACH ROW
       'Removed order: ',
       OLD.partitions,
       ' of ',
-      COALESCE((SELECT CONCAT(Platform.instrumentModel, ' ', SequencingParameters.name) FROM SequencingParameters JOIN Platform ON SequencingParameters.platformId = Platform.platformId WHERE SequencingParameters.parametersId = OLD.parametersId), 'n/a')))//
+      COALESCE((SELECT CONCAT(InstrumentModel.alias, ' ', SequencingParameters.name) FROM SequencingParameters JOIN InstrumentModel ON SequencingParameters.instrumentModelId = InstrumentModel.instrumentModelId WHERE SequencingParameters.parametersId = OLD.parametersId), 'n/a')))//
 
 DROP TRIGGER IF EXISTS PoolOrderChange//
 CREATE TRIGGER PoolOrderChange BEFORE UPDATE ON PoolOrder
@@ -40,11 +40,11 @@ FOR EACH ROW
         'Changed order: ',
         OLD.partitions,
         ' of ',
-        COALESCE((SELECT CONCAT(Platform.instrumentModel, ' ', SequencingParameters.name) FROM SequencingParameters JOIN Platform ON SequencingParameters.platformId = Platform.platformId WHERE SequencingParameters.parametersId = OLD.parametersId), 'n/a'),
+        COALESCE((SELECT CONCAT(InstrumentModel.alias, ' ', SequencingParameters.name) FROM SequencingParameters JOIN InstrumentModel ON SequencingParameters.instrumentModelId = InstrumentModel.instrumentModelId WHERE SequencingParameters.parametersId = OLD.parametersId), 'n/a'),
         ' → ',
         NEW.partitions,
         ' of ',
-        COALESCE((SELECT CONCAT(Platform.instrumentModel, ' ', SequencingParameters.name) FROM SequencingParameters JOIN Platform ON SequencingParameters.platformId = Platform.platformId WHERE SequencingParameters.parametersId = NEW.parametersId), 'n/a')));
+        COALESCE((SELECT CONCAT(InstrumentModel.alias, ' ', SequencingParameters.name) FROM SequencingParameters JOIN InstrumentModel ON SequencingParameters.instrumentModelId = InstrumentModel.instrumentModelId WHERE SequencingParameters.parametersId = NEW.parametersId), 'n/a')));
   END IF;
   END//
 

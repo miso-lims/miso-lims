@@ -153,7 +153,7 @@ public class PoolOrderRestController extends RestController {
     if (parameters == null) {
       throw new RestException("No sequencing parameters found with ID: " + poolOrderDto.getParameters(), Status.BAD_REQUEST);
     }
-    poolOrder.setSequencingParameter(parameters);
+    poolOrder.setSequencingParameters(parameters);
     poolOrderService.update(poolOrder);
   }
 

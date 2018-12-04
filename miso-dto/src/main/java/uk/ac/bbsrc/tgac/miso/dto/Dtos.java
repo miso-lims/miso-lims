@@ -53,6 +53,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
@@ -66,8 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
@@ -1154,7 +1154,7 @@ public class Dtos {
     PoolOrder to = new PoolOrderImpl();
     if (from.getId() != null) to.setId(from.getId());
     to.setPool(to(from.getPool()));
-    to.setSequencingParameter(to(from.getParameters()));
+    to.setSequencingParameters(to(from.getParameters()));
     to.setPartitions(from.getPartitions());
     to.setDescription(from.getDescription());
     return to;
@@ -1164,7 +1164,7 @@ public class Dtos {
     SequencingParametersDto dto = new SequencingParametersDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
-    dto.setPlatform(asDto(from.getPlatform()));
+    dto.setInstrumentModel(asDto(from.getInstrumentModel()));
     return dto;
   }
 
@@ -1172,8 +1172,8 @@ public class Dtos {
     SequencingParameters to = new SequencingParameters();
     to.setId(from.getId());
     to.setName(from.getName());
-    if (from.getPlatform() != null) {
-      to.setPlatform(to(from.getPlatform()));
+    if (from.getInstrumentModel() != null) {
+      to.setInstrumentModel(to(from.getInstrumentModel()));
     }
     return to;
   }
@@ -1650,7 +1650,7 @@ public class Dtos {
     }
     dto.setLastModified(formatDateTime(from.getLastModified()));
     if (from.getSequencer() != null) {
-      dto.setPlatformType(from.getSequencer().getPlatform().getPlatformType().getKey());
+      dto.setPlatformType(from.getSequencer().getInstrumentModel().getPlatformType().getKey());
     } else {
       dto.setPlatformType("");
     }
@@ -1723,7 +1723,7 @@ public class Dtos {
   public static RunPositionDto asDto(@Nonnull RunPosition from) {
     RunPositionDto dto = new RunPositionDto();
     setId(dto::setPositionId, from.getPosition());
-    setString(dto::setPositionAlias, maybeGetProperty(from.getPosition(), PlatformPosition::getAlias));
+    setString(dto::setPositionAlias, maybeGetProperty(from.getPosition(), InstrumentPosition::getAlias));
     setId(dto::setId, from.getContainer());
     setString(dto::setIdentificationBarcode, maybeGetProperty(from.getContainer(), SequencerPartitionContainer::getIdentificationBarcode));
     setObject(dto::setContainerModel, from.getContainer().getModel(), Dtos::asDto);
@@ -1737,7 +1737,7 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setPlatformType(from.getPlatformType().name());
-    dto.setPlatformIds(from.getPlatforms().stream().map(Platform::getId).collect(Collectors.toList()));
+    dto.setInstrumentModelIds(from.getInstrumentModels().stream().map(InstrumentModel::getId).collect(Collectors.toList()));
     dto.setPartitionCount(from.getPartitionCount());
     dto.setArchived(from.isArchived());
     return dto;
@@ -1827,26 +1827,26 @@ public class Dtos {
     return dto;
   }
 
-  public static PlatformDto asDto(@Nonnull Platform from) {
-    PlatformDto dto = new PlatformDto();
+  public static InstrumentModelDto asDto(@Nonnull InstrumentModel from) {
+    InstrumentModelDto dto = new InstrumentModelDto();
     dto.setId(from.getId());
     dto.setPlatformType(from.getPlatformType().name());
     dto.setDescription(from.getDescription());
-    dto.setInstrumentModel(from.getInstrumentModel());
+    dto.setAlias(from.getAlias());
     dto.setNumContainers(from.getNumContainers());
     dto.setInstrumentType(from.getInstrumentType().name());
     if (from.getPositions() != null) {
-      dto.setPositions(from.getPositions().stream().map(PlatformPosition::getAlias).collect(Collectors.toList()));
+      dto.setPositions(from.getPositions().stream().map(InstrumentPosition::getAlias).collect(Collectors.toList()));
     }
     return dto;
   }
 
-  public static Platform to(@Nonnull PlatformDto from) {
-    Platform to = new Platform();
+  public static InstrumentModel to(@Nonnull InstrumentModelDto from) {
+    InstrumentModel to = new InstrumentModel();
     to.setId(from.getId());
     to.setPlatformType(PlatformType.get(from.getPlatformType()));
     to.setDescription(from.getDescription());
-    to.setInstrumentModel(from.getInstrumentModel());
+    to.setAlias(from.getAlias());
     to.setNumContainers(from.getNumContainers());
     to.setInstrumentType(InstrumentType.valueOf(from.getInstrumentType()));
     return to;
@@ -2123,7 +2123,7 @@ public class Dtos {
     dto.setDateCommissioned(formatDate(from.getDateCommissioned()));
     dto.setDateDecommissioned(formatDate(from.getDateDecommissioned()));
     dto.setName(from.getName());
-    dto.setPlatform(asDto(from.getPlatform()));
+    dto.setInstrumentModel(asDto(from.getInstrumentModel()));
     dto.setSerialNumber(from.getSerialNumber());
     if (from.getDateDecommissioned() == null) {
       if (from.isOutOfService()) {
@@ -2145,7 +2145,7 @@ public class Dtos {
     to.setDateCommissioned(parseDate(dto.getDateCommissioned()));
     to.setDateDecommissioned(parseDate(dto.getDateDecommissioned()));
     to.setName(dto.getName());
-    to.setPlatform(to(dto.getPlatform()));
+    to.setInstrumentModel(to(dto.getInstrumentModel()));
     to.setSerialNumber(dto.getSerialNumber());
     return to;
   }
@@ -2234,7 +2234,7 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setName(from.getName());
-    dto.setPlatform(asDto(from.getPlatform()));
+    dto.setInstrumentModel(asDto(from.getInstrumentModel()));
     dto.setLibrary(asDto(from.getLibrary(), false));
     dto.setPartitions(from.getRunPartitions().stream()
         .map(entry -> new ExperimentDto.RunPartitionDto(asDto(entry.getRun()), asDto(entry.getPartition()))).collect(Collectors.toList()));
@@ -2269,7 +2269,7 @@ public class Dtos {
     to.setAlias(dto.getAlias());
     to.setDescription(dto.getDescription());
     to.setLibrary(to(dto.getLibrary()));
-    to.setPlatform(to(dto.getPlatform()));
+    to.setInstrumentModel(to(dto.getInstrumentModel()));
     to.setRunPartitions(dto.getPartitions().stream().map(rpDto -> {
       RunPartition rpTo = new RunPartition();
       rpTo.setExperiment(to);
@@ -2709,7 +2709,7 @@ public class Dtos {
     setString(dto::setTitle, from.getTitle());
     setString(dto::setDetails, from.getDetails());
     setString(dto::setReferenceNumber, from.getReferenceNumber());
-    setString(dto::setPosition, maybeGetProperty(from.getPosition(), PlatformPosition::getAlias));
+    setString(dto::setPosition, maybeGetProperty(from.getPosition(), InstrumentPosition::getAlias));
     dto.setAttachments(from.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList()));
     return dto;
   }

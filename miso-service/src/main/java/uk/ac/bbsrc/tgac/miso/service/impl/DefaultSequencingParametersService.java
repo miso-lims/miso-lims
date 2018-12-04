@@ -57,13 +57,13 @@ public class DefaultSequencingParametersService implements SequencingParametersS
   }
 
   @Override
-  public Collection<SequencingParameters> getForPlatform(Long platformId) throws IOException {
-    if (platformId == null) {
+  public Collection<SequencingParameters> getForInstrumentModel(Long instrumentModelId) throws IOException {
+    if (instrumentModelId == null) {
       return Collections.emptyList();
     }
     Collection<SequencingParameters> results = new ArrayList<>();
     for (SequencingParameters sp : sequencingParametersDao.getSequencingParameters()) {
-      if (sp.getPlatform().getId() == platformId) {
+      if (sp.getInstrumentModel().getId() == instrumentModelId) {
         results.add(sp);
       }
     }

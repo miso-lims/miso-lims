@@ -16,7 +16,7 @@ public interface PoolOrder extends Deletable {
 
   public SequencingParameters getSequencingParameter();
 
-  public void setSequencingParameter(SequencingParameters parameter);
+  public void setSequencingParameters(SequencingParameters parameter);
 
   public User getCreatedBy();
 

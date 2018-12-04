@@ -186,7 +186,7 @@ public abstract class Run
     this.notes.add(note);
   }
 
-  public void addSequencerPartitionContainer(SequencerPartitionContainer f, PlatformPosition position) {
+  public void addSequencerPartitionContainer(SequencerPartitionContainer f, InstrumentPosition position) {
     f.setSecurityProfile(getSecurityProfile());
     RunPosition rp = new RunPosition();
     rp.setRun(this);
@@ -392,7 +392,7 @@ public abstract class Run
   }
 
   public boolean isFull() {
-    return getRunPositions().size() >= sequencer.getPlatform().getNumContainers();
+    return getRunPositions().size() >= sequencer.getInstrumentModel().getNumContainers();
   }
 
   @Override

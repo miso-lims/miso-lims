@@ -80,7 +80,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
@@ -111,7 +111,7 @@ public class ImportExportControllerHelperService {
   @Autowired
   private LibraryService libraryService;
   @Autowired
-  private PlatformService platformService;
+  private InstrumentModelService platformService;
   @Autowired
   private PoolService poolService;
   @Autowired

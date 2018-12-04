@@ -46,16 +46,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @since 0.0.2
  */
 @Entity
-@Table(name = "Platform")
-
-public class Platform implements Comparable<Platform>, Serializable {
+@Table(name = "InstrumentModel")
+public class InstrumentModel implements Comparable<InstrumentModel>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
   public static final Long UNSAVED_ID = 0L;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "name")
+  @Column(name = "platform")
   private PlatformType platformType;
 
   @Column(nullable = true)
@@ -65,23 +64,23 @@ public class Platform implements Comparable<Platform>, Serializable {
   private InstrumentType instrumentType;
 
   @Column(nullable = false)
-  private String instrumentModel;
+  private String alias;
 
   private int numContainers;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long platformId = Platform.UNSAVED_ID;
+  private long instrumentModelId = InstrumentModel.UNSAVED_ID;
 
-  @OneToMany(mappedBy = "platform")
-  private Set<PlatformPosition> positions;
+  @OneToMany(mappedBy = "instrumentModel")
+  private Set<InstrumentPosition> positions;
 
   public Long getId() {
-    return platformId;
+    return instrumentModelId;
   }
 
-  public void setId(Long platformId) {
-    this.platformId = platformId;
+  public void setId(Long instrumentModelId) {
+    this.instrumentModelId = instrumentModelId;
   }
 
   public PlatformType getPlatformType() {
@@ -100,16 +99,16 @@ public class Platform implements Comparable<Platform>, Serializable {
     this.description = description;
   }
 
-  public String getInstrumentModel() {
-    return instrumentModel;
+  public String getAlias() {
+    return alias;
   }
 
-  public void setInstrumentModel(String instrumentModel) {
-    this.instrumentModel = instrumentModel;
+  public void setAlias(String alias) {
+    this.alias = alias;
   }
 
-  public String getNameAndModel() {
-    return platformType.getKey() + " - " + instrumentModel;
+  public String getPlatformAndAlias() {
+    return platformType.getKey() + " - " + alias;
   }
 
   public int getNumContainers() {
@@ -128,7 +127,7 @@ public class Platform implements Comparable<Platform>, Serializable {
     this.instrumentType = instrumentType;
   }
 
-  public Set<PlatformPosition> getPositions() {
+  public Set<InstrumentPosition> getPositions() {
     return positions;
   }
 
@@ -140,11 +139,11 @@ public class Platform implements Comparable<Platform>, Serializable {
   public boolean equals(Object obj) {
     if (obj == null) return false;
     if (obj == this) return true;
-    if (!(obj instanceof Platform)) return false;
-    Platform them = (Platform) obj;
+    if (!(obj instanceof InstrumentModel)) return false;
+    InstrumentModel them = (InstrumentModel) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getId() == Platform.UNSAVED_ID || them.getId() == Platform.UNSAVED_ID) {
+    if (getId() == InstrumentModel.UNSAVED_ID || them.getId() == InstrumentModel.UNSAVED_ID) {
       return getPlatformType().equals(them.getPlatformType()) && getDescription().equals(them.getDescription());
     } else {
       return getId().longValue() == them.getId().longValue();
@@ -153,7 +152,7 @@ public class Platform implements Comparable<Platform>, Serializable {
 
   @Override
   public int hashCode() {
-    if (getId() != Platform.UNSAVED_ID) {
+    if (getId() != InstrumentModel.UNSAVED_ID) {
       return getId().intValue();
     } else {
       final int PRIME = 37;
@@ -165,7 +164,7 @@ public class Platform implements Comparable<Platform>, Serializable {
   }
 
   @Override
-  public int compareTo(Platform t) {
+  public int compareTo(InstrumentModel t) {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

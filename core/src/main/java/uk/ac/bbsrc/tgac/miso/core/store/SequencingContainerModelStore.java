@@ -25,7 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.util.List;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 
 public interface SequencingContainerModelStore {
@@ -42,7 +42,7 @@ public interface SequencingContainerModelStore {
    *          the number of partitions that the model must have (required)
    * @return an appropriate model if one is found; null otherwise
    */
-  SequencingContainerModel find(Platform platform, String search, int partitionCount);
+  SequencingContainerModel find(InstrumentModel platform, String search, int partitionCount);
 
   List<SequencingContainerModel> list();
 

@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencingContainerModelStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -43,11 +43,11 @@ public class HibernateSequencingContainerModelDao implements SequencingContainer
   }
 
   @Override
-  public SequencingContainerModel find(Platform platform, String search, int partitionCount) {
+  public SequencingContainerModel find(InstrumentModel instrumentModel, String search, int partitionCount) {
     SequencingContainerModel model;
     Criteria criteria = currentSession().createCriteria(SequencingContainerModel.class);
-    criteria.createAlias("platforms", "platform");
-    criteria.add(Restrictions.eq("platform.id", platform.getId()));
+    criteria.createAlias("instrumentModels", "instrumentModel");
+    criteria.add(Restrictions.eq("instrumentModel.id", instrumentModel.getId()));
     criteria.add(Restrictions.eq("partitionCount", partitionCount));
     if (LimsUtils.isStringEmptyOrNull(search)) {
       criteria.add(Restrictions.eq("fallback", true));
@@ -58,8 +58,8 @@ public class HibernateSequencingContainerModelDao implements SequencingContainer
       if (model == null) {
         // remove search restriction and get fallback option if search did not retrieve anything
         Criteria fallback = currentSession().createCriteria(SequencingContainerModel.class);
-        fallback.createAlias("platforms", "platform");
-        fallback.add(Restrictions.eq("platform.id", platform.getId()));
+        fallback.createAlias("instrumentModels", "instrumentModel");
+        fallback.add(Restrictions.eq("instrumentModel.id", instrumentModel.getId()));
         fallback.add(Restrictions.eq("partitionCount", partitionCount));
         fallback.add(Restrictions.eq("fallback", true));
         model = (SequencingContainerModel) fallback.uniqueResult();

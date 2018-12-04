@@ -12,7 +12,7 @@ public class InstrumentStatus implements Serializable {
 
   private Instrument instrument;
 
-  private final Map<PlatformPosition, Run> positions = new HashMap<>();
+  private final Map<InstrumentPosition, Run> positions = new HashMap<>();
 
   public long getId() {
     return id;
@@ -26,7 +26,7 @@ public class InstrumentStatus implements Serializable {
     this.instrument = instrument;
   }
 
-  public Map<PlatformPosition, Run> getPositions() {
+  public Map<InstrumentPosition, Run> getPositions() {
     return positions;
   }
 

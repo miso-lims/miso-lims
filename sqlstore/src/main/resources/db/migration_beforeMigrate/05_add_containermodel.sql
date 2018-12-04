@@ -8,7 +8,7 @@ CREATE PROCEDURE addContainerModel(
   iBarcode varchar(255),
   iPartitionCount int(11),
   iPlatformType varchar(255),
-  iPlatformModel varchar(50)
+  iInstrumentModel varchar(50)
 ) BEGIN
   DECLARE errorMessage varchar(300);
   IF NOT EXISTS (SELECT 1 FROM Platform WHERE instrumentModel = iPlatformModel) THEN
@@ -24,10 +24,10 @@ CREATE PROCEDURE addContainerModel(
   
   INSERT INTO SequencingContainerModel (alias, identificationBarcode, partitionCount, platformType)
   VALUES (iName, iBarcode, iPartitionCount, iPlatformType);
-  INSERT INTO SequencingContainerModel_Platform (sequencingContainerModelId, platformId)
+  INSERT INTO SequencingContainerModel_InstrumentModel (sequencingContainerModelId, instrumentModelId)
   VALUES (
     (SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = iName),
-    (SELECT platformId FROM Platform WHERE instrumentModel = iPlatformModel));
+    (SELECT instrumentModelId FROM InstrumentModel WHERE alias = iInstrumentModel));
 END//
 
 DELIMITER ;

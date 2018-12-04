@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
@@ -25,7 +24,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -71,7 +70,8 @@ public class HibernateExperimentDaoTest extends AbstractDAOTest {
   public void testSave() throws IOException, MisoNamingException {
     Experiment experiment = new Experiment();
     experiment.setName("TEMPORARY_XXX");
-    experiment.setPlatform(new Platform());
+    InstrumentModel model = (InstrumentModel) sessionFactory.getCurrentSession().get(InstrumentModel.class, 16L);
+    experiment.setInstrumentModel(model);
     experiment.setStudy(new StudyImpl());
     User user = new UserImpl();
     user.setUserId(1L);
@@ -111,15 +111,6 @@ public class HibernateExperimentDaoTest extends AbstractDAOTest {
   public void testCount() throws IOException {
     int count = dao.count();
     assertEquals(32, count);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#listBySearch(java.lang.String)} .
-   */
-  @Ignore
-  @Test
-  public void testListBySearch() {
-    // This method isn't tested as I have deprecated it.
   }
 
   /**

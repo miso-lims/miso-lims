@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.PlatformPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
@@ -37,28 +37,24 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface PlatformStore extends Store<Platform> {
+public interface InstrumentModelStore extends Store<InstrumentModel> {
   /**
-   * Get a Platform given a model name
+   * Get an Instrument Model given a model alias
    * 
-   * @param model
-   *          of type String
+   * @param alias
    * @return Platform
    * @throws IOException
-   *           when
    */
-  Platform getByModel(String model) throws IOException;
+  InstrumentModel getByAlias(String alias) throws IOException;
 
   /**
-   * List all Platforms given a Platform manufacturer name
+   * List all Instrument Models given a PlatformType
    * 
-   * @param name
-   *          of type String
+   * @param platformType
    * @return List<Platform>
    * @throws IOException
-   *           when
    */
-  List<Platform> listByName(String name) throws IOException;
+  List<InstrumentModel> listByPlatformType(String platformType) throws IOException;
 
   /**
    * List all distinct Platform names
@@ -69,7 +65,7 @@ public interface PlatformStore extends Store<Platform> {
    */
   List<PlatformType> listDistinctPlatformNames() throws IOException;
 
-  PlatformPosition getPlatformPosition(long positionId) throws IOException;
+  InstrumentPosition getInstrumentPosition(long positionId) throws IOException;
 
   Set<PlatformType> listActivePlatformTypes() throws IOException;
 

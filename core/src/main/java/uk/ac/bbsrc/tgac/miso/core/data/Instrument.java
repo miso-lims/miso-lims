@@ -31,9 +31,9 @@ public interface Instrument extends Nameable, Serializable {
 
   public void setName(String name);
 
-  public void setPlatform(Platform platform);
+  public void setInstrumentModel(InstrumentModel instrumentModel);
 
-  public Platform getPlatform();
+  public InstrumentModel getInstrumentModel();
   
   public void setSerialNumber(String serialNumber);
   
@@ -100,7 +100,7 @@ public interface Instrument extends Nameable, Serializable {
 
   public boolean isOutOfService();
 
-  public Set<PlatformPosition> getOutOfServicePositions();
+  public Set<InstrumentPosition> getOutOfServicePositions();
 
   public String getOutOfServicePositionsLabel();
 

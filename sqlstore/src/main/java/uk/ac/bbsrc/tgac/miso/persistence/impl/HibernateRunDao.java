@@ -38,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<Run> {
 
   private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator",
-      "sequencer", "sequencer.platform");
+      "sequencer", "sequencer.instrumentModel");
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateRunDao.class);
 
@@ -212,16 +212,6 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public List<Run> listByPlatformId(long platformId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(Run.class, "r");
-    criteria.createAlias("r.sequencer", "sr");
-    criteria.add(Restrictions.eq("sr.platform.id", platformId));
-    @SuppressWarnings("unchecked")
-    List<Run> records = criteria.list();
-    return withWatcherGroup(records);
-  }
-
-  @Override
   public List<Run> listByStatus(String health) throws IOException {
     Criteria criteria = currentSession().createCriteria(Run.class, "r");
     criteria.add(Restrictions.eq("health", HealthType.get(health)));
@@ -326,7 +316,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public String propertyForSortColumn(String original) {
-    if ("platformType".equals(original)) return "platform.platformType";
+    if ("platformType".equals(original)) return "instrumentModel.platformType";
     if ("status".equals(original)) return "health";
     if ("endDate".equals(original)) return "completionDate";
     return original;
@@ -362,7 +352,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("platform.platformType", platformType));
+    criteria.add(Restrictions.eq("instrumentModel.platformType", platformType));
   }
 
   @Override

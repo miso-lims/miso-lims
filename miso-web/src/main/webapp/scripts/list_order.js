@@ -78,18 +78,18 @@ ListTarget.order = {
       return [{
         name: "Create",
         handler: function() {
-          Utils.showWizardDialog('Create Order', Constants.platforms.filter(function(platform) {
-            return platform.platformType == platformType.name && platform.active;
-          }).map(function(platform) {
+          Utils.showWizardDialog('Create Order', Constants.instrumentModels.filter(function(instrumentModel) {
+            return instrumentModel.platformType == platformType.name && instrumentModel.active;
+          }).map(function(instrumentModel) {
             return {
-              name: platform.instrumentModel,
+              name: instrumentModel.alias,
               handler: function() {
                 Utils.showDialog('Create Order', 'Save', [{
                   type: "select",
                   label: "Sequencing Parameters",
                   property: "parameters",
                   values: Constants.sequencingParameters.filter(function(parameters) {
-                    return parameters.platform.id == platform.id;
+                    return parameters.instrumentModel.id == instrumentModel.id;
                   }),
                   getLabel: Utils.array.getName
                 }, {
@@ -123,8 +123,8 @@ ListTarget.order = {
       return pt.name == config.platformType;
     }, Constants.platformTypes);
     return [{
-      "sTitle": "Platform",
-      "mData": "parameters.platform.instrumentModel",
+      "sTitle": "Instrument Model",
+      "mData": "parameters.instrumentModel.alias",
       "include": true,
       "iSortPriority": 1
     }, {

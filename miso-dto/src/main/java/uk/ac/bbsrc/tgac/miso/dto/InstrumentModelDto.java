@@ -2,13 +2,13 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
 
-public class PlatformDto {
+public class InstrumentModelDto {
   private boolean active;
   private String description;
 
   private long id;
 
-  private String instrumentModel;
+  private String alias;
 
   private int numContainers;
 
@@ -26,8 +26,8 @@ public class PlatformDto {
     return id;
   }
 
-  public String getInstrumentModel() {
-    return instrumentModel;
+  public String getAlias() {
+    return alias;
   }
 
 
@@ -55,8 +55,8 @@ public class PlatformDto {
     this.id = id;
   }
 
-  public void setInstrumentModel(String instrumentModel) {
-    this.instrumentModel = instrumentModel;
+  public void setAlias(String alias) {
+    this.alias = alias;
   }
 
   public void setNumContainers(int numContainers) {

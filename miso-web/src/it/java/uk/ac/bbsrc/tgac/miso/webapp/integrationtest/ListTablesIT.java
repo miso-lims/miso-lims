@@ -42,15 +42,15 @@ public class ListTablesIT extends AbstractIT {
       Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.DILUTIONS, Columns.CONCENTRATION, Columns.LOCATION, Columns.AVG_INSERT_SIZE,
       Columns.LAST_MODIFIED);
   private static final Set<String> ordersColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.ORDER_DESCRIPTION,
-		  Columns.POOL_DESCRIPTION, Columns.PLATFORM, Columns.LONGEST_INDEX, Columns.SEQUENCING_PARAMETERS, Columns.REMAINING, 
-		  Columns.LAST_MODIFIED);
+      Columns.POOL_DESCRIPTION, Columns.INSTRUMENT_MODEL, Columns.LONGEST_INDEX, Columns.SEQUENCING_PARAMETERS,
+      Columns.REMAINING, Columns.LAST_MODIFIED);
   private static final Set<String> containersColumns = Sets.newHashSet(Columns.SORT, Columns.ID, Columns.SERIAL_NUMBER,
       Columns.LAST_RUN_NAME, Columns.LAST_RUN_ALIAS, Columns.LAST_SEQUENCER, Columns.LAST_MODIFIED);
   private static final Set<String> runsColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.SEQ_PARAMS, Columns.STATUS,
       Columns.START_DATE, Columns.END_DATE, Columns.LAST_MODIFIED);
   private static final Set<String> boxesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
       Columns.STORAGE_LOCATION, Columns.LOCATION, Columns.ITEMS_CAPACITY, Columns.SIZE);
-  private static final Set<String> sequencersColumns = Sets.newHashSet(Columns.INSTRUMENT_NAME, Columns.PLATFORM, Columns.MODEL,
+  private static final Set<String> sequencersColumns = Sets.newHashSet(Columns.INSTRUMENT_NAME, Columns.PLATFORM, Columns.INSTRUMENT_MODEL,
       Columns.STATUS, Columns.SERIAL_NUMBER);
   private static final Set<String> kitsColumns = Sets.newHashSet(Columns.KIT_NAME, Columns.VERSION, Columns.MANUFACTURER,
       Columns.PART_NUMBER, Columns.STOCK_LEVEL, Columns.PLATFORM);

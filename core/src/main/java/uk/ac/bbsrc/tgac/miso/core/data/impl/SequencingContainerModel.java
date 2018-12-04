@@ -15,7 +15,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
@@ -35,10 +35,10 @@ public class SequencingContainerModel implements Serializable, Barcodable {
   private PlatformType platformType;
 
   @ManyToMany
-  @JoinTable(name = "SequencingContainerModel_Platform",
+  @JoinTable(name = "SequencingContainerModel_InstrumentModel",
       joinColumns = { @JoinColumn(name = "sequencingContainerModelId", nullable = false) },
-      inverseJoinColumns = { @JoinColumn(name = "platformId", nullable = false) })
-  private List<Platform> platforms;
+      inverseJoinColumns = { @JoinColumn(name = "instrumentModelId", nullable = false) })
+  private List<InstrumentModel> instrumentModels;
 
   private int partitionCount;
 
@@ -103,12 +103,12 @@ public class SequencingContainerModel implements Serializable, Barcodable {
     this.platformType = platformType;
   }
 
-  public List<Platform> getPlatforms() {
-    return platforms;
+  public List<InstrumentModel> getInstrumentModels() {
+    return instrumentModels;
   }
 
-  public void setPlatforms(List<Platform> platforms) {
-    this.platforms = platforms;
+  public void setInstrumentModels(List<InstrumentModel> instrumentModels) {
+    this.instrumentModels = instrumentModels;
   }
 
   public int getPartitionCount() {

@@ -86,7 +86,7 @@ public class InstrumentPositionStatus implements Serializable {
 
   @ManyToOne
   @JoinColumn(name = "positionId", nullable = true)
-  private PlatformPosition position;
+  private InstrumentPosition position;
 
   @Id
   private long positionKey;
@@ -106,11 +106,11 @@ public class InstrumentPositionStatus implements Serializable {
     this.instrument = instrument;
   }
 
-  public PlatformPosition getPosition() {
+  public InstrumentPosition getPosition() {
     return position;
   }
 
-  public void setPosition(PlatformPosition position) {
+  public void setPosition(InstrumentPosition position) {
     this.position = position;
   }
 

@@ -10,7 +10,7 @@ public class ContainerModelDto {
   private String platformType;
   private Integer partitionCount;
   private Boolean archived;
-  private List<Long> platformIds;
+  private List<Long> instrumentModelIds;
 
   public Long getId() {
     return id;
@@ -60,12 +60,12 @@ public class ContainerModelDto {
     this.archived = archived;
   }
 
-  public List<Long> getPlatformIds() {
-    return platformIds;
+  public List<Long> getInstrumentModelIds() {
+    return instrumentModelIds;
   }
 
-  public void setPlatformIds(List<Long> platformIds) {
-    this.platformIds = platformIds;
+  public void setInstrumentModelIds(List<Long> instrumentModelIds) {
+    this.instrumentModelIds = instrumentModelIds;
   }
 
 }

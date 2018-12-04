@@ -185,9 +185,9 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, N
   @Column(nullable = false)
   private String name;
 
-  @ManyToOne(targetEntity = Platform.class)
-  @JoinColumn(name = "platform_platformId")
-  private Platform platform;
+  @ManyToOne(targetEntity = InstrumentModel.class)
+  @JoinColumn(name = "instrumentModelId")
+  private InstrumentModel instrumentModel;
 
   // defines the parent run which processes this experiment
   @OneToMany(mappedBy = "experiment", cascade=CascadeType.ALL)
@@ -295,8 +295,8 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, N
     return name;
   }
 
-  public Platform getPlatform() {
-    return platform;
+  public InstrumentModel getInstrumentModel() {
+    return instrumentModel;
   }
 
   public List<RunPartition> getRunPartitions() {
@@ -359,8 +359,8 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, N
     this.name = name;
   }
 
-  public void setPlatform(Platform platform) {
-    this.platform = platform;
+  public void setInstrumentModel(InstrumentModel instrumentModel) {
+    this.instrumentModel = instrumentModel;
   }
 
   public void setRunPartitions(List<RunPartition> runPartitions) {

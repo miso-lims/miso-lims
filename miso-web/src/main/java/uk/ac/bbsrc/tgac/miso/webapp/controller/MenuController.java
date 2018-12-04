@@ -85,13 +85,14 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.PlatformDto;
+import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.service.AttachmentCategoryService;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
@@ -99,7 +100,6 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
-import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
@@ -156,7 +156,7 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private LibraryDesignCodeService libraryDesignCodeService;
   @Autowired
-  private PlatformService platformService;
+  private InstrumentModelService instrumentModelService;
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
   @Autowired
@@ -286,10 +286,10 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "libraryStrategies", libraryService.listLibraryStrategyTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "libraryDesignCodes", libraryDesignCodeService.list(), Dtos::asDto);
     Set<Long> activePlatforms = sequencerService.list().stream().filter(Instrument::isActive)
-        .map(sequencer -> sequencer.getPlatform().getId())
+        .map(sequencer -> sequencer.getInstrumentModel().getId())
         .collect(Collectors.toSet());
-    createArray(mapper, baseUri, node, "platforms", platformService.list(), platform -> {
-      PlatformDto dto = Dtos.asDto(platform);
+    createArray(mapper, baseUri, node, "instrumentModels", instrumentModelService.list(), platform -> {
+      InstrumentModelDto dto = Dtos.asDto(platform);
       dto.setActive(activePlatforms.contains(platform.getId()));
       return dto;
     });
@@ -336,7 +336,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "workflows", Arrays.asList(WorkflowName.values()), Dtos::asDto);
 
     ArrayNode platformTypes = node.putArray("platformTypes");
-    Collection<PlatformType> activePlatformTypes = platformService.listActivePlatformTypes();
+    Collection<PlatformType> activePlatformTypes = instrumentModelService.listActivePlatformTypes();
     for (PlatformType platformType : PlatformType.values()) {
       ObjectNode dto = platformTypes.addObject();
       dto.put("name", platformType.name());

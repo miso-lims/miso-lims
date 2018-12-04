@@ -13,7 +13,7 @@ public interface SequencingParametersService {
 
   Collection<SequencingParameters> getAll() throws IOException;
 
-  Collection<SequencingParameters> getForPlatform(Long platformId) throws IOException;
+  Collection<SequencingParameters> getForInstrumentModel(Long instrumentModelId) throws IOException;
 
   void update(SequencingParameters sequencingParameters) throws IOException;
 }

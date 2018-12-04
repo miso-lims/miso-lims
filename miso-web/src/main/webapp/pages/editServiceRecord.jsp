@@ -103,7 +103,7 @@
         <tr>
           <td class="h">Position Affected:</td>
           <td>
-            <miso:select id="position" path="position" items="${serviceRecord.instrument.platform.positions}" itemLabel="alias"
+            <miso:select id="position" path="position" items="${serviceRecord.instrument.instrumentModel.positions}" itemLabel="alias"
                       itemValue="id" defaultLabel="n/a" defaultValue=""/>
           </td>
         </tr>

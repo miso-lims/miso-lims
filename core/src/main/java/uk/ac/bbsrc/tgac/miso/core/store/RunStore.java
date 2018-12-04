@@ -105,15 +105,6 @@ public interface RunStore extends Store<Run>, PaginatedDataSource<Run> {
   List<Run> listByProjectId(long projectId) throws IOException;
 
   /**
-   * List all Runs carried out on a Platform given a Platform ID
-   *
-   * @param platformId of type long
-   * @return List<Run>
-   * @throws IOException when
-   */
-  List<Run> listByPlatformId(long platformId) throws IOException;
-
-  /**
    * List all Runs by their health given a HealthType
    *
    * @param health status to search for

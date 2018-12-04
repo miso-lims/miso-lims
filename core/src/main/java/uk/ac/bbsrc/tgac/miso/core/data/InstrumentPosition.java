@@ -11,7 +11,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 @Entity
-public class PlatformPosition implements Serializable, Aliasable {
+public class InstrumentPosition implements Serializable, Aliasable {
 
   private static final long serialVersionUID = 1L;
 
@@ -22,8 +22,8 @@ public class PlatformPosition implements Serializable, Aliasable {
   private long positionId = UNSAVED_ID;
 
   @ManyToOne
-  @JoinColumn(name = "platformId")
-  private Platform platform;
+  @JoinColumn(name = "instrumentModelId")
+  private InstrumentModel instrumentModel;
 
   private String alias;
 
@@ -40,12 +40,12 @@ public class PlatformPosition implements Serializable, Aliasable {
     this.positionId = id;
   }
 
-  public Platform getPlatform() {
-    return platform;
+  public InstrumentModel getInstrumentModel() {
+    return instrumentModel;
   }
 
-  public void setPlatform(Platform platform) {
-    this.platform = platform;
+  public void setInstrumentModel(InstrumentModel instrumentModel) {
+    this.instrumentModel = instrumentModel;
   }
 
   @Override
@@ -75,7 +75,7 @@ public class PlatformPosition implements Serializable, Aliasable {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((alias == null) ? 0 : alias.hashCode());
-    result = prime * result + ((platform == null) ? 0 : platform.hashCode());
+    result = prime * result + ((instrumentModel == null) ? 0 : instrumentModel.hashCode());
     result = prime * result + (int) (positionId ^ (positionId >>> 32));
     return result;
   }
@@ -85,13 +85,13 @@ public class PlatformPosition implements Serializable, Aliasable {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    PlatformPosition other = (PlatformPosition) obj;
+    InstrumentPosition other = (InstrumentPosition) obj;
     if (alias == null) {
       if (other.alias != null) return false;
     } else if (!alias.equals(other.alias)) return false;
-    if (platform == null) {
-      if (other.platform != null) return false;
-    } else if (!platform.equals(other.platform)) return false;
+    if (instrumentModel == null) {
+      if (other.instrumentModel != null) return false;
+    } else if (!instrumentModel.equals(other.instrumentModel)) return false;
     if (positionId != other.positionId) return false;
     return true;
   }
