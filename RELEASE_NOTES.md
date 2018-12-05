@@ -1,3 +1,9 @@
+# 0.2.157
+
+Changes:
+
+ * fixed error creating new runs
+
 # 0.2.156
 
 Changes:
@@ -13,6 +19,9 @@ Changes:
  * added Instruments section to user manual
  * fixed error with saving new runs from runscanner
  * added Sample & Library distribution fields
+
+Bad:
+ * Error when trying to create new runs from the Runs list page
 
 # 0.2.155
 
