@@ -81,7 +81,6 @@ import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ExternalUriBuilder;
-import uk.ac.bbsrc.tgac.miso.webapp.util.ExperimentListConfiguration;
 import uk.ac.bbsrc.tgac.miso.webapp.util.JsonArrayCollector;
 import uk.ac.bbsrc.tgac.miso.webapp.util.RunMetricsSource;
 
@@ -242,7 +241,7 @@ public class EditRunController {
       model.put("runPositions", run.getRunPositions().stream().map(Dtos::asDto).collect(Collectors.toList()));
       model.put("runPartitions", run.getSequencerPartitionContainers().stream().flatMap(container -> container.getPartitions().stream())
           .map(WhineyFunction.rethrow(partition -> {
-            PartitionDto dto = Dtos.asDto(partition);
+            PartitionDto dto = Dtos.asDto(partition, false);
             PartitionQC qc = partitionQCService.get(run, partition);
             if (qc != null) {
               dto.setQcType(qc.getType().getId());
@@ -278,10 +277,9 @@ public class EditRunController {
       model.put("experiments",
           experimentService.listAllByRunId(run.getId()).stream().map(Dtos::asDto)
               .collect(Collectors.toList()));
-      model.put("experimentConfiguration",
-          mapper.writeValueAsString(
-              new ExperimentListConfiguration(experimentService, libraryService, run.getSequencer().getInstrumentModel(),
-                  run)));
+      ObjectNode experimentConfig = mapper.createObjectNode();
+      experimentConfig.put("runId", run.getId());
+      model.put("experimentConfiguration", mapper.writeValueAsString(experimentConfig));
 
       return new ModelAndView("/pages/editRun.jsp", model);
     } catch (IOException ex) {

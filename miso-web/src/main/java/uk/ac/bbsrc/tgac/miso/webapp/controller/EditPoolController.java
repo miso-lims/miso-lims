@@ -114,7 +114,7 @@ public class EditPoolController {
   @Autowired
   private ChangeLogService changeLogService;
   @Autowired
-  private InstrumentModelService platformService;
+  private InstrumentModelService instrumentModelService;
   @Autowired
   private PoolService poolService;
   @Autowired
@@ -131,7 +131,7 @@ public class EditPoolController {
   }
 
   public void setPlatformService(InstrumentModelService platformService) {
-    this.platformService = platformService;
+    this.instrumentModelService = platformService;
   }
 
   private static class Config {
@@ -145,7 +145,7 @@ public class EditPoolController {
 
   @ModelAttribute("platformTypes")
   public Collection<String> populatePlatformTypes() throws IOException {
-    return PlatformType.platformTypeNames(platformService.listActivePlatformTypes());
+    return PlatformType.platformTypeNames(instrumentModelService.listActivePlatformTypes());
   }
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
@@ -188,7 +188,7 @@ public class EditPoolController {
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
-      model.put("platforms", getFilteredPlatforms(pool.getPlatformType()));
+      model.put("platforms", getFilteredInstrumentModels(pool.getPlatformType()));
 
       model.put("partitions", containerService.listPartitionsByPoolId(poolId).stream().map(Dtos::asDto).collect(Collectors.toList()));
       model.put("runs", poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(runService.listByPoolId(poolId)));
@@ -210,9 +210,9 @@ public class EditPoolController {
     }
   }
 
-  private Collection<InstrumentModel> getFilteredPlatforms(PlatformType platformType) throws IOException {
+  private Collection<InstrumentModel> getFilteredInstrumentModels(PlatformType platformType) throws IOException {
     List<InstrumentModel> selected = new ArrayList<>();
-    for (InstrumentModel p : platformService.list()) {
+    for (InstrumentModel p : instrumentModelService.list()) {
       if (p.getPlatformType() == platformType && !sequencingParametersService.getForInstrumentModel(p.getId()).isEmpty()) {
         selected.add(p);
       }
