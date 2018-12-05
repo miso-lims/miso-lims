@@ -49,11 +49,11 @@ ListTarget.run = {
 
             Utils.showWizardDialog("Add " + platformKey + " Run", instruments.filter(
                 function(instrument) {
-                  return instrument.platform.platformType == config.platformType && !instrument.dateDecommissioned
-                      && instrument.platform.instrumentType === 'SEQUENCER';
+                  return instrument.instrumentModel.platformType == config.platformType && !instrument.dateDecommissioned
+                      && instrument.instrumentModel.instrumentType === 'SEQUENCER';
                 }).sort(Utils.sorting.standardSort('name')).map(function(sequencer) {
               return {
-                name: sequencer.name + " (" + sequencer.platform.instrumentModel + ")",
+                name: sequencer.name + " (" + sequencer.instrumentModel.alias + ")",
                 handler: function() {
                   window.location = '/miso/run/new/' + sequencer.id;
                 }
@@ -113,15 +113,7 @@ ListTarget.run = {
         }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['runstatus'],
-      searchTerms['created'],
-      searchTerms['changed'],
-      searchTerms['creator'],
-      searchTerms['changedby'],
-      searchTerms['platform'],
-      searchTerms['index_name'],
-      searchTerms['index_seq'],
-      searchTerms['parameters']
-    ]
+    return [searchTerms['runstatus'], searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'],
+        searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['parameters']]
   }
 };
