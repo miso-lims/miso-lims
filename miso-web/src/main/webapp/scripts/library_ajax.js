@@ -357,7 +357,7 @@ Library.ui = {
       buttons: {
         "Add Note": function() {
           if (jQuery('#notetext').val().length > 0) {
-            self.addLibraryNote(libraryId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+            Utils.notes.addNote('library', libraryId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
             jQuery(this).dialog('close');
           } else {
             jQuery('#notetext').focus();
@@ -370,26 +370,9 @@ Library.ui = {
     });
   },
 
-  addLibraryNote: function(libraryId, internalOnly, text) {
-    Fluxion.doAjax('libraryControllerHelperService', 'addLibraryNote', {
-      'libraryId': libraryId,
-      'internalOnly': internalOnly,
-      'text': text,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': Utils.page.pageReload
-    });
-  },
-
   deleteLibraryNote: function(libraryId, noteId) {
     var deleteIt = function() {
-      Fluxion.doAjax('libraryControllerHelperService', 'deleteLibraryNote', {
-        'libraryId': libraryId,
-        'noteId': noteId,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': Utils.page.pageReload
-      });
+      Utils.notes.deleteNote('library', libraryId, noteId);
     }
     Utils.showConfirmDialog('Delete Note', 'Delete', ["Are you sure you want to delete this note?"], deleteIt);
   },

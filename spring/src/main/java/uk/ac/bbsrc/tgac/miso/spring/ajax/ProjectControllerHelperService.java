@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -147,46 +145,6 @@ public class ProjectControllerHelperService {
     }
 
     return JSONUtils.SimpleJSONResponse("ok");
-  }
-
-  public JSONObject addProjectOverviewNote(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    final String text = json.getString("text");
-
-    try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-      final Project project = overview.getProject();
-
-      final Note note = new Note();
-
-      note.setInternalOnly(json.getString("internalOnly").equals("on"));
-      note.setText(text);
-      note.setOwner(user);
-      note.setCreationDate(new Date());
-      overview.getNotes().add(note);
-      projectService.saveProjectOverviewNote(overview, note);
-      projectService.saveProject(project);
-    } catch (final IOException e) {
-      log.error("add project overview note", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-
-    return JSONUtils.SimpleJSONResponse("ok");
-  }
-
-  public JSONObject deleteProjectOverviewNote(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    final Long noteId = json.getLong("noteId");
-
-    try {
-      final ProjectOverview po = projectService.getProjectOverviewById(overviewId);
-      projectService.deleteProjectOverviewNote(po, noteId);
-      return JSONUtils.SimpleJSONResponse("OK");
-    } catch (final IOException e) {
-      log.error("delete project overview", e);
-      return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
-    }
   }
 
   public JSONObject unlockProjectOverview(HttpSession session, JSONObject json) {

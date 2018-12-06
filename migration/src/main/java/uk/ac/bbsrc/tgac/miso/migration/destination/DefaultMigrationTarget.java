@@ -785,7 +785,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       setPoolModifiedDetails(toPool);
       serviceManager.getPoolService().save(toPool);
       for (Note note : fromPool.getNotes()) {
-        serviceManager.getPoolService().saveNote(toPool, note);
+        serviceManager.getPoolService().addNote(toPool, note);
       }
       log.debug(String.format("Merged new pool %s with existing pool '%s'", fromPool.getAlias(), toPool.getAlias()));
     }

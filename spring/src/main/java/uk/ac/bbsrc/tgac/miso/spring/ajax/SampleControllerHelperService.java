@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
@@ -94,38 +93,6 @@ public class SampleControllerHelperService {
     } catch (Exception e) {
       log.error("Exception in validateSampleAlias", e);
       throw e;
-    }
-  }
-
-  public JSONObject addSampleNote(HttpSession session, JSONObject json) {
-    Long sampleId = json.getLong("sampleId");
-    String text = json.getString("text");
-
-    try {
-      Sample sample = sampleService.get(sampleId);
-      Note note = new Note();
-      note.setInternalOnly(json.getString("internalOnly").equals("on"));
-      note.setText(text);
-      sampleService.addNote(sample, note);
-    } catch (IOException e) {
-      log.error("add sample note", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-
-    return JSONUtils.SimpleJSONResponse("Note saved successfully");
-  }
-
-  public JSONObject deleteSampleNote(HttpSession session, JSONObject json) {
-    Long sampleId = json.getLong("sampleId");
-    Long noteId = json.getLong("noteId");
-
-    try {
-      Sample sample = sampleService.get(sampleId);
-      sampleService.deleteNote(sample, noteId);
-      return JSONUtils.SimpleJSONResponse("OK");
-    } catch (IOException e) {
-      log.error("cannot remove note", e);
-      return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
     }
   }
 

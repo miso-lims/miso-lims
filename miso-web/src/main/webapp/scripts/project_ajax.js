@@ -347,7 +347,7 @@ Project.overview = {
       buttons: {
         "Add Note": function() {
           if (jQuery('#notetext').val().length > 0) {
-            self.addProjectOverviewNote(overviewId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+            Utils.notes.addNote('projectoverview', overviewId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
             jQuery(this).dialog('close');
           } else {
             jQuery('#notetext').focus();
@@ -360,26 +360,9 @@ Project.overview = {
     });
   },
 
-  addProjectOverviewNote: function(overviewId, internalOnly, text) {
-    Fluxion.doAjax('projectControllerHelperService', 'addProjectOverviewNote', {
-      'overviewId': overviewId,
-      'internalOnly': internalOnly,
-      'text': text,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': Utils.page.pageReload
-    });
-  },
-
   deleteProjectOverviewNote: function(overviewId, noteId) {
     if (confirm("Are you sure you want to delete this note?")) {
-      Fluxion.doAjax('projectControllerHelperService', 'deleteProjectOverviewNote', {
-        'overviewId': overviewId,
-        'noteId': noteId,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': Utils.page.pageReload
-      });
+      Utils.notes.deleteNote('projectoverview', overviewId, noteId);
     }
   },
 

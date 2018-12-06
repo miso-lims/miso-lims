@@ -5,14 +5,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.Note;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface SampleService extends PaginatedDataSource<Sample>, BarcodableService<Sample>, DeleterService<Sample> {
+public interface SampleService extends PaginatedDataSource<Sample>, BarcodableService<Sample>, DeleterService<Sample>, NoteService<Sample> {
 
   @Override
   default EntityType getEntityType() {
@@ -33,10 +31,6 @@ public interface SampleService extends PaginatedDataSource<Sample>, BarcodableSe
       throws IOException;
 
   void confirmExternalNameUniqueForProjectIfRequired(String externalNames, Sample sample) throws IOException;
-
-  public void addNote(Sample sample, Note note) throws IOException;
-
-  public void deleteNote(Sample sample, Long noteId) throws IOException;
 
   Sample getByBarcode(String barcode) throws IOException;
 
