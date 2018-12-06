@@ -169,7 +169,7 @@ Run.ui = {
       buttons: {
         "Add Note": function() {
           if (jQuery('#notetext').val().length > 0) {
-            self.addRunNote(runId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+            Utils.notes.addNote('run', runId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
             jQuery(this).dialog('close');
           } else {
             jQuery('#notetext').focus();
@@ -182,26 +182,9 @@ Run.ui = {
     });
   },
 
-  addRunNote: function(runId, internalOnly, text) {
-    Fluxion.doAjax('runControllerHelperService', 'addRunNote', {
-      'runId': runId,
-      'internalOnly': internalOnly,
-      'text': text,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': Utils.page.pageReload
-    });
-  },
-
   deleteRunNote: function(runId, noteId) {
     if (confirm("Are you sure you want to delete this note?")) {
-      Fluxion.doAjax('runControllerHelperService', 'deleteRunNote', {
-        'runId': runId,
-        'noteId': noteId,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': Utils.page.pageReload
-      });
+      Utils.notes.deleteNote('run', runId, noteId);
     }
   },
 };

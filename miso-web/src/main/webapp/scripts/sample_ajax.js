@@ -563,7 +563,7 @@ Sample.ui = {
       buttons: {
         "Add Note": function() {
           if (jQuery('#notetext').val().length > 0) {
-            self.addSampleNote(sampleId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+            Utils.notes.addNote('sample', sampleId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
             jQuery(this).dialog('close');
           } else {
             jQuery('#notetext').focus();
@@ -576,26 +576,9 @@ Sample.ui = {
     });
   },
 
-  addSampleNote: function(sampleId, internalOnly, text) {
-    Fluxion.doAjax('sampleControllerHelperService', 'addSampleNote', {
-      'sampleId': sampleId,
-      'internalOnly': internalOnly,
-      'text': text,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': Utils.page.pageReload
-    });
-  },
-
   deleteSampleNote: function(sampleId, noteId) {
     if (confirm("Are you sure you want to delete this note?")) {
-      Fluxion.doAjax('sampleControllerHelperService', 'deleteSampleNote', {
-        'sampleId': sampleId,
-        'noteId': noteId,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': Utils.page.pageReload
-      });
+      Utils.notes.deleteNote('sample', sampleId, noteId);
     }
   },
 

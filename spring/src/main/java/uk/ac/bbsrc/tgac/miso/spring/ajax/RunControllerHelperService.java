@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
@@ -58,39 +57,6 @@ public class RunControllerHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RunService runService;
-
-  public JSONObject addRunNote(HttpSession session, JSONObject json) {
-    Long runId = json.getLong("runId");
-    String text = json.getString("text");
-
-    try {
-      Run run = runService.get(runId);
-      Note note = new Note();
-
-      note.setInternalOnly(json.getString("internalOnly").equals("on"));
-      note.setText(text);
-      runService.addNote(run, note);
-    } catch (IOException e) {
-      log.error("add run note", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-
-    return JSONUtils.SimpleJSONResponse("Note saved successfully");
-  }
-
-  public JSONObject deleteRunNote(HttpSession session, JSONObject json) {
-    Long runId = json.getLong("runId");
-    Long noteId = json.getLong("noteId");
-
-    try {
-      Run run = runService.get(runId);
-      runService.deleteNote(run, noteId);
-      return JSONUtils.SimpleJSONResponse("OK");
-    } catch (IOException e) {
-      log.error("delete run note", e);
-      return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
-    }
-  }
 
   public JSONObject watchRun(HttpSession session, JSONObject json) {
     Long runId = json.getLong("runId");

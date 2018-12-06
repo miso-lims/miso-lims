@@ -321,7 +321,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   }
 
   @Override
-  public void saveNote(Pool pool, Note note) throws IOException {
+  public void addNote(Pool pool, Note note) throws IOException {
     Pool managed = poolStore.get(pool.getId());
     authorizationManager.throwIfNotWritable(managed);
     note.setCreationDate(new Date());

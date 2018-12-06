@@ -1098,3 +1098,16 @@ Utils.sorting = {
         || a.alias.localeCompare(b.alias);
   }
 };
+
+Utils.notes = {
+   addNote: function(entityType, entityId, internalOnly, text) {
+        Utils.ajaxWithDialog('Adding Note', 'POST', window.location.origin + '/miso/rest/note/' + entityType + '/' + entityId, {
+            internalOnly: internalOnly == 'on',
+            text: text
+          }, Utils.page.pageReload);
+   },
+   deleteNote: function(entityType, entityId, noteId) {
+        Utils.ajaxWithDialog('Deleting Note', 'DELETE', window.location.origin + '/miso/rest/note/' + entityType + '/' + entityId + '/' + noteId, null, Utils.page.pageReload);
+   },
+
+};
