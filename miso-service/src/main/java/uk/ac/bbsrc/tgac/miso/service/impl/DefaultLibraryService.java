@@ -111,9 +111,9 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
         validateAliasOrThrow(library);
       }
       long newId = libraryDao.save(library);
-      
+
       Library managed = libraryDao.get(newId);
-      
+
       // post-save field generation
       boolean needsUpdate = false;
       if (hasTemporaryName(library)) {
@@ -280,7 +280,9 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
 
   @Override
   public Map<String, Integer> getLibraryColumnSizes() throws IOException {
-    return libraryDao.getLibraryColumnSizes();
+    return ValidationUtils.adjustNameLength(
+        ValidationUtils.adjustLength(libraryDao.getLibraryColumnSizes(), "alias", namingScheme.libraryAliasLengthAdjustment()),
+        namingScheme);
   }
 
   @Override
@@ -400,7 +402,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
    * @throws IOException
    */
   private void makeChangeLogForIndices(List<Index> originalIndices, List<Index> updatedIndices, Library target) throws IOException {
-    
+
     Set<String> original = stringifyIndices(originalIndices);
     Set<String> updated = stringifyIndices(updatedIndices);
     Set<String> added = new TreeSet<>(updated);

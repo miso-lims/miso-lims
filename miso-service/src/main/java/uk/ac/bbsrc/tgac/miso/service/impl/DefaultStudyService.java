@@ -54,7 +54,7 @@ public class DefaultStudyService implements StudyService, AuthorizedPaginatedDat
 
   @Override
   public Map<String, Integer> getColumnSizes() throws IOException {
-    return studyStore.getStudyColumnSizes();
+    return ValidationUtils.adjustNameLength(studyStore.getStudyColumnSizes(), namingScheme);
   }
 
   public ProjectStore getProjectStore() {

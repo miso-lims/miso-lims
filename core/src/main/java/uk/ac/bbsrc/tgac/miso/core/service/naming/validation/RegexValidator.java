@@ -10,8 +10,10 @@ public abstract class RegexValidator implements NameValidator {
   private String customValidationMessage = null;
   private boolean allowDuplicates = false;
   private boolean allowNulls = false;
+  private Integer validationLength;
 
-  public RegexValidator(String regex, boolean allowDuplicates, boolean allowNulls) {
+  public RegexValidator(String regex, boolean allowDuplicates, boolean allowNulls, Integer validationLength) {
+    this.validationLength = validationLength;
     this.pattern = Pattern.compile(regex);
     this.allowDuplicates = allowDuplicates;
     this.allowNulls = allowNulls;
@@ -81,5 +83,14 @@ public abstract class RegexValidator implements NameValidator {
   protected abstract boolean nullabilityOptionEnabled();
 
   protected abstract boolean enableDuplicatesOptionEnabled();
+
+  @Override
+  public Integer validationLength() {
+    return validationLength;
+  }
+
+  public void setValidationLength(Integer validationLength) {
+    this.validationLength = validationLength;
+  }
 
 }
