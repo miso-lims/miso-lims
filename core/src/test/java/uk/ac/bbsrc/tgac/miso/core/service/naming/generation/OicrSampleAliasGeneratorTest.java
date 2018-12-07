@@ -90,13 +90,13 @@ public class OicrSampleAliasGeneratorTest {
 
   @Test
   public void generateForAliquotFromAliquotTest() throws Exception {
-    assertEquals("PROJ_0001_nn_n_nn_1-1_R_12_MR_2", sut.generate(makeAliquotFromAliquot()));
+    assertEquals("PROJ_1234567_nn_n_nn_1-1_R_12_MR_2", sut.generate(makeAliquotFromAliquot()));
   }
 
   private SampleAliquot makeAliquotFromAliquot() throws Exception {
     SampleAliquot aliquot = new SampleAliquotImpl();
     SampleAliquot parent = makeAliquotFromStock();
-    parent.setAlias("PROJ_0001_nn_n_nn_1-1_R_12");
+    parent.setAlias("PROJ_1234567_nn_n_nn_1-1_R_12");
     SampleClass parentSc = new SampleClassImpl();
     parentSc.setSampleCategory(SampleAliquot.CATEGORY_NAME);
     aliquot.setParent(parent);

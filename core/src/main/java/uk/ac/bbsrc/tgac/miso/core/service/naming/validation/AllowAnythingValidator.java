@@ -38,4 +38,9 @@ public class AllowAnythingValidator implements NameValidator {
     return true;
   }
 
+  @Override
+  public Integer validationLength() {
+    return null;
+  }
+
 }

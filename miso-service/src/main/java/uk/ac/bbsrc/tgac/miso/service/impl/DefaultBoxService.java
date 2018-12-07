@@ -179,7 +179,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
 
   @Override
   public Map<String, Integer> getColumnSizes() throws IOException {
-    return boxStore.getBoxColumnSizes();
+    return ValidationUtils.adjustNameLength(boxStore.getBoxColumnSizes(), namingScheme);
   }
 
   @Override

@@ -113,4 +113,23 @@ public abstract class AbstractNamingScheme implements NamingScheme {
 
   protected abstract NameValidator getProjectShortNameValidator();
 
+  @Override
+  public Integer projectShortNameLengthAdjustment() {
+    return getProjectShortNameValidator() == null ? null : getProjectShortNameValidator().validationLength();
+  }
+
+  @Override
+  public Integer nameLengthAdjustment() {
+    return getNameValidator() == null ? null : getNameValidator().validationLength();
+  }
+
+  @Override
+  public Integer libraryAliasLengthAdjustment() {
+    return getLibraryAliasValidator() == null ? null : getLibraryAliasValidator().validationLength();
+  }
+
+  @Override
+  public Integer sampleAliasLengthAdjustment() {
+    return getSampleAliasValidator() == null ? null : getSampleAliasValidator().validationLength();
+  }
 }

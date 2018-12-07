@@ -17,12 +17,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrSampleAliasValidator;
 
 public class OicrLibraryAliasGenerator implements NameGenerator<Library> {
 
   private static final String SEPARATOR = "_";
 
-  private static final @RegEx String sampleRegex = "^([A-Z\\d]{3,5}_\\d{3,6})(_(?:[A-Z][a-z]|nn)_[A-Zn])_.*";
+  private static final @RegEx String sampleRegex = "^" + OicrSampleAliasValidator.IDENTITY_REGEX_PART + "(_(?:[A-Z][a-z]|nn)_[A-Zn])_.*";
   private static final Pattern samplePattern = Pattern.compile(sampleRegex);
 
   @Autowired
@@ -72,7 +73,7 @@ public class OicrLibraryAliasGenerator implements NameGenerator<Library> {
    */
   private String getIlluminaSampleAliasPart(DetailedLibrary library) throws MisoNamingException {
     Matcher m = getSampleAliasMatcher(library);
-    return m.group(1) + m.group(2);
+    return m.group(1) + "_" + m.group(2) + m.group(3);
   }
 
   private Matcher getSampleAliasMatcher(DetailedLibrary library) throws MisoNamingException {
@@ -82,7 +83,7 @@ public class OicrLibraryAliasGenerator implements NameGenerator<Library> {
     }
     return m;
   }
-  
+
   /**
    * @param library the Library that an alias is being generated for
    * @return the name portion representing the LibraryType
@@ -142,7 +143,7 @@ public class OicrLibraryAliasGenerator implements NameGenerator<Library> {
    */
   private String getIdentityAliasPart(DetailedLibrary library) throws MisoNamingException {
     Matcher m = getSampleAliasMatcher(library);
-    return m.group(1);
+    return m.group(1) + "_" + m.group(2);
   }
 
   private String getCreationDateString(DetailedLibrary library) {

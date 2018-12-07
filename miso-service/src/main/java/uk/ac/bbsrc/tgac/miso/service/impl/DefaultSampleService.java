@@ -930,7 +930,9 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   @Override
   public Map<String, Integer> getSampleColumnSizes() throws IOException {
-    return sampleStore.getSampleColumnSizes();
+    return ValidationUtils.adjustNameLength(
+        ValidationUtils.adjustLength(sampleStore.getSampleColumnSizes(), "alias", namingScheme.sampleAliasLengthAdjustment()),
+        namingScheme);
   }
 
   @Override
@@ -994,5 +996,5 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       return get(sample.getId());
     }
   }
-  
+
 }

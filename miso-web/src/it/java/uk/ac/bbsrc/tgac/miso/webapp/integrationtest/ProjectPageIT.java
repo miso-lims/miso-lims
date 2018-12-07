@@ -44,7 +44,7 @@ public class ProjectPageIT extends AbstractIT {
     unsaved.put(Fields.NAME, "Unsaved");
     unsaved.put(Fields.CREATION_DATE, dateFormatter.print(new Date().getTime()));
     unsaved.put(Fields.ALIAS, "Create New Project via UI");
-    unsaved.put(Fields.SHORTNAME, "NEW");
+    unsaved.put(Fields.SHORTNAME, "SUCHNEW");
     unsaved.put(Fields.DESCRIPTION, "New Project via UI");
     unsaved.put(Fields.PROGRESS, "PROPOSED");
     unsaved.put(Fields.REFERENCE_GENOME, "Human hg18 random");

@@ -345,7 +345,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
 
   @Override
   public Map<String, Integer> getPoolColumnSizes() throws IOException {
-    return poolStore.getPoolColumnSizes();
+    return ValidationUtils.adjustNameLength(poolStore.getPoolColumnSizes(), namingScheme);
   }
 
   @Override

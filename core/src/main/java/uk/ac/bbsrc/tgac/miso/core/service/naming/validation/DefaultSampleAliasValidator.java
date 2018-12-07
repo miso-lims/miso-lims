@@ -6,7 +6,7 @@ public class DefaultSampleAliasValidator extends RegexValidator {
   private static final String regex = "([A-z0-9]+)_S([A-z0-9]+)_(.*)";
 
   public DefaultSampleAliasValidator() {
-    super(regex, false, false);
+    super(regex, false, false, null);
   }
 
   @Override

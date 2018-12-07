@@ -6,11 +6,13 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 
@@ -18,6 +20,17 @@ public class ValidationUtils {
 
   private ValidationUtils() {
     throw new IllegalStateException("Static util class not intended for instantiation");
+  }
+
+  public static Map<String, Integer> adjustNameLength(Map<String, Integer> input, NamingScheme scheme) {
+    return adjustLength(input, "name", scheme.nameLengthAdjustment());
+  }
+
+  public static Map<String, Integer> adjustLength(Map<String, Integer> input, String name, Integer validationLength) {
+    if (validationLength != null) {
+      input.put(name, input.containsKey(name) ? Math.min(input.get(name), validationLength) : validationLength);
+    }
+    return input;
   }
 
   public static <T extends Barcodable> void validateBarcodeUniqueness(T barcodable, T beforeChange,

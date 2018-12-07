@@ -62,4 +62,9 @@ public class DefaultNameValidator implements NameValidator {
     return false;
   }
 
+  @Override
+  public Integer validationLength() {
+    return null;
+  }
+
 }

@@ -101,7 +101,9 @@ public class DefaultProjectService implements ProjectService {
 
   @Override
   public Map<String, Integer> getProjectColumnSizes() throws IOException {
-    return projectStore.getProjectColumnSizes();
+    return ValidationUtils.adjustNameLength(
+        ValidationUtils.adjustLength(projectStore.getProjectColumnSizes(), "shortName", namingScheme.projectShortNameLengthAdjustment()),
+        namingScheme);
   }
 
   @Override
