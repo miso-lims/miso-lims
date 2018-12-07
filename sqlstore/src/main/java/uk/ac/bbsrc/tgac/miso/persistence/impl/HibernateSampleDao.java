@@ -207,6 +207,11 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, String recipient, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.ilike("distributionRecipient", recipient, MatchMode.ANYWHERE));
+  }
+
+  @Override
   public long save(Sample t) throws IOException {
     if (t.getId() == SampleImpl.UNSAVED_ID) {
       return addSample(t);

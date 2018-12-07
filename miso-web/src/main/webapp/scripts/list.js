@@ -110,6 +110,14 @@ ListUtils = (function() {
     "parameters": {
       term: "parameters:NAME",
       help: "Checks if an item has the specified sequencing parameters."
+    },
+    "groupid": {
+      term: "groupid:NAME",
+      help: "Checks if an item has the specified group ID."
+    },
+    "distributedto": {
+      term: "distributedto:NAME",
+      help: "Checks if the item has been distributed to the specified recipient."
     }
   };
 

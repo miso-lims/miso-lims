@@ -113,7 +113,7 @@ ListTarget.sample = {
             Utils.showOkDialog('Create Samples', ["That's a peculiar number of samples to create."]);
             return;
           }
-          if(result.createBox && Constants.isDetailedSample && result.sampleClass.sampleCategory == 'Identity'){
+          if (result.createBox && Constants.isDetailedSample && result.sampleClass.sampleCategory == 'Identity') {
             Utils.showOkDialog('Error', ["Identities cannot be placed in boxes"]);
             return;
           }
@@ -240,8 +240,9 @@ ListTarget.sample = {
   },
   searchTermSelector: function(searchTerms) {
     const plainSampleTerms = [searchTerms['created'], searchTerms['changed'], searchTerms['received'], searchTerms['creator'],
-      searchTerms['changedby'], searchTerms['box']];
-    const detailedSampleTerms = [searchTerms['class'], searchTerms['institute'], searchTerms['external'], searchTerms['subproject']];
+        searchTerms['changedby'], searchTerms['box']];
+    const detailedSampleTerms = [searchTerms['class'], searchTerms['institute'], searchTerms['external'], searchTerms['subproject'],
+        searchTerms['groupid'], searchTerms['distributedto']];
     if (Constants.isDetailedSample) {
       return plainSampleTerms.concat(detailedSampleTerms);
     } else {

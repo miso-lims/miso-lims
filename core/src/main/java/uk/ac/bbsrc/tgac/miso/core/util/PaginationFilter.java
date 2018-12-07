@@ -97,6 +97,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter distributedTo(String recipient) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByDistributionRecipient(item, recipient, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter exactQuery(final String query) {
     return new PaginationFilter() {
 
@@ -123,6 +133,16 @@ public abstract interface PaginationFilter {
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
         sink.restrictPaginationByFulfilled(item, isFulfilled, errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter groupId(String groupId) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByGroupId(item, groupId, errorHandler);
       }
     };
   }
@@ -291,6 +311,10 @@ public abstract interface PaginationFilter {
         case "parameters":
         case "params":
           return sequencingParameters(parts[1]);
+        case "groupid":
+          return groupId(parts[1]);
+        case "distributedto":
+          return distributedTo(parts[1]);
         }
       }
       return query(x);

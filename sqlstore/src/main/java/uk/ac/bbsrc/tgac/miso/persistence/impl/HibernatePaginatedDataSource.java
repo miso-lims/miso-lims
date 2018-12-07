@@ -181,6 +181,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  public default void restrictPaginationByDistributionRecipient(Criteria criteria, String recipient, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be distributed.", getFriendlyName()));
+  }
+
+  @Override
   default void restrictPaginationByExternalName(Criteria criteria, String name, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s has no external name.", getFriendlyName()));
   }
