@@ -21,7 +21,7 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.spring;
+package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
