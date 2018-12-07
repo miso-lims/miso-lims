@@ -457,6 +457,11 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
+  public void restrictPaginationByGroupId(Criteria criteria, String groupId, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.ilike("groupId", groupId, MatchMode.EXACT));
+  }
+
+  @Override
   public String getFriendlyName() {
     return "Library";
   }
