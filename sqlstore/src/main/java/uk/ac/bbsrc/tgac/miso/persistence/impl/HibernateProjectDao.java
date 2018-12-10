@@ -43,7 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
@@ -116,22 +115,12 @@ public class HibernateProjectDao implements ProjectStore {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
 
-  @Override
-  @CoverageIgnore
-  public ProjectOverview getProjectOverviewById(long overviewId) throws IOException {
-    return (ProjectOverview) currentSession().get(ProjectOverview.class, overviewId);
-  }
-
   public SecurityStore getSecurityStore() {
     return securityStore;
   }
 
   public SessionFactory getSessionFactory() {
     return sessionFactory;
-  }
-
-  public ProjectOverview lazyGetProjectOverviewById(long overviewId) throws IOException {
-    return getProjectOverviewById(overviewId);
   }
 
   @Override
@@ -162,25 +151,6 @@ public class HibernateProjectDao implements ProjectStore {
   }
 
   @Override
-  public List<ProjectOverview> listOverviewsByProjectId(long projectId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(ProjectOverview.class);
-    criteria.createAlias("project", "project");
-    criteria.add(Restrictions.eq("project.id", projectId));
-    @SuppressWarnings("unchecked")
-    List<ProjectOverview> results = criteria.list();
-    return results;
-  }
-
-  public boolean removeOverview(ProjectOverview overview) throws IOException {
-    if (overview.isDeletable()) {
-      overview.setProject(null);
-      currentSession().delete(overview);
-      return true;
-    }
-    return false;
-  }
-
-  @Override
   public long save(Project project) throws IOException {
     Date timestamp = new Date();
     project.setLastUpdated(timestamp);
@@ -191,18 +161,6 @@ public class HibernateProjectDao implements ProjectStore {
       currentSession().update(project);
       return project.getId();
     }
-  }
-
-  @Override
-  public long saveOverview(ProjectOverview overview) throws IOException {
-    long id;
-    if (overview.getId() == ProjectOverview.UNSAVED_ID) {
-      id = (Long) currentSession().save(overview);
-    } else {
-      currentSession().update(overview);
-      id = overview.getId();
-    }
-    return id;
   }
 
   @CoverageIgnore

@@ -27,7 +27,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -111,22 +110,6 @@ public interface Project extends Comparable<Project>, SecurableByProfile, Nameab
   Collection<Study> getStudies();
 
   /**
-   * Returns the overviews of this Project object.
-   * 
-   * @return Collection<ProjectOverview> overviews.
-   */
-  Collection<ProjectOverview> getOverviews();
-
-  /**
-   * Returns the overview of this Project object with the given ID
-   * 
-   * @param overviewId
-   *          of type Long
-   * @return ProjectOverview overview.
-   */
-  ProjectOverview getOverviewById(Long overviewId);
-
-  /**
    * Registers a collection of samples to this Project object.
    * 
    * @param samples
@@ -149,14 +132,6 @@ public interface Project extends Comparable<Project>, SecurableByProfile, Nameab
    *          studies.
    */
   void setStudies(Collection<Study> studies);
-
-  /**
-   * Registers a collection of project overviews to this Project object.
-   * 
-   * @param overviews
-   *          overviews.
-   */
-  void setOverviews(Collection<ProjectOverview> overviews);
 
   Date getLastUpdated();
 

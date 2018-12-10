@@ -100,8 +100,6 @@ public class ProjectImpl implements Project {
   @OneToMany(targetEntity = StudyImpl.class, fetch = FetchType.LAZY, mappedBy = "project")
   private Collection<Study> studies = new HashSet<>();
 
-  @OneToMany(targetEntity = ProjectOverview.class, mappedBy = "project", cascade = CascadeType.ALL)
-  private Collection<ProjectOverview> overviews = new HashSet<>();
 
   @Enumerated(EnumType.STRING)
   private ProgressType progress;
@@ -190,21 +188,6 @@ public class ProjectImpl implements Project {
   }
 
   @Override
-  public Collection<ProjectOverview> getOverviews() {
-    return overviews;
-  }
-
-  @Override
-  public ProjectOverview getOverviewById(Long overviewId) {
-    for (ProjectOverview p : getOverviews()) {
-      if (p.getId() == overviewId) {
-        return p;
-      }
-    }
-    return null;
-  }
-
-  @Override
   public void setCreationDate(Date date) {
     this.creationDate = date;
   }
@@ -240,17 +223,6 @@ public class ProjectImpl implements Project {
   public void setStudies(Collection<Study> studies) {
     this.studies = studies;
     Collections.sort(Lists.newArrayList(this.studies), new AliasComparator<Study>());
-  }
-
-  @Override
-  public void setOverviews(Collection<ProjectOverview> overviews) {
-    if (overviews == null) {
-      this.overviews = new HashSet<>();
-    }
-    this.overviews = overviews;
-    for (ProjectOverview po : overviews) {
-      po.setProject(this);
-    }
   }
 
   @Override

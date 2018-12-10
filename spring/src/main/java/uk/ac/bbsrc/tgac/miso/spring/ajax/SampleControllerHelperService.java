@@ -45,7 +45,6 @@ import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
@@ -138,45 +137,6 @@ public class SampleControllerHelperService {
     } catch (IOException e) {
       log.error("cannot set receipt date for sample", e);
       return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot set receipt date for sample");
-    }
-  }
-
-  public JSONObject removeSampleFromOverview(HttpSession session, JSONObject json) {
-    User user;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    } catch (IOException e) {
-      log.error("remove sample from group", e);
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
-    }
-
-    if (user != null) {
-      if (json.has("sampleId") && json.has("overviewId")) {
-        Long sampleId = json.getLong("sampleId");
-        Long overviewId = json.getLong("overviewId");
-        try {
-          ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-          Sample s = sampleService.get(sampleId);
-          if (overview.getSamples().contains(s)) {
-            if (overview.getSamples().remove(s)) {
-              projectService.saveProjectOverview(overview);
-
-              return JSONUtils.SimpleJSONResponse("Sample removed from group");
-            } else {
-              return JSONUtils.SimpleJSONError("Error removing sample from sample group.");
-            }
-          } else {
-            return JSONUtils.SimpleJSONResponse("Sample not in this sample group!");
-          }
-        } catch (IOException e) {
-          log.error("remove sample from group", e);
-          return JSONUtils.SimpleJSONError("Cannot remove sample from group: " + e.getMessage());
-        }
-      } else {
-        return JSONUtils.SimpleJSONError("No sample or sample group specified to remove.");
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("Only logged-in users can remove objects.");
     }
   }
 

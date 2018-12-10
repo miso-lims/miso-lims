@@ -45,7 +45,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -137,32 +136,6 @@ public class ExternalRestController extends RestController {
     sb.append("'progress':'" + p.getProgress().name() + "'");
     sb.append(",");
     sb.append("'description':'" + p.getDescription() + "'");
-    sb.append(",");
-
-    sb.append("'overviews':[");
-    if (p.getOverviews().size() > 0) {
-      int oi = 0;
-      for (ProjectOverview overview : p.getOverviews()) {
-        oi++;
-        sb.append("{");
-        sb.append("'allSampleQcPassed':" + overview.getAllSampleQcPassed());
-        sb.append(",");
-        sb.append("'libraryPreparationComplete':" + overview.getLibraryPreparationComplete());
-        sb.append(",");
-        sb.append("'allLibrariesQcPassed':" + overview.getAllLibrariesQcPassed());
-        sb.append(",");
-        sb.append("'allPoolsConstructed':" + overview.getAllPoolsConstructed());
-        sb.append(",");
-        sb.append("'allRunsCompleted':" + overview.getAllRunsCompleted());
-        sb.append(",");
-        sb.append("'primaryAnalysisCompleted':" + overview.getPrimaryAnalysisCompleted());
-        sb.append("}");
-        if (oi < p.getOverviews().size()) {
-          sb.append(",");
-        }
-      }
-    }
-    sb.append("]");
     sb.append(",");
 
     sb.append("'samples':[");

@@ -27,7 +27,6 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
@@ -216,17 +215,6 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
   public void testGetByStudyId() throws IOException {
     Project p = projectDAO.getByStudyId(1L);
     assertNotNull(p);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#getProjectOverviewById(long)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testGetProjectOverviewById() throws IOException {
-    ProjectOverview po = projectDAO.getProjectOverviewById(1L);
-    assertNotNull(po);
   }
 
   /**

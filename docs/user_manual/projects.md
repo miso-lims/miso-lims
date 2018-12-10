@@ -7,8 +7,7 @@ section: 6
 
 A project is a grouping of samples, libraries, sequencer runs, and other related items. Each sample in MISO belongs to
 a specific project. By association, a sample's libraries and dilutions belong to the same project. Some other items,
-such as pools and sequencer runs, may include items from multiple projects. Projects can also have overviews, which
-hold information about a project's design and status.
+such as pools and sequencer runs, may include items from multiple projects.
 
 
 
@@ -92,56 +91,6 @@ Projects list page. You can edit the project's details by changing them on this 
 button to confirm.
 
 {% include userman-toplink.md %}
-
-
-
-{% assign subsub = 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Project Overviews" %}
-
-{% assign figure = 1 %}
-A project overview allows you to record the progress of a set of the project's samples from receipt to analysis,
-including several steps in-between. Figure {{figure}} shows a project overview box on the Edit Project page.
-
-{% include userman-figure.md num=figure cap="Project overview" img="projects-overview.png" %}
-
-To add a new project overview, click the "Add Overview" link on the right side of the screen at the bottom of the
-Project Information section. Enter the name of the principal investigator and the number of proposed samples in the
-dialog, then click the "Add Overview" button. The new overview box will show up at the bottom of the Project
-Information section. Here, you can set the start and end date for the overview. Clicking the "Save" button at the top
-right of the Edit Project page will also save changes to any of the project's overviews.
-
-To specify which samples this overview is meant to track, click the "Add Sample Group" link at the bottom right of the
-project overview box. This will open a list where you can select the samples. Click the "Group Selected" button at the
-top of the list after you are done making your selections. After adding a sample group, the "# QC Passed Samples" field
-will be updated to show a count of how many of these samples passed QC.
-
-When the samples have passed a particular step, come back to the Edit Project page and click the checkbox under that
-step in the project overview box to record their progress. The steps you can track are:
-
-* Sample QCs
-* Libraries Prepared
-* Library QCs
-* Pools Constructed
-* Runs Completed
-* Primary Analysis
-
-Remember to save the project to confirm any changes to the overview.
-
-If you wish to add any other information to a project overview, you can do so using notes. Click the "Add Note" button
-near the bottom right of the project overview box. In the dialog, enter any text that you would like to attach to the
-overview. If you would like the note to be visibile only to internal users, and not to external collaborators, check
-the "Internal Only?" checkbox. Click the "Add Note" button when you are done. The note will appear in the project
-overview box. You may add any number of notes that you require. To delete a note, click the trash can icon to the right
-of the note. A note may only be deleted its creator or a MISO administrator. The note's creator is also shown to the
-right of the note.
-
-A project overview can be locked by either the project owner or any MISO administrator to prevent further editing. To
-do this, click the lock icon in the "Lock/Unlock" column in the project overview box. To unlock the overview, click
-again on the lock icon. The lock icon will appear opened if the project overview is unlocked, and closed if it is
-locked.
-
-{% include userman-toplink.md %}
-
 
 
 {% assign subsub = subsub | plus: 1 %}
