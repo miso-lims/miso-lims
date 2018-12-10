@@ -115,6 +115,10 @@ ListUtils = (function() {
       term: "groupid:NAME",
       help: "Checks if an item has the specified group ID."
     },
+    "distributed": {
+      term: "distributed:DATE",
+      help: "Checks whether this item has a distribution date that matches the provided date. For rules about dates, see below. If empty, checks whether an item has been distributed at any time."
+    },
     "distributedto": {
       term: "distributedto:NAME",
       help: "Checks if the item has been distributed to the specified recipient."

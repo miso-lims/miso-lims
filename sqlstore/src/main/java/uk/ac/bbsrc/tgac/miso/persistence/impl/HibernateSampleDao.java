@@ -207,6 +207,11 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
+  public void restrictPaginationByDistributed(Criteria criteria, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("distributed", true));
+  }
+
+  @Override
   public void restrictPaginationByDistributionRecipient(Criteria criteria, String recipient, Consumer<String> errorHandler) {
     criteria.add(Restrictions.ilike("distributionRecipient", recipient, MatchMode.ANYWHERE));
   }
@@ -353,6 +358,8 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
       return "lastModified";
     case RECEIVE:
       return "receivedDate";
+    case DISTRIBUTED:
+      return "distributionDate";
     default:
       return null;
     }

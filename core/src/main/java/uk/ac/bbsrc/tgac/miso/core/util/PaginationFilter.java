@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.util;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -93,6 +95,19 @@ public abstract interface PaginationFilter {
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
         sink.restrictPaginationByDate(item, start, end, type, errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter distributed(String maybeDistributionDates) {
+    if (!isStringEmptyOrNull(maybeDistributionDates)) {
+      return parseDate(maybeDistributionDates, DateType.DISTRIBUTED);
+    }
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByDistributed(item, errorHandler);
       }
     };
   }
@@ -313,6 +328,8 @@ public abstract interface PaginationFilter {
           return sequencingParameters(parts[1]);
         case "groupid":
           return groupId(parts[1]);
+        case "distributed":
+          return distributed(parts[1]);
         case "distributedto":
           return distributedTo(parts[1]);
         }

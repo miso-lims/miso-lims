@@ -242,7 +242,7 @@ ListTarget.sample = {
     const plainSampleTerms = [searchTerms['created'], searchTerms['changed'], searchTerms['received'], searchTerms['creator'],
         searchTerms['changedby'], searchTerms['box']];
     const detailedSampleTerms = [searchTerms['class'], searchTerms['institute'], searchTerms['external'], searchTerms['subproject'],
-        searchTerms['groupid'], searchTerms['distributedto']];
+        searchTerms['groupid'], searchTerms['distributed'], searchTerms['distributedto']];
     if (Constants.isDetailedSample) {
       return plainSampleTerms.concat(detailedSampleTerms);
     } else {
