@@ -45,9 +45,6 @@
   <bean id="sampleControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.SampleControllerHelperService">
   </bean>
 
-  <bean id="runControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.RunControllerHelperService">
-  </bean>
-
   <bean id="containerControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ContainerControllerHelperService">
   </bean>
 

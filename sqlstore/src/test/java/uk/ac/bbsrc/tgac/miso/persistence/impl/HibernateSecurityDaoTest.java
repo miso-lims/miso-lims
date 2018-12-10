@@ -143,7 +143,7 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
   
   @Test
   public void testListUsersByGroup() throws IOException {
-    assertEquals(2, dao.listUsersByGroupName("RunWatchers").size());
+    assertEquals(2, dao.listUsersByGroupName("TestGroup").size());
   }
   
   @Test
@@ -200,8 +200,8 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
     Group group = dao.getGroupById(1L);
     assertNotNull(group);
     assertEquals(Long.valueOf(1L), group.getGroupId());
-    assertEquals("RunWatchers", group.getName());
-    assertEquals("Watches for all events on all runs", group.getDescription());
+    assertEquals("TestGroup", group.getName());
+    assertEquals("Is full of testing", group.getDescription());
   }
   
   @Test
@@ -217,7 +217,7 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
   
   @Test
   public void testGetGroupByName() throws IOException {
-    Group group = dao.getGroupByName("RunWatchers");
+    Group group = dao.getGroupByName("TestGroup");
     assertNotNull(group);
     assertEquals(Long.valueOf(1L), group.getGroupId());
   }
@@ -235,14 +235,14 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
   
   @Test
   public void testListAllGroups() throws IOException {
-    assertEquals(3, dao.listAllGroups().size());
+    assertEquals(1, dao.listAllGroups().size());
   }
   
   @Test
   public void testListGroupsByUserId() throws IOException {
     assertEquals(1, dao.listGroupsByUserId(1L).size());
     assertEquals(0, dao.listGroupsByUserId(2L).size());
-    assertEquals(2, dao.listGroupsByUserId(3L).size());
+    assertEquals(1, dao.listGroupsByUserId(3L).size());
   }
   
   @Test
@@ -276,11 +276,11 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
   
   @Test
   public void testSaveGroupEdit() throws IOException {
-    Group group = dao.getGroupById(3L);
+    Group group = dao.getGroupById(1L);
     assertNotNull(group);
     group.setDescription("new description");
     assertEquals(group.getGroupId().longValue(), dao.saveGroup(group));
-    Group saved = dao.getGroupById(3L);
+    Group saved = dao.getGroupById(1L);
     assertEquals(group.getDescription(), saved.getDescription());
   }
   

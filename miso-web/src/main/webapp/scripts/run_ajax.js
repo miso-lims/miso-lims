@@ -188,27 +188,3 @@ Run.ui = {
     }
   },
 };
-
-Run.alert = {
-  watchRun: function(runId) {
-    Fluxion.doAjax('runControllerHelperService', 'watchRun', {
-      'runId': runId,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': function() {
-        Utils.page.pageReload();
-      }
-    });
-  },
-
-  unwatchRun: function(runId) {
-    Fluxion.doAjax('runControllerHelperService', 'unwatchRun', {
-      'runId': runId,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': function() {
-        Utils.page.pageReload();
-      }
-    });
-  }
-};

@@ -28,8 +28,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
@@ -130,8 +128,4 @@ public interface RunStore extends Store<Run>, PaginatedDataSource<Run> {
   public long countRuns() throws IOException;
 
   public long countBySearch(String querystr) throws IOException;
-
-  public void addWatcher(Run run, User watcher);
-
-  public void removeWatcher(Run run, User watcher);
 }

@@ -263,7 +263,6 @@ public class EditRunController {
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, run, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run, securityManager.listAllGroups()));
-      model.put("isWatching", run.getWatchers().contains(user));
 
       ObjectMapper mapper = new ObjectMapper();
       ObjectNode partitionConfig = mapper.createObjectNode();

@@ -283,11 +283,6 @@ public class EditProjectController {
     model.put("overviews", project.getOverviews());
 
     Map<Long, String> overviewMap = new HashMap<>();
-    for (ProjectOverview po : project.getOverviews()) {
-      if (po.getWatchers().contains(user)) {
-        overviewMap.put(po.getId(), user.getLoginName());
-      }
-    }
     model.put("overviewMap", overviewMap);
 
     return new ModelAndView("/pages/editProject.jsp", model);

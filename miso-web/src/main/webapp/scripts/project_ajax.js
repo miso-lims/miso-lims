@@ -595,38 +595,3 @@ Project.overview = {
     });
   }
 };
-
-Project.alert = {
-  watchOverview: function(overviewId) {
-    Fluxion.doAjax('projectControllerHelperService', 'watchOverview', {
-      'overviewId': overviewId,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': function() {
-        Utils.page.pageReload();
-      }
-    });
-  },
-
-  unwatchOverview: function(overviewId) {
-    Fluxion.doAjax('projectControllerHelperService', 'unwatchOverview', {
-      'overviewId': overviewId,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': function() {
-        Utils.page.pageReload();
-      }
-    });
-  },
-
-  listWatchOverview: function(overviewId) {
-    Fluxion.doAjax('projectControllerHelperService', 'listWatchOverview', {
-      'overviewId': overviewId,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': function(json) {
-        jQuery('#watchersList' + overviewId).html(json.watchers);
-      }
-    });
-  }
-};

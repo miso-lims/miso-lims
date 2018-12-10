@@ -27,8 +27,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 
-import com.eaglegenomics.simlims.core.Group;
-
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
@@ -38,13 +36,12 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * A Project represents the top level object in the MISO data model. A Project couples together {@link Study} and {@link Sample} objects to
  * record information about a given sequencing project.
  * <p/>
- * A Project's progress status is tracked by its {@link ProgressType} enumeration. A Project describes a collaborator or PI via the
- * {@link ProjectOverview} object, whereby proposed start and end dates, number of expected samples and watchers can be assigned.
+ * A Project's progress status is tracked by its {@link ProgressType} enumeration.
  * 
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Project extends Comparable<Project>, SecurableByProfile, Watchable, Nameable, Serializable, Attachable {
+public interface Project extends Comparable<Project>, SecurableByProfile, Nameable, Serializable, Attachable {
 
   /** Field PREFIX */
   public static final String PREFIX = "PRO";
@@ -172,7 +169,4 @@ public interface Project extends Comparable<Project>, SecurableByProfile, Watcha
   public TargetedSequencing getDefaultTargetedSequencing();
 
   public void setDefaultTargetedSequencing(TargetedSequencing defaultTargetedSequencing);
-
-  @Override
-  public void setWatchGroup(Group group);
 }

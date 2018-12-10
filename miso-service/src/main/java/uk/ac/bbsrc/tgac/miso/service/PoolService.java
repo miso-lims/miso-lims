@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -39,9 +37,5 @@ public interface PoolService extends PaginatedDataSource<Pool>, BarcodableServic
   public Pool getByBarcode(String barcode) throws IOException;
 
   public Map<String, Integer> getPoolColumnSizes() throws IOException;
-
-  public void addPoolWatcher(Pool pool, User watcher) throws IOException;
-
-  public void removePoolWatcher(Pool pool, User watcher) throws IOException;
 
 }

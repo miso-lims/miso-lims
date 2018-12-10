@@ -80,12 +80,6 @@ public class DefaultProjectService implements ProjectService {
   private SecurityManager securityManager;
 
   @Override
-  public void addProjectWatcher(Project project, User watcher) throws IOException {
-    authorizationManager.throwIfNotWritable(project);
-    projectStore.addWatcher(project, watcher);
-  }
-
-  @Override
   public void deleteProjectOverviewNote(ProjectOverview projectOverview, Long noteId) throws IOException {
     if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
       throw new IllegalArgumentException("Cannot delete an unsaved Note");
@@ -192,12 +186,6 @@ public class DefaultProjectService implements ProjectService {
       managed.add(securityManager.getUserById(item.getUserId()));
     }
     return managed;
-  }
-
-  @Override
-  public void removeProjectWatcher(Project project, User watcher) throws IOException {
-    authorizationManager.throwIfNotWritable(project);
-    projectStore.removeWatcher(project, watcher);
   }
 
   private Collection<Group> resolveGroups(Collection<Group> groups) throws IOException {

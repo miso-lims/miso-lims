@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -347,22 +346,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   @Override
   public Map<String, Integer> getPoolColumnSizes() throws IOException {
     return poolStore.getPoolColumnSizes();
-  }
-
-  @Override
-  public void addPoolWatcher(Pool pool, User watcher) throws IOException {
-    User managedWatcher = securityManager.getUserById(watcher.getUserId());
-    Pool managedPool = poolStore.get(pool.getId());
-    authorizationManager.throwIfNotReadable(managedPool);
-    authorizationManager.throwIfNotReadable(managedPool, managedWatcher);
-    poolStore.addWatcher(pool, watcher);
-  }
-
-  @Override
-  public void removePoolWatcher(Pool pool, User watcher) throws IOException {
-    User managedWatcher = securityManager.getUserById(watcher.getUserId());
-    authorizationManager.throwIfNonAdminOrMatchingOwner(managedWatcher);
-    poolStore.removeWatcher(pool, managedWatcher);
   }
 
   @Override

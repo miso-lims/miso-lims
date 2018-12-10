@@ -184,13 +184,6 @@
 <c:forEach items="${project.overviews}" var="overview" varStatus="ov">
 <div id="overviewdiv${overview.id}" class="ui-corner-all simplebox">
 
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    //show watchers list
-    Project.alert.listWatchOverview(${overview.id});
-  });
-</script>
-
 <div style="float:right;margin:5px;">
   <div class="breadcrumbsbubbleInfo">
     <div class="trigger"><c:choose>

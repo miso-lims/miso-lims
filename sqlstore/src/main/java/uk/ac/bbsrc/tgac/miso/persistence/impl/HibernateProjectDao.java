@@ -41,9 +41,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -72,13 +69,6 @@ public class HibernateProjectDao implements ProjectStore {
   private JdbcTemplate template;
 
   @Override
-  public void addWatcher(Project project, User watcher) {
-    log.debug("Adding watcher " + watcher.getLoginName() + " to " + project.getName());
-    project.addWatcher(watcher);
-    currentSession().update(project);
-  }
-
-  @Override
   public int count() throws IOException {
     long c = (Long) currentSession().createCriteria(ProjectImpl.class).setProjection(Projections.rowCount()).uniqueResult();
     return (int) c;
@@ -91,21 +81,21 @@ public class HibernateProjectDao implements ProjectStore {
   @Override
   public Project get(long projectId) throws IOException {
     Project result = (Project) currentSession().get(ProjectImpl.class, projectId);
-    return withWatcherGroup(result);
+    return result;
   }
 
   @Override
   public Project getByAlias(String alias) throws IOException {
     Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
     criteria.add(Restrictions.eq("alias", alias));
-    return withWatcherGroup((Project) criteria.uniqueResult());
+    return (Project) criteria.uniqueResult();
   }
 
   @Override
   public Project getByShortName(String shortName) throws IOException {
     Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
     criteria.add(Restrictions.eq("shortName", shortName));
-    return withWatcherGroup((Project) criteria.uniqueResult());
+    return (Project) criteria.uniqueResult();
   }
 
   @Override
@@ -113,7 +103,7 @@ public class HibernateProjectDao implements ProjectStore {
     Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
     criteria.createAlias("studies", "study");
     criteria.add(Restrictions.eq("study.id", studyId));
-    return withWatcherGroup((Project) criteria.uniqueResult());
+    return (Project) criteria.uniqueResult();
   }
 
   @CoverageIgnore
@@ -129,11 +119,7 @@ public class HibernateProjectDao implements ProjectStore {
   @Override
   @CoverageIgnore
   public ProjectOverview getProjectOverviewById(long overviewId) throws IOException {
-    return withWatcherGroup((ProjectOverview) currentSession().get(ProjectOverview.class, overviewId));
-  }
-
-  private Group getProjectWatcherGroup() throws IOException {
-    return getSecurityStore().getGroupByName("ProjectWatchers");
+    return (ProjectOverview) currentSession().get(ProjectOverview.class, overviewId);
   }
 
   public SecurityStore getSecurityStore() {
@@ -153,8 +139,9 @@ public class HibernateProjectDao implements ProjectStore {
     Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
     @SuppressWarnings("unchecked")
     List<Project> results = criteria.list();
-    return withWatcherGroup(results);
+    return results;
   }
+
   @Override
   public List<Project> listAllWithLimit(long limit) throws IOException {
     Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
@@ -162,7 +149,7 @@ public class HibernateProjectDao implements ProjectStore {
     criteria.addOrder(Order.desc("projectId"));
     @SuppressWarnings("unchecked")
     List<Project> results = criteria.list();
-    return withWatcherGroup(results);
+    return results;
   }
 
   @Override
@@ -171,7 +158,7 @@ public class HibernateProjectDao implements ProjectStore {
     criteria.add(DbUtils.searchRestrictions(query, false, SEARCH_PROPERTIES));
     @SuppressWarnings("unchecked")
     List<Project> results = criteria.list();
-    return withWatcherGroup(results);
+    return results;
   }
 
   @Override
@@ -181,7 +168,7 @@ public class HibernateProjectDao implements ProjectStore {
     criteria.add(Restrictions.eq("project.id", projectId));
     @SuppressWarnings("unchecked")
     List<ProjectOverview> results = criteria.list();
-    return withOverviewWatcherGroup(results);
+    return results;
   }
 
   public boolean removeOverview(ProjectOverview overview) throws IOException {
@@ -191,13 +178,6 @@ public class HibernateProjectDao implements ProjectStore {
       return true;
     }
     return false;
-  }
-
-  @Override
-  public void removeWatcher(Project project, User watcher) {
-    log.debug("Removing watcher " + watcher.getLoginName() + " from " + project.getWatchableIdentifier());
-    project.removeWatcher(watcher);
-    currentSession().update(project);
   }
 
   @Override
@@ -236,35 +216,5 @@ public class HibernateProjectDao implements ProjectStore {
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
-  }
-
-  private List<ProjectOverview> withOverviewWatcherGroup(List<ProjectOverview> projectoverviews) throws IOException {
-    Group group = getProjectWatcherGroup();
-    for (ProjectOverview overview : projectoverviews) {
-      overview.setWatchGroup(group);
-    }
-    return projectoverviews;
-  }
-
-  private List<Project> withWatcherGroup(List<Project> projects) throws IOException {
-    Group group = getProjectWatcherGroup();
-    for (Project project : projects) {
-      project.setWatchGroup(group);
-    }
-    return projects;
-  }
-
-  private Project withWatcherGroup(Project project) throws IOException {
-    if (project != null) {
-      project.setWatchGroup(getProjectWatcherGroup());
-    }
-    return project;
-  }
-
-  private ProjectOverview withWatcherGroup(ProjectOverview projectoverview) throws IOException {
-    if (projectoverview != null) {
-      projectoverview.setWatchGroup(getProjectWatcherGroup());
-    }
-    return projectoverview;
   }
 }

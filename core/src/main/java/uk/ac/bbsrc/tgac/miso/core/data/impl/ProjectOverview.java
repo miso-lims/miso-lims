@@ -50,19 +50,14 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.Watchable;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data
@@ -74,7 +69,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Watchable;
  */
 @Entity
 @Table(name = "ProjectOverview")
-public class ProjectOverview implements Watchable, Nameable, Serializable {
+public class ProjectOverview implements Nameable, Serializable {
 
   protected static final Logger log = LoggerFactory.getLogger(ProjectOverview.class);
 
@@ -130,21 +125,6 @@ public class ProjectOverview implements Watchable, Nameable, Serializable {
   @JoinTable(name = "ProjectOverview_Sample", joinColumns = { @JoinColumn(name = "projectOverview_overviewId") }, inverseJoinColumns = {
       @JoinColumn(name = "sample_sampleId") })
   private Set<Sample> sampleGroup;
-
-  @Transient
-  // not Hibernate-managed
-  private Group watchGroup;
-
-  @ManyToMany(targetEntity = UserImpl.class)
-  @Fetch(FetchMode.SUBSELECT)
-  @JoinTable(name = "ProjectOverview_Watcher", joinColumns = { @JoinColumn(name = "overviewId") }, inverseJoinColumns = {
-      @JoinColumn(name = "userId") })
-  private Set<User> watchUsers = new HashSet<>();
-
-  @Override
-  public void addWatcher(User user) {
-    watchUsers.add(user);
-  }
 
   @Override
   public boolean equals(Object obj) {
@@ -254,27 +234,6 @@ public class ProjectOverview implements Watchable, Nameable, Serializable {
   }
 
   @Override
-  public String getWatchableIdentifier() {
-    return getName();
-  }
-
-  @Override
-  public Set<User> getWatchers() {
-    Set<User> allWatchers = new HashSet<>();
-    if (watchGroup != null) allWatchers.addAll(watchGroup.getUsers());
-    if (watchUsers != null) allWatchers.addAll(watchUsers);
-    return allWatchers;
-  }
-
-  public Group getWatchGroup() {
-    return watchGroup;
-  }
-
-  public Set<User> getWatchUsers() {
-    return watchUsers;
-  }
-
-  @Override
   public int hashCode() {
     return new HashCodeBuilder(17, 47)
         .append(allLibrariesQcPassed)
@@ -293,11 +252,6 @@ public class ProjectOverview implements Watchable, Nameable, Serializable {
 
   public boolean isDeletable() {
     return getId() != ProjectOverview.UNSAVED_ID;
-  }
-
-  @Override
-  public void removeWatcher(User user) {
-    watchUsers.remove(user);
   }
 
   public void setAllLibrariesQcPassed(boolean allLibrariesQcPassed) {
@@ -363,15 +317,6 @@ public class ProjectOverview implements Watchable, Nameable, Serializable {
 
   public void setStartDate(Date startDate) {
     this.startDate = startDate;
-  }
-
-  @Override
-  public void setWatchGroup(Group watchGroup) {
-    this.watchGroup = watchGroup;
-  }
-
-  public void setWatchUsers(Set<User> watchUsers) {
-    this.watchUsers = watchUsers;
   }
 
   @Override

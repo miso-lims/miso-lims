@@ -56,14 +56,6 @@
     </c:forEach>
     <span></span>
   </c:if>
-  <c:choose>
-    <c:when test="${run.id != 0 && isWatching}">
-      <a href='javascript:void(0);' onclick="Run.alert.unwatchRun(${run.id});" class="ui-button ui-state-default">Stop watching</a>
-    </c:when>
-    <c:when test="${run.id != 0}">
-      <a href='javascript:void(0);' onclick="Run.alert.watchRun(${run.id});" class="ui-button ui-state-default">Watch</a>
-    </c:when>
-  </c:choose>
 </div>
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
