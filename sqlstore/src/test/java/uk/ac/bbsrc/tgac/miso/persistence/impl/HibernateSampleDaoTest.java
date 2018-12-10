@@ -395,6 +395,26 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   }
 
   @Test
+  public void testSearchByDistributed() throws IOException {
+    testSearch(PaginationFilter.distributed(""));
+  }
+
+  @Test
+  public void testSearchByDistributedWithString() throws IOException {
+    testSearch(PaginationFilter.distributed("lastweek"));
+  }
+
+  @Test
+  public void testSearchByDistributedWithDate() throws IOException {
+    testSearch(PaginationFilter.distributed("2017-01-01"));
+  }
+
+  @Test
+  public void testSearchByDistributedTo() throws IOException {
+    testSearch(PaginationFilter.distributedTo("elsewhere"));
+  }
+
+  @Test
   public void testSearchByCreator() throws IOException {
     testSearch(PaginationFilter.user("admin", true));
   }
@@ -407,6 +427,11 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   @Test
   public void testSearchByBox() throws IOException {
     testSearch(PaginationFilter.box("BOX1"));
+  }
+
+  @Test
+  public void testSearchByGroupId() throws IOException {
+    testSearch(PaginationFilter.groupId("ID of group"));
   }
 
   /**
