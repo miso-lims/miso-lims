@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
-import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -50,7 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @since 0.0.2
  */
 public interface Pool
-    extends SecurableByProfile, Comparable<Pool>, Barcodable, Watchable, Boxable, Nameable, ChangeLoggable,
+    extends SecurableByProfile, Comparable<Pool>, Barcodable, Boxable, Nameable, ChangeLoggable,
     Serializable, Aliasable, QualityControllable<PoolQC>, Deletable, Attachable {
 
   /**
@@ -182,9 +181,6 @@ public interface Pool
   Set<String> getDuplicateIndicesSequences();
 
   Set<String> getNearDuplicateIndicesSequences();
-
-  @Override
-  void setWatchGroup(Group group);
 
   public void setBoxPosition(PoolBoxPosition boxPosition);
 

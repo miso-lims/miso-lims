@@ -192,23 +192,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   @Override
-  public void addRunWatcher(Run run, User watcher) throws IOException {
-    User managedWatcher = securityManager.getUserById(watcher.getUserId());
-    Run managedRun = runDao.get(run.getId());
-    authorizationManager.throwIfNotReadable(managedRun);
-    authorizationManager.throwIfNotReadable(managedRun, managedWatcher);
-    runDao.addWatcher(managedRun, watcher);
-  }
-
-  @Override
-  public void removeRunWatcher(Run run, User watcher) throws IOException {
-    User managedWatcher = securityManager.getUserById(watcher.getUserId());
-    Run managedRun = runDao.get(run.getId());
-    authorizationManager.throwIfNonAdminOrMatchingOwner(managedWatcher);
-    runDao.removeWatcher(managedRun, managedWatcher);
-  }
-
-  @Override
   public int count() throws IOException {
     return runDao.count();
   }

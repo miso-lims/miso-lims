@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 
@@ -121,9 +119,5 @@ public interface ProjectStore extends Store<Project> {
    * @throws IOException
    */
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
-
-  void addWatcher(Project project, User watcher);
-
-  void removeWatcher(Project project, User watcher);
 
 }

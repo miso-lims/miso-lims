@@ -22,14 +22,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -42,12 +38,9 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateRunDao.class);
 
-  private static final String WATCHERS_GROUP = "RunWatchers";
   private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "description" };
   @Autowired
   private SessionFactory sessionFactory;
-  @Autowired
-  private SecurityStore securityStore;
   @Autowired
   private JdbcTemplate template;
 
@@ -73,24 +66,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public Run get(long id) throws IOException {
     Run run = (Run) currentSession().get(Run.class, id);
-    return withWatcherGroup(run);
-  }
-
-  private Group getRunWatcherGroup() throws IOException {
-    return securityStore.getGroupByName(WATCHERS_GROUP);
-  }
-
-  private Run withWatcherGroup(Run run) throws IOException {
-    if (run != null) run.setWatchGroup(getRunWatcherGroup());
     return run;
-  }
-
-  private List<Run> withWatcherGroup(List<Run> runs) throws IOException {
-    Group group = getRunWatcherGroup();
-    for (Run run : runs) {
-      run.setWatchGroup(group);
-    }
-    return runs;
   }
 
   @Override
@@ -99,7 +75,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
 
-    return withWatcherGroup(records);
+    return records;
   }
 
   @Override
@@ -120,7 +96,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     criteria.add(Restrictions.eq("spc.id", containerId));
     criteria.addOrder(Order.desc("startDate"));
     criteria.setMaxResults(1);
-    return withWatcherGroup((Run) criteria.uniqueResult());
+    return (Run) criteria.uniqueResult();
   }
 
   @Override
@@ -135,7 +111,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     criteria.add(Restrictions.eq("spc.id", containerId));
     criteria.addOrder(Order.desc("id"));
     criteria.setMaxResults(1);
-    return withWatcherGroup((Run) criteria.uniqueResult());
+    return (Run) criteria.uniqueResult();
   }
 
   @Override
@@ -144,14 +120,14 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     criteria.add(DbUtils.searchRestrictions(query, false, SEARCH_PROPERTIES));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
-    return withWatcherGroup(records);
+    return records;
   }
 
   @Override
   public Run getByAlias(String alias) throws IOException {
     Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.add(Restrictions.eq("alias", alias));
-    return withWatcherGroup((Run) criteria.uniqueResult());
+    return (Run) criteria.uniqueResult();
   }
 
   @Override
@@ -170,7 +146,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     criteria.add(Restrictions.in("id", ids));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
-    return withWatcherGroup(records);
+    return records;
   }
 
   @Override
@@ -185,7 +161,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     criteria.add(Restrictions.eq("spc.id", containerId));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
-    return withWatcherGroup(records);
+    return records;
   }
 
   @Override
@@ -208,7 +184,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     criteria.add(Restrictions.in("id", ids));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
-    return withWatcherGroup(records);
+    return records;
   }
 
   @Override
@@ -217,7 +193,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     criteria.add(Restrictions.eq("health", HealthType.get(health)));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
-    return withWatcherGroup(records);
+    return records;
   }
 
   @Override
@@ -226,7 +202,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     criteria.add(Restrictions.eq("sequencer.id", sequencerId));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
-    return withWatcherGroup(records);
+    return records;
   }
 
   @Override
@@ -262,24 +238,6 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
-  }
-
-  public void setSecurityStore(SecurityStore securityStore) {
-    this.securityStore = securityStore;
-  }
-
-  @Override
-  public void addWatcher(Run run, User watcher) {
-    log.debug("Adding watcher " + watcher.getLoginName() + " to " + run.getName());
-    run.addWatcher(watcher);
-    currentSession().update(run);
-  }
-
-  @Override
-  public void removeWatcher(Run run, User watcher) {
-    log.debug("Removing watcher " + watcher.getLoginName() + " from " + run.getWatchableIdentifier());
-    run.removeWatcher(watcher);
-    currentSession().update(run);
   }
 
   @Override

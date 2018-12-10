@@ -28,8 +28,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -104,10 +102,6 @@ public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
    * @throws IOException
    */
   public Map<String, Integer> getPoolColumnSizes() throws IOException;
-
-  void removeWatcher(Pool pool, User watcher);
-
-  void addWatcher(Pool pool, User watcher);
 
   Collection<Pool> listPoolsById(List<Long> poolIds);
 

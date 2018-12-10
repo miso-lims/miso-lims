@@ -133,8 +133,10 @@ INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (3, 'Human h
 INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `password`, `email`)
 VALUES (3,1,0,0,'user',1,'user','user','user@user.user');
 
+DELETE FROM `_Group`;
+INSERT INTO `_Group`(`groupId`, `name`, `description`) VALUES (1, 'TestGroup', 'Is full of testing');
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
-VALUES (3,1),(3,2),(1,1);
+VALUES (3,1),(1,1);
 
 DELETE FROM `SecurityProfile`;
 DELETE FROM `SecurityProfile_ReadGroup`;
@@ -146,8 +148,8 @@ VALUES (1,1,1),(2,1,1),(3,1,1),(4,1,1),(5,1,1),(6,1,1),(7,1,1),(8,1,1),(9,1,1),(
 
 INSERT INTO SecurityProfile_ReadUser(SecurityProfile_profileId, readUser_userId) VALUES (1, 1);
 INSERT INTO SecurityProfile_WriteUser(SecurityProfile_profileId, writeUser_userId) VALUES (2, 1);
-INSERT INTO SecurityProfile_ReadGroup(SecurityProfile_profileId, readGroup_groupId) VALUES (3, 2);
-INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_groupId) VALUES (4, 2);
+INSERT INTO SecurityProfile_ReadGroup(SecurityProfile_profileId, readGroup_groupId) VALUES (3, 1);
+INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_groupId) VALUES (4, 1);
 
 DELETE FROM `ProjectOverview`;
 DELETE FROM `Project`;

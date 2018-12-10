@@ -23,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstituteDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstrumentDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstrumentModelDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateKitDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
@@ -30,7 +31,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDilutionDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstrumentModelDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolOrderDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolableElementViewDao;
@@ -61,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultContainerService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultIndexService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultInstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultInstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultKitService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLabService;
@@ -68,7 +69,6 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryService;
-import uk.ac.bbsrc.tgac.miso.service.impl.DefaultInstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolableElementViewService;
@@ -379,7 +379,6 @@ public class MisoServiceManager {
     if (securityManager != null) securityManager.setSecurityStore(securityStore);
     if (poolDao != null) poolDao.setSecurityStore(securityStore);
     if (projectDao != null) projectDao.setSecurityStore(securityStore);
-    if (runDao != null) runDao.setSecurityStore(securityStore);
     if (experimentService != null) experimentService.setSecurityStore(securityStore);
   }
 
@@ -851,7 +850,6 @@ public class MisoServiceManager {
     HibernateRunDao dao = new HibernateRunDao();
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
-    dao.setSecurityStore(securityStore);
     setRunDao(dao);
   }
 

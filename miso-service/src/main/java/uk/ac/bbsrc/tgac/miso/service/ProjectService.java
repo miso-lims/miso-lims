@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -76,9 +75,5 @@ public interface ProjectService extends ProviderService<Project> {
   public void deleteProjectOverviewNote(ProjectOverview projectOverview, Long noteId) throws IOException;
 
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
-
-  void addProjectWatcher(Project project, User watcher) throws IOException;
-
-  void removeProjectWatcher(Project project, User watcher) throws IOException;
 
 }

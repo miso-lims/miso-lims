@@ -101,7 +101,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
-    dao.setSecurityStore(securityDAO);
     emptyUser.setUserId(1L);
     when(securityDAO.getUserById(Matchers.anyLong())).thenReturn(emptyUser);
     emptySR.setId(1L);
@@ -372,26 +371,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     List<Run> runs = dao.list(2, 2, false, "lastModified");
     assertEquals(2, runs.size());
     assertEquals(2, runs.get(0).getId());
-  }
-
-  @Test
-  public void testWatchers() throws Exception {
-    Run run = dao.get(1L);
-    assertNotNull(run);
-    assertEquals(0, run.getWatchers().size());
-
-    User user = (User) sessionFactory.getCurrentSession().get(UserImpl.class, 1L);
-    assertNotNull(user);
-
-    dao.addWatcher(run, user);
-    assertEquals(1, run.getWatchers().size());
-    run = dao.get(1L);
-    assertEquals(1, run.getWatchers().size());
-
-    dao.removeWatcher(run, user);
-    assertEquals(0, run.getWatchers().size());
-    run = dao.get(1L);
-    assertEquals(0, run.getWatchers().size());
   }
 
   @Test

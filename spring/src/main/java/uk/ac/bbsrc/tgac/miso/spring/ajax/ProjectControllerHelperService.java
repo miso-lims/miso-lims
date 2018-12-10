@@ -35,9 +35,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -288,57 +286,6 @@ public class ProjectControllerHelperService {
     } else {
       return JSONUtils.SimpleJSONError("Missing project ID or document format supplied.");
     }
-  }
-
-  public JSONObject watchOverview(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-      projectService.addProjectWatcher(overview.getProject(), user);
-      return JSONUtils.SimpleJSONResponse("OK");
-    } catch (final IOException e) {
-      log.error("watch overview", e);
-    }
-    return JSONUtils.SimpleJSONError("Unable to watch/unwatch overview");
-  }
-
-  public JSONObject unwatchOverview(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-      projectService.removeProjectWatcher(overview.getProject(), user);
-      if (!overview.getProject().getSecurityProfile().getOwner().equals(user)) {
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError("Cannot unwatch an entity of which you are the owner.");
-      }
-    } catch (final IOException e) {
-      log.error("unwatch overview", e);
-    }
-    return JSONUtils.SimpleJSONError("Unable to watch/unwatch overview");
-  }
-
-  public JSONObject listWatchOverview(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    final StringBuilder sb = new StringBuilder();
-    final JSONObject j = new JSONObject();
-    try {
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-      sb.append("<ul class='bullets' style='margin-left: -30px;'>");
-      for (final User theUser : overview.getWatchers()) {
-        sb.append("<li>");
-        sb.append(theUser.getFullName());
-        sb.append("</li>");
-      }
-      sb.append("</ul>");
-      j.put("watchers", sb.toString());
-      return j;
-    } catch (final IOException e) {
-      log.error("list watch overview", e);
-    }
-    return JSONUtils.SimpleJSONError("Unable to list watchers");
   }
 
   public JSONObject listSamplesByProject(HttpSession session, JSONObject json) {

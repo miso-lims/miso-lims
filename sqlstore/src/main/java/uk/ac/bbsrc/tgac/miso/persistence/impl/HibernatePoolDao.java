@@ -22,9 +22,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
@@ -51,8 +48,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   private static final String TABLE_NAME = "Pool";
 
-  private static final String WATCHER_GROUP = "PoolWatchers";
-
   @Autowired
   private BoxStore boxStore;
 
@@ -66,13 +61,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   @Autowired
   private SessionFactory sessionFactory;
-
-  @Override
-  public void addWatcher(Pool pool, User watcher) {
-    log.debug("Adding watcher " + watcher.getLoginName() + " to " + pool.getName());
-    pool.addWatcher(watcher);
-    currentSession().update(pool);
-  }
 
   @Override
   public int count() {
@@ -91,7 +79,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   @Override
   public Pool get(long poolId) throws IOException {
-    return withWatcherGroup((PoolImpl) currentSession().get(PoolImpl.class, poolId));
+    return (PoolImpl) currentSession().get(PoolImpl.class, poolId);
   }
 
   public BoxStore getBoxStore() {
@@ -101,7 +89,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   @Override
   public Pool getByBarcode(String barcode) throws IOException {
     if (barcode == null) throw new NullPointerException("cannot look up null barcode");
-    return withWatcherGroup((Pool) createCriteria().add(Restrictions.eq("identificationBarcode", barcode)).uniqueResult());
+    return (Pool) createCriteria().add(Restrictions.eq("identificationBarcode", barcode)).uniqueResult();
   }
 
   @Override
@@ -113,7 +101,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
     criteria.add(Restrictions.in("identificationBarcode", barcodeList));
     @SuppressWarnings("unchecked")
     List<Pool> results = criteria.list();
-    return withWatcherGroup(results);
+    return results;
   }
 
   public JdbcTemplate getJdbcTemplate() {
@@ -123,10 +111,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   @Override
   public Map<String, Integer> getPoolColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(jdbcTemplate, TABLE_NAME);
-  }
-
-  private Group getPoolWatcherGroup() throws IOException {
-    return securityStore.getGroupByName(WATCHER_GROUP);
   }
 
   public SecurityStore getSecurityStore() {
@@ -141,7 +125,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   public List<Pool> listAll() throws IOException {
     @SuppressWarnings("unchecked")
     List<Pool> results = createCriteria().list();
-    return withWatcherGroup(results);
+    return results;
   }
 
   @Override
@@ -161,7 +145,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
     }
     @SuppressWarnings("unchecked")
     List<Pool> results = criteria.list();
-    return withWatcherGroup(results);
+    return results;
   }
 
   @Override
@@ -204,14 +188,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
-  public void removeWatcher(Pool pool, User watcher) {
-    log.debug(String.format("Removing watcher %s from %s", watcher.getLoginName(), pool.getWatchableIdentifier()));
-    pool.removeWatcher(watcher);
-    currentSession().update(pool);
-
-  }
-
-  @Override
   public long save(final Pool pool) throws IOException {
     currentSession().flush();
     Long id;
@@ -250,21 +226,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
-  }
-
-  private List<Pool> withWatcherGroup(List<Pool> pools) throws IOException {
-    Group group = getPoolWatcherGroup();
-    for (Pool pool : pools) {
-      pool.setWatchGroup(group);
-    }
-    return pools;
-  }
-
-  private Pool withWatcherGroup(Pool pool) throws IOException {
-    if (pool != null) {
-      pool.setWatchGroup(getPoolWatcherGroup());
-    }
-    return pool;
   }
 
   private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator");

@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
@@ -48,10 +46,6 @@ public interface RunService extends ProviderService<Run>, PaginatedDataSource<Ru
    * @throws IOException
    */
   Run getLatestRunBySequencerPartitionContainerId(long containerId) throws IOException;
-
-  void addRunWatcher(Run run, User watcher) throws IOException;
-
-  void removeRunWatcher(Run run, User watcher) throws IOException;
 
   Long create(Run run) throws IOException;
 
