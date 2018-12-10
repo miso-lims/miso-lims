@@ -99,6 +99,10 @@ ListTarget.experiment = {
         handler: function() {
           var url = window.location.origin + '/miso/rest/run/' + config.runId + '/potentialExperiments';
           Utils.ajaxWithDialog('Finding potential experiments', 'GET', url, null, function(potentialExperiments) {
+            if (!potentialExperiments || !potentialExperiments.length) {
+              Utils.showOkDialog('Error', ['No existing experiments found']);
+              return;
+            }
             Utils.showWizardDialog("Add to Experiment", potentialExperiments.map(function(request) {
               return {
                 name: request.partition.containerName + " " + request.partition.partitionNumber + " (" + request.partition.pool.name
