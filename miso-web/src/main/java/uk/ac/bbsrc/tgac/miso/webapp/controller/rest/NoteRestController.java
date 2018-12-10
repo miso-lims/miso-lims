@@ -42,11 +42,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.eaglegenomics.simlims.core.Note;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.NoteService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
@@ -82,26 +80,6 @@ public class NoteRestController extends RestController {
 
   @Autowired
   private PoolService poolService;
-
-  private final NoteService<?> projectOverviewWrapper = new NoteService<ProjectOverview>() {
-
-    @Override
-    public void addNote(ProjectOverview overview, Note note) throws IOException {
-      projectService.saveProjectOverviewNote(overview, note);
-    }
-
-    @Override
-    public void deleteNote(ProjectOverview overview, Long noteId) throws IOException {
-      projectService.deleteProjectOverviewNote(overview, noteId);
-    }
-
-    @Override
-    public ProjectOverview get(long id) throws IOException {
-      return projectService.getProjectOverviewById(id);
-    }
-  };
-  @Autowired
-  private ProjectService projectService;
 
   @Autowired
   private RunService runService;
@@ -149,8 +127,6 @@ public class NoteRestController extends RestController {
       return poolService;
     case "run":
       return runService;
-    case "projectoverview":
-      return projectOverviewWrapper;
     default:
       throw new RestException("Unknown entity type: " + entityType, Status.NOT_FOUND);
     }
@@ -162,10 +138,6 @@ public class NoteRestController extends RestController {
 
   public void setPoolService(PoolService poolService) {
     this.poolService = poolService;
-  }
-
-  public void setProjectService(ProjectService projectService) {
-    this.projectService = projectService;
   }
 
   public void setRunService(RunService runService) {

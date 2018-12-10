@@ -47,7 +47,6 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
@@ -120,57 +119,6 @@ public class ProjectControllerHelperService {
         return JSONUtils.SimpleJSONError(shortNameValidation.getMessage());
       }
     }
-  }
-
-  public JSONObject addProjectOverview(HttpSession session, JSONObject json) {
-    final Long projectId = json.getLong("projectId");
-    final String principalInvestigator = (String) json.get("principalInvestigator");
-    final Integer numProposedSamples = json.getInt("numProposedSamples");
-
-    try {
-      final Project project = projectService.get(projectId);
-      final ProjectOverview overview = new ProjectOverview();
-      overview.setNumProposedSamples(numProposedSamples);
-      overview.setPrincipalInvestigator(principalInvestigator);
-      overview.setProject(project);
-      overview.setLocked(false);
-      project.getOverviews().add(overview);
-      projectService.saveProjectOverview(overview);
-      projectService.saveProject(project);
-    } catch (final IOException e) {
-      log.error("add project overview", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-
-    return JSONUtils.SimpleJSONResponse("ok");
-  }
-
-  public JSONObject unlockProjectOverview(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    try {
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-      overview.setLocked(false);
-      projectService.saveProjectOverview(overview);
-      projectService.saveProject(overview.getProject());
-    } catch (final IOException e) {
-      log.error("unlock project overview", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-    return JSONUtils.SimpleJSONResponse("ok");
-  }
-
-  public JSONObject lockProjectOverview(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    try {
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-      overview.setLocked(true);
-      projectService.saveProjectOverview(overview);
-      projectService.saveProject(overview.getProject());
-    } catch (final IOException e) {
-      log.error("lock project overview", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-    return JSONUtils.SimpleJSONResponse("ok");
   }
 
   public JSONObject generateSampleDeliveryForm(HttpSession session, JSONObject json) {
@@ -285,83 +233,6 @@ public class ProjectControllerHelperService {
       }
     } else {
       return JSONUtils.SimpleJSONError("Missing project ID or document format supplied.");
-    }
-  }
-
-  public JSONObject listSamplesByProject(HttpSession session, JSONObject json) {
-    final Long projectId = json.getLong("projectId");
-
-    try {
-      final JSONObject j = new JSONObject();
-      final JSONArray jsonArray = new JSONArray();
-      for (final Sample sample : sampleService.listByProjectId(projectId)) {
-        jsonArray.add("{'id':'" + sample.getId() + "'," + "'name':'" + sample.getName() + "'," + "'alias':'" + sample.getAlias() + "',"
-            + "'type':'" + sample.getSampleType() + "'," + "'description':'" + sample.getDescription() + "'}");
-      }
-      j.put("array", jsonArray);
-      return j;
-    } catch (final IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-  }
-
-  public JSONObject addSampleGroup(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    try {
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-
-      final Set<Sample> samples = new HashSet<>();
-      if (json.has("samples")) {
-        final JSONArray a = JSONArray.fromObject(json.get("samples"));
-        for (final JSONObject j : (Iterable<JSONObject>) a) {
-          if (j.has("sampleId")) {
-            samples.add(sampleService.get(j.getLong("sampleId")));
-          } else {
-            return JSONUtils.SimpleJSONError("Unable to add Sample Group: invalid sample set JSON has missing sampleId");
-          }
-        }
-      }
-
-      overview.setSampleGroup(samples);
-
-      projectService.saveProjectOverview(overview);
-      projectService.saveProject(overview.getProject());
-
-      return JSONUtils.SimpleJSONResponse("OK");
-    } catch (final IOException e) {
-      log.error("add sample group", e);
-      return JSONUtils.SimpleJSONError("Unable to add Sample Group: " + e.getMessage());
-    }
-  }
-
-  public JSONObject addSamplesToGroup(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    try {
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-      if (json.has("samples")) {
-        final JSONArray a = JSONArray.fromObject(json.get("samples"));
-        for (final JSONObject j : (Iterable<JSONObject>) a) {
-          if (j.has("sampleId")) {
-            final Sample s = sampleService.get(j.getLong("sampleId"));
-            if (overview.getSamples().contains(s)) {
-              log.error("Sample group already contains " + s.getName());
-            } else {
-              overview.getSamples().add(s);
-            }
-          } else {
-            return JSONUtils.SimpleJSONError("Unable to add Sample Group: invalid sample set JSON has missing sampleId");
-          }
-        }
-      }
-
-      projectService.saveProjectOverview(overview);
-      projectService.saveProject(overview.getProject());
-
-      return JSONUtils.SimpleJSONResponse("OK");
-    } catch (final IOException e) {
-      log.error("add samples to group", e);
-      return JSONUtils.SimpleJSONError("Unable to add Sample Group: " + e.getMessage());
     }
   }
 }

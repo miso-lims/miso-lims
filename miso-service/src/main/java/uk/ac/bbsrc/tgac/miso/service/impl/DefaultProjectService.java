@@ -39,7 +39,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -47,7 +46,6 @@ import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -79,27 +77,6 @@ public class DefaultProjectService implements ProjectService {
   @Autowired
   private SecurityManager securityManager;
 
-  @Override
-  public void deleteProjectOverviewNote(ProjectOverview projectOverview, Long noteId) throws IOException {
-    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
-      throw new IllegalArgumentException("Cannot delete an unsaved Note");
-    }
-    ProjectOverview managed = projectStore.getProjectOverviewById(projectOverview.getId());
-    Note deleteNote = null;
-    for (Note note : managed.getNotes()) {
-      if (note.getNoteId().equals(noteId)) {
-        deleteNote = note;
-        break;
-      }
-    }
-    if (deleteNote == null) {
-      throw new IOException("Note " + noteId + " not found for ProjectOverview " + projectOverview.getId());
-    }
-    authorizationManager.throwIfNonAdminOrMatchingOwner(deleteNote.getOwner());
-    managed.getNotes().remove(deleteNote);
-    projectStore.saveOverview(managed);
-  }
-
   // GETS
   @Override
   public Project get(long projectId) throws IOException {
@@ -125,18 +102,6 @@ public class DefaultProjectService implements ProjectService {
   @Override
   public Map<String, Integer> getProjectColumnSizes() throws IOException {
     return projectStore.getProjectColumnSizes();
-  }
-
-  @Override
-  public ProjectOverview getProjectOverviewById(long overviewId) throws IOException {
-    ProjectOverview projectOverview = projectStore.getProjectOverviewById(overviewId);
-    authorizationManager.throwIfNotReadable(projectOverview.getProject());
-    return projectOverview;
-  }
-
-  @Override
-  public Collection<ProjectOverview> listAllOverviewsByProjectId(long projectId) throws IOException {
-    return authorizationManager.filterUnreadable(projectStore.listOverviewsByProjectId(projectId), ProjectOverview::getProject);
   }
 
   @Override
@@ -252,50 +217,12 @@ public class DefaultProjectService implements ProjectService {
         original.setDefaultTargetedSequencing(null);
       }
       original.setShortName(project.getShortName());
-      for (ProjectOverview po : project.getOverviews()) {
-        if (po.getId() == ProjectOverview.UNSAVED_ID) {
-          original.getOverviews().add(po);
-        }
-      }
       updateSecurityProfile(original.getSecurityProfile(), project.getSecurityProfile());
       project = original;
     }
     project.getSecurityProfile().setProfileId(saveSecurityProfile(project.getSecurityProfile()));
     long id = projectStore.save(project);
     return id;
-  }
-
-  @Override
-  public long saveProjectOverview(ProjectOverview overview) throws IOException {
-    if (overview.getId() != ProjectOverview.UNSAVED_ID) {
-      ProjectOverview original = projectStore.getProjectOverviewById(overview.getId());
-      authorizationManager.throwIfNotWritable(original.getProject());
-      original.setAllLibrariesQcPassed(overview.getAllLibrariesQcPassed());
-      original.setAllPoolsConstructed(overview.getAllPoolsConstructed());
-      original.setAllRunsCompleted(overview.getAllRunsCompleted());
-      original.setLocked(overview.getLocked());
-      original.setPrimaryAnalysisCompleted(overview.getPrimaryAnalysisCompleted());
-      original.setPrincipalInvestigator(overview.getPrincipalInvestigator());
-      original.setStartDate(overview.getStartDate());
-      original.setEndDate(overview.getEndDate());
-      original.setNumProposedSamples(overview.getNumProposedSamples());
-      original.setAllSampleQcPassed(overview.getAllSampleQcPassed());
-      overview = original;
-    } else {
-      authorizationManager.throwIfNotWritable(overview.getProject());
-    }
-    overview.setLastUpdated(new Date());
-    return projectStore.saveOverview(overview);
-  }
-
-  @Override
-  public void saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException {
-    ProjectOverview managed = projectStore.getProjectOverviewById(overview.getId());
-    authorizationManager.throwIfNotWritable(managed.getProject());
-    note.setCreationDate(new Date());
-    note.setOwner(authorizationManager.getCurrentUser());
-    managed.getNotes().add(note);
-    projectStore.saveOverview(managed);
   }
 
   private long saveSecurityProfile(SecurityProfile sp) throws IOException {
