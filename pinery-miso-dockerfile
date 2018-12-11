@@ -1,0 +1,11 @@
+FROM maven:3.6.0-jdk-8 as builder
+COPY . /miso-lims
+RUN cd miso-lims && mvn clean package
+
+FROM tomcat:8-jre8
+RUN rm -rf /usr/local/tomcat/webapps/ROOT
+COPY --from=builder /miso-lims/pinery-miso/target/*.war /usr/local/tomcat/webapps/ROOT.war
+COPY pinery-miso/docker/* /usr/local/tomcat/conf/Catalina/localhost/
+EXPOSE 8080
+CMD ["catalina.sh", "run"]
+
