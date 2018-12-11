@@ -53,11 +53,15 @@ public class PartitionQCTypeDto {
   public String getDetailedLabel() {
     StringBuilder sb = new StringBuilder();
     sb.append(getDescription());
-    if (!isOrderFulfilled() || isAnalysisSkipped()) sb.append(" (");
-    if (!isOrderFulfilled()) sb.append("order not fulfilled");
-    if (!isOrderFulfilled() && isAnalysisSkipped()) sb.append(", ");
-    if (isAnalysisSkipped()) sb.append("analysis skipped");
-    if (!isOrderFulfilled() || isAnalysisSkipped()) sb.append(")");
+    sb.append(" (order ");
+    if (!isOrderFulfilled()) sb.append("not ");
+    sb.append("fulfilled, analysis ");
+    if (isAnalysisSkipped()) {
+      sb.append("skipped");
+    } else {
+      sb.append("to proceed");
+    }
+    sb.append(")");
     return sb.toString();
   }
 
