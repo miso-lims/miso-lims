@@ -34,11 +34,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,8 +56,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PartitionSpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -145,6 +151,48 @@ public class ContainerRestController extends RestController {
         .map(WhineyFunction.rethrow(containerService::get))
         .flatMap(container -> container.getPartitions().stream());
     return MisoWebUtils.generateSpreadsheet(input, PartitionSpreadsheets::valueOf, request, response);
+  }
+
+  @PostMapping(value = "/validate-serial-number")
+  public ResponseEntity<?> validateSerialNumber(@RequestBody String params, HttpServletRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+    JsonNode reqBody = null;
+    try {
+      reqBody = new ObjectMapper().readTree(params);
+    } catch (JsonProcessingException e) {
+      String error = String.format("Error looking up containers by serial number");
+      log.error(error, e);
+      return ResponseEntity
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(error);
+    }
+
+    if (!reqBody.has("serialNumber") || LimsUtils.isStringEmptyOrNull(reqBody.get("serialNumber").asText()) || !reqBody.has("containerId")
+        || reqBody.get("containerId").asLong() == SequencerPartitionContainerImpl.UNSAVED_ID) {
+      return ResponseEntity
+          .status(HttpStatus.PRECONDITION_FAILED)
+          .body("Container ID and serial number must be provided");
+    }
+    String serialNumber = reqBody.get("serialNumber").asText();
+    Long containerId = reqBody.get("containerId").asLong();
+    try {
+      List<SequencerPartitionContainer> matchingContainers = (List<SequencerPartitionContainer>) containerService
+          .listByBarcode(serialNumber);
+      if (matchingContainers.isEmpty()
+          || (matchingContainers.size() == 1 && matchingContainers.get(0).getId() == Long.valueOf(containerId))) {
+        return ResponseEntity.status(HttpStatus.OK).build();
+      } else {
+        return ResponseEntity
+            .status(HttpStatus.PRECONDITION_FAILED)
+            .body("Serial number is already associated with another container");
+      }
+    } catch (IOException e) {
+      String error = String.format("Error looking up containers by serial number '%s'", serialNumber);
+      log.error(error, e);
+      return ResponseEntity
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(error);
+    }
   }
 
 }

@@ -58,6 +58,7 @@ var Sample = Sample || {
     if (skipAliasValidation) {
       jQuery('#alias').attr('data-parsley-required', 'true');
     } else {
+      // attach the AJAX validator
       jQuery('#alias').attr('data-parsley-sample-alias', '');
       jQuery('#alias').attr('data-parsley-debounce', '500');
     }
