@@ -140,9 +140,9 @@ ListTarget.library = {
   },
   searchTermSelector: function(searchTerms) {
     const plainSampleTerms = [searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'],
-        searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box'], searchTerms['kitname']];
-    const detailedSampleTerms = [searchTerms['institute'], searchTerms['external'], searchTerms['groupid'], searchTerms['distributed'],
-        searchTerms['distributedto']];
+        searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box'], searchTerms['kitname'],
+        searchTerms['distributed'], searchTerms['distributedto']];
+    const detailedSampleTerms = [searchTerms['institute'], searchTerms['external'], searchTerms['groupid']];
     if (Constants.isDetailedSample) {
       return plainSampleTerms.concat(detailedSampleTerms);
     } else {

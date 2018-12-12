@@ -240,9 +240,9 @@ ListTarget.sample = {
   },
   searchTermSelector: function(searchTerms) {
     const plainSampleTerms = [searchTerms['created'], searchTerms['changed'], searchTerms['received'], searchTerms['creator'],
-        searchTerms['changedby'], searchTerms['box']];
+        searchTerms['changedby'], searchTerms['box'], searchTerms['distributed'], searchTerms['distributedto']];
     const detailedSampleTerms = [searchTerms['class'], searchTerms['institute'], searchTerms['external'], searchTerms['subproject'],
-        searchTerms['groupid'], searchTerms['distributed'], searchTerms['distributedto']];
+        searchTerms['groupid']];
     if (Constants.isDetailedSample) {
       return plainSampleTerms.concat(detailedSampleTerms);
     } else {
