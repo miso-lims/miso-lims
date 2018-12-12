@@ -25,16 +25,17 @@
 window.Parsley.addValidator('sampleAlias', {
   validateString: function(value) {
     var deferred = new jQuery.Deferred();
-    Fluxion.doAjax('sampleControllerHelperService', 'validateSampleAlias', {
-      'alias': value,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': function(json) {
-        deferred.resolve();
-      },
-      'doOnError': function(json) {
-        deferred.reject(json.error);
-      }
+    jQuery.ajax({
+      url: '/miso/rest/sample/validate-alias',
+      type: 'POST',
+      contentType: 'application/json; charset=utf8',
+      data: JSON.stringify({
+        alias: value
+      })
+    }).success(function(json) {
+      deferred.resolve();
+    }).fail(function(response, textStatus, serverStatus) {
+      deferred.reject(response.error);
     });
     return deferred.promise();
   },

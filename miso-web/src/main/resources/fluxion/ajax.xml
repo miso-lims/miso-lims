@@ -42,13 +42,7 @@
   <bean id="projectControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectControllerHelperService">
   </bean>
 
-  <bean id="sampleControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.SampleControllerHelperService">
-  </bean>
-
   <bean id="containerControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ContainerControllerHelperService">
-  </bean>
-
-  <bean id="libraryControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.LibraryControllerHelperService">
   </bean>
 
   <bean id="dashboard" class="uk.ac.bbsrc.tgac.miso.spring.ajax.DashboardHelperService">

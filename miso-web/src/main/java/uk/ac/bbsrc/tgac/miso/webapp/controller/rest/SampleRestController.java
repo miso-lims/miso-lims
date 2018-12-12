@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,6 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -76,6 +79,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -107,6 +112,8 @@ public class SampleRestController extends RestController {
   private SampleClassService sampleClassService;
   @Autowired
   private ProjectService projectService;
+  @Autowired
+  private NamingScheme namingScheme;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -342,6 +349,33 @@ public class SampleRestController extends RestController {
       matches = sampleService.getIdentitiesByExternalNameOrAliasAndProject(identityIdentifier, null, exactMatch);
     }
     return matches.stream().map(identity -> Dtos.asDto(identity, false)).collect(Collectors.toSet());
+  }
+
+  /**
+   * This is a first pass at validating the alias. Further validation is done in the Sample Service, as
+   * validation results may depend on other sample properties.
+   */
+  @PostMapping(value = "/validate-alias", produces = { "application/json" })
+  public ResponseEntity<?> preValidateAlias(@RequestBody String alias, HttpServletRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) {
+    if (isStringEmptyOrNull(alias)) {
+      if (namingScheme.hasSampleAliasGenerator()) {
+        return ResponseEntity.status(HttpStatus.OK).build();
+      } else {
+        return ResponseEntity
+            .status(HttpStatus.PRECONDITION_FAILED)
+            .body("No alias specified");
+      }
+    }
+    
+    ValidationResult aliasValidation = namingScheme.validateSampleAlias(alias);
+    if (aliasValidation.isValid()) {
+      return ResponseEntity.status(HttpStatus.OK).build();
+    } else {
+      return ResponseEntity
+          .status(HttpStatus.PRECONDITION_FAILED)
+          .body(aliasValidation.getMessage());
+    }
   }
 
   @PostMapping(value = "/query", produces = { "application/json" })
