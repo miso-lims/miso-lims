@@ -50,9 +50,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
-import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -79,7 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @Table(name = "Run")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Run
-    implements SecurableByProfile, Comparable<Run>, Watchable, Nameable, ChangeLoggable, Aliasable, Attachable, Serializable {
+    implements SecurableByProfile, Comparable<Run>, Nameable, ChangeLoggable, Aliasable, Attachable, Serializable {
   private static final long serialVersionUID = 1L;
 
   /** Field PREFIX */
@@ -151,14 +149,6 @@ public abstract class Run
   @Temporal(TemporalType.DATE)
   private Date startDate;
 
-  @Transient
-  // not Hibernate-managed
-  private Group watchGroup;
-
-  @ManyToMany(targetEntity = UserImpl.class)
-  @JoinTable(name = "Run_Watcher", joinColumns = { @JoinColumn(name = "runId") }, inverseJoinColumns = { @JoinColumn(name = "userId") })
-  private Set<User> watchUsers = new HashSet<>();
-
   @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Run_Attachment", joinColumns = { @JoinColumn(name = "runId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
@@ -193,11 +183,6 @@ public abstract class Run
     rp.setContainer(f);
     rp.setPosition(position);
     getRunPositions().add(rp);
-  }
-
-  @Override
-  public void addWatcher(User user) {
-    watchUsers.add(user);
   }
 
   @Override
@@ -344,27 +329,6 @@ public abstract class Run
   }
 
   @Override
-  public String getWatchableIdentifier() {
-    return getName();
-  }
-
-  @Override
-  public Set<User> getWatchers() {
-    Set<User> allWatchers = new HashSet<>();
-    if (watchGroup != null) allWatchers.addAll(watchGroup.getUsers());
-    if (watchUsers != null) allWatchers.addAll(watchUsers);
-    return allWatchers;
-  }
-
-  public Group getWatchGroup() {
-    return watchGroup;
-  }
-
-  public Set<User> getWatchUsers() {
-    return watchUsers;
-  }
-
-  @Override
   public List<FileAttachment> getAttachments() {
     return attachments;
   }
@@ -393,11 +357,6 @@ public abstract class Run
 
   public boolean isFull() {
     return getRunPositions().size() >= sequencer.getInstrumentModel().getNumContainers();
-  }
-
-  @Override
-  public void removeWatcher(User user) {
-    watchUsers.remove(user);
   }
 
   public void setAccession(String accession) {
@@ -460,15 +419,6 @@ public abstract class Run
 
   public void setStartDate(Date startDate) {
     this.startDate = startDate;
-  }
-
-  @Override
-  public void setWatchGroup(Group watchGroup) {
-    this.watchGroup = watchGroup;
-  }
-
-  public void setWatchUsers(Set<User> watchUsers) {
-    this.watchUsers = watchUsers;
   }
 
   @Override

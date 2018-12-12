@@ -199,8 +199,6 @@ This user manual is a work in progress, so parts of it may be missing until it h
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Edit Project Page" %}
 {% assign subsub =  1 %}
-{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Project Overviews" %}
-{% assign subsub = subsub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Tracked Issues" %}
 {% assign subsub = subsub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Project Files" %}

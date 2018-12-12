@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -69,7 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
@@ -280,15 +278,6 @@ public class EditProjectController {
     model.put("owners", LimsSecurityUtils.getPotentialOwners(user, project, securityManager.listAllUsers()));
     model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, project, securityManager.listAllUsers()));
     model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, project, securityManager.listAllGroups()));
-    model.put("overviews", project.getOverviews());
-
-    Map<Long, String> overviewMap = new HashMap<>();
-    for (ProjectOverview po : project.getOverviews()) {
-      if (po.getWatchers().contains(user)) {
-        overviewMap.put(po.getId(), user.getLoginName());
-      }
-    }
-    model.put("overviewMap", overviewMap);
 
     return new ModelAndView("/pages/editProject.jsp", model);
   }
@@ -299,9 +288,6 @@ public class EditProjectController {
       throws IOException {
     try {
       projectService.saveProject(project);
-      for (ProjectOverview overview : project.getOverviews()) {
-        projectService.saveProjectOverview(overview);
-      }
       session.setComplete();
       model.clear();
       return new ModelAndView("redirect:/miso/project/" + project.getId(), model);

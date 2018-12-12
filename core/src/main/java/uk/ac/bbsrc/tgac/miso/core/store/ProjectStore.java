@@ -27,10 +27,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 
 /**
  * Defines a DAO interface for storing Projects
@@ -75,28 +72,6 @@ public interface ProjectStore extends Store<Project> {
   Collection<Project> listBySearch(String query) throws IOException;
 
   /**
-   * Get a ProjectOverview given a ProjectOverview ID
-   * 
-   * @param overviewId
-   *          of type long
-   * @return ProjectOverview
-   * @throws IOException
-   *           when
-   */
-  ProjectOverview getProjectOverviewById(long overviewId) throws IOException;
-
-  /**
-   * Get ProjectOverviews given a Project ID
-   * 
-   * @param projectId
-   *          of type long
-   * @return Collection<ProjectOverview>
-   * @throws IOException
-   *           when
-   */
-  Collection<ProjectOverview> listOverviewsByProjectId(long projectId) throws IOException;
-
-  /**
    * List all persisted objects
    * 
    * @return Collection<Project>
@@ -104,26 +79,11 @@ public interface ProjectStore extends Store<Project> {
    *           when the objects cannot be retrieved
    */
   Collection<Project> listAllWithLimit(long limit) throws IOException;
-
-  /**
-   * Save a ProjectOverview
-   * 
-   * @param overview
-   *          of type ProjectOverview
-   * @return long
-   * @throws IOException
-   *           when
-   */
-  long saveOverview(ProjectOverview overview) throws IOException;
   
   /**
    * @return a map containing all column names and max lengths from the Project table
    * @throws IOException
    */
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
-
-  void addWatcher(Project project, User watcher);
-
-  void removeWatcher(Project project, User watcher);
 
 }

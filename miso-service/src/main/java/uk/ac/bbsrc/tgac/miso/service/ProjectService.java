@@ -27,28 +27,18 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 
 public interface ProjectService extends ProviderService<Project> {
 
   // SAVES
   public long saveProject(Project project) throws IOException;
 
-  public long saveProjectOverview(ProjectOverview overview) throws IOException;
-
-  public void saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException;
-
 
   // GETS
   public Project getProjectByAlias(String projectAlias) throws IOException;
 
   public Project getProjectByShortName(String projectShortName) throws IOException;
-
-  public ProjectOverview getProjectOverviewById(long overviewId) throws IOException;
 
   // LISTS
   /**
@@ -69,16 +59,8 @@ public interface ProjectService extends ProviderService<Project> {
    */
   public Collection<Project> listAllProjectsByShortname() throws IOException;
 
-  public Collection<ProjectOverview> listAllOverviewsByProjectId(long projectId) throws IOException;
-
   // DELETES
 
-  public void deleteProjectOverviewNote(ProjectOverview projectOverview, Long noteId) throws IOException;
-
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
-
-  void addProjectWatcher(Project project, User watcher) throws IOException;
-
-  void removeProjectWatcher(Project project, User watcher) throws IOException;
 
 }

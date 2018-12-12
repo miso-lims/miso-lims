@@ -133,8 +133,10 @@ INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (3, 'Human h
 INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `password`, `email`)
 VALUES (3,1,0,0,'user',1,'user','user','user@user.user');
 
+DELETE FROM `_Group`;
+INSERT INTO `_Group`(`groupId`, `name`, `description`) VALUES (1, 'TestGroup', 'Is full of testing');
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
-VALUES (3,1),(3,2),(1,1);
+VALUES (3,1),(1,1);
 
 DELETE FROM `SecurityProfile`;
 DELETE FROM `SecurityProfile_ReadGroup`;
@@ -146,19 +148,14 @@ VALUES (1,1,1),(2,1,1),(3,1,1),(4,1,1),(5,1,1),(6,1,1),(7,1,1),(8,1,1),(9,1,1),(
 
 INSERT INTO SecurityProfile_ReadUser(SecurityProfile_profileId, readUser_userId) VALUES (1, 1);
 INSERT INTO SecurityProfile_WriteUser(SecurityProfile_profileId, writeUser_userId) VALUES (2, 1);
-INSERT INTO SecurityProfile_ReadGroup(SecurityProfile_profileId, readGroup_groupId) VALUES (3, 2);
-INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_groupId) VALUES (4, 2);
+INSERT INTO SecurityProfile_ReadGroup(SecurityProfile_profileId, readGroup_groupId) VALUES (3, 1);
+INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_groupId) VALUES (4, 1);
 
-DELETE FROM `ProjectOverview`;
 DELETE FROM `Project`;
 INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `shortName`, `lastUpdated`, `referenceGenomeId`) VALUES
 (1,'2015-08-27 15:40:15','Test project','PRO1',1,'ACTIVE','TEST1','TEST1','2015-08-27 19:40:40', 1),
 (2,'2013-11-27 12:20:15','Test project2','PRO2',1,'ACTIVE','TEST2','TEST2','2015-11-30 15:23:18', 1),
 (3,'2016-01-27 11:11:15','Test project3','PRO3',1,'ACTIVE','TEST3','TEST3','2016-02-22 10:43:18', 2);
-
-INSERT INTO ProjectOverview(overviewId, principalInvestigator, startDate, project_projectId)
-VALUES
- (1, 'Dr. Professorsworth', NOW(), 1);
 
 DELETE FROM Study;
 INSERT INTO Study(studyId, name, description, accession, securityProfile_profileId, project_projectId, studyTypeId, alias, creator, created, lastModifier, lastModified)
@@ -617,8 +614,6 @@ VALUES
 (1, '2016-02-25', 1, 'first note', 1),
 (2, '2016-01-23', 0, 'second note', 1),
 (3, '2016-03-11', 0, 'third note', 1);
-
-DELETE FROM `ProjectOverview_note`;
 
 DELETE FROM `Kit_Note`;
 

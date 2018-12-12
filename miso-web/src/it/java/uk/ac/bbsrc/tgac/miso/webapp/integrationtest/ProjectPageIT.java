@@ -129,21 +129,4 @@ public class ProjectPageIT extends AbstractIT {
         .collect(Collectors.joining());
     assertTrue("unexpected errors on project tables: " + errorString, isStringEmptyOrNull(errorString));
   }
-
-  @Test
-  public void testAddOverview() {
-    // goal: ensure that one project overview can be added to a project
-    final String investigator = "well-dressed crocodilian";
-    final Integer numSamples = 3;
-
-    ProjectPage page = getProjectPage(900L);
-    page.addOverview(investigator, numSamples);
-
-    Project project = (Project) getSession().get(ProjectImpl.class, 900L);
-    assertEquals(1, project.getOverviews().size());
-    project.getOverviews().stream().forEach(pov -> {
-      assertEquals(investigator, pov.getPrincipalInvestigator());
-      assertEquals(numSamples, pov.getNumProposedSamples());
-    });
-  }
 }

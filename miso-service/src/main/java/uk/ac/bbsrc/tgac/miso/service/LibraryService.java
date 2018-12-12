@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.Note;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
@@ -17,7 +15,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface LibraryService extends PaginatedDataSource<Library>, BarcodableService<Library>, DeleterService<Library> {
+public interface LibraryService
+    extends PaginatedDataSource<Library>, BarcodableService<Library>, DeleterService<Library>, NoteService<Library> {
 
   @Override
   default EntityType getEntityType() {
@@ -79,9 +78,5 @@ public interface LibraryService extends PaginatedDataSource<Library>, Barcodable
   List<LibrarySpikeIn> listSpikeIns() throws IOException;
 
   LibrarySpikeIn getSpikeIn(long spikeInId) throws IOException;
-
-  void addNote(Library library, Note note) throws IOException;
-
-  void deleteNote(Library library, Long noteId) throws IOException;
 
 }

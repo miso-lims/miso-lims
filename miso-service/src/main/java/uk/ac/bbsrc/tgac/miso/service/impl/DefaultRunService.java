@@ -38,10 +38,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
-import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
-import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
+import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
@@ -63,8 +63,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
@@ -189,23 +189,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     Run run = runDao.getLatestRunIdRunBySequencerPartitionContainerId(containerId);
     authorizationManager.throwIfNotReadable(run);
     return run;
-  }
-
-  @Override
-  public void addRunWatcher(Run run, User watcher) throws IOException {
-    User managedWatcher = securityManager.getUserById(watcher.getUserId());
-    Run managedRun = runDao.get(run.getId());
-    authorizationManager.throwIfNotReadable(managedRun);
-    authorizationManager.throwIfNotReadable(managedRun, managedWatcher);
-    runDao.addWatcher(managedRun, watcher);
-  }
-
-  @Override
-  public void removeRunWatcher(Run run, User watcher) throws IOException {
-    User managedWatcher = securityManager.getUserById(watcher.getUserId());
-    Run managedRun = runDao.get(run.getId());
-    authorizationManager.throwIfNonAdminOrMatchingOwner(managedWatcher);
-    runDao.removeWatcher(managedRun, managedWatcher);
   }
 
   @Override
@@ -625,14 +608,20 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       throw new NotImplementedException();
     }
 
+    target.setChangeDetails(user);
+
+    if (isNew) {
+      // save this up before saving containers or calling `updateSequencingParameters` because otherwise Hibernate has to
+      // flush things and it is sad/bad.
+      target.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(target.getSecurityProfile())));
+    }
+
     isMutated |= updateSequencingParameters(target, user, filterParameters, sequencer);
 
-    target.setChangeDetails(user);
     for (RunPosition pos : target.getRunPositions()) {
       containerService.save(pos.getContainer());
     }
     if (isNew) {
-      target.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(target.getSecurityProfile())));
       target.setName(generateTemporaryName());
 
       save(target);

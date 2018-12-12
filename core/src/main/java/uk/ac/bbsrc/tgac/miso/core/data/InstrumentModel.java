@@ -68,6 +68,9 @@ public class InstrumentModel implements Comparable<InstrumentModel>, Serializabl
 
   private int numContainers;
 
+  @Enumerated(EnumType.STRING)
+  private InstrumentDataManglingPolicy dataManglingPolicy;
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long instrumentModelId = InstrumentModel.UNSAVED_ID;
@@ -168,6 +171,14 @@ public class InstrumentModel implements Comparable<InstrumentModel>, Serializabl
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;
+  }
+
+  public InstrumentDataManglingPolicy getDataManglingPolicy() {
+    return dataManglingPolicy;
+  }
+
+  public void setDataManglingPolicy(InstrumentDataManglingPolicy dataManglingPolicy) {
+    this.dataManglingPolicy = dataManglingPolicy;
   }
 
 }

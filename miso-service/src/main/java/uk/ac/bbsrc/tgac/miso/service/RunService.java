@@ -5,16 +5,13 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface RunService extends ProviderService<Run>, PaginatedDataSource<Run> {
+public interface RunService extends ProviderService<Run>, PaginatedDataSource<Run>, NoteService<Run> {
 
   Collection<Run> list() throws IOException;
 
@@ -49,14 +46,6 @@ public interface RunService extends ProviderService<Run>, PaginatedDataSource<Ru
    * @throws IOException
    */
   Run getLatestRunBySequencerPartitionContainerId(long containerId) throws IOException;
-
-  void addRunWatcher(Run run, User watcher) throws IOException;
-
-  void removeRunWatcher(Run run, User watcher) throws IOException;
-
-  void addNote(Run run, Note note) throws IOException;
-
-  void deleteNote(Run run, Long noteId) throws IOException;
 
   Long create(Run run) throws IOException;
 

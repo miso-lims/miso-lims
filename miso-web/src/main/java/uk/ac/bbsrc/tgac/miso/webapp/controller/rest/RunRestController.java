@@ -26,6 +26,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,12 +56,17 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Pair;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
-import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -70,8 +77,15 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
+import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto.RunPartitionDto;
+import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
+import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
 import uk.ac.bbsrc.tgac.miso.dto.RunDto;
+import uk.ac.bbsrc.tgac.miso.dto.StudyDto;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
@@ -126,6 +140,10 @@ public class RunRestController extends RestController {
   private ContainerService containerService;
   @Autowired
   private PartitionQCService partitionQCService;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private ExperimentService experimentService;
 
   private final JQueryDataTableBackend<Run, RunDto> jQueryBackend = new JQueryDataTableBackend<Run, RunDto>() {
 
@@ -311,6 +329,119 @@ public class RunRestController extends RestController {
           qc.setNotes(request.notes);
           return qc;
         })).forEach(WhineyConsumer.rethrow(partitionQCService::save));
+  }
+
+  public static class StudiesForExperiment {
+    private ExperimentDto experiment;
+    private List<StudyDto> studies;
+
+    public ExperimentDto getExperiment() {
+      return experiment;
+    }
+
+    public List<StudyDto> getStudies() {
+      return studies;
+    }
+
+    public void setExperiment(ExperimentDto experiment) {
+      this.experiment = experiment;
+    }
+
+    public void setStudies(List<StudyDto> studies) {
+      this.studies = studies;
+    }
+  }
+
+  @GetMapping("{runId}/potentialExperiments")
+  public @ResponseBody List<StudiesForExperiment> getPotentialExperiments(@PathVariable long runId) throws IOException {
+    Run run = getRun(runId);
+
+    RunDto runDto = Dtos.asDto(run);
+    InstrumentModelDto instrumentModelDto = Dtos.asDto(run.getSequencer().getInstrumentModel());
+    Map<Library, List<Partition>> libraryGroups = getLibraryGroups(run);
+
+    return libraryGroups.entrySet().stream().map(group -> new Pair<>(group.getKey(),
+        group.getValue().stream().map(Dtos::asDto).map(partitionDto -> new RunPartitionDto(runDto, partitionDto))
+            .collect(Collectors.toList())))
+        .map(group -> {
+          StudiesForExperiment result = new StudiesForExperiment();
+          result.experiment = new ExperimentDto();
+          result.experiment.setLibrary(Dtos.asDto(group.getKey(), false));
+          result.experiment.setInstrumentModel(instrumentModelDto);
+          result.experiment.setPartitions(group.getValue());
+
+          result.studies = group.getKey().getSample().getProject().getStudies().stream().map(Dtos::asDto).collect(Collectors.toList());
+          return result;
+        }).collect(Collectors.toList());
+  }
+
+  public static class AddRequest {
+    private ExperimentDto experiment;
+    private PartitionDto partition;
+
+    public ExperimentDto getExperiment() {
+      return experiment;
+    }
+
+    public PartitionDto getPartition() {
+      return partition;
+    }
+
+    public void setExperiment(ExperimentDto experiment) {
+      this.experiment = experiment;
+    }
+
+    public void setPartition(PartitionDto partition) {
+      this.partition = partition;
+    }
+  }
+
+  @GetMapping("{runId}/potentialExperimentExpansions")
+  public @ResponseBody List<AddRequest> getPotentialExperimentExpansions(@PathVariable long runId) throws IOException {
+    Run run = getRun(runId);
+
+    Map<Library, List<Partition>> libraryGroups = getLibraryGroups(run);
+
+    return libraryGroups.entrySet().stream()
+        .<AddRequest> flatMap(WhineyFunction.rethrow(group -> //
+        experimentService.listAllByLibraryId(group.getKey().getId()).stream()//
+            .filter(experiment -> experiment.getInstrumentModel().getId().equals(run.getSequencer().getInstrumentModel().getId()))
+            .flatMap(experiment -> group.getValue().stream()//
+                .filter(partition -> experiment.getRunPartitions().stream().noneMatch(rp -> rp.getPartition().equals(partition)))
+                .map(partition -> {
+                  AddRequest request = new AddRequest();
+                  request.experiment = Dtos.asDto(experiment);
+                  request.partition = Dtos.asDto(partition);
+                  return request;
+                }))))
+        .collect(Collectors.toList());
+  }
+
+  private Map<Library, List<Partition>> getLibraryGroups(Run run) {
+    return run.getSequencerPartitionContainers().stream()//
+        .flatMap(container -> container.getPartitions().stream())//
+        .filter(partition -> partition.getPool() != null)//
+        .flatMap(partition -> partition.getPool().getPoolDilutions().stream()//
+            .map(PoolDilution::getPoolableElementView)//
+            .map(PoolableElementView::getLibraryId)//
+            .distinct()
+            .map(libraryId -> new Pair<>(libraryId, partition)))//
+        .collect(Collectors.groupingBy(Pair::getKey))//
+        .entrySet().stream()//
+        .collect(Collectors.toMap(//
+            WhineyFunction
+                .rethrow(entry -> libraryService.get(entry.getKey())), //
+            entry -> entry.getValue().stream()//
+                .map(Pair::getValue)//
+                .collect(Collectors.toList())));
+  }
+
+  private Run getRun(long runId) throws IOException {
+    Run run = runService.get(runId);
+    if (run == null) {
+      throw new RestException("Run not found", Status.NOT_FOUND);
+    }
+    return run;
   }
 
 }

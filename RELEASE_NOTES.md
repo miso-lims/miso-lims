@@ -1,8 +1,22 @@
+# 0.2.158
+
+Changes:
+
+ * Fix boxing bugs for discards & distributed (#1786)
+ * Remove project overviews pending redesign
+ * Improved loading time of Run and Container pages (#1777)
+ * Fix run scanner create run error (#1780)
+ * Handle instruments which mangle the i5 index
+
 # 0.2.157
 
 Changes:
 
  * fixed error creating new runs
+
+Bad:
+
+  * Error creating some runs from Run Scanner
 
 # 0.2.156
 

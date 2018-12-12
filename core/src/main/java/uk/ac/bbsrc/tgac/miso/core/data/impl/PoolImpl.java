@@ -47,7 +47,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -55,14 +54,10 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
-import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -171,15 +166,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Enumerated(EnumType.STRING)
   private VolumeUnit volumeUnits;
 
-  @Transient
-  // not Hibernate-managed
-  private Group watchGroup;
-
-  @ManyToMany(targetEntity = UserImpl.class)
-  @Fetch(FetchMode.SUBSELECT)
-  @JoinTable(name = "Pool_Watcher", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = { @JoinColumn(name = "userId") })
-  private Set<User> watchUsers = new HashSet<>();
-
   @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Pool_Attachment", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
@@ -201,11 +187,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public void addNote(Note note) {
     this.notes.add(note);
-  }
-
-  @Override
-  public void addWatcher(User user) {
-    watchUsers.add(user);
   }
 
   @Override
@@ -336,27 +317,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public String getWatchableIdentifier() {
-    return getName();
-  }
-
-  @Override
-  public Set<User> getWatchers() {
-    Set<User> allWatchers = new HashSet<>();
-    if (watchGroup != null) allWatchers.addAll(watchGroup.getUsers());
-    if (watchUsers != null) allWatchers.addAll(watchUsers);
-    return allWatchers;
-  }
-
-  public Group getWatchGroup() {
-    return watchGroup;
-  }
-
-  public Set<User> getWatchUsers() {
-    return watchUsers;
-  }
-
-  @Override
   public List<FileAttachment> getAttachments() {
     return attachments;
   }
@@ -431,11 +391,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   public int hashCode() {
     return new HashCodeBuilder(23, 47).appendSuper(super.hashCode()).append(description).append(poolDilutions)
         .append(concentration).append(identificationBarcode).append(qcPassed).toHashCode();
-  }
-
-  @Override
-  public void removeWatcher(User user) {
-    watchUsers.remove(user);
   }
 
   @Override
@@ -516,15 +471,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public void setVolumeUnits(VolumeUnit volumeUnits) {
     this.volumeUnits = volumeUnits;
-  }
-
-  @Override
-  public void setWatchGroup(Group group) {
-    this.watchGroup = group;
-  }
-
-  public void setWatchUsers(Set<User> watchUsers) {
-    this.watchUsers = watchUsers;
   }
 
   @Override

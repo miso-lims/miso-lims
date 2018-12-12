@@ -355,6 +355,12 @@ the possibilities for unique sequences. Some dual-indexed families have an index
 together. These are referred to as "unique dual index" families within MISO. In other index families, any index 1 may
 be matched with any index 2.
 
+Some Illumina sequencers, including the NextSeq, sequence the index 2 as the
+reverse complement of other sequencers. MISO has an option to set the
+sequencing platform to use the normal index in the interface and provide the
+reverse complement in sample sheets and though the Pinery data export
+interface.
+
 Index families may be archived if they are no longer needed. This will prevent them from showing up in the options when
 creating new libraries.
 

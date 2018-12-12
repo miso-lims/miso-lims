@@ -327,14 +327,27 @@ Library.ui = {
    */
   distributionChanged: function() {
     var isDistributed = document.getElementById('distributed').checked;
+    var distributionDate = document.getElementById('distributionDatePicker');
+    var recipient = document.getElementById('distributionRecipient');
+    var location = document.getElementById('locationBarcode');
     if (isDistributed) {
-      document.getElementById('distributionDatePicker').removeAttribute('disabled');
-      document.getElementById('distributionRecipient').removeAttribute('disabled');
+      distributionDate.removeAttribute('readonly');
+      distributionDate.classList.remove('disabled');
+      Utils.ui.addDatePicker('distributionDatePicker');
+      recipient.removeAttribute('readonly');
+      recipient.classList.remove('disabled');
     } else {
-      document.getElementById('distributionDatePicker').setAttribute('value', '');
-      document.getElementById('distributionDatePicker').setAttribute('disabled', 'disabled');
-      document.getElementById('distributionRecipient').setAttribute('value', '');
-      document.getElementById('distributionRecipient').setAttribute('disabled', 'disabled');
+      distributionDate.setAttribute('value', "");
+      distributionDate.setAttribute('readonly', 'readonly');
+      distributionDate.classList.add('disabled');
+      jQuery('#distributionDatePicker').datepicker('destroy');
+      jQuery('#distributionDatePicker').removeClass('hasDatepicker');
+      recipient.setAttribute('value', "");
+      recipient.setAttribute('readonly', 'readonly');
+      recipient.classList.add('disabled');
+      if (location.value.indexOf('SENT TO:') == 0) {
+        location.setAttribute('value', "");
+      }
     }
   },
 
@@ -357,7 +370,7 @@ Library.ui = {
       buttons: {
         "Add Note": function() {
           if (jQuery('#notetext').val().length > 0) {
-            self.addLibraryNote(libraryId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+            Utils.notes.addNote('library', libraryId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
             jQuery(this).dialog('close');
           } else {
             jQuery('#notetext').focus();
@@ -370,26 +383,9 @@ Library.ui = {
     });
   },
 
-  addLibraryNote: function(libraryId, internalOnly, text) {
-    Fluxion.doAjax('libraryControllerHelperService', 'addLibraryNote', {
-      'libraryId': libraryId,
-      'internalOnly': internalOnly,
-      'text': text,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': Utils.page.pageReload
-    });
-  },
-
   deleteLibraryNote: function(libraryId, noteId) {
     var deleteIt = function() {
-      Fluxion.doAjax('libraryControllerHelperService', 'deleteLibraryNote', {
-        'libraryId': libraryId,
-        'noteId': noteId,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': Utils.page.pageReload
-      });
+      Utils.notes.deleteNote('library', libraryId, noteId);
     }
     Utils.showConfirmDialog('Delete Note', 'Delete', ["Are you sure you want to delete this note?"], deleteIt);
   },

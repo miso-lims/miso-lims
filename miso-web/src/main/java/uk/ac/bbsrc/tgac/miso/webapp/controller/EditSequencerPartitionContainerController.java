@@ -150,7 +150,7 @@ public class EditSequencerPartitionContainerController {
   private ModelAndView setupForm(SequencerPartitionContainer container, ModelMap model) throws IOException {
     model.put("container", container);
     model.put("containerPartitions",
-        container.getPartitions().stream().map(partition -> Dtos.asDto(partition, true)).collect(Collectors.toList()));
+        container.getPartitions().stream().map(partition -> Dtos.asDto(partition, false)).collect(Collectors.toList()));
     model.put("containerRuns", runService.listByContainerId(container.getId()).stream().map(Dtos::asDto).collect(Collectors.toList()));
     model.put("clusteringKits",
         kitService.listKitDescriptorsByType(KitType.CLUSTERING).stream()

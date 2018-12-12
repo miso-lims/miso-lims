@@ -42,56 +42,83 @@ ListTarget.experiment = {
   },
   createStaticActions: function(config, projectId) {
     var actions = [];
-    if (config.studiesForExperiment && config.studiesForExperiment.length) {
+    if (config.runId) {
       actions.push({
-        name: "Create New",
+        name: 'Create New',
         handler: function() {
-          var showCreate;
-          var creationActions = config.studiesForExperiment.map(function(request) {
-            return {
-              name: request.experiment.library.name + " (" + request.experiment.library.alias + ")",
-              handler: function() {
-                Utils.showDialog("Create Experiment", "Create", [{
-                  type: 'select',
-                  required: true,
-                  label: "Study",
-                  values: request.studies,
-                  getLabel: function(study) {
-                    return study.name + " (" + study.alias + ")";
-                  },
-                  property: "study"
-                }, {
-                  type: 'text',
-                  required: 'true',
-                  label: 'Title',
-                  property: 'title'
-                }, {
-                  type: 'text',
-                  required: 'true',
-                  label: 'Alias',
-                  property: 'alias'
-                }],
-                    function(result) {
-                      request.experiment.alias = result.alias;
-                      request.experiment.study = result.study;
-                      request.experiment.title = result.title;
+          var url = window.location.origin + '/miso/rest/run/' + config.runId + '/potentialExperiments';
+          Utils.ajaxWithDialog('Finding potential experiments', 'GET', url, null, function(potentialExperiments) {
+            if (!potentialExperiments || !potentialExperiments.length) {
+              Utils.showOkDialog('Error',
+                  ['No potential experiments found. At least one study must exist in the project that the desired library belongs to']);
+              return;
+            }
+            var creationActions = potentialExperiments.map(function(request) {
+              return {
+                name: request.experiment.library.name + " (" + request.experiment.library.alias + ")",
+                handler: function() {
+                  Utils.showDialog('Create Experiment', 'Create', [{
+                    type: 'select',
+                    required: true,
+                    label: 'Study',
+                    values: request.studies,
+                    getLabel: function(study) {
+                      return study.name + ' (' + study.alias + ')';
+                    },
+                    property: 'study'
+                  }, {
+                    type: 'text',
+                    required: 'true',
+                    label: 'Title',
+                    property: 'title'
+                  }, {
+                    type: 'text',
+                    required: 'true',
+                    label: 'Alias',
+                    property: 'alias'
+                  }], function(result) {
+                    request.experiment.alias = result.alias;
+                    request.experiment.study = result.study;
+                    request.experiment.title = result.title;
 
-                      Utils.ajaxWithDialog("Creating to Experiment", "POST", "/miso/rest/experiment", request.experiment,
-                          Utils.page.pageReload);
+                    Utils.ajaxWithDialog('Creating to Experiment', 'POST', '/miso/rest/experiment', request.experiment,
+                        Utils.page.pageReload);
 
-                    }, showCreate);
-              }
+                  }, showCreate);
+                }
+              };
+            });
+            var showCreate = function() {
+              Utils.showWizardDialog('Create Experiment', creationActions);
             };
+            showCreate();
           });
-          showCreate = function() {
-            Utils.showWizardDialog("Create Experiment", creationActions);
-
-          };
-          showCreate();
-
+        }
+      }, {
+        name: 'Add to Existing',
+        handler: function() {
+          var url = window.location.origin + '/miso/rest/run/' + config.runId + '/potentialExperiments';
+          Utils.ajaxWithDialog('Finding potential experiments', 'GET', url, null, function(potentialExperiments) {
+            if (!potentialExperiments || !potentialExperiments.length) {
+              Utils.showOkDialog('Error', ['No existing experiments found']);
+              return;
+            }
+            Utils.showWizardDialog("Add to Experiment", potentialExperiments.map(function(request) {
+              return {
+                name: request.partition.containerName + " " + request.partition.partitionNumber + " (" + request.partition.pool.name
+                    + ") to " + request.experiment.name + " (" + request.experiment.alias + ")",
+                handler: function() {
+                  Utils.ajaxWithDialog("Adding to Experiment", "POST", "/miso/rest/experiment/" + request.experiment.id + "/add?"
+                      + jQuery.param({
+                        runId: config.runId,
+                        partitionId: request.partition.id
+                      }), null, Utils.page.pageReload);
+                }
+              };
+            }));
+          });
         }
       });
-
     }
 
     if (config.addToExperiment && config.addToExperiment.length) {

@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,10 +35,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -51,7 +47,6 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
@@ -124,97 +119,6 @@ public class ProjectControllerHelperService {
         return JSONUtils.SimpleJSONError(shortNameValidation.getMessage());
       }
     }
-  }
-
-  public JSONObject addProjectOverview(HttpSession session, JSONObject json) {
-    final Long projectId = json.getLong("projectId");
-    final String principalInvestigator = (String) json.get("principalInvestigator");
-    final Integer numProposedSamples = json.getInt("numProposedSamples");
-
-    try {
-      final Project project = projectService.get(projectId);
-      final ProjectOverview overview = new ProjectOverview();
-      overview.setNumProposedSamples(numProposedSamples);
-      overview.setPrincipalInvestigator(principalInvestigator);
-      overview.setProject(project);
-      overview.setLocked(false);
-      project.getOverviews().add(overview);
-      projectService.saveProjectOverview(overview);
-      projectService.saveProject(project);
-    } catch (final IOException e) {
-      log.error("add project overview", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-
-    return JSONUtils.SimpleJSONResponse("ok");
-  }
-
-  public JSONObject addProjectOverviewNote(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    final String text = json.getString("text");
-
-    try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-      final Project project = overview.getProject();
-
-      final Note note = new Note();
-
-      note.setInternalOnly(json.getString("internalOnly").equals("on"));
-      note.setText(text);
-      note.setOwner(user);
-      note.setCreationDate(new Date());
-      overview.getNotes().add(note);
-      projectService.saveProjectOverviewNote(overview, note);
-      projectService.saveProject(project);
-    } catch (final IOException e) {
-      log.error("add project overview note", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-
-    return JSONUtils.SimpleJSONResponse("ok");
-  }
-
-  public JSONObject deleteProjectOverviewNote(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    final Long noteId = json.getLong("noteId");
-
-    try {
-      final ProjectOverview po = projectService.getProjectOverviewById(overviewId);
-      projectService.deleteProjectOverviewNote(po, noteId);
-      return JSONUtils.SimpleJSONResponse("OK");
-    } catch (final IOException e) {
-      log.error("delete project overview", e);
-      return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
-    }
-  }
-
-  public JSONObject unlockProjectOverview(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    try {
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-      overview.setLocked(false);
-      projectService.saveProjectOverview(overview);
-      projectService.saveProject(overview.getProject());
-    } catch (final IOException e) {
-      log.error("unlock project overview", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-    return JSONUtils.SimpleJSONResponse("ok");
-  }
-
-  public JSONObject lockProjectOverview(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    try {
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-      overview.setLocked(true);
-      projectService.saveProjectOverview(overview);
-      projectService.saveProject(overview.getProject());
-    } catch (final IOException e) {
-      log.error("lock project overview", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-    return JSONUtils.SimpleJSONResponse("ok");
   }
 
   public JSONObject generateSampleDeliveryForm(HttpSession session, JSONObject json) {
@@ -329,134 +233,6 @@ public class ProjectControllerHelperService {
       }
     } else {
       return JSONUtils.SimpleJSONError("Missing project ID or document format supplied.");
-    }
-  }
-
-  public JSONObject watchOverview(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-      projectService.addProjectWatcher(overview.getProject(), user);
-      return JSONUtils.SimpleJSONResponse("OK");
-    } catch (final IOException e) {
-      log.error("watch overview", e);
-    }
-    return JSONUtils.SimpleJSONError("Unable to watch/unwatch overview");
-  }
-
-  public JSONObject unwatchOverview(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-      projectService.removeProjectWatcher(overview.getProject(), user);
-      if (!overview.getProject().getSecurityProfile().getOwner().equals(user)) {
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError("Cannot unwatch an entity of which you are the owner.");
-      }
-    } catch (final IOException e) {
-      log.error("unwatch overview", e);
-    }
-    return JSONUtils.SimpleJSONError("Unable to watch/unwatch overview");
-  }
-
-  public JSONObject listWatchOverview(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    final StringBuilder sb = new StringBuilder();
-    final JSONObject j = new JSONObject();
-    try {
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-      sb.append("<ul class='bullets' style='margin-left: -30px;'>");
-      for (final User theUser : overview.getWatchers()) {
-        sb.append("<li>");
-        sb.append(theUser.getFullName());
-        sb.append("</li>");
-      }
-      sb.append("</ul>");
-      j.put("watchers", sb.toString());
-      return j;
-    } catch (final IOException e) {
-      log.error("list watch overview", e);
-    }
-    return JSONUtils.SimpleJSONError("Unable to list watchers");
-  }
-
-  public JSONObject listSamplesByProject(HttpSession session, JSONObject json) {
-    final Long projectId = json.getLong("projectId");
-
-    try {
-      final JSONObject j = new JSONObject();
-      final JSONArray jsonArray = new JSONArray();
-      for (final Sample sample : sampleService.listByProjectId(projectId)) {
-        jsonArray.add("{'id':'" + sample.getId() + "'," + "'name':'" + sample.getName() + "'," + "'alias':'" + sample.getAlias() + "',"
-            + "'type':'" + sample.getSampleType() + "'," + "'description':'" + sample.getDescription() + "'}");
-      }
-      j.put("array", jsonArray);
-      return j;
-    } catch (final IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-  }
-
-  public JSONObject addSampleGroup(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    try {
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-
-      final Set<Sample> samples = new HashSet<>();
-      if (json.has("samples")) {
-        final JSONArray a = JSONArray.fromObject(json.get("samples"));
-        for (final JSONObject j : (Iterable<JSONObject>) a) {
-          if (j.has("sampleId")) {
-            samples.add(sampleService.get(j.getLong("sampleId")));
-          } else {
-            return JSONUtils.SimpleJSONError("Unable to add Sample Group: invalid sample set JSON has missing sampleId");
-          }
-        }
-      }
-
-      overview.setSampleGroup(samples);
-
-      projectService.saveProjectOverview(overview);
-      projectService.saveProject(overview.getProject());
-
-      return JSONUtils.SimpleJSONResponse("OK");
-    } catch (final IOException e) {
-      log.error("add sample group", e);
-      return JSONUtils.SimpleJSONError("Unable to add Sample Group: " + e.getMessage());
-    }
-  }
-
-  public JSONObject addSamplesToGroup(HttpSession session, JSONObject json) {
-    final Long overviewId = json.getLong("overviewId");
-    try {
-      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
-      if (json.has("samples")) {
-        final JSONArray a = JSONArray.fromObject(json.get("samples"));
-        for (final JSONObject j : (Iterable<JSONObject>) a) {
-          if (j.has("sampleId")) {
-            final Sample s = sampleService.get(j.getLong("sampleId"));
-            if (overview.getSamples().contains(s)) {
-              log.error("Sample group already contains " + s.getName());
-            } else {
-              overview.getSamples().add(s);
-            }
-          } else {
-            return JSONUtils.SimpleJSONError("Unable to add Sample Group: invalid sample set JSON has missing sampleId");
-          }
-        }
-      }
-
-      projectService.saveProjectOverview(overview);
-      projectService.saveProject(overview.getProject());
-
-      return JSONUtils.SimpleJSONResponse("OK");
-    } catch (final IOException e) {
-      log.error("add samples to group", e);
-      return JSONUtils.SimpleJSONError("Unable to add Sample Group: " + e.getMessage());
     }
   }
 }

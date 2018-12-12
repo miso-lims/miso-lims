@@ -99,7 +99,7 @@ Pool.ui = {
       buttons: {
         "Add Note": function() {
           if (jQuery('#notetext').val().length > 0) {
-            self.addPoolNote(poolId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+            Utils.notes.addNote('pool', poolId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
             jQuery(this).dialog('close');
           } else {
             jQuery('#notetext').focus();
@@ -112,26 +112,9 @@ Pool.ui = {
     });
   },
 
-  addPoolNote: function(poolId, internalOnly, text) {
-    Fluxion.doAjax('poolControllerHelperService', 'addPoolNote', {
-      'poolId': poolId,
-      'internalOnly': internalOnly,
-      'text': text,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': Utils.page.pageReload
-    });
-  },
-
   deletePoolNote: function(poolId, noteId) {
     var deleteIt = function() {
-      Fluxion.doAjax('poolControllerHelperService', 'deletePoolNote', {
-        'poolId': poolId,
-        'noteId': noteId,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': Utils.page.pageReload
-      });
+      Utils.notes.deleteNote('pool', poolId, noteId);
     }
     Utils.showConfirmDialog('Delete Note', 'Delete', ["Are you sure you want to delete this note?"], deleteIt);
   }

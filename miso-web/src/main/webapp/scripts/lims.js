@@ -527,7 +527,7 @@ var Utils = Utils
           'dataType': 'json',
           'type': method,
           'url': url,
-          'data': JSON.stringify(data),
+          'data': data == null ? undefined : JSON.stringify(data),
           'contentType': 'application/json; charset=utf8',
           'success': function(data, textStatus, xhr) {
             dialog.dialog("close");
@@ -1097,4 +1097,17 @@ Utils.sorting = {
     return (Constants.sampleCategories.indexOf(a.sampleCategory) - Constants.sampleCategories.indexOf(b.sampleCategory))
         || a.alias.localeCompare(b.alias);
   }
+};
+
+Utils.notes = {
+   addNote: function(entityType, entityId, internalOnly, text) {
+        Utils.ajaxWithDialog('Adding Note', 'POST', window.location.origin + '/miso/rest/note/' + entityType + '/' + entityId, {
+            internalOnly: internalOnly == 'on',
+            text: text
+          }, Utils.page.pageReload);
+   },
+   deleteNote: function(entityType, entityId, noteId) {
+        Utils.ajaxWithDialog('Deleting Note', 'DELETE', window.location.origin + '/miso/rest/note/' + entityType + '/' + entityId + '/' + noteId, null, Utils.page.pageReload);
+   },
+
 };

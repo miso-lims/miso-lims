@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -40,20 +39,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
-import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
@@ -106,8 +100,6 @@ public class ProjectImpl implements Project {
   @OneToMany(targetEntity = StudyImpl.class, fetch = FetchType.LAZY, mappedBy = "project")
   private Collection<Study> studies = new HashSet<>();
 
-  @OneToMany(targetEntity = ProjectOverview.class, mappedBy = "project", cascade = CascadeType.ALL)
-  private Collection<ProjectOverview> overviews = new HashSet<>();
 
   @Enumerated(EnumType.STRING)
   private ProgressType progress;
@@ -127,16 +119,6 @@ public class ProjectImpl implements Project {
   @Column(nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
-
-  @ManyToMany(targetEntity = UserImpl.class)
-  @Fetch(FetchMode.SUBSELECT)
-  @JoinTable(name = "Project_Watcher", joinColumns = { @JoinColumn(name = "projectId") },
-      inverseJoinColumns = { @JoinColumn(name = "userId") })
-  private Set<User> watchUsers = new HashSet<>();
-
-  @Transient
-  // not Hibernate-managed
-  private Group watchGroup;
 
   /**
    * Construct a new Project with a default empty SecurityProfile
@@ -206,21 +188,6 @@ public class ProjectImpl implements Project {
   }
 
   @Override
-  public Collection<ProjectOverview> getOverviews() {
-    return overviews;
-  }
-
-  @Override
-  public ProjectOverview getOverviewById(Long overviewId) {
-    for (ProjectOverview p : getOverviews()) {
-      if (p.getId() == overviewId) {
-        return p;
-      }
-    }
-    return null;
-  }
-
-  @Override
   public void setCreationDate(Date date) {
     this.creationDate = date;
   }
@@ -256,17 +223,6 @@ public class ProjectImpl implements Project {
   public void setStudies(Collection<Study> studies) {
     this.studies = studies;
     Collections.sort(Lists.newArrayList(this.studies), new AliasComparator<Study>());
-  }
-
-  @Override
-  public void setOverviews(Collection<ProjectOverview> overviews) {
-    if (overviews == null) {
-      this.overviews = new HashSet<>();
-    }
-    this.overviews = overviews;
-    for (ProjectOverview po : overviews) {
-      po.setProject(this);
-    }
   }
 
   @Override
@@ -313,46 +269,6 @@ public class ProjectImpl implements Project {
 
     // add
     this.studies.add(s);
-  }
-
-  public void setWatchUsers(Set<User> watchUsers) {
-    this.watchUsers = watchUsers;
-  }
-
-  public Set<User> getWatchUsers() {
-    return watchUsers;
-  }
-
-  @Override
-  public void setWatchGroup(Group watchGroup) {
-    this.watchGroup = watchGroup;
-  }
-
-  public Group getWatchGroup() {
-    return watchGroup;
-  }
-
-  @Override
-  public Set<User> getWatchers() {
-    Set<User> allWatchers = new HashSet<>();
-    if (watchGroup != null) allWatchers.addAll(watchGroup.getUsers());
-    if (watchUsers != null) allWatchers.addAll(watchUsers);
-    return allWatchers;
-  }
-
-  @Override
-  public void addWatcher(User user) {
-    watchUsers.add(user);
-  }
-
-  @Override
-  public void removeWatcher(User user) {
-    watchUsers.remove(user);
-  }
-
-  @Override
-  public String getWatchableIdentifier() {
-    return getName();
   }
 
   @Override

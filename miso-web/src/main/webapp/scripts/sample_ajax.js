@@ -46,21 +46,6 @@ window.Parsley.addValidator('sampleAlias', {
 var Sample = Sample
     || {
 
-      removeSampleFromOverview: function(sampleId, overviewId, successfunc) {
-        Utils.showConfirmDialog("Confirm Remove", "OK", ["Are you sure you really want to remove SAM" + sampleId + " from overview?"],
-            function() {
-              Fluxion.doAjax('sampleControllerHelperService', 'removeSampleFromOverview', {
-                'sampleId': sampleId,
-                'overviewId': overviewId,
-                'url': ajaxurl
-              }, {
-                'doOnSuccess': function(json) {
-                  successfunc();
-                }
-              });
-            });
-      },
-
       validateSample: function(isDetailedSample, skipAliasValidation, isNewSample) {
         Validate.cleanFields('#sample-form');
         jQuery('#sample-form').parsley().destroy();
@@ -432,14 +417,27 @@ Sample.ui = {
    */
   distributionChanged: function() {
     var isDistributed = document.getElementById('distributed').checked;
+    var distributionDate = document.getElementById('distributionDatePicker');
+    var recipient = document.getElementById('distributionRecipient');
+    var location = document.getElementById('locationBarcode');
     if (isDistributed) {
-      document.getElementById('distributionDatePicker').removeAttribute('disabled');
-      document.getElementById('distributionRecipient').removeAttribute('disabled');
+      distributionDate.removeAttribute('readonly');
+      distributionDate.classList.remove('disabled');
+      Utils.ui.addDatePicker('distributionDatePicker');
+      recipient.removeAttribute('readonly');
+      recipient.classList.remove('disabled');
     } else {
-      document.getElementById('distributionDatePicker').setAttribute('value', '');
-      document.getElementById('distributionDatePicker').setAttribute('disabled', 'disabled');
-      document.getElementById('distributionRecipient').setAttribute('value', '');
-      document.getElementById('distributionRecipient').setAttribute('disabled', 'disabled');
+      distributionDate.setAttribute('value', "");
+      distributionDate.setAttribute('readonly', 'readonly');
+      distributionDate.classList.add('disabled');
+      jQuery('#distributionDatePicker').datepicker('destroy');
+      jQuery('#distributionDatePicker').removeClass('hasDatepicker');
+      recipient.setAttribute('value', "");
+      recipient.setAttribute('readonly', 'readonly');
+      recipient.classList.add('disabled');
+      if (location.value.indexOf('SENT TO:') == 0) {
+        location.setAttribute('value', "");
+      }
     }
   },
 
@@ -563,7 +561,7 @@ Sample.ui = {
       buttons: {
         "Add Note": function() {
           if (jQuery('#notetext').val().length > 0) {
-            self.addSampleNote(sampleId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+            Utils.notes.addNote('sample', sampleId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
             jQuery(this).dialog('close');
           } else {
             jQuery('#notetext').focus();
@@ -576,26 +574,9 @@ Sample.ui = {
     });
   },
 
-  addSampleNote: function(sampleId, internalOnly, text) {
-    Fluxion.doAjax('sampleControllerHelperService', 'addSampleNote', {
-      'sampleId': sampleId,
-      'internalOnly': internalOnly,
-      'text': text,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': Utils.page.pageReload
-    });
-  },
-
   deleteSampleNote: function(sampleId, noteId) {
     if (confirm("Are you sure you want to delete this note?")) {
-      Fluxion.doAjax('sampleControllerHelperService', 'deleteSampleNote', {
-        'sampleId': sampleId,
-        'noteId': noteId,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': Utils.page.pageReload
-      });
+      Utils.notes.deleteNote('sample', sampleId, noteId);
     }
   },
 

@@ -19,7 +19,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.service.BarcodableService;
 import uk.ac.bbsrc.tgac.miso.service.workflow.factory.ProgressStepFactory;
-import uk.ac.bbsrc.tgac.miso.spring.LimsBindingInitializer;
 import uk.ac.bbsrc.tgac.miso.webapp.util.SessionConversationAttributeStore;
 
 /**

@@ -95,8 +95,6 @@ public class MisoClient implements Lims {
   // RunSample queries
   private static final String QUERY_ALL_RUN_SAMPLES = getResourceAsString("queryAllRunSamples.sql");
   private static final String QUERY_RUN_SAMPLES_BY_RUN_ID = QUERY_ALL_RUN_SAMPLES
-      + " JOIN SequencerPartitionContainer_Partition spcp ON spcp.partitions_partitionId = part.partitionId"
-      + " JOIN SequencerPartitionContainer spc ON spc.containerId = spcp.container_containerId"
       + " JOIN Run_SequencerPartitionContainer rcpc ON rcpc.containers_containerId = spc.containerId" + " WHERE rcpc.Run_runId = ?";
 
   // Sample queries
@@ -910,6 +908,55 @@ public class MisoClient implements Lims {
   }
 
   private static class RunSampleRowMapper implements RowMapper<MisoRunSample> {
+    private char complement(char nt) {
+      switch (nt) {
+      case 'A':
+        return 'T';
+      case 'C':
+        return 'G';
+      case 'G':
+        return 'C';
+      case 'T':
+      case 'U':
+        return 'A';
+      // Below are all the degenerate nucleotides. I hope we never need these and if we had one, the edit distance calculations would have
+      // to be the changed.
+      case 'R': // AG
+        return 'Y';
+      case 'Y': // CT
+        return 'R';
+      case 'S': // CG
+        return 'S';
+      case 'W': // AT
+        return 'W';
+      case 'K': // GT
+        return 'M';
+      case 'M': // AC
+        return 'K';
+      case 'B': // CGT
+        return 'V';
+      case 'D': // AGT
+        return 'H';
+      case 'H':// ACT
+        return 'D';
+      case 'V':// ACG
+        return 'B';
+      case 'N':
+        return 'N';
+      default:
+        return nt;
+      }
+    }
+
+    public String reverseComplement(String index) {
+      if (index == null)
+        return null;
+      StringBuilder buffer = new StringBuilder(index.length());
+      for (int i = index.length() - 1; i >= 0; i--) {
+        buffer.append(complement(Character.toUpperCase(index.charAt(i))));
+      }
+      return buffer.toString();
+    }
 
     @Override
     public MisoRunSample mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -918,7 +965,9 @@ public class MisoClient implements Lims {
       s.setId(rs.getString("dilutionId"));
       s.setPartitionId(rs.getInt("partitionId"));
       s.setBarcode(AttributeKey.BARCODE.extractStringValueFrom(rs));
-      s.setBarcodeTwo(AttributeKey.BARCODE_TWO.extractStringValueFrom(rs));
+      String barcode2 = AttributeKey.BARCODE_TWO.extractStringValueFrom(rs);
+      boolean reverseComplement2 = rs.getString("dataManglingPolicy").equals("I5_RC");
+      s.setBarcodeTwo(reverseComplement2 ? reverseComplement(barcode2) : barcode2);
 
       Attribute att = AttributeKey.TARGETED_RESEQUENCING.extractAttributeFrom(rs);
       if (att != null) {

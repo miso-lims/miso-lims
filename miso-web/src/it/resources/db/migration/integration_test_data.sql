@@ -377,7 +377,6 @@ INSERT INTO Project(projectId, name, alias, shortName, creationDate, description
   (300, 'PRO300', 'BulkDilutionIT', 'DILT', '2017-08-14', 'bulk dilution test project', 1, 'ACTIVE', 1, '2017-08-14 11:54:00'),
   (400, 'PRO400', 'StudiesIT', 'STUT', '2017-08-16', 'studies test project', 1, 'ACTIVE', 1, '2017-08-16 14:50:00'),
   (500, 'PRO500', 'Tubes In Boxes', 'TIB', '2017-08-15', 'test tubes in and out of boxes', 1, 'ACTIVE', 1, '2017-08-15 13:45:00'),
-  (900, 'PRO900', 'Add Overview', 'POV', '2017-10-20', 'add project overview', 1, 'ACTIVE', 1, '2017-10-20 15:30:00'),
   (4440, 'PRO4440', 'Propagate Samples', 'PROP', '2017-10-26', 'propagate samples', 1, 'ACTIVE', 1, '2017-10-26 14:20:00'),
   (2200, 'PRO2200', 'Update Via QC', 'UQC', '2018-07-10', 'update via qc', 1, 'ACTIVE', 1, '2018-07-10 12:52:00');
 
