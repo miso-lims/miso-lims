@@ -181,6 +181,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -2046,6 +2047,13 @@ public class Dtos {
     return dto;
   }
 
+  public static PrinterLayoutDto asDto(@Nonnull Layout from) {
+    PrinterLayoutDto dto = new PrinterLayoutDto();
+    dto.setId(from.ordinal());
+    dto.setName(from.name());
+    return dto;
+  }
+
   public static PrinterDto asDto(@Nonnull Printer from) {
     PrinterDto dto = new PrinterDto();
     dto.setId(from.getId());
@@ -2053,6 +2061,7 @@ public class Dtos {
     dto.setBackend(from.getBackend().name());
     // We intentionally do not pass configuration to the front end since it has passwords in it.
     dto.setDriver(from.getDriver().name());
+    dto.setLayout(from.getLayout().name());
     dto.setName(from.getName());
     return dto;
   }
@@ -2063,6 +2072,7 @@ public class Dtos {
     to.setBackend(Backend.valueOf(dto.getBackend()));
     to.setConfiguration(new ObjectMapper().writeValueAsString(dto.getConfiguration()));
     to.setDriver(Driver.valueOf(dto.getDriver()));
+    to.setLayout(Layout.valueOf(dto.getLayout()));
     to.setEnabled(dto.isAvailable());
     to.setName(dto.getName());
 
