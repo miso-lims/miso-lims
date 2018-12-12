@@ -123,7 +123,7 @@ VALUES
   (12,'InsertSizeQC', 'Insert Size QC', 'Library', 'bp');
 
 DELETE FROM `Printer`;
-INSERT INTO Printer(printerId, name, backend, configuration, driver, enabled) VALUES (1, 'foo', 'CUPS', '{}', 'BRADY_1D', 1);
+INSERT INTO Printer(printerId, name, backend, configuration, driver, layout, enabled) VALUES (1, 'foo', 'CUPS', '{}', 'BRADY', 'AVERY_8363', 1);
     
 DELETE FROM `ReferenceGenome`;
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Human hg19 random');

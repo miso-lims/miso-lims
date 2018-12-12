@@ -8,6 +8,7 @@ public class PrinterDto {
   private ObjectNode configuration;
   private String driver;
   private long id;
+  private String layout;
   private String name;
 
   public String getBackend() {
@@ -24,6 +25,10 @@ public class PrinterDto {
 
   public long getId() {
     return id;
+  }
+
+  public String getLayout() {
+    return layout;
   }
 
   public String getName() {
@@ -52,6 +57,10 @@ public class PrinterDto {
 
   public void setId(long id) {
     this.id = id;
+  }
+
+  public void setLayout(String layout) {
+    this.layout = layout;
   }
 
   public void setName(String name) {

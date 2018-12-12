@@ -1,6 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,6 +20,7 @@ import com.google.common.base.Charsets;
 
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
 
 @Entity
 @Table(name = "Printer")
@@ -38,6 +42,10 @@ public class Printer implements Deletable, Serializable {
   private boolean enabled;
 
   @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private Layout layout;
+
+  @Column(nullable = false)
   private String name;
 
   @Id
@@ -52,6 +60,21 @@ public class Printer implements Deletable, Serializable {
     return configuration;
   }
 
+  @Override
+  public String getDeleteDescription() {
+    return getName() + " (" + getDriver().name() + "/" + getBackend().name() + ")";
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Printer";
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    return null;
+  }
+
   public Driver getDriver() {
     return driver;
   }
@@ -59,6 +82,10 @@ public class Printer implements Deletable, Serializable {
   @Override
   public long getId() {
     return printerId;
+  }
+
+  public Layout getLayout() {
+    return layout;
   }
 
   public String getName() {
@@ -69,8 +96,14 @@ public class Printer implements Deletable, Serializable {
     return enabled;
   }
 
-  public boolean printBarcode(Barcodable b, User user, int copies) {
-    return backend.print(driver.encode(b, copies).getBytes(Charsets.US_ASCII), configuration, user);
+  public long printBarcode(User user, int copies, Stream<Barcodable> barcodables) {
+    AtomicLong counter = new AtomicLong();
+    backend.print(barcodables//
+        .map(b -> layout.draw(driver, b).finish(copies))//
+        .peek(x -> counter.incrementAndGet())//
+        .collect(Collectors.joining())//
+        .getBytes(Charsets.US_ASCII), configuration, user);
+    return counter.get();
   }
 
   public void setBackend(Backend backend) {
@@ -94,23 +127,12 @@ public class Printer implements Deletable, Serializable {
     this.printerId = printerId;
   }
 
+  public void setLayout(Layout layout) {
+    this.layout = layout;
+  }
+
   public void setName(String name) {
     this.name = name;
-  }
-
-  @Override
-  public String getDeleteType() {
-    return "Printer";
-  }
-
-  @Override
-  public String getDeleteDescription() {
-    return getName() + " (" + getDriver().name() + "/" + getBackend().name() + ")";
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    return null;
   }
 
 }

@@ -237,8 +237,8 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
 
   @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits().getUnits(),
-        getConcentrationUnits().getUnits());
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits() == null ? null : getVolumeUnits().getUnits(),
+        getConcentrationUnits() == null ? null : getConcentrationUnits().getUnits());
   }
 
 }

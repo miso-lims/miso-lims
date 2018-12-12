@@ -61,6 +61,7 @@ public interface AbstractListPage {
     public static final String TYPE = "Type";
     public static final String PRINTER = "Printer";
     public static final String DRIVER = "Driver";
+    public static final String LAYOUT = "Layout";
     public static final String BACKEND = "Backend";
     public static final String AVAILABLE = "Available";
     public static final String SHORT_NAME = "Short Name";
