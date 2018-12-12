@@ -449,7 +449,7 @@ Sample.ui = {
       jQuery('#distributionDatePicker').removeClass('hasDatepicker');
       recipient.setAttribute('value', "");
       recipient.setAttribute('readonly', 'readonly');
-      distributionDate.classList.add('disabled');
+      recipient.classList.add('disabled');
       if (location.value.indexOf('SENT TO:') == 0) {
         location.setAttribute('value', "");
       }
