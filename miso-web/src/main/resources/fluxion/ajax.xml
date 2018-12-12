@@ -39,9 +39,6 @@
     
   <context:annotation-config/>
 
-  <bean id="projectControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectControllerHelperService">
-  </bean>
-
   <bean id="dashboard" class="uk.ac.bbsrc.tgac.miso.spring.ajax.DashboardHelperService">
   </bean>
 

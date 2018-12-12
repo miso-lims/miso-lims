@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -36,9 +38,13 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -51,6 +57,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.dto.AttachmentDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
@@ -90,6 +98,8 @@ public class ProjectRestController extends RestController {
   private RunService runService;
   @Autowired
   private SampleGroupService sampleGroupService;
+  @Autowired
+  private NamingScheme namingScheme;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -190,6 +200,23 @@ public class ProjectRestController extends RestController {
       throw new RestException("Project not found", Status.NOT_FOUND);
     }
     return project.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList());
+  }
+
+  @PostMapping(value = "/validate-short-name")
+  public ResponseEntity<?> validateShortName(@RequestBody String shortName, UriComponentsBuilder uriBuilder) {
+    if (isStringEmptyOrNull(shortName)) {
+      return ResponseEntity
+          .status(HttpStatus.PRECONDITION_FAILED)
+          .body("No short name specified");
+    }
+    ValidationResult validationResult = namingScheme.validateProjectShortName(shortName);
+    if (validationResult.isValid()) {
+      return ResponseEntity.status(HttpStatus.OK).build();
+    } else {
+      return ResponseEntity
+          .status(HttpStatus.PRECONDITION_FAILED)
+          .body(validationResult.getMessage());
+    }
   }
 
 }

@@ -35,7 +35,7 @@ window.Parsley.addValidator('sampleAlias', {
     }).success(function(json) {
       deferred.resolve();
     }).fail(function(response, textStatus, serverStatus) {
-      deferred.reject(response.error);
+      deferred.reject(response.error); // need to upgrade Parsley to get custom error messages
     });
     return deferred.promise();
   },
