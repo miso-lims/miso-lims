@@ -93,15 +93,11 @@ HotTarget.boxable = (function() {
             },
             depends: ['discarded', 'distributed'],
             update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              var applyChanges = function(source, autoSelect) {
-                setOptions({
-                  source: source
-                });
-                setData(source.length > 1 && !autoSelect ? 'SELECT' : source[0]);
-              };
               if ((flatProperty === 'discarded' && value == 'True') || (flatProperty == 'distributed' && value == 'Sent Out')) {
                 setData(null);
                 setReadOnly(true);
+              } else {
+                setReadOnly(false);
               }
             }
           },
@@ -131,16 +127,21 @@ HotTarget.boxable = (function() {
                 obj.box.id = null;
               }
             },
-            depends: ['boxSearch', 'distributed'],
+            depends: ['boxSearch', 'distributed', 'discarded'],
             update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               var applyChanges = function(source, autoSelect) {
                 setOptions({
                   source: source
                 });
+
                 setData(source.length > 1 && !autoSelect ? 'SELECT' : source[0]);
               };
-              if (!value || (flatProperty == 'distributed' && value == 'Sent Out')) {
+              if (!value) {
                 applyChanges([''], false);
+                return;
+              }
+              if ((flatProperty === 'discarded') || (flatProperty === 'distributed')) {
+                applyChanges([''], true);
                 return;
               }
               if (boxSearchCache[value.toLowerCase()]) {

@@ -372,15 +372,15 @@
 <tr>
   <td><label for="distributionRecipient">Distribution Recipient:</label></td>
   <td><form:input id="distributionRecipient" path="distributionRecipient"/>
-    <script type="text/javascript">
-      Library.ui.distributionChanged();
-      Utils.ui.addDatePicker("distributionDatePicker");
-    </script>
   </td>
 </tr>
 <tr>
   <td class="h"><label for="locationBarcode">Location:</label></td>
-  <td><form:input id="locationBarcode" path="locationBarcode"/></td>
+  <td><form:input id="locationBarcode" path="locationBarcode"/>
+    <script type="text/javascript">
+      Library.ui.distributionChanged();
+    </script>
+  </td>
 </tr>
 <tr>
   <td class="h">Box Location:</td>
