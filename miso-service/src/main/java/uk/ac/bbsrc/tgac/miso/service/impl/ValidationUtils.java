@@ -59,7 +59,7 @@ public class ValidationUtils {
     } else {
       if (distributionDate != null)
         errors.add(new ValidationError("distributionDate", "Distribution date should be empty since item is not distributed"));
-      if (distributionRecipient != null)
+      if (!isStringEmptyOrNull(distributionRecipient))
         errors.add(new ValidationError("distributionRecipient", "Distribution recipient should be empty since item is not distributed"));
     }
   }
