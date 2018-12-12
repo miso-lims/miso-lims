@@ -726,9 +726,7 @@ public class BulkLibraryIT extends AbstractIT {
     BulkLibraryPage page = BulkLibraryPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(libId));
     HandsOnTable table = page.getTable();
     table.enterText(LibColumns.DISCARDED, 0, "True");
-    assertTrue(table.getInvalidCells(0).contains(LibColumns.DISCARDED));
     table.clearField(LibColumns.BOX_ALIAS, 0);
-    assertFalse(table.getInvalidCells(0).contains(LibColumns.DISCARDED));
     saveAndAssertSuccess(table);
 
     DetailedLibrary after = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
@@ -747,14 +745,12 @@ public class BulkLibraryIT extends AbstractIT {
 
     BulkLibraryPage page = BulkLibraryPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(libId));
     HandsOnTable table = page.getTable();
+    table.enterText(LibColumns.DISCARDED, 0, "False");
     table.enterText(LibColumns.BOX_SEARCH, 0, "BOX100001");
     table.waitForSearch(LibColumns.BOX_ALIAS, 0);
     assertEquals("Bulk Boxables Test", table.getText(LibColumns.BOX_ALIAS, 0));
     table.enterText(LibColumns.BOX_POSITION, 0, "B01");
     assertEquals("B01", table.getText(LibColumns.BOX_POSITION, 0));
-    assertTrue(table.getInvalidCells(0).contains(LibColumns.DISCARDED));
-    table.enterText(LibColumns.DISCARDED, 0, "False");
-    assertFalse(table.getInvalidCells(0).contains(LibColumns.DISCARDED));
     saveAndAssertSuccess(table);
 
     DetailedLibrary after = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
