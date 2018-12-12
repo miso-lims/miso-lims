@@ -527,7 +527,7 @@ var Utils = Utils
           'dataType': 'json',
           'type': method,
           'url': url,
-          'data': JSON.stringify(data),
+          'data': data == null ? undefined : JSON.stringify(data),
           'contentType': 'application/json; charset=utf8',
           'success': function(data, textStatus, xhr) {
             dialog.dialog("close");
