@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -48,7 +49,7 @@ public class ValidationUtils {
     }
   }
 
-  public static void validateDistributionFields(boolean isDistributed, Date distributionDate, String distributionRecipient,
+  public static void validateDistributionFields(boolean isDistributed, Date distributionDate, String distributionRecipient, Box box,
       Collection<ValidationError> errors) {
     if (isDistributed) {
       if (distributionDate == null)
@@ -58,9 +59,14 @@ public class ValidationUtils {
     } else {
       if (distributionDate != null)
         errors.add(new ValidationError("distributionDate", "Distribution date should be empty since item is not distributed"));
-      if (distributionRecipient != null)
+      if (!isStringEmptyOrNull(distributionRecipient))
         errors.add(new ValidationError("distributionRecipient", "Distribution recipient should be empty since item is not distributed"));
     }
+  }
+
+  public static void validateUnboxableFields(boolean discarded, boolean distributed, Box box, Collection<ValidationError> errors) {
+    if (discarded && box != null) errors.add(new ValidationError("box", "Discarded item cannot be added to a box"));
+    if (distributed && box != null) errors.add(new ValidationError("box", "Distributed item cannot be added to a box"));
   }
 
 }

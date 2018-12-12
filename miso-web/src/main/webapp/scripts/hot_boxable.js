@@ -76,7 +76,7 @@ HotTarget.boxable = (function() {
 
   return {
     makeBoxLocationColumns: function(config) {
-      if(config.box){
+      if (config.box) {
         cacheBox(config.box);
       }
       return [
@@ -90,6 +90,15 @@ HotTarget.boxable = (function() {
             },
             pack: function(obj, flat, errorHandler) {
               // search field only
+            },
+            depends: ['discarded', 'distributed'],
+            update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              if ((flatProperty === 'discarded' && value == 'True') || (flatProperty == 'distributed' && value == 'Sent Out')) {
+                setData(null);
+                setReadOnly(true);
+              } else {
+                setReadOnly(false);
+              }
             }
           },
           {
@@ -118,58 +127,69 @@ HotTarget.boxable = (function() {
                 obj.box.id = null;
               }
             },
-            depends: ['boxSearch', 'distributed'],
+            depends: ['boxSearch', 'distributed', 'discarded'],
             update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               var applyChanges = function(source, autoSelect) {
                 setOptions({
                   source: source
                 });
+
                 setData(source.length > 1 && !autoSelect ? 'SELECT' : source[0]);
               };
-              if (!value || (flatProperty == 'distributed' && value == 'Sent Out')) {
+              if (!value) {
                 applyChanges([''], false);
+                return;
+              }
+              if ((flatProperty === 'discarded') || (flatProperty === 'distributed')) {
+                applyChanges([''], true);
                 return;
               }
               if (boxSearchCache[value.toLowerCase()]) {
                 applyChanges(boxSearchCache[value.toLowerCase()].map(function(item) {
                   return item.alias;
-                }), (boxSearchCache[value.toLowerCase()][0].name.toLowerCase() == value.toLowerCase()
-                		|| boxSearchCache[value.toLowerCase()][0].alias.toLowerCase() == value.toLowerCase() 
-                		|| (boxSearchCache[value.toLowerCase()][0].identificationBarcode && boxSearchCache[value.toLowerCase()][0].identificationBarcode.toLowerCase() == value.toLowerCase())));
+                }),
+                    (boxSearchCache[value.toLowerCase()][0].name.toLowerCase() == value.toLowerCase()
+                        || boxSearchCache[value.toLowerCase()][0].alias.toLowerCase() == value.toLowerCase() || (boxSearchCache[value
+                        .toLowerCase()][0].identificationBarcode && boxSearchCache[value.toLowerCase()][0].identificationBarcode
+                        .toLowerCase() == value.toLowerCase())));
                 return;
               }
 
               setData('(...searching...)');
               var deferred = jQuery.Deferred();
-              jQuery.ajax({
-                url: '/miso/rest/boxes/search/partial?' + jQuery.param({
-                  q: value,
-                  b: false
-                }),
-                contentType: "application/json; charset=utf8",
-                dataType: "json"
-              }).success(function(data) {
-                boxSearchCache[value.toLowerCase()] = data;
-                jQuery.each(data, function(index, item) {
-                  if (!boxesByAlias[item.alias]) {
-                    cacheBox(item);
-                  }
-                });
-                if (!data.length) {
-                  applyChanges([''], false);
-                } else {
-                  applyChanges(data.map(function(item) {
-                    return item.alias;
-                  }), (data[0].name.toLowerCase() == value.toLowerCase() 
-                  		|| data[0].alias.toLowerCase() == value.toLowerCase() 
-                  		|| (data[0].identificationBarcode && data[0].identificationBarcode.toLowerCase() == value.toLowerCase())));
-                }
-              }).fail(function(response, textStatus, serverStatus) {
-                applyChanges([''], false);
-                HotUtils.showServerErrors(response, serverStatus);
-              }).always(function() {
-                deferred.resolve();
-              });
+              jQuery
+                  .ajax({
+                    url: '/miso/rest/boxes/search/partial?' + jQuery.param({
+                      q: value,
+                      b: false
+                    }),
+                    contentType: "application/json; charset=utf8",
+                    dataType: "json"
+                  })
+                  .success(
+                      function(data) {
+                        boxSearchCache[value.toLowerCase()] = data;
+                        jQuery.each(data, function(index, item) {
+                          if (!boxesByAlias[item.alias]) {
+                            cacheBox(item);
+                          }
+                        });
+                        if (!data.length) {
+                          applyChanges([''], false);
+                        } else {
+                          applyChanges(
+                              data.map(function(item) {
+                                return item.alias;
+                              }),
+                              (data[0].name.toLowerCase() == value.toLowerCase() || data[0].alias.toLowerCase() == value.toLowerCase() || (data[0].identificationBarcode && data[0].identificationBarcode
+                                  .toLowerCase() == value.toLowerCase())));
+                        }
+                      }).fail(function(response, textStatus, serverStatus) {
+                    applyChanges([''], false);
+                    HotUtils.showServerErrors(response, serverStatus);
+                  }).always(function() {
+                    deferred.resolve();
+                  });
               return deferred.promise();
             }
           },
@@ -195,7 +215,7 @@ HotTarget.boxable = (function() {
             },
             depends: config.box ? '*start' : 'boxAlias',
             update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if(flatProperty != '*start'){
+              if (flatProperty != '*start') {
                 setReadOnly(!value);
                 setOptions({
                   validator: value ? HotUtils.validator.requiredAutocomplete : HotUtils.validator.requiredEmpty
