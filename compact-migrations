@@ -49,13 +49,12 @@ do
 	git rm "${FILE}"
 done
 
-ls | grep "^V8.*" > dangling_migrations
-DANGLING_MIGRATION_COUNT=$(cat dangling_migrations | wc -l)
+DANGLING_MIGRATION_COUNT=$(ls | grep "^V8.*" | wc -l)
 
 if [ "$DANGLING_MIGRATION_COUNT" -gt 0 ]; then
   echo ""
 	echo "************* Found migrations with malformed file names. ****************"
-	cat dangling_migrations
+	ls | grep "^V8.*"
 	echo "************* You should undo all migration changes before fixing. *******"
 	exit 1
 fi
