@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 
 public enum ConcentrationUnit {
 
-  NANOGRAMS_PER_MICROLITRE("ng/&#181;L"), NANOMOLAR("nM");
+  NANOGRAMS_PER_MICROLITRE("ng/&#181;L"), NANOMOLAR("nM"), PICOMOLAR("pM");
 
   private final String units;
 
