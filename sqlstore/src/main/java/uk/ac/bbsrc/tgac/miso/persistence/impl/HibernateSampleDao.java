@@ -202,6 +202,21 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
+  public void restrictPaginationByGroupId(Criteria criteria, String groupId, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.ilike("groupId", groupId, MatchMode.EXACT));
+  }
+
+  @Override
+  public void restrictPaginationByDistributed(Criteria criteria, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("distributed", true));
+  }
+
+  @Override
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, String recipient, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.ilike("distributionRecipient", recipient, MatchMode.ANYWHERE));
+  }
+
+  @Override
   public long save(Sample t) throws IOException {
     if (t.getId() == SampleImpl.UNSAVED_ID) {
       return addSample(t);
@@ -343,6 +358,8 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
       return "lastModified";
     case RECEIVE:
       return "receivedDate";
+    case DISTRIBUTED:
+      return "distributionDate";
     default:
       return null;
     }
