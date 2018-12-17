@@ -51,6 +51,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -59,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.AttachmentDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
@@ -203,7 +208,24 @@ public class ProjectRestController extends RestController {
   }
 
   @PostMapping(value = "/validate-short-name")
-  public ResponseEntity<?> validateShortName(@RequestBody String shortName, UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<?> validateShortName(@RequestBody String requestBody, UriComponentsBuilder uriBuilder) throws IOException {
+    JsonNode reqBody = null;
+    String shortName = null;
+    String genericError = "Error parsing shortName in request body";
+    try {
+      reqBody = new ObjectMapper().readTree(requestBody);
+    } catch (JsonProcessingException e) {
+      log.error(genericError, e);
+      return ResponseEntity
+          .status(HttpStatus.BAD_REQUEST)
+          .body(genericError);
+    }
+    if (!reqBody.has("shortName") || LimsUtils.isStringEmptyOrNull(reqBody.get("shortName").asText())) {
+      return ResponseEntity
+          .status(HttpStatus.BAD_REQUEST)
+          .body(genericError);
+    }
+    shortName = reqBody.get("shortName").asText();
     if (isStringEmptyOrNull(shortName)) {
       return ResponseEntity
           .status(HttpStatus.PRECONDITION_FAILED)

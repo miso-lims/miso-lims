@@ -65,6 +65,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -81,6 +82,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -354,10 +356,29 @@ public class SampleRestController extends RestController {
   /**
    * This is a first pass at validating the alias. Further validation is done in the Sample Service, as
    * validation results may depend on other sample properties.
+   * 
+   * @throws IOException
    */
   @PostMapping(value = "/validate-alias", produces = { "application/json" })
-  public ResponseEntity<?> preValidateAlias(@RequestBody String alias, HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<?> validateAlias(@RequestBody String requestBody, HttpServletRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+    JsonNode reqBody = null;
+    String alias = null;
+    String genericError = "Error parsing alias in request body";
+    try {
+      reqBody = new ObjectMapper().readTree(requestBody);
+    } catch (JsonProcessingException e) {
+      log.error(genericError, e);
+      return ResponseEntity
+          .status(HttpStatus.BAD_REQUEST)
+          .body(genericError);
+    }
+    if (!reqBody.has("alias") || LimsUtils.isStringEmptyOrNull(reqBody.get("alias").asText())) {
+      return ResponseEntity
+          .status(HttpStatus.BAD_REQUEST)
+          .body(genericError);
+    }
+    alias = reqBody.get("alias").asText();
     if (isStringEmptyOrNull(alias)) {
       if (namingScheme.hasSampleAliasGenerator()) {
         return ResponseEntity.status(HttpStatus.OK).build();

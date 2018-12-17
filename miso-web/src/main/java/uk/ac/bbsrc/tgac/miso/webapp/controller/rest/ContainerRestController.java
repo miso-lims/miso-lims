@@ -163,23 +163,28 @@ public class ContainerRestController extends RestController {
       String error = String.format("Error looking up containers by serial number");
       log.error(error, e);
       return ResponseEntity
-          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .status(HttpStatus.BAD_REQUEST)
           .body(error);
     }
 
-    if (!reqBody.has("serialNumber") || LimsUtils.isStringEmptyOrNull(reqBody.get("serialNumber").asText()) || !reqBody.has("containerId")
-        || reqBody.get("containerId").asLong() == SequencerPartitionContainerImpl.UNSAVED_ID) {
+    if (!reqBody.has("serialNumber") || LimsUtils.isStringEmptyOrNull(reqBody.get("serialNumber").asText())
+        || !reqBody.has("containerId")) {
       return ResponseEntity
           .status(HttpStatus.PRECONDITION_FAILED)
-          .body("Container ID and serial number must be provided");
+          .body("Serial number and containerID must be provided");
     }
     String serialNumber = reqBody.get("serialNumber").asText();
-    Long containerId = reqBody.get("containerId").asLong();
+    Long containerId = null;
+    if (reqBody.get("containerId").asText().contains("Unsaved")) {
+      containerId = SequencerPartitionContainerImpl.UNSAVED_ID;
+    } else {
+      containerId = reqBody.get("containerId").asLong();
+    }
     try {
       List<SequencerPartitionContainer> matchingContainers = (List<SequencerPartitionContainer>) containerService
           .listByBarcode(serialNumber);
       if (matchingContainers.isEmpty()
-          || (matchingContainers.size() == 1 && matchingContainers.get(0).getId() == Long.valueOf(containerId))) {
+          || (matchingContainers.size() == 1 && matchingContainers.get(0).getId() == containerId)) {
         return ResponseEntity.status(HttpStatus.OK).build();
       } else {
         return ResponseEntity

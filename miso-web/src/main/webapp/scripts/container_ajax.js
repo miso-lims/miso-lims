@@ -24,7 +24,7 @@
 window.Parsley.addValidator('serialNumber', {
   validateString: function(value) {
     var deferred = new jQuery.Deferred();
-    var containerId = parseInt(document.getElementById('containerId').innerHTML);
+    var containerId = document.getElementById('containerId').innerHTML;
     jQuery.ajax({
       url: '/miso/rest/container/validate-serial-number',
       type: 'POST',
