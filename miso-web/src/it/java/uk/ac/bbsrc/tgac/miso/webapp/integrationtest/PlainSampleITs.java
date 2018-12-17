@@ -267,8 +267,6 @@ public class PlainSampleITs extends AbstractIT {
     slugs.add("sample/1");
     slugs.add("library/1");
     slugs.add("pool/1");
-    slugs.add("sample/receipt");
-    slugs.add("importexport");
     final Set<String> urlSlugs = Collections.unmodifiableSet(slugs);
 
     String errors = urlSlugs.stream()

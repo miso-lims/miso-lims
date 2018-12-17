@@ -54,8 +54,5 @@
   <bean id="dashboard" class="uk.ac.bbsrc.tgac.miso.spring.ajax.DashboardHelperService">
   </bean>
 
-  <bean id="importExportControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ImportExportControllerHelperService">
-  </bean>
-
 </beans>
 

@@ -63,8 +63,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("box/1");
     slugs.add("kitdescriptor/1");
     slugs.add("study/1");
-    slugs.add("sample/receipt");
-    slugs.add("importexport");
     urlSlugs = Collections.unmodifiableSet(slugs);
   }
 

@@ -29,8 +29,6 @@
 	<div class="menu">
 		<a href="<c:url value="/miso/sample/receipt"/>">Receive
 				Samples</a>
-		<a href="<c:url value="/miso/importexport"/>">Import &amp;
-				Export</a>
 	</div>
 
     <h2>Preparation</h2>

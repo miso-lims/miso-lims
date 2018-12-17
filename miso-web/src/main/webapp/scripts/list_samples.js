@@ -54,41 +54,13 @@ ListTarget.sample = {
         });
       }
     });
-
-    if (projectId) {
-      actions = actions.concat([{
-        name: "Get Form",
-        action: function(items) {
-          Utils.showDialog("Get Information Form", "Next", [{
-            property: "format",
-            type: "select",
-            label: "Type",
-            values: [{
-              name: "Tubes",
-              value: false
-            }, {
-              name: "Plate",
-              value: true
-            }],
-            getLabel: Utils.array.getName
-          }], function(result) {
-            Project.ui.processSampleDeliveryForm(projectId, result.format.value, items.map(Utils.array.getId));
-          });
-        }
-      }, {
-        name: "Receive",
-        action: function(items) {
-          Project.ui.receiveSelectedSamples(items.map(Utils.array.getId));
-        }
-      }]);
-    }
+    
     return actions;
 
   },
   createStaticActions: function(config, projectId) {
     return [{
       name: "Create",
-      include: true,
       handler: function() {
         var fields = [{
           property: 'quantity',
@@ -130,62 +102,7 @@ ListTarget.sample = {
           return result.quantity;
         });
       }
-    }, {
-      name: "Get Input Form",
-      include: !!projectId,
-      handler: function() {
-        Utils.showDialog("Get Bulk Sample Input Form", "Get Form", [{
-          property: 'formType',
-          type: 'select',
-          label: 'Format',
-          values: [{
-            name: "OpenOffice (ODS)",
-            value: "ods"
-          }, {
-            name: "Excel (XLSX)",
-            value: "xlsx"
-          }],
-          getLabel: Utils.array.getName
-        }], function(result) {
-          Project.ui.downloadBulkSampleInputForm(projectId, result.formType.value);
-        });
-      }
-    }, {
-      name: "Import/Export",
-      include: !!projectId,
-      handler: function() {
-        Utils.showWizardDialog('Import/Export', [
-
-        {
-          name: "Import Input Form",
-          handler: function() {
-            Project.ui.uploadBulkSampleInputForm();
-          }
-        }, {
-          name: "Import Information",
-          handler: function() {
-            Project.ui.uploadSampleDeliveryForm();
-          }
-        }, {
-          name: "Export Sample QC Sheet",
-          handler: function() {
-            window.location = "/miso/importexport/exportsamplesheet";
-          }
-        }, {
-          name: "Import Sample QC Sheet",
-          handler: function() {
-            window.location = "/miso/importexport/importsamplesheet";
-          }
-        }, {
-          name: "Import Library Sheet",
-          handler: function() {
-            window.location = "/miso/importexport/importlibrarypoolsheet";
-          }
-        }]);
-      }
-    }].filter(function(x) {
-      return !x || x.include;
-    });
+    }];
   },
   createColumns: function(config, projectId) {
     return [ListUtils.idHyperlinkColumn("Name", "sample", "id", Utils.array.getName, 1, true),

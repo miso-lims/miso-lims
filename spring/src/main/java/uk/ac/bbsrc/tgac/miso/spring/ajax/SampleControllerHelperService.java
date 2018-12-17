@@ -25,30 +25,18 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import java.io.IOException;
-import java.util.Date;
-
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.service.ProjectService;
-import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -62,12 +50,6 @@ import uk.ac.bbsrc.tgac.miso.service.SampleService;
 public class SampleControllerHelperService {
 
   protected static final Logger log = LoggerFactory.getLogger(SampleControllerHelperService.class);
-  @Autowired
-  private SecurityManager securityManager;
-  @Autowired
-  private ProjectService projectService;
-  @Autowired
-  private SampleService sampleService;
   @Autowired
   private NamingScheme namingScheme;
 
@@ -93,59 +75,6 @@ public class SampleControllerHelperService {
       log.error("Exception in validateSampleAlias", e);
       throw e;
     }
-  }
-
-  public JSONObject getSampleByBarcode(HttpSession session, JSONObject json) {
-    JSONObject response = new JSONObject();
-    String barcode = json.getString("barcode");
-
-    try {
-      Sample sample = sampleService.getByBarcode(barcode);
-      // Base64-encoded string, most likely a barcode image beeped in. decode and search
-      if (sample == null) {
-        sample = sampleService.getByBarcode(new String(Base64.decodeBase64(barcode)));
-      }
-      if (sample.getReceivedDate() == null) {
-        response.put("name", sample.getName());
-        response.put("desc", sample.getDescription());
-        response.put("id", sample.getId());
-        response.put("type", sample.getSampleType());
-        response.put("project", sample.getProject().getName());
-        return response;
-      } else {
-        return JSONUtils.SimpleJSONError("Sample " + sample.getName() + " has already been received");
-      }
-    } catch (Exception e) {
-      log.error("sample not in database", e);
-      return JSONUtils.SimpleJSONError(e.getMessage() + ": This sample doesn't seem to be in the database.");
-    }
-  }
-
-  public JSONObject setSampleReceivedDateByBarcode(HttpSession session, JSONObject json) {
-    JSONObject response = new JSONObject();
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      JSONArray sampleIds = JSONArray.fromObject(json.getString("samples"));
-      for (int index = 0; index < sampleIds.size(); index++) {
-        Sample sample = sampleService.get(sampleIds.getLong(index));
-        sample.setReceivedDate(new Date());
-        sample.setLastModifier(user);
-        sampleService.update(sample);
-      }
-      response.put("result", "Samples received date saved");
-      return response;
-    } catch (IOException e) {
-      log.error("cannot set receipt date for sample", e);
-      return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot set receipt date for sample");
-    }
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public void setProjectService(ProjectService projectService) {
-    this.projectService = projectService;
   }
 
   public void setSampleNamingScheme(NamingScheme namingScheme) {
