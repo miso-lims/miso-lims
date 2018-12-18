@@ -62,7 +62,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -350,6 +349,18 @@ public class SampleRestController extends RestController {
     return matches.stream().map(identity -> Dtos.asDto(identity, false)).collect(Collectors.toSet());
   }
 
+  private static class AliasValidationDto {
+    private final String alias;
+
+    public AliasValidationDto(String alias) {
+      this.alias = alias;
+    }
+
+    public String getAlias() {
+      return alias;
+    }
+  }
+
   /**
    * This is a first pass at validating the alias. Further validation is done in the Sample Service, as
    * validation results may depend on other sample properties.
@@ -358,27 +369,18 @@ public class SampleRestController extends RestController {
    */
   @PostMapping(value = "/validate-alias", produces = { "application/json" })
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void validateAlias(@RequestBody String requestBody, HttpServletRequest request, HttpServletResponse response,
+  public void validateAlias(@RequestBody AliasValidationDto params, HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    String aliasKey = "alias";
-    JsonNode reqBody = null;
-    String alias = null;
-    try {
-      reqBody = new ObjectMapper().readTree(requestBody);
-    } catch (JsonProcessingException e) {
-      throw new RestException("Error parsing alias in request body");
+    String alias = params.getAlias();
+    if (LimsUtils.isStringEmptyOrNull(alias) && !namingScheme.hasSampleAliasGenerator()) {
+      throw new RestException("No alias specified, and no alias generator exists", Status.BAD_REQUEST);
     }
-    if ((!reqBody.has(aliasKey) || LimsUtils.isStringEmptyOrNull(reqBody.get(aliasKey).asText()))
-        && !namingScheme.hasSampleAliasGenerator()) {
-      throw new RestException("No alias specified, and no alias generator exists");
-    }
-    alias = reqBody.get(aliasKey).asText();
     
     ValidationResult aliasValidation = namingScheme.validateSampleAlias(alias);
     if (aliasValidation.isValid()) {
       return;
     } else {
-      throw new RestException(aliasValidation.getMessage());
+      throw new RestException(aliasValidation.getMessage(), Status.PRECONDITION_FAILED);
     }
   }
 

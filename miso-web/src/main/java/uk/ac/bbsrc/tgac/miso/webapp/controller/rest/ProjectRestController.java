@@ -49,10 +49,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -205,27 +201,31 @@ public class ProjectRestController extends RestController {
     return project.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
+  private static class ShortNameValidationDto {
+    private final String shortName;
+
+    public ShortNameValidationDto(String shortName) {
+      this.shortName = shortName;
+    }
+
+    public String getShortName() {
+      return shortName;
+    }
+  }
+
   @PostMapping(value = "/validate-short-name")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void validateShortName(@RequestBody String requestBody, UriComponentsBuilder uriBuilder) throws IOException {
-    String shortNameKey = "shortName";
-    JsonNode reqBody = null;
-    String shortName = null;
-    try {
-      reqBody = new ObjectMapper().readTree(requestBody);
-    } catch (JsonProcessingException e) {
-      throw new RestException("Error parsing shortName in request body");
+  public void validateShortName(@RequestBody ShortNameValidationDto params, UriComponentsBuilder uriBuilder) throws IOException {
+    String shortName = params.getShortName();
+    if (LimsUtils.isStringEmptyOrNull(shortName)) {
+      throw new RestException("No short name specified", Status.BAD_REQUEST);
     }
-    if (!reqBody.has(shortNameKey) || LimsUtils.isStringEmptyOrNull(reqBody.get(shortNameKey).asText())) {
-      throw new RestException("No short name specified");
-    }
-    shortName = reqBody.get(shortNameKey).asText();
 
     ValidationResult validationResult = namingScheme.validateProjectShortName(shortName);
     if (validationResult.isValid()) {
       return;
     } else {
-      throw new RestException(validationResult.getMessage());
+      throw new RestException(validationResult.getMessage(), Status.PRECONDITION_FAILED);
     }
   }
 

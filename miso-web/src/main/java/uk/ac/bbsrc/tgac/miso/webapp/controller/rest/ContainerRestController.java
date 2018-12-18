@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +57,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PartitionSpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -152,31 +150,40 @@ public class ContainerRestController extends RestController {
     return MisoWebUtils.generateSpreadsheet(input, PartitionSpreadsheets::valueOf, request, response);
   }
 
-  @PostMapping(value = "/validate-serial-number")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void validateSerialNumber(@RequestBody String params, HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) throws IOException {
-    String serialNumberKey = "serialNumber";
-    String containerIdKey = "containerId";
-    JsonNode reqBody = null;
-    try {
-      reqBody = new ObjectMapper().readTree(params);
-    } catch (JsonProcessingException e) {
-      String error = "Error looking up containers by serial number";
-      log.error(error, e);
-      throw new RestException(error);
+  private static class SerialNumberValidationDto {
+    private final String serialNumber;
+    private final String containerId;
+
+    public SerialNumberValidationDto(String serialNumber, String containerId) {
+      this.serialNumber = serialNumber;
+      this.containerId = containerId;
     }
 
-    if (!reqBody.has(serialNumberKey) || LimsUtils.isStringEmptyOrNull(reqBody.get(serialNumberKey).asText())
-        || !reqBody.has(containerIdKey)) {
-      throw new RestException("Serial number and containerID must be provided");
+    public String getSerialNumber() {
+      return serialNumber;
     }
-    String serialNumber = reqBody.get(serialNumberKey).asText();
+
+    public String getContainerId() {
+      return containerId;
+    }
+  }
+
+  @PostMapping(value = "/validate-serial-number")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void validateSerialNumber(@RequestBody SerialNumberValidationDto params, HttpServletRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+    String serialNumber = params.getSerialNumber();
+    String maybeContainerId = params.getContainerId();
+
+    if (isStringEmptyOrNull(serialNumber) || isStringEmptyOrNull(maybeContainerId)) {
+      throw new RestException("Serial number and containerID must be provided", Status.BAD_REQUEST);
+    }
+
     Long containerId = null;
-    if (reqBody.get(containerIdKey).asText().contains("Unsaved")) {
+    if (maybeContainerId.contains("Unsaved")) {
       containerId = SequencerPartitionContainerImpl.UNSAVED_ID;
     } else {
-      containerId = reqBody.get(containerIdKey).asLong();
+      containerId = Long.valueOf(maybeContainerId);
     }
     try {
       List<SequencerPartitionContainer> matchingContainers = (List<SequencerPartitionContainer>) containerService
@@ -185,7 +192,7 @@ public class ContainerRestController extends RestController {
           || (matchingContainers.size() == 1 && matchingContainers.get(0).getId() == containerId)) {
         return;
       } else {
-        throw new RestException("Serial number is already associated with another container");
+        throw new RestException("Serial number is already associated with another container", Status.PRECONDITION_FAILED);
       }
     } catch (IOException e) {
       String error = String.format("Error looking up containers by serial number '%s'", serialNumber);
