@@ -301,7 +301,7 @@ public class RunPageIT extends AbstractIT {
     assertTrue(isStringEmptyOrNull(page.getLaneInfo(Columns.QC_NOTE, 0)));
 
     RunPage page2 = page.setPartitionQC(Arrays.asList(0), LaneQC.FAIL_INSTRUMENT, null);
-    assertEquals("Failed: Instrument problem (order not fulfilled, analysis skipped)", page2.getLaneInfo(Columns.QC_STATUS, 0));
+    assertEquals(LaneQC.FAIL_INSTRUMENT, page2.getLaneInfo(Columns.QC_STATUS, 0));
     assertTrue(isStringEmptyOrNull(page.getLaneInfo(Columns.QC_NOTE, 0)));
   }
 
@@ -313,7 +313,7 @@ public class RunPageIT extends AbstractIT {
     assertTrue(isStringEmptyOrNull(page.getLaneInfo(Columns.QC_NOTE, 0)));
 
     RunPage page2 = page.setPartitionQC(Arrays.asList(0), LaneQC.FAIL_OTHER, "Sequencer ran out of Cs");
-    assertEquals("Failed: Other problem (order not fulfilled, analysis skipped)", page2.getLaneInfo(Columns.QC_STATUS, 0));
+    assertEquals(LaneQC.FAIL_OTHER, page2.getLaneInfo(Columns.QC_STATUS, 0));
     assertEquals("Sequencer ran out of Cs", page.getLaneInfo(Columns.QC_NOTE, 0));
   }
 
@@ -325,11 +325,11 @@ public class RunPageIT extends AbstractIT {
     assertTrue(isStringEmptyOrNull(page.getLaneInfo(Columns.QC_NOTE, 0)));
 
     RunPage page2 = page.setPartitionQC(Arrays.asList(0), LaneQC.FAIL_INSTRUMENT, null);
-    assertEquals("Failed: Instrument problem (order not fulfilled, analysis skipped)", page2.getLaneInfo(Columns.QC_STATUS, 0));
+    assertEquals(LaneQC.FAIL_INSTRUMENT, page2.getLaneInfo(Columns.QC_STATUS, 0));
     assertTrue(isStringEmptyOrNull(page.getLaneInfo(Columns.QC_NOTE, 0)));
 
     RunPage page3 = page2.setPartitionQC(Arrays.asList(0), LaneQC.OK_COLLAB, null);
-    assertEquals("OK'd by collaborator", page3.getLaneInfo(Columns.QC_STATUS, 0));
+    assertEquals(LaneQC.OK_COLLAB, page3.getLaneInfo(Columns.QC_STATUS, 0));
     assertTrue(isStringEmptyOrNull(page.getLaneInfo(Columns.QC_NOTE, 0)));
   }
 
