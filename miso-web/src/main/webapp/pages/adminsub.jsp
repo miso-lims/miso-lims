@@ -25,15 +25,7 @@
 <%@ taglib prefix="miso" uri="http://miso.tgac.bbsrc.ac.uk/tags/form" %>
 
 <div id="subcontent">
-	<h2>Sample Processing</h2>
-	<div class="menu">
-		<a href="<c:url value="/miso/sample/receipt"/>">Receive
-				Samples</a>
-		<a href="<c:url value="/miso/importexport"/>">Import &amp;
-				Export</a>
-	</div>
-
-    <h2>Preparation</h2>
+	<h2>Preparation</h2>
     <div class="menu">
         <a href="<c:url value="/miso/samples"/>">Samples</a>
         <a href="<c:url value="/miso/libraries"/>">Libraries</a>
