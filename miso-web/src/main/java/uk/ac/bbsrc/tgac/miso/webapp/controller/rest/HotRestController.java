@@ -86,15 +86,19 @@ public class HotRestController extends RestController {
 
   @PostMapping("/import")
   public @ResponseBody List<ColumnDataDto> importSpreadsheet(@RequestParam("file") MultipartFile file) throws IOException {
-    String extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".") + 1).toLowerCase();
+    String extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1).toLowerCase();
     SpreadsheetWrapper sheet = null;
-    if (extension.equals("xlsx")) {
+    switch (extension) {
+    case "xlsx":
       sheet = new ExcelSpreadsheetWrapper(file.getInputStream());
-    } else if (extension.equals("ods")) {
+      break;
+    case "ods":
       sheet = new OpenDocumentSpreadsheetWrapper(file.getInputStream());
-    } else if (extension.equals("csv")) {
+      break;
+    case "csv":
       sheet = new DelimitedSpreadsheetWrapper(file.getInputStream());
-    } else {
+      break;
+    default:
       throw new RestException("Unknown file extension: " + extension + ". Only xlsx, ods, and csv files are accepted", Status.BAD_REQUEST);
     }
 

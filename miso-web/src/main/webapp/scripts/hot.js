@@ -649,115 +649,118 @@ var HotUtils = {
         {
           buttonText: "Import",
           eventHandler: function() {
-            var dialogArea = jQuery('#dialog');
-            dialogArea.empty();
+            var mainDialog = function() {
+              var dialogArea = jQuery('#dialog');
+              dialogArea.empty();
 
-            var form = jQuery('<form id="uploadForm">');
-            form.append(jQuery('<p><input id="fileInput" type="file" name="file"></p>'));
-            dialogArea.append(form);
+              var form = jQuery('<form id="uploadForm">');
+              form.append(jQuery('<p><input id="fileInput" type="file" name="file"></p>'));
+              dialogArea.append(form);
 
-            var dialog = dialogArea.dialog({
-              autoOpen: true,
-              width: 500,
-              title: 'Import Spreadsheet',
-              modal: true,
-              buttons: {
-                upload: {
-                  id: 'upload',
-                  text: 'Import',
-                  click: function() {
-                    if (!jQuery('#fileInput').val()) {
-                      alert('No file selected!');
-                      return;
-                    }
-                    var formData = new FormData(jQuery('#uploadForm')[0]);
-                    dialog.dialog("close");
-                    dialogArea.empty();
-                    dialogArea.append(jQuery('<p>Uploading...</p>'));
-
-                    dialog = jQuery('#dialog').dialog({
-                      autoOpen: true,
-                      height: 400,
-                      width: 350,
-                      title: 'Uploading File',
-                      modal: true,
-                      buttons: {},
-                      closeOnEscape: false,
-                      open: function(event, ui) {
-                        jQuery(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+              var dialog = dialogArea.dialog({
+                autoOpen: true,
+                width: 500,
+                title: 'Import Spreadsheet',
+                modal: true,
+                buttons: {
+                  upload: {
+                    id: 'upload',
+                    text: 'Import',
+                    click: function() {
+                      if (!jQuery('#fileInput').val()) {
+                        Utils.showOkDialog('Error', ['No file selected!'], mainDialog);
+                        return;
                       }
-                    });
-
-                    jQuery.ajax({
-                      url: '/miso/rest/hot/import',
-                      type: 'POST',
-                      data: formData,
-                      cache: false,
-                      contentType: false,
-                      processData: false
-                    }).success(
-                        function(columnData) {
-                          dialog.dialog("close");
-                          var hotHeaders = table.getColHeader();
-                          // validate column headings and row count
-                          var errorCols = [];
-                          var maxRowLength = 0;
-                          columnData.forEach(function(column) {
-                            if (hotHeaders.indexOf(column.heading) === -1) {
-                              errorCols.push(column.heading);
-                            }
-                            if (column.data.length > maxRowLength) {
-                              maxRowLength = column.data.length;
-                            }
-                          });
-                          if (errorCols.length) {
-                            Utils.showOkDialog('Error', ['The following spreadsheet columns do not match any table columns:']
-                                .concat(errorCols.map(function(errorCol) {
-                                  return "* " + errorCol;
-                                })));
-                            return;
-                          }
-                          if (maxRowLength > table.countRows()) {
-                            Utils.showOkDialog('Error', ['The spreadsheet contains ' + maxRowLength + ' rows, but the table only contains '
-                                + table.countRows()]);
-                            return;
-                          }
-                          // validate read-only cells
-                          columnData.forEach(function(column) {
-                            var columnIndex = hotHeaders.indexOf(column.heading);
-                            for (var rowIndex = 0; rowIndex < column.data.length; rowIndex++) {
-                              var cellValue = table.getDataAtCell(rowIndex, columnIndex);
-                              var importValue = column.data[rowIndex];
-                              if (table.getCellMeta(rowIndex, columnIndex).readOnly
-                                  && !(!!importValue === !!cellValue || importValue === cellValue)) {
-                                Utils.showOkDialog('Error', ['Values in read-only column \'' + column.heading + '\' do not match']);
-                              }
-                            }
-                          });
-                          // set values from spreadsheet
-                          columnData.forEach(function(column) {
-                            var columnIndex = hotHeaders.indexOf(column.heading);
-                            for (var rowIndex = 0; rowIndex < column.data.length; rowIndex++) {
-                              if (!table.getCellMeta(rowIndex, columnIndex).readOnly) {
-                                table.setDataAtCell(rowIndex, columnIndex, column.data[rowIndex]);
-                              }
-                            }
-                          });
-                        }).fail(function(xhr, textStatus, errorThrown) {
+                      var formData = new FormData(jQuery('#uploadForm')[0]);
                       dialog.dialog("close");
-                      Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);
-                    });
-                  }
-                },
-                cancel: {
-                  id: 'cancel',
-                  text: 'Cancel',
-                  click: function() {
-                    dialog.dialog("close");
+                      dialogArea.empty();
+                      dialogArea.append(jQuery('<p>Uploading...</p>'));
+
+                      dialog = jQuery('#dialog').dialog({
+                        autoOpen: true,
+                        height: 400,
+                        width: 350,
+                        title: 'Uploading File',
+                        modal: true,
+                        buttons: {},
+                        closeOnEscape: false,
+                        open: function(event, ui) {
+                          jQuery(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                        }
+                      });
+
+                      jQuery.ajax({
+                        url: '/miso/rest/hot/import',
+                        type: 'POST',
+                        data: formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false
+                      }).success(
+                          function(columnData) {
+                            dialog.dialog("close");
+                            var hotHeaders = table.getColHeader();
+                            // validate column headings and row count
+                            var errorCols = [];
+                            var maxRowLength = 0;
+                            columnData.forEach(function(column) {
+                              if (hotHeaders.indexOf(column.heading) === -1) {
+                                errorCols.push(column.heading);
+                              }
+                              if (column.data.length > maxRowLength) {
+                                maxRowLength = column.data.length;
+                              }
+                            });
+                            if (errorCols.length) {
+                              Utils.showOkDialog('Error', ['The following spreadsheet columns do not match any table columns:']
+                                  .concat(errorCols.map(function(errorCol) {
+                                    return "* " + errorCol;
+                                  })));
+                              return;
+                            }
+                            if (maxRowLength > table.countRows()) {
+                              Utils.showOkDialog('Error', ['The spreadsheet contains ' + maxRowLength
+                                  + ' rows, but the table only contains ' + table.countRows()]);
+                              return;
+                            }
+                            // validate read-only cells
+                            for (var colI = 0; colI < columnData.length; colI++) {
+                              var columnIndex = hotHeaders.indexOf(columnData[colI].heading);
+                              for (var rowIndex = 0; rowIndex < columnData[colI].data.length; rowIndex++) {
+                                var cellValue = table.getDataAtCell(rowIndex, columnIndex);
+                                var importValue = columnData[colI].data[rowIndex];
+                                if (table.getCellMeta(rowIndex, columnIndex).readOnly
+                                    && (!!importValue != !!cellValue || (!!importValue && !!cellValue && importValue != cellValue))) {
+                                  Utils.showOkDialog('Error', ['Values in read-only column \'' + columnData[colI].heading
+                                      + '\' do not match']);
+                                  return;
+                                }
+                              }
+                            }
+                            // set values from spreadsheet
+                            columnData.forEach(function(column) {
+                              var columnIndex = hotHeaders.indexOf(column.heading);
+                              for (var rowIndex = 0; rowIndex < column.data.length; rowIndex++) {
+                                table.setDataAtCell(rowIndex, columnIndex, column.data[rowIndex], 'CopyPaste.paste');
+                              }
+                            });
+                          }).fail(function(xhr, textStatus, errorThrown) {
+                        dialog.dialog("close");
+                        Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);
+                      });
+                    }
+                  },
+                  cancel: {
+                    id: 'cancel',
+                    text: 'Cancel',
+                    click: function() {
+                      dialog.dialog("close");
+                    }
                   }
                 }
-              }
-            });
+              });
+            }
+            mainDialog();
           }
         }, {
           buttonText: "Export",
