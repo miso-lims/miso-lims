@@ -49,6 +49,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -204,7 +206,7 @@ public class ProjectRestController extends RestController {
   private static class ShortNameValidationDto {
     private final String shortName;
 
-    public ShortNameValidationDto(String shortName) {
+    public ShortNameValidationDto(@JsonProperty("shortName") String shortName) {
       this.shortName = shortName;
     }
 

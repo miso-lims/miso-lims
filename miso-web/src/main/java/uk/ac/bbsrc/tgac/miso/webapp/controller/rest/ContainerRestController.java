@@ -52,6 +52,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -154,7 +156,7 @@ public class ContainerRestController extends RestController {
     private final String serialNumber;
     private final String containerId;
 
-    public SerialNumberValidationDto(String serialNumber, String containerId) {
+    public SerialNumberValidationDto(@JsonProperty("serialNumber") String serialNumber, @JsonProperty("containerId") String containerId) {
       this.serialNumber = serialNumber;
       this.containerId = containerId;
     }

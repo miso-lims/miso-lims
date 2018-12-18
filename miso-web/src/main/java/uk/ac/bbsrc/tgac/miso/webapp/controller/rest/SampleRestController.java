@@ -60,6 +60,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -352,7 +353,7 @@ public class SampleRestController extends RestController {
   private static class AliasValidationDto {
     private final String alias;
 
-    public AliasValidationDto(String alias) {
+    public AliasValidationDto(@JsonProperty("alias") String alias) {
       this.alias = alias;
     }
 
