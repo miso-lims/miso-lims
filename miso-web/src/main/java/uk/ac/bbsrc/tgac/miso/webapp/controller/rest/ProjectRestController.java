@@ -215,7 +215,7 @@ public class ProjectRestController extends RestController {
 
   @PostMapping(value = "/validate-short-name")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void validateShortName(@RequestBody ShortNameValidationDto params, UriComponentsBuilder uriBuilder) throws IOException {
+  public void validateShortName(@RequestBody ShortNameValidationDto params, UriComponentsBuilder uriBuilder) {
     String shortName = params.getShortName();
     if (LimsUtils.isStringEmptyOrNull(shortName)) {
       throw new RestException("No short name specified", Status.BAD_REQUEST);
@@ -223,7 +223,7 @@ public class ProjectRestController extends RestController {
 
     ValidationResult validationResult = namingScheme.validateProjectShortName(shortName);
     if (!validationResult.isValid()) {
-      throw new RestException(validationResult.getMessage(), Status.PRECONDITION_FAILED);
+      throw new RestException(validationResult.getMessage(), Status.BAD_REQUEST);
     }
   }
 

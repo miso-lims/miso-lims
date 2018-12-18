@@ -179,23 +179,13 @@ public class ContainerRestController extends RestController {
       throw new RestException("Serial number and containerID must be provided", Status.BAD_REQUEST);
     }
 
-    Long containerId = SequencerPartitionContainerImpl.UNSAVED_ID;
-    if (!maybeContainerId.contains("Unsaved")) {
-      containerId = Long.valueOf(maybeContainerId);
-    }
-    try {
-      List<SequencerPartitionContainer> matchingContainers = (List<SequencerPartitionContainer>) containerService
-          .listByBarcode(serialNumber);
-      if (matchingContainers.isEmpty()
-          || (matchingContainers.size() == 1 && matchingContainers.get(0).getId() == containerId)) {
-        return;
-      } else {
-        throw new RestException("Serial number is already associated with another container", Status.PRECONDITION_FAILED);
-      }
-    } catch (IOException e) {
-      String error = String.format("Error looking up containers by serial number '%s'", serialNumber);
-      log.error(error, e);
-      throw new RestException(error);
+    final Long containerId = (!maybeContainerId.contains("Unsaved") ? SequencerPartitionContainerImpl.UNSAVED_ID
+        : Long.valueOf(maybeContainerId));
+
+    List<SequencerPartitionContainer> matchingContainers = (List<SequencerPartitionContainer>) containerService
+        .listByBarcode(serialNumber);
+    if (!matchingContainers.isEmpty() && !matchingContainers.stream().anyMatch(spc -> spc.getId() == containerId)) {
+      throw new RestException("Serial number is already associated with another container", Status.BAD_REQUEST);
     }
   }
 

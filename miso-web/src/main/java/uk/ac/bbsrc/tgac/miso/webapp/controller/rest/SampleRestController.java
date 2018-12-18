@@ -370,7 +370,7 @@ public class SampleRestController extends RestController {
   @PostMapping(value = "/validate-alias", produces = { "application/json" })
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void validateAlias(@RequestBody AliasValidationDto params, HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) throws IOException {
+      UriComponentsBuilder uriBuilder) {
     String alias = params.getAlias();
     if (LimsUtils.isStringEmptyOrNull(alias) && !namingScheme.hasSampleAliasGenerator()) {
       throw new RestException("No alias specified, and no alias generator exists", Status.BAD_REQUEST);
@@ -378,7 +378,7 @@ public class SampleRestController extends RestController {
     
     ValidationResult aliasValidation = namingScheme.validateSampleAlias(alias);
     if (!aliasValidation.isValid()) {
-      throw new RestException(aliasValidation.getMessage(), Status.PRECONDITION_FAILED);
+      throw new RestException(aliasValidation.getMessage(), Status.BAD_REQUEST);
     }
   }
 
