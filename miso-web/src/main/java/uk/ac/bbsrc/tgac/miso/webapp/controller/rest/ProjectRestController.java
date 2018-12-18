@@ -187,9 +187,9 @@ public class ProjectRestController extends RestController {
     return groups;
   }
 
-  @GetMapping(value = "/picker/search")
+  @GetMapping(value = "/search")
   @ResponseBody
-  public List<ProjectDto> getProjectsBySearch(@RequestParam("query") String query) throws IOException {
+  public List<ProjectDto> getProjectsBySearch(@RequestParam("q") String query) throws IOException {
     return projectService.listAllProjectsBySearch(query).stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 

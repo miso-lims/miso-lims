@@ -21,33 +21,22 @@
  * *********************************************************************
  */
 
-var Search = Search || {
-  dashboardSearch: function(inp, throbber) {
-    var t = jQuery(inp);
-    var id = t.attr('id');
-    jQuery('#' + id + 'result').html("<img src='/styles/images/ajax-loader.gif'/>");
-    Fluxion.doAjax('dashboard', id, {
-      'str': t.val(),
-      'url': ajaxurl
-    }, {
-      "doOnSuccess": function(json) {
-        if (throbber) {
-          jQuery('#' + id + 'result').html("");
-        }
+PaneTarget.run = (function() {
+  var title = "Run";
+  var url = "/miso/rest/run/search";
 
-        if (!Utils.validation.isNullCheck(json.html)) {
-          jQuery('#' + id + 'result').html(json.html);
-        } else {
-          jQuery('#' + id + 'result').html("No matches");
-        }
-      }
+  var transform = function(run) {
+    return Tile.make([Tile.title(run.alias), Tile.lines(["Name: " + run.name, "Status: " + run.status])], function() {
+      window.location = window.location.origin + '/miso/run/' + run.id;
     });
-    return true;
-  },
+  };
 
-  loadAll: function() {
-    var self = this;
-    self.dashboardSearch(jQuery('#searchProject'), true);
-    self.dashboardSearch(jQuery('#searchRun'), true);
-  },
-};
+  return {
+    createPane: function(paneId) {
+      var divs = Pane.createSearchPane(paneId, title);
+
+      Pane.updateTiles(divs.content, transform, '/miso/rest/run/recent', null, []);
+      Pane.registerSearchHandlers(divs.input, transform, url, divs.content, true);
+    }
+  }
+})();
