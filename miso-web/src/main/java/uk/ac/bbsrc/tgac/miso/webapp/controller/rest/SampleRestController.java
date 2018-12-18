@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,7 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -360,43 +357,28 @@ public class SampleRestController extends RestController {
    * @throws IOException
    */
   @PostMapping(value = "/validate-alias", produces = { "application/json" })
-  public ResponseEntity<?> validateAlias(@RequestBody String requestBody, HttpServletRequest request, HttpServletResponse response,
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void validateAlias(@RequestBody String requestBody, HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     String aliasKey = "alias";
     JsonNode reqBody = null;
     String alias = null;
-    String genericError = "Error parsing alias in request body";
     try {
       reqBody = new ObjectMapper().readTree(requestBody);
     } catch (JsonProcessingException e) {
-      log.error(genericError, e);
-      return ResponseEntity
-          .status(HttpStatus.BAD_REQUEST)
-          .body(genericError);
+      throw new RestException("Error parsing alias in request body");
     }
-    if (!reqBody.has(aliasKey) || LimsUtils.isStringEmptyOrNull(reqBody.get(aliasKey).asText())) {
-      return ResponseEntity
-          .status(HttpStatus.BAD_REQUEST)
-          .body(genericError);
+    if ((!reqBody.has(aliasKey) || LimsUtils.isStringEmptyOrNull(reqBody.get(aliasKey).asText()))
+        && !namingScheme.hasSampleAliasGenerator()) {
+      throw new RestException("No alias specified, and no alias generator exists");
     }
     alias = reqBody.get(aliasKey).asText();
-    if (isStringEmptyOrNull(alias)) {
-      if (namingScheme.hasSampleAliasGenerator()) {
-        return ResponseEntity.status(HttpStatus.OK).build();
-      } else {
-        return ResponseEntity
-            .status(HttpStatus.PRECONDITION_FAILED)
-            .body("No alias specified");
-      }
-    }
     
     ValidationResult aliasValidation = namingScheme.validateSampleAlias(alias);
     if (aliasValidation.isValid()) {
-      return ResponseEntity.status(HttpStatus.OK).build();
+      return;
     } else {
-      return ResponseEntity
-          .status(HttpStatus.PRECONDITION_FAILED)
-          .body(aliasValidation.getMessage());
+      throw new RestException(aliasValidation.getMessage());
     }
   }
 

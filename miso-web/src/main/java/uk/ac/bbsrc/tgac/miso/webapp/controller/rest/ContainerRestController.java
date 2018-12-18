@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -154,7 +153,8 @@ public class ContainerRestController extends RestController {
   }
 
   @PostMapping(value = "/validate-serial-number")
-  public ResponseEntity<?> validateSerialNumber(@RequestBody String params, HttpServletRequest request, HttpServletResponse response,
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void validateSerialNumber(@RequestBody String params, HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     String serialNumberKey = "serialNumber";
     String containerIdKey = "containerId";
@@ -164,16 +164,12 @@ public class ContainerRestController extends RestController {
     } catch (JsonProcessingException e) {
       String error = "Error looking up containers by serial number";
       log.error(error, e);
-      return ResponseEntity
-          .status(HttpStatus.BAD_REQUEST)
-          .body(error);
+      throw new RestException(error);
     }
 
     if (!reqBody.has(serialNumberKey) || LimsUtils.isStringEmptyOrNull(reqBody.get(serialNumberKey).asText())
         || !reqBody.has(containerIdKey)) {
-      return ResponseEntity
-          .status(HttpStatus.PRECONDITION_FAILED)
-          .body("Serial number and containerID must be provided");
+      throw new RestException("Serial number and containerID must be provided");
     }
     String serialNumber = reqBody.get(serialNumberKey).asText();
     Long containerId = null;
@@ -187,18 +183,14 @@ public class ContainerRestController extends RestController {
           .listByBarcode(serialNumber);
       if (matchingContainers.isEmpty()
           || (matchingContainers.size() == 1 && matchingContainers.get(0).getId() == containerId)) {
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return;
       } else {
-        return ResponseEntity
-            .status(HttpStatus.PRECONDITION_FAILED)
-            .body("Serial number is already associated with another container");
+        throw new RestException("Serial number is already associated with another container");
       }
     } catch (IOException e) {
       String error = String.format("Error looking up containers by serial number '%s'", serialNumber);
       log.error(error, e);
-      return ResponseEntity
-          .status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(error);
+      throw new RestException(error);
     }
   }
 

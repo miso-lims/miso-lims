@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -39,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -208,37 +206,26 @@ public class ProjectRestController extends RestController {
   }
 
   @PostMapping(value = "/validate-short-name")
-  public ResponseEntity<?> validateShortName(@RequestBody String requestBody, UriComponentsBuilder uriBuilder) throws IOException {
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void validateShortName(@RequestBody String requestBody, UriComponentsBuilder uriBuilder) throws IOException {
     String shortNameKey = "shortName";
     JsonNode reqBody = null;
     String shortName = null;
-    String genericError = "Error parsing shortName in request body";
     try {
       reqBody = new ObjectMapper().readTree(requestBody);
     } catch (JsonProcessingException e) {
-      log.error(genericError, e);
-      return ResponseEntity
-          .status(HttpStatus.BAD_REQUEST)
-          .body(genericError);
+      throw new RestException("Error parsing shortName in request body");
     }
     if (!reqBody.has(shortNameKey) || LimsUtils.isStringEmptyOrNull(reqBody.get(shortNameKey).asText())) {
-      return ResponseEntity
-          .status(HttpStatus.BAD_REQUEST)
-          .body(genericError);
+      throw new RestException("No short name specified");
     }
     shortName = reqBody.get(shortNameKey).asText();
-    if (isStringEmptyOrNull(shortName)) {
-      return ResponseEntity
-          .status(HttpStatus.PRECONDITION_FAILED)
-          .body("No short name specified");
-    }
+
     ValidationResult validationResult = namingScheme.validateProjectShortName(shortName);
     if (validationResult.isValid()) {
-      return ResponseEntity.status(HttpStatus.OK).build();
+      return;
     } else {
-      return ResponseEntity
-          .status(HttpStatus.PRECONDITION_FAILED)
-          .body(validationResult.getMessage());
+      throw new RestException(validationResult.getMessage());
     }
   }
 
