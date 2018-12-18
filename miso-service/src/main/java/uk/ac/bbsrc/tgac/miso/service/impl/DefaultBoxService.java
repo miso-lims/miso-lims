@@ -285,6 +285,9 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
             movedWithinBox.add(newPos);
           } else {
             // Moved from a different box
+            Box oldBox = get(oldOccupant.getBoxId());
+            addBoxContentsChangeLog(oldBox, String.format("Removed %s (%s) to %s (%s)", oldOccupant.getAlias(), oldOccupant.getName(),
+                managed.getAlias(), managed.getName()));
             message.append(String.format("Moved %s (%s) from %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(),
                 oldOccupant.getBoxAlias(), oldOccupant.getBoxName(), entry.getKey()));
             movedFromOtherBoxes.add(oldOccupant);
