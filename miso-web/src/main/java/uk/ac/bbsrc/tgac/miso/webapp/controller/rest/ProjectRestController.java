@@ -209,6 +209,7 @@ public class ProjectRestController extends RestController {
 
   @PostMapping(value = "/validate-short-name")
   public ResponseEntity<?> validateShortName(@RequestBody String requestBody, UriComponentsBuilder uriBuilder) throws IOException {
+    String shortNameKey = "shortName";
     JsonNode reqBody = null;
     String shortName = null;
     String genericError = "Error parsing shortName in request body";
@@ -220,12 +221,12 @@ public class ProjectRestController extends RestController {
           .status(HttpStatus.BAD_REQUEST)
           .body(genericError);
     }
-    if (!reqBody.has("shortName") || LimsUtils.isStringEmptyOrNull(reqBody.get("shortName").asText())) {
+    if (!reqBody.has(shortNameKey) || LimsUtils.isStringEmptyOrNull(reqBody.get(shortNameKey).asText())) {
       return ResponseEntity
           .status(HttpStatus.BAD_REQUEST)
           .body(genericError);
     }
-    shortName = reqBody.get("shortName").asText();
+    shortName = reqBody.get(shortNameKey).asText();
     if (isStringEmptyOrNull(shortName)) {
       return ResponseEntity
           .status(HttpStatus.PRECONDITION_FAILED)

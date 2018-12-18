@@ -156,29 +156,31 @@ public class ContainerRestController extends RestController {
   @PostMapping(value = "/validate-serial-number")
   public ResponseEntity<?> validateSerialNumber(@RequestBody String params, HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
+    String serialNumberKey = "serialNumber";
+    String containerIdKey = "containerId";
     JsonNode reqBody = null;
     try {
       reqBody = new ObjectMapper().readTree(params);
     } catch (JsonProcessingException e) {
-      String error = String.format("Error looking up containers by serial number");
+      String error = "Error looking up containers by serial number";
       log.error(error, e);
       return ResponseEntity
           .status(HttpStatus.BAD_REQUEST)
           .body(error);
     }
 
-    if (!reqBody.has("serialNumber") || LimsUtils.isStringEmptyOrNull(reqBody.get("serialNumber").asText())
-        || !reqBody.has("containerId")) {
+    if (!reqBody.has(serialNumberKey) || LimsUtils.isStringEmptyOrNull(reqBody.get(serialNumberKey).asText())
+        || !reqBody.has(containerIdKey)) {
       return ResponseEntity
           .status(HttpStatus.PRECONDITION_FAILED)
           .body("Serial number and containerID must be provided");
     }
-    String serialNumber = reqBody.get("serialNumber").asText();
+    String serialNumber = reqBody.get(serialNumberKey).asText();
     Long containerId = null;
-    if (reqBody.get("containerId").asText().contains("Unsaved")) {
+    if (reqBody.get(containerIdKey).asText().contains("Unsaved")) {
       containerId = SequencerPartitionContainerImpl.UNSAVED_ID;
     } else {
-      containerId = reqBody.get("containerId").asLong();
+      containerId = reqBody.get(containerIdKey).asLong();
     }
     try {
       List<SequencerPartitionContainer> matchingContainers = (List<SequencerPartitionContainer>) containerService

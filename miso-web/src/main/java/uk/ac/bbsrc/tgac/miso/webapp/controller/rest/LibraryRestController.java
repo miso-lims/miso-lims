@@ -225,6 +225,7 @@ public class LibraryRestController extends RestController {
   @PostMapping(value = "/validate-alias", produces = { "application/json" })
   public ResponseEntity<?> validateAlias(@RequestBody String requestBody, HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
+    String aliasKey = "alias";
     JsonNode reqBody = null;
     String alias = null;
     String genericError = "Error parsing alias in request body";
@@ -236,12 +237,12 @@ public class LibraryRestController extends RestController {
           .status(HttpStatus.BAD_REQUEST)
           .body(genericError);
     }
-    if (!reqBody.has("alias") || LimsUtils.isStringEmptyOrNull(reqBody.get("alias").asText())) {
+    if (!reqBody.has(aliasKey) || LimsUtils.isStringEmptyOrNull(reqBody.get(aliasKey).asText())) {
       return ResponseEntity
           .status(HttpStatus.BAD_REQUEST)
           .body(genericError);
     }
-    alias = reqBody.get("alias").asText();
+    alias = reqBody.get(aliasKey).asText();
 
     if (isStringEmptyOrNull(alias)) {
       if (namingScheme.hasLibraryAliasGenerator()) {
