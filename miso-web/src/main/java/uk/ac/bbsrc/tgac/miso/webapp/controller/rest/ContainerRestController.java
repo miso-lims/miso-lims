@@ -179,10 +179,8 @@ public class ContainerRestController extends RestController {
       throw new RestException("Serial number and containerID must be provided", Status.BAD_REQUEST);
     }
 
-    Long containerId = null;
-    if (maybeContainerId.contains("Unsaved")) {
-      containerId = SequencerPartitionContainerImpl.UNSAVED_ID;
-    } else {
+    Long containerId = SequencerPartitionContainerImpl.UNSAVED_ID;
+    if (!maybeContainerId.contains("Unsaved")) {
       containerId = Long.valueOf(maybeContainerId);
     }
     try {

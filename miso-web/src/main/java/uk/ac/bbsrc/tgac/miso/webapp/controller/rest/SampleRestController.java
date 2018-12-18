@@ -377,9 +377,7 @@ public class SampleRestController extends RestController {
     }
     
     ValidationResult aliasValidation = namingScheme.validateSampleAlias(alias);
-    if (aliasValidation.isValid()) {
-      return;
-    } else {
+    if (!aliasValidation.isValid()) {
       throw new RestException(aliasValidation.getMessage(), Status.PRECONDITION_FAILED);
     }
   }

@@ -222,9 +222,7 @@ public class ProjectRestController extends RestController {
     }
 
     ValidationResult validationResult = namingScheme.validateProjectShortName(shortName);
-    if (validationResult.isValid()) {
-      return;
-    } else {
+    if (!validationResult.isValid()) {
       throw new RestException(validationResult.getMessage(), Status.PRECONDITION_FAILED);
     }
   }
