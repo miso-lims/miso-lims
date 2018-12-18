@@ -122,7 +122,6 @@
     <module>miso-service</module>
     <module>sqlstore</module>
     <module>miso-dto</module>
-    <module>miso-external-web</module>
     <module>pinery-miso</module>
   </modules>
   <!-- SVN connection -->
