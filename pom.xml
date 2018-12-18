@@ -218,6 +218,11 @@
         <version>[1.0,)</version>
       </dependency>
       <dependency>
+        <groupId>com.opencsv</groupId>
+        <artifactId>opencsv</artifactId>
+        <version>4.4</version>
+      </dependency>
+      <dependency>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-client</artifactId>
         <version>${jersey.version}</version>

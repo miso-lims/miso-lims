@@ -454,8 +454,7 @@ HotTarget.sample = (function() {
               } // else externalName is for a new Identity and will come from the External Name column
             }
           },
-          HotUtils.makeColumnForEnum('&nbsp;&nbsp;Donor Sex&nbsp;&nbsp;', show['Identity'], true, 'donorSex', Constants.donorSexes,
-              'Unknown'),
+          HotUtils.makeColumnForEnum('Donor Sex', show['Identity'], true, 'donorSex', Constants.donorSexes, 'Unknown'),
           HotUtils.makeColumnForEnum('Consent', show['Identity'], true, 'consentLevel', Constants.consentLevels, 'This Project'),
 
           // Detailed sample columns

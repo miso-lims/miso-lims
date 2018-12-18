@@ -15,7 +15,7 @@ public enum SpreadSheetFormat {
       return input.collect(new ExcelCollector<>(format.columns()));
     }
   },
-  ODF("Open Document Format", "odt", "application", "vnd.oasis.opendocument.spreadsheet") {
+  ODF("Open Document Format", "ods", "application", "vnd.oasis.opendocument.spreadsheet") {
     @Override
     public <T> byte[] generate(Stream<T> input, Spreadsheet<T> format) {
       return input.collect(new OpenDocumentCollector<>(format.columns()));
