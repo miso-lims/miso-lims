@@ -67,14 +67,12 @@ public class RunPage extends FormPage<RunPage.Field> {
   } // end PoolSearch class
 
   public static class LaneQC {
-    public static final String OK = "OK";
-    public static final String OK_COLLAB = "OK'd by collaborator";
-    public static final String FAIL_INSTRUMENT = "Failed: Instrument problem";
-    public static final String FAIL_LIB_PREP = "Failed: Library preparation problem";
-    public static final String FAIL_ANALYSIS = "Failed: Analysis problem";
-    public static final String FAIL_OTHER = "Failed: Other problem";
-    public static final String FAIL_SEQINFO = "Failed: SeqInfo QC";
-    public static final String FAIL_SEQOPS = "Failed: SeqOps QC";
+    public static final String OK = "OK (order fulfilled, analysis to proceed)";
+    public static final String OK_COLLAB = "OK'd by collaborator (order fulfilled, analysis to proceed)";
+    public static final String FAIL_INSTRUMENT = "Failed: Instrument problem (order not fulfilled, analysis skipped)";
+    public static final String FAIL_LIB_PREP = "Failed: Library preparation problem (order fulfilled, analysis skipped)";
+    public static final String FAIL_ANALYSIS = "Failed: Analysis problem (order fulfilled, analysis skipped)";
+    public static final String FAIL_OTHER = "Failed: Other problem (order not fulfilled, analysis skipped)";
   } // end LaneQC class
 
   public static class RunTableWrapperId {
@@ -217,8 +215,6 @@ public class RunPage extends FormPage<RunPage.Field> {
     case LaneQC.FAIL_ANALYSIS:
       break;
     case LaneQC.FAIL_OTHER:
-    case LaneQC.FAIL_SEQINFO:
-    case LaneQC.FAIL_SEQOPS:
       waitUntil(textToBe(By.className("ui-dialog-title"), "Failed: Other problem Notes"));
       dialog.findElement(By.tagName("input")).sendKeys(noteText);
       getDriver().findElement(By.id("ok")).click();
