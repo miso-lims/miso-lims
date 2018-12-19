@@ -20,73 +20,66 @@
  *
  * *********************************************************************
  */
+// Custom Parsley validator to validate Container serial number server-side
+window.Parsley.addValidator('serialNumber', {
+  validateString: function(value) {
+    var deferred = new jQuery.Deferred();
+    var containerId = document.getElementById('containerId').innerHTML.trim();
+    jQuery.ajax({
+      url: '/miso/rest/container/validate-serial-number',
+      type: 'POST',
+      contentType: 'application/json; charset=utf8',
+      data: JSON.stringify({
+        serialNumber: value,
+        containerId: containerId
+      })
+    }).success(function(json) {
+      deferred.resolve();
+    }).fail(function(response, textStatus, serverStatus) {
+      deferred.reject(response); // doesn't give a custom error message unless we upgrade Parsley
+    });
+    return deferred.promise();
+  },
+  messages: {
+    en: 'Serial number must be unique'
+  }
+});
 
-var Container = Container
-    || {
-      validateContainer: function() {
-        Validate.cleanFields('#container-form');
-        jQuery('#container-form').parsley().destroy();
+var Container = Container || {
+  validateContainer: function() {
+    Validate.cleanFields('#container-form');
+    jQuery('#container-form').parsley().destroy();
 
-        // ID Barcode validation
-        jQuery('#identificationBarcode').attr('class', 'form-control');
-        jQuery('#identificationBarcode').attr('data-parsley-required', 'true');
-        jQuery('#identificationBarcode').attr('data-parsley-maxlength', '100');
-        jQuery('#identificationBarcode').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    // ID Barcode validation
+    jQuery('#identificationBarcode').attr('class', 'form-control');
+    jQuery('#identificationBarcode').attr('data-parsley-required', 'true');
+    jQuery('#identificationBarcode').attr('data-parsley-maxlength', '100');
+    jQuery('#identificationBarcode').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    // attach the AJAX validator
+    jQuery('#identificationBarcode').attr('data-parsley-serial-number', ''); // attach the AJAX validator
+    jQuery('#identificationBarcode').attr('data-parsley-debounce', '500');
 
-        // Description input field validation
-        jQuery('#description').attr('class', 'form-control');
-        jQuery('#description').attr('data-parsley-maxlength', '255');
-        jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    // Description input field validation
+    jQuery('#description').attr('class', 'form-control');
+    jQuery('#description').attr('data-parsley-maxlength', '255');
+    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
-        // Received Date validation
-        jQuery('#receivedDate').attr('class', 'form-control');
-        jQuery('#receivedDate').attr('data-parsley-required', 'true');
-        jQuery('#receivedDate').attr('data-date-format', 'YYYY-MM-DD');
-        jQuery('#receivedDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
-        jQuery('#receivedDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+    // Received Date validation
+    jQuery('#receivedDate').attr('class', 'form-control');
+    jQuery('#receivedDate').attr('data-parsley-required', 'true');
+    jQuery('#receivedDate').attr('data-date-format', 'YYYY-MM-DD');
+    jQuery('#receivedDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
+    jQuery('#receivedDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
 
-        // Returned Date validation
-        jQuery('#returnedDate').attr('class', 'form-control');
-        jQuery('#returnedDate').attr('data-date-format', 'YYYY-MM-DD');
-        jQuery('#returnedDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
-        jQuery('#returnedDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+    // Returned Date validation
+    jQuery('#returnedDate').attr('class', 'form-control');
+    jQuery('#returnedDate').attr('data-date-format', 'YYYY-MM-DD');
+    jQuery('#returnedDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
+    jQuery('#returnedDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
 
-        jQuery('#container-form').parsley();
-        jQuery('#container-form').parsley().validate();
+    jQuery('#container-form').parsley();
+    jQuery('#container-form').parsley().validate();
 
-        // Ensure provided serial number is unique.
-        var serialNumberField = jQuery('#identificationBarcode');
-        var serialNumber = serialNumberField.val();
-        var containerIdField = jQuery("#containerId");
-        var containerId = null;
-        if (containerIdField.length > 0) {
-          containerId = parseInt(containerIdField.text());
-          if (isNaN(containerId)) {
-            containerId = null;
-          }
-        }
-
-        Fluxion.doAjax('containerControllerHelperService', 'isSerialNumberUnique', {
-          'serialNumber': serialNumber,
-          'containerId': containerId,
-          'url': ajaxurl
-        }, {
-          'doOnSuccess': function(json) {
-            if (json.isSerialNumberUnique === "true") {
-              Validate.updateWarningOrSubmit('#container-form', Container.validateStudyAdded);
-            } else {
-              // Serial number is not unique.
-              window.ParsleyUI.addError(serialNumberField.parsley(), "serialNumberError",
-                  'This serial number is already in use. Please choose another.');
-              return false;
-            }
-          },
-          'doOnError': function(json) {
-            // Unable to perform lookup.
-            Utils.showOkDialog('Check Serial Number', [json.error]);
-            window.ParsleyUI.addError(serialNumberField.parsley(), "serialNumberError", 'Unable to determine if serial number is unique.');
-            return false;
-          }
-        });
-      },
-    };
+    Validate.updateWarningOrSubmit('#container-form', Container.validateStudyAdded);
+  }
+};

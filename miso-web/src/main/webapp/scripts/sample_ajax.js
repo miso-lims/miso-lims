@@ -25,16 +25,17 @@
 window.Parsley.addValidator('sampleAlias', {
   validateString: function(value) {
     var deferred = new jQuery.Deferred();
-    Fluxion.doAjax('sampleControllerHelperService', 'validateSampleAlias', {
-      'alias': value,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': function(json) {
-        deferred.resolve();
-      },
-      'doOnError': function(json) {
-        deferred.reject(json.error);
-      }
+    jQuery.ajax({
+      url: '/miso/rest/sample/validate-alias',
+      type: 'POST',
+      contentType: 'application/json; charset=utf8',
+      data: JSON.stringify({
+        alias: value
+      })
+    }).success(function(json) {
+      deferred.resolve();
+    }).fail(function(response, textStatus, serverStatus) {
+      deferred.reject(response.error); // need to upgrade Parsley to get custom error messages
     });
     return deferred.promise();
   },
@@ -57,6 +58,7 @@ var Sample = Sample || {
     if (skipAliasValidation) {
       jQuery('#alias').attr('data-parsley-required', 'true');
     } else {
+      // attach the AJAX validator
       jQuery('#alias').attr('data-parsley-sample-alias', '');
       jQuery('#alias').attr('data-parsley-debounce', '500');
     }
