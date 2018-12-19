@@ -30,14 +30,14 @@ public class HomePageIT extends AbstractIT {
 
   @Test
   public void testProjectSearch() {
-    List<Long> badSearch = page.searchProjects("notaproject");
+    List<String> badSearch = page.searchProjects("notaproject");
     assertTrue(badSearch.isEmpty());
 
-    List<Long> goodSearch = page.searchProjects("Project One");
+    List<String> goodSearch = page.searchProjects("Project One");
     assertEquals(1, goodSearch.size());
-    assertEquals(1L, goodSearch.get(0).longValue());
+    assertEquals("PRO1", goodSearch.get(0));
 
-    ProjectPage projectPage = page.clickProjectSearchResult(1L);
+    ProjectPage projectPage = page.clickProjectSearchResult("PRO1");
     assertNotNull(projectPage);
     String projectIdString = projectPage.getId();
     long projectId = Long.parseLong(projectIdString);

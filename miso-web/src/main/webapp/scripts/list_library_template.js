@@ -54,8 +54,8 @@ ListTarget.library_template = {
             property: "query",
             value: ""
           }, ], function(results) {
-            Utils.ajaxWithDialog('Getting Projects', 'GET', '/miso/rest/project/picker/search?' + jQuery.param({
-              query: results.query
+            Utils.ajaxWithDialog('Getting Projects', 'GET', '/miso/rest/project/search?' + jQuery.param({
+              q: results.query
             }), null, function(response) {
               var projectActions = [];
               response.forEach(function(project) {

@@ -34,39 +34,10 @@
         <miso:tiles-ajax id="tiles_barcode" target="barcode"/>
         <miso:tiles-ajax id="tiles_instrument_status" target="instrument_status"/>
         <miso:tiles-ajax id="tiles_workflow" target="workflow"/>
-
-        <div class="dashboard_widget">
-            <div class="widget_title ui-corner-top">
-                Project <input type="text" size="20" id="searchProject" name="searchProject"/>
-            </div>
-            <div class="widget ui-corner-bottom">
-                <div id="searchProjectresult">
-                </div>
-            </div>
-        </div>
-
-        <div class="dashboard_widget">
-
-            <div class="widget_title ui-corner-top">
-                Run <input type="text" size="20" id="searchRun" name="searchRun"/>
-            </div>
-            <div class="widget ui-corner-bottom">
-                <div id="searchRunresult"></div>
-            </div>
-        </div>
+        <miso:tiles-ajax id="tiles_project" target="project"/>
+        <miso:tiles-ajax id="tiles_run" target="run"/>
     </div>
 </div>
-<script type="text/javascript">
-  jQuery(document).ready(function() {
-    Search.loadAll();
-    Utils.timer.typewatchFunc(jQuery('#searchProject'), function () {
-        Search.dashboardSearch(jQuery('#searchProject'))
-    }, 300, 2);
-    Utils.timer.typewatchFunc(jQuery('#searchRun'), function () {
-        Search.dashboardSearch(jQuery('#searchRun'))
-    }, 300, 2);
-  });
-</script>
 <%@ include file="adminsub.jsp" %>
 
 <%@ include file="../footer.jsp" %>
