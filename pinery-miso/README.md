@@ -103,5 +103,5 @@ docker run -it -p {port}:8080 pinery-miso
 Specifying a different properties file at container run time:
 
 ```
-docker run -it -p {port}:8080 -v {properties-file}:/usr/local/tomcat/conf/Catalina/localhost/pinery-miso.properties pinery-miso
+docker run -it -p {port}:8080 -v {properties-file}:/config/pinery-miso.properties pinery-miso
 ```
