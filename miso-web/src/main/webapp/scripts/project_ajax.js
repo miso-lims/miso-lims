@@ -22,7 +22,7 @@
  */
 
 // these variables are set on the editProject page if the project has samples/libraries
-var projectId_sample, sampleQcTypesString, libraryQcTypesString, projectId_d3graph;
+var projectId_sample, sampleQcTypesString, libraryQcTypesString;
 
 // Custom Parsley validator to validate Project shortName server-side
 window.Parsley.addValidator('projectShortName', {

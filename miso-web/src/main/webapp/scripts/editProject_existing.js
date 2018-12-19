@@ -39,14 +39,6 @@ var diagonal = d3.svg.diagonal.radial().projection(function(d) {
 var vis = d3.select("#chart").append("svg:svg").attr("width", r * 2).attr("height", r * 2 - 150).append("svg:g").attr("transform",
     "translate(" + r + "," + r + ")");
 
-function getProjectD3Json() {
-  d3.json("/miso/d3graph/project/" + projectId_d3graph, function(json) {
-    json.x0 = 800;
-    json.y0 = 0;
-    update(root = json);
-  });
-}
-
 function update(source) {
   // Compute the new tree layout.
   var nodes = tree.nodes(root);

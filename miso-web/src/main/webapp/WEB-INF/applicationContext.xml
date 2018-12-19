@@ -39,7 +39,6 @@
 
   <context:component-scan annotation-config="true" base-package="com.eaglegenomics.simlims" />
   <context:component-scan annotation-config="true" base-package="uk.ac.bbsrc.tgac.miso" />
-  <context:component-scan annotation-config="true" base-package="net.sourceforge.fluxion.ajax" />
 
   <bean name="webBindingInitializer" class="uk.ac.bbsrc.tgac.miso.webapp.context.LimsBindingInitializer" />
 
