@@ -14,7 +14,8 @@ RUN     apt-get -y update && apt-get -y install --no-install-recommends     \
         cd /home/ && bash /root/miso-ansible/files/miso-install.sh $version   &&\
         apt-get purge --auto-remove -q -y                                   \
             unzip xmlstarlet                                                &&\
-        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+	chown -R mysql:mysql /var/lib/mysql /var/run/mysqld
 
 CMD	["/root/miso-ansible/misoStart.sh"]
 
