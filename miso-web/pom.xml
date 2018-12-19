@@ -380,10 +380,6 @@
           <resource>
             <filtering>true</filtering>
             <directory>src/main/resources</directory>
-            <includes>
-              <include>fluxion/</include>
-              <include>status/</include>
-            </includes>
             <excludes>
               <exclude>../internal/*</exclude>
               <exclude>../external/*</exclude>

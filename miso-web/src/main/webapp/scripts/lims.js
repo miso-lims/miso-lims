@@ -26,8 +26,6 @@ jQuery.ajaxSetup({
   cache: false
 });
 
-var ajaxurl = '/miso/fluxion.ajax';
-
 var Utils = Utils
     || {
       /** Maps a form element's child input elements to a JSON object. */
@@ -850,27 +848,6 @@ Utils.ui = {
     var queryString = (searchTerm ? searchTerm + ':' : '') + '\"' + queryTarget + '\"';
     jQuery('#' + tableId).dataTable().fnFilter(queryString); // regrettably ugly
     jQuery('#' + tableId + '_filter input').val(queryString);
-  }
-};
-
-Utils.fileUpload = {
-  fileUploadProgress: function(formname, divname, successfunc) {
-    Fluxion.doAjaxUpload(formname, 'fileUploadProgressBean', 'checkUploadStatus', {
-      'url': ajaxurl
-    }, {
-      'statusElement': divname,
-      'progressElement': 'trash',
-      'doOnSuccess': successfunc
-    }, {
-      '': ''
-    });
-  },
-
-  processingOverlay: function() {
-    jQuery.colorbox({
-      width: "30%",
-      html: "Processing..."
-    });
   }
 };
 

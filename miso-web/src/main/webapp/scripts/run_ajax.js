@@ -24,19 +24,6 @@
 var Run = Run || {
   userIsAdmin: false,
 
-  deleteRun: function(runId, successfunc) {
-    if (confirm("Are you sure you really want to delete RUN" + runId + "? This operation is permanent!")) {
-      Fluxion.doAjax('runControllerHelperService', 'deleteRun', {
-        'runId': runId,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': function(json) {
-          successfunc();
-        }
-      });
-    }
-  },
-
   // Validate methods can be found in parsley_form_validations.js
   validateRun: function() {
     Validate.cleanFields('#run-form');

@@ -706,26 +706,6 @@
     jQuery(document).ready(function () {
       // Attach Parsley form validator
       Validate.attachParsley('#sample-form');
-
-      // display identification barcode image
-      if (document.getElementById('idBarcodePresent')) {
-        var sampleId = parseInt(document.getElementById('idBarcodePresent').getAttribute('data-sampleId'));
-        var idbarcode = document.getElementById('idBarcodePresent').getAttribute('data-idbarcode');
-        Fluxion.doAjax(
-          'sampleControllerHelperService',
-          'getSampleBarcode',
-          {
-            'sampleId': sampleId,
-            'url': ajaxurl
-          },
-          {
-            'doOnSuccess': function (json) {
-              var img = '<img style="height:30px; border:0;" alt="'+idbarcode+'" title="'+idbarcode+'" src="/temp/'+json.img+'"/>';
-              document.getElementById('idBarcode').innerHTML = img;
-            }
-          }
-        );
-      }
       HotUtils.projects = ${projectsDtos};
     });
   </script>
