@@ -256,23 +256,12 @@
     </dependency>
     <dependency>
       <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-      <artifactId>spring</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>stax-api</artifactId>
-          <groupId>stax</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
       <artifactId>sqlstore</artifactId>
     </dependency>
     <dependency>
       <groupId>uk.ac.tgac.statsdb</groupId>
       <artifactId>statsdb-api</artifactId>
     </dependency>
-
     <dependency>
       <!-- Do not remove - used by container -->
       <groupId>xml-apis</groupId>

@@ -82,7 +82,6 @@ import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
 @Controller
 @RequestMapping("/rest")
@@ -869,7 +868,8 @@ public class BoxRestController extends RestController {
 
   private static void createBoxSpreadsheet(String templateName, File outpath, String name, String alias, List<List<String>> boxContents)
       throws IOException {
-    try (FileOutputStream fileOut = new FileOutputStream(outpath); InputStream in = FormUtils.class.getResourceAsStream(templateName)) {
+    try (FileOutputStream fileOut = new FileOutputStream(outpath);
+        InputStream in = BoxRestController.class.getResourceAsStream(templateName)) {
       XSSFWorkbook oDoc = new XSSFWorkbook(in);
 
       writeBoxSpreadsheet(oDoc, name, alias, boxContents, fileOut);
