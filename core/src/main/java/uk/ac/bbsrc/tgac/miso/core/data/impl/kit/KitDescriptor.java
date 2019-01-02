@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -91,11 +92,11 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
   @OneToMany(targetEntity = KitDescriptorChangeLog.class, mappedBy = "kitDescriptor")
   private Collection<ChangeLog> changelog = new ArrayList<>();
 
-  @ManyToMany(targetEntity = TargetedSequencing.class)
+  @ManyToMany(targetEntity = TargetedSequencing.class, cascade = { CascadeType.PERSIST })
   @JoinTable(name = "TargetedSequencing_KitDescriptor", inverseJoinColumns = {
       @JoinColumn(name = "targetedSequencingId") }, joinColumns = {
           @JoinColumn(name = "kitDescriptorId") })
-  private Set<TargetedSequencing> targetedSequencing = new HashSet<>();
+  private final Set<TargetedSequencing> targetedSequencing = new HashSet<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -344,8 +345,21 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
     return targetedSequencing;
   }
 
-  public void setTargetedSequencing(Set<TargetedSequencing> targetedSequencing) {
-    this.targetedSequencing = targetedSequencing;
+  public void addTargetedSequencing(TargetedSequencing targetedSequencing) {
+    this.targetedSequencing.add(targetedSequencing);
+    targetedSequencing.getKitDescriptors().add(this);
+  }
+
+  public void removeTargetedSequencing(TargetedSequencing targetedSequencing) {
+    this.targetedSequencing.remove(targetedSequencing);
+    targetedSequencing.getKitDescriptors().remove(this);
+  }
+
+  public void clearTargetedSequencing() {
+    for (TargetedSequencing ts : this.targetedSequencing) {
+      ts.getKitDescriptors().remove(this);
+    }
+    this.targetedSequencing.clear();
   }
 
   /**

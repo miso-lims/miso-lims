@@ -46,6 +46,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 
 @Controller
@@ -100,6 +101,7 @@ public class EditKitDescriptorController {
 
       model.put("formObj", kitDescriptor);
       model.put("kitDescriptor", kitDescriptor);
+      model.put("associatedTargetedSequencings", Dtos.asTargetedSequencingDtos(kitDescriptor.getTargetedSequencing()));
       return new ModelAndView("/pages/editKitDescriptor.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {

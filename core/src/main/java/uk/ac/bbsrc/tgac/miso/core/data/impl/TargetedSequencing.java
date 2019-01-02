@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,16 +18,14 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 @Entity
 @Table(name = "TargetedSequencing")
-public class TargetedSequencing implements Serializable {
+public class TargetedSequencing implements Serializable, Timestamped {
 
   public static final TargetedSequencing NULL = new TargetedSequencing();
 
@@ -50,9 +48,8 @@ public class TargetedSequencing implements Serializable {
   @Column(nullable = false)
   private String description;
 
-  @ManyToMany(mappedBy = "targetedSequencing")
-  @Fetch(FetchMode.SUBSELECT)
-  private final Collection<KitDescriptor> kitDescriptors = new HashSet<>();
+  @ManyToMany(targetEntity = KitDescriptor.class, mappedBy = "targetedSequencing")
+  private final Set<KitDescriptor> kitDescriptors = new HashSet<>();
 
   @Column(nullable = false)
   private boolean archived;
@@ -117,35 +114,43 @@ public class TargetedSequencing implements Serializable {
     this.description = description;
   }
 
-  public User getCreatedBy() {
+  @Override
+  public User getCreator() {
     return createdBy;
   }
 
-  public void setCreatedBy(User createdBy) {
+  @Override
+  public void setCreator(User createdBy) {
     this.createdBy = createdBy;
   }
 
-  public Date getCreationDate() {
+  @Override
+  public Date getCreationTime() {
     return creationDate;
   }
 
-  public void setCreationDate(Date creationDate) {
+  @Override
+  public void setCreationTime(Date creationDate) {
     this.creationDate = creationDate;
   }
 
-  public User getUpdatedBy() {
+  @Override
+  public User getLastModifier() {
     return updatedBy;
   }
 
-  public void setUpdatedBy(User updatedBy) {
+  @Override
+  public void setLastModifier(User updatedBy) {
     this.updatedBy = updatedBy;
   }
 
-  public Date getLastUpdated() {
+  @Override
+  public Date getLastModified() {
     return lastUpdated;
   }
 
-  public void setLastUpdated(Date lastUpdated) {
+  @Override
+  public void setLastModified(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
 
@@ -160,20 +165,10 @@ public class TargetedSequencing implements Serializable {
   /**
    * Returns all Library Prep Kits that are associated with this TargetedSequencing.
    * 
-   * @return Collection of KitDescriptor
+   * @return Set of KitDescriptor
    */
-  public Collection<KitDescriptor> getKitDescriptors() {
+  public Set<KitDescriptor> getKitDescriptors() {
     return kitDescriptors;
-  }
-
-  /**
-   * Sets the Collection of Library Prep Kits associated with this TargetedSequeincing.
-   * 
-   * @param kitDescriptors Collection of KitDescriptor
-   */
-  public void setKitDescriptors(Collection<KitDescriptor> kitDescriptors) {
-    this.kitDescriptors.clear();
-    this.kitDescriptors.addAll(kitDescriptors);
   }
 
   @Override
@@ -204,6 +199,11 @@ public class TargetedSequencing implements Serializable {
       if (other.targetedSequencingId != null) return false;
     } else if (!targetedSequencingId.equals(other.targetedSequencingId)) return false;
     return true;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return targetedSequencingId != UNSAVED_ID;
   }
 
 }

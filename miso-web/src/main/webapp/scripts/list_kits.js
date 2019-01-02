@@ -32,12 +32,16 @@ ListTarget.kit = {
     return [];
   },
   createStaticActions: function(config, projectId) {
-    return [{
-      "name": "Add",
-      "handler": function() {
-        window.location = '/miso/kitdescriptor/new';
-      }
-    }];
+    var actions = [];
+    if (config.isUserAdmin) {
+      actions.push({
+        "name": "Add",
+        "handler": function() {
+          window.location = '/miso/kitdescriptor/new';
+        }
+      });
+    }
+    return actions;
   },
   createColumns: function(config, projectId) {
     return [ListUtils.labelHyperlinkColumn("Kit Name", "kitdescriptor", Utils.array.getId, "name", 1, true), {

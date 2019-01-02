@@ -2,10 +2,6 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,9 +23,7 @@ public class DefaultLibraryDilutionServiceTest {
   public void setUp() {
     service = new DefaultLibraryDilutionService();
     library = new DetailedLibraryImpl();
-    Set<TargetedSequencing> libraryTs = new HashSet<>();
     KitDescriptor libraryKd = new KitDescriptor();
-    libraryKd.setTargetedSequencing(libraryTs);
     library.setKitDescriptor(libraryKd);
   }
 
@@ -84,6 +78,6 @@ public class DefaultLibraryDilutionServiceTest {
   }
 
   private void addTargetedSequencing(TargetedSequencing ts, Library library) {
-    library.getKitDescriptor().setTargetedSequencing(new HashSet<>(Arrays.asList(ts)));
+    library.getKitDescriptor().addTargetedSequencing(ts);
   }
 }

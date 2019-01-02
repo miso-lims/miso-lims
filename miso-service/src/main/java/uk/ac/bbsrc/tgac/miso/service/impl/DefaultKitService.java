@@ -15,11 +15,13 @@ import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional(rollbackFor = Exception.class)
@@ -28,7 +30,8 @@ public class DefaultKitService implements KitService {
 
   @Autowired
   private KitStore kitStore;
-
+  @Autowired
+  private TargetedSequencingService targetedSequencingService;
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -110,10 +113,23 @@ public class DefaultKitService implements KitService {
       original.setPartNumber(kitDescriptor.getPartNumber());
       original.setStockLevel(kitDescriptor.getStockLevel());
       original.setDescription(kitDescriptor.getDescription());
+      original.clearTargetedSequencing();
+      for (TargetedSequencing ts : kitDescriptor.getTargetedSequencing()) {
+        original.addTargetedSequencing(ts);
+      }
       kitDescriptor = original;
     }
+    loadChildEntities(kitDescriptor);
     kitDescriptor.setChangeDetails(authorizationManager.getCurrentUser());
     return kitStore.saveKitDescriptor(kitDescriptor);
+  }
+
+  private void loadChildEntities(KitDescriptor kitDescriptor) throws IOException {
+    for (TargetedSequencing ts : kitDescriptor.getTargetedSequencing()) {
+      if (ts != null && ts.getId() != TargetedSequencing.UNSAVED_ID) {
+        kitDescriptor.addTargetedSequencing(targetedSequencingService.get(ts.getId()));
+      }
+    }
   }
 
   @Override

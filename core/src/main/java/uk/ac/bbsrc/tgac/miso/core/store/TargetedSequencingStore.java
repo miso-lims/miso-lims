@@ -1,7 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
+import java.io.IOException;
+import java.util.List;
 
-public interface TargetedSequencingStore extends Store<TargetedSequencing> {
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+
+public interface TargetedSequencingStore extends Store<TargetedSequencing>, PaginatedDataSource<TargetedSequencing> {
+
+  List<TargetedSequencing> list(List<Long> targetedSequencingIds) throws IOException;
 
 }

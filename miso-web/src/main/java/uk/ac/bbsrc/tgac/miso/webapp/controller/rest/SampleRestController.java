@@ -353,6 +353,7 @@ public class SampleRestController extends RestController {
   private static class AliasValidationDto {
     private final String alias;
 
+    @SuppressWarnings("unused")
     public AliasValidationDto(@JsonProperty("alias") String alias) {
       this.alias = alias;
     }

@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -34,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.KitDescriptorDto;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
@@ -42,7 +45,8 @@ public class KitDescriptorRestController extends RestController {
 
   @Autowired
   private KitService kitService;
-
+  @Autowired
+  private TargetedSequencingService targetedSequencingService;
   @Autowired
   private SecurityManager securityManager;
 
@@ -61,6 +65,27 @@ public class KitDescriptorRestController extends RestController {
       return kitService;
     }
   };
+
+  public static class KitChangeTargetedSequencingRequest {
+    private List<Long> add;
+    private List<Long> remove;
+
+    public List<Long> getAdd() {
+      return add;
+    }
+
+    public List<Long> getRemove() {
+      return remove;
+    }
+
+    public void setAdd(List<Long> add) {
+      this.add = add;
+    }
+
+    public void setRemove(List<Long> remove) {
+      this.remove = remove;
+    }
+  }
 
   public void setKitService(KitService kitService) {
     this.kitService = kitService;
@@ -138,4 +163,21 @@ public class KitDescriptorRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.kitType(kitType));
   }
 
+  @PutMapping(value = "/kitdescriptor/{id}/targetedsequencing", produces = "application/json")
+  public @ResponseBody KitDescriptorDto changeTargetedSequencings(@PathVariable("id") Long id,
+      @RequestBody KitChangeTargetedSequencingRequest request) throws IOException {
+    KitDescriptor kitDescriptor = kitService.getKitDescriptorById(id);
+    // remove first
+    for (Long idToRemove : request.remove) {
+      TargetedSequencing toRemove = targetedSequencingService.get(idToRemove);
+      kitDescriptor.removeTargetedSequencing(toRemove);
+    }
+    // then add
+    for (Long idToAdd : request.add) {
+      TargetedSequencing toAdd = targetedSequencingService.get(idToAdd);
+      kitDescriptor.addTargetedSequencing(toAdd);
+    }
+    kitService.saveKitDescriptor(kitDescriptor);
+    return Dtos.asDto(kitService.getKitDescriptorById(id));
+  }
 }
