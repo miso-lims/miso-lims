@@ -29,7 +29,8 @@ CREATE PROCEDURE deleteRun(
   DELETE Note, Run_Note FROM Run_Note
   JOIN Note 
   WHERE Note.noteId = Run_Note.notes_noteId AND Run_Note.run_runId = @runId;
-  
+
+  DELETE FROM Run_Attachment WHERE runId = @runId;
   DELETE FROM RunChangeLog WHERE runId = @runId;
   DELETE FROM Run_SequencerPartitionContainer WHERE Run_runId = @runId;
   
