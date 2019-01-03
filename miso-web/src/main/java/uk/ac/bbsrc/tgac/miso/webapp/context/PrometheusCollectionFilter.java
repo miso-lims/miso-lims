@@ -33,10 +33,6 @@ public class PrometheusCollectionFilter extends GenericFilterBean {
       HttpServletRequest httpRequest = (HttpServletRequest) request;
       method = httpRequest.getMethod();
       uri = httpRequest.getRequestURI().replaceAll("[0-9,]", "");
-      // Fluxion URLs are useless, so get the target service instead
-      if (uri.endsWith("fluxion.ajax")) {
-        uri = String.format("fluxion:%s:%s", httpRequest.getParameter("servicename"), httpRequest.getParameter("action"));
-      }
     }
     long start = System.nanoTime();
     try {

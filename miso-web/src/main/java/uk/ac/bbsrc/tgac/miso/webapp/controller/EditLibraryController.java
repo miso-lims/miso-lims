@@ -73,7 +73,6 @@ import com.google.common.collect.Lists;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
@@ -123,13 +122,13 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryTemplateService;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
@@ -530,24 +529,6 @@ public class EditLibraryController {
       }
     }
     rtn.put("libraryTypes", rtnLibTypes);
-    return rtn;
-  }
-
-  /* HOT */
-  @GetMapping(value = "indexPositionsJson")
-  public @ResponseBody JSONObject indexPositionsJson(@RequestParam("indexFamily") String indexFamily) {
-    JSONObject rtn;
-    if (!isStringEmptyOrNull(indexFamily)) {
-      final IndexFamily ifam = indexService.getIndexFamilyByName(indexFamily.trim());
-      if (ifam != null) {
-        rtn = new JSONObject();
-        rtn.put("numApplicableIndices", ifam.getMaximumNumber());
-      } else {
-        rtn = JSONUtils.SimpleJSONError("No family found with the name: \"" + indexFamily + "\"");
-      }
-    } else {
-      rtn = JSONUtils.SimpleJSONError("No valid family given");
-    }
     return rtn;
   }
 

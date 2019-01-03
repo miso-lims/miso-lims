@@ -47,7 +47,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
@@ -55,33 +54,17 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
-
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
-import uk.ac.bbsrc.tgac.miso.service.RunService;
-import uk.ac.bbsrc.tgac.miso.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -108,42 +91,10 @@ public class EditProjectController {
   @Autowired
   private TargetedSequencingService targetedSequencingService;
   @Autowired
-  private RunService runService;
-  @Autowired
-  private ExperimentService experimentService;
-  @Autowired
-  private SampleService sampleService;
-  @Autowired
-  private LibraryService libraryService;
-  @Autowired
-  private LibraryDilutionService dilutionService;
-  @Autowired
-  private StudyService studyService;
-  @Autowired
   private SubprojectService subprojectService;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
-  }
-
-  public void setSampleService(SampleService sampleService) {
-    this.sampleService = sampleService;
-  }
-
-  public void setLibraryService(LibraryService libraryService) {
-    this.libraryService = libraryService;
-  }
-
-  public void setExperimentService(ExperimentService experimentService) {
-    this.experimentService = experimentService;
-  }
-
-  public void setDilutionService(LibraryDilutionService dilutionService) {
-    this.dilutionService = dilutionService;
-  }
-
-  public void setRunService(RunService runService) {
-    this.runService = runService;
   }
 
   @InitBinder
@@ -155,80 +106,6 @@ public class EditProjectController {
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return projectService.getProjectColumnSizes();
-  }
-
-  @GetMapping("/graph/{projectId}")
-  public @ResponseBody JSONObject graphRest(@PathVariable Long projectId) throws IOException {
-    JSONObject j = new JSONObject();
-    try {
-      Collection<Sample> samples = sampleService.listByProjectId(projectId);
-      Collection<Run> runs = runService.listByProjectId(projectId);
-      Collection<Study> studies = studyService.listByProjectId(projectId);
-
-      JSONObject runsJSON = new JSONObject();
-      JSONObject studiesJSON = new JSONObject();
-      JSONObject samplesJSON = new JSONObject();
-
-      for (Run run : runs) {
-        if (run.getHealth() == HealthType.Completed) {
-          runsJSON.put(run.getName(), "1");
-        } else {
-          runsJSON.put(run.getName(), "0");
-        }
-      }
-
-      for (Study study : studies) {
-        Collection<Experiment> experiments = experimentService.listAllByStudyId(study.getId());
-        if (experiments.size() == 0) {
-          studiesJSON.put(study.getName(), "2");
-        } else {
-          JSONObject experimentsJSON = new JSONObject();
-          for (Experiment e : experiments) {
-            experimentsJSON.put(e.getName(), "2");
-          }
-          studiesJSON.put(study.getName(), experimentsJSON);
-        }
-      }
-
-      for (Sample sample : samples) {
-        Collection<Library> libraries = libraryService.listBySampleId(sample.getId());
-        if (libraries.size() == 0) {
-          if (sample.getQcPassed()) {
-            samplesJSON.put(sample.getName(), "1");
-          } else {
-            samplesJSON.put(sample.getName(), "0");
-          }
-        } else {
-          JSONObject librariesJSON = new JSONObject();
-          for (Library library : libraries) {
-            Collection<LibraryDilution> lds = dilutionService.listByLibraryId(library.getId());
-            if (lds.size() > 0) {
-              JSONObject dilutionsJSON = new JSONObject();
-              for (LibraryDilution ld : lds) {
-                dilutionsJSON.put(ld.getName(), "2");
-              }
-              librariesJSON.put(library.getName(), dilutionsJSON);
-            } else {
-              if (library.getQCs().size() > 0) {
-                librariesJSON.put(library.getName(), "1");
-              } else {
-                librariesJSON.put(library.getName(), "0");
-              }
-            }
-          }
-          samplesJSON.put(sample.getName(), librariesJSON);
-        }
-      }
-
-      j.put("Runs", runsJSON);
-      j.put("Studies", studiesJSON);
-      j.put("Samples", samplesJSON);
-
-      return j;
-    } catch (IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
   }
 
   @GetMapping("/new")
