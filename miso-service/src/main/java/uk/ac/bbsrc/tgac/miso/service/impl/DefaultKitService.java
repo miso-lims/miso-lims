@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
+import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
@@ -125,7 +127,9 @@ public class DefaultKitService implements KitService {
   }
 
   private void loadChildEntities(KitDescriptor kitDescriptor) throws IOException {
-    for (TargetedSequencing ts : kitDescriptor.getTargetedSequencing()) {
+    Set<TargetedSequencing> maybeManaged = Sets.newHashSet(kitDescriptor.getTargetedSequencing());
+    kitDescriptor.clearTargetedSequencing();
+    for (TargetedSequencing ts : maybeManaged) {
       if (ts != null && ts.getId() != TargetedSequencing.UNSAVED_ID) {
         kitDescriptor.addTargetedSequencing(targetedSequencingService.get(ts.getId()));
       }

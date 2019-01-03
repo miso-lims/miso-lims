@@ -50,7 +50,7 @@ public class HibernateTargetedSequencingDao implements TargetedSequencingStore, 
 
   @Override
   public List<TargetedSequencing> list(List<Long> targetedSequencingIds) throws IOException {
-    if (targetedSequencingIds.size() == 0) {
+    if (targetedSequencingIds.isEmpty()) {
       return Collections.emptyList();
     }
     Criteria criteria = currentSession().createCriteria(TargetedSequencing.class);

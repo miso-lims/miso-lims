@@ -30,7 +30,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -92,7 +91,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
   @OneToMany(targetEntity = KitDescriptorChangeLog.class, mappedBy = "kitDescriptor")
   private Collection<ChangeLog> changelog = new ArrayList<>();
 
-  @ManyToMany(targetEntity = TargetedSequencing.class, cascade = { CascadeType.PERSIST })
+  @ManyToMany(targetEntity = TargetedSequencing.class)
   @JoinTable(name = "TargetedSequencing_KitDescriptor", inverseJoinColumns = {
       @JoinColumn(name = "targetedSequencingId") }, joinColumns = {
           @JoinColumn(name = "kitDescriptorId") })
