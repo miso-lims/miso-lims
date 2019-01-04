@@ -130,12 +130,12 @@ public class DefaultKitService implements KitService {
   public long saveKitDescriptorTargetedSequencingRelationships(KitDescriptor kitDescriptor) throws IOException {
     authorizationManager.throwIfNonAdmin();
     KitDescriptor managed = kitStore.getKitDescriptorById(kitDescriptor.getId());
-    if (managed != null) {
-      validateChange(managed, kitDescriptor);
-      managed.clearTargetedSequencing();
-      for (TargetedSequencing ts : kitDescriptor.getTargetedSequencing()) {
-        managed.addTargetedSequencing(ts);
-      }
+    if (managed == null)
+      throw new IllegalArgumentException("Cannot change kit descriptor-targeted sequencing relationship when kit does not exist");
+    validateChange(managed, kitDescriptor);
+    managed.clearTargetedSequencing();
+    for (TargetedSequencing ts : kitDescriptor.getTargetedSequencing()) {
+      managed.addTargetedSequencing(ts);
     }
     loadChildEntities(managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
