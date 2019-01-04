@@ -45,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
@@ -235,6 +237,17 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
   @Override
   public String propertyForUserName(Criteria criteria, boolean creator) {
     return creator ? null : "lastModifier";
+  }
+
+  @Override
+  public List<LibraryDilution> getDilutionsForKdTsRelationship(KitDescriptor kd, TargetedSequencing ts) {
+    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
+    criteria.createAlias("library.kitDescriptor", "kitDescriptor");
+    criteria.add(Restrictions.eq("kitDescriptor.id", kd.getId()));
+    criteria.add(Restrictions.eq("targetedSequencing.id", ts.getId()));
+    @SuppressWarnings("unchecked")
+    List<LibraryDilution> records = criteria.list();
+    return records;
   }
 
 }

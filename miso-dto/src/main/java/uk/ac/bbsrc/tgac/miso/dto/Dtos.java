@@ -1996,8 +1996,20 @@ public class Dtos {
     TargetedSequencingDto dto = new TargetedSequencingDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
+    dto.setArchived(from.isArchived());
     dto.setKitDescriptorIds(from.getKitDescriptors().stream().map(KitDescriptor::getId).collect(Collectors.toList()));
     return dto;
+  }
+
+  public static Set<TargetedSequencingDto> asTargetedSequencingDtos(Set<TargetedSequencing> from) {
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
+  }
+
+  public static TargetedSequencing to(@Nonnull TargetedSequencingDto dto) {
+    TargetedSequencing to = new TargetedSequencing();
+    to.setId(dto.getId());
+    to.setAlias(dto.getAlias());
+    return to;
   }
 
   public static Pool to(@Nonnull PoolDto dto) {

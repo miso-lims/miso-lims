@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -60,5 +62,7 @@ public interface KitStore extends Store<Kit>, PaginatedDataSource<KitDescriptor>
    * @throws IOException
    */
   public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException;
+
+  List<LibraryDilution> getDilutionsForKdTsRelationship(KitDescriptor kd, TargetedSequencing ts);
 
 }

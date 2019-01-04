@@ -95,7 +95,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
   @JoinTable(name = "TargetedSequencing_KitDescriptor", inverseJoinColumns = {
       @JoinColumn(name = "targetedSequencingId") }, joinColumns = {
           @JoinColumn(name = "kitDescriptorId") })
-  private Set<TargetedSequencing> targetedSequencing = new HashSet<>();
+  private final Set<TargetedSequencing> targetedSequencing = new HashSet<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -344,8 +344,21 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
     return targetedSequencing;
   }
 
-  public void setTargetedSequencing(Set<TargetedSequencing> targetedSequencing) {
-    this.targetedSequencing = targetedSequencing;
+  public void addTargetedSequencing(TargetedSequencing targetedSequencing) {
+    this.targetedSequencing.add(targetedSequencing);
+    targetedSequencing.getKitDescriptors().add(this);
+  }
+
+  public void removeTargetedSequencing(TargetedSequencing targetedSequencing) {
+    this.targetedSequencing.remove(targetedSequencing);
+    targetedSequencing.getKitDescriptors().remove(this);
+  }
+
+  public void clearTargetedSequencing() {
+    for (TargetedSequencing ts : this.targetedSequencing) {
+      ts.getKitDescriptors().remove(this);
+    }
+    this.targetedSequencing.clear();
   }
 
   /**
