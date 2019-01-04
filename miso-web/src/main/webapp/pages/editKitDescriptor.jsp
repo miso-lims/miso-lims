@@ -34,8 +34,10 @@
       <h1><c:choose><c:when
           test="${kitDescriptor.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
         Kit Descriptor
-        <button id="save" type="submit" class="fg-button ui-state-default ui-corner-all"
-        onclick="return KitDescriptor.validateKitDescriptor();">Save</button>
+        <c:if test="${isUserAdmin}">
+          <button id="save" type="submit" class="fg-button ui-state-default ui-corner-all"
+          onclick="return KitDescriptor.validateKitDescriptor();">Save</button>
+        </c:if>
       </h1>
       <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
         <div id="note_arrowclick" class="toggleLeft"></div>

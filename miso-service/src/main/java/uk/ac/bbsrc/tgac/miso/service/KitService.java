@@ -27,6 +27,8 @@ public interface KitService extends PaginatedDataSource<KitDescriptor> {
 
   public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
 
+  public long saveKitDescriptorTargetedSequencingRelationships(KitDescriptor kitDescriptor) throws IOException;
+
   public Kit getKitById(long kitId) throws IOException;
 
   public Kit getKitByIdentificationBarcode(String barcode) throws IOException;

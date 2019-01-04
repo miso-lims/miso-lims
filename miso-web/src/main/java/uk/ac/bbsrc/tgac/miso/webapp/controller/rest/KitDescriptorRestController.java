@@ -177,7 +177,7 @@ public class KitDescriptorRestController extends RestController {
       TargetedSequencing toAdd = targetedSequencingService.get(idToAdd);
       kitDescriptor.addTargetedSequencing(toAdd);
     }
-    kitService.saveKitDescriptor(kitDescriptor);
+    kitService.saveKitDescriptorTargetedSequencingRelationships(kitDescriptor);
     return Dtos.asDto(kitService.getKitDescriptorById(id));
   }
 }
