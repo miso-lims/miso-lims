@@ -1,3 +1,17 @@
+# 0.2.160
+
+Changes:
+
+ * Fixed issue causing errors when attempting to print
+ * Linking kits to targeted sequencing supported
+ * Add changelog entry for box an item was moved from
+ * Lengthen project short names
+ * Display order and analysis implications in lane QC selection on Run page
+ * Removed old form import/export functionality
+ * Added spreadsheet import function to bulk input tables
+ * Add picomolar concentration unit 
+ * Search by distribution (Samples & Libraries) or group ID (DetailedSample only)
+
 # 0.2.159
 
 Changes:

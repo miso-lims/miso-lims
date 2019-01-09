@@ -1,3 +1,10 @@
+-- shortname
+
+ALTER TABLE Project CHANGE COLUMN shortName shortName VARCHAR(255);
+
+
+-- printer_layout
+
 ALTER TABLE Printer ADD COLUMN layout varchar(255);
 
 UPDATE Printer SET
@@ -7,3 +14,5 @@ UPDATE Printer SET
   driver = CASE
     WHEN driver LIKE 'ZEBRA_%' THEN 'ZEBRA_24DPMM'
     ELSE 'BRADY' END;
+
+

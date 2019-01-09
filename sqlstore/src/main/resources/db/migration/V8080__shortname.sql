@@ -1,1 +1,0 @@
-ALTER TABLE Project CHANGE COLUMN shortName shortName VARCHAR(255);
