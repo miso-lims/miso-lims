@@ -191,6 +191,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     List<Index> originalIndices = new ArrayList<>(managed.getIndices());
     authorizationManager.throwIfNotWritable(managed);
+    maybeRemoveFromBox(library);
     boxService.throwIfBoxPositionIsFilled(library);
     boolean validateAliasUniqueness = !managed.getAlias().equals(library.getAlias());
     validateChange(library, managed);
@@ -557,6 +558,12 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     }
   }
 
+  private void maybeRemoveFromBox(Library library) {
+    if (library.isDiscarded() || library.isDistributed()) {
+      library.setBoxPosition(null);
+    }
+  }
+
   private void validateChange(Library library, Library beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
@@ -565,7 +572,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     validateBarcodeUniqueness(library, beforeChange, libraryDao::getByBarcode, errors, "library");
     validateDistributionFields(library.isDistributed(), library.getDistributionDate(), library.getDistributionRecipient(), library.getBox(),
         errors);
-    validateUnboxableFields(library.isDiscarded(), library.isDistributed(), library.getBox(), errors);
 
     if (library.getSpikeIn() != null) {
       if (library.getSpikeInDilutionFactor() == null) {

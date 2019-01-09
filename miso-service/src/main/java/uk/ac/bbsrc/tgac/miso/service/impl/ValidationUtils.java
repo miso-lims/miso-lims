@@ -77,9 +77,4 @@ public class ValidationUtils {
     }
   }
 
-  public static void validateUnboxableFields(boolean discarded, boolean distributed, Box box, Collection<ValidationError> errors) {
-    if (discarded && box != null) errors.add(new ValidationError("box", "Discarded item cannot be added to a box"));
-    if (distributed && box != null) errors.add(new ValidationError("box", "Distributed item cannot be added to a box"));
-  }
-
 }
