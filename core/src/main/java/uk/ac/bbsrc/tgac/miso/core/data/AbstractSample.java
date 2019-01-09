@@ -151,6 +151,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private List<FileAttachment> attachments;
 
   private boolean distributed;
+  @Temporal(TemporalType.DATE)
   private Date distributionDate;
   private String distributionRecipient;
 
