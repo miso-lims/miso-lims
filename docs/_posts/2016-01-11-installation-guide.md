@@ -155,9 +155,13 @@ Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if using Tomcat 
 
 (Update the security method if you are using LDAP or Active Directory LDAP.)
 
-Create the directory `/storage/miso`:
+Create the directory `/storage/miso` and subdirectory `/storage/miso/logs`. 
 
-  	cd /storage/miso
+  	mkdir -p /storage/miso/logs
+    
+If you have created a group for your Tomcat server it will need write permission to the storage directory.
+
+    chgrp -R tomcat /storage/miso/
 
 Move the following configuration files from `miso-lims/miso-web/src/main/resources` into
 the `/storage/miso/` directory:
