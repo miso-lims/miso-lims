@@ -155,7 +155,7 @@ Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if using Tomcat 
 
 (Update the security method if you are using LDAP or Active Directory LDAP.)
 
-Create the directory `/storage/miso` and subdirectory `/storage/miso/logs`. 
+Create the directory `/storage/miso` and subdirectory `/storage/miso/log`. 
 
   	mkdir -p /storage/miso/log
     
