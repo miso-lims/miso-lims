@@ -46,7 +46,9 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
 @RequestMapping("/kitdescriptor")
@@ -56,7 +58,8 @@ public class EditKitDescriptorController {
 
   @Autowired
   private KitService kitService;
-
+  @Autowired
+  private AuthorizationManager authorizationManager;
   @Autowired
   private MenuController menuController;
 
@@ -100,6 +103,8 @@ public class EditKitDescriptorController {
 
       model.put("formObj", kitDescriptor);
       model.put("kitDescriptor", kitDescriptor);
+      model.put("associatedTargetedSequencings", Dtos.asTargetedSequencingDtos(kitDescriptor.getTargetedSequencing()));
+      model.put("isUserAdmin", authorizationManager.getCurrentUser().isAdmin());
       return new ModelAndView("/pages/editKitDescriptor.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {

@@ -67,7 +67,7 @@ ListTarget.poolelement = {
     }
     return actions;
   },
-  createStaticActions: function(config, prodjectId) {
+  createStaticActions: function(config, projectId) {
     return [];
   },
   createColumns: function(config, projectId) {

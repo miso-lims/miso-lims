@@ -5,6 +5,7 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -14,14 +15,14 @@ import com.google.common.collect.Lists;
 
 public class HomePage extends HeaderFooterPage {
 
-  @FindBy(id = "searchProject")
+  @FindBy(css = "#tiles_project input")
   private WebElement projectSearchInput;
 
-  @FindBy(id = "searchProjectresult")
+  @FindBy(css = "#tiles_project > div.widget")
   private WebElement projectSearchResultContainer;
 
-  private static final By projectResultsLoadingGif = By.cssSelector("#searchProjectresult > img");
-  private static final By resultElements = By.cssSelector("a.dashboardresult"); // nested in SearchResultContainer
+  private static final By projectResultsLoadingGif = By.cssSelector("#tiles_project > div.widget > div > img");
+  private static final By resultElements = By.cssSelector("div.tile");
 
   /**
    * Constructs a new Home Page with the assumption that the home page is already loaded or loading
@@ -46,9 +47,10 @@ public class HomePage extends HeaderFooterPage {
    * @param search
    * @return
    */
-  public List<Long> searchProjects(String search) {
+  public List<String> searchProjects(String search) {
     projectSearchInput.clear();
     projectSearchInput.sendKeys(search);
+    projectSearchInput.sendKeys(Keys.ENTER);
 
     // give time for the previous results to be cleared and the loading icon to appear
     waitExplicitly(300);
@@ -57,29 +59,29 @@ public class HomePage extends HeaderFooterPage {
     return getProjectSearchResults();
   }
 
-  public List<Long> getProjectSearchResults() {
+  public List<String> getProjectSearchResults() {
     List<WebElement> results = projectSearchResultContainer.findElements(resultElements);
-    List<Long> projectIds = Lists.newArrayList();
+    List<String> projectTitles = Lists.newArrayList();
     for (WebElement result : results) {
-      projectIds.add(getProjectIdFromSearchResult(result));
+      projectTitles.add(getProjectTitleFromSearchResult(result));
     }
-    return projectIds;
+    return projectTitles;
   }
 
-  private Long getProjectIdFromSearchResult(WebElement result) {
-    String linkUrl = result.getAttribute("href");
-    return Long.valueOf(linkUrl.replaceFirst(".*/miso/project/", ""));
+  private String getProjectTitleFromSearchResult(WebElement result) {
+    WebElement title = result.findElement(By.className("name"));
+    return title.getText();
   }
 
-  public ProjectPage clickProjectSearchResult(Long projectId) {
+  public ProjectPage clickProjectSearchResult(String projectTitle) {
     List<WebElement> results = projectSearchResultContainer.findElements(resultElements);
     for (WebElement result : results) {
-      if (projectId.equals(getProjectIdFromSearchResult(result))) {
+      if (projectTitle.equals(getProjectTitleFromSearchResult(result))) {
         result.click();
         return new ProjectPage(getDriver());
       }
     }
-    throw new IllegalArgumentException("No project search result found with ID " + projectId);
+    throw new IllegalArgumentException("No project search result found with ID " + projectTitle);
   }
 
 }

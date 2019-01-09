@@ -355,6 +355,32 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   public void testSearchByKitName() throws IOException {
     testSearch(PaginationFilter.kitName("Test Kit"));
   }
+  
+
+  @Test
+  public void testSearchByDistributed() throws IOException {
+    testSearch(PaginationFilter.distributed(""));
+  }
+
+  @Test
+  public void testSearchByDistributedWithString() throws IOException {
+    testSearch(PaginationFilter.distributed("lastweek"));
+  }
+
+  @Test
+  public void testSearchByDistributedWithDate() throws IOException {
+    testSearch(PaginationFilter.distributed("2017-01-01"));
+  }
+  
+  @Test
+  public void testSearchByDistributedTo() throws IOException {
+    testSearch(PaginationFilter.distributedTo("elsewhere"));
+  }
+
+  @Test
+  public void testSearchByGroupId() throws IOException {
+    testSearch(PaginationFilter.groupId("ID of group"));
+  }
 
   /**
    * Verifies Hibernate mappings by ensuring that no exception is thrown by a search

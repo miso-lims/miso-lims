@@ -488,7 +488,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
 
   @Override
   public Map<String, Integer> getRunColumnSizes() throws IOException {
-    return runDao.getRunColumnSizes();
+    return ValidationUtils.adjustNameLength(runDao.getRunColumnSizes(), namingScheme);
   }
 
   public void setSecurityManager(SecurityManager securityManager) {

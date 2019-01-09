@@ -181,6 +181,16 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  public default void restrictPaginationByDistributed(Criteria criteria, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be distributed.", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationByDistributionRecipient(Criteria criteria, String recipient, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be distributed.", getFriendlyName()));
+  }
+
+  @Override
   default void restrictPaginationByExternalName(Criteria criteria, String name, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s has no external name.", getFriendlyName()));
   }
@@ -188,6 +198,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   @Override
   default void restrictPaginationByFulfilled(Criteria criteria, boolean isFulfilled, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s has no fulfillment (nor existential dread).", getFriendlyName()));
+  }
+
+  @Override
+  default void restrictPaginationByGroupId(Criteria criteria, String groupId, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no group ID (and we are all happier for it).", getFriendlyName()));
   }
 
   @Override

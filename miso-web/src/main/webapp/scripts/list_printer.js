@@ -72,6 +72,11 @@ ListTarget.printer = {
             values: Constants.printerDrivers.map(Utils.array.getName)
           }, {
             type: "select",
+            label: "Layout",
+            property: "layout",
+            values: Constants.printerLayouts.map(Utils.array.getName)
+          }, {
+            type: "select",
             label: "Backend",
             property: "backend",
             values: Constants.printerBackends,
@@ -91,6 +96,7 @@ ListTarget.printer = {
                 "backend": printer.backend.name,
                 "configuration": printerConfig,
                 "driver": printer.driver,
+                "layout": printer.layout,
                 "name": printer.name,
               }, Utils.page.pageReload);
             }
@@ -127,6 +133,11 @@ ListTarget.printer = {
       "include": true,
       "iSortPriority": 0,
       "mData": "driver"
+    }, {
+      "sTitle": "Layout",
+      "include": true,
+      "iSortPriority": 0,
+      "mData": "layout"
     }, {
       "sTitle": "Backend",
       "include": true,

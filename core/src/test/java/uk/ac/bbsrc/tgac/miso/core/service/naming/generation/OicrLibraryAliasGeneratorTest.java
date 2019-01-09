@@ -77,7 +77,7 @@ public class OicrLibraryAliasGeneratorTest {
     library.setPlatformType(PlatformType.OXFORDNANOPORE);
 
     DetailedSample sample = new DetailedSampleImpl();
-    sample.setAlias("LALA_1010_Ly_R_nn_1-1_D_1");
+    sample.setAlias("LALA_1234567_Ly_R_nn_1-1_D_1");
     library.setSample(sample);
 
     LibraryType libraryType = new LibraryType();
@@ -92,7 +92,7 @@ public class OicrLibraryAliasGeneratorTest {
 
     Mockito.when(siblingNumberGenerator.getNextSiblingNumber(Mockito.any(), Mockito.any())).thenReturn(5);
 
-    assertEquals("LALA_1010_Ly_R_RPD_WG_5", sut.generate(library));
+    assertEquals("LALA_1234567_Ly_R_RPD_WG_5", sut.generate(library));
   }
 
 }

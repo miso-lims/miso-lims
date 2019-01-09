@@ -34,8 +34,10 @@
       <h1><c:choose><c:when
           test="${kitDescriptor.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
         Kit Descriptor
-        <button id="save" type="submit" class="fg-button ui-state-default ui-corner-all"
-        onclick="return KitDescriptor.validateKitDescriptor();">Save</button>
+        <c:if test="${isUserAdmin}">
+          <button id="save" type="submit" class="fg-button ui-state-default ui-corner-all"
+          onclick="return KitDescriptor.validateKitDescriptor();">Save</button>
+        </c:if>
       </h1>
       <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
         <div id="note_arrowclick" class="toggleLeft"></div>
@@ -107,7 +109,13 @@
         </tr>
       </table>
     </form:form>
-    <miso:changelog item="${kitDescriptor}"/>
+    <c:if test="${kitDescriptor.id != 0}">
+      <c:if test="${kitDescriptor.kitType.key == 'Library'}">
+        <miso:list-section id="list_associated_ts" name="Associated Targeted Sequencings" target="targetedsequencing" alwaysShow="true" items="${associatedTargetedSequencings}" config="{kitDescriptorId: ${kitDescriptor.id}}" />
+        <miso:list-section-ajax id="list_available_ts" name="Available Targeted Sequencings" target="targetedsequencing" config="{kitDescriptorId: ${kitDescriptor.id}, add: true}" />
+      </c:if>
+      <miso:changelog item="${kitDescriptor}"/>
+    </c:if>
   </div>
 </div>
 

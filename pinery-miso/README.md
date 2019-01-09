@@ -61,3 +61,47 @@ The Pinery-MISO webapp should be upgraded whenever the MISO webapp is upgraded.
 3. Copy the new war file (`pinery-miso/target/pinery-miso-<version>.war`) into
    `${CATALINA_HOME}/webapps/`. Rename it to match your desired webapp name (e.g. `pinery-miso.war`)
 5. Restart tomcat
+
+## Docker Container
+
+### Configuration
+
+A properties file is required to specify database connection information. This properties file may be
+included in the image, or specified at container run time. To include the properties in the image, modify
+`pinery-miso/docker/pinery-miso.properties` to include the connection info for your MISO database.
+
+If you wish to specify a different properties file at container run time, create a properties file
+containing the following, and include the connection info for your MISO database.
+
+```
+miso.db.host=
+miso.db.port=
+miso.db.name=
+miso.db.user=
+miso.db.pass=
+```
+
+### Building from source (from the `miso-lims` directory):
+
+```
+docker build -t pinery-miso -f pinery-miso-dockerfile .
+```
+
+### Running
+
+You can run the container using either the properties file included at build time, or a different properties
+file supplied at run time. Either way, you will also need to specify a port on the host system that should be
+used to expose the Pinery-MISO webservice. For example, if you specify `-p 8888:8080`, then Pinery-MISO will
+be available at `http://localhost:8888` while the container is running.
+
+Using the properties file included at container build time:
+
+```
+docker run -it -p {port}:8080 pinery-miso
+```
+
+Specifying a different properties file at container run time:
+
+```
+docker run -it -p {port}:8080 -v {properties-file}:/config/pinery-miso.properties pinery-miso
+```

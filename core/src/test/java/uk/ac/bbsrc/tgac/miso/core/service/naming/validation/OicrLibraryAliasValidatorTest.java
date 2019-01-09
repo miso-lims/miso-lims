@@ -58,7 +58,7 @@ public class OicrLibraryAliasValidatorTest {
 
   @Test
   public void test_alias_02() throws Exception {
-    assertThat(sut.validate("AOE_1273_Br_P_PE_1K_WG").isValid(), is(true));
+    assertThat(sut.validate("AOE_1234567_Br_P_PE_1K_WG").isValid(), is(true));
   }
 
   @Test

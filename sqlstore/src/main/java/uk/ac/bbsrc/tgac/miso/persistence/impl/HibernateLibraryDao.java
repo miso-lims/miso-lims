@@ -419,6 +419,10 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
       return "creationTime";
     case UPDATE:
       return "lastModified";
+    case RECEIVE:
+      return "receivedDate";
+    case DISTRIBUTED:
+      return "distributionDate";
     default:
       return null;
     }
@@ -454,6 +458,21 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   public static void restrictPaginationByIndices(Criteria criteria, String index) {
     criteria.add(Restrictions.or(Restrictions.ilike("indices.name", index, MatchMode.ANYWHERE),
         Restrictions.ilike("indices.sequence", index, MatchMode.EXACT)));
+  }
+
+  @Override
+  public void restrictPaginationByGroupId(Criteria criteria, String groupId, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.ilike("groupId", groupId, MatchMode.EXACT));
+  }
+  
+  @Override
+  public void restrictPaginationByDistributed(Criteria criteria, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("distributed", true));
+  }
+
+  @Override
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, String recipient, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.ilike("distributionRecipient", recipient, MatchMode.ANYWHERE));
   }
 
   @Override

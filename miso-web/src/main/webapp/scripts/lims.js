@@ -26,8 +26,6 @@ jQuery.ajaxSetup({
   cache: false
 });
 
-var ajaxurl = '/miso/fluxion.ajax';
-
 var Utils = Utils
     || {
       /** Maps a form element's child input elements to a JSON object. */
@@ -853,27 +851,6 @@ Utils.ui = {
   }
 };
 
-Utils.fileUpload = {
-  fileUploadProgress: function(formname, divname, successfunc) {
-    Fluxion.doAjaxUpload(formname, 'fileUploadProgressBean', 'checkUploadStatus', {
-      'url': ajaxurl
-    }, {
-      'statusElement': divname,
-      'progressElement': 'trash',
-      'doOnSuccess': successfunc
-    }, {
-      '': ''
-    });
-  },
-
-  processingOverlay: function() {
-    jQuery.colorbox({
-      width: "30%",
-      html: "Processing..."
-    });
-  }
-};
-
 Utils.validation = {
   dateRegex: '^(19|20)[0-9]{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$',
   dateTimeRegex: '^(19|20)[0-9]{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) ([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$',
@@ -1100,14 +1077,15 @@ Utils.sorting = {
 };
 
 Utils.notes = {
-   addNote: function(entityType, entityId, internalOnly, text) {
-        Utils.ajaxWithDialog('Adding Note', 'POST', window.location.origin + '/miso/rest/note/' + entityType + '/' + entityId, {
-            internalOnly: internalOnly == 'on',
-            text: text
-          }, Utils.page.pageReload);
-   },
-   deleteNote: function(entityType, entityId, noteId) {
-        Utils.ajaxWithDialog('Deleting Note', 'DELETE', window.location.origin + '/miso/rest/note/' + entityType + '/' + entityId + '/' + noteId, null, Utils.page.pageReload);
-   },
+  addNote: function(entityType, entityId, internalOnly, text) {
+    Utils.ajaxWithDialog('Adding Note', 'POST', window.location.origin + '/miso/rest/note/' + entityType + '/' + entityId, {
+      internalOnly: internalOnly == 'on',
+      text: text
+    }, Utils.page.pageReload);
+  },
+  deleteNote: function(entityType, entityId, noteId) {
+    Utils.ajaxWithDialog('Deleting Note', 'DELETE', window.location.origin + '/miso/rest/note/' + entityType + '/' + entityId + '/'
+        + noteId, null, Utils.page.pageReload);
+  },
 
 };

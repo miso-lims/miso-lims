@@ -29,7 +29,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.159.1-oicr-SNAPSHOT</version>
+    <version>0.2.160-oicr-SNAPSHOT</version>
   </parent>
   <artifactId>miso-web</artifactId>
   <packaging>war</packaging>
@@ -67,6 +67,10 @@
     <dependency>
       <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
       <artifactId>oauth-signature</artifactId>
+    </dependency>
+    <dependency>
+     <groupId>commons-fileupload</groupId>
+     <artifactId>commons-fileupload</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-httpclient</groupId>
@@ -252,23 +256,12 @@
     </dependency>
     <dependency>
       <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-      <artifactId>spring</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>stax-api</artifactId>
-          <groupId>stax</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
       <artifactId>sqlstore</artifactId>
     </dependency>
     <dependency>
       <groupId>uk.ac.tgac.statsdb</groupId>
       <artifactId>statsdb-api</artifactId>
     </dependency>
-
     <dependency>
       <!-- Do not remove - used by container -->
       <groupId>xml-apis</groupId>
@@ -277,6 +270,11 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -371,10 +369,6 @@
           <resource>
             <filtering>true</filtering>
             <directory>src/main/resources</directory>
-            <includes>
-              <include>fluxion/</include>
-              <include>status/</include>
-            </includes>
             <excludes>
               <exclude>../internal/*</exclude>
               <exclude>../external/*</exclude>

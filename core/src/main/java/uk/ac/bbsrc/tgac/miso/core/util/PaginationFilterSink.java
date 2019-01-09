@@ -23,9 +23,15 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByDate(T item, Date start, Date end, DateType type, Consumer<String> errorHandler);
 
+  public void restrictPaginationByDistributed(T item, Consumer<String> errorHandler);
+
+  public void restrictPaginationByDistributionRecipient(T item, String recipient, Consumer<String> errorHandler);
+
   public void restrictPaginationByExternalName(T item, String name, Consumer<String> errorHandler);
 
   public void restrictPaginationByFulfilled(T item, boolean isFulfilled, Consumer<String> errorHandler);
+
+  public void restrictPaginationByGroupId(T item, String groupId, Consumer<String> errorHandler);
 
   public void restrictPaginationByHealth(T item, EnumSet<HealthType> healths, Consumer<String> errorHandler);
 

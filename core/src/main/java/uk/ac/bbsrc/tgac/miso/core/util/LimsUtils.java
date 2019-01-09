@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
@@ -73,6 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
@@ -465,17 +467,18 @@ public class LimsUtils {
     return Arrays.stream(sets).flatMap(Collection::stream).collect(Collectors.toSet());
   }
 
-  public static String makeVolumeAndConcentrationLabel(Double volume, Double concentration, String volumeUnits, String concentrationUnits) {
-    volumeUnits = (volumeUnits == null ? "" : volumeUnits);
-    concentrationUnits = (concentrationUnits == null ? "" : concentrationUnits);
+  public static String makeVolumeAndConcentrationLabel(Double volume, Double concentration, VolumeUnit volumeUnits,
+      ConcentrationUnit concentrationUnits) {
+    String strVolumeUnits = (volumeUnits == null ? "" : volumeUnits.getUnits());
+    String strConcentrationUnits = (concentrationUnits == null ? "" : concentrationUnits.getUnits());
     if (volume != null && volume != 0 && concentration != null && concentration != 0) {
-      return String.format("%.0f%s@%.0f%s", volume, volumeUnits, concentration, concentrationUnits);
+      return String.format("%.0f%s@%.0f%s", volume, strVolumeUnits, concentration, strConcentrationUnits);
     }
     if (volume != null && volume != 0) {
-      return String.format("%.0f%s", volume, volumeUnits);
+      return String.format("%.0f%s", volume, strVolumeUnits);
     }
     if (concentration != null && concentration != 0) {
-      return String.format("%.0f%s", concentration, concentrationUnits);
+      return String.format("%.0f%s", concentration, strConcentrationUnits);
     }
     return null;
   }

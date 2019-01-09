@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/TGAC/miso-lims.svg?branch=develop)](https://travis-ci.org/TGAC/miso-lims) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=uk.ac.bbsrc.tgac.miso:miso&metric=alert_status)](https://sonarcloud.io/dashboard?id=uk.ac.bbsrc.tgac.miso:miso) [![DOI](https://zenodo.org/badge/4726428.svg)](https://zenodo.org/badge/latestdoi/4726428)
+[![Build Status](https://travis-ci.org/TGAC/miso-lims.svg?branch=develop)](https://travis-ci.org/TGAC/miso-lims) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=uk.ac.bbsrc.tgac.miso:miso&metric=alert_status)](https://sonarcloud.io/dashboard?id=uk.ac.bbsrc.tgac.miso:miso) [![DOI](https://zenodo.org/badge/4726428.svg)](https://zenodo.org/badge/latestdoi/4726428) [![Gitter](https://badges.gitter.im/TGAC/miso-lims.svg)](https://gitter.im/TGAC/miso-lims?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 
 # MISO: An open source LIMS for small-to-large scale sequencing centres
@@ -64,5 +64,6 @@ Installation and configuration details can be found in the [MISO installation gu
 
 ## Contact and Community
 
-- [MISO Twitter](https://twitter.com/misolims)
-- [Slack Group](https://miso-lims.slack.com/)
+- [MISO Twitter](https://twitter.com/misolims) : for news and updates
+- [MISO Gitter](https://gitter.im/TGAC/miso-lims) : for user group and developer questions and discussion
+- [Slack Group](https://miso-lims.slack.com/) : for developers

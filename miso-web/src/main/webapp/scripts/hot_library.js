@@ -288,18 +288,19 @@ HotTarget.library = (function() {
                   if (lib.nonStandardAlias) {
                     return callback(true);
                   }
-                  Fluxion.doAjax('libraryControllerHelperService', 'validateLibraryAlias', {
-                    'alias': value,
-                    'url': ajaxurl
-                  }, {
-                    'doOnSuccess': function() {
-                      validationCache[value] = true;
-                      return callback(true);
-                    },
-                    'doOnError': function(json) {
-                      validationCache[value] = false;
-                      return callback(false);
-                    }
+                  jQuery.ajax({
+                    url: '/miso/rest/library/validate-alias',
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf8',
+                    data: JSON.stringify({
+                      alias: value
+                    })
+                  }).success(function(json) {
+                    validationCache[value] = true;
+                    return callback(true);
+                  }).fail(function(response, textStatus, serverStatus) {
+                    validationCache[value] = false;
+                    return callback(false);
                   });
                 });
               });

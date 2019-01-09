@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
@@ -178,5 +179,13 @@ public interface NamingScheme {
    * @return true if {@link Project} shortName is a mandatory field; false if null is allowed
    */
   public boolean nullProjectShortNameAllowed();
+
+  public Integer projectShortNameLengthAdjustment();
+
+  public Integer nameLengthAdjustment();
+
+  public Integer libraryAliasLengthAdjustment();
+
+  public Integer sampleAliasLengthAdjustment();
 
 }

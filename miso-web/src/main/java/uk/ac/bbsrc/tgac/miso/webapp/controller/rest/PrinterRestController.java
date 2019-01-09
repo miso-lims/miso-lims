@@ -196,10 +196,8 @@ public class PrinterRestController extends RestController {
       throw new IllegalArgumentException("Unknown barcodeable type: " + type);
     }
 
-    return COMMA.splitAsStream(ids)//
+    return printer.printBarcode(user, copies, COMMA.splitAsStream(ids)//
         .map(Long::parseLong)//
-        .map(WhineyFunction.rethrow(fetcher))//
-        .filter(b -> printer.printBarcode(b, user, copies))//
-        .count();
+        .map(WhineyFunction.rethrow(fetcher)));
   }
 }

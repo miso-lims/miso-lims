@@ -150,18 +150,19 @@ HotTarget.sample = (function() {
                   if (sam.nonStandardAlias) {
                     return callback(true);
                   }
-                  Fluxion.doAjax('sampleControllerHelperService', 'validateSampleAlias', {
-                    'alias': value,
-                    'url': ajaxurl
-                  }, {
-                    'doOnSuccess': function() {
-                      validationCache[value] = true;
-                      return callback(true);
-                    },
-                    'doOnError': function(json) {
-                      validationCache[value] = false;
-                      return callback(false);
-                    }
+                  jQuery.ajax({
+                    url: '/miso/rest/sample/validate-alias',
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf8',
+                    data: JSON.stringify({
+                      alias: value
+                    })
+                  }).success(function(json) {
+                    validationCache[value] = true;
+                    return callback(true);
+                  }).fail(function(response, textStatus, serverStatus) {
+                    validationCache[value] = false;
+                    return callback(false);
                   });
                 });
               })
@@ -454,8 +455,7 @@ HotTarget.sample = (function() {
               } // else externalName is for a new Identity and will come from the External Name column
             }
           },
-          HotUtils.makeColumnForEnum('&nbsp;&nbsp;Donor Sex&nbsp;&nbsp;', show['Identity'], true, 'donorSex', Constants.donorSexes,
-              'Unknown'),
+          HotUtils.makeColumnForEnum('Donor Sex', show['Identity'], true, 'donorSex', Constants.donorSexes, 'Unknown'),
           HotUtils.makeColumnForEnum('Consent', show['Identity'], true, 'consentLevel', Constants.consentLevels, 'This Project'),
 
           // Detailed sample columns

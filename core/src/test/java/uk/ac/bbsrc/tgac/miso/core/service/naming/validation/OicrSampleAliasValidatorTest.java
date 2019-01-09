@@ -5,8 +5,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrSampleAliasValidator;
-
 public class OicrSampleAliasValidatorTest {
 
   private OicrSampleAliasValidator sut;
@@ -24,7 +22,7 @@ public class OicrSampleAliasValidatorTest {
   @Test
   public void testValidTissueAlias() throws Exception {
     assertTrue(sut.validate("PROJ_1234_nn_n_nn_1-1").isValid());
-    assertTrue(sut.validate("PROJ_1234_Br_P_32_1-1").isValid());
+    assertTrue(sut.validate("PROJ_1234567_Br_P_32_1-1").isValid());
   }
   
   @Test

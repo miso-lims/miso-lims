@@ -41,6 +41,24 @@ FOR EACH ROW
     '',
     NEW.lastModifier,
     'Kit descriptor created.')//
+    
+DROP TRIGGER IF EXISTS TargetedSequencing_KitDescriptorInsert//
+CREATE TRIGGER TargetedSequencing_KitDescriptorInsert AFTER INSERT ON TargetedSequencing_KitDescriptor
+FOR EACH ROW
+  INSERT INTO KitDescriptorChangeLog(kitDescriptorId, columnsChanged, userId, message) VALUES (
+    NEW.kitDescriptorId,
+    'targetedSequencingId',
+    (SELECT kd.lastModifier FROM KitDescriptor kd WHERE kd.kitDescriptorId = NEW.kitDescriptorId),
+    CONCAT('Added targeted sequencing: ', (SELECT ts.alias FROM TargetedSequencing ts WHERE ts.targetedSequencingId = NEW.targetedSequencingId)))//
+
+DROP TRIGGER IF EXISTS TargetedSequencing_KitDescriptorDelete//
+CREATE TRIGGER TargetedSequencing_KitDescriptorDelete AFTER DELETE ON TargetedSequencing_KitDescriptor
+FOR EACH ROW
+  INSERT INTO KitDescriptorChangeLog(kitDescriptorId, columnsChanged, userId, message) VALUES (
+    OLD.kitDescriptorId,
+    'targetedSequencingId',
+    (SELECT kd.lastModifier FROM KitDescriptor kd WHERE kd.kitDescriptorId = OLD.kitDescriptorId),
+    CONCAT('Removed targeted sequencing: ', (SELECT ts.alias FROM TargetedSequencing ts WHERE ts.targetedSequencingId = OLD.targetedSequencingId)))//
 
 DELIMITER ;
 -- EndNoTest

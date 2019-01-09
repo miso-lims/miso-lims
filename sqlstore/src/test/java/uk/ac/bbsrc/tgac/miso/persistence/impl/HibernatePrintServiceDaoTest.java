@@ -18,7 +18,7 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePrinterDao;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
 
 public class HibernatePrintServiceDaoTest extends AbstractDAOTest {
   @Rule
@@ -70,7 +70,8 @@ public class HibernatePrintServiceDaoTest extends AbstractDAOTest {
     printer.setName(NEW_NAME);
     printer.setBackend(Backend.CUPS);
     printer.setConfiguration("blah, blah, blah");
-    printer.setDriver(Driver.BRADY_1D);
+    printer.setDriver(Driver.BRADY);
+    printer.setLayout(Layout.AVERY_8363);
     printer.setEnabled(true);
     long id = dao.save(printer);
     Printer fetchedPrinter = dao.get(id);

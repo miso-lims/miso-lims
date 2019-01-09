@@ -436,6 +436,16 @@ public class RunRestController extends RestController {
                 .collect(Collectors.toList())));
   }
 
+  @GetMapping("/search")
+  public @ResponseBody List<RunDto> searchRuns(@RequestParam("q") String query) throws IOException {
+    return runService.listBySearch(query).stream().map(Dtos::asDto).collect(Collectors.toList());
+  }
+
+  @GetMapping("/recent")
+  public @ResponseBody List<RunDto> listRecentRuns() throws IOException {
+    return runService.list(0, 50, false, "startDate").stream().map(Dtos::asDto).collect(Collectors.toList());
+  }
+
   private Run getRun(long runId) throws IOException {
     Run run = runService.get(runId);
     if (run == null) {

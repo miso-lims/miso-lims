@@ -65,7 +65,7 @@
     </tr>
     <tr>
       <td>Serial Number:*</td>
-      <td><form:input id="identificationBarcode" path="identificationBarcode"/> </td>
+      <td><form:input id="identificationBarcode" path="identificationBarcode" /> </td>
     </tr>
     <tr>
       <td>Container Model:</td>

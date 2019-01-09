@@ -84,6 +84,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
@@ -309,6 +310,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "sequencingParameters", sequencingParametersService.getAll(), Dtos::asDto);
     createArray(mapper, baseUri, node, "printerBackends", Arrays.asList(Backend.values()), Dtos::asDto);
     createArray(mapper, baseUri, node, "printerDrivers", Arrays.asList(Driver.values()), Dtos::asDto);
+    createArray(mapper, baseUri, node, "printerLayouts", Arrays.asList(Layout.values()), Dtos::asDto);
     createArray(mapper, baseUri, node, "boxSizes", boxService.listSizes(), Function.identity());
     createArray(mapper, baseUri, node, "boxUses", boxService.listUses(), Function.identity());
     createArray(mapper, baseUri, node, "studyTypes", studyService.listTypes(), Dtos::asDto);

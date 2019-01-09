@@ -578,8 +578,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits().getUnits(),
-        getConcentrationUnits().getUnits());
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits(),
+        getConcentrationUnits());
   }
 
   @Override

@@ -242,7 +242,7 @@ ListTarget.partition = {
 
           Utils.showWizardDialog("Set QC", Constants.partitionQcTypes.map(function(qcType) {
             return {
-              name: qcType.description,
+              name: qcType.detailedLabel,
               handler: function() {
                 if (qcType.noteRequired) {
                   Utils.showDialog(qcType.description + " Notes", "Set", [{
