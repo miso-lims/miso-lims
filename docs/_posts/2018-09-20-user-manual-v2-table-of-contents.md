@@ -596,7 +596,11 @@ This user manual is a work in progress, so parts of it may be missing until it h
 {% assign section-title = "Attachments" %}
 {% include userman-toc-link.md section=section section-title=section-title %}
 {% assign sub = 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding Attachments" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding Attachments to a Single Item" %}
+{% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding Attachments to Multiple Items" %}
+{% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Linking Project Attachments" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Downloading Attachments" %}
 {% assign sub = sub | plus: 1 %}
