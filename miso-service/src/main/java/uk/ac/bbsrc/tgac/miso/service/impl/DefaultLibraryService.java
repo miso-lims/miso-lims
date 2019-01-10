@@ -572,6 +572,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     validateBarcodeUniqueness(library, beforeChange, libraryDao::getByBarcode, errors, "library");
     validateDistributionFields(library.isDistributed(), library.getDistributionDate(), library.getDistributionRecipient(), library.getBox(),
         errors);
+    validateUnboxableFields(library.isDiscarded(), library.isDistributed(), library.getBox(), errors);
 
     if (library.getSpikeIn() != null) {
       if (library.getSpikeInDilutionFactor() == null) {

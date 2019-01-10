@@ -705,6 +705,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     validateBarcodeUniqueness(sample, beforeChange, sampleStore::getByBarcode, errors, "sample");
     validateDistributionFields(sample.isDistributed(), sample.getDistributionDate(), sample.getDistributionRecipient(), sample.getBox(),
         errors);
+    validateUnboxableFields(sample.isDiscarded(), sample.isDistributed(), sample.getBox(), errors);
 
     if (taxonLookupEnabled && (beforeChange == null || !sample.getScientificName().equals(beforeChange.getScientificName()))
         && (sample.getScientificName() == null || TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName()) == null)) {
