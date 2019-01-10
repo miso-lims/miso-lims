@@ -38,9 +38,9 @@ Edit Run page. Here you can add sequencing containers and further modify the run
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Editing a Run" %}
 
-To get to the Edit Run page, click on its ID or Serial Number on the Runs list. The top section of the Edit Run page
-contains a list of fields, most of which may be modified. You can make any changes you would like and then click the
-"Save" button at the top right to confirm the changes.
+To get to the Edit Run page, click on its ID or alias on the Runs list. The top section of the Edit Run page contains a
+list of fields, most of which may be modified. You can make any changes you would like and then click the "Save" button
+at the top right to confirm the changes.
 
 Below, there are sections for Notes, Attachments, Related Issues, Sequencing Containers, and Partitions, which are
 discussed in other parts of this section of the user manual. There is another section for Experiments, which are
@@ -133,11 +133,11 @@ sample sheets.
 
 
 {% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Automatically Populate Runs using RunScanner" %}
+{% include userman-heading.md section=page.section sub=sub title="Automatically Populate Runs using Run Scanner" %}
 
-RunScanner is software that monitors your sequencer run directories and provides information about the runs. MISO can
-be configured to talk to RunScanner and automatically add and update runs based on its data. For more information about
-RunScanner, see the [Related Software - RunScanner](related_software#runscanner) section.
+Run Scanner is software that monitors your sequencer run directories and provides information about the runs. MISO can
+be configured to talk to Run Scanner and automatically add and update runs based on its data. For more information
+about Run Scanner, see the [Related Software - Run Scanner](related_software#run_scanner) section.
 
 {% include userman-toplink.md %}
 
