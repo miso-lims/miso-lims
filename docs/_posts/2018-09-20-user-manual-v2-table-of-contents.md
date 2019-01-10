@@ -687,7 +687,7 @@ This user manual is a work in progress, so parts of it may be missing until it h
 {% assign section-title = "Related Software" %}
 {% include userman-toc-link.md section=section section-title=section-title %}
 {% assign sub = 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Runscanner" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="RunScanner" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Pinery" %}
 
