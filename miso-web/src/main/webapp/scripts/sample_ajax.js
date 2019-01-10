@@ -363,35 +363,6 @@ Sample.ui = {
   },
 
   /**
-   * Enable or disable distribution date & recipient, depending on if distributed is checked
-   */
-  distributionChanged: function() {
-    var isDistributed = document.getElementById('distributed').checked;
-    var distributionDate = document.getElementById('distributionDatePicker');
-    var recipient = document.getElementById('distributionRecipient');
-    var location = document.getElementById('locationBarcode');
-    if (isDistributed) {
-      distributionDate.removeAttribute('readonly');
-      distributionDate.classList.remove('disabled');
-      Utils.ui.addDatePicker('distributionDatePicker');
-      recipient.removeAttribute('readonly');
-      recipient.classList.remove('disabled');
-    } else {
-      distributionDate.setAttribute('value', "");
-      distributionDate.setAttribute('readonly', 'readonly');
-      distributionDate.classList.add('disabled');
-      jQuery('#distributionDatePicker').datepicker('destroy');
-      jQuery('#distributionDatePicker').removeClass('hasDatepicker');
-      recipient.setAttribute('value', "");
-      recipient.setAttribute('readonly', 'readonly');
-      recipient.classList.add('disabled');
-      if (location.value.indexOf('SENT TO:') == 0) {
-        location.setAttribute('value', "");
-      }
-    }
-  },
-
-  /**
    * Update display with note required (or not) for QC Status
    */
   detailedQcStatusChanged: function() {

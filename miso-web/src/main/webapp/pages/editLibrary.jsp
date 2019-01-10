@@ -361,10 +361,10 @@
 </tr>
 <tr>
   <td><label for="distributed">Distributed:</label></td>
-  <td><form:checkbox id="distributed" path="distributed" onchange="Library.ui.distributionChanged()" /></td>
+  <td><form:checkbox id="distributed" path="distributed" onchange="Boxable.distributionChanged()" /></td>
 </tr>
 <tr>
-  <td><label for="distributionDate">Distribution Date:</label></td>
+  <td><label for="distributionDatePicker">Distribution Date:</label></td>
   <td>
     <form:input path="distributionDate" id="distributionDatePicker" placeholder="YYYY-MM-DD"/>
   </td>
@@ -378,7 +378,7 @@
   <td class="h"><label for="locationBarcode">Location:</label></td>
   <td><form:input id="locationBarcode" path="locationBarcode"/>
     <script type="text/javascript">
-      Library.ui.distributionChanged();
+      Boxable.distributionChanged();
     </script>
   </td>
 </tr>

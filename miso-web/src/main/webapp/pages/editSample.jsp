@@ -292,10 +292,10 @@
     </tr>
     <tr>
       <td><label for="distributed">Distributed:</label></td>
-      <td><form:checkbox id="distributed" path="distributed" onchange="Sample.ui.distributionChanged()" /></td>
+      <td><form:checkbox id="distributed" path="distributed" onchange="Boxable.distributionChanged()" /></td>
     </tr>
     <tr>
-      <td><label for="distributionDate">Distribution Date:</label></td>
+      <td><label for="distributionDatePicker">Distribution Date:</label></td>
       <td>
         <form:input path="distributionDate" id="distributionDatePicker" placeholder="YYYY-MM-DD"/>
       </td>
@@ -309,14 +309,14 @@
       <td class="h"><label for="locationBarcode">Location:</label></td>
       <td><form:input id="locationBarcode" path="locationBarcode"/>
         <script type="text/javascript"> 
-          Sample.ui.distributionChanged();
+          Boxable.distributionChanged();
           Utils.ui.addDatePicker("distributionDatePicker");
         </script>
       </td>
     </tr>
     <tr>
       <td class="h">Box Location:</td>
-      <td>
+      <td id="boxLocation">
         <c:if test="${!empty sample.box.locationBarcode}">${sample.box.locationBarcode},</c:if>
         <c:if test="${!empty sample.boxPosition}"><a href='<c:url value="/miso/box/${sample.box.id}"/>'>${sample.box.alias}, ${sample.boxPosition}</a></c:if>
       </td>

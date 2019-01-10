@@ -191,6 +191,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     List<Index> originalIndices = new ArrayList<>(managed.getIndices());
     authorizationManager.throwIfNotWritable(managed);
+    maybeRemoveFromBox(library);
     boxService.throwIfBoxPositionIsFilled(library);
     boolean validateAliasUniqueness = !managed.getAlias().equals(library.getAlias());
     validateChange(library, managed);
@@ -554,6 +555,12 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       }
       dTarget.setGroupId(dSource.getGroupId());
       dTarget.setGroupDescription(dSource.getGroupDescription());
+    }
+  }
+
+  private void maybeRemoveFromBox(Library library) {
+    if (library.isDiscarded() || library.isDistributed()) {
+      library.setBoxPosition(null);
     }
   }
 

@@ -674,6 +674,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     boolean validateAliasUniqueness = !managed.getAlias().equals(sample.getAlias());
     authorizationManager.throwIfNotWritable(managed);
+    maybeRemoveFromBox(sample);
     boxService.throwIfBoxPositionIsFilled(sample);
     validateChange(sample, managed);
     applyChanges(managed, sample);
@@ -688,6 +689,12 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
     save(managed, validateAliasUniqueness);
     boxService.updateBoxableLocation(sample);
+  }
+
+  private void maybeRemoveFromBox(Sample sample) {
+    if (sample.isDiscarded() || sample.isDistributed()) {
+      sample.setBoxPosition(null);
+    }
   }
 
   private void validateChange(Sample sample, Sample beforeChange) throws IOException {

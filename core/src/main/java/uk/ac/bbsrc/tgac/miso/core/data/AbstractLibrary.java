@@ -205,6 +205,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private List<FileAttachment> attachments;
 
   private boolean distributed;
+  @Temporal(TemporalType.DATE)
   private Date distributionDate;
   private String distributionRecipient;
 
