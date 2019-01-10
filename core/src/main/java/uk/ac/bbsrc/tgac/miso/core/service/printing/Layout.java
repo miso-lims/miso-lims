@@ -57,11 +57,12 @@ public enum Layout {
     public LabelCanvas draw(Driver driver, Barcodable barcodable) {
       LabelCanvas label = driver.start(14, 4.666);
       label.textClipped(10.5, 2.7, 0.5, 12, barcodable.getAlias());
-      label.multilineText(1, 1.375, 0.875, 15, 3, Stream.of(//
-          new Pair<>(FontStyle.BOLD, barcodable.getAlias()), //
+      label.multilineText(1, 1.375, .8, 18, 2, Stream.of(//
+          new Pair<>(FontStyle.BOLD, barcodable.getAlias())));
+      label.multilineText(1, 3.375, .8, 12, 2, Stream.of(//
           new Pair<>(FontStyle.REGULAR, LimsUtils.formatDate(barcodable.getBarcodeDate())), //
           new Pair<>(FontStyle.REGULAR, unescapeHtml(barcodable.getBarcodeExtraInfo()))));
-      label.barcode2d(6.78, 4, 0.13, barcodable.getAlias());
+      label.barcode2d(6.78, 4, 0.1, barcodable.getAlias());
       return label;
     }
 
@@ -72,10 +73,12 @@ public enum Layout {
     @Override
     public LabelCanvas draw(Driver driver, Barcodable barcodable) {
       LabelCanvas label = driver.start(8.3, 4.08);
-      label.textClipped(0.6, 1.125, .8, 18, barcodable.getAlias());
-      label.text(0.583, 3.92, .8, LimsUtils.formatDate(barcodable.getBarcodeDate()));
-      label.text(0.583, 3.08, .8, unescapeHtml(barcodable.getBarcodeExtraInfo()));
-      label.barcode2d(6.78, 4, 0.13, barcodable.getAlias());
+      label.multilineText(0.1, 1, .8, 18, 2, Stream.of(//
+          new Pair<>(FontStyle.BOLD, barcodable.getAlias())));
+      label.multilineText(0.1, 3, .8, 12, 2, Stream.of(//
+          new Pair<>(FontStyle.REGULAR, LimsUtils.formatDate(barcodable.getBarcodeDate())), //
+          new Pair<>(FontStyle.REGULAR, unescapeHtml(barcodable.getBarcodeExtraInfo()))));
+      label.barcode2d(5.78, 3.8, 0.1, getBarcode(barcodable));
       return label;
     }
 

@@ -12,6 +12,10 @@ Changes:
  * Add picomolar concentration unit 
  * Search by distribution (Samples & Libraries) or group ID (DetailedSample only)
 
+Bad:
+
+ * Labels do not print correctly
+
 # 0.2.159
 
 Changes:
