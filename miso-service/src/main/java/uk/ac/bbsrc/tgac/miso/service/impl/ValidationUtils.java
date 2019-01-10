@@ -81,6 +81,5 @@ public class ValidationUtils {
     if (discarded && box != null) errors.add(new ValidationError("box", "Discarded item cannot be added to a box"));
     if (distributed && box != null) errors.add(new ValidationError("box", "Distributed item cannot be added to a box"));
   }
-  }
 
 }
