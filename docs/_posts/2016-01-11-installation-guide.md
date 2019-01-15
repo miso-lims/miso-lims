@@ -26,7 +26,7 @@ Application Server:
 Database Server:
 
 * MySQL 5.7.7
-* Flyway 3.2.1 (newer versions may cause issues)
+* [Flyway 3.2.1](https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/3.2.1/) (newer versions may cause issues)
 
 Development Machine(s):
 
@@ -155,9 +155,13 @@ Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if using Tomcat 
 
 (Update the security method if you are using LDAP or Active Directory LDAP.)
 
-Create the directory `/storage/miso`:
+Create the directory `/storage/miso` and subdirectory `/storage/miso/log`. 
 
-  	cd /storage/miso
+  	mkdir -p /storage/miso/log
+    
+Ensure that the user that Tomcat runs as has write permission to the storage directory. For example, if the user is in the 'tomcat' group:
+
+    chgrp -R tomcat /storage/miso/
 
 Move the following configuration files from `miso-lims/miso-web/src/main/resources` into
 the `/storage/miso/` directory:

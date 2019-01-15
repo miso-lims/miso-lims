@@ -74,7 +74,7 @@ public abstract class LabelCanvas {
   }
 
   /**
-   * Create a mulit-line text block
+   * Create a multi-line text block
    *
    * @param x the x coordinator the top-left position of the text block in mm
    * @param y the y coordinator the top-left position of the text block in mm
@@ -90,18 +90,25 @@ public abstract class LabelCanvas {
     lines//
         .filter(input -> !LimsUtils.isStringBlankOrNull(input.getValue()))//
         .reduce(0, (offset, input) -> {
-          int line;
-          for (line = offset; line < maxLines - 1 && input.getValue().length() > line * numCharsPerLine; line++) {
-            text(x + direction.xMultiplier * 1.1 * height * line, y + direction.yMultiplier * 1.1 * height * line, height, direction,
-                input.getKey(), Justification.LEFT,
-                input.getValue().substring(line * numCharsPerLine, Math.min(input.getValue().length(), (line + 1) * numCharsPerLine)));
+          // This block is full. This line of text gets ignored. So sad.
+          if (offset >= maxLines) {
+            return offset;
           }
-          if (input.getValue().length() > maxLines * numCharsPerLine) {
-            text(x + direction.xMultiplier * 1.1 * height * (maxLines - 1), y + direction.yMultiplier * 1.1 * height * (maxLines - 1),
-                height,
-                direction, input.getKey(), Justification.LEFT,
-                input.getValue().substring((maxLines - 1) * numCharsPerLine, maxLines * numCharsPerLine - 2) + "...");
-            line++;
+          int line;
+          // Print this text over as many lines as it needs and/or the block can hold
+          for (line = 0; line + offset < maxLines && input.getValue().length() > line * numCharsPerLine; line++) {
+            String str;
+            // If we are on our last line and this string needs more than one, then add some dots at the end of this line to stand in for
+            // the additional line(s).
+            if (line + offset == maxLines - 1 && input.getValue().length() > (line + 1) * numCharsPerLine) {
+              str = input.getValue().substring(line * numCharsPerLine, (line + 1) * numCharsPerLine - 2) + "...";
+            } else {
+              str = input.getValue().substring(line * numCharsPerLine, Math.min(input.getValue().length(), (line + 1) * numCharsPerLine));
+            }
+            text(x + direction.xMultiplier * 1.1 * height * (line + offset), y + direction.yMultiplier * 1.1 * height * (line + offset),
+                height, direction,
+                input.getKey(), Justification.LEFT,
+                str);
           }
           return line;
         }, (a, b) -> a + b);

@@ -1,3 +1,13 @@
+# 0.2.161
+
+Changes:
+
+ * Fix multiline barcode printing layout
+ * Added Attachments section of user manual
+ * Added Notes section of user manual
+ * Added Sequencer Runs section of user manual
+ * Fix bugs in distributing from edit single Sample/Library pages
+
 # 0.2.160
 
 Changes:
@@ -11,6 +21,10 @@ Changes:
  * Added spreadsheet import function to bulk input tables
  * Add picomolar concentration unit 
  * Search by distribution (Samples & Libraries) or group ID (DetailedSample only)
+
+Bad:
+
+ * Labels do not print correctly
 
 # 0.2.159
 
