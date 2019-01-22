@@ -56,7 +56,9 @@ public enum Layout {
     @Override
     public LabelCanvas draw(Driver driver, Barcodable barcodable) {
       LabelCanvas label = driver.start(14, 4.666);
-      label.textClipped(10.5, 2.7, 0.5, 12, barcodable.getAlias());
+      // This label can handle 10 char/line, but we restrict it to 8 so that the barcodes break in a nice place for projects that people
+      // care about.
+      label.multilineText(10.7, 2.3, 0.5, 8, 2, Stream.of(new Pair<>(FontStyle.REGULAR, barcodable.getAlias())));
       label.multilineText(1, 1.375, .8, 18, 2, Stream.of(//
           new Pair<>(FontStyle.BOLD, barcodable.getAlias())));
       label.multilineText(1, 3.375, .8, 12, 2, Stream.of(//
