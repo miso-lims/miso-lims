@@ -4,9 +4,13 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -82,4 +86,32 @@ public class ValidationUtils {
     if (distributed && box != null) errors.add(new ValidationError("box", "Distributed item cannot be added to a box"));
   }
 
+  public static void validateUrl(String maybeUrl, boolean allowEmptyUrl, Collection<ValidationError> errors) {
+    if (isStringEmptyOrNull(maybeUrl) && allowEmptyUrl) return;
+    URL url = parseUrl(maybeUrl, errors);
+    if (url == null) {
+      errors.add(new ValidationError(URL_FIELD, INVALID_URL));
+      return;
+    }
+    if (!allowedUrlSchemes.contains(url.getProtocol())) {
+      errors.add(new ValidationError(URL_FIELD, INVALID_URL));
+    }
+  }
+
+  private static URL parseUrl(String maybeUrl, Collection<ValidationError> errors) {
+    try {
+      return new URL(maybeUrl);
+    } catch (MalformedURLException e) {
+      errors.add(new ValidationError(URL_FIELD, INVALID_URL));
+    }
+    return null;
+  }
+
+  private static Set<String> allowedUrlSchemes = new HashSet<>();
+  static {
+    allowedUrlSchemes.add("http");
+    allowedUrlSchemes.add("https");
+  }
+  private static final String INVALID_URL = "URL is not valid";
+  private static final String URL_FIELD = "url";
 }
