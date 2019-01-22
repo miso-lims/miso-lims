@@ -178,6 +178,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
     to.setIdentificationBarcode(from.getIdentificationBarcode());
     to.setParentLocation(from.getParentLocation());
     to.setMapUrl(from.getMapUrl());
+    to.setProbeId(from.getProbeId());
   }
 
   @Override

@@ -89,6 +89,13 @@
         <div id="mapUrlError" class="errorContainer"></div>
       </td>
     </tr>
+    <tr>
+      <td class="h">Probe ID:</td>
+      <td>
+        <input type="text" id="probeId"/><span id="probeIdCounter" class="counter"></span>
+        <div id="probeIdError" class="errorContainer"></div>
+      </td>
+    </tr>
   </table>
 </div>
 
@@ -112,6 +119,13 @@ jQuery(document).ready(function() {
     counter: '#mapUrlCounter',
     countType: 'characters',
     maxCount: ${maxLengths['mapUrl']},
+    countDirection: 'down'
+  });
+  
+  jQuery('#probeId').simplyCountable({
+    counter: '#probeIdCounter',
+    countType: 'characters',
+    maxCount: ${maxLengths['probeId']},
     countDirection: 'down'
   });
 });
