@@ -5,7 +5,9 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -239,6 +241,11 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   public String getBarcodeSizeInfo() {
     return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits(),
         getConcentrationUnits());
+  }
+
+  @Override
+  public Date getBarcodeDate() {
+    return Stream.of(getReceivedDate(), getCreationDate(), getCreationTime()).filter(Objects::nonNull).findFirst().orElse(null);
   }
 
 }
