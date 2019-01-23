@@ -1,3 +1,9 @@
+# 0.2.163
+
+Changes:
+
+ * Make JTT_7S the same as JTT_7 with size info instead of extra info
+
 # 0.2.162
 
 Changes:
