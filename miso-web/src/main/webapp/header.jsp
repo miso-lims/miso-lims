@@ -43,8 +43,6 @@
   <jsp:useBean id="timestamp" class="java.util.Date" scope="request"/>
 
   <title><c:if test="${not empty title}">${title} &mdash; </c:if>MISO LIMS ${misoInstanceName}</title>
-  <script type="text/javascript"
-          src="<c:url value='/scripts/fluxion-ajax/fluxion-ajax.js'/>"></script>
           
   <!-- jQuery -->
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-1.8.3.min.js'/>"></script>

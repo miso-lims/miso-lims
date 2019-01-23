@@ -1,3 +1,13 @@
+# 0.2.161
+
+Changes:
+
+ * Fix multiline barcode printing layout
+ * Added Attachments section of user manual
+ * Added Notes section of user manual
+ * Added Sequencer Runs section of user manual
+ * Fix bugs in distributing from edit single Sample/Library pages
+
 # 0.2.160
 
 Changes:
