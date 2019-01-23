@@ -339,6 +339,12 @@ To add a new kit descriptor, click the "Add" button in the toolbar at the top of
 will take you to the Create Kit Descriptor page. Enter all of the kit details, then click the "Save" button at the top
 right to create the kit descriptor.
 
+Once a kit has been created, it is possible to link existing [Targeted Sequencing](#targeted_sequencing) values to the
+kit descriptor. Then, if a library is prepared using this kit descriptor, dilutions created from the library can select
+a targeted sequencing from the ones linked to the kit descriptor. This means that if a desired targeted sequencing is
+not available for a dilution, this can be solved by linking the targeted sequencing to the kit descriptor of the 
+dilution's parent library.
+
 {% include userman-toplink.md %}
 
 
