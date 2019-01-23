@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 
 @Controller
 @RequestMapping("/freezer")
@@ -45,21 +46,31 @@ public class EditFreezerController {
     return storageLocationService.listRooms();
   }
 
-  @RequestMapping("/new")
+  @GetMapping("/new")
   public ModelAndView newStorageLocation(ModelMap model) {
     model.addAttribute(MODEL_ATTR_PAGEMODE, "create");
     model.put("title", "New Storage Location");
     return new ModelAndView(JSP, model);
   }
 
-  @RequestMapping("/{locationId}")
+  @GetMapping("/{locationId}")
   public ModelAndView setupForm(@PathVariable(name = "locationId", required = true) long locationId, ModelMap model) throws IOException {
-    model.addAttribute(MODEL_ATTR_PAGEMODE, "edit");
     StorageLocation freezer = storageLocationService.get(locationId);
-    if (freezer == null || freezer.getLocationUnit() != LocationUnit.FREEZER) {
-      throw new NotFoundException("Freezer not found");
-    }
+    return setupFreezerForm(freezer, model);
+  }
 
+  @GetMapping("/barcode/{storageBarcode}")
+  public ModelAndView setupForm(@PathVariable(name = "storageBarcode", required = true) String storageBarcode, ModelMap model)
+      throws IOException {
+    StorageLocation freezer = storageLocationService.getFreezerForBarcodedStorageLocation(storageBarcode);
+    return setupFreezerForm(freezer, model);
+  }
+
+  private ModelAndView setupFreezerForm(StorageLocation freezer, ModelMap model) throws IOException {
+    if (freezer == null || freezer.getLocationUnit() != LocationUnit.FREEZER) {
+      throw new RestException("Freezer not found");
+    }
+    model.addAttribute(MODEL_ATTR_PAGEMODE, "edit");
     ObjectMapper mapper = new ObjectMapper();
     model.put("title", "Freezer " + freezer.getId());
     model.addAttribute(MODEL_ATTR_JSON, mapper.writer().writeValueAsString(Dtos.asDto(freezer, true, true)));

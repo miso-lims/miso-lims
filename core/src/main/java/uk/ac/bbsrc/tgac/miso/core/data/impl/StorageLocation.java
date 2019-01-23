@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -119,6 +121,8 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
 
   private String mapUrl;
 
+  private String probeId;
+
   @Override
   public long getId() {
     return id;
@@ -205,6 +209,19 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
         + getDisplayLocation();
   }
 
+  public String getProbeId() {
+    return probeId;
+  }
+
+  /** Only freezers can have probes */
+  public void setProbeId(String probeId) {
+    if (getLocationUnit() == null || getLocationUnit() != LocationUnit.FREEZER || isStringEmptyOrNull(probeId)) {
+      this.probeId = null;
+    } else {
+      this.probeId = probeId;
+    }
+  }
+
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
@@ -277,6 +294,7 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
     result = prime * result + ((locationUnit == null) ? 0 : locationUnit.hashCode());
     result = prime * result + ((parentLocation == null) ? 0 : parentLocation.hashCode());
     result = prime * result + ((mapUrl == null) ? 0 : mapUrl.hashCode());
+    result = prime * result + ((probeId == null) ? 0 : probeId.hashCode());
     return result;
   }
 
@@ -306,6 +324,9 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
     if (mapUrl == null) {
       if (other.mapUrl != null) return false;
     } else if (!mapUrl.equals(other.mapUrl)) return false;
+    if (probeId == null) {
+      if (other.probeId != null) return false;
+    } else if (!probeId.equals(other.probeId)) return false;
     return true;
   }
 
