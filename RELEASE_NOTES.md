@@ -1,3 +1,10 @@
+# 0.2.162
+
+Changes:
+
+ * Search for freezers by storage location barcode (#1816)
+ * Include creation date as a possibility when printing samples
+
 # 0.2.161
 
 Changes:
