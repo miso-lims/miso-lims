@@ -53,6 +53,11 @@
     $('#mapUrl').attr('data-parsley-type', 'url');
     $('#mapUrl').attr('data-parsley-errors-container', '#mapUrlError');
 
+    $('#probeId').attr('class', 'form-control');
+    $('#probeId').attr('data-parsley-maxlength', '50');
+    $('#probeId').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    $('#probeId').attr('data-parsley-errors-container', '#probeIdError');
+
     $('#freezer-form').parsley();
     $('#freezer-form').parsley().validate();
 
@@ -221,6 +226,7 @@
       $('#alias').val(freezerJson.alias);
       $('#identificationBarcode').val(freezerJson.identificationBarcode);
       $('#mapUrl').val(freezerJson.mapUrl);
+      $('#probeId').val(freezerJson.probeId);
       updateVisual();
       updateChangelogs();
     }
@@ -520,6 +526,7 @@
     freezer.alias = $('#alias').val();
     freezer.identificationBarcode = $('#identificationBarcode').val();
     freezer.mapUrl = $('#mapUrl').val();
+    freezer.probeId = $('#probeId').val();
     freezer.locationUnit = 'FREEZER';
     freezerJson = freezer;
   }

@@ -26,4 +26,13 @@ public interface StorageLocationService {
 
   public long updateStorageComponent(StorageLocation location) throws IOException;
 
+  /**
+   * Gets a freezer associated with a given barcode. If the given barcode is associated with a storage component inside
+   * the freezer, the freezer is returned. If the given barcode is associated with a room, no StorageLocation is returned.
+   * 
+   * @param barcode of interest
+   * @return StorageLocation freezer identified by or containing storage component identified by the given barcode
+   */
+  public StorageLocation getFreezerForBarcodedStorageLocation(String barcode);
+
 }

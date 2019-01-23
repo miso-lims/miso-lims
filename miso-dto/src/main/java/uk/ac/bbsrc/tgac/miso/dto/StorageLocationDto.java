@@ -18,6 +18,7 @@ public class StorageLocationDto {
   private List<StorageLocationDto> childLocations;
   private Set<BoxDto> boxes;
   private String mapUrl;
+  private String probeId;
 
   public long getId() {
     return id;
@@ -106,6 +107,14 @@ public class StorageLocationDto {
 
   public void setMapUrl(String url) {
     this.mapUrl = url;
+  }
+
+  public String getProbeId() {
+    return probeId;
+  }
+
+  public void setProbeId(String probeId) {
+    this.probeId = probeId;
   }
 
 }

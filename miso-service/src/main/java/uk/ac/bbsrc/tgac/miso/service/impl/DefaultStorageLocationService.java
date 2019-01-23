@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.validateUrl;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +53,16 @@ public class DefaultStorageLocationService implements StorageLocationService {
   @Override
   public StorageLocation getByBarcode(String barcode) {
     return storageLocationStore.getByBarcode(barcode);
+  }
+
+  @Override
+  public StorageLocation getFreezerForBarcodedStorageLocation(String barcode) {
+    for (StorageLocation current = getByBarcode(barcode); current != null; current = current.getParentLocation()) {
+      if (current.getLocationUnit() == LocationUnit.FREEZER) {
+        return current;
+      }
+    }
+    return null;
   }
 
   @Override
@@ -135,6 +147,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
     }
 
     validateLocationUnitRelationships(storage, errors);
+    validateUrl(storage.getMapUrl(), true, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
@@ -165,6 +178,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
     to.setIdentificationBarcode(from.getIdentificationBarcode());
     to.setParentLocation(from.getParentLocation());
     to.setMapUrl(from.getMapUrl());
+    to.setProbeId(from.getProbeId());
   }
 
   @Override

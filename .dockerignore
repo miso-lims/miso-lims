@@ -1,2 +1,8 @@
 .git
-*/target
+core/target
+integration-tools/target
+migration/target
+miso-dto/target
+miso-service/target
+pinery-miso/target
+sqlstore/target

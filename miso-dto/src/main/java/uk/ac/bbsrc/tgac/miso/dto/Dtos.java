@@ -2662,6 +2662,7 @@ public class Dtos {
     dto.setDisplayLocation(from.getDisplayLocation());
     dto.setFullDisplayLocation(from.getFullDisplayLocation());
     dto.setMapUrl(from.getMapUrl());
+    dto.setProbeId(from.getProbeId());
     if (includeChildLocations) {
       dto.setChildLocations(from.getChildLocations().stream()
           .map(child -> Dtos.asDto(child, recursive, recursive))
@@ -2686,6 +2687,7 @@ public class Dtos {
       location.getParentLocation().setId(from.getParentLocationId());
     }
     location.setLocationUnit(LocationUnit.valueOf(from.getLocationUnit()));
+    location.setProbeId(from.getProbeId());
     return location;
   }
 
