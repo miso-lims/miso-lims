@@ -340,10 +340,10 @@ will take you to the Create Kit Descriptor page. Enter all of the kit details, t
 right to create the kit descriptor.
 
 Once a kit has been created, it is possible to link existing [Targeted Sequencing](#targeted_sequencing) values to the
-kit descriptor. Then, if a library is prepared using this kit descriptor, dilutions created from the library can select
-a targeted sequencing from the ones linked to the kit descriptor. This means that if a desired targeted sequencing is
-not available for a dilution, this can be solved by linking the targeted sequencing to the kit descriptor of the 
-dilution's parent library.
+kit descriptor. Then, if a library is prepared using this kit descriptor, dilutions created from the library can be 
+assigned a targeted sequencing from the targeted sequencings linked to the kit descriptor. This means that if a desired
+targeted sequencing is not available for a dilution, this can be solved by linking the targeted sequencing to the kit
+descriptor of the dilution's parent library.
 
 {% include userman-toplink.md %}
 
