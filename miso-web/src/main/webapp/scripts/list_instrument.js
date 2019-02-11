@@ -46,7 +46,7 @@ ListTarget.instrument = {
             label: "Instrument Name",
             required: true
           }, {
-            property: "platform",
+            property: "instrumentModel",
             type: "select",
             values: Constants.instrumentModels.sort(function(a, b) {
               return a.platformType.localeCompare(b.platformType) || a.alias.localeCompare(b.alias);
