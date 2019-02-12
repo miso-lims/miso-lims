@@ -56,6 +56,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
@@ -65,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.IlluminaWorkflowType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
@@ -152,6 +154,11 @@ public class EditRunController {
   @ModelAttribute("platforms")
   public Collection<InstrumentModel> populatePlatforms() throws IOException {
     return platformService.list();
+  }
+
+  @ModelAttribute("illuminaWorkflowTypes")
+  public Collection<IlluminaWorkflowType> populateWorkflowTypes() {
+    return Lists.newArrayList(IlluminaWorkflowType.values());
   }
 
   public Boolean isMultiplexed(Run run) throws IOException {
