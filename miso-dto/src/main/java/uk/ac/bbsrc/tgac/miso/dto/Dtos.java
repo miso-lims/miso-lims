@@ -169,6 +169,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.IlluminaWorkflowType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -1981,6 +1982,9 @@ public class Dtos {
     to.setCallCycle(from.getCallCycle());
     to.setScoreCycle(from.getScoreCycle());
     to.setRunBasesMask(from.getRunBasesMask());
+    if (!isStringEmptyOrNull(from.getWorkflowType())) {
+      to.setWorkflowType(IlluminaWorkflowType.get(from.getWorkflowType()));
+    }
   }
 
   private static void setCommonRunValues(@Nonnull NotificationDto from, @Nonnull Run to) {

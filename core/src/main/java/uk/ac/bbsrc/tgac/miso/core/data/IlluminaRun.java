@@ -25,11 +25,14 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.IlluminaWorkflowType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
@@ -52,6 +55,8 @@ public class IlluminaRun extends Run {
   private Integer scoreCycle;
   @Column(nullable = false)
   private boolean pairedEnd = true;
+  @Enumerated(EnumType.STRING)
+  private IlluminaWorkflowType workflowType;
 
   public String getRunBasesMask() {
     return runBasesMask;
@@ -101,6 +106,14 @@ public class IlluminaRun extends Run {
   @Override
   public void setPairedEnd(boolean pairedEnd) {
     this.pairedEnd = pairedEnd;
+  }
+
+  public IlluminaWorkflowType getWorkflowType() {
+    return workflowType;
+  }
+
+  public void setWorkflowType(IlluminaWorkflowType workflowType) {
+    this.workflowType = workflowType;
   }
 
   @Override
