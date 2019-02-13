@@ -122,6 +122,11 @@ ListUtils = (function() {
     "distributedto": {
       term: "distributedto:NAME",
       help: "Checks if the item has been distributed to the specified recipient."
+    },
+    "ghost": {
+      term: "is:GHOST?",
+      help: "Match based on whether a sample is real or a ghost/synthetic sample created for hierarchy purposes. 'GHOST?' may be either "
+          + "'ghost' or 'real'. 'is:ghost' matches ghost/synthetic samples, and 'is:real' matches NON-ghost/synthetic samples."
     }
   };
 

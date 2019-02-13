@@ -430,8 +430,18 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   }
 
   @Test
+  public void testSearchByGhost() throws IOException {
+    testSearch(PaginationFilter.ghost(true));
+  }
+
+  @Test
   public void testSearchByGroupId() throws IOException {
     testSearch(PaginationFilter.groupId("ID of group"));
+  }
+
+  @Test
+  public void testSearchByReal() throws IOException {
+    testSearch(PaginationFilter.ghost(false));
   }
 
   /**

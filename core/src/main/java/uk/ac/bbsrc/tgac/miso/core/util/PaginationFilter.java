@@ -152,6 +152,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter ghost(boolean isGhost) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByGhost(item, isGhost, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter groupId(String groupId) {
     return new PaginationFilter() {
 
@@ -271,6 +281,10 @@ public abstract interface PaginationFilter {
             return health(HealthType.Running);
           case "incomplete":
             return health(EnumSet.of(HealthType.Running, HealthType.Started, HealthType.Stopped));
+          case "ghost":
+            return ghost(true);
+          case "real":
+            return ghost(false);
           default:
             errorHandler.accept("No filter for " + x);
             return null;
