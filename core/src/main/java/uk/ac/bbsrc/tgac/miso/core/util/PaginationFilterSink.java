@@ -31,6 +31,8 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByFulfilled(T item, boolean isFulfilled, Consumer<String> errorHandler);
 
+  public void restrictPaginationByGhost(T item, boolean isGhost, Consumer<String> errorHandler);
+
   public void restrictPaginationByGroupId(T item, String groupId, Consumer<String> errorHandler);
 
   public void restrictPaginationByHealth(T item, EnumSet<HealthType> healths, Consumer<String> errorHandler);

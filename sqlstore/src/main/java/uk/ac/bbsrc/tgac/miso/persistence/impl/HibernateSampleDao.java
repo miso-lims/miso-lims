@@ -217,6 +217,11 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
+  public void restrictPaginationByGhost(Criteria criteria, boolean isGhost, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("isSynthetic", isGhost));
+  }
+
+  @Override
   public long save(Sample t) throws IOException {
     if (t.getId() == SampleImpl.UNSAVED_ID) {
       return addSample(t);
