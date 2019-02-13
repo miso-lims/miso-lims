@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
@@ -33,10 +34,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -573,6 +576,9 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     validateDistributionFields(library.isDistributed(), library.getDistributionDate(), library.getDistributionRecipient(), library.getBox(),
         errors);
     validateUnboxableFields(library.isDiscarded(), library.isDistributed(), library.getBox(), errors);
+    if (isDetailedLibrary(library) && beforeChange != null) {
+      validateTargetedSequencing(((DetailedLibrary) library).getLibraryDesignCode(), beforeChange.getLibraryDilutions(), errors);
+    }
 
     if (library.getSpikeIn() != null) {
       if (library.getSpikeInDilutionFactor() == null) {
@@ -585,6 +591,24 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
+    }
+  }
+
+  private void validateTargetedSequencing(LibraryDesignCode libraryDesignCode, Collection<LibraryDilution> libraryDilutions,
+      List<ValidationError> errors) throws IOException {
+    if (libraryDilutions == null || libraryDilutions.isEmpty()) {
+      return;
+    }
+    libraryDesignCode = libraryDesignCodeService.get(libraryDesignCode.getId());
+    if (libraryDesignCode.isTargetedSequencingRequired()) {
+      List<String> badDilutions = libraryDilutions.stream().filter(dilution -> dilution.getTargetedSequencing() == null)
+          .map(LibraryDilution::getName).collect(Collectors.toList());
+      if (!badDilutions.isEmpty()) {
+        errors.add(new ValidationError("libraryDesignCode",
+            String.format("Targeted sequencing must be assigned to the affected dilutions (%s) to use this library design code: %s",
+                String.join(", ", badDilutions),
+                libraryDesignCode.getCode())));
+      }
     }
   }
 
