@@ -14,6 +14,7 @@ SELECT DISTINCT r.alias
   ,sp.readLength AS read_length
   ,sp.name AS sequencingParameters
   ,ri.runBasesMask AS runBasesMask
+  ,ri.workflowType AS workflowType
 FROM Run AS r  
 LEFT JOIN SequencingParameters AS sp ON sp.parametersId = r.sequencingParameters_parametersId 
 LEFT JOIN Run_SequencerPartitionContainer AS rscp ON rscp.Run_runId = r.runId 
