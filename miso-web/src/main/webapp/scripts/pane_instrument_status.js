@@ -103,7 +103,7 @@ PaneTarget.instrument_status = (function() {
     }
     lines.push(status + (statusDate ? (' since ' + statusDate) : ''));
 
-    return Tile.make([Tile.titleAndStatus(data.instrument.name, statusFunction()), Tile.lines(lines, false)], function() {
+    return Tile.make([Tile.titleAndStatus(data.instrument.name, statusFunction(status)), Tile.lines(lines, false)], function() {
       var links = [{
         name: "View Instrument (" + data.instrument.name + ")",
         handler: function() {
