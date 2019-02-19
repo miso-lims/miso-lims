@@ -416,6 +416,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     target.setScoreCycle(source.getScoreCycle());
     target.setPairedEnd(source.getPairedEnd());
     target.setRunBasesMask(source.getRunBasesMask());
+    target.setWorkflowType(source.getWorkflowType());
   }
 
   private void applyLS454Changes(LS454Run target, LS454Run source) {
@@ -690,6 +691,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     isMutated |= updateField(source.getScoreCycle(), target.getScoreCycle(), target::setScoreCycle);
     isMutated |= updateField(source.getPairedEnd(), target.getPairedEnd(), target::setPairedEnd);
     isMutated |= updateField(source.getRunBasesMask(), target.getRunBasesMask(), target::setRunBasesMask);
+    isMutated |= updateField(source.getWorkflowType(), target.getWorkflowType(), target::setWorkflowType);
     return isMutated;
   }
 
@@ -800,14 +802,14 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     return false;
   }
 
-  private <T> boolean updateField(T dtoValue, T modelValue, Consumer<T> writer) {
-    if (dtoValue == null) {
+  private <T> boolean updateField(T newValue, T oldValue, Consumer<T> writer) {
+    if (newValue == null) {
       return false;
     }
-    if (dtoValue.equals(modelValue)) {
+    if (newValue.equals(oldValue)) {
       return false;
     }
-    writer.accept(dtoValue);
+    writer.accept(newValue);
     return true;
   }
 

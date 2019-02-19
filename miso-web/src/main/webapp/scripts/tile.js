@@ -60,24 +60,36 @@ var Tile = {
     });
     return p;
   },
-  statusOk: function() {
+  statusOk: function(title) {
     var status = document.createElement("IMG");
     status.setAttribute("src", "/styles/images/tile-ok.svg");
+    if (title) {
+      status.setAttribute("title", title);
+    }
     return status;
   },
-  statusMaybe: function() {
+  statusMaybe: function(title) {
     var status = document.createElement("IMG");
     status.setAttribute("src", "/styles/images/tile-maybe.svg");
+    if (title) {
+      status.setAttribute("title", title);
+    }
     return status;
   },
-  statusBad: function() {
+  statusBad: function(title) {
     var status = document.createElement("IMG");
     status.setAttribute("src", "/styles/images/tile-bad.svg");
+    if (title) {
+      status.setAttribute("title", title);
+    }
     return status;
   },
-  statusBusy: function() {
+  statusBusy: function(title) {
     var status = document.createElement("IMG");
     status.setAttribute("src", "/styles/images/tile-busy.svg");
+    if (title) {
+      status.setAttribute("title", title);
+    }
     return status;
   },
   make: function(tileparts, clickHandler) {

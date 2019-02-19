@@ -169,6 +169,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.IlluminaWorkflowType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -186,9 +187,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
-import ca.on.oicr.gsi.runscanner.dto.LS454NotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
-import ca.on.oicr.gsi.runscanner.dto.SolidNotificationDto;
 
 @SuppressWarnings("squid:S3776") // make Sonar ignore cognitive complexity warnings for this file
 public class Dtos {
@@ -1961,13 +1960,6 @@ public class Dtos {
     case ILLUMINA:
       setIlluminaRunValues((IlluminaNotificationDto) from, (IlluminaRun) to);
       break;
-    case LS454:
-      to.setPairedEnd(((LS454NotificationDto) from).isPairedEndRun());
-      ((LS454Run) to).setCycles(((LS454NotificationDto) from).getCycles());
-      break;
-    case SOLID:
-      to.setPairedEnd(((SolidNotificationDto) from).isPairedEndRun());
-      break;
     default:
       throw new NotImplementedException();
     }
@@ -1981,6 +1973,9 @@ public class Dtos {
     to.setCallCycle(from.getCallCycle());
     to.setScoreCycle(from.getScoreCycle());
     to.setRunBasesMask(from.getRunBasesMask());
+    if (!isStringEmptyOrNull(from.getWorkflowType())) {
+      to.setWorkflowType(IlluminaWorkflowType.get(from.getWorkflowType()));
+    }
   }
 
   private static void setCommonRunValues(@Nonnull NotificationDto from, @Nonnull Run to) {

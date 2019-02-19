@@ -206,6 +206,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationByGhost(Criteria criteria, boolean isGhost, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no ghosts", getFriendlyName()));
+  }
+
+  @Override
   public default void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s has no health information.", getFriendlyName()));
   }

@@ -157,6 +157,10 @@
   </tr>
   <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
     <tr>
+      <td>Workflow Type:</td>
+      <td><miso:select id="workflowType" path="workflowType" items="${illuminaWorkflowTypes}" itemLabel="label" itemValue="rawValue" defaultLabel="N/A" defaultValue=""/></td>
+    </tr>
+    <tr>
       <td>Number of Cycles:</td>
       <td><form:input id="numCycles" path="numCycles" class="validateable"/></td>
     </tr>
