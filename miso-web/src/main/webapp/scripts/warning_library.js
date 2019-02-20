@@ -34,7 +34,7 @@ WarningTarget.library = {
   tableWarnings: function(data, type, library){
     var warnings = [];
     warnings = Warning.addWarnings([
-      [library.subprojectPriority, 'PRIORITY (' + library.subprojectAlias + ')'],
+      [library.subprojectPriority, '<span class="parsley-subproject-error">PRIORITY (' + library.subprojectAlias + ')</span>'],
       [parseFloat(library.volume) < 0, '(NEGATIVE VOLUME)'],
       [library.identityConsentLevel === 'Revoked', '(CONSENT REVOKED)']
       ], warnings);

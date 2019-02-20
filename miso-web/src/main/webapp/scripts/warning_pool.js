@@ -47,8 +47,10 @@ WarningTarget.pool = {
   tableWarnings: function(data, type, pool){
     var warnings = [];
     warnings = Warning.addWarnings([
-      [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0, 'PRIORITY (' 
-        + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] : 'MULTIPLE') + ')'],
+      [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0,
+        '<span class="parsley-subproject-error">PRIORITY ('
+        + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] : 'MULTIPLE')
+        + ')</span>'],
       [pool.duplicateIndices, "(DUPLICATE INDICES)"],
       [pool.nearDuplicateIndices && !pool.duplicateIndices, "(NEAR-DUPLICATE INDICES)"],
       [pool.hasEmptySequence, "(MISSING INDEX)"],
@@ -62,9 +64,10 @@ WarningTarget.pool = {
   tileWarnings: function(pool){
     var warnings = [];
     warnings = Warning.addWarnings([
-      [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0, 'PRIORITY ('
+      [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0,
+        '<span class="parsley-subproject-error">PRIORITY ('
         + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] :
-          pool.prioritySubprojectAliases.join(', ')) + ')'],
+          pool.prioritySubprojectAliases.join(', ')) + ')</span>'],
       [pool.duplicateIndices, "DUPLICATE INDICES"],
       [pool.nearDuplicateIndices && !pool.duplicateIndices, "NEAR-DUPLICATE INDICES"],
       [pool.hasEmptySequence, "MISSING INDEX"],

@@ -1825,6 +1825,10 @@ textarea.parsley-error {
 }
 
 .parsley-custom-error-message {
+  color: #FF0000;
+}
+
+.parsley-subproject-error {
   color: #0011ff;
 }
 
