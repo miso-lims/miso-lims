@@ -25,8 +25,8 @@ WarningTarget.dilution = {
     tableWarnings: function(data, type, dilution){
       var warnings = [];
       warnings = Warning.addWarnings([
-        [dilution.subprojectPriority, '<span class="parsley-subproject-error">PRIORITY (' + dilution.subprojectAlias
-            + ')</span>'],
+        [dilution.subprojectPriority, 'PRIORITY (' + dilution.subprojectAlias
+            + ')', "info"],
         [dilution.identityConsentLevel === 'Revoked', '(CONSENT REVOKED)']
         ], warnings);
       return Warning.generateTableWarnings(data, warnings);

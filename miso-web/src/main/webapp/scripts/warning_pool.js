@@ -48,9 +48,9 @@ WarningTarget.pool = {
     var warnings = [];
     warnings = Warning.addWarnings([
       [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0,
-        '<span class="parsley-subproject-error">PRIORITY ('
+        'PRIORITY ('
         + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] : 'MULTIPLE')
-        + ')</span>'],
+        + ')', "info"],
       [pool.duplicateIndices, "(DUPLICATE INDICES)"],
       [pool.nearDuplicateIndices && !pool.duplicateIndices, "(NEAR-DUPLICATE INDICES)"],
       [pool.hasEmptySequence, "(MISSING INDEX)"],
@@ -65,9 +65,9 @@ WarningTarget.pool = {
     var warnings = [];
     warnings = Warning.addWarnings([
       [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0,
-        '<span class="parsley-subproject-error">PRIORITY ('
+        'PRIORITY ('
         + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] :
-          pool.prioritySubprojectAliases.join(', ')) + ')</span>'],
+          pool.prioritySubprojectAliases.join(', ')) + ')'],
       [pool.duplicateIndices, "DUPLICATE INDICES"],
       [pool.nearDuplicateIndices && !pool.duplicateIndices, "NEAR-DUPLICATE INDICES"],
       [pool.hasEmptySequence, "MISSING INDEX"],

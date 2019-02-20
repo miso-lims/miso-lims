@@ -35,9 +35,9 @@ WarningTarget.partition = {
       var warnings = [];
       warnings = Warning.addWarnings([
         [data.prioritySubprojectAliases && data.prioritySubprojectAliases.length > 0,
-          '<span class="parsley-subproject-error">PRIORITY ('
+          'PRIORITY ('
           + (data.prioritySubprojectAliases.length == 1 ? data.prioritySubprojectAliases[0] : 'MULTIPLE')
-          + ')</span>'],
+          + ')', "info"],
         [data.duplicateIndices, "(DUPLICATE INDICES)"],
         [data.nearDuplicateIndices && !data.duplicateIndices, "(NEAR-DUPLICATE INDICES)"],
         [data.hasEmptySequence, "(MISSING INDEX)"],

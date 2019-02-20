@@ -33,7 +33,7 @@ WarningTarget.sample = {
     tableWarnings: function(data, type, sample){
       var warnings = [];
       warnings = Warning.addWarnings([
-        [sample.subprojectPriority, '<span class="parsley-subproject-error">PRIORITY (' + sample.subprojectAlias + ')</span>'],
+        [sample.subprojectPriority, 'PRIORITY (' + sample.subprojectAlias + ')', "info"],
         [sample.identityConsentLevel === 'Revoked', '(CONSENT REVOKED)'],
         ], warnings);
       return Warning.generateTableWarnings(data, warnings);
