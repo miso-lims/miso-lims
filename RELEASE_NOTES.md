@@ -1,3 +1,9 @@
+# 0.2.165
+
+Changes:
+
+ * Logging bug fix
+
 # 0.2.164
 
 Changes:
