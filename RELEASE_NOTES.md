@@ -8,6 +8,8 @@ Changes:
  * Store NovaSeq workflow type
  * User manual: link kits & targeted sequencing 
  * Fix bugs with saving Sequencers and Dilutions
+ 
+ BAD: Dropped dependency in Run Scanner disabled logging.
 
 # 0.2.163
 
