@@ -4,12 +4,10 @@ Changes:
 
  * Added titles to instrument status icons
  * Added search filter for ghost/real samples
- * Added MiSeq chemistries
  * Adjustments to JTT7 label layouts
  * Store NovaSeq workflow type
- * In default setup, commented out runscanner URLs
  * User manual: link kits & targeted sequencing 
- * Updated add reference genome procedure with default scientific name
+ * Fix bugs with saving Sequencers and Dilutions
 
 # 0.2.163
 
