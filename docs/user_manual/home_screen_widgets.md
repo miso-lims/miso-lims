@@ -9,10 +9,11 @@ section: 26
 {% include userman-heading.md section=page.section sub=sub title="Search" %}
 
 The Search widget can be used to quickly find an item in MISO. This includes samples, libraries, library dilutions,
-pools, sequencing containers, and boxes. You can search for an item by its name, alias, or barcode. Scanning an
-item's barcode using a barcode scanner also works. The search returns exact matches only, so must enter the entire
-name, alias, or barcode to find what you are looking for. Press the Enter key to run the search. Your search results
-will appear in the widget and you can click on a result tile to go to the Edit page for that item.
+pools, sequencing containers, and boxes. Note that there are separate search widgets for projects and runs, detailed
+below. You can search for an item by its name, alias, or barcode. Scanning an item's barcode using a barcode scanner
+also works. The search returns exact matches only, so you must enter the entire name, alias, or barcode to find what
+you are looking for. Press the Enter key to run the search. The search results will appear in the widget and you can
+click on a result tile to go to the Edit page for that item.
 
 {% include userman-toplink.md %}
 
@@ -34,7 +35,7 @@ following.
 * **Busy**: All of the sequencer's positions are active
 * **Out of Service**: All of the sequencer's positions are out of service
 
-CLicking on a tile in the Instrument Status widget will open a menu where you can choose to view the instrument, one of
+Clicking on a tile in the Instrument Status widget will open a menu where you can choose to view the instrument, one of
 the latest runs, or one of the pools from one of the latest runs. Click an option in this menu to go to the Edit page
 for the selected item.
 
