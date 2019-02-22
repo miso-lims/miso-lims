@@ -26,7 +26,6 @@ import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
@@ -184,7 +183,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
       throw new IllegalStateException("Cannot find “other” study type.");
     }
     for (Project project : projects) {
-      project.setSecurityProfile(new SecurityProfile(migrationUser));
       valueTypeLookup.resolveAll(project);
       Project existing = serviceManager.getProjectDao().getByShortName(project.getShortName());
       if (existing != null) {
@@ -205,7 +203,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
         for (Study study : project.getStudies()) {
           study.setProject(project);
-          study.inheritPermissions(project);
           study.setId(serviceManager.getStudyService().save(study));
         }
       }
@@ -252,7 +249,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
       }
     }
     log.debug("Saving sample " + sample.getAlias());
-    sample.inheritPermissions(sample.getProject());
     valueTypeLookup.resolveAll(sample);
 
     Collection<SampleQC> qcs = new TreeSet<>(sample.getQCs());
@@ -454,7 +450,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
     if (library.getSample() == null || library.getSample().getId() == AbstractSample.UNSAVED_ID) {
       throw new IOException("Library does not have a parent sample set");
     }
-    library.inheritPermissions(library.getSample().getProject());
     valueTypeLookup.resolveAll(library);
     library.setLastModifier(migrationUser);
     Collection<LibraryQC> qcs = new TreeSet<>(library.getQCs());

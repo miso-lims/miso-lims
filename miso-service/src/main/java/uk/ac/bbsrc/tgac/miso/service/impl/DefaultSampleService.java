@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -61,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.TissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
@@ -77,11 +79,10 @@ import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultSampleService implements SampleService, AuthorizedPaginatedDataSource<Sample> {
+public class DefaultSampleService implements SampleService, PaginatedDataSource<Sample> {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
@@ -235,15 +236,12 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   @Override
   public Sample get(long sampleId) throws IOException {
-    Sample sample = sampleStore.getSample(sampleId);
-    authorizationManager.throwIfNotReadable(sample);
-    return sample;
+    return sampleStore.getSample(sampleId);
   }
 
   @Override
   public Long create(Sample sample) throws IOException {
     loadChildEntities(sample);
-    authorizationManager.throwIfNotWritable(sample);
     boxService.throwIfBoxPositionIsFilled(sample);
     sample.setChangeDetails(authorizationManager.getCurrentUser());
     if (isDetailedSample(sample)) {
@@ -274,9 +272,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
               + "' already exists in project " + sample.getProject().getShortName());
         }
       }
-      detailed.inheritPermissions(detailed.getParent() == null ? detailed.getProject() : detailed.getParent());
-    } else {
-      sample.inheritPermissions(sample.getProject());
     }
 
     // pre-save field generation
@@ -596,7 +591,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     identitySample.setAlias(namingScheme.generateSampleAlias(identitySample));
 
     identitySample.setChangeDetails(authorizationManager.getCurrentUser());
-    identitySample.inheritPermissions(sample.getProject());
     return (SampleIdentity) save(identitySample, true);
   }
 
@@ -673,7 +667,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     Sample managed = get(sample.getId());
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     boolean validateAliasUniqueness = !managed.getAlias().equals(sample.getAlias());
-    authorizationManager.throwIfNotWritable(managed);
     maybeRemoveFromBox(sample);
     boxService.throwIfBoxPositionIsFilled(sample);
     validateChange(sample, managed);
@@ -856,8 +849,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   @Override
   public List<Sample> list() throws IOException {
-    Collection<Sample> allSamples = sampleStore.list();
-    return authorizationManager.filterUnreadable(allSamples);
+    return sampleStore.list();
   }
 
   @Override
@@ -867,17 +859,12 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   @Override
   public Collection<Sample> listByProjectId(long projectId) throws IOException {
-    Collection<Sample> samples = sampleStore.listByProjectId(projectId);
-    return authorizationManager.filterUnreadable(samples);
+    return sampleStore.listByProjectId(projectId);
   }
 
   @Override
   public Collection<Sample> listByIdList(List<Long> idList) throws IOException {
-    Collection<Sample> samples = sampleStore.getByIdList(idList);
-    for (Sample sample : samples) {
-      authorizationManager.throwIfNotReadable(sample);
-    }
-    return samples;
+    return sampleStore.getByIdList(idList);
   }
 
   @Override
@@ -894,14 +881,12 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   @Override
   public Sample getByBarcode(String barcode) throws IOException {
-    Sample sample = sampleStore.getByBarcode(barcode);
-    return (authorizationManager.readCheck(sample) ? sample : null);
+    return sampleStore.getByBarcode(barcode);
   }
 
   @Override
   public void addNote(Sample sample, Note note) throws IOException {
     Sample managed = sampleStore.get(sample.getId());
-    authorizationManager.throwIfNotWritable(managed);
     note.setCreationDate(new Date());
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
@@ -914,7 +899,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       throw new IllegalArgumentException("Cannot delete an unsaved Note");
     }
     Sample managed = sampleStore.get(sample.getId());
-    authorizationManager.throwIfNotWritable(managed);
     Note deleteNote = null;
     for (Note note : managed.getNotes()) {
       if (note.getNoteId().equals(noteId)) {
@@ -940,11 +924,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     return ValidationUtils.adjustNameLength(
         ValidationUtils.adjustLength(sampleStore.getSampleColumnSizes(), "alias", namingScheme.sampleAliasLengthAdjustment()),
         namingScheme);
-  }
-
-  @Override
-  public PaginatedDataSource<Sample> getBackingPaginationSource() {
-    return sampleStore;
   }
 
   @Override
@@ -1002,6 +981,17 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       update(sample);
       return get(sample.getId());
     }
+  }
+
+  @Override
+  public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
+    return sampleStore.count(errorHandler, filter);
+  }
+
+  @Override
+  public List<Sample> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter) throws IOException {
+    return sampleStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
 }

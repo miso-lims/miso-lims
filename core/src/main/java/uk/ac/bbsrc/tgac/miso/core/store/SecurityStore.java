@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 public interface SecurityStore {
@@ -35,8 +34,6 @@ public interface SecurityStore {
   public Collection<Group> listAllGroups() throws IOException;
 
   public Collection<Group> listGroupsByIds(Collection<Long> groupIds) throws IOException;
-
-  public SecurityProfile getSecurityProfileById(Long profileId) throws IOException;
 
   /**
    * @return a map containing all column names and max lengths from the User table

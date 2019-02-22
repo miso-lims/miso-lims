@@ -12,7 +12,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderCompletionDao;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderCompletionService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -20,9 +19,6 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 public class DefaultPoolOrderCompletionService implements PoolOrderCompletionService {
   @Autowired
   private PoolOrderCompletionDao poolOrderCompletionDao;
-
-  @Autowired
-  private AuthorizationManager authorizationManager;
 
   @Override
   public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
@@ -33,13 +29,11 @@ public class DefaultPoolOrderCompletionService implements PoolOrderCompletionSer
   public List<PoolOrderCompletion> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
       PaginationFilter... filter)
       throws IOException {
-    return authorizationManager.filterUnreadable(poolOrderCompletionDao.list(errorHandler, offset, limit, sortDir, sortCol, filter),
-        x -> x.getPool());
+    return poolOrderCompletionDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
   @Override
   public List<PoolOrderCompletion> getByPoolId(Long poolId) throws IOException {
-    return authorizationManager.filterUnreadable(poolOrderCompletionDao.list(0, 100, false, "remaining", PaginationFilter.pool(poolId)),
-        x -> x.getPool());
+    return poolOrderCompletionDao.list(0, 100, false, "remaining", PaginationFilter.pool(poolId));
   }
 }

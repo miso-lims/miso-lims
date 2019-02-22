@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -107,7 +106,7 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
 
   @SuppressWarnings("unchecked")
   @Override
-  public Collection<Kit> listAll() throws IOException {
+  public List<Kit> listAll() throws IOException {
     return currentSession().createCriteria(KitImpl.class).list();
   }
 

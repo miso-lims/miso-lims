@@ -3,8 +3,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
@@ -14,10 +12,6 @@ public class IonTorrentRun extends Run {
 
   public IonTorrentRun() {
     super();
-  }
-
-  public IonTorrentRun(User user) {
-    super(user);
   }
 
   @Override

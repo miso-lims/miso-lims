@@ -51,23 +51,18 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
-import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ExternalUriBuilder;
 
 @Controller
@@ -76,10 +71,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.context.ExternalUriBuilder;
 public class EditProjectController {
   private static final Logger log = LoggerFactory.getLogger(EditProjectController.class);
 
-  @Autowired
-  private AuthorizationManager authorizationManager;
-  @Autowired
-  private SecurityManager securityManager;
   @Autowired
   private ProjectService projectService;
   @Autowired
@@ -123,10 +114,9 @@ public class EditProjectController {
   @GetMapping("/{projectId}")
   public ModelAndView setupForm(@PathVariable Long projectId, ModelMap model) throws IOException {
     List<Issue> issues = Collections.emptyList();
-    User user = authorizationManager.getCurrentUser();
     Project project = null;
     if (projectId == ProjectImpl.UNSAVED_ID) {
-      project = new ProjectImpl(user);
+      project = new ProjectImpl();
       model.put("title", "New Project");
     } else {
       project = projectService.get(projectId);
@@ -152,9 +142,6 @@ public class EditProjectController {
     model.put("targetedSequencing", targetedSequencingList);
     model.put("formObj", project);
     model.put("project", project);
-    model.put("owners", LimsSecurityUtils.getPotentialOwners(user, project, securityManager.listAllUsers()));
-    model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, project, securityManager.listAllUsers()));
-    model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, project, securityManager.listAllGroups()));
 
     return new ModelAndView("/pages/editProject.jsp", model);
   }

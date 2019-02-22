@@ -46,7 +46,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
@@ -61,7 +60,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.DilutionBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -76,7 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @Entity
 @Table(name = "LibraryDilution")
 public class LibraryDilution extends AbstractBoxable
-    implements SecurableByProfile, Barcodable, Comparable<LibraryDilution>, Nameable, Boxable, Deletable, Serializable, Timestamped {
+    implements Barcodable, Comparable<LibraryDilution>, Nameable, Boxable, Deletable, Serializable, Timestamped {
 
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
@@ -110,9 +108,6 @@ public class LibraryDilution extends AbstractBoxable
   @ManyToOne(targetEntity = LibraryImpl.class)
   @JoinColumn(name = "library_libraryId")
   private Library library;
-
-  @ManyToOne
-  private SecurityProfile securityProfile;
 
   @ManyToOne
   @JoinColumn(name = "targetedSequencingId")
@@ -258,16 +253,6 @@ public class LibraryDilution extends AbstractBoxable
   @CoverageIgnore
   public String getLabelText() {
     return getLibrary().getAlias();
-  }
-
-  @Override
-  public SecurityProfile getSecurityProfile() {
-    return securityProfile;
-  }
-
-  @Override
-  public void setSecurityProfile(SecurityProfile profile) {
-    this.securityProfile = profile;
   }
 
   @Override
@@ -442,11 +427,6 @@ public class LibraryDilution extends AbstractBoxable
   @Override
   public String getDeleteDescription() {
     return getName() + (getLibrary() == null || getLibrary().getAlias() == null ? "" : " (" + getLibrary().getAlias() + ")");
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    return getSecurityProfile();
   }
 
   public Double getNgUsed() {

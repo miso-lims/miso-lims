@@ -14,7 +14,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -175,10 +174,5 @@ public class SubprojectImpl implements Subproject {
         + " - "
         + getAlias()
         + (getAlias().equals(getDescription()) ? "" : " (" + getDescription() + ")");
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    return null;
   }
 }

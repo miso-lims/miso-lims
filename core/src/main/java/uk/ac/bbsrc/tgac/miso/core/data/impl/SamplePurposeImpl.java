@@ -14,7 +14,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
@@ -121,11 +120,6 @@ public class SamplePurposeImpl implements SamplePurpose {
   @Override
   public String getDeleteDescription() {
     return getAlias();
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    return null;
   }
 
   @Override

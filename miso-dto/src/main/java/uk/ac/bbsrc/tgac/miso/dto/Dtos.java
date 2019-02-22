@@ -59,7 +59,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
@@ -1950,8 +1949,8 @@ public class Dtos {
     return dto;
   }
 
-  public static Run to(@Nonnull NotificationDto from, User user) {
-    final Run to = getMisoPlatformTypeFromRunscanner(from.getPlatformType()).createRun(user);
+  public static Run to(@Nonnull NotificationDto from) {
+    final Run to = getMisoPlatformTypeFromRunscanner(from.getPlatformType()).createRun();
     setCommonRunValues(from, to);
 
     switch (to.getPlatformType()) {
@@ -2306,7 +2305,7 @@ public class Dtos {
   }
 
   public static Run to(@Nonnull RunDto dto) {
-    Run to = PlatformType.get(dto.getPlatformType()).createRun(null);
+    Run to = PlatformType.get(dto.getPlatformType()).createRun();
     to.setId(dto.getId());
     return to;
   }

@@ -13,12 +13,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
@@ -157,7 +155,6 @@ public class HibernateStudyDaoTest extends AbstractDAOTest {
   }
 
   private Study makeStudy() {
-    SecurityProfile profile = Mockito.mock(SecurityProfile.class);
     User user = new UserImpl();
     user.setUserId(1L);
     Project project = new ProjectImpl();
@@ -165,11 +162,9 @@ public class HibernateStudyDaoTest extends AbstractDAOTest {
     StudyType studyType = new StudyType();
     studyType.setId(1L);
     Study s = new StudyImpl();
-    s.setSecurityProfile(project.getSecurityProfile());
     s.setName("STU999");
     s.setStudyType(studyType);
     s.setDescription("foo");
-    s.setSecurityProfile(profile);
     s.setProject(project);
     s.setChangeDetails(user);
     return s;

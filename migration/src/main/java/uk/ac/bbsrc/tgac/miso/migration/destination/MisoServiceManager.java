@@ -45,7 +45,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleValidRelationshipDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityProfileDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerPartitionContainerDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStudyDao;
@@ -100,7 +99,6 @@ public class MisoServiceManager {
   private MigrationAuthorizationManager authorizationManager;
 
   private HibernateSecurityDao securityStore;
-  private HibernateSecurityProfileDao securityProfileDao;
   private HibernateProjectDao projectDao;
   private HibernateChangeLogDao changeLogDao;
   private HibernateSampleQcDao sampleQcDao;
@@ -233,7 +231,6 @@ public class MisoServiceManager {
     m.setDefaultSampleValidRelationshipDao();
     m.setDefaultSampleValidRelationshipService();
     m.setDefaultSecurityManager();
-    m.setDefaultSecurityProfileDao();
     m.setDefaultSecurityStore();
     m.setDefaultSequencerPartitionContainerDao();
     m.setDefaultInstrumentDao();
@@ -350,12 +347,9 @@ public class MisoServiceManager {
   public void setDefaultProjectService() {
     DefaultProjectService projectService = new DefaultProjectService();
     // Set stores for entities which need names generated before creation and can't be saved via services.
-    projectService.setAuthorizationManager(authorizationManager);
     projectService.setProjectStore(projectDao);
     projectService.setNamingScheme(getNamingScheme());
-    projectService.setSecurityProfileStore(securityProfileDao);
     projectService.setReferenceGenomeDao(referenceGenomeDao);
-    projectService.setSecurityManager(securityManager);
     setProjectService(projectService);
   }
 
@@ -379,30 +373,6 @@ public class MisoServiceManager {
     if (securityManager != null) securityManager.setSecurityStore(securityStore);
     if (poolDao != null) poolDao.setSecurityStore(securityStore);
     if (projectDao != null) projectDao.setSecurityStore(securityStore);
-    if (experimentService != null) experimentService.setSecurityStore(securityStore);
-  }
-
-  public HibernateSecurityProfileDao getSecurityProfileDao() {
-    return securityProfileDao;
-  }
-
-  public void setSecurityProfileDao(HibernateSecurityProfileDao securityProfileDao) {
-    this.securityProfileDao = securityProfileDao;
-    updateSecurityProfileDaoDependencies();
-  }
-
-  public void setDefaultSecurityProfileDao() {
-    HibernateSecurityProfileDao store = new HibernateSecurityProfileDao();
-    store.setSessionFactory(sessionFactory);
-    setSecurityProfileDao(store);
-  }
-
-  private void updateSecurityProfileDaoDependencies() {
-    if (projectService != null) projectService.setSecurityProfileStore(securityProfileDao);
-    if (runService != null) runService.setSecurityProfileStore(securityProfileDao);
-    if (containerService != null) containerService.setSecurityProfileDao(securityProfileDao);
-    if (experimentService != null) experimentService.setSecurityProfileStore(securityProfileDao);
-    if (boxService != null) boxService.setSecurityProfileStore(securityProfileDao);
   }
 
   public LocalSecurityManager getSecurityManager() {
@@ -421,8 +391,6 @@ public class MisoServiceManager {
   }
 
   private void updateSecurityManagerDependencies() {
-    if (projectService != null) projectService.setSecurityManager(securityManager);
-    if (libraryService != null) libraryService.setSecurityManager(securityManager);
     if (runService != null) runService.setSecurityManager(securityManager);
   }
 
@@ -622,7 +590,6 @@ public class MisoServiceManager {
     svc.setIndexService(indexService);
     svc.setKitService(kitService);
     svc.setSampleService(sampleService);
-    svc.setSecurityManager(securityManager);
     svc.setChangeLogService(changeLogService);
     setLibraryService(svc);
   }
@@ -1364,7 +1331,6 @@ public class MisoServiceManager {
     service.setRunDao(runDao);
     service.setSecurityManager(securityManager);
     service.setNamingScheme(getNamingScheme());
-    service.setSecurityProfileStore(securityProfileDao);
     service.setContainerService(containerService);
     service.setInstrumentService(instrumentService);
     service.setSequencingParametersService(sequencingParametersService);
@@ -1389,7 +1355,6 @@ public class MisoServiceManager {
     service.setAuthorizationManager(authorizationManager);
     service.setContainerDao(sequencerPartitionContainerDao);
     service.setPoolService(poolService);
-    service.setSecurityProfileDao(securityProfileDao);
     setContainerService(service);
   }
 
@@ -1634,8 +1599,6 @@ public class MisoServiceManager {
     service.setNamingScheme(getNamingScheme());
     service.setPlatformService(platformService);
     service.setLibraryService(libraryService);
-    service.setSecurityStore(securityStore);
-    service.setSecurityProfileStore(securityProfileDao);
     service.setStudyService(studyService);
     setExperimentService(service);
   }
@@ -1650,7 +1613,6 @@ public class MisoServiceManager {
     service.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
     service.setChangeLogService(changeLogService);
     service.setNamingScheme(namingScheme);
-    service.setSecurityProfileStore(securityProfileDao);
     setBoxService(service);
   }
 

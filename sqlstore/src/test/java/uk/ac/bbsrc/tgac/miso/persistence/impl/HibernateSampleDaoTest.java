@@ -13,12 +13,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
@@ -41,7 +38,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateSampleDaoTest extends AbstractDAOTest {
 
-  private static final Logger log = LoggerFactory.getLogger(HibernateSampleDaoTest.class);
   @Rule
   public final ExpectedException exception = ExpectedException.none();
 
@@ -69,11 +65,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
 
   @Test
   public void testSaveNew() throws Exception {
-    SecurityProfile profile = new SecurityProfile();
-    profile.setProfileId(1L);
-
     Sample sample = new SampleImpl();
-    sample.setSecurityProfile(profile);
     String sampleName = "latestSample32";
     sample.setName(sampleName);
     sample.setAlias("alias32LK");
@@ -98,10 +90,6 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   public void testSaveExisting() throws Exception {
 
     Sample sample = dao.get(8);
-
-    SecurityProfile profile = new SecurityProfile();
-    profile.setProfileId(1L);
-    sample.setSecurityProfile(profile);
 
     Project project = new ProjectImpl();
     project.setId(2L);

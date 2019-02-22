@@ -197,7 +197,7 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
 
   @Test
   public void testSave() throws Exception {
-    Box box = new BoxImpl(new UserImpl());
+    Box box = new BoxImpl();
     UserImpl user = new UserImpl();
     user.setId(1l);
     Date now = new Date();
@@ -231,7 +231,7 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   @Test
   public void testGetBoxColumnSizes() throws Exception {
     Map<String, Integer> boxColumnSizes = dao.getBoxColumnSizes();
-    assertEquals(14, boxColumnSizes.size());
+    assertEquals(13, boxColumnSizes.size());
   }
 
   @Test

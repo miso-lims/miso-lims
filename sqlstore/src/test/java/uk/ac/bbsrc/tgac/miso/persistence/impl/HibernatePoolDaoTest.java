@@ -22,7 +22,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
@@ -46,7 +45,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     assertEquals(expected.getName(), actual.getName());
     assertEquals(expected.getIdentificationBarcode(), actual.getIdentificationBarcode());
     assertEquals(0, (expected.getCreationTime().getTime() - actual.getCreationTime().getTime()) / 84600000);
-    assertEquals(expected.getSecurityProfile().getProfileId(), actual.getSecurityProfile().getProfileId());
     assertEquals(expected.getPlatformType(), actual.getPlatformType());
     assertEquals(expected.getAlias(), actual.getAlias());
     assertEquals(expected.getLastModifier().getUserId(), actual.getLastModifier().getUserId());
@@ -61,13 +59,10 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     assertEquals(expected.getNotes().size(), actual.getNotes().size());
   }
 
-  final SecurityProfile mockSecurityProfile = new SecurityProfile();
-
   private PoolImpl getATestPool(int counter, Date creationDate, boolean discarded, int notes) {
     final PoolImpl rtn = new PoolImpl();
     final User mockUser = new UserImpl();
 
-    mockSecurityProfile.setProfileId(1L);
     mockUser.setUserId(1L);
     mockUser.setLoginName("franklin");
 
@@ -76,7 +71,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     rtn.setIdentificationBarcode("BOOP" + counter);
     rtn.setCreationTime(creationDate);
     rtn.setLastModified(creationDate);
-    rtn.setSecurityProfile(mockSecurityProfile);
     rtn.setPlatformType(PlatformType.ILLUMINA);
     rtn.setAlias("Alias " + counter);
     rtn.setLastModifier(mockUser);

@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -45,7 +44,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
@@ -53,8 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
-import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
@@ -135,29 +131,17 @@ public class EditStudyController {
   @GetMapping(value = "/new")
   public ModelAndView newStudy(ModelMap model) throws IOException {
     User user = authorizationManager.getCurrentUser();
-    Study study = new StudyImpl(user);
+    Study study = new StudyImpl();
 
-    authorizationManager.throwIfNotWritable(study);
     return setupForm(study, user, "New Study", model);
   }
 
   @GetMapping(value = "/new/{projectId}")
   public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     User user = authorizationManager.getCurrentUser();
-    Study study = new StudyImpl(user);
+    Study study = new StudyImpl();
     Project project = projectService.get(projectId);
     study.setProject(project);
-
-    if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
-      SecurityProfile sp = new SecurityProfile(user);
-      LimsUtils.inheritUsersAndGroups(study, project.getSecurityProfile());
-      sp.setOwner(user);
-      study.setSecurityProfile(sp);
-    } else {
-      study.inheritPermissions(project);
-    }
-
-    authorizationManager.throwIfNotWritable(study);
     return setupForm(study, user, "New Study", model);
   }
 
@@ -174,9 +158,6 @@ public class EditStudyController {
     model.put("title", title);
     model.put("formObj", study);
     model.put("study", study);
-    model.put("owners", LimsSecurityUtils.getPotentialOwners(user, study, securityManager.listAllUsers()));
-    model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, study, securityManager.listAllUsers()));
-    model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, study, securityManager.listAllGroups()));
     model.put("experiments", study.getExperiments().stream().map(Dtos::asDto).collect(Collectors.toList()));
     return new ModelAndView("/pages/editStudy.jsp", model);
   }

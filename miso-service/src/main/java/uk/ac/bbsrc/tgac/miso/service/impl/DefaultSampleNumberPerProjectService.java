@@ -87,7 +87,6 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
 
   @Override
   public SampleNumberPerProject getByProject(Project project) throws IOException {
-    authorizationManager.throwIfNotReadable(project);
     return sampleNumberPerProjectDao.getByProject(project);
   }
 

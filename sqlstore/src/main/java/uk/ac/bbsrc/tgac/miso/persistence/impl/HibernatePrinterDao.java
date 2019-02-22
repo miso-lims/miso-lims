@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -96,7 +95,7 @@ public class HibernatePrinterDao implements PrinterStore, HibernatePaginatedData
   }
 
   @Override
-  public Collection<Printer> listAll() throws IOException {
+  public List<Printer> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(Printer.class);
     @SuppressWarnings("unchecked")
     List<Printer> results = criteria.list();

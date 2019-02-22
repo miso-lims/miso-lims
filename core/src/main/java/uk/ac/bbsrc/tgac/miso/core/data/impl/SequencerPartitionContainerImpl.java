@@ -48,7 +48,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
@@ -92,10 +91,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @OneToMany(mappedBy = "container")
   private Set<RunPosition> runPositions;
 
-  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "securityProfile_profileId")
-  private SecurityProfile securityProfile;
-
   @OneToMany(targetEntity = SequencerPartitionContainerChangeLog.class, mappedBy = "sequencerPartitionContainer", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
@@ -138,20 +133,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
    * Construct a new SequencerPartitionContainer with a default empty SecurityProfile
    */
   public SequencerPartitionContainerImpl() {
-    this(new SecurityProfile());
-  }
-
-  /**
-   * Construct a new SequencerPartitionContainer with a SecurityProfile owned by the given User
-   * 
-   * @param user of type User
-   */
-  public SequencerPartitionContainerImpl(User user) {
-    this(new SecurityProfile(user));
-  }
-
-  private SequencerPartitionContainerImpl(SecurityProfile securityProfile) {
-    setSecurityProfile(securityProfile);
     setPartitionLimit(DEFAULT_PARTITION_LIMIT);
   }
 
@@ -253,16 +234,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
     return getRunPositions().stream().map(RunPosition::getRun).filter(r -> r.getStartDate() != null)
         .max((a, b) -> a.getStartDate().compareTo(b.getStartDate()))
         .orElse(null);
-  }
-
-  @Override
-  public void setSecurityProfile(SecurityProfile securityProfile) {
-    this.securityProfile = securityProfile;
-  }
-
-  @Override
-  public SecurityProfile getSecurityProfile() {
-    return securityProfile;
   }
 
   @Override
@@ -428,11 +399,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @Override
   public String getDeleteDescription() {
     return getIdentificationBarcode() + " (" + getModel().getAlias() + ")";
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    return getSecurityProfile();
   }
 
 }

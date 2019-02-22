@@ -24,7 +24,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -103,7 +102,7 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
 
   @SuppressWarnings("unchecked")
   @Override
-  public Collection<Instrument> listAll() throws IOException {
+  public List<Instrument> listAll() throws IOException {
     return currentSession().createCriteria(InstrumentImpl.class).list();
   }
 

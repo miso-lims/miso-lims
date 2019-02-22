@@ -162,7 +162,7 @@ public class HibernateExperimentDao implements ExperimentStore {
   }
 
   @Override
-  public Collection<Experiment> listByRun(long runId) throws IOException {
+  public List<Experiment> listByRun(long runId) throws IOException {
     Criteria idCriteria = currentSession().createCriteria(Experiment.class);
     idCriteria.createCriteria("runPartitions").createAlias("run", "run").add(Restrictions.eq("run.id", runId));
     idCriteria.setProjection(Projections.distinct(Projections.property("id")));

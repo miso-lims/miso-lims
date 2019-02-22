@@ -16,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
@@ -227,7 +226,6 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
   public void testSaveEdit() throws IOException {
     final LibraryDilution oldLd = dao.get(1L);
     oldLd.setConcentration(1.23D);
-    oldLd.setSecurityProfile(new SecurityProfile());
     final Library lib = new LibraryImpl();
     lib.setId(1L);
     oldLd.setLibrary(lib);

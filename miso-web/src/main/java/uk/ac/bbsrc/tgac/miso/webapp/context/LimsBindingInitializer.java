@@ -47,7 +47,6 @@ import org.springframework.web.bind.support.WebBindingInitializer;
 import org.springframework.web.context.request.WebRequest;
 
 import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
@@ -374,7 +373,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       public User resolveById(long id) throws Exception {
         return securityManager.getUserById(id);
       }
-    }.register(binder, "securityProfile.owner").register(binder, Set.class, "users");
+    }.register(binder, Set.class, "users");
 
     new BindingConverterByPrefixedId<Project>(Project.class, Project.PREFIX) {
       @Override
@@ -526,14 +525,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       public Instrument resolveById(long id) throws Exception {
         return instrumentService.get(id);
       }
-    }.register(binder);
-
-    new BindingConverterById<SecurityProfile>(SecurityProfile.class) {
-      @Override
-      public SecurityProfile resolveById(long id) throws Exception {
-        return securityManager.getSecurityProfileById(id);
-      }
-
     }.register(binder);
 
     new BindingConverterById<Kit>(Kit.class) {

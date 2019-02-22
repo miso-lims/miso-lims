@@ -210,8 +210,7 @@ public class DefaultArrayService implements ArrayService {
 
   @Override
   public List<Sample> getArrayableSamplesBySearch(String search) throws IOException {
-    List<Sample> samples = arrayStore.getArrayableSamplesBySearch(search);
-    return authorizationManager.filterUnreadable(samples);
+    return arrayStore.getArrayableSamplesBySearch(search);
   }
 
   @Override
