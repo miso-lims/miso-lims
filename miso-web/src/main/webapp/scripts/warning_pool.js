@@ -67,7 +67,7 @@ WarningTarget.pool = {
       [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0,
         'PRIORITY ('
         + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] :
-          pool.prioritySubprojectAliases.join(', ')) + ')'],
+          pool.prioritySubprojectAliases.join(', ')) + ')', "info"],
       [pool.duplicateIndices, "DUPLICATE INDICES"],
       [pool.nearDuplicateIndices && !pool.duplicateIndices, "NEAR-DUPLICATE INDICES"],
       [pool.hasEmptySequence, "MISSING INDEX"],
