@@ -167,7 +167,6 @@ public class SampleIdentityImpl extends DetailedSampleImpl implements SampleIden
       i.setExternalName(externalName);
       i.setDonorSex(donorSex);
       i.setConsentLevel(consentLevel);
-      i.inheritPermissions(project);
 
       return i;
     }

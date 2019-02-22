@@ -8,14 +8,6 @@ INSERT INTO `_Group` (description, name) VALUES
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (3,1),(3,2),(1,1);
 
-INSERT INTO `SecurityProfile`(`profileId`, `allowAllInternal`, `owner_userId`) 
-VALUES (1,1,1),(2,1,1),(3,1,1),(4,1,1),(5,1,1),(6,1,1),(7,1,1),(8,1,1),(9,1,1),(10,1,1),(11,1,1),(12,1,NULL),(13,1,NULL),(14,1,NULL),(15,1,NULL);
-
-INSERT INTO SecurityProfile_ReadUser(SecurityProfile_profileId, readUser_userId) VALUES (1, 1);
-INSERT INTO SecurityProfile_WriteUser(SecurityProfile_profileId, writeUser_userId) VALUES (2, 1);
-INSERT INTO SecurityProfile_ReadGroup(SecurityProfile_profileId, readGroup_groupId) VALUES (3, 2);
-INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_groupId) VALUES (4, 2);
-
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Triticum aestivum');
 
 INSERT INTO QCType (name, description, qcTarget, units, archived, precisionAfterDecimal) VALUES
@@ -131,31 +123,31 @@ INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLen
 INSERT INTO Instrument (instrumentId, name, instrumentModelId) VALUES
   (1, 'T2500', 1);
 
-INSERT INTO Project(projectId, name, alias, shortName, creationDate, description, securityProfile_profileId,
+INSERT INTO Project(projectId, name, alias, shortName, creationDate, description,
   progress, referenceGenomeId, lastUpdated) VALUES
-  (1, 'PRO1', 'PLAIN', NULL, '2017-06-27', 'integration test project one', 1, 'ACTIVE', 1, '2017-06-27 14:11:00');
+  (1, 'PRO1', 'PLAIN', NULL, '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00');
   
-INSERT INTO Study (studyId, name, securityProfile_profileId, project_projectId, alias, studyTypeId, creator, created, lastModifier, lastModified) VALUES
-(1, 'STU1', 1, 1, 'PLAIN Study One', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
+INSERT INTO Study (studyId, name, project_projectId, alias, studyTypeId, creator, created, lastModifier, lastModified) VALUES
+(1, 'STU1',  1, 'PLAIN Study One', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
-INSERT INTO Sample (sampleId, name, alias, description, securityProfile_profileId, identificationBarcode, sampleType, receivedDate, project_projectId,
+INSERT INTO Sample (sampleId, name, alias, description, identificationBarcode, sampleType, receivedDate, project_projectId,
 scientificName, volume, qcPassed, lastModifier, creator, created, lastModified) VALUES
-(1, 'SAM1', 'PLAIN_S0001_1', 'Plain', 2, 'SAM1::PLAIN_S0001_first', 'GENOMIC', '2017-07-20', 1, 'Triticum aestivum', NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00');
+(1, 'SAM1', 'PLAIN_S0001_1', 'Plain', 'SAM1::PLAIN_S0001_first', 'GENOMIC', '2017-07-20', 1, 'Triticum aestivum', NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00');
 
-INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, securityProfile_profileId, sample_sampleId, platformType,
+INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
   volume, volumeUnits, concentration, concentrationUnits, locationBarcode, kitDescriptorId) VALUES
-  (1, 'LIB1', 'PLAIN_L0001-1_1', 'LIB1::PLAIN_L0001-1_1', 'plain lib', 2, 1, 'ILLUMINA', 1, 3, 1,  '2016-11-07', 
+  (1, 'LIB1', 'PLAIN_L0001-1_1', 'LIB1::PLAIN_L0001-1_1', 'plain lib', 1, 'ILLUMINA', 1, 3, 1,  '2016-11-07', 
     1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, 300, 5.0, 'MICROLITRES', 2.75, 'NANOGRAMS_PER_MICROLITRE', NULL, 1);
 
 INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (1, 5);
 
-INSERT INTO LibraryDilution (dilutionId, name, concentration, concentrationUnits, library_libraryId, identificationBarcode, creationDate, creator, securityProfile_profileId, lastModifier, lastUpdated) VALUES
-(1, 'LDI1', 5.9, 'NANOGRAMS_PER_MICROLITRE', 1, 'LDI1::PLAIN_L0001_1-1', '2017-07-20', 1, 2, 1, '2017-07-20 09:01:00');
+INSERT INTO LibraryDilution (dilutionId, name, concentration, concentrationUnits, library_libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated) VALUES
+(1, 'LDI1', 5.9, 'NANOGRAMS_PER_MICROLITRE', 1, 'LDI1::PLAIN_L0001_1-1', '2017-07-20', 1, 1, '2017-07-20 09:01:00');
 
-INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
-(1, 8.25, NULL, 'IPO1', 'POOL_1', 'IPO1::POOL_1', NULL, '2017-07-20', 2, 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL);
+INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
+(1, 8.25, NULL, 'IPO1', 'POOL_1', 'IPO1::POOL_1', NULL, '2017-07-20', 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL);
 
 INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
 (1, 1);

@@ -18,8 +18,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 
@@ -185,8 +183,4 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
         + getTitle();
   }
 
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    return null;
-  }
 }

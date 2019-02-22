@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -92,7 +91,7 @@ public class HibernateSubmissionDao implements SubmissionStore {
   }
 
   @Override
-  public Collection<Submission> listAll() throws IOException {
+  public List<Submission> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(Submission.class);
     @SuppressWarnings("unchecked")
     List<Submission> results = criteria.list();

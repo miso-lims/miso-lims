@@ -19,8 +19,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
@@ -195,12 +193,6 @@ public class LibraryTemplate implements Serializable, Deletable {
   public String getDeleteDescription() {
     // return getAlias() + " (" + getProjects().getAlias() + ")";
     return getAlias();
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    // return getProject().getSecurityProfile();
-    return null;
   }
 
 }

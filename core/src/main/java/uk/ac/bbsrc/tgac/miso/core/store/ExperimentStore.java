@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -75,5 +76,5 @@ public interface ExperimentStore extends Store<Experiment> {
 
   Collection<Experiment> listByLibrary(long id) throws IOException;
 
-  Collection<Experiment> listByRun(long runId) throws IOException;
+  List<Experiment> listByRun(long runId) throws IOException;
 }

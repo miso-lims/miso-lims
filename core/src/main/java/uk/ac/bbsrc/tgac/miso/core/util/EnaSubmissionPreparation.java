@@ -441,7 +441,7 @@ public class EnaSubmissionPreparation {
       Element contacts = submissionDocument.createElementNS(null, "CONTACTS");
       Stream
           .concat(Stream.of(user),
-              submission.getExperiments().stream().map(experiment -> experiment.getSecurityProfile().getOwner()).filter(Objects::nonNull))
+              submission.getExperiments().stream().map(experiment -> experiment.getCreator()).filter(Objects::nonNull))
           .map(User::getFullName).distinct()
           .map(contactName -> {
             Element contact = submissionDocument.createElementNS(null, "CONTACT");

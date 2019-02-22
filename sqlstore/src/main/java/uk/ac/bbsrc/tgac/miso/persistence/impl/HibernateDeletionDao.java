@@ -44,7 +44,6 @@ public class HibernateDeletionDao implements DeletionStore, HibernatePaginatedDa
     deletion.setTargetType(deletable.getDeleteType());
     deletion.setTargetId(deletable.getId());
     deletion.setDescription(deletable.getDeleteDescription());
-    deletion.setSecurityProfile(deletable.getDeletionSecurityProfile());
     deletion.setUser(user);
     deletion.setChangeTime(new Date());
     currentSession().delete(deletable);

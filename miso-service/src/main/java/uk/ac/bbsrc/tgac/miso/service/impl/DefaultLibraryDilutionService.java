@@ -5,9 +5,9 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -34,9 +33,9 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
@@ -47,19 +46,16 @@ import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultLibraryDilutionService
-    implements LibraryDilutionService, AuthorizedPaginatedDataSource<LibraryDilution> {
+    implements LibraryDilutionService, PaginatedDataSource<LibraryDilution> {
 
   protected static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
   @Autowired
   private LibraryDilutionStore dilutionDao;
-  @Autowired
-  private SecurityProfileStore securityProfileStore;
   @Autowired
   private DeletionStore deletionStore;
   @Autowired
@@ -82,7 +78,6 @@ public class DefaultLibraryDilutionService
   @Override
   public LibraryDilution get(long dilutionId) throws IOException {
     LibraryDilution dilution = dilutionDao.get(dilutionId);
-    authorizationManager.throwIfNotReadable(dilution);
     return dilution;
   }
 
@@ -155,10 +150,6 @@ public class DefaultLibraryDilutionService
   public Long create(LibraryDilution dilution) throws IOException {
     loadChildEntities(dilution);
     dilution.setCreator(authorizationManager.getCurrentUser());
-    if (dilution.getSecurityProfile() == null) {
-      dilution.inheritPermissions(libraryService.get(dilution.getLibrary().getId()));
-    }
-    authorizationManager.throwIfNotWritable(dilution);
     boxService.throwIfBoxPositionIsFilled(dilution);
 
     if (dilution.getConcentration() == null) {
@@ -187,7 +178,6 @@ public class DefaultLibraryDilutionService
   @Override
   public void update(LibraryDilution dilution) throws IOException {
     LibraryDilution managed = get(dilution.getId());
-    authorizationManager.throwIfNotWritable(managed);
     boxService.throwIfBoxPositionIsFilled(dilution);
 
     Library library = dilution.getLibrary();
@@ -216,20 +206,17 @@ public class DefaultLibraryDilutionService
 
   @Override
   public List<LibraryDilution> list() throws IOException {
-    Collection<LibraryDilution> allDilutions = dilutionDao.listAll();
-    return authorizationManager.filterUnreadable(allDilutions);
+    return dilutionDao.listAll();
   }
 
   @Override
   public List<LibraryDilution> listByLibraryId(Long libraryId) throws IOException {
-    Collection<LibraryDilution> allDilutions = dilutionDao.listByLibraryId(libraryId);
-    return authorizationManager.filterUnreadable(allDilutions);
+    return dilutionDao.listByLibraryId(libraryId);
   }
 
   @Override
   public LibraryDilution getByBarcode(String barcode) throws IOException {
-    LibraryDilution dilution = dilutionDao.getByBarcode(barcode);
-    return (authorizationManager.readCheck(dilution) ? dilution : null);
+    return dilutionDao.getByBarcode(barcode);
   }
 
   /**
@@ -250,9 +237,6 @@ public class DefaultLibraryDilutionService
     }
     if (dilution.getTargetedSequencing() != null) {
       dilution.setTargetedSequencing(targetedSequencingService.get(dilution.getTargetedSequencing().getId()));
-    }
-    if (dilution.getSecurityProfile() != null && dilution.getSecurityProfile().getProfileId() != SecurityProfile.UNSAVED_ID) {
-      dilution.setSecurityProfile(securityProfileStore.get(dilution.getSecurityProfile().getProfileId()));
     }
   }
 
@@ -324,14 +308,8 @@ public class DefaultLibraryDilutionService
   }
 
   @Override
-  public PaginatedDataSource<LibraryDilution> getBackingPaginationSource() {
-    return dilutionDao;
-  }
-
-  @Override
   public List<LibraryDilution> listByIdList(List<Long> idList) throws IOException {
-    Collection<LibraryDilution> dilutions = dilutionDao.listByIdList(idList);
-    return authorizationManager.filterUnreadable(dilutions);
+    return dilutionDao.listByIdList(idList);
 
   }
 
@@ -381,6 +359,17 @@ public class DefaultLibraryDilutionService
     changeLog.setTime(new Date());
     changeLog.setUser(authorizationManager.getCurrentUser());
     changeLogService.create(changeLog);
+  }
+
+  @Override
+  public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
+    return dilutionDao.count(errorHandler, filter);
+  }
+
+  @Override
+  public List<LibraryDilution> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter) throws IOException {
+    return dilutionDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
 }

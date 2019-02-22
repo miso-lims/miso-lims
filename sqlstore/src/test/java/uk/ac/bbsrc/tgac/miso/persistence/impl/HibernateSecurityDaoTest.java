@@ -17,7 +17,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
@@ -25,13 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 
 public class HibernateSecurityDaoTest extends AbstractDAOTest {
   
@@ -43,9 +39,6 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
   private JdbcTemplate jdbcTemplate;
   @Autowired
   private SessionFactory sessionFactory;
-  
-  @Mock
-  private Store<SecurityProfile> securityProfileDAO;
   
   @InjectMocks
   private HibernateSecurityDao dao;

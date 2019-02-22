@@ -41,7 +41,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -95,11 +94,6 @@ public class HibernateSecurityDao implements SecurityStore {
   @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
-  }
-
-  @Override
-  public SecurityProfile getSecurityProfileById(Long profileId) throws IOException {
-    return (SecurityProfile) currentSession().get(SecurityProfile.class, profileId);
   }
 
   public SessionFactory getSessionFactory() {

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
@@ -31,12 +32,11 @@ import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultContainerService
-    implements ContainerService, AuthorizedPaginatedDataSource<SequencerPartitionContainer> {
+    implements ContainerService, PaginatedDataSource<SequencerPartitionContainer> {
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -45,8 +45,6 @@ public class DefaultContainerService
   private SequencerPartitionContainerStore containerDao;
   @Autowired
   private PoolService poolService;
-  @Autowired
-  private SecurityProfileStore securityProfileDao;
   @Autowired
   private KitService kitService;
   @Autowired
@@ -57,30 +55,20 @@ public class DefaultContainerService
     return authorizationManager;
   }
 
-  @Override
-  public PaginatedDataSource<SequencerPartitionContainer> getBackingPaginationSource() {
-    return containerDao;
-  }
 
   @Override
   public List<SequencerPartitionContainer> list() throws IOException {
-    Collection<SequencerPartitionContainer> containers = containerDao.listAll();
-    return authorizationManager.filterUnreadable(containers);
+    return containerDao.listAll();
   }
 
   @Override
   public Collection<SequencerPartitionContainer> listByBarcode(String barcode) throws IOException {
-    Collection<SequencerPartitionContainer> containers = containerDao.listSequencerPartitionContainersByBarcode(barcode);
-    for (SequencerPartitionContainer container : containers) {
-      authorizationManager.throwIfNotReadable(container);
-    }
-    return containers;
+    return containerDao.listSequencerPartitionContainersByBarcode(barcode);
   }
 
   @Override
   public Collection<SequencerPartitionContainer> listByRunId(long runId) throws IOException {
-    Collection<SequencerPartitionContainer> containers = containerDao.listAllSequencerPartitionContainersByRunId(runId);
-    return authorizationManager.filterUnreadable(containers);
+    return containerDao.listAllSequencerPartitionContainersByRunId(runId);
   }
 
   @Override
@@ -90,25 +78,20 @@ public class DefaultContainerService
 
   @Override
   public SequencerPartitionContainer get(long containerId) throws IOException, AuthorizationException {
-    SequencerPartitionContainer container = containerDao.get(containerId);
-    authorizationManager.throwIfNotReadable(container);
-    return container;
+    return containerDao.get(containerId);
   }
 
   @Override
   public SequencerPartitionContainer create(SequencerPartitionContainer container) throws IOException {
     loadChildEntities(container);
-    authorizationManager.throwIfNotWritable(container);
     container.setChangeDetails(authorizationManager.getCurrentUser());
 
-    container.setSecurityProfile(securityProfileDao.get(securityProfileDao.save(container.getSecurityProfile())));
     return containerDao.save(container);
   }
 
   @Override
   public SequencerPartitionContainer update(SequencerPartitionContainer container) throws IOException {
     SequencerPartitionContainer managed = get(container.getId());
-    authorizationManager.throwIfNotWritable(managed);
     applyChanges(container, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     loadChildEntities(managed);
@@ -198,7 +181,6 @@ public class DefaultContainerService
   @Override
   public Partition getPartition(long partitionId) throws IOException {
     Partition partition = containerDao.getPartitionById(partitionId);
-    authorizationManager.throwIfNotReadable(partition.getSequencerPartitionContainer());
     return partition;
   }
 
@@ -214,14 +196,9 @@ public class DefaultContainerService
     this.containerDao = containerStore;
   }
 
-  public void setSecurityProfileDao(SecurityProfileStore securityProfileStore) {
-    this.securityProfileDao = securityProfileStore;
-  }
-
   @Override
   public void update(Partition partition) throws IOException {
     Partition original = containerDao.getPartitionById(partition.getId());
-    authorizationManager.throwIfNotWritable(original.getSequencerPartitionContainer());
     if (partition.getPool() != null) {
       partition.setPool(poolService.get(partition.getPool().getId()));
     }
@@ -285,5 +262,16 @@ public class DefaultContainerService
     }
 
     return result;
+  }
+
+  @Override
+  public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
+    return containerDao.count(errorHandler, filter);
+  }
+
+  @Override
+  public List<SequencerPartitionContainer> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter) throws IOException {
+    return containerDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 }

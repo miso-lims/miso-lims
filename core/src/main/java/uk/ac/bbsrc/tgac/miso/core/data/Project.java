@@ -29,7 +29,6 @@ import java.util.Date;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * A Project represents the top level object in the MISO data model. A Project couples together {@link Study} and {@link Sample} objects to
@@ -40,7 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Project extends Comparable<Project>, SecurableByProfile, Nameable, Serializable, Attachable {
+public interface Project extends Comparable<Project>, Nameable, Serializable, Attachable {
 
   /** Field PREFIX */
   public static final String PREFIX = "PRO";

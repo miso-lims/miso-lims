@@ -42,7 +42,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
@@ -145,9 +144,6 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
   public void testSaveEdit() throws IOException {
     SequencerPartitionContainer spc = dao.get(4L);
 
-    SecurityProfile profile = Mockito.mock(SecurityProfile.class);
-    spc.setSecurityProfile(profile);
-    Mockito.when(profile.getProfileId()).thenReturn(1L);
     SequencingContainerModel model = (SequencingContainerModel) sessionFactory.getCurrentSession().get(SequencingContainerModel.class, 1L);
     spc.setModel(model);
     spc.setLastModifier(emptyUser);
@@ -181,10 +177,8 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
   }
 
   private SequencerPartitionContainer makeSPC(String identificationBarcode) throws IOException {
-    SecurityProfile profile = Mockito.mock(SecurityProfile.class);
     SequencerPartitionContainer pc = new SequencerPartitionContainerImpl();
     Date now = new Date();
-    pc.setSecurityProfile(profile);
     pc.setIdentificationBarcode(identificationBarcode);
     SequencingContainerModel model = (SequencingContainerModel) sessionFactory.getCurrentSession().get(SequencingContainerModel.class, 1L);
     pc.setModel(model);

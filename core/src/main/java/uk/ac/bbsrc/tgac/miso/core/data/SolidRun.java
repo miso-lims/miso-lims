@@ -4,8 +4,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
@@ -15,10 +13,6 @@ public class SolidRun extends Run {
 
   public SolidRun() {
     super();
-  }
-
-  public SolidRun(User user) {
-    super(user);
   }
 
   @Column(nullable = false)

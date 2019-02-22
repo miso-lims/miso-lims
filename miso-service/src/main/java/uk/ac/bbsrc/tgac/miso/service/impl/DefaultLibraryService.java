@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -24,8 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -52,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
@@ -64,11 +64,10 @@ import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultLibraryService implements LibraryService, AuthorizedPaginatedDataSource<Library> {
+public class DefaultLibraryService implements LibraryService, PaginatedDataSource<Library> {
 
   protected static final Logger log = LoggerFactory.getLogger(DefaultLibraryService.class);
 
@@ -78,8 +77,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   private DeletionStore deletionStore;
   @Autowired
   private AuthorizationManager authorizationManager;
-  @Autowired
-  private SecurityManager securityManager;
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
@@ -103,9 +100,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
 
   @Override
   public Library get(long libraryId) throws IOException {
-    Library library = libraryDao.get(libraryId);
-    authorizationManager.throwIfNotReadable(library);
-    return library;
+    return libraryDao.get(libraryId);
   }
 
   private Library save(Library library, boolean validateAliasUniqueness) throws IOException {
@@ -165,10 +160,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     loadChildEntities(library);
     boxService.throwIfBoxPositionIsFilled(library);
     library.setChangeDetails(authorizationManager.getCurrentUser());
-    if (library.getSecurityProfile() == null) {
-      library.inheritPermissions(sampleService.get(library.getSample().getId()));
-    }
-    authorizationManager.throwIfNotWritable(library);
     validateParentOrThrow(library);
 
     // pre-save field generation
@@ -193,7 +184,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     Library managed = get(library.getId());
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     List<Index> originalIndices = new ArrayList<>(managed.getIndices());
-    authorizationManager.throwIfNotWritable(managed);
     maybeRemoveFromBox(library);
     boxService.throwIfBoxPositionIsFilled(library);
     boolean validateAliasUniqueness = !managed.getAlias().equals(library.getAlias());
@@ -217,69 +207,57 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
 
   @Override
   public List<Library> list() throws IOException {
-    Collection<Library> allLibraries = libraryDao.listAll();
-    return authorizationManager.filterUnreadable(allLibraries);
+    return libraryDao.listAll();
   }
 
   @Override
   public Library getAdjacentLibrary(long libraryId, boolean before) throws IOException {
-    Library library = libraryDao.getAdjacentLibrary(libraryId, before);
-    // We don't throw because the user has no real control over this.
-    return (authorizationManager.readCheck(library) ? library : null);
+    return libraryDao.getAdjacentLibrary(libraryId, before);
   }
 
   @Override
   public Library getByBarcode(String barcode) throws IOException {
-    Library library = libraryDao.getByBarcode(barcode);
-    return (authorizationManager.readCheck(library) ? library : null);
+    return libraryDao.getByBarcode(barcode);
   }
 
   @Override
   public List<Library> listByBarcodeList(List<String> barcodeList) throws IOException {
-    Collection<Library> libraries = libraryDao.getByBarcodeList(barcodeList);
-    return authorizationManager.filterUnreadable(libraries);
+    return libraryDao.getByBarcodeList(barcodeList);
   }
 
   @Override
   public List<Library> listByIdList(List<Long> idList) throws IOException {
-    Collection<Library> libraries = libraryDao.getByIdList(idList);
-    return authorizationManager.filterUnreadable(libraries);
+    return libraryDao.getByIdList(idList);
   }
 
   @Override
   public Library getByPositionId(long positionId) throws IOException {
-    Library library = (Library) libraryDao.getByPositionId(positionId);
-    return (authorizationManager.readCheck(library) ? library : null);
+    return (Library) libraryDao.getByPositionId(positionId);
   }
 
   @Override
   public List<Library> listBySearch(String querystr) throws IOException {
-    Collection<Library> libraries = libraryDao.listBySearch(querystr);
-    return authorizationManager.filterUnreadable(libraries);
+    return libraryDao.listBySearch(querystr);
   }
 
   @Override
   public List<Library> listByAlias(String alias) throws IOException {
-    Collection<Library> libraries = libraryDao.listByAlias(alias);
-    return authorizationManager.filterUnreadable(libraries);
+    return libraryDao.listByAlias(alias);
   }
 
   @Override
   public List<Library> searchByCreationDate(Date from, Date to) throws IOException {
-    Collection<Library> libraries = libraryDao.searchByCreationDate(from, to);
-    return authorizationManager.filterUnreadable(libraries);
+    return libraryDao.searchByCreationDate(from, to);
   }
 
   @Override
   public List<Library> listBySampleId(long sampleId) throws IOException {
-    Collection<Library> libraries = libraryDao.listBySampleId(sampleId);
-    return authorizationManager.filterUnreadable(libraries);
+    return libraryDao.listBySampleId(sampleId);
   }
 
   @Override
   public List<Library> listByProjectId(long projectId) throws IOException {
-    Collection<Library> libraries = libraryDao.listByProjectId(projectId);
-    return authorizationManager.filterUnreadable(libraries);
+    return libraryDao.listByProjectId(projectId);
   }
 
   @Override
@@ -352,7 +330,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   @Override
   public void addNote(Library library, Note note) throws IOException {
     Library managed = libraryDao.get(library.getId());
-    authorizationManager.throwIfNotWritable(managed);
     note.setCreationDate(new Date());
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
@@ -365,7 +342,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       throw new IllegalArgumentException("Cannot delete an unsaved Note");
     }
     Library managed = libraryDao.get(library.getId());
-    authorizationManager.throwIfNotWritable(managed);
     Note deleteNote = null;
     for (Note note : managed.getNotes()) {
       if (note.getNoteId().equals(noteId)) {
@@ -461,9 +437,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       }
     }
     library.setIndices(managedIndices);
-    if (library.getSecurityProfile() != null && library.getSecurityProfile().getProfileId() != SecurityProfile.UNSAVED_ID) {
-      library.setSecurityProfile(securityManager.getSecurityProfileById(library.getSecurityProfile().getProfileId()));
-    }
     if (library.getKitDescriptor() != null) {
       library.setKitDescriptor(kitService.getKitDescriptorById(library.getKitDescriptor().getId()));
     }
@@ -669,10 +642,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     this.authorizationManager = authorizationManager;
   }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
@@ -714,11 +683,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   }
 
   @Override
-  public PaginatedDataSource<Library> getBackingPaginationSource() {
-    return libraryDao;
-  }
-
-  @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
   }
@@ -757,6 +721,17 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       box.getBoxPositions().remove(object.getBoxPosition());
       boxService.save(box);
     }
+  }
+
+  @Override
+  public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
+    return libraryDao.count(errorHandler, filter);
+  }
+
+  @Override
+  public List<Library> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter) throws IOException {
+    return libraryDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
 }

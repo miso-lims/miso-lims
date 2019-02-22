@@ -14,13 +14,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.DilutionBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * This interface simply describes an object that can be placed into a box. i.e. Sample, Library
  * 
  */
-public interface Boxable extends Nameable, Barcodable, SecurableByProfile, Serializable {
+public interface Boxable extends Nameable, Barcodable, Serializable {
 
   public enum EntityType {
     SAMPLE(SampleImpl.class, SampleBoxPosition::new),

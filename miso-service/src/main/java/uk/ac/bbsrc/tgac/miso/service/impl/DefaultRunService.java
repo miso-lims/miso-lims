@@ -56,9 +56,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
@@ -72,11 +72,10 @@ import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultRunService implements RunService, AuthorizedPaginatedDataSource<Run> {
+public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
 
   private static class NotIn implements Predicate<SequencerPartitionContainer> {
 
@@ -110,8 +109,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
-  private SecurityProfileStore securityProfileStore;
-  @Autowired
   private ContainerService containerService;
   @Autowired
   private InstrumentService instrumentService;
@@ -125,70 +122,48 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   private InstrumentModelService platformService;
 
   @Override
-  public AuthorizationManager getAuthorizationManager() {
-    return authorizationManager;
-  }
-
-  @Override
-  public PaginatedDataSource<Run> getBackingPaginationSource() {
-    return runDao;
-  }
-
-  @Override
   public Collection<Run> list() throws IOException {
-    Collection<Run> allRuns = runDao.listAll();
-    return authorizationManager.filterUnreadable(allRuns);
+    return runDao.listAll();
   }
 
   @Override
   public Collection<Run> listBySearch(String query) throws IOException {
-    Collection<Run> runs = runDao.listBySearch(query);
-    return authorizationManager.filterUnreadable(runs);
+    return runDao.listBySearch(query);
   }
 
   @Override
   public Collection<Run> listByProjectId(long projectId) throws IOException {
-    Collection<Run> runs = runDao.listByProjectId(projectId);
-    return authorizationManager.filterUnreadable(runs);
+    return runDao.listByProjectId(projectId);
   }
 
   @Override
   public Collection<Run> listByPoolId(long poolId) throws IOException {
-    Collection<Run> runs = runDao.listByPoolId(poolId);
-    return authorizationManager.filterUnreadable(runs);
+    return runDao.listByPoolId(poolId);
   }
 
   @Override
   public Collection<Run> listByContainerId(long containerId) throws IOException {
-    Collection<Run> runs = runDao.listBySequencerPartitionContainerId(containerId);
-    return authorizationManager.filterUnreadable(runs);
+    return runDao.listBySequencerPartitionContainerId(containerId);
   }
 
   @Override
   public Collection<Run> listByInstrumentId(long instrumentId) throws IOException {
-    Collection<Run> runs = runDao.listBySequencerId(instrumentId);
-    return authorizationManager.filterUnreadable(runs);
+    return runDao.listBySequencerId(instrumentId);
   }
 
   @Override
   public Run get(long runId) throws IOException, AuthorizationException {
-    Run run = runDao.get(runId);
-    authorizationManager.throwIfNotReadable(run);
-    return run;
+    return runDao.get(runId);
   }
 
   @Override
   public Run getRunByAlias(String alias) throws IOException, AuthorizationException {
-    Run run = runDao.getByAlias(alias);
-    authorizationManager.throwIfNotReadable(run);
-    return run;
+    return runDao.getByAlias(alias);
   }
 
   @Override
   public Run getLatestRunBySequencerPartitionContainerId(long containerId) throws IOException, AuthorizationException {
-    Run run = runDao.getLatestRunIdRunBySequencerPartitionContainerId(containerId);
-    authorizationManager.throwIfNotReadable(run);
-    return run;
+    return runDao.getLatestRunIdRunBySequencerPartitionContainerId(containerId);
   }
 
   @Override
@@ -199,7 +174,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   @Override
   public void addNote(Run run, Note note) throws IOException {
     Run managed = runDao.get(run.getId());
-    authorizationManager.throwIfNotWritable(managed);
     note.setCreationDate(new Date());
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
@@ -213,7 +187,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       throw new IllegalArgumentException("Cannot delete an unsaved Note");
     }
     Run managed = runDao.get(run.getId());
-    authorizationManager.throwIfNotWritable(managed);
     Note deleteNote = null;
     for (Note note : managed.getNotes()) {
       if (note.getNoteId().equals(noteId)) {
@@ -231,13 +204,11 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
 
   @Override
   public Long create(Run run) throws IOException {
-    authorizationManager.throwIfNotWritable(run);
     validateChanges(null, run);
     saveContainers(run);
     run.setChangeDetails(authorizationManager.getCurrentUser());
     loadChildEntities(run);
 
-    run.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(run.getSecurityProfile())));
     run.setName(generateTemporaryName());
 
     Run saved = save(run);
@@ -248,7 +219,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   @Override
   public void update(Run run) throws IOException {
     Run managed = get(run.getId());
-    authorizationManager.throwIfNotWritable(managed);
     loadChildEntities(run);
     saveContainers(run);
     applyChanges(managed, run);
@@ -500,10 +470,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     this.namingScheme = namingScheme;
   }
 
-  public void setSecurityProfileStore(SecurityProfileStore securityProfileStore) {
-    this.securityProfileStore = securityProfileStore;
-  }
-
   public void setSequencingParametersService(SequencingParametersService sequencingParametersService) {
     this.sequencingParametersService = sequencingParametersService;
   }
@@ -544,7 +510,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     boolean isNew;
 
     if (runFromDb == null) {
-      target = source.getPlatformType().createRun(user);
+      target = source.getPlatformType().createRun();
       target.setCreationTime(now);
       target.setCreator(user);
       target.setName(generateTemporaryName());
@@ -610,12 +576,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     }
 
     target.setChangeDetails(user);
-
-    if (isNew) {
-      // save this up before saving containers or calling `updateSequencingParameters` because otherwise Hibernate has to
-      // flush things and it is sad/bad.
-      target.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(target.getSecurityProfile())));
-    }
 
     isMutated |= updateSequencingParameters(target, user, filterParameters, sequencer);
 
@@ -725,7 +685,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     }
     switch (containers.size()) {
     case 0:
-      SequencerPartitionContainer newContainer = new SequencerPartitionContainerImpl(user);
+      SequencerPartitionContainer newContainer = new SequencerPartitionContainerImpl();
       newContainer.setModel(containerModel);
       newContainer.setCreator(user);
       newContainer.setIdentificationBarcode(containerSerialNumber);
@@ -811,6 +771,17 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     }
     writer.accept(newValue);
     return true;
+  }
+
+  @Override
+  public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
+    return runDao.count(errorHandler, filter);
+  }
+
+  @Override
+  public List<Run> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
+      throws IOException {
+    return runDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
 }

@@ -1,14 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.migration.destination;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Function;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -68,69 +63,12 @@ public class MigrationAuthorizationManager implements AuthorizationManager {
   }
 
   @Override
-  public boolean readCheck(SecurableByProfile resource) throws IOException {
-    // auth disabled in this manager; allow all access
-    return true;
-  }
-
-  @Override
-  public void throwIfNotReadable(SecurableByProfile resource) throws IOException, AuthorizationException {
-    // auth disabled in this manager; do nothing
-  }
-
-  @Override
-  public boolean writeCheck(SecurableByProfile resource) throws IOException {
-    // auth disabled in this manager; allow all access
-    return true;
-  }
-
-  @Override
-  public void throwIfNotWritable(SecurableByProfile resource) throws IOException, AuthorizationException {
-    // auth disabled in this manager; do nothing
-  }
-
-  @Override
-  public <T extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered) throws IOException, AuthorizationException {
-    // auth disabled in this manager; allow all access
-    return new ArrayList<>(unfiltered);
-  }
-
-  @Override
   public void throwIfNonAdminOrMatchingOwner(User owner) throws IOException, AuthorizationException {
     // auth disabled in this manager; do nothing
   }
 
   @Override
   public void throwIfNotInternal() throws IOException, AuthorizationException {
-    // auth disabled in this manager; do nothing
-  }
-
-  @Override
-  public <T, P extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered, Function<T, P> getOwner)
-      throws IOException, AuthorizationException {
-    // auth disabled in this manager; allow all access
-    return new ArrayList<>(unfiltered);
-  }
-
-  @Override
-  public boolean readCheck(SecurableByProfile resource, User user) {
-    // auth disabled in this manager; allow all access
-    return true;
-  }
-
-  @Override
-  public void throwIfNotReadable(SecurableByProfile resource, User user) throws AuthorizationException {
-    // auth disabled in this manager; do nothing
-  }
-
-  @Override
-  public boolean writeCheck(SecurableByProfile resource, User user) {
-    // auth disabled in this manager; allow all access
-    return true;
-  }
-
-  @Override
-  public void throwIfNotWritable(SecurableByProfile resource, User user) throws AuthorizationException {
     // auth disabled in this manager; do nothing
   }
 

@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -80,22 +79,6 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
    */
   @Test
   public void testSave() throws Exception {
-    final String testAlias = "test alias";
-    project.setAlias(testAlias);
-
-    long savedProjectId = projectDAO.save(project);
-
-    Project savedProject = projectDAO.get(savedProjectId);
-    assertEquals(testAlias, savedProject.getAlias());
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#save(uk.ac.bbsrc.tgac.miso.core.data.Project)} .
-   */
-
-  @Test
-  public void testSaveWithUnsavedSecurityProfile() throws Exception {
-    project.getSecurityProfile().setProfileId(SecurityProfile.UNSAVED_ID);
     final String testAlias = "test alias";
     project.setAlias(testAlias);
 

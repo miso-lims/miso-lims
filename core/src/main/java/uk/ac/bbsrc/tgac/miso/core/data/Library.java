@@ -39,7 +39,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * A Library is the first step in constructing sequenceable material from an initial {@link Sample}. A Library is then diluted down to a
@@ -51,7 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @since 0.0.2
  */
 public interface Library
-    extends SecurableByProfile, Comparable<Library>, Barcodable, Locatable, Boxable, ChangeLoggable, Aliasable, Serializable,
+    extends Comparable<Library>, Barcodable, Locatable, Boxable, ChangeLoggable, Aliasable, Serializable,
     QualityControllable<LibraryQC>, Deletable, Attachable, Distributable {
 
   /** Field UNSAVED_ID */

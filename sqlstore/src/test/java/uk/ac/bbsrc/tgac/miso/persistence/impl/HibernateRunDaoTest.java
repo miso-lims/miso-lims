@@ -45,7 +45,6 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
@@ -62,7 +61,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.store.InstrumentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -81,8 +79,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
 
   @Mock
   private SecurityStore securityDAO;
-  @Mock
-  private Store<SecurityProfile> securityProfileDAO;
   @Mock
   private InstrumentStore instrumentDAO;
   @Mock
@@ -250,8 +246,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   public void testSaveEdit() throws IOException, MisoNamingException {
     Run run = dao.get(1L);
 
-    SecurityProfile profile = Mockito.mock(SecurityProfile.class);
-    run.setSecurityProfile(profile);
     Instrument instrument = Mockito.mock(InstrumentImpl.class);
     Mockito.when(instrument.getId()).thenReturn(1L);
     User user = Mockito.mock(UserImpl.class);
@@ -286,14 +280,12 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   }
 
   private Run makeRun(String alias) {
-    SecurityProfile profile = (SecurityProfile) sessionFactory.getCurrentSession().get(SecurityProfile.class, 3L);
     Instrument instrument = emptySR;
     Date now = new Date();
     User user = new UserImpl();
     user.setUserId(1L);
 
     Run run = new IlluminaRun();
-    run.setSecurityProfile(profile);
     run.setAlias(alias);
     run.setDescription("description");
     run.setFilePath("/somewhere/someplace/");

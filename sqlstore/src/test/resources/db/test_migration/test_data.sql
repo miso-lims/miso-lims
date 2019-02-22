@@ -138,58 +138,45 @@ INSERT INTO `_Group`(`groupId`, `name`, `description`) VALUES (1, 'TestGroup', '
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (3,1),(1,1);
 
-DELETE FROM `SecurityProfile`;
-DELETE FROM `SecurityProfile_ReadGroup`;
-DELETE FROM `SecurityProfile_WriteGroup`;
-DELETE FROM `SecurityProfile_ReadUser`;
-DELETE FROM `SecurityProfile_WriteUser`;
-INSERT INTO `SecurityProfile`(`profileId`, `allowAllInternal`, `owner_userId`) 
-VALUES (1,1,1),(2,1,1),(3,1,1),(4,1,1),(5,1,1),(6,1,1),(7,1,1),(8,1,1),(9,1,1),(10,1,1),(11,1,1),(12,1,NULL),(13,1,NULL),(14,1,NULL),(15,1,NULL);
-
-INSERT INTO SecurityProfile_ReadUser(SecurityProfile_profileId, readUser_userId) VALUES (1, 1);
-INSERT INTO SecurityProfile_WriteUser(SecurityProfile_profileId, writeUser_userId) VALUES (2, 1);
-INSERT INTO SecurityProfile_ReadGroup(SecurityProfile_profileId, readGroup_groupId) VALUES (3, 1);
-INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_groupId) VALUES (4, 1);
-
 DELETE FROM `Project`;
-INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `shortName`, `lastUpdated`, `referenceGenomeId`) VALUES
-(1,'2015-08-27 15:40:15','Test project','PRO1',1,'ACTIVE','TEST1','TEST1','2015-08-27 19:40:40', 1),
-(2,'2013-11-27 12:20:15','Test project2','PRO2',1,'ACTIVE','TEST2','TEST2','2015-11-30 15:23:18', 1),
-(3,'2016-01-27 11:11:15','Test project3','PRO3',1,'ACTIVE','TEST3','TEST3','2016-02-22 10:43:18', 2);
+INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `progress`, `alias`, `shortName`, `lastUpdated`, `referenceGenomeId`) VALUES
+(1,'2015-08-27 15:40:15','Test project','PRO1','ACTIVE','TEST1','TEST1','2015-08-27 19:40:40', 1),
+(2,'2013-11-27 12:20:15','Test project2','PRO2','ACTIVE','TEST2','TEST2','2015-11-30 15:23:18', 1),
+(3,'2016-01-27 11:11:15','Test project3','PRO3','ACTIVE','TEST3','TEST3','2016-02-22 10:43:18', 2);
 
 DELETE FROM Study;
-INSERT INTO Study(studyId, name, description, accession, securityProfile_profileId, project_projectId, studyTypeId, alias, creator, created, lastModifier, lastModified)
-VALUES (1,'STU1','Test study1',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study1',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
-(2,'STU2','Test study2',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study2',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
-(3,'STU3','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study3',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
-(4,'STU4','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study4',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
-(5,'STU5','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study5',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
-(6,'STU6','delete me',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study6',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
+INSERT INTO Study(studyId, name, description, accession, project_projectId, studyTypeId, alias, creator, created, lastModifier, lastModified)
+VALUES (1,'STU1','Test study1',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study1',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(2,'STU2','Test study2',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study2',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(3,'STU3','OICR',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study3',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(4,'STU4','OICR',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study4',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(5,'STU5','OICR',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study5',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(6,'STU6','delete me',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study6',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
 DELETE FROM `Experiment`;
 
 DELETE FROM `Sample`;
-INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `securityProfile_profileId`, `identificationBarcode`, `locationBarcode`, `sampleType`, `receivedDate`, `qcPassed`, `alias`, `project_projectId`, `scientificName`, `taxonIdentifier`, `lastModifier`, `lastModified`, `creator`, `created`) 
-VALUES (1,NULL,'SAM1','Inherited from TEST_0001',1,'SAM1::TEST_0001_Bn_P_nn_1-1_D_1','Freezer1_1','GENOMIC','2015-01-27','true','TEST_0001_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47'),
-(2,NULL,'SAM2','Inherited from TEST_0001',1,'SAM2::TEST_0001_Bn_R_nn_1-1_D_1','Freezer1_2','GENOMIC','2005-01-27','true','TEST_0001_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:48',1,'2016-07-07 13:30:48'),
-(3,NULL,'SAM3','Inherited from TEST_0002',1,'SAM3::TEST_0002_Bn_P_nn_1-1_D_1','Freezer1_3','GENOMIC','2014-01-17','true','TEST_0002_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
-(4,NULL,'SAM4','Inherited from TEST_0002',1,'SAM4::TEST_0002_Bn_R_nn_1-1_D_1','Freezer1_4','GENOMIC','2015-01-27','true','TEST_0002_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
-(5,NULL,'SAM5','Inherited from TEST_0003',1,'SAM5::TEST_0003_Bn_P_nn_1-1_D_1','Freezer1_5','GENOMIC','2015-01-27','true','TEST_0003_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53'),
-(6,NULL,'SAM6','Inherited from TEST_0003',1,'SAM6::TEST_0003_Bn_R_nn_1-1_D_1','Freezer1_6','GENOMIC','2016-01-03','true','TEST_0003_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55'),
-(7,NULL,'SAM7','Inherited from TEST_0004',1,'SAM7::TEST_0004_Bn_P_nn_1-1_D_1','Freezer1_7','GENOMIC','2015-02-27','true','TEST_0004_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57'),
-(8,NULL,'SAM8','Inherited from TEST_0004',1,'SAM8::TEST_0004_Bn_R_nn_1-1_D_1','Freezer1_8','GENOMIC','2015-01-07','true','TEST_0004_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59'),
-(9,NULL,'SAM9','Inherited from TEST_0005',1,'SAM9::TEST_0005_Bn_P_nn_1-1_D_1','Freezer1_9','GENOMIC','2015-01-22','true','TEST_0005_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01'),
-(10,NULL,'SAM10','Inherited from TEST_0005',1,'SAM10::TEST_0005_Bn_R_nn_1-1_D_1','Freezer1_10','GENOMIC','2015-01-27','true','TEST_0005_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03'),
-(11,NULL,'SAM11','Inherited from TEST_0006',1,'SAM11::TEST_0006_Bn_P_nn_1-1_D_1','Freezer1_11','GENOMIC','2015-01-27','true','TEST_0006_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05'),
-(12,NULL,'SAM12','Inherited from TEST_0006',1,'SAM12::TEST_0006_Bn_R_nn_1-1_D_1','Freezer1_12','GENOMIC','2015-01-27','true','TEST_0006_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07'),
-(13,NULL,'SAM13','Inherited from TEST_0007',1,'SAM13::TEST_0007_Bn_P_nn_1-1_D_1','Freezer1_13','GENOMIC','2015-01-27','true','TEST_0007_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:09',1,'2016-07-07 13:31:09'),
-(14,NULL,'SAM14','Inherited from TEST_0007',1,'SAM14::TEST_0007_Bn_R_nn_1-1_D_1','Freezer1_14','GENOMIC','2015-01-27','true','TEST_0007_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11'),
-(15,NULL,'SAM15','identity1',1,'SAM15::TEST_0001_IDENTITY_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_IDENTITY_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13'),
-(16,NULL,'SAM16','tissue1',1,'SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15'),
-(17,NULL,'SAM17','tissue2',1,'SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17'),
-(18,NULL,'SAM18','stock1',1,'SAM18::TEST_0001_STOCK_1','Freezer1_1','GENOMIC',NULL,'true','TEST_0001_STOCK_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:19',1,'2016-07-07 13:31:19'),
-(19,NULL,'SAM19','aliquot1',1,'SAM19::TEST_0001_ALIQUOT_1','Freezer1_1','GENOMIC',NULL,'true','TEST_0001_ALIQUOT_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:21',1,'2016-07-07 13:31:21'),
-(20,NULL,'SAM20','identity2',1,'SAM20::TEST_0002_IDENTITY_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0002_IDENTITY_2',1,'Homo sapiens',NULL,1,'2018-02-22 14:34:00',1,'2018-02-22 14:34:00');
+INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `receivedDate`, `qcPassed`, `alias`, `project_projectId`, `scientificName`, `taxonIdentifier`, `lastModifier`, `lastModified`, `creator`, `created`) 
+VALUES (1,NULL,'SAM1','Inherited from TEST_0001','SAM1::TEST_0001_Bn_P_nn_1-1_D_1','Freezer1_1','GENOMIC','2015-01-27','true','TEST_0001_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47'),
+(2,NULL,'SAM2','Inherited from TEST_0001','SAM2::TEST_0001_Bn_R_nn_1-1_D_1','Freezer1_2','GENOMIC','2005-01-27','true','TEST_0001_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:48',1,'2016-07-07 13:30:48'),
+(3,NULL,'SAM3','Inherited from TEST_0002','SAM3::TEST_0002_Bn_P_nn_1-1_D_1','Freezer1_3','GENOMIC','2014-01-17','true','TEST_0002_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
+(4,NULL,'SAM4','Inherited from TEST_0002','SAM4::TEST_0002_Bn_R_nn_1-1_D_1','Freezer1_4','GENOMIC','2015-01-27','true','TEST_0002_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
+(5,NULL,'SAM5','Inherited from TEST_0003','SAM5::TEST_0003_Bn_P_nn_1-1_D_1','Freezer1_5','GENOMIC','2015-01-27','true','TEST_0003_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53'),
+(6,NULL,'SAM6','Inherited from TEST_0003','SAM6::TEST_0003_Bn_R_nn_1-1_D_1','Freezer1_6','GENOMIC','2016-01-03','true','TEST_0003_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55'),
+(7,NULL,'SAM7','Inherited from TEST_0004','SAM7::TEST_0004_Bn_P_nn_1-1_D_1','Freezer1_7','GENOMIC','2015-02-27','true','TEST_0004_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57'),
+(8,NULL,'SAM8','Inherited from TEST_0004','SAM8::TEST_0004_Bn_R_nn_1-1_D_1','Freezer1_8','GENOMIC','2015-01-07','true','TEST_0004_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59'),
+(9,NULL,'SAM9','Inherited from TEST_0005','SAM9::TEST_0005_Bn_P_nn_1-1_D_1','Freezer1_9','GENOMIC','2015-01-22','true','TEST_0005_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01'),
+(10,NULL,'SAM10','Inherited from TEST_0005','SAM10::TEST_0005_Bn_R_nn_1-1_D_1','Freezer1_10','GENOMIC','2015-01-27','true','TEST_0005_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03'),
+(11,NULL,'SAM11','Inherited from TEST_0006','SAM11::TEST_0006_Bn_P_nn_1-1_D_1','Freezer1_11','GENOMIC','2015-01-27','true','TEST_0006_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05'),
+(12,NULL,'SAM12','Inherited from TEST_0006','SAM12::TEST_0006_Bn_R_nn_1-1_D_1','Freezer1_12','GENOMIC','2015-01-27','true','TEST_0006_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07'),
+(13,NULL,'SAM13','Inherited from TEST_0007','SAM13::TEST_0007_Bn_P_nn_1-1_D_1','Freezer1_13','GENOMIC','2015-01-27','true','TEST_0007_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:09',1,'2016-07-07 13:31:09'),
+(14,NULL,'SAM14','Inherited from TEST_0007','SAM14::TEST_0007_Bn_R_nn_1-1_D_1','Freezer1_14','GENOMIC','2015-01-27','true','TEST_0007_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11'),
+(15,NULL,'SAM15','identity1','SAM15::TEST_0001_IDENTITY_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_IDENTITY_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13'),
+(16,NULL,'SAM16','tissue1','SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15'),
+(17,NULL,'SAM17','tissue2','SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17'),
+(18,NULL,'SAM18','stock1','SAM18::TEST_0001_STOCK_1','Freezer1_1','GENOMIC',NULL,'true','TEST_0001_STOCK_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:19',1,'2016-07-07 13:31:19'),
+(19,NULL,'SAM19','aliquot1','SAM19::TEST_0001_ALIQUOT_1','Freezer1_1','GENOMIC',NULL,'true','TEST_0001_ALIQUOT_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:21',1,'2016-07-07 13:31:21'),
+(20,NULL,'SAM20','identity2','SAM20::TEST_0002_IDENTITY_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0002_IDENTITY_2',1,'Homo sapiens',NULL,1,'2018-02-22 14:34:00',1,'2018-02-22 14:34:00');
 
 DELETE FROM `SampleQC`;
 INSERT INTO `SampleQC`(`sample_sampleId`, `creator`, `date`, `type`, `results`) 
@@ -262,22 +249,22 @@ INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNum
 (2, 'Test Kit 2', 1, 'KitMaker', 'k002', 0, 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
 DELETE FROM `Library`;
-INSERT INTO `Library`(`libraryId`, `name`, `description`, `accession`, `securityProfile_profileId`, `sample_sampleId`, `identificationBarcode`, `locationBarcode`, `libraryType`, `concentration`, `creationDate`, `platformType`, `alias`, `paired`, `librarySelectionType`, `libraryStrategyType`, `qcPassed`, `lastModifier`, `lastModified`, `creator`, `created`, `kitDescriptorId`)
-VALUES (1,'LIB1','Inherited from TEST_0001',NULL,1,1,'LIB1::TEST_0001_Bn_P_PE_300_WG','LIBRARY_INBOX_A01',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49', 1),
-(2,'LIB2','Inherited from TEST_0001',NULL,1,2,'LIB2::TEST_0001_Bn_R_PE_300_WG','LIBRARY_INBOX_A02',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51', NULL),
-(3,'LIB3','Inherited from TEST_0002',NULL,1,3,'LIB3::TEST_0002_Bn_P_PE_300_WG','LIBRARY_INBOX_A03',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53', NULL),
-(4,'LIB4','Inherited from TEST_0002',NULL,1,4,'LIB4::TEST_0002_Bn_R_PE_300_WG','LIBRARY_INBOX_A04',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55', NULL),
-(5,'LIB5','Inherited from TEST_0003',NULL,1,5,'LIB5::TEST_0003_Bn_P_PE_300_WG','LIBRARY_INBOX_A05',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57', NULL),
-(6,'LIB6','Inherited from TEST_0003',NULL,1,6,'LIB6::TEST_0003_Bn_R_PE_300_WG','LIBRARY_INBOX_A06',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59', NULL),
-(7,'LIB7','Inherited from TEST_0004',NULL,1,7,'LIB7::TEST_0004_Bn_P_PE_300_WG','LIBRARY_INBOX_A07',3,0,'2015-08-27','ILLUMINA','TEST_0004_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01', NULL),
-(8,'LIB8','Inherited from TEST_0004',NULL,1,8,'LIB8::TEST_0004_Bn_R_PE_300_WG','LIBRARY_INBOX_A08',3,0,'2015-08-27','ILLUMINA','TEST_0004_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03', NULL),
-(9,'LIB9','Inherited from TEST_0005',NULL,1,9,'LIB9::TEST_0005_Bn_P_PE_300_WG','LIBRARY_INBOX_A09',3,0,'2015-08-27','ILLUMINA','TEST_0005_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05', NULL),
-(10,'LIB10','Inherited from TEST_0005',NULL,1,10,'LIB10::TEST_0005_Bn_R_PE_300_WG','LIBRARY_INBOX_A10',3,0,'2015-08-27','ILLUMINA','TEST_0005_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07', NULL),
-(11,'LIB11','Inherited from TEST_0006',NULL,1,11,'LIB11::TEST_0006_Bn_P_PE_300_WG','LIBRARY_INBOX_B01',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:09',1,'2016-07-07 13:31:09', NULL),
-(12,'LIB12','Inherited from TEST_0006',NULL,1,12,'LIB12::TEST_0006_Bn_R_PE_300_WG','LIBRARY_INBOX_B02',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11', NULL),
-(13,'LIB13','Inherited from TEST_0007',NULL,1,13,'LIB13::TEST_0007_Bn_P_PE_300_WG','LIBRARY_INBOX_B03',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13', NULL),
-(14,'LIB14','Inherited from TEST_0007',NULL,1,14,'LIB14::TEST_0007_Bn_R_PE_300_WG','LIBRARY_INBOX_B04',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15', NULL),
-(15,'LIB15',NULL,NULL,1,19,'LIB15::TEST_0001_ALIQUOT_1_PE_300_WG',NULL,3,0,'2018-02-15','ILLUMINA','TEST_0001_ALIQUOT_1_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15', NULL);
+INSERT INTO `Library`(`libraryId`, `name`, `description`, `accession`, `sample_sampleId`, `identificationBarcode`, `locationBarcode`, `libraryType`, `concentration`, `creationDate`, `platformType`, `alias`, `paired`, `librarySelectionType`, `libraryStrategyType`, `qcPassed`, `lastModifier`, `lastModified`, `creator`, `created`, `kitDescriptorId`)
+VALUES (1,'LIB1','Inherited from TEST_0001',NULL,1,'LIB1::TEST_0001_Bn_P_PE_300_WG','LIBRARY_INBOX_A01',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49', 1),
+(2,'LIB2','Inherited from TEST_0001',NULL,2,'LIB2::TEST_0001_Bn_R_PE_300_WG','LIBRARY_INBOX_A02',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51', NULL),
+(3,'LIB3','Inherited from TEST_0002',NULL,3,'LIB3::TEST_0002_Bn_P_PE_300_WG','LIBRARY_INBOX_A03',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53', NULL),
+(4,'LIB4','Inherited from TEST_0002',NULL,4,'LIB4::TEST_0002_Bn_R_PE_300_WG','LIBRARY_INBOX_A04',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55', NULL),
+(5,'LIB5','Inherited from TEST_0003',NULL,5,'LIB5::TEST_0003_Bn_P_PE_300_WG','LIBRARY_INBOX_A05',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57', NULL),
+(6,'LIB6','Inherited from TEST_0003',NULL,6,'LIB6::TEST_0003_Bn_R_PE_300_WG','LIBRARY_INBOX_A06',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59', NULL),
+(7,'LIB7','Inherited from TEST_0004',NULL,7,'LIB7::TEST_0004_Bn_P_PE_300_WG','LIBRARY_INBOX_A07',3,0,'2015-08-27','ILLUMINA','TEST_0004_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01', NULL),
+(8,'LIB8','Inherited from TEST_0004',NULL,8,'LIB8::TEST_0004_Bn_R_PE_300_WG','LIBRARY_INBOX_A08',3,0,'2015-08-27','ILLUMINA','TEST_0004_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03', NULL),
+(9,'LIB9','Inherited from TEST_0005',NULL,9,'LIB9::TEST_0005_Bn_P_PE_300_WG','LIBRARY_INBOX_A09',3,0,'2015-08-27','ILLUMINA','TEST_0005_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05', NULL),
+(10,'LIB10','Inherited from TEST_0005',NULL,10,'LIB10::TEST_0005_Bn_R_PE_300_WG','LIBRARY_INBOX_A10',3,0,'2015-08-27','ILLUMINA','TEST_0005_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07', NULL),
+(11,'LIB11','Inherited from TEST_0006',NULL,11,'LIB11::TEST_0006_Bn_P_PE_300_WG','LIBRARY_INBOX_B01',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:09',1,'2016-07-07 13:31:09', NULL),
+(12,'LIB12','Inherited from TEST_0006',NULL,12,'LIB12::TEST_0006_Bn_R_PE_300_WG','LIBRARY_INBOX_B02',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11', NULL),
+(13,'LIB13','Inherited from TEST_0007',NULL,13,'LIB13::TEST_0007_Bn_P_PE_300_WG','LIBRARY_INBOX_B03',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13', NULL),
+(14,'LIB14','Inherited from TEST_0007',NULL,14,'LIB14::TEST_0007_Bn_R_PE_300_WG','LIBRARY_INBOX_B04',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15', NULL),
+(15,'LIB15',NULL,NULL,19,'LIB15::TEST_0001_ALIQUOT_1_PE_300_WG',NULL,3,0,'2018-02-15','ILLUMINA','TEST_0001_ALIQUOT_1_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15', NULL);
 
 DELETE FROM LibraryChangeLog;
 INSERT INTO `LibraryChangeLog`(`libraryId`, `columnsChanged`, `userId`, `message`, `changeTime`)
@@ -312,22 +299,22 @@ INSERT INTO TargetedSequencing_KitDescriptor(targetedSequencingId, kitDescriptor
 (2,2);
 
 DELETE FROM `LibraryDilution`;
-INSERT INTO `LibraryDilution`(`dilutionId`, `concentration`, `library_libraryId`, `identificationBarcode`, `creationDate`, `creator`, `lastModifier`, `name`, `securityProfile_profileId`) 
-VALUES (1,2,1,'LDI1::TEST_0001_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI1',1),
-(2,2,2,'LDI2::TEST_0001_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI2',1),
-(3,2,3,'LDI3::TEST_0002_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI3',1),
-(4,2,4,'LDI4::TEST_0002_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI4',1),
-(5,2,5,'LDI5::TEST_0003_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI5',1),
-(6,2,6,'LDI6::TEST_0003_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI6',1),
-(7,2,7,'LDI7::TEST_0004_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI7',1),
-(8,2,8,'LDI8::TEST_0004_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI8',1),
-(9,2,9,'LDI9::TEST_0005_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI9',1),
-(10,2,10,'LDI10::TEST_0005_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI10',1),
-(11,2,11,'LDI11::TEST_0006_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI11',1),
-(12,2,12,'LDI12::TEST_0006_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI12',1),
-(13,2,13,'LDI13::TEST_0007_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI13',1),
-(14,2,14,'LDI14::TEST_0007_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI14',1),
-(15,2,15,'LDI15::TEST_0001_ALIQUOT_1_PE_300_WG','2018-02-15',1,1,'LDI15',1);
+INSERT INTO `LibraryDilution`(`dilutionId`, `concentration`, `library_libraryId`, `identificationBarcode`, `creationDate`, `creator`, `lastModifier`, `name`) 
+VALUES (1,2,1,'LDI1::TEST_0001_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI1'),
+(2,2,2,'LDI2::TEST_0001_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI2'),
+(3,2,3,'LDI3::TEST_0002_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI3'),
+(4,2,4,'LDI4::TEST_0002_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI4'),
+(5,2,5,'LDI5::TEST_0003_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI5'),
+(6,2,6,'LDI6::TEST_0003_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI6'),
+(7,2,7,'LDI7::TEST_0004_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI7'),
+(8,2,8,'LDI8::TEST_0004_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI8'),
+(9,2,9,'LDI9::TEST_0005_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI9'),
+(10,2,10,'LDI10::TEST_0005_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI10'),
+(11,2,11,'LDI11::TEST_0006_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI11'),
+(12,2,12,'LDI12::TEST_0006_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI12'),
+(13,2,13,'LDI13::TEST_0007_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI13'),
+(14,2,14,'LDI14::TEST_0007_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI14'),
+(15,2,15,'LDI15::TEST_0001_ALIQUOT_1_PE_300_WG','2018-02-15',1,1,'LDI15');
 
 DELETE FROM `LibraryQC`;
 INSERT INTO `LibraryQC`(`qcId`, `library_libraryId`, `creator`, `date`, `type`, `results`) VALUES
@@ -352,17 +339,17 @@ INSERT INTO `Library_Index`
 VALUES (1,12),(2,11),(3,10),(4,9),(5,8),(6,7),(7,6),(8,5),(9,4),(10,3),(11,2),(12,1),(13,24),(14,23);
 
 DELETE FROM `Pool`;
-INSERT INTO `Pool`(`poolId`, `concentration`, `identificationBarcode`, `name`, `description`, `creationDate`, `securityProfile_profileId`, `platformType`, `alias`, `qcPassed`, `lastModifier`, `lastModified`, `creator`, `created`)
-VALUES (1,2,'IPO1::Illumina','IPO1','TEST','2015-08-27',2,'ILLUMINA','Pool 1',NULL,1,'2016-06-07 13:13:30',1,'2016-07-07 13:30:49'),
-(2,2,'IPO2::Illumina','IPO2','TEST','2015-08-27',3,'ILLUMINA','Pool 2',NULL,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
-(3,2,'IPO3::Illumina','IPO3','TEST','2015-08-27',4,'ILLUMINA','Pool 3',NULL,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53'),
-(4,2,'IPO4::Illumina','IPO4','TEST','2015-08-27',5,'ILLUMINA','Pool 4',NULL,1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55'),
-(5,2,'IPO5::Illumina','IPO5','TEST','2015-08-27',6,'ILLUMINA','Pool 5',NULL,1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57'),
-(6,2,'IPO6::Illumina','IPO6','TEST','2015-08-27',7,'ILLUMINA','Pool 6',NULL,1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59'),
-(7,2,'IPO7::Illumina','IPO7','TEST','2015-08-27',8,'ILLUMINA','Pool 7',NULL,1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01'),
-(8,2,'IPO8::Illumina','IPO8','TEST','2015-08-27',9,'ILLUMINA','Pool 8',NULL,1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03'),
-(9,2,'IPO9::Illumina','IPO9','TEST','2015-08-27',10,'ILLUMINA','Pool 9',NULL,1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05'),
-(10,2,'IPO10::Illumina','IPO10','TEST','2015-08-27',11,'ILLUMINA','Pool 10',NULL,1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07');
+INSERT INTO `Pool`(`poolId`, `concentration`, `identificationBarcode`, `name`, `description`, `creationDate`, `platformType`, `alias`, `qcPassed`, `lastModifier`, `lastModified`, `creator`, `created`)
+VALUES (1,2,'IPO1::Illumina','IPO1','TEST','2015-08-27','ILLUMINA','Pool 1',NULL,1,'2016-06-07 13:13:30',1,'2016-07-07 13:30:49'),
+(2,2,'IPO2::Illumina','IPO2','TEST','2015-08-27','ILLUMINA','Pool 2',NULL,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
+(3,2,'IPO3::Illumina','IPO3','TEST','2015-08-27','ILLUMINA','Pool 3',NULL,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53'),
+(4,2,'IPO4::Illumina','IPO4','TEST','2015-08-27','ILLUMINA','Pool 4',NULL,1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55'),
+(5,2,'IPO5::Illumina','IPO5','TEST','2015-08-27','ILLUMINA','Pool 5',NULL,1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57'),
+(6,2,'IPO6::Illumina','IPO6','TEST','2015-08-27','ILLUMINA','Pool 6',NULL,1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59'),
+(7,2,'IPO7::Illumina','IPO7','TEST','2015-08-27','ILLUMINA','Pool 7',NULL,1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01'),
+(8,2,'IPO8::Illumina','IPO8','TEST','2015-08-27','ILLUMINA','Pool 8',NULL,1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03'),
+(9,2,'IPO9::Illumina','IPO9','TEST','2015-08-27','ILLUMINA','Pool 9',NULL,1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05'),
+(10,2,'IPO10::Illumina','IPO10','TEST','2015-08-27','ILLUMINA','Pool 10',NULL,1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07');
 
 DELETE FROM `Pool_Dilution`;
 INSERT INTO `Pool_Dilution`(`pool_poolId`, `dilution_dilutionId`) 
@@ -430,40 +417,40 @@ INSERT INTO `Instrument`(`instrumentId`, `name`, `instrumentModelId`) VALUES
 (2, 'h1180', 16),
 (3, 'iScan_1', 30);
 
-INSERT INTO `Experiment`(`experimentId`, `name`, `description`, `accession`, `title`, `securityProfile_profileId`, `study_studyId`, `alias`, `instrumentModelId`,`lastModifier`, lastModified, creator, created, `library_libraryId`) 
+INSERT INTO `Experiment`(`experimentId`, `name`, `description`, `accession`, `title`, `study_studyId`, `alias`, `instrumentModelId`,`lastModifier`, lastModified, creator, created, `library_libraryId`) 
 VALUES
-(1,'EXP1','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_1',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 1),
-(2,'EXP2','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_2',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 2),
-(3,'EXP3','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_3',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 3),
-(4,'EXP4','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_4',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 3),
-(5,'EXP5','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_5',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 4),
-(6,'EXP6','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_6',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 4),
-(7,'EXP7','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_7',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 4),
-(8,'EXP8','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_8',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 4),
-(9,'EXP9','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_9',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 5),
-(10,'EXP10','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_10',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 5),
-(11,'EXP11','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_11',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 5),
-(12,'EXP12','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_12',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 5),
-(13,'EXP13','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_13',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 6),
-(14,'EXP14','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_14',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 6),
-(15,'EXP15','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_15',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 6),
-(16,'EXP16','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_16',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 6),
-(17,'EXP17','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_17',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 7),
-(18,'EXP18','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_18',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 7),
-(19,'EXP19','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_19',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 7),
-(20,'EXP20','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_20',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 7),
-(21,'EXP21','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_21',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 8),
-(22,'EXP22','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_22',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 8),
-(23,'EXP23','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_23',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 8),
-(24,'EXP24','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_24',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 8),
-(25,'EXP25','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_25',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 10),
-(26,'EXP26','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,2,'EXP_AUTOGEN_STU1_Other_26',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 10),
-(27,'EXP27','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,3,'EXP_AUTOGEN_STU1_Other_27',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 10),
-(28,'EXP28','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,4,'EXP_AUTOGEN_STU1_Other_28',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 10),
-(29,'EXP29','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,2,'EXP_AUTOGEN_STU1_Other_29',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9),
-(30,'EXP30','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,3,'EXP_AUTOGEN_STU1_Other_30',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9),
-(31,'EXP31','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,4,'EXP_AUTOGEN_STU1_Other_31',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9),
-(32,'EXP32','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,5,'EXP_AUTOGEN_STU1_Other_32',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9);
+(1,'EXP1','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_1',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 1),
+(2,'EXP2','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_2',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 2),
+(3,'EXP3','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_3',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 3),
+(4,'EXP4','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_4',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 3),
+(5,'EXP5','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_5',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 4),
+(6,'EXP6','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_6',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 4),
+(7,'EXP7','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_7',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 4),
+(8,'EXP8','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_8',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 4),
+(9,'EXP9','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_9',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 5),
+(10,'EXP10','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_10',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 5),
+(11,'EXP11','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_11',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 5),
+(12,'EXP12','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_12',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 5),
+(13,'EXP13','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_13',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 6),
+(14,'EXP14','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_14',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 6),
+(15,'EXP15','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_15',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 6),
+(16,'EXP16','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_16',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 6),
+(17,'EXP17','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_17',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 7),
+(18,'EXP18','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_18',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 7),
+(19,'EXP19','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_19',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 7),
+(20,'EXP20','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_20',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 7),
+(21,'EXP21','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_21',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 8),
+(22,'EXP22','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_22',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 8),
+(23,'EXP23','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_23',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 8),
+(24,'EXP24','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_24',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 8),
+(25,'EXP25','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,'EXP_AUTOGEN_STU1_Other_25',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 10),
+(26,'EXP26','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',2,'EXP_AUTOGEN_STU1_Other_26',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 10),
+(27,'EXP27','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',3,'EXP_AUTOGEN_STU1_Other_27',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 10),
+(28,'EXP28','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',4,'EXP_AUTOGEN_STU1_Other_28',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 10),
+(29,'EXP29','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',2,'EXP_AUTOGEN_STU1_Other_29',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9),
+(30,'EXP30','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',3,'EXP_AUTOGEN_STU1_Other_30',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9),
+(31,'EXP31','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',4,'EXP_AUTOGEN_STU1_Other_31',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9),
+(32,'EXP32','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',5,'EXP_AUTOGEN_STU1_Other_32',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9);
 
 DELETE FROM `ServiceRecord`;
 INSERT INTO `ServiceRecord`(`recordId`, `instrumentId`, `title`, `details`, `servicedBy`, `referenceNumber`, `serviceDate`, `startTime`, `endTime`)
@@ -475,11 +462,11 @@ DELETE FROM `RunIllumina`;
 DELETE FROM `RunPacBio`;
 DELETE FROM `RunLS454`;
 DELETE FROM `Run`;
-INSERT INTO `Run`(`runId`, `name`, `description`, `accession`, `filePath`, `securityProfile_profileId`, `alias`, `instrumentId`, `lastModifier`, `health`, `completionDate`, `lastModified`, `creator`, `created`) 
-VALUES (1,'RUN1','BC0JHTACXX',NULL,'/.mounts/labs/prod/archive/h1179/120323_h1179_0070_BC0JHTACXX',12,'120323_h1179_0070_BC0JHTACXX',1,1,'Completed','2012-03-31','2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
-(2,'RUN2','AD0VJ9ACXX',NULL,'/.mounts/labs/prod/archive/h1179/120404_h1179_0072_AD0VJ9ACXX',13,'120404_h1179_0072_AD0VJ9ACXX',1,1,'Failed','2012-04-04','2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
-(3,'RUN3','BC075RACXX',NULL,'/.mounts/labs/prod/archive/h1179/120412_h1179_0073_BC075RACXX',14,'120412_h1179_0073_BC075RACXX',1,1,'Completed','2012-04-20','2016-07-07 13:30:53',1,'2016-07-07 13:30:53'),
-(4,'RUN4','AC0KY7ACXX',NULL,'/.mounts/labs/prod/archive/h1179/120314_h1179_0068_AC0KY7ACXX',15,'120314_h1179_0068_AC0KY7ACXX',1,1,'Completed','2012-03-23','2016-07-07 13:30:55',1,'2016-07-07 13:30:55');
+INSERT INTO `Run`(`runId`, `name`, `description`, `accession`, `filePath`, `alias`, `instrumentId`, `lastModifier`, `health`, `completionDate`, `lastModified`, `creator`, `created`) 
+VALUES (1,'RUN1','BC0JHTACXX',NULL,'/.mounts/labs/prod/archive/h1179/120323_h1179_0070_BC0JHTACXX','120323_h1179_0070_BC0JHTACXX',1,1,'Completed','2012-03-31','2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
+(2,'RUN2','AD0VJ9ACXX',NULL,'/.mounts/labs/prod/archive/h1179/120404_h1179_0072_AD0VJ9ACXX','120404_h1179_0072_AD0VJ9ACXX',1,1,'Failed','2012-04-04','2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
+(3,'RUN3','BC075RACXX',NULL,'/.mounts/labs/prod/archive/h1179/120412_h1179_0073_BC075RACXX','120412_h1179_0073_BC075RACXX',1,1,'Completed','2012-04-20','2016-07-07 13:30:53',1,'2016-07-07 13:30:53'),
+(4,'RUN4','AC0KY7ACXX',NULL,'/.mounts/labs/prod/archive/h1179/120314_h1179_0068_AC0KY7ACXX','120314_h1179_0068_AC0KY7ACXX',1,1,'Completed','2012-03-23','2016-07-07 13:30:55',1,'2016-07-07 13:30:55');
 INSERT INTO RunIllumina(runId) VALUES (1), (2), (3), (4);
 
 INSERT INTO `RunChangeLog`(`runId`, `columnsChanged`, `userId`, `message`, `changeTime`)
@@ -536,11 +523,11 @@ INSERT INTO SequencingContainerModel_InstrumentModel (sequencingContainerModelId
 (2, 16),
 (3, 16);
 
-INSERT INTO `SequencerPartitionContainer`(`containerId`, `securityProfile_profileId`, `identificationBarcode`, sequencingContainerModelId, `lastModifier`, `lastModified`, `creator`, `created`) 
-VALUES (1,12,'C0JHTACXX',1,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47'),
-(2,13,'D0VJ9ACXX',1,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
-(3,14,'C075RACXX',1,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
-(4,15,'C0KY7ACXX',1,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53');
+INSERT INTO `SequencerPartitionContainer`(`containerId`, `identificationBarcode`, sequencingContainerModelId, `lastModifier`, `lastModified`, `creator`, `created`) 
+VALUES (1,'C0JHTACXX',1,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47'),
+(2,'D0VJ9ACXX',1,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
+(3,'C075RACXX',1,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
+(4,'C0KY7ACXX',1,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53');
 
 INSERT INTO `SequencerPartitionContainerChangeLog`(`containerId`, `columnsChanged`, `userId`, `message`, `changeTime`)
 VALUES (1, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:47'),
@@ -576,10 +563,10 @@ VALUES
 ('2', 'boxuse2');
 
 DELETE FROM Box;
-INSERT INTO `Box` (`boxId`, `boxSizeId`, `boxUseId`, `name`, `alias`, `description`, `identificationBarcode`, `locationBarcode`, `securityProfile_profileId`, `lastModifier`, `lastModified`, `creator`, `created`)
+INSERT INTO `Box` (`boxId`, `boxSizeId`, `boxUseId`, `name`, `alias`, `description`, `identificationBarcode`, `locationBarcode`, `lastModifier`, `lastModified`, `creator`, `created`)
 VALUES
-('1','1', '1', 'box1', 'box1alias', 'box1','identificationbarcode1', 'location1', '1', '1', '2017-06-20 16:02:00', '1', '2017-06-20 16:02:00'),
-('2','1', '2', 'box2', 'box2alias', 'box2','identificationbarcode2', 'location2', '1', '1', '2017-06-20 16:02:00', '1', '2017-06-20 16:02:00');
+('1','1', '1', 'box1', 'box1alias', 'box1','identificationbarcode1', 'location1', '1', '2017-06-20 16:02:00', '1', '2017-06-20 16:02:00'),
+('2','1', '2', 'box2', 'box2alias', 'box2','identificationbarcode2', 'location2', '1', '2017-06-20 16:02:00', '1', '2017-06-20 16:02:00');
 
 DELETE FROM BoxChangeLog;
 INSERT INTO BoxChangeLog(boxChangeLogId, boxId, columnsChanged, userId, message, changeTime)

@@ -22,7 +22,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
@@ -261,8 +260,6 @@ public class DefaultSampleServiceTest {
 
     SampleIdentity shellParent = new SampleIdentityImpl();
     shellParent.setExternalName(parent.getExternalName());
-    shellParent.setSecurityProfile(parent.getSecurityProfile());
-    shellParent.getSecurityProfile().setOwner(mockUser());
     Long shellParentId = 88L;
     shellParent.setId(shellParentId);
     child.setParent(shellParent);
@@ -303,8 +300,6 @@ public class DefaultSampleServiceTest {
     SampleTissue sample = makeUnsavedChildTissue();
     SampleIdentity fakeParent = new SampleIdentityImpl();
     fakeParent.setExternalName("non-existing");
-    fakeParent.setSecurityProfile(new SecurityProfile(mockUser()));
-    fakeParent.getSecurityProfile().setOwner(mockUser());
     sample.setParent(fakeParent);
     mockShellProjectWithRealLookup(sample);
     mockUser();
@@ -535,7 +530,6 @@ public class DefaultSampleServiceTest {
     
     sut.addNote(paramSample, note);
     
-    Mockito.verify(authorizationManager).throwIfNotWritable(dbSample);
     ArgumentCaptor<Sample> capture = ArgumentCaptor.forClass(Sample.class);
     Mockito.verify(sampleStore).save(capture.capture());
     Sample savedSample = capture.getValue();
@@ -592,8 +586,6 @@ public class DefaultSampleServiceTest {
     sample.getSampleClass().setAlias("identity");
     sample.getSampleClass().setSampleCategory(SampleIdentity.CATEGORY_NAME);
     sample.setExternalName("external");
-    sample.setSecurityProfile(new SecurityProfile(mockUser()));
-    sample.getSecurityProfile().setOwner(mockUser());
     return sample;
   }
 
@@ -601,7 +593,6 @@ public class DefaultSampleServiceTest {
     SampleTissue sample = makeUnsavedParentTissue();
     sample.setSampleType("type");
     sample.setScientificName("scientific");
-    sample.setSecurityProfile(new SecurityProfile(new UserImpl()));
     return sample;
   }
 
@@ -612,7 +603,6 @@ public class DefaultSampleServiceTest {
     sample.getSampleClass().setAlias("tissue");
     sample.getSampleClass().setSampleCategory(SampleTissue.CATEGORY_NAME);
     Mockito.when(sampleClassService.get(sample.getSampleClass().getId())).thenReturn(sample.getSampleClass());
-    sample.setSecurityProfile(new SecurityProfile(new UserImpl()));
     return sample;
   }
 
@@ -656,8 +646,6 @@ public class DefaultSampleServiceTest {
     project.setId(shell.getId());
     project.setAlias("real_project");
     project.setShortName("PROJ");
-    project.setSecurityProfile(new SecurityProfile(mockUser()));
-    project.getSecurityProfile().setOwner(mockUser());
     Mockito.when(projectStore.get(shell.getId())).thenReturn(project);
     return project;
   }

@@ -16,7 +16,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
@@ -29,10 +28,6 @@ public abstract class AbstractBox implements Box {
   private static final long serialVersionUID = 1L;
 
   private static final Long UNSAVED_ID = 0L;
-
-  @ManyToOne(cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "securityProfile_profileId")
-  private SecurityProfile securityProfile = null;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -135,16 +130,6 @@ public abstract class AbstractBox implements Box {
   }
 
   @Override
-  public SecurityProfile getSecurityProfile() {
-    return securityProfile;
-  }
-
-  @Override
-  public void setSecurityProfile(SecurityProfile securityProfile) {
-    this.securityProfile = securityProfile;
-  }
-
-  @Override
   public BoxUse getUse() {
     return use;
   }
@@ -227,11 +212,6 @@ public abstract class AbstractBox implements Box {
   @Override
   public String getDeleteDescription() {
     return getName() + " (" + getAlias() + ")";
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    return getSecurityProfile();
   }
 
   @Override

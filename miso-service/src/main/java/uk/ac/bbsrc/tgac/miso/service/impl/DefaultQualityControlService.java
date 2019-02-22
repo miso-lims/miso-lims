@@ -47,7 +47,6 @@ public class DefaultQualityControlService implements QualityControlService {
     QcTargetStore handler = getHandler(qc.getType().getQcTarget());
 
     QualityControlEntity entity = handler.getEntity(qc.getEntity().getId());
-    authorizationManager.throwIfNotWritable(entity);
     User user = authorizationManager.getCurrentUser();
     qc.setCreator(user);
     qc.setCreationTime(new Date());
@@ -74,7 +73,6 @@ public class DefaultQualityControlService implements QualityControlService {
     QcTargetStore handler = getHandler(qc.getType().getQcTarget());
 
     QualityControlEntity entity = handler.getEntity(qc.getEntity().getId());
-    authorizationManager.throwIfNotWritable(entity);
     User user = authorizationManager.getCurrentUser();
 
     QC original = handler.get(qc.getId());
@@ -93,16 +91,12 @@ public class DefaultQualityControlService implements QualityControlService {
 
   @Override
   public QC get(QcTarget target, Long id) throws IOException {
-    QC qc = getHandler(target).get(id);
-    authorizationManager.throwIfNotReadable(qc.getEntity());
-    return qc;
+    return getHandler(target).get(id);
   }
 
   @Override
   public QualityControlEntity getEntity(QcTarget target, long ownerId) throws IOException {
-    QualityControlEntity entity = getHandler(target).getEntity(ownerId);
-    authorizationManager.throwIfNotReadable(entity);
-    return entity;
+    return getHandler(target).getEntity(ownerId);
   }
 
   private QcTargetStore getHandler(QcTarget target) {
@@ -123,7 +117,7 @@ public class DefaultQualityControlService implements QualityControlService {
   @Override
   public Collection<? extends QC> listQCsFor(QcTarget target, long ownerId) throws IOException {
     Collection<? extends QC> unfiltered = getHandler(target).listForEntity(ownerId);
-    return authorizationManager.filterUnreadable(unfiltered, QC::getEntity);
+    return unfiltered;
   }
 
   @Override

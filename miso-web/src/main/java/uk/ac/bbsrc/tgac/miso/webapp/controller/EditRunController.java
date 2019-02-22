@@ -53,7 +53,6 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
@@ -69,7 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.IlluminaWorkflowType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
-import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
@@ -77,7 +75,6 @@ import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
@@ -107,8 +104,6 @@ public class EditRunController {
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
-  private SecurityManager securityManager;
-  @Autowired
   private ChangeLogService changeLogService;
   @Autowired
   private RunService runService;
@@ -121,8 +116,6 @@ public class EditRunController {
   private InstrumentService instrumentService;
   @Autowired
   private SequencingParametersService sequencingParametersService;
-  @Autowired
-  private LibraryService libraryService;
   @Autowired
   private ExperimentService experimentService;
 
@@ -176,11 +169,10 @@ public class EditRunController {
 
   @GetMapping("/new/{srId}")
   public ModelAndView newUnassignedRun(@PathVariable Long srId, ModelMap model) throws IOException {
-    User user = authorizationManager.getCurrentUser();
     // clear any existing run in the model
     model.addAttribute("run", null);
     Instrument instrument = instrumentService.get(srId);
-    Run run = instrument.getInstrumentModel().getPlatformType().createRun(user);
+    Run run = instrument.getInstrumentModel().getPlatformType().createRun();
     run.setSequencer(instrument);
     return setupForm(run, model);
 
@@ -214,7 +206,6 @@ public class EditRunController {
   public ModelAndView setupForm(Run run, ModelMap model) throws IOException {
 
     try {
-      User user = authorizationManager.getCurrentUser();
 
       if (run.getId() == Run.UNSAVED_ID) {
         model.put("title", "New Run");
@@ -266,9 +257,6 @@ public class EditRunController {
       }
       model.put("formObj", run);
       model.put("run", run);
-      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, run, securityManager.listAllUsers()));
-      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run, securityManager.listAllUsers()));
-      model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run, securityManager.listAllGroups()));
 
       ObjectMapper mapper = new ObjectMapper();
       ObjectNode partitionConfig = mapper.createObjectNode();

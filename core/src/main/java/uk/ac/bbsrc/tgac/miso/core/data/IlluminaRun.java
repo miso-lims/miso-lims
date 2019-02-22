@@ -29,8 +29,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.IlluminaWorkflowType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -42,10 +40,6 @@ public class IlluminaRun extends Run {
 
   public IlluminaRun() {
     super();
-  }
-
-  public IlluminaRun(User user) {
-    super(user);
   }
 
   private String runBasesMask;

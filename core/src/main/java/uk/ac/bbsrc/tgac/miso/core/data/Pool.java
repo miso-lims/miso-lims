@@ -34,7 +34,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * A Pool represents a collection of one or more {@link Poolable} objects, which enables multiplexing to be modelled if necessary. Pools
@@ -49,7 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @since 0.0.2
  */
 public interface Pool
-    extends SecurableByProfile, Comparable<Pool>, Barcodable, Boxable, Nameable, ChangeLoggable,
+    extends Comparable<Pool>, Barcodable, Boxable, Nameable, ChangeLoggable,
     Serializable, Aliasable, QualityControllable<PoolQC>, Deletable, Attachable {
 
   /**

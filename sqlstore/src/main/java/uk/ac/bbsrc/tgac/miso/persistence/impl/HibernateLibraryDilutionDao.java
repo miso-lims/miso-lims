@@ -68,7 +68,7 @@ public class HibernateLibraryDilutionDao
   }
 
   @Override
-  public Collection<LibraryDilution> listAll() throws IOException {
+  public List<LibraryDilution> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
     @SuppressWarnings("unchecked")
     List<LibraryDilution> records = criteria.list();
@@ -82,7 +82,7 @@ public class HibernateLibraryDilutionDao
   }
 
   @Override
-  public Collection<LibraryDilution> listByLibraryId(long libraryId) throws IOException {
+  public List<LibraryDilution> listByLibraryId(long libraryId) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
     criteria.add(Restrictions.eq("library.id", libraryId));
     @SuppressWarnings("unchecked")
@@ -190,7 +190,7 @@ public class HibernateLibraryDilutionDao
   }
 
   @Override
-  public Collection<LibraryDilution> listByIdList(List<Long> idList) throws IOException {
+  public List<LibraryDilution> listByIdList(List<Long> idList) throws IOException {
     if (idList.isEmpty()) {
       return Collections.emptyList();
     }

@@ -146,7 +146,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public Collection<Sample> listAll() throws IOException {
+  public List<Sample> listAll() throws IOException {
     return list();
   }
 

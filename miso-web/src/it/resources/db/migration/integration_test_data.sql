@@ -260,14 +260,6 @@ INSERT INTO `_Group` (description, name) VALUES
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (3,1),(3,2),(1,1);
 
-INSERT INTO `SecurityProfile`(`profileId`, `allowAllInternal`, `owner_userId`) 
-VALUES (1,1,1),(2,1,1),(3,1,1),(4,1,1),(5,1,1),(6,1,1),(7,1,1),(8,1,1),(9,1,1),(10,1,1),(11,1,1),(12,1,NULL),(13,1,NULL),(14,1,NULL),(15,1,NULL);
-
-INSERT INTO SecurityProfile_ReadUser(SecurityProfile_profileId, readUser_userId) VALUES (1, 1);
-INSERT INTO SecurityProfile_WriteUser(SecurityProfile_profileId, writeUser_userId) VALUES (2, 1);
-INSERT INTO SecurityProfile_ReadGroup(SecurityProfile_profileId, readGroup_groupId) VALUES (3, 2);
-INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_groupId) VALUES (4, 2);
-
 INSERT INTO IndexFamily (indexFamilyId, name, platformType) VALUES
   (1, 'Single Index 6bp', 'ILLUMINA'),
   (2, 'Dual Index 6bp', 'ILLUMINA'),
@@ -362,92 +354,92 @@ INSERT INTO ServiceRecord(recordId, instrumentId, title, details, servicedBy, re
   (151, 101, 'Test 151', NULL, NULL, NULL, '2017-09-12', NULL, NULL, 0),
   (152, 101, 'Test 152', 'details to remove', 'technitchin', 'Riffraff', '2017-09-12', '2017-09-11 11:00:00', '2017-09-12 12:00:00', 1);
 
-INSERT INTO Project(projectId, name, alias, shortName, creationDate, description, securityProfile_profileId,
+INSERT INTO Project(projectId, name, alias, shortName, creationDate, description,
   progress, referenceGenomeId, lastUpdated) VALUES
-  (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 1, 'ACTIVE', 1, '2017-06-27 14:11:00'),
-  (2, 'PRO2', 'Project Two', 'PRO2', '2017-07-20', 'integration test project for custom identities', 2, 'ACTIVE', 1, '2017-07-20 16:55:00'),
-  (3, 'PRO3', 'Test Data', 'TEST', '2017-06-27', 'integration test project three', 2, 'ACTIVE', 1, '2017-06-27 14:12:00'),
-  (4, 'PRO4', 'Project To Change', 'DELTA', '2017-08-04', 'integration test project for changing fields', 2, 'PROPOSED', 2, '2017-08-04 15:12:00'),
-  (5, 'PRO5', 'Search Tables Project', 'SRCH', '2017-10-10', 'integration test project five', 1, 'ACTIVE', 1, '2017-10-10 10:10:10'),
-  (100001, 'PRO100001', 'BulkLibraryIT', 'LIBT', '2017-07-24', 'bulk library test project', 1, 'ACTIVE', 1, '2017-07-24 16:11:00'),
-  (110001, 'PRO110001', 'SingleLibraryIT', '1LIB', '2017-08-16', 'single library test project', 1, 'ACTIVE', 1, '2017-08-16 16:11:00'),
-  (120001, 'PRO120001', 'SinglePoolIT', '1IPO', '2017-08-22', 'single pool test project', 1, 'ACTIVE', 1, '2017-08-22 16:35:00'),
-  (200001, 'PRO200001', 'BulkPoolIT', 'IPOT', '2017-08-15', 'bulk Pool test project', 1, 'ACTIVE', 1, '2017-08-15 12:22:00'),
-  (200, 'PRO200', 'HotSorting', 'SORT', '2017-08-09', 'test sorting by BoxPosition in Handsontable', 1, 'ACTIVE', 1, '2017-08-09 11:51:00'),
-  (300, 'PRO300', 'BulkDilutionIT', 'DILT', '2017-08-14', 'bulk dilution test project', 1, 'ACTIVE', 1, '2017-08-14 11:54:00'),
-  (400, 'PRO400', 'StudiesIT', 'STUT', '2017-08-16', 'studies test project', 1, 'ACTIVE', 1, '2017-08-16 14:50:00'),
-  (500, 'PRO500', 'Tubes In Boxes', 'TIB', '2017-08-15', 'test tubes in and out of boxes', 1, 'ACTIVE', 1, '2017-08-15 13:45:00'),
-  (4440, 'PRO4440', 'Propagate Samples', 'PROP', '2017-10-26', 'propagate samples', 1, 'ACTIVE', 1, '2017-10-26 14:20:00'),
-  (2200, 'PRO2200', 'Update Via QC', 'UQC', '2018-07-10', 'update via qc', 1, 'ACTIVE', 1, '2018-07-10 12:52:00');
+  (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00'),
+  (2, 'PRO2', 'Project Two', 'PRO2', '2017-07-20', 'integration test project for custom identities', 'ACTIVE', 1, '2017-07-20 16:55:00'),
+  (3, 'PRO3', 'Test Data', 'TEST', '2017-06-27', 'integration test project three', 'ACTIVE', 1, '2017-06-27 14:12:00'),
+  (4, 'PRO4', 'Project To Change', 'DELTA', '2017-08-04', 'integration test project for changing fields', 'PROPOSED', 2, '2017-08-04 15:12:00'),
+  (5, 'PRO5', 'Search Tables Project', 'SRCH', '2017-10-10', 'integration test project five', 'ACTIVE', 1, '2017-10-10 10:10:10'),
+  (100001, 'PRO100001', 'BulkLibraryIT', 'LIBT', '2017-07-24', 'bulk library test project', 'ACTIVE', 1, '2017-07-24 16:11:00'),
+  (110001, 'PRO110001', 'SingleLibraryIT', '1LIB', '2017-08-16', 'single library test project', 'ACTIVE', 1, '2017-08-16 16:11:00'),
+  (120001, 'PRO120001', 'SinglePoolIT', '1IPO', '2017-08-22', 'single pool test project', 'ACTIVE', 1, '2017-08-22 16:35:00'),
+  (200001, 'PRO200001', 'BulkPoolIT', 'IPOT', '2017-08-15', 'bulk Pool test project', 'ACTIVE', 1, '2017-08-15 12:22:00'),
+  (200, 'PRO200', 'HotSorting', 'SORT', '2017-08-09', 'test sorting by BoxPosition in Handsontable', 'ACTIVE', 1, '2017-08-09 11:51:00'),
+  (300, 'PRO300', 'BulkDilutionIT', 'DILT', '2017-08-14', 'bulk dilution test project', 'ACTIVE', 1, '2017-08-14 11:54:00'),
+  (400, 'PRO400', 'StudiesIT', 'STUT', '2017-08-16', 'studies test project', 'ACTIVE', 1, '2017-08-16 14:50:00'),
+  (500, 'PRO500', 'Tubes In Boxes', 'TIB', '2017-08-15', 'test tubes in and out of boxes', 'ACTIVE', 1, '2017-08-15 13:45:00'),
+  (4440, 'PRO4440', 'Propagate Samples', 'PROP', '2017-10-26', 'propagate samples', 'ACTIVE', 1, '2017-10-26 14:20:00'),
+  (2200, 'PRO2200', 'Update Via QC', 'UQC', '2018-07-10', 'update via qc', 'ACTIVE', 1, '2018-07-10 12:52:00');
 
 INSERT INTO SampleNumberPerProject(projectId, highestSampleNumber, padding, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (100001, 1, 4, 1, '2017-10-11 15:33:00', 1, '2017-10-11 15:33:00');
 
-INSERT INTO Study (studyId, name, securityProfile_profileId, project_projectId, alias, studyTypeId, creator, created, lastModifier, lastModified) VALUES
-(1, 'STU1', 1, 1, 'Study One', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
-(400, 'STU400', 1, 400, 'UI Test Study', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
+INSERT INTO Study (studyId, name, project_projectId, alias, studyTypeId, creator, created, lastModifier, lastModified) VALUES
+(1, 'STU1', 1, 'Study One', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(400, 'STU400', 400, 'UI Test Study', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
-INSERT INTO Sample (sampleId, name, alias, description, securityProfile_profileId, identificationBarcode, sampleType, receivedDate, project_projectId,
+INSERT INTO Sample (sampleId, name, alias, description, identificationBarcode, sampleType, receivedDate, project_projectId,
 scientificName, volume, volumeUnits, qcPassed, lastModifier, creator, created, lastModified) VALUES
-(1, 'SAM1', 'TEST_0001', 'Identity', 2, '11111', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00'),
-(2, 'SAM2', 'TEST_0001_Bn_R_nn_1-1', 'Tissue', 2, '22222', 'GENOMIC', '2017-07-20', 3, 'Homo sapiens', 30, 'MICROLITRES', 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(3, 'SAM3', 'TEST_0001_Bn_R_nn_1-1_SL01', 'Slide', 2, '33333', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(4, 'SAM4', 'TEST_0001_Bn_R_nn_1-1_C01', 'Curls', 2, '44444', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(5, 'SAM5', 'TEST_0001_Bn_R_nn_1-1_LCM01', 'LCM Tube', 2, '55555', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(6, 'SAM6', 'TEST_0001_Bn_R_nn_1-1_D_S1', 'gDNA stock', 2, '66666', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(7, 'SAM7', 'TEST_0001_Bn_R_nn_1-1_R_S1', 'whole RNA stock', 2, '77777', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(8, 'SAM8', 'TEST_0001_Bn_R_nn_1-1_D_1', 'gDNA aliquot', 2, '88888', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(9, 'SAM9', 'TEST_0001_Bn_R_nn_1-1_R_1', 'whole RNA aliquot', 2, '99999', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(10, 'SAM10', 'TEST_0001_Bn_R_nn_1-1_D_S2', 'cDNA stock', 2, '10101', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(11, 'SAM11', 'TEST_0001_Bn_R_nn_1-1_D_2', 'cDNA aliquot', 2, '11011', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(12, 'SAM12', 'TEST_0001_Bn_R_nn_1-1_R_1_SM_1', 'smRNA', 2, '12121', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(13, 'SAM13', 'TEST_0001_Bn_R_nn_1-1_R_1_MR_1', 'mRNA', 2, '13131', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(14, 'SAM14', 'TEST_0001_Bn_R_nn_1-1_R_1_WT_1', 'rRNA_depleted', 2, '14141', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(501, 'SAM501', 'TIB_0001', NULL, 1, NULL, 'GENOMIC', NULL, 500, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-08-15 13:45:00', '2017-08-15 13:45:00'),
-(502, 'SAM502', 'TIB_0001_nn_n_1-1', NULL, 1, 'TIB_SamTissue', 'GENOMIC', NULL, 500, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-08-15 13:45:00', '2017-08-15 13:45:00'),
-(503, 'SAM503', 'TIB_0001_nn_n_1-1_D_S1', NULL, 1, 'TIB_SamStock', 'GENOMIC', NULL, 500, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-08-15 13:45:00', '2017-08-15 13:45:00'),
-(504, 'SAM504', 'TIB_0001_nn_n_1-1_D_1', NULL, 1, 'TIB_SamAliquot', 'GENOMIC', NULL, 500, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-08-15 13:45:00', '2017-08-15 13:45:00');
+(1, 'SAM1', 'TEST_0001', 'Identity', '11111', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00'),
+(2, 'SAM2', 'TEST_0001_Bn_R_nn_1-1', 'Tissue', '22222', 'GENOMIC', '2017-07-20', 3, 'Homo sapiens', 30, 'MICROLITRES', 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(3, 'SAM3', 'TEST_0001_Bn_R_nn_1-1_SL01', 'Slide', '33333', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(4, 'SAM4', 'TEST_0001_Bn_R_nn_1-1_C01', 'Curls', '44444', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(5, 'SAM5', 'TEST_0001_Bn_R_nn_1-1_LCM01', 'LCM Tube', '55555', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(6, 'SAM6', 'TEST_0001_Bn_R_nn_1-1_D_S1', 'gDNA stock', '66666', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(7, 'SAM7', 'TEST_0001_Bn_R_nn_1-1_R_S1', 'whole RNA stock', '77777', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(8, 'SAM8', 'TEST_0001_Bn_R_nn_1-1_D_1', 'gDNA aliquot', '88888', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(9, 'SAM9', 'TEST_0001_Bn_R_nn_1-1_R_1', 'whole RNA aliquot', '99999', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(10, 'SAM10', 'TEST_0001_Bn_R_nn_1-1_D_S2', 'cDNA stock', '10101', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(11, 'SAM11', 'TEST_0001_Bn_R_nn_1-1_D_2', 'cDNA aliquot', '11011', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(12, 'SAM12', 'TEST_0001_Bn_R_nn_1-1_R_1_SM_1', 'smRNA', '12121', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(13, 'SAM13', 'TEST_0001_Bn_R_nn_1-1_R_1_MR_1', 'mRNA', '13131', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(14, 'SAM14', 'TEST_0001_Bn_R_nn_1-1_R_1_WT_1', 'rRNA_depleted', '14141', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(501, 'SAM501', 'TIB_0001', NULL, NULL, 'GENOMIC', NULL, 500, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-08-15 13:45:00', '2017-08-15 13:45:00'),
+(502, 'SAM502', 'TIB_0001_nn_n_1-1', NULL, 'TIB_SamTissue', 'GENOMIC', NULL, 500, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-08-15 13:45:00', '2017-08-15 13:45:00'),
+(503, 'SAM503', 'TIB_0001_nn_n_1-1_D_S1', NULL, 'TIB_SamStock', 'GENOMIC', NULL, 500, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-08-15 13:45:00', '2017-08-15 13:45:00'),
+(504, 'SAM504', 'TIB_0001_nn_n_1-1_D_1', NULL, 'TIB_SamAliquot', 'GENOMIC', NULL, 500, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-08-15 13:45:00', '2017-08-15 13:45:00');
 
-INSERT INTO Sample(sampleId, project_projectId, name, alias, securityProfile_profileId, sampleType, scientificName, creator, created,
+INSERT INTO Sample(sampleId, project_projectId, name, alias, sampleType, scientificName, creator, created,
   lastModifier, lastModified) VALUES
-  (100001, 100001, 'SAM100001', 'LIBT_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (100002, 100001, 'SAM100002', 'LIBT_0001_Ly_P_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (100003, 100001, 'SAM100003', 'LIBT_0001_Ly_P_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (100004, 100001, 'SAM100004', 'LIBT_0001_Ly_P_1-1_D1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (110001, 110001, 'SAM110001', '1LIB_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (110002, 110001, 'SAM110002', '1LIB_0001_Ly_P_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (110003, 110001, 'SAM110003', '1LIB_0001_Ly_P_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (110004, 110001, 'SAM110004', '1LIB_0001_Ly_P_1-1_D1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (120001, 120001, 'SAM120001', '1IPO_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (120002, 120001, 'SAM120002', '1IPO_0001_Ly_P_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (120003, 120001, 'SAM120003', '1IPO_0001_Ly_P_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (120004, 120001, 'SAM120004', '1IPO_0001_Ly_P_1-1_D1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (200001, 200001, 'SAM200001', 'IPOT_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (200002, 200001, 'SAM200002', 'IPOT_0001_Pa_P_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (200003, 200001, 'SAM200003', 'IPOT_0001_Pa_P_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (200004, 200001, 'SAM200004', 'IPOT_0001_Pa_P_1-1_D_1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (201, 200, 'SAM201', 'SORT_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
-  (202, 200, 'SAM202', 'SORT_0001_nn_n_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
-  (203, 200, 'SAM203', 'SORT_0001_nn_n_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
-  (204, 200, 'SAM204', 'SORT_0001_nn_n_1-1_D_1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
-  (205, 200, 'SAM205', 'SORT_0001_nn_n_1-1_D_2', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
-  (206, 200, 'SAM206', 'SORT_0001_nn_n_1-1_D_3', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
-  (301, 300, 'SAM301', 'DILT_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00'),
-  (302, 300, 'SAM302', 'DILT_0001_nn_n_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00'),
-  (303, 300, 'SAM303', 'DILT_0001_nn_n_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00'),
-  (304, 300, 'SAM304', 'DILT_0001_nn_n_1-1_D_1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00'),
-  (305, 300, 'SAM305', 'DILT_0001_nn_n_1-1_D_2', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00'),
-  (4441, 4440, 'SAM4441', 'PROP_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
-  (4442, 4440, 'SAM4442', 'PROP_0001_nn_n_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
-  (4443, 4440, 'SAM4443', 'PROP_0001_nn_n_1-1_SL01', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
-  (4444, 4440, 'SAM4444', 'PROP_0001_nn_n_1-1_LCM01', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
-  (4445, 4440, 'SAM4445', 'PROP_0001_nn_n_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
-  (4446, 4440, 'SAM4446', 'PROP_0001_nn_n_1-1_R_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
-  (4447, 4440, 'SAM4447', 'PROP_0001_nn_n_1-1_R_1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00');
+  (100001, 100001, 'SAM100001', 'LIBT_0001', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (100002, 100001, 'SAM100002', 'LIBT_0001_Ly_P_1-1', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (100003, 100001, 'SAM100003', 'LIBT_0001_Ly_P_1-1_D_S1', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (100004, 100001, 'SAM100004', 'LIBT_0001_Ly_P_1-1_D1', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (110001, 110001, 'SAM110001', '1LIB_0001', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (110002, 110001, 'SAM110002', '1LIB_0001_Ly_P_1-1', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (110003, 110001, 'SAM110003', '1LIB_0001_Ly_P_1-1_D_S1', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (110004, 110001, 'SAM110004', '1LIB_0001_Ly_P_1-1_D1', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (120001, 120001, 'SAM120001', '1IPO_0001', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (120002, 120001, 'SAM120002', '1IPO_0001_Ly_P_1-1', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (120003, 120001, 'SAM120003', '1IPO_0001_Ly_P_1-1_D_S1', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (120004, 120001, 'SAM120004', '1IPO_0001_Ly_P_1-1_D1', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (200001, 200001, 'SAM200001', 'IPOT_0001', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (200002, 200001, 'SAM200002', 'IPOT_0001_Pa_P_1-1', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (200003, 200001, 'SAM200003', 'IPOT_0001_Pa_P_1-1_D_S1', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (200004, 200001, 'SAM200004', 'IPOT_0001_Pa_P_1-1_D_1', 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (201, 200, 'SAM201', 'SORT_0001', 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
+  (202, 200, 'SAM202', 'SORT_0001_nn_n_1-1', 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
+  (203, 200, 'SAM203', 'SORT_0001_nn_n_1-1_D_S1', 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
+  (204, 200, 'SAM204', 'SORT_0001_nn_n_1-1_D_1', 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
+  (205, 200, 'SAM205', 'SORT_0001_nn_n_1-1_D_2', 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
+  (206, 200, 'SAM206', 'SORT_0001_nn_n_1-1_D_3', 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
+  (301, 300, 'SAM301', 'DILT_0001', 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00'),
+  (302, 300, 'SAM302', 'DILT_0001_nn_n_1-1', 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00'),
+  (303, 300, 'SAM303', 'DILT_0001_nn_n_1-1_D_S1', 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00'),
+  (304, 300, 'SAM304', 'DILT_0001_nn_n_1-1_D_1', 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00'),
+  (305, 300, 'SAM305', 'DILT_0001_nn_n_1-1_D_2', 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00'),
+  (4441, 4440, 'SAM4441', 'PROP_0001', 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
+  (4442, 4440, 'SAM4442', 'PROP_0001_nn_n_1-1', 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
+  (4443, 4440, 'SAM4443', 'PROP_0001_nn_n_1-1_SL01', 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
+  (4444, 4440, 'SAM4444', 'PROP_0001_nn_n_1-1_LCM01', 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
+  (4445, 4440, 'SAM4445', 'PROP_0001_nn_n_1-1_D_S1', 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
+  (4446, 4440, 'SAM4446', 'PROP_0001_nn_n_1-1_R_S1', 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
+  (4447, 4440, 'SAM4447', 'PROP_0001_nn_n_1-1_R_1', 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00');
 
-INSERT INTO Sample(sampleId, project_projectId, name, alias, securityProfile_profileId, sampleType, scientificName, creator, created,
+INSERT INTO Sample(sampleId, project_projectId, name, alias, sampleType, scientificName, creator, created,
   lastModifier, lastModified, volume, concentration, volumeUnits, concentrationUnits) VALUES
-  (2201, 2200, 'SAM2201', 'UQC_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2018-07-10 12:53:00', 1, '2018-07-10 12:53:00', 50, 60, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE');
+  (2201, 2200, 'SAM2201', 'UQC_0001', 'GENOMIC', 'Homo sapiens', 1, '2018-07-10 12:53:00', 1, '2018-07-10 12:53:00', 50, 60, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE');
 
 INSERT INTO DetailedSample (sampleId, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, archived) VALUES
 (1, 1, NULL, NULL, NULL, NULL, 1, NULL, 0),
@@ -573,110 +565,110 @@ INSERT INTO `SampleAliquot` (sampleId, samplePurposeId) VALUES
 (504, NULL),
 (4447, 3);
 
-INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, securityProfile_profileId, sample_sampleId, platformType,
+INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
   volume, concentration, locationBarcode, kitDescriptorId, discarded, volumeUnits, concentrationUnits, spikeInId, spikeInDilutionFactor,
   spikeInVolume) VALUES
-  (1, 'LIB1', 'TEST_0001_Bn_R_PE_300_WG', '11211', 'description lib 1', 2, 8, 'ILLUMINA', 1, 3, 1,  '2016-11-07', 
+  (1, 'LIB1', 'TEST_0001_Bn_R_PE_300_WG', '11211', 'description lib 1', 8, 'ILLUMINA', 1, 3, 1,  '2016-11-07', 
     1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, 300, 5.0, 2.75, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE',
     NULL, NULL, NULL),
-  (100001, 'LIB100001', 'LIBT_0001_Ly_P_PE_251_WG', 'libbar100001', 'libdesc100001', 1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+  (100001, 'LIB100001', 'LIBT_0001_Ly_P_PE_251_WG', 'libbar100001', 'libdesc100001', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    251,  2.5,  10, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE',
     1, 'TEN', 12.34),
-  (100002, 'LIB100002', 'LIBT_0001_Ly_P_PE_252_WG', 'libbar100002', 'libdesc100002', 1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+  (100002, 'LIB100002', 'LIBT_0001_Ly_P_PE_252_WG', 'libbar100002', 'libdesc100002', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    252,  4,    6.3, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE',
     1, 'TEN', 12.34),
-  (100003, 'LIB100003', 'LIBT_0001_Ly_P_PE_253_WG', NULL,           NULL,            1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+  (100003, 'LIB100003', 'LIBT_0001_Ly_P_PE_253_WG', NULL,           NULL,            100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (100004, 'LIB100004', 'LIBT_0001_Ly_P_PE_254_WG', NULL,           'libdesc100004', 1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+  (100004, 'LIB100004', 'LIBT_0001_Ly_P_PE_254_WG', NULL,           'libdesc100004', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (100005, 'LIB100005', 'LIBT_0001_Ly_P_PE_255_WG', NULL,           'libdesc100005', 1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+  (100005, 'LIB100005', 'LIBT_0001_Ly_P_PE_255_WG', NULL,           'libdesc100005', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (100006, 'LIB100006', 'LIBT_0001_Ly_P_PE_256_WG', NULL,           'libdesc100006', 1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+  (100006, 'LIB100006', 'LIBT_0001_Ly_P_PE_256_WG', NULL,           'libdesc100006', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (100007, 'LIB100007', 'LIBT_0001_Ly_P_PE_257_WG', NULL,           'libdesc100007', 1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+  (100007, 'LIB100007', 'LIBT_0001_Ly_P_PE_257_WG', NULL,           'libdesc100007', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (100008, 'LIB100008', 'LIBT_0001_Ly_P_PE_258_WG', NULL,           'libdesc100008', 1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+  (100008, 'LIB100008', 'LIBT_0001_Ly_P_PE_258_WG', NULL,           'libdesc100008', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, NULL, NULL, NULL),
-  (110001, 'LIB110001', '1LIB_0001_Ly_P_PE_251_WG', 'libbar110001', 'libdesc110001', 1, 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+  (110001, 'LIB110001', '1LIB_0001_Ly_P_PE_251_WG', 'libbar110001', 'libdesc110001', 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    251,  2.5,  10, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE',
     NULL, NULL, NULL),
-  (110002, 'LIB110002', '1LIB_0001_Ly_P_PE_252_WG', 'libbar110002', 'libdesc110002', 1, 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+  (110002, 'LIB110002', '1LIB_0001_Ly_P_PE_252_WG', 'libbar110002', 'libdesc110002', 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    252,  4,    6.3, 'lib_location_110002', 1, 0, 'MICROLITRES',
     'NANOGRAMS_PER_MICROLITRE', NULL, NULL, NULL),
-  (110003, 'LIB110003', '1LIB_0001_Ly_P_PE_253_WG', NULL,           NULL,            1, 110004, 'ILLUMINA', 1, NULL, NULL, '2017-07-24',
+  (110003, 'LIB110003', '1LIB_0001_Ly_P_PE_253_WG', NULL,           NULL,            110004, 'ILLUMINA', 1, NULL, NULL, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (110004, 'LIB110004', '1LIB_0001_Ly_P_PE_254_WG', NULL,           'libdesc110004', 1, 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+  (110004, 'LIB110004', '1LIB_0001_Ly_P_PE_254_WG', NULL,           'libdesc110004', 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, 5, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL),
-  (110005, 'LIB110005', '1LIB_0001_Ly_P_PE_255_WG', NULL,           'libdesc110005', 1, 110004, 'ILLUMINA', 1, NULL, NULL, '2017-07-24',
+  (110005, 'LIB110005', '1LIB_0001_Ly_P_PE_255_WG', NULL,           'libdesc110005', 110004, 'ILLUMINA', 1, NULL, NULL, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, 5, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL),
-  (120001, 'LIB120001', '1IPO_0001_Ly_P_PE_251_WG', 'libbar120001', 'libdesc120001', 1, 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+  (120001, 'LIB120001', '1IPO_0001_Ly_P_PE_251_WG', 'libbar120001', 'libdesc120001', 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    251,  2.5,  10, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE',
     NULL, NULL, NULL),
-  (120002, 'LIB120002', '1IPO_0001_Ly_P_PE_252_WG', 'libbar120002', 'libdesc120002', 1, 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+  (120002, 'LIB120002', '1IPO_0001_Ly_P_PE_252_WG', 'libbar120002', 'libdesc120002', 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    252,  4,    6.3, 'lib_location_120002', 1, 0, 'MICROLITRES',
     'NANOGRAMS_PER_MICROLITRE', NULL, NULL, NULL),
-  (200001, 'LIB200001', 'IPOT_0001_Pa_P_PE_251_WG', 'libbar200001', 'libdesc200001', 1, 200004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+  (200001, 'LIB200001', 'IPOT_0001_Pa_P_PE_251_WG', 'libbar200001', 'libdesc200001', 200004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    251,  2.5,  10, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE',
     NULL, NULL, NULL),
-  (200002, 'LIB200002', 'IPOT_0001_Pa_P_PE_252_WG', 'libbar200002', 'libdesc200002', 1, 200004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+  (200002, 'LIB200002', 'IPOT_0001_Pa_P_PE_252_WG', 'libbar200002', 'libdesc200002', 200004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    252,  4,    6.3, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE',
     NULL, NULL, NULL),
-  (204, 'LIB204', 'SORT_0001_nn_n_PE_204_WG', NULL, 'description', 1, 204, 'ILLUMINA', 1, 3, 1, '2017-08-09',
+  (204, 'LIB204', 'SORT_0001_nn_n_PE_204_WG', NULL, 'description', 204, 'ILLUMINA', 1, 3, 1, '2017-08-09',
     1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (205, 'LIB205', 'SORT_0001_nn_n_PE_205_WG', NULL, 'description', 1, 205, 'ILLUMINA', 1, 3, 1, '2017-08-09',
+  (205, 'LIB205', 'SORT_0001_nn_n_PE_205_WG', NULL, 'description', 205, 'ILLUMINA', 1, 3, 1, '2017-08-09',
     1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (206, 'LIB206', 'SORT_0001_nn_n_PE_206_WG', NULL, 'description', 1, 206, 'ILLUMINA', 1, 3, 1, '2017-08-09',
+  (206, 'LIB206', 'SORT_0001_nn_n_PE_206_WG', NULL, 'description', 206, 'ILLUMINA', 1, 3, 1, '2017-08-09',
     1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (304, 'LIB304', 'DILT_0001_nn_n_PE_304_WG', NULL, 'description', 1, 304, 'ILLUMINA', 1, 3, 1, '2017-08-14',
+  (304, 'LIB304', 'DILT_0001_nn_n_PE_304_WG', NULL, 'description', 304, 'ILLUMINA', 1, 3, 1, '2017-08-14',
     1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (305, 'LIB305', 'DILT_0001_nn_n_PE_305_WG', NULL, 'description', 1, 305, 'ILLUMINA', 1, 3, 1, '2017-08-14',
+  (305, 'LIB305', 'DILT_0001_nn_n_PE_305_WG', NULL, 'description', 305, 'ILLUMINA', 1, 3, 1, '2017-08-14',
     1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (306, 'LIB306', 'DILT_0001_nn_n_PE_306_WG', NULL, 'description', 1, 304, 'ILLUMINA', 1, 3, 1, '2017-08-14',
+  (306, 'LIB306', 'DILT_0001_nn_n_PE_306_WG', NULL, 'description', 304, 'ILLUMINA', 1, 3, 1, '2017-08-14',
     1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (504, 'LIB504', 'TIB_0001_nn_n_PE_404_WG', 'TIB_Lib', NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+  (504, 'LIB504', 'TIB_0001_nn_n_PE_404_WG', 'TIB_Lib', NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (505, 'LIB505', 'TIB_0001_nn_n_PE_505_WG', 'TIB_Lib2', NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+  (505, 'LIB505', 'TIB_0001_nn_n_PE_505_WG', 'TIB_Lib2', NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (601, 'LIB601', 'TIB_0001_nn_n_PE_601_WG', 'SimLib1', NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
+  (601, 'LIB601', 'TIB_0001_nn_n_PE_601_WG', 'SimLib1', NULL, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
     1, '2018-06-26 11:38:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (602, 'LIB602', 'TIB_0001_nn_n_PE_602_WG', 'SimLib2', NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
+  (602, 'LIB602', 'TIB_0001_nn_n_PE_602_WG', 'SimLib2', NULL, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
     1, '2018-06-26 11:38:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (603, 'LIB603', 'TIB_0001_nn_n_PE_603_WG', 'SameLib1', NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
+  (603, 'LIB603', 'TIB_0001_nn_n_PE_603_WG', 'SameLib1', NULL, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
     1, '2018-06-26 11:38:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (604, 'LIB604', 'TIB_0001_nn_n_PE_604_WG', 'SameLib2', NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
+  (604, 'LIB604', 'TIB_0001_nn_n_PE_604_WG', 'SameLib2', NULL, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
     1, '2018-06-26 11:38:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL),
-  (700, 'LIB700', 'TIB_0001_nn_n_PE_700_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+  (700, 'LIB700', 'TIB_0001_nn_n_PE_700_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL),
-  (701, 'LIB701', 'TIB_0001_nn_n_PE_701_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+  (701, 'LIB701', 'TIB_0001_nn_n_PE_701_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL),
-  (801, 'LIB801', 'TIB_0001_nn_n_PE_801_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+  (801, 'LIB801', 'TIB_0001_nn_n_PE_801_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL),
-  (802, 'LIB802', 'TIB_0001_nn_n_PE_802_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+  (802, 'LIB802', 'TIB_0001_nn_n_PE_802_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL),
-  (803, 'LIB803', 'TIB_0001_nn_n_PE_803_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+  (803, 'LIB803', 'TIB_0001_nn_n_PE_803_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL),
-  (804, 'LIB804', 'TIB_0001_nn_n_PE_804_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+  (804, 'LIB804', 'TIB_0001_nn_n_PE_804_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 60, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL),
-  (805, 'LIB805', 'TIB_0001_nn_n_PE_805_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+  (805, 'LIB805', 'TIB_0001_nn_n_PE_805_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 100, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL),
-  (806, 'LIB806', 'TIB_0001_nn_n_PE_806_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+  (806, 'LIB806', 'TIB_0001_nn_n_PE_806_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 60, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL),
-  (807, 'LIB807', 'TIB_0001_nn_n_PE_807_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+  (807, 'LIB807', 'TIB_0001_nn_n_PE_807_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 60, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL),
-  (901, 'LIB901', 'TIB_0001_nn_n_PE_901_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+  (901, 'LIB901', 'TIB_0001_nn_n_PE_901_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, -30, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL);
 
-INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, securityProfile_profileId, sample_sampleId, platformType,
+INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
   volume, concentration, locationBarcode, kitDescriptorId, discarded, lowQuality) VALUES
-  (600, 'LIB600', 'TIB_0001_nn_n_PE_600_WG', 'BADLIB', NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+  (600, 'LIB600', 'TIB_0001_nn_n_PE_600_WG', 'BADLIB', NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, 1, 0, 1);
 
-INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, securityProfile_profileId, sample_sampleId, platformType,
+INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
   volume, concentration, locationBarcode, kitDescriptorId, discarded, volumeUnits, concentrationUnits) VALUES
-  (2201, 'LIB2201', 'TIB_0001_nn_n_PE_2201_WG', NULL, NULL, 1, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
+  (2201, 'LIB2201', 'TIB_0001_nn_n_PE_2201_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, 50, 60, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE');
 
 INSERT INTO DetailedLibrary(libraryId, archived, libraryDesign, libraryDesignCodeId) VALUES
@@ -730,65 +722,65 @@ INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (603, 8),
   (604, 8);
 
-INSERT INTO LibraryDilution (dilutionId, name, concentration, concentrationUnits, library_libraryId, identificationBarcode, creationDate, creator, securityProfile_profileId, lastModifier, lastUpdated) VALUES
-(1, 'LDI1', 5.9, 'NANOGRAMS_PER_MICROLITRE', 1, '12321', '2017-07-20', 1, 2, 1, '2017-07-20 09:01:00'),
-(304, 'LDI304', 7.97, 'NANOGRAMS_PER_MICROLITRE', 304, '300304', '2017-08-14', 1, 1, 1, '2017-08-14 12:25:00'),
-(305, 'LDI305', 7.97, 'NANOGRAMS_PER_MICROLITRE', 305, '300305', '2017-08-14', 1, 1, 1, '2017-08-14 12:25:00'),
-(120001, 'LDI120001', 4, 'NANOGRAMS_PER_MICROLITRE', 120001, NULL, '2017-08-15', 1, 2, 1, '2017-08-15 09:01:00'),
-(120002, 'LDI120002', 4, 'NANOGRAMS_PER_MICROLITRE', 120002, NULL, '2017-08-15', 1, 2, 1, '2017-08-15 09:01:00'),
-(200001, 'LDI200001', 4, 'NANOGRAMS_PER_MICROLITRE', 200001, NULL, '2017-08-15', 1, 2, 1, '2017-08-15 09:01:00'),
-(200002, 'LDI200002', 3, 'NANOGRAMS_PER_MICROLITRE', 200002, NULL, '2017-08-15', 1, 2, 1, '2017-08-15 09:01:00'),
-(504, 'LDI504', 5.9, 'NANOGRAMS_PER_MICROLITRE', 504, 'TIB_Dil', '2017-08-15', 1, 1, 1, '2017-08-15 13:55:00'),
-(505, 'LDI505', 3.3, 'NANOGRAMS_PER_MICROLITRE', 504, 'TIB_replaceDil', '2017-08-15', 1, 1, 1, '2017-08-15 13:55:00'),
-(701, 'LDI701', 2.2, 'NANOGRAMS_PER_MICROLITRE', 504, 'test_pooling_1', '2017-10-16', 1, 1, 1, '2017-10-16 15:59:00'),
-(702, 'LDI702', 2.2, 'NANOGRAMS_PER_MICROLITRE', 504, 'test_pooling_2', '2017-10-16', 1, 1, 1, '2017-10-16 15:59:00'),
-(800, 'LDI800', 2.2, 'NANOGRAMS_PER_MICROLITRE', 600, 'low_quality_library', '2018-06-26', 1, 1, 1, '2018-06-26 11:39:00'),
-(801, 'LDI801', 2.2, 'NANOGRAMS_PER_MICROLITRE', 601, 'similar_index_1', '2018-06-26', 1, 1, 1, '2018-06-26 11:39:00'),
-(802, 'LDI802', 2.2, 'NANOGRAMS_PER_MICROLITRE', 602, 'similar_index_2', '2018-06-26', 1, 1, 1, '2018-06-26 11:39:00'),
-(803, 'LDI803', 2.2, 'NANOGRAMS_PER_MICROLITRE', 603, 'same_index_1', '2018-06-26', 1, 1, 1, '2018-06-26 11:39:00'),
-(804, 'LDI804', 2.2, 'NANOGRAMS_PER_MICROLITRE', 604, 'same_index_2', '2018-06-26', 1, 1, 1, '2018-06-26 11:39:00');
+INSERT INTO LibraryDilution (dilutionId, name, concentration, concentrationUnits, library_libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated) VALUES
+(1, 'LDI1', 5.9, 'NANOGRAMS_PER_MICROLITRE', 1, '12321', '2017-07-20', 1, 1, '2017-07-20 09:01:00'),
+(304, 'LDI304', 7.97, 'NANOGRAMS_PER_MICROLITRE', 304, '300304', '2017-08-14', 1, 1, '2017-08-14 12:25:00'),
+(305, 'LDI305', 7.97, 'NANOGRAMS_PER_MICROLITRE', 305, '300305', '2017-08-14', 1, 1, '2017-08-14 12:25:00'),
+(120001, 'LDI120001', 4, 'NANOGRAMS_PER_MICROLITRE', 120001, NULL, '2017-08-15', 1, 1, '2017-08-15 09:01:00'),
+(120002, 'LDI120002', 4, 'NANOGRAMS_PER_MICROLITRE', 120002, NULL, '2017-08-15', 1, 1, '2017-08-15 09:01:00'),
+(200001, 'LDI200001', 4, 'NANOGRAMS_PER_MICROLITRE', 200001, NULL, '2017-08-15', 1, 1, '2017-08-15 09:01:00'),
+(200002, 'LDI200002', 3, 'NANOGRAMS_PER_MICROLITRE', 200002, NULL, '2017-08-15', 1, 1, '2017-08-15 09:01:00'),
+(504, 'LDI504', 5.9, 'NANOGRAMS_PER_MICROLITRE', 504, 'TIB_Dil', '2017-08-15', 1, 1, '2017-08-15 13:55:00'),
+(505, 'LDI505', 3.3, 'NANOGRAMS_PER_MICROLITRE', 504, 'TIB_replaceDil', '2017-08-15', 1, 1, '2017-08-15 13:55:00'),
+(701, 'LDI701', 2.2, 'NANOGRAMS_PER_MICROLITRE', 504, 'test_pooling_1', '2017-10-16', 1, 1, '2017-10-16 15:59:00'),
+(702, 'LDI702', 2.2, 'NANOGRAMS_PER_MICROLITRE', 504, 'test_pooling_2', '2017-10-16', 1, 1, '2017-10-16 15:59:00'),
+(800, 'LDI800', 2.2, 'NANOGRAMS_PER_MICROLITRE', 600, 'low_quality_library', '2018-06-26', 1, 1, '2018-06-26 11:39:00'),
+(801, 'LDI801', 2.2, 'NANOGRAMS_PER_MICROLITRE', 601, 'similar_index_1', '2018-06-26', 1, 1, '2018-06-26 11:39:00'),
+(802, 'LDI802', 2.2, 'NANOGRAMS_PER_MICROLITRE', 602, 'similar_index_2', '2018-06-26', 1, 1, '2018-06-26 11:39:00'),
+(803, 'LDI803', 2.2, 'NANOGRAMS_PER_MICROLITRE', 603, 'same_index_1', '2018-06-26', 1, 1, '2018-06-26 11:39:00'),
+(804, 'LDI804', 2.2, 'NANOGRAMS_PER_MICROLITRE', 604, 'same_index_2', '2018-06-26', 1, 1, '2018-06-26 11:39:00');
 
 
-INSERT INTO LibraryDilution (dilutionId, name, concentration, concentrationUnits, library_libraryId, identificationBarcode, creationDate, creator, securityProfile_profileId, lastModifier, lastUpdated, volumeUsed) VALUES
-(901, 'LDI901', 4.3, 'NANOGRAMS_PER_MICROLITRE', 504, 'auto_calculate_pool_1', '2018-07-12', 1, 1, 1, '2018-07-12 09:43:00', 14.7),
-(902, 'LDI902', 1.7, 'NANOGRAMS_PER_MICROLITRE', 504, 'auto_calculate_pool_2', '2018-07-12', 1, 1, 1, '2018-07-12 09:43:00', 21.3),
-(1001, 'LDI1001', 1.7, 'NANOGRAMS_PER_MICROLITRE', 804, 'edit_volumeused_1', '2018-07-12', 1, 1, 1, '2018-07-12 09:43:00', 40),
-(1002, 'LDI1002', 1.7, 'NANOGRAMS_PER_MICROLITRE', 805, 'edit_volumeused_2', '2018-07-12', 1, 1, 1, '2018-07-12 09:43:00', NULL),
-(1003, 'LDI1003', 1.7, 'NANOGRAMS_PER_MICROLITRE', 806, 'edit_volumeused_3', '2018-07-12', 1, 1, 1, '2018-07-12 09:43:00', 40),
-(1004, 'LDI1004', 1.7, 'NANOGRAMS_PER_MICROLITRE', 807, 'edit_volumeused_4', '2018-07-12', 1, 1, 1, '2018-07-12 09:43:00', 40);
+INSERT INTO LibraryDilution (dilutionId, name, concentration, concentrationUnits, library_libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated, volumeUsed) VALUES
+(901, 'LDI901', 4.3, 'NANOGRAMS_PER_MICROLITRE', 504, 'auto_calculate_pool_1', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 14.7),
+(902, 'LDI902', 1.7, 'NANOGRAMS_PER_MICROLITRE', 504, 'auto_calculate_pool_2', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 21.3),
+(1001, 'LDI1001', 1.7, 'NANOGRAMS_PER_MICROLITRE', 804, 'edit_volumeused_1', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 40),
+(1002, 'LDI1002', 1.7, 'NANOGRAMS_PER_MICROLITRE', 805, 'edit_volumeused_2', '2018-07-12', 1, 1, '2018-07-12 09:43:00', NULL),
+(1003, 'LDI1003', 1.7, 'NANOGRAMS_PER_MICROLITRE', 806, 'edit_volumeused_3', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 40),
+(1004, 'LDI1004', 1.7, 'NANOGRAMS_PER_MICROLITRE', 807, 'edit_volumeused_4', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 40);
 
-INSERT INTO Pool (poolId, concentration, concentrationUnits, volume, volumeUnits, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
-(1, 8.25, 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 2, 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL),
-(501, 2.2, 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, 'IPO501', 'TIB_Pool', 'TIB_Pool', NULL, '2017-08-15', 1, 'ILLUMINA', 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00', 1),
-(120001, 6.5, 'NANOGRAMS_PER_MICROLITRE', 12, 'MICROLITRES', 'IPO120001', '1IPO_POOL_1', 'ipobar120001', 'ipodesc120001', '2017-08-15', 2, 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
-(120002, 6.5, 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, 'IPO120002', '1IPO_POOL_2', NULL, NULL, '2017-08-15', 2, 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', NULL),
-(120003, 6.5, 'NANOGRAMS_PER_MICROLITRE', 12, 'MICROLITRES', 'IPO120003', '1IPO_POOL_3', 'ipobar120003', 'ipodesc120003', '2017-08-15', 2, 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
-(120004, 6.5, 'NANOGRAMS_PER_MICROLITRE', 12, 'MICROLITRES', 'IPO120004', '1IPO_POOL_4', 'ipobar120004', 'ipodesc120004', '2017-08-15', 2, 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
-(120005, 6.5, 'NANOGRAMS_PER_MICROLITRE', 12, 'MICROLITRES', 'IPO120005', '1IPO_POOL_5', NULL, 'ipodesc120005', '2017-08-15', 2, 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
-(200001, 6.5, 'NANOGRAMS_PER_MICROLITRE', 12, 'MICROLITRES', 'IPO200001', 'IPOT_POOL_1', 'ipobar200001', NULL, '2017-08-15', 2, 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
-(200002, 6.5, 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, 'IPO200002', 'IPOT_POOL_2', NULL, NULL, '2017-08-15', 2, 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', NULL),
-(200003, 6.5, 'NANOGRAMS_PER_MICROLITRE', 7.92, 'MICROLITRES', 'IPO200003', 'IPOT_POOL_3', 'ipobar200003', NULL, '2017-08-15', 2, 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 1),
-(200004, 6.5, 'NANOGRAMS_PER_MICROLITRE', 7.92, 'MICROLITRES', 'IPO200004', 'IPOT_POOL_4', 'ipobar200004', NULL, '2017-08-15', 2, 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 1),
-(200005, 6.5, 'NANOGRAMS_PER_MICROLITRE', 7.92, 'MICROLITRES', 'IPO200005', 'IPOT_POOL_5', 'ipobar200005', NULL, '2017-08-15', 2, 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 1),
-(200006, 6.5, 'NANOGRAMS_PER_MICROLITRE', 7.92, 'MICROLITRES', 'IPO200006', 'IPOT_POOL_6', 'ipobar200006', NULL, '2017-08-15', 2, 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 1),
-(5004, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5004', 'RUN_POOL_ADD', 'ipobar5004', NULL, '2017-09-27', 2, 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
-(5005, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5005', 'RUN_POOL_REMOVE', 'ipobar5005', NULL, '2017-09-27', 2, 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
-(5006, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5006', 'RUN_POOL_INITIAL', 'ipobar50056', NULL, '2017-09-27', 2, 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
-(5007, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5007', 'RUN_POOL_REPLACE', 'ipobar5007', NULL, '2017-09-27', 2, 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
-(5101, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5101', 'POOL_SEARCH_1', 'ipobar5101', 'swimming', '2017-09-27', 2, 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
-(5102, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5102', 'POOL_SEARCH_2', 'ipobar5102', 'cats', '2017-09-27', 2, 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
-(5103, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5103', 'POOL_WITH_ORDERS', 'ipobar5103', 'sergeant', '2017-09-27', 2, 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
-(5104, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5104', 'POOL_WITH_COMPLETED_ORDERS', 'ipobar5104', 'mission accomplished', '2017-09-27', 2, 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
-(5105, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5105', 'POOL_NOT_READY', 'ipobar5105', 'unprepared', '2017-09-27', 2, 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
-(701, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO701', 'TEST_POOLING_DILUTIONS', 'ipobar701', 'test pool', '2017-10-17', 2, 'ILLUMINA', 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL),
-(702, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO702', 'TEST_REMOVING_DILUTIONS', 'ipobar702', 'test pool', '2017-10-17', 2, 'ILLUMINA', 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL),
-(801, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO801', 'TEST_NO_INDEX_WARNING', 'ipobar801', 'no indices', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
-(802, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO802', 'TEST_SIMILAR_INDEX_WARNING', 'ipobar802', 'similar index', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
-(803, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO803', 'TEST_SAME_INDEX_WARNING', 'ipobar803', 'same index', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
-(804, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO804', 'TEST_BAD_LIBRARY_WARNING', 'ipobar804', 'low quality library', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL);
+INSERT INTO Pool (poolId, concentration, concentrationUnits, volume, volumeUnits, name, alias, identificationBarcode, description, creationDate, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
+(1, 8.25, 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL),
+(501, 2.2, 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, 'IPO501', 'TIB_Pool', 'TIB_Pool', NULL, '2017-08-15', 'ILLUMINA', 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00', 1),
+(120001, 6.5, 'NANOGRAMS_PER_MICROLITRE', 12, 'MICROLITRES', 'IPO120001', '1IPO_POOL_1', 'ipobar120001', 'ipodesc120001', '2017-08-15', 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
+(120002, 6.5, 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, 'IPO120002', '1IPO_POOL_2', NULL, NULL, '2017-08-15', 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', NULL),
+(120003, 6.5, 'NANOGRAMS_PER_MICROLITRE', 12, 'MICROLITRES', 'IPO120003', '1IPO_POOL_3', 'ipobar120003', 'ipodesc120003', '2017-08-15', 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
+(120004, 6.5, 'NANOGRAMS_PER_MICROLITRE', 12, 'MICROLITRES', 'IPO120004', '1IPO_POOL_4', 'ipobar120004', 'ipodesc120004', '2017-08-15', 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
+(120005, 6.5, 'NANOGRAMS_PER_MICROLITRE', 12, 'MICROLITRES', 'IPO120005', '1IPO_POOL_5', NULL, 'ipodesc120005', '2017-08-15', 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
+(200001, 6.5, 'NANOGRAMS_PER_MICROLITRE', 12, 'MICROLITRES', 'IPO200001', 'IPOT_POOL_1', 'ipobar200001', NULL, '2017-08-15', 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
+(200002, 6.5, 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, 'IPO200002', 'IPOT_POOL_2', NULL, NULL, '2017-08-15', 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', NULL),
+(200003, 6.5, 'NANOGRAMS_PER_MICROLITRE', 7.92, 'MICROLITRES', 'IPO200003', 'IPOT_POOL_3', 'ipobar200003', NULL, '2017-08-15', 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 1),
+(200004, 6.5, 'NANOGRAMS_PER_MICROLITRE', 7.92, 'MICROLITRES', 'IPO200004', 'IPOT_POOL_4', 'ipobar200004', NULL, '2017-08-15', 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 1),
+(200005, 6.5, 'NANOGRAMS_PER_MICROLITRE', 7.92, 'MICROLITRES', 'IPO200005', 'IPOT_POOL_5', 'ipobar200005', NULL, '2017-08-15', 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 1),
+(200006, 6.5, 'NANOGRAMS_PER_MICROLITRE', 7.92, 'MICROLITRES', 'IPO200006', 'IPOT_POOL_6', 'ipobar200006', NULL, '2017-08-15', 'ILLUMINA', 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 1),
+(5004, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5004', 'RUN_POOL_ADD', 'ipobar5004', NULL, '2017-09-27', 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
+(5005, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5005', 'RUN_POOL_REMOVE', 'ipobar5005', NULL, '2017-09-27', 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
+(5006, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5006', 'RUN_POOL_INITIAL', 'ipobar50056', NULL, '2017-09-27', 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
+(5007, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5007', 'RUN_POOL_REPLACE', 'ipobar5007', NULL, '2017-09-27', 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
+(5101, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5101', 'POOL_SEARCH_1', 'ipobar5101', 'swimming', '2017-09-27', 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
+(5102, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5102', 'POOL_SEARCH_2', 'ipobar5102', 'cats', '2017-09-27', 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
+(5103, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5103', 'POOL_WITH_ORDERS', 'ipobar5103', 'sergeant', '2017-09-27', 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
+(5104, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5104', 'POOL_WITH_COMPLETED_ORDERS', 'ipobar5104', 'mission accomplished', '2017-09-27', 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
+(5105, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5105', 'POOL_NOT_READY', 'ipobar5105', 'unprepared', '2017-09-27', 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
+(701, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO701', 'TEST_POOLING_DILUTIONS', 'ipobar701', 'test pool', '2017-10-17', 'ILLUMINA', 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL),
+(702, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO702', 'TEST_REMOVING_DILUTIONS', 'ipobar702', 'test pool', '2017-10-17', 'ILLUMINA', 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL),
+(801, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO801', 'TEST_NO_INDEX_WARNING', 'ipobar801', 'no indices', '2018-06-22', 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
+(802, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO802', 'TEST_SIMILAR_INDEX_WARNING', 'ipobar802', 'similar index', '2018-06-22', 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
+(803, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO803', 'TEST_SAME_INDEX_WARNING', 'ipobar803', 'same index', '2018-06-22', 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
+(804, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO804', 'TEST_BAD_LIBRARY_WARNING', 'ipobar804', 'low quality library', '2018-06-22', 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL);
 
-INSERT INTO Pool (poolId, concentration, concentrationUnits, volume, volumeUnits, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
-(2201, 50, 'NANOGRAMS_PER_MICROLITRE', 60, 'MICROLITRES', 'IPO2201', 'AUTO_UPDATE_QC', 'ipobar2201', 'autoupdate qc', '2018-06-22', 2, 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL);
+INSERT INTO Pool (poolId, concentration, concentrationUnits, volume, volumeUnits, name, alias, identificationBarcode, description, creationDate, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
+(2201, 50, 'NANOGRAMS_PER_MICROLITRE', 60, 'MICROLITRES', 'IPO2201', 'AUTO_UPDATE_QC', 'ipobar2201', 'autoupdate qc', '2018-06-22', 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL);
 
 INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
 (1, 1),
@@ -826,13 +818,13 @@ INSERT INTO PoolOrder (poolOrderId, poolId, partitions, parametersId, createdBy,
 (7, 803, 2, 2, 1, 1, '2018-06-26 10:10:00', '2018-06-26 10:10:00'),
 (8, 804, 2, 2, 1, 1, '2018-06-26 10:10:00', '2018-06-26 10:10:00');
 
-INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, securityProfile_profileId, lastModifier, creator, created, lastModified) VALUES
-(1, 1, 1, 'BOX1', 'First Box', 1, 1, 1, '2017-07-20 13:01:01', '2017-07-20 13:01:01'),
-(2, 1, 1, 'BOX2', 'Boxxy', 1, 1, 1, '2018-08-30 15:15:00', '2018-08-30 15:15:00'),
-(500, 1, 1, 'BOX500', 'Tubes In Boxes Test', 1, 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00'),
-(501, 1, 1, 'BOX501', 'Second box for Tubes in Boxes test', 1, 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
-(502, 1, 1, 'BOX502', 'Editable box', 1, 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
-(100001, 1, 1, 'BOX100001', 'Bulk Boxables Test', 1, 1, 1, '2017-12-19 15:04:00', '2017-12-19 15:04:00');
+INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, lastModifier, creator, created, lastModified) VALUES
+(1, 1, 1, 'BOX1', 'First Box', 1, 1, '2017-07-20 13:01:01', '2017-07-20 13:01:01'),
+(2, 1, 1, 'BOX2', 'Boxxy', 1, 1, '2018-08-30 15:15:00', '2018-08-30 15:15:00'),
+(500, 1, 1, 'BOX500', 'Tubes In Boxes Test', 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00'),
+(501, 1, 1, 'BOX501', 'Second box for Tubes in Boxes test', 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
+(502, 1, 1, 'BOX502', 'Editable box', 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
+(100001, 1, 1, 'BOX100001', 'Bulk Boxables Test', 1, 1, '2017-12-19 15:04:00', '2017-12-19 15:04:00');
 
 INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
 (1, 1,   'LIBRARY',  'A01'),
@@ -849,20 +841,20 @@ INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
 (500, 502, 'SAMPLE', 'A01'), (500, 504, 'LIBRARY', 'B01'), (500, 504, 'DILUTION', 'C01'), (500, 501, 'POOL', 'D01'), (500, 505, 'LIBRARY', 'F10'),
 (100001, 100006, 'LIBRARY', 'A02'), (100001, 100007, 'LIBRARY', 'A03'); 
 
-INSERT INTO SequencerPartitionContainer (containerId, securityProfile_profileId, identificationBarcode, sequencingContainerModelId, lastModifier, creator, created, lastModified) VALUES
-(1, 3, 'MISEQXX', 1, 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01'),
-(2, 4, 'PACBIO1', 11, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5002, 4, 'EXISTING', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5003, 4, 'REMOVABLE', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5004, 4, 'ADDPOOLS', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5005, 4, 'REMOVE_POOL', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5006, 4, 'REPLACE_POOL', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5008, 4, 'FAIL_LANE', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5009, 4, 'FAIL_LANE_WITH_NOTE', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5010, 4, 'FAIL_LANE_TO_PASS', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5100, 4, 'SEARCH_POOLS', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5101, 4, 'POOL_COMPLETED_ORDER', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(6001, 4, 'CHANGEABLE', 1, 1, 1, '2017-10-03 14:45', '2017-10-03 14:45');
+INSERT INTO SequencerPartitionContainer (containerId, identificationBarcode, sequencingContainerModelId, lastModifier, creator, created, lastModified) VALUES
+(1, 'MISEQXX', 1, 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01'),
+(2, 'PACBIO1', 11, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5002, 'EXISTING', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5003, 'REMOVABLE', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5004, 'ADDPOOLS', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5005, 'REMOVE_POOL', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5006, 'REPLACE_POOL', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5008, 'FAIL_LANE', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5009, 'FAIL_LANE_WITH_NOTE', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5010, 'FAIL_LANE_TO_PASS', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5100, 'SEARCH_POOLS', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(5101, 'POOL_COMPLETED_ORDER', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(6001, 'CHANGEABLE', 1, 1, 1, '2017-10-03 14:45', '2017-10-03 14:45');
 
 INSERT INTO `_Partition` (partitionId, partitionNumber, pool_poolId) VALUES 
 (1, 1, 1), (2, 1, NULL),
@@ -898,22 +890,22 @@ INSERT INTO SequencerPartitionContainer_Partition (container_containerId, partit
 (5101, 5105),
 (6001, 6001);
 
-INSERT INTO Run (runId, name, securityProfile_profileId, alias, instrumentId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
-(1, 'RUN1', 5, 'MiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
-(2, 'RUN2', 5, 'PacBio_Run_1', 3, '2017-08-01', NULL, 'Running', 1, '2017-08-01 10:03:02', 1, '2017-08-01 10:03:02');
+INSERT INTO Run (runId, name, alias, instrumentId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
+(1, 'RUN1', 'MiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
+(2, 'RUN2', 'PacBio_Run_1', 3, '2017-08-01', NULL, 'Running', 1, '2017-08-01 10:03:02', 1, '2017-08-01 10:03:02');
 
-INSERT INTO Run (runId, name, securityProfile_profileId, alias, instrumentId, sequencingParameters_parametersId, description, filePath, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
-(5001, 'RUN5001', 5, 'Change_Values_Run', 5002, 2, 'description', '/filePath', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5002, 'RUN5002', 5, 'Add_Existing_Container_Run', 5002, 2, 'add existing container to run', '/existing', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5003, 'RUN5003', 5, 'Remove_Existing_Container_Run', 5002, 2, 'remove container from run', '/removable', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5004, 'RUN5004', 5, 'Add_Pools_To_Container_Run', 5002, 2, 'add pools to container on run', '/add/pools', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5005, 'RUN5005', 5, 'Remove_Pools_From_Container_Run', 5002, 2, 'remove pools from container on run', '/remove/pools', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5006, 'RUN5006', 5, 'Replace_Pool_In_Container_Run', 5002, 2, 'replace pool in container on run', '/replace/pool', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5008, 'RUN5008', 5, 'Fail_Lane_In_Container_Run', 5002, 2, 'fail lane in container on run', '/fail/lane', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5009, 'RUN5009', 5, 'Fail_Lane_With_Note_Run', 5002, 2, 'fail lane with note on run', '/fail/note', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5010, 'RUN5010', 5, 'Fail_Lane_To_Ok_Run', 5002, 2, 'fail lane change to ok', '/fail/ok', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5100, 'RUN5100', 5, 'Search_Pool_Run', 2, 4, 'test pool searches', '/test/searches', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5101, 'RUN5101', 5, 'Pool_Completed_Orders_Run', 2, 2, 'pool orders are complete', '/complete/orders', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00');
+INSERT INTO Run (runId, name, alias, instrumentId, sequencingParameters_parametersId, description, filePath, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
+(5001, 'RUN5001', 'Change_Values_Run', 5002, 2, 'description', '/filePath', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5002, 'RUN5002', 'Add_Existing_Container_Run', 5002, 2, 'add existing container to run', '/existing', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5003, 'RUN5003', 'Remove_Existing_Container_Run', 5002, 2, 'remove container from run', '/removable', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5004, 'RUN5004', 'Add_Pools_To_Container_Run', 5002, 2, 'add pools to container on run', '/add/pools', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5005, 'RUN5005', 'Remove_Pools_From_Container_Run', 5002, 2, 'remove pools from container on run', '/remove/pools', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5006, 'RUN5006', 'Replace_Pool_In_Container_Run', 5002, 2, 'replace pool in container on run', '/replace/pool', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5008, 'RUN5008', 'Fail_Lane_In_Container_Run', 5002, 2, 'fail lane in container on run', '/fail/lane', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5009, 'RUN5009', 'Fail_Lane_With_Note_Run', 5002, 2, 'fail lane with note on run', '/fail/note', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5010, 'RUN5010', 'Fail_Lane_To_Ok_Run', 5002, 2, 'fail lane change to ok', '/fail/ok', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5100, 'RUN5100', 'Search_Pool_Run', 2, 4, 'test pool searches', '/test/searches', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5101, 'RUN5101', 'Pool_Completed_Orders_Run', 2, 2, 'pool orders are complete', '/complete/orders', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00');
 
 INSERT INTO RunIllumina (runId, pairedEnd) VALUES (1, 1);
 INSERT INTO RunIllumina (runId, callCycle, imgCycle, numCycles, scoreCycle, pairedEnd) VALUES

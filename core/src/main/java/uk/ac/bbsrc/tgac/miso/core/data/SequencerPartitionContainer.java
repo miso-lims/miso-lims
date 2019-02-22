@@ -31,7 +31,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * A SequencerPartitionContainer describes a collection of {@link Partition} objects that can be used as part of a sequencer {@link Run}.
@@ -41,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @since 0.1.6
  */
 public interface SequencerPartitionContainer
-    extends SecurableByProfile, Comparable<SequencerPartitionContainer>, Barcodable, ChangeLoggable, Serializable,
+    extends Comparable<SequencerPartitionContainer>, Barcodable, ChangeLoggable, Serializable,
     QualityControllable<ContainerQC>, Deletable {
 
   String getDescription();

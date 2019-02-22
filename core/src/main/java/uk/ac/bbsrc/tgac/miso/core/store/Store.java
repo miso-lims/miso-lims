@@ -24,7 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Defines a DAO interface
@@ -62,7 +62,7 @@ public interface Store<T> {
    * @throws IOException
    *           when the objects cannot be retrieved
    */
-  public Collection<T> listAll() throws IOException;
+  public List<T> listAll() throws IOException;
 
   /**
    * Count all persisted objects

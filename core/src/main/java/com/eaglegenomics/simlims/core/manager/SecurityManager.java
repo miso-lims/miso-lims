@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 /**
@@ -48,8 +47,6 @@ public interface SecurityManager {
   public Group getGroupById(Long userId) throws IOException;
 
   public Group getGroupByName(String groupName) throws IOException;
-
-  public SecurityProfile getSecurityProfileById(Long profileId) throws IOException;
 
   public boolean isPasswordMutable();
 
