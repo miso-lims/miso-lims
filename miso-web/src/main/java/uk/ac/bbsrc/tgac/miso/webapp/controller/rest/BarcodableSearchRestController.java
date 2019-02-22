@@ -40,7 +40,10 @@ public class BarcodableSearchRestController extends RestController {
   private BarcodableDto toDto(BarcodableView view) {
     BarcodableDto dto = Dtos.asDto(view);
 
-    dto.setUrl(makeUrl(makeUrlComponent(view.getId().getTargetType()), view.getId().getTargetId()));
+    // all barcodable views except container models are linkable
+    if (!Barcodable.EntityType.CONTAINER_MODEL.equals(view.getId().getTargetType())) {
+      dto.setUrl(makeUrl(makeUrlComponent(view.getId().getTargetType()), view.getId().getTargetId()));
+    }
 
     return dto;
   }
