@@ -5,6 +5,7 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -264,7 +265,12 @@ public class RunPage extends FormPage<RunPage.Field> {
     if (!dialog.isDisplayed()) {
       throw new IllegalStateException("Dialog is not visible");
     }
-    List<WebElement> poolWarnings = dialog.findElements(By.className("parsley-custom-error-message"));
-    return poolWarnings.stream().map(warning -> warning.getText().substring(2)).collect(Collectors.toList());
+    List<WebElement> poolWarnings = dialog.findElements(By.className("message-error"));
+    List<WebElement> poolInfo = dialog.findElements(By.className("message-info"));
+    return Stream.concat(poolWarnings.stream(), poolInfo.stream()).map(tile -> {
+        if (tile == null) throw new IllegalArgumentException("Tile is null");
+        if (tile.getText() == null) throw new IllegalArgumentException("Tile text is null");
+        return tile.getText().substring(2);
+      }).collect(Collectors.toList());
   }
 }
