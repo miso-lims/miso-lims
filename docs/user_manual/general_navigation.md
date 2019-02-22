@@ -26,7 +26,6 @@ depending on the item you clicked, or perform some other action.
 
 Individual widgets are described in more detail in the [Home Screen Widgets section](home_screen_widgets.html)
 
-
 {% include userman-toplink.md %}
 
 
