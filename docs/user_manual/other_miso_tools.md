@@ -12,8 +12,8 @@ appropriate link in the Tools list in the menu on the left side of the screen.
 
 When you run multiple libraries in a sequencing lane or partition, known as multiplexing, indices are used to
 identify the individual libraries and demultiplex (separate) the data afterwards. If two or more libraries in the pool
-have identical or near-identical barcodes, demultiplexing may be more difficult or even impossible. The Index Distance
-tool can help you identify these clashing indices within a set.
+have identical or near-identical indices, demultiplexing may be more difficult or even impossible. The Index Distance
+tool can help you identify indices which may be inadvisable to multiplex together.
 
 {% assign figure = 1 %}
 {% include userman-figure.md num=figure cap="Index Distance tool" img="tools-index-distance.png" %}
@@ -57,9 +57,9 @@ how many of the indices each family contains.
 
 Note: This tool only appears if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
 
-The Identity Search tool can be used to find identity samples with a specified external name, and to see all of the
-children of the resulting identities. This is useful if you're not sure whether you've received samples from this donor
-or organism before, or if you want to see all of the samples related to it.
+The Identity Search tool can be used to find identity (donor/organism) samples with a specified external name, and to
+see all of the samples descended from the resulting identities. This is useful if you're not sure whether you've
+received samples from this donor or organism before, or if you want to see all of the samples related to it.
 
 {% assign figure = figure | plus: 1 %}
 {% include userman-figure.md num=figure cap="Identity Search tool" img="tools-identity-search.png" %}
