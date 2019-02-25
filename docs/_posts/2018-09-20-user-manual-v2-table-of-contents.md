@@ -418,7 +418,7 @@ This user manual is a work in progress, so parts of it may be missing until it h
 {% assign section-title = "Freezers and Rooms" %}
 {% include userman-toc-link.md section=section section-title=section-title %}
 {% assign sub = 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Freezers & Rooms List" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Storage Locations List" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding a Room" %}
 {% assign sub = sub | plus: 1 %}
