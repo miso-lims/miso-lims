@@ -134,7 +134,7 @@ optionally a barcode for the tray rack, then click the "OK" button. A final dial
 each tray within the tray rack if you wish. Click the "OK" button when you are done to finish adding the tray rack. It
 will appear in the Layout diagram within the shelf.
 
-YOu can click an existing tray rack in the diagram to select it, which allows you to change its barcode. Once you've
+You can click an existing tray rack in the diagram to select it, which allows you to change its barcode. Once you've
 selected a tray rack, a second diagram appears showing the trays within the tray rack. You can click a tray in this
 diagram to select the tray, allowing you to change its barcode or add boxes to it.
 
