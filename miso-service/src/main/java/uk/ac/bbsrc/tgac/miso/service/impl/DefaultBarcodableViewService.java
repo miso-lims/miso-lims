@@ -25,7 +25,7 @@ public class DefaultBarcodableViewService implements BarcodableViewService {
   BarcodableViewDao barcodableViewDao;
 
   @Resource()
-  private Map<EntityType, BarcodableService> barcodableServicesMap;
+  private Map<EntityType, BarcodableService<?>> barcodableServicesMap;
 
   @Override
   public List<BarcodableView> searchByBarcode(String barcode) {
