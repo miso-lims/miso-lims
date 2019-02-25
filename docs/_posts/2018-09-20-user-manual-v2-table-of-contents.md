@@ -684,6 +684,8 @@ This user manual is a work in progress, so parts of it may be missing until it h
 {% assign sub = 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Index Distance" %}
 {% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Index Search" %}
+{% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Identity Search" %}
 
 
