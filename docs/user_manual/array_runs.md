@@ -26,7 +26,7 @@ Click the "Add" button in the toolbar at the top of the Array Runs list to get t
 can enter all of the array run details.
 
 To add an array to the run, enter the array's alias or serial number into the Array Search box and click the "Search"
-button. Matching arrays will appear in the dropdown below. Endure that the correct array is selected, then click the
+button. Matching arrays will appear in the dropdown below. Ensure that the correct array is selected, then click the
 "Apply" button to confirm.
 
 When you are done, click the "Save" button at the top right to save the array run. After saving, you will be taken to the
@@ -40,7 +40,7 @@ single Edit Array Run page, where you can further modify the array run.
 
 To get to the Edit Array Run page, click on the array run's ID or alias in the Array Runs list. The top section of this
 page is the same as on the Create Array Run page, and allows you to modify the array run details. Make any changes you
-would like, then click the "Save" button at the top right. The Samples section below shows all of the samples in the
-array if one has been added to the array run. Under that is another list containing the array run's change log.
+would like, then click the "Save" button at the top right. If an array has been added to the array run, all of its
+samples are listed in the Samples section below. Under that is another list containing the array run's change log.
 
 {% include userman-toplink.md %}
