@@ -1,14 +1,38 @@
 ---
 layout: page
-title: "User Manual V2"
+title: "User Manual"
 category: usr
 date: 2018-09-20
 order: 1
 ---
 
-<strong style="color:red; font-size:2em;">Document under construction<strong>
+This user manual is intended to document all of MISO's features and everything that a user could need to know about
+using MISO. We will make every effort to keep it up to date. If you should come across any errors, outdated
+information, or a feature that is missing from the user manual, please let us know by
+[opening an issue](https://github.com/TGAC/miso-lims/issues), so we can update it. Thanks!
 
-This user manual is a work in progress, so parts of it may be missing until it has been completed.
+## Introduction
+
+[MISO](https://github.com/TGAC/miso-lims) (**M**anaging **I**nformation for **S**equencing **O**perations) is a Lab
+Information Management System (LIMS) developed at [Earlham Institute](http://www.earlham.ac.uk/) and the
+[Ontario Institute for Cancer Research](https://oicr.on.ca/). MISO is heavily modelled upon the submission schemas
+specified by the [European Nucleotide Archive (ENA)](https://www.ebi.ac.uk/ena) and is able to automatically generate
+the required XML and data files for submission.
+
+## History
+
+MISO has been developed by the [Davey group](http://www.earlham.ac.uk/davey-group) at Earlham Institute since
+February 2010. The first version of MISO was released internally to Earlham staff on 19th Sept 2011. The first beta
+community release of MISO was 0.1.6, released May 31st, 2012. Since then, a small dedicated software team has provided
+the fixes and patches needed to support the institute.
+
+In 2015, the [Genome Sequence Informatics](http://labs.oicr.on.ca/genome-sequence-informatics/) team at OICR chose MISO
+as their new LIMS. OICR did not want to fork MISO entirely, so together the team at Earlham and OICR worked out a
+development plan to better support multiple institutes with the same code base. All active work is visible on GitHub
+and undergoes thorough code reviews and testing before being integrated into the mainline branches. Releases are pushed
+weekly to [GitHub](https://github.com/TGAC/miso-lims/releases).
+
+## Contents
 
 🔹 = item only applicable to Detailed Sample mode
 
@@ -165,6 +189,8 @@ This user manual is a work in progress, so parts of it may be missing until it h
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Targeted Sequencing" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="QC Types" %}
+{% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Partition QC Types" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Box Sizes" %}
 {% assign sub = sub | plus: 1 %}
@@ -533,6 +559,8 @@ This user manual is a work in progress, so parts of it may be missing until it h
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Removing a Sequencing Container from a Run" %}
 {% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Setting Partition QCs" %}
+{% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="External Links" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Notes" %}
@@ -686,7 +714,7 @@ This user manual is a work in progress, so parts of it may be missing until it h
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Index Search" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Identity Search" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Identity Search🔹" %}
 
 
 {% assign section = section | plus: 1 %}
