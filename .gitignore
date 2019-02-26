@@ -12,6 +12,7 @@ test_file.txt
 
 # Maven build directory.
 target/
+.m2
 
 # Flyway database migration credentials file.
 sqlstore/flyway.properties
@@ -32,3 +33,6 @@ _site/
 
 #Mac artifacts
 .DS_Store
+
+# Password file
+.miso_db_password
