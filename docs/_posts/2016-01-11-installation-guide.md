@@ -146,8 +146,8 @@ method for users to report issues using the "Report a problem" link in the heade
 Download some supporting JARs:
 
     cd $CATALINA_HOME/lib
-    curl -O https://repos.tgac.ac.uk/miso/common/mysql-connector-java-5.1.10.jar
-    curl -O https://repos.tgac.ac.uk/miso/common/jndi-file-factory-1.0.jar
+    curl -O https://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/8.0.15/mysql-connector-java-8.0.15.jar
+    curl -O https://artifacts.oicr.on.ca/artifactory/webapp/#/artifacts/browse/tree/General/gsi-dependencies/uk/ac/ebi/fgpt/jndi-file-factory/1.0/jndi-file-factory-1.0.jar
 
 Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if using Tomcat from Debian or Ubuntu, `/etc/default/tomcat8`:
 
@@ -322,7 +322,7 @@ There will be an important build artefact: `miso-web/target/ROOT.war`
 # Releasing and Upgrading
 
 Prior to release, ensure that you have followed the instructions in the
-above and have WAR files for both MISO (`ROOT.war`) and Run Scanner(`runscanner-*.war`).
+above and have WAR files for both MISO (`ROOT.war`) and, if desired, [Run Scanner](https://github.com/oicr-gsi/runscanner)(`runscanner-*.war`).
 
 To install or upgrade, perform the following steps:
 
@@ -332,7 +332,7 @@ To install or upgrade, perform the following steps:
 1. Copy the `ROOT.war` from the build to `$CATALINA_HOME/webapps`.
 1. Make any necessary configuration changes to `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`.
 1. Migrate the database to the newest version. (Described below.)
-1. Deploy Run Scanner:
+1. If also releasing Run Scanner, deploy it:
     1. Stop Run Scanner's Tomcat.
     1. Deploy the Run Scanner WAR.
     1. Restart Run Scanner's Tomcat.
