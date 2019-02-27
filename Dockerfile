@@ -50,11 +50,11 @@ WORKDIR /
 
 ENV MISO_DB_USER tgaclims
 ENV MISO_DB lims
-ENV MISO_DB_URL db:3306
+ENV MISO_DB_HOST_PORT db:3306
 ENV MISO_DB_PASS_FILE /run/secrets/lims_password
 ENV MISO_FILES_DIR /storage/miso/files/
 
-CMD bash /wait-for-it.sh -t 0 ${MISO_DB_URL} && bash /flyway-migrate.sh
+CMD bash /wait-for-it.sh -t 0 ${MISO_DB_HOST_PORT} && bash /flyway-migrate.sh
 
 
 #######################################################
@@ -82,7 +82,7 @@ COPY --from=builder /miso-lims/miso-web/target/ROOT.war ${CATALINA_HOME}/webapps
 
 ENV MISO_DB_USER tgaclims
 ENV MISO_DB lims
-ENV MISO_DB_URL db:3306
+ENV MISO_DB_HOST_PORT db:3306
 ENV MISO_DB_PASS_FILE /run/secrets/lims_password
 ENV MISO_FILES_DIR /storage/miso/files/
 
