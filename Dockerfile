@@ -28,8 +28,7 @@ FROM openjdk:8-jre-alpine as flyway-migration
 ARG FLYWAY_VERSION=3.2.1
 RUN apk --no-cache add --update bash openssl unzip
 
-RUN wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -O /wait-for-it.sh
-COPY ./.docker/flyway-migrate.sh .
+COPY ./.docker/flyway-migrate.sh ./.docker/wait-for-it.sh /
 
 # Add the flyway user and step in the directory
 RUN adduser -S -h /flyway -D flyway

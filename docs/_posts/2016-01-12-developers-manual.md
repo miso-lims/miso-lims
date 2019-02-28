@@ -408,7 +408,7 @@ Pull the tag or snapshot that you want to build and package it:
 
     export version="0.2.35-SNAPSHOT"
     git checkout "tags/${version}"
-    docker build --target flyway-migrate -t "misolims/miso-lims-migration:${version}" --no-cache .
+    docker build --target flyway-migration -t "misolims/miso-lims-migration:${version}" --no-cache .
     docker build --target webapp -t "misolims/miso-lims-webapp:${version}" --no-cache .
     docker tag "misolims/miso-lims-migration:${version}" misolims/miso-lims-migration:latest
     docker tag "misolims/miso-lims-webapp:${version}" misolims/miso-lims-webapp:latest
@@ -416,7 +416,7 @@ Pull the tag or snapshot that you want to build and package it:
 Once the build completes, test it by launching it. This command uses the default 
 environment variables in .env and relies on `.miso_db_password` file existing.
 
-    export MISO_TAG="0.2.35-SNAPSHOT" && docker-compose up
+    export MISO_TAG="${version}" && docker-compose up
 
 Navigate to `http://localhost:8090` and login with the credentials admin:admin.
 
