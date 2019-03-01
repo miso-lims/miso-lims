@@ -399,7 +399,7 @@ This will cause Tomcat to start but will not run any tests. You can access this 
 output once the Tomcat has finished starting up. As Tomcat is not running tests, it will have to be killed
 with `Ctrl-C` and the MySQL Docker container will have to be manually cleaned up.
 
-## Building the Docker image (after building a release)
+## Building the Docker images (after building a release)
 
 If you are a MISO maintainer and you have created the latest release, you will need to create a
 Docker image for it and send it to DockerHub.
@@ -408,16 +408,22 @@ Pull the tag or snapshot that you want to build and package it:
 
     export version="0.2.35-SNAPSHOT"
     git checkout "tags/${version}"
-    mvn -P external clean install package
-    docker build -t "misolims/miso-lims:${version}" --build-arg version="${version}" --no-cache .
+    docker build --target flyway-migration -t "misolims/miso-lims-migration:${version}" --no-cache .
+    docker build --target webapp -t "misolims/miso-lims-webapp:${version}" --no-cache .
+    docker tag "misolims/miso-lims-migration:${version}" misolims/miso-lims-migration:latest
+    docker tag "misolims/miso-lims-webapp:${version}" misolims/miso-lims-webapp:latest
 
-Once the build completes, test it by launching it:
+Once the build completes, test it by launching it. This command uses the default 
+environment variables in .env and relies on `.miso_db_password` file existing.
 
-    docker run -p 8090:8080 --name "miso${version}" -t "misolims/miso-lims:${version}"
+    export MISO_TAG="${version}" && docker-compose up
 
 Navigate to `http://localhost:8090` and login with the credentials admin:admin.
 
 Once satisfied, push the image to Docker Hub. Note that only members of the [misolims](https://hub.docker.com/u/misolims/) organisation can push:
 
     docker login
-    docker push "misolims/miso-lims:${version}"
+    docker push "misolims/miso-lims-migration:${version}"
+    docker push "misolims/miso-lims-migration:latest"
+    docker push "misolims/miso-lims-webapp:${version}"
+    docker push "misolims/miso-lims-webapp:latest"

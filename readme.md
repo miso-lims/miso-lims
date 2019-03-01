@@ -26,26 +26,39 @@
 ### Docker
 
 The simplest way to get MISO up and running quickly is to use
-[Docker](https://www.docker.com/). Images of the most recent MISO releases are
+[Docker](https://www.docker.com/) compose. Images of the most recent MISO releases are
 available on Docker Hub in
-[misolims/miso-lims](https://hub.docker.com/r/misolims/miso-lims/). The Docker
-container is intended as a demonstration and not a permanent installation. Please 
-note that shutting down the Docker container deletes all MISO data, and 
-restarting the Docker container starts up with a fresh MISO. If you wish to 
-store your data longer-term when testing out MISO, please follow the instructions 
-for _Running an Instance of MISO_ below.
+[misolims](https://hub.docker.com/r/misolims/). 
 
 To use it:
 
-1. [Install Docker 1.9.1+](https://www.docker.com/products/docker) 
-1. ```docker pull misolims/miso-lims``` 
-1. ```docker run -p 8090:8080 -d -t misolims/miso-lims```
+1. [Install Docker 18.06.0+](https://docs.docker.com/install/)
+1. If necessary, [install Docker Compose](https://docs.docker.com/compose/install/)
+1. Launch with Docker Compose:
+
+```bash
+# download the docker-compose file
+wget https://raw.githubusercontent.com/TGAC/miso-lims/master/docker-compose.yml -O docker-compose.yml
+# set the password for the database
+echo "changeme" > ./.miso_db_password
+# set required environment variables
+export MISO_DB_USER=tgaclims MISO_DB=lims MISO_DB_PASSWORD_FILE=./.miso_db_password MISO_TAG=latest
+docker-compose up
+```
 
 Navigate to [http://localhost:8090](http://localhost:8090) to login to miso with
 the credentials **admin/admin**.
 
 Please add a sequencing _Instrument_ before you attempt to create libraries, as 
 libraries can only be created for platforms with active (non-retired) instruments.
+
+The default docker-compose.yml file creates Docker volumes for the MISO DB 
+(miso_db) and files uploaded into MISO (miso_files) and these will persist 
+across multiple startups until the Docker environment is pruned. As such, it is 
+intended as a demonstration and __not a permanent installation__. Please see
+[miso-lims-webapp](https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-webapp)
+on DockerHub for more information on configuring the Compose file.
+
 
 ## User Tutorial
 
