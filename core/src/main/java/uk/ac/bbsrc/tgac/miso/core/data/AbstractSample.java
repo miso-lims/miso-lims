@@ -55,7 +55,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
@@ -101,10 +100,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @OneToMany(targetEntity = SampleChangeLog.class, mappedBy = "sample", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
-
-  @ManyToOne
-  @JoinColumn(name = "securityProfile_profileId")
-  private SecurityProfile securityProfile = null;
 
   private String accession;
   private String name;
@@ -401,16 +396,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public SecurityProfile getSecurityProfile() {
-    return securityProfile;
-  }
-
-  @Override
-  public void setSecurityProfile(SecurityProfile securityProfile) {
-    this.securityProfile = securityProfile;
-  }
-
-  @Override
   public int compareTo(Sample s) {
     if (getId() != 0L && s.getId() != 0L) {
       if (getId() < s.getId()) return -1;
@@ -512,11 +497,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   public String getDeleteDescription() {
     return getName()
         + (getAlias() == null ? "" : " (" + getAlias() + ")");
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    return getSecurityProfile();
   }
 
   @Override

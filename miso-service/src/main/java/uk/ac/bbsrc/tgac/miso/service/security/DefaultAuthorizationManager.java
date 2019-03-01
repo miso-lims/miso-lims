@@ -1,10 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.security;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -15,7 +11,6 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class DefaultAuthorizationManager implements AuthorizationManager {
@@ -91,76 +86,6 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
   }
 
   @Override
-  public boolean readCheck(SecurableByProfile resource) throws IOException {
-    return readCheck(resource, getCurrentUser());
-  }
-
-  @Override
-  public boolean readCheck(SecurableByProfile resource, User user) {
-    if (resource == null || resource.getSecurityProfile() == null) {
-      return true;
-    } else {
-      return resource.getSecurityProfile().userCanRead(user);
-    }
-  }
-
-  @Override
-  public void throwIfNotReadable(SecurableByProfile resource) throws IOException, AuthorizationException {
-    if (!readCheck(resource)) {
-      throw new AuthorizationException("Current user does not have permission to view this resource");
-    }
-  }
-
-  @Override
-  public void throwIfNotReadable(SecurableByProfile resource, User user) throws AuthorizationException {
-    if (!readCheck(resource, user)) {
-      throw new AuthorizationException("User " + user.getLoginName() + " does not have permission to view this resource");
-    }
-  }
-
-  @Override
-  public boolean writeCheck(SecurableByProfile resource) throws IOException {
-    return writeCheck(resource, getCurrentUser());
-  }
-
-  @Override
-  public boolean writeCheck(SecurableByProfile resource, User user) {
-    if (resource.getSecurityProfile() == null) {
-      return true;
-    } else {
-      return resource.getSecurityProfile().userCanWrite(user);
-    }
-  }
-
-  @Override
-  public void throwIfNotWritable(SecurableByProfile resource) throws IOException, AuthorizationException {
-    if (!writeCheck(resource)) {
-      throw new AuthorizationException("Current user does not have permission to modify this resource");
-    }
-  }
-
-  @Override
-  public void throwIfNotWritable(SecurableByProfile resource, User user) throws AuthorizationException {
-    if (!writeCheck(resource, user)) {
-      throw new AuthorizationException("User " + user.getLoginName() + " does not have permission to modify this resource");
-    }
-  }
-
-  @Override
-  public <T, R extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered, Function<T, R> getProfileHolder) throws IOException {
-    User currentUser = getCurrentUser();
-    List<T> filtered = new ArrayList<>();
-    if (unfiltered != null) {
-      for (T item : unfiltered) {
-        if (readCheck(getProfileHolder.apply(item), currentUser)) {
-          filtered.add(item);
-        }
-      }
-    }
-    return filtered;
-  }
-
-  @Override
   public void throwIfNotInternal() throws IOException, AuthorizationException {
     if (!getCurrentUser().isInternal()) throw new AuthorizationException("Current user is not an internal user");
   }
@@ -175,11 +100,6 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
         throw new AuthorizationException("Current user is not admin or owner");
       }
     }
-  }
-
-  @Override
-  public <T extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered) throws IOException, AuthorizationException {
-    return filterUnreadable(unfiltered, x -> x);
   }
 
   @Override

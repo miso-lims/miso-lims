@@ -15,14 +15,11 @@ import uk.ac.bbsrc.tgac.miso.core.store.PartitionQcStore;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class DefaultPartitionQCService implements PartitionQCService {
 
-  @Autowired
-  private AuthorizationManager authorizationManager;
   @Autowired
   private ContainerService containerService;
   @Autowired
@@ -33,7 +30,6 @@ public class DefaultPartitionQCService implements PartitionQCService {
   @Override
   public PartitionQC get(Run run, Partition partition) throws IOException {
     Run managedRun = runService.get(run.getId());
-    authorizationManager.throwIfNotReadable(managedRun);
     return partitionQcDao.get(managedRun, partition);
   }
 
@@ -51,7 +47,6 @@ public class DefaultPartitionQCService implements PartitionQCService {
   public void save(PartitionQC qc) throws IOException {
     PartitionQC managedQc = get(qc.getRun(), qc.getPartition());
     Run managedRun = runService.get(qc.getRun().getId());
-    authorizationManager.throwIfNotWritable(managedRun);
     Partition managedPartition = containerService.getPartition(qc.getPartition().getId());
 
     // update run and container for accurate lastModified and lastModifier (used in changelogs)

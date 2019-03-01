@@ -17,7 +17,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -185,11 +184,6 @@ public class Workset implements Serializable, Aliasable, Timestamped, Deletable 
   @Override
   public String getDeleteDescription() {
     return getAlias();
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    return null;
   }
 
 }

@@ -4,8 +4,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
@@ -18,10 +16,6 @@ public class LS454Run extends Run {
 
   public LS454Run() {
     super();
-  }
-
-  public LS454Run(User user) {
-    super(user);
   }
 
   public int getCycles() {

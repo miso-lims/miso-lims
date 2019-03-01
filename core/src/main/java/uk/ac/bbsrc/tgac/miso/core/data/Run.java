@@ -52,7 +52,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
@@ -62,7 +61,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * A Run represents a sequencing run on a single sequencing instrument, referenced by a {@link Instrument}, comprising one or more
@@ -77,7 +75,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @Table(name = "Run")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Run
-    implements SecurableByProfile, Comparable<Run>, Nameable, ChangeLoggable, Aliasable, Attachable, Serializable {
+    implements Comparable<Run>, Nameable, ChangeLoggable, Aliasable, Attachable, Serializable {
   private static final long serialVersionUID = 1L;
 
   /** Field PREFIX */
@@ -135,10 +133,6 @@ public abstract class Run
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long runId = UNSAVED_ID;
 
-  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "securityProfile_profileId")
-  private SecurityProfile securityProfile = new SecurityProfile();
-
   @ManyToOne(targetEntity = InstrumentImpl.class)
   @JoinColumn(name = "instrumentId", nullable = false)
   private Instrument sequencer;
@@ -158,18 +152,6 @@ public abstract class Run
    * Construct a new Run with a default empty SecurityProfile
    */
   public Run() {
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  /**
-   * Construct a new Run with a SecurityProfile owned by the given User
-   * 
-   * @param user
-   *          of type User
-   * 
-   */
-  public Run(User user) {
-    setSecurityProfile(new SecurityProfile(user));
   }
 
   public void addNote(Note note) {
@@ -177,7 +159,6 @@ public abstract class Run
   }
 
   public void addSequencerPartitionContainer(SequencerPartitionContainer f, InstrumentPosition position) {
-    f.setSecurityProfile(getSecurityProfile());
     RunPosition rp = new RunPosition();
     rp.setRun(this);
     rp.setContainer(f);
@@ -300,11 +281,6 @@ public abstract class Run
     return notes;
   }
 
-  @Override
-  public SecurityProfile getSecurityProfile() {
-    return securityProfile;
-  }
-
   public List<SequencerPartitionContainer> getSequencerPartitionContainers() {
     return getRunPositions().stream().map(RunPosition::getContainer).collect(Collectors.toList());
   }
@@ -402,11 +378,6 @@ public abstract class Run
 
   public void setNotes(Collection<Note> notes) {
     this.notes = notes;
-  }
-
-  @Override
-  public void setSecurityProfile(SecurityProfile securityProfile) {
-    this.securityProfile = securityProfile;
   }
 
   public void setSequencer(Instrument sequencer) {

@@ -59,7 +59,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
@@ -157,10 +156,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   private Boolean qcPassed;
 
-  @ManyToOne
-  @JoinColumn(name = "securityProfile_profileId")
-  private SecurityProfile securityProfile;
-
   @Enumerated(EnumType.STRING)
   private ConcentrationUnit concentrationUnits;
   @Enumerated(EnumType.STRING)
@@ -172,11 +167,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private List<FileAttachment> attachments;
 
   public PoolImpl() {
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  public PoolImpl(User user) {
-    setSecurityProfile(new SecurityProfile(user));
   }
 
   @Override
@@ -312,11 +302,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public SecurityProfile getSecurityProfile() {
-    return securityProfile;
-  }
-
-  @Override
   public List<FileAttachment> getAttachments() {
     return attachments;
   }
@@ -446,11 +431,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public Long getPreMigrationId() {
     return null;
-  }
-
-  @Override
-  public void setSecurityProfile(SecurityProfile securityProfile) {
-    this.securityProfile = securityProfile;
   }
 
   @Override
@@ -590,11 +570,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public String getDeleteDescription() {
     return getName() + (getAlias() == null ? "" : " (" + getAlias() + ")");
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    return getSecurityProfile();
   }
 
   @Override

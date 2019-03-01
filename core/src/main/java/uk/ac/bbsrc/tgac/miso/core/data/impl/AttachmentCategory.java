@@ -7,8 +7,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 
@@ -56,11 +54,6 @@ public class AttachmentCategory implements Aliasable, Deletable, Serializable {
   @Override
   public String getDeleteDescription() {
     return getAlias();
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    return null;
   }
 
   @Override

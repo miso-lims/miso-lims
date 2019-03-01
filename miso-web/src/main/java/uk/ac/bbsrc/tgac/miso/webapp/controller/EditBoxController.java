@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -45,7 +44,6 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
@@ -56,9 +54,6 @@ public class EditBoxController {
   protected static final Logger log = LoggerFactory.getLogger(EditBoxController.class);
 
   private static final String MODEL_ATTR_PAGEMODE = "pageMode";
-
-  @Autowired
-  private AuthorizationManager authorizationManager;
 
   @Autowired
   private BoxService boxService;
@@ -137,8 +132,7 @@ public class EditBoxController {
   public ModelAndView newBox(ModelMap model) throws IOException {
     model.put("title", "New Box");
     model.put(MODEL_ATTR_PAGEMODE, "create");
-    User user = authorizationManager.getCurrentUser();
-    return setupForm(new BoxImpl(user), model);
+    return setupForm(new BoxImpl(), model);
   }
 
   @GetMapping(value = "/{boxId}")

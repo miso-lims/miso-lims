@@ -247,7 +247,6 @@
   </div>
 </c:if>
 <div class="noPrint">
-  <%@ include file="permissions.jsp" %>
   <miso:changelog item="${pool}"/>
 </div>
 </form:form>

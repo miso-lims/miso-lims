@@ -78,11 +78,6 @@ var Project = Project || {
     jQuery('#progress1').attr('data-parsley-errors-container', '#progressSelectError');
     jQuery('#progress').attr('data-parsley-class-handler', '#progressButtons');
 
-    if (jQuery('#securityProfile_owner').length > 0) {
-      jQuery('#securityProfile_owner').attr('class', 'form-control');
-      jQuery('#securityProfile_owner').attr('required', 'true');
-    }
-
     jQuery('#project-form').parsley();
     jQuery('#project-form').parsley().validate();
 

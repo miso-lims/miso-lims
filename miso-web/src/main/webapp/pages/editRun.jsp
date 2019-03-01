@@ -329,7 +329,6 @@
     <miso:list-section id="list_experiment" name="Experiments" target="experiment" alwaysShow="true" items="${experiments}" config="${experimentConfiguration}"/>
   </div>
 </c:if>
-<%@ include file="permissions.jsp" %>
 </form:form>
 <miso:changelog item="${run}"/>
 </div>

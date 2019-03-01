@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
@@ -46,11 +45,6 @@ public abstract class AbstractSecurityManager implements SecurityManager {
   @Override
   public Map<String, Integer> getGroupColumnSizes() throws IOException {
       return securityStore.getGroupColumnSizes();
-  }
-
-  @Override
-  public SecurityProfile getSecurityProfileById(Long profileId) throws IOException {
-    return securityStore.getSecurityProfileById(profileId);
   }
 
   @Override

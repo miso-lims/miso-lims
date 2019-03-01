@@ -37,7 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -47,11 +46,10 @@ import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSource<Box> {
+public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -69,9 +67,6 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
 
   @Autowired
   private NamingScheme namingScheme;
-
-  @Autowired
-  private SecurityProfileStore securityProfileStore;
 
   @Autowired
   private DeletionStore deletionStore;
@@ -103,7 +98,6 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   @Override
   public void discardAllContents(Box box) throws IOException {
     Box managed = get(box.getId());
-    authorizationManager.throwIfNotWritable(managed);
     addBoxContentsChangeLog(managed, String.format("Discarded all box contents (%d items)", managed.getBoxPositions().size()));
     for (BoxPosition bp : managed.getBoxPositions().values()) {
       discardBoxable(bp.getBoxableId());
@@ -115,7 +109,6 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   @Override
   public void discardSingleItem(Box box, String position) throws IOException {
     Box managed = boxStore.get(box.getId());
-    authorizationManager.throwIfNotWritable(managed);
     BoxPosition bp = managed.getBoxPositions().get(position);
     if (bp == null) {
       throw new IllegalArgumentException("No item in the specified box position");
@@ -142,16 +135,12 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   @Override
   public Box get(long boxId) throws IOException {
     Box o = boxStore.get(boxId);
-    authorizationManager.throwIfNotReadable(o);
     return o;
   }
 
   @Override
   public List<Box> listByIdList(List<Long> idList) throws IOException {
     List<Box> boxes = boxStore.getByIdList(idList);
-    for (Box box : boxes) {
-      authorizationManager.throwIfNotReadable(box);
-    }
     return boxes;
   }
 
@@ -160,15 +149,10 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
     return authorizationManager;
   }
 
-  @Override
-  public PaginatedDataSource<Box> getBackingPaginationSource() {
-    return boxStore;
-  }
 
   @Override
   public Box getByAlias(String alias) throws IOException {
     Box o = boxStore.getBoxByAlias(alias);
-    authorizationManager.throwIfNotReadable(o);
     return o;
   }
 
@@ -200,7 +184,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   @Override
   public List<Box> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
       throws IOException {
-    return authorizationManager.filterUnreadable(boxStore.list(errorHandler, offset, limit, sortDir, sortCol, filter));
+    return boxStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
   @Override
@@ -246,7 +230,6 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       return saveNewBox(box);
     } else {
       Box managed = boxStore.get(box.getId());
-      authorizationManager.throwIfNotWritable(managed);
       logStorageChange(box, managed);
       validateChange(box, managed);
       applyChanges(box, managed);
@@ -398,10 +381,8 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   }
 
   private long saveNewBox(Box box) throws IOException {
-    authorizationManager.throwIfNotWritable(box);
     try {
       box.setName(generateTemporaryName());
-      box.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(box.getSecurityProfile())));
       box.setChangeDetails(authorizationManager.getCurrentUser());
       box.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(box.getIdentificationBarcode()));
       validateChange(box, null);
@@ -489,10 +470,6 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
 
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
-  }
-
-  public void setSecurityProfileStore(SecurityProfileStore securityProfileStore) {
-    this.securityProfileStore = securityProfileStore;
   }
 
   @Override

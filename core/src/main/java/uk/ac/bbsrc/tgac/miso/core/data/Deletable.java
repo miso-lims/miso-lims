@@ -23,17 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-
 public interface Deletable extends Identifiable {
 
   public String getDeleteType();
 
   public String getDeleteDescription();
-
-  /**
-   * @return the SecurityProfile to attach to the Deletion record. May return null to make the Deletion visible to all users
-   */
-  public SecurityProfile getDeletionSecurityProfile();
 
 }

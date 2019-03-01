@@ -139,24 +139,7 @@
    <td>Library:</td>
    <td><a href="/miso/library/${experiment.library.id}">${experiment.library.name} (${experiment.library.alias})</td>
 </tr>
-<c:choose>
-  <c:when
-      test="${!empty experiment.study and experiment.securityProfile.profileId eq experiment.study.securityProfile.profileId}">
-    <tr>
-      <td>Permissions</td>
-      <td><i>Inherited from study </i><a
-          href='<c:url value="/miso/study/${experiment.study.id}"/>'>${experiment.study.name}</a>
-        <input type="hidden" value="${experiment.study.securityProfile.profileId}"
-               name="securityProfile" id="securityProfile"/>
-      </td>
-    </tr>
-    </table>
-  </c:when>
-  <c:otherwise>
-    </table>
-    <%@ include file="permissions.jsp" %>
-  </c:otherwise>
-</c:choose>
+</table>
 
 <script type="text/javascript">
   jQuery(document).ready(function() {

@@ -31,7 +31,6 @@ import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * A Sample contains information about the original material upon which a sequencing experiment is to be based.
@@ -46,7 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @since 0.0.2
  */
 public interface Sample
-    extends SecurableByProfile, Locatable, Comparable<Sample>, Boxable, ChangeLoggable, Aliasable, Serializable,
+    extends Locatable, Comparable<Sample>, Boxable, ChangeLoggable, Aliasable, Serializable,
     QualityControllable<SampleQC>, Deletable, Attachable, Distributable {
 
   /** Field UNSAVED_ID */

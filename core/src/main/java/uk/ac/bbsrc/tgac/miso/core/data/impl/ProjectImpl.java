@@ -48,8 +48,6 @@ import javax.persistence.TemporalType;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -57,7 +55,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 
 /**
@@ -112,29 +109,15 @@ public class ProjectImpl implements Project {
   @JoinColumn(name = "targetedSequencingId", referencedColumnName = "targetedSequencingId", nullable = true)
   private TargetedSequencing defaultTargetedSequencing;
 
-  @ManyToOne
-  @JoinColumn(name = "securityProfile_profileId")
-  private SecurityProfile securityProfile = null;
 
   @Column(nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
   /**
-   * Construct a new Project with a default empty SecurityProfile
+   * Construct a new Project
    */
   public ProjectImpl() {
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  /**
-   * Construct a new Project with a SecurityProfile owned by the given User
-   * 
-   * @param user
-   *          of type User
-   */
-  public ProjectImpl(User user) {
-    setSecurityProfile(new SecurityProfile(user));
   }
 
   @Override
@@ -245,28 +228,9 @@ public class ProjectImpl implements Project {
     this.lastUpdated = lastUpdated;
   }
 
-  @Override
-  public SecurityProfile getSecurityProfile() {
-    return securityProfile;
-  }
-
-  @Override
-  public void setSecurityProfile(SecurityProfile profile) {
-    this.securityProfile = profile;
-  }
-
-  @Override
-  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    // projects have no parents
-  }
-
   public void addStudy(Study s) {
     // do study validation
     s.setProject(this);
-
-    // propagate security profiles down the hierarchy
-    s.setSecurityProfile(this.securityProfile);
-
     // add
     this.studies.add(s);
   }

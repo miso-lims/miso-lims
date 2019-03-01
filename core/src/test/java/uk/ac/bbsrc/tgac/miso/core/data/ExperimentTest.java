@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -11,12 +11,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 public class ExperimentTest {
   private Experiment ae;
@@ -42,18 +38,6 @@ public class ExperimentTest {
     assertKitListEqual(expectedSequencingKits, sequencingKits);
     assertKitListEqual(expectedClusteringKits, clusteringKits);
     assertKitListEqual(expectedMultiplexingKits, multiplexingKits);
-  }
-
-  @Test
-  public final void testInheritPermissions() {
-    final SecurableByProfile parent = Mockito.mock(SecurableByProfile.class);
-    final SecurityProfile mockSecurityProfile = Mockito.mock(SecurityProfile.class);
-    final User mockUser = Mockito.mock(User.class);
-    when(parent.getSecurityProfile()).thenReturn(mockSecurityProfile);
-    when(mockSecurityProfile.getOwner()).thenReturn(mockUser);
-
-    ae.inheritPermissions(parent);
-    assertNotNull(ae.getSecurityProfile());
   }
 
   // Utility methods.

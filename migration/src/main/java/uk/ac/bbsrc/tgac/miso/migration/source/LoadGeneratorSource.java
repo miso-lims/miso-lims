@@ -468,7 +468,7 @@ public class LoadGeneratorSource implements MigrationSource {
     while (runNumPadded.length() < runNumPadding) {
       runNumPadded = "0" + runNumPadded;
     }
-    Run run = (pools.size() > 0 ? pools.get(0).getPlatformType() : PlatformType.ILLUMINA).createRun(null);
+    Run run = (pools.size() > 0 ? pools.get(0).getPlatformType() : PlatformType.ILLUMINA).createRun();
     String runBarcode = runNumPadded + "ADXX";
     run.setAlias(RUN_DATE_STRING + "_LoadTest_" + runNumPadded + "_" + runBarcode);
     run.setDescription(runBarcode);

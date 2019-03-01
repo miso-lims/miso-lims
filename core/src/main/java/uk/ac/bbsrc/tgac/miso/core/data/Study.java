@@ -28,15 +28,13 @@ import java.util.Collection;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
 /**
  * A Study is a subset of work carried out for a {@link Project}, comprising one or more {@link Experiment}s.
  * 
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Study extends SecurableByProfile, Comparable<Study>, Deletable, Nameable, ChangeLoggable, Aliasable, Serializable {
+public interface Study extends Comparable<Study>, Deletable, Nameable, ChangeLoggable, Aliasable, Serializable {
 
   /** Field PREFIX */
   public static final String PREFIX = "STU";

@@ -14,7 +14,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -161,11 +160,6 @@ public class PoolOrderImpl implements PoolOrder, Serializable {
     return "Pool " + getPool().getId() + " - "
         + getPartitions() + " partitions of "
         + getSequencingParameter().getName();
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    return null;
   }
 
 }

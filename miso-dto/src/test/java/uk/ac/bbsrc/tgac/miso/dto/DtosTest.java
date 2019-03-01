@@ -145,14 +145,14 @@ public class DtosTest {
   @Test
   public void testConvertToUtilDate_Illumina() throws ParseException {
     NotificationDto dto = fullyPopulatedIlluminaNotificationDto("RUN_B");
-    Run run = Dtos.to(dto, null);
+    Run run = Dtos.to(dto);
     assertThat(dto.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE), is(LimsUtils.formatDate(run.getStartDate())));
   }
 
   @Test
   public void testConvertToUtilDate_PacBio() throws ParseException {
     NotificationDto dto = fullyPopulatedPacBioNotificationDto("RUN_B");
-    Run run = Dtos.to(dto, null);
+    Run run = Dtos.to(dto);
     assertThat(dto.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE), is(LimsUtils.formatDate(run.getStartDate())));
   }
 

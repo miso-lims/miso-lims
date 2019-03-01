@@ -44,7 +44,6 @@ import javax.persistence.Transient;
 
 import org.w3c.dom.Document;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
@@ -81,10 +80,6 @@ public class StudyImpl implements Study {
   @Transient
   public transient Document submissionDocument;
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "securityProfile_profileId")
-  private SecurityProfile securityProfile = null;
-
   @Column(name = "name", nullable = false)
   private String name;
   @Column(name = "description", nullable = false)
@@ -119,25 +114,10 @@ public class StudyImpl implements Study {
    * Construct a new Study with a default empty SecurityProfile
    */
   public StudyImpl() {
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  /**
-   * Construct a new Study with a SecurityProfile owned by the given User
-   * 
-   * @param user
-   *          of type User
-   */
-  public StudyImpl(User user) {
-    setSecurityProfile(new SecurityProfile(user));
   }
 
   @Override
   public void addExperiment(Experiment e) {
-    // propagate security profiles down the hierarchy
-    e.setSecurityProfile(this.securityProfile);
-
-    // add
     this.experiments.add(e);
   }
 
@@ -211,11 +191,6 @@ public class StudyImpl implements Study {
   }
 
   @Override
-  public SecurityProfile getSecurityProfile() {
-    return securityProfile;
-  }
-
-  @Override
   public StudyType getStudyType() {
     return studyType;
   }
@@ -269,11 +244,6 @@ public class StudyImpl implements Study {
   }
 
   @Override
-  public void setSecurityProfile(SecurityProfile securityProfile) {
-    this.securityProfile = securityProfile;
-  }
-
-  @Override
   public void setStudyType(StudyType studyType) {
     this.studyType = studyType;
   }
@@ -317,11 +287,6 @@ public class StudyImpl implements Study {
     Project p = getProject();
     return (p.getShortName() == null ? p.getAlias() : p.getShortName())
         + " " + getName() + " (" + getAlias() + ")";
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    return getSecurityProfile();
   }
 
   @Override

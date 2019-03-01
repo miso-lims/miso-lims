@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
@@ -53,38 +52,38 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 public enum PlatformType {
   ILLUMINA("Illumina", "Flow Cell", "Lane", "Lanes", "ILLUMINA") {
     @Override
-    public Run createRun(User user) {
-      return new IlluminaRun(user);
+    public Run createRun() {
+      return new IlluminaRun();
     }
   }, //
   LS454("LS454", "Plate", "Lane", "Lanes", "LS454") {
     @Override
-    public Run createRun(User user) {
-      return new LS454Run(user);
+    public Run createRun() {
+      return new LS454Run();
     }
   }, //
   SOLID("Solid", "Slide", "Lane", "Lanes", "ABI_SOLID") {
     @Override
-    public Run createRun(User user) {
-      return new SolidRun(user);
+    public Run createRun() {
+      return new SolidRun();
     }
   }, //
   IONTORRENT("IonTorrent", "Chip", "Chip", "Chips", null) {
     @Override
-    public Run createRun(User user) {
-      return new IonTorrentRun(user);
+    public Run createRun() {
+      return new IonTorrentRun();
     }
   }, //
   PACBIO("PacBio", "8Pac", "SMRT Cell", "SMRT Cells", null) {
     @Override
-    public Run createRun(User user) {
-      return new PacBioRun(user);
+    public Run createRun() {
+      return new PacBioRun();
     }
   }, //
   OXFORDNANOPORE("Oxford Nanopore", "Flow Cell", "Flow Cell", "Flow Cells", null) {
     @Override
-    public Run createRun(User user) {
-      return new OxfordNanoporeRun(user);
+    public Run createRun() {
+      return new OxfordNanoporeRun();
     }
 
     @Override
@@ -178,7 +177,7 @@ public enum PlatformType {
     return sraName;
   }
 
-  public abstract Run createRun(User user);
+  public abstract Run createRun();
 
   public SequencerPartitionContainer createContainer() {
     return new SequencerPartitionContainerImpl();

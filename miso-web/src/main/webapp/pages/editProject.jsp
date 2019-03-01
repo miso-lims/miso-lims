@@ -106,7 +106,7 @@
     <td>Progress:*</td>
     <td>
       <c:choose>
-        <c:when test="${miso:isCurrentUser(project.securityProfile.owner.loginName) or miso:isAdmin()}">
+        <c:when test="${miso:isAdmin()}">
           <div id="progressButtons">
             <form:radiobuttons id="progress" path="progress"/>
           </div>
@@ -188,17 +188,12 @@
   <miso:list-section id="list_issue" name="Related Issues" target="issue" items="${projectIssues}" config="{}"/>
 </div>
 
-<%@ include file="permissions.jsp" %>
 <c:if test="${project.id == 0}">
   <script type="text/javascript">
     jQuery(document).ready(function () {
       //show import pane by default if project is unsaved
       jQuery("#issuesdiv").attr("style", "");
       jQuery("#issues_arrowclick").removeClass("toggleLeft").addClass("toggleLeftDown");
-
-      //show permissions pane by default if project is unsaved
-      jQuery("#permissions").attr("style", "");
-      jQuery("#permissions_arrowclick").removeClass("toggleLeft").addClass("toggleLeftDown");
     });
   </script>
 </c:if>

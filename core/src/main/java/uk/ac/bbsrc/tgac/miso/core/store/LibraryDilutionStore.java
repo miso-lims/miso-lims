@@ -47,9 +47,9 @@ public interface LibraryDilutionStore
    * @throws IOException
    *           when
    */
-  Collection<LibraryDilution> listByLibraryId(long libraryId) throws IOException;
+  List<LibraryDilution> listByLibraryId(long libraryId) throws IOException;
 
-  Collection<LibraryDilution> listByIdList(List<Long> idList) throws IOException;
+  List<LibraryDilution> listByIdList(List<Long> idList) throws IOException;
 
   /**
    * Get a LibraryDilution by ID barcode

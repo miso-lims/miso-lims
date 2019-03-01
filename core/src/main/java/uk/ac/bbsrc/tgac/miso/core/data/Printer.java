@@ -14,7 +14,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.base.Charsets;
 
@@ -68,11 +67,6 @@ public class Printer implements Deletable, Serializable {
   @Override
   public String getDeleteType() {
     return "Printer";
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    return null;
   }
 
   public Driver getDriver() {

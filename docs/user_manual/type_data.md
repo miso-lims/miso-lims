@@ -433,6 +433,20 @@ samples that are already using the affected QC types.
 
 
 {% assign sub = sub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Partition QC Types" %}
+
+Partition QCs describe the status of a sequenced partition and allows individual partitions within a run to have their
+own status, rather than grouping them all together with the run's status. Partition QCs can be used to determine
+whether the partition counts towards order fulfillment, and whether downstream analysis should be run on the partition.
+
+Modifications to partition QC types can only be made via direct access to the MISO database. As such, they must be
+performed by a MISO adminstrator.
+
+{% include userman-toplink.md %}
+
+
+
+{% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Box Sizes" %}
 
 A box in MISO describes a physical container that holds multiple samples, libraries, dilutions, and/or pools. Box sizes
