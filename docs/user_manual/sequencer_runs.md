@@ -77,6 +77,24 @@ table to remove the container.
 
 
 {% assign sub = sub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Setting Partition QCs" %}
+
+Partition QCs answer two questions about a sequenced partition:
+
+* Does this partition count towards order fulfillment?
+* Should downstream analysis be run on this partition?
+
+To set partition QCs, a sequencing container must first be added to the run. In the Partitions list, select the
+partitions for which you wish to set QCs, then click the "Set QC" button in the toolbar at the top of the list. Note
+that the Partitions list will be labelled differently depending on the platform of the run. In the dialog that appears,
+select a QC value. The effects of the selection are displayed in parenthesis. The Partitions list will be updated to
+reflect your selection.
+
+{% include userman-toplink.md %}
+
+
+
+{% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="External Links" %}
 
 If you have a web resource that includes pages for each of your runs, and the URL for those are predictable based on
