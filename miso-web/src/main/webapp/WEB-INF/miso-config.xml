@@ -38,8 +38,6 @@
   
   <bean id="authorizationManager" class="uk.ac.bbsrc.tgac.miso.service.security.DefaultAuthorizationManager" />
 
-  <bean id="misoFormsService" name="misoFormsService" class="uk.ac.bbsrc.tgac.miso.webapp.service.forms.MisoFormsService" />
-
   <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
     <property name="maxUploadSizePerFile" value="10485760" /> <!-- 10MB -->
   </bean>

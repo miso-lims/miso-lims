@@ -28,7 +28,6 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
@@ -55,17 +54,6 @@ public class SampleImpl extends AbstractSample {
    * Construct a new Sample with a default empty SecurityProfile
    */
   public SampleImpl() {
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  /**
-   * Construct a new Sample with a SecurityProfile owned by the given User
-   * 
-   * @param user
-   *          of type User
-   */
-  public SampleImpl(User user) {
-    setSecurityProfile(new SecurityProfile(user));
   }
 
   @Override

@@ -134,21 +134,7 @@
         <td>Study Type:</td>
         <td><miso:select id="studyType" path="studyType" items="${studyTypes}" itemLabel="name" itemValue="id" /></td>
       </tr>
-      <c:choose>
-        <c:when test="${study.securityProfile.profileId eq study.project.securityProfile.profileId}">
-          <tr>
-            <td>Permissions</td>
-            <td><i>Inherited from project </i><a
-                href='<c:url value="/miso/project/${project.id}"/>'>${study.project.name}</a>
-            </td>
-          </tr>
-          </table>
-        </c:when>
-        <c:otherwise>
-          </table>
-          <%@ include file="permissions.jsp" %>
-        </c:otherwise>
-      </c:choose>
+      </table>
       <br/>
       
       <script type="text/javascript">

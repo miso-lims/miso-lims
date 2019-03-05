@@ -1,3 +1,12 @@
+# 0.2.166
+
+Changes:
+
+ * Update Run Scanner to 1.3.0
+ * Turn MISO docker container into docker-compose containers
+ * Finalize new user maual
+ * Remove SecurityProfile
+
 # 0.2.165
 
 Changes:

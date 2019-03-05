@@ -1,0 +1,58 @@
+version: '3.7'
+
+# .env file or shell environment variables should contain the following: 
+# MISO_DB_USER : name of the MySQL user who accesses MISO_DB [tgaclims]
+# MISO_DB : name of the LIMS Db in MySql [lims]
+# MISO_DB_PASSWORD_FILE : path to the file with the password to the MySQL DB for user MISO_DB_USER
+# MISO_TAG : tag of the MISO Docker containers (migration and webapp)
+# echo "changeme" > ./.miso_db_password && export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && MISO_TAG=latest
+
+
+secrets:
+  lims_password: 
+    file: ${MISO_DB_PASSWORD_FILE}
+
+services:
+  db:
+    image: mysql:5.7.25
+    restart: always
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_DATABASE: ${MISO_DB}
+      MYSQL_USER: ${MISO_DB_USER}
+      MYSQL_PASSWORD_FILE: /run/secrets/lims_password
+    volumes:
+      - "miso_db:/var/lib/mysql"
+    secrets:
+      - lims_password
+
+  flyway:
+    image: misolims/miso-lims-migration:${MISO_TAG}
+    restart: on-failure
+    secrets:
+      - lims_password
+    links:
+      - db
+    depends_on:
+      - db
+
+  webapp:
+    image: misolims/miso-lims-webapp:${MISO_TAG}
+    restart: always
+    ports: 
+      - "8090:8080"
+    secrets:
+      - lims_password
+    volumes:
+      - "miso_files:/storage/miso/files/"
+    links:
+      - db
+      - flyway
+    depends_on:
+      - db
+      - flyway
+
+
+volumes:
+  miso_db:
+  miso_files:

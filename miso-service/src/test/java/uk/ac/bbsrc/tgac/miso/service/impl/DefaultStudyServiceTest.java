@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
@@ -69,7 +68,6 @@ public class DefaultStudyServiceTest {
     when(studyStore.save(db)).thenReturn(1L);
 
     assertEquals(1L, sut.save(s));
-    Mockito.verify(authorizationManager).throwIfNotWritable(db);
     assertEquals(s.getDescription(), db.getDescription());
     assertNotEquals(s.getName(), db.getName());
   }
@@ -83,6 +81,5 @@ public class DefaultStudyServiceTest {
     when(studyStore.get(1L)).thenReturn(db);
 
     assertEquals(db, sut.get(1L));
-    Mockito.verify(authorizationManager).throwIfNotReadable(db);
   }
 }

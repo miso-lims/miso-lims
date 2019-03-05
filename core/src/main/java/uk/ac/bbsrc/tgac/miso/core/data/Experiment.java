@@ -47,7 +47,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
@@ -56,7 +55,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ExperimentChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
 /**
@@ -64,7 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  */
 @Entity
 @Table(name = "Experiment")
-public class Experiment implements SecurableByProfile, Comparable<Experiment>, Nameable, ChangeLoggable, Serializable {
+public class Experiment implements Comparable<Experiment>, Nameable, ChangeLoggable, Serializable {
   @Entity
   @Embeddable
   @Table(name = "Experiment_Run_Partition")
@@ -193,10 +191,6 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, N
   @OneToMany(mappedBy = "experiment", cascade=CascadeType.ALL)
   private List<RunPartition> runPartitions;
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "securityProfile_profileId")
-  private SecurityProfile securityProfile = new SecurityProfile();
-
   @ManyToOne(targetEntity = StudyImpl.class)
   @JoinColumn(name = "study_studyId")
   private Study study;
@@ -303,11 +297,6 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, N
     return runPartitions;
   }
 
-  @Override
-  public SecurityProfile getSecurityProfile() {
-    return securityProfile;
-  }
-
   public Study getStudy() {
     return study;
   }
@@ -365,11 +354,6 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, N
 
   public void setRunPartitions(List<RunPartition> runPartitions) {
     this.runPartitions = runPartitions;
-  }
-
-  @Override
-  public void setSecurityProfile(SecurityProfile profile) {
-    this.securityProfile = profile;
   }
 
   public void setStudy(Study study) {

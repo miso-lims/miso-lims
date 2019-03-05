@@ -134,7 +134,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public Collection<Box> listAll() throws IOException {
+  public List<Box> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(BoxImpl.class);
     @SuppressWarnings("unchecked")
     List<Box> results = criteria.list();

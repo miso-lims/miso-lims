@@ -47,7 +47,10 @@ var Warning = {
   addWarnings: function(warningConditions, oldWarnings){
     warningConditions.forEach(function(warningCondition){
       if(warningCondition[0]){
-        oldWarnings.push(warningCondition[1]);
+        if(warningCondition[2] === null){
+            warningCondition[2] = "error";
+        }
+        oldWarnings.push("<span class='message-" + warningCondition[2] + "'>" + warningCondition[1] + "</span>");
       }
     })
     return oldWarnings;

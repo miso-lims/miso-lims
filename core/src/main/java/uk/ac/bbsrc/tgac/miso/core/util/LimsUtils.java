@@ -48,8 +48,6 @@ import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
@@ -78,7 +76,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 
@@ -206,14 +203,6 @@ public class LimsUtils {
 
   public static DateFormat getDateTimeFormat() {
     return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-  }
-
-  public static void inheritUsersAndGroups(SecurableByProfile child, SecurityProfile parentProfile) {
-    SecurityProfile childProfile = child.getSecurityProfile();
-    childProfile.setReadGroups(parentProfile.getReadGroups());
-    childProfile.setWriteGroups(parentProfile.getWriteGroups());
-    childProfile.setReadUsers(parentProfile.getReadUsers());
-    childProfile.setWriteUsers(parentProfile.getWriteUsers());
   }
 
   public static boolean isDetailedSample(Sample sample) {

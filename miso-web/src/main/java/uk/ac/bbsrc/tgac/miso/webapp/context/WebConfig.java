@@ -70,10 +70,10 @@ public class WebConfig extends WebMvcConfigurationSupport {
   }
 
   @Autowired
-  private List<BarcodableService> barcodableServices;
+  private List<BarcodableService<?>> barcodableServices;
 
   @Bean
-  public Map<EntityType, BarcodableService> barcodableServicesMap() {
+  public Map<EntityType, BarcodableService<?>> barcodableServicesMap() {
     return barcodableServices.stream().collect(Collectors.toMap(BarcodableService::getEntityType, Function.identity()));
   }
 

@@ -684,24 +684,6 @@
     </div>
   </c:if>
 
-  <c:choose>
-    <c:when test="${!empty sample.project and sample.securityProfile.profileId eq sample.project.securityProfile.profileId}">
-      <table class ="in">
-        <tr>
-          <td>Permissions</td>
-          <td><i>Inherited from project </i>
-            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name} (${sample.project.alias})</a>
-            <input type="hidden" value="${sample.project.securityProfile.profileId}"
-                   name="securityProfile" id="securityProfile"/>
-          </td>
-        </tr>
-      </table>
-    </c:when>
-    <c:otherwise>
-      <%@ include file="permissions.jsp" %>
-    </c:otherwise>
-  </c:choose>
-
   <script type="text/javascript">
     jQuery(document).ready(function () {
       // Attach Parsley form validator

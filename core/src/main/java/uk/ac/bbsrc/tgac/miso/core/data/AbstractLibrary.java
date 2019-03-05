@@ -55,7 +55,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
@@ -131,10 +130,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @OneToMany(targetEntity = LibraryDilution.class, mappedBy = "library", cascade = CascadeType.ALL)
   private final Collection<LibraryDilution> libraryDilutions = new HashSet<>();
-
-  @ManyToOne
-  @JoinColumn(name = "securityProfile_profileId")
-  private SecurityProfile securityProfile;
 
   @ManyToOne(targetEntity = SampleImpl.class)
   @JoinColumn(name = "sample_sampleId")
@@ -484,16 +479,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     return null;
   }
 
-  @Override
-  public void setSecurityProfile(SecurityProfile securityProfile) {
-    this.securityProfile = securityProfile;
-  }
-
-  @Override
-  public SecurityProfile getSecurityProfile() {
-    return securityProfile;
-  }
-
   @CoverageIgnore
   @Override
   public int compareTo(Library l) {
@@ -688,11 +673,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public String getDeleteDescription() {
     return getName() + (getAlias() == null ? "" : " (" + getAlias() + ")");
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
-    return getSecurityProfile();
   }
 
   @Override

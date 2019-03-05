@@ -1828,6 +1828,14 @@ textarea.parsley-error {
   color: #ff0000;
 }
 
+.message-error{
+  color: #ff0000;
+}
+
+.message-info {
+  color: #5560ff;
+}
+
 .hidden {
   display: none;
 }

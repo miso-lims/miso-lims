@@ -76,11 +76,6 @@ DELETE FROM ProjectOverview;
 DELETE FROM Project;
 DELETE FROM ReferenceGenome;
 DELETE FROM Note;
-DELETE FROM SecurityProfile_ReadGroup;
-DELETE FROM SecurityProfile_WriteGroup;
-DELETE FROM SecurityProfile_ReadUser;
-DELETE FROM SecurityProfile_WriteUser;
-DELETE FROM SecurityProfile;
 DELETE FROM User_Group;
 DELETE FROM User;
 DELETE FROM _Group;
@@ -93,14 +88,6 @@ INSERT INTO `_Group` (description, name) VALUES
 
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (1,1);
-
-INSERT INTO `SecurityProfile`(`profileId`, `allowAllInternal`, `owner_userId`) 
-VALUES (1,1,1);
-
-INSERT INTO SecurityProfile_ReadUser(SecurityProfile_profileId, readUser_userId) VALUES (1, 1);
-INSERT INTO SecurityProfile_WriteUser(SecurityProfile_profileId, writeUser_userId) VALUES (1, 1);
-INSERT INTO SecurityProfile_ReadGroup(SecurityProfile_profileId, readGroup_groupId) VALUES (1, 1);
-INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_groupId) VALUES (1, 1);
 
 INSERT INTO InstrumentModel (instrumentModelId, platform, alias, numContainers, instrumentType) VALUES
   (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1, 'SEQUENCER'),
@@ -224,28 +211,28 @@ INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
 
 -- Plain sample data
 
-INSERT INTO Project(projectId, name, alias, shortName, creationDate, description, securityProfile_profileId,
+INSERT INTO Project(projectId, name, alias, shortName, creationDate, description,
   progress, referenceGenomeId, lastUpdated) VALUES
-  (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 1, 'ACTIVE', 1, '2017-06-27 14:11:00'),
-  (2, 'PRO2', 'Project Two', 'PRO2', '2017-06-27', 'integration test project two', 1, 'ACTIVE', 1, '2017-06-27 14:11:00');
+  (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00'),
+  (2, 'PRO2', 'Project Two', 'PRO2', '2017-06-27', 'integration test project two', 'ACTIVE', 1, '2017-06-27 14:11:00');
 
-INSERT INTO Sample (sampleId, name, alias, description, securityProfile_profileId, identificationBarcode, sampleType, receivedDate, project_projectId,
+INSERT INTO Sample (sampleId, name, alias, description, identificationBarcode, sampleType, receivedDate, project_projectId,
 scientificName, volume, qcPassed, lastModifier, creator, created, lastModified) VALUES
-(1, 'SAM1', 'TEST_0001', 'Identity', 1, '11111', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2016-07-20 09:00:00', '2016-07-20 09:00:00'),
-(2, 'SAM2', 'TEST_0001_Bn_R_nn_1-1', 'Tissue', 1, '22222', 'GENOMIC', '2017-07-20', 1, 'Homo sapiens', 30, 1, 1, 1, '2016-07-20 09:01:00', '2016-07-20 09:01:00'),
-(3, 'SAM3', 'TEST_0001_Bn_R_nn_1-1_SL01', 'Slide', 1, '33333', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(4, 'SAM4', 'TEST_0001_Bn_R_nn_1-1_C01', 'Curls', 1, '44444', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(5, 'SAM5', 'TEST_0001_Bn_R_nn_1-1_LCM01', 'LCM Tube', 1, '55555', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(6, 'SAM6', 'TEST_0001_Bn_R_nn_1-1_D_S1', 'gDNA stock', 1, '66666', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(7, 'SAM7', 'TEST_0001_Bn_R_nn_1-1_R_S1', 'whole RNA stock', 1, '77777', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(8, 'SAM8', 'TEST_0001_Bn_R_nn_1-1_D_1', 'gDNA aliquot', 1, '88888', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(9, 'SAM9', 'TEST_0001_Bn_R_nn_1-1_R_1', 'whole RNA aliquot', 1, '99999', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(10, 'SAM10', 'TEST_0001_Bn_R_nn_1-1_D_S2', 'cDNA stock', 1, '10101', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(11, 'SAM11', 'TEST_0001_Bn_R_nn_1-1_D_2', 'cDNA aliquot', 1, '11011', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(12, 'SAM12', 'TEST_0001_Bn_R_nn_1-1_R_1_SM_1', 'smRNA', 1, '12121', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(13, 'SAM13', 'TEST_0001_Bn_R_nn_1-1_R_1_MR_1', 'mRNA', 1, '13131', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(14, 'SAM14', 'TEST_0001_Bn_R_nn_1-1_R_1_WT_1', 'rRNA_depleted', 1, '14141', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(15, 'SAM15', 'PRO2_0001', 'Identity', 1, '15151', 'GENOMIC', NULL, 2, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00');
+(1, 'SAM1', 'TEST_0001', 'Identity', '11111', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2016-07-20 09:00:00', '2016-07-20 09:00:00'),
+(2, 'SAM2', 'TEST_0001_Bn_R_nn_1-1', 'Tissue', '22222', 'GENOMIC', '2017-07-20', 1, 'Homo sapiens', 30, 1, 1, 1, '2016-07-20 09:01:00', '2016-07-20 09:01:00'),
+(3, 'SAM3', 'TEST_0001_Bn_R_nn_1-1_SL01', 'Slide', '33333', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(4, 'SAM4', 'TEST_0001_Bn_R_nn_1-1_C01', 'Curls', '44444', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(5, 'SAM5', 'TEST_0001_Bn_R_nn_1-1_LCM01', 'LCM Tube', '55555', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(6, 'SAM6', 'TEST_0001_Bn_R_nn_1-1_D_S1', 'gDNA stock', '66666', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(7, 'SAM7', 'TEST_0001_Bn_R_nn_1-1_R_S1', 'whole RNA stock', '77777', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(8, 'SAM8', 'TEST_0001_Bn_R_nn_1-1_D_1', 'gDNA aliquot', '88888', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(9, 'SAM9', 'TEST_0001_Bn_R_nn_1-1_R_1', 'whole RNA aliquot', '99999', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(10, 'SAM10', 'TEST_0001_Bn_R_nn_1-1_D_S2', 'cDNA stock', '10101', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(11, 'SAM11', 'TEST_0001_Bn_R_nn_1-1_D_2', 'cDNA aliquot', '11011', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(12, 'SAM12', 'TEST_0001_Bn_R_nn_1-1_R_1_SM_1', 'smRNA', '12121', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(13, 'SAM13', 'TEST_0001_Bn_R_nn_1-1_R_1_MR_1', 'mRNA', '13131', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(14, 'SAM14', 'TEST_0001_Bn_R_nn_1-1_R_1_WT_1', 'rRNA_depleted', '14141', 'GENOMIC', NULL, 1, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(15, 'SAM15', 'PRO2_0001', 'Identity', '15151', 'GENOMIC', NULL, 2, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00');
 
 INSERT INTO SampleChangeLog(sampleId, columnsChanged, message, userId, changeTime) VALUES
 (1,'one','change oneone',1,'2016-07-20 09:00:00'),
@@ -253,26 +240,26 @@ INSERT INTO SampleChangeLog(sampleId, columnsChanged, message, userId, changeTim
 (2,'one','change twoone',1,'2016-07-20 09:00:00'),
 (2,'two','change twotwo',1,'2016-07-20 09:00:01');
 
-INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, securityProfile_profileId, sample_sampleId, platformType,
+INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
   volume, concentration, locationBarcode, kitDescriptorId) VALUES
-  (1, 'LIB1', 'TEST_0001_Bn_R_PE_300_WG', '11211', 'description lib 1', 1, 8, 'ILLUMINA', 1, 3, 1,  '2016-11-07', 1, '2017-07-20 09:01:00',
+  (1, 'LIB1', 'TEST_0001_Bn_R_PE_300_WG', '11211', 'description lib 1', 8, 'ILLUMINA', 1, 3, 1,  '2016-11-07', 1, '2017-07-20 09:01:00',
     1, '2017-07-20 09:01:00', 1, 300, 5.0, 2.75, NULL, 1);
 
 INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (1, 5);
 
-INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, creator, securityProfile_profileId, lastModifier, lastUpdated) VALUES
-(1, 'LDI1', 5.9, 1, '12321', '2017-07-20', 1, 1, 1, '2017-07-20 09:01:00');
+INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated) VALUES
+(1, 'LDI1', 5.9, 1, '12321', '2017-07-20', 1, 1, '2017-07-20 09:01:00');
 
-INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
-(1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 1, 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL);
+INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
+(1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL);
 
 INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
 (1, 1);
 
-INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, securityProfile_profileId, lastModifier, creator, created, lastModified) VALUES
-(1, 1, 1, 'BOX1', 'First Box', 1, 1, 1, '2017-07-20 13:01:01', '2017-07-20 13:01:01');
+INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, lastModifier, creator, created, lastModified) VALUES
+(1, 1, 1, 'BOX1', 'First Box', 1, 1, '2017-07-20 13:01:01', '2017-07-20 13:01:01');
 
 INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
 (1, 1, 'LIBRARY', 'A01'),
@@ -284,8 +271,8 @@ INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
 (1, 7, 'SAMPLE', 'G07'),
 (1, 8, 'SAMPLE', 'H08');
 
-INSERT INTO SequencerPartitionContainer (containerId, securityProfile_profileId, identificationBarcode, sequencingContainerModelId, lastModifier, creator, created, lastModified) VALUES
-(1, 1, 'MISEQXX', 1, 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01');
+INSERT INTO SequencerPartitionContainer (containerId, identificationBarcode, sequencingContainerModelId, lastModifier, creator, created, lastModified) VALUES
+(1, 'MISEQXX', 1, 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01');
 
 INSERT INTO `_Partition` (partitionId, partitionNumber, pool_poolId) VALUES 
 (1, 1, 1);
@@ -293,8 +280,8 @@ INSERT INTO `_Partition` (partitionId, partitionNumber, pool_poolId) VALUES
 INSERT INTO SequencerPartitionContainer_Partition (container_containerId, partitions_partitionId) VALUES
 (1, 1);
 
-INSERT INTO Run (runId, name, securityProfile_profileId, alias, instrumentId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
-(1, 'RUN1', 1, 'MiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02');
+INSERT INTO Run (runId, name, alias, instrumentId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
+(1, 'RUN1', 'MiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02');
 
 INSERT INTO RunIllumina (runId, pairedEnd) VALUES
 (1, 1);

@@ -28,7 +28,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -62,9 +61,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -110,7 +106,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
-import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -148,7 +143,6 @@ import uk.ac.bbsrc.tgac.miso.service.StainService;
 import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
@@ -184,10 +178,6 @@ public class EditSampleController {
   private ArrayService arrayService;
   @Autowired
   private ArrayRunService arrayRunService;
-  @Autowired
-  private AuthorizationManager authorizationManager;
-  @Autowired
-  private SecurityManager securityManager;
   @Autowired
   private BoxService boxService;
 
@@ -241,10 +231,6 @@ public class EditSampleController {
 
   public void setTissueMaterialService(TissueMaterialService tissueMaterialService) {
     this.tissueMaterialService = tissueMaterialService;
-  }
-
-  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
-    this.authorizationManager = authorizationManager;
   }
 
   public RunService getRunService() {
@@ -602,10 +588,9 @@ public class EditSampleController {
   @GetMapping(value = "/{sampleId}/project/{projectId}")
   public ModelAndView setupForm(@PathVariable Long sampleId, @PathVariable Long projectId, ModelMap model) throws IOException {
     try {
-      User user = authorizationManager.getCurrentUser();
       Sample sample = null;
       if (sampleId == AbstractSample.UNSAVED_ID) {
-        sample = detailedSample ? new DetailedSampleBuilder(user) : new SampleImpl(user);
+        sample = detailedSample ? new DetailedSampleBuilder() : new SampleImpl();
         model.put("sampleCategory", "new");
         model.put("title", "New Sample");
 
@@ -614,15 +599,6 @@ public class EditSampleController {
           if (project == null) throw new NotFoundException("No project found for ID " + projectId.toString());
           model.addAttribute("project", project);
           sample.setProject(project);
-
-          if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
-            SecurityProfile sp = new SecurityProfile(user);
-            LimsUtils.inheritUsersAndGroups(sample, project.getSecurityProfile());
-            sp.setOwner(user);
-            sample.setSecurityProfile(sp);
-          } else {
-            sample.inheritPermissions(project);
-          }
         } else {
           model.put("accessibleProjects", populateProjects());
         }
@@ -690,11 +666,6 @@ public class EditSampleController {
 
       model.put("volumeUnits", VolumeUnit.values());
       model.put("concentrationUnits", ConcentrationUnit.values());
-
-      Collection<User> allUsers = securityManager.listAllUsers();
-      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, allUsers));
-      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, allUsers));
-      model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, sample, securityManager.listAllGroups()));
 
       return new ModelAndView("/pages/editSample.jsp", model);
     } catch (IOException ex) {

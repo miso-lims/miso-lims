@@ -62,7 +62,7 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
    * @return Collection<Library>
    * @throws IOException when
    */
-  Collection<Library> listBySearch(String query) throws IOException;
+  List<Library> listBySearch(String query) throws IOException;
 
   /**
    * Get all Library with a given Library alias
@@ -71,7 +71,7 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
    * @return all libraries with the given alias
    * @throws IOException
    */
-  Collection<Library> listByAlias(String alias) throws IOException;
+  List<Library> listByAlias(String alias) throws IOException;
 
   /**
    * List all Libraries generated from a Sample given a parent Sample ID
@@ -80,7 +80,7 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
    * @return Collection<Library>
    * @throws IOException when
    */
-  Collection<Library> listBySampleId(long sampleId) throws IOException;
+  List<Library> listBySampleId(long sampleId) throws IOException;
 
   /**
    * List all Libraries that are related to a Project given a Project ID
@@ -89,7 +89,7 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
    * @return Collection<Library>
    * @throws IOException when
    */
-  Collection<Library> listByProjectId(long projectId) throws IOException;
+  List<Library> listByProjectId(long projectId) throws IOException;
 
   /**
    * List all Libraries associated with ids from the given id list
@@ -97,7 +97,7 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
    * @return Collection<Library>
    * @throws IOException when the objects cannot be retrieved or read
    */
-  Collection<Library> getByIdList(List<Long> idList) throws IOException;
+  List<Library> getByIdList(List<Long> idList) throws IOException;
 
   /**
    * Get a LibraryType given a LibraryType ID
@@ -202,7 +202,7 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
    * @return Collection<Library>
    * @throws IOException when the objects cannot be retrieved
    */
-  Collection<Library> getByBarcodeList(Collection<String> barcodeList) throws IOException;
+  List<Library> getByBarcodeList(Collection<String> barcodeList) throws IOException;
 
   /**
    * @return a map containing all column names and max lengths from the Library table

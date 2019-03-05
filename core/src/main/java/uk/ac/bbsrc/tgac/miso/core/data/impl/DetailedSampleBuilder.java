@@ -13,7 +13,6 @@ import java.util.TreeSet;
 import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
@@ -64,7 +63,6 @@ public class DetailedSampleBuilder
   // Sample attributes
   private long sampleId = AbstractSample.UNSAVED_ID;
   private Project project;
-  private SecurityProfile securityProfile = null;
   private String accession;
   private String name;
   private String description;
@@ -150,13 +148,6 @@ public class DetailedSampleBuilder
   private String digestion;
 
   public DetailedSampleBuilder() {
-    this(null);
-  }
-
-  public DetailedSampleBuilder(User user) {
-    if (user != null) {
-      securityProfile = new SecurityProfile(user);
-    }
   }
 
   @Override
@@ -215,16 +206,6 @@ public class DetailedSampleBuilder
 
   public void setSubmissionDocument(Document submissionDocument) {
     throw new UnsupportedOperationException("Method not implemented on builder");
-  }
-
-  @Override
-  public SecurityProfile getSecurityProfile() {
-    return securityProfile;
-  }
-
-  @Override
-  public void setSecurityProfile(SecurityProfile securityProfile) {
-    this.securityProfile = securityProfile;
   }
 
   @Override
@@ -1001,7 +982,6 @@ public class DetailedSampleBuilder
 
     sample.setId(sampleId);
     sample.setProject(project);
-    sample.setSecurityProfile(securityProfile);
     sample.setAccession(accession);
     sample.setName(name);
     sample.setDescription(description);
@@ -1171,11 +1151,6 @@ public class DetailedSampleBuilder
 
   @Override
   public String getDeleteDescription() {
-    throw new UnsupportedOperationException("Cannot delete non-persisted builder object");
-  }
-
-  @Override
-  public SecurityProfile getDeletionSecurityProfile() {
     throw new UnsupportedOperationException("Cannot delete non-persisted builder object");
   }
 

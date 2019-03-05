@@ -123,7 +123,7 @@ public class RunScannerClient {
             }
           };
 
-          (runService.processNotification(Dtos.to(dto, user), dto.getLaneCount(), dto.getContainerModel(), dto.getContainerSerialNumber(),
+          (runService.processNotification(Dtos.to(dto), dto.getLaneCount(), dto.getContainerModel(), dto.getContainerSerialNumber(),
               dto.getSequencerName(), isMatchingSequencingParameters, laneContents, dto.getSequencerPosition()) ? saveNew : saveUpdate).inc();
           saveCount.inc();
           badRuns.remove(dto.getRunAlias());

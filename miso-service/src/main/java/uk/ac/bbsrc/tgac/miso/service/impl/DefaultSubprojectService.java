@@ -77,7 +77,6 @@ public class DefaultSubprojectService implements SubprojectService {
   @Override
   public Set<Subproject> getByProjectId(Long projectId) throws IOException {
     Project project = projectStore.get(projectId);
-    authorizationManager.throwIfNotReadable(project);
     return Sets.newHashSet(subprojectDao.getByProjectId(projectId));
   }
 

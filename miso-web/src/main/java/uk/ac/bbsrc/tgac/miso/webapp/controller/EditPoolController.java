@@ -54,8 +54,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
@@ -70,7 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
@@ -86,7 +83,6 @@ import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
 
@@ -107,10 +103,6 @@ public class EditPoolController {
   @Autowired
   private SequencingParametersService sequencingParametersService;
 
-  @Autowired
-  private AuthorizationManager authorizationManager;
-  @Autowired
-  private SecurityManager securityManager;
   @Autowired
   private ChangeLogService changeLogService;
   @Autowired
@@ -169,10 +161,9 @@ public class EditPoolController {
   @GetMapping(value = "/{poolId}")
   public ModelAndView setupForm(@PathVariable Long poolId, ModelMap model) throws IOException {
     try {
-      User user = authorizationManager.getCurrentUser();
       Pool pool = null;
       if (poolId == PoolImpl.UNSAVED_ID) {
-        pool = new PoolImpl(user);
+        pool = new PoolImpl();
         model.put("title", "New Pool");
       } else {
         pool = poolService.get(poolId);
@@ -185,9 +176,6 @@ public class EditPoolController {
       model.put("formObj", pool);
       model.put("pool", pool);
       model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(pool, true, false)));
-      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
-      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
-      model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
       model.put("platforms", getFilteredInstrumentModels(pool.getPlatformType()));
 
       model.put("partitions", containerService.listPartitionsByPoolId(poolId).stream().map(Dtos::asDto).collect(Collectors.toList()));

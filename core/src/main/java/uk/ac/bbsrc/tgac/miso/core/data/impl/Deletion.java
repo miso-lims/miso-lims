@@ -12,13 +12,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
 @Entity
-public class Deletion implements SecurableByProfile {
+public class Deletion {
 
   @Id
   @Column(name = "deletionId")
@@ -37,10 +34,6 @@ public class Deletion implements SecurableByProfile {
 
   @Temporal(TemporalType.TIMESTAMP)
   private Date changeTime;
-
-  @ManyToOne
-  @JoinColumn(name = "securityProfileId")
-  private SecurityProfile securityProfile = null;
 
   public long getId() {
     return id;
@@ -88,16 +81,6 @@ public class Deletion implements SecurableByProfile {
 
   public void setChangeTime(Date changeTime) {
     this.changeTime = changeTime;
-  }
-
-  @Override
-  public SecurityProfile getSecurityProfile() {
-    return securityProfile;
-  }
-
-  @Override
-  public void setSecurityProfile(SecurityProfile profile) {
-    this.securityProfile = profile;
   }
 
 }

@@ -44,19 +44,15 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
 @RequestMapping("/experiment")
@@ -66,11 +62,6 @@ public class EditExperimentController {
 
   @Autowired
   private ExperimentService experimentService;
-
-  @Autowired
-  private AuthorizationManager authorizationManager;
-  @Autowired
-  private SecurityManager securityManager;
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
@@ -89,7 +80,6 @@ public class EditExperimentController {
   @GetMapping(value = "/{experimentId}")
   public ModelAndView setupForm(@PathVariable Long experimentId, ModelMap model) throws IOException {
     Experiment experiment = experimentService.get(experimentId);
-    User user = authorizationManager.getCurrentUser();
     if (experiment == null) throw new NotFoundException("No experiment found for ID " + experimentId.toString());
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode consumableConfig = mapper.createObjectNode();
@@ -115,9 +105,6 @@ public class EditExperimentController {
         experiment.getRunPartitions().stream()
             .map(entry -> new ExperimentDto.RunPartitionDto(Dtos.asDto(entry.getRun()), Dtos.asDto(entry.getPartition())))
             .collect(Collectors.toList()));
-    model.put("owners", LimsSecurityUtils.getPotentialOwners(user, experiment, securityManager.listAllUsers()));
-    model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, experiment, securityManager.listAllUsers()));
-    model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, experiment, securityManager.listAllGroups()));
     model.put("title", "Edit Experiment");
     return new ModelAndView("/pages/editExperiment.jsp", model);
   }

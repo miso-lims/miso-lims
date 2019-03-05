@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -21,8 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -35,9 +34,9 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
@@ -47,11 +46,10 @@ import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataSource<Pool> {
+public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool> {
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
@@ -61,8 +59,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   @Autowired
   private PoolStore poolStore;
   @Autowired
-  private SecurityProfileStore securityProfileStore;
-  @Autowired
   private DeletionStore deletionStore;
   @Autowired
   private NamingScheme namingScheme;
@@ -70,8 +66,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   private ChangeLogService changeLogService;
   @Autowired
   private BoxService boxService;
-  @Autowired
-  private SecurityManager securityManager;
   @Autowired
   private PoolableElementViewService poolableElementViewService;
   @Autowired
@@ -111,50 +105,38 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   }
 
   @Override
-  public PaginatedDataSource<Pool> getBackingPaginationSource() {
-    return poolStore;
-  }
-
-  @Override
   public Collection<Pool> listBySearch(String query) throws IOException {
-    List<Pool> pools = poolStore.listAllByCriteria(null, query, null);
-    return authorizationManager.filterUnreadable(pools);
+    return poolStore.listAllByCriteria(null, query, null);
   }
 
   @Override
   public Collection<Pool> listWithLimit(int limit) throws IOException {
-    List<Pool> pools = poolStore.listAllByCriteria(null, null, limit);
-    return authorizationManager.filterUnreadable(pools);
+    return poolStore.listAllByCriteria(null, null, limit);
   }
 
   @Override
   public Collection<Pool> list() throws IOException {
-    Collection<Pool> pools = poolStore.listAll();
-    return authorizationManager.filterUnreadable(pools);
+    return poolStore.listAll();
   }
 
   @Override
   public Collection<Pool> listByPlatform(PlatformType platformType) throws IOException {
-    Collection<Pool> pools = poolStore.listAllByCriteria(platformType, null, null);
-    return authorizationManager.filterUnreadable(pools);
+    return poolStore.listAllByCriteria(platformType, null, null);
   }
 
   @Override
   public Collection<Pool> listByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
-    List<Pool> pools = poolStore.listAllByCriteria(platformType, query, null);
-    return authorizationManager.filterUnreadable(pools);
+    return poolStore.listAllByCriteria(platformType, query, null);
   }
 
   @Override
   public Collection<Pool> listByProjectId(long projectId) throws IOException {
-    Collection<Pool> pools = poolStore.listByProjectId(projectId);
-    return authorizationManager.filterUnreadable(pools);
+    return poolStore.listByProjectId(projectId);
   }
 
   @Override
   public Collection<Pool> listByLibraryId(long libraryId) throws IOException {
-    Collection<Pool> pools = poolStore.listByLibraryId(libraryId);
-    return authorizationManager.filterUnreadable(pools);
+    return poolStore.listByLibraryId(libraryId);
   }
 
   @Override
@@ -193,7 +175,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     long savedId;
     if (!pool.isSaved()) {
       pool.setName(generateTemporaryName());
-      loadSecurityProfile(pool);
       loadPoolDilutions(pool.getPoolDilutions(), pool);
       pool.setChangeDetails(authorizationManager.getCurrentUser());
       boxService.throwIfBoxPositionIsFilled(pool);
@@ -212,7 +193,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       savedId = poolStore.save(pool);
     } else {
       Pool managed = poolStore.get(pool.getId());
-      authorizationManager.throwIfNotWritable(managed);
       boxService.throwIfBoxPositionIsFilled(pool);
       validateChange(pool, managed);
       managed.setAlias(pool.getAlias());
@@ -269,16 +249,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     }
   }
 
-  private void loadSecurityProfile(Pool pool) throws IOException {
-    if (pool.getSecurityProfile() == null) {
-      pool.setSecurityProfile(new SecurityProfile(authorizationManager.getCurrentUser()));
-    }
-    if (pool.getSecurityProfile().getProfileId() == SecurityProfile.UNSAVED_ID) {
-      pool.getSecurityProfile().setProfileId(securityProfileStore.save(pool.getSecurityProfile()));
-    }
-    pool.setSecurityProfile(securityProfileStore.get(pool.getSecurityProfile().getProfileId()));
-  }
-
   private void loadPoolDilutions(Collection<PoolDilution> source, Pool target) throws IOException {
     Set<PoolDilution> targetDilutions = target.getPoolDilutions();
     targetDilutions.removeIf(notInOther(source));
@@ -322,7 +292,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   @Override
   public void addNote(Pool pool, Note note) throws IOException {
     Pool managed = poolStore.get(pool.getId());
-    authorizationManager.throwIfNotWritable(managed);
     note.setCreationDate(new Date());
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
@@ -331,16 +300,12 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
 
   @Override
   public Pool get(long poolId) throws IOException {
-    Pool pool = poolStore.get(poolId);
-    authorizationManager.throwIfNotReadable(pool);
-    return pool;
+    return poolStore.get(poolId);
   }
 
   @Override
   public Pool getByBarcode(String barcode) throws IOException {
-    Pool pool = poolStore.getByBarcode(barcode);
-    authorizationManager.throwIfNotReadable(pool);
-    return pool;
+    return poolStore.getByBarcode(barcode);
   }
 
   @Override
@@ -350,7 +315,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
 
   @Override
   public Collection<Pool> listByIdList(List<Long> poolIds) throws IOException {
-    return authorizationManager.filterUnreadable(poolStore.listPoolsById(poolIds));
+    return poolStore.listPoolsById(poolIds);
   }
 
   @Override
@@ -385,6 +350,17 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     }
 
     return result;
+  }
+
+  @Override
+  public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
+    return poolStore.count(errorHandler, filter);
+  }
+
+  @Override
+  public List<Pool> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
+      throws IOException {
+    return poolStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
 }

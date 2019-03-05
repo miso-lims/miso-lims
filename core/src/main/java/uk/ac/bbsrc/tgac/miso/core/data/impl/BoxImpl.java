@@ -13,7 +13,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
@@ -38,16 +37,6 @@ public class BoxImpl extends AbstractBox {
    * Construct new Box with defaults, and an empty SecurityProfile
    */
   public BoxImpl() {
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  /**
-   * Construct new Box using Security Profile owned by a given User
-   * 
-   * @param User user
-   */
-  public BoxImpl(User user) {
-    setSecurityProfile(new SecurityProfile(user));
   }
 
   @Override

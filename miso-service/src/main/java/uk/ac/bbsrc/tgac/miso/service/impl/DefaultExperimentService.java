@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
@@ -23,14 +21,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
@@ -53,10 +49,6 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
   @Autowired
   private LibraryService libraryService;
   @Autowired
-  private SecurityStore securityStore;
-  @Autowired
-  private SecurityProfileStore securityProfileStore;
-  @Autowired
   private StudyService studyService;
   @Autowired
   private ContainerService containerService;
@@ -65,9 +57,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
 
   @Override
   public Experiment get(long experimentId) throws IOException {
-    Experiment o = experimentStore.get(experimentId);
-    authorizationManager.throwIfNotReadable(o);
-    return o;
+    return experimentStore.get(experimentId);
   }
 
   @Override
@@ -81,28 +71,27 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
 
   @Override
   public Collection<Experiment> listAll() throws IOException {
-    return authorizationManager.filterUnreadable(experimentStore.listAll());
+    return experimentStore.listAll();
   }
 
   @Override
   public Collection<Experiment> listAllBySearch(String query) throws IOException {
-    return authorizationManager.filterUnreadable(experimentStore.listBySearch(query));
+    return experimentStore.listBySearch(query);
   }
 
   @Override
   public Collection<Experiment> listAllByStudyId(long studyId) throws IOException {
-    return authorizationManager.filterUnreadable(studyService.get(studyId).getExperiments());
+    return studyService.get(studyId).getExperiments();
   }
 
   @Override
   public Collection<Experiment> listAllWithLimit(long limit) throws IOException {
-    return authorizationManager.filterUnreadable(experimentStore.listAllWithLimit(limit));
+    return experimentStore.listAllWithLimit(limit);
   }
 
   @Override
   public long save(Experiment experiment) throws IOException {
     try {
-      authorizationManager.throwIfNotWritable(experiment);
       experiment.setLastModifier(authorizationManager.getCurrentUser());
       if (experiment.getRunPartitions() == null) {
         experiment.setRunPartitions(Collections.emptyList());
@@ -122,11 +111,6 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
         experiment.setLibrary(libraryService.get(experiment.getLibrary().getId()));
         experiment.setStudy(studyService.get(experiment.getStudy().getId()));
         experiment.setChangeDetails(authorizationManager.getCurrentUser());
-        if (experiment.getSecurityProfile().getProfileId() == SecurityProfile.UNSAVED_ID) {
-          securityProfileStore.save(experiment.getSecurityProfile());
-        } else {
-          experiment.setSecurityProfile(securityProfileStore.get(experiment.getSecurityProfile().getProfileId()));
-        }
 
         experimentStore.save(experiment);
         String name = namingScheme.generateNameFor(experiment);
@@ -144,7 +128,6 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
       }
 
       Experiment original = experimentStore.get(experiment.getId());
-      authorizationManager.throwIfNotWritable(original);
       original.setAccession(experiment.getAccession());
       original.setAlias(experiment.getAlias());
       original.setDescription(experiment.getDescription());
@@ -152,7 +135,6 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
       original.setInstrumentModel(platformService.get(experiment.getInstrumentModel().getId()));
       original.setLibrary(libraryService.get(experiment.getLibrary().getId()));
       original.setStudy(studyService.get(experiment.getStudy().getId()));
-      original.setSecurityProfile(securityStore.getSecurityProfileById(experiment.getSecurityProfile().getProfileId()));
       original.setTitle(experiment.getTitle());
       original.setRunPartitions(experiment.getRunPartitions());// These have been already reloaded.
       original.getRunPartitions().forEach(rp -> rp.setExperiment(original));
@@ -189,14 +171,6 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
     this.platformService = platformService;
   }
 
-  public void setSecurityStore(SecurityStore securityStore) {
-    this.securityStore = securityStore;
-  }
-
-  public void setSecurityProfileStore(SecurityProfileStore securityProfileStore) {
-    this.securityProfileStore = securityProfileStore;
-  }
-
   public void setStudyService(StudyService studyService) {
     this.studyService = studyService;
   }
@@ -207,12 +181,12 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
 
   @Override
   public Collection<Experiment> listAllByLibraryId(long id) throws AuthorizationException, IOException {
-    return authorizationManager.filterUnreadable(experimentStore.listByLibrary(id));
+    return experimentStore.listByLibrary(id);
   }
 
   @Override
   public List<Experiment> listAllByRunId(long runId) throws IOException {
-    return authorizationManager.filterUnreadable(experimentStore.listByRun(runId));
+    return experimentStore.listByRun(runId);
   }
 
 }
