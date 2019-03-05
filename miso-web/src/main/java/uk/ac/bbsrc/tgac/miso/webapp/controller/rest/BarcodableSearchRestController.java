@@ -63,7 +63,7 @@ public class BarcodableSearchRestController extends RestController {
     case CONTAINER:
       return "container";
     default:
-      throw new IllegalArgumentException("Cannot make URL: unknown entity type");
+      throw new IllegalArgumentException("Cannot make URL for entity type " + entityType.toString());
     }
   }
 
