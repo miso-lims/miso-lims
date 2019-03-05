@@ -1,3 +1,5 @@
+-- drop_security_profiles
+
 ALTER TABLE `Deletion` DROP FOREIGN KEY fk_deletion_securityProfile;
 ALTER TABLE `Library` DROP FOREIGN KEY fk_library_securityProfile;
 ALTER TABLE `Pool` DROP FOREIGN KEY fk_pool_securityProfile;
@@ -23,4 +25,6 @@ DROP TABLE `SecurityProfile_ReadGroup`;
 DROP TABLE `SecurityProfile_WriteGroup`;
 DROP TABLE `SecurityProfile_ReadUser`;
 DROP TABLE `SecurityProfile_WriteUser`;
+
+
 
