@@ -265,6 +265,8 @@ public class RunPage extends FormPage<RunPage.Field> {
       throw new IllegalStateException("Dialog is not visible");
     }
     List<WebElement> poolWarnings = dialog.findElements(By.className("parsley-custom-error-message"));
+    poolWarnings.addAll(dialog.findElements(By.className("message-error")));
+    poolWarnings.addAll(dialog.findElements(By.className("message-info")));
     return poolWarnings.stream().map(warning -> warning.getText().substring(2)).collect(Collectors.toList());
   }
 }
