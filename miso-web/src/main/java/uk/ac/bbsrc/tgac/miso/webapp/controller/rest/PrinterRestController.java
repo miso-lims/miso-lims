@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -198,6 +199,7 @@ public class PrinterRestController extends RestController {
 
     return printer.printBarcode(user, copies, COMMA.splitAsStream(ids)//
         .map(Long::parseLong)//
-        .map(WhineyFunction.rethrow(fetcher)));
+        .map(WhineyFunction.rethrow(fetcher))//
+        .sorted(Comparator.comparing(Barcodable::getAlias)));
   }
 }
