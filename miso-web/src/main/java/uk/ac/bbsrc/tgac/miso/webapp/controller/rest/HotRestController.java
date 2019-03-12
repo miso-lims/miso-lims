@@ -109,19 +109,30 @@ public class HotRestController extends RestController {
     List<ColumnDataDto> columns = new ArrayList<>();
     for (int i = 0; i < sheet.getColumnCount(); i++) {
       try {
-        columns.add(new ColumnDataDto(sheet.getCellValue(0, i)));
+        final String header = sheet.getCellValue(0, i);
+        if (header.isEmpty()) {
+          break;
+        }
+        columns.add(new ColumnDataDto(header));
       } catch (IllegalArgumentException e) {
         throw new RestException(String.format("Failed to parse heading cell at row 0, column %d", i), Status.BAD_REQUEST);
       }
     }
     for (int rowNum = 1; rowNum < sheet.getRowCount(); rowNum++) {
-      for (int colNum = 0; colNum < sheet.getColumnCount(); colNum++) {
+      List<String> values = new ArrayList<>();
+      for (int colNum = 0; colNum < columns.size(); colNum++) {
         try {
-          columns.get(colNum).getData().add(sheet.getCellValue(rowNum, colNum));
+          values.add(sheet.getCellValue(rowNum, colNum));
         } catch (IllegalArgumentException e) {
           throw new RestException(String.format("Failed to parse value of cell at row %d, column %d", rowNum, colNum),
               Status.BAD_REQUEST);
         }
+      }
+      if (values.stream().allMatch(""::equals)) {
+        break;
+      }
+      for (int colNum = 0; colNum < columns.size(); colNum++) {
+        columns.get(colNum).getData().add(values.get(colNum));
       }
     }
     return columns;
