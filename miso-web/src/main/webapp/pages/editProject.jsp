@@ -105,16 +105,9 @@
   <tr>
     <td>Progress:*</td>
     <td>
-      <c:choose>
-        <c:when test="${miso:isAdmin()}">
-          <div id="progressButtons">
-            <form:radiobuttons id="progress" path="progress"/>
-          </div>
-        </c:when>
-        <c:otherwise>
-          ${project.progress}
-        </c:otherwise>
-      </c:choose>
+      <div id="progressButtons">
+        <form:radiobuttons id="progress" path="progress"/>
+      </div>
     </td>
   </tr>
   <tr>
