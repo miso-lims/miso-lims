@@ -110,7 +110,7 @@ public abstract class LabelCanvas {
                 input.getKey(), Justification.LEFT,
                 str);
           }
-          return line;
+          return line + offset;
         }, (a, b) -> a + b);
   }
 
