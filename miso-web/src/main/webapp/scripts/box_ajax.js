@@ -490,35 +490,50 @@ Box.ui = {
   },
 
   getBulkActions: function(positionStrings) {
-    function addToolbarMemo(memo) {
-      // empty all previous bulk actions and/or info
-      Box.ui.createToolbarIfNecessary();
-      var toolbar = jQuery('#listingBoxablesToolbar');
-      toolbar.empty();
-      jQuery('<span/>', {
-        'text': memo
-      }).appendTo(toolbar);
-    }
-
     var items;
     if (positionStrings) {
       items = Box.boxJSON.items.filter(function(item) {
         return positionStrings.indexOf(item.coordinates) >= 0
       });
     } else {
-      // if no items are selected, determine bulk actions based on the entity types of all box contents
+      // if no items are selected, determine bulk actions based on the entity
+		// types of all box contents
       items = Box.boxJSON.items;
     }
+
+    var actions = [ {
+      name: "Print Barcodes by Position",
+      action: function() {
+        // Ignore items; it's a mess of different object types
+        Utils.printSelectDialog(function(printer, copies) {
+        var input = items.length == 0 ? Box.boxJSON.items.map(function(i) { return i.coordinates; }) : positionStrings;
+        Utils.ajaxWithDialog('Printing', 'POST', window.location.origin + '/miso/rest/printer/' + printer + '/boxpositions', {
+                  boxId: Box.boxId,
+                  positions:input,
+                  copies: copies 
+                },
+                function(result) {
+                  Utils.showOkDialog('Printing', [result == input.length ? 'Printing successful.'
+                      : (result + ' of ' + input.length + ' printed.')]);
+                });
+        });
+      }
+    } ];
+
     if (items.length < 1) {
       if (Box.boxJSON.items.length) {
         // there are items in the box but an empty position is selected
-        addToolbarMemo("Select one or more items to see bulk actions.");
+        Box.ui.refreshToolbar(actions,items, "Select one or more items to see bulk actions.");
         return;
       } else {
         // empty box
-        addToolbarMemo("Add items to box to see bulk actions.");
+        Box.ui.refreshToolbar([],items, "Add items to box to see bulk actions.");
         return;
       }
+    }
+
+    if (items.length == 1) {
+      actions = [];
     }
 
     var entityTypes = Utils.array.deduplicateString(items.map(function(item) {
@@ -528,34 +543,33 @@ Box.ui = {
     if (entityTypes.length > 1) {
       if (positionStrings) {
         // heterogenous items are selected
-        addToolbarMemo("Selection contains multiple types of items. Select items of the same type to see bulk actions.");
+    Box.ui.refreshToolbar(actions, items, "Selection contains multiple types of items. Select items of the same type to see bulk actions.");
         return;
       } else {
         // no items are selected, but box contains heterogenous items
-        addToolbarMemo("Box contains multiple types of items. Select items of same type to see bulk actions.");
+    Box.ui.refreshToolbar(actions, items, "Box contains multiple types of items. Select items of same type to see bulk actions.");
         return;
       }
     }
 
-    var actions = [];
     switch (entityTypes[0]) {
     case 'SAMPLE':
-      actions = HotTarget.sample.getBulkActions({
+      actions = actions.concat(HotTarget.sample.getBulkActions({
         sortLibraryPropagate: 'sampleBoxColumn'
-      });
+      }));
       break;
     case 'LIBRARY':
-      actions = HotTarget.library.getBulkActions({});
+      actions = actions.concat(HotTarget.library.getBulkActions({}));
       break;
     case 'DILUTION':
-      actions = HotTarget.dilution.getBulkActions({});
+      actions = actions.concat(HotTarget.dilution.getBulkActions({}));
       break;
     case 'POOL':
-      actions = HotTarget.pool.getBulkActions({});
+      actions = actions.concat(HotTarget.pool.getBulkActions({}));
       break;
     }
 
-    Box.ui.refreshToolbar(actions, items);
+    Box.ui.refreshToolbar(actions, items, null);
   },
 
   createToolbarIfNecessary: function() {
@@ -569,7 +583,7 @@ Box.ui = {
     }
   },
 
-  refreshToolbar: function(actions, items) {
+  refreshToolbar: function(actions, items, memo) {
     Box.ui.createToolbarIfNecessary();
     var toolbar = jQuery('#listingBoxablesToolbar');
     toolbar.empty();
@@ -591,6 +605,13 @@ Box.ui = {
       }
       button.appendTo(toolbar);
     });
+
+    if (memo) {
+      jQuery('<span/>', {
+        'text': memo
+      }).appendTo(toolbar);
+    }
+
   },
 
   exportBox: function(boxId) {
