@@ -133,12 +133,12 @@ var RunGraph = (function() {
   };
 
   // Line graph starting at 0 on x axis
-  var lineGraph = function(typeName, title, yLabel) {
-    return lineGraph_CustomX(typeName, title, yLabel, 0)
+  var lineGraph = function(typeName, title, yLabel, xLabel) {
+    return lineGraph_CustomX(typeName, title, yLabel, xLabel, 0)
   }
 
   // Line graph with a custom starting point on the x axis
-  var lineGraph_CustomX = function(typeName, title, yLabel, xStart) {
+  var lineGraph_CustomX = function(typeName, title, yLabel, xLabel, xStart) {
     return function(metrics, width, renamePartitions) {
       return metrics.filter(function(metric) {
         return metric.type == typeName;
@@ -166,6 +166,9 @@ var RunGraph = (function() {
               xAxis: {
                 allowDecimals: false,
                 floor: 0,
+                title: {
+                  text: xLabel || null
+                }
               },
               yAxis: {
                 floor: 0,
@@ -196,7 +199,7 @@ var RunGraph = (function() {
       });
     };
   };
-  var barGraph = function(typeName, title, yLabel) {
+  var barGraph = function(typeName, title, yLabel, xLabel) {
     return function(metrics, width, renamePartitions) {
       return metrics.filter(function(metric) {
         return metric.type == typeName;
@@ -223,7 +226,7 @@ var RunGraph = (function() {
               xAxis: {
                 categories: metric.categories,
                 title: {
-                  text: null
+                  text: xLabel || null
                 }
               },
               yAxis: {
@@ -254,7 +257,7 @@ var RunGraph = (function() {
     };
   };
 
-  var boxPlot = function(metric, title, yLabel, width) {
+  var boxPlot = function(metric, title, yLabel, xLabel, width) {
     var node = document.createElement('DIV');
     return {
       dom: node,
@@ -274,6 +277,9 @@ var RunGraph = (function() {
           xAxis: {
             allowDecimals: false,
             floor: 0,
+            title: {
+              text: xLabel || null
+            }
           },
           yAxis: {
             min: 1,
@@ -298,7 +304,7 @@ var RunGraph = (function() {
     };
   };
 
-  var illuminaPerCyclePlot = function(typeName, title, yLabel) {
+  var illuminaPerCyclePlot = function(typeName, title, yLabel, xLabel) {
     return function(metrics, width, renamePartitions) {
       return metrics.filter(function(metric) {
         return metric.type == typeName;
@@ -310,12 +316,12 @@ var RunGraph = (function() {
           series.visible = !/{\d+}/.test(series.name);
           series.name = renamePartitions(series.name, true);
         });
-        return boxPlot(metric, title, yLabel, width);
+        return boxPlot(metric, title, yLabel, xLabel, width);
       });
     };
   };
 
-  var illuminaPerLanePlot = function(typeName, title, yLabel) {
+  var illuminaPerLanePlot = function(typeName, title, yLabel, xLabel) {
     return function(metrics, width, renamePartitions) {
       return metrics.filter(function(metric) {
         return metric.type == typeName;
@@ -323,7 +329,7 @@ var RunGraph = (function() {
         metric.series.forEach(function(series) {
           series.name = renamePartitions(series.name, true);
         });
-        return boxPlot(metric, title, yLabel);
+        return boxPlot(metric, title, yLabel, xLabel);
       });
     };
   };
@@ -333,11 +339,11 @@ var RunGraph = (function() {
     // scanner. Additional processors maybe added in separate files and appended
     // to this list.
     metricProcessors: [example, externalLink, errorMessage, chart, summaryTable,
-        illuminaPerCyclePlot('illumina-q30-by-cycle', '> Q30', '% Bases >Q30'),
-        lineGraph('illumina-called-intensity-by-cycle', 'Called Intensity', 'Average Intensity per Cycle'),
-        lineGraph('illumina-base-percent-by-cycle', 'Base %', 'Percentage'),
-        illuminaPerLanePlot('illumina-cluster-density-by-lane', 'Cluster Density', 'Density (K/mm²)'),
-        lineGraph_CustomX('illumina-clusters-by-lane', 'Lane', 'Clusters', 1), barGraph('illumina-yield-by-read', 'Yields', 'Yield (gb)')],
+        illuminaPerCyclePlot('illumina-q30-by-cycle', '> Q30 by Cycle', '% Bases >Q30', 'Cycle'),
+        lineGraph('illumina-called-intensity-by-cycle', 'Called Intensity by Cycle', 'Average Intensity per Cycle', 'Cycle'),
+        lineGraph('illumina-base-percent-by-cycle', 'Base % by Cycle', 'Percentage', 'Cycle'),
+        illuminaPerLanePlot('illumina-cluster-density-by-lane', 'Cluster Density by Lane', 'Density (K/mm²)', 'Lane'),
+        lineGraph_CustomX('illumina-clusters-by-lane', 'Clusters by Lane', 'Clusters', 'Lane', 1), barGraph('illumina-yield-by-read', 'Yields per Read', 'Yield (gb)')],
     // Takes a list of metrics and renders them to #metricsdiv
     renderMetrics: function(metrics, partitionNames) {
       var container = document.getElementById('metricsdiv');
