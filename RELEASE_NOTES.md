@@ -1,3 +1,13 @@
+# 0.2.167
+
+Changes:
+
+ * Update run graph titles and axis labels 
+ * Allow printing labels by position in a box
+ * changed Help tab link to new User Manual 
+ * Allow anyone to change project progress
+ * Sort items for printing by alias
+
 # 0.2.166
 
 Changes:
