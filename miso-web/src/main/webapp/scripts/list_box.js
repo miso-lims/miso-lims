@@ -32,6 +32,21 @@ ListTarget.box = {
         [
             HotUtils.printAction('box'),
             {
+              name: 'Print Contents',
+              action: function(items) {
+                Utils.printSelectDialog(function(printer, copies) {
+                  Utils.ajaxWithDialog('Printing', 'POST', window.location.origin + '/miso/rest/printer/' + printer + '/boxcontents', {
+                    boxes: items.map(Utils.array.getId),
+                    copies: copies
+                  }, function(result) {
+                    Utils.showOkDialog('Printing', [('Printed ' + result + ' labels.')]);
+                  });
+
+                });
+              }
+
+            },
+            {
               name: "Delete",
               action: function(items) {
                 var lines = ['Are you sure you wish to delete the following boxes? This cannot be undone.',

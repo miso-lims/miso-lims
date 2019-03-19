@@ -473,7 +473,14 @@ public class RunPageIT extends AbstractIT {
     List<String> poolWarnings = page.getPoolWarningsFromTiles();
     assertTrue(poolWarnings.size() >= 1);
 
-    assertTrue(poolWarnings.contains(warning));
+    boolean containsWarning = false;
+    for (String poolWarning : poolWarnings){
+      if(poolWarning.contains(warning)){
+        containsWarning = true;
+        break;
+      }
+    }
+    assertTrue(containsWarning);
   }
 
   private void assertRunAttributes(Map<RunPage.Field, String> expectedValues, Run run) {

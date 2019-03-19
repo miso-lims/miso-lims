@@ -537,7 +537,7 @@ var Utils = Utils
           }
         });
       },
-      printDialog: function(type, ids) {
+      printSelectDialog: function(callback) {
         Utils.ajaxWithDialog('Getting Printers', 'GET', window.location.origin + '/miso/rest/printer', null, function(printers) {
           Utils.showDialog('Select Printer', 'Print', [{
             "property": "printer",
@@ -557,17 +557,19 @@ var Utils = Utils
             "value": 1
           }], function(result) {
             window.localStorage.setItem("miso-printer", result.printer.name);
-            Utils.ajaxWithDialog('Printing', 'POST', window.location.origin + '/miso/rest/printer/' + result.printer.id + '?'
-                + jQuery.param({
-                  type: type,
-                  ids: ids.join(','),
-                  copies: Math.max(1, result.copies)
-                }), null,
-                function(result) {
-                  Utils.showOkDialog('Printing', [result == ids.length ? 'Printing successful.'
-                      : (result + ' of ' + ids.length + ' printed.')]);
-                });
+            callback(result.printer.id, Math.max(1, result.copies));
           }, null);
+        });
+      },
+      printDialog: function(type, ids) {
+        Utils.printSelectDialog(function(printer, copies) {
+          Utils.ajaxWithDialog('Printing', 'POST', window.location.origin + '/miso/rest/printer/' + printer + '?' + jQuery.param({
+            type: type,
+            ids: ids.join(','),
+            copies: copies
+          }), null, function(result) {
+            Utils.showOkDialog('Printing', [result == ids.length ? 'Printing successful.' : (result + ' of ' + ids.length + ' printed.')]);
+          });
         });
       },
 

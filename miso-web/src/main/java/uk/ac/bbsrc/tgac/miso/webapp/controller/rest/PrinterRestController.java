@@ -1,7 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -29,6 +32,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -198,6 +203,109 @@ public class PrinterRestController extends RestController {
 
     return printer.printBarcode(user, copies, COMMA.splitAsStream(ids)//
         .map(Long::parseLong)//
-        .map(WhineyFunction.rethrow(fetcher)));
+        .map(WhineyFunction.rethrow(fetcher))//
+        .sorted(Comparator.comparing(Barcodable::getAlias)));
+  }
+
+  public static class BoxPrintRequest {
+    private List<Long> boxes;
+    private int copies;
+
+    public int getCopies() {
+      return copies;
+    }
+
+    public void setCopies(int copies) {
+      this.copies = copies;
+    }
+
+    public List<Long> getBoxes() {
+      return boxes;
+    }
+
+    public void setBoxes(List<Long> boxes) {
+      this.boxes = boxes;
+    }
+  }
+
+  private Barcodable loadBarcodable(Entry<String, BoxPosition> e) throws IOException {
+    long id = e.getValue().getBoxableId().getTargetId();
+    switch (e.getValue().getBoxableId().getTargetType()) {
+    case DILUTION:
+      return dilutionService.get(id);
+    case LIBRARY:
+      return libraryService.get(id);
+    case SAMPLE:
+      return sampleService.get(id);
+    case POOL:
+      return poolService.get(id);
+    default:
+      throw new IllegalArgumentException("Unknown barcodeable type: " + e.getValue().getBoxableId().getTargetType());
+    }
+  }
+
+  @PostMapping(value = "{printerId}/boxcontents", headers = { "Content-type=application/json" })
+  @ResponseBody
+  public long boxContents(@PathVariable("printerId") Long printerId, @RequestBody BoxPrintRequest request)
+      throws IOException {
+    User user = authorizationManager.getCurrentUser();
+    Printer printer = printerService.get(printerId);
+    if (printer == null) {
+      throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
+    }
+    return printer.printBarcode(user, request.getCopies(),
+        request.getBoxes().stream()//
+            .map(WhineyFunction.rethrow(boxService::get))//
+            .sorted(Comparator.comparing(Box::getAlias))//
+            .flatMap(b -> b.getBoxPositions().entrySet().stream()//
+                .sorted(Comparator.comparing(Entry::getKey))//
+            .map(WhineyFunction.rethrow(this::loadBarcodable))));
+  }
+
+  public static class BoxPositionPrintRequest {
+    private long boxId;
+    private Set<String> positions;
+    private int copies;
+
+    public int getCopies() {
+      return copies;
+    }
+
+    public void setCopies(int copies) {
+      this.copies = copies;
+    }
+
+    public long getBoxId() {
+      return boxId;
+    }
+
+    public void setBoxId(long boxId) {
+      this.boxId = boxId;
+    }
+
+    public Set<String> getPositions() {
+      return positions;
+    }
+
+    public void setPositions(Set<String> positions) {
+      this.positions = positions;
+    }
+  }
+
+  @PostMapping(value = "{printerId}/boxpositions", headers = { "Content-type=application/json" })
+  @ResponseBody
+  public long boxPositions(@PathVariable("printerId") Long printerId, @RequestBody BoxPositionPrintRequest request)
+      throws IOException {
+    User user = authorizationManager.getCurrentUser();
+    Printer printer = printerService.get(printerId);
+    if (printer == null) {
+      throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
+    }
+    Box box = boxService.get(request.getBoxId());
+    return printer.printBarcode(user, request.getCopies(),
+        box.getBoxPositions().entrySet().stream()//
+            .filter(e -> request.getPositions().contains(e.getKey()))//
+            .sorted(Comparator.comparing(Entry::getKey))//
+            .map(WhineyFunction.rethrow(this::loadBarcodable)));
   }
 }
