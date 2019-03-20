@@ -60,11 +60,10 @@ Orders can be created on pools either for a single pool or for multiple pools at
 To create an order for a single pool, first navigate to the [Edit Pool
 Page](pools.html#editing_a_single_pool).
 
-On the Edit Pool Page, scroll down to the "Request Orders" table and click
-"Create" from the toolbar at the top of the table. Select the sequencing
-platform from the dialog. In the next dialog, select the sequencing parameters
-and the number of partitions required. An optional description maybe be provided.
-Click "Save".
+On the Edit Pool Page, scroll down to the "Requested Orders" table and click
+"Create" from the toolbar at the top of the table.
+
+Select the platform, sequencing parameters, and partitions and click "Save".
 
 {% assign subsub = subsub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub subsub=subsub section-title=section-title title="Bulk" %}
