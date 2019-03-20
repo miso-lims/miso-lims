@@ -78,41 +78,9 @@ ListTarget.order = {
       return [{
         name: "Create",
         handler: function() {
-          Utils.showWizardDialog('Create Order', Constants.instrumentModels.filter(function(instrumentModel) {
-            return instrumentModel.platformType == platformType.name && instrumentModel.active;
-          }).map(function(instrumentModel) {
-            return {
-              name: instrumentModel.alias,
-              handler: function() {
-                Utils.showDialog('Create Order', 'Save', [{
-                  type: "select",
-                  label: "Sequencing Parameters",
-                  property: "parameters",
-                  values: Constants.sequencingParameters.filter(function(parameters) {
-                    return parameters.instrumentModel.id == instrumentModel.id;
-                  }),
-                  getLabel: Utils.array.getName
-                }, {
-                  type: "int",
-                  label: platformType.pluralPartitionName,
-                  property: "count",
-                  value: 1
-                }, {
-                  type: "text",
-                  label: "Description",
-                  property: "description"
-                }], function(results) {
-
-                  Utils.ajaxWithDialog('Creating Order', 'POST', '/miso/rest/poolorder', {
-                    "pool": config.pool,
-                    "partitions": results.count,
-                    "parameters": results.parameters,
-                    "description": results.description
-                  }, Utils.page.pageReload);
-                });
-              }
-            };
-          }));
+          window.location = window.location.origin + '/miso/order/bulk/create?' + jQuery.param({
+            ids: config.pool.id
+          });
         }
       }];
     }
