@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  db:
+    volumes:
+      - "miso_db:/var/lib/mysql"
+  
+  flyway:
+    volumes:
+      - "./.docker/detailed_sample_config:/flyway/migrations"
+
+  webapp:
+    volumes:
+      - "miso_files:/storage/miso/files/"
+
+volumes:
+  miso_db:
+  miso_files:
