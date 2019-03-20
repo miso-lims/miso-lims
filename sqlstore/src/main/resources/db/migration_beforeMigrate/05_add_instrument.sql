@@ -12,11 +12,11 @@ CREATE PROCEDURE addInstrument(
   iDateDecommissioned date,
   iUpgradedInstrumentName varchar(30)
 ) BEGIN
-  DECLARE instrumentModelId, upgradedId bigint(20);
+  DECLARE existingModelId, upgradedId bigint(20);
   DECLARE errorMessage varchar(300);
   IF NOT EXISTS (SELECT 1 FROM Instrument WHERE name = iName) THEN
-    SELECT instrumentModelId INTO instrumentModelId FROM InstrumentModel WHERE platform = iPlatformName AND alias = iInstrumentModel;
-    IF instrumentModelId IS NULL THEN
+    SELECT instrumentModelId INTO existingModelId FROM InstrumentModel WHERE platform = iPlatformName AND alias = iInstrumentModel;
+    IF existingModelId IS NULL THEN
       SET errorMessage = CONCAT('Instrument Model ''', iInstrumentModel, ''' not found.');
       SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
     END IF;
@@ -31,7 +31,7 @@ CREATE PROCEDURE addInstrument(
     END IF;
     
     INSERT INTO Instrument(name, instrumentModelId, serialNumber, dateCommissioned, dateDecommissioned, upgradedInstrumentId)
-    VALUES (iName, instrumentModelId, iSerialNumber, iDateCommissioned, iDateDecommissioned, upgradedId);
+    VALUES (iName, existingModelId, iSerialNumber, iDateCommissioned, iDateDecommissioned, upgradedId);
   END IF;
 END//
 
