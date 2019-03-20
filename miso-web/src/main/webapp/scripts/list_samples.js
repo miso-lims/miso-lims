@@ -148,7 +148,7 @@ ListTarget.sample = {
         }, {
           "sTitle": "Warnings",
           "mData": null,
-          "mRender": WarningTarget.sample.tableWarnings,
+          "mRender": Warning.tableWarningRenderer(WarningTarget.sample),
           "include": true,
           "iSortPriority": 0,
           "bVisible": true,

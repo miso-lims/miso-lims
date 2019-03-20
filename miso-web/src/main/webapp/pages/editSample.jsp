@@ -124,7 +124,7 @@
         <td colspan="2" id ="warnings">
           <script>
             jQuery(document).ready(function() {
-              jQuery('#warnings').append(WarningTarget.sample.headerWarnings(${sampleDto}));
+              Warning.generateHeaderWarnings('warnings', WarningTarget.sample, ${sampleDto});
             });
           </script>
         </td>

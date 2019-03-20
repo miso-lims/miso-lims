@@ -92,7 +92,7 @@ ListTarget.pool = {
         ListUtils.labelHyperlinkColumn("Alias", "pool", Utils.array.getId, "alias", 0, true), {
           "sTitle": "Description",
           "mData": "description",
-          "mRender": WarningTarget.pool.tableWarnings,
+          "mRender": Warning.tableWarningRenderer(WarningTarget.pool),
           "include": true,
           "iSortPriority": 0,
           "bSortable": false

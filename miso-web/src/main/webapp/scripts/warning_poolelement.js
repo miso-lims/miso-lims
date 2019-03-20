@@ -22,8 +22,9 @@
  */
 
 WarningTarget.poolelement = {
-    tableWarnings: function(duplicateSequences, nearDuplicateSequences){
-      return function(data, type, dilution){
+  makeTarget: function(duplicateSequences, nearDuplicateSequences) {
+    return {
+      getWarnings: function(dilution) {
         var indices = Constants.indexFamilies.reduce(function(acc, family) {
           return acc.concat(family.indices.filter(function(index) {
             return dilution.indexIds.indexOf(index.id) != -1;
@@ -35,17 +36,29 @@ WarningTarget.poolelement = {
         var combined = indices.map(function(index) {
           return index.sequence;
         }).join('');
-        
-        var warnings = [];
-        warnings = Warning.addWarnings([
-          [dilution.subprojectPriority, 'PRIORITY (' + dilution.subprojectAlias + ')'],
-          [duplicateSequences && duplicateSequences.indexOf(combined) != -1, "(DUPLICATE INDEX)"],
-          [nearDuplicateSequences && nearDuplicateSequences.indexOf(combined) != -1 && 
-            !(duplicateSequences && duplicateSequences.indexOf(combined) != -1), "(NEAR-DUPLICATE INDEX)"],
-          [Utils.validation.isEmpty(combined), "(NO INDEX)"],
-          [dilution.identityConsentLevel === 'Revoked', '(CONSENT REVOKED)']
-          ], warnings);
-        return Warning.generateTableWarnings(data, warnings);
-      };
+
+        return [
+            {
+              include: dilution.subprojectPriority,
+              tableMessage: 'PRIORITY (' + dilution.subprojectAlias + ')',
+              level: 'info'
+            },
+            {
+              include: duplicateSequences && duplicateSequences.indexOf(combined) != -1,
+              tableMessage: "(DUPLICATE INDEX)"
+            },
+            {
+              include: nearDuplicateSequences && nearDuplicateSequences.indexOf(combined) != -1
+                  && !(duplicateSequences && duplicateSequences.indexOf(combined) != -1),
+              tableMessage: "(NEAR-DUPLICATE INDEX)"
+            }, {
+              include: Utils.validation.isEmpty(combined),
+              tableMessage: "(NO INDEX)"
+            }, {
+              include: dilution.identityConsentLevel === 'Revoked',
+              tableMessage: '(CONSENT REVOKED)'
+            }];
+      }
     }
+  }
 };

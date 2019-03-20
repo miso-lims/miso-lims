@@ -71,104 +71,107 @@ ListTarget.poolelement = {
     return [];
   },
   createColumns: function(config, projectId) {
-    return [{
-      'sTitle': 'Dilution Name',
-      'mData': 'name',
-      'include': true,
-      'iSortPriority': 1
-    }, {
-      "sTitle": "Warnings",
-      "mData": null,
-      "mRender": WarningTarget.poolelement.tableWarnings(config.duplicateIndicesSequences, config.nearDuplicateIndicesSequences),
-      "include": true,
-      "iSortPriority": 0,
-      "bVisible": true,
-      "bSortable": false
-    }, {
-      'sTitle': 'Proportion',
-      'sType': 'numeric',
-      'mData': 'proportion',
-      'include': !config.add,
-      'iSortPriority': 0
-    }, ListUtils.idHyperlinkColumn("Library Name", "library", "library.id", function(dilution) {
-      return dilution.library.name;
-    }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Library Alias", "library", function(dilution) {
-      return dilution.library.id;
-    }, "library.alias", 0, true), ListUtils.idHyperlinkColumn("Sample Name", "sample", "library.parentSampleId", function(dilution) {
-      return "SAM" + dilution.library.parentSampleId;
-    }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Sample Alias", "sample", function(dilution) {
-      return dilution.library.parentSampleId;
-    }, "library.parentSampleAlias", 0, true, "noPrint"), {
-      'sTitle': 'Conc.',
-      'sType': 'numeric',
-      'mData': 'concentration',
-      'include': true,
-      'iSortPriority': 0,
-      'mRender': function(data, type, full) {
-        if (type === 'display' && !!data) {
-          var units = Constants.concentrationUnits.find(function(unit) {
-            return unit.name == full.concentrationUnits;
-          });
-          if (!!units) {
-            return data + ' ' + units.units;
+    return [
+        {
+          'sTitle': 'Dilution Name',
+          'mData': 'name',
+          'include': true,
+          'iSortPriority': 1
+        },
+        {
+          "sTitle": "Warnings",
+          "mData": null,
+          "mRender": Warning.tableWarningRenderer(WarningTarget.poolelement.makeTarget(config.duplicateIndicesSequences,
+              config.nearDuplicateIndicesSequences)),
+          "include": true,
+          "iSortPriority": 0,
+          "bVisible": true,
+          "bSortable": false
+        }, {
+          'sTitle': 'Proportion',
+          'sType': 'numeric',
+          'mData': 'proportion',
+          'include': !config.add,
+          'iSortPriority': 0
+        }, ListUtils.idHyperlinkColumn("Library Name", "library", "library.id", function(dilution) {
+          return dilution.library.name;
+        }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Library Alias", "library", function(dilution) {
+          return dilution.library.id;
+        }, "library.alias", 0, true), ListUtils.idHyperlinkColumn("Sample Name", "sample", "library.parentSampleId", function(dilution) {
+          return "SAM" + dilution.library.parentSampleId;
+        }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Sample Alias", "sample", function(dilution) {
+          return dilution.library.parentSampleId;
+        }, "library.parentSampleAlias", 0, true, "noPrint"), {
+          'sTitle': 'Conc.',
+          'sType': 'numeric',
+          'mData': 'concentration',
+          'include': true,
+          'iSortPriority': 0,
+          'mRender': function(data, type, full) {
+            if (type === 'display' && !!data) {
+              var units = Constants.concentrationUnits.find(function(unit) {
+                return unit.name == full.concentrationUnits;
+              });
+              if (!!units) {
+                return data + ' ' + units.units;
+              }
+            }
+            return data;
           }
-        }
-        return data;
-      }
-    }, {
-      "sTitle": "Targeted Sequencing",
-      "mData": "targetedSequencingId",
-      "include": Constants.isDetailedSample,
-      "mRender": ListUtils.render.textFromId(Constants.targetedSequencings, 'alias', '(None)'),
-      "iSortPriority": 0,
-      "bSortable": false
-    }, {
-      'sTitle': 'Indices',
-      'mData': 'indexIds',
-      'include': true,
-      'bSortable': false,
-      'iSortPriority': 0,
-      'mRender': function(data, type, full) {
-        var indices = Constants.indexFamilies.reduce(function(acc, family) {
-          return acc.concat(family.indices.filter(function(index) {
-            return data.indexOf(index.id) != -1;
-          }));
-        }, []).sort(function(a, b) {
-          return a.position - b.position;
-        });
+        }, {
+          "sTitle": "Targeted Sequencing",
+          "mData": "targetedSequencingId",
+          "include": Constants.isDetailedSample,
+          "mRender": ListUtils.render.textFromId(Constants.targetedSequencings, 'alias', '(None)'),
+          "iSortPriority": 0,
+          "bSortable": false
+        }, {
+          'sTitle': 'Indices',
+          'mData': 'indexIds',
+          'include': true,
+          'bSortable': false,
+          'iSortPriority': 0,
+          'mRender': function(data, type, full) {
+            var indices = Constants.indexFamilies.reduce(function(acc, family) {
+              return acc.concat(family.indices.filter(function(index) {
+                return data.indexOf(index.id) != -1;
+              }));
+            }, []).sort(function(a, b) {
+              return a.position - b.position;
+            });
 
-        var combined = indices.map(function(index) {
-          return index.sequence;
-        }).join('');
+            var combined = indices.map(function(index) {
+              return index.sequence;
+            }).join('');
 
-        var html = indices.map(function(index) {
-          return index.label;
-        }).join(', ');
+            var html = indices.map(function(index) {
+              return index.label;
+            }).join(', ');
 
-        return html;
-      }
-    }, {
-      'sTitle': 'Last Modified',
-      'mData': 'lastModified',
-      'include': true,
-      'iSortPriority': 0,
-      'sClass': 'noPrint'
-    }, {
-      'sTitle': 'Low Quality',
-      'bSortable': false,
-      'mData': 'library.lowQuality',
-      'mRender': function(data, type, full) {
-        return data ? "⚠" : "";
-      },
-      'include': true,
-      'iSortPriority': 0
-    }, {
-      "sTitle": "QC Passed",
-      "mData": "library.qcPassed",
-      "include": true,
-      "iSortPriority": 0,
-      "mRender": ListUtils.render.booleanChecks,
-      "bSortable": false
-    }];
+            return html;
+          }
+        }, {
+          'sTitle': 'Last Modified',
+          'mData': 'lastModified',
+          'include': true,
+          'iSortPriority': 0,
+          'sClass': 'noPrint'
+        }, {
+          'sTitle': 'Low Quality',
+          'bSortable': false,
+          'mData': 'library.lowQuality',
+          'mRender': function(data, type, full) {
+            return data ? "⚠" : "";
+          },
+          'include': true,
+          'iSortPriority': 0
+        }, {
+          "sTitle": "QC Passed",
+          "mData": "library.qcPassed",
+          "include": true,
+          "iSortPriority": 0,
+          "mRender": ListUtils.render.booleanChecks,
+          "bSortable": false
+        }];
   }
 };

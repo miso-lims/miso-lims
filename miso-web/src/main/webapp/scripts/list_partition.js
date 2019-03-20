@@ -50,8 +50,6 @@ ListTarget.partition = {
       });
 
       response.items.forEach(function(item) {
-        var warnings = WarningTarget.pool.tileWarnings(item.pool);
-
         var dilutionInfo = item.pool.pooledElements.filter(function(element, index, array) {
           return array.length < maxDilutions || index < maxDilutions - 1;
         }).map(function(dilution) {
@@ -69,8 +67,8 @@ ListTarget.partition = {
                   + (order.remaining == 1 ? platformType.partitionName : platformType.pluralPartitionName) + " remaining";
             });
 
-        var tileParts = [Tile.titleAndStatus(item.pool.name + " (" + item.pool.alias + ")", warnings.length == 0 ? Tile.statusOk() : Tile
-            .statusBad())].concat(warnings);
+        var tileParts = [Tile.titleAndStatus(item.pool.name + " (" + item.pool.alias + ")", Warning.hasWarnings(WarningTarget.pool,
+            item.pool) ? Tile.statusBad() : Tile.statusOk())].concat(Warning.generateTileWarnings(WarningTarget.pool, item.pool));
         tileParts.push(Tile.lines(dilutionInfo, false));
         tileParts.push(Tile.lines(orderInfo, true));
 
@@ -277,10 +275,14 @@ ListTarget.partition = {
       "bSortDirection": true
     }, {
       "sTitle": "Pool",
-      "mData": "pool",
+      "mData": function(full) {
+        return full.pool ? full.pool.name + ' (' + full.pool.alias + ')' : '(none)';
+      },
       "include": config.showPool,
       "iSortPriority": 0,
-      "mRender": WarningTarget.partition.tableWarnings
+      "mRender": Warning.tableWarningRenderer(WarningTarget.partition, function(full) {
+        return '/miso/pool/' + full.pool.id;
+      })
     }, {
       "sTitle": "Dilutions",
       "mData": "pool",

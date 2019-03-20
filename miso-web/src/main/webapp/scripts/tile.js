@@ -38,12 +38,6 @@ var Tile = {
 
     return title;
   },
-  error: function(message) {
-    var errorP = document.createElement("P");
-    errorP.setAttribute("class", "parsley-custom-error-message");
-    errorP.innerText = "⚠ " + message;
-    return errorP;
-  },
   lines: function(lines, special) {
     var p = document.createElement("P");
     if (special) {

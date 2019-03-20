@@ -22,23 +22,21 @@
  */
 
 WarningTarget.library = {
-  headerWarnings: function(library){
-    var warnings = [];
-    warnings = Warning.addWarnings([
-      [library.subprojectPriority, 'Belongs to high priority subproject \'' + library.subprojectAlias + '\''],
-      [parseFloat(library.volume) < 0, 'This library has a negative volume!'],
-      [library.identityConsentLevel === 'Revoked', 'Donor has revoked consent']
-      ], warnings);
-    return Warning.generateHeaderWarnings(warnings);
-  },
-  tableWarnings: function(data, type, library){
-    var warnings = [];
-    warnings = Warning.addWarnings([
-      [library.subprojectPriority, 'PRIORITY (' + library.subprojectAlias + ')', "info"],
-      [parseFloat(library.volume) < 0, '(NEGATIVE VOLUME)'],
-      [library.identityConsentLevel === 'Revoked', '(CONSENT REVOKED)']
-      ], warnings);
-    return Warning.generateTableWarnings(data, warnings);
-  },
-  
+  getWarnings: function(library) {
+    return [{
+      include: library.subprojectPriority,
+      headerMessage: 'Belongs to high priority subproject \'' + library.subprojectAlias + '\'',
+      tableMessage: 'PRIORITY (' + library.subprojectAlias + ')',
+      level: 'info'
+    }, {
+      include: parseFloat(library.volume) < 0,
+      headerMessage: 'This library has a negative volume!',
+      tableMessage: '(NEGATIVE VOLUME)'
+    }, {
+      include: library.identityConsentLevel === 'Revoked',
+      headerMessage: 'Donor has revoked consent',
+      tableMessage: '(CONSENT REVOKED)'
+    }];
+  }
+
 };

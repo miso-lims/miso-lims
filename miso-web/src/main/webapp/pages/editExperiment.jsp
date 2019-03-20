@@ -133,7 +133,7 @@
 </tr>
 <tr>
    <td>Platform:</td>
-   <td>${experiment.platform.platformType.key} - ${experiment.platform.instrumentModel}</td>
+   <td>${experiment.instrumentModel.platformType.key} - ${experiment.instrumentModel.alias}</td>
 </tr>
 <tr>
    <td>Library:</td>
@@ -149,7 +149,7 @@
 </script>
 
 </form:form>
-<miso:list-section id="list_part_lane" alwaysShow="true" name="${experiment.platform.platformType.pluralPartitionName}" target="experiment_run_partition" items="${runPartitions}" config="{}"/>
+<miso:list-section id="list_part_lane" alwaysShow="true" name="${experiment.instrumentModel.platformType.pluralPartitionName}" target="experiment_run_partition" items="${runPartitions}" config="{}"/>
 <miso:list-section id="list_consumable" alwaysShow="true" name="Consumables" target="kit_consumable" items="${consumables}" config="${consumableConfig}"/>
 <miso:changelog item="${experiment}"/>
 </div>

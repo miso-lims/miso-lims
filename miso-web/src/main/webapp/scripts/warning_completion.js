@@ -22,20 +22,29 @@
  */
 
 WarningTarget.completion = {
-    tableWarnings: function(data, type, full){
-      var warnings = [];
-      var pool = full.pool;
-      warnings = Warning.addWarnings([
-        [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0, 'PRIORITY (' 
-          + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] : 'MULTIPLE') + ')'],
-        [pool.duplicateIndices, "(DUPLICATE INDICES)"],
-        [pool.nearDuplicateIndices && !pool.duplicateIndices, "(NEAR-DUPLICATE INDICES)"],
-        [pool.hasEmptySequence, "(MISSING INDEX)"],
-        [pool.hasLowQualityLibraries, "(LOW QUALITY LIBRARIES)"],
-        [pool.pooledElements && pool.pooledElements.some(function(dilution){
-          return dilution.identityConsentLevel === 'Revoked';
-        }), "(CONSENT REVOKED)"]
-        ], warnings);
-      return Warning.generateTableWarnings(data, warnings);
-    }
+  getWarnings: function(order) {
+    var pool = order.pool;
+    return [{
+      include: pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0,
+      tableMessage: 'PRIORITY (' + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] : 'MULTIPLE') + ')',
+      level: 'info'
+    }, {
+      include: pool.duplicateIndices,
+      tableMessage: "(DUPLICATE INDICES)"
+    }, {
+      include: pool.nearDuplicateIndices && !pool.duplicateIndices,
+      tableMessage: "(NEAR-DUPLICATE INDICES)"
+    }, {
+      include: pool.hasEmptySequence,
+      tableMessage: "(MISSING INDEX)"
+    }, {
+      include: pool.hasLowQualityLibraries,
+      tableMessage: "(LOW QUALITY LIBRARIES)"
+    }, {
+      include: pool.pooledElements && pool.pooledElements.some(function(dilution) {
+        return dilution.identityConsentLevel === 'Revoked';
+      }),
+      tableMessage: "(CONSENT REVOKED)"
+    }];
+  }
 };
