@@ -1,0 +1,6 @@
+version: '3.7'
+
+services:
+  flyway:
+    volumes:
+      - "./.docker/detailed_sample_config:/flyway/migrations"

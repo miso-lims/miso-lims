@@ -1,0 +1,6 @@
+version: '3.7'
+
+services:
+  webapp:
+    volumes:
+      - ".docker/detailed_sample_config/miso.properties:/usr/local/tomcat/conf/Catalina/localhost/miso.properties"

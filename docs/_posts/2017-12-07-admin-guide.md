@@ -288,4 +288,6 @@ CALL addContainerModel('Mid Output Flow Cell Cartridge V2', '15065974', 4, 'ILLU
 ```
 
 *HiSeq X*
-`CALL addContainerModel('HiSeq X', NULL, 8, 'ILLUMINA', 'Illumina HiSeq X');`
+```
+CALL addContainerModel('HiSeq X', NULL, 8, 'ILLUMINA', 'Illumina HiSeq X');
+```
