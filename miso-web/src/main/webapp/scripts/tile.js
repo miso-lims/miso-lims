@@ -33,9 +33,9 @@ var Tile = {
   },
   titleAndStatus: function(label, status) {
     var title = this.title(label);
-
-    title.append(status);
-
+    if (status != null) {
+      title.append(status);
+    }
     return title;
   },
   lines: function(lines, special) {

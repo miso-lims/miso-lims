@@ -68,7 +68,7 @@ ListTarget.partition = {
             });
 
         var tileParts = [Tile.titleAndStatus(item.pool.name + " (" + item.pool.alias + ")", Warning.hasWarnings(WarningTarget.pool,
-            item.pool) ? Tile.statusBad() : Tile.statusOk())].concat(Warning.generateTileWarnings(WarningTarget.pool, item.pool));
+            item.pool) ? Tile.statusBad('Warning') : null)].concat(Warning.generateTileWarnings(WarningTarget.pool, item.pool));
         tileParts.push(Tile.lines(dilutionInfo, false));
         tileParts.push(Tile.lines(orderInfo, true));
 
@@ -281,7 +281,7 @@ ListTarget.partition = {
       "include": config.showPool,
       "iSortPriority": 0,
       "mRender": Warning.tableWarningRenderer(WarningTarget.partition, function(full) {
-        return '/miso/pool/' + full.pool.id;
+        return full.pool ? ('/miso/pool/' + full.pool.id) : null;
       })
     }, {
       "sTitle": "Dilutions",

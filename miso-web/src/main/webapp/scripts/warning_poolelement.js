@@ -44,6 +44,10 @@ WarningTarget.poolelement = {
               level: 'info'
             },
             {
+              include: dilution.library.lowQuality,
+              tableMessage: '(LOW QUALITY LIBRARY)'
+            },
+            {
               include: duplicateSequences && duplicateSequences.indexOf(combined) != -1,
               tableMessage: "(DUPLICATE INDEX)"
             },

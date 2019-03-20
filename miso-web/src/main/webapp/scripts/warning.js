@@ -45,11 +45,12 @@ var Warning = (function($) {
         }
         var html = '';
         if (data) {
-          if (makeLink) {
-            html += '<a href="' + makeLink(full) + '">';
+          var link = makeLink ? makeLink(full) : null;
+          if (link) {
+            html += '<a href="' + link + '">';
           }
           html += data;
-          if (makeLink) {
+          if (link) {
             html += '</a>';
           }
         }

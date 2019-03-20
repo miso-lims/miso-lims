@@ -36,6 +36,10 @@ WarningTarget.library = {
       include: library.identityConsentLevel === 'Revoked',
       headerMessage: 'Donor has revoked consent',
       tableMessage: '(CONSENT REVOKED)'
+    }, {
+      include: library.lowQuality,
+      headerMessage: 'Low Quality Library',
+      tableMessage: '(LOW QUALITY)'
     }];
   }
 
