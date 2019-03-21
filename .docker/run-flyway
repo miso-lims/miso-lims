@@ -15,7 +15,7 @@ eval "${command} $1"
 
 rc=$?; if [[ $rc != 0 ]]
 then
-    eval "${command} clean"
+	"run-flyway command $1 failed with exit : $rc"
 fi
 exit $rc; 
 
