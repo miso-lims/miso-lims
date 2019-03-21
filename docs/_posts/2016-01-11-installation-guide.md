@@ -6,8 +6,55 @@ date: 2016-01-11 13:51:46
 order: 1
 ---
 
+# Installing MISO using Docker-Compose
 
-# Installing MISO
+The MISO Docker container consist of two parts: the MySQL database and the Tomcat webapp container. There is a third container that runs Flyway migrate in order to initialize or update the database container. We use docker-compose to bring up these containers together.
+
+There are a number of compose files in the miso-lims Github repository:
+
+* docker-compose.yml : starts up plain sample with no local storage
+* docker-compose.override.yml : adds the migrations needed for detailed sample and for orders (Sequencing Parameters, Instruments, Targeted Seqeuencing) and adds volumes to persist data between startups
+* docker-compose.detailed.yml : loads the miso.properties that configures detailed sample + OICR alias autogeneration
+* docker-compose.env.yml : allows you to override the environment variables for each service
+* docker-compose.build.yml : builds the flyway and webapp Docker containers using the current state of the miso-lims directory
+* docker-compose.prod.yml : persists the DB and MISO files to permanent locations and starts up a 'production-like' environment with an entirely empty database.
+ 
+As per [Using multiple compose files](https://docs.docker.com/compose/extends/#different-environments), docker-compose.yml and docker-compose.override.yml are used by default when launching `docker-compose up`. 
+
+You can specify multiple compose files when launching docker-compose. For detailed samples mode with demo data:
+
+```
+docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.detailed.yml up 
+```
+
+For more information on the MISO docker containers, see [miso-lims-migration](https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-migration) and [miso-lims-webapp](https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-webapp) on DockerHub.
+
+## Installing MISO in production using compose
+
+The docker-compose.prod.yml file is an example for how to create a compose file to be used in production. We suggest the following:
+
+1. Mount the MySQL database to a permanent, backed-up location using the instructions in [MySQL Docker Hub](https://hub.docker.com/_/mysql).
+2. Mount the MISO files storage location to a permanent, backed up location
+3. Omit or modify the docker-compose.override.yml file to pre-load desired data (if any). Starting MISO with an entirely empty database will not provide full functions: see the [administrator's manual](http://tgac.github.io/miso-lims/adm/admin-guide.html) for more information on stored procedures or setup, or the demo data under [.docker/detailed_sample_config](.docker/detailed_sample_config).
+4. Modify and mount the miso.properties file to have your desired configuration.
+5. Change the username and password for the database using the environmental variables
+
+
+To bring up a plain sample production-like environment, run
+
+```
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+```
+
+For a detailed sample production-like environment, run
+
+```
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.detailed.yml up
+```
+Note: this will override your miso.properties configuration.
+
+
+# Installing MISO on baremetal
 MISO requires some configuration directly in the source code. While we plan to
 change this over time, running an instance of MISO will require building and
 deploying a fork of the code base with customisations.
