@@ -157,15 +157,6 @@ ListTarget.poolelement = {
           'iSortPriority': 0,
           'sClass': 'noPrint'
         }, {
-          'sTitle': 'Low Quality',
-          'bSortable': false,
-          'mData': 'library.lowQuality',
-          'mRender': function(data, type, full) {
-            return data ? "⚠" : "";
-          },
-          'include': true,
-          'iSortPriority': 0
-        }, {
           "sTitle": "QC Passed",
           "mData": "library.qcPassed",
           "include": true,
