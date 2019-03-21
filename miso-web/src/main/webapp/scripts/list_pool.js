@@ -45,7 +45,7 @@ ListTarget.pool = {
         });
         Utils.showConfirmDialog('Delete Pools', 'Delete', lines, function() {
           Utils.ajaxWithDialog('Deleting Pools', 'POST', '/miso/rest/pool/bulk-delete', ids, function() {
-            window.location = window.location.origin + '/miso/pools';
+            Utils.page.pageReload();
           });
         });
       }

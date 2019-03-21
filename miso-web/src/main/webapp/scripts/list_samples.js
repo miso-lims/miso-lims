@@ -49,7 +49,7 @@ ListTarget.sample = {
         });
         Utils.showConfirmDialog('Delete Samples', 'Delete', lines, function() {
           Utils.ajaxWithDialog('Deleting Samples', 'POST', '/miso/rest/sample/bulk-delete', ids, function() {
-            window.location = window.location.origin + '/miso/samples';
+            Utils.page.pageReload();
           });
         });
       }
