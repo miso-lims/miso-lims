@@ -10,8 +10,8 @@ CREATE PROCEDURE addInstrumentModel(
   iNumContainers tinyint(4),
   iInstrumentType varchar(50)
 ) BEGIN
-  IF NOT EXISTS (SELECT 1 FROM Platform WHERE name = iName and instrumentModel = iInstrumentModel) THEN
-    INSERT INTO Platform(platform, alias, description, numContainers, instrumentType)
+  IF NOT EXISTS (SELECT 1 FROM InstrumentModel WHERE platform = iPlatform and alias = iAlias) THEN
+    INSERT INTO InstrumentModel(platform, alias, description, numContainers, instrumentType)
     VALUES (iPlatform, iAlias, iDescription, iNumContainers, iInstrumentType);
   END IF;
 END//
