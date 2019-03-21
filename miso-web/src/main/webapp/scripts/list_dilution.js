@@ -44,7 +44,7 @@ ListTarget.dilution = {
         });
         Utils.showConfirmDialog('Delete Library Dilutions', 'Delete', lines, function() {
           Utils.ajaxWithDialog('Deleting Library Dilutions', 'POST', '/miso/rest/librarydilution/bulk-delete', ids, function() {
-            window.location = window.location.origin + '/miso/dilutions';
+            Utils.page.pageReload();
           });
         });
       }

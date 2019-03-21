@@ -58,7 +58,7 @@ ListTarget.box = {
                 });
                 Utils.showConfirmDialog('Delete Boxes', 'Delete', lines, function() {
                   Utils.ajaxWithDialog('Deleting Boxes', 'POST', '/miso/rest/boxes/bulk-delete', ids, function() {
-                    window.location = window.location.origin + '/miso/boxes';
+                    Utils.page.pageReload();
                   });
                 });
               }

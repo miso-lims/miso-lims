@@ -56,7 +56,7 @@ ListTarget.container = {
         });
         Utils.showConfirmDialog('Delete Containers', 'Delete', lines, function() {
           Utils.ajaxWithDialog('Deleting Containers', 'POST', '/miso/rest/container/bulk-delete', ids, function() {
-            window.location = window.location.origin + '/miso/containers';
+            Utils.page.pageReload();
           });
         });
       }
