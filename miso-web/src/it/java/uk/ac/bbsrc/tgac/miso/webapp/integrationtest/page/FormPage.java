@@ -13,6 +13,10 @@ public abstract class FormPage<T extends FormPage.FieldElement> extends HeaderFo
   public interface FieldElement {
     public By getSelector();
 
+    public default By getLabelSelector() {
+      return null;
+    }
+
     public FieldType getType();
 
     public default boolean isEditable(WebDriver driver) {
@@ -20,6 +24,10 @@ public abstract class FormPage<T extends FormPage.FieldElement> extends HeaderFo
     }
 
     public default String get(WebDriver driver) {
+      By labelSelector = getLabelSelector();
+      if (labelSelector != null && findElementIfExists(driver, labelSelector) != null) {
+        return FieldType.LABEL.getValue(driver, labelSelector);
+      }
       return getType().getValue(driver, getSelector());
     }
 

@@ -21,7 +21,11 @@ public abstract class AbstractPage extends AbstractElement {
     LABEL() {
       @Override
       protected String getValue(WebDriver driver, By selector) {
-        return driver.findElement(selector).getText();
+        WebElement element = driver.findElement(selector);
+        if (isLabel(element)) {
+          return element.getText();
+        }
+        return super.getValue(driver, selector);
       }
       
       @Override
@@ -31,6 +35,10 @@ public abstract class AbstractPage extends AbstractElement {
           return false;
         }
         return super.isEditable(element);
+      }
+
+      private boolean isLabel(WebElement element) {
+        return "span".equals(element.getTagName());
       }
     },
     TEXT() {

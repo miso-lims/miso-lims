@@ -26,12 +26,16 @@ FormTarget.box = (function($) {
               title: 'Box ID',
               data: 'id',
               type: 'read-only',
-              initial: 'Unsaved'
+              getDisplayValue: function(box) {
+                return box.id || 'Unsaved';
+              }
             }, {
               title: 'Name',
               data: 'name',
               type: 'read-only',
-              initial: 'Unsaved'
+              getDisplayValue: function(box) {
+                return box.name || 'Unsaved';
+              }
             }, {
               title: 'Alias',
               data: 'alias',
@@ -73,8 +77,8 @@ FormTarget.box = (function($) {
               include: config.isNew
             }, {
               title: 'Box Size',
-              data: 'sizeLabel',
-              getValue: function(box) {
+              data: 'sizeId',
+              getDisplayValue: function(box) {
                 return box.rows + ' × ' + box.cols + ' (can ' + (box.scannable ? '' : 'not ') + 'be scanned by your lab\'s bulk scanner)';
               },
               type: 'read-only',
@@ -85,12 +89,9 @@ FormTarget.box = (function($) {
               type: 'text',
               maxLength: 255
             }, {
-              data: 'storageLocationId',
-              type: 'hidden'
-            }, {
               title: 'Freezer Location',
-              data: 'freezerLocation',
-              getValue: function(box) {
+              data: 'storageLocationId',
+              getDisplayValue: function(box) {
                 return box.storageDisplayLocation || 'Unknown';
               },
               type: 'read-only'
@@ -197,7 +198,7 @@ FormTarget.box = (function($) {
     Utils.ui.setDisabled('#setFreezerLocation', true);
     var location = getSelectedLocation();
     $('#storageLocationId').val(location.id);
-    $('#freezerLocation').text(location.fullDisplayLocation);
+    $('#storageLocationIdLabel').text(location.fullDisplayLocation);
     resetLocationSearch();
   }
   

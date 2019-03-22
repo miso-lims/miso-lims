@@ -18,8 +18,10 @@ FormUtils = (function($) {
    * Field Structure: {
    *   title: string; required except for hidden fields; Field name to display
    *   data: required string; JSON property to use for value (unless getValue is supplied). Also used as the input ID
-   *   getValue: function(object) returning string; generate a value to display instead of the object's basic field
-   *   type: required string (read-only|hidden|text|dropdown|special); type of field
+   *   getDisplayValue: optional function(object) returning string; generate a value to display in a read-only field instead of the
+   *       data value
+   *   type: required string (read-only|text|dropdown|special); type of field. Note: read-only means not directly editable. The value
+   *       may still be changed via javascript, and that updated value will be validated and saved
    *   include: optional boolean; determines whether the field is displayed. Field is displayed by default
    *   initial: optional string; value to initialize field value to for new items
    *   required: optional boolean; whether the field is required
@@ -63,10 +65,11 @@ FormUtils = (function($) {
     sections.forEach(function(section) {
       section.fields.forEach(function(field) {
         switch (field.type) {
-        case 'read-only': // Should not be updated
         case 'special': // FormTarget is responsible for managing updates, likely via an additional hidden field
           break;
-        case 'hidden':
+        case 'read-only':
+          object[field.data] = field.getDisplayValue ? $('#' + field.data).val() : $('#' + field.data).text();
+          break;
         case 'text':
         case 'dropdown':
           object[field.data] = $('#' + field.data).val();
@@ -143,14 +146,10 @@ FormUtils = (function($) {
     var tbody = $('<tbody>');
     
     section.fields.forEach(function(field) {
-      if (field.type === 'hidden') {
-        container.append(makeHiddenInput(field, object));
-      } else {
-        var tr = $('<tr>');
-        tr.append(makeFieldLabel(field));
-        tr.append(makeFieldInput(field, object));
-        tbody.append(tr);
-      }
+      var tr = $('<tr>');
+      tr.append(makeFieldLabel(field));
+      tr.append(makeFieldInput(field, object));
+      tbody.append(tr);
     });
     
     container.append($('<div>').attr('id', section.id)
@@ -167,6 +166,15 @@ FormUtils = (function($) {
   function makeFieldInput(field, object) {
     var td = $('<td>');
     var value = getValue(field, object);
+    
+    if (field.getDisplayValue) {
+      // we're displaying something different, so put the actual data in a hidden field
+      var hidden = $('<input>').attr('id', field.data).attr('type', 'hidden');
+      if (object[field.data]) {
+        hidden.val(object[field.data]);
+      }
+      td.append(hidden);
+    }
     
     switch (field.type) {
     case 'read-only':
@@ -192,8 +200,8 @@ FormUtils = (function($) {
   
   function getValue(field, object) {
     var value = null;
-    if (field.getValue) {
-      value = field.getValue(object);
+    if (field.getDisplayValue) {
+      value = field.getDisplayValue(object);
     } else if (object[field.data]) {
       value = object[field.data];
     }
@@ -203,12 +211,8 @@ FormUtils = (function($) {
     return value;
   }
   
-  function makeHiddenInput(field, object) {
-    return $('<input>').attr('id', field.data).attr('type', 'hidden').val(getValue(field, object));
-  }
-  
   function makeReadOnlyInput(field, value) {
-    var input = $('<span>').attr('id', field.data);
+    var input = $('<span>').attr('id', field.data + (field.getDisplayValue ? 'Label' : ''));
     if (value !== null) {
       input.text(value);
     }
