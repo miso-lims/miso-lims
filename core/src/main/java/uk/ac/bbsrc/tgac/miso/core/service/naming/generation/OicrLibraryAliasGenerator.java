@@ -48,7 +48,7 @@ public class OicrLibraryAliasGenerator implements NameGenerator<Library> {
     case OXFORDNANOPORE:
       return generateOxfordNanoporeLibraryAlias(detailed);
     default:
-      throw new MisoNamingException("Alias generation is only available for Illumina and PacBio Libraries");
+      throw new MisoNamingException("Alias generation is only available for Illumina, PacBio, and Oxford Nanopore Libraries");
     }
   }
 
@@ -93,7 +93,7 @@ public class OicrLibraryAliasGenerator implements NameGenerator<Library> {
   private String getLibraryTypeAbbreviation(DetailedLibrary library) throws MisoNamingException {
     String abbr = library.getLibraryType().getAbbreviation();
     if (abbr == null) {
-      throw new MisoNamingException("Cannot generate alias for LibraryType '" + library.getLibraryType().getDescription() + "'");
+      throw new MisoNamingException("Cannot generate alias for library type '" + library.getLibraryType().getDescription() + "'");
     }
     return abbr;
   }
@@ -105,7 +105,7 @@ public class OicrLibraryAliasGenerator implements NameGenerator<Library> {
    */
   private String getInsertSize(Library library) throws MisoNamingException {
     if (library.getDnaSize() == null) {
-      throw new MisoNamingException("Cannot generate an alias without insert size set");
+      throw new MisoNamingException("Cannot generate an alias without size (bp) set");
     }
     return library.getDnaSize().toString();
   }
@@ -117,7 +117,7 @@ public class OicrLibraryAliasGenerator implements NameGenerator<Library> {
    */
   private String getDesignCode(DetailedLibrary library) {
     if (library.getLibraryDesignCode() == null || library.getLibraryDesignCode().getCode() == null) {
-      throw new NullPointerException("LibraryDesignCode missing");
+      throw new NullPointerException("Library design code missing");
     }
     return library.getLibraryDesignCode().getCode();
   }
