@@ -30,10 +30,12 @@ public abstract class FormPage<T extends FormPage.FieldElement> extends HeaderFo
       case "td":
       case "span":
       case "p":
+      case "a":
         return element.getText();
       case "select":
         return getSelectedDropdownText(element);
       case "textarea":
+      case "hidden":
         return element.getAttribute("value");
       case "input":
         switch (element.getAttribute("type")) {
