@@ -3,6 +3,14 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import java.net.URI;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({ @JsonSubTypes.Type(value = ContainerDto.class, name = "Container"),
+    @JsonSubTypes.Type(value = OxfordNanoporeContainerDto.class, name = "OxfordNanoporeContainer") })
+@JsonTypeName(value = "Container")
 public class ContainerDto implements WritableUrls {
   private Long id;
   // identificationBarcode is displayed as "serial number" to the user
@@ -14,8 +22,8 @@ public class ContainerDto implements WritableUrls {
   private String lastSequencerName;
   private Long lastSequencerId;
   private String lastModified;
-  private KitDescriptorDto clusteringKit;
-  private KitDescriptorDto multiplexingKit;
+  private Long clusterKitId;
+  private Long multiplexingKitId;
   private List<PartitionDto> partitions;
 
   public Long getId() {
@@ -96,20 +104,20 @@ public class ContainerDto implements WritableUrls {
     this.lastSequencerId = lastSequencerId;
   }
 
-  public KitDescriptorDto getClusteringKit() {
-    return clusteringKit;
+  public Long getClusterKitId() {
+    return clusterKitId;
   }
 
-  public void setClusteringKit(KitDescriptorDto clusteringKit) {
-    this.clusteringKit = clusteringKit;
+  public void setClusterKitId(Long clusterKitId) {
+    this.clusterKitId = clusterKitId;
   }
 
-  public KitDescriptorDto getMultiplexingKit() {
-    return multiplexingKit;
+  public Long getMultiplexingKitId() {
+    return multiplexingKitId;
   }
 
-  public void setMultiplexingKit(KitDescriptorDto multiplexingKit) {
-    this.multiplexingKit = multiplexingKit;
+  public void setMultiplexingKitId(Long multiplexingKitId) {
+    this.multiplexingKitId = multiplexingKitId;
   }
 
   public List<PartitionDto> getPartitions() {

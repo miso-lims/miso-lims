@@ -122,9 +122,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
@@ -1687,7 +1689,19 @@ public class Dtos {
   }
 
   public static ContainerDto asDto(@Nonnull SequencerPartitionContainer from, boolean includePartitions, boolean includePoolContents) {
-    ContainerDto dto = new ContainerDto();
+    ContainerDto dto = null;
+    if (from instanceof OxfordNanoporeContainer) {
+      OxfordNanoporeContainer ontFrom = (OxfordNanoporeContainer) from;
+      OxfordNanoporeContainerDto ontDto = new OxfordNanoporeContainerDto();
+      if (ontFrom.getPoreVersion() != null) {
+        ontDto.setPoreVersionId(ontFrom.getPoreVersion().getId());
+      }
+      ontDto.setReceivedDate(formatDate(ontFrom.getReceivedDate()));
+      ontDto.setReturnedDate(formatDate(ontFrom.getReturnedDate()));
+      dto = ontDto;
+    } else {
+      dto = new ContainerDto();
+    }
     dto.setId(from.getId());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setModel(asDto(from.getModel()));
@@ -1702,10 +1716,10 @@ public class Dtos {
       dto.setLastModified(formatDateTime(from.getLastModified()));
     }
     if (from.getClusteringKit() != null) {
-      dto.setClusteringKit(asDto(from.getClusteringKit()));
+      dto.setClusterKitId(from.getClusteringKit().getId());
     }
     if (from.getMultiplexingKit() != null) {
-      dto.setMultiplexingKit(asDto(from.getMultiplexingKit()));
+      dto.setMultiplexingKitId(from.getMultiplexingKit().getId());
     }
 
     if (includePartitions) {
@@ -1717,6 +1731,29 @@ public class Dtos {
   public static List<ContainerDto> asContainerDtos(@Nonnull Collection<SequencerPartitionContainer> containerSubset,
       boolean includeContainerPartitions, boolean includePoolContents) {
     return asContainerDtos(containerSubset, includeContainerPartitions, includePoolContents);
+  }
+
+  public static SequencerPartitionContainer to(@Nonnull ContainerDto from) {
+    SequencerPartitionContainer to = null;
+    if (from instanceof OxfordNanoporeContainerDto) {
+      OxfordNanoporeContainerDto ontFrom = (OxfordNanoporeContainerDto) from;
+      OxfordNanoporeContainer ontTo = new OxfordNanoporeContainer();
+      setObject(ontTo::setPoreVersion, PoreVersion::new, ontFrom.getPoreVersionId());
+      setDate(ontTo::setReceivedDate, ontFrom.getReceivedDate());
+      setDate(ontTo::setReturnedDate, ontFrom.getReturnedDate());
+      to = ontTo;
+    } else {
+      to = new SequencerPartitionContainerImpl();
+    }
+    setLong(to::setId, from.getId(), false);
+    setString(to::setIdentificationBarcode, from.getIdentificationBarcode());
+    setObject(to::setModel, SequencingContainerModel::new, maybeGetProperty(from.getModel(), ContainerModelDto::getId));
+    setObject(to::setClusteringKit, KitDescriptor::new, from.getClusterKitId());
+    setObject(to::setMultiplexingKit, KitDescriptor::new, from.getMultiplexingKitId());
+
+    // Note: partitions not included
+
+    return to;
   }
 
   public static RunPositionDto asDto(@Nonnull RunPosition from) {
@@ -2878,6 +2915,13 @@ public class Dtos {
     return to;
   }
 
+  public static PoreVersionDto asDto(@Nonnull PoreVersion from) {
+    PoreVersionDto dto = new PoreVersionDto();
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setAlias, from.getAlias());
+    return dto;
+  }
+
   private static void setBigDecimal(@Nonnull Consumer<BigDecimal> setter, String value) {
     setter.accept(isStringEmptyOrNull(value) ? null : new BigDecimal(value));
   }
@@ -2892,6 +2936,10 @@ public class Dtos {
 
   private static void setDateString(@Nonnull Consumer<String> setter, Date value) {
     setter.accept(value == null ? null : formatDate(value));
+  }
+
+  private static void setDate(@Nonnull Consumer<Date> setter, String value) {
+    setter.accept(value == null ? null : parseDate(value));
   }
 
   private static void setDateTimeString(@Nonnull Consumer<String> setter, Date value) {

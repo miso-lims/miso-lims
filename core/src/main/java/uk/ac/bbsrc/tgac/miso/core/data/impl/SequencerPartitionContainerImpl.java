@@ -231,6 +231,9 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   @Override
   public Run getLastRun() {
+    if (getRunPositions() == null) {
+      return null;
+    }
     return getRunPositions().stream().map(RunPosition::getRun).filter(r -> r.getStartDate() != null)
         .max((a, b) -> a.getStartDate().compareTo(b.getStartDate()))
         .orElse(null);
