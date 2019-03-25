@@ -131,7 +131,7 @@ ListTarget.library = {
         }, {
           "sTitle": "Warnings",
           "mData": null,
-          "mRender": WarningTarget.library.tableWarnings,
+          "mRender": Warning.tableWarningRenderer(WarningTarget.library),
           "include": true,
           "iSortPriority": 0,
           "bVisible": true,

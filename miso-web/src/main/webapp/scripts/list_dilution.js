@@ -92,7 +92,7 @@ ListTarget.dilution = {
     }, {
       "sTitle": "Warnings",
       "mData": null,
-      "mRender": WarningTarget.dilution.tableWarnings,
+      "mRender": Warning.tableWarningRenderer(WarningTarget.dilution),
       "include": true,
       "iSortPriority": 0,
       "bVisible": true,

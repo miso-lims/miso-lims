@@ -56,10 +56,14 @@ ListTarget.experiment_run_partition = {
       "bSortDirection": true
     }, {
       "sTitle": "Pool",
-      "mData": "partition.pool",
+      "mData": function(full, type) {
+        return full.partition.pool.name + ' (' + full.partition.pool.alias + ')';
+      },
       "include": true,
       "iSortPriority": 0,
-      "mRender": WarningTarget.experiment_run_partition.tableWarnings
+      "mRender": Warning.tableWarningRenderer(WarningTarget.experiment_run_partition, function(data) {
+        return '/miso/pool/' + data.partition.pool.id;
+      })
     }, ];
   }
 };

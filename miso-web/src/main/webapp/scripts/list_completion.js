@@ -71,7 +71,7 @@ ListTarget.completion = {
     }, {
       "sTitle": "Pool Description",
       "mData": "pool.description",
-      "mRender": WarningTarget.completion.tableWarnings,
+      "mRender": Warning.tableWarningRenderer(WarningTarget.completion),
       "bSortable": false,
       "iSortPriority": 0,
       "include": !config.poolId

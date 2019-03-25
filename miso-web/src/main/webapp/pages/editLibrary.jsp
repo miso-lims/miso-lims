@@ -118,7 +118,7 @@
     <td colspan="2" id ="warnings">
       <script>
         jQuery(document).ready(function() {
-          jQuery('#warnings').append(WarningTarget.library.headerWarnings(${libraryDto}));
+          Warning.generateHeaderWarnings('warnings', WarningTarget.library, ${libraryDto});
         });
       </script>
     </td>

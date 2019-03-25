@@ -135,7 +135,7 @@ public class PoolRestController extends RestController {
 
     @Override
     protected PoolDto asDto(Pool model) {
-      return Dtos.asDto(model, false, false);
+      return Dtos.asDto(model, true, false);
     }
 
     @Override

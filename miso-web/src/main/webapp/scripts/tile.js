@@ -33,16 +33,10 @@ var Tile = {
   },
   titleAndStatus: function(label, status) {
     var title = this.title(label);
-
-    title.append(status);
-
+    if (status != null) {
+      title.append(status);
+    }
     return title;
-  },
-  error: function(message) {
-    var errorP = document.createElement("P");
-    errorP.setAttribute("class", "parsley-custom-error-message");
-    errorP.innerText = "⚠ " + message;
-    return errorP;
   },
   lines: function(lines, special) {
     var p = document.createElement("P");

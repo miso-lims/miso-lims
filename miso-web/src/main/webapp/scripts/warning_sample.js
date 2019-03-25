@@ -22,20 +22,16 @@
  */
 
 WarningTarget.sample = {
-    headerWarnings: function(sample){
-      var warnings = [];
-      warnings = Warning.addWarnings([
-        [sample.subprojectPriority, 'Belongs to high priority subproject \'' + sample.subprojectAlias + '\''],
-        [sample.identityConsentLevel === 'Revoked', 'Donor has revoked consent'],
-        ], warnings);
-      return Warning.generateHeaderWarnings(warnings);
-    },
-    tableWarnings: function(data, type, sample){
-      var warnings = [];
-      warnings = Warning.addWarnings([
-        [sample.subprojectPriority, 'PRIORITY (' + sample.subprojectAlias + ')', "info"],
-        [sample.identityConsentLevel === 'Revoked', '(CONSENT REVOKED)'],
-        ], warnings);
-      return Warning.generateTableWarnings(data, warnings);
-    },
+  getWarnings: function(sample) {
+    return [{
+      include: sample.subprojectPriority,
+      headerMessage: 'Belongs to high priority subproject \'' + sample.subprojectAlias + '\'',
+      tableMessage: 'PRIORITY (' + sample.subprojectAlias + ')',
+      level: "info"
+    }, {
+      include: sample.identityConsentLevel === 'Revoked',
+      headerMessage: 'Donor has revoked consent',
+      tableMessage: '(CONSENT REVOKED)'
+    }];
+  }
 };
