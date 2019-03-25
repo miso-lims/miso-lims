@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 /**
  * Page that is mainly composed of a list of fields
@@ -24,11 +25,31 @@ public abstract class FormPage<T extends FormPage.FieldElement> extends HeaderFo
     }
 
     public default String get(WebDriver driver) {
-      By labelSelector = getLabelSelector();
-      if (labelSelector != null && findElementIfExists(driver, labelSelector) != null) {
-        return FieldType.LABEL.getValue(driver, labelSelector);
+      WebElement element = driver.findElement(getSelector());
+      switch (element.getTagName()) {
+      case "td":
+      case "span":
+      case "p":
+        return element.getText();
+      case "select":
+        return getSelectedDropdownText(element);
+      case "textarea":
+        return element.getAttribute("value");
+      case "input":
+        switch (element.getAttribute("type")) {
+        case "text":
+          return element.getAttribute("value");
+        case "checkbox":
+          // "true" or "false"
+          return element.isSelected() ? Boolean.TRUE.toString() : Boolean.FALSE.toString();
+        case "radio":
+          return getSelectedRadioButtonValue(driver.findElements(getSelector()));
+        default:
+          throw new IllegalArgumentException("Unhandled input type: " + element.getAttribute("type"));
+        }
+      default:
+        throw new IllegalArgumentException("Unhandled element type: " + element.getTagName());
       }
-      return getType().getValue(driver, getSelector());
     }
 
     public default void set(WebDriver driver, String value) {

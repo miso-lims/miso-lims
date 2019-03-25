@@ -20,15 +20,6 @@ public abstract class AbstractPage extends AbstractElement {
   protected enum FieldType {
     LABEL() {
       @Override
-      protected String getValue(WebDriver driver, By selector) {
-        WebElement element = driver.findElement(selector);
-        if (isLabel(element)) {
-          return element.getText();
-        }
-        return super.getValue(driver, selector);
-      }
-      
-      @Override
       protected boolean isEditable(WebElement element) {
         // non-input tag is expected
         if (element.getTagName() != "input") {
@@ -36,21 +27,8 @@ public abstract class AbstractPage extends AbstractElement {
         }
         return super.isEditable(element);
       }
-
-      private boolean isLabel(WebElement element) {
-        return "span".equals(element.getTagName());
-      }
     },
     TEXT() {
-      @Override
-      protected String getValue(WebDriver driver, By selector) {
-        WebElement element = driver.findElement(selector);
-        if (!isTextBox(element)) {
-          return element.getText();
-        }
-        return super.getValue(driver, selector);
-      }
-      
       @Override
       protected void setValue(WebDriver driver, By selector, String value) {
         setText(value == null ? "" : value, driver.findElement(selector));
@@ -71,33 +49,11 @@ public abstract class AbstractPage extends AbstractElement {
     },
     TEXTAREA() {
       @Override
-      protected String getValue(WebDriver driver, By selector) {
-        WebElement element = driver.findElement(selector);
-        if (!isTextArea(element)) {
-          return element.getText();
-        }
-        return super.getValue(driver, selector);
-      }
-
-      @Override
       protected void setValue(WebDriver driver, By selector, String value) {
         setText(value == null ? "" : value, driver.findElement(selector));
       }
-
-      private boolean isTextArea(WebElement element) {
-        return "textarea".equals(element.getTagName());
-      }
     },
     RADIO() {
-      @Override
-      protected String getValue(WebDriver driver, By selector) {
-        WebElement element = driver.findElement(selector);
-        if (!isRadioButtons(element)) {
-          return element.getText();
-        }
-        return getSelectedRadioButtonValue(driver.findElements(selector));
-      }
-
       @Override
       protected void setValue(WebDriver driver, By selector, String value) {
         setRadioButton(value == null ? "" : value, driver.findElements(selector));
@@ -108,18 +64,8 @@ public abstract class AbstractPage extends AbstractElement {
         List<WebElement> buttons = driver.findElements(selector);
         return !buttons.isEmpty() && buttons.stream().anyMatch((element) -> element.isDisplayed() && element.isEnabled());
       }
-
-      private boolean isRadioButtons(WebElement element) {
-        return "radio".equals(element.getAttribute("type"));
-      }
     },
     CHECKBOX() {
-      @Override
-      protected String getValue(WebDriver driver, By selector) {
-        // "true" or "false"
-        return driver.findElement(selector).isSelected() ? Boolean.TRUE.toString() : Boolean.FALSE.toString();
-      }
-
       @Override
       protected void setValue(WebDriver driver, By selector, String value) {
         if (!value.equalsIgnoreCase(Boolean.TRUE.toString()) && !value.equalsIgnoreCase(Boolean.FALSE.toString())) {
@@ -129,15 +75,6 @@ public abstract class AbstractPage extends AbstractElement {
       }
     },
     DROPDOWN() {
-      @Override
-      protected String getValue(WebDriver driver, By selector) {
-        WebElement element = driver.findElement(selector);
-        if (!isDropdown(element)) {
-          return element.getText();
-        }
-        return getSelectedDropdownText(driver.findElement(selector));
-      }
-
       @Override
       protected void setValue(WebDriver driver, By selector, String value) {
         setDropdown(value, driver.findElement(selector));
@@ -157,15 +94,6 @@ public abstract class AbstractPage extends AbstractElement {
     },
     DATEPICKER() {
       @Override
-      protected String getValue(WebDriver driver, By selector) {
-        WebElement element = driver.findElement(selector);
-        if (!isTextBox(element)) {
-          return element.getText();
-        }
-        return super.getValue(driver, selector);
-      }
-
-      @Override
       protected void setValue(WebDriver driver, By selector, String value) {
         setText(value == null ? "" : value, driver.findElement(selector));
         ((JavascriptExecutor) driver).executeScript("jQuery('.ui-datepicker').hide();");
@@ -184,10 +112,6 @@ public abstract class AbstractPage extends AbstractElement {
         return "input".equals(element.getTagName());
       }
     };
-
-    protected String getValue(WebDriver driver, By selector) {
-      return driver.findElement(selector).getAttribute("value");
-    }
 
     protected void setValue(WebDriver driver, By selector, String value) {
       throw new UnsupportedOperationException("Field is not modifiable");
