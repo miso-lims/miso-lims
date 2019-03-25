@@ -98,12 +98,12 @@ public class DefaultWorksetService implements WorksetService {
 
   @Override
   public List<Workset> listByLibrary(long libraryId) {
-    return worksetStore.listBySample(libraryId);
+    return worksetStore.listByLibrary(libraryId);
   }
 
   @Override
   public List<Workset> listByDilution(long dilutionId) {
-    return worksetStore.listBySample(dilutionId);
+    return worksetStore.listByDilution(dilutionId);
   }
 
   @Override
