@@ -3,7 +3,7 @@ version: '3.7'
 services:
   db:
     volumes:
-      - "miso_db:/var/lib/mysql"
+      - "miso_plain_db:/var/lib/mysql"
   
   flyway:
     volumes:
@@ -14,5 +14,5 @@ services:
       - "miso_files:/storage/miso/files/"
 
 volumes:
-  miso_db:
+  miso_plain_db:
   miso_files:
