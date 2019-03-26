@@ -50,7 +50,7 @@ public class BoxPageIT extends AbstractIT {
     unsaved.put(Field.LOCATION, "Here");
     page.setFields(unsaved);
 
-    assertEquals("Box ID is unsaved", "Unsaved", page.getField(Field.ID));
+    assertEquals("Box ID is unsaved", "", page.getField(Field.ID));
     assertFieldValues("changes pre-save", unsaved, page);
     BoxPage savedPage = page.clickSave();
     assertFieldValues("changes post-save", unsaved, savedPage);
