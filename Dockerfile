@@ -28,7 +28,7 @@ FROM openjdk:8-jre-alpine as flyway-migration
 ARG FLYWAY_VERSION=3.2.1
 RUN apk --no-cache add --update bash openssl unzip
 
-COPY ./.docker/flyway-migrate.sh ./.docker/wait-for-it.sh /
+COPY ./.docker/run-flyway ./.docker/wait-for-it.sh /
 
 # Add the flyway user and step in the directory
 RUN adduser -S -h /flyway -D flyway
@@ -43,7 +43,8 @@ RUN wget https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${FLYWAY
   && tar -xzf flyway-commandline-${FLYWAY_VERSION}.tar.gz \
   && mv flyway-${FLYWAY_VERSION}/* . \
   && rm flyway-commandline-${FLYWAY_VERSION}.tar.gz \
-  && unzip -xjo ROOT.war 'WEB-INF/lib/sqlstore-*.jar' -d lib
+  && unzip -xjo ROOT.war 'WEB-INF/lib/sqlstore-*.jar' -d lib \
+  && mkdir /flyway/migrations
 
 WORKDIR /
 
@@ -53,7 +54,7 @@ ENV MISO_DB_HOST_PORT db:3306
 ENV MISO_DB_PASS_FILE /run/secrets/lims_password
 ENV MISO_FILES_DIR /storage/miso/files/
 
-CMD bash /wait-for-it.sh -t 0 ${MISO_DB_HOST_PORT} && bash /flyway-migrate.sh
+CMD bash /wait-for-it.sh -t 0 ${MISO_DB_HOST_PORT} && bash /run-flyway migrate
 
 
 #######################################################
