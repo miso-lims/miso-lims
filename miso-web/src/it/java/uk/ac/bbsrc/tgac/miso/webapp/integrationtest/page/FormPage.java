@@ -25,7 +25,13 @@ public abstract class FormPage<T extends FormPage.FieldElement> extends HeaderFo
     }
 
     public default String get(WebDriver driver) {
-      WebElement element = driver.findElement(getSelector());
+      WebElement element = null;
+      if (getLabelSelector() != null) {
+        element = findElementIfExists(driver, getLabelSelector());
+      }
+      if (element == null) {
+        element = driver.findElement(getSelector());
+      }
       switch (element.getTagName()) {
       case "td":
       case "span":
