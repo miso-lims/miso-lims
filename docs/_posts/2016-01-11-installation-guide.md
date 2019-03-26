@@ -13,8 +13,8 @@ The MISO Docker container consist of two parts: the MySQL database and the Tomca
 There are a number of compose files in the miso-lims Github repository:
 
 * docker-compose.yml : starts up plain sample with no local storage
-* docker-compose.override.yml : adds the migrations needed for detailed sample and for orders (Sequencing Parameters, Instruments, Targeted Seqeuencing) and adds volumes to persist data between startups
-* docker-compose.detailed.yml : loads the miso.properties that configures detailed sample + OICR alias autogeneration
+* docker-compose.override.yml : adds the migrations needed for detailed sample and for orders (Sequencing Parameters, Instruments, Targeted Seqeuencing) and adds volumes to persist data between startups.
+* docker-compose.detailed.yml : loads the miso.properties that configures detailed sample + OICR alias autogeneration, and overrides the MySQL volume to be specific for detailed sample and persist between startups.
 * docker-compose.env.yml : allows you to override the environment variables for each service
 * docker-compose.build.yml : builds the flyway and webapp Docker containers using the current state of the miso-lims directory
 * docker-compose.prod.yml : persists the DB and MISO files to permanent locations and starts up a 'production-like' environment with an entirely empty database.
@@ -27,7 +27,26 @@ You can specify multiple compose files when launching docker-compose. For detail
 docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.detailed.yml up 
 ```
 
+Once you are finished with the container, make sure to run `docker-compose down` to clean up the instances and networks. Note that this does not remove the volumes created in docker-compose.override.yml so you can bring down the environment without impacting your data.
+
 For more information on the MISO docker containers, see [miso-lims-migration](https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-migration) and [miso-lims-webapp](https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-webapp) on DockerHub.
+
+## Building docker-compose from the local repository
+
+If you are developing MISO or want to use the MISO code from a particular commit, add a command to build the docker containers using docker-compose.
+
+For example, to build a detailed sample MISO instance from the local repository, run the following command.
+
+```
+docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.build.yml  -f docker-compose.detailed.yml build
+```
+
+This will build each docker image from the local Dockerfile. Then you can run `docker-compose ... up`, making sure to source docker-compose.build.yml again.
+
+```
+docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.build.yml  -f docker-compose.detailed.yml up
+```
+
 
 ## Installing MISO in production using compose
 
@@ -52,6 +71,16 @@ For a detailed sample production-like environment, run
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.detailed.yml up
 ```
 Note: this will override your miso.properties configuration.
+
+## Troubleshooting docker-compose
+
+1. **The flyway-migration container is failing with a "Schema `lims` contains a failed migration to version 0790!" or 
+   similar error.**
+
+    You may have an volume mounted with a MySQL database from a failed migration. You have two options: remove the volume
+    entirely using `docker system prune --volumes` or rename the volume in docker-compose.override.yml (plain sample) or 
+    docker-compose.detailed.yml (detailed sample). Note that using `docker system prune --volumes` will remove _all_ 
+    detached volumes, not just the MISO ones, and this data will be permanently lost.
 
 
 # Installing MISO on baremetal
