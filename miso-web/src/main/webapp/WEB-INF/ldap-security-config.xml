@@ -54,7 +54,7 @@
 
     <security:remember-me data-source-ref="dataSource" user-service-ref="ldapUserAuthService" remember-me-parameter="_spring_security_remember_me" />
 
-    <security:intercept-url pattern="/login.jsp" access="permitAll" />
+    <security:intercept-url pattern="/miso/login" access="permitAll" />
 
     <security:intercept-url pattern="/miso/constants.js" access="permitAll" />
     <security:intercept-url pattern="/miso/admin/**" access="hasRole('ROLE_ADMIN')" />
@@ -63,9 +63,9 @@
 
     <security:intercept-url pattern="/miso/**" access="hasRole('ROLE_INTERNAL')" />
 
-    <security:logout invalidate-session="true" logout-success-url="/loggedOut.jsp" />
+    <security:logout invalidate-session="true" logout-success-url="/miso/login" />
 
-    <security:session-management invalid-session-url="/login.jsp" session-fixation-protection="none" />
+    <security:session-management invalid-session-url="/miso/login" session-fixation-protection="none" />
   </security:http>
 
   <bean id="ajaxSessionFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.AjaxSessionFilter">
@@ -75,14 +75,14 @@
   </bean>
 
   <bean id="invalidSessionStrategy" class="org.springframework.security.web.session.SimpleRedirectInvalidSessionStrategy">
-    <constructor-arg value="/login.jsp" />
+    <constructor-arg value="/miso/login" />
     <property name="createNewSession" value="false" />
   </bean>
 
   <bean id="httpSessionSecurityContextRepository" class="org.springframework.security.web.context.HttpSessionSecurityContextRepository" />
 
   <bean id="loginUrlAuthenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-    <constructor-arg value="/login.jsp" />
+    <constructor-arg value="/miso/login" />
   </bean>
 
   <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
@@ -112,7 +112,7 @@
     <property name="useReferer" value="true" />
   </bean>
   <bean id="failureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
-    <property name="defaultFailureUrl" value="/login.jsp?login_error=1" />
+    <property name="defaultFailureUrl" value="/miso/login?login_error=1" />
   </bean>
 
   <security:authentication-manager alias="authenticationManager">
