@@ -1705,6 +1705,7 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setModel(asDto(from.getModel()));
+    dto.setDescription(from.getDescription());
     Run lastRun = from.getLastRun();
     if (lastRun != null) {
       dto.setLastRunAlias(lastRun.getAlias());
@@ -1716,7 +1717,7 @@ public class Dtos {
       dto.setLastModified(formatDateTime(from.getLastModified()));
     }
     if (from.getClusteringKit() != null) {
-      dto.setClusterKitId(from.getClusteringKit().getId());
+      dto.setClusteringKitId(from.getClusteringKit().getId());
     }
     if (from.getMultiplexingKit() != null) {
       dto.setMultiplexingKitId(from.getMultiplexingKit().getId());
@@ -1748,7 +1749,8 @@ public class Dtos {
     setLong(to::setId, from.getId(), false);
     setString(to::setIdentificationBarcode, from.getIdentificationBarcode());
     setObject(to::setModel, SequencingContainerModel::new, maybeGetProperty(from.getModel(), ContainerModelDto::getId));
-    setObject(to::setClusteringKit, KitDescriptor::new, from.getClusterKitId());
+    setString(to::setDescription, from.getDescription());
+    setObject(to::setClusteringKit, KitDescriptor::new, from.getClusteringKitId());
     setObject(to::setMultiplexingKit, KitDescriptor::new, from.getMultiplexingKitId());
 
     // Note: partitions not included

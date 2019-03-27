@@ -1,7 +1,7 @@
 if (typeof FormTarget === 'undefined') {
   FormTarget = {};
 }
-FormTarget.container = (function($) {
+FormTarget.container = (function() {
 
   return {
     getSaveUrl: function(container) {
@@ -107,4 +107,4 @@ FormTarget.container = (function($) {
     });
   }
 
-})(jQuery);
+})();

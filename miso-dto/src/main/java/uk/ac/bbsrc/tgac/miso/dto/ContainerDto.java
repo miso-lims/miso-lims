@@ -17,12 +17,13 @@ public class ContainerDto implements WritableUrls {
   private String identificationBarcode;
   private String url;
   private ContainerModelDto model;
+  private String description;
   private String lastRunAlias;
   private Long lastRunId;
   private String lastSequencerName;
   private Long lastSequencerId;
   private String lastModified;
-  private Long clusterKitId;
+  private Long clusteringKitId;
   private Long multiplexingKitId;
   private List<PartitionDto> partitions;
 
@@ -56,6 +57,14 @@ public class ContainerDto implements WritableUrls {
 
   public void setModel(ContainerModelDto model) {
     this.model = model;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public String getLastRunAlias() {
@@ -104,12 +113,12 @@ public class ContainerDto implements WritableUrls {
     this.lastSequencerId = lastSequencerId;
   }
 
-  public Long getClusterKitId() {
-    return clusterKitId;
+  public Long getClusteringKitId() {
+    return clusteringKitId;
   }
 
-  public void setClusterKitId(Long clusterKitId) {
-    this.clusterKitId = clusterKitId;
+  public void setClusteringKitId(Long clusteringKitId) {
+    this.clusteringKitId = clusteringKitId;
   }
 
   public Long getMultiplexingKitId() {
