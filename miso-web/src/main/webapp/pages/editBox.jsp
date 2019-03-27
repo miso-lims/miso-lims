@@ -41,13 +41,12 @@
 
 <div id="tab-1">
 
-<form:form id="box-form" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8">
 <h1>
   <c:choose>
     <c:when test="${pageMode eq 'create'}">Create</c:when>
     <c:otherwise>Edit</c:otherwise>
   </c:choose> Box
-  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all" onclick="return Box.validateAndSave();">Save</button>
+  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
   <c:if test="${box.id != 0 && not empty box.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('box', [${box.id}]);">Print Barcode</span></c:if>
@@ -60,115 +59,15 @@
   A Box is subdivided into rows and columns which hold Samples, Libraries, Dilutions, or Pools.
 </div>
 
-<div class="bs-callout bs-callout-warning hidden">
-  <h2>Oh snap!</h2>
-  <p>This form seems to be invalid</p>
-</div>
+<form:form id="boxForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 
-<h2>Box Information</h2>
-<div id="boxInfo">
-  <table class="in">
-    <tr>
-      <td class="h">Box ID:</td>
-      <td><span id="id">Unsaved</span></td>
-    </tr>
-    <tr>
-      <td>Name:</td>
-      <td><span id="name">Unsaved</span></td>
-    </tr>
-    <tr>
-      <td class="h">Alias:*</td>
-      <td>
-        <input type="text" id="alias"/><span id="aliasCounter" class="counter"></span>
-        <div id="aliasError" class="errorContainer"></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="h">Description:</td>
-      <td>
-        <input type="text" id="description"/><span id="descriptionCounter" class="counter"></span>
-        <div id="descriptionError" class="errorContainer"></div>
-      </td>
-    </tr>
-    <c:if test="${not autoGenerateIdBarcodes}">
-      <tr>
-        <td class="h">Matrix Barcode:</td>
-        <td>
-          <input type="text" id="identificationBarcode"/><span id="identificationBarcodeCounter" class="counter"></span>
-          <div id="identificationBarcodeError" class="errorContainer"></div>
-        </td>
-      </tr>
-    </c:if>
-    <tr>
-      <td class="h">Box Use:</td>
-      <td>
-        <select id="boxUse">
-          <c:forEach items="${boxUses}" var="use">
-            <option value="${use.id}">${use.alias}</option>
-          </c:forEach>
-        </select>
-        <div id="boxUseError" class="errorContainer"></div>
-      </td>
-    </tr>
-    <tr>
-      <td>Box Size:</td>
-      <td id=boxSizeCell>
-        <select id="boxSize">
-          <c:forEach items="${boxSizes}" var="size">
-            <option value="${size.id}">${size.getRowsByColumnsWithScan()}</option>
-          </c:forEach>
-        </select>
-        <div id="boxSizeError" class="errorContainer"></div>
-      </td>
-    </tr>
-    <tr>
-      <td>Location:</td>
-      <td>
-        <input type="text" id="locationBarcode"/><span id="locationBarcodeCounter" class="counter"></span>
-        <div id="locationBarcodeError" class="errorContainer"></div>
-      </td>
-    </tr>
-    <tr>
-      <td>Freezer Location:</td>
-      <td>
-        <input id="storageLocation" type="hidden">
-        <span id="freezerLocation"></span>
-      </td>
-    </tr>
-    <tr>
-      <td>Change Location (scan or select):</td>
-      <td>
-        <input id="freezerLocationScan" type="text" style="width: 120px;">
-        <span id="freezerLocationRoot"></span>
-        <select id="freezerLocationSelect" onchange="Box.ui.onLocationSelect()">
-        </select>
-        <img id="freezerLocationLoader" src="/styles/images/ajax-loader.gif" class="fg-button hidden"/>
-        <button id="setFreezerLocation" type="button" class="ui-state-default" onclick="Box.ui.setFreezerLocation()">Set</button>
-        <button id="resetFreezerLocation" type="button" class="ui-state-default" onclick="Box.ui.resetLocationSearch()">Reset</button>
-      </td>
-    </tr>
-  </table>
-</div>
-</form:form>
 </div>
 
 <script type="text/javascript">
   jQuery(document).ready(function () {
     // Attaches form validation listener
     Validate.attachParsley('#box-form');
-    Box.ui.resetLocationSearch();
-    
-    jQuery('#freezerLocationScan').keyup(function(event) {
-      if (event.which == "13") {
-        Box.ui.onLocationScan();
-      }
-    });
-
-    jQuery('#freezerLocationScan').on('paste', function(e) {
-      window.setTimeout(function() {
-        Box.ui.onLocationScan();
-      }, 100);
-    });
+    FormUtils.createForm('boxForm', 'save', ${boxJSON}, 'box', {isNew: ${pageMode eq 'create'}});
   });
 </script>
 
@@ -308,37 +207,6 @@
 </div>
 </div>
 
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    jQuery('#alias').simplyCountable({
-      counter: '#aliasCounter',
-      countType: 'characters',
-      maxCount: ${maxLengths['alias']},
-      countDirection: 'down'
-    });
-
-    jQuery('#description').simplyCountable({
-      counter: '#descriptionCounter',
-      countType: 'characters',
-      maxCount: ${maxLengths['description']},
-      countDirection: 'down'
-    });
-
-    jQuery('#identificationBarcode').simplyCountable({
-      counter: '#identificationBarcodeCounter',
-      countType: 'characters',
-      maxCount: ${maxLengths['identificationBarcode']},
-      countDirection: 'down'
-    });
-
-    jQuery('#locationBarcode').simplyCountable({
-      counter: '#locationBarcodeCounter',
-      countType: 'characters',
-      maxCount: ${maxLengths['locationBarcode']},
-      countDirection: 'down'
-    });
-  });
-</script>
 <%@ include file="adminsub.jsp" %>
 <%@ include file="../footer.jsp" %>
 

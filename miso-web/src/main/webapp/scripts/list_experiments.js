@@ -148,7 +148,7 @@ ListTarget.experiment = {
     return [ListUtils.idHyperlinkColumn("Name", "experiment", "id", Utils.array.getName, 1, true),
         ListUtils.labelHyperlinkColumn("Alias", "experiment", Utils.array.getId, "alias", 0, true), {
           "sTitle": "Platform",
-          "mData": "platform.instrumentModel",
+          "mData": "instrumentModel.alias",
           "include": true,
           "iSortPriority": 0,
         }, ListUtils.labelHyperlinkColumn("Library Name", "library", function(experiment) {

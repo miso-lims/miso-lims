@@ -48,9 +48,9 @@
     <security:custom-filter position="FORM_LOGIN_FILTER" ref="jdbcAuthFilter" />
     <security:remember-me data-source-ref="dataSource" user-service-ref="jdbcUserAuthService" remember-me-parameter="_spring_security_remember_me" />
 
-    <security:logout logout-success-url="/loggedOut.jsp" />
+    <security:logout logout-success-url="/miso/login" />
 
-    <security:intercept-url pattern="/login.jsp" access="permitAll" />
+    <security:intercept-url pattern="/miso/login" access="permitAll" />
 
     <security:intercept-url pattern="/miso/constants.js" access="permitAll" />
     <security:intercept-url pattern="/miso/admin/**" access="hasRole('ROLE_ADMIN')" />
@@ -59,7 +59,7 @@
 
     <security:intercept-url pattern="/miso/**" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
 
-    <security:session-management invalid-session-url="/login.jsp" session-fixation-protection="none" />
+    <security:session-management invalid-session-url="/miso/login" session-fixation-protection="none" />
   </security:http>
 
   <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
@@ -93,7 +93,7 @@
   </bean>
 
   <bean id="loginUrlAuthenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-    <constructor-arg value="/login.jsp" />
+    <constructor-arg value="/miso/login" />
   </bean>
 
   <bean id="jdbcAuthFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
@@ -107,7 +107,7 @@
     <property name="useReferer" value="true" />
   </bean>
   <bean id="failureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
-    <property name="defaultFailureUrl" value="/login.jsp?login_error=1" />
+    <property name="defaultFailureUrl" value="/miso/login?login_error=1" />
   </bean>
 
   <bean id="jdbcUserAuthService" class="uk.ac.bbsrc.tgac.miso.sqlstore.manager.MisoJdbcUserDetailsManager">

@@ -49,7 +49,7 @@ ListTarget.sample = {
         });
         Utils.showConfirmDialog('Delete Samples', 'Delete', lines, function() {
           Utils.ajaxWithDialog('Deleting Samples', 'POST', '/miso/rest/sample/bulk-delete', ids, function() {
-            window.location = window.location.origin + '/miso/samples';
+            Utils.page.pageReload();
           });
         });
       }
@@ -148,7 +148,7 @@ ListTarget.sample = {
         }, {
           "sTitle": "Warnings",
           "mData": null,
-          "mRender": WarningTarget.sample.tableWarnings,
+          "mRender": Warning.tableWarningRenderer(WarningTarget.sample),
           "include": true,
           "iSortPriority": 0,
           "bVisible": true,

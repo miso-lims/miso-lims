@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  db:
+    volumes:
+      - "miso_detailed_db:/var/lib/mysql"
+  webapp:
+    volumes:
+      - ".docker/detailed_sample_config/miso.properties:/usr/local/tomcat/conf/Catalina/localhost/miso.properties"
+      
+volumes:
+  miso_detailed_db:

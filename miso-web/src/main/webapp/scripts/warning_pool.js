@@ -22,61 +22,52 @@
  */
 
 WarningTarget.pool = {
-  headerWarnings: function(pool){
+  getWarnings: function(pool) {
     var revokedDilutions = [];
-    if(pool.pooledElements){
-      revokedDilutions = pool.pooledElements.filter(function(dilution){
+    if (pool.pooledElements) {
+      revokedDilutions = pool.pooledElements.filter(function(dilution) {
         return dilution.identityConsentLevel === 'Revoked';
-      }).map(function(dilution){
+      }).map(function(dilution) {
         return dilution.name;
       })
     }
-    var warnings = [];
-    warnings = Warning.addWarnings([
-      [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0, 'Belongs to high priority subproject'
-        + (pool.prioritySubprojectAliases.length == 1 ? ' \'' + pool.prioritySubprojectAliases[0] + '\'' :
-          's: ' + pool.prioritySubprojectAliases.join(', '))],
-      [pool.duplicateIndices, "This pool contains duplicate indices!"],
-      [pool.nearDuplicateIndices && !pool.duplicateIndices, "This pool contains near-duplicate indices!"],
-      [pool.hasEmptySequence, "This pool contains at least one library with no index!"],
-      [pool.hasLowQualityLibraries, "This pool contains at least one low quality library!"],
-      [revokedDilutions.length > 0, "Donor has revoked consent for " + revokedDilutions.toString()]
-      ], warnings);
-    return Warning.generateHeaderWarnings(warnings);
-  },
-  tableWarnings: function(data, type, pool){
-    var warnings = [];
-    warnings = Warning.addWarnings([
-      [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0,
-        'PRIORITY ('
-        + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] : 'MULTIPLE')
-        + ')', "info"],
-      [pool.duplicateIndices, "(DUPLICATE INDICES)"],
-      [pool.nearDuplicateIndices && !pool.duplicateIndices, "(NEAR-DUPLICATE INDICES)"],
-      [pool.hasEmptySequence, "(MISSING INDEX)"],
-      [pool.hasLowQualityLibraries, "(LOW QUALITY LIBRARIES)"],
-      [pool.pooledElements && pool.pooledElements.some(function(dilution){
-        return dilution.identityConsentLevel === 'Revoked';
-      }), "(CONSENT REVOKED)"]
-      ], warnings);
-    return Warning.generateTableWarnings(data, warnings);
-  },
-  tileWarnings: function(pool){
-    var warnings = [];
-    warnings = Warning.addWarnings([
-      [pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0,
-        'PRIORITY ('
-        + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] :
-          pool.prioritySubprojectAliases.join(', ')) + ')', "info"],
-      [pool.duplicateIndices, "DUPLICATE INDICES"],
-      [pool.nearDuplicateIndices && !pool.duplicateIndices, "NEAR-DUPLICATE INDICES"],
-      [pool.hasEmptySequence, "MISSING INDEX"],
-      [pool.hasLowQualityLibraries, "LOW QUALITY LIBRARIES"],
-      [pool.pooledElements && pool.pooledElements.some(function(dilution){
-        return dilution.identityConsentLevel === 'Revoked';
-      }), "CONSENT REVOKED"]
-      ], warnings);
-    return Warning.generateTileWarnings(warnings);
-  },
-  
+    return [
+        {
+          include: pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0,
+          headerMessage: 'Belongs to high priority subproject'
+              + (pool.prioritySubprojectAliases.length == 1 ? ' \'' + pool.prioritySubprojectAliases[0] + '\'' : 's: '
+                  + pool.prioritySubprojectAliases.join(', ')),
+          tableMessage: 'PRIORITY (' + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] : 'MULTIPLE') + ')',
+          tileMessage: 'PRIORITY ('
+              + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] : pool.prioritySubprojectAliases.join(', '))
+              + ')',
+          level: 'info'
+        }, {
+          include: pool.duplicateIndices,
+          headerMessage: 'This pool contains duplicate indices!',
+          tableMessage: '(DUPLICATE INDICES)',
+          tileMessage: 'DUPLICATE INDICES'
+        }, {
+          include: pool.nearDuplicateIndices && !pool.duplicateIndices,
+          headerMessage: 'This pool contains near-duplicate indices!',
+          tableMessage: '(NEAR-DUPLICATE INDICES)',
+          tileMessage: 'NEAR-DUPLICATE INDICES'
+        }, {
+          include: pool.hasEmptySequence,
+          headerMessage: 'This pool contains at least one library with no index!',
+          tableMessage: '(MISSING INDEX)',
+          tileMessage: 'MISSING INDEX'
+        }, {
+          include: pool.hasLowQualityLibraries,
+          headerMessage: 'This pool contains at least one low quality library!',
+          tableMessage: '(LOW QUALITY LIBRARIES)',
+          tileMessage: 'LOW QUALITY LIBRARIES'
+        }, {
+          include: revokedDilutions.length > 0,
+          headerMessage: "Donor has revoked consent for " + revokedDilutions.toString(),
+          tableMessage: '(CONSENT REVOKED)',
+          tileMessage: 'CONSENT REVOKED'
+        }];
+  }
+
 };

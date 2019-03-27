@@ -86,16 +86,16 @@ Note that the sequencing platform must be entered in all caps.
 
 ## Instruments
 
-Each instrument has a platform, an instrument model, a serial number, an IP address, a date the instrument was put into service (commissionedDate), an optional date the instrument was taken out of service (decommissionedDate), and an optional reference to the sequencer that this instrument was upgraded to.
+Each instrument has a platform, an instrument model, a serial number, a date the instrument was put into service (commissionedDate), an optional date the instrument was taken out of service (decommissionedDate), and an optional reference to the sequencer that this instrument was upgraded to.
 Instruments can also be added to MISO by admin users.
 
 ```
-addInstrument(name, platform, instrumentModel, serialNumber, ipAddress, commissionedDate, decommissionedDate, upgradedInstrumentName);
+addInstrument(name, platform, instrumentModel, serialNumber, commissionedDate, decommissionedDate, upgradedInstrumentName);
 ```
 
 For instance, to add an Illumina HiSeq 2000 which was later upgraded to a HiSeq2500:
 ```
-CALL addInstrument('h501', 'ILLUMINA', 'Illumina HiSeq 2000', '12345', 'localhost', '2015-01-07', '2016-05-19', 'SN501');
+CALL addInstrument('h501', 'ILLUMINA', 'Illumina HiSeq 2000', '12345', '2015-01-07', '2016-05-19', 'SN501');
 ```
 Note that the platform must be in all caps, and the instrumentModel must be an exact match for a value in `Platform.instrumentModel`.
 Note also that if adding an instrument which references an upgraded instrument, the upgraded instrument must already exist in MISO. If the instrument to be added has not been upgraded, set upgradedInstrumentName to `NULL`.
@@ -152,12 +152,12 @@ Note that special characters should be HTML-encoded. If your lab does Qubit for 
 
 A `KitDescriptor` has a name, version, manufacturer, part number, kit type (Library, Multiplexing, Sequencing), sequencing platform, and description. Note that while the MISO database does have a `Kit` table, it is not accessible from the user interface at this time. There are plans to add a kit tracking feature to MISO in the future.
 ```
-addKitDescriptor(name, version, partNumber, kitType, platform, description);
+addKitDescriptor(name, version, manufacturer, partNumber, kitType, platform, description);
 ```
 
 For example, to add a Nextera library prep kit:
 ```
-CALL addKitDescriptor('Nextera DNA Exome', 1, 1, 'LIBRARY', 'ILLUMINA', 'Previously known as the TruSeq Rapid Exome Library Prep Kit');
+CALL addKitDescriptor('Nextera DNA Exome', 1, 'Nextera', 1, 'LIBRARY', 'ILLUMINA', 'Previously known as the TruSeq Rapid Exome Library Prep Kit');
 ```
 Note that the kit type and sequencing platform must be entered in all caps.
 <a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_kit.sql">Source</a>
@@ -288,4 +288,6 @@ CALL addContainerModel('Mid Output Flow Cell Cartridge V2', '15065974', 4, 'ILLU
 ```
 
 *HiSeq X*
-`CALL addContainerModel('HiSeq X', NULL, 8, 'ILLUMINA', 'Illumina HiSeq X');`
+```
+CALL addContainerModel('HiSeq X', NULL, 8, 'ILLUMINA', 'Illumina HiSeq X');
+```

@@ -1,3 +1,18 @@
+# 0.2.168
+
+Changes:
+
+ * Updated to use Run Scanner v1.4.2
+ * Add detailed sample docker-compose and demo data for plain sample
+ * Display instance name on login page
+ * Added Illumina NovaSeq 6000 instrument model (if missing)
+ * Fixed deleting libraries and dilutions from worksets list
+ * Stay on same page after deleting items
+ * Improved OicrLibraryAliasGenerator error messages
+ * Fixed warnings in assign pool dialog
+ * Use bulk tables instead of dialogs for creating dilutions and orders
+ * Fixed some stored procedures
+
 # 0.2.167
 
 Changes:

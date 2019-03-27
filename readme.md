@@ -28,17 +28,27 @@
 The simplest way to get MISO up and running quickly is to use
 [Docker](https://www.docker.com/) compose. Images of the most recent MISO releases are
 available on Docker Hub in
-[misolims](https://hub.docker.com/r/misolims/). 
+the [misolims](https://hub.docker.com/r/misolims/) organisation. 
 
-To use it:
+To use it, install required dependencies:
 
 1. [Install Docker 18.06.0+](https://docs.docker.com/install/)
 1. If necessary, [install Docker Compose](https://docs.docker.com/compose/install/)
-1. Launch with Docker Compose:
+
+There are two available modes for MISO to run in: plain sample mode, used by 
+Earlham Institute, and detailed sample mode, used by Ontario Institute for 
+Cancer Research. 
+
+**Plain sample mode** has a straightforward Sample -> Library -> Dilution -> 
+Pool workflow and is sufficient for basic laboratory tracking for sequencing.
+
+Launch the plain sample demo with docker-compose:
 
 ```bash
 # download the docker-compose file
 wget https://raw.githubusercontent.com/TGAC/miso-lims/master/docker-compose.yml -O docker-compose.yml
+wget https://raw.githubusercontent.com/TGAC/miso-lims/master/docker-compose.override.yml -O docker-compose.override.yml
+
 # set the password for the database
 echo "changeme" > ./.miso_db_password
 # set required environment variables
@@ -49,21 +59,43 @@ docker-compose up
 Navigate to [http://localhost:8090](http://localhost:8090) to login to miso with
 the credentials **admin/admin**.
 
-Please add a sequencing _Instrument_ before you attempt to create libraries, as 
-libraries can only be created for platforms with active (non-retired) instruments.
+**Detailed sample mode** has all of the features of plain sample mode, plus it
+allows users to build a hierarchy of Samples (e.g. Identity -> Tissue -> Slide 
+-> gDNA (stock) -> gDNA (aliquot) and also includes alias autogeneration.
 
-The default docker-compose.yml file creates Docker volumes for the MISO DB 
+Launch the detailed sample demo with docker-compose:
+
+```bash
+# download the docker-compose file
+wget https://raw.githubusercontent.com/TGAC/miso-lims/master/docker-compose.yml -O docker-compose.yml
+wget https://raw.githubusercontent.com/TGAC/miso-lims/master/docker-compose.override.yml -O docker-compose.override.yml
+wget https://raw.githubusercontent.com/TGAC/miso-lims/master/docker-compose.detailed.yml -O docker-compose.detailed.yml
+
+# set the password for the database
+echo "changeme" > ./.miso_db_password
+# set required environment variables
+export MISO_DB_USER=tgaclims MISO_DB=lims MISO_DB_PASSWORD_FILE=./.miso_db_password MISO_TAG=latest
+docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.detailed.yml up
+```
+
+Navigate to [http://localhost:8090](http://localhost:8090) to login to miso with
+the credentials **admin/admin**.
+
+The docker-compose.override.yml file creates Docker volumes for the MISO DB 
 (miso_db) and files uploaded into MISO (miso_files) and these will persist 
 across multiple startups until the Docker environment is pruned. As such, it is 
 intended as a demonstration and __not a permanent installation__. Please see
 [miso-lims-webapp](https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-webapp)
-on DockerHub for more information on configuring the Compose file.
+on DockerHub for more information on configuring the containers and the compose files.
 
 
 ## User Tutorial
 
-There is a [tutorial available](https://oicr-gsi.github.io/miso-docs-oicr/plain-index)
-for introducing new users to MISO's functionality. Some of the resources (MISO URL,
+There are tutorials available to introduce and train new users to MISO's functionality.  
+* [Plain sample tutorials](https://oicr-gsi.github.io/miso-docs-oicr/plain-index)
+* [Detailed sample tutorials](https://oicr-gsi.github.io/miso-docs-oicr)
+
+Some of the resources (MISO URL,
 ways of contacting the MISO administrators) can be changed by forking and configuring
 the [tutorial repository](https://github.com/oicr-gsi/miso-docs-oicr) to suit your
 lab's specific needs.

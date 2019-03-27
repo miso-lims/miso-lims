@@ -41,7 +41,7 @@ ListTarget.library = {
             });
             Utils.showConfirmDialog('Delete Libraries', 'Delete', lines, function() {
               Utils.ajaxWithDialog('Deleting Libraries', 'POST', '/miso/rest/library/bulk-delete', ids, function() {
-                window.location = window.location.origin + '/miso/libraries';
+                Utils.page.pageReload();
               });
             });
           }
@@ -131,7 +131,7 @@ ListTarget.library = {
         }, {
           "sTitle": "Warnings",
           "mData": null,
-          "mRender": WarningTarget.library.tableWarnings,
+          "mRender": Warning.tableWarningRenderer(WarningTarget.library),
           "include": true,
           "iSortPriority": 0,
           "bVisible": true,

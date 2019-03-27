@@ -45,7 +45,7 @@ ListTarget.pool = {
         });
         Utils.showConfirmDialog('Delete Pools', 'Delete', lines, function() {
           Utils.ajaxWithDialog('Deleting Pools', 'POST', '/miso/rest/pool/bulk-delete', ids, function() {
-            window.location = window.location.origin + '/miso/pools';
+            Utils.page.pageReload();
           });
         });
       }
@@ -92,7 +92,7 @@ ListTarget.pool = {
         ListUtils.labelHyperlinkColumn("Alias", "pool", Utils.array.getId, "alias", 0, true), {
           "sTitle": "Description",
           "mData": "description",
-          "mRender": WarningTarget.pool.tableWarnings,
+          "mRender": Warning.tableWarningRenderer(WarningTarget.pool),
           "include": true,
           "iSortPriority": 0,
           "bSortable": false

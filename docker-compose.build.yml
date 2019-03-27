@@ -1,0 +1,22 @@
+version: '3.7'
+
+# This version uses the current working directory instead of a pre-built image 
+# for docker-compose and defines all environment variables explicitly.
+#
+# .env file or shell environment variables should contain the following: 
+# MISO_DB_USER : name of the MySQL user who accesses MISO_DB [tgaclims]
+# MISO_DB : name of the LIMS Db in MySql [lims]
+# MISO_DB_PASSWORD_FILE : path to the file with the password to the MySQL DB for user MISO_DB_USER
+
+services:
+  flyway:
+    build:
+      context: .
+      target: flyway-migration
+      args:
+        FLYWAY_VERSION: 3.2.1
+
+  webapp:
+    build:
+      context: .
+      target: webapp

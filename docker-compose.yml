@@ -21,8 +21,6 @@ services:
       MYSQL_DATABASE: ${MISO_DB}
       MYSQL_USER: ${MISO_DB_USER}
       MYSQL_PASSWORD_FILE: /run/secrets/lims_password
-    volumes:
-      - "miso_db:/var/lib/mysql"
     secrets:
       - lims_password
 
@@ -43,8 +41,6 @@ services:
       - "8090:8080"
     secrets:
       - lims_password
-    volumes:
-      - "miso_files:/storage/miso/files/"
     links:
       - db
       - flyway
@@ -52,7 +48,3 @@ services:
       - db
       - flyway
 
-
-volumes:
-  miso_db:
-  miso_files:

@@ -22,34 +22,35 @@
  */
 
 WarningTarget.partition = {
-  tableWarnings: function(data, type, full) {
-    if (!data) {
-      if (type === 'display') {
-        return "(None)";
-      } else {
-        return "";
-      }
+  getWarnings: function(data) {
+    var pool = data.pool;
+    if (!pool) {
+      return [];
     }
-    var prettyName = data.name + " (" + data.alias + ")";
-    if (type === 'display') {
-      var warnings = [];
-      warnings = Warning.addWarnings([
-        [data.prioritySubprojectAliases && data.prioritySubprojectAliases.length > 0,
-          'PRIORITY ('
-          + (data.prioritySubprojectAliases.length == 1 ? data.prioritySubprojectAliases[0] : 'MULTIPLE')
-          + ')', "info"],
-        [data.duplicateIndices, "(DUPLICATE INDICES)"],
-        [data.nearDuplicateIndices && !data.duplicateIndices, "(NEAR-DUPLICATE INDICES)"],
-        [data.hasEmptySequence, "(MISSING INDEX)"],
-        [data.hasLowQualityLibraries, "(LOW QUALITY LIBRARIES)"],
-        [data.pooledElements && data.pooledElements.some(function(dilution){
-          return dilution.identityConsentLevel === 'Revoked';
-        }), "(CONSENT REVOKED)"]
-        ], warnings);
-      return Warning.generateTableWarnings("<a href=\"/miso/pool/" + data.id + "\">" + prettyName + "</a>", warnings);
-    } else {
-      return prettyName;
-    }
-
+    return [
+        {
+          include: pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0,
+          tableMessage: 'PRIORITY ('
+              + (pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0]
+                  : 'MULTIPLE') + ')',
+          level: "info"
+        }, {
+          include: pool.duplicateIndices,
+          tableMessage: "(DUPLICATE INDICES)"
+        }, {
+          include: pool.nearDuplicateIndices && !pool.duplicateIndices,
+          tableMessage: "(NEAR-DUPLICATE INDICES)"
+        }, {
+          include: pool.hasEmptySequence,
+          tableMessage: "(MISSING INDEX)"
+        }, {
+          include: pool.hasLowQualityLibraries,
+          tableMessage: "(LOW QUALITY LIBRARIES)"
+        }, {
+          include: pool.pooledElements && pool.pooledElements.some(function(dilution) {
+            return dilution.identityConsentLevel === 'Revoked';
+          }),
+          tableMessage: "(CONSENT REVOKED)"
+        }];
   }
 };

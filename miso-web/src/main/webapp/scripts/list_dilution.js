@@ -44,7 +44,7 @@ ListTarget.dilution = {
         });
         Utils.showConfirmDialog('Delete Library Dilutions', 'Delete', lines, function() {
           Utils.ajaxWithDialog('Deleting Library Dilutions', 'POST', '/miso/rest/librarydilution/bulk-delete', ids, function() {
-            window.location = window.location.origin + '/miso/dilutions';
+            Utils.page.pageReload();
           });
         });
       }
@@ -56,84 +56,27 @@ ListTarget.dilution = {
     return config.library ? [{
       "name": "Create",
       "handler": function() {
-        var fields = [{
-          property: "identificationBarcode",
-          type: "text",
-          label: "Matrix Barcode",
-          required: false
-        }, {
-          property: "concentration",
-          type: "float",
-          label: "Conc.",
-          required: true
-        }, {
-          property: "concentrationUnits",
-          type: "text",
-          label: "Conc. Units",
-          required: false
-        }, {
-          property: "creationDate",
-          type: "date",
-          label: "Creation Date",
-          required: true
-        }];
-        if (Constants.isDetailedSample) {
-          fields.push({
-            property: "targetedSequencing",
-            type: "select",
-            values: [{
-              "alias": "(None)",
-              "id": 0
-            }].concat(Constants.targetedSequencings.filter(function(targetedSequencing) {
-              return targetedSequencing.kitDescriptorIds.indexOf(config.library.kitDescriptorId) != -1;
-            }).sort(function(a, b) {
-              return a.alias.localeCompare(b.alias);
-            })),
-            getLabel: Utils.array.getAlias,
-            label: "Targeted Sequencing",
-            required: true
+        HotUtils.warnIfConsentRevoked([config.library], function() {
+          var fields = [ListUtils.createBoxField];
+          Utils.showDialog('Make Dilution', 'Create', fields, function(result) {
+            var params = {
+              ids: config.library.id
+            }
+            var loadPage = function() {
+              window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate?' + jQuery.param(params);
+            }
+            if (result.createBox) {
+              Utils.createBoxDialog(result, function(result) {
+                return 1;
+              }, function(newBox) {
+                params['boxId'] = newBox.id;
+                loadPage();
+              });
+            } else {
+              loadPage();
+            }
           });
-        }
-
-        fields.push(ListUtils.createBoxField)
-
-        Utils.showDialog("Create Dilution", "Create", fields, function(dil) {
-          var newDil = {
-            "library": config.library,
-            "name": dil.name,
-            "identificationBarcode": dil.identificationBarcode,
-            "concentration": dil.concentration,
-            "concentrationUnits": dil.concentrationUnits,
-            "ngUsed": dil.ngUsed,
-            "volumeUsed": dil.volumeUsed,
-            "creationDate": dil.creationDate,
-            "targetedSequencingId": dil.targetedSequencing && dil.targetedSequencing.id != 0 ? dil.targetedSequencing.id : null
-          }
-          var makeDilution = function() {
-            Utils.ajaxWithDialog('Saving Dilution', 'POST', '/miso/rest/librarydilution', newDil, Utils.page.pageReload);
-          }
-          if (dil.createBox) {
-            Utils.createBoxDialog(dil, function(result) {
-              return 1;
-            }, function(newBox) {
-              var boxFields = [{
-                property: 'position',
-                type: 'select',
-                label: 'Box Position',
-                values: Utils.getEmptyBoxPositions(newBox),
-                required: true
-              }];
-              Utils.showDialog("Select Box Position", "Select", boxFields, function(box) {
-                newDil['box'] = newBox;
-                newDil['boxPosition'] = box.position;
-                makeDilution();
-              })
-            });
-          } else {
-            makeDilution();
-          }
         });
-
       }
     }] : [];
   },
@@ -149,7 +92,7 @@ ListTarget.dilution = {
     }, {
       "sTitle": "Warnings",
       "mData": null,
-      "mRender": WarningTarget.dilution.tableWarnings,
+      "mRender": Warning.tableWarningRenderer(WarningTarget.dilution),
       "include": true,
       "iSortPriority": 0,
       "bVisible": true,

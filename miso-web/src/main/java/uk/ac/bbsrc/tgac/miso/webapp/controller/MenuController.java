@@ -48,6 +48,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.ModelAndView;
@@ -203,6 +204,11 @@ public class MenuController implements ServletContextAware {
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
     return autoGenerateIdBarcodes;
+  }
+
+  @RequestMapping("/login")
+  public ModelAndView loginPage(ModelMap model, @RequestParam(name = "login_error", required = false) Integer loginError) {
+    return new ModelAndView("/login.jsp", model);
   }
 
   @RequestMapping("/myAccount")

@@ -73,7 +73,7 @@
       <td colspan="2" id="warnings">
         <script>
             jQuery(document).ready(function() {
-                jQuery('#warnings').append(WarningTarget.pool.headerWarnings(${poolDto}));
+              Warning.generateHeaderWarnings('warnings', WarningTarget.pool, ${poolDto});
             });
         </script>
       </td>

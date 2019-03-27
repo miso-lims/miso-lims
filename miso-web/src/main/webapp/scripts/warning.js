@@ -22,38 +22,64 @@
  */
 
 var WarningTarget = {};
-var Warning = {
-  generateHeaderWarnings: function(warnings){
-    if(warnings.length == 0){
-      return;
-    }
-    var html = '<span style="float:right;"><img src="/styles/images/fail.png"/></span>';
-    warnings.forEach(function(warning){
-      html += '<p class="big-warning">' + warning + '</p>';
-    });
-    return html;
-  },
-  generateTableWarnings: function(data, warnings){
-    var html = data ? data : "";
-    warnings.forEach(function(warning){
-      html += " <span class='parsley-custom-error-message'><strong>" + warning + "</strong></span>";
-    });
-    return html;
-  },
-  generateTileWarnings: function(warnings){
-    return warnings.map(Tile.error);
-  },
+var Warning = (function($) {
 
-  addWarnings: function(warningConditions, oldWarnings){
-    warningConditions.forEach(function(warningCondition){
-      if(warningCondition[0]){
-        if(warningCondition[2] === null){
-            warningCondition[2] = "error";
-        }
-        oldWarnings.push("<span class='message-" + warningCondition[2] + "'>" + warningCondition[1] + "</span>");
+  return {
+    generateHeaderWarnings: function(containerId, target, item) {
+      // Note: header warnings currently ignore the warning level and show all warnings in red
+      var warnings = getWarnings(target, item);
+      if (warnings.length == 0) {
+        return;
       }
-    })
-    return oldWarnings;
-  },
-  
-};
+      var container = $('#' + containerId);
+      container.append($('<span>').css('float', 'right').append($('<img>').attr('src', '/styles/images/fail.png')));
+      warnings.forEach(function(warning) {
+        container.append($('<p>').addClass('big-warning').text(warning.headerMessage));
+      });
+    },
+
+    tableWarningRenderer: function(target, makeLink) {
+      return function(data, type, full) {
+        if (type !== 'display') {
+          return data || '';
+        }
+        var html = '';
+        if (data) {
+          var link = makeLink ? makeLink(full) : null;
+          if (link) {
+            html += '<a href="' + link + '">';
+          }
+          html += data;
+          if (link) {
+            html += '</a>';
+          }
+        }
+        getWarnings(target, full).forEach(function(warning) {
+          html += ' <span class="message-' + (warning.level || 'error') + '"><strong>' + warning.tableMessage + '</strong></span>';
+        });
+        return html;
+      };
+    },
+
+    hasWarnings: function(target, item) {
+      return getWarnings(target, item).length > 0;
+    },
+
+    generateTileWarnings: function(target, item) {
+      return getWarnings(target, item).map(function(warning) {
+        var errorP = document.createElement('P');
+        errorP.setAttribute('class', 'message-' + (warning.level || 'error'));
+        errorP.innerText = "⚠ " + warning.tileMessage;
+        return errorP;
+      });
+    }
+  }
+
+  function getWarnings(target, item) {
+    // warnings: { include: boolean, tileMessage: string, tableMessage: string, headerMessage: string, level: string ('info'|'error') }
+    return target.getWarnings(item).filter(function(warning) {
+      return warning.include;
+    });
+  }
+
+}(jQuery));
