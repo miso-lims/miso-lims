@@ -43,8 +43,7 @@ public class DefaultLibraryAliasGenerator implements NameGenerator<Library> {
         } while (siblingAliases.contains(alias));
         return alias;
       } else {
-        throw new MisoNamingException(
-            "Cannot generate Library alias for: " + library.toString() + " from supplied sample alias: " + library.getSample().getAlias());
+        throw new MisoNamingException("Cannot generate Library alias from supplied sample alias: " + library.getSample().getAlias());
       }
     } else {
       throw new NullPointerException("This alias generation scheme requires the Library to have a parent Sample set.");

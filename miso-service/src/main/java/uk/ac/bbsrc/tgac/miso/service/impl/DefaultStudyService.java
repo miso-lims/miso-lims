@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -54,7 +56,7 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
 
   @Override
   public Map<String, Integer> getColumnSizes() throws IOException {
-    return ValidationUtils.adjustNameLength(studyStore.getStudyColumnSizes(), namingScheme);
+    return adjustNameLength(studyStore.getStudyColumnSizes(), namingScheme);
   }
 
   public ProjectStore getProjectStore() {
@@ -100,7 +102,7 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
       long id = studyStore.save(study);
       try {
         study.setName(namingScheme.generateNameFor(study));
-        LimsUtils.validateNameOrThrow(study, namingScheme);
+        validateNameOrThrow(study, namingScheme);
         studyStore.save(study);
       } catch (MisoNamingException e) {
         throw new IOException(e);

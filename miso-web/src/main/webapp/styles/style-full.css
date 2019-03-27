@@ -28,7 +28,7 @@ h1 {
 h2 {
     font-size: 1.2em;
     padding: 0;
-    margin: 0;
+    margin: 0.8em 0em 0em 0em;
     color: #666666;
 }
 
@@ -183,7 +183,6 @@ div.lowquality div {
 
 div.menu {
     margin: 0;
-    margin-bottom: 0.8em;
 }
 
 div.menu a {
@@ -1897,10 +1896,17 @@ img.center {
   color: #b23115;
 }
 
-.big-warning {
+.big-info {
   font-size:200%;
   font-weight:bold;
-  color:#a93232;
+  color:#5560ff;
+  margin-top:0px
+}
+
+.big-error {
+  font-size:200%;
+  font-weight:bold;
+  color:#ff0000;
   margin-top:0px
 }
 

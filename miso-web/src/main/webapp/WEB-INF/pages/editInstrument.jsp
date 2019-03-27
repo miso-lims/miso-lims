@@ -72,7 +72,7 @@
       <c:choose>
         <c:when test="${instrument.isOutOfService()}"><p class="big-warning">Out of Service</p></c:when>
         <c:when test="${not empty instrument.getOutOfServicePositions()}">
-          <p class="big-warning">${instrument.getOutOfServicePositionsLabel()} out of service</p>
+          <p class="big-error">${instrument.getOutOfServicePositionsLabel()} out of service</p>
         </c:when>
       </c:choose>
 

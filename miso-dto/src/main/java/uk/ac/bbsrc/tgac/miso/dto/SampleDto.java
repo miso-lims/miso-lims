@@ -55,6 +55,9 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
   private Boolean qcPassed;
   private String alias;
   private Long projectId;
+  private String projectName;
+  private String projectAlias;
+  private String projectShortName;
   private String scientificName;
   private String taxonIdentifier;
   private Long rootSampleClassId;
@@ -180,6 +183,30 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setProjectId(Long projectId) {
     this.projectId = projectId;
+  }
+
+  public String getProjectName() {
+    return projectName;
+  }
+
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
+  }
+
+  public String getProjectAlias() {
+    return projectAlias;
+  }
+
+  public void setProjectAlias(String projectAlias) {
+    this.projectAlias = projectAlias;
+  }
+
+  public String getProjectShortName() {
+    return projectShortName;
+  }
+
+  public void setProjectShortName(String projectShortName) {
+    this.projectShortName = projectShortName;
   }
 
   public String getScientificName() {

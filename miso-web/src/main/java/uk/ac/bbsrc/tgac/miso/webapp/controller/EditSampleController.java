@@ -23,18 +23,13 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
-
-import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,9 +43,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,13 +57,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -78,9 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
-import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -88,32 +74,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
-import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
-import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleBuilder;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
-import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
 import uk.ac.bbsrc.tgac.miso.dto.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotSingleCellDto;
@@ -130,19 +98,13 @@ import uk.ac.bbsrc.tgac.miso.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
-import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
-import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
-import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
-import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
-import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
-import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
@@ -160,8 +122,6 @@ public class EditSampleController {
 
   @Autowired
   private ProjectService projectService;
-  @Autowired
-  private NamingScheme namingScheme;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -185,10 +145,6 @@ public class EditSampleController {
     this.projectService = projectService;
   }
 
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
-  }
-
   public void setSampleService(SampleService sampleService) {
     this.sampleService = sampleService;
   }
@@ -209,41 +165,12 @@ public class EditSampleController {
     this.sampleClassService = sampleClassService;
   }
 
-  public void setTissueOriginService(TissueOriginService tissueOriginService) {
-    this.tissueOriginService = tissueOriginService;
-  }
-
-  public void setTissueTypeService(TissueTypeService tissueTypeService) {
-    this.tissueTypeService = tissueTypeService;
-  }
-
-  public void setDetailedQcStatusService(DetailedQcStatusService detailedQcStatusService) {
-    this.detailedQcStatusService = detailedQcStatusService;
-  }
-
-  public void setLabService(LabService labService) {
-    this.labService = labService;
-  }
-
-  public void setSamplePurposeService(SamplePurposeService samplePurposeService) {
-    this.samplePurposeService = samplePurposeService;
-  }
-
-  public void setTissueMaterialService(TissueMaterialService tissueMaterialService) {
-    this.tissueMaterialService = tissueMaterialService;
-  }
-
   public RunService getRunService() {
     return runService;
   }
 
   public void setRunService(RunService runService) {
     this.runService = runService;
-  }
-
-  @ModelAttribute("aliasGenerationEnabled")
-  public Boolean isAliasGenerationEnabled() {
-    return namingScheme != null && namingScheme.hasSampleAliasGenerator();
   }
 
   @Value("${miso.detailed.sample.enabled}")
@@ -317,263 +244,8 @@ public class EditSampleController {
     return Collections.emptyMap();
   }
 
-  private Collection<Project> populateProjects() throws IOException {
-    try {
-      List<Project> ps = new ArrayList<>(projectService.listAllProjects());
-
-      if (isDetailedSampleEnabled()) {
-        Collections.sort(ps, (a, b) -> a.getShortName().compareTo(b.getShortName()));
-      } else {
-        Collections.sort(ps, (a, b) -> a.getAlias().compareTo(b.getAlias()));
-      }
-      return ps;
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list projects", ex);
-      }
-      throw ex;
-    }
-  }
-
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> maxLengths() throws IOException {
-    return sampleService.getSampleColumnSizes();
-  }
-
   @Autowired
   private SampleClassService sampleClassService;
-
-  private static final Comparator<SampleClass> SAMPLECLASS_CATEGORY_ALIAS = (SampleClass o1, SampleClass o2) -> {
-    int categoryOrder = SampleClass.CATEGORIES.indexOf(o1.getSampleCategory()) - SampleClass.CATEGORIES.indexOf(o2.getSampleCategory());
-    if (categoryOrder != 0) return categoryOrder;
-    return o1.getAlias().compareTo(o2.getAlias());
-  };
-
-  private void populateSampleClasses(ModelMap model, DetailedSample sample) throws IOException {
-    List<SampleClass> sampleClasses = sampleClassService.getAll().stream()
-        .filter(sc -> (!sc.isArchived() && sc.isDirectCreationAllowed())
-            || (sample.getSampleClass() != null && sample.getSampleClass().getId().equals(sc.getId())))
-        .collect(Collectors.toList());
-    List<SampleClass> tissueClasses = sampleClasses.stream()
-        .filter(sc -> SampleTissue.CATEGORY_NAME.equals(sc.getSampleCategory()))
-        .collect(Collectors.toList());
-    Collections.sort(sampleClasses, SAMPLECLASS_CATEGORY_ALIAS);
-    Collections.sort(tissueClasses, SAMPLECLASS_CATEGORY_ALIAS);
-    model.put("sampleClasses", sampleClasses);
-    model.put("tissueClasses", tissueClasses);
-  }
-
-  @Autowired
-  private TissueOriginService tissueOriginService;
-
-  @ModelAttribute("tissueOrigins")
-  public List<TissueOrigin> getTissueOrigins() throws IOException {
-    return tissueOriginService.getAll().stream()
-        .sorted(Comparator.comparing(TissueOrigin::getAlias))
-        .collect(Collectors.toList());
-  }
-
-  @Autowired
-  private TissueTypeService tissueTypeService;
-
-  @ModelAttribute("tissueTypes")
-  public List<TissueType> getTissueTypes() throws IOException {
-    return tissueTypeService.getAll().stream()
-        .sorted(Comparator.comparing(TissueType::getAlias).reversed()) // reverse comparison as most frequently used tissue types are at
-                                                                       // bottom of alphabet
-        .collect(Collectors.toList());
-  }
-
-  @Autowired
-  private DetailedQcStatusService detailedQcStatusService;
-
-  @ModelAttribute("detailedQcStatuses")
-  public List<DetailedQcStatus> getDetailedQcStatuses() throws IOException {
-    List<DetailedQcStatus> list = new ArrayList<>(detailedQcStatusService.getAll());
-    Collections.sort(list, new Comparator<DetailedQcStatus>() {
-      @Override
-      public int compare(DetailedQcStatus o1, DetailedQcStatus o2) {
-        if (o1.getStatus() == null) {
-          return (o2.getStatus() == null ? 0 : -1);
-        } else if (o2.getStatus() == null) {
-          return 1;
-        } else {
-          return o1.getStatus().compareTo(o2.getStatus());
-        }
-      }
-    });
-    return list;
-  }
-
-  @Autowired
-  private LabService labService;
-
-  @ModelAttribute("labs")
-  public List<Lab> getLabs() throws IOException {
-    return labService.getAll().stream()
-        .sorted(Comparator.comparing(Lab::getAlias))
-        .collect(Collectors.toList());
-  }
-
-  @Autowired
-  private SamplePurposeService samplePurposeService;
-
-  public List<SamplePurpose> getSamplePurposes(Sample sample) throws IOException {
-    SampleAliquot aliquot = isAliquotSample(sample) ? (SampleAliquot) sample : null;
-    return samplePurposeService.getAll().stream()
-        .filter(samPurpose -> !samPurpose.isArchived() ||
-            (aliquot != null && aliquot.getSamplePurpose() != null && aliquot.getSamplePurpose().getId() == samPurpose.getId()))
-        .sorted(Comparator.comparing(Aliasable::getAlias))
-        .collect(Collectors.toList());
-  }
-
-  @Autowired
-  private TissueMaterialService tissueMaterialService;
-
-  @ModelAttribute("tissueMaterials")
-  public List<TissueMaterial> getTissueMaterials() throws IOException {
-    return tissueMaterialService.getAll().stream()
-        .sorted(Comparator.comparing(TissueMaterial::getAlias))
-        .collect(Collectors.toList());
-  }
-
-  @ModelAttribute("strStatusOptions")
-  public StrStatus[] getStrStatusOptions() {
-    return StrStatus.values();
-  }
-
-  @ModelAttribute("consentLevelOptions")
-  public ConsentLevel[] getConsentLevelOptions() {
-    return ConsentLevel.values();
-  }
-
-  @ModelAttribute("donorSexOptions")
-  public DonorSex[] getDonorSexOptions() {
-    return DonorSex.values();
-  }
-
-  /**
-   * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects
-   *
-   * @param binder
-   */
-  @InitBinder
-  public void includeForeignKeys(WebDataBinder binder) {
-    binder.registerCustomEditor(Project.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        Project p = new ProjectImpl();
-        p.setId(Long.valueOf(text));
-        setValue(p);
-      }
-    });
-
-    binder.registerCustomEditor(SampleClass.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        if (isStringEmptyOrNull(text)) {
-          setValue(null);
-        } else {
-          SampleClass sc = new SampleClassImpl();
-          sc.setId(Long.valueOf(text));
-          setValue(sc);
-        }
-      }
-    });
-
-    binder.registerCustomEditor(TissueOrigin.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        TissueOrigin to = new TissueOriginImpl();
-        to.setId(Long.valueOf(text));
-        setValue(to);
-      }
-    });
-
-    binder.registerCustomEditor(TissueType.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        TissueType tt = new TissueTypeImpl();
-        tt.setId(Long.valueOf(text));
-        setValue(tt);
-      }
-    });
-
-    binder.registerCustomEditor(DetailedQcStatus.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        if (isStringEmptyOrNull(text)) {
-          setValue(null);
-        } else {
-          DetailedQcStatus qcpd = new DetailedQcStatusImpl();
-          qcpd.setId(Long.valueOf(text));
-          setValue(qcpd);
-        }
-      }
-    });
-
-    binder.registerCustomEditor(Subproject.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        if (isStringEmptyOrNull(text)) {
-          setValue(null);
-        } else {
-          Subproject sp = new SubprojectImpl();
-          sp.setId(Long.valueOf(text));
-          setValue(sp);
-        }
-      }
-    });
-
-    binder.registerCustomEditor(Lab.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        if (isStringEmptyOrNull(text)) {
-          setValue(null);
-        } else {
-          Lab lab = new LabImpl();
-          lab.setId(Long.valueOf(text));
-          setValue(lab);
-        }
-      }
-    });
-
-    binder.registerCustomEditor(SamplePurpose.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        if (isStringEmptyOrNull(text)) {
-          setValue(null);
-        } else {
-          SamplePurpose sp = new SamplePurposeImpl();
-          sp.setId(Long.valueOf(text));
-          setValue(sp);
-        }
-      }
-    });
-
-    binder.registerCustomEditor(TissueMaterial.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        if (isStringEmptyOrNull(text)) {
-          setValue(null);
-        } else {
-          TissueMaterial tm = new TissueMaterialImpl();
-          tm.setId(Long.valueOf(text));
-          setValue(tm);
-        }
-      }
-    });
-  }
-
-  @GetMapping(value = "/new")
-  public ModelAndView newUnassignedSample(ModelMap model) throws IOException {
-    return setupForm(AbstractSample.UNSAVED_ID, null, model);
-  }
-
-  @GetMapping(value = "/new/{projectId}")
-  public ModelAndView newAssignedSample(@PathVariable Long projectId, ModelMap model) throws IOException {
-    return setupForm(AbstractSample.UNSAVED_ID, projectId, model);
-  }
 
   @GetMapping(value = "/rest/{sampleId}")
   public @ResponseBody Sample jsonRest(@PathVariable Long sampleId) throws IOException {
@@ -582,98 +254,33 @@ public class EditSampleController {
 
   @GetMapping(value = "/{sampleId}")
   public ModelAndView setupForm(@PathVariable Long sampleId, ModelMap model) throws IOException {
-    return setupForm(sampleId, null, model);
-  }
+    Sample sample = sampleService.get(sampleId);
+    if (sample == null) throw new NotFoundException("No sample found for ID " + sampleId.toString());
 
-  @GetMapping(value = "/{sampleId}/project/{projectId}")
-  public ModelAndView setupForm(@PathVariable Long sampleId, @PathVariable Long projectId, ModelMap model) throws IOException {
-    try {
-      Sample sample = null;
-      if (sampleId == AbstractSample.UNSAVED_ID) {
-        sample = detailedSample ? new DetailedSampleBuilder() : new SampleImpl();
-        model.put("sampleCategory", "new");
-        model.put("title", "New Sample");
+    model.put("title", "Sample " + sampleId);
 
-        if (projectId != null) {
-          Project project = projectService.get(projectId);
-          if (project == null) throw new NotFoundException("No project found for ID " + projectId.toString());
-          model.addAttribute("project", project);
-          sample.setProject(project);
-        } else {
-          model.put("accessibleProjects", populateProjects());
-        }
-        List<ProjectDto> projects = new ArrayList<>();
-        for (Project p : projectService.listAllProjects()) {
-          projects.add(Dtos.asDto(p));
-        }
-        model.put("projectsDtos", mapper.valueToTree(projects));
-      } else {
-        sample = sampleService.get(sampleId);
-        if (sample == null) throw new NotFoundException("No sample found for ID " + sampleId.toString());
-        model.put("sampleCategory", detailedSample ? ((DetailedSample) sample).getSampleClass().getSampleCategory() : "plain");
-        if (detailedSample) {
-          model.put("sampleClass", ((DetailedSample) sample).getSampleClass().getAlias());
-          Optional<DetailedSample> effective = ((DetailedSample) sample).getEffectiveGroupIdSample();
-          if (effective.isPresent()) {
-            model.put("effectiveGroupId", effective.get().getGroupId());
-            model.put("effectiveGroupIdSample", effective.get().getAlias());
-          }
-          if (!isIdentitySample(sample)) {
-            SampleIdentity identity = getParent(SampleIdentity.class, (DetailedSample) sample);
-            model.put("effectiveExternalName", identity.getExternalName());
-          }
-        }
-        model.put("title", "Sample " + sampleId);
-
-        if (projectId != null && projectId.longValue() != sample.getProject().getId()) {
-          throw new IllegalArgumentException("Requested project does not match sample project");
-        }
-
-        Map<String, Sample> adjacentSamples = getAdjacentSamplesInProject(sample, sample.getProject().getId());
-        if (!adjacentSamples.isEmpty()) {
-          model.put("previousSample", adjacentSamples.get("previousSample"));
-          model.put("nextSample", adjacentSamples.get("nextSample"));
-        }
-
-        model.put("projectsDtos", "[]");
-
-        model.put("sampleLibraries", sample.getLibraries().stream().map(lib -> Dtos.asDto(lib, false)).collect(Collectors.toList()));
-        Set<Pool> pools = sample.getLibraries().stream()
-            .flatMap(WhineyFunction.flatRethrow(library -> poolService.listByLibraryId(library.getId())))
-            .distinct().collect(Collectors.toSet());
-        List<RunDto> runDtos = pools.stream().flatMap(WhineyFunction.flatRethrow(pool -> runService.listByPoolId(pool.getId())))
-            .map(Dtos::asDto)
-            .collect(Collectors.toList());
-        model.put("samplePools", pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
-        model.put("sampleRuns", runDtos);
-        model.put("sampleRelations", getRelations(sample));
-        addArrayData(sampleId, model);
-      }
-
-      model.put("formObj", sample);
-      model.put("sample", sample);
-      model.put("sampleDto", sample.getId() == SampleImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(sample, false)));
-
-      Collection<String> sampleTypes = sampleService.listSampleTypes();
-      if (sample.getSampleType() != null && !sampleTypes.contains(sample.getSampleType())) {
-        sampleTypes.add(sample.getSampleType());
-      }
-      model.put("sampleTypes", sampleTypes);
-      if (detailedSample) {
-        model.put("samplePurposes", getSamplePurposes(sample));
-        populateSampleClasses(model, (DetailedSample) sample);
-      }
-
-      model.put("volumeUnits", VolumeUnit.values());
-      model.put("concentrationUnits", ConcentrationUnit.values());
-
-      return new ModelAndView("/WEB-INF/pages/editSample.jsp", model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show sample", ex);
-      }
-      throw ex;
+    Map<String, Sample> adjacentSamples = getAdjacentSamplesInProject(sample, sample.getProject().getId());
+    if (!adjacentSamples.isEmpty()) {
+      model.put("previousSample", adjacentSamples.get("previousSample"));
+      model.put("nextSample", adjacentSamples.get("nextSample"));
     }
+
+    model.put("sampleLibraries", sample.getLibraries().stream().map(lib -> Dtos.asDto(lib, false)).collect(Collectors.toList()));
+    Set<Pool> pools = sample.getLibraries().stream()
+        .flatMap(WhineyFunction.flatRethrow(library -> poolService.listByLibraryId(library.getId())))
+        .distinct().collect(Collectors.toSet());
+    List<RunDto> runDtos = pools.stream().flatMap(WhineyFunction.flatRethrow(pool -> runService.listByPoolId(pool.getId())))
+        .map(Dtos::asDto)
+        .collect(Collectors.toList());
+    model.put("samplePools", pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
+    model.put("sampleRuns", runDtos);
+    model.put("sampleRelations", getRelations(sample));
+    addArrayData(sampleId, model);
+
+    model.put("sample", sample);
+    model.put("sampleDto", sample.getId() == SampleImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(sample, false)));
+
+    return new ModelAndView("/WEB-INF/pages/editSample.jsp", model);
   }
 
   private void addArrayData(long sampleId, ModelMap model) throws IOException {

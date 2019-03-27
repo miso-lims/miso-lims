@@ -268,7 +268,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
               detailed.setParent(findOrCreateParent(detailed));
             }
           } catch (MisoNamingException e) {
-            throw new IOException(e.getMessage(), e);
+            throw new ValidationException(e.getMessage());
           }
         }
         addExternalNames(detailed, identityCopy);
@@ -325,12 +325,21 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       // post-save field generation
       boolean needsUpdate = false;
       if (hasTemporaryName(sample)) {
-        created.setName(namingScheme.generateNameFor(created));
+        try {
+          created.setName(namingScheme.generateNameFor(created));
+        } catch (MisoNamingException e) {
+          throw new ValidationException(new ValidationError("name", e.getMessage()));
+        }
         validateNameOrThrow(created, namingScheme);
         needsUpdate = true;
       }
       if (hasTemporaryAlias(sample)) {
-        String generatedAlias = namingScheme.generateSampleAlias(created);
+        String generatedAlias;
+        try {
+          generatedAlias = namingScheme.generateSampleAlias(created);
+        } catch (MisoNamingException e) {
+          throw new ValidationException(new ValidationError("alias", e.getMessage()));
+        }
         created.setAlias(generatedAlias);
         if (isDetailedSample(created)) {
           // generation of non-standard aliases is allowed
@@ -353,14 +362,10 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
         validateAliasUniqueness(created);
       }
       return created;
-    } catch (MisoNamingException e) {
-      throw new IllegalArgumentException("Name generator failed to generate a valid name", e);
     } catch (ConstraintViolationException e) {
       // Send the nested root cause message to the user, since it contains the actual error.
       throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),
           e.getConstraintName());
-    } catch (SQLException e) {
-      throw new IOException(e);
     }
   }
 
@@ -375,7 +380,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation = namingScheme.validateSampleAlias(sample
           .getAlias());
       if (!aliasValidation.isValid()) {
-        throw new IllegalArgumentException("Invalid sample alias: '" + sample.getAlias() + "' - " + aliasValidation.getMessage());
+        throw new ValidationException(new ValidationError("alias", aliasValidation.getMessage()));
       }
     }
   }
@@ -395,8 +400,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       return;
     }
     if (!namingScheme.duplicateSampleAliasAllowed() && sampleStore.listByAlias(sample.getAlias()).size() > 1) {
-      throw new ConstraintViolationException(String.format("A sample with this alias '%s' already exists in the database",
-          sample.getAlias()), null, "alias");
+      throw new ValidationException(new ValidationError("alias", String.format("A sample with alias '%s' already exists",
+          sample.getAlias())));
     }
   }
 
@@ -735,14 +740,22 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     target.setAlias(source.getAlias());
     target.setDescription(source.getDescription());
     target.setDiscarded(source.isDiscarded());
-    if (target.isDiscarded()) {
+    if (target.isDiscarded() || target.isDistributed()) {
       target.setVolume(0.0);
     } else {
       target.setVolume(source.getVolume());
     }
-    target.setVolumeUnits(target.getVolume() == null ? null : source.getVolumeUnits());
+    if (target.getVolume() == null) {
+      target.setVolumeUnits(null);
+    } else if (!target.getVolume().equals(Double.valueOf(0.0)) || target.getVolumeUnits() != null) {
+      target.setVolumeUnits(source.getVolumeUnits());
+    }
     target.setConcentration(source.getConcentration());
-    target.setConcentrationUnits(target.getConcentration() == null ? null : source.getConcentrationUnits());
+    if (target.getConcentration() == null) {
+      target.setConcentrationUnits(null);
+    } else if (!target.getConcentration().equals(Double.valueOf(0.0)) || target.getConcentrationUnits() != null) {
+      target.setConcentrationUnits(source.getConcentrationUnits());
+    }
     target.setLocationBarcode(source.getLocationBarcode());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setDistributed(source.isDistributed());
@@ -750,7 +763,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     target.setDistributionRecipient(source.getDistributionRecipient());
     if (target.isDistributed()) {
       target.setLocationBarcode("SENT TO: " + target.getDistributionRecipient());
-      target.setVolume(0.0);
     } else {
       target.setLocationBarcode(source.getLocationBarcode());
     }

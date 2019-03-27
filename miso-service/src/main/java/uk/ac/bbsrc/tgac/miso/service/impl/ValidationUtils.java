@@ -15,10 +15,13 @@ import java.util.Set;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 
 public class ValidationUtils {
 
@@ -114,4 +117,11 @@ public class ValidationUtils {
   }
   private static final String INVALID_URL = "URL is not valid";
   private static final String URL_FIELD = "url";
+
+  public static void validateNameOrThrow(Nameable object, NamingScheme namingScheme) {
+    ValidationResult val = namingScheme.validateName(object.getName());
+    if (!val.isValid()) {
+      throw new ValidationException(new ValidationError("name", val.getMessage()));
+    }
+  }
 }
