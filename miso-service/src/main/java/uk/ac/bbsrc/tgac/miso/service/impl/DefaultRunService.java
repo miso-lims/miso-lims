@@ -564,7 +564,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       isMutated |= updateField(source.getPairedEnd(), target.getPairedEnd(), target::setPairedEnd);
       break;
     case OXFORDNANOPORE:
-      throw new NotImplementedException();
+      // Nothing to do
+      break;
     case PACBIO:
       // Nothing to do
       break;
