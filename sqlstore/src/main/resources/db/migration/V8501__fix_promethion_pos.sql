@@ -16,33 +16,33 @@ CALL TempFixPos('P101_0', '1-A1-D1');
 CALL TempFixPos('P105_0', '1-A3-D3');
 CALL TempFixPos('P109_0', '1-A5-D5');
 
-CALL TempFixPos('P101_1', '1-E1-D1');
-CALL TempFixPos('P105_1', '1-E3-D3');
-CALL TempFixPos('P109_1', '1-E5-D5');
+CALL TempFixPos('P101_1', '1-E1-H1');
+CALL TempFixPos('P105_1', '1-E3-H3');
+CALL TempFixPos('P109_1', '1-E5-H5');
 
 CALL TempFixPos('P102_0', '1-A7-D7');
 CALL TempFixPos('P106_0', '1-A9-D9');
 CALL TempFixPos('P110_0', '1-A11-D11');
 
-CALL TempFixPos('P102_1', '1-E7-D7');
-CALL TempFixPos('P106_1', '1-E9-D9');
-CALL TempFixPos('P110_1', '1-E11-D11');
+CALL TempFixPos('P102_1', '1-E7-H7');
+CALL TempFixPos('P106_1', '1-E9-H9');
+CALL TempFixPos('P110_1', '1-E11-H11');
 
 CALL TempFixPos('P103_0', '2-A1-D1');
 CALL TempFixPos('P107_0', '2-A3-D3');
 CALL TempFixPos('P111_0', '2-A5-D5');
 
-CALL TempFixPos('P103_1', '2-E1-D1');
-CALL TempFixPos('P107_1', '2-E3-D3');
-CALL TempFixPos('P111_1', '2-E5-D5');
+CALL TempFixPos('P103_1', '2-E1-H1');
+CALL TempFixPos('P107_1', '2-E3-H3');
+CALL TempFixPos('P111_1', '2-E5-H5');
 
 CALL TempFixPos('P104_0', '2-A7-D7');
 CALL TempFixPos('P108_0', '2-A9-D9');
 CALL TempFixPos('P112_0', '2-A11-D11');
 
-CALL TempFixPos('P104_1', '2-E7-D7');
-CALL TempFixPos('P108_1', '2-E9-D9');
-CALL TempFixPos('P112_1', '2-E11-D11');
+CALL TempFixPos('P104_1', '2-E7-H7');
+CALL TempFixPos('P108_1', '2-E9-H9');
+CALL TempFixPos('P112_1', '2-E11-H11');
 
 DROP PROCEDURE TempFixPos;
 
