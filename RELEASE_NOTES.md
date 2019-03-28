@@ -1,3 +1,9 @@
+# 0.2.169
+
+Changes:
+
+ * Fix failure to save Oxford Nanopore runs from Run Scanner
+
 # 0.2.168
 
 Changes:
@@ -12,6 +18,10 @@ Changes:
  * Fixed warnings in assign pool dialog
  * Use bulk tables instead of dialogs for creating dilutions and orders
  * Fixed some stored procedures
+
+BAD:
+
+ * Failure to save Oxford Nanopore runs from Run Scanner
 
 # 0.2.167
 

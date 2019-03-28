@@ -1955,6 +1955,7 @@ public class Dtos {
 
     switch (to.getPlatformType()) {
     case PACBIO:
+    case OXFORDNANOPORE:
       break;
     case ILLUMINA:
       setIlluminaRunValues((IlluminaNotificationDto) from, (IlluminaRun) to);
