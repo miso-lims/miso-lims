@@ -57,7 +57,6 @@ CREATE PROCEDURE TempAddPos(iName varchar(10)) BEGIN
 END//
 DELIMITER ;
 
-INSERT INTO InstrumentPosition (instrumentModelId, alias) VALUES
 CALL TempAddPos('1-A2-D2');
 CALL TempAddPos('1-A4-D4');
 CALL TempAddPos('1-A6-D6');
