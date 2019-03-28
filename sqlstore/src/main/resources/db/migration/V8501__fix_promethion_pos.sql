@@ -84,5 +84,6 @@ CALL TempAddPos('2-E12-H12');
 
 DROP PROCEDURE TempAddPos;
 
+SELECT instrumentModelId INTO @promethion FROM InstrumentModel WHERE alias = 'PromethION';
 DELETE FROM InstrumentPosition WHERE instrumentModelId = @promethion AND alias LIKE 'P___\__';
 -- EndNoTest
