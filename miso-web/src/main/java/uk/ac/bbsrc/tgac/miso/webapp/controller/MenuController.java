@@ -46,6 +46,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -211,7 +212,7 @@ public class MenuController implements ServletContextAware {
 
   @RequestMapping("/login")
   public ModelAndView loginPage(ModelMap model, @RequestParam(name = "login_error", required = false) Integer loginError) {
-    return new ModelAndView("/login.jsp", model);
+    return new ModelAndView("/WEB-INF/login.jsp", model);
   }
 
   @RequestMapping("/myAccount")
@@ -228,13 +229,13 @@ public class MenuController implements ServletContextAware {
       model.put("userId", user.getUserId());
       model.put("apiKey", SignatureHelper.generatePrivateUserKey((user.getLoginName() + "::" + user.getPassword()).getBytes("UTF-8")));
       model.put("userGroups", groups.toString());
-      return new ModelAndView("/pages/myAccount.jsp", model);
+      return new ModelAndView("/WEB-INF/pages/myAccount.jsp", model);
     } catch (IOException e) {
       log.error("my account menu", e);
-      return new ModelAndView("/login.jsp", model);
+      return new ModelAndView("/WEB-INF/login.jsp", model);
     } catch (NoSuchAlgorithmException e) {
       log.error("my account menu", e);
-      return new ModelAndView("/login.jsp", model);
+      return new ModelAndView("/WEB-INF/login.jsp", model);
     }
   }
 
@@ -249,7 +250,7 @@ public class MenuController implements ServletContextAware {
     ObjectMapper mapper = new ObjectMapper();
     model.put("favouriteWorkflows",
         user.getFavouriteWorkflows().stream().map(Dtos::asDto).map(dto -> mapper.valueToTree(dto)).collect(Collectors.toList()));
-    return new ModelAndView("/pages/mainMenu.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/mainMenu.jsp", model);
   }
 
   @Override
@@ -390,5 +391,15 @@ public class MenuController implements ServletContextAware {
 
   public void refreshConstants() {
     constantsJsTime = 0;
+  }
+
+  @GetMapping("/accessDenied")
+  public ModelAndView showAccessDenied(ModelMap model) {
+    return new ModelAndView("/WEB-INF/accessDenied.jsp", model);
+  }
+
+  @GetMapping("/error")
+  public ModelAndView showError(ModelMap model) {
+    return new ModelAndView("/WEB-INF/error.jsp", model);
   }
 }

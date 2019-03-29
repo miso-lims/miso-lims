@@ -53,7 +53,7 @@ public class ExceptionHandlerAdvice {
     model.addAttribute("genericMessage", genericMessage);
     model.addAttribute("specificMessage", specificMessage);
     model.addAttribute("showBugUrl", showBugUrl);
-    return new ModelAndView("/pages/handledError.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/handledError.jsp", model);
   }
 
   private void logException(Exception e) {

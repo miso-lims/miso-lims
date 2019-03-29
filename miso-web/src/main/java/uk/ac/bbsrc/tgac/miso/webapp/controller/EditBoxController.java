@@ -170,7 +170,7 @@ public class EditBoxController {
         }
       }
 
-      return new ModelAndView("/pages/editBox.jsp", model);
+      return new ModelAndView("/WEB-INF/pages/editBox.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.error("Failed to show Box", ex);

@@ -29,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 @RequestMapping("/arrayrun")
 public class EditArrayRunController {
 
-  private static final String JSP = "/pages/editArrayRun.jsp";
+  private static final String JSP = "/WEB-INF/pages/editArrayRun.jsp";
 
   private static final String MODEL_ATTR_PAGEMODE = "pageMode";
   private static final String MODEL_ATTR_SCANNERS = "arrayScanners";

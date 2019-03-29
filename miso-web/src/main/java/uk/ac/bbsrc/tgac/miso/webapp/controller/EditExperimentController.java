@@ -106,7 +106,7 @@ public class EditExperimentController {
             .map(entry -> new ExperimentDto.RunPartitionDto(Dtos.asDto(entry.getRun()), Dtos.asDto(entry.getPartition())))
             .collect(Collectors.toList()));
     model.put("title", "Edit Experiment");
-    return new ModelAndView("/pages/editExperiment.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/editExperiment.jsp", model);
   }
 
 }

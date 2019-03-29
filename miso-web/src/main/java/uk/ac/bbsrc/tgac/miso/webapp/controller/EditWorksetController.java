@@ -23,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.service.WorksetService;
 @RequestMapping("/workset")
 public class EditWorksetController {
 
-  private static final String JSP = "/pages/editWorkset.jsp";
+  private static final String JSP = "/WEB-INF/pages/editWorkset.jsp";
 
   private static final String MODEL_ATTR_TITLE = "title";
   private static final String MODEL_ATTR_PAGEMODE = "pageMode";

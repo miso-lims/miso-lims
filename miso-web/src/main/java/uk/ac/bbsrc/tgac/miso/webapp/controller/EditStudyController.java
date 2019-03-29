@@ -45,7 +45,6 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
@@ -64,8 +63,6 @@ public class EditStudyController {
 
   @Autowired
   private AuthorizationManager authorizationManager;
-  @Autowired
-  private SecurityManager securityManager;
   @Autowired
   private ProjectService projectService;
   @Autowired
@@ -159,7 +156,7 @@ public class EditStudyController {
     model.put("formObj", study);
     model.put("study", study);
     model.put("experiments", study.getExperiments().stream().map(Dtos::asDto).collect(Collectors.toList()));
-    return new ModelAndView("/pages/editStudy.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/editStudy.jsp", model);
   }
 
   @PostMapping

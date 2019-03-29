@@ -28,7 +28,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 @RequestMapping("/freezer")
 public class EditFreezerController {
 
-  private static final String JSP = "/pages/editFreezer.jsp";
+  private static final String JSP = "/WEB-INF/pages/editFreezer.jsp";
 
   private static final String MODEL_ATTR_PAGEMODE = "pageMode";
   private static final String MODEL_ATTR_JSON = "freezerJson";

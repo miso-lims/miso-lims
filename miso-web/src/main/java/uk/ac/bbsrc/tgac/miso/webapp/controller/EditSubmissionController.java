@@ -106,6 +106,6 @@ public class EditSubmissionController {
     model.put("formObj", submission);
     model.put("submission", submission);
     model.put("experiments", submission.getExperiments().stream().map(Dtos::asDto).collect(Collectors.toList()));
-    return new ModelAndView("/pages/editSubmission.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/editSubmission.jsp", model);
   }
 }

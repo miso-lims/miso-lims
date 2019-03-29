@@ -156,7 +156,6 @@ public class EditSequencerPartitionContainerController {
     ObjectMapper mapper = new ObjectMapper();
     model.put("containerJSON", mapper.writer().writeValueAsString(Dtos.asDto(container)));
     model.put("poreVersions", containerService.listPoreVersions());
-
-    return new ModelAndView("/pages/editSequencerPartitionContainer.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/editSequencerPartitionContainer.jsp", model);
   }
 }

@@ -10,7 +10,7 @@ public class IndexSearchToolController {
 
   @GetMapping("/tools/indexsearch")
   public ModelAndView getTool(ModelMap model) {
-    return new ModelAndView("/pages/indexSearchTool.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/indexSearchTool.jsp", model);
   }
 
 }

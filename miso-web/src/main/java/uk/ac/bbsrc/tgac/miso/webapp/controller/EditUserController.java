@@ -114,7 +114,7 @@ public class EditUserController {
         if (authorizationManager.getCurrentUser().getLoginName().equals(user.getLoginName())) {
           model.put("user", user);
 
-          return new ModelAndView("/pages/editUser.jsp", model);
+          return new ModelAndView("/WEB-INF/pages/editUser.jsp", model);
         } else {
           throw new SecurityException("You can only edit your own user details.");
         }
@@ -143,7 +143,7 @@ public class EditUserController {
     try {
       model.put("user", userId == UserImpl.UNSAVED_ID ? new UserImpl() : securityManager.getUserById(userId));
       model.put("title", userId == UserImpl.UNSAVED_ID ? "New User" : ("User " + userId));
-      return new ModelAndView("/pages/editUser.jsp", model);
+      return new ModelAndView("/WEB-INF/pages/editUser.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show user", ex);

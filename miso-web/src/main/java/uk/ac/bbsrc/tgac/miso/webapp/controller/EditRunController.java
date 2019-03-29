@@ -275,7 +275,7 @@ public class EditRunController {
       experimentConfig.put("runId", run.getId());
       model.put("experimentConfiguration", mapper.writeValueAsString(experimentConfig));
 
-      return new ModelAndView("/pages/editRun.jsp", model);
+      return new ModelAndView("/WEB-INF/pages/editRun.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show run", ex);
