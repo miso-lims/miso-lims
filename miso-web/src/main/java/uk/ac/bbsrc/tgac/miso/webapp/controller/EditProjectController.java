@@ -143,7 +143,7 @@ public class EditProjectController {
     model.put("formObj", project);
     model.put("project", project);
 
-    return new ModelAndView("/pages/editProject.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/editProject.jsp", model);
   }
 
   @PostMapping

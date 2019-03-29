@@ -42,7 +42,7 @@
 
   <security:http use-expressions="true" auto-config="false" entry-point-ref="loginUrlAuthenticationEntryPoint">
 
-    <security:access-denied-handler error-page="/accessDenied.jsp"/>
+    <security:access-denied-handler error-page="/miso/accessDenied"/>
     <security:csrf disabled="true" />
 
     <security:custom-filter position="FORM_LOGIN_FILTER" ref="jdbcAuthFilter" />
@@ -51,6 +51,8 @@
     <security:logout logout-success-url="/miso/login" />
 
     <security:intercept-url pattern="/miso/login" access="permitAll" />
+    <security:intercept-url pattern="/miso/accessDenied" access="permitAll" />
+    <security:intercept-url pattern="/miso/error" access="permitAll" />
 
     <security:intercept-url pattern="/miso/constants.js" access="permitAll" />
     <security:intercept-url pattern="/miso/admin/**" access="hasRole('ROLE_ADMIN')" />

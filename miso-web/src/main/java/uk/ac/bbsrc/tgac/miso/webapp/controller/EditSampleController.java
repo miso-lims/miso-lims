@@ -667,7 +667,7 @@ public class EditSampleController {
       model.put("volumeUnits", VolumeUnit.values());
       model.put("concentrationUnits", ConcentrationUnit.values());
 
-      return new ModelAndView("/pages/editSample.jsp", model);
+      return new ModelAndView("/WEB-INF/pages/editSample.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show sample", ex);

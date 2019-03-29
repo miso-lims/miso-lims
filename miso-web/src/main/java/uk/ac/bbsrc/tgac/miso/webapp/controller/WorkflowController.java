@@ -30,7 +30,7 @@ public class WorkflowController {
     Workflow workflow = workflowManager.beginWorkflow(workflowName);
     model.put("title", workflow.getProgress().getWorkflowName().getDescription());
     model.put("state", new ObjectMapper().writeValueAsString(Dtos.asDto(workflow)));
-    return new ModelAndView("/pages/workflow.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/workflow.jsp", model);
   }
 
   @RequestMapping("/edit/{id}")
@@ -39,6 +39,6 @@ public class WorkflowController {
     if (workflow == null) throw new NotFoundException("No workflow found for ID " + id.toString());
     model.put("title", workflow.getProgress().getWorkflowName().getDescription());
     model.put("state", new ObjectMapper().writeValueAsString(Dtos.asDto(workflow)));
-    return new ModelAndView("/pages/workflow.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/workflow.jsp", model);
   }
 }

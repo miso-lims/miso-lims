@@ -128,7 +128,7 @@ public class EditServiceRecordController {
     } else {
       throw new NotFoundException("No service found for ID " + recordId.toString());
     }
-    return new ModelAndView("/pages/editServiceRecord.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/editServiceRecord.jsp", model);
   }
   
   @GetMapping(value = "/new/{instrumentId}")
@@ -140,7 +140,7 @@ public class EditServiceRecordController {
     record.setServiceDate(new Date());
     model.put(ModelKeys.RECORD.getKey(), record);
     model.put("title", "New Service Record");
-    return new ModelAndView("/pages/editServiceRecord.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/editServiceRecord.jsp", model);
   }
   
   @PostMapping

@@ -11,6 +11,6 @@ public class IdentitySearchController {
 
   @RequestMapping(value = "/tools/identitysearch", method = RequestMethod.GET)
   public ModelAndView getTool(ModelMap model) {
-    return new ModelAndView("/pages/identitySearchTool.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/identitySearchTool.jsp", model);
   }
 }

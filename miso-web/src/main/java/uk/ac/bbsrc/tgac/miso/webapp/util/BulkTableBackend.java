@@ -45,7 +45,7 @@ public abstract class BulkTableBackend<Dto> {
     model.put("input",
         mapper.writerFor(mapper.getTypeFactory().constructCollectionType(List.class, dtoClass)).writeValueAsString(dtos));
     model.put("method", "Propagate");
-    return new ModelAndView("/pages/handsontables.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/handsontables.jsp", model);
   }
 
   /**

@@ -83,7 +83,7 @@ public class IndexDistanceToolController {
 
   @RequestMapping(value = "/tools/indexdistance", method = RequestMethod.GET)
   public ModelAndView getTool(ModelMap model) {
-    return new ModelAndView("/pages/indexDistanceTool.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/indexDistanceTool.jsp", model);
   }
 
   @RequestMapping(value = "/rest/indexdistance", method = RequestMethod.POST)

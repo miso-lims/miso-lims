@@ -1,4 +1,4 @@
-<%@ include file="../header.jsp" %>
+<%@ include file="/WEB-INF/header.jsp" %>
 
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
@@ -25,23 +25,19 @@
 <%@ page import="uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider" %>
 
 <div id="maincontent">
-  <div id="contentcolumn">
-    <h1>Error</h1>
-    <c:if test="${misoBugUrl != null}">
-      Please copy the URL in the address bar and the <b>full</b> text below and raise a
-      <a href="${misoBugUrl}" target="_blank">ticket</a>, describing what you were
-      trying to do when this error occurred.<br/><br/>
-    </c:if>
+  <h1>Error</h1>
+  <c:if test="${misoBugUrl != null}">
+    Please copy the URL in the address bar and the <b>full</b> text below and raise a
+    <a href="${misoBugUrl}" target="_blank">ticket</a>, describing what you were
+    trying to do when this error occurred.<br/><br/>
+  </c:if>
 
-    <h2>${pageContext.exception.message}</h2><br/>
-    <ul>
-      <c:forEach items="${pageContext.exception.stackTrace}" var="trace">
-        <li>${trace}</li>
-      </c:forEach>
-    </ul>
-  </div>
+  <h2>${pageContext.exception.message}</h2><br/>
+  <ul>
+    <c:forEach items="${pageContext.exception.stackTrace}" var="trace">
+      <li>${trace}</li>
+    </c:forEach>
+  </ul>
 </div>
 
-<%@ include file="adminsub.jsp" %>
-
-<%@ include file="../footer.jsp" %>
+<%@ include file="/WEB-INF/footer.jsp" %>

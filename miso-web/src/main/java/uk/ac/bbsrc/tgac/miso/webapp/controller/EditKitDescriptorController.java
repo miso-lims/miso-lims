@@ -105,7 +105,7 @@ public class EditKitDescriptorController {
       model.put("kitDescriptor", kitDescriptor);
       model.put("associatedTargetedSequencings", Dtos.asTargetedSequencingDtos(kitDescriptor.getTargetedSequencing()));
       model.put("isUserAdmin", authorizationManager.getCurrentUser().isAdmin());
-      return new ModelAndView("/pages/editKitDescriptor.jsp", model);
+      return new ModelAndView("/WEB-INF/pages/editKitDescriptor.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show Kit Descriptor", ex);
