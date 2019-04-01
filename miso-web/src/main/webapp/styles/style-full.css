@@ -1074,14 +1074,13 @@ div.flashinfo {
 
 td.headertable #instanceName {
     font: Helvetica;
-    padding: 0 30px;
     color: #666666;
     display: inline;
-    font-size: 40px;
+    font-size: 72px;
 }
 
-td.headertable img {
-	vertical-align: top;
+td.headertable {
+	vertical-align: middle;
 }
 
 .bubbleInfo {
