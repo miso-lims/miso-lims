@@ -34,84 +34,34 @@
 
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form id="container-form" data-parsley-validate="" action="/miso/container" method="POST" commandName="container" autocomplete="off">
-<sessionConversation:insertSessionConversationId attributeName="container"/>
-  <h1>
-    <c:choose>
-      <c:when test="${container.id != 0}">Edit</c:when>
-      <c:otherwise>Create</c:otherwise>
-    </c:choose> ${container.model.platformType.containerName}
-    <button type="button" id="save" class="fg-button ui-state-default ui-corner-all"
-          onclick="return Container.validateContainer();">Save</button>
-  </h1>
-  <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
-    <c:if test="${container.id != 0 && not empty container.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('container', [${container.id}]);">Print Barcode</span></c:if>
-  </div>
+<h1>
+  <c:choose>
+    <c:when test="${container.id != 0}">Edit</c:when>
+    <c:otherwise>Create</c:otherwise>
+  </c:choose> ${container.model.platformType.containerName}
+  <button type="button" id="save" class="fg-button ui-state-default ui-corner-all">Save</button>
+</h1>
+<div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
+  <c:if test="${container.id != 0 && not empty container.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('container', [${container.id}]);">Print Barcode</span></c:if>
+</div>
 
-  <div class="bs-callout bs-callout-warning hidden">
-    <h2>Oh snap!</h2>
-    <p>This form seems to be invalid!</p>
-  </div>
+<form:form id="containerForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    FormUtils.createForm('containerForm', 'save', ${containerJSON}, 'container', {
+      isNew: ${container.id == 0},
+      platformType: '${container.model.platformType}'
+    });
+  });
+</script>
 
-  <table class="in">
-    <tr>
-      <td class="h">Container ID:</td>
-      <td id="containerId">
-        <c:choose>
-          <c:when test="${container.id != 0}">${container.id}</c:when>
-          <c:otherwise><i>Unsaved</i></c:otherwise>
-        </c:choose>
-      </td>
-    </tr>
-    <tr>
-      <td>Serial Number:*</td>
-      <td><form:input id="identificationBarcode" path="identificationBarcode" /> </td>
-    </tr>
-    <tr>
-      <td>Container Model:</td>
-      <td><span id="model">${container.model.alias}</span></td>
-    </tr>
-    <tr>
-      <td>Description:</td>
-      <td><form:input id="description" path="description"/></td>
-    </tr>
-    <tr>
-      <td>Clustering Kit:</td>
-      <td><miso:select id="clusteringKit" path="clusteringKit" items="${clusteringKits}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="" /></td>
-    </tr>
-    <tr>
-      <td>Multiplexing Kit:</td>
-      <td><miso:select id="multiplexingKit" path="multiplexingKit" items="${multiplexingKits}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="" /></td>
-    </tr>
-    
-    <c:if test="${miso:instanceOf(container, 'uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer')}">
-      <tr>
-        <td>Pore Version:</td>
-        <td><miso:select id="poreVersion" path="poreVersion" items="${poreVersions}" itemLabel="alias" itemValue="id" defaultLabel="(Unknown)" defaultValue="" /></td>
-      </tr>
-      <tr>
-        <td>Received Date:*</td>
-        <td><form:input path="receivedDate" id="receivedDate" /></td>
-      </tr>
-      <tr>
-        <td>Returned Date:</td>
-        <td><form:input path="returnedDate" id="returnedDate" /></td>
-      </tr>
-      <script type="text/javascript">
-      Utils.ui.addDatePicker("receivedDate");
-      Utils.ui.addDatePicker("returnedDate");
-      </script>
-    </c:if>
-    
-  </table>
-</form:form>
+<c:if test="${container.id != 0}">
+  <miso:qcs id="list_qcs" item="${container}"/>
+  <miso:list-section id="list_partition" name="${container.model.platformType.pluralPartitionName}" target="partition" items="${containerPartitions}" config="{ 'platformType' : '${container.model.platformType.name()}', 'showContainer' : false , 'showPool' : true}"/>
+</c:if>
+<miso:list-section id="list_run" name="Runs" target="run" items="${containerRuns}"/>
+<miso:changelog item="${container}"/>
 
-  <c:if test="${container.id != 0}">
-    <miso:qcs id="list_qcs" item="${container}"/>
-    <miso:list-section id="list_partition" name="${container.model.platformType.pluralPartitionName}" target="partition" items="${containerPartitions}" config="{ 'platformType' : '${container.model.platformType.name()}', 'showContainer' : false , 'showPool' : true}"/>
-  </c:if>
-  <miso:list-section id="list_run" name="Runs" target="run" items="${containerRuns}"/>
-  <miso:changelog item="${container}"/>
 </div>
 </div>
 

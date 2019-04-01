@@ -93,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.service.AttachmentCategoryService;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
@@ -185,6 +186,8 @@ public class MenuController implements ServletContextAware {
   private PartitionQCService partitionQCService;
   @Autowired
   private StudyService studyService;
+  @Autowired
+  private ContainerService containerService;
   @Autowired
   private ContainerModelService containerModelService;
   @Autowired
@@ -323,6 +326,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "sampleCategories", SampleClass.CATEGORIES, Function.identity());
     createArray(mapper, baseUri, node, "submissionAction", Arrays.asList(SubmissionActionType.values()), SubmissionActionType::name);
     createArray(mapper, baseUri, node, "containerModels", containerModelService.list(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "poreVersions", containerService.listPoreVersions(), Dtos::asDto);
     createArray(mapper, baseUri, node, "spikeIns", libraryService.listSpikeIns(), Dtos::asDto);
     createArray(mapper, baseUri, node, "attachmentCategories", attachmentCategoryService.list(), Dtos::asDto);
 

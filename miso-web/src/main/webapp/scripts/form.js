@@ -1,5 +1,5 @@
 FormUtils = (function($) {
-  
+
   /*
    * FormTarget Structure: {
    *   getSaveUrl: required function(object) returning string; URL to save object
@@ -32,7 +32,7 @@ FormUtils = (function($) {
    *   makeControls: function() returning single or array of jQuery controls; required for special fields; set up special fields
    * }
    */
-  
+
   return {
     createForm: function(containerId, saveId, object, targetName, config) {
       var container = $('#' + containerId);
@@ -40,28 +40,28 @@ FormUtils = (function($) {
       if (!object) {
         object = {};
       }
-      
+
       writeGeneralValidationBox(container);
       var sections = getFilteredSections(target, config);
       sections.forEach(function(section) {
         writeSection(container, section, object);
       });
-      
+
       $('#' + saveId).click(function() {
         validateAndSave(containerId, object, target, sections);
       });
-      
+
       if (target.onLoad) {
         target.onLoad();
       }
     }
   };
-  
+
   function validateAndSave(containerId, object, target, sections) {
     var selector = '#' + containerId;
     Validate.cleanFields(selector);
     Validate.clearErrors(selector);
-    
+
     sections.forEach(function(section) {
       section.fields.forEach(function(field) {
         switch (field.type) {
@@ -72,6 +72,7 @@ FormUtils = (function($) {
           break;
         case 'text':
         case 'dropdown':
+        case 'date':
           object[field.data] = $('#' + field.data).val();
           addValidation(field);
           break;
@@ -80,15 +81,15 @@ FormUtils = (function($) {
         }
       });
     });
-    
+
     $(selector).parsley();
     $(selector).parsley().validate();
-    
+
     Validate.updateWarningOrSubmit(selector, null, function() {
       save(containerId, object, target);
     });
   }
-  
+
   function addValidation(field) {
     var control = $('#' + field.data).addClass('form-control').attr('data-parsley-errors-container', '#' + field.data + 'Error');
     if (field.required) {
@@ -99,9 +100,13 @@ FormUtils = (function($) {
     }
     if (field.type === 'text') {
       control.attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    } else if (field.type === 'date') {
+      control.attr('data-date-format', 'YYYY-MM-DD');
+      control.attr('data-parsley-pattern', Utils.validation.dateRegex);
+      control.attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
     }
   }
-  
+
   function save(containerId, object, target) {
     $.ajax({
       url: target.getSaveUrl(object),
@@ -115,14 +120,12 @@ FormUtils = (function($) {
       Validate.displayErrors(JSON.parse(response.responseText), '#' + containerId);
     });
   }
-  
+
   function writeGeneralValidationBox(container) {
-    container.append($('<div>').addClass('bs-callout bs-callout-warning hidden')
-        .append($('<h2>').text('Oh snap!'))
-        .append($('<p>').text('This form seems to be invalid'))
-    );
+    container.append($('<div>').addClass('bs-callout bs-callout-warning hidden').append($('<h2>').text('Oh snap!')).append(
+        $('<p>').text('This form seems to be invalid')));
   }
-  
+
   function getFilteredSections(target, config) {
     var filtered = [];
     target.getSections(config).filter(function(section) {
@@ -140,33 +143,35 @@ FormUtils = (function($) {
     });
     return filtered;
   }
-  
+
   function writeSection(container, section, object) {
     container.append($('<h2>').text(section.title));
     var tbody = $('<tbody>');
-    
+
     section.fields.forEach(function(field) {
       var tr = $('<tr>');
       tr.append(makeFieldLabel(field));
       tr.append(makeFieldInput(field, object));
       tbody.append(tr);
     });
-    
-    container.append($('<div>').attr('id', section.id)
-        .append($('<table>').addClass('in')
-            .append(tbody)
-        )
-    );
+
+    container.append($('<div>').attr('id', section.id).append($('<table>').addClass('in').append(tbody)));
+
+    section.fields.forEach(function(field) {
+      if (field.type === 'date') {
+        Utils.ui.addDatePicker(field.data);
+      }
+    });
   }
-  
+
   function makeFieldLabel(field, object) {
     return $('<td>').addClass('h').text(field.title + ':' + (field.required ? '*' : ''));
   }
-  
+
   function makeFieldInput(field, object) {
     var td = $('<td>');
     var value = getValue(field, object);
-    
+
     if (field.getDisplayValue) {
       // we're displaying something different, so put the actual data in a hidden field
       var hidden = $('<input>').attr('id', field.data).attr('type', 'hidden');
@@ -175,12 +180,13 @@ FormUtils = (function($) {
       }
       td.append(hidden);
     }
-    
+
     switch (field.type) {
     case 'read-only':
       td.append(makeReadOnlyInput(field, value));
       break;
     case 'text':
+    case 'date': // treat as text for now. date picker gets added later
       td.append(makeTextInput(field, value));
       break;
     case 'dropdown':
@@ -197,7 +203,7 @@ FormUtils = (function($) {
     }
     return td;
   }
-  
+
   function getValue(field, object) {
     var value = null;
     if (field.getDisplayValue) {
@@ -210,7 +216,7 @@ FormUtils = (function($) {
     }
     return value;
   }
-  
+
   function makeReadOnlyInput(field, value) {
     var input = $('<span>').attr('id', field.data + (field.getDisplayValue ? 'Label' : ''));
     if (value !== null) {
@@ -218,7 +224,7 @@ FormUtils = (function($) {
     }
     return input;
   }
-  
+
   function makeTextInput(field, value) {
     var input = $('<input>').attr('id', field.data).attr('type', 'text');
     if (value !== null) {
@@ -229,7 +235,7 @@ FormUtils = (function($) {
     }
     return input;
   }
-  
+
   function makeDropdownInput(field, value) {
     var select = $('<select>').attr('id', field.data);
     if (!field.required) {
@@ -241,13 +247,13 @@ FormUtils = (function($) {
     select.val(value);
     return select;
   }
-  
+
   function makeSpecialInput(field, value) {
     return field.makeControls();
   }
-  
+
   function makeFieldValidationBox(field) {
     return $('<div>').attr('id', field.data + 'Error').addClass('errorContainer');
   }
-  
+
 })(jQuery);

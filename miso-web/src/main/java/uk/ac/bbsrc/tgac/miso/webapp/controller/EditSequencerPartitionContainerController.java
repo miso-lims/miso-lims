@@ -47,12 +47,12 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
@@ -152,15 +152,11 @@ public class EditSequencerPartitionContainerController {
     model.put("containerPartitions",
         container.getPartitions().stream().map(partition -> Dtos.asDto(partition, false)).collect(Collectors.toList()));
     model.put("containerRuns", runService.listByContainerId(container.getId()).stream().map(Dtos::asDto).collect(Collectors.toList()));
-    model.put("clusteringKits",
-        kitService.listKitDescriptorsByType(KitType.CLUSTERING).stream()
-            .filter(descriptor -> descriptor.getPlatformType() == container.getModel().getPlatformType())
-            .sorted(KitDescriptor::sortByName).collect(Collectors.toList()));
-    model.put("multiplexingKits",
-        kitService.listKitDescriptorsByType(KitType.MULTIPLEXING).stream()
-            .filter(descriptor -> descriptor.getPlatformType() == container.getModel().getPlatformType())
-            .sorted(KitDescriptor::sortByName).collect(Collectors.toList()));
+
+    ObjectMapper mapper = new ObjectMapper();
+    model.put("containerJSON", mapper.writer().writeValueAsString(Dtos.asDto(container)));
     model.put("poreVersions", containerService.listPoreVersions());
+
     return new ModelAndView("/pages/editSequencerPartitionContainer.jsp", model);
   }
 }

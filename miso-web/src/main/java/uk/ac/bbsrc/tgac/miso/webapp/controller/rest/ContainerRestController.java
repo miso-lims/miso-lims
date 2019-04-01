@@ -45,11 +45,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -68,16 +68,8 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
-/**
- * uk.ac.bbsrc.tgac.miso.webapp.controller.rest
- * <p/>
- * Info
- * 
- * @author Xingdong Bian
- */
 @Controller
 @RequestMapping("/rest/container")
-@SessionAttributes("container")
 public class ContainerRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(ContainerRestController.class);
 
@@ -98,7 +90,7 @@ public class ContainerRestController extends RestController {
 
   };
 
-  @GetMapping(value = "{containerBarcode}", produces = "application/json")
+  @GetMapping(value = "/{containerBarcode}", produces = "application/json")
   public @ResponseBody List<ContainerDto> jsonRest(@PathVariable String containerBarcode) throws IOException {
     return containerService.listByBarcode(containerBarcode).stream().map(Dtos::asDto).collect(Collectors.toList());
   }
@@ -156,6 +148,7 @@ public class ContainerRestController extends RestController {
     private final String serialNumber;
     private final String containerId;
 
+    @SuppressWarnings("unused")
     public SerialNumberValidationDto(@JsonProperty("serialNumber") String serialNumber, @JsonProperty("containerId") String containerId) {
       this.serialNumber = serialNumber;
       this.containerId = containerId;
@@ -189,6 +182,33 @@ public class ContainerRestController extends RestController {
     if (!matchingContainers.isEmpty() && matchingContainers.stream().noneMatch(spc -> spc.getId() == containerId)) {
       throw new RestException("Serial number is already associated with another container", Status.BAD_REQUEST);
     }
+  }
+
+  @PostMapping
+  public @ResponseBody ContainerDto create(@RequestBody ContainerDto dto) throws IOException {
+    if (dto.getId() != null) {
+      throw new RestException("Container appears to have been created already", Status.BAD_REQUEST);
+    }
+    SequencerPartitionContainer container = Dtos.to(dto);
+    SequencerPartitionContainer saved = containerService.save(container);
+    return Dtos.asDto(saved);
+
+  }
+
+  @PutMapping("/{containerId}")
+  public @ResponseBody ContainerDto update(@PathVariable Long containerId, @RequestBody ContainerDto dto) throws IOException {
+    if (containerId == null || !dto.getId().equals(containerId)) {
+      throw new RestException("Invalid container ID", Status.BAD_REQUEST);
+    }
+    SequencerPartitionContainer original = containerService.get(containerId);
+    if (original == null) {
+      throw new RestException("Container not found", Status.NOT_FOUND);
+    }
+    SequencerPartitionContainer container = Dtos.to(dto);
+    // reset partitions since they're not intended to be modified by this method
+    container.setPartitions(original.getPartitions());
+    SequencerPartitionContainer saved = containerService.save(container);
+    return Dtos.asDto(saved);
   }
 
 }

@@ -7,8 +7,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
+
 @Entity
-public class PoreVersion implements Serializable {
+public class PoreVersion implements Serializable, Aliasable {
 
   private static final long serialVersionUID = 1L;
 
@@ -20,14 +22,17 @@ public class PoreVersion implements Serializable {
 
   private String alias;
 
+  @Override
   public long getId() {
     return poreVersionId;
   }
 
+  @Override
   public void setId(long id) {
     this.poreVersionId = id;
   }
 
+  @Override
   public String getAlias() {
     return alias;
   }
