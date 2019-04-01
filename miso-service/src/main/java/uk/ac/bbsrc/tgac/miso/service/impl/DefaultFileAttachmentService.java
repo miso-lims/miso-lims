@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -165,6 +166,7 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
     attachment.setCategory(category);
     attachment.setCreator(authorizationManager.getCurrentUser());
     attachment.setCreationTime(new Date());
+    attachableStore.save(attachment);
     return attachment;
   }
 
@@ -232,11 +234,24 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   }
 
   @Override
-  public void afterDelete(Attachable object) {
-    for (FileAttachment a : object.getAttachments()) {
-      File file = new File(makeFullPath(a.getPath()));
-      deleteFileOrLog(file, object, a);
+  public void beforeDelete(Attachable object) throws IOException {
+    // Delete database entity only. Do not delete file until after the object is successfully deleted
+    object.setPendingAttachmentDeletions(new ArrayList<>(object.getAttachments()));
+  }
+
+  @Override
+  public void afterDelete(Attachable object) throws IOException {
+    // Delete attachments from the object and the associated files if they are not used by anything else
+    if (object.getPendingAttachmentDeletions() != null) {
+      for (FileAttachment attachment : object.getPendingAttachmentDeletions()) {
+        File file = new File(makeFullPath(attachment.getPath()));
+        if (file.exists() && attachableStore.getUsage(attachment) == 0) {
+          attachableStore.delete(attachment);
+          deleteFileOrLog(file, object, attachment);
+        }
+      }
     }
+    // Delete the entity's attachments directory and anything in it
     File dir = new File(makeFullPath(makeRelativeDir(object.getAttachmentsTarget(), object.getId())));
     if (dir.exists() && dir.isDirectory()) {
       if (dir.listFiles() != null) {

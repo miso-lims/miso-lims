@@ -63,7 +63,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
@@ -118,8 +117,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   private PoolService poolService;
   @Autowired
   private ContainerModelService containerModelService;
-  @Autowired
-  private InstrumentModelService platformService;
 
   @Override
   public Collection<Run> list() throws IOException {
@@ -492,10 +489,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
 
   public void setRunDao(RunStore runDao) {
     this.runDao = runDao;
-  }
-
-  public void setPlatformService(InstrumentModelService platformService) {
-    this.platformService = platformService;
   }
 
   @Override

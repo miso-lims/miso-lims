@@ -50,6 +50,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -194,10 +195,13 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Enumerated(EnumType.STRING)
   private DilutionFactor spikeInDilutionFactor;
 
-  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = FileAttachment.class)
   @JoinTable(name = "Library_Attachment", joinColumns = { @JoinColumn(name = "libraryId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
   private List<FileAttachment> attachments;
+
+  @Transient
+  private List<FileAttachment> pendingAttachmentDeletions;
 
   private boolean distributed;
   @Temporal(TemporalType.DATE)
@@ -743,6 +747,16 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public String getAttachmentsTarget() {
     return "library";
+  }
+
+  @Override
+  public List<FileAttachment> getPendingAttachmentDeletions() {
+    return pendingAttachmentDeletions;
+  }
+
+  @Override
+  public void setPendingAttachmentDeletions(List<FileAttachment> pendingAttachmentDeletions) {
+    this.pendingAttachmentDeletions = pendingAttachmentDeletions;
   }
 
   @Override

@@ -17,6 +17,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
@@ -65,6 +66,9 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
   @JoinTable(name = "ServiceRecord_Attachment", joinColumns = { @JoinColumn(name = "recordId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
   private List<FileAttachment> attachments;
+
+  @Transient
+  private List<FileAttachment> pendingAttachmentDeletions;
 
   @Override
   public void setId(long id) {
@@ -169,6 +173,16 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
   @Override
   public String getAttachmentsTarget() {
     return "servicerecord";
+  }
+
+  @Override
+  public List<FileAttachment> getPendingAttachmentDeletions() {
+    return pendingAttachmentDeletions;
+  }
+
+  @Override
+  public void setPendingAttachmentDeletions(List<FileAttachment> pendingAttachmentDeletions) {
+    this.pendingAttachmentDeletions = pendingAttachmentDeletions;
   }
 
   @Override

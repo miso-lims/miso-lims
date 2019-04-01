@@ -69,6 +69,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
@@ -142,6 +143,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   private BoxService boxService;
   @Autowired
   private WorksetService worksetService;
+  @Autowired
+  private FileAttachmentService fileAttachmentService;
 
   @Autowired
   private NamingScheme namingScheme;
@@ -208,6 +211,10 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
   public void setWorksetService(WorksetService worksetService) {
     this.worksetService = worksetService;
+  }
+
+  public void setFileAttachmentService(FileAttachmentService fileAttachmentService) {
+    this.fileAttachmentService = fileAttachmentService;
   }
 
   public void setNamingScheme(NamingScheme namingScheme) {
@@ -971,6 +978,12 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       box.getBoxPositions().remove(object.getBoxPosition());
       boxService.save(box);
     }
+    fileAttachmentService.beforeDelete(object);
+  }
+
+  @Override
+  public void afterDelete(Sample object) throws IOException {
+    fileAttachmentService.afterDelete(object);
   }
 
   @Override

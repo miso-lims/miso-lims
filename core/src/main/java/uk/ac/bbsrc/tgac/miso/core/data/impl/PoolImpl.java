@@ -54,6 +54,7 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -161,10 +162,13 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Enumerated(EnumType.STRING)
   private VolumeUnit volumeUnits;
 
-  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = FileAttachment.class)
   @JoinTable(name = "Pool_Attachment", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
   private List<FileAttachment> attachments;
+
+  @Transient
+  private List<FileAttachment> pendingAttachmentDeletions;
 
   public PoolImpl() {
   }
@@ -314,6 +318,16 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public String getAttachmentsTarget() {
     return "pool";
+  }
+
+  @Override
+  public List<FileAttachment> getPendingAttachmentDeletions() {
+    return pendingAttachmentDeletions;
+  }
+
+  @Override
+  public void setPendingAttachmentDeletions(List<FileAttachment> pendingAttachmentDeletions) {
+    this.pendingAttachmentDeletions = pendingAttachmentDeletions;
   }
 
   @Override

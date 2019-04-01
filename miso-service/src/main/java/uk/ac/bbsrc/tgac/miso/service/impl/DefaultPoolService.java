@@ -39,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
@@ -70,6 +71,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   private PoolableElementViewService poolableElementViewService;
   @Autowired
   private PoolOrderService poolOrderService;
+  @Autowired
+  private FileAttachmentService fileAttachmentService;
 
   public void setAutoGenerateIdBarcodes(boolean autoGenerateIdBarcodes) {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
@@ -97,6 +100,10 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
 
   public void setPoolableElementViewService(PoolableElementViewService poolableElementViewService) {
     this.poolableElementViewService = poolableElementViewService;
+  }
+
+  public void setFileAttachmentService(FileAttachmentService fileAttachmentService) {
+    this.fileAttachmentService = fileAttachmentService;
   }
 
   @Override
@@ -338,6 +345,12 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
       box.getBoxPositions().remove(object.getBoxPosition());
       boxService.save(box);
     }
+    fileAttachmentService.beforeDelete(object);
+  }
+
+  @Override
+  public void afterDelete(Pool object) throws IOException {
+    fileAttachmentService.afterDelete(object);
   }
 
   @Override
