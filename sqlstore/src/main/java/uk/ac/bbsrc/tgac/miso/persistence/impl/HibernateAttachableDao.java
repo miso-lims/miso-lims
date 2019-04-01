@@ -62,4 +62,9 @@ public class HibernateAttachableDao implements AttachableStore {
     currentSession().delete(attachment);
   }
 
+  @Override
+  public void save(FileAttachment attachment) {
+    currentSession().save(attachment);
+  }
+
 }

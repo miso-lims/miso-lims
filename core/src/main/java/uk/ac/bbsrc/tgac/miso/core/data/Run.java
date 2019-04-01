@@ -50,6 +50,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
@@ -143,10 +144,13 @@ public abstract class Run
   @Temporal(TemporalType.DATE)
   private Date startDate;
 
-  @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = FileAttachment.class)
   @JoinTable(name = "Run_Attachment", joinColumns = { @JoinColumn(name = "runId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
   private List<FileAttachment> attachments;
+
+  @Transient
+  private List<FileAttachment> pendingAttachmentDeletions;
 
   /**
    * Construct a new Run with a default empty SecurityProfile
@@ -317,6 +321,16 @@ public abstract class Run
   @Override
   public String getAttachmentsTarget() {
     return "run";
+  }
+
+  @Override
+  public List<FileAttachment> getPendingAttachmentDeletions() {
+    return pendingAttachmentDeletions;
+  }
+
+  @Override
+  public void setPendingAttachmentDeletions(List<FileAttachment> pendingAttachmentDeletions) {
+    this.pendingAttachmentDeletions = pendingAttachmentDeletions;
   }
 
   @Override

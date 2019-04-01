@@ -54,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
@@ -95,6 +96,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   private BoxService boxService;
   @Autowired
   private WorksetService worksetService;
+  @Autowired
+  private FileAttachmentService fileAttachmentService;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
@@ -678,6 +681,10 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     this.worksetService = worksetService;
   }
 
+  public void setFileAttachmentService(FileAttachmentService fileAttachmentService) {
+    this.fileAttachmentService = fileAttachmentService;
+  }
+
   public void setAutoGenerateIdBarcodes(Boolean autoGenerateIdBarcodes) {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
   }
@@ -721,6 +728,12 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       box.getBoxPositions().remove(object.getBoxPosition());
       boxService.save(box);
     }
+    fileAttachmentService.beforeDelete(object);
+  }
+
+  @Override
+  public void afterDelete(Library object) throws IOException {
+    fileAttachmentService.afterDelete(object);
   }
 
   @Override

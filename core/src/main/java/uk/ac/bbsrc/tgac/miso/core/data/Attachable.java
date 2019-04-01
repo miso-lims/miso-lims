@@ -15,4 +15,8 @@ public interface Attachable extends Identifiable {
    */
   public String getAttachmentsTarget();
 
+  public List<FileAttachment> getPendingAttachmentDeletions();
+
+  public void setPendingAttachmentDeletions(List<FileAttachment> pendingAttachmentDeletions);
+
 }

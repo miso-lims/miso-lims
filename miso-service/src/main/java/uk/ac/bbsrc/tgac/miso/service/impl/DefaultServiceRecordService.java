@@ -120,7 +120,12 @@ public class DefaultServiceRecordService implements ServiceRecordService {
   }
 
   @Override
-  public void afterDelete(ServiceRecord object) {
+  public void beforeDelete(ServiceRecord object) throws IOException {
+    fileAttachmentService.beforeDelete(object);
+  }
+
+  @Override
+  public void afterDelete(ServiceRecord object) throws IOException {
     fileAttachmentService.afterDelete(object);
   }
 

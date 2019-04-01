@@ -24,10 +24,17 @@ public interface FileAttachmentService {
   public void delete(Attachable object, FileAttachment attachment) throws IOException;
 
   /**
-   * Deletes all files attached to the deleted object. Should be called after deleting any Attachable object
+   * Removes attachments from an object being deleted. Should be called before deleting any Attachable object
    * 
    * @param object an Attachable object that was just deleted
    */
-  public void afterDelete(Attachable object);
+  public void beforeDelete(Attachable object) throws IOException;
+
+  /**
+   * Deletes the attachments directory for a deleted object. Should be called after deleting any Attachable object
+   * 
+   * @param object an Attachable object that was just deleted
+   */
+  public void afterDelete(Attachable object) throws IOException;
 
 }

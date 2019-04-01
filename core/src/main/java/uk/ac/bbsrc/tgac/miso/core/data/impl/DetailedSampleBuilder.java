@@ -1174,4 +1174,14 @@ public class DetailedSampleBuilder
     throw new UnsupportedOperationException("Cannot attach files to non-persisted builder object");
   }
 
+  @Override
+  public List<FileAttachment> getPendingAttachmentDeletions() {
+    throw new UnsupportedOperationException("Cannot attach files to non-persisted builder object");
+  }
+
+  @Override
+  public void setPendingAttachmentDeletions(List<FileAttachment> pendingAttachmentDeletions) {
+    throw new UnsupportedOperationException("Cannot attach files to non-persisted builder object");
+  }
+
 }
