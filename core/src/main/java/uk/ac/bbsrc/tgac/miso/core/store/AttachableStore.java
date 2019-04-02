@@ -15,4 +15,6 @@ public interface AttachableStore {
 
   public void delete(FileAttachment attachment);
 
+  public void save(FileAttachment attachment);
+
 }

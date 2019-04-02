@@ -11,16 +11,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcTypeDto;
 import uk.ac.bbsrc.tgac.miso.service.QcTypeService;
-import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 
 @Controller
 @RequestMapping("/qctype")
 public class QcTypeDefaultsController extends AbstractInstituteDefaultsController<QcType, QcTypeDto> {
   @Autowired
   private QcTypeService qcTypeService;
-
-  @Autowired
-  private QualityControlService qcService;
 
   @Override
   protected QcTypeDto asDto(QcType model) {

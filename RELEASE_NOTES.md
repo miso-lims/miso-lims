@@ -1,8 +1,22 @@
+# 0.2.170
+
+Changes:
+
+ * Updated run scanner version
+ * Updated miso logo, removed institute logo
+ * Fixed deleting items with attachments
+ * Fixed saving Oxford Nanopore data from run scanner (still experimental)
+ * Fixed names of PromethION flowcell models and positions
+
 # 0.2.169
 
 Changes:
 
  * Fix failure to save Oxford Nanopore runs from Run Scanner
+
+BAD:
+
+ * Didn't actually fix the issue with saving Oxford Nanopore runs
 
 # 0.2.168
 

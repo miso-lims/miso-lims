@@ -191,7 +191,7 @@ public class EditPoolController {
       model.put("volumeUnits", VolumeUnit.values());
       model.put("concentrationUnits", ConcentrationUnit.values());
 
-      return new ModelAndView("/pages/editPool.jsp", model);
+      return new ModelAndView("/WEB-INF/pages/editPool.jsp", model);
     } catch (IOException ex) {
       log.debug("Failed to show pool", ex);
       throw ex;

@@ -88,7 +88,7 @@ public class TabbedListItemsPage {
     model.put("projectId", projectId);
     model.put("property", property);
     model.put("tabs", tabs);
-    return new ModelAndView("/pages/listTabbed.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/listTabbed.jsp", model);
   }
 
   public <V> ModelAndView list(Function<String, Stream<V>> getter, ModelMap model) throws IOException {
@@ -106,7 +106,7 @@ public class TabbedListItemsPage {
       getter.apply(key).forEach(array::addPOJO);
       return mapper.writeValueAsString(array);
     }))));
-    return new ModelAndView("/pages/listTabbedStatic.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/listTabbedStatic.jsp", model);
   }
 
   public final ModelAndView listByProject(long project, ModelMap model) throws IOException {

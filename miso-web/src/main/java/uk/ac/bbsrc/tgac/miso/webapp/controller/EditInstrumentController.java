@@ -90,7 +90,7 @@ public class EditInstrumentController {
     model.put("instrument", sr);
     model.put("serviceRecords", serviceRecords.stream().map(Dtos::asDto).collect(Collectors.toList()));
     model.put("title", "Instrument " + sr.getId());
-    return new ModelAndView("/pages/editInstrument.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/editInstrument.jsp", model);
   }
 
   @PostMapping

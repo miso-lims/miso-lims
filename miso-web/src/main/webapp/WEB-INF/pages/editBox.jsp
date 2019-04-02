@@ -65,8 +65,6 @@
 
 <script type="text/javascript">
   jQuery(document).ready(function () {
-    // Attaches form validation listener
-    Validate.attachParsley('#box-form');
     FormUtils.createForm('boxForm', 'save', ${boxJSON}, 'box', {isNew: ${pageMode eq 'create'}});
   });
 </script>

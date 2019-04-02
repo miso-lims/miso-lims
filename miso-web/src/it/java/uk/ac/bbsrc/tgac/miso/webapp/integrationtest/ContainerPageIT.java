@@ -65,8 +65,8 @@ public class ContainerPageIT extends AbstractIT {
     fields.put(Field.ID, "Unsaved");
     fields.put(Field.SERIAL_NUMBER, null);
     fields.put(Field.MODEL, model);
-    fields.put(Field.CLUSTERING_KIT, "(None)");
-    fields.put(Field.MULTIPLEXING_KIT, "(None)");
+    fields.put(Field.CLUSTERING_KIT, "None");
+    fields.put(Field.MULTIPLEXING_KIT, "None");
     assertFieldValues("default values", fields, page1);
 
     // enter container info
@@ -97,8 +97,8 @@ public class ContainerPageIT extends AbstractIT {
     fields.put(Field.ID, "6001");
     fields.put(Field.SERIAL_NUMBER, "CHANGEABLE");
     fields.put(Field.MODEL, "Generic 4-Lane Illumina Flow Cell");
-    fields.put(Field.CLUSTERING_KIT, "(None)");
-    fields.put(Field.MULTIPLEXING_KIT, "(None)");
+    fields.put(Field.CLUSTERING_KIT, "None");
+    fields.put(Field.MULTIPLEXING_KIT, "None");
     assertFieldValues("initial values", fields, page1);
 
     Map<ContainerPage.Field, String> changes = Maps.newLinkedHashMap();

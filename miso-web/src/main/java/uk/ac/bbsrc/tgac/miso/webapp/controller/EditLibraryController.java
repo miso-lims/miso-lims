@@ -624,7 +624,7 @@ public class EditLibraryController {
       SampleIdentity identity = getParent(SampleIdentity.class, (DetailedSample) detailed.getSample());
       model.put("effectiveExternalName", identity.getExternalName());
     }
-    return new ModelAndView("/pages/editLibrary.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/editLibrary.jsp", model);
   }
 
   private final BulkEditTableBackend<Library, LibraryDto> libraryBulkEditBackend = new BulkEditTableBackend<Library, LibraryDto>(

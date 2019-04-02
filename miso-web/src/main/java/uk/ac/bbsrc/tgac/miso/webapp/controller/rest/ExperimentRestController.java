@@ -80,7 +80,7 @@ public class ExperimentRestController extends RestController {
       kit = Dtos.to(dto);
       kitService.saveKit(kit);
     } else {
-      if (!kit.getKitDescriptor().getId().equals(dto.getDescriptor().getId())) {
+      if (kit.getKitDescriptor().getId() != (dto.getDescriptor().getId())) {
         throw new RestException("Kit exists, but kit type does not match.", Status.BAD_REQUEST);
       }
     }

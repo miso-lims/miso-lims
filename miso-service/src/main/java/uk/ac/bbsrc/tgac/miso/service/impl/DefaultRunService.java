@@ -63,7 +63,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
@@ -118,8 +117,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   private PoolService poolService;
   @Autowired
   private ContainerModelService containerModelService;
-  @Autowired
-  private InstrumentModelService platformService;
 
   @Override
   public Collection<Run> list() throws IOException {
@@ -494,10 +491,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     this.runDao = runDao;
   }
 
-  public void setPlatformService(InstrumentModelService platformService) {
-    this.platformService = platformService;
-  }
-
   @Override
   public boolean processNotification(Run source, int laneCount, String containerModel, String containerSerialNumber, String sequencerName,
       Predicate<SequencingParameters> filterParameters, GetLaneContents getLaneContents, String positionName)
@@ -564,7 +557,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       isMutated |= updateField(source.getPairedEnd(), target.getPairedEnd(), target::setPairedEnd);
       break;
     case OXFORDNANOPORE:
-      throw new NotImplementedException();
+      // Nothing to do
+      break;
     case PACBIO:
       // Nothing to do
       break;

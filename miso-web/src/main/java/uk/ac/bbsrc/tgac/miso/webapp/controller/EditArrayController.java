@@ -24,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.service.ArrayService;
 @RequestMapping("/array")
 public class EditArrayController {
 
-  private static final String JSP = "/pages/editArray.jsp";
+  private static final String JSP = "/WEB-INF/pages/editArray.jsp";
 
   private static final String MODEL_ATTR_PAGEMODE = "pageMode";
   private static final String MODEL_ATTR_MODELS = "arrayModels";

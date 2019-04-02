@@ -53,6 +53,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.KitDescriptorChangeLog;
@@ -68,7 +69,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  */
 @Entity
 @Table(name = "KitDescriptor")
-public class KitDescriptor implements Serializable, ChangeLoggable {
+public class KitDescriptor implements Serializable, ChangeLoggable, Identifiable {
 
   public static int sortByName(KitDescriptor a, KitDescriptor b) {
     return a.getName().compareTo(b.getName());
@@ -124,7 +125,8 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
    * 
    * @return Long kitDescriptorId.
    */
-  public Long getId() {
+  @Override
+  public long getId() {
     return kitDescriptorId;
   }
 
@@ -134,7 +136,8 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
    * @param kitDescriptorId
    *          kitDescriptorId.
    */
-  public void setId(Long kitDescriptorId) {
+  @Override
+  public void setId(long kitDescriptorId) {
     this.kitDescriptorId = kitDescriptorId;
   }
 

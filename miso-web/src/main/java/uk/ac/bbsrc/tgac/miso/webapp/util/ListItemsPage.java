@@ -22,7 +22,7 @@ public class ListItemsPage {
   public final ModelAndView list(ModelMap model) throws IOException {
     prepare(model);
     model.put("projectId", "null");
-    return new ModelAndView("/pages/list.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/list.jsp", model);
   }
 
   public final <T> ModelAndView list(ModelMap model, Stream<T> data) throws IOException {
@@ -30,14 +30,14 @@ public class ListItemsPage {
     ArrayNode array = mapper.createArrayNode();
     data.forEach(array::addPOJO);
     model.put("data", mapper.writeValueAsString(array));
-    return new ModelAndView("/pages/listStatic.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/listStatic.jsp", model);
 
   }
 
   public final ModelAndView listByProject(long project, ModelMap model) throws IOException {
     prepare(model);
     model.put("projectId", Long.toString(project));
-    return new ModelAndView("/pages/list.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/list.jsp", model);
   }
 
   public final ModelAndView listByProject(Project project, ModelMap model) throws IOException {
