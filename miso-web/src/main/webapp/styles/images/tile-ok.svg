@@ -12,7 +12,7 @@
    viewBox="0 0 32 31.999999"
    height="32"
    width="32"
-   inkscape:version="0.91 r13725"
+   inkscape:version="0.92.4 (unknown)"
    sodipodi:docname="tile-ok.svg">
   <sodipodi:namedview
      pagecolor="#ffffff"
@@ -23,16 +23,16 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1558"
-     inkscape:window-height="1039"
+     inkscape:window-width="1855"
+     inkscape:window-height="1176"
      id="namedview21"
      showgrid="false"
      inkscape:zoom="4.9166667"
      inkscape:cx="33.355932"
      inkscape:cy="24"
-     inkscape:window-x="0"
+     inkscape:window-x="65"
      inkscape:window-y="24"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
   <defs
      id="defs4" />
@@ -44,18 +44,19 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
      transform="matrix(0.75,0,0,0.75,-2,-755.27164)"
-     id="layer1">
+     id="layer1"
+     style="fill:#abc937;fill-opacity:1">
     <circle
        r="20"
        cy="1028.3622"
        cx="24"
        id="path4136"
-       style="fill:#66ce16;fill-opacity:1;stroke:none;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:2, 2;stroke-dashoffset:0;stroke-opacity:1" />
+       style="fill:#abc937;fill-opacity:1;stroke:none;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:2, 2;stroke-dashoffset:0;stroke-opacity:1" />
   </g>
 </svg>

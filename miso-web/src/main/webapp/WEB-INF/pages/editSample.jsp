@@ -109,7 +109,7 @@
 
 <h2>Sample Information</h2>
 <div>
-  <table class="in" <c:if test="${detailedSample && sample.isSynthetic()}">style="background-color: #ddd"</c:if>>
+  <table class="in <c:if test="${detailedSample && sample.isSynthetic()}"> synthetic</c:if>">
     <tr>
       <td class="h">Sample ID:</td>
       <td><span id="sampleId">
@@ -228,7 +228,7 @@
     </tr>
     <c:choose>
     <c:when test="${not detailedSample}">
-	  <tr style="background-color:yellow;">
+	  <tr class="highlightfield">
 	    <td>QC Passed:</td>
 	    <td>
 	      <form:radiobutton path="qcPassed" value="" label="Unknown"/>

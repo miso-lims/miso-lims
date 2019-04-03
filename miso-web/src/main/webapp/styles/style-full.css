@@ -65,7 +65,11 @@ pre.wrap {
 }
 
 a {
-    color: #0066cc;
+    color: #404087;
+}
+
+a:hover { 
+    text-decoration: none;
 }
 
 .disabled {
@@ -119,7 +123,7 @@ div.lowquality div {
     width: 100%;
     font-size: 93%;
     line-height: normal;
-    border-bottom: 1px solid #666;
+    border-bottom: thick double #666;
     margin-bottom: 0em; /*margin between menu and rest of page*/
     overflow: hidden;
 }
@@ -738,8 +742,16 @@ div.checklist {
     float: right;
 }
 
+.highlightfield {
+    background-color: #FFE778;
+}
+
+.synthetic {
+    background-color: #ddd;
+}
+
 .note {
-    background-color: #FFFFCC;
+    background-color: #FEFEE3;
     border: 1px solid #333333;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -1064,7 +1076,7 @@ div.flasherror {
 }
 
 div.flashinfo {
-    background-color: #FFFFCC;
+    background-color: #FEFEE3;
     border-color: #999900;
     padding: 4px 4px 4px 30px;
     margin-bottom: 12px;
@@ -1301,7 +1313,7 @@ div.experimentwizard li {
     text-align: right;
     text-decoration: none;
     background: white;
-    color: #0066CC;
+    color: #6565d8;
     font: 11px arial;
 }
 
@@ -1364,7 +1376,7 @@ div.experimentwizard li {
     text-align: right;
     text-decoration: none;
     background: white;
-    color: #0066CC;
+    color: #6565d8;
     font: 11px arial;
 }
 
@@ -1832,7 +1844,7 @@ textarea.parsley-error {
 }
 
 .message-info {
-  color: #5560ff;
+  color: #6565d8;
 }
 
 .hidden {
@@ -1842,7 +1854,7 @@ textarea.parsley-error {
 .bs-callout {
   margin: 20px 0;
   padding: 20px;
-  border-left: 3px solid #eee;
+  border-left: 3px solid #000;
 }
 .bs-callout h4 {
   margin-top: 0;
@@ -1864,15 +1876,15 @@ textarea.parsley-error {
   color: #d9534f;
 }
 .bs-callout-warning {
-  background-color: #fcf8f2;
-  border-color: #f0ad4e;
+  background-color: #f8f8f8;
+  border-color: #FFE778;
 }
 .bs-callout-warning h4 {
-  color: #f0ad4e;
+  color: #FFE778;
 }
 .bs-callout-info {
-  background-color: #f4f8fa;
-  border-color: #5bc0de;
+  background-color: #f8f8f8;
+  border-color: #6565D8;
 }
 .bs-callout-info h4 {
   color: #5bc0de;
@@ -1912,7 +1924,7 @@ button.disabled {
 }
 
 .table-note {
-  background-color: #ffffcc;
+  background-color: #FEFEE3;
 }
 
 .dataTables_paginate_numbers {
@@ -1959,7 +1971,7 @@ button.disabled {
 }
 
 .handsontable td.nonStandardAlias {
-  background-color: #FFFFCC;
+  background-color: #FEFEE3;
 }
 
 .handsontable td.nonStandardAlias.htInvalid {

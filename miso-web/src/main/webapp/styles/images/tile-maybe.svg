@@ -12,8 +12,8 @@
    viewBox="0 0 32 31.999999"
    height="32"
    width="32"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="tile-ok.svg">
+   inkscape:version="0.92.4 (unknown)"
+   sodipodi:docname="tile-maybe.svg">
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -23,15 +23,15 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1558"
-     inkscape:window-height="1039"
+     inkscape:window-width="708"
+     inkscape:window-height="692"
      id="namedview21"
      showgrid="false"
-     inkscape:zoom="4.9166667"
-     inkscape:cx="33.355932"
-     inkscape:cy="24"
-     inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:zoom="14.481547"
+     inkscape:cx="5.9482004"
+     inkscape:cy="16.125007"
+     inkscape:window-x="297"
+     inkscape:window-y="323"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg2" />
   <defs
@@ -44,18 +44,25 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <g
-     transform="matrix(0.75,0,0,0.75,-2,-755.27164)"
-     id="layer1">
-    <circle
-       r="20"
-       cy="1028.3622"
-       cx="24"
-       id="path4136"
-       style="fill:#ffd800;fill-opacity:1;stroke:none;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:2, 2;stroke-dashoffset:0;stroke-opacity:1" />
-  </g>
+  <path
+     sodipodi:type="star"
+     style="fill:#ffe778;fill-opacity:1"
+     id="path2712"
+     sodipodi:sides="3"
+     sodipodi:cx="16.992188"
+     sodipodi:cy="21.84375"
+     sodipodi:r1="20.470575"
+     sodipodi:r2="10.235288"
+     sodipodi:arg1="2.6179939"
+     sodipodi:arg2="3.6651914"
+     inkscape:flatsided="false"
+     inkscape:rounded="0"
+     inkscape:randomized="0"
+     d="M -0.73585099,32.079037 8.1281682,16.726106 16.992188,1.3731747 l 8.864018,15.3529313 8.86402,15.352932 -17.728038,0 z"
+     inkscape:transform-center-y="-4.5673137"
+     transform="matrix(0.70741137,0,0,0.89246406,3.9795335,1.0725512)" />
 </svg>
