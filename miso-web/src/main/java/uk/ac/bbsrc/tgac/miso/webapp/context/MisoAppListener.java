@@ -24,6 +24,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
@@ -107,6 +110,7 @@ public class MisoAppListener implements ServletContextListener {
     } else {
       log.info(dirchecks.get("ok"));
     }
+    linkMapsDir(application, fileStoragePath);
 
     // set headless property so JFreeChart doesn't try to use the X rendering system to generate images
     System.setProperty("java.awt.headless", "true");
@@ -121,6 +125,22 @@ public class MisoAppListener implements ServletContextListener {
     }
 
     loadIssueTrackerManager(misoProperties, context);
+  }
+
+  private void linkMapsDir(ServletContext application, String fileStoragePath) {
+    try {
+      Path target = Paths.get(fileStoragePath, "freezermaps");
+      if (!Files.exists(target)) {
+        Files.createDirectory(target);
+      }
+      Path link = Paths.get(application.getRealPath("/"), "freezermaps");
+      if (Files.exists(link)) {
+        Files.delete(link);
+      }
+      Files.createSymbolicLink(link, target);
+    } catch (IOException e) {
+      throw new IllegalStateException("Failed to link freezer maps directory", e);
+    }
   }
 
   private void loadIssueTrackerManager(Map<String, String> misoProperties, XmlWebApplicationContext context) {
