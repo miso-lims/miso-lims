@@ -72,7 +72,6 @@ DELETE FROM Experiment;
 DELETE FROM InstrumentModel;
 DELETE FROM StudyChangeLog;
 DELETE FROM Study;
-DELETE FROM ProjectOverview;
 DELETE FROM Project;
 DELETE FROM ReferenceGenome;
 DELETE FROM Note;
