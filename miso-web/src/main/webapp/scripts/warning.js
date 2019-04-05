@@ -24,6 +24,19 @@
 var WarningTarget = {};
 var Warning = (function($) {
 
+  /*
+   * warning format: {
+   *   include: boolean,
+   *   tileMessage: string,
+   *   tableMessage: string,
+   *   headerMessage: string,
+   *   level: string ('error'|'important'|'info')
+   * }
+   * 
+   * error = red, important = blue, info = grey
+   * if a particular message is not provided, the warning will not be shown in that format
+   */
+
   return {
     generateHeaderWarnings: function(containerId, target, item) {
       // Note: header warnings currently ignore the warning level and show all warnings in red
@@ -32,9 +45,8 @@ var Warning = (function($) {
         return;
       }
       var container = $('#' + containerId);
-      container.append($('<span>').css('float', 'right').append($('<img>').attr('src', '/styles/images/fail.png')));
       warnings.forEach(function(warning) {
-        container.append($('<p>').addClass('big-' + (warning.level || 'error')).text(warning.headerMessage));
+        container.append($('<p>').addClass('big big-' + (warning.level || 'error')).text(warning.headerMessage));
       });
     },
 
@@ -76,7 +88,6 @@ var Warning = (function($) {
   }
 
   function getWarnings(target, item, messageProperty) {
-    // warnings: { include: boolean, tileMessage: string, tableMessage: string, headerMessage: string, level: string ('info'|'error') }
     return target.getWarnings(item).filter(function(warning) {
       return warning.include && warning.hasOwnProperty(messageProperty);
     });

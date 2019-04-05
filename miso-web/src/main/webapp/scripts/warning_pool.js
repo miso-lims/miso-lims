@@ -41,7 +41,7 @@ WarningTarget.pool = {
           tileMessage: 'PRIORITY ('
               + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] : pool.prioritySubprojectAliases.join(', '))
               + ')',
-          level: 'info'
+          level: 'important'
         }, {
           include: pool.duplicateIndices,
           headerMessage: 'This pool contains duplicate indices!',

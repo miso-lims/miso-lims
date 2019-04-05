@@ -92,12 +92,9 @@
     
     var opts = {
       detailedSample: Constants.isDetailedSample,
-      includeAccession: ${not empty sample.accession},
-      projectId: ${sample.project.id}
+      generateSampleAliases: Constants.automaticSampleAlias
     };
     <c:if test="${detailedSample}">
-    opts.sampleCategory = '${sample.sampleClass.sampleCategory}';
-    opts.sampleClass = '${sample.sampleClass.alias}';
     opts.dnaseTreatable = ${sample.sampleClass.DNAseTreatable};
     </c:if>
     FormUtils.createForm('sampleForm', 'save', ${sampleDto}, 'sample', opts);

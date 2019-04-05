@@ -27,7 +27,7 @@ WarningTarget.completion = {
     return [{
       include: pool.prioritySubprojectAliases && pool.prioritySubprojectAliases.length > 0,
       tableMessage: 'PRIORITY (' + (pool.prioritySubprojectAliases.length == 1 ? pool.prioritySubprojectAliases[0] : 'MULTIPLE') + ')',
-      level: 'info'
+      level: 'important'
     }, {
       include: pool.duplicateIndices,
       tableMessage: "(DUPLICATE INDICES)"

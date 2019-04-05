@@ -9,6 +9,8 @@ public class DetailedSampleDto extends SampleDto {
   private String parentAlias;
   private Long parentTissueSampleClassId;
   private Long sampleClassId;
+  private String sampleClassAlias;
+  private String sampleCategory;
   private Long detailedQcStatusId;
   private String detailedQcStatusNote;
   private Long subprojectId;
@@ -89,6 +91,22 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setSampleClassId(Long sampleClassId) {
     this.sampleClassId = sampleClassId;
+  }
+
+  public String getSampleClassAlias() {
+    return sampleClassAlias;
+  }
+
+  public void setSampleClassAlias(String sampleClassAlias) {
+    this.sampleClassAlias = sampleClassAlias;
+  }
+
+  public String getSampleCategory() {
+    return sampleCategory;
+  }
+
+  public void setSampleCategory(String sampleCategory) {
+    this.sampleCategory = sampleCategory;
   }
 
   public String getGroupId() {

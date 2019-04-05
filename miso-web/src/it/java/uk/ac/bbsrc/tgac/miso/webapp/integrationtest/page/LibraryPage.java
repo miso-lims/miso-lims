@@ -40,7 +40,7 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
     CONCENTRATION(By.id("concentration"), FieldType.TEXT),
     ARCHIVED(By.id("archived"), FieldType.CHECKBOX),
 
-    WARNINGS(By.className("big-error"), FieldType.LABEL);
+    WARNINGS(By.className("big"), FieldType.LABEL);
 
     private final By selector;
     private final FieldType type;

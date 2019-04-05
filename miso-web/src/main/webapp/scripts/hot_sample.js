@@ -610,15 +610,16 @@ HotTarget.sample = (function() {
             }(),
             validator: Handsontable.validators.AutocompleteValidator,
             unpack: function(sam, flat, setCellMeta) {
-              if (sam.stain) {
-                flat.stainName = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(sam.stain.id),
+              if (sam.stainId) {
+                flat.stainName = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(sam.stainId),
                     Constants.stains), 'name');
               } else {
                 flat.stainName = '(None)';
               }
             },
             pack: function(sam, flat, errorHandler) {
-              sam.stain = Utils.array.findFirstOrNull(Utils.array.namePredicate(flat.stainName), Constants.stains);
+              sam.stainId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.namePredicate(flat.stainName),
+                  Constants.stains), 'id');
             },
             include: show['Tissue Processing'] && config.targetSampleClass.alias == 'Slide'
           },

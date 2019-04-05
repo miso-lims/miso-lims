@@ -426,6 +426,8 @@ public class Dtos {
       throw new IllegalArgumentException();
     }
     dto.setSampleClassId(from.getSampleClass().getId());
+    dto.setSampleClassAlias(from.getSampleClass().getAlias());
+    dto.setSampleCategory(from.getSampleClass().getSampleCategory());
     if (from.getDetailedQcStatus() != null) {
       dto.setDetailedQcStatusId(from.getDetailedQcStatus().getId());
     }
@@ -993,7 +995,7 @@ public class Dtos {
     to.setSlides(from.getSlides());
     to.setDiscards(from.getDiscards());
     to.setThickness(from.getThickness());
-    if (from.getId() == null) {
+    if (from.getStainId() == null) {
       to.setStain(null);
     } else {
       Stain stain = new Stain();

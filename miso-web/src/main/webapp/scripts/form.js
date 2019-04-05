@@ -5,7 +5,7 @@ FormUtils = (function($) {
    *   getSaveUrl: required function(object) returning string; URL to save object
    *   getSaveMethod: required function(object) returning string (POST|PUT); HTTP method to save object
    *   getEditUrl: required function(object) returning string; URL for the object's edit page
-   *   getSections: required function(config) returning array of FormSections; see below
+   *   getSections: required function(config, object) returning array of FormSections; see below
    *   onLoad: optional function(updateField); called after the form is initialized
    * }
    * 
@@ -55,7 +55,7 @@ FormUtils = (function($) {
       }
 
       writeGeneralValidationBox(container);
-      var sections = getFilteredSections(target, config);
+      var sections = getFilteredSections(target, config, object);
 
       var updateField = function(dataProperty, options) {
         var field = findField(sections, dataProperty);
@@ -225,9 +225,9 @@ FormUtils = (function($) {
         $('<p>').text('This form seems to be invalid')).append($('<div>').addClass('generalErrors')));
   }
 
-  function getFilteredSections(target, config) {
+  function getFilteredSections(target, config, object) {
     var filtered = [];
-    target.getSections(config).filter(function(section) {
+    target.getSections(config, object).filter(function(section) {
       return !section.hasOwnProperty('include') || section.include;
     }).forEach(function(section) {
       var fields = section.fields.filter(function(field) {
@@ -307,6 +307,9 @@ FormUtils = (function($) {
     default:
       throw new Error('Unknown field type: ' + field.type);
     }
+    if (field.note) {
+      td.append(makeFieldNote(field));
+    }
     if (field.type !== 'special') {
       td.append(makeFieldValidationBox(field));
     }
@@ -381,6 +384,10 @@ FormUtils = (function($) {
 
   function makeSpecialInput(field, value) {
     return field.makeControls();
+  }
+
+  function makeFieldNote(field) {
+    return $('<span>').addClass('message-info').text(field.note);
   }
 
   function makeFieldValidationBox(field) {

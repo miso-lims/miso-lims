@@ -27,7 +27,7 @@ WarningTarget.sample = {
       include: sample.subprojectPriority,
       headerMessage: 'Belongs to high priority subproject \'' + sample.subprojectAlias + '\'',
       tableMessage: 'PRIORITY (' + sample.subprojectAlias + ')',
-      level: 'info'
+      level: 'important'
     }, {
       include: sample.identityConsentLevel === 'Revoked',
       headerMessage: 'Donor has revoked consent',
