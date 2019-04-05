@@ -4,7 +4,7 @@ CREATE TABLE `sequence_data` (
     PRIMARY KEY (`sequence_name`)
 ) ENGINE=MyISAM;
 
---StartNoTest
+-- StartNoTest
 DELIMITER //
 CREATE FUNCTION `nextval` (`seq_name` varchar(100))
 RETURNS bigint(20) NOT DETERMINISTIC
@@ -18,7 +18,7 @@ BEGIN
     RETURN cur_val;
 END//
 DELIMITER ;
---EndNoTest
+-- EndNoTest
 
 CREATE TABLE BoxSize (
   boxSizeId bigint(20) NOT NULL AUTO_INCREMENT,
@@ -80,10 +80,10 @@ ALTER TABLE Sample ADD COLUMN (
 	emptied boolean NOT NULL DEFAULT 0,
 	volume double DEFAULT NULL);
 
---StartNoTest
+-- StartNoTest
 ALTER TABLE Sample
   MODIFY identificationBarcode VARCHAR(255) UNIQUE;
---EndNoTest
+-- EndNoTest
 
 UPDATE Sample set boxPositionId = nextval('box_position_seq') WHERE boxPositionId IS NULL;
 
@@ -93,10 +93,10 @@ ALTER TABLE Library ADD COLUMN (
 	emptied boolean NOT NULL DEFAULT 0,
 	volume double DEFAULT NULL);
 
---StartNoTest
+-- StartNoTest
 ALTER TABLE Library
   MODIFY identificationBarcode VARCHAR(255) UNIQUE;
---EndNoTest
+-- EndNoTest
 
 UPDATE Library set boxPositionId = nextval('box_position_seq') WHERE boxPositionId IS NULL;
 
@@ -105,10 +105,10 @@ ALTER TABLE Pool ADD COLUMN (
   emptied boolean NOT NULL DEFAULT 0,
   volume double DEFAULT NULL);
 
---StartNoTest
+-- StartNoTest
 ALTER TABLE Pool 
   MODIFY identificationBarcode VARCHAR(255) UNIQUE;
---EndNoTest
+-- EndNoTest
 
 UPDATE Pool set boxPositionId = nextval('box_position_seq') WHERE boxPositionId IS NULL;
 

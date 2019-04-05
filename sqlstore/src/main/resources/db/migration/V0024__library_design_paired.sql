@@ -1,6 +1,6 @@
---StartNoTest
+-- StartNoTest
 ALTER TABLE LibraryType ENGINE = InnoDB;
---EndNoTest
+-- EndNoTest
 ALTER TABLE LibraryDesign ADD COLUMN libraryType bigint(20) NOT NULL;
 ALTER TABLE LibraryDesign DROP COLUMN paired;
 ALTER TABLE LibraryDesign DROP COLUMN platformName;

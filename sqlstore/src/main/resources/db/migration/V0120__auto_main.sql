@@ -1,8 +1,8 @@
 -- remove_externalName_unique_constraint
 
---StartNoTest
+-- StartNoTest
 ALTER TABLE Identity DROP INDEX `externalName_UNIQUE`;
---EndNoTest
+-- EndNoTest
 
 
 -- nullable_descriptions

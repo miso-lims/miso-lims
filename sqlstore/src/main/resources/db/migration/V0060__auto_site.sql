@@ -4,9 +4,9 @@ ALTER TABLE SampleValidRelationship ADD COLUMN archived BOOLEAN NOT NULL DEFAULT
 
 -- tagbarcode_to_index
 
---StartNoTest
+-- StartNoTest
 ALTER TABLE TagBarcodes DROP FOREIGN KEY `TagBarcodes_ibfk_1`;
---EndNoTest
+-- EndNoTest
 
 ALTER TABLE TagBarcodes CHANGE COLUMN tagFamilyId indexFamilyId bigint(20) NOT NULL;
 ALTER TABLE TagBarcodeFamily CHANGE COLUMN tagFamilyId indexFamilyId bigint(20) NOT NULL AUTO_INCREMENT;
