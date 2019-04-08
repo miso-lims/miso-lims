@@ -173,6 +173,7 @@ Create a file called `ROOT.xml` in the following directory
 and populate it with the following information:
 
     <Context path="/ROOT" docBase="${catalina.home}/webapps/ROOT">
+      <Resources allowLinking="true"/>
       <Resource name="jdbc/MISODB" type="javax.sql.DataSource"
       driverClassName="com.mysql.jdbc.Driver"
       initialSize="32"
