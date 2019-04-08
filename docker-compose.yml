@@ -26,7 +26,6 @@ services:
 
   flyway:
     image: misolims/miso-lims-migration:${MISO_TAG}
-    restart: on-failure
     secrets:
       - lims_password
     links:
@@ -43,8 +42,6 @@ services:
       - lims_password
     links:
       - db
-      - flyway
     depends_on:
       - db
-      - flyway
 
