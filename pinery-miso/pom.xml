@@ -79,7 +79,6 @@
     <dependency>
       <groupId>uk.ac.bbsrc.tgac.miso</groupId>
       <artifactId>sqlstore</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   
@@ -239,7 +238,7 @@
               <password>${mysql.pw}</password>
               <locations>
                 <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
-                <location>classpath:db/migration</location>
+                <location>filesystem:target/test-classes/db/migration</location>
               </locations>
               <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
               <placeholders>
