@@ -111,4 +111,16 @@ public interface Boxable extends Nameable, Barcodable, Serializable {
    */
   public void removeFromBox();
 
+  public boolean isDistributed();
+
+  void setDistributed(boolean distributed);
+
+  Date getDistributionDate();
+
+  void setDistributionDate(Date distributionDate);
+
+  String getDistributionRecipient();
+
+  void setDistributionRecipient(String distributionRecipient);
+
 }

@@ -31,6 +31,7 @@ public class BoxableView implements Serializable {
   private String locationBarcode;
   private Double volume;
   private boolean discarded;
+  private boolean distributed;
   private Long boxId;
   private String boxName;
   private String boxAlias;
@@ -48,6 +49,7 @@ public class BoxableView implements Serializable {
     v.setLocationBarcode(boxable.getLocationBarcode());
     v.setVolume(boxable.getVolume());
     v.setDiscarded(boxable.isDiscarded());
+    v.setDistributed(boxable.isDistributed());
     Box box = boxable.getBox();
     if (box != null) {
       v.setBoxId(box.getId());
@@ -115,6 +117,15 @@ public class BoxableView implements Serializable {
   public void setDiscarded(boolean discarded) {
     if (discarded) setVolume(0D);
     this.discarded = discarded;
+  }
+
+  public boolean isDistributed() {
+    return distributed;
+  }
+
+  public void setDistributed(boolean distributed) {
+    if (distributed) setVolume(0D);
+    this.distributed = distributed;
   }
 
   public Long getBoxId() {
