@@ -142,7 +142,7 @@
 
       <sec:authorize access="isAuthenticated()">
         <li>
-          <a href="<c:url value="http://tgac.github.io/miso-lims/usr/user-manual-table-of-contents.html"/>"><span>Help</span></a>
+          <a href="<c:url value="http://miso-lims.github.io/miso-lims/usr/user-manual-table-of-contents.html"/>"><span>Help</span></a>
         </li>
       </sec:authorize>
 
