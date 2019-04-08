@@ -66,10 +66,11 @@ pre.wrap {
 
 a {
     color: #404087;
+    text-decoration: none;
 }
 
 a:hover { 
-    text-decoration: none;
+    text-decoration: underline;
 }
 
 .disabled {
