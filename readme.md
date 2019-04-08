@@ -35,9 +35,9 @@ To use it, install required dependencies:
 1. [Install Docker 18.06.0+](https://docs.docker.com/install/)
 1. If necessary, [install Docker Compose](https://docs.docker.com/compose/install/)
 
-There are two available modes for MISO to run in: plain sample mode, used by 
-Earlham Institute, and detailed sample mode, used by Ontario Institute for 
-Cancer Research. 
+There are two available modes for MISO to run in: plain sample mode, which was 
+originally used by Earlham Institute, and detailed sample mode, used by Ontario
+Institute for Cancer Research. 
 
 **Plain sample mode** has a straightforward Sample -> Library -> Dilution -> 
 Pool workflow and is sufficient for basic laboratory tracking for sequencing.
@@ -46,8 +46,8 @@ Launch the plain sample demo with docker-compose:
 
 ```bash
 # download the docker-compose file
-wget https://raw.githubusercontent.com/TGAC/miso-lims/master/docker-compose.yml -O docker-compose.yml
-wget https://raw.githubusercontent.com/TGAC/miso-lims/master/docker-compose.override.yml -O docker-compose.override.yml
+wget https://raw.githubusercontent.com/miso-lims/miso-lims/master/docker-compose.yml -O docker-compose.yml
+wget https://raw.githubusercontent.com/miso-lims/miso-lims/master/docker-compose.override.yml -O docker-compose.override.yml
 
 # set the password for the database
 echo "changeme" > ./.miso_db_password
@@ -67,9 +67,9 @@ Launch the detailed sample demo with docker-compose:
 
 ```bash
 # download the docker-compose file
-wget https://raw.githubusercontent.com/TGAC/miso-lims/master/docker-compose.yml -O docker-compose.yml
-wget https://raw.githubusercontent.com/TGAC/miso-lims/master/docker-compose.override.yml -O docker-compose.override.yml
-wget https://raw.githubusercontent.com/TGAC/miso-lims/master/docker-compose.detailed.yml -O docker-compose.detailed.yml
+wget https://raw.githubusercontent.com/miso-lims/miso-lims/master/docker-compose.yml -O docker-compose.yml
+wget https://raw.githubusercontent.com/miso-lims/miso-lims/master/docker-compose.override.yml -O docker-compose.override.yml
+wget https://raw.githubusercontent.com/miso-lims/miso-lims/master/docker-compose.detailed.yml -O docker-compose.detailed.yml
 
 # set the password for the database
 echo "changeme" > ./.miso_db_password
@@ -92,18 +92,18 @@ on DockerHub for more information on configuring the containers and the compose 
 ## User Tutorial
 
 There are tutorials available to introduce and train new users to MISO's functionality.  
-* [Plain sample tutorials](https://oicr-gsi.github.io/miso-docs-oicr/plain-index)
-* [Detailed sample tutorials](https://oicr-gsi.github.io/miso-docs-oicr)
+* [Plain sample tutorials](https://miso-lims.github.io/walkthroughs/plain-index)
+* [Detailed sample tutorials](https://miso-lims.github.io/walkthroughs)
 
 Some of the resources (MISO URL,
 ways of contacting the MISO administrators) can be changed by forking and configuring
-the [tutorial repository](https://github.com/oicr-gsi/miso-docs-oicr) to suit your
+the [tutorial repository](https://github.com/miso-lims/walkthroughs) to suit your
 lab's specific needs.
 
 ## Running an Instance of MISO 
 
 To run your own MISO instance in the long term, download the 
-[latest release](https://github.com/TGAC/miso-lims/releases/latest).
+[latest release](https://github.com/miso-lims/miso-lims/releases/latest).
 
 Installation and configuration details can be found in the [MISO installation guide](docs/_posts/2016-01-11-installation-guide.md).
 

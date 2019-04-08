@@ -7,7 +7,7 @@ order: 1
 ---
 
 This manual is intended to be an overview of all MISO's major development areas. If you feel that anything is missing, please
-[let us know](https://github.com/TGAC/miso-lims/issues).
+[let us know](https://github.com/miso-lims/miso-lims/issues).
 
 # Module Overview
 
@@ -36,17 +36,14 @@ applications.
 
 |Interface|Description|
 |-------|-----------|
-|[Aliasable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Aliasable.java)|Defines objects that have a human-readable identifying 'alias' field|
-|[Barcodable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Barcodable.java)|Defines whether an implementing object is able to be identified by a barcode string. This interface also defines a label text property which can be used to provide abstraction of a number of member properties into a printable string.|
-|[Boxable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Boxable.java)|Defines whether an implementing object can be stored in a [Box](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Box.java)|
-|[ChangeLoggable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/ChangeLoggable.java)|Defines objects that have change logs written to the database|
-|[Deletable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Deletable.java)|Defines whether an implementing object is deletable by the system. The isDeletable() method defines a contract for ascertaining whether the object has any dependencies that prevent it from being removed, e.g. child members.|
-|[Identifiable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Identifiable.java)|Defines objects which have an unique ID field. This ID is used as the database primary key|
-|[Locatable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Locatable.java)|Defines whether an implementing object is able to be located by a barcode string, e.g. a freezer shelf barcode.|
-|[Nameable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java)|Defines whether an implementing object is able to be identified by a unique long and named by a string. This name may or may not be unique depending on the given [NamingScheme](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/NamingScheme.java) applied (see [Naming Schemes](#naming-schemes)). This interface is heavily used in MISO for all persistable objects.|
-|[Securable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/com/eaglegenomics/simlims/core/Securable.java)|Defines whether an object can be read from or written to, given a User.|
-|[SecurableByProfile](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/security/SecurableByProfile.java)|An extension of Securable, defines objects that are Secured via [SecurityProfile](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/com/eaglegenomics/simlims/core/SecurityProfile.java)|
-|[Watchable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Watchable.java)|Defines whether an implementing object can be assigned watchers that will receive alerts upon the occurrence of defined events.|
+|[Aliasable](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Aliasable.java)|Defines objects that have a human-readable identifying 'alias' field|
+|[Barcodable](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Barcodable.java)|Defines whether an implementing object is able to be identified by a barcode string. This interface also defines a label text property which can be used to provide abstraction of a number of member properties into a printable string.|
+|[Boxable](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Boxable.java)|Defines whether an implementing object can be stored in a [Box](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Box.java)|
+|[ChangeLoggable](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/ChangeLoggable.java)|Defines objects that have change logs written to the database|
+|[Deletable](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Deletable.java)|Defines whether an implementing object is deletable by the system. The isDeletable() method defines a contract for ascertaining whether the object has any dependencies that prevent it from being removed, e.g. child members.|
+|[Identifiable](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Identifiable.java)|Defines objects which have an unique ID field. This ID is used as the database primary key|
+|[Locatable](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Locatable.java)|Defines whether an implementing object is able to be located by a barcode string, e.g. a freezer shelf barcode.|
+|[Nameable](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java)|Defines whether an implementing object is able to be identified by a unique long and named by a string. This name may or may not be unique depending on the given [NamingScheme](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/NamingScheme.java) applied (see [Naming Schemes](#naming-schemes)). This interface is heavily used in MISO for all persistable objects.|
 
 ### Core Model Interfaces
 
@@ -68,14 +65,6 @@ to wrap up the synonymous objects so that SRA XMLs can be generated.
 |Run|a sequencer run|
 |SequencerReference|a hardware sequencer|
 |Box|storage box which holds barcoded sample/library/dilution/pool tubes|
-
-### Core Security Interfaces
-
-MISO objects are secured based on a SecurityProfile associated with that object. SecurityProfiles control access based on a single
-overarching owner, which always has full access (read/write/delete). Users can then be registered with that object's SecurityProfile that
-enable them to read or write information. Similarly, read and write access can be specified at the Group level. The _allowAllInternal_ flag
-states that any User with the ROLE_INTERNAL role is able to read and write to this object, regardless of the Group that the User is a part
-of.
 
 ## Enumerated Types
 
@@ -109,7 +98,7 @@ management of types that may be institute-specific. Another is that some of thes
 <a name="naming-schemes"/>
 ## Naming Schemes
 
-All [Nameable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java) entities
+All [Nameable](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java) entities
 in MISO should conform to a Naming Scheme. This ensures consistency of human-readable names across entity space, and allows centralised
 validation with no requirement of extra code (backend or frontend) on an external developer's part. The alias attribute on Sample and
 Library can also be generated and/or validated by the naming scheme.
@@ -128,7 +117,7 @@ Library can also be generated and/or validated by the naming scheme.
 ### Files
 
 API access to the underlying filesystem is made available through implementors of the
-[FilesManager](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/FilesManager.java)
+[FilesManager](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/FilesManager.java)
 interface. This interface defines a contract to, based on a properties-supplied base directory (see
 [Web Application Configuration](#configuration) and
 [Installation Readme](https://documentation.tgac.ac.uk/pages/viewpage.action?pageId=950282#Installation&AdministrationManual-Settingupmiso.propertiesfile)),
@@ -166,7 +155,7 @@ MISO also obfuscates the actual filename and path within the web application use
 ### IssueTrackers
 
 API access to any registered Issue trackers, e.g. JIRA, RT, Redmine, Mantis, is made available through implementors of the
-[IssueTrackerManager](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/IssueTrackerManager.java)
+[IssueTrackerManager](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/IssueTrackerManager.java)
 interface. The IssueTrackerManager interface has the @Spi annotation, allowing any custom managers to be automatically resolved at runtime
 by using the @ServiceProvider annotation on any concrete classes. The interface itself is very simple, with only three methods to
 override: **getType()** which represents the underlying issue tracker enum, e.g. "JIRA", **getBaseTrackerUrl()** which represents the REST
@@ -176,7 +165,7 @@ it as a JSONObject.
 Issue tracker managers allow integration with external issue trackers, removing the need to context switch between MISO and said tracker
 by a user. An example of this feature is in the Project page, where one or more issue IDs can be supplied which will import the issue
 details from the tracker's API. Currently the only default supported implementation is JIRA, as provided by the
-[JiraIssueManager](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/java/uk/ac/bbsrc/tgac/miso/webapp/service/integration/jira/JiraIssueManager.java)
+[JiraIssueManager](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/java/uk/ac/bbsrc/tgac/miso/webapp/service/integration/jira/JiraIssueManager.java)
 class.
 
 # Database and Schema
@@ -275,13 +264,13 @@ A great deal of MISO can be configured at the Spring XML level, making it easy f
 
 |Configuration file|Description|
 |------------------|-----------|
-|[web.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/web.xml)|Configures the web application with respect to the web container, e.g. Tomcat. Allows mapping of URLs to DispatcherServlets, and the inclusion of any relevant filters or logging framework configuration property files|
-|[applicationContext.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/applicationContext.xml)|Configures the central application miso.properties location and pulls in the configuration files below|
-|[miso-servlet.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/miso-servlet.xml)|Defines low-level MISO webapp-centric elements. Very little configuration should go in here|
-|[miso-config.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/miso-config.xml)|High-level user-space MISO bean configuration|
-|[db-config.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/db-config.xml)|Configures access to the underlying datasource|
-|[jdbc-security-config.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/jdbc-security-config.xml) / [ldap-security-config.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/ldap-security-config.xml)|Database and LDAP specific configuration, respectively. JDBC configuration is the initial default, and is the simplest mechanism to get started. If you would like more fine-grained access to a directory-style authentication and role assignment mechanism, then LDAP support is also available|
-|[integration-config.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/integration-config.xml)|Configures elements in the integration layer, e.g. analysis server|
+|[web.xml](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/web.xml)|Configures the web application with respect to the web container, e.g. Tomcat. Allows mapping of URLs to DispatcherServlets, and the inclusion of any relevant filters or logging framework configuration property files|
+|[applicationContext.xml](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/applicationContext.xml)|Configures the central application miso.properties location and pulls in the configuration files below|
+|[miso-servlet.xml](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/miso-servlet.xml)|Defines low-level MISO webapp-centric elements. Very little configuration should go in here|
+|[miso-config.xml](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/miso-config.xml)|High-level user-space MISO bean configuration|
+|[db-config.xml](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/db-config.xml)|Configures access to the underlying datasource|
+|[jdbc-security-config.xml](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/jdbc-security-config.xml) / [ldap-security-config.xml](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/ldap-security-config.xml)|Database and LDAP specific configuration, respectively. JDBC configuration is the initial default, and is the simplest mechanism to get started. If you would like more fine-grained access to a directory-style authentication and role assignment mechanism, then LDAP support is also available|
+|[integration-config.xml](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/integration-config.xml)|Configures elements in the integration layer, e.g. analysis server|
 
 ## REST API
 
@@ -348,7 +337,7 @@ will run the schema translator.
 ### Test Data
 
 Test data is populated via Flyway from the script
-[test_data.sql](https://github.com/TGAC/miso-lims/blob/develop/sqlstore/src/test/resources/db/test_migration/test_data.sql)
+[test_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/sqlstore/src/test/resources/db/test_migration/test_data.sql)
 
 Flyway is configured to look for any files in the migration directory ending with .test.sql. They must include version numbers higher than
 the production schema versions so that they are run after the tables are created.

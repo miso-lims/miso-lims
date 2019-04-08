@@ -6,15 +6,15 @@ date: 2016-01-11 13:51:46
 order: 2
 ---
 
-This guide container instructions to facilitate day-to-day running MISO at your institution. See [Building and Deploying](installation-guide) if you need to set up your instance.
+This guide container instructions to facilitate day-to-day running MISO at your institution. See [Building and Deploying](2016-01-11-installation-guide.md) if you need to set up your instance.
 
 
 # Adding Value-Type Data
 
 MISO has several categories of value-type data which the users interact with but cannot add or edit.
 There are some stored procedures which may help in adding these values to the database. If any of these are
-out of date, please <a href="https://github.com/TGAC/miso-lims/issues">create an issue</a>, and check the
-source code for the exact methods of <a href="https://github.com/TGAC/miso-lims/tree/master/sqlstore/src/main/resources/db/migration_beforeMigrate">adding</a> and <a href="https://github.com/TGAC/miso-lims/tree/master/sqlstore/src/main/resources/db/migration_afterMigrate">removing</a> data from the database.
+out of date, please <a href="https://github.com/miso-lims/miso-lims/issues">create an issue</a>, and check the
+source code for the exact methods of <a href="https://github.com/miso-lims/miso-lims/tree/master/sqlstore/src/main/resources/db/migration_beforeMigrate">adding</a> and <a href="https://github.com/miso-lims/miso-lims/tree/master/sqlstore/src/main/resources/db/migration_afterMigrate">removing</a> data from the database.
 
 ## Indices (also known as Barcodes, Molecular IDs, Tag Barcodes)
 
@@ -34,7 +34,7 @@ CALL addIndex('Custom Indices A', 'Index 1', 'ACACACAC', 1);
 CALL addIndex('Custom Indices A', 'Index 2', 'GTGTGTGT', 1);
 ```
 Note that the sequencing platform must be entered in all caps.
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_index.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_index.sql">Source</a>
 
 
 ## Boxes
@@ -50,7 +50,7 @@ For example, to add a box for DNA that has 10 rows and 10 columns and cannot be 
 CALL addBoxUse('DNA');
 CALL addBoxSize(10, 10, 0);
 ```
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_box_parameters.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_box_parameters.sql">Source</a>
 
 ## Library Type
 
@@ -65,7 +65,7 @@ For example, to add a whole genome PacBio library type:
 CALL addLibraryType('Whole Genome', 'PACBIO', 0);
 ```
 Note that the sequencing platform must be entered in all caps.
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_library_parameters.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_library_parameters.sql">Source</a>
 
 
 ## Instrument Models
@@ -81,7 +81,7 @@ For example, to add a MinION sequencer:
 CALL addInstrumentModel('OXFORDNANOPORE', 'MinION', '1-channel portable nanopore', 1);
 ```
 Note that the sequencing platform must be entered in all caps.
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_platform.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_platform.sql">Source</a>
 
 
 ## Instruments
@@ -99,7 +99,7 @@ CALL addInstrument('h501', 'ILLUMINA', 'Illumina HiSeq 2000', '12345', '2015-01-
 ```
 Note that the platform must be in all caps, and the instrumentModel must be an exact match for a value in `Platform.instrumentModel`.
 Note also that if adding an instrument which references an upgraded instrument, the upgraded instrument must already exist in MISO. If the instrument to be added has not been upgraded, set upgradedInstrumentName to `NULL`.
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_instrument.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_instrument.sql">Source</a>
 
 ## Container Models
 
@@ -113,7 +113,7 @@ addContainerModel(name, identificationBarcode, partitionCount, platform, instrum
 See **List of container models** below for usage examples, including a full list of the container models found by OICR, which can be added to your MISO as desired. If you do not add any container models, MISO will use the generic container models. MISO will emit a warning in the logs when attempting to save a new run when it cannot find a container model (but will not prevent the run from being saved, and will not warn the user). If you would like this type of error to not be emitted, you can use the information from these warnings to add new container models.
 
 Note that the sequencing platform must be in all caps, and the instrumentModel must be an exact match for a value in `Platform.instrumentModel`.
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_containermodel.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_containermodel.sql">Source</a>
 
 
 ## Sequencing Parameters
@@ -129,7 +129,7 @@ For instance, to add sequencing parameters for a paired-end run with a read leng
 CALL addSequencingParameters('2x151', 'ILLUMINA', 'Illumina MiSeq', 151, 1, 'V2');
 ```
 Note that the sequencing platform must be in all caps, and the instrumentModel must be an exact match for a value in `Platform.instrumentModel`.
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_seqparam.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_seqparam.sql">Source</a>
 
 
 ## QC Types
@@ -145,7 +145,7 @@ For example, to add Qubit as a QC Type for samples:
 CALL addQcType('Qubit', 'Quantitation of DNA, RNA, and protein, manufactured by Invitrogen', 'Sample', 'ng/&#181;l', 2);
 ```
 Note that special characters should be HTML-encoded. If your lab does Qubit for libraries as well, a separate QcType for target 'Library' would have to be added.
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_qc.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_qc.sql">Source</a>
 
 
 ## Kits
@@ -160,7 +160,7 @@ For example, to add a Nextera library prep kit:
 CALL addKitDescriptor('Nextera DNA Exome', 1, 'Nextera', 1, 'LIBRARY', 'ILLUMINA', 'Previously known as the TruSeq Rapid Exome Library Prep Kit');
 ```
 Note that the kit type and sequencing platform must be entered in all caps.
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_kit.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_kit.sql">Source</a>
 
 
 ## Targeted Sequencing
@@ -176,7 +176,7 @@ For example, to add a targeted sequencing panel for a library kit of the same na
 CALL addTargetedSequencing('Agilent SureSelectXT MethylSeq', 'Agilent SureSelectXT panel for methyl seq', 'Agilent SureSelectXT MethylSeq', 0);
 ```
 Note: the library kit must already exist in MISO.
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_tarseq.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_tarseq.sql">Source</a>
 
 
 # Removing Lab-entered data
@@ -195,7 +195,7 @@ As an administrator, the following items can be deleted via SQL stored procedure
 ```
 CALL deleteRun(runId, runAlias);
 ```
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_run.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_run.sql">Source</a>
 
 
 ## Sequencing Containers
@@ -203,7 +203,7 @@ CALL deleteRun(runId, runAlias);
 ```
 CALL deleteContainer(containerId, containerBarcode);
 ```
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_container.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_container.sql">Source</a>
 
 
 ## Pools
@@ -211,7 +211,7 @@ CALL deleteContainer(containerId, containerBarcode);
 ```
 CALL deletePool(poolId, poolAlias);
 ```
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_pool.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_pool.sql">Source</a>
 
 
 ## Dilutions
@@ -220,7 +220,7 @@ CALL deletePool(poolId, poolAlias);
 CALL deleteDilution(dilutionId, libraryId, userName);
 ```
 Note: deleting a dilution adds a changelog entry to the library.
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_librarydilution.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_librarydilution.sql">Source</a>
 
 
 ## Libraries
@@ -228,7 +228,7 @@ Note: deleting a dilution adds a changelog entry to the library.
 ```
 CALL deleteLibrary(libraryId, libraryAlias);
 ```
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_library.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_library.sql">Source</a>
 
 
 ## Samples
@@ -236,7 +236,7 @@ CALL deleteLibrary(libraryId, libraryAlias);
 ```
 CALL deleteSample(sampleId, sampleAlias);
 ```
-<a href="https://github.com/TGAC/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_sample.sql">Source</a>
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_sample.sql">Source</a>
 
 
 # Upgrading to the latest version.

@@ -54,7 +54,7 @@ The docker-compose.prod.yml file is an example for how to create a compose file 
 
 1. Mount the MySQL database to a permanent, backed-up location using the instructions in [MySQL Docker Hub](https://hub.docker.com/_/mysql).
 2. Mount the MISO files storage location to a permanent, backed up location
-3. Omit or modify the docker-compose.override.yml file to pre-load desired data (if any). Starting MISO with an entirely empty database will not provide full functions: see the [administrator's manual](http://tgac.github.io/miso-lims/adm/admin-guide.html) for more information on stored procedures or setup, or the demo data under [.docker/detailed_sample_config](.docker/detailed_sample_config).
+3. Omit or modify the docker-compose.override.yml file to pre-load desired data (if any). Starting MISO with an entirely empty database will not provide full functions: see the [administrator's manual](http://miso-lims.github.io/miso-lims/adm/admin-guide.html) for more information on stored procedures or setup, or the demo data under [.docker/detailed_sample_config](.docker/detailed_sample_config).
 4. Modify and mount the miso.properties file to have your desired configuration.
 5. Change the username and password for the database using the environmental variables
 
@@ -114,7 +114,7 @@ Development Machine(s):
 <a id="latest-release">
 
 ## Downloading the latest release
-Use the GitHub interface to download the [latest release](https://github.com/TGAC/miso-lims/releases/latest).
+Use the GitHub interface to download the [latest release](https://github.com/miso-lims/miso-lims/releases/latest).
 Extract the `.zip` or `.tar.gz` file.
 
 Proceed to set up a build environment.
@@ -210,7 +210,7 @@ this file as appropriate (see [Naming Schemes](#naming-schemes) below).
 
 * The naming schemes will determine how MISO checks if object names (especially
 samples, libraries) are valid. If you do not want to use one of the supplied
-ones (TGAC's standard, OICR's standard, or no checks), you will have to write
+ones (default standard, OICR's standard, or no checks), you will have to write
 one or more specific to your organisation. See [Naming Schemes](#naming-schemes)
 below for more information.
 * Optional: If using any bulk barcode scanners (only VisionMate is supported at present),
@@ -444,5 +444,5 @@ Available metrics can be obtained at at `http://<miso-URL>/metrics` (note: no `/
 
 # Next steps
 
-After MISO is installed, refer to the [Admin Manual](admin-guide) for tips on maintaining and running MISO.
+After MISO is installed, refer to the [Admin Manual](2017-12-07-admin-guide.md) for tips on maintaining and running MISO.
 
