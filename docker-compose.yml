@@ -26,6 +26,7 @@ services:
 
   flyway:
     image: misolims/miso-lims-migration:${MISO_TAG}
+    command: migrate
     secrets:
       - lims_password
     links:

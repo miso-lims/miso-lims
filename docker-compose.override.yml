@@ -7,7 +7,7 @@ services:
   
   flyway:
     volumes:
-      - "./.docker/detailed_sample_config:/flyway/migrations"
+      - "./.docker/detailed_sample_config/V0792__detailed_sample_data.sql:/flyway/sql/V0792__detailed_sample_data.sql"
 
   webapp:
     volumes:
