@@ -224,7 +224,7 @@ Download some supporting JARs:
 
     cd $CATALINA_HOME/lib
     curl -O https://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/8.0.15/mysql-connector-java-8.0.15.jar
-    curl -O https://artifacts.oicr.on.ca/artifactory/webapp/#/artifacts/browse/tree/General/gsi-dependencies/uk/ac/ebi/fgpt/jndi-file-factory/1.0/jndi-file-factory-1.0.jar
+    curl -O https://artifacts.oicr.on.ca/artifactory/gsi-dependencies/uk/ac/ebi/fgpt/jndi-file-factory/1.0/jndi-file-factory-1.0.jar
 
 Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if using Tomcat from Debian or Ubuntu, `/etc/default/tomcat8`:
 
