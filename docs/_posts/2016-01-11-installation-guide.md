@@ -226,7 +226,7 @@ Download some supporting JARs:
     curl -O https://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/5.1.10/mysql-connector-java-5.1.10.jar
     curl -O https://artifacts.oicr.on.ca/artifactory/gsi-dependencies/uk/ac/ebi/fgpt/jndi-file-factory/1.0/jndi-file-factory-1.0.jar
 
-Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if using Tomcat from Debian or Ubuntu, `/etc/default/tomcat8`:
+Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if you installed Tomcat through apt, `/etc/default/tomcat8`:
 
     JAVA_OPTS="$JAVA_OPTS -Dsecurity.method=jdbc -Xmx768M"
 
