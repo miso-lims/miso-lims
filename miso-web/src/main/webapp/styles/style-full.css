@@ -66,10 +66,6 @@ pre.wrap {
 
 a {
     color: #404087;
-    text-decoration: none;
-}
-
-a:hover { 
     text-decoration: underline;
 }
 
