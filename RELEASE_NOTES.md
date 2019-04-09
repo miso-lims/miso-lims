@@ -1,3 +1,26 @@
+# 0.2.171
+
+Changes:
+
+ * Corrections to installation instructions
+ * Remove documentation of deleted parts
+ * Update links to use new GitHub organization
+ * Speed up docker builds
+ * Now everything is purple to match the new logo
+ * Changes to serving freezer maps
+
+Upgrade notes:
+
+ * Freezer maps can now be served from MISO by placing the files in
+`${miso.fileStorageDirectory}/freezermaps/`. While this is intended for freezer maps, anything
+placed in this directory will be served as a static resource at
+http(s)://<server-addr>/freezermaps/. To support this, the following line must be added to your
+ROOT.xml inside the Context element:
+
+```
+<Resources allowLinking="true"/>
+```
+
 # 0.2.170
 
 Changes:
