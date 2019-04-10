@@ -1,3 +1,9 @@
+# 0.2.172
+
+Changes:
+
+ * Bug fixes and performance enhancements
+
 # 0.2.171
 
 Changes:
@@ -21,6 +27,9 @@ ROOT.xml inside the Context element:
 <Resources allowLinking="true"/>
 ```
 
+BAD: 
+ * Bad database migration
+
 # 0.2.170
 
 Changes:
@@ -30,6 +39,9 @@ Changes:
  * Fixed deleting items with attachments
  * Fixed saving Oxford Nanopore data from run scanner (still experimental)
  * Fixed names of PromethION flowcell models and positions
+
+BAD: 
+ * Manually created containers sometimes had wrong number of partitions
 
 # 0.2.169
 
