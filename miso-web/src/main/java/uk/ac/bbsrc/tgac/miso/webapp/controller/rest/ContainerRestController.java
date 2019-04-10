@@ -65,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
@@ -75,6 +76,8 @@ public class ContainerRestController extends RestController {
 
   @Autowired
   private ContainerService containerService;
+  @Autowired
+  private ContainerModelService containerModelService;
 
   private final JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto> jQueryBackend = new JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto>() {
 
@@ -190,6 +193,15 @@ public class ContainerRestController extends RestController {
       throw new RestException("Container appears to have been created already", Status.BAD_REQUEST);
     }
     SequencerPartitionContainer container = Dtos.to(dto);
+    if (container.getModel() == null) {
+      throw new RestException("Container model not specified", Status.BAD_REQUEST);
+    }
+    container.setModel(containerModelService.get(container.getModel().getId()));
+    if (container.getModel() == null) {
+      throw new RestException("Invalid container model", Status.BAD_REQUEST);
+    }
+    container.setPartitionLimit(container.getModel().getPartitionCount());
+
     SequencerPartitionContainer saved = containerService.save(container);
     return Dtos.asDto(saved);
 

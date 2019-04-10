@@ -57,7 +57,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
-import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 
 @Controller
@@ -68,8 +67,6 @@ public class EditSequencerPartitionContainerController {
 
   @Autowired
   private ContainerService containerService;
-  @Autowired
-  private KitService kitService;
   @Autowired
   private RunService runService;
   @Autowired

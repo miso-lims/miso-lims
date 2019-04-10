@@ -84,6 +84,7 @@ public class DefaultContainerService
   @Override
   public SequencerPartitionContainer create(SequencerPartitionContainer container) throws IOException {
     loadChildEntities(container);
+    validateChange(container, null);
     container.setChangeDetails(authorizationManager.getCurrentUser());
 
     return containerDao.save(container);
@@ -92,9 +93,10 @@ public class DefaultContainerService
   @Override
   public SequencerPartitionContainer update(SequencerPartitionContainer container) throws IOException {
     SequencerPartitionContainer managed = get(container.getId());
+    loadChildEntities(container);
+    validateChange(container, managed);
     applyChanges(container, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
-    loadChildEntities(managed);
     return containerDao.save(managed);
   }
 
@@ -104,6 +106,13 @@ public class DefaultContainerService
       return create(container);
     } else {
       return update(container);
+    }
+  }
+
+  private void validateChange(SequencerPartitionContainer container, SequencerPartitionContainer beforeChange) {
+    if (container.getModel().getPartitionCount() != container.getPartitions().size()) {
+      // this is not user-correctable, so should not be reported as a validation error
+      throw new IllegalArgumentException("Number of partitions does not match container model specifications");
     }
   }
 
