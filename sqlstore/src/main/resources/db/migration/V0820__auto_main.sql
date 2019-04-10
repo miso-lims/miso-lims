@@ -1,5 +1,4 @@
 -- drop_unused_tables
--- StartNoTest
 DROP TABLE ProjectOverview_Note;
 DROP TABLE ProjectOverview_Sample;
 DROP TABLE ProjectOverview;
@@ -9,5 +8,4 @@ DROP TABLE Workflow_State;
 DROP TABLE emPCRDilution;
 DROP TABLE emPCR;
 DROP TABLE persistent_logins;
--- EndNoTest
 
