@@ -167,6 +167,8 @@ HotTarget.library = (function() {
   var getProjectId = function(library, flat, config) {
     if (library.parentSampleProjectId) {
       return library.parentSampleProjectId;
+    } else if (config.project) {
+      return config.project.id;
     } else if (flat.sample && flat.sample.projectAlias) {
       return Utils.array.findUniqueOrThrow(function(project) {
         if (Constants.isDetailedSample) {
