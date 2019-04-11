@@ -19,6 +19,7 @@ import com.google.common.collect.Maps;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
@@ -229,12 +230,18 @@ public class RunPageIT extends AbstractIT {
 
     Run run = (Run) getSession().get(Run.class, 5004L);
     assertEquals(1, run.getSequencerPartitionContainers().size());
-    run.getSequencerPartitionContainers().get(0).getPartitions()
-        .forEach(partition -> {
-          assertNotNull(partition.getPool());
-          assertEquals(LimsUtils.toNiceString(concentration), LimsUtils.toNiceString(partition.getLoadingConcentration()));
-          assertEquals(ConcentrationUnit.NANOMOLAR, partition.getLoadingConcentrationUnits());
-        });
+    int partitionsSet = 0;
+    for (Partition partition : run.getSequencerPartitionContainers().get(0).getPartitions()) {
+      if (partition.getPartitionNumber() > 2) {
+        assertNull(partition.getPool());
+      } else {
+        assertNotNull(partition.getPool());
+        assertEquals(LimsUtils.toNiceString(concentration), LimsUtils.toNiceString(partition.getLoadingConcentration()));
+        assertEquals(ConcentrationUnit.NANOMOLAR, partition.getLoadingConcentrationUnits());
+        partitionsSet++;
+      }
+    }
+    assertEquals(2, partitionsSet);
   }
 
   @Test
@@ -243,8 +250,13 @@ public class RunPageIT extends AbstractIT {
     final String poolAlias = "RUN_POOL_REMOVE";
     Run initial = (Run) getSession().get(Run.class, 5005L);
     assertEquals(1, initial.getSequencerPartitionContainers().size());
-    initial.getSequencerPartitionContainers().get(0).getPartitions()
-        .forEach(partition -> assertNotNull(partition.getPool()));
+    for (Partition partition : initial.getSequencerPartitionContainers().get(0).getPartitions()) {
+      if (partition.getPartitionNumber() > 2) {
+        assertNull(partition.getPool());
+      } else {
+        assertNotNull(partition.getPool());
+      }
+    }
 
     RunPage page1 = RunPage.getForEdit(getDriver(), getBaseUrl(), 5005L);
     List<String> page1Pools = page1.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
@@ -266,11 +278,9 @@ public class RunPageIT extends AbstractIT {
     final String secondPool = "IPO5007";
     Run initial = (Run) getSession().get(Run.class, 5006L);
     assertEquals(1, initial.getSequencerPartitionContainers().size());
-    initial.getSequencerPartitionContainers().get(0).getPartitions()
-        .forEach(partition -> {
-          assertNotNull(partition.getPool());
-          assertEquals(firstPool, partition.getPool().getName());
-        });
+    Partition initialPartition = initial.getSequencerPartitionContainers().get(0).getPartitionAt(1);
+    assertNotNull(initialPartition.getPool());
+    assertEquals(firstPool, initialPartition.getPool().getName());
 
     RunPage page1 = RunPage.getForEdit(getDriver(), getBaseUrl(), 5006L);
     List<String> page1Pools = page1.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
@@ -284,13 +294,11 @@ public class RunPageIT extends AbstractIT {
 
     Run run = (Run) getSession().get(Run.class, 5006L);
     assertEquals(1, run.getSequencerPartitionContainers().size());
-    run.getSequencerPartitionContainers().get(0).getPartitions()
-        .forEach(partition -> {
-          assertNotNull(partition.getPool());
-          assertEquals(secondPool, partition.getPool().getName());
-          assertEquals(LimsUtils.toNiceString(concentration), LimsUtils.toNiceString(partition.getLoadingConcentration()));
-          assertEquals(ConcentrationUnit.NANOGRAMS_PER_MICROLITRE, partition.getLoadingConcentrationUnits());
-        });
+    Partition partition = run.getSequencerPartitionContainers().get(0).getPartitionAt(1);
+    assertNotNull(partition.getPool());
+    assertEquals(secondPool, partition.getPool().getName());
+    assertEquals(LimsUtils.toNiceString(concentration), LimsUtils.toNiceString(partition.getLoadingConcentration()));
+    assertEquals(ConcentrationUnit.NANOGRAMS_PER_MICROLITRE, partition.getLoadingConcentrationUnits());
   }
 
   @Test

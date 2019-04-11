@@ -268,7 +268,7 @@ public class RunRestController extends RestController {
   }
 
   @PostMapping(value = "{runId}/add", produces = "application/json")
-  @ResponseStatus(code = HttpStatus.OK)
+  @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void addContainerByBarcode(@PathVariable Long runId, @RequestParam("position") String position,
       @RequestParam("barcode") String barcode) throws IOException {
     Run run = runService.get(runId);
@@ -302,7 +302,7 @@ public class RunRestController extends RestController {
   }
 
   @PostMapping(value = "{runId}/remove", produces = "application/json")
-  @ResponseStatus(code = HttpStatus.OK)
+  @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void removeContainer(@PathVariable Long runId, @RequestBody List<Long> containerIds) throws IOException {
     Run run = runService.get(runId);
     run.getRunPositions().removeIf(rp -> containerIds.contains(rp.getContainer().getId()));
