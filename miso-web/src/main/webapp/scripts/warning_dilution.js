@@ -26,7 +26,7 @@ WarningTarget.dilution = {
     return [{
       include: dilution.subprojectPriority,
       tableMessage: 'PRIORITY (' + dilution.subprojectAlias + ')',
-      level: "info"
+      level: "important"
     }, {
       include: dilution.identityConsentLevel === 'Revoked',
       tableMessage: '(CONSENT REVOKED)'

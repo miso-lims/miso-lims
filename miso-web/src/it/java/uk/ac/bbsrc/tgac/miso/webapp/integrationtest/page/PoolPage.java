@@ -28,7 +28,7 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     DISCARDED(By.id("discarded"), FieldType.CHECKBOX),
     LOCATION(By.id("location"), FieldType.LABEL),
     
-    WARNINGS(By.className("big-warning"), FieldType.LABEL);
+    WARNINGS(By.className("big"), FieldType.LABEL);
 
     private final By selector;
     private final FieldType type;

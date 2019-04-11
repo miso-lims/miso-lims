@@ -22,6 +22,17 @@ public class ValidationException extends RuntimeException {
   }
 
   /**
+   * Constructs a ValidationException containing a single error explaining why validation failed
+   * 
+   * @param error the error related to the action in question
+   */
+  public ValidationException(ValidationError error) {
+    super("Validation failed");
+    this.errors = new ArrayList<>();
+    this.errors.add(error);
+  }
+
+  /**
    * Constructs a ValidationException containing a single general validation error
    * 
    * @param message the general error message

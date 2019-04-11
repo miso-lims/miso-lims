@@ -386,6 +386,9 @@ public class Dtos {
     }
     dto.setAlias(from.getAlias());
     dto.setProjectId(from.getProject().getId());
+    dto.setProjectName(from.getProject().getName());
+    dto.setProjectAlias(from.getProject().getAlias());
+    dto.setProjectShortName(from.getProject().getShortName());
     dto.setScientificName(from.getScientificName());
     dto.setTaxonIdentifier(from.getTaxonIdentifier());
     if (from.getVolume() != null) {
@@ -423,6 +426,8 @@ public class Dtos {
       throw new IllegalArgumentException();
     }
     dto.setSampleClassId(from.getSampleClass().getId());
+    dto.setSampleClassAlias(from.getSampleClass().getAlias());
+    dto.setSampleCategory(from.getSampleClass().getSampleCategory());
     if (from.getDetailedQcStatus() != null) {
       dto.setDetailedQcStatusId(from.getDetailedQcStatus().getId());
     }
@@ -436,6 +441,9 @@ public class Dtos {
       dto.setParentAlias(from.getParent().getAlias());
       dto.setParentTissueSampleClassId(from.getParent().getSampleClass().getId());
       dto.setIdentityConsentLevel(getIdentityConsentLevelString(from));
+
+      SampleIdentity identity = LimsUtils.getParent(SampleIdentity.class, from);
+      dto.setEffectiveExternalNames(identity.getExternalName());
     }
     Optional<DetailedSample> effective = from.getEffectiveGroupIdSample();
     if (effective.isPresent()) {
@@ -978,7 +986,7 @@ public class Dtos {
     dto.setDiscards(from.getDiscards());
     dto.setSlidesRemaining(from.getSlidesRemaining());
     dto.setThickness(from.getThickness());
-    dto.setStain(from.getStain() == null ? null : asDto(from.getStain()));
+    dto.setStainId(from.getStain() == null ? null : from.getStain().getId());
     return dto;
   }
 
@@ -987,11 +995,11 @@ public class Dtos {
     to.setSlides(from.getSlides());
     to.setDiscards(from.getDiscards());
     to.setThickness(from.getThickness());
-    if (from.getStain() == null) {
+    if (from.getStainId() == null) {
       to.setStain(null);
     } else {
       Stain stain = new Stain();
-      stain.setId(from.getStain().getId());
+      stain.setId(from.getStainId());
       to.setStain(stain);
     }
     return to;

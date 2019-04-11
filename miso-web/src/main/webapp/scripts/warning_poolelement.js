@@ -41,7 +41,7 @@ WarningTarget.poolelement = {
             {
               include: dilution.subprojectPriority,
               tableMessage: 'PRIORITY (' + dilution.subprojectAlias + ')',
-              level: 'info'
+              level: 'important'
             },
             {
               include: dilution.library.lowQuality,

@@ -27,7 +27,7 @@ WarningTarget.library = {
       include: library.subprojectPriority,
       headerMessage: 'Belongs to high priority subproject \'' + library.subprojectAlias + '\'',
       tableMessage: 'PRIORITY (' + library.subprojectAlias + ')',
-      level: 'info'
+      level: 'important'
     }, {
       include: parseFloat(library.volume) < 0,
       headerMessage: 'This library has a negative volume!',

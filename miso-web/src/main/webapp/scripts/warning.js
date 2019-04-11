@@ -24,17 +24,29 @@
 var WarningTarget = {};
 var Warning = (function($) {
 
+  /*
+   * warning format: {
+   *   include: boolean,
+   *   tileMessage: string,
+   *   tableMessage: string,
+   *   headerMessage: string,
+   *   level: string ('error'|'important'|'info')
+   * }
+   * 
+   * error = red, important = blue, info = grey
+   * if a particular message is not provided, the warning will not be shown in that format
+   */
+
   return {
     generateHeaderWarnings: function(containerId, target, item) {
       // Note: header warnings currently ignore the warning level and show all warnings in red
-      var warnings = getWarnings(target, item);
+      var warnings = getWarnings(target, item, 'headerMessage');
       if (warnings.length == 0) {
         return;
       }
       var container = $('#' + containerId);
-      container.append($('<span>').css('float', 'right').append($('<img>').attr('src', '/styles/images/fail.png')));
       warnings.forEach(function(warning) {
-        container.append($('<p>').addClass('big-warning').text(warning.headerMessage));
+        container.append($('<p>').addClass('big big-' + (warning.level || 'error')).text(warning.headerMessage));
       });
     },
 
@@ -54,19 +66,19 @@ var Warning = (function($) {
             html += '</a>';
           }
         }
-        getWarnings(target, full).forEach(function(warning) {
+        getWarnings(target, full, 'tableMessage').forEach(function(warning) {
           html += ' <span class="message-' + (warning.level || 'error') + '"><strong>' + warning.tableMessage + '</strong></span>';
         });
         return html;
       };
     },
 
-    hasWarnings: function(target, item) {
-      return getWarnings(target, item).length > 0;
+    hasTileWarnings: function(target, item) {
+      return getWarnings(target, item, 'tileMessage').length > 0;
     },
 
     generateTileWarnings: function(target, item) {
-      return getWarnings(target, item).map(function(warning) {
+      return getWarnings(target, item, 'tileMessage').map(function(warning) {
         var errorP = document.createElement('P');
         errorP.setAttribute('class', 'message-' + (warning.level || 'error'));
         errorP.innerText = "⚠ " + warning.tileMessage;
@@ -75,10 +87,9 @@ var Warning = (function($) {
     }
   }
 
-  function getWarnings(target, item) {
-    // warnings: { include: boolean, tileMessage: string, tableMessage: string, headerMessage: string, level: string ('info'|'error') }
+  function getWarnings(target, item, messageProperty) {
     return target.getWarnings(item).filter(function(warning) {
-      return warning.include;
+      return warning.include && warning.hasOwnProperty(messageProperty);
     });
   }
 

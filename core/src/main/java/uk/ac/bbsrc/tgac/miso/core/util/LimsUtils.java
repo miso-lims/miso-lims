@@ -76,8 +76,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 
 /**
  * Utility class to provde helpful functions to MISO
@@ -314,11 +312,6 @@ public class LimsUtils {
       }
     }
     return null;
-  }
-
-  public static void validateNameOrThrow(Nameable object, NamingScheme namingScheme) throws IOException {
-    ValidationResult val = namingScheme.validateName(object.getName());
-    if (!val.isValid()) throw new IOException("Save failed - invalid name:" + val.getMessage());
   }
 
   /**

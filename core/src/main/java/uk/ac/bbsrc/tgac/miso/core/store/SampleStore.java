@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,6 @@ import java.util.Map;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
@@ -117,7 +115,7 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
 
   Sample getByPreMigrationId(Long id) throws IOException;
 
-  Long addSample(Sample sample) throws IOException, MisoNamingException, SQLException;
+  Long addSample(Sample sample) throws IOException;
 
   void deleteSample(Sample sample);
 

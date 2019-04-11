@@ -14,7 +14,7 @@ public class SampleSlideDto extends SampleTissueProcessingDto {
   private Integer slidesRemaining;
   private Integer discards;
   private Integer thickness;
-  private StainDto stain;
+  private Long stainId;
 
   public Integer getSlides() {
     return slides;
@@ -52,12 +52,12 @@ public class SampleSlideDto extends SampleTissueProcessingDto {
     this.thickness = thickness;
   }
 
-  public StainDto getStain() {
-    return stain;
+  public Long getStainId() {
+    return stainId;
   }
 
-  public void setStain(StainDto stain) {
-    this.stain = stain;
+  public void setStainId(Long stainId) {
+    this.stainId = stainId;
   }
 
 }

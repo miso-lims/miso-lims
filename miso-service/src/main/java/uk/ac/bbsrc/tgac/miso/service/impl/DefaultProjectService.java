@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.validateNameOrThrow;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -45,7 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 
 @Transactional(rollbackFor = Exception.class)
@@ -126,7 +126,7 @@ public class DefaultProjectService implements ProjectService {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Project - issue with naming scheme", e);
       }
-      LimsUtils.validateNameOrThrow(project, namingScheme);
+      validateNameOrThrow(project, namingScheme);
     } else {
       Project original = projectStore.get(project.getId());
       original.setAlias(project.getAlias());

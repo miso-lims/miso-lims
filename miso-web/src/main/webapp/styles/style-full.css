@@ -28,7 +28,7 @@ h1 {
 h2 {
     font-size: 1.2em;
     padding: 0;
-    margin: 0;
+    margin: 0.8em 0em 0em 0em;
     color: #666666;
 }
 
@@ -183,7 +183,6 @@ div.lowquality div {
 
 div.menu {
     margin: 0;
-    margin-bottom: 0.8em;
 }
 
 div.menu a {
@@ -446,30 +445,6 @@ table.containerSummary td.partitionOccupied {
     margin-left: -100%;
     padding: 5px 0 5px 10px;
     width: 200px;
-}
-
-.Unknown {
-    background-image: url(images/unknown.png);
-    background-position: 100% 80px;
-    background-repeat: no-repeat;
-}
-
-.Failed {
-    background-image: url(images/fail.png);
-    background-position: 100% 80px;
-    background-repeat: no-repeat;
-}
-
-.Completed {
-    background-image: url(images/ok.png);
-    background-position: 100% 80px;
-    background-repeat: no-repeat;
-}
-
-.Running {
-    background-image: url(images/running.png);
-    background-position: 100% 80px;
-    background-repeat: no-repeat;
 }
 
 h1.h_Unknown {
@@ -1836,12 +1811,20 @@ textarea.parsley-error {
   color: #ff0000;
 }
 
-.message-error{
+.message-error {
   color: #ff0000;
 }
 
-.message-info {
+.message-important {
   color: #6565d8;
+}
+
+.message-info {
+  color: #666666;
+}
+
+.message-info {
+  color: #666666;
 }
 
 .hidden {
@@ -1897,11 +1880,32 @@ img.center {
   color: #b23115;
 }
 
-.big-warning {
-  font-size:200%;
+.big {
+  font-size:150%;
   font-weight:bold;
-  color:#a93232;
-  margin-top:0px
+  margin-top:0px;
+  margin-bottom: .15em;
+  border: 1px solid black;
+  border-radius: .25rem;
+  padding: .25em;
+}
+
+.big-error {
+  color: #B94A48;
+  border-color: #B94A48;
+  background-color: #ffe3e3;
+}
+
+.big-important {
+  color: #6565d8;
+  border-color: #6565d8;
+  background-color: #F0F0FF;
+}
+
+.big-info {
+  color: #666666;
+  border-color: #666666;
+  background-color: #3333;
 }
 
 button.disabled {

@@ -89,10 +89,6 @@ ListTarget.sample = {
             Utils.showOkDialog('Error', ["Identities cannot be placed in boxes"]);
             return;
           }
-          if (!result.createBox && !Constants.isDetailedSample && result.quantity == 1) {
-            window.location = '/miso/sample/new' + (projectId ? '/' + projectId : '');
-            return;
-          }
           return {
             quantity: result.quantity,
             projectId: projectId,
