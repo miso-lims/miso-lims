@@ -37,6 +37,10 @@ HotTarget.boxable = (function() {
     };
     return col;
   };
+  
+  var isTargetIdentity = function(config) {
+    return config && config.targetSampleClass && config.targetSampleClass.alias == 'Identity';
+  }
 
   function fillBoxPositions(table, sortFunction) {
     var rowCount = table.countRows();
@@ -233,7 +237,94 @@ HotTarget.boxable = (function() {
                 });
               }
             }
-          }, makeDiscardedColumn()];
+          }, makeDiscardedColumn(),
+          // Distribution to collaborator or outside destination
+          {
+            header: 'Distributed',
+            data: 'distributed',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: ['Sent Out', 'No'],
+            include: !config.create && !config.propagate && (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
+            unpack: function(obj, flat, setCellMeta) {
+              if (obj.distributed === true) {
+                flat.distributed = 'Sent Out';
+              } else {
+                flat.distributed = 'No';
+              }
+            },
+            pack: function(obj, flat, errorHandler) {
+              if (flat.distributed === 'Sent Out') {
+                obj.distributed = true;
+              } else {
+                obj.distributed = false;
+              }
+            }
+          }, {
+            header: 'Distribution Date',
+            data: 'distributionDate',
+            type: 'date',
+            dateFormat: 'YYYY-MM-DD',
+            datePickerConfig: {
+              firstDay: 0,
+              numberOfMonths: 1
+            },
+            allowEmpty: true,
+            include: !config.create && !config.propagate && (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
+            depends: 'distributed',
+            update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              if (value === 'Sent Out') {
+                setReadOnly(false);
+                setOptions({
+                  required: true,
+                  validator: HotUtils.validator.requiredTextNoSpecialChars
+                });
+              } else {
+                setReadOnly(true);
+                setOptions({
+                  validator: HotUtils.validator.requiredEmpty
+                });
+                setData(null);
+              }
+            },
+            unpack: function(obj, flat, setCellMeta) {
+              if (obj.distributionDate) {
+                flat.distributionDate = Utils.valOrNull(obj.distributionDate);
+              }
+            },
+            pack: function(obj, flat, errorHandler) {
+              obj.distributionDate = flat.distributionDate;
+            }
+          }, {
+            header: 'Distribution Recipient',
+            data: 'distributionRecipient',
+            type: 'text',
+            include: !config.create && !config.propagate && (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
+            depends: 'distributed',
+            update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              if (value === 'Sent Out') {
+                setOptions({
+                  required: true,
+                  validator: HotUtils.validator.requiredTextNoSpecialChars
+                });
+                setReadOnly(false);
+              } else {
+                setOptions({
+                  validator: HotUtils.validator.requiredEmpty
+                });
+                setData(null);
+                setReadOnly(true);
+              }
+            },
+            unpack: function(obj, flat, setCellMeta) {
+              if (obj.distributionRecipient) {
+                flat.distributionRecipient = Utils.valOrNull(obj.distributionRecipient);
+              }
+            },
+            pack: function(obj, flat, errorHandler) {
+              obj.distributionRecipient = flat.distributionRecipient;
+            }
+          }];
     },
     getCustomActions: function(table) {
       return [{

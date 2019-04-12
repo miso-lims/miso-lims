@@ -80,7 +80,7 @@ FormTarget.dilution = (function($) {
           title: 'Volume of Library Used',
           data: 'volumeUsed',
           type: 'decimal'
-        }]
+        }].concat(FormUtils.makeDistributionFields())
       }];
     }
   };

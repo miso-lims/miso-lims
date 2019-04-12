@@ -739,7 +739,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     target.setAlias(source.getAlias());
     target.setDescription(source.getDescription());
     target.setDiscarded(source.isDiscarded());
-    if (source.isDiscarded() || source.isDiscarded()) {
+    if (source.isDiscarded() || source.isDistributed()) {
       target.setVolume(0.0);
     } else {
       target.setVolume(source.getVolume());
