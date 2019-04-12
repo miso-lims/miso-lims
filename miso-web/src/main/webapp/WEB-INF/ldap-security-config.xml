@@ -51,9 +51,7 @@
     <security:csrf disabled="true" />
 
     <security:custom-filter position="FORM_LOGIN_FILTER" ref="misoAuthFilter" />
-
     <security:remember-me data-source-ref="dataSource" user-service-ref="ldapUserAuthService" remember-me-parameter="_spring_security_remember_me" />
-
     <security:intercept-url pattern="/miso/login" access="permitAll" />
     <security:intercept-url pattern="/miso/accessDenied" access="permitAll" />
     <security:intercept-url pattern="/miso/error" access="permitAll" />
@@ -113,6 +111,7 @@
   <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
     <property name="useReferer" value="true" />
   </bean>
+
   <bean id="failureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
     <property name="defaultFailureUrl" value="/miso/login?login_error=1" />
   </bean>
