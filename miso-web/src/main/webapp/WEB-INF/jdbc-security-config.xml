@@ -46,7 +46,6 @@
     <security:csrf disabled="true" />
 
     <security:custom-filter position="FORM_LOGIN_FILTER" ref="jdbcAuthFilter" />
-    <security:remember-me data-source-ref="dataSource" user-service-ref="jdbcUserAuthService" remember-me-parameter="_spring_security_remember_me" />
 
     <security:logout logout-success-url="/miso/login" />
 
