@@ -145,6 +145,7 @@ public class EditLibraryController {
     private static final String SORTABLE_LOCATION = "sortableLocation";
     private static final String IS_LIBRARY_RECEIPT = "isLibraryReceipt";
     private static final String DEFAULT_SCI_NAME = "defaultSciName";
+    private static final String CREATE = "create";
     private static final String PROPAGATE = "propagate";
     private static final String EDIT = "edit";
     private static final String SHOW_LIBRARY_ALIAS = "showLibraryAlias";
@@ -556,6 +557,7 @@ public class EditLibraryController {
       config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
       config.put(Config.SORTABLE_LOCATION, false);
       config.put(Config.PROPAGATE, false);
+      config.put(Config.CREATE, true);
       config.put(Config.IS_LIBRARY_RECEIPT, true);
       config.putPOJO(Config.BOX, newBox);
       config.putPOJO(Config.TEMPLATES, templatesByProjectId);
@@ -595,6 +597,7 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO(Config.BOX, newBox);
+      config.put(Config.PROPAGATE, true);
     }
   }
 
@@ -621,6 +624,7 @@ public class EditLibraryController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+      config.put(Config.EDIT, true);
     }
   };
 
@@ -710,6 +714,7 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO(Config.BOX, newBox);
+      config.put(Config.PROPAGATE, true);
     }
   }
 
@@ -768,6 +773,8 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO(Config.BOX, newBox);
+      config.put(Config.CREATE, true);
+      config.put(Config.PROPAGATE, true);
     }
   }
 
@@ -806,6 +813,8 @@ public class EditLibraryController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.putPOJO("dilutionsToPool", dilutions);
       config.putPOJO(Config.BOX, newBox);
+      config.put(Config.CREATE, true);
+      config.put(Config.PROPAGATE, true);
     }
 
     public ModelAndView create(ModelMap model) throws IOException {

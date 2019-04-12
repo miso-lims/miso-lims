@@ -245,7 +245,7 @@ HotTarget.boxable = (function() {
             type: 'dropdown',
             trimDropdown: false,
             source: ['Sent Out', 'No'],
-            include: !config.create && !config.propagate && (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
+            include: config.edit && (!Constants.isDetailedSample || !isTargetIdentity(config)),
             unpack: function(obj, flat, setCellMeta) {
               if (obj.distributed === true) {
                 flat.distributed = 'Sent Out';
@@ -270,7 +270,7 @@ HotTarget.boxable = (function() {
               numberOfMonths: 1
             },
             allowEmpty: true,
-            include: !config.create && !config.propagate && (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
+            include: config.edit && (!Constants.isDetailedSample || !isTargetIdentity(config)),
             depends: 'distributed',
             update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               if (value === 'Sent Out') {
@@ -299,7 +299,7 @@ HotTarget.boxable = (function() {
             header: 'Distribution Recipient',
             data: 'distributionRecipient',
             type: 'text',
-            include: !config.create && !config.propagate && (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
+            include: config.edit && (!Constants.isDetailedSample || !isTargetIdentity(config)),
             depends: 'distributed',
             update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               if (value === 'Sent Out') {

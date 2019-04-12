@@ -26,6 +26,9 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     QC_PASSED(By.id("qcPassed"), FieldType.DROPDOWN),
     VOLUME(By.id("volume"), FieldType.TEXT),
     DISCARDED(By.id("discarded"), FieldType.CHECKBOX),
+    DISTRIBUTED(By.id("distributed"), FieldType.CHECKBOX),
+    DISTRIBUTION_DATE(By.id("distributionDate"), FieldType.TEXT), //
+    DISTRIBUTION_RECIPIENT(By.id("distributionRecipient"), FieldType.TEXT),
     LOCATION(By.id("boxPosition"), FieldType.LABEL),
     
     WARNINGS(By.className("big"), FieldType.LABEL);
