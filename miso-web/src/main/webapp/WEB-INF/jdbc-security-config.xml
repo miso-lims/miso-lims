@@ -46,6 +46,7 @@
     <security:csrf disabled="true" />
 
     <security:custom-filter position="FORM_LOGIN_FILTER" ref="jdbcAuthFilter" />
+    <security:remember-me data-source-ref="dataSource" user-service-ref="jdbcUserAuthService" remember-me-parameter="_spring_security_remember_me" />
 
     <security:logout logout-success-url="/miso/login" />
 
@@ -104,14 +105,11 @@
     <property name="authenticationFailureHandler" ref="failureHandler" />
     <property name="authenticationSuccessHandler" ref="successHandler" />
   </bean>
-<<<<<<< HEAD
 
   <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
     <property name="useReferer" value="true" />
  </bean>
 
-=======
->>>>>>> fc9af56bfbca61fdeb66f15a76a765a85deb8ffa
   <bean id="failureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
     <property name="defaultFailureUrl" value="/miso/login?login_error=1" />
   </bean>
