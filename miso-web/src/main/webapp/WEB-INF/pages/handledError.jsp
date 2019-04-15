@@ -21,7 +21,7 @@
   ~ **********************************************************************
   --%>
 
-<%@ include file="/header.jsp" %>
+<%@ include file="../header.jsp" %>
 
 <p class="errorTitle">${genericMessage}</p>
 <div id="flasherror" class="flasherror">${specificMessage}</div>
@@ -33,4 +33,4 @@
 
 <p><a href="javascript:void(0);" onclick="window.history.back();">Return to Previous Page</a></p>
 
-<%@ include file="/footer.jsp" %>
+<%@ include file="../footer.jsp" %>
