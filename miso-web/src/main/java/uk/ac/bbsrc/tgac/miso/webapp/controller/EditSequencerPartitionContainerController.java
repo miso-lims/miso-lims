@@ -140,6 +140,7 @@ public class EditSequencerPartitionContainerController {
   @GetMapping(value = "/{containerId}")
   public ModelAndView setupEditForm(@PathVariable Long containerId, ModelMap model) throws IOException {
     SequencerPartitionContainer container = containerService.get(containerId);
+    if (container == null) throw new NotFoundException("No container found with ID " + containerId);
     model.put("title", container.getModel().getPlatformType().getContainerName() + " " + containerId);
     return setupForm(container, model);
   }
