@@ -89,6 +89,7 @@ import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
@@ -400,10 +401,11 @@ public class PoolRestController extends RestController {
         message -> new RestException(message, Status.BAD_REQUEST));
   }
 
-  @GetMapping(value = "/spreadsheet")
+  @PostMapping(value = "/spreadsheet")
   @ResponseBody
-  public HttpEntity<byte[]> getSpreadsheet(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder) {
-    return MisoWebUtils.generateSpreadsheet(poolService::get, PoolSpreadSheets::valueOf, request, response);
+  public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) {
+    return MisoWebUtils.generateSpreadsheet(request, poolService::get, PoolSpreadSheets::valueOf, response);
   }
 
   @PostMapping(value = "/bulk-delete")

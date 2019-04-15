@@ -28,7 +28,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -65,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
@@ -135,16 +135,14 @@ public class ContainerRestController extends RestController {
     containerService.bulkDelete(containers);
   }
 
-  private static final Pattern COMMA = Pattern.compile(",");
-
-  @GetMapping(value = "/spreadsheet")
+  @PostMapping(value = "/spreadsheet")
   @ResponseBody
-  public HttpEntity<byte[]> getSpreadsheet(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder) {
-    Stream<Partition> input = COMMA.splitAsStream(request.getParameter("ids"))
-        .map(Long::parseLong)
+  public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) {
+    Stream<Partition> input = request.getIds().stream()
         .map(WhineyFunction.rethrow(containerService::get))
         .flatMap(container -> container.getPartitions().stream());
-    return MisoWebUtils.generateSpreadsheet(input, PartitionSpreadsheets::valueOf, request, response);
+    return MisoWebUtils.generateSpreadsheet(request, input, PartitionSpreadsheets::valueOf, response);
   }
 
   private static class SerialNumberValidationDto {

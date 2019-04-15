@@ -783,21 +783,7 @@ var HotUtils = {
                 return x.description;
               }
             }], function(result) {
-              var request = new XMLHttpRequest(); // xhr because jQuery.ajax doesn't support blob response
-              request.open('POST', '/miso/rest/hot/spreadsheet?format=' + result.format.name);
-              request.responseType = 'blob';
-              request.setRequestHeader('Content-Type', 'application/json; charset=utf8');
-              request.onreadystatechange = function() {
-                if (request.readyState === 4) {
-                  if (request.status === 200) {
-                    var filename = /filename=(.*)$/.exec(request.getResponseHeader('Content-Disposition'))[1];
-                    download(request.response, filename, request.getResponseHeader('Content-Type'));
-                  } else {
-                    Utils.showOkDialog('Error', ['Download failed.']);
-                  }
-                }
-              }
-              request.send(JSON.stringify(data));
+              Utils.ajaxDownloadWithDialog('POST', '/miso/rest/hot/spreadsheet?format=' + result.format.name);
             });
           }
         }];
@@ -1145,14 +1131,13 @@ var HotUtils = {
           if (errors.length >= 1) {
             Utils.showOkDialog("Error", errors);
           } else {
-            window.location = window.location.origin + url + '?' + jQuery.param({
-              ids: items.map(Utils.array.getId).join(','),
+            Utils.ajaxDownloadWithDialog(url, {
+              ids: items.map(Utils.array.getId),
               format: result.format.name,
               sheet: result.sheet.name
             });
           }
         });
-
       },
       allowOnLibraryPage: true
     };

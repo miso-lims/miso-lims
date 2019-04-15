@@ -31,10 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -47,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.util
@@ -119,19 +118,18 @@ public class MisoWebUtils {
     return checks;
   }
 
-  private static final Pattern COMMA = Pattern.compile(",");
-
-  public static <T> HttpEntity<byte[]> generateSpreadsheet(WhineyFunction<Long, T> fetcher, Function<String, Spreadsheet<T>> formatLibrary,
-      HttpServletRequest request,
+  public static <T> HttpEntity<byte[]> generateSpreadsheet(SpreadsheetRequest request, WhineyFunction<Long, T> fetcher,
+      Function<String, Spreadsheet<T>> formatLibrary,
       HttpServletResponse response) {
-    Stream<T> input = COMMA.splitAsStream(request.getParameter("ids")).map(Long::parseLong).map(WhineyFunction.rethrow(fetcher));
-    return generateSpreadsheet(input, formatLibrary, request, response);
+    Stream<T> input = request.getIds().stream().map(WhineyFunction.rethrow(fetcher));
+    return generateSpreadsheet(request, input, formatLibrary, response);
   }
 
-  public static <T> HttpEntity<byte[]> generateSpreadsheet(Stream<T> input, Function<String, Spreadsheet<T>> formatLibrary,
-      HttpServletRequest request, HttpServletResponse response) {
-    Spreadsheet<T> spreadsheet = formatLibrary.apply(request.getParameter("sheet"));
-    SpreadSheetFormat formatter = SpreadSheetFormat.valueOf(request.getParameter("format"));
+  public static <T> HttpEntity<byte[]> generateSpreadsheet(SpreadsheetRequest request, Stream<T> input,
+      Function<String, Spreadsheet<T>> formatLibrary,
+      HttpServletResponse response) {
+    Spreadsheet<T> spreadsheet = formatLibrary.apply(request.getSheet());
+    SpreadSheetFormat formatter = SpreadSheetFormat.valueOf(request.getFormat());
     HttpHeaders headers = makeHttpHeaders(spreadsheet, formatter, response);
     return new HttpEntity<>(formatter.generate(input, spreadsheet), headers);
   }

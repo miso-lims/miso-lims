@@ -77,6 +77,9 @@
   <!-- Parsley for form validation -->
   <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 
+  <!-- Download support -->
+  <script src="<c:url value='/scripts/download/download.js'/>" type="text/javascript"></script>
+
   <!-- Third-party stylesheets imported first, so we are able to override them -->
   <link href="<c:url value='/scripts/handsontable/dist/pikaday/pikaday.css'/>" rel="stylesheet" type="text/css" />
   <link rel="stylesheet" media="screen" href="<c:url value='/scripts/handsontable/dist/handsontable.full.css'/>">

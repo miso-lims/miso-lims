@@ -93,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleLCMTubeDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
+import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
@@ -391,10 +392,11 @@ public class SampleRestController extends RestController {
         message -> new RestException(message, Status.BAD_REQUEST));
   }
 
-  @GetMapping(value = "/spreadsheet")
+  @PostMapping(value = "/spreadsheet")
   @ResponseBody
-  public HttpEntity<byte[]> getSpreadsheet(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder) {
-    return MisoWebUtils.generateSpreadsheet(sampleService::get, SampleSpreadSheets::valueOf, request, response);
+  public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) {
+    return MisoWebUtils.generateSpreadsheet(request, sampleService::get, SampleSpreadSheets::valueOf, response);
   }
 
   private final RelationFinder<Sample> parentFinder = (new RelationFinder<Sample>() {
