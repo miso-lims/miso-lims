@@ -537,6 +537,44 @@ var Utils = Utils
           }
         });
       },
+      ajaxDownloadWithDialog: function(url, data) {
+        var dialogArea = document.getElementById('dialog');
+        while (dialogArea.hasChildNodes()) {
+          dialogArea.removeChild(dialogArea.lastChild);
+        }
+        var p = document.createElement('P');
+        p.appendChild(document.createTextNode('Preparing and downloading...'));
+        dialogArea.appendChild(p);
+
+        var dialog = jQuery('#dialog').dialog({
+          autoOpen: true,
+          height: 400,
+          width: 350,
+          title: 'Generating spreadsheet',
+          modal: true,
+          buttons: {},
+          closeOnEscape: false,
+          open: function(event, ui) {
+            jQuery(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+          }
+        });
+        var request = new XMLHttpRequest(); // xhr because jQuery.ajax doesn't support blob response
+        request.open('POST', url);
+        request.responseType = 'blob';
+        request.setRequestHeader('Content-Type', 'application/json; charset=utf8');
+        request.onreadystatechange = function() {
+          if (request.readyState === 4) {
+            dialog.dialog("close");
+            if (request.status === 200) {
+              var filename = /filename=(.*)$/.exec(request.getResponseHeader('Content-Disposition'))[1];
+              download(request.response, filename, request.getResponseHeader('Content-Type'));
+            } else {
+              Utils.showOkDialog('Error', ['Download failed.']);
+            }
+          }
+        }
+        request.send(JSON.stringify(data));
+      },
       printSelectDialog: function(callback) {
         Utils.ajaxWithDialog('Getting Printers', 'GET', window.location.origin + '/miso/rest/printer', null, function(printers) {
           Utils.showDialog('Select Printer', 'Print', [{
@@ -563,11 +601,11 @@ var Utils = Utils
       },
       printDialog: function(type, ids) {
         Utils.printSelectDialog(function(printer, copies) {
-          Utils.ajaxWithDialog('Printing', 'POST', window.location.origin + '/miso/rest/printer/' + printer + '?' + jQuery.param({
+          Utils.ajaxWithDialog('Printing', 'POST', window.location.origin + '/miso/rest/printer/' + printer, {
             type: type,
-            ids: ids.join(','),
+            ids: ids,
             copies: copies
-          }), null, function(result) {
+          }, function(result) {
             Utils.showOkDialog('Printing', [result == ids.length ? 'Printing successful.' : (result + ' of ' + ids.length + ' printed.')]);
           });
         });

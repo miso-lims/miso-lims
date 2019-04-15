@@ -50,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
@@ -165,10 +166,11 @@ public class LibraryDilutionRestController extends RestController {
         message -> new RestException(message, Status.BAD_REQUEST));
   }
 
-  @GetMapping(value = "/spreadsheet")
+  @PostMapping(value = "/spreadsheet")
   @ResponseBody
-  public HttpEntity<byte[]> getSpreadsheet(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder) {
-    return MisoWebUtils.generateSpreadsheet(dilutionService::get, LibraryDilutionSpreadSheets::valueOf, request, response);
+  public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) {
+    return MisoWebUtils.generateSpreadsheet(request, dilutionService::get, LibraryDilutionSpreadSheets::valueOf, response);
   }
 
   private static Stream<Sample> getSample(LibraryDilution dilution) {

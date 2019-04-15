@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -53,7 +51,96 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 @RequestMapping("/rest/printer")
 
 public class PrinterRestController extends RestController {
-  private static final Pattern COMMA = Pattern.compile(",");
+  public static class BoxPositionPrintRequest {
+    private long boxId;
+    private int copies;
+    private Set<String> positions;
+
+    public long getBoxId() {
+      return boxId;
+    }
+
+    public int getCopies() {
+      return copies;
+    }
+
+    public Set<String> getPositions() {
+      return positions;
+    }
+
+    public void setBoxId(long boxId) {
+      this.boxId = boxId;
+    }
+
+    public void setCopies(int copies) {
+      this.copies = copies;
+    }
+
+    public void setPositions(Set<String> positions) {
+      this.positions = positions;
+    }
+  }
+
+  public static class BoxPrintRequest {
+    private List<Long> boxes;
+    private int copies;
+
+    public List<Long> getBoxes() {
+      return boxes;
+    }
+
+    public int getCopies() {
+      return copies;
+    }
+
+    public void setBoxes(List<Long> boxes) {
+      this.boxes = boxes;
+    }
+
+    public void setCopies(int copies) {
+      this.copies = copies;
+    }
+  }
+
+  public static class PrintRequest {
+    private int copies;
+    private List<Long> ids;
+    private long printerId;
+    private String type;
+
+    public int getCopies() {
+      return copies;
+    }
+
+    public List<Long> getIds() {
+      return ids;
+    }
+
+    public long getPrinterId() {
+      return printerId;
+    }
+
+    public String getType() {
+      return type;
+    }
+
+    public void setCopies(int copies) {
+      this.copies = copies;
+    }
+
+    public void setIds(List<Long> ids) {
+      this.ids = ids;
+    }
+
+    public void setPrinterId(long printerId) {
+      this.printerId = printerId;
+    }
+
+    public void setType(String type) {
+      this.type = type;
+    }
+  }
+
   private static final Logger log = LoggerFactory.getLogger(PrinterRestController.class);
 
   @Autowired
@@ -94,6 +181,41 @@ public class PrinterRestController extends RestController {
   @Autowired
   private SampleService sampleService;
 
+  @PostMapping(value = "{printerId}/boxcontents", headers = { "Content-type=application/json" })
+  @ResponseBody
+  public long boxContents(@PathVariable("printerId") Long printerId, @RequestBody BoxPrintRequest request)
+      throws IOException {
+    User user = authorizationManager.getCurrentUser();
+    Printer printer = printerService.get(printerId);
+    if (printer == null) {
+      throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
+    }
+    return printer.printBarcode(user, request.getCopies(),
+        request.getBoxes().stream()//
+            .map(WhineyFunction.rethrow(boxService::get))//
+            .sorted(Comparator.comparing(Box::getAlias))//
+            .flatMap(b -> b.getBoxPositions().entrySet().stream()//
+                .sorted(Comparator.comparing(Entry::getKey))//
+                .map(WhineyFunction.rethrow(this::loadBarcodable))));
+  }
+
+  @PostMapping(value = "{printerId}/boxpositions", headers = { "Content-type=application/json" })
+  @ResponseBody
+  public long boxPositions(@PathVariable("printerId") Long printerId, @RequestBody BoxPositionPrintRequest request)
+      throws IOException {
+    User user = authorizationManager.getCurrentUser();
+    Printer printer = printerService.get(printerId);
+    if (printer == null) {
+      throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
+    }
+    Box box = boxService.get(request.getBoxId());
+    return printer.printBarcode(user, request.getCopies(),
+        box.getBoxPositions().entrySet().stream()//
+            .filter(e -> request.getPositions().contains(e.getKey()))//
+            .sorted(Comparator.comparing(Entry::getKey))//
+            .map(WhineyFunction.rethrow(this::loadBarcodable)));
+  }
+
   @PostMapping(headers = { "Content-type=application/json" })
   @ResponseBody
   @ResponseStatus(code = HttpStatus.CREATED)
@@ -131,7 +253,6 @@ public class PrinterRestController extends RestController {
   public void enable(@RequestBody List<Long> printerIds) throws IOException {
     setState(printerIds, true);
   }
-
   @GetMapping(value = "{printerId}", produces = "application/json")
   public @ResponseBody PrinterDto get(@PathVariable Long printerId) throws IOException {
     Printer printer = printerService.get(printerId);
@@ -145,6 +266,22 @@ public class PrinterRestController extends RestController {
   @ResponseBody
   public List<PrinterDto> list() throws IOException {
     return printerService.list(0, 0, true, "id").stream().map(Dtos::asDto).collect(Collectors.toList());
+  }
+
+  private Barcodable loadBarcodable(Entry<String, BoxPosition> e) throws IOException {
+    long id = e.getValue().getBoxableId().getTargetId();
+    switch (e.getValue().getBoxableId().getTargetType()) {
+    case DILUTION:
+      return dilutionService.get(id);
+    case LIBRARY:
+      return libraryService.get(id);
+    case SAMPLE:
+      return sampleService.get(id);
+    case POOL:
+      return poolService.get(id);
+    default:
+      throw new IllegalArgumentException("Unknown barcodeable type: " + e.getValue().getBoxableId().getTargetType());
+    }
   }
 
   public void setPrinterService(PrinterService printerService) {
@@ -166,10 +303,10 @@ public class PrinterRestController extends RestController {
     }
   }
 
+
   @PostMapping(value = "{printerId}", headers = { "Content-type=application/json" })
   @ResponseBody
-  public long submit(@PathVariable("printerId") Long printerId, @RequestParam("type") String type, @RequestParam("ids") String ids,
-      @RequestParam("copies") int copies)
+  public long submit(@PathVariable("printerId") Long printerId, @RequestBody PrintRequest request)
       throws IOException {
     User user = authorizationManager.getCurrentUser();
     Printer printer = printerService.get(printerId);
@@ -178,7 +315,7 @@ public class PrinterRestController extends RestController {
     }
     WhineyFunction<Long, Barcodable> fetcher;
 
-    switch (type) {
+    switch (request.getType()) {
     case "box":
       fetcher = boxService::get;
       break;
@@ -198,114 +335,11 @@ public class PrinterRestController extends RestController {
       fetcher = poolService::get;
       break;
     default:
-      throw new IllegalArgumentException("Unknown barcodeable type: " + type);
+      throw new IllegalArgumentException("Unknown barcodeable type: " + request.getType());
     }
 
-    return printer.printBarcode(user, copies, COMMA.splitAsStream(ids)//
-        .map(Long::parseLong)//
+    return printer.printBarcode(user, request.getCopies(), request.getIds().stream()//
         .map(WhineyFunction.rethrow(fetcher))//
         .sorted(Comparator.comparing(Barcodable::getAlias)));
-  }
-
-  public static class BoxPrintRequest {
-    private List<Long> boxes;
-    private int copies;
-
-    public int getCopies() {
-      return copies;
-    }
-
-    public void setCopies(int copies) {
-      this.copies = copies;
-    }
-
-    public List<Long> getBoxes() {
-      return boxes;
-    }
-
-    public void setBoxes(List<Long> boxes) {
-      this.boxes = boxes;
-    }
-  }
-
-  private Barcodable loadBarcodable(Entry<String, BoxPosition> e) throws IOException {
-    long id = e.getValue().getBoxableId().getTargetId();
-    switch (e.getValue().getBoxableId().getTargetType()) {
-    case DILUTION:
-      return dilutionService.get(id);
-    case LIBRARY:
-      return libraryService.get(id);
-    case SAMPLE:
-      return sampleService.get(id);
-    case POOL:
-      return poolService.get(id);
-    default:
-      throw new IllegalArgumentException("Unknown barcodeable type: " + e.getValue().getBoxableId().getTargetType());
-    }
-  }
-
-  @PostMapping(value = "{printerId}/boxcontents", headers = { "Content-type=application/json" })
-  @ResponseBody
-  public long boxContents(@PathVariable("printerId") Long printerId, @RequestBody BoxPrintRequest request)
-      throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    Printer printer = printerService.get(printerId);
-    if (printer == null) {
-      throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
-    }
-    return printer.printBarcode(user, request.getCopies(),
-        request.getBoxes().stream()//
-            .map(WhineyFunction.rethrow(boxService::get))//
-            .sorted(Comparator.comparing(Box::getAlias))//
-            .flatMap(b -> b.getBoxPositions().entrySet().stream()//
-                .sorted(Comparator.comparing(Entry::getKey))//
-            .map(WhineyFunction.rethrow(this::loadBarcodable))));
-  }
-
-  public static class BoxPositionPrintRequest {
-    private long boxId;
-    private Set<String> positions;
-    private int copies;
-
-    public int getCopies() {
-      return copies;
-    }
-
-    public void setCopies(int copies) {
-      this.copies = copies;
-    }
-
-    public long getBoxId() {
-      return boxId;
-    }
-
-    public void setBoxId(long boxId) {
-      this.boxId = boxId;
-    }
-
-    public Set<String> getPositions() {
-      return positions;
-    }
-
-    public void setPositions(Set<String> positions) {
-      this.positions = positions;
-    }
-  }
-
-  @PostMapping(value = "{printerId}/boxpositions", headers = { "Content-type=application/json" })
-  @ResponseBody
-  public long boxPositions(@PathVariable("printerId") Long printerId, @RequestBody BoxPositionPrintRequest request)
-      throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    Printer printer = printerService.get(printerId);
-    if (printer == null) {
-      throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
-    }
-    Box box = boxService.get(request.getBoxId());
-    return printer.printBarcode(user, request.getCopies(),
-        box.getBoxPositions().entrySet().stream()//
-            .filter(e -> request.getPositions().contains(e.getKey()))//
-            .sorted(Comparator.comparing(Entry::getKey))//
-            .map(WhineyFunction.rethrow(this::loadBarcodable)));
   }
 }
