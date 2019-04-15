@@ -106,7 +106,7 @@ public class DefaultPoolOrderService implements PoolOrderService {
 
   @Override
   public void authorizeDeletion(PoolOrder order) throws IOException {
-    authorizationManager.throwIfNonAdminOrMatchingOwner(order.getCreatedBy());
+    authorizationManager.throwIfNotInternal();
   }
 
   @Override
