@@ -1,3 +1,11 @@
+# 0.2.173
+
+Changes:
+
+ * Allow downloading spreadsheets with lots of items
+ * Fix error page
+ * Allow any internal user to delete a pool order
+
 # 0.2.172
 
 Changes:
