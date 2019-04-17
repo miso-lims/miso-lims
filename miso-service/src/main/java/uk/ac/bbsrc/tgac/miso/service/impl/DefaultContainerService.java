@@ -62,7 +62,7 @@ public class DefaultContainerService
   }
 
   @Override
-  public Collection<SequencerPartitionContainer> listByBarcode(String barcode) throws IOException {
+  public List<SequencerPartitionContainer> listByBarcode(String barcode) throws IOException {
     return containerDao.listSequencerPartitionContainersByBarcode(barcode);
   }
 
@@ -109,10 +109,21 @@ public class DefaultContainerService
     }
   }
 
-  private void validateChange(SequencerPartitionContainer container, SequencerPartitionContainer beforeChange) {
+  private void validateChange(SequencerPartitionContainer container, SequencerPartitionContainer beforeChange) throws IOException {
     if (container.getModel().getPartitionCount() != container.getPartitions().size()) {
       // this is not user-correctable, so should not be reported as a validation error
       throw new IllegalArgumentException("Number of partitions does not match container model specifications");
+    }
+
+    List<ValidationError> errors = new ArrayList<>();
+
+    if (beforeChange == null || !container.getIdentificationBarcode().equals(beforeChange.getIdentificationBarcode())
+        && !listByBarcode(container.getIdentificationBarcode()).isEmpty()) {
+      errors.add(new ValidationError("identificationBarcode", "There is already a container with this serial number"));
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
     }
   }
 

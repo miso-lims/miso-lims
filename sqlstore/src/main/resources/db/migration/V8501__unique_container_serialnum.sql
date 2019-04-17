@@ -1,0 +1,1 @@
+ALTER TABLE SequencerPartitionContainer ADD CONSTRAINT uk_container_identificationBarcode UNIQUE (identificationBarcode);
