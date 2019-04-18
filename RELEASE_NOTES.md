@@ -1,3 +1,16 @@
+# NEXT VERSION
+
+NOTE: Duplicate serial numbers are no longer allowed for sequencer partition containers. If you
+have duplicates, they must be fixed before migrating to this version. Check for duplicate serial
+numbers using the following query. To fix, ensure that each container has a unique serial number.
+
+```
+SELECT identificationBarcode, COUNT(containerId)
+FROM SequencerPartitionContainer
+GROUP BY identificationBarcode
+HAVING COUNT(containerId) > 1;
+```
+
 # 0.2.173
 
 Changes:
@@ -36,6 +49,7 @@ ROOT.xml inside the Context element:
 ```
 
 BAD: 
+
  * Bad database migration
 
 # 0.2.170
