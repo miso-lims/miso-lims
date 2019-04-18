@@ -117,7 +117,7 @@ public class DefaultContainerService
 
     List<ValidationError> errors = new ArrayList<>();
 
-    if (beforeChange == null || !container.getIdentificationBarcode().equals(beforeChange.getIdentificationBarcode())
+    if ((beforeChange == null || !container.getIdentificationBarcode().equals(beforeChange.getIdentificationBarcode()))
         && !listByBarcode(container.getIdentificationBarcode()).isEmpty()) {
       errors.add(new ValidationError("identificationBarcode", "There is already a container with this serial number"));
     }
