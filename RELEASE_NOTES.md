@@ -1,15 +1,26 @@
 # NEXT VERSION
 
-NOTE: Duplicate serial numbers are no longer allowed for sequencer partition containers. If you
-have duplicates, they must be fixed before migrating to this version. Check for duplicate serial
-numbers using the following query. To fix, ensure that each container has a unique serial number.
+Upgrade notes:
 
-```
-SELECT identificationBarcode, COUNT(containerId)
-FROM SequencerPartitionContainer
-GROUP BY identificationBarcode
-HAVING COUNT(containerId) > 1;
-```
+ * We have updated MISO to use Flyway 5.2.4. To accomodate this change, you will need to manually
+   run the provided SQL script on your database **before** migrating to the new version. Replace
+   your database and user names in the follow command if necessary:
+
+   ```
+   mysql -D lims -u tgaclims -p < sqlstore/src/main/resources/db/scripts/flyway-upgrade-5.2.4.sql
+   ```
+
+ * Duplicate serial numbers are no longer allowed for sequencer partition containers. If you have
+   duplicates, they must be fixed **before** migrating to this version. Check for duplicate serial
+   numbers using the following query. To fix, ensure that each container has a unique serial
+   number.
+
+   ```
+   SELECT identificationBarcode, COUNT(containerId)
+   FROM SequencerPartitionContainer
+   GROUP BY identificationBarcode
+   HAVING COUNT(containerId) > 1;
+   ```
 
 # 0.2.173
 
