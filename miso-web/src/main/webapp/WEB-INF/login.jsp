@@ -48,7 +48,6 @@
           <td align="right"><label for="password">Password</label></td>
           <td align="left"><input type="password" name="password" id="password"/></td>
         </tr>
-
         <tr>
           <td></td>
           <td align="left">
