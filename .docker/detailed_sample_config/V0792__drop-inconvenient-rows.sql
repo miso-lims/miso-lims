@@ -5,3 +5,4 @@ DELETE FROM BoxUse WHERE alias='Libraries';
 DELETE FROM SampleClass WHERE alias='Slide';
 DELETE FROM ReferenceGenome WHERE alias='Unknown';
 SET FOREIGN_KEY_CHECKS=1;
+

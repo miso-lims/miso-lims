@@ -270,7 +270,6 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
@@ -565,7 +564,7 @@
 	          <password>${mysql.pw}</password>
 	          <locations>
                 <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
-                <location>classpath:db/migration</location>
+                <location>filesystem:target/test-classes/db/migration</location>
               </locations>
 	          <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
               <placeholders>
@@ -842,7 +841,7 @@
 	          <password>${mysql.pw}</password>
 	          <locations>
                 <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
-                <location>classpath:db/migration</location>
+                <location>filesystem:target/test-classes/db/migration</location>
               </locations>
 	          <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
               <placeholders>

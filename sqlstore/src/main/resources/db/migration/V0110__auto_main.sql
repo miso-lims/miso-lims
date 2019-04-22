@@ -12,16 +12,16 @@ ALTER TABLE `Identity` DROP COLUMN internalName;
 */
 
 -- Remove DetailedSample.kitDescriptorId field (currently unused; also only applicable to Stocks)
---StartNoTest
+-- StartNoTest
 ALTER TABLE DetailedSample DROP FOREIGN KEY DetailedSample_ibfk_1;
---EndNoTest
+-- EndNoTest
 ALTER TABLE DetailedSample DROP COLUMN kitDescriptorId;
 
 -- Add missing FK
 ALTER TABLE Kit ADD CONSTRAINT kit_kitDescriptor_fkey FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId);
 
 
---StartNoTest
+-- StartNoTest
 
 -- Remove 'Test' kit added in V0002 migration
 DELETE FROM KitDescriptor WHERE kitDescriptorId=121 AND name='Test' AND partNumber='123123123';
@@ -129,6 +129,6 @@ DROP FUNCTION kitExists;
 -- add constraint
 ALTER TABLE KitDescriptor ADD CONSTRAINT uk_kitDescriptor_name UNIQUE (name);
 
---EndNoTest
+-- EndNoTest
 
 

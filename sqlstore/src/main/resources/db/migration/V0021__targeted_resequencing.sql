@@ -1,7 +1,7 @@
 -- Switch tables to InnoDB to permit foreign key constraints.
---StartNoTest
+-- StartNoTest
 ALTER TABLE LibraryDilution ENGINE = InnoDB ROW_FORMAT = DEFAULT;
---EndNoTest
+-- EndNoTest
 
 CREATE TABLE `TargetedResequencing` (
   `targetedResequencingId` bigint(20) NOT NULL AUTO_INCREMENT,

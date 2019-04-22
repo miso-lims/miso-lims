@@ -238,6 +238,7 @@
           <placeholders>
             <filesDir>/storage/miso/files/</filesDir>
           </placeholders>
+          <configFile>flyway.properties</configFile>
         </configuration>
       </plugin>
     </plugins>

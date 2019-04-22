@@ -15,7 +15,7 @@ services:
   # http://tgac.github.io/miso-lims/adm/admin-guide.html
   flyway:
     volumes:
-      - "./.docker/detailed_sample_config/V0792__drop-inconvenient-rows.sql:/flyway/migrations/V0792__drop-inconvenient-rows.sql"
+      - "./.docker/detailed_sample_config/V0792__drop-inconvenient-rows.sql:/flyway/sql/V0792__drop-inconvenient-rows.sql"
 
   # persist MISO's uploads to a permanent location at ./docker-miso_files
   # mount MISO's properties file to configure MISO

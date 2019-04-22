@@ -13,8 +13,6 @@ services:
     build:
       context: .
       target: flyway-migration
-      args:
-        FLYWAY_VERSION: 3.2.1
 
   webapp:
     build:

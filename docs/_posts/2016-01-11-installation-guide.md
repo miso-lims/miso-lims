@@ -102,7 +102,7 @@ Application Server:
 Database Server:
 
 * MySQL 5.7.7
-* [Flyway 3.2.1](https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/3.2.1/) (newer versions may cause issues)
+* [Flyway 5.2.4](https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/5.2.4/) (newer versions may cause issues)
 
 Development Machine(s):
 
@@ -163,7 +163,7 @@ need to add a grant privilege to the MISO database from your remote machine:
 
 # Setting Up the Application Server
 
-Download the [Flyway command line tool](https://flywaydb.org/download/community) version 3.2.1 and install it.
+Download the [Flyway command line tool](https://flywaydb.org/download/community) version 5.2.4 and install it.
 Newer versions of Flyway may cause issues, and are not recommended.
 
 The application server needs [Tomcat 8](https://tomcat.apache.org/download-80.cgi).
