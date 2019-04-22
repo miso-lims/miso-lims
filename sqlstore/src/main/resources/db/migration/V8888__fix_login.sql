@@ -1,5 +1,3 @@
--- StartNoTest
-
 DROP TABLE IF EXISTS `persistent_logins`;
 
 CREATE TABLE `persistent_logins` (
@@ -9,5 +7,3 @@ CREATE TABLE `persistent_logins` (
   `last_used` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`series`)
 ) ENGINE = InnoDB ROW_FORMAT = DEFAULT;
-
--- EndNoTest
