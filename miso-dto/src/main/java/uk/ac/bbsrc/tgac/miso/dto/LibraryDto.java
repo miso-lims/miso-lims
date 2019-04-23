@@ -50,6 +50,7 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
   private Long index2Id;
   private String index1Label;
   private String index2Label;
+  private Long indexFamilyId;
   private String indexFamilyName;
   private String url;
   private String volume;
@@ -135,6 +136,14 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
 
   public String getIndex2Label() {
     return index2Label;
+  }
+
+  public Long getIndexFamilyId() {
+    return indexFamilyId;
+  }
+
+  public void setIndexFamilyId(Long indexFamilyId) {
+    this.indexFamilyId = indexFamilyId;
   }
 
   public String getIndexFamilyName() {

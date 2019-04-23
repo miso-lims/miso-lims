@@ -39,8 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -68,14 +66,12 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -88,13 +84,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -122,8 +114,6 @@ import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryTemplateService;
@@ -186,10 +176,6 @@ public class EditLibraryController {
   @Autowired
   private LibraryService libraryService;
   @Autowired
-  private LibraryDesignService libraryDesignService;
-  @Autowired
-  private LibraryDesignCodeService libraryDesignCodeService;
-  @Autowired
   private SampleService sampleService;
   @Autowired
   private ChangeLogService changeLogService;
@@ -234,10 +220,6 @@ public class EditLibraryController {
     this.libraryService = libraryService;
   }
 
-  public void setLibraryDesignService(LibraryDesignService libraryDesignService) {
-    this.libraryDesignService = libraryDesignService;
-  }
-
   public void setSampleService(SampleService sampleService) {
     this.sampleService = sampleService;
   }
@@ -266,11 +248,6 @@ public class EditLibraryController {
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
     return autoGenerateIdBarcodes;
-  }
-
-  @ModelAttribute("aliasGenerationEnabled")
-  public Boolean isAliasGenerationEnabled() {
-    return namingScheme != null && namingScheme.hasLibraryAliasGenerator();
   }
 
   public Boolean isDetailedSampleEnabled() {
@@ -308,18 +285,6 @@ public class EditLibraryController {
     return libraryService.getLibraryColumnSizes();
   }
 
-  private List<String> populatePlatformTypes() throws IOException {
-    return populatePlatformTypes(Lists.newArrayList());
-  }
-
-  private List<String> populatePlatformTypes(Library library) throws IOException {
-    if (library.getPlatformType() == null) {
-      return populatePlatformTypes();
-    } else {
-      return populatePlatformTypes(Lists.newArrayList(library.getPlatformType().getKey()));
-    }
-  }
-
   private List<String> populatePlatformTypes(Collection<String> current) throws IOException {
     Collection<PlatformType> base = platformService.listActivePlatformTypes();
     if (base.isEmpty()) {
@@ -349,33 +314,11 @@ public class EditLibraryController {
     return types;
   }
 
-  public void populateAvailableIndexFamilies(Library library, ModelMap model) throws IOException {
-    if (library.getPlatformType() == null || isStringEmptyOrNull(library.getPlatformType().getKey())) {
-      model.put("indexFamilies", Collections.singleton(INDEX_FAMILY_NEEDS_PLATFORM));
-    } else {
-      List<IndexFamily> visibleFamilies = new ArrayList<>();
-      visibleFamilies.add(IndexFamily.NULL);
-      visibleFamilies.addAll(indexService.getIndexFamiliesByPlatform(library.getPlatformType()).stream()
-          .filter(family -> !family.getArchived() || (library.getIndices() != null && !library.getIndices().isEmpty()
-              && library.getIndices().get(0).getFamily().getId().equals(family.getId())))
-          .collect(Collectors.toList()));
-      model.put("indexFamilies", visibleFamilies);
-    }
-  }
-
   @ModelAttribute("prepKits")
   public List<KitDescriptor> getPrepKits() throws IOException {
     List<KitDescriptor> list = new ArrayList<>(kitService.listKitDescriptorsByType(KitType.LIBRARY));
     Collections.sort(list, KitDescriptor::sortByName);
     return list;
-  }
-
-  private void populateDesigns(ModelMap model, SampleClass sampleClass) throws IOException {
-    model.put("libraryDesigns", libraryDesignService.listByClass(sampleClass));
-  }
-
-  private void populateDesignCodes(ModelMap model) throws IOException {
-    model.put("libraryDesignCodes", libraryDesignCodeService.list());
   }
 
   /**
@@ -533,27 +476,6 @@ public class EditLibraryController {
     return changeLogService.listAll("Library");
   }
 
-  @GetMapping(value = "/new/{sampleId}")
-  public ModelAndView newAssignedLibrary(@PathVariable Long sampleId, ModelMap model) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    Sample sample = sampleService.get(sampleId);
-    Library library = (isDetailedSampleEnabled() ? new DetailedLibraryImpl() : new LibraryImpl());
-    library.setSample(sample);
-
-    String regex = "([A-z0-9]+)_S([A-z0-9]+)_(.*)";
-    Pattern pat = Pattern.compile(regex);
-    Matcher mat = pat.matcher(sample.getAlias());
-    if (mat.matches()) {
-      // convert the sample alias automatically to a library alias
-      int numLibs = libraryService.listBySampleId(sample.getId()).size();
-      String autogenLibAlias = mat.group(1) + "_" + "L" + mat.group(2) + "-" + (numLibs + 1) + "_" + mat.group(3);
-      model.put("autogeneratedLibraryAlias", autogenLibAlias);
-    }
-
-    model.put("title", "Library from Sample " + sample.getId());
-    return setupForm(user, library, model);
-  }
-
   @GetMapping(value = "/{libraryId}")
   public ModelAndView setupForm(@PathVariable Long libraryId, ModelMap model) throws IOException {
     User user = authorizationManager.getCurrentUser();
@@ -572,14 +494,9 @@ public class EditLibraryController {
   }
 
   private ModelAndView setupForm(User user, Library library, ModelMap model) throws IOException {
-
     if (library == null) throw new NotFoundException("No library found");
 
-    model.put("formObj", library);
     model.put("library", library);
-
-    model.put("platformTypes", populatePlatformTypes(library));
-    populateAvailableIndexFamilies(library, model);
     addAdjacentLibraries(library, model);
 
     Collection<Pool> pools = poolService.listByLibraryId(library.getId());
@@ -594,35 +511,12 @@ public class EditLibraryController {
     model.put("libraryDilutionsConfig", mapper.writeValueAsString(config));
     model.put("experiments", experimentService.listAllByLibraryId(library.getId()).stream().map(Dtos::asDto)
         .collect(Collectors.toList()));
-    model.put("libraryDto", library.getId() == LibraryImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(library, false)));
-
-    model.put("volumeUnits", VolumeUnit.values());
-    model.put("concentrationUnits", ConcentrationUnit.values());
-    model.put("spikeIns", libraryService.listSpikeIns());
-    model.put("dilutionFactors", DilutionFactor.values());
-
-    populateDesigns(model,
-        LimsUtils.isDetailedSample(library.getSample()) ? ((DetailedSample) library.getSample()).getSampleClass() : null);
-    populateDesignCodes(model);
+    model.put("libraryDto", mapper.writeValueAsString(Dtos.asDto(library, false)));
 
     if (LimsUtils.isDetailedLibrary(library)) {
       DetailedLibrary detailed = (DetailedLibrary) library;
-      String effectiveGroupId = "";
-      String effectiveGroupIdSampleAlias = "";
-      if (!LimsUtils.isStringEmptyOrNull(detailed.getGroupId())) {
-        effectiveGroupId = detailed.getGroupId();
-        effectiveGroupIdSampleAlias = library.getAlias();
-      } else {
-        Optional<DetailedSample> effective = ((DetailedSample) detailed.getSample()).getEffectiveGroupIdSample();
-        if (effective.isPresent()) {
-          effectiveGroupId = effective.get().getGroupId();
-          effectiveGroupIdSampleAlias = effective.get().getAlias();
-        }
-      }
-      model.put("effectiveGroupId", effectiveGroupId);
-      model.put("effectiveGroupIdSample", effectiveGroupIdSampleAlias);
       SampleIdentity identity = getParent(SampleIdentity.class, (DetailedSample) detailed.getSample());
-      model.put("effectiveExternalName", identity.getExternalName());
+      model.put("effectiveExternalNames", identity.getExternalName());
     }
     return new ModelAndView("/WEB-INF/pages/editLibrary.jsp", model);
   }
