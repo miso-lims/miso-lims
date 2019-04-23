@@ -1,3 +1,10 @@
+-- unique_container_serialnum
+ALTER TABLE SequencerPartitionContainer ADD CONSTRAINT uk_container_identificationBarcode UNIQUE (identificationBarcode);
+
+-- plate_change_log
+DROP TABLE PlateChangeLog;
+
+-- fix_login
 DROP TABLE IF EXISTS `persistent_logins`;
 
 CREATE TABLE `persistent_logins` (
@@ -7,3 +14,4 @@ CREATE TABLE `persistent_logins` (
   `last_used` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`series`)
 ) ENGINE = InnoDB ROW_FORMAT = DEFAULT;
+

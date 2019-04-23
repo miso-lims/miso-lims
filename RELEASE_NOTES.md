@@ -1,10 +1,17 @@
-# NEXT VERSION
+# 0.2.174
+
+Changes:
+
+ * Fixed error on logout
+ * Fixed container serial number uniqueness validation
 
 Upgrade notes:
 
  * We have updated MISO to use Flyway 5.2.4. To accomodate this change, you will need to manually
    run the provided SQL script on your database **before** migrating to the new version. Replace
-   your database and user names in the follow command if necessary:
+   your database and user names in the follow command if necessary. You will also need to upgrade
+   to version 5.2.4 of the Flyway command-line tool:
+   https://flywaydb.org/documentation/commandline/#download-and-installation
 
    ```
    mysql -D lims -u tgaclims -p < sqlstore/src/main/resources/db/scripts/flyway-upgrade-5.2.4.sql

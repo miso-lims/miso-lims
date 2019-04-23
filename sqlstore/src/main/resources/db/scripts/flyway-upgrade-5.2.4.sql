@@ -2,6 +2,7 @@
 -- due to enforcement of SQL comment syntax and changed checksum method
 
 RENAME TABLE schema_version TO flyway_schema_history;
+ALTER TABLE flyway_schema_history DROP COLUMN version_rank;
 
 UPDATE flyway_schema_history SET checksum =  '-641246264' WHERE version = '0001' AND checksum = '68049289';
 UPDATE flyway_schema_history SET checksum =  '345627387' WHERE version = '0002' AND checksum = '918021264';
