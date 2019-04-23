@@ -18,7 +18,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -49,20 +48,20 @@ public class LibraryPageIT extends AbstractIT {
     fields.put(Field.CREATION_DATE, "2017-07-24");
     fields.put(Field.PLATFORM, "Illumina");
     fields.put(Field.LIBRARY_TYPE, "Paired End");
-    fields.put(Field.DESIGN, "(None)");
-    fields.put(Field.DESIGN_CODE, "WG");
+    fields.put(Field.DESIGN, "None");
+    fields.put(Field.DESIGN_CODE, "WG (Whole Genome)");
     fields.put(Field.SELECTION, "PCR");
     fields.put(Field.STRATEGY, "WGS");
     fields.put(Field.INDEX_FAMILY, "Dual Index 6bp");
     fields.put(Field.INDEX_1, "A01 (AAACCC)");
     fields.put(Field.INDEX_2, "B01 (AAATTT)");
-    fields.put(Field.QC_PASSED, "false");
+    fields.put(Field.QC_PASSED, "False");
     fields.put(Field.LOW_QUALITY, "false");
     fields.put(Field.SIZE, "251");
     fields.put(Field.VOLUME, "2.5");
     fields.put(Field.DISCARDED, "false");
     fields.put(Field.LOCATION, null);
-    fields.put(Field.BOX_LOCATION, null);
+    fields.put(Field.BOX_LOCATION, "n/a");
     fields.put(Field.KIT, "Test Kit");
     fields.put(Field.CONCENTRATION, "10.0");
     fields.put(Field.ARCHIVED, "false");
@@ -74,12 +73,12 @@ public class LibraryPageIT extends AbstractIT {
     changes.put(Field.BARCODE, "newbarcode");
     changes.put(Field.DESCRIPTION, "libdesc_changed_110001");
     changes.put(Field.LIBRARY_TYPE, "Total RNA");
-    changes.put(Field.DESIGN_CODE, "MR");
+    changes.put(Field.DESIGN_CODE, "MR (mRNA)");
     changes.put(Field.SELECTION, "cDNA");
     changes.put(Field.STRATEGY, "RNA-Seq");
     changes.put(Field.INDEX_FAMILY, "Single Index 6bp");
     changes.put(Field.INDEX_1, "Index 01 (AAAAAA)");
-    changes.put(Field.QC_PASSED, "true");
+    changes.put(Field.QC_PASSED, "True");
     changes.put(Field.LOW_QUALITY, "true");
     changes.put(Field.SIZE, "151");
     changes.put(Field.VOLUME, "0.5");
@@ -119,19 +118,19 @@ public class LibraryPageIT extends AbstractIT {
     fields.put(Field.PLATFORM, "Illumina");
     fields.put(Field.LIBRARY_TYPE, "Paired End");
     fields.put(Field.DESIGN, "WG");
-    fields.put(Field.DESIGN_CODE, "WG");
+    fields.put(Field.DESIGN_CODE, "WG (Whole Genome)");
     fields.put(Field.SELECTION, "PCR");
     fields.put(Field.STRATEGY, "WGS");
     fields.put(Field.INDEX_FAMILY, "Dual Index 6bp");
     fields.put(Field.INDEX_1, "A01 (AAACCC)");
     fields.put(Field.INDEX_2, "B01 (AAATTT)");
-    fields.put(Field.QC_PASSED, "false");
+    fields.put(Field.QC_PASSED, "False");
     fields.put(Field.LOW_QUALITY, "false");
     fields.put(Field.SIZE, "252");
     fields.put(Field.VOLUME, "4.0");
     fields.put(Field.DISCARDED, "false");
     fields.put(Field.LOCATION, "lib_location_110002");
-    fields.put(Field.BOX_LOCATION, null);
+    fields.put(Field.BOX_LOCATION, "n/a");
     fields.put(Field.KIT, "Test Kit");
     fields.put(Field.CONCENTRATION, "6.3");
     fields.put(Field.ARCHIVED, "false");
@@ -141,11 +140,11 @@ public class LibraryPageIT extends AbstractIT {
     Map<Field, String> changes = Maps.newLinkedHashMap();
     changes.put(Field.BARCODE, null);
     changes.put(Field.DESCRIPTION, null);
-    changes.put(Field.DESIGN, "(None)");
-    changes.put(Field.SELECTION, "(None)");
-    changes.put(Field.STRATEGY, "(None)");
+    changes.put(Field.DESIGN, "None");
+    changes.put(Field.SELECTION, "None");
+    changes.put(Field.STRATEGY, "None");
     changes.put(Field.INDEX_FAMILY, "No indices");
-    changes.put(Field.QC_PASSED, null);
+    changes.put(Field.QC_PASSED, "Unknown");
     changes.put(Field.SIZE, null);
     changes.put(Field.VOLUME, null);
     changes.put(Field.LOCATION, null);
@@ -182,19 +181,19 @@ public class LibraryPageIT extends AbstractIT {
     fields.put(Field.CREATION_DATE, "2017-07-24");
     fields.put(Field.PLATFORM, "Illumina");
     fields.put(Field.LIBRARY_TYPE, "Paired End");
-    fields.put(Field.DESIGN, "(None)");
-    fields.put(Field.DESIGN_CODE, "WG");
-    fields.put(Field.SELECTION, "(None)");
-    fields.put(Field.STRATEGY, "(None)");
+    fields.put(Field.DESIGN, "None");
+    fields.put(Field.DESIGN_CODE, "WG (Whole Genome)");
+    fields.put(Field.SELECTION, "None");
+    fields.put(Field.STRATEGY, "None");
     fields.put(Field.INDEX_FAMILY, "No indices");
-    fields.put(Field.INDEX_1, "No index (null)");
-    fields.put(Field.QC_PASSED, null);
+    fields.put(Field.INDEX_1, "None");
+    fields.put(Field.QC_PASSED, "Unknown");
     fields.put(Field.LOW_QUALITY, "false");
     fields.put(Field.SIZE, null);
     fields.put(Field.VOLUME, null);
     fields.put(Field.DISCARDED, "false");
     fields.put(Field.LOCATION, null);
-    fields.put(Field.BOX_LOCATION, null);
+    fields.put(Field.BOX_LOCATION, "n/a");
     fields.put(Field.KIT, "Test Kit");
     fields.put(Field.CONCENTRATION, null);
     fields.put(Field.ARCHIVED, "false");
@@ -206,7 +205,7 @@ public class LibraryPageIT extends AbstractIT {
     changes.put(Field.DESCRIPTION, "lib_110003_desc");
     changes.put(Field.DESIGN, "WG");
     changes.put(Field.INDEX_FAMILY, "No indices");
-    changes.put(Field.QC_PASSED, "true");
+    changes.put(Field.QC_PASSED, "True");
     changes.put(Field.SIZE, "253");
     changes.put(Field.VOLUME, "1000.12");
     changes.put(Field.LOCATION, "lib_110003_location");
@@ -261,10 +260,10 @@ public class LibraryPageIT extends AbstractIT {
     LibraryPage page = LibraryPage.get(getDriver(), getBaseUrl(), 110005L);
 
     Map<Field, String> fields = Maps.newLinkedHashMap();
-    fields.put(Field.DESIGN, "(None)");
-    fields.put(Field.DESIGN_CODE, "EX");
-    fields.put(Field.SELECTION, "(None)");
-    fields.put(Field.STRATEGY, "(None)");
+    fields.put(Field.DESIGN, "None");
+    fields.put(Field.DESIGN_CODE, "EX (Exome)");
+    fields.put(Field.SELECTION, "None");
+    fields.put(Field.STRATEGY, "None");
     assertFieldValues("loaded", fields, page);
     assertTrue(page.isEditable(Field.DESIGN_CODE));
     assertTrue(page.isEditable(Field.SELECTION));
@@ -273,7 +272,7 @@ public class LibraryPageIT extends AbstractIT {
     page.setField(Field.DESIGN, "WG");
     // fields affected by design
     fields.put(Field.DESIGN, "WG");
-    fields.put(Field.DESIGN_CODE, "WG");
+    fields.put(Field.DESIGN_CODE, "WG (Whole Genome)");
     fields.put(Field.SELECTION, "PCR");
     fields.put(Field.STRATEGY, "WGS");
 
@@ -282,8 +281,8 @@ public class LibraryPageIT extends AbstractIT {
     assertFalse(page.isEditable(Field.SELECTION));
     assertFalse(page.isEditable(Field.STRATEGY));
 
-    page.setField(Field.DESIGN, "(None)");
-    fields.put(Field.DESIGN, "(None)");
+    page.setField(Field.DESIGN, "None");
+    fields.put(Field.DESIGN, "None");
     assertFieldValues("loaded", fields, page);
     assertTrue(page.isEditable(Field.DESIGN_CODE));
     assertTrue(page.isEditable(Field.SELECTION));
@@ -306,7 +305,7 @@ public class LibraryPageIT extends AbstractIT {
     assertEquals("PacBio", page.getField(Field.PLATFORM));
     assertNotEquals("Paired End", page.getField(Field.LIBRARY_TYPE));
     assertEquals("No indices", page.getField(Field.INDEX_FAMILY));
-    assertEquals("No index (null)", page.getField(Field.INDEX_1));
+    assertEquals("None", page.getField(Field.INDEX_1));
   }
 
   @Test
@@ -389,12 +388,13 @@ public class LibraryPageIT extends AbstractIT {
     assertAttribute(Field.CREATION_DATE, expectedValues, dateFormatter.print(lib.getCreationDate().getTime()));
     assertAttribute(Field.PLATFORM, expectedValues, lib.getPlatformType().getKey());
     assertAttribute(Field.LIBRARY_TYPE, expectedValues, lib.getLibraryType().getDescription());
-    assertAttribute(Field.DESIGN, expectedValues, nullValueOrGet(lib.getLibraryDesign(), LibraryDesign::getName, "(None)"));
-    assertAttribute(Field.DESIGN_CODE, expectedValues, nullOrGet(lib.getLibraryDesignCode(), LibraryDesignCode::getCode));
+    assertAttribute(Field.DESIGN, expectedValues, nullValueOrGet(lib.getLibraryDesign(), LibraryDesign::getName, "None"));
+    assertAttribute(Field.DESIGN_CODE, expectedValues, nullOrGet(lib.getLibraryDesignCode(),
+        code -> code.getCode() + " (" + code.getDescription() + ")"));
     assertAttribute(Field.SELECTION, expectedValues,
-        nullValueOrGet(lib.getLibrarySelectionType(), LibrarySelectionType::getName, "(None)"));
+        nullValueOrGet(lib.getLibrarySelectionType(), LibrarySelectionType::getName, "None"));
     assertAttribute(Field.STRATEGY, expectedValues,
-        nullValueOrGet(lib.getLibraryStrategyType(), LibraryStrategyType::getName, "(None)"));
+        nullValueOrGet(lib.getLibraryStrategyType(), LibraryStrategyType::getName, "None"));
     assertAttribute(Field.INDEX_FAMILY, expectedValues,
         lib.getIndices() == null || lib.getIndices().isEmpty() ? "No indices" : lib.getIndices().get(0).getFamily().getName());
     if (expectedValues.containsKey(Field.INDEX_1)) {
@@ -403,7 +403,9 @@ public class LibraryPageIT extends AbstractIT {
     if (expectedValues.containsKey(Field.INDEX_2)) {
       assertAttribute(Field.INDEX_2, expectedValues, getIndexString(lib, 2));
     }
-    assertAttribute(Field.QC_PASSED, expectedValues, nullOrToString(lib.getQcPassed()));
+    String qcPassed = replaceIfNull(nullOrToString(lib.getQcPassed()), "Unknown");
+    qcPassed = qcPassed.substring(0, 1).toUpperCase() + qcPassed.substring(1);
+    assertAttribute(Field.QC_PASSED, expectedValues, qcPassed);
     assertAttribute(Field.LOW_QUALITY, expectedValues, Boolean.toString(lib.isLowQuality()));
     assertAttribute(Field.SIZE, expectedValues, nullOrToString(lib.getDnaSize()));
     assertAttribute(Field.VOLUME, expectedValues, nullOrToString(lib.getVolume()));
@@ -416,7 +418,7 @@ public class LibraryPageIT extends AbstractIT {
 
   private static String getIndexString(Library lib, int position) {
     Index index = lib.getIndices().stream().filter(i -> i.getPosition() == position).findFirst().orElse(null);
-    return nullValueOrGet(index, Index::getLabel, "No index (null)");
+    return nullValueOrGet(index, Index::getLabel, "None");
   }
 
 }

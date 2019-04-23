@@ -112,30 +112,7 @@ FormTarget.sample = (function($) {
                     return item;
                   },
                   required: true
-                }, {
-                  title: 'QC Passed',
-                  data: 'qcPassed',
-                  type: 'dropdown',
-                  getSource: function() {
-                    return [{
-                      label: 'Unknown',
-                      value: null
-                    }, {
-                      label: 'True',
-                      value: true
-                    }, {
-                      label: 'False',
-                      value: false
-                    }];
-                  },
-                  getItemLabel: function(item) {
-                    return item.label;
-                  },
-                  getItemValue: function(item) {
-                    return item.value;
-                  },
-                  include: !config.detailedSample
-                }, {
+                }, FormUtils.makeQcPassedField(!config.detailedSample), {
                   title: 'QC Status',
                   data: 'detailedQcStatusId',
                   type: 'dropdown',
@@ -173,7 +150,12 @@ FormTarget.sample = (function($) {
                 }, {
                   title: 'Discarded',
                   data: 'discarded',
-                  type: 'checkbox'
+                  type: 'checkbox',
+                  onChange: function(newValue, updateField) {
+                    updateField('volume', {
+                      disabled: newValue
+                    });
+                  }
                 }, {
                   title: 'Volume',
                   data: 'volume',
@@ -210,42 +192,12 @@ FormTarget.sample = (function($) {
                     return item.name;
                   },
                   required: true
-                }, {
-                  title: 'Distributed',
-                  data: 'distributed',
-                  type: 'checkbox'
-                }, {
-                  title: 'Distribution Date',
-                  data: 'distributionDate',
-                  type: 'date'
-                }, {
-                  title: 'Distribution Recipient',
-                  data: 'distributionRecipient',
-                  type: 'text',
-                  maxLength: 250
-                }, {
-                  title: 'Location',
-                  data: 'locationBarcode',
-                  type: 'text',
-                  maxLength: 255
-                }, {
-                  title: 'Box Location',
-                  data: 'boxPosition',
-                  type: 'read-only',
-                  getDisplayValue: function(sample) {
-                    if (!sample.box) {
-                      return 'n/a';
-                    }
-                    var location = '';
-                    if (sample.box.locationBarcode) {
-                      location += sample.box.locationBarcode + ', ';
-                    }
-                    location += sample.box.alias + ' ' + sample.boxPosition;
-                  },
-                  getLink: function(sample) {
-                    return sample.box ? ('/miso/box/' + sample.box.id) : null;
-                  }
-                }]
+                }].concat(FormUtils.makeDistributionFields()).concat([{
+              title: 'Location',
+              data: 'locationBarcode',
+              type: 'text',
+              maxLength: 255
+            }, FormUtils.makeBoxLocationField()])
           }, {
             title: 'Identity',
             include: config.detailedSample && object.sampleCategory === 'Identity',
@@ -319,14 +271,19 @@ FormTarget.sample = (function($) {
               data: 'effectiveGroupId',
               type: 'read-only',
               getDisplayValue: function(sample) {
-                return sample.effectiveGroupId ? (sample.effectiveGroupId + ' (' + sample.effectiveGroupIdSample + ')') : '(None)';
+                if (sample.hasOwnProperty('effectiveGroupId') && sample.effectiveGroupId !== null) {
+                  return sample.effectiveGroupId + ' (' + sample.effectiveGroupIdSample + ')';
+                } else {
+                  return 'None';
+                }
               },
               include: object.sampleCategory !== 'Identity'
             }, {
               title: 'Group ID',
               data: 'groupId',
               type: 'text',
-              maxLength: 100
+              maxLength: 100,
+              regex: Utils.validation.alphanumRegex
             }, {
               title: 'Group Description',
               data: 'groupDescription',
@@ -489,7 +446,8 @@ FormTarget.sample = (function($) {
               title: 'Digestion',
               data: 'digestion',
               type: 'text',
-              maxLength: 255
+              maxLength: 255,
+              required: true
             }]
           }, {
             title: 'Stock',

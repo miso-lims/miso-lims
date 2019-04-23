@@ -1242,6 +1242,7 @@ public class Dtos {
       dto.setKitDescriptorId(from.getKitDescriptor().getId());
     }
     if (!from.getIndices().isEmpty()) {
+      dto.setIndexFamilyId(from.getIndices().get(0).getFamily().getId());
       dto.setIndexFamilyName(from.getIndices().get(0).getFamily().getName());
       for (Index index : from.getIndices()) {
         switch (index.getPosition()) {
