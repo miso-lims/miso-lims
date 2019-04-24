@@ -9,9 +9,11 @@ Upgrade notes:
 
  * We have updated MISO to use Flyway 5.2.4. To accomodate this change, you will need to manually
    run the provided SQL script on your database **before** migrating to the new version. Replace
-   your database and user names in the follow command if necessary. You will also need to upgrade
-   to version 5.2.4 of the Flyway command-line tool:
-   https://flywaydb.org/documentation/commandline/#download-and-installation
+   your database and user names in the follow command if necessary. Be sure to check the
+   installation guide as the procedure for
+   [migrating the database](https://github.com/miso-lims/miso-lims/blob/develop/docs/_posts/2016-01-11-installation-guide.md#migrating-the-database)
+   has been updated. You will also need to upgrade to version 5.2.4 of the
+   [Flyway command-line tool](https://flywaydb.org/documentation/commandline/#download-and-installation).
 
    ```
    mysql -D lims -u tgaclims -p < sqlstore/src/main/resources/db/scripts/flyway-upgrade-5.2.4.sql
