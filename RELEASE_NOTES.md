@@ -1,3 +1,10 @@
+# Unreleased
+
+Changes:
+
+* Changed Edit Library page to show validation messages instead of error page when saving fails
+* Fixed missing Notes section on Edit Sample page
+
 # 0.2.174
 
 Changes:

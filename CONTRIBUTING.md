@@ -28,9 +28,9 @@ We have several types of automated testing:
 * Unit tests
   * Run with `mvn clean install -P external`
 * Integration tests in `miso-web` for plain sample mode
-  * Run with `cd miso-lims; mvn clean verify -P external -DrunPlainITs`
+  * Run with `cd miso-web; mvn clean verify -P external -DrunPlainITs`
 * Integration tests in `miso-web` for detailed sample mode (also contains tests which are relevant to both modes)
-  * Run with `cd miso-lims; mvn clean verify -P external -DskipITs=false`
+  * Run with `cd miso-web; mvn clean verify -P external -DskipITs=false`
   * Run individual test classes or methods by adding `-Dit.test=ClassName` or `Dit.test=ClassName#methodName`
 * Integration tests for `pinery-miso`
   * Run with `cd pinery-miso; mvn clean verify -DskipITs=false`
@@ -39,12 +39,11 @@ Please make sure to add or update the relevant tests for your changes.
 
 ## Commits
 
-Commit messages should begin with the issue number and describe a user-visible change rather than a
-developer-visible change when appropriate.
-
-**Good**: "#1234: fixed display of dilution concentration units"
-
-**Bad**: "fixed character encoding"
+* Make sure your commit messages begin with the issue number. e.g. "#1234: fixed display of
+  dilution concentration units"
+* Edit the **Unreleased** section in `RELEASE_NOTES.md` to detail any user-visible **Changes** or
+  **Update Notes** (Additional steps that must be taken when upgrading to the MISO version
+  containing your change)
 
 ## Pull Requests
 
