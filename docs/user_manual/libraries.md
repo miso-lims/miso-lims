@@ -195,8 +195,7 @@ To get to the single Edit Library page, click on the library's name or alias in 
 Library page appear on several pages for related items as well, including:
 
 * Library Name and Library Alias columns of the Dilutions tables on the Edit Pool page
-* Name, Library Name, and Library Alias columns of the Dilutions list page
-  * Dilutions do not have their own page, so links to the dilution will actually link to the Edit Library page as well
+* Library Name and Library Alias columns of the Dilutions list page
 
 The Library Information section of the Edit Library page contains a list of fields, most of which may be modified. You
 can make any changes you would like and then click the "Save" button at the top right to confirm the changes.

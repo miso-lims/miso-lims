@@ -23,6 +23,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -93,7 +94,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
-  public Collection<Pool> getByBarcodeList(Collection<String> barcodeList) throws IOException {
+  public List<Pool> getByBarcodeList(Collection<String> barcodeList) throws IOException {
     if (barcodeList.isEmpty()) {
       return Collections.emptyList();
     }
@@ -157,6 +158,21 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
     idCriteria.setProjection(Projections.distinct(Projections.property("pools.id")));
     @SuppressWarnings("unchecked")
     List<Long> ids = idCriteria.list();
+    return listByIdList(ids);
+  }
+
+  @Override
+  public List<Pool> listByDilutionId(long dilutionId) throws IOException {
+    Criteria idCriteria = currentSession().createCriteria(LibraryDilution.class)
+        .add(Restrictions.eq("id", dilutionId))
+        .createAlias("pools", "pool")
+        .setProjection(Projections.distinct(Projections.property("pool.id")));
+    @SuppressWarnings("unchecked")
+    List<Long> ids = idCriteria.list();
+    return listByIdList(ids);
+  }
+
+  private List<Pool> listByIdList(List<Long> ids) {
     if (ids.isEmpty()) {
       return Collections.emptyList();
     }
@@ -165,7 +181,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
     @SuppressWarnings("unchecked")
     List<Pool> results = criteria.list();
     return results;
-
   }
 
   @Override
@@ -300,7 +315,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
-  public Collection<Pool> listPoolsById(List<Long> poolIds) {
+  public List<Pool> listPoolsById(List<Long> poolIds) {
     if (poolIds.isEmpty()) return Collections.emptyList();
     Criteria criteria = currentSession().createCriteria(PoolImpl.class);
     criteria.add(Restrictions.in("id", poolIds));
