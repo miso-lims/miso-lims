@@ -2,6 +2,11 @@
 
 Changes:
 
+* Redesigned page header to minimize wasted space. Tabs have been removed and the links relocated:
+  * Home: MISO logo
+  * My Account: Username link near the top right of the screen
+  * My Projects: "Projects" link under Preparation in the navigation menu
+  * Help: "Help" link near the top right of the screen
 * Added single Edit Dilution page
 * Added dilution changelogs, separated from library changelogs
 * Changed Edit Library page to show validation messages instead of error page when saving fails

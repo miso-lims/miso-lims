@@ -27,6 +27,7 @@
 <div id="subcontent">
 	<h2>Preparation</h2>
     <div class="menu">
+        <a href="<c:url value="/miso/projects"/>">Projects</a>
         <a href="<c:url value="/miso/samples"/>">Samples</a>
         <a href="<c:url value="/miso/libraries"/>">Libraries</a>
         <a href="<c:url value="/miso/dilutions"/>">Dilutions</a>

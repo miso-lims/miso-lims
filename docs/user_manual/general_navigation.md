@@ -8,8 +8,8 @@ section: 2
 {% assign sub = 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Home Screen" %}
 The Home Screen or Home Page is the main page of MISO, and contains [widgets](#home-screen-widgets) and links
-to other areas of MISO. To get to the Home Screen, click on either the MISO logo or the "Home" tab, both in
-the top left corner of all MISO pages.
+to other areas of MISO. To get to the Home Screen, click on either the MISO logo in the top left corner of all MISO
+pages.
 
 {% include userman-toplink.md %}
 
@@ -274,14 +274,14 @@ working with items in MISO and the lab. Individual tools are documented in more 
 
 
 {% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="My Account Tab" %}
+{% include userman-heading.md section=page.section sub=sub title="My Account" %}
 
-Clicking the "My Account" tab at the top of the screen will take you to a page showing your name and the groups that
-you belong to. There is an Edit link that will open a page showing more of your user details. Depending on your site
-configuration, you may be able to edit some of these details and reset your password from this page. See
+Clicking on your username near the top right of the screen will take you to a page showing your name and the groups
+that you belong to. There is an Edit link that will open a page showing more of your user details. Depending on your
+site configuration, you may be able to edit some of these details and reset your password from this page. See
 [Authentication](site_configuration.html#logging_in) for more details.
 
-If you are a MISO administrator, an Administration section will also appear on the My Account tab. The Clear Cache
+If you are a MISO administrator, an Administration section will also appear on the My Account page. The Clear Cache
 action should not be necessary, but can be used to help troubleshoot bugs. The Refresh Constants action can be used to
 make new type data values show up immediately in cases where they do not. For more information, see the
 [Type Data section](type_data.html).
@@ -291,25 +291,9 @@ make new type data values show up immediately in cases where they do not. For mo
 
 
 {% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="My Projects Tab" %}
+{% include userman-heading.md section=page.section sub=sub title="Help" %}
 
-A Project in MISO is a grouping of Studies, Samples, and other items. Permissions may be set at the project level to
-control who has access to all of the items contained within a project.
-
-Clicking the "My Projects" tab at the top of the screen will take you to the Projects list page. This is similar to the
-other list pages, except that it does not appear in the menu on the left side of the screen. From the Projects list
-page,you can click the project links to see view or edit details about a project, or click the "Add" button in the
-toolbar to create a new project.
-
-{% include userman-toplink.md %}
-
-
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Help Tab" %}
-
-The "Help" tab at the top of the screen will link you to the MISO user tutorials, where you can learn more about how to
-use MISO by working through a number of exercises.
+The "Help" link near the top right of the screen will link you to this user manual.
 
 {% include userman-toplink.md %}
 
