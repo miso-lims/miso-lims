@@ -83,7 +83,7 @@ ListTarget.dilution = {
   createColumns: function(config, projectId) {
     return [{
       "sTitle": "Name",
-      "mData": "name",
+      "mData": "id", // for sorting purposes (numerical order instead of string)
       "include": true,
       "iSortPriority": 1,
       "mRender": function(data, type, full) {

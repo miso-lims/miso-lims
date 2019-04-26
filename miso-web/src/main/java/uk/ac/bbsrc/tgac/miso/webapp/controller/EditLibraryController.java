@@ -25,12 +25,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
-import java.beans.PropertyEditorSupport;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -49,9 +46,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,7 +58,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -77,7 +71,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -86,10 +79,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
@@ -112,8 +101,6 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
-import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryTemplateService;
@@ -123,7 +110,6 @@ import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkMergeTableBackend;
@@ -170,8 +156,6 @@ public class EditLibraryController {
   }
 
   @Autowired
-  private AuthorizationManager authorizationManager;
-  @Autowired
   private IndexService indexService;
   @Autowired
   private LibraryService libraryService;
@@ -180,13 +164,9 @@ public class EditLibraryController {
   @Autowired
   private ChangeLogService changeLogService;
   @Autowired
-  private KitService kitService;
-  @Autowired
   private NamingScheme namingScheme;
   @Autowired
   private RunService runService;
-  @Autowired
-  private InstrumentModelService platformService;
   @Autowired
   private PoolService poolService;
   @Autowired
@@ -224,10 +204,6 @@ public class EditLibraryController {
     this.sampleService = sampleService;
   }
 
-  public void setKitService(KitService kitService) {
-    this.kitService = kitService;
-  }
-
   public void setRunService(RunService runService) {
     this.runService = runService;
   }
@@ -263,114 +239,6 @@ public class EditLibraryController {
 
   }
 
-  public Collection<LibraryType> populateLibraryTypesByPlatform(String platform) throws IOException {
-    List<LibraryType> types = new ArrayList<>();
-    for (LibraryType type : libraryService.listLibraryTypesByPlatform(PlatformType.get(platform))) {
-      if (!type.getArchived()) {
-        types.add(type);
-      }
-    }
-    Collections.sort(types);
-    return types;
-  }
-
-  public Collection<LibraryType> populateLibraryTypes() throws IOException {
-    List<LibraryType> types = new ArrayList<>(libraryService.listLibraryTypes());
-    Collections.sort(types);
-    return types;
-  }
-
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> maxLengths() throws IOException {
-    return libraryService.getLibraryColumnSizes();
-  }
-
-  private List<String> populatePlatformTypes(Collection<String> current) throws IOException {
-    Collection<PlatformType> base = platformService.listActivePlatformTypes();
-    if (base.isEmpty()) {
-      base = Arrays.asList(PlatformType.values());
-    }
-    List<String> types = new ArrayList<>(PlatformType.platformTypeNames(base));
-    for (String s : current) {
-      if (s != null && !types.contains(s)) {
-        types.add(s);
-      }
-    }
-    Collections.sort(types);
-    return types;
-  }
-
-  @ModelAttribute("librarySelectionTypes")
-  public Collection<LibrarySelectionType> populateLibrarySelectionTypes() throws IOException {
-    List<LibrarySelectionType> types = new ArrayList<>(libraryService.listLibrarySelectionTypes());
-    Collections.sort(types);
-    return types;
-  }
-
-  @ModelAttribute("libraryStrategyTypes")
-  public Collection<LibraryStrategyType> populateLibraryStrategyTypes() throws IOException {
-    List<LibraryStrategyType> types = new ArrayList<>(libraryService.listLibraryStrategyTypes());
-    Collections.sort(types);
-    return types;
-  }
-
-  @ModelAttribute("prepKits")
-  public List<KitDescriptor> getPrepKits() throws IOException {
-    List<KitDescriptor> list = new ArrayList<>(kitService.listKitDescriptorsByType(KitType.LIBRARY));
-    Collections.sort(list, KitDescriptor::sortByName);
-    return list;
-  }
-
-  /**
-   * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects
-   * 
-   * @param binder
-   */
-  @InitBinder
-  public void includeForeignKeys(WebDataBinder binder) {
-    binder.registerCustomEditor(KitDescriptor.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        if (isStringEmptyOrNull(text)) {
-          setValue(null);
-        } else {
-          KitDescriptor to = new KitDescriptor();
-          to.setId(Long.valueOf(text));
-          setValue(to);
-        }
-      }
-    });
-    binder.registerCustomEditor(Long.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        setValue(isStringEmptyOrNull(text) ? null : Long.valueOf(text));
-      }
-    });
-    binder.registerCustomEditor(LibrarySpikeIn.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) {
-        if (isStringEmptyOrNull(text)) {
-          setValue(null);
-        } else {
-          LibrarySpikeIn to = new LibrarySpikeIn();
-          to.setId(Long.valueOf(text));
-          setValue(to);
-        }
-      }
-    });
-    binder.registerCustomEditor(BigDecimal.class, new PropertyEditorSupport() {
-      @Override
-      public String getAsText() {
-        return toNiceString((BigDecimal) getValue());
-      }
-
-      @Override
-      public void setAsText(String text) {
-        setValue(isStringEmptyOrNull(text) ? null : new BigDecimal(text));
-      }
-    });
-  }
-
   /* HOT */
   @GetMapping(value = "indicesJson")
   public @ResponseBody JSONObject indicesJson(@RequestParam("indexFamily") String indexFamily, @RequestParam("position") String position)
@@ -391,46 +259,6 @@ public class EditLibraryController {
     return rtn;
   }
 
-  /**
-   * Each PlatformName holds a null IndexFamily.
-   *
-   * Structure of this indices object:
-   * 
-   * <pre>
-   *  {
-   *    PlatformName : {
-   *      IndexFamilyName: {
-   *        1: [ { id: ##, name: AAAA, sequence: XXXXX }, ... ],
-   *        ... },
-   *      ... },
-   *  ... }
-   * </pre>
-   * 
-   * @return indices object
-   */
-  @ModelAttribute("indices")
-  public JSONObject indicesString() {
-    final JSONObject io = new JSONObject();
-    try {
-      for (String pfName : platformService.listDistinctPlatformTypeNames()) {
-        JSONObject pf = new JSONObject();
-        io.put(pfName, pf);
-        io.getJSONObject(pfName).put("No Index", nullIndexFamily());
-      }
-      for (IndexFamily ifam : indexService.getIndexFamilies()) {
-        JSONObject ifamo = new JSONObject();
-        for (int i = 1; i <= ifam.getMaximumNumber(); i++) {
-          ifamo.put(Integer.toString(i), indicesForPosition(ifam, i));
-        }
-        String platformKey = ifam.getPlatformType().getKey();
-        io.getJSONObject(platformKey).put(ifam.getName(), ifamo);
-      }
-    } catch (IOException e) {
-      log.error("Failed to retrieve all platform names: " + e);
-    }
-    return io;
-  }
-
   public List<JSONObject> indicesForPosition(IndexFamily ifam, int position) {
     final List<JSONObject> rtnList = new ArrayList<>();
     for (final Index index : ifam.getIndicesForPosition(position)) {
@@ -442,18 +270,6 @@ public class EditLibraryController {
       rtnList.add(obj);
     }
     return rtnList;
-  }
-
-  public JSONObject nullIndexFamily() {
-    final JSONObject nullIndexFam = new JSONObject();
-    final JSONArray nullIndices = new JSONArray();
-    final JSONObject nullIndex = new JSONObject();
-    nullIndex.put("id", IndexFamily.NULL.getId());
-    nullIndex.put("name", IndexFamily.NULL.getName());
-    nullIndex.put("sequence", "");
-    nullIndices.add(nullIndex);
-    nullIndexFam.put("1", nullIndices);
-    return nullIndexFam;
   }
 
   /* HOT */
@@ -478,23 +294,9 @@ public class EditLibraryController {
 
   @GetMapping(value = "/{libraryId}")
   public ModelAndView setupForm(@PathVariable Long libraryId, ModelMap model) throws IOException {
-    User user = authorizationManager.getCurrentUser();
     Library library = libraryService.get(libraryId);
     if (library == null) throw new NotFoundException("No library found for ID " + libraryId.toString());
     model.put("title", "Library " + library.getId());
-    return setupForm(user, library, model);
-  }
-
-  @GetMapping(value = "/dilution/{dilutionId}")
-  public ModelAndView setupFormByDilution(@PathVariable Long dilutionId, ModelMap model) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    LibraryDilution dilution = dilutionService.get(dilutionId);
-    model.put("title", "Library " + dilution.getLibrary().getId());
-    return setupForm(user, dilution.getLibrary(), model);
-  }
-
-  private ModelAndView setupForm(User user, Library library, ModelMap model) throws IOException {
-    if (library == null) throw new NotFoundException("No library found");
 
     model.put("library", library);
     addAdjacentLibraries(library, model);

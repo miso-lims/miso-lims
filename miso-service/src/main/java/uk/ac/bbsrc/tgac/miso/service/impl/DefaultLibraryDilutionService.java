@@ -133,9 +133,21 @@ public class DefaultLibraryDilutionService
     dilution.setName(generateTemporaryName());
     validateChange(dilution, null);
     long savedId = save(dilution).getId();
-    libraryService.update(library);
+    updateLibrary(library);
     boxService.updateBoxableLocation(dilution);
     return savedId;
+  }
+
+  private void updateLibrary(Library library) throws IOException {
+    try {
+      libraryService.update(library);
+    } catch (ValidationException e) {
+      List<ValidationError> newErrors = new ArrayList<>();
+      for (ValidationError error : e.getErrors()) {
+        newErrors.add(new ValidationError(String.format("Library %s: %s", error.getProperty(), error.getMessage())));
+      }
+      throw new ValidationException(newErrors);
+    }
   }
 
   @Override
@@ -158,7 +170,7 @@ public class DefaultLibraryDilutionService
     applyChanges(managed, dilution);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     save(managed);
-    libraryService.update(library);
+    updateLibrary(library);
     boxService.updateBoxableLocation(dilution);
   }
 

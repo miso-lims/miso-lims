@@ -62,7 +62,7 @@ you to see a more detailed view of the dilution.
 {% include userman-heading.md section=page.section sub=sub subsub=subsub title="Editing a Single Dilution" %}
 
 To get to the single Edit Dilution page, click on the dilution's name in the Dilutions list. Links to the Edit
-Dilution page also appaear on the Edit Pool page in the Included and Available Dilutions lists.
+Dilution page also appear on the Edit Pool page in the Included and Available Dilutions lists.
 
 The Dilution Information section of the Edit Dilution page contains a list of fields, most of which may be modified.
 You can make any changes you would like and then click the "Save" button at the top right to confirm the changes.
