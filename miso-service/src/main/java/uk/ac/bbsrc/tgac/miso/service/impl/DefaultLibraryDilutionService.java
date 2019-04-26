@@ -231,6 +231,7 @@ public class DefaultLibraryDilutionService
     target.setConcentrationUnits(target.getConcentration() == null ? null : source.getConcentrationUnits());
     target.setNgUsed(source.getNgUsed());
     target.setVolumeUsed(source.getVolumeUsed());
+    target.setCreationDate(source.getCreationDate());
   }
 
   private void validateChange(LibraryDilution dilution, LibraryDilution beforeChange) throws IOException {

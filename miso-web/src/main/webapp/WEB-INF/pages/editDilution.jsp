@@ -70,6 +70,7 @@
 
 <miso:list-section id="list_pool" name="Pools" target="pool" items="${dilutionPools}"/>
 <miso:list-section id="list_run" name="Runs" target="run" items="${dilutionRuns}"/>
+<miso:changelog item="${dilution}"/>
 
 </div>
 </div>
