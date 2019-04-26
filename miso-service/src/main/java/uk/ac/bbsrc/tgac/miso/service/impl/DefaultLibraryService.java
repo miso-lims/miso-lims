@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
@@ -261,13 +260,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   @Override
   public List<Library> listByProjectId(long projectId) throws IOException {
     return libraryDao.listByProjectId(projectId);
-  }
-
-  @Override
-  public Map<String, Integer> getLibraryColumnSizes() throws IOException {
-    return ValidationUtils.adjustNameLength(
-        ValidationUtils.adjustLength(libraryDao.getLibraryColumnSizes(), "alias", namingScheme.libraryAliasLengthAdjustment()),
-        namingScheme);
   }
 
   @Override

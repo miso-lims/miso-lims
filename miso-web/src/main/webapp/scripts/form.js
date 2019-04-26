@@ -7,6 +7,7 @@ FormUtils = (function($) {
    *   getEditUrl: required function(object) returning string; URL for the object's edit page
    *   getSections: required function(config, object) returning array of FormSections; see below
    *   onLoad: optional function(updateField); called after the form is initialized
+   *   confirmSave: optional function(object, saveCallback); called before saving. saveCallback must be invoked to confirm and save
    * }
    * 
    * FormSection Structure: {
@@ -318,7 +319,15 @@ FormUtils = (function($) {
     $(selector).parsley().validate();
 
     Validate.updateWarningOrSubmit(selector, null, function() {
-      save(containerId, object, target);
+      var saveCallback = function() {
+        save(containerId, object, target);
+      };
+
+      if (target.confirmSave) {
+        target.confirmSave(object, saveCallback);
+      } else {
+        saveCallback();
+      }
     });
   }
 

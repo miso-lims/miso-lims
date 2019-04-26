@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
@@ -18,7 +17,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,15 +45,10 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   private final static String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode", "description" };
 
-  private static final String TABLE_NAME = "Pool";
-
   @Autowired
   private BoxStore boxStore;
 
   private final Queue<ChangeLogEntry> changeLogQueue = new ConcurrentLinkedQueue<>();
-
-  @Autowired
-  private JdbcTemplate jdbcTemplate;
 
   @Autowired
   private SecurityStore securityStore;
@@ -103,15 +96,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
     @SuppressWarnings("unchecked")
     List<Pool> results = criteria.list();
     return results;
-  }
-
-  public JdbcTemplate getJdbcTemplate() {
-    return jdbcTemplate;
-  }
-
-  @Override
-  public Map<String, Integer> getPoolColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(jdbcTemplate, TABLE_NAME);
   }
 
   public SecurityStore getSecurityStore() {
@@ -229,10 +213,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   public void setBoxStore(BoxStore boxDAO) {
     this.boxStore = boxDAO;
-  }
-
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.jdbcTemplate = template;
   }
 
   public void setSecurityStore(SecurityStore securityStore) {

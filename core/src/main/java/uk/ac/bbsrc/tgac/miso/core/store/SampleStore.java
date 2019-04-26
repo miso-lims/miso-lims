@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
@@ -93,12 +92,6 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
    *           when the objects cannot be retrieved
    */
   Collection<Sample> getByBarcodeList(Collection<String> barcodeList) throws IOException;
-  
-  /**
-   * @return a map containing all column names and max lengths from the Sample table
-   * @throws IOException
-   */
-  public Map<String, Integer> getSampleColumnSizes() throws IOException;
   
   /**
    * List all Samples associated with ids from the given id list

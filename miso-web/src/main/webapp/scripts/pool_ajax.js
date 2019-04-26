@@ -21,63 +21,7 @@
  * *********************************************************************
  */
 
-var Pool = {
-
-  savePool: function() {
-    if (jQuery('#poolId').text().indexOf('Unsaved') > -1 && !Constants.automaticBarcodes && !jQuery('#identificationBarcode').val().length) {
-      Utils.showConfirmDialog("Missing Barcode", "Save",
-          ["Pools should usually have barcodes. Are you sure you wish to save without one?"], Pool.validatePool);
-    } else {
-      Pool.validatePool();
-    }
-  },
-
-  validatePool: function() {
-    Validate.cleanFields('#pool-form');
-    jQuery('#pool-form').parsley().destroy();
-
-    // Alias input field validation
-    jQuery('#alias').attr('class', 'form-control');
-    jQuery('#alias').attr('data-parsley-required', 'true');
-    jQuery('#alias').attr('data-parsley-maxlength', '100');
-    jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
-    // Description input field validation
-    jQuery('#description').attr('class', 'form-control');
-    jQuery('#description').attr('data-parsley-maxlength', '255');
-    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
-    // Platform Type input select validation
-    jQuery('#platformType').attr('class', 'form-control');
-    jQuery('#platformType').attr('required', 'true');
-    jQuery('#sampleTypes').attr('data-parsley-error-message', 'You must select a Platform');
-
-    // Concentration input field validation
-    jQuery('#concentration').attr('class', 'form-control');
-    jQuery('#concentration').attr('data-parsley-required', 'false');
-    jQuery('#concentration').attr('data-parsley-maxlength', '10');
-    jQuery('#concentration').attr('data-parsley-type', 'number');
-
-    // Creation Date input field validation
-    jQuery('#creationDate').attr('class', 'form-control');
-    jQuery('#creationDate').attr('required', 'true');
-    jQuery('#creationDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
-    jQuery('#creationDate').attr('data-date-format', 'YYYY-MM-DD');
-    jQuery('#creationDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
-
-    // Volume validation
-    jQuery('#volume').attr('class', 'form-control');
-    jQuery('#volume').attr('data-parsley-maxlength', '10');
-    jQuery('#volume').attr('data-parsley-type', 'number');
-    
-
-    jQuery('#pool-form').parsley();
-    jQuery('#pool-form').parsley().validate();
-
-    Validate.updateWarningOrSubmit('#pool-form');
-    return false;
-  }
-};
+var Pool = {};
 
 Pool.ui = {
   showPoolNoteDialog: function(poolId) {

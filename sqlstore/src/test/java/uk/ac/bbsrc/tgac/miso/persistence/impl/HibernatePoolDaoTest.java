@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -18,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
@@ -100,8 +98,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
 
   @Autowired
   private SessionFactory sessionFactory;
-  @Autowired
-  private JdbcTemplate template;
 
   @InjectMocks
   private HibernatePoolDao dao;
@@ -110,7 +106,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
-    dao.setJdbcTemplate(template);
     dao.setBoxStore(boxStore);
   }
 
@@ -357,13 +352,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     Pool pool = dao.get(1L);
     assertNotNull(pool);
     assertEquals(1L, pool.getId());
-  }
-
-  @Test
-  public void testGetPoolColumnSizes() throws IOException {
-    Map<String, Integer> map = dao.getPoolColumnSizes();
-    assertNotNull(map);
-    assertFalse(map.isEmpty());
   }
 
   @Test

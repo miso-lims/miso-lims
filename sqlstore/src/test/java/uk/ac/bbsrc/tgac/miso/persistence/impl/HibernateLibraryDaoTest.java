@@ -16,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -40,8 +39,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 public class HibernateLibraryDaoTest extends AbstractDAOTest {
 
   @Autowired
-  private JdbcTemplate jdbcTemplate;
-  @Autowired
   private SessionFactory sessionFactory;
   @Mock
   private IndexStore indexStore;
@@ -56,7 +53,6 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   @Before
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
-    dao.setTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
   }
 

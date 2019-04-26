@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
@@ -318,11 +317,6 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   @Override
   public Pool getByBarcode(String barcode) throws IOException {
     return poolStore.getByBarcode(barcode);
-  }
-
-  @Override
-  public Map<String, Integer> getPoolColumnSizes() throws IOException {
-    return ValidationUtils.adjustNameLength(poolStore.getPoolColumnSizes(), namingScheme);
   }
 
   @Override

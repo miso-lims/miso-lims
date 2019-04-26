@@ -39,11 +39,11 @@ public class PoolPageIT extends AbstractIT {
 
     // default values
     Map<PoolPage.Field, String> fields = Maps.newLinkedHashMap();
-    fields.put(Field.ID, "Unsaved");
-    fields.put(Field.NAME, "Unsaved");
+    fields.put(Field.ID, null);
+    fields.put(Field.NAME, null);
     fields.put(Field.BARCODE, null);
     fields.put(Field.DESCRIPTION, null);
-    fields.put(Field.QC_PASSED, null);
+    fields.put(Field.QC_PASSED, "Unknown");
     fields.put(Field.VOLUME, null);
     fields.put(Field.DISCARDED, Boolean.FALSE.toString());
     fields.put(Field.LOCATION, null);
@@ -84,7 +84,7 @@ public class PoolPageIT extends AbstractIT {
     fields.put(Field.PLATFORM, PlatformType.ILLUMINA.getKey());
     fields.put(Field.CONCENTRATION, "6.5");
     fields.put(Field.CREATE_DATE, "2017-08-15");
-    fields.put(Field.QC_PASSED, Boolean.FALSE.toString());
+    fields.put(Field.QC_PASSED, "False");
     fields.put(Field.VOLUME, "12.0");
     fields.put(Field.DISCARDED, Boolean.FALSE.toString());
     fields.put(Field.LOCATION, null);
@@ -94,7 +94,7 @@ public class PoolPageIT extends AbstractIT {
     changes.put(Field.ALIAS, "1IPO_POOL_1_CHANGED");
     changes.put(Field.DESCRIPTION, "changed desc");
     changes.put(Field.CONCENTRATION, "7.25");
-    changes.put(Field.QC_PASSED, Boolean.TRUE.toString());
+    changes.put(Field.QC_PASSED, "True");
     changes.put(Field.VOLUME, "8.91");
     page1.setFields(changes);
 
@@ -121,7 +121,7 @@ public class PoolPageIT extends AbstractIT {
     fields.put(Field.PLATFORM, PlatformType.ILLUMINA.getKey());
     fields.put(Field.CONCENTRATION, "6.5");
     fields.put(Field.CREATE_DATE, "2017-08-15");
-    fields.put(Field.QC_PASSED, null);
+    fields.put(Field.QC_PASSED, "Unknown");
     fields.put(Field.VOLUME, null);
     fields.put(Field.DISCARDED, Boolean.FALSE.toString());
     fields.put(Field.LOCATION, null);
@@ -130,7 +130,7 @@ public class PoolPageIT extends AbstractIT {
     Map<PoolPage.Field, String> changes = Maps.newLinkedHashMap();
     changes.put(Field.BARCODE, "ITS:A:BAR:CODE");
     changes.put(Field.DESCRIPTION, "added desc");
-    changes.put(Field.QC_PASSED, Boolean.TRUE.toString());
+    changes.put(Field.QC_PASSED, "True");
     changes.put(Field.VOLUME, "9.99");
     page1.setFields(changes);
 
@@ -157,7 +157,7 @@ public class PoolPageIT extends AbstractIT {
     fields.put(Field.PLATFORM, PlatformType.ILLUMINA.getKey());
     fields.put(Field.CONCENTRATION, "6.5");
     fields.put(Field.CREATE_DATE, "2017-08-15");
-    fields.put(Field.QC_PASSED, Boolean.FALSE.toString());
+    fields.put(Field.QC_PASSED, "False");
     fields.put(Field.VOLUME, "12.0");
     fields.put(Field.DISCARDED, Boolean.FALSE.toString());
     fields.put(Field.LOCATION, null);
@@ -166,7 +166,7 @@ public class PoolPageIT extends AbstractIT {
     Map<PoolPage.Field, String> changes = Maps.newLinkedHashMap();
     changes.put(Field.BARCODE, null);
     changes.put(Field.DESCRIPTION, null);
-    changes.put(Field.QC_PASSED, null);
+    changes.put(Field.QC_PASSED, "Unknown");
     changes.put(Field.VOLUME, null);
     page1.setFields(changes);
 
@@ -326,7 +326,9 @@ public class PoolPageIT extends AbstractIT {
     assertAttribute(Field.PLATFORM, expectedValues, pool.getPlatformType().getKey());
     assertAttribute(Field.CONCENTRATION, expectedValues, nullOrToString(pool.getConcentration()));
     assertAttribute(Field.CREATE_DATE, expectedValues, LimsUtils.formatDate(pool.getCreationDate()));
-    assertAttribute(Field.QC_PASSED, expectedValues, nullOrToString(pool.getQcPassed()));
+    String qcPassed = replaceIfNull(nullOrToString(pool.getQcPassed()), "Unknown");
+    qcPassed = qcPassed.substring(0, 1).toUpperCase() + qcPassed.substring(1);
+    assertAttribute(Field.QC_PASSED, expectedValues, qcPassed);
     assertAttribute(Field.VOLUME, expectedValues, nullOrToString(pool.getVolume()));
     assertAttribute(Field.DISCARDED, expectedValues, Boolean.toString(pool.isDiscarded()));
     assertAttribute(Field.LOCATION, expectedValues, pool.getLocationBarcode());

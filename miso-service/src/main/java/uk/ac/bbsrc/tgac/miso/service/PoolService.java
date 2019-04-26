@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -36,7 +35,5 @@ public interface PoolService extends PaginatedDataSource<Pool>, BarcodableServic
   public long save(Pool pool) throws IOException;
 
   public Pool getByBarcode(String barcode) throws IOException;
-
-  public Map<String, Integer> getPoolColumnSizes() throws IOException;
 
 }
