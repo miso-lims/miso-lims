@@ -51,7 +51,9 @@ public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
    * @throws IOException
    *           when
    */
-  Collection<Pool> listByLibraryId(long libraryId) throws IOException;
+  List<Pool> listByLibraryId(long libraryId) throws IOException;
+
+  List<Pool> listByDilutionId(long dilutionId) throws IOException;
 
   /**
    * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Project}
@@ -62,7 +64,7 @@ public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
    * @throws IOException
    *           when
    */
-  Collection<Pool> listByProjectId(long projectId) throws IOException;
+  List<Pool> listByProjectId(long projectId) throws IOException;
 
   /**
    * List all Pools that are for a given {@link PlatformType}
@@ -84,7 +86,7 @@ public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
    * @throws IOException
    *           when the objects cannot be retrieved
    */
-  Collection<Pool> getByBarcodeList(Collection<String> barcodeList) throws IOException;
+  List<Pool> getByBarcodeList(Collection<String> barcodeList) throws IOException;
 
   /**
    * List the Pool associated with a given identificationBarcode
@@ -103,7 +105,7 @@ public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
    */
   public Map<String, Integer> getPoolColumnSizes() throws IOException;
 
-  Collection<Pool> listPoolsById(List<Long> poolIds);
+  List<Pool> listPoolsById(List<Long> poolIds);
 
   public long getPartitionCount(Pool pool);
 

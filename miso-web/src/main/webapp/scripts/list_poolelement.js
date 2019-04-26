@@ -76,7 +76,13 @@ ListTarget.poolelement = {
           'sTitle': 'Dilution Name',
           'mData': 'name',
           'include': true,
-          'iSortPriority': 1
+          'iSortPriority': 1,
+          "mRender": function(data, type, full) {
+            if (type === 'display') {
+              return "<a href=\"/miso/dilution/" + full.id + "\">" + data + "</a>";
+            }
+            return data;
+          }
         },
         {
           "sTitle": "Warnings",

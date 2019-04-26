@@ -34,6 +34,7 @@ FormUtils = (function($) {
    *   nullLabel: optional string; label for null value in dropdown. If not provided, and the field is not required, there will be no
    *       null value in the dropdown - it will default to the first option unless an initial value is specified
    *   getSource: function() returning array of objects; required for dropdown fields; Provides dropdown options
+   *   sortSource: optional function(a, b); sort function for dropdown options
    *   getItemLabel: function(item) returning string; get the label for a dropdown option. If omitted and the item is a string, it is
    *       used as the label; otherwise, an error is thrown
    *   getItemValue: function(item) returning string; get the value for a dropdown option. If omitted, the item is used as the value
@@ -327,13 +328,14 @@ FormUtils = (function($) {
       control.attr('data-parsley-required', true);
     }
     if (field.maxLength) {
-      control.attr('data-parsley-max-length', field.maxLength);
-    }
-    if (field.regex) {
-      control.attr('data-parsley-pattern', field.regex);
+      control.attr('data-parsley-maxlength', field.maxLength);
     }
     if (field.type === 'text') {
-      control.attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+      if (field.regex) {
+        control.attr('data-parsley-pattern', field.regex);
+      } else {
+        control.attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+      }
     } else if (field.type === 'date') {
       control.attr('data-date-format', 'YYYY-MM-DD');
       control.attr('data-parsley-pattern', Utils.validation.dateRegex);

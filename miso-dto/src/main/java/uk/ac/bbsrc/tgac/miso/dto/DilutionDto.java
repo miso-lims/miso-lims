@@ -26,6 +26,7 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
   private String creationDate;
   private String dilutionCreatorName;
   private Long targetedSequencingId;
+  private Long libraryId;
   private LibraryDto library;
   private String libraryUrl;
   private String lastModified;
@@ -110,6 +111,14 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setTargetedSequencingId(Long targetedSequencingId) {
     this.targetedSequencingId = targetedSequencingId;
+  }
+
+  public Long getLibraryId() {
+    return libraryId;
+  }
+
+  public void setLibraryId(Long libraryId) {
+    this.libraryId = libraryId;
   }
 
   public LibraryDto getLibrary() {

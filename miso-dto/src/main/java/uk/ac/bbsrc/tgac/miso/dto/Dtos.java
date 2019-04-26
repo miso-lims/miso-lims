@@ -1491,12 +1491,22 @@ public class Dtos {
     if (from.getTargetedSequencing() != null) {
       dto.setTargetedSequencingId(from.getTargetedSequencing().getId());
     }
+    dto.setLibraryId(libraryDto.getId());
     dto.setLibrary(libraryDto);
     if (from.getBox() != null) {
       dto.setBox(asDto(from.getBox(), includeBoxPositions));
       dto.setBoxPosition(from.getBoxPosition());
     }
     dto.setDiscarded(from.isDiscarded());
+    Sample sample = from.getLibrary().getSample();
+    if (isDetailedSample(sample)) {
+      DetailedSample detailed = (DetailedSample) sample;
+      dto.setIdentityConsentLevel(getIdentityConsentLevelString(detailed));
+      if (detailed.getSubproject() != null) {
+        dto.setSubprojectAlias(detailed.getSubproject().getAlias());
+        dto.setSubprojectPriority(detailed.getSubproject().getPriority());
+      }
+    }
     return dto;
   }
 
@@ -1506,13 +1516,20 @@ public class Dtos {
       libDto = asDto(from.getLibrary(), false);
     } else {
       Library lib = from.getLibrary();
-      libDto = new LibraryDto();
+      if (isDetailedLibrary(lib)) {
+        libDto = new DetailedLibraryDto();
+      } else {
+        libDto = new LibraryDto();
+      }
       libDto.setId(lib.getId());
       libDto.setName(lib.getName());
       libDto.setAlias(lib.getAlias());
       libDto.setIdentificationBarcode(lib.getIdentificationBarcode());
       if (lib.getPlatformType() != null) {
         libDto.setPlatformType(lib.getPlatformType().getKey());
+      }
+      if (lib.getKitDescriptor() != null) {
+        libDto.setKitDescriptorId(lib.getKitDescriptor().getId());
       }
     }
     return asDto(from, libDto, includeBoxPositions);
