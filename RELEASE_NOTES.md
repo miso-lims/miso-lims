@@ -3,6 +3,7 @@
 Changes:
 
 * Added single Edit Dilution page
+* Added dilution changelogs, separated from library changelogs
 * Changed Edit Library page to show validation messages instead of error page when saving fails
 * Fixed missing Notes section on Edit Sample page
 
