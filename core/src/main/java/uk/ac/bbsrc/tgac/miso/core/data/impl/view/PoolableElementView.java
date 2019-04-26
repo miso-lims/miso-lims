@@ -125,6 +125,8 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private String creatorName;
 
+  private String creatorFullName;
+
   private Long targetedSequencingId;
 
   private String boxAlias;
@@ -501,6 +503,14 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     this.creatorName = creatorName;
   }
 
+  public String getCreatorFullName() {
+    return creatorFullName;
+  }
+
+  public void setCreatorFullName(String creatorFullName) {
+    this.creatorFullName = creatorFullName;
+  }
+
   @Override
   public int compareTo(PoolableElementView o) {
     PoolableElementView t = o;
@@ -596,6 +606,7 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     result = prime * result + ((boxName == null) ? 0 : boxName.hashCode());
     result = prime * result + ((created == null) ? 0 : created.hashCode());
     result = prime * result + ((creatorName == null) ? 0 : creatorName.hashCode());
+    result = prime * result + ((creatorFullName == null) ? 0 : creatorFullName.hashCode());
     result = prime * result + ((dilutionBarcode == null) ? 0 : dilutionBarcode.hashCode());
     result = prime * result + ((dilutionConcentration == null) ? 0 : dilutionConcentration.hashCode());
     result = prime * result + ((dilutionConcentrationUnits == null) ? 0 : dilutionConcentrationUnits.hashCode());
@@ -657,6 +668,9 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     if (creatorName == null) {
       if (other.creatorName != null) return false;
     } else if (!creatorName.equals(other.creatorName)) return false;
+    if (creatorFullName == null) {
+      if (other.creatorFullName != null) return false;
+    } else if (!creatorFullName.equals(other.creatorFullName)) return false;
     if (dilutionBarcode == null) {
       if (other.dilutionBarcode != null) return false;
     } else if (!dilutionBarcode.equals(other.dilutionBarcode)) return false;
