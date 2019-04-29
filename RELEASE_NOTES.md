@@ -5,6 +5,7 @@ Changes:
 * Added single Edit Dilution page
 * Changed Edit Library page to show validation messages instead of error page when saving fails
 * Fixed missing Notes section on Edit Sample page
+* Fixed export function on bulk tables
 * Fixed a bug in the bulk library table where selecting a box position and index family for a
   library without a library template would cause the table to become unresponsive
 
