@@ -5,6 +5,7 @@ Changes:
 * Added single Edit Dilution page
 * Changed Edit Library page to show validation messages instead of error page when saving fails
 * Fixed missing Notes section on Edit Sample page
+* Fixed export function on bulk tables
 
 # 0.2.174
 
