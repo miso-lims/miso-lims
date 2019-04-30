@@ -2,20 +2,25 @@
 
 Changes:
 
-* Redesigned page header to minimize wasted space. Tabs have been removed and the links relocated:
-  * Home: MISO logo
-  * My Account: Username link near the top right of the screen
-  * My Projects: "Projects" link under Preparation in the navigation menu
-  * Help: "Help" link near the top right of the screen
-* Added single Edit Dilution page
-* Added dilution changelogs, separated from library changelogs
-* Changed Edit Library page to show validation messages instead of error page when saving fails
-* Changed Edit Pool page to show validation messages instead of error page when saving fails
-* Fixed missing Notes section on Edit Sample page
-* Fixed searching dilutions by creator
-* Fixed export function on bulk tables
-* Fixed a bug in the bulk library table where selecting a box position and index family for a
-  library without a library template would cause the table to become unresponsive
+  * 
+
+# 0.2.175
+
+Changes:
+ 
+  * Redesigned page header to minimize wasted space. Tabs have been removed and the links relocated:
+    * Home: MISO logo
+    * My Account: Username link near the top right of the screen
+    * My Projects: "Projects" link under Preparation in the navigation menu
+    * Help: "Help" link near the top right of the screen
+  * Added single Edit Dilution page with dilution changelogs
+  * Changed Edit Library and Edit Pool pages to show validation messages instead of error page 
+    when saving fails
+  * Fixed missing Notes section on Edit Sample page
+  * Fixed searching dilutions by creator
+  * Fixed export function on bulk tables
+  * Fixed a bug in the bulk library table where selecting a box position and index family for a
+    library without a library template would cause the table to become unresponsive
 
 # 0.2.174
 
