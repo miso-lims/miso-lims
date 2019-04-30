@@ -5,6 +5,7 @@ Changes:
 * Added single Edit Dilution page
 * Added dilution changelogs, separated from library changelogs
 * Changed Edit Library page to show validation messages instead of error page when saving fails
+* Changed Edit Pool page to show validation messages instead of error page when saving fails
 * Fixed missing Notes section on Edit Sample page
 * Fixed searching dilutions by creator
 * Fixed export function on bulk tables

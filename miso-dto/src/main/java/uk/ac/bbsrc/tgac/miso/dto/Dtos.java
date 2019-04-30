@@ -2087,18 +2087,20 @@ public class Dtos {
     }
     to.setVolumeUnits(dto.getVolumeUnits());
     to.setPlatformType(PlatformType.valueOf(dto.getPlatformType()));
-    to.setPoolDilutions(dto.getPooledElements().stream().map(dilution -> {
-      PoolableElementView view = new PoolableElementView();
-      view.setDilutionId(dilution.getId());
-      view.setDilutionName(dilution.getName());
-      view.setDilutionVolumeUsed(dilution.getVolumeUsed() == null ? null : Double.valueOf(dilution.getVolumeUsed()));
-
-      PoolDilution link = new PoolDilution(to, view);
-      if (dilution.getProportion() != null) {
-        link.setProportion(dilution.getProportion());
-      }
-      return link;
-    }).collect(Collectors.toSet()));
+    if (dto.getPooledElements() != null) {
+      to.setPoolDilutions(dto.getPooledElements().stream().map(dilution -> {
+        PoolableElementView view = new PoolableElementView();
+        view.setDilutionId(dilution.getId());
+        view.setDilutionName(dilution.getName());
+        view.setDilutionVolumeUsed(dilution.getVolumeUsed() == null ? null : Double.valueOf(dilution.getVolumeUsed()));
+  
+        PoolDilution link = new PoolDilution(to, view);
+        if (dilution.getProportion() != null) {
+          link.setProportion(dilution.getProportion());
+        }
+        return link;
+      }).collect(Collectors.toSet()));
+    }
     to.setQcPassed(dto.getQcPassed());
     to.setBoxPosition((PoolBoxPosition) makeBoxablePosition(dto, to));
     return to;

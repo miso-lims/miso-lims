@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -203,12 +202,6 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
    * @throws IOException when the objects cannot be retrieved
    */
   List<Library> getByBarcodeList(Collection<String> barcodeList) throws IOException;
-
-  /**
-   * @return a map containing all column names and max lengths from the Library table
-   * @throws IOException
-   */
-  public Map<String, Integer> getLibraryColumnSizes() throws IOException;
 
   /**
    *
