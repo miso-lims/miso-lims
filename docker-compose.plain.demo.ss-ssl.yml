@@ -1,0 +1,65 @@
+version: '3.7'
+
+# .env file or shell environment variables should contain the following: 
+# MISO_DB_USER : name of the MySQL user who accesses MISO_DB [tgaclims]
+# MISO_DB : name of the LIMS Db in MySql [lims]
+# MISO_DB_PASSWORD_FILE : path to the file with the password to the MySQL DB for user MISO_DB_USER
+# MISO_TAG : tag of the MISO Docker containers (migration and webapp)
+# SSL_PASSWORD_FILE : path to the file with the password for the SSL certificate passed to nginx
+#
+# echo "changeme" > ./.miso_db_password && echo "changeme" > ./.ssl_password && export MISO_DB_USER=tgaclims MISO_DB=lims MISO_DB_PASSWORD_FILE=./.miso_db_password MISO_TAG=latest SSL_PASSWORD_FILE=./.ssl_password
+
+
+secrets:
+  lims_password: 
+    file: ${MISO_DB_PASSWORD_FILE}
+  ssl_password:
+    file: ${SSL_PASSWORD_FILE}
+    
+services:
+  db:
+    image: mysql:5.7.25
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_DATABASE: ${MISO_DB}
+      MYSQL_USER: ${MISO_DB_USER}
+      MYSQL_PASSWORD_FILE: /run/secrets/lims_password
+    secrets:
+      - lims_password
+
+  flyway:
+    image: misolims/miso-lims-migration:${MISO_TAG}
+    secrets:
+      - lims_password
+    links:
+      - db
+    depends_on:
+      - db
+    volumes:
+      - "./.docker/detailed_sample_config:/flyway/migrations:ro"
+
+
+  webapp:
+    image: misolims/miso-lims-webapp:${MISO_TAG}
+    secrets:
+      - lims_password
+    links:
+      - db
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:1.15.12-alpine
+    ports: 
+      - "80:80"
+      - "443:443"
+    secrets: 
+      - ssl_password
+    volumes:
+      - "./.docker/nginx/ssl.conf:/etc/nginx/conf.d/default.conf:ro"
+      - "./.docker/nginx/self-sign-cert.sh:/self-sign-cert.sh:ro"
+    links:
+      - webapp
+    depends_on:
+      - webapp
+    command: ["sh", "-c", "./self-sign-cert.sh; nginx -g 'daemon off;'"]

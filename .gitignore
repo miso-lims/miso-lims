@@ -34,5 +34,6 @@ _site/
 #Mac artifacts
 .DS_Store
 
-# Password file
+# Password files
 .miso_db_password
+.ssl_password
