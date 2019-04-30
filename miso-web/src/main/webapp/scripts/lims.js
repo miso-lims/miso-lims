@@ -606,7 +606,7 @@ var Utils = Utils
             ids: ids,
             copies: copies
           }, function(result) {
-            Utils.showOkDialog('Printing', [result == ids.length ? 'Printing successful.' : (result + ' of ' + ids.length + ' printed.')]);
+            Utils.showOkDialog('Printing', [result == ids.length ? 'Barcodes sent to printer.' : (result + ' of ' + ids.length + ' sent to printer.')]);
           });
         });
       },
