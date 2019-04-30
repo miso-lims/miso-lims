@@ -40,11 +40,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -81,14 +83,15 @@ import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto.RunPartitionDto;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
-import uk.ac.bbsrc.tgac.miso.dto.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.StudyDto;
+import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 
 /**
  * A controller to handle all REST requests for Runs
@@ -405,7 +408,7 @@ public class RunRestController extends RestController {
     return libraryGroups.entrySet().stream()
         .<AddRequest> flatMap(WhineyFunction.rethrow(group -> //
         experimentService.listAllByLibraryId(group.getKey().getId()).stream()//
-            .filter(experiment -> experiment.getInstrumentModel().getId().equals(run.getSequencer().getInstrumentModel().getId()))
+            .filter(experiment -> experiment.getInstrumentModel().getId() == run.getSequencer().getInstrumentModel().getId())
             .flatMap(experiment -> group.getValue().stream()//
                 .filter(partition -> experiment.getRunPartitions().stream().noneMatch(rp -> rp.getPartition().equals(partition)))
                 .map(partition -> {
@@ -452,6 +455,35 @@ public class RunRestController extends RestController {
       throw new RestException("Run not found", Status.NOT_FOUND);
     }
     return run;
+  }
+
+  @PostMapping
+  public @ResponseBody RunDto createRun(@RequestBody RunDto dto) throws IOException {
+    Run run = Dtos.to(dto);
+    if (run.isSaved()) {
+      throw new ClientErrorException("Run is already saved");
+    }
+    Long savedId = runService.create(run);
+    return Dtos.asDto(runService.get(savedId));
+  }
+
+  @PutMapping("/{runId}")
+  public @ResponseBody RunDto updateRun(@PathVariable long runId, @RequestBody RunDto dto) throws IOException {
+    Run run = Dtos.to(dto);
+    if (run.getId() != runId) {
+      throw new ClientErrorException("Run ID mismatch");
+    }
+    Run existing = runService.get(runId);
+    if (existing == null) {
+      throw new NotFoundException("No run found with ID " + runId);
+    }
+    // Containers cannot be updated in this way
+    run.getRunPositions().clear();
+    for (RunPosition pos : existing.getRunPositions()) {
+      run.addSequencerPartitionContainer(pos.getContainer(), pos.getPosition());
+    }
+    runService.update(run);
+    return Dtos.asDto(runService.get(runId));
   }
 
 }

@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
 import java.util.function.Predicate;
 
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
@@ -16,8 +15,6 @@ public interface RunService extends ProviderService<Run>, PaginatedDataSource<Ru
   Collection<Run> list() throws IOException;
 
   int count() throws IOException;
-
-  Map<String, Integer> getRunColumnSizes() throws IOException;
 
   Collection<Run> listBySearch(String query) throws IOException;
 

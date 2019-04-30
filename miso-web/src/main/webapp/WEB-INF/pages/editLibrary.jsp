@@ -113,7 +113,7 @@
         </a>
 
         <div id="notesMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-          <a onclick="Library.ui.showLibraryNoteDialog(${library.id});" href="javascript:void(0);" class="add">Add Note</a>
+          <a onclick="Utils.notes.showNoteDialog('library', ${library.id});" href="javascript:void(0);" class="add">Add Note</a>
         </div>
       </li>
     </ul>
@@ -124,8 +124,11 @@
             <b>${note.creationDate}</b>: ${note.text}
               <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
                 <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
-                <span style="color:#000000"><a href='#' onclick="Library.ui.deleteLibraryNote('${library.id}', '${note.noteId}');">
-                  <span class="ui-icon ui-icon-trash note-delete-icon"></span></a></span>
+                  <span style="color:#000000">
+                    <a href='#' onclick="Utils.notes.deleteNote('library', '${library.id}', '${note.noteId}'); return false;">
+                      <span class="ui-icon ui-icon-trash note-delete-icon"></span>
+                    </a>
+                  </span>
                 </c:if>
               </span>
           </div>
