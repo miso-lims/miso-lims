@@ -28,7 +28,7 @@ FormTarget.pool = (function($) {
           data: 'name',
           type: 'read-only',
           getDisplayValue: function(pool) {
-            return pool.id || 'Unsaved';
+            return pool.name || 'Unsaved';
           }
         }, {
           title: 'Alias',

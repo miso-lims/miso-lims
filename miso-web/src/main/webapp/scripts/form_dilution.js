@@ -54,6 +54,7 @@ FormTarget.dilution = (function($) {
         }, FormUtils.makeUnitsField('concentration'), {
           title: 'Creation Date',
           data: 'creationDate',
+          required: 'true',
           type: 'date'
         }, {
           title: 'Targeted Sequencing',
