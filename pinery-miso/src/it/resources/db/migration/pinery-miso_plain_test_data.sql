@@ -23,6 +23,7 @@ DELETE FROM Pool_Dilution;
 DELETE FROM Pool_Note;
 DELETE FROM PoolChangeLog;
 DELETE FROM Pool;
+DELETE FROM DilutionChangeLog;
 DELETE FROM LibraryDilution;
 DELETE FROM DetailedLibrary;
 DELETE FROM Library_Index;
