@@ -14,10 +14,11 @@ such as pools and sequencer runs, may include items from multiple projects.
 {% assign sub = 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Projects List" %}
 
-The Projects list page can be accessed by clicking the "My Projects" tab near the top of the screen. Here you can see
-all of the projects that you have access to in MISO. Clicking on the project's name, alias, or short name in the table
-will take you to the Edit Project page, where you can see more project details, as well as all of the items associated
-with the project. The toolbar at the top of the table includes an "Add" button for creating new projects.
+The Projects list page can be accessed by clicking the "Projects" link in the Preparation list in the menu on the left
+side of the screen. Here you can see all of the projects that you have access to in MISO. Clicking on the project's
+name, alias, or short name in the table will take you to the Edit Project page, where you can see more project details,
+as well as all of the items associated with the project. The toolbar at the top of the table includes an "Add" button
+for creating new projects.
 
 {% include userman-toplink.md %}
 
