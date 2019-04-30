@@ -177,6 +177,6 @@ ListTarget.dilution = {
   },
   searchTermSelector: function(searchTerms) {
     return [searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'],
-        searchTerms['index_name'], searchTerms['index_seq'], searchTerms['institute'], searchTerms['external'], searchTerms['box']]
+        searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box']]
   }
 };

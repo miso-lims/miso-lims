@@ -1539,7 +1539,7 @@ public class Dtos {
     DilutionDto dto = new DilutionDto();
     dto.setId(from.getDilutionId());
     dto.setName(from.getDilutionName());
-    dto.setDilutionUserName(from.getCreatorName());
+    dto.setDilutionUserName(from.getCreatorFullName());
     dto.setConcentration(from.getDilutionConcentration() == null ? null : from.getDilutionConcentration().toString());
     dto.setConcentrationUnits(from.getDilutionConcentrationUnits());
     dto.setLastModified(formatDateTime(from.getLastModified()));

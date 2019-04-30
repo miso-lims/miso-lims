@@ -142,7 +142,7 @@ ListTarget.library = {
     const plainSampleTerms = [searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'],
         searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box'], searchTerms['kitname'],
         searchTerms['distributed'], searchTerms['distributedto']];
-    const detailedSampleTerms = [searchTerms['institute'], searchTerms['external'], searchTerms['groupid']];
+    const detailedSampleTerms = [searchTerms['groupid']];
     if (Constants.isDetailedSample) {
       return plainSampleTerms.concat(detailedSampleTerms);
     } else {
