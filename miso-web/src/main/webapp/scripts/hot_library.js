@@ -98,12 +98,14 @@ HotTarget.library = (function() {
         var readOnly = false;
         if (flat.templateAlias && flat.boxPosition && indexFamily) {
           var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
-          var positionProp = n == 1 ? 'indexOneIds' : 'indexTwoIds';
-          if (template.indexFamilyId && template[positionProp] && template[positionProp][flat.boxPosition]) {
-            var index = Utils.array.getObjById(template[positionProp][flat.boxPosition], indexFamily.indices);
-            if (index) {
-              setData(index.label);
-              readOnly = true;
+          if (template) {
+            var positionProp = n == 1 ? 'indexOneIds' : 'indexTwoIds';
+            if (template.indexFamilyId && template[positionProp] && template[positionProp][flat.boxPosition]) {
+              var index = Utils.array.getObjById(template[positionProp][flat.boxPosition], indexFamily.indices);
+              if (index) {
+                setData(index.label);
+                readOnly = true;
+              }
             }
           }
         }

@@ -83,11 +83,14 @@ ListTarget.dilution = {
   createColumns: function(config, projectId) {
     return [{
       "sTitle": "Name",
-      "mData": "id",
+      "mData": "id", // for sorting purposes (numerical order instead of string)
       "include": true,
       "iSortPriority": 1,
       "mRender": function(data, type, full) {
-        return "<a href=\"/miso/library/" + full.library.id + "\">" + full.name + "</a>";
+        if (type === 'display') {
+          return "<a href=\"/miso/dilution/" + full.id + "\">" + data + "</a>";
+        }
+        return data;
       }
     }, {
       "sTitle": "Warnings",

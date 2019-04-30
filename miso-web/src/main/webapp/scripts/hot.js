@@ -783,7 +783,7 @@ var HotUtils = {
                 return x.description;
               }
             }], function(result) {
-              Utils.ajaxDownloadWithDialog('POST', '/miso/rest/hot/spreadsheet?format=' + result.format.name);
+              Utils.ajaxDownloadWithDialog('/miso/rest/hot/spreadsheet?format=' + result.format.name, data);
             });
           }
         }];

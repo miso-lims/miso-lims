@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
@@ -112,38 +112,43 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   @Override
-  public Collection<Pool> listBySearch(String query) throws IOException {
+  public List<Pool> listBySearch(String query) throws IOException {
     return poolStore.listAllByCriteria(null, query, null);
   }
 
   @Override
-  public Collection<Pool> listWithLimit(int limit) throws IOException {
+  public List<Pool> listWithLimit(int limit) throws IOException {
     return poolStore.listAllByCriteria(null, null, limit);
   }
 
   @Override
-  public Collection<Pool> list() throws IOException {
+  public List<Pool> list() throws IOException {
     return poolStore.listAll();
   }
 
   @Override
-  public Collection<Pool> listByPlatform(PlatformType platformType) throws IOException {
+  public List<Pool> listByPlatform(PlatformType platformType) throws IOException {
     return poolStore.listAllByCriteria(platformType, null, null);
   }
 
   @Override
-  public Collection<Pool> listByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
+  public List<Pool> listByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
     return poolStore.listAllByCriteria(platformType, query, null);
   }
 
   @Override
-  public Collection<Pool> listByProjectId(long projectId) throws IOException {
+  public List<Pool> listByProjectId(long projectId) throws IOException {
     return poolStore.listByProjectId(projectId);
   }
 
   @Override
-  public Collection<Pool> listByLibraryId(long libraryId) throws IOException {
+  public List<Pool> listByLibraryId(long libraryId) throws IOException {
     return poolStore.listByLibraryId(libraryId);
+  }
+
+  @Override
+  public List<Pool> listByDilutionId(long dilutionId) throws IOException {
+    return poolStore.listByDilutionId(dilutionId);
   }
 
   @Override
@@ -321,7 +326,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   @Override
-  public Collection<Pool> listByIdList(List<Long> poolIds) throws IOException {
+  public List<Pool> listByIdList(List<Long> poolIds) throws IOException {
     return poolStore.listPoolsById(poolIds);
   }
 

@@ -25,10 +25,12 @@ WarningTarget.dilution = {
   getWarnings: function(dilution) {
     return [{
       include: dilution.subprojectPriority,
+      headerMessage: 'Belongs to high priority subproject \'' + dilution.subprojectAlias + '\'',
       tableMessage: 'PRIORITY (' + dilution.subprojectAlias + ')',
       level: "important"
     }, {
       include: dilution.identityConsentLevel === 'Revoked',
+      headerMessage: 'Donor has revoked consent',
       tableMessage: '(CONSENT REVOKED)'
     }];
   },
