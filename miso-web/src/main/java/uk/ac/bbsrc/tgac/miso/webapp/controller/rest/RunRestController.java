@@ -40,7 +40,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -91,7 +90,6 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 
 /**
  * A controller to handle all REST requests for Runs
@@ -461,7 +459,7 @@ public class RunRestController extends RestController {
   public @ResponseBody RunDto createRun(@RequestBody RunDto dto) throws IOException {
     Run run = Dtos.to(dto);
     if (run.isSaved()) {
-      throw new ClientErrorException("Run is already saved");
+      throw new RestException("Run is already saved", Status.BAD_REQUEST);
     }
     Long savedId = runService.create(run);
     return Dtos.asDto(runService.get(savedId));
@@ -471,11 +469,11 @@ public class RunRestController extends RestController {
   public @ResponseBody RunDto updateRun(@PathVariable long runId, @RequestBody RunDto dto) throws IOException {
     Run run = Dtos.to(dto);
     if (run.getId() != runId) {
-      throw new ClientErrorException("Run ID mismatch");
+      throw new RestException("Run ID mismatch", Status.BAD_REQUEST);
     }
     Run existing = runService.get(runId);
     if (existing == null) {
-      throw new NotFoundException("No run found with ID " + runId);
+      throw new RestException("No run found with ID " + runId, Status.NOT_FOUND);
     }
     // Containers cannot be updated in this way
     run.getRunPositions().clear();
