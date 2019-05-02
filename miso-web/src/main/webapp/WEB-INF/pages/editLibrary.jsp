@@ -135,7 +135,6 @@
         </c:forEach>
       </div>
     </c:if>
-    <div id="addNoteDialog" title="Create new Note"></div>
   </div>
 </c:if>
 
