@@ -2791,13 +2791,38 @@ public class Dtos {
   public static ServiceRecordDto asDto(@Nonnull ServiceRecord from) {
     ServiceRecordDto dto = new ServiceRecordDto();
     setId(dto::setId, from);
+    setId(dto::setInstrumentId, from.getInstrument());
+    setString(dto::setInstrumentName, maybeGetProperty(from.getInstrument(), Instrument::getName));
     setDateString(dto::setServiceDate, from.getServiceDate());
     setString(dto::setTitle, from.getTitle());
     setString(dto::setDetails, from.getDetails());
     setString(dto::setReferenceNumber, from.getReferenceNumber());
+    setId(dto::setPositionId, from.getPosition());
     setString(dto::setPosition, maybeGetProperty(from.getPosition(), InstrumentPosition::getAlias));
-    dto.setAttachments(from.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    setString(dto::setServicedBy, from.getServicedByName());
+    setBoolean(dto::setOutOfService, from.isOutOfService(), true);
+    setDateTimeString(dto::setStartTime, from.getStartTime());
+    setDateTimeString(dto::setEndTime, from.getEndTime());
+    if (from.getAttachments() != null) {
+      dto.setAttachments(from.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    }
     return dto;
+  }
+
+  public static ServiceRecord to(@Nonnull ServiceRecordDto dto) {
+    ServiceRecord to = new ServiceRecord();
+    setLong(to::setId, dto.getId(), false);
+    setObject(to::setInstrument, InstrumentImpl::new, dto.getInstrumentId());
+    setDate(to::setServiceDate, dto.getServiceDate());
+    setString(to::setTitle, dto.getTitle());
+    setString(to::setDetails, dto.getDetails());
+    setString(to::setReferenceNumber, dto.getReferenceNumber());
+    setObject(to::setPosition, InstrumentPosition::new, dto.getPositionId());
+    setString(to::setServicedByName, dto.getServicedBy());
+    setBoolean(to::setOutOfService, dto.getOutOfService(), false);
+    setDateTime(to::setStartTime, dto.getStartTime());
+    setDateTime(to::setEndTime, dto.getEndTime());
+    return to;
   }
 
   public static VolumeUnitDto asDto(VolumeUnit from) {
@@ -2957,6 +2982,14 @@ public class Dtos {
     setter.accept(isStringEmptyOrNull(value) ? null : new BigDecimal(value));
   }
 
+  private static void setBoolean(@Nonnull Consumer<Boolean> setter, Boolean value, boolean nullOk) {
+    if (value != null || nullOk) {
+      setter.accept(value);
+    } else {
+      setter.accept(false);
+    }
+  }
+
   private static void setString(@Nonnull Consumer<String> setter, BigDecimal value) {
     setter.accept(toNiceString(value));
   }
@@ -2975,6 +3008,10 @@ public class Dtos {
 
   private static void setDateTimeString(@Nonnull Consumer<String> setter, Date value) {
     setter.accept(value == null ? null : formatDateTime(value));
+  }
+
+  private static void setDateTime(@Nonnull Consumer<Date> setter, String value) {
+    setter.accept(value == null ? null : parseDateTime(value));
   }
 
   private static void setLong(@Nonnull Consumer<Long> setter, Long value, boolean nullOk) {
