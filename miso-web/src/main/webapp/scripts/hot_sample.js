@@ -85,9 +85,9 @@ HotTarget.sample = (function() {
       var startProgression;
       if (!Constants.isDetailedSample) {
         startProgression = -1;
-      } else if (config.create == true) {
+      } else if (config.pageMode == 'create') {
         startProgression = 0;
-      } else if (config.edit == true) {
+      } else if (config.pageMode == 'edit') {
         startProgression = endProgression;
       } else {
         startProgression = progression.indexOf(sourceCategory);
@@ -189,7 +189,7 @@ HotTarget.sample = (function() {
             include: (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
               // If creating, default to today's date in format YYYY-MM-DD
-              if (!sam.receivedDate && config.create) {
+              if (!sam.receivedDate && config.pageMode == 'create') {
                 flat.receivedDate = Utils.getCurrentDate();
               } else {
                 flat.receivedDate = Utils.valOrNull(sam.receivedDate);
@@ -231,7 +231,7 @@ HotTarget.sample = (function() {
             type: (config.hasProject ? 'text' : 'dropdown'),
             trimDropdown: false,
             source: (function() {
-              if ((!config.projects || config.projects.length == 0) && config.create && !config.propagate && !config.hasProject) {
+              if ((!config.projects || config.projects.length == 0) && config.pageMode == 'create' && !config.hasProject) {
                 /* projects list failed to generate when it should have, and we can't proceed. Notify the user. */
                 var serverErrorMessages = document.getElementById('serverErrors');
                 serverErrorMessages.innerHTML = '<p>Failed to generate list of projects. Please notify your MISO administrators.</p>';
@@ -268,7 +268,7 @@ HotTarget.sample = (function() {
             },
             readOnly: config.hasProject,
             validator: HotUtils.validator.requiredAutocomplete,
-            include: config.create
+            include: config.pageMode == 'create'
           },
           HotUtils.makeColumnForText('Sci. Name', true, 'scientificName', {
             validator: HotUtils.validator.requiredTextNoSpecialChars,
@@ -290,7 +290,7 @@ HotTarget.sample = (function() {
 
           // Detailed Sample
           // parent columns
-          HotUtils.makeColumnForText('Parent Alias', (Constants.isDetailedSample && config.propagate && !config.isLibraryReceipt),
+          HotUtils.makeColumnForText('Parent Alias', (Constants.isDetailedSample && config.pageMode == 'propagate' && !config.isLibraryReceipt),
               'parentAlias', {
                 readOnly: true
               }),
@@ -309,7 +309,7 @@ HotTarget.sample = (function() {
                 return item.alias == flat.parentTissueSampleClassAlias;
               }, Constants.sampleClasses), 'id');
             },
-            include: Constants.isDetailedSample && config.propagate && !config.isLibraryReceipt
+            include: Constants.isDetailedSample && config.pageMode == 'propagate' && !config.isLibraryReceipt
           },
 
           // Identity columns
@@ -514,7 +514,7 @@ HotTarget.sample = (function() {
           {
             header: 'Effective Group ID',
             data: 'effectiveGroupId',
-            include: Constants.isDetailedSample && !isTargetIdentity(config) && !config.isLibraryReceipt && !config.create,
+            include: Constants.isDetailedSample && !isTargetIdentity(config) && !config.isLibraryReceipt && config.pageMode != 'create',
             type: 'text',
             readOnly: true,
             depends: 'groupId',
@@ -531,10 +531,10 @@ HotTarget.sample = (function() {
           },
           HotUtils.makeColumnForText('Group ID', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupId', {
             validator: HotUtils.validator.optionalTextAlphanumeric
-          }, config.targetSampleClass && config.targetSampleClass.alias === 'LCM Tube' && !config.edit ? config.defaultLcmTubeGroupId
+          }, config.targetSampleClass && config.targetSampleClass.alias === 'LCM Tube' && config.pageMode != 'edit' ? config.defaultLcmTubeGroupId
               : null),
           HotUtils.makeColumnForText('Group Desc.', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupDescription', {},
-              config.targetSampleClass && config.targetSampleClass.alias === 'LCM Tube' && !config.edit
+              config.targetSampleClass && config.targetSampleClass.alias === 'LCM Tube' && config.pageMode != 'edit'
                   ? config.defaultLcmTubeGroupDescription : null),
           {
             header: 'Date of Creation',
@@ -549,7 +549,7 @@ HotTarget.sample = (function() {
             description: 'The date that the sample was created.',
             include: Constants.isDetailedSample && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
-              if (!sam.creationDate && config.propagate) {
+              if (!sam.creationDate && config.pageMode == 'propagate') {
                 flat.creationDate = Utils.getCurrentDate();
               } else {
                 flat.creationDate = Utils.valOrNull(sam.creationDate);
@@ -763,7 +763,7 @@ HotTarget.sample = (function() {
             })(),
             validator: HotUtils.validator.requiredText,
             unpack: function(sam, flat, setCellMeta) {
-              if (config.edit) {
+              if (config.pageMode == 'edit') {
                 flat.detailedQcStatusDescription = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
                     .idPredicate(sam.detailedQcStatusId), Constants.detailedQcStatuses), 'description')
                     || 'Not Ready';

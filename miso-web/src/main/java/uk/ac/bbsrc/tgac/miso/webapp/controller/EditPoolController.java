@@ -112,6 +112,7 @@ public class EditPoolController {
 
   private static class Config {
     private static final String BOX = "box";
+    private static final String PAGE_MODE = "pageMode";
     private static final String EDIT = "edit";
     private static final String PROPAGATE = "propagate";
     private static final String CREATE = "create";
@@ -180,7 +181,7 @@ public class EditPoolController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      config.put(Config.EDIT, true);
+      config.put(Config.PAGE_MODE, Config.EDIT);
     }
   };
 
@@ -258,8 +259,7 @@ public class EditPoolController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.putPOJO(Config.BOX, newBox);
-      config.put(Config.CREATE, true);
-      config.put(Config.PROPAGATE, true);
+      config.put(Config.PAGE_MODE, Config.CREATE);
     }
 
     public ModelAndView merge(String parentIdsString, String proportionsString, ModelMap model) throws IOException {
