@@ -40,7 +40,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
@@ -56,9 +55,6 @@ public class HibernateServiceRecordDaoTest extends AbstractDAOTest {
   
   @Autowired
   private SessionFactory sessionFactory;
-
-  @Autowired
-  private JdbcTemplate jdbcTemplate;
   
   @Mock
   private MisoFilesManager misoFilesManager;
@@ -72,7 +68,6 @@ public class HibernateServiceRecordDaoTest extends AbstractDAOTest {
   @Before
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
-    dao.setTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
 
     emptySR.setId(2L);
