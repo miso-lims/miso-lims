@@ -28,65 +28,68 @@
 The simplest way to get MISO up and running quickly is to use
 [Docker](https://www.docker.com/) compose. Images of the most recent MISO releases are
 available on Docker Hub in
-the [misolims](https://hub.docker.com/r/misolims/) organisation. 
+the [misolims](https://hub.docker.com/r/misolims/) organisation.
 
-To use it, install required dependencies:
+#### Prerequisites
+
+Install required dependencies:
 
 1. [Install Docker 18.06.0+](https://docs.docker.com/install/)
 1. If necessary, [install Docker Compose](https://docs.docker.com/compose/install/)
 
-There are two available modes for MISO to run in: plain sample mode, which was 
-originally used by Earlham Institute, and detailed sample mode, used by Ontario
-Institute for Cancer Research. 
 
-**Plain sample mode** has a straightforward Sample -> Library -> Dilution -> 
+Download and extract the `.docker` directory from Github into `miso-lims-compose`.
+
+```
+wget https://github.com/miso-lims/miso-lims/archive/master.zip
+unzip master.zip 'miso-lims-master/.docker/*'
+mv miso-lims-master/.docker miso-lims-compose
+rm -r master.zip miso-lims-master/
+```
+
+You are now ready to run MISO.
+
+#### Quick Start
+
+To bring up a demo environment, install the pre-requisites above and run the
+following commands.
+
+**Plain sample mode** has a straightforward Sample -> Library -> Dilution ->
 Pool workflow and is sufficient for basic laboratory tracking for sequencing.
 
 Launch the plain sample demo with docker-compose:
-
-```bash
-# download the docker-compose file
-wget https://raw.githubusercontent.com/miso-lims/miso-lims/master/docker-compose.yml -O docker-compose.yml
-wget https://raw.githubusercontent.com/miso-lims/miso-lims/master/docker-compose.override.yml -O docker-compose.override.yml
-
-# set the password for the database
+``` bash
+cd miso-lims-compose
+export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && MISO_TAG=latest
 echo "changeme" > ./.miso_db_password
-# set required environment variables
-export MISO_DB_USER=tgaclims MISO_DB=lims MISO_DB_PASSWORD_FILE=./.miso_db_password MISO_TAG=latest
-docker-compose up
+docker-compose -f demo.plain.yml up
 ```
 
-Navigate to [http://localhost/miso](http://localhost/miso) to login to miso with
-the credentials **admin/admin**.
-
 **Detailed sample mode** has all of the features of plain sample mode, plus it
-allows users to build a hierarchy of Samples (e.g. Identity -> Tissue -> Slide 
+allows users to build a hierarchy of Samples (e.g. Identity -> Tissue -> Slide
 -> gDNA (stock) -> gDNA (aliquot) and also includes alias autogeneration.
 
 Launch the detailed sample demo with docker-compose:
 
 ```bash
-# download the docker-compose file
-wget https://raw.githubusercontent.com/miso-lims/miso-lims/master/docker-compose.yml -O docker-compose.yml
-wget https://raw.githubusercontent.com/miso-lims/miso-lims/master/docker-compose.override.yml -O docker-compose.override.yml
-wget https://raw.githubusercontent.com/miso-lims/miso-lims/master/docker-compose.detailed.yml -O docker-compose.detailed.yml
-
-# set the password for the database
+cd miso-lims-compose
+export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && MISO_TAG=latest
 echo "changeme" > ./.miso_db_password
-# set required environment variables
-export MISO_DB_USER=tgaclims MISO_DB=lims MISO_DB_PASSWORD_FILE=./.miso_db_password MISO_TAG=latest
-docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.detailed.yml up
+docker-compose -f demo.detailed.yml up
 ```
 
-Navigate to [http://localhost/miso](http://localhost/miso) to login to miso with
-the credentials **admin/admin**.
+For both environments, navigate to [http://localhost/miso](http://localhost/miso)
+and use the credentials **admin**/**admin**.
 
-The docker-compose.override.yml file creates Docker volumes for the MISO DB 
-(miso_db) and files uploaded into MISO (miso_files) and these will persist 
-across multiple startups until the Docker environment is pruned. As such, it is 
-intended as a demonstration and __not a permanent installation__. Please see
-[miso-lims-webapp](https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-webapp)
-on DockerHub for more information on configuring the containers and the compose files.
+Once you are finished with the container, make sure to run
+`docker-compose -f <compose.yml> down`, where `<compose.yml>` is either
+`demo.plain.yml` or `demo.detailed.yml`. This will clean up the instances and
+networks and release their resources to the host operating system.
+
+
+These compose files are intended as a demonstration and __not a permanent installation__.
+
+Please see the [Docker Compose Guide](http://miso-lims.github.io/miso-lims/adm/compose-installation-guide) for more information on configuring the containers and the compose files.
 
 
 ## User Tutorial
@@ -100,12 +103,12 @@ ways of contacting the MISO administrators) can be changed by forking and config
 the [tutorial repository](https://github.com/miso-lims/walkthroughs) to suit your
 lab's specific needs.
 
-## Running an Instance of MISO 
+## Running an Instance of MISO
 
-To run your own MISO instance in the long term, download the 
+To run your own MISO instance in the long term, download the
 [latest release](https://github.com/miso-lims/miso-lims/releases/latest).
 
-Installation and configuration details can be found in the [MISO installation guide](docs/_posts/2016-01-11-installation-guide.md).
+Installation and configuration details can be found in the [MISO installation guide](http://miso-lims.github.io/miso-lims/adm/installation-guide.html).
 
 ## Contact and Community
 
