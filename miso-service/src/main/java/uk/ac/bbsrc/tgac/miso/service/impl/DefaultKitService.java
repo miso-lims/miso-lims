@@ -162,7 +162,7 @@ public class DefaultKitService implements KitService {
     Set<TargetedSequencing> maybeManaged = Sets.newHashSet(kitDescriptor.getTargetedSequencing());
     kitDescriptor.clearTargetedSequencing();
     for (TargetedSequencing ts : maybeManaged) {
-      if (ts != null && ts.getId() != TargetedSequencing.UNSAVED_ID) {
+      if (ts != null && ts.isSaved()) {
         kitDescriptor.addTargetedSequencing(targetedSequencingService.get(ts.getId()));
       }
     }

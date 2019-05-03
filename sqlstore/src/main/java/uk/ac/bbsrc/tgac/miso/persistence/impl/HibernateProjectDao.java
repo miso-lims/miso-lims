@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -110,11 +109,6 @@ public class HibernateProjectDao implements ProjectStore {
     return template;
   }
 
-  @Override
-  public Map<String, Integer> getProjectColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(template, TABLE_NAME);
-  }
-
   public SecurityStore getSecurityStore() {
     return securityStore;
   }
@@ -154,7 +148,7 @@ public class HibernateProjectDao implements ProjectStore {
   public long save(Project project) throws IOException {
     Date timestamp = new Date();
     project.setLastUpdated(timestamp);
-    if (project.getId() == ProjectImpl.UNSAVED_ID) {
+    if (!project.isSaved()) {
       project.setCreationDate(timestamp);
       return (Long) currentSession().save(project);
     } else {

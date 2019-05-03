@@ -26,9 +26,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,38 +34,34 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
-import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
-import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ExternalUriBuilder;
 
 @Controller
 @RequestMapping("/project")
-@SessionAttributes("project")
 public class EditProjectController {
   private static final Logger log = LoggerFactory.getLogger(EditProjectController.class);
 
@@ -78,25 +72,12 @@ public class EditProjectController {
   @Autowired
   private ExternalUriBuilder externalUriBuilder;
   @Autowired
-  private ReferenceGenomeService referenceGenomeService;
-  @Autowired
-  private TargetedSequencingService targetedSequencingService;
-  @Autowired
   private SubprojectService subprojectService;
+  @Autowired
+  private NamingScheme namingScheme;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
-  }
-
-  @InitBinder
-  public void initBinder(WebDataBinder binder) {
-    CustomDateEditor cde = new CustomDateEditor(LimsUtils.getDateFormat(), true);
-    binder.registerCustomEditor(Date.class, cde);
-  }
-
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> maxLengths() throws IOException {
-    return projectService.getProjectColumnSizes();
   }
 
   @GetMapping("/new")
@@ -135,13 +116,17 @@ public class EditProjectController {
 
     model.put("projectIssues", issues.stream().map(Dtos::asDto).collect(Collectors.toList()));
     model.put("projectReportLinks", externalUriBuilder.getUris(project));
-    model.put("referenceGenome", referenceGenomeService.listAllReferenceGenomeTypes());
-
-    Collection<TargetedSequencing> targetedSequencingList = targetedSequencingService.list();
-    targetedSequencingList.add(TargetedSequencing.NULL);
-    model.put("targetedSequencing", targetedSequencingList);
-    model.put("formObj", project);
     model.put("project", project);
+
+    ObjectMapper mapper = new ObjectMapper();
+    model.put("projectDto", mapper.writeValueAsString(Dtos.asDto(project)));
+
+    ArrayNode progressOptions = mapper.createArrayNode();
+    for (ProgressType item : ProgressType.values()) {
+      progressOptions.add(item.getKey());
+    }
+    model.put("progressOptions", progressOptions);
+    model.put("shortNameRequired", !namingScheme.nullProjectShortNameAllowed());
 
     return new ModelAndView("/WEB-INF/pages/editProject.jsp", model);
   }

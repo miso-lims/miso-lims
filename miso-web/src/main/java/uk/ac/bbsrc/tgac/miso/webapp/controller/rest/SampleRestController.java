@@ -60,7 +60,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -77,9 +76,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -112,8 +108,6 @@ public class SampleRestController extends RestController {
   private SampleClassService sampleClassService;
   @Autowired
   private ProjectService projectService;
-  @Autowired
-  private NamingScheme namingScheme;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -349,39 +343,6 @@ public class SampleRestController extends RestController {
       matches = sampleService.getIdentitiesByExternalNameOrAliasAndProject(identityIdentifier, null, exactMatch);
     }
     return matches.stream().map(identity -> Dtos.asDto(identity, false)).collect(Collectors.toSet());
-  }
-
-  private static class AliasValidationDto {
-    private final String alias;
-
-    public AliasValidationDto(@JsonProperty("alias") String alias) {
-      this.alias = alias;
-    }
-
-    public String getAlias() {
-      return alias;
-    }
-  }
-
-  /**
-   * This is a first pass at validating the alias. Further validation is done in the Sample Service, as
-   * validation results may depend on other sample properties.
-   * 
-   * @throws IOException
-   */
-  @PostMapping(value = "/validate-alias", produces = { "application/json" })
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void validateAlias(@RequestBody AliasValidationDto params, HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) {
-    String alias = params.getAlias();
-    if (LimsUtils.isStringEmptyOrNull(alias) && !namingScheme.hasSampleAliasGenerator()) {
-      throw new RestException("No alias specified, and no alias generator exists", Status.BAD_REQUEST);
-    }
-    
-    ValidationResult aliasValidation = namingScheme.validateSampleAlias(alias);
-    if (!aliasValidation.isValid()) {
-      throw new RestException(aliasValidation.getMessage(), Status.BAD_REQUEST);
-    }
   }
 
   @PostMapping(value = "/query", produces = { "application/json" })

@@ -143,4 +143,6 @@ public interface Project extends Comparable<Project>, Nameable, Serializable, At
   public TargetedSequencing getDefaultTargetedSequencing();
 
   public void setDefaultTargetedSequencing(TargetedSequencing defaultTargetedSequencing);
+
+  public boolean isSaved();
 }

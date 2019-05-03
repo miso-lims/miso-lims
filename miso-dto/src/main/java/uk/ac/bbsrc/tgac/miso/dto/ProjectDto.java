@@ -4,10 +4,13 @@ public class ProjectDto {
   private long id;
   private String alias;
   private String name;
+  private String creationDate;
   private String shortName;
   private String description;
   private String progress;
+  private Long referenceGenomeId;
   private String defaultSciName;
+  private Long defaultTargetedSequencingId;
 
   public long getId() {
     return id;
@@ -31,6 +34,14 @@ public class ProjectDto {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getCreationDate() {
+    return creationDate;
+  }
+
+  public void setCreationDate(String creationDate) {
+    this.creationDate = creationDate;
   }
 
   public String getShortName() {
@@ -57,11 +68,27 @@ public class ProjectDto {
     this.progress = progress;
   }
 
+  public Long getReferenceGenomeId() {
+    return referenceGenomeId;
+  }
+
+  public void setReferenceGenomeId(Long referenceGenomeId) {
+    this.referenceGenomeId = referenceGenomeId;
+  }
+
   public String getDefaultSciName() {
     return defaultSciName;
   }
 
   public void setDefaultSciName(String defaultSciName) {
     this.defaultSciName = defaultSciName;
+  }
+
+  public Long getDefaultTargetedSequencingId() {
+    return defaultTargetedSequencingId;
+  }
+
+  public void setDefaultTargetedSequencingId(Long defaultTargetedSequencingId) {
+    this.defaultTargetedSequencingId = defaultTargetedSequencingId;
   }
 }
