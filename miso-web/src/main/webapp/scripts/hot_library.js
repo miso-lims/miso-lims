@@ -98,12 +98,14 @@ HotTarget.library = (function() {
         var readOnly = false;
         if (flat.templateAlias && flat.boxPosition && indexFamily) {
           var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
-          var positionProp = n == 1 ? 'indexOneIds' : 'indexTwoIds';
-          if (template.indexFamilyId && template[positionProp] && template[positionProp][flat.boxPosition]) {
-            var index = Utils.array.getObjById(template[positionProp][flat.boxPosition], indexFamily.indices);
-            if (index) {
-              setData(index.label);
-              readOnly = true;
+          if (template) {
+            var positionProp = n == 1 ? 'indexOneIds' : 'indexTwoIds';
+            if (template.indexFamilyId && template[positionProp] && template[positionProp][flat.boxPosition]) {
+              var index = Utils.array.getObjById(template[positionProp][flat.boxPosition], indexFamily.indices);
+              if (index) {
+                setData(index.label);
+                readOnly = true;
+              }
             }
           }
         }
@@ -794,93 +796,7 @@ HotTarget.library = (function() {
               obj.spikeInId = (Utils.validation.isEmpty(flat.spikeIn) || flat.spikeIn === '(None)') ? null : Utils.array.getIdFromAlias(
                   flat.spikeIn, Constants.spikeIns);
             }
-          }, makeSpikeInDilutionFactorColumn(), makeSpikeInVolumeColumn(), {
-            header: 'Distributed',
-            data: 'distributed',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: ['Sent Out', 'No'],
-            include: !config.create && !config.propagate,
-            unpack: function(lib, flat, setCellMeta) {
-              if (lib.distributed === true) {
-                flat.distributed = 'Sent Out';
-              } else {
-                flat.distributed = 'No';
-              }
-            },
-            pack: function(lib, flat, errorHandler) {
-              if (flat.distributed === 'Sent Out') {
-                lib.distributed = true;
-              } else {
-                lib.distributed = false;
-              }
-            }
-          }, {
-            header: 'Distribution Date',
-            data: 'distributionDate',
-            type: 'date',
-            dateFormat: 'YYYY-MM-DD',
-            datePickerConfig: {
-              firstDay: 0,
-              numberOfMonths: 1
-            },
-            allowEmpty: true,
-            description: 'The date that the library was sent to an external recipient.',
-            include: !config.create && !config.propagate,
-            depends: 'distributed',
-            update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if (value === 'Sent Out') {
-                setReadOnly(false);
-                setOptions({
-                  required: true,
-                  validator: HotUtils.validator.requiredTextNoSpecialChars
-                });
-              } else {
-                setReadOnly(true);
-                setOptions({
-                  validator: HotUtils.validator.requiredEmpty
-                });
-                setData(null);
-              }
-            },
-            unpack: function(lib, flat, setCellMeta) {
-              if (lib.distributionDate) {
-                flat.distributionDate = Utils.valOrNull(lib.distributionDate);
-              }
-            },
-            pack: function(lib, flat, errorHandler) {
-              lib.distributionDate = flat.distributionDate;
-            }
-          }, {
-            header: 'Distribution Recipient',
-            data: 'distributionRecipient',
-            type: 'text',
-            include: !config.create && !config.propagate,
-            depends: 'distributed',
-            update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if (value === 'Sent Out') {
-                setOptions({
-                  required: true,
-                  validator: HotUtils.validator.requiredTextNoSpecialChars
-                });
-                setReadOnly(false);
-              } else {
-                setOptions({
-                  validator: HotUtils.validator.requiredEmpty
-                });
-                setData(null);
-                setReadOnly(true);
-              }
-            },
-            unpack: function(lib, flat, setCellMeta) {
-              if (lib.distributionRecipient) {
-                flat.distributionRecipient = Utils.valOrNull(lib.distributionRecipient);
-              }
-            },
-            pack: function(lib, flat, errorHandler) {
-              lib.distributionRecipient = flat.distributionRecipient;
-            }
-          }];
+          }, makeSpikeInDilutionFactorColumn(), makeSpikeInVolumeColumn()];
 
       var spliceIndex = columns.indexOf(columns.filter(function(column) {
         return column.data === 'identificationBarcode';

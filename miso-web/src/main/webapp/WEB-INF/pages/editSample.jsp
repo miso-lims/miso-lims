@@ -101,26 +101,63 @@
   });
 </script>
 
-<c:if test="${sample.id != 0}">
-  <miso:attachments item="${sample}" projectId="${sample.project.id}"/>
-  <miso:qcs id="list_qc" item="${sample}"/>
-
-  <c:if test="${ !detailedSample or detailedSample and sampleCategory eq 'Aliquot' }">
-    <miso:list-section id="list_library" name="Libraries" target="library" items="${sampleLibraries}"/>
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
+  <div id="notes_arrowclick" class="toggleLeftDown"></div>
+</div>
+<div id="notes">
+  <h1>Notes</h1>
+  <ul class="sddm">
+    <li>
+      <a onmouseover="mopen('notesmenu')" onmouseout="mclosetime()">Options
+        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+      </a>
+      <div id="notesmenu"
+           onmouseover="mcancelclosetime()"
+           onmouseout="mclosetime()">
+        <a onclick="Utils.notes.showNoteDialog('sample', ${sample.id});" href="javascript:void(0);" class="add">Add Note</a>
+      </div>
+    </li>
+  </ul>
+  <c:if test="${fn:length(sample.notes) > 0}">
+    <div class="note" style="clear:both">
+      <c:forEach items="${sample.notes}" var="note" varStatus="n">
+        <div class="exppreview" id="sample-notes-${n.count}">
+          <b>${note.creationDate}</b>: ${note.text}
+          <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
+            <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
+              <span style="color:#000000">
+                <a href='#' onclick="Utils.notes.deleteNote('sample', '${sample.id}', '${note.noteId}'); return false;">
+                  <span class="ui-icon ui-icon-trash note-delete-icon"></span>
+                </a>
+              </span>
+            </c:if>
+          </span>
+        </div>
+      </c:forEach>
+    </div>
   </c:if>
+  <div id="addSampleNoteDialog" title="Create new Note"></div>
+</div>
+<br/>
 
-  <c:if test="${detailedSample}">
-    <miso:list-section id="list_relation" name="Relationships" target="sample" items="${sampleRelations}"/>
-  </c:if>
+<miso:attachments item="${sample}" projectId="${sample.project.id}"/>
+<miso:qcs id="list_qc" item="${sample}"/>
 
-  <miso:list-section id="list_pool" name="Pools" target="pool" items="${samplePools}"/>
-  <miso:list-section id="list_run" name="Runs" target="run" items="${sampleRuns}"/>
-  
-  <miso:list-section id="list_array" name="Arrays" target="array" items="${sampleArrays}"/>
-  <miso:list-section id="list_arrayrun" name="Array Runs" target="arrayrun" items="${sampleArrayRuns}"/>
-  
-  <miso:changelog item="${sample}"/>
+<c:if test="${ !detailedSample or detailedSample and sampleCategory eq 'Aliquot' }">
+  <miso:list-section id="list_library" name="Libraries" target="library" items="${sampleLibraries}"/>
 </c:if>
+
+<c:if test="${detailedSample}">
+  <miso:list-section id="list_relation" name="Relationships" target="sample" items="${sampleRelations}"/>
+</c:if>
+
+<miso:list-section id="list_pool" name="Pools" target="pool" items="${samplePools}"/>
+<miso:list-section id="list_run" name="Runs" target="run" items="${sampleRuns}"/>
+
+<miso:list-section id="list_array" name="Arrays" target="array" items="${sampleArrays}"/>
+<miso:list-section id="list_arrayrun" name="Array Runs" target="arrayrun" items="${sampleArrayRuns}"/>
+
+<miso:changelog item="${sample}"/>
 <div id="dialog"></div>
 </div>
 

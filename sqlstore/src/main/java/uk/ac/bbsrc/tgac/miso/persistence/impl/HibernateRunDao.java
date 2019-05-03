@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
@@ -18,7 +17,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,8 +39,6 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "description" };
   @Autowired
   private SessionFactory sessionFactory;
-  @Autowired
-  private JdbcTemplate template;
 
   @Override
   public Session currentSession() {
@@ -206,11 +202,6 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public Map<String, Integer> getRunColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(template, TABLE_NAME);
-  }
-
-  @Override
   public long countRuns() throws IOException {
     long c = (Long) currentSession().createCriteria(Run.class).setProjection(Projections.rowCount()).uniqueResult();
     return (int) c;
@@ -222,14 +213,6 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     criteria.add(DbUtils.searchRestrictions(querystr, false, "name", "alias", "description"));
     long c = (long) criteria.setProjection(Projections.rowCount()).uniqueResult();
     return (int) c;
-  }
-
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
-  }
-
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
   }
 
   public SessionFactory getSessionFactory() {

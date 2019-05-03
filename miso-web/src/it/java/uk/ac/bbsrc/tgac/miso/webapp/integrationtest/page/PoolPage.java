@@ -15,7 +15,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.NotesSection;
 public class PoolPage extends FormPage<PoolPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
-    ID(By.id("poolId"), FieldType.LABEL),
+    ID(By.id("id"), FieldType.LABEL),
     NAME(By.id("name"), FieldType.LABEL),
     ALIAS(By.id("alias"), FieldType.TEXT),
     BARCODE(By.id("identificationBarcode"), FieldType.TEXT),
@@ -23,10 +23,13 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     PLATFORM(By.id("platformType"), FieldType.DROPDOWN),
     CONCENTRATION(By.id("concentration"), FieldType.TEXT),
     CREATE_DATE(By.id("creationDate"), FieldType.TEXT),
-    QC_PASSED(By.name("qcPassed"), FieldType.RADIO),
+    QC_PASSED(By.id("qcPassed"), FieldType.DROPDOWN),
     VOLUME(By.id("volume"), FieldType.TEXT),
     DISCARDED(By.id("discarded"), FieldType.CHECKBOX),
-    LOCATION(By.id("location"), FieldType.LABEL),
+    DISTRIBUTED(By.id("distributed"), FieldType.CHECKBOX),
+    DISTRIBUTION_DATE(By.id("distributionDate"), FieldType.TEXT), //
+    DISTRIBUTION_RECIPIENT(By.id("distributionRecipient"), FieldType.TEXT),
+    LOCATION(By.id("boxPosition"), FieldType.LABEL),
     
     WARNINGS(By.className("big"), FieldType.LABEL);
 

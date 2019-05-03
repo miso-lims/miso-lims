@@ -71,9 +71,12 @@ ListTarget.run = {
     return [ListUtils.idHyperlinkColumn("Name", "run", "id", Utils.array.getName, 1, true),
         ListUtils.labelHyperlinkColumn("Alias", "run", Utils.array.getId, "alias", 0, true), {
           "sTitle": "Seq. Params.",
-          "mData": "parameters.name",
+          "mData": "sequencingParametersName",
           "include": true,
-          "bSortable": false
+          "bSortable": false,
+          "mRender": function(data, type, full) {
+            return data || "(None)";
+          }
         }, {
           "sTitle": "Status",
           "mData": "status",

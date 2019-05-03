@@ -149,11 +149,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
 
-  private boolean distributed;
-  @Temporal(TemporalType.DATE)
-  private Date distributionDate;
-  private String distributionRecipient;
-
   @Override
   public EntityType getEntityType() {
     return EntityType.SAMPLE;
@@ -561,36 +556,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setPendingAttachmentDeletions(List<FileAttachment> pendingAttachmentDeletions) {
     this.pendingAttachmentDeletions = pendingAttachmentDeletions;
-  }
-
-  @Override
-  public boolean isDistributed() {
-    return distributed;
-  }
-
-  @Override
-  public void setDistributed(boolean distributed) {
-    this.distributed = distributed;
-  }
-
-  @Override
-  public Date getDistributionDate() {
-    return distributionDate;
-  }
-
-  @Override
-  public void setDistributionDate(Date distributionDate) {
-    this.distributionDate = distributionDate;
-  }
-
-  @Override
-  public String getDistributionRecipient() {
-    return distributionRecipient;
-  }
-
-  @Override
-  public void setDistributionRecipient(String distributionRecipient) {
-    this.distributionRecipient = distributionRecipient;
   }
 
 }

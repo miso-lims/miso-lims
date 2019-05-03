@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
@@ -23,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -84,8 +81,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
 
   @Autowired
   private SessionFactory sessionFactory;
-  @Autowired
-  private JdbcTemplate template;
   @Autowired
   private BoxStore boxDao;
   @Value("${miso.detailed.sample.enabled:false}")
@@ -282,11 +277,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     return records;
   }
 
-  @Override
-  public Map<String, Integer> getLibraryColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(template, "Library");
-  }
-
   private final static List<String> STANDARD_ALIASES = Arrays.asList("sample", "lastModifier", "creator");
 
   @Override
@@ -366,11 +356,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
-  }
-
-  @CoverageIgnore
-  public void setTemplate(JdbcTemplate template) {
-    this.template = template;
   }
 
   public BoxStore getBoxDao() {

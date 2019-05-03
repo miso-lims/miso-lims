@@ -56,15 +56,19 @@ import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.IonTorrentRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
+import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
+import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -97,6 +101,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
@@ -186,6 +191,14 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.dto.run.IlluminaRunDto;
+import uk.ac.bbsrc.tgac.miso.dto.run.IonTorrentRunDto;
+import uk.ac.bbsrc.tgac.miso.dto.run.Ls454RunDto;
+import uk.ac.bbsrc.tgac.miso.dto.run.OxfordNanoporeRunDto;
+import uk.ac.bbsrc.tgac.miso.dto.run.PacBioRunDto;
+import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
+import uk.ac.bbsrc.tgac.miso.dto.run.RunPositionDto;
+import uk.ac.bbsrc.tgac.miso.dto.run.SolidRunDto;
 
 import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
@@ -1242,6 +1255,7 @@ public class Dtos {
       dto.setKitDescriptorId(from.getKitDescriptor().getId());
     }
     if (!from.getIndices().isEmpty()) {
+      dto.setIndexFamilyId(from.getIndices().get(0).getFamily().getId());
       dto.setIndexFamilyName(from.getIndices().get(0).getFamily().getName());
       for (Index index : from.getIndices()) {
         switch (index.getPosition()) {
@@ -1490,12 +1504,25 @@ public class Dtos {
     if (from.getTargetedSequencing() != null) {
       dto.setTargetedSequencingId(from.getTargetedSequencing().getId());
     }
+    dto.setLibraryId(libraryDto.getId());
     dto.setLibrary(libraryDto);
     if (from.getBox() != null) {
       dto.setBox(asDto(from.getBox(), includeBoxPositions));
       dto.setBoxPosition(from.getBoxPosition());
     }
     dto.setDiscarded(from.isDiscarded());
+    dto.setDistributed(from.isDistributed());
+    dto.setDistributionDate(formatDate(from.getDistributionDate()));
+    dto.setDistributionRecipient(from.getDistributionRecipient());
+    Sample sample = from.getLibrary().getSample();
+    if (isDetailedSample(sample)) {
+      DetailedSample detailed = (DetailedSample) sample;
+      dto.setIdentityConsentLevel(getIdentityConsentLevelString(detailed));
+      if (detailed.getSubproject() != null) {
+        dto.setSubprojectAlias(detailed.getSubproject().getAlias());
+        dto.setSubprojectPriority(detailed.getSubproject().getPriority());
+      }
+    }
     return dto;
   }
 
@@ -1505,13 +1532,20 @@ public class Dtos {
       libDto = asDto(from.getLibrary(), false);
     } else {
       Library lib = from.getLibrary();
-      libDto = new LibraryDto();
+      if (isDetailedLibrary(lib)) {
+        libDto = new DetailedLibraryDto();
+      } else {
+        libDto = new LibraryDto();
+      }
       libDto.setId(lib.getId());
       libDto.setName(lib.getName());
       libDto.setAlias(lib.getAlias());
       libDto.setIdentificationBarcode(lib.getIdentificationBarcode());
       if (lib.getPlatformType() != null) {
         libDto.setPlatformType(lib.getPlatformType().getKey());
+      }
+      if (lib.getKitDescriptor() != null) {
+        libDto.setKitDescriptorId(lib.getKitDescriptor().getId());
       }
     }
     return asDto(from, libDto, includeBoxPositions);
@@ -1521,7 +1555,7 @@ public class Dtos {
     DilutionDto dto = new DilutionDto();
     dto.setId(from.getDilutionId());
     dto.setName(from.getDilutionName());
-    dto.setDilutionUserName(from.getCreatorName());
+    dto.setDilutionUserName(from.getCreatorFullName());
     dto.setConcentration(from.getDilutionConcentration() == null ? null : from.getDilutionConcentration().toString());
     dto.setConcentrationUnits(from.getDilutionConcentrationUnits());
     dto.setLastModified(formatDateTime(from.getLastModified()));
@@ -1581,6 +1615,9 @@ public class Dtos {
     }
     to.setBoxPosition((DilutionBoxPosition) makeBoxablePosition(from, to));
     to.setDiscarded(from.isDiscarded());
+    to.setDistributed(from.isDistributed());
+    to.setDistributionDate(parseDate(from.getDistributionDate()));
+    to.setDistributionRecipient(from.getDistributionRecipient());
     return to;
   }
 
@@ -1636,6 +1673,9 @@ public class Dtos {
       dto.setBoxPosition(from.getBoxPosition());
     }
     dto.setDiscarded(from.isDiscarded());
+    dto.setDistributed(from.isDistributed());
+    dto.setDistributionDate(formatDate(from.getDistributionDate()));
+    dto.setDistributionRecipient(from.getDistributionRecipient());
     dto.setHasLowQualityLibraries(from.getHasLowQualityMembers());
     dto.setPrioritySubprojectAliases(from.getPrioritySubprojectAliases());
 
@@ -1648,18 +1688,26 @@ public class Dtos {
 
   public static RunDto asDto(@Nonnull Run from, boolean includeContainers, boolean includeContainerPartitions,
       boolean includePoolContents) {
-    RunDto dto = new RunDto();
-    dto.setId(from.getId());
-    dto.setName(from.getName());
-    dto.setAlias(from.getAlias());
+    RunDto dto = getPlatformRunDto(from);
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setName, from.getName());
+    setString(dto::setAlias, from.getAlias());
+    setString(dto::setDescription, from.getDescription());
     if (from.getHealth() != null) {
       dto.setStatus(from.getHealth().getKey());
     } else {
       dto.setStatus("");
     }
     dto.setLastModified(formatDateTime(from.getLastModified()));
+    setString(dto::setAccession, from.getAccession());
     if (from.getSequencer() != null) {
       dto.setPlatformType(from.getSequencer().getInstrumentModel().getPlatformType().getKey());
+      dto.setInstrumentId(from.getSequencer().getId());
+      dto.setInstrumentName(from.getSequencer().getName());
+      if (from.getSequencer().getInstrumentModel() != null) {
+        dto.setInstrumentModelId(from.getSequencer().getInstrumentModel().getId());
+        dto.setInstrumentModelAlias(from.getSequencer().getInstrumentModel().getAlias());
+      }
     } else {
       dto.setPlatformType("");
     }
@@ -1672,14 +1720,11 @@ public class Dtos {
       dto.setEndDate(formatDate(from.getCompletionDate()));
     }
     if (from.getSequencingParameters() != null) {
-      dto.setParameters(asDto(from.getSequencingParameters()));
-    } else {
-      SequencingParametersDto parametersDto = new SequencingParametersDto();
-      parametersDto.setId(-1L);
-      parametersDto.setName("(None)");
-      dto.setParameters(parametersDto);
+      dto.setSequencingParametersId(from.getSequencingParameters().getId());
+      dto.setSequencingParametersName(from.getSequencingParameters().getName());
     }
     dto.setProgress(from.getProgress());
+    dto.setRunPath(from.getFilePath());
 
     if (includeContainers) {
       dto.setContainers(asContainerDtos(from.getSequencerPartitionContainers(), includeContainerPartitions, includePoolContents));
@@ -1688,8 +1733,100 @@ public class Dtos {
     return dto;
   }
 
+  private static RunDto getPlatformRunDto(@Nonnull Run from) {
+    if (from instanceof IlluminaRun) {
+      IlluminaRunDto dto = new IlluminaRunDto();
+      IlluminaRun illuminaRun = (IlluminaRun) from;
+      setString(dto::setWorkflowType, maybeGetProperty(illuminaRun.getWorkflowType(), IlluminaWorkflowType::getRawValue));
+      dto.setNumCycles(illuminaRun.getNumCycles());
+      dto.setCalledCycles(illuminaRun.getCallCycle());
+      dto.setImagedCycles(illuminaRun.getImgCycle());
+      dto.setScoredCycles(illuminaRun.getScoreCycle());
+      dto.setPairedEnd(illuminaRun.getPairedEnd());
+      setString(dto::setBasesMask, illuminaRun.getRunBasesMask());
+      return dto;
+    } else if (from instanceof IonTorrentRun) {
+      return new IonTorrentRunDto();
+    } else if (from instanceof LS454Run) {
+      Ls454RunDto dto = new Ls454RunDto();
+      LS454Run ls454Run = (LS454Run) from;
+      dto.setCycles(ls454Run.getCycles());
+      dto.setPairedEnd(ls454Run.getPairedEnd());
+      return dto;
+    } else if (from instanceof SolidRun) {
+      SolidRunDto dto = new SolidRunDto();
+      SolidRun solidRun = (SolidRun) from;
+      dto.setPairedEnd(solidRun.getPairedEnd());
+      return dto;
+    } else if (from instanceof OxfordNanoporeRun) {
+      OxfordNanoporeRunDto dto = new OxfordNanoporeRunDto();
+      OxfordNanoporeRun ontRun = (OxfordNanoporeRun) from;
+      setString(dto::setMinKnowVersion, ontRun.getMinKnowVersion());
+      setString(dto::setProtocolVersion, ontRun.getProtocolVersion());
+      return dto;
+    } else if (from instanceof PacBioRun) {
+      return new PacBioRunDto();
+    } else {
+      throw new IllegalArgumentException("Unknown run type");
+    }
+  }
+
   public static List<RunDto> asRunDtos(Collection<Run> runSubset) {
     return runSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
+  }
+
+  public static Run to(@Nonnull RunDto dto) {
+    Run to = getPlatformRun(dto);
+    setLong(to::setId, dto.getId(), false);
+    setString(to::setName, dto.getName());
+    setString(to::setAlias, dto.getAlias());
+    setString(to::setDescription, dto.getDescription());
+    setObject(to::setHealth, dto.getStatus(), status -> HealthType.get(status));
+    setString(to::setAccession, dto.getAccession());
+    setObject(to::setSequencer, InstrumentImpl::new, dto.getInstrumentId());
+    setDate(to::setStartDate, dto.getStartDate());
+    setDate(to::setCompletionDate, dto.getEndDate());
+    setObject(to::setSequencingParameters, SequencingParameters::new, dto.getSequencingParametersId());
+    setString(to::setFilePath, dto.getRunPath());
+    return to;
+  }
+
+  private static Run getPlatformRun(RunDto from) {
+    if (from instanceof IlluminaRunDto) {
+      IlluminaRun run = new IlluminaRun();
+      IlluminaRunDto illuminaDto = (IlluminaRunDto) from;
+      setObject(run::setWorkflowType, illuminaDto.getWorkflowType(), wf -> IlluminaWorkflowType.get(wf));
+      run.setNumCycles(illuminaDto.getNumCycles());
+      run.setCallCycle(illuminaDto.getCalledCycles());
+      run.setImgCycle(illuminaDto.getImagedCycles());
+      run.setScoreCycle(illuminaDto.getScoredCycles());
+      run.setPairedEnd(illuminaDto.getPairedEnd());
+      setString(run::setRunBasesMask, illuminaDto.getBasesMask());
+      return run;
+    } else if (from instanceof IonTorrentRunDto) {
+      return new IonTorrentRun();
+    } else if (from instanceof Ls454RunDto) {
+      LS454Run run = new LS454Run();
+      Ls454RunDto ls454Dto = (Ls454RunDto) from;
+      run.setCycles(ls454Dto.getCycles());
+      run.setPairedEnd(ls454Dto.getPairedEnd());
+      return run;
+    } else if (from instanceof SolidRunDto) {
+      SolidRun run = new SolidRun();
+      SolidRunDto solidDto = (SolidRunDto) from;
+      run.setPairedEnd(solidDto.getPairedEnd());
+      return run;
+    } else if (from instanceof OxfordNanoporeRunDto) {
+      OxfordNanoporeRun run = new OxfordNanoporeRun();
+      OxfordNanoporeRunDto ontDto = (OxfordNanoporeRunDto) from;
+      setString(run::setMinKnowVersion, ontDto.getMinKnowVersion());
+      setString(run::setProtocolVersion, ontDto.getProtocolVersion());
+      return run;
+    } else if (from instanceof PacBioRunDto) {
+      return new PacBioRun();
+    } else {
+      throw new IllegalArgumentException("Unknown run type");
+    }
   }
 
   public static ContainerDto asDto(@Nonnull SequencerPartitionContainer from) {
@@ -2064,23 +2201,28 @@ public class Dtos {
     to.setDescription(dto.getDescription());
     to.setIdentificationBarcode(dto.getIdentificationBarcode());
     to.setDiscarded(dto.isDiscarded());
+    to.setDistributed(dto.isDistributed());
+    to.setDistributionDate(parseDate(dto.getDistributionDate()));
+    to.setDistributionRecipient(dto.getDistributionRecipient());
     if (dto.getVolume() != null) {
       to.setVolume(Double.valueOf(dto.getVolume()));
     }
     to.setVolumeUnits(dto.getVolumeUnits());
     to.setPlatformType(PlatformType.valueOf(dto.getPlatformType()));
-    to.setPoolDilutions(dto.getPooledElements().stream().map(dilution -> {
-      PoolableElementView view = new PoolableElementView();
-      view.setDilutionId(dilution.getId());
-      view.setDilutionName(dilution.getName());
-      view.setDilutionVolumeUsed(dilution.getVolumeUsed() == null ? null : Double.valueOf(dilution.getVolumeUsed()));
-
-      PoolDilution link = new PoolDilution(to, view);
-      if (dilution.getProportion() != null) {
-        link.setProportion(dilution.getProportion());
-      }
-      return link;
-    }).collect(Collectors.toSet()));
+    if (dto.getPooledElements() != null) {
+      to.setPoolDilutions(dto.getPooledElements().stream().map(dilution -> {
+        PoolableElementView view = new PoolableElementView();
+        view.setDilutionId(dilution.getId());
+        view.setDilutionName(dilution.getName());
+        view.setDilutionVolumeUsed(dilution.getVolumeUsed() == null ? null : Double.valueOf(dilution.getVolumeUsed()));
+  
+        PoolDilution link = new PoolDilution(to, view);
+        if (dilution.getProportion() != null) {
+          link.setProportion(dilution.getProportion());
+        }
+        return link;
+      }).collect(Collectors.toSet()));
+    }
     to.setQcPassed(dto.getQcPassed());
     to.setBoxPosition((PoolBoxPosition) makeBoxablePosition(dto, to));
     return to;
@@ -2338,7 +2480,8 @@ public class Dtos {
       RunPartition rpTo = new RunPartition();
       rpTo.setExperiment(to);
       rpTo.setPartition(to(rpDto.getPartition()));
-      rpTo.setRun(to(rpDto.getRun()));
+      rpTo.setRun(PlatformType.get(rpDto.getRun().getPlatformType()).createRun());
+      rpTo.getRun().setId(rpDto.getRun().getId());
       return rpTo;
     }).collect(Collectors.toList()));
     to.setStudy(to(dto.getStudy()));
@@ -2348,12 +2491,6 @@ public class Dtos {
 
   public static Study to(@Nonnull StudyDto dto) {
     Study to = new StudyImpl();
-    to.setId(dto.getId());
-    return to;
-  }
-
-  public static Run to(@Nonnull RunDto dto) {
-    Run to = PlatformType.get(dto.getPlatformType()).createRun();
     to.setId(dto.getId());
     return to;
   }
@@ -2771,13 +2908,38 @@ public class Dtos {
   public static ServiceRecordDto asDto(@Nonnull ServiceRecord from) {
     ServiceRecordDto dto = new ServiceRecordDto();
     setId(dto::setId, from);
+    setId(dto::setInstrumentId, from.getInstrument());
+    setString(dto::setInstrumentName, maybeGetProperty(from.getInstrument(), Instrument::getName));
     setDateString(dto::setServiceDate, from.getServiceDate());
     setString(dto::setTitle, from.getTitle());
     setString(dto::setDetails, from.getDetails());
     setString(dto::setReferenceNumber, from.getReferenceNumber());
+    setId(dto::setPositionId, from.getPosition());
     setString(dto::setPosition, maybeGetProperty(from.getPosition(), InstrumentPosition::getAlias));
-    dto.setAttachments(from.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    setString(dto::setServicedBy, from.getServicedByName());
+    setBoolean(dto::setOutOfService, from.isOutOfService(), true);
+    setDateTimeString(dto::setStartTime, from.getStartTime());
+    setDateTimeString(dto::setEndTime, from.getEndTime());
+    if (from.getAttachments() != null) {
+      dto.setAttachments(from.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    }
     return dto;
+  }
+
+  public static ServiceRecord to(@Nonnull ServiceRecordDto dto) {
+    ServiceRecord to = new ServiceRecord();
+    setLong(to::setId, dto.getId(), false);
+    setObject(to::setInstrument, InstrumentImpl::new, dto.getInstrumentId());
+    setDate(to::setServiceDate, dto.getServiceDate());
+    setString(to::setTitle, dto.getTitle());
+    setString(to::setDetails, dto.getDetails());
+    setString(to::setReferenceNumber, dto.getReferenceNumber());
+    setObject(to::setPosition, InstrumentPosition::new, dto.getPositionId());
+    setString(to::setServicedByName, dto.getServicedBy());
+    setBoolean(to::setOutOfService, dto.getOutOfService(), false);
+    setDateTime(to::setStartTime, dto.getStartTime());
+    setDateTime(to::setEndTime, dto.getEndTime());
+    return to;
   }
 
   public static VolumeUnitDto asDto(VolumeUnit from) {
@@ -2937,6 +3099,14 @@ public class Dtos {
     setter.accept(isStringEmptyOrNull(value) ? null : new BigDecimal(value));
   }
 
+  private static void setBoolean(@Nonnull Consumer<Boolean> setter, Boolean value, boolean nullOk) {
+    if (value != null || nullOk) {
+      setter.accept(value);
+    } else {
+      setter.accept(false);
+    }
+  }
+
   private static void setString(@Nonnull Consumer<String> setter, BigDecimal value) {
     setter.accept(toNiceString(value));
   }
@@ -2955,6 +3125,10 @@ public class Dtos {
 
   private static void setDateTimeString(@Nonnull Consumer<String> setter, Date value) {
     setter.accept(value == null ? null : formatDateTime(value));
+  }
+
+  private static void setDateTime(@Nonnull Consumer<Date> setter, String value) {
+    setter.accept(value == null ? null : parseDateTime(value));
   }
 
   private static void setLong(@Nonnull Consumer<Long> setter, Long value, boolean nullOk) {

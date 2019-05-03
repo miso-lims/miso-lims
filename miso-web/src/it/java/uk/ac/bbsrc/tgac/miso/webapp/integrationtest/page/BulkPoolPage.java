@@ -26,6 +26,9 @@ public class BulkPoolPage extends HeaderFooterPage {
     public static final String BOX_ALIAS = "Box Alias";
     public static final String BOX_POSITION = "Position";
     public static final String DISCARDED = "Discarded";
+    public static final String DISTRIBUTED = "Distributed";
+    public static final String DISTRIBUTION_DATE = "Distribution Date";
+    public static final String DISTRIBUTION_RECIPIENT = "Distribution Recipient";
     public static final String CREATE_DATE = "Creation Date";
     public static final String CONCENTRATION = "Concentration";
     public static final String CONCENTRATION_UNITS = "Conc. Units";

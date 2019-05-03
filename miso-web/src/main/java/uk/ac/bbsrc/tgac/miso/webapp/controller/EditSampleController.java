@@ -82,7 +82,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
@@ -94,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
+import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
@@ -192,6 +192,7 @@ public class EditSampleController {
   }
 
   private static class Config {
+    private static final String PAGE_MODE = "pageMode";
     private static final String CREATE = "create";
     private static final String PROPAGATE = "propagate";
     private static final String EDIT = "edit";
@@ -506,8 +507,7 @@ public class EditSampleController {
       } else {
         config.put(Config.DNASE_TREATABLE, false);
       }
-      config.put(Config.PROPAGATE, false);
-      config.put(Config.EDIT, true);
+      config.put(Config.PAGE_MODE, Config.EDIT);
     }
   }
 
@@ -555,8 +555,7 @@ public class EditSampleController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      config.put(Config.PROPAGATE, true);
-      config.put(Config.EDIT, false);
+      config.put(Config.PAGE_MODE, Config.PROPAGATE);
       config.put(Config.DNASE_TREATABLE, targetSampleClass.getDNAseTreatable());
       config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(targetSampleClass));
       config.putPOJO(Config.SOURCE_SAMPLE_CLASS, Dtos.asDto(sourceSampleClass));
@@ -587,7 +586,7 @@ public class EditSampleController {
       } else {
         config.put(Config.DNASE_TREATABLE, false);
       }
-      config.put(Config.CREATE, true);
+      config.put(Config.PAGE_MODE, Config.CREATE);
       config.put(Config.HAS_PROJECT, project != null);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_ID, defaultLcmTubeGroupId);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_DESC, defaultLcmTubeGroupDesc);

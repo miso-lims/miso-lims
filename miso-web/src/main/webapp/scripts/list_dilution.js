@@ -83,11 +83,14 @@ ListTarget.dilution = {
   createColumns: function(config, projectId) {
     return [{
       "sTitle": "Name",
-      "mData": "id",
+      "mData": "id", // for sorting purposes (numerical order instead of string)
       "include": true,
       "iSortPriority": 1,
       "mRender": function(data, type, full) {
-        return "<a href=\"/miso/library/" + full.library.id + "\">" + full.name + "</a>";
+        if (type === 'display') {
+          return "<a href=\"/miso/dilution/" + data + "\">" + full.name + "</a>";
+        }
+        return data;
       }
     }, {
       "sTitle": "Warnings",
@@ -174,6 +177,6 @@ ListTarget.dilution = {
   },
   searchTermSelector: function(searchTerms) {
     return [searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'],
-        searchTerms['index_name'], searchTerms['index_seq'], searchTerms['institute'], searchTerms['external'], searchTerms['box']]
+        searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box']]
   }
 };

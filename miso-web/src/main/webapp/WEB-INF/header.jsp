@@ -106,62 +106,25 @@
 
 <body>
 <div id="pageHeader">
-  <table class="full-width no-border">
-    <tr>
-      <td class="headertable" align="left">
-        <a href='<c:url value='/'/>'>
-          <img src="<c:url value='/styles/images/miso_logo.png'/>" alt="MISO Logo" name="logo" border="0" id="misologo"/>
-        </a>
-      </td>
-      <td class="headertable" align="right">
-        <span id="instanceName">${misoInstanceName}</span>
-      </td>
-    </tr>
-  </table>
-
-  <div id="navtabs">
-    <ul>
-
-      <sec:authorize access="isAuthenticated()">
-        <li><a href="<c:url value="/miso/mainMenu"/>"><span>Home</span></a></li>
-      </sec:authorize>
-
-      <%--<sec:authorize access="hasRole('ROLE_ADMIN')">--%>
-      <%--<li><a href="<c:url value="/miso/admin/menu"/>"><span>Admin</span></a></li>--%>
-      <%--</sec:authorize>--%>
-
-      <%--<sec:authorize access="hasRole('ROLE_TECH')">--%>
-      <%--<li><a href="<c:url value="/miso/tech/menu"/>"><span>Tech</span></a></li>--%>
-      <%--</sec:authorize>--%>
-
-      <sec:authorize access="isAuthenticated()">
-        <li>
-          <a id="myAccountLink" href="<c:url value="/miso/myAccount"/>"><span id="myAccountSpan">My Account</span></a>
-        </li>
-      </sec:authorize>
-      <sec:authorize access="isAuthenticated()">
-        <li><a href="<c:url value="/miso/projects"/>"><span>My Projects</span></a></li>
-      </sec:authorize>
-
-      <sec:authorize access="isAuthenticated()">
-        <li>
-          <a href="<c:url value="http://miso-lims.github.io/miso-lims/usr/user-manual-table-of-contents.html"/>"><span>Help</span></a>
-        </li>
-      </sec:authorize>
-
-    </ul>
-  </div>
-
-  <sec:authorize access="isAuthenticated()">
-    <div id="loggedInBanner" style="display:inline-block">
-      <c:if test="${misoBugUrl != null}">
-        <a href="${misoBugUrl}" target="_blank">Report a problem</a> |
-      </c:if>
-      Logged in as:
-      <b id="currentUser"><sec:authentication property="principal.username"/></b>
-      | <a href="<c:url value="/logout"/>">Logout</a>
+  <div class="cell">
+    <div id="logoContainer">
+      <a href='<c:url value='/'/>'><img src="<c:url value='/styles/images/miso_logo.png'/>" alt="MISO Logo" name="logo" border="0" id="misologo"/></a>
     </div>
-  </sec:authorize>
+    <c:if test="${not empty misoInstanceName}"><span id="instanceName">${misoInstanceName}</span></c:if>
+  </div>
+  <div class="cell">
+    <sec:authorize access="isAuthenticated()">
+      <div id="loggedInBanner">
+        <a href="http://miso-lims.github.io/miso-lims/usr/user-manual-table-of-contents.html">Help</a> |
+        <c:if test="${misoBugUrl != null}">
+          <a href="${misoBugUrl}" target="_blank">Report a problem</a> |
+        </c:if>
+        Logged in as:
+        <a href="/miso/myAccount"><b id="currentUser"><sec:authentication property="principal.username"/></b></a>
+        | <a href="<c:url value="/logout"/>">Logout</a>
+      </div>
+    </sec:authorize>
+  </div>
 </div>
 
 <div id="content">

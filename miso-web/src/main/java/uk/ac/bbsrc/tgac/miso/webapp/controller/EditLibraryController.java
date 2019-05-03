@@ -25,12 +25,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
-import java.beans.PropertyEditorSupport;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,8 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,9 +46,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,39 +58,27 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
-import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
@@ -120,10 +101,6 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
-import uk.ac.bbsrc.tgac.miso.service.KitService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryTemplateService;
@@ -133,7 +110,6 @@ import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkMergeTableBackend;
@@ -169,6 +145,8 @@ public class EditLibraryController {
     private static final String SORTABLE_LOCATION = "sortableLocation";
     private static final String IS_LIBRARY_RECEIPT = "isLibraryReceipt";
     private static final String DEFAULT_SCI_NAME = "defaultSciName";
+    private static final String PAGE_MODE = "pageMode";
+    private static final String CREATE = "create";
     private static final String PROPAGATE = "propagate";
     private static final String EDIT = "edit";
     private static final String SHOW_LIBRARY_ALIAS = "showLibraryAlias";
@@ -180,27 +158,17 @@ public class EditLibraryController {
   }
 
   @Autowired
-  private AuthorizationManager authorizationManager;
-  @Autowired
   private IndexService indexService;
   @Autowired
   private LibraryService libraryService;
-  @Autowired
-  private LibraryDesignService libraryDesignService;
-  @Autowired
-  private LibraryDesignCodeService libraryDesignCodeService;
   @Autowired
   private SampleService sampleService;
   @Autowired
   private ChangeLogService changeLogService;
   @Autowired
-  private KitService kitService;
-  @Autowired
   private NamingScheme namingScheme;
   @Autowired
   private RunService runService;
-  @Autowired
-  private InstrumentModelService platformService;
   @Autowired
   private PoolService poolService;
   @Autowired
@@ -234,16 +202,8 @@ public class EditLibraryController {
     this.libraryService = libraryService;
   }
 
-  public void setLibraryDesignService(LibraryDesignService libraryDesignService) {
-    this.libraryDesignService = libraryDesignService;
-  }
-
   public void setSampleService(SampleService sampleService) {
     this.sampleService = sampleService;
-  }
-
-  public void setKitService(KitService kitService) {
-    this.kitService = kitService;
   }
 
   public void setRunService(RunService runService) {
@@ -268,11 +228,6 @@ public class EditLibraryController {
     return autoGenerateIdBarcodes;
   }
 
-  @ModelAttribute("aliasGenerationEnabled")
-  public Boolean isAliasGenerationEnabled() {
-    return namingScheme != null && namingScheme.hasLibraryAliasGenerator();
-  }
-
   public Boolean isDetailedSampleEnabled() {
     return detailedSample;
   }
@@ -284,148 +239,6 @@ public class EditLibraryController {
     model.put("previousLibrary", libraryService.getAdjacentLibrary(l.getId(), true));
     model.put("nextLibrary", libraryService.getAdjacentLibrary(l.getId(), false));
 
-  }
-
-  public Collection<LibraryType> populateLibraryTypesByPlatform(String platform) throws IOException {
-    List<LibraryType> types = new ArrayList<>();
-    for (LibraryType type : libraryService.listLibraryTypesByPlatform(PlatformType.get(platform))) {
-      if (!type.getArchived()) {
-        types.add(type);
-      }
-    }
-    Collections.sort(types);
-    return types;
-  }
-
-  public Collection<LibraryType> populateLibraryTypes() throws IOException {
-    List<LibraryType> types = new ArrayList<>(libraryService.listLibraryTypes());
-    Collections.sort(types);
-    return types;
-  }
-
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> maxLengths() throws IOException {
-    return libraryService.getLibraryColumnSizes();
-  }
-
-  private List<String> populatePlatformTypes() throws IOException {
-    return populatePlatformTypes(Lists.newArrayList());
-  }
-
-  private List<String> populatePlatformTypes(Library library) throws IOException {
-    if (library.getPlatformType() == null) {
-      return populatePlatformTypes();
-    } else {
-      return populatePlatformTypes(Lists.newArrayList(library.getPlatformType().getKey()));
-    }
-  }
-
-  private List<String> populatePlatformTypes(Collection<String> current) throws IOException {
-    Collection<PlatformType> base = platformService.listActivePlatformTypes();
-    if (base.isEmpty()) {
-      base = Arrays.asList(PlatformType.values());
-    }
-    List<String> types = new ArrayList<>(PlatformType.platformTypeNames(base));
-    for (String s : current) {
-      if (s != null && !types.contains(s)) {
-        types.add(s);
-      }
-    }
-    Collections.sort(types);
-    return types;
-  }
-
-  @ModelAttribute("librarySelectionTypes")
-  public Collection<LibrarySelectionType> populateLibrarySelectionTypes() throws IOException {
-    List<LibrarySelectionType> types = new ArrayList<>(libraryService.listLibrarySelectionTypes());
-    Collections.sort(types);
-    return types;
-  }
-
-  @ModelAttribute("libraryStrategyTypes")
-  public Collection<LibraryStrategyType> populateLibraryStrategyTypes() throws IOException {
-    List<LibraryStrategyType> types = new ArrayList<>(libraryService.listLibraryStrategyTypes());
-    Collections.sort(types);
-    return types;
-  }
-
-  public void populateAvailableIndexFamilies(Library library, ModelMap model) throws IOException {
-    if (library.getPlatformType() == null || isStringEmptyOrNull(library.getPlatformType().getKey())) {
-      model.put("indexFamilies", Collections.singleton(INDEX_FAMILY_NEEDS_PLATFORM));
-    } else {
-      List<IndexFamily> visibleFamilies = new ArrayList<>();
-      visibleFamilies.add(IndexFamily.NULL);
-      visibleFamilies.addAll(indexService.getIndexFamiliesByPlatform(library.getPlatformType()).stream()
-          .filter(family -> !family.getArchived() || (library.getIndices() != null && !library.getIndices().isEmpty()
-              && library.getIndices().get(0).getFamily().getId().equals(family.getId())))
-          .collect(Collectors.toList()));
-      model.put("indexFamilies", visibleFamilies);
-    }
-  }
-
-  @ModelAttribute("prepKits")
-  public List<KitDescriptor> getPrepKits() throws IOException {
-    List<KitDescriptor> list = new ArrayList<>(kitService.listKitDescriptorsByType(KitType.LIBRARY));
-    Collections.sort(list, KitDescriptor::sortByName);
-    return list;
-  }
-
-  private void populateDesigns(ModelMap model, SampleClass sampleClass) throws IOException {
-    model.put("libraryDesigns", libraryDesignService.listByClass(sampleClass));
-  }
-
-  private void populateDesignCodes(ModelMap model) throws IOException {
-    model.put("libraryDesignCodes", libraryDesignCodeService.list());
-  }
-
-  /**
-   * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects
-   * 
-   * @param binder
-   */
-  @InitBinder
-  public void includeForeignKeys(WebDataBinder binder) {
-    binder.registerCustomEditor(KitDescriptor.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        if (isStringEmptyOrNull(text)) {
-          setValue(null);
-        } else {
-          KitDescriptor to = new KitDescriptor();
-          to.setId(Long.valueOf(text));
-          setValue(to);
-        }
-      }
-    });
-    binder.registerCustomEditor(Long.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        setValue(isStringEmptyOrNull(text) ? null : Long.valueOf(text));
-      }
-    });
-    binder.registerCustomEditor(LibrarySpikeIn.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) {
-        if (isStringEmptyOrNull(text)) {
-          setValue(null);
-        } else {
-          LibrarySpikeIn to = new LibrarySpikeIn();
-          to.setId(Long.valueOf(text));
-          setValue(to);
-        }
-      }
-    });
-    binder.registerCustomEditor(BigDecimal.class, new PropertyEditorSupport() {
-      @Override
-      public String getAsText() {
-        return toNiceString((BigDecimal) getValue());
-      }
-
-      @Override
-      public void setAsText(String text) {
-        setValue(isStringEmptyOrNull(text) ? null : new BigDecimal(text));
-      }
-    });
   }
 
   /* HOT */
@@ -448,46 +261,6 @@ public class EditLibraryController {
     return rtn;
   }
 
-  /**
-   * Each PlatformName holds a null IndexFamily.
-   *
-   * Structure of this indices object:
-   * 
-   * <pre>
-   *  {
-   *    PlatformName : {
-   *      IndexFamilyName: {
-   *        1: [ { id: ##, name: AAAA, sequence: XXXXX }, ... ],
-   *        ... },
-   *      ... },
-   *  ... }
-   * </pre>
-   * 
-   * @return indices object
-   */
-  @ModelAttribute("indices")
-  public JSONObject indicesString() {
-    final JSONObject io = new JSONObject();
-    try {
-      for (String pfName : platformService.listDistinctPlatformTypeNames()) {
-        JSONObject pf = new JSONObject();
-        io.put(pfName, pf);
-        io.getJSONObject(pfName).put("No Index", nullIndexFamily());
-      }
-      for (IndexFamily ifam : indexService.getIndexFamilies()) {
-        JSONObject ifamo = new JSONObject();
-        for (int i = 1; i <= ifam.getMaximumNumber(); i++) {
-          ifamo.put(Integer.toString(i), indicesForPosition(ifam, i));
-        }
-        String platformKey = ifam.getPlatformType().getKey();
-        io.getJSONObject(platformKey).put(ifam.getName(), ifamo);
-      }
-    } catch (IOException e) {
-      log.error("Failed to retrieve all platform names: " + e);
-    }
-    return io;
-  }
-
   public List<JSONObject> indicesForPosition(IndexFamily ifam, int position) {
     final List<JSONObject> rtnList = new ArrayList<>();
     for (final Index index : ifam.getIndicesForPosition(position)) {
@@ -499,18 +272,6 @@ public class EditLibraryController {
       rtnList.add(obj);
     }
     return rtnList;
-  }
-
-  public JSONObject nullIndexFamily() {
-    final JSONObject nullIndexFam = new JSONObject();
-    final JSONArray nullIndices = new JSONArray();
-    final JSONObject nullIndex = new JSONObject();
-    nullIndex.put("id", IndexFamily.NULL.getId());
-    nullIndex.put("name", IndexFamily.NULL.getName());
-    nullIndex.put("sequence", "");
-    nullIndices.add(nullIndex);
-    nullIndexFam.put("1", nullIndices);
-    return nullIndexFam;
   }
 
   /* HOT */
@@ -533,53 +294,13 @@ public class EditLibraryController {
     return changeLogService.listAll("Library");
   }
 
-  @GetMapping(value = "/new/{sampleId}")
-  public ModelAndView newAssignedLibrary(@PathVariable Long sampleId, ModelMap model) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    Sample sample = sampleService.get(sampleId);
-    Library library = (isDetailedSampleEnabled() ? new DetailedLibraryImpl() : new LibraryImpl());
-    library.setSample(sample);
-
-    String regex = "([A-z0-9]+)_S([A-z0-9]+)_(.*)";
-    Pattern pat = Pattern.compile(regex);
-    Matcher mat = pat.matcher(sample.getAlias());
-    if (mat.matches()) {
-      // convert the sample alias automatically to a library alias
-      int numLibs = libraryService.listBySampleId(sample.getId()).size();
-      String autogenLibAlias = mat.group(1) + "_" + "L" + mat.group(2) + "-" + (numLibs + 1) + "_" + mat.group(3);
-      model.put("autogeneratedLibraryAlias", autogenLibAlias);
-    }
-
-    model.put("title", "Library from Sample " + sample.getId());
-    return setupForm(user, library, model);
-  }
-
   @GetMapping(value = "/{libraryId}")
   public ModelAndView setupForm(@PathVariable Long libraryId, ModelMap model) throws IOException {
-    User user = authorizationManager.getCurrentUser();
     Library library = libraryService.get(libraryId);
     if (library == null) throw new NotFoundException("No library found for ID " + libraryId.toString());
     model.put("title", "Library " + library.getId());
-    return setupForm(user, library, model);
-  }
 
-  @GetMapping(value = "/dilution/{dilutionId}")
-  public ModelAndView setupFormByDilution(@PathVariable Long dilutionId, ModelMap model) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    LibraryDilution dilution = dilutionService.get(dilutionId);
-    model.put("title", "Library " + dilution.getLibrary().getId());
-    return setupForm(user, dilution.getLibrary(), model);
-  }
-
-  private ModelAndView setupForm(User user, Library library, ModelMap model) throws IOException {
-
-    if (library == null) throw new NotFoundException("No library found");
-
-    model.put("formObj", library);
     model.put("library", library);
-
-    model.put("platformTypes", populatePlatformTypes(library));
-    populateAvailableIndexFamilies(library, model);
     addAdjacentLibraries(library, model);
 
     Collection<Pool> pools = poolService.listByLibraryId(library.getId());
@@ -594,35 +315,12 @@ public class EditLibraryController {
     model.put("libraryDilutionsConfig", mapper.writeValueAsString(config));
     model.put("experiments", experimentService.listAllByLibraryId(library.getId()).stream().map(Dtos::asDto)
         .collect(Collectors.toList()));
-    model.put("libraryDto", library.getId() == LibraryImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(library, false)));
-
-    model.put("volumeUnits", VolumeUnit.values());
-    model.put("concentrationUnits", ConcentrationUnit.values());
-    model.put("spikeIns", libraryService.listSpikeIns());
-    model.put("dilutionFactors", DilutionFactor.values());
-
-    populateDesigns(model,
-        LimsUtils.isDetailedSample(library.getSample()) ? ((DetailedSample) library.getSample()).getSampleClass() : null);
-    populateDesignCodes(model);
+    model.put("libraryDto", mapper.writeValueAsString(Dtos.asDto(library, false)));
 
     if (LimsUtils.isDetailedLibrary(library)) {
       DetailedLibrary detailed = (DetailedLibrary) library;
-      String effectiveGroupId = "";
-      String effectiveGroupIdSampleAlias = "";
-      if (!LimsUtils.isStringEmptyOrNull(detailed.getGroupId())) {
-        effectiveGroupId = detailed.getGroupId();
-        effectiveGroupIdSampleAlias = library.getAlias();
-      } else {
-        Optional<DetailedSample> effective = ((DetailedSample) detailed.getSample()).getEffectiveGroupIdSample();
-        if (effective.isPresent()) {
-          effectiveGroupId = effective.get().getGroupId();
-          effectiveGroupIdSampleAlias = effective.get().getAlias();
-        }
-      }
-      model.put("effectiveGroupId", effectiveGroupId);
-      model.put("effectiveGroupIdSample", effectiveGroupIdSampleAlias);
       SampleIdentity identity = getParent(SampleIdentity.class, (DetailedSample) detailed.getSample());
-      model.put("effectiveExternalName", identity.getExternalName());
+      model.put("effectiveExternalNames", identity.getExternalName());
     }
     return new ModelAndView("/WEB-INF/pages/editLibrary.jsp", model);
   }
@@ -643,7 +341,7 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.put(Config.SORTABLE_LOCATION, true);
-      config.put(Config.EDIT, true);
+      config.put(Config.PAGE_MODE, Config.EDIT);
       writeLibraryConfiguration(config);
     }
   };
@@ -741,7 +439,7 @@ public class EditLibraryController {
         config.put(Config.SORT, sort);
       }
       config.putPOJO(Config.BOX, newBox);
-      config.put(Config.PROPAGATE, true);
+      config.put(Config.PAGE_MODE, Config.PROPAGATE);
     }
 
     public ModelAndView propagate(String idString, String replicates, String sort, ModelMap model) throws IOException {
@@ -834,7 +532,7 @@ public class EditLibraryController {
         config.putPOJO("targetSampleClass", Dtos.asDto(aliquotClass));
         config.put("dnaseTreatable", aliquotClass.hasPathToDnaseTreatable(sampleValidRelationshipService.getAll()));
       }
-      config.put("create", true);
+      config.put(Config.PAGE_MODE, Config.CREATE);
       config.put("hasProject", project != null);
       Map<Long, List<LibraryTemplateDto>> templatesByProjectId = new HashMap<>();
       if (project == null) {
@@ -859,7 +557,7 @@ public class EditLibraryController {
       config.put(Config.SHOW_VOLUME, showVolume);
       config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
       config.put(Config.SORTABLE_LOCATION, false);
-      config.put(Config.PROPAGATE, false);
+      config.put(Config.PAGE_MODE, Config.CREATE);
       config.put(Config.IS_LIBRARY_RECEIPT, true);
       config.putPOJO(Config.BOX, newBox);
       config.putPOJO(Config.TEMPLATES, templatesByProjectId);
@@ -899,6 +597,7 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO(Config.BOX, newBox);
+      config.put(Config.PAGE_MODE, Config.PROPAGATE);
     }
   }
 
@@ -925,6 +624,7 @@ public class EditLibraryController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+      config.put(Config.PAGE_MODE, Config.EDIT);
     }
   };
 
@@ -1014,6 +714,7 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO(Config.BOX, newBox);
+      config.put(Config.PAGE_MODE, Config.PROPAGATE);
     }
   }
 
@@ -1072,6 +773,7 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO(Config.BOX, newBox);
+      config.put(Config.PAGE_MODE, Config.CREATE);
     }
   }
 
@@ -1110,6 +812,7 @@ public class EditLibraryController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.putPOJO("dilutionsToPool", dilutions);
       config.putPOJO(Config.BOX, newBox);
+      config.put(Config.PAGE_MODE, Config.CREATE);
     }
 
     public ModelAndView create(ModelMap model) throws IOException {

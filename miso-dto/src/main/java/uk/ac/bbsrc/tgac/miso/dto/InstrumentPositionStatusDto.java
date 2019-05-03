@@ -2,6 +2,8 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
+
 public class InstrumentPositionStatusDto {
 
   private String position;

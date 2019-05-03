@@ -47,7 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  */
 @Entity
 @Table(name = "InstrumentModel")
-public class InstrumentModel implements Comparable<InstrumentModel>, Serializable {
+public class InstrumentModel implements Comparable<InstrumentModel>, Identifiable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -78,11 +78,13 @@ public class InstrumentModel implements Comparable<InstrumentModel>, Serializabl
   @OneToMany(mappedBy = "instrumentModel")
   private Set<InstrumentPosition> positions;
 
-  public Long getId() {
+  @Override
+  public long getId() {
     return instrumentModelId;
   }
 
-  public void setId(Long instrumentModelId) {
+  @Override
+  public void setId(long instrumentModelId) {
     this.instrumentModelId = instrumentModelId;
   }
 
@@ -149,14 +151,14 @@ public class InstrumentModel implements Comparable<InstrumentModel>, Serializabl
     if (getId() == InstrumentModel.UNSAVED_ID || them.getId() == InstrumentModel.UNSAVED_ID) {
       return getPlatformType().equals(them.getPlatformType()) && getDescription().equals(them.getDescription());
     } else {
-      return getId().longValue() == them.getId().longValue();
+      return getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
     if (getId() != InstrumentModel.UNSAVED_ID) {
-      return getId().intValue();
+      return Long.valueOf(getId()).intValue();
     } else {
       final int PRIME = 37;
       int hashcode = -1;

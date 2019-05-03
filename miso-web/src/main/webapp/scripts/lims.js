@@ -606,7 +606,7 @@ var Utils = Utils
             ids: ids,
             copies: copies
           }, function(result) {
-            Utils.showOkDialog('Printing', [result == ids.length ? 'Printing successful.' : (result + ' of ' + ids.length + ' printed.')]);
+            Utils.showOkDialog('Printing', [result == ids.length ? 'Barcodes sent to printer.' : (result + ' of ' + ids.length + ' sent to printer.')]);
           });
         });
       },
@@ -1117,6 +1117,23 @@ Utils.sorting = {
 };
 
 Utils.notes = {
+  showNoteDialog: function(entityType, entityId) {
+    Utils.showDialog('Create New Note', 'Add Note', [{
+      label: 'Internal Only?',
+      property: 'internalOnly',
+      type: 'checkbox',
+      value: true
+    }, {
+      label: 'Text',
+      property: 'text',
+      type: 'textarea',
+      rows: 3,
+      required: true
+    }], function(results) {
+      Utils.notes.addNote(entityType, entityId, results.internalOnly, results.text);
+    });
+  },
+
   addNote: function(entityType, entityId, internalOnly, text) {
     Utils.ajaxWithDialog('Adding Note', 'POST', window.location.origin + '/miso/rest/note/' + entityType + '/' + entityId, {
       internalOnly: internalOnly == 'on',
@@ -1124,8 +1141,10 @@ Utils.notes = {
     }, Utils.page.pageReload);
   },
   deleteNote: function(entityType, entityId, noteId) {
-    Utils.ajaxWithDialog('Deleting Note', 'DELETE', window.location.origin + '/miso/rest/note/' + entityType + '/' + entityId + '/'
-        + noteId, null, Utils.page.pageReload);
+    Utils.showConfirmDialog('Delete Note', 'Delete', ['Are you sure you wish to delete this note?'], function() {
+      Utils.ajaxWithDialog('Deleting Note', 'DELETE', window.location.origin + '/miso/rest/note/' + entityType + '/' + entityId + '/'
+          + noteId, null, Utils.page.pageReload);
+    });
   },
 
 };

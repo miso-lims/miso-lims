@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -50,8 +49,6 @@ public interface SampleService extends PaginatedDataSource<Sample>, BarcodableSe
    * @throws IOException
    */
   Collection<String> listSampleTypes() throws IOException;
-
-  Map<String, Integer> getSampleColumnSizes() throws IOException;
 
   Sample save(Sample sample) throws IOException;
 

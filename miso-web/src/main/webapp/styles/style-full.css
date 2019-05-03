@@ -115,69 +115,38 @@ div.lowquality div {
 	color: #a93232;
 }
 
-#navtabs {
-    float: left;
-    width: 100%;
-    font-size: 93%;
-    line-height: normal;
+#pageHeader {
+	display: table;
+	width: 100%;
     border-bottom: thick double #666;
-    margin-bottom: 0em; /*margin between menu and rest of page*/
-    overflow: hidden;
 }
 
-#navtabs ul {
-    margin: 0;
-    padding: 10px 10px 0 0px;
-    list-style: none;
-
+#pageHeader .cell {
+    display: table-cell;
+    vertical-align: bottom;
 }
 
-#navtabs li {
-    display: inline;
-    margin: 0;
-    padding: 0;
+#pageHeader #logoContainer {
+    width: 192px;
+    padding-left: 10px;
+    float:left;
 }
 
-#navtabs a {
-    float: left;
-    background: url("images/left.png") no-repeat left top;
-    margin: 0;
-    padding: 0 0 0 6px;
-    text-decoration: none;
+#pageHeader #misologo {
+    height: 36px;
 }
 
-#navtabs a span {
-    float: left;
-    display: block;
-    background: url("images/right.png") no-repeat right top;
-    padding: 6px 15px 4px 6px;
-    margin-right: 2px;
-    color: #FFF;
-}
-
-/* Commented Backslash Hack hides rule from IE5-Mac \*/
-#navtabs a span {
-    float: none;
-}
-
-/* End IE5-Mac hack */
-#navtabs a:hover span {
-}
-
-#navtabs a:hover {
-    background-position: 0% -42px;
-}
-
-#navtabs a:hover span {
-    background-position: 100% -42px;
+#pageHeader #instanceName {
+    font: Helvetica;
+    color: #666666;
+    font-size: 36px;
+    padding-left: 10px;
 }
 
 #loggedInBanner {
     color: gray;
-    margin-top: -21px;
     padding-right: 2px;
     float: right;
-    text-align: right;
     font-size: 12px;
 }
 
@@ -1054,17 +1023,6 @@ div.flashinfo {
     margin-bottom: 12px;
     font-size: 1em;
     border: 2px solid;
-}
-
-td.headertable #instanceName {
-    font: Helvetica;
-    color: #666666;
-    display: inline;
-    font-size: 72px;
-}
-
-td.headertable {
-	vertical-align: middle;
 }
 
 .bubbleInfo {

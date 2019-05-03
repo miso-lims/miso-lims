@@ -54,7 +54,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -87,9 +86,9 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderCompletionDto;
-import uk.ac.bbsrc.tgac.miso.dto.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
+import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
@@ -109,7 +108,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
  */
 @Controller
 @RequestMapping("/rest/pool")
-@SessionAttributes("pool")
 public class PoolRestController extends RestController {
   public static class PoolChangeRequest {
     private List<Long> add;
@@ -182,10 +180,10 @@ public class PoolRestController extends RestController {
 
   @PostMapping(produces = "application/json")
   @ResponseBody
-  public PoolDto createPool(@RequestBody PoolDto pool, UriComponentsBuilder uriBuilder, HttpServletResponse response)
+  public PoolDto createPool(@RequestBody PoolDto pool)
       throws IOException {
     Pool poolobj = Dtos.to(pool);
-    if (poolobj.getVolume() == null && poolobj.getPoolDilutions().stream()
+    if (poolobj.getVolume() == null && !poolobj.getPoolDilutions().isEmpty() && poolobj.getPoolDilutions().stream()
         .map(PoolDilution::getPoolableElementView)
         .allMatch(view -> view.getDilutionVolumeUsed() != null)) {
       poolobj.setVolume(poolobj.getPoolDilutions().stream()

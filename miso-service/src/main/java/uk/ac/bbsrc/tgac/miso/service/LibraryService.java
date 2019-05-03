@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -52,8 +51,6 @@ public interface LibraryService
   List<Library> listBySampleId(long sampleId) throws IOException;
 
   List<Library> listByProjectId(long projectId) throws IOException;
-
-  Map<String, Integer> getLibraryColumnSizes() throws IOException;
 
   LibraryType getLibraryTypeById(long libraryTypeId) throws IOException;
 

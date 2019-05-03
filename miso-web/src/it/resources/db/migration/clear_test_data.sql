@@ -36,6 +36,7 @@ DELETE FROM ArrayChangeLog;
 DELETE FROM Array;
 DELETE FROM ArrayModel;
 DELETE FROM LibraryQC;
+DELETE FROM DilutionChangeLog;
 DELETE FROM LibraryDilution;
 DELETE FROM DetailedLibrary;
 DELETE FROM Library_Index;

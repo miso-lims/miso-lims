@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -51,7 +50,9 @@ public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
    * @throws IOException
    *           when
    */
-  Collection<Pool> listByLibraryId(long libraryId) throws IOException;
+  List<Pool> listByLibraryId(long libraryId) throws IOException;
+
+  List<Pool> listByDilutionId(long dilutionId) throws IOException;
 
   /**
    * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Project}
@@ -62,7 +63,7 @@ public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
    * @throws IOException
    *           when
    */
-  Collection<Pool> listByProjectId(long projectId) throws IOException;
+  List<Pool> listByProjectId(long projectId) throws IOException;
 
   /**
    * List all Pools that are for a given {@link PlatformType}
@@ -84,7 +85,7 @@ public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
    * @throws IOException
    *           when the objects cannot be retrieved
    */
-  Collection<Pool> getByBarcodeList(Collection<String> barcodeList) throws IOException;
+  List<Pool> getByBarcodeList(Collection<String> barcodeList) throws IOException;
 
   /**
    * List the Pool associated with a given identificationBarcode
@@ -97,13 +98,7 @@ public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
    */
   Pool getByBarcode(String barcode) throws IOException;
 
-  /**
-   * @return a map containing all column names and max lengths from the Pool table
-   * @throws IOException
-   */
-  public Map<String, Integer> getPoolColumnSizes() throws IOException;
-
-  Collection<Pool> listPoolsById(List<Long> poolIds);
+  List<Pool> listPoolsById(List<Long> poolIds);
 
   public long getPartitionCount(Pool pool);
 

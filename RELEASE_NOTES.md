@@ -1,3 +1,33 @@
+# Unreleased
+
+Changes:
+
+  * Changed Edit Run page to show validation messages instead of error page when saving fails
+  * Changed Edit Service Record page to show validation messages instead of error page when saving
+    fails
+  * Made dilutions and pools distributable
+  * Improved "Location" display in list tables
+  * Fixed Pinery-MISO failing to reverse compliment indices when appropriate if the container model
+    is not accurately detected
+
+# 0.2.175
+
+Changes:
+ 
+  * Redesigned page header to minimize wasted space. Tabs have been removed and the links relocated:
+    * Home: MISO logo
+    * My Account: Username link near the top right of the screen
+    * My Projects: "Projects" link under Preparation in the navigation menu
+    * Help: "Help" link near the top right of the screen
+  * Added single Edit Dilution page with dilution changelogs
+  * Changed Edit Library and Edit Pool pages to show validation messages instead of error page 
+    when saving fails
+  * Fixed missing Notes section on Edit Sample page
+  * Fixed searching dilutions by creator
+  * Fixed export function on bulk tables
+  * Fixed a bug in the bulk library table where selecting a box position and index family for a
+    library without a library template would cause the table to become unresponsive
+
 # 0.2.174
 
 Changes:
@@ -9,9 +39,11 @@ Upgrade notes:
 
  * We have updated MISO to use Flyway 5.2.4. To accomodate this change, you will need to manually
    run the provided SQL script on your database **before** migrating to the new version. Replace
-   your database and user names in the follow command if necessary. You will also need to upgrade
-   to version 5.2.4 of the Flyway command-line tool:
-   https://flywaydb.org/documentation/commandline/#download-and-installation
+   your database and user names in the follow command if necessary. Be sure to check the
+   installation guide as the procedure for
+   [migrating the database](https://github.com/miso-lims/miso-lims/blob/develop/docs/_posts/2016-01-11-installation-guide.md#migrating-the-database)
+   has been updated. You will also need to upgrade to version 5.2.4 of the
+   [Flyway command-line tool](https://flywaydb.org/documentation/commandline/#download-and-installation).
 
    ```
    mysql -D lims -u tgaclims -p < sqlstore/src/main/resources/db/scripts/flyway-upgrade-5.2.4.sql

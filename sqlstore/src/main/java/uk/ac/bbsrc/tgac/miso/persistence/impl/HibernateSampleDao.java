@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -249,11 +248,6 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
-  }
-
-  @Override
-  public Map<String, Integer> getSampleColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(template, "Sample");
   }
 
   @Override

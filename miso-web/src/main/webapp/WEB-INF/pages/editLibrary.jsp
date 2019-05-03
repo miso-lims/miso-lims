@@ -21,13 +21,6 @@
   ~ **********************************************************************
   --%>
 
-<%--
-  Created by IntelliJ IDEA.
-  User: davey
-  Date: 15-Feb-2010
-  Time: 15:09:06
-
---%>
 <%@ include file="../header.jsp" %>
 <script src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
@@ -37,17 +30,9 @@
 <div id="maincontent">
 <div id="contentcolumn">
 
-<form:form id="library-form" data-parsley-validate="" action="/miso/library" method="POST" commandName="library" autocomplete="off" acceptCharset="utf-8">
-<sessionConversation:insertSessionConversationId attributeName="library"/>
 <h1>
-  <c:choose>
-    <c:when test="${library.id != 0}">Edit</c:when>
-    <c:otherwise>Create</c:otherwise>
-  </c:choose> Library
-  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all"
-      onclick="return Library.validateLibrary(${detailedSample && (library.hasNonStandardAlias() || library.sample.hasNonStandardAlias())});">
-    Save
-  </button>
+  Edit Library
+  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
   <c:if test="${library.id != 0 && not empty library.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('library', [${library.id}]);">Print Barcode</span></c:if>
@@ -96,378 +81,22 @@
   material from an initial Sample. A Library is then diluted down to a Dilution, and put in a Pool.
 </div>
 
-<div class="bs-callout bs-callout-warning hidden">
-  <h2>Oh snap!</h2>
-  <p>This form seems to be invalid</p>
-</div>
+<div id="warnings"></div>
 
-<h2>Library Information</h2>
-
-<table class="in">
-<tr>
-  <td class="h">Library ID:</td>
-  <td id="libraryId">
-    <c:choose>
-      <c:when test="${library.id != 0}">${library.id}</c:when>
-      <c:otherwise><i>Unsaved</i></c:otherwise>
-    </c:choose>
-  </td>
-</tr>
-<tr>
-  <c:if test="${library.id != 0}">
-    <td colspan="2" id ="warnings">
-      <script>
-        jQuery(document).ready(function() {
-          Warning.generateHeaderWarnings('warnings', WarningTarget.library, ${libraryDto});
-        });
-      </script>
-    </td>
-  </c:if>
-</tr>
-<tr>
-  <td class="h">Name:</td>
-  <td id="name">
-    <c:choose>
-      <c:when test="${library.id != 0}">${library.name}</c:when>
-      <c:otherwise><i>Unsaved</i></c:otherwise>
-    </c:choose>
-  </td>
-</tr>
-<tr>
-  <td>Parent Sample:</td>
-  <td>
-    <c:choose>
-      <c:when test='${empty library.sample}'>
-        <i>Unassigned</i>
-      </c:when>
-      <c:otherwise>
-        <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.alias} (${library.sample.name})</a>
-      </c:otherwise>
-    </c:choose>
-  </td>
-</tr>
-<tr>
-  <td class="h">Alias:
-    <c:choose>
-      <c:when test="${!aliasGenerationEnabled || library.id != 0}">
-        *
-      </c:when>
-      <c:when test="${detailedSample && library.sample.hasNonStandardAlias()}">
-        * (cannot auto-generate since parent has non-standard alias)
-      </c:when>
-      <c:otherwise>
-        (blank to auto-generate)
-      </c:otherwise>
-    </c:choose>
-  </td>
-  <td>
-    <form:input id="alias" path="alias" class="validateable"/>
-    <span id="aliasCounter" class="counter"></span>
-    <c:if test="${detailedSample && library.hasNonStandardAlias()}">
-      <ul class="parsley-errors-list filled" id="nonStandardAlias">
-        <li class="parsley-custom-error-message">
-        Double-check this alias -- it will be saved even if it is duplicated or does not follow the naming standard!
-        </li>
-      </ul>
-    </c:if>
-  </td>
-</tr>
-<tr>
-  <td>Description:</td>
-  <td>
-    <form:input id="description" path="description" class="validateable"/>
-    <span id="descriptionCounter" class="counter"></span></td>
-</tr>
-<c:if test="${not autoGenerateIdBarcodes}">
-  <tr>
-    <td class="h">Matrix Barcode:</td>
-    <td><form:input id="identificationBarcode" path="identificationBarcode" name="identificationBarcode"/></td>
-  </tr>
-</c:if>
-<tr>
-  <td>Date of receipt:</td>
-  <td>
-    <form:input path="receivedDate" id="receiveddatepicker" placeholder="YYYY-MM-DD"/>
-    <script type="text/javascript">
-      Utils.ui.addDatePicker("receiveddatepicker");
-    </script>
-  </td>
-</tr>
-<tr>
-  <td class="h">Creation date:</td>
-  <td id="creationDate">
-    <form:input path="creationDate" id="creationdatepicker" placeholder="YYYY-MM-DD"/>
-    <script type="text/javascript">
-      Utils.ui.addDatePicker("creationdatepicker");
-    </script>
-  </td>
-</tr>
-<c:if test="${not empty library.accession}">
-  <tr>
-    <td class="h">Accession:</td>
-    <td><a href="http://www.ebi.ac.uk/ena/data/view/${library.accession}">${library.accession}</a>
-    </td>
-  </tr>
-</c:if>
-<c:choose>
-  <c:when test="${!empty library.sample && detailedSample}">
-    <input type="hidden" value="true" name="paired" id="paired"/>
-  </c:when>
-  <c:otherwise>
-	<tr>
-	  <td><label for="paired">Paired:</label></td>
-	  <td>
-	    <c:choose>
-	      <c:when test="${library.id != 0}">
-	        <form:checkbox id="paired" path="paired" checked="checked"/>
-	      </c:when>
-	      <c:otherwise>
-	        <form:checkbox id="paired" path="paired"/>
-	      </c:otherwise>
-	    </c:choose>
-	  </td>
-	</tr>
-  </c:otherwise>
-</c:choose>
-
-<tr>
-  <c:choose>
-    <c:when test="${library.id == 0 or empty library.libraryType or miso:isAdmin() or miso:isTech()}">
-      <td>Platform - Library Type:</td>
-      <td>
-        <form:select id="platformTypes" path="platformType" items="${platformTypes}"
-                     onchange="Library.ui.changePlatformType(null);" class="validateable"/>
-        <form:select id="libraryTypes" path="libraryType"/>
-      </td>
-      <script type="text/javascript">
-        jQuery(document).ready(function () {
-          Library.ui.changePlatformType(<c:out value="${library.libraryType.id}" default="0"/>, function() {
-            <c:if test="${not empty library.libraryType}">jQuery('#libraryTypes').val('${library.libraryType.id}');</c:if>
-            Library.setOriginalIndices();
-          });
-        });
-      </script>
-    </c:when>
-    <c:otherwise>
-      <td>Platform - Library Type</td>
-      <td>${library.platformType} - ${library.libraryType.description}</td>
-    </c:otherwise>
-  </c:choose>
-</tr>
-<tr>
-<c:if test="${!empty library.sample && detailedSample}">
-  <tr>
-    <td>Library Design:</td>
-    <td>
-      <miso:select id="libraryDesignTypes" path="libraryDesign" items="${libraryDesigns}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" onchange="Library.ui.changeDesign()"/>
-      &nbsp;&nbsp;&nbsp;Design Code: <miso:select id="libraryDesignCodes" path="libraryDesignCode" items="${libraryDesignCodes}" itemLabel="code" itemValue="id" defaultLabel="(None)" defaultValue="-1"/>
-    </td>
-  </tr>
-</c:if>
-  <c:choose>
-    <c:when test="${library.id == 0 or empty library.librarySelectionType or miso:isAdmin() or miso:isTech()}">
-      <td>Library Selection Type:</td>
-      <td>
-        <miso:select id="librarySelectionTypes" path="librarySelectionType" items="${librarySelectionTypes}"
-                     itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" />
-      </td>
-    </c:when>
-    <c:otherwise>
-      <td>Library Selection Type:</td>
-      <td>${library.librarySelectionType.name}</td>
-    </c:otherwise>
-  </c:choose>
-</tr>
-<tr>
-  <c:choose>
-    <c:when
-        test="${library.id == 0 or empty library.libraryStrategyType or miso:isAdmin() or miso:isTech()}">
-      <td>Library Strategy Type:</td>
-      <td>
-        <miso:select id="libraryStrategyTypes" path="libraryStrategyType" items="${libraryStrategyTypes}"
-                     itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" />
-      </td>
-    </c:when>
-    <c:otherwise>
-      <td>Library Strategy Type:</td>
-      <td>${library.libraryStrategyType.name}</td>
-    </c:otherwise>
-  </c:choose>
-</tr>
-<tr>
-  <td>Index Family:</td>
-  <td>
-    <miso:select id='indexFamily' name='indexFamily' path="currentFamily" items="${indexFamilies}" itemLabel="name" itemValue="id" onchange='Library.ui.updateIndices();'/>
-  </td>
-</tr>
-
-<tr>
-  <td>Indices:</td>
-  <td id="indicesDiv">
-  </td>
-</tr>
-
-<tr bgcolor="yellow">
-  <td>QC Passed:*</td>
-  <td>
-    <form:radiobutton path="qcPassed" value="" label="Unknown"/>
-    <form:radiobutton path="qcPassed" value="true" label="True"/>
-    <form:radiobutton path="qcPassed" value="false" label="False"/>
-  </td>
-</tr>
-
-<tr>
-  <td style="color:#a93232"><label for="lowQuality">Low Quality Sequencing:</label></td>
-  <td>
-    <form:checkbox path="lowQuality" id="lowQuality"/>
-  </td>
-</tr>
-
-<tr>
-  <td>Size (bp):</td>
-  <td><form:input id="dnaSize" path="dnaSize"/></td>
-</tr>
-<tr>
-  <td><label for="discarded">Discarded:</label></td>
-  <td><form:checkbox id="discarded" path="discarded"/></td>
-</tr>
-<tr>
-  <td>Volume:</td>
-  <td><form:input id="volume" path="volume"/></td>
-</tr>
-<tr>
-  <td>Volume Units:</td>
-  <td><form:select id="volumeUnits" path="volumeUnits">
-    <c:forEach var="volumeUnit" items="${volumeUnits}">
-      <option value="${volumeUnit}" <c:if test="${library.volumeUnits eq volumeUnit or (empty library.volumeUnits and volumeUnit.toString() eq 'MICROLITRES')}">selected="selected"</c:if>>
-        ${volumeUnit.units}
-      </option>
-    </c:forEach>
-  </form:select></td>
-</tr>
-<tr>
-  <td class="h"><label for="concentration">Concentration:</label></td>
-  <td><form:input id="concentration" path="concentration"/></td>
-</tr>
-<tr>
-  <td>Concentration Units:</td>
-  <td><form:select id="concentrationUnits" path="concentrationUnits">
-    <c:forEach var="concentrationUnit" items="${concentrationUnits}">
-      <option value="${concentrationUnit}" <c:if test="${library.concentrationUnits eq concentrationUnit or (empty library.concentrationUnits and concentrationUnit.toString() eq 'NANOGRAMS_PER_MICROLITRE')}">selected="selected"</c:if>>
-        ${concentrationUnit.units}
-      </option>
-    </c:forEach>
-  </form:select></td>
-</tr>
-<tr>
-  <td><label for="distributed">Distributed:</label></td>
-  <td><form:checkbox id="distributed" path="distributed" onchange="Boxable.distributionChanged()" /></td>
-</tr>
-<tr>
-  <td><label for="distributionDatePicker">Distribution Date:</label></td>
-  <td>
-    <form:input path="distributionDate" id="distributionDatePicker" placeholder="YYYY-MM-DD"/>
-  </td>
-</tr>
-<tr>
-  <td><label for="distributionRecipient">Distribution Recipient:</label></td>
-  <td><form:input id="distributionRecipient" path="distributionRecipient"/>
-  </td>
-</tr>
-<tr>
-  <td class="h"><label for="locationBarcode">Location:</label></td>
-  <td><form:input id="locationBarcode" path="locationBarcode"/>
-    <script type="text/javascript">
-      Boxable.distributionChanged();
-    </script>
-  </td>
-</tr>
-<tr>
-  <td class="h">Box Location:</td>
-  <td id="boxLocation">
-    <c:if test="${!empty library.box.locationBarcode}">${library.box.locationBarcode},</c:if>
-    <c:if test="${!empty library.boxPosition}"><a href='<c:url value="/miso/box/${library.box.id}"/>'>${library.box.alias}, ${library.boxPosition}</a></c:if>
-  </td>
-</tr>
-  <tr>
-    <td>Library Kit:*</td>
-    <td>
-      <miso:select id="libraryKit" path="kitDescriptor" items="${prepKits}" itemLabel="name"
-          itemValue="id" defaultLabel="SELECT" defaultValue=""/>
-    </td>
-  </tr>
-  <tr>
-    <td>Spike-In:</td>
-    <td>
-      <miso:select id="spikeIn" path="spikeIn" items="${spikeIns}" itemLabel="alias"
-          itemValue="id" defaultLabel="None" defaultValue="" onchange="Library.ui.changeSpikeIn()"/>
-      <script>
-        jQuery(document).ready(function() {
-          Library.ui.changeSpikeIn();
-        });
-      </script>
-    </td>
-  </tr>
-  <tr>
-    <td>Spike-In Dilution Factor:</td>
-    <td><form:select id="spikeInDilutionFactor" path="spikeInDilutionFactor">
-    <option value="" <c:if test="${empty library.spikeInDilutionFactor}">selected="selected"</c:if>>n/a</option>
-      <c:forEach var="factor" items="${dilutionFactors}">
-        <option value="${factor}" <c:if test="${library.spikeInDilutionFactor eq factor}">selected="selected"</c:if>>
-          ${factor.label}
-        </option>
-      </c:forEach>
-    </form:select></td>
-  </tr>
-  <tr>
-    <td>Spike-In Volume:</td>
-    <td><form:input id="spikeInVolume" path="spikeInVolume"/></td>
-  </tr>
-</table>
-<%@ include file="volumeControl.jspf" %>
-
-<c:if test="${detailedSample}">
-<br/>
-<br/>
-<h2>Details</h2>
-<table class="in">
-  <tr>
-    <td class="h">External Names:</td>
-    <td>${effectiveExternalName}</td>
-  </tr>
-  <tr>
-    <td class="h">Effective Group ID:</td>
-    <td id="effectiveGroupId">
-      <c:choose>
-      <c:when test="${empty effectiveGroupId}">(None)</c:when>
-      <c:otherwise>${effectiveGroupId} (${effectiveGroupIdSample})</c:otherwise>
-      </c:choose>
-    </td>
-  </tr>
-  <tr>
-    <td class="h">Group ID:</td>
-    <td>
-      <form:input id="groupId" path="groupId"/>
-    </td>
-  </tr>
-  <tr>
-    <td class="h">Group Description:</td>
-    <td>
-      <form:input id="groupDescription" path="groupDescription"/>
-    </td>
-  </tr>
-  
-  <tr>
-    <td class="h"><label for="archived">Archived:</label></td>
-    <td><form:checkbox id="archived" path="archived"/></td>
-  </tr>
-</table>
-</c:if>
-
+<form:form id="libraryForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 <script type="text/javascript">
   jQuery(document).ready(function () {
-    // Attach Parsley form validator
-    Validate.attachParsley('#library-form');
+    Warning.generateHeaderWarnings('warnings', WarningTarget.library, ${libraryDto});
+    
+    var opts = {
+      detailedSample: Constants.isDetailedSample,
+      generateLibraryAliases: Constants.automaticLibraryAlias
+    };
+    var dto = ${libraryDto};
+    if (Constants.isDetailedSample) {
+      dto.effectiveExternalNames = '${effectiveExternalNames}';
+    }
+    FormUtils.createForm('libraryForm', 'save', dto, 'library', opts);
   });
 </script>
 
@@ -484,7 +113,7 @@
         </a>
 
         <div id="notesMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-          <a onclick="Library.ui.showLibraryNoteDialog(${library.id});" href="javascript:void(0);" class="add">Add Note</a>
+          <a onclick="Utils.notes.showNoteDialog('library', ${library.id});" href="javascript:void(0);" class="add">Add Note</a>
         </div>
       </li>
     </ul>
@@ -495,18 +124,20 @@
             <b>${note.creationDate}</b>: ${note.text}
               <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
                 <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
-                <span style="color:#000000"><a href='#' onclick="Library.ui.deleteLibraryNote('${library.id}', '${note.noteId}');">
-                  <span class="ui-icon ui-icon-trash note-delete-icon"></span></a></span>
+                  <span style="color:#000000">
+                    <a href='#' onclick="Utils.notes.deleteNote('library', '${library.id}', '${note.noteId}'); return false;">
+                      <span class="ui-icon ui-icon-trash note-delete-icon"></span>
+                    </a>
+                  </span>
                 </c:if>
               </span>
           </div>
         </c:forEach>
       </div>
     </c:if>
-    <div id="addNoteDialog" title="Create new Note"></div>
   </div>
 </c:if>
-</form:form>
+
 <br/>
 <c:if test="${library.id != 0}">
   <miso:attachments item="${library}" projectId="${library.sample.project.id}"/>
@@ -519,41 +150,6 @@
 </c:if>
 </div>
 </div>
-
-<script type="text/javascript">
-  Library = Library || {};
-  Library.setOriginalIndices = function() {
-    Library.originalIndexFamilyId = ${library.getCurrentFamily().id};
-    document.getElementById('indexFamily').value = Library.originalIndexFamilyId;
-    <c:forEach items="${library.indices}" var="index">
-      <c:if test="${index.id != 0}">
-        jQuery('#index' + ${index.position}).val(${index.id});
-      </c:if>
-    </c:forEach>
-  };
-
-  jQuery(document).ready(function () {
-    Library.ui.updateIndices();
-    Library.setOriginalIndices();
-    
-    Library.ui.changeDesign(<c:out value="${library.libraryType.id}" default="0"/>, function() {
-      Library.setOriginalIndices();
-    });
-    jQuery('#alias').simplyCountable({
-      counter: '#aliasCounter',
-      countType: 'characters',
-      maxCount: ${maxLengths['alias']},
-      countDirection: 'down'
-    });
-
-    jQuery('#description').simplyCountable({
-      counter: '#descriptionCounter',
-      countType: 'characters',
-      maxCount: ${maxLengths['description']},
-      countDirection: 'down'
-    });
-  });
-</script>
 
 <%@ include file="adminsub.jsp" %>
 

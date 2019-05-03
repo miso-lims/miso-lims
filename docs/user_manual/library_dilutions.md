@@ -50,10 +50,40 @@ adjustments and click the "Save" button to try again.
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Editing Dilutions" %}
 
-As there is no single-item "Edit Dilution" page, we can only edit dilutions using the bulk interface. To get there, go
-to the Dilutions list, select the dilutions that you wish to edit, and then click the "Edit" button in the toolbar at
-the top of the table. This will take you to the bulk Edit Dilutions page, which functions similarly to the bulk Create
-Dilutions from Libraries page.
+Dilutions can be edited individually or in bulk. Bulk editing is convenient when you have several dilutions to modify
+at once. Editing individual dilutions is sometimes preferable because it provides a few additional options, and allows
+you to see a more detailed view of the dilution.
+
+{% include userman-toplink.md %}
+
+
+
+{% assign subsub = 1 %}
+{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Editing a Single Dilution" %}
+
+To get to the single Edit Dilution page, click on the dilution's name in the Dilutions list. Links to the Edit
+Dilution page also appear on the Edit Pool page in the Included and Available Dilutions lists.
+
+The Dilution Information section of the Edit Dilution page contains a list of fields, most of which may be modified.
+You can make any changes you would like and then click the "Save" button at the top right to confirm the changes.
+
+Other sections below list the pools that the dilution has been added to, and the runs that those pools have been loaded
+into. The dilution's changes are currently included in the library's change log, but this will soon be changing.
+
+{% include userman-toplink.md %}
+
+
+
+{% assign subsub = subsub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Editing Dilutions in Bulk" %}
+
+To get to the bulk Edit Dilutions page, go to the Dilutions list, check the checkboxes beside the dilutions you wish to
+modify, then click the "Edit" button in the toolbar at the top of the table.
+
+The bulk Edit Dilutions page works similarly to the bulk Create Dilutions from Libraries page. You can make the changes
+you would like, then click the "Save" button at the top right to confirm. If there are any problems with the data
+you've entered, the error messages will be displayed at the top of the screen and you can adjust as necessary before
+clicking "Save" again.
 
 {% include userman-toplink.md %}
 

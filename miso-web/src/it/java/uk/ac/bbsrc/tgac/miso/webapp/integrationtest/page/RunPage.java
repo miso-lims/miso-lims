@@ -21,22 +21,22 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 public class RunPage extends FormPage<RunPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
-    ID(By.id("runId"), FieldType.LABEL), //
+    ID(By.id("id"), FieldType.LABEL), //
     NAME(By.id("name"), FieldType.LABEL), //
     ALIAS(By.id("alias"), FieldType.TEXT), //
-    PLATFORM(By.id("platform"), FieldType.LABEL), //
-    SEQUENCER(By.id("sequencer"), FieldType.LABEL), //
-    SEQ_PARAMS(By.id("sequencingParameters"), FieldType.DROPDOWN),//
+    PLATFORM(By.id("platformType"), FieldType.LABEL), //
+    SEQUENCER(By.id("instrumentIdLabel"), FieldType.LABEL), //
+    SEQ_PARAMS(By.id("sequencingParametersId"), FieldType.DROPDOWN), //
     DESCRIPTION(By.id("description"), FieldType.TEXT), //
-    FILE_PATH(By.id("filePath"), FieldType.TEXT), //
+    FILE_PATH(By.id("runPath"), FieldType.TEXT), //
     NUM_CYCLES(By.id("numCycles"), FieldType.TEXT), //
-    CALL_CYCLE(By.id("callCycle"), FieldType.TEXT), //
-    IMG_CYCLE(By.id("imgCycle"), FieldType.TEXT), //
-    SCORE_CYCLE(By.id("scoreCycle"), FieldType.TEXT), //
+    CALL_CYCLE(By.id("calledCycles"), FieldType.TEXT), //
+    IMG_CYCLE(By.id("imagedCycles"), FieldType.TEXT), //
+    SCORE_CYCLE(By.id("scoredCycles"), FieldType.TEXT), //
     PAIRED_END(By.id("pairedEnd"), FieldType.CHECKBOX), //
-    STATUS(By.name("health"), FieldType.RADIO), //
+    STATUS(By.id("status"), FieldType.DROPDOWN), //
     START_DATE(By.id("startDate"), FieldType.DATEPICKER), //
-    COMPLETION_DATE(By.id("completionDate"), FieldType.DATEPICKER);
+    COMPLETION_DATE(By.id("endDate"), FieldType.DATEPICKER);
 
     private final By selector;
     private final FieldType type;

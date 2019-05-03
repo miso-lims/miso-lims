@@ -28,7 +28,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -81,43 +80,7 @@ public class DefaultLibraryDilutionService
     return dilution;
   }
 
-  private boolean isTargetedSequencingRequired(Library library) {
-    return LimsUtils.isDetailedLibrary(library)
-        && ((DetailedLibrary) library).getLibraryDesignCode().isTargetedSequencingRequired();
-  }
-
-  @VisibleForTesting
-  protected boolean isTargetedSequencingCompatible(TargetedSequencing ts, Library library) {
-    return library.getKitDescriptor().getTargetedSequencing().contains(ts);
-  }
-
-  private void throwTargetedSequencingIncompatible(TargetedSequencing ts, KitDescriptor kd) {
-    String tsName = ts.getAlias();
-    String kitName = kd.getName();
-
-    throw new IllegalArgumentException(String.format("Selected targeted sequencing is not available for kit on parent library.\n"
-        + "If you think this is an error, please contact your MISO administrator "
-        + "to make targeted sequencing \"%s\" available for kit \"%s\".", tsName, kitName));
-  }
-
-  private void validateTargetedSequencing(LibraryDilution dilution) {
-    TargetedSequencing ts = dilution.getTargetedSequencing();
-    Library library = dilution.getLibrary();
-
-    if (ts == null) {
-      if (isTargetedSequencingRequired(library)) {
-        throw new IllegalArgumentException("Targeted sequencing value is required");
-      }
-    } else {
-      if (!isTargetedSequencingCompatible(ts, library)) {
-        throwTargetedSequencingIncompatible(ts, library.getKitDescriptor());
-      }
-    }
-  }
-
   private LibraryDilution save(LibraryDilution dilution) throws IOException {
-    validateTargetedSequencing(dilution);
-
     dilution.setLastModifier(authorizationManager.getCurrentUser());
     try {
       Long newId = dilutionDao.save(dilution);
@@ -170,9 +133,21 @@ public class DefaultLibraryDilutionService
     dilution.setName(generateTemporaryName());
     validateChange(dilution, null);
     long savedId = save(dilution).getId();
-    libraryService.update(library);
+    updateLibrary(library);
     boxService.updateBoxableLocation(dilution);
     return savedId;
+  }
+
+  private void updateLibrary(Library library) throws IOException {
+    try {
+      libraryService.update(library);
+    } catch (ValidationException e) {
+      List<ValidationError> newErrors = new ArrayList<>();
+      for (ValidationError error : e.getErrors()) {
+        newErrors.add(new ValidationError(String.format("Library %s: %s", error.getProperty(), error.getMessage())));
+      }
+      throw new ValidationException(newErrors);
+    }
   }
 
   @Override
@@ -180,6 +155,7 @@ public class DefaultLibraryDilutionService
     LibraryDilution managed = get(dilution.getId());
     boxService.throwIfBoxPositionIsFilled(dilution);
 
+    loadChildEntities(dilution);
     Library library = dilution.getLibrary();
     if (library.getVolume() != null) {
       if (dilution.getVolumeUsed() != null && managed.getVolumeUsed() != null) {
@@ -193,9 +169,8 @@ public class DefaultLibraryDilutionService
     validateChange(dilution, managed);
     applyChanges(managed, dilution);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
-    loadChildEntities(managed);
     save(managed);
-    libraryService.update(library);
+    updateLibrary(library);
     boxService.updateBoxableLocation(dilution);
   }
 
@@ -250,12 +225,20 @@ public class DefaultLibraryDilutionService
   private void applyChanges(LibraryDilution target, LibraryDilution source) {
     target.setTargetedSequencing(source.getTargetedSequencing());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
-    target.setVolume(source.getVolume());
-    target.setVolumeUnits(target.getVolume() == null ? null : source.getVolumeUnits());
+    if (source.isDiscarded() || source.isDistributed()) {
+      target.setVolume(0.0);
+    } else {
+      target.setVolume(source.getVolume());
+    }
+    target.setVolumeUnits(source.getVolume() == null ? null : source.getVolumeUnits());
+    target.setDistributed(source.isDistributed());
+    target.setDistributionDate(source.getDistributionDate());
+    target.setDistributionRecipient(source.getDistributionRecipient());
     target.setConcentration(source.getConcentration());
     target.setConcentrationUnits(target.getConcentration() == null ? null : source.getConcentrationUnits());
     target.setNgUsed(source.getNgUsed());
     target.setVolumeUsed(source.getVolumeUsed());
+    target.setCreationDate(source.getCreationDate());
   }
 
   private void validateChange(LibraryDilution dilution, LibraryDilution beforeChange) throws IOException {
@@ -264,10 +247,36 @@ public class DefaultLibraryDilutionService
     validateConcentrationUnits(dilution.getConcentration(), dilution.getConcentrationUnits(), errors);
     validateVolumeUnits(dilution.getVolume(), dilution.getVolumeUnits(), errors);
     validateBarcodeUniqueness(dilution, beforeChange, dilutionDao::getByBarcode, errors, "dilution");
+    validateTargetedSequencing(dilution, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
+  }
+
+  private void validateTargetedSequencing(LibraryDilution dilution, List<ValidationError> errors) {
+    TargetedSequencing ts = dilution.getTargetedSequencing();
+    Library library = dilution.getLibrary();
+
+    if (ts == null) {
+      if (isTargetedSequencingRequired(library)) {
+        errors.add(new ValidationError("targetedSequencingId", "Value is required (based on library design code)"));
+      }
+    } else {
+      if (!isTargetedSequencingCompatible(ts, library)) {
+        errors.add(new ValidationError("targetedSequencingId", "Selected value not compatible with the library kit"));
+      }
+    }
+  }
+
+  private boolean isTargetedSequencingRequired(Library library) {
+    return LimsUtils.isDetailedLibrary(library)
+        && ((DetailedLibrary) library).getLibraryDesignCode().isTargetedSequencingRequired();
+  }
+
+  @VisibleForTesting
+  protected boolean isTargetedSequencingCompatible(TargetedSequencing ts, Library library) {
+    return library.getKitDescriptor().getTargetedSequencing().contains(ts);
   }
 
   public void setDilutionDao(LibraryDilutionStore dilutionDao) {

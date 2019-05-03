@@ -349,17 +349,16 @@ The same path should be used for `MISO_FILES_DIR` as is set for `miso.fileStorag
 (`/storage/miso/files/` by default)
 
     cd ${FLYWAY}
-    rm -f lib/sqlstore-*.jar
-    unzip -xjo $CATALINA_HOME/webapps/ROOT.war 'WEB-INF/lib/sqlstore-*.jar' -d lib
+    rm -f jars/sqlstore-*.jar
+    unzip -xjo $CATALINA_HOME/webapps/ROOT.war 'WEB-INF/lib/sqlstore-*.jar' -d jars
     ./flyway -user=$MISO_DB_USER -password=$MISO_DB_PASS -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration,classpath:uk.ac.bbsrc.tgac.miso.db.migration migrate -placeholders.filesDir=${MISO_FILES_DIR}
 
-`$DB_URL` should be in the same format as in the `ROOT.xml`, except replacing `&amp;` with just `&`:
+`$DB_URL` should be in the same format as in the `ROOT.xml`, except replacing `&amp;` with just `&`
+and replacing `zeroDateTimeBehavior=convertToNull` with `zeroDateTimeBehavior=CONVERT_TO_NULL`:
 
 ```
-jdbc:mysql://localhost:3306/lims?autoReconnect=true&zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8
+jdbc:mysql://localhost:3306/lims?autoReconnect=true&zeroDateTimeBehavior=CONVERT_TO_NULL&useUnicode=true&characterEncoding=UTF-8
 ```
 
 If you encounter errors migrating the database, make sure that you are using the recommended version of Flyway (see
-[Prerequisites](#prerequisites)). There are known issues with using newer Flyway versions with the MISO migrations.
-As Flyway has changed their checksum calculations in newer versions and we don't want to break completed migrations
-for existing users, there are no plans to support newer versions of Flyway at this time.
+[Prerequisites](#prerequisites)).

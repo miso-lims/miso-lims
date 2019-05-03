@@ -27,10 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,19 +37,15 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,8 +55,6 @@ import com.google.common.collect.Lists;
 import net.sf.json.JSONArray;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -78,7 +70,6 @@ import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
@@ -96,7 +87,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
  */
 @Controller
 @RequestMapping("/pool")
-@SessionAttributes("pool")
 public class EditPoolController {
   protected static final Logger log = LoggerFactory.getLogger(EditPoolController.class);
 
@@ -105,8 +95,6 @@ public class EditPoolController {
 
   @Autowired
   private ChangeLogService changeLogService;
-  @Autowired
-  private InstrumentModelService instrumentModelService;
   @Autowired
   private PoolService poolService;
   @Autowired
@@ -122,35 +110,16 @@ public class EditPoolController {
     this.runService = runService;
   }
 
-  public void setPlatformService(InstrumentModelService platformService) {
-    this.instrumentModelService = platformService;
-  }
-
   private static class Config {
     private static final String BOX = "box";
+    private static final String PAGE_MODE = "pageMode";
+    private static final String EDIT = "edit";
+    private static final String CREATE = "create";
   }
 
   @GetMapping(value = "/rest/changes")
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
     return changeLogService.listAll("Pool");
-  }
-
-  @ModelAttribute("platformTypes")
-  public Collection<String> populatePlatformTypes() throws IOException {
-    return PlatformType.platformTypeNames(instrumentModelService.listActivePlatformTypes());
-  }
-
-  @Value("${miso.autoGenerateIdentificationBarcodes}")
-  private Boolean autoGenerateIdBarcodes;
-
-  @ModelAttribute("autoGenerateIdBarcodes")
-  public Boolean autoGenerateIdentificationBarcodes() {
-    return autoGenerateIdBarcodes;
-  }
-
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> maxLengths() throws IOException {
-    return poolService.getPoolColumnSizes();
   }
 
   @GetMapping(value = "/new")
@@ -160,81 +129,32 @@ public class EditPoolController {
 
   @GetMapping(value = "/{poolId}")
   public ModelAndView setupForm(@PathVariable Long poolId, ModelMap model) throws IOException {
-    try {
-      Pool pool = null;
-      if (poolId == PoolImpl.UNSAVED_ID) {
-        pool = new PoolImpl();
-        model.put("title", "New Pool");
-      } else {
-        pool = poolService.get(poolId);
-        model.put("title", "Pool " + poolId);
-      }
-
-      if (pool == null) throw new NotFoundException("No pool found for ID " + poolId.toString());
-
-      ObjectMapper mapper = new ObjectMapper();
-      model.put("formObj", pool);
-      model.put("pool", pool);
-      model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(pool, true, false)));
-      model.put("platforms", getFilteredInstrumentModels(pool.getPlatformType()));
-
-      model.put("partitions", containerService.listPartitionsByPoolId(poolId).stream().map(Dtos::asDto).collect(Collectors.toList()));
-      model.put("runs", poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(runService.listByPoolId(poolId)));
-      model.put("orders",
-          poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asPoolOrderDtos(poolOrderService.getByPool(poolId)));
-
-      model.put("duplicateIndicesSequences", mapper.writeValueAsString(pool.getDuplicateIndicesSequences()));
-      model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(pool.getNearDuplicateIndicesSequences()));
-
-      model.put("includedDilutions", Dtos.asDto(pool, true, false).getPooledElements());
-
-      model.put("volumeUnits", VolumeUnit.values());
-      model.put("concentrationUnits", ConcentrationUnit.values());
-
-      return new ModelAndView("/WEB-INF/pages/editPool.jsp", model);
-    } catch (IOException ex) {
-      log.debug("Failed to show pool", ex);
-      throw ex;
+    Pool pool = null;
+    if (poolId == PoolImpl.UNSAVED_ID) {
+      pool = new PoolImpl();
+      model.put("title", "New Pool");
+    } else {
+      pool = poolService.get(poolId);
+      model.put("title", "Pool " + poolId);
     }
-  }
 
-  private Collection<InstrumentModel> getFilteredInstrumentModels(PlatformType platformType) throws IOException {
-    List<InstrumentModel> selected = new ArrayList<>();
-    for (InstrumentModel p : instrumentModelService.list()) {
-      if (p.getPlatformType() == platformType && !sequencingParametersService.getForInstrumentModel(p.getId()).isEmpty()) {
-        selected.add(p);
-      }
-    }
-    Collections.sort(selected, new Comparator<InstrumentModel>() {
+    if (pool == null) throw new NotFoundException("No pool found for ID " + poolId.toString());
 
-      @Override
-      public int compare(InstrumentModel o1, InstrumentModel o2) {
-        return o1.getPlatformAndAlias().compareTo(o2.getPlatformAndAlias());
-      }
+    ObjectMapper mapper = new ObjectMapper();
+    model.put("pool", pool);
+    model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "{}" : mapper.writeValueAsString(Dtos.asDto(pool, true, false)));
 
-    });
-    return selected;
-  }
+    model.put("partitions", containerService.listPartitionsByPoolId(poolId).stream().map(Dtos::asDto).collect(Collectors.toList()));
+    model.put("runs", poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(runService.listByPoolId(poolId)));
+    model.put("orders",
+        poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asPoolOrderDtos(poolOrderService.getByPool(poolId)));
 
-  @PostMapping
-  public ModelAndView processSubmit(@ModelAttribute("pool") Pool pool, ModelMap model, SessionStatus session)
-      throws IOException {
-    try {
-      // The pooled elements may have been modified asynchronously while the form was being edited. Since they can't be edited by form,
-      // update them to avoid reverting the state.
-      if (pool.getId() != PoolImpl.UNSAVED_ID) {
-        Pool original = poolService.get(pool.getId());
-        pool.setPoolDilutions(original.getPoolDilutions());
-      }
+    model.put("duplicateIndicesSequences", mapper.writeValueAsString(pool.getDuplicateIndicesSequences()));
+    model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(pool.getNearDuplicateIndicesSequences()));
 
-      poolService.save(pool);
-      session.setComplete();
-      model.clear();
-      return new ModelAndView("redirect:/miso/pool/" + pool.getId(), model);
-    } catch (IOException ex) {
-      log.debug("Failed to save pool", ex);
-      throw ex;
-    }
+    model.put("includedDilutions", Dtos.asDto(pool, true, false).getPooledElements());
+
+    return new ModelAndView("/WEB-INF/pages/editPool.jsp", model);
   }
 
   @ModelAttribute
@@ -260,6 +180,7 @@ public class EditPoolController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+      config.put(Config.PAGE_MODE, Config.EDIT);
     }
   };
 
@@ -337,6 +258,7 @@ public class EditPoolController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.putPOJO(Config.BOX, newBox);
+      config.put(Config.PAGE_MODE, Config.CREATE);
     }
 
     public ModelAndView merge(String parentIdsString, String proportionsString, ModelMap model) throws IOException {

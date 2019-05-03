@@ -26,6 +26,7 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
   private String creationDate;
   private String dilutionCreatorName;
   private Long targetedSequencingId;
+  private Long libraryId;
   private LibraryDto library;
   private String libraryUrl;
   private String lastModified;
@@ -36,6 +37,9 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
   private Integer proportion;
   private String subprojectAlias;
   private Boolean subprojectPriority;
+  private boolean distributed;
+  private String distributionDate;
+  private String distributionRecipient;
 
   public Long getId() {
     return id;
@@ -110,6 +114,14 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setTargetedSequencingId(Long targetedSequencingId) {
     this.targetedSequencingId = targetedSequencingId;
+  }
+
+  public Long getLibraryId() {
+    return libraryId;
+  }
+
+  public void setLibraryId(Long libraryId) {
+    this.libraryId = libraryId;
   }
 
   public LibraryDto getLibrary() {
@@ -214,6 +226,30 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setSubprojectPriority(Boolean subprojectPriority) {
     this.subprojectPriority = subprojectPriority;
+  }
+
+  public boolean isDistributed() {
+    return distributed;
+  }
+
+  public void setDistributed(boolean distributed) {
+    this.distributed = distributed;
+  }
+
+  public String getDistributionDate() {
+    return distributionDate;
+  }
+
+  public void setDistributionDate(String distributionDate) {
+    this.distributionDate = distributionDate;
+  }
+
+  public String getDistributionRecipient() {
+    return distributionRecipient;
+  }
+
+  public void setDistributionRecipient(String distributionRecipient) {
+    this.distributionRecipient = distributionRecipient;
   }
 
 }

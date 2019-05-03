@@ -7,6 +7,7 @@ FormUtils = (function($) {
    *   getEditUrl: required function(object) returning string; URL for the object's edit page
    *   getSections: required function(config, object) returning array of FormSections; see below
    *   onLoad: optional function(updateField); called after the form is initialized
+   *   confirmSave: optional function(object, saveCallback); called before saving. saveCallback must be invoked to confirm and save
    * }
    * 
    * FormSection Structure: {
@@ -21,30 +22,56 @@ FormUtils = (function($) {
    *   getDisplayValue: optional function(object) returning string; generate a value to display in a read-only field instead of the
    *       data value
    *   getLink: optional function(object) returning URL string; generate a link URL for read-only field
-   *   type: required string (read-only|text|dropdown|checkbox|int|decimal|special); type of field. Note: read-only means not directly
-   *       editable. The value may still be changed via javascript, and that updated value will be validated and saved
+   *   type: required string (read-only|text|textarea|dropdown|checkbox|int|decimal|date|datetime|special); type of field. Note: read-only
+   *       means not directly editable. The value may still be changed via javascript, and that updated value will be validated and saved
    *   include: optional boolean; determines whether the field is displayed. Field is displayed by default
    *   initial: optional string; value to initialize field value to for new items
+   *   disabled: optional boolean; whether the field is disabled
    *   required: optional boolean; whether the field is required
    *   maxLength: optional integer; maximum number of characters for text input
+   *   regex: optional regex; validation regex for text input
    *   min: minimum value for int or decimal input
    *   precision: maximum precision (length, excluding the decimal) for decimal input
    *   scale: maximum scale (decimal places) for decimal input
    *   nullLabel: optional string; label for null value in dropdown. If not provided, and the field is not required, there will be no
    *       null value in the dropdown - it will default to the first option unless an initial value is specified
    *   getSource: function() returning array of objects; required for dropdown fields; Provides dropdown options
+   *   sortSource: optional function(a, b); sort function for dropdown options
    *   getItemLabel: function(item) returning string; get the label for a dropdown option. If omitted and the item is a string, it is
    *       used as the label; otherwise, an error is thrown
    *   getItemValue: function(item) returning string; get the value for a dropdown option. If omitted, the item is used as the value
    *   onChange: function(newValue, updateField); allows modifying other fields when a dropdown type field value is changed. updateField
-   *       is a function(dataProperty, options). options may include 'disabled' (boolean) and 'value' (string/number/boolean depending on
-   *       field type)
+   *       is a function(dataProperty, options). options may include
+   *       * 'disabled' (boolean)
+   *       * 'required' (boolean)
+   *       * 'value' (string/number/boolean depending on field type)
+   *       * 'source' (array of objects or strings)
    *   makeControls: function() returning single or array of jQuery controls; required for special fields; set up special fields
    * }
    */
 
   var defaultDecimalPrecision = 21;
   var defaultDecimalScale = 17;
+
+  var changeOrder = {
+    disabled: 1,
+    required: 1,
+    source: 2,
+    value: 3
+  };
+
+  var units = {
+    volume: {
+      title: 'Volume Units',
+      data: 'volumeUnits',
+      source: Constants.volumeUnits
+    },
+    concentration: {
+      title: 'Concentration Units',
+      data: 'concentrationUnits',
+      source: Constants.concentrationUnits
+    }
+  };
 
   return {
     createForm: function(containerId, saveId, object, targetName, config) {
@@ -57,9 +84,10 @@ FormUtils = (function($) {
       writeGeneralValidationBox(container);
       var sections = getFilteredSections(target, config, object);
 
+      var triggerUpdate;
       var updateField = function(dataProperty, options) {
         var field = findField(sections, dataProperty);
-        for ( var option in options) {
+        Object.keys(options).sort(sortChanges).forEach(function(option) {
           switch (option) {
           case 'disabled':
             Utils.ui.setDisabled('#' + field.data, options.disabled);
@@ -71,11 +99,34 @@ FormUtils = (function($) {
             field.required = options.required;
             $('#' + field.data).closest('tr').children().first().text(getFieldLabelText(field));
             break;
+          case 'source': {
+            if (field.type !== 'dropdown') {
+              throw new Error('Cannot set source for non-dropdown field \'' + field.title + '\'');
+            }
+            field.getSource = function() {
+              return options.source;
+            }
+            var originalValue = getFormValue(field);
+            var select = $('#' + field.data);
+            select.empty();
+            addDropdownOptions(field, select);
+            var newOption = $('#' + field.data + ' option[value="' + originalValue + '"]');
+            if (newOption.length) {
+              select.val(originalValue);
+            }
+            break;
+          }
           default:
             throw new Error('Invalid field update option: ' + option);
           }
+        });
+        if (field.onChange) {
+          triggerUpdate(field);
         }
-      }
+      };
+      triggerUpdate = function(field) {
+        field.onChange(getFormValue(field), updateField);
+      };
 
       sections.forEach(function(section) {
         writeSection(container, section, object, updateField);
@@ -95,6 +146,103 @@ FormUtils = (function($) {
       if (target.onLoad) {
         target.onLoad(updateField);
       }
+    },
+
+    makeQcPassedField: function(include) {
+      return {
+        title: 'QC Passed',
+        data: 'qcPassed',
+        type: 'dropdown',
+        getSource: function() {
+          return [{
+            label: 'True',
+            value: true
+          }, {
+            label: 'False',
+            value: false
+          }];
+        },
+        getItemLabel: function(item) {
+          return item.label;
+        },
+        getItemValue: function(item) {
+          return item.value;
+        },
+        include: include,
+        nullLabel: 'Unknown'
+      };
+    },
+
+    makeUnitsField: function(unitType) {
+      var unit = units[unitType];
+      if (!unit) {
+        throw new Error('Unknown unit type: ' + unitType);
+      }
+      return {
+        title: unit.title,
+        data: unit.data,
+        type: 'dropdown',
+        getSource: function() {
+          return unit.source;
+        },
+        getItemLabel: function(item) {
+          return decodeHtmlString(item.units);
+        },
+        getItemValue: function(item) {
+          return item.name;
+        },
+        required: true
+      }
+    },
+
+    makeBoxLocationField: function() {
+      return {
+        title: 'Box Location',
+        data: 'boxPosition',
+        type: 'read-only',
+        getDisplayValue: function(object) {
+          if (!object.box) {
+            return 'n/a';
+          }
+          var location = '';
+          if (object.box.locationBarcode) {
+            location += object.box.locationBarcode + ', ';
+          }
+          location += object.box.alias + ' ' + object.boxPosition;
+          return location;
+        },
+        getLink: function(object) {
+          return object.box ? ('/miso/box/' + object.box.id) : null;
+        }
+      }
+    },
+
+    makeDistributionFields: function() {
+      return [{
+        title: 'Distributed',
+        data: 'distributed',
+        type: 'checkbox',
+        onChange: function(newValue, updateField) {
+          var options = {
+            disabled: !newValue,
+            required: newValue
+          }
+          if (!newValue) {
+            options.value = '';
+          }
+          updateField('distributionDate', options);
+          updateField('distributionRecipient', options);
+        }
+      }, {
+        title: 'Distribution Date',
+        data: 'distributionDate',
+        type: 'date'
+      }, {
+        title: 'Distribution Recipient',
+        data: 'distributionRecipient',
+        type: 'text',
+        maxLength: 250
+      }];
     }
   };
 
@@ -104,10 +252,12 @@ FormUtils = (function($) {
     case 'read-only':
       return field.getDisplayValue ? control.val() : control.text();
     case 'text':
+    case 'textarea':
     case 'dropdown':
     case 'date':
+    case 'datetime':
     case 'decimal':
-      return control.val().length ? control.val() : null;
+      return control.val() !== null && control.val().length ? control.val() : null;
     case 'int':
       return control.val().length ? Number(control.val()) : null;
     case 'checkbox':
@@ -120,8 +270,10 @@ FormUtils = (function($) {
   function setFormValue(field, value) {
     switch (field.type) {
     case 'text':
+    case 'textarea':
     case 'dropdown':
     case 'date':
+    case 'datetime':
     case 'decimal':
     case 'int':
       $('#' + field.data).val(value);
@@ -149,6 +301,10 @@ FormUtils = (function($) {
     return fields[0];
   }
 
+  function sortChanges(a, b) {
+    return (changeOrder[a] || 0) - (changeOrder[b] || 0);
+  }
+
   function validateAndSave(containerId, object, target, sections) {
     var selector = '#' + containerId;
     Validate.cleanFields(selector);
@@ -159,7 +315,7 @@ FormUtils = (function($) {
         if (field.type !== 'special') { // FormTarget is responsible for managing updates, likely via an additional hidden field
           object[field.data] = getFormValue(field);
         }
-        if (['text', 'dropdown', 'date', 'decimal', 'int'].indexOf(field.type) !== -1) {
+        if (['text', 'textarea', 'dropdown', 'date', 'datetime', 'decimal', 'int'].indexOf(field.type) !== -1) {
           addValidation(field);
         }
       });
@@ -169,7 +325,15 @@ FormUtils = (function($) {
     $(selector).parsley().validate();
 
     Validate.updateWarningOrSubmit(selector, null, function() {
-      save(containerId, object, target);
+      var saveCallback = function() {
+        save(containerId, object, target);
+      };
+
+      if (target.confirmSave) {
+        target.confirmSave(object, saveCallback);
+      } else {
+        saveCallback();
+      }
     });
   }
 
@@ -179,14 +343,22 @@ FormUtils = (function($) {
       control.attr('data-parsley-required', true);
     }
     if (field.maxLength) {
-      control.attr('data-parsley-max-length', field.maxLength);
+      control.attr('data-parsley-maxlength', field.maxLength);
     }
-    if (field.type === 'text') {
-      control.attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    if (field.type === 'text' || field.type === 'textarea') {
+      if (field.regex) {
+        control.attr('data-parsley-pattern', field.regex);
+      } else {
+        control.attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+      }
     } else if (field.type === 'date') {
       control.attr('data-date-format', 'YYYY-MM-DD');
       control.attr('data-parsley-pattern', Utils.validation.dateRegex);
       control.attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+    } else if (field.type === 'datetime') {
+      control.attr('data-date-format', 'YYYY-MM-DD hh:mm:ss');
+      control.attr('data-parsley-pattern', Utils.validation.dateTimeRegex);
+      control.attr('data-parsley-error-message', 'Time must be of form YYYY-MM-DD hh:mm:ss');
     } else if (field.type === 'int') {
       control.attr('data-parsley-type', 'integer');
       if (field.hasOwnProperty('min')) {
@@ -260,6 +432,12 @@ FormUtils = (function($) {
       if (field.type === 'date') {
         $('#' + field.data).attr('placeholder', 'YYYY-MM-DD');
         Utils.ui.addDatePicker(field.data);
+      } else if (field.type === 'datetime') {
+        $('#' + field.data).attr('placeholder', 'YYYY-MM-DD hh:mm:ss');
+        Utils.ui.addDateTimePicker(field.data);
+      }
+      if (field.disabled) {
+        Utils.ui.setDisabled('#' + field.data, true);
       }
     });
   }
@@ -293,13 +471,17 @@ FormUtils = (function($) {
     case 'int':
     case 'decimal':
     case 'date': // treat as text for now. date picker gets added later
+    case 'datetime':
       td.append(makeTextInput(field, value));
+      break;
+    case 'textarea':
+      td.append(makeTextareaInput(field, value));
       break;
     case 'dropdown':
       td.append(makeDropdownInput(field, value, updateField));
       break;
     case 'checkbox':
-      td.append(makeCheckboxInput(field, value));
+      td.append(makeCheckboxInput(field, value, updateField));
       break;
     case 'special':
       td.append(makeSpecialInput(field, value));
@@ -352,12 +534,38 @@ FormUtils = (function($) {
     return input;
   }
 
+  function makeTextareaInput(field, value) {
+    var input = $('<textarea>').attr('id', field.data);
+    if (value !== null) {
+      input.val(value);
+    }
+    if (field.maxLength) {
+      input.attr('maxlength', field.maxlength);
+    }
+    return input;
+  }
+
   function makeDropdownInput(field, value, updateField) {
     var select = $('<select>').attr('id', field.data);
+    addDropdownOptions(field, select);
+    if (typeof value === 'boolean') {
+      value = value.toString();
+    }
+    select.val(value);
+    if (field.onChange) {
+      select.change(function() {
+        field.onChange(this.value, updateField);
+      });
+    }
+    return select;
+  }
+
+  function addDropdownOptions(field, select) {
     if (!field.required || field.nullLabel) {
       select.append($('<option>').val(null).text(field.nullLabel || 'None'));
     }
-    field.getSource().forEach(function(item) {
+    var items = field.sortSource ? field.getSource().sort(field.sortSource) : field.getSource();
+    items.forEach(function(item) {
       var itemValue = field.getItemValue ? field.getItemValue(item) : item;
       var itemLabel = field.getItemLabel ? field.getItemLabel(item) : null;
       if (field.getItemLabel) {
@@ -369,17 +577,16 @@ FormUtils = (function($) {
       }
       select.append($('<option>').val(itemValue).text(itemLabel));
     });
-    select.val(value);
-    if (field.onChange) {
-      select.change(function() {
-        field.onChange(this.value, updateField);
-      });
-    }
-    return select;
   }
 
-  function makeCheckboxInput(field, value) {
-    return $('<input>').attr('id', field.data).attr('type', 'checkbox').prop('checked', value);
+  function makeCheckboxInput(field, value, updateField) {
+    var checkbox = $('<input>').attr('id', field.data).attr('type', 'checkbox').prop('checked', value);
+    if (field.onChange) {
+      checkbox.change(function() {
+        field.onChange(this.checked, updateField);
+      });
+    }
+    return checkbox;
   }
 
   function makeSpecialInput(field, value) {
@@ -392,6 +599,12 @@ FormUtils = (function($) {
 
   function makeFieldValidationBox(field) {
     return $('<div>').attr('id', field.data + 'Error').addClass('errorContainer');
+  }
+
+  function decodeHtmlString(text) {
+    var textarea = document.createElement('textarea');
+    textarea.innerHTML = text;
+    return textarea.value;
   }
 
 })(jQuery);

@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
@@ -112,38 +111,43 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   @Override
-  public Collection<Pool> listBySearch(String query) throws IOException {
+  public List<Pool> listBySearch(String query) throws IOException {
     return poolStore.listAllByCriteria(null, query, null);
   }
 
   @Override
-  public Collection<Pool> listWithLimit(int limit) throws IOException {
+  public List<Pool> listWithLimit(int limit) throws IOException {
     return poolStore.listAllByCriteria(null, null, limit);
   }
 
   @Override
-  public Collection<Pool> list() throws IOException {
+  public List<Pool> list() throws IOException {
     return poolStore.listAll();
   }
 
   @Override
-  public Collection<Pool> listByPlatform(PlatformType platformType) throws IOException {
+  public List<Pool> listByPlatform(PlatformType platformType) throws IOException {
     return poolStore.listAllByCriteria(platformType, null, null);
   }
 
   @Override
-  public Collection<Pool> listByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
+  public List<Pool> listByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
     return poolStore.listAllByCriteria(platformType, query, null);
   }
 
   @Override
-  public Collection<Pool> listByProjectId(long projectId) throws IOException {
+  public List<Pool> listByProjectId(long projectId) throws IOException {
     return poolStore.listByProjectId(projectId);
   }
 
   @Override
-  public Collection<Pool> listByLibraryId(long libraryId) throws IOException {
+  public List<Pool> listByLibraryId(long libraryId) throws IOException {
     return poolStore.listByLibraryId(libraryId);
+  }
+
+  @Override
+  public List<Pool> listByDilutionId(long dilutionId) throws IOException {
+    return poolStore.listByDilutionId(dilutionId);
   }
 
   @Override
@@ -209,10 +213,17 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
       managed.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(pool.getIdentificationBarcode()));
       managed.setPlatformType(pool.getPlatformType());
       managed.setQcPassed(pool.getQcPassed());
-      managed.setVolume(pool.getVolume());
-      managed.setVolumeUnits(pool.getVolumeUnits());
       managed.setDiscarded(pool.isDiscarded());
       managed.setCreationDate(pool.getCreationDate());
+      if (pool.isDiscarded() || pool.isDistributed()) {
+        managed.setVolume(0.0);
+      } else {
+        managed.setVolume(pool.getVolume());
+      }
+      managed.setVolumeUnits(pool.getVolume() == null ? null : pool.getVolumeUnits());
+      managed.setDistributed(pool.isDistributed());
+      managed.setDistributionDate(pool.getDistributionDate());
+      managed.setDistributionRecipient(pool.getDistributionRecipient());
 
       Set<String> originalItems = extractDilutionNames(managed.getPoolDilutions());
       loadPoolDilutions(pool, managed);
@@ -316,12 +327,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   @Override
-  public Map<String, Integer> getPoolColumnSizes() throws IOException {
-    return ValidationUtils.adjustNameLength(poolStore.getPoolColumnSizes(), namingScheme);
-  }
-
-  @Override
-  public Collection<Pool> listByIdList(List<Long> poolIds) throws IOException {
+  public List<Pool> listByIdList(List<Long> poolIds) throws IOException {
     return poolStore.listPoolsById(poolIds);
   }
 
