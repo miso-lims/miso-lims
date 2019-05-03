@@ -114,7 +114,6 @@ public class EditPoolController {
     private static final String BOX = "box";
     private static final String PAGE_MODE = "pageMode";
     private static final String EDIT = "edit";
-    private static final String PROPAGATE = "propagate";
     private static final String CREATE = "create";
   }
 
