@@ -1,4 +1,6 @@
-package uk.ac.bbsrc.tgac.miso.dto;
+package uk.ac.bbsrc.tgac.miso.dto.run;
+
+import uk.ac.bbsrc.tgac.miso.dto.ContainerModelDto;
 
 public class RunPositionDto {
 

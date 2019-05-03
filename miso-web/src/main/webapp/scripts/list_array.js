@@ -47,7 +47,7 @@ ListTarget.array = {
           mData: 'lastModified',
           include: true,
           iSortPriority: 2,
-          bVisible: (Sample.detailedSample ? true : false)
+          bVisible: Constants.isDetailedSample
         }];
   }
 };

@@ -455,11 +455,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     changeLogService.create(changeLog);
   }
 
-  @Override
-  public Map<String, Integer> getRunColumnSizes() throws IOException {
-    return ValidationUtils.adjustNameLength(runDao.getRunColumnSizes(), namingScheme);
-  }
-
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }

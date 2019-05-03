@@ -815,7 +815,6 @@ public class MisoServiceManager {
 
   public void setDefaultRunDao() {
     HibernateRunDao dao = new HibernateRunDao();
-    dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
     setRunDao(dao);
   }

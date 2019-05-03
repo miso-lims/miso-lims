@@ -78,6 +78,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.IlluminaWorkflowType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
@@ -378,6 +380,19 @@ public class MenuController implements ServletContextAware {
     ArrayNode dilutionFactors = node.putArray("dilutionFactors");
     for (String label : DilutionFactor.getLabels()) {
       dilutionFactors.add(label);
+    }
+    ArrayNode healthTypes = node.putArray("healthTypes");
+    for (HealthType status : HealthType.values()) {
+      ObjectNode dto = healthTypes.addObject();
+      dto.put("label", status.getKey());
+      dto.put("allowedFromSequencer", status.isAllowedFromSequencer());
+      dto.put("isDone", status.isDone());
+    }
+    ArrayNode illuminaWorkflowTypes = node.putArray("illuminaWorkflowTypes");
+    for (IlluminaWorkflowType wf : IlluminaWorkflowType.values()) {
+      ObjectNode dto = illuminaWorkflowTypes.addObject();
+      dto.put("label", wf.getLabel());
+      dto.put("value", wf.getRawValue());
     }
 
     // Save the regenerated file in cache. This has a race condition where multiple concurrent requests could results in regenerating this

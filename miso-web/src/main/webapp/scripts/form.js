@@ -22,10 +22,11 @@ FormUtils = (function($) {
    *   getDisplayValue: optional function(object) returning string; generate a value to display in a read-only field instead of the
    *       data value
    *   getLink: optional function(object) returning URL string; generate a link URL for read-only field
-   *   type: required string (read-only|text|dropdown|checkbox|int|decimal|special); type of field. Note: read-only means not directly
-   *       editable. The value may still be changed via javascript, and that updated value will be validated and saved
+   *   type: required string (read-only|text|textarea|dropdown|checkbox|int|decimal|date|datetime|special); type of field. Note: read-only
+   *       means not directly editable. The value may still be changed via javascript, and that updated value will be validated and saved
    *   include: optional boolean; determines whether the field is displayed. Field is displayed by default
    *   initial: optional string; value to initialize field value to for new items
+   *   disabled: optional boolean; whether the field is disabled
    *   required: optional boolean; whether the field is required
    *   maxLength: optional integer; maximum number of characters for text input
    *   regex: optional regex; validation regex for text input
@@ -250,8 +251,10 @@ FormUtils = (function($) {
     case 'read-only':
       return field.getDisplayValue ? control.val() : control.text();
     case 'text':
+    case 'textarea':
     case 'dropdown':
     case 'date':
+    case 'datetime':
     case 'decimal':
       return control.val() !== null && control.val().length ? control.val() : null;
     case 'int':
@@ -266,8 +269,10 @@ FormUtils = (function($) {
   function setFormValue(field, value) {
     switch (field.type) {
     case 'text':
+    case 'textarea':
     case 'dropdown':
     case 'date':
+    case 'datetime':
     case 'decimal':
     case 'int':
       $('#' + field.data).val(value);
@@ -309,7 +314,7 @@ FormUtils = (function($) {
         if (field.type !== 'special') { // FormTarget is responsible for managing updates, likely via an additional hidden field
           object[field.data] = getFormValue(field);
         }
-        if (['text', 'dropdown', 'date', 'decimal', 'int'].indexOf(field.type) !== -1) {
+        if (['text', 'textarea', 'dropdown', 'date', 'datetime', 'decimal', 'int'].indexOf(field.type) !== -1) {
           addValidation(field);
         }
       });
@@ -339,7 +344,7 @@ FormUtils = (function($) {
     if (field.maxLength) {
       control.attr('data-parsley-maxlength', field.maxLength);
     }
-    if (field.type === 'text') {
+    if (field.type === 'text' || field.type === 'textarea') {
       if (field.regex) {
         control.attr('data-parsley-pattern', field.regex);
       } else {
@@ -349,6 +354,10 @@ FormUtils = (function($) {
       control.attr('data-date-format', 'YYYY-MM-DD');
       control.attr('data-parsley-pattern', Utils.validation.dateRegex);
       control.attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+    } else if (field.type === 'datetime') {
+      control.attr('data-date-format', 'YYYY-MM-DD hh:mm:ss');
+      control.attr('data-parsley-pattern', Utils.validation.dateTimeRegex);
+      control.attr('data-parsley-error-message', 'Time must be of form YYYY-MM-DD hh:mm:ss');
     } else if (field.type === 'int') {
       control.attr('data-parsley-type', 'integer');
       if (field.hasOwnProperty('min')) {
@@ -422,6 +431,12 @@ FormUtils = (function($) {
       if (field.type === 'date') {
         $('#' + field.data).attr('placeholder', 'YYYY-MM-DD');
         Utils.ui.addDatePicker(field.data);
+      } else if (field.type === 'datetime') {
+        $('#' + field.data).attr('placeholder', 'YYYY-MM-DD hh:mm:ss');
+        Utils.ui.addDateTimePicker(field.data);
+      }
+      if (field.disabled) {
+        Utils.ui.setDisabled('#' + field.data, true);
       }
     });
   }
@@ -455,7 +470,11 @@ FormUtils = (function($) {
     case 'int':
     case 'decimal':
     case 'date': // treat as text for now. date picker gets added later
+    case 'datetime':
       td.append(makeTextInput(field, value));
+      break;
+    case 'textarea':
+      td.append(makeTextareaInput(field, value));
       break;
     case 'dropdown':
       td.append(makeDropdownInput(field, value, updateField));
@@ -505,6 +524,17 @@ FormUtils = (function($) {
 
   function makeTextInput(field, value) {
     var input = $('<input>').attr('id', field.data).attr('type', 'text');
+    if (value !== null) {
+      input.val(value);
+    }
+    if (field.maxLength) {
+      input.attr('maxlength', field.maxlength);
+    }
+    return input;
+  }
+
+  function makeTextareaInput(field, value) {
+    var input = $('<textarea>').attr('id', field.data);
     if (value !== null) {
       input.val(value);
     }

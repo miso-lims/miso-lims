@@ -346,6 +346,7 @@ public class LibraryPageIT extends AbstractIT {
     assertEquals("true", dialog.getField(AddNoteDialog.Field.INTERNAL_ONLY));
     assertEquals("test note", dialog.getField(AddNoteDialog.Field.TEXT));
     LibraryPage page2 = dialog.submit();
+    assertNotNull(page2);
 
     List<Note> afterAddNotes = page2.getNotesSection().getNotes();
     assertEquals(initialNotes.size() + 1, afterAddNotes.size());

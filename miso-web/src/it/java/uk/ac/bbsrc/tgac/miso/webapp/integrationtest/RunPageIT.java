@@ -45,8 +45,8 @@ public class RunPageIT extends AbstractIT {
 
     // default values
     Map<RunPage.Field, String> fields = Maps.newLinkedHashMap();
-    fields.put(Field.ID, "Unsaved");
-    fields.put(Field.NAME, "Unsaved");
+    fields.put(Field.ID, null);
+    fields.put(Field.NAME, null);
     fields.put(Field.ALIAS, null);
     fields.put(Field.PLATFORM, "PacBio");
     fields.put(Field.SEQUENCER, "PacBio_SR_5001 - PacBio RS II");
@@ -88,8 +88,8 @@ public class RunPageIT extends AbstractIT {
 
     // default values
     Map<RunPage.Field, String> fields = Maps.newLinkedHashMap();
-    fields.put(Field.ID, "Unsaved");
-    fields.put(Field.NAME, "Unsaved");
+    fields.put(Field.ID, null);
+    fields.put(Field.NAME, null);
     fields.put(Field.ALIAS, null);
     fields.put(Field.PLATFORM, "Illumina");
     fields.put(Field.SEQUENCER, "HiSeq_SR_5002 - Illumina HiSeq 2500");

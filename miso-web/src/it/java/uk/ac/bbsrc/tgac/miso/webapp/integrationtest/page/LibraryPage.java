@@ -8,7 +8,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HoverMenu;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.NotesSection;
 
 public class LibraryPage extends FormPage<LibraryPage.Field> {
@@ -61,22 +60,15 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
     }
   } // end Field enum
 
-  private static final By QCS_MENU_SELECTOR = By.id("notesMenuHandle");
-  private static final By DILUTIONS_MENU_SELECTOR = By.id("notesMenuHandle");
-
   @FindBy(id = "save")
   private WebElement saveButton;
 
-  private final HoverMenu qcsMenu;
-  private final HoverMenu dilutionsMenu;
   private final NotesSection<LibraryPage> notesSection;
 
   public LibraryPage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(titleContains("Library "));
-    qcsMenu = new HoverMenu(getDriver(), QCS_MENU_SELECTOR);
-    dilutionsMenu = new HoverMenu(getDriver(), DILUTIONS_MENU_SELECTOR);
     notesSection = new NotesSection<>(driver, LibraryPage::new);
   }
 

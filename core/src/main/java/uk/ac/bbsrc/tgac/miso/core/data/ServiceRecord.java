@@ -28,7 +28,7 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
 
   private static final long serialVersionUID = 1L;
 
-  public static final long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
   
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -42,7 +42,7 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
   private String title;
   private String details;
 
-  @Column(name = "servicedBy", nullable = false)
+  @Column(name = "servicedBy")
   private String servicedByName;
   private String referenceNumber;
 
@@ -78,6 +78,10 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
   @Override
   public long getId() {
     return recordId;
+  }
+
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
   public void setInstrument(Instrument instrument) {
