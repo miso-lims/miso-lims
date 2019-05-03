@@ -5,6 +5,8 @@ Changes:
   * Changed Edit Run page to show validation messages instead of error page when saving fails
   * Changed Edit Service Record page to show validation messages instead of error page when saving
     fails
+  * Made dilutions and pools distributable
+  * Improved "Location" display in list tables
 
 # 0.2.175
 

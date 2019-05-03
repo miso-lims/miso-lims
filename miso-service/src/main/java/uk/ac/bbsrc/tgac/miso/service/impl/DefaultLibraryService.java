@@ -476,7 +476,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     target.setLowQuality(source.isLowQuality());
     target.setDiscarded(source.isDiscarded());
     target.setCreationDate(source.getCreationDate());
-    if (target.isDiscarded()) {
+    if (source.isDiscarded() || source.isDistributed()) {
       target.setVolume(0.0);
     } else {
       target.setVolume(source.getVolume());
@@ -506,12 +506,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     target.setDistributed(source.isDistributed());
     target.setDistributionDate(source.getDistributionDate());
     target.setDistributionRecipient(source.getDistributionRecipient());
-    if (target.isDistributed()) {
-      target.setLocationBarcode("SENT TO: " + target.getDistributionRecipient());
-      target.setVolume(0.0);
-    } else {
-      target.setLocationBarcode(source.getLocationBarcode());
-    }
+    target.setLocationBarcode(source.getLocationBarcode());
 
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;

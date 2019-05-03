@@ -1,7 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -18,6 +22,11 @@ public abstract class AbstractBoxable implements Boxable {
   private boolean discarded;
   @Column(nullable = true)
   private Double volume;
+
+  private boolean distributed;
+  @Temporal(TemporalType.DATE)
+  private Date distributionDate;
+  private String distributionRecipient;
 
   @Override
   public Double getVolume() {
@@ -38,6 +47,36 @@ public abstract class AbstractBoxable implements Boxable {
   public void setDiscarded(boolean discarded) {
     if (discarded) volume = 0.0;
     this.discarded = discarded;
+  }
+
+  @Override
+  public boolean isDistributed() {
+    return distributed;
+  }
+
+  @Override
+  public void setDistributed(boolean distributed) {
+    this.distributed = distributed;
+  }
+
+  @Override
+  public Date getDistributionDate() {
+    return distributionDate;
+  }
+
+  @Override
+  public void setDistributionDate(Date distributionDate) {
+    this.distributionDate = distributionDate;
+  }
+
+  @Override
+  public String getDistributionRecipient() {
+    return distributionRecipient;
+  }
+
+  @Override
+  public void setDistributionRecipient(String distributionRecipient) {
+    this.distributionRecipient = distributionRecipient;
   }
 
   @Override
