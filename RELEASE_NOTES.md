@@ -7,6 +7,8 @@ Changes:
     fails
   * Made dilutions and pools distributable
   * Improved "Location" display in list tables
+  * Fixed Pinery-MISO failing to reverse compliment indices when appropriate if the container model
+    is not accurately detected
 
 # 0.2.175
 

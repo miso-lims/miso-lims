@@ -94,8 +94,7 @@ public class MisoClient implements Lims {
 
   // RunSample queries
   private static final String QUERY_ALL_RUN_SAMPLES = getResourceAsString("queryAllRunSamples.sql");
-  private static final String QUERY_RUN_SAMPLES_BY_RUN_ID = QUERY_ALL_RUN_SAMPLES
-      + " JOIN Run_SequencerPartitionContainer rcpc ON rcpc.containers_containerId = spc.containerId" + " WHERE rcpc.Run_runId = ?";
+  private static final String QUERY_RUN_SAMPLES_BY_RUN_ID = QUERY_ALL_RUN_SAMPLES + " WHERE Run.runId = ?";
 
   // Sample queries
   private static final String QUERY_ALL_SAMPLES = getResourceAsString("queryAllSamples.sql");
