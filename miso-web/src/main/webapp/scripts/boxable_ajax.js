@@ -57,7 +57,7 @@ var Boxable = Boxable || {
       recipient.setAttribute('readonly', 'readonly');
       recipient.classList.add('disabled');
       jQuery('.requiredForDistribution').remove();
-      if (location.value.indexOf('SENT TO:') == 0) {
+      if (location && location.value.indexOf('SENT TO:') == 0) {
         location.setAttribute('value', "");
       }
     }

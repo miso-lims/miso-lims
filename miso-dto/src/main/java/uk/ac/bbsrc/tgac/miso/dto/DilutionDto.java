@@ -37,6 +37,9 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
   private Integer proportion;
   private String subprojectAlias;
   private Boolean subprojectPriority;
+  private boolean distributed;
+  private String distributionDate;
+  private String distributionRecipient;
 
   public Long getId() {
     return id;
@@ -223,6 +226,30 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setSubprojectPriority(Boolean subprojectPriority) {
     this.subprojectPriority = subprojectPriority;
+  }
+
+  public boolean isDistributed() {
+    return distributed;
+  }
+
+  public void setDistributed(boolean distributed) {
+    this.distributed = distributed;
+  }
+
+  public String getDistributionDate() {
+    return distributionDate;
+  }
+
+  public void setDistributionDate(String distributionDate) {
+    this.distributionDate = distributionDate;
+  }
+
+  public String getDistributionRecipient() {
+    return distributionRecipient;
+  }
+
+  public void setDistributionRecipient(String distributionRecipient) {
+    this.distributionRecipient = distributionRecipient;
   }
 
 }

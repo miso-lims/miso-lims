@@ -159,26 +159,30 @@ public class BoxUtils {
   }
 
   public static String makeLocationLabel(BoxableView boxable) {
-    return makeLocationLabel(boxable.isDiscarded(), boxable.getLocationBarcode(), boxable.getBoxAlias(), boxable.getBoxPosition(),
+    return makeLocationLabel(boxable.isDiscarded(), boxable.isDistributed(), boxable.getLocationBarcode(), boxable.getBoxAlias(),
+        boxable.getBoxPosition(),
         boxable.getBoxLocationBarcode());
   }
 
   public static String makeLocationLabel(Boxable boxable) {
     return makeLocationLabel(boxable.isDiscarded(),
+        boxable.isDistributed(),
         boxable.getLocationBarcode(),
         boxable.getBox() == null ? null : boxable.getBox().getAlias(),
         boxable.getBoxPosition(),
         boxable.getBox() == null ? null : boxable.getBox().getLocationBarcode());
   }
 
-  public static String makeLocationLabel(boolean discarded, String locationBarcode, String boxAlias, String position,
+  public static String makeLocationLabel(boolean discarded, boolean distributed, String locationBarcode, String boxAlias, String position,
       String boxLocationBarcode) {
-    if (discarded) {
-      return "EMPTY";
-    } else if (boxAlias != null && position != null) {
+    if (boxAlias != null && position != null) {
       return (isStringEmptyOrNull(locationBarcode) ? "" : locationBarcode + ", ")
           + boxAlias + " - " + position
           + (isStringEmptyOrNull(boxLocationBarcode) ? "" : " (" + boxLocationBarcode + ")");
+    } else if (discarded) {
+      return "EMPTY";
+    } else if (distributed) {
+      return "DISTRIBUTED";
     } else if (locationBarcode != null) {
       return locationBarcode;
     } else {

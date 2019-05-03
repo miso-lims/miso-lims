@@ -224,7 +224,8 @@ FormUtils = (function($) {
         type: 'checkbox',
         onChange: function(newValue, updateField) {
           var options = {
-            disabled: !newValue
+            disabled: !newValue,
+            required: newValue
           }
           if (!newValue) {
             options.value = '';

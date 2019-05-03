@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -41,6 +42,9 @@ public class BulkPoolIT extends AbstractIT {
   private static final Set<String> dilutionsToPoolColumns = Sets.newHashSet(Columns.DILUTION_NAME, Columns.LIBRARY_ALIAS,
       Columns.LIBRARY_SIZE, Columns.POOL);
 
+  private static final Set<String> editColumns = Sets.newHashSet(Columns.DISTRIBUTED, Columns.DISTRIBUTION_DATE,
+      Columns.DISTRIBUTION_RECIPIENT);
+
   @Before
   public void setup() {
     loginAdmin();
@@ -51,8 +55,9 @@ public class BulkPoolIT extends AbstractIT {
     BulkPoolPage page = BulkPoolPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(200001L));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(commonColumns.size(), headings.size());
-    for (String col : commonColumns) {
+    Set<String> expectedHeadings = Stream.of(commonColumns, editColumns).flatMap(Set::stream).collect(Collectors.toSet());
+    assertEquals(expectedHeadings.size(), headings.size());
+    for (String col : expectedHeadings) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());

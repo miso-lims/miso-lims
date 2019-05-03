@@ -1511,6 +1511,9 @@ public class Dtos {
       dto.setBoxPosition(from.getBoxPosition());
     }
     dto.setDiscarded(from.isDiscarded());
+    dto.setDistributed(from.isDistributed());
+    dto.setDistributionDate(formatDate(from.getDistributionDate()));
+    dto.setDistributionRecipient(from.getDistributionRecipient());
     Sample sample = from.getLibrary().getSample();
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
@@ -1612,6 +1615,9 @@ public class Dtos {
     }
     to.setBoxPosition((DilutionBoxPosition) makeBoxablePosition(from, to));
     to.setDiscarded(from.isDiscarded());
+    to.setDistributed(from.isDistributed());
+    to.setDistributionDate(parseDate(from.getDistributionDate()));
+    to.setDistributionRecipient(from.getDistributionRecipient());
     return to;
   }
 
@@ -1667,6 +1673,9 @@ public class Dtos {
       dto.setBoxPosition(from.getBoxPosition());
     }
     dto.setDiscarded(from.isDiscarded());
+    dto.setDistributed(from.isDistributed());
+    dto.setDistributionDate(formatDate(from.getDistributionDate()));
+    dto.setDistributionRecipient(from.getDistributionRecipient());
     dto.setHasLowQualityLibraries(from.getHasLowQualityMembers());
     dto.setPrioritySubprojectAliases(from.getPrioritySubprojectAliases());
 
@@ -2192,6 +2201,9 @@ public class Dtos {
     to.setDescription(dto.getDescription());
     to.setIdentificationBarcode(dto.getIdentificationBarcode());
     to.setDiscarded(dto.isDiscarded());
+    to.setDistributed(dto.isDistributed());
+    to.setDistributionDate(parseDate(dto.getDistributionDate()));
+    to.setDistributionRecipient(dto.getDistributionRecipient());
     if (dto.getVolume() != null) {
       to.setVolume(Double.valueOf(dto.getVolume()));
     }

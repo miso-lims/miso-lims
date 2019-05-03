@@ -225,8 +225,15 @@ public class DefaultLibraryDilutionService
   private void applyChanges(LibraryDilution target, LibraryDilution source) {
     target.setTargetedSequencing(source.getTargetedSequencing());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
-    target.setVolume(source.getVolume());
-    target.setVolumeUnits(target.getVolume() == null ? null : source.getVolumeUnits());
+    if (source.isDiscarded() || source.isDistributed()) {
+      target.setVolume(0.0);
+    } else {
+      target.setVolume(source.getVolume());
+    }
+    target.setVolumeUnits(source.getVolume() == null ? null : source.getVolumeUnits());
+    target.setDistributed(source.isDistributed());
+    target.setDistributionDate(source.getDistributionDate());
+    target.setDistributionRecipient(source.getDistributionRecipient());
     target.setConcentration(source.getConcentration());
     target.setConcentrationUnits(target.getConcentration() == null ? null : source.getConcentrationUnits());
     target.setNgUsed(source.getNgUsed());

@@ -86,7 +86,7 @@ FormTarget.pool = (function($) {
               disabled: newValue
             });
           }
-        }, FormUtils.makeBoxLocationField(true)]
+        }].concat(FormUtils.makeDistributionFields()).concat(FormUtils.makeBoxLocationField(true))
       }];
     },
     confirmSave: function(pool, saveCallback) {
