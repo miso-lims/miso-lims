@@ -1,11 +1,11 @@
 version: '3.7'
 
 ################################################################################
-# Builds and brings up a MISO LIMS environment in detailed sample mode.
+# Builds and brings up a MISO LIMS environment in plain sample mode.
 # 
 # Intended for testing the current version of the MISO codebase.
 # NOT INTENDED FOR PRODUCTION USE. 
-# See the docs for more information: https://miso-lims.github.io/miso-lims/
+# See the docs for more information: https://miso-lims.github.io/miso-lims/#
 #
 # Environment variables must be provided for this file to work. 
 # The .env file or shell environment variables contain: 
@@ -17,9 +17,7 @@ version: '3.7'
 ################################################################################
 # USAGE : run in cloned miso-lims repository 
 #
-# echo "changeme" > ./.miso_db_password
-# docker-compose -f docker-compose.detailed.yml build
-# docker-compose -f docker-compose.detailed.yml up
+# echo "changeme" > ./.miso_db_password && docker-compose build && docker-compose up
 ################################################################################
 # Code available at https://github.com/miso-lims/miso-lims under GPL-3.0
 ################################################################################
@@ -52,11 +50,7 @@ services:
       - db
     depends_on:
       - db
-    volumes:
-      - "./.docker/detailed_sample_config/V0792__drop-inconvenient-rows.sql:/flyway/sql/V0792__drop-inconvenient-rows.sql:ro"
-      - "./.docker/detailed_sample_config/V0793__detailed_sample_data.sql:/flyway/sql/V0793__detailed_sample_data.sql:ro"
 
-      
   webapp:
     build:
       context: .
@@ -68,8 +62,7 @@ services:
       - db
     depends_on:
       - db
-    volumes:
-      - ".docker/detailed_sample_config/miso.properties:/usr/local/tomcat/conf/Catalina/localhost/miso.properties:ro"
+
   
   nginx:
     image: nginx:1.15.12-alpine

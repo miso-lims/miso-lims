@@ -56,7 +56,7 @@ export MISO_DB_USER=tgaclims MISO_DB=lims MISO_DB_PASSWORD_FILE=./.miso_db_passw
 docker-compose up
 ```
 
-Navigate to [http://localhost:8090](http://localhost:8090) to login to miso with
+Navigate to [http://localhost/miso](http://localhost/miso) to login to miso with
 the credentials **admin/admin**.
 
 **Detailed sample mode** has all of the features of plain sample mode, plus it
@@ -78,7 +78,7 @@ export MISO_DB_USER=tgaclims MISO_DB=lims MISO_DB_PASSWORD_FILE=./.miso_db_passw
 docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.detailed.yml up
 ```
 
-Navigate to [http://localhost:8090](http://localhost:8090) to login to miso with
+Navigate to [http://localhost/miso](http://localhost/miso) to login to miso with
 the credentials **admin/admin**.
 
 The docker-compose.override.yml file creates Docker volumes for the MISO DB 
