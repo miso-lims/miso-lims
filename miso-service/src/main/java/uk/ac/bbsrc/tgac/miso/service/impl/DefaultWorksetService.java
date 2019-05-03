@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -179,11 +178,6 @@ public class DefaultWorksetService implements WorksetService {
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
-  }
-
-  @Override
-  public Map<String, Integer> getColumnSizes() throws IOException {
-    return worksetStore.getColumnSizes();
   }
 
   @Override
