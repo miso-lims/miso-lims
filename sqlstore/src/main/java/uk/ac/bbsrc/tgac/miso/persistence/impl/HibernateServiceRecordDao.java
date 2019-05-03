@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -12,14 +11,11 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.store.ServiceRecordStore;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -30,12 +26,6 @@ public class HibernateServiceRecordDao implements ServiceRecordStore {
   @Autowired
   private SessionFactory sessionFactory;
 
-  @Autowired
-  private JdbcTemplate template;
-
-  @Autowired
-  private MisoFilesManager misoFilesManager;
-
   private Session currentSession() {
     return getSessionFactory().getCurrentSession();
   }
@@ -43,7 +33,7 @@ public class HibernateServiceRecordDao implements ServiceRecordStore {
   @Override
   public long save(ServiceRecord ssr) throws IOException {
     long id;
-    if (ssr.getId() == ServiceRecord.UNSAVED_ID) {
+    if (!ssr.isSaved()) {
       if (ssr.getInstrument().getDateDecommissioned() != null)
         throw new IOException("Cannot add service records to a retired instrument!");
 
@@ -83,25 +73,12 @@ public class HibernateServiceRecordDao implements ServiceRecordStore {
     return records;
   }
 
-  @Override
-  public Map<String, Integer> getServiceRecordColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(template, "ServiceRecord");
-  }
-
   public SessionFactory getSessionFactory() {
     return sessionFactory;
   }
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
-  }
-
-  public void setTemplate(JdbcTemplate template) {
-    this.template = template;
-  }
-
-  public void setMisoFilesManager(MisoFilesManager misoFilesManager) {
-    this.misoFilesManager = misoFilesManager;
   }
 
 }

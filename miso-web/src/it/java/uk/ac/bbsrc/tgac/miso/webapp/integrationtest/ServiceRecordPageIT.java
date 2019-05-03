@@ -37,7 +37,7 @@ public class ServiceRecordPageIT extends AbstractIT {
     ServiceRecordPage page = seqPage.addServiceRecord();
     assertNotNull(page);
 
-    assertEquals(page.getField(Field.INSTRUMENT), seq.getName());
+    assertEquals(seq.getName(), page.getField(Field.INSTRUMENT));
 
     Map<Field, String> fields = Maps.newLinkedHashMap();
     fields.put(Field.TITLE, "Test Service Record");
