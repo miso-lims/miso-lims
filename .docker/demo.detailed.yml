@@ -2,34 +2,34 @@ version: '3.7'
 
 ################################################################################
 # Brings up a MISO LIMS environment in detailed sample mode.
-# 
-# Intended for demo purposes only. NOT INTENDED FOR PRODUCTION USE. 
+#
+# Intended for demo purposes only. NOT INTENDED FOR PRODUCTION USE.
 # See the docs for more information: https://miso-lims.github.io/miso-lims/
 #
 #
-# Environment variables must be provided for this file to work. 
-# The .env file or shell environment variables contain: 
-# the following: 
+# Environment variables must be provided for this file to work.
+# The .env file or shell environment variables contain:
+# the following:
 # * MISO_DB_USER : name of the MySQL user who accesses MISO_DB
 # * MISO_DB : name of the LIMS Db in MySql
-# * MISO_DB_PASSWORD_FILE : path to the file with the password to the MySQL DB for user MISO_DB_USER 
+# * MISO_DB_PASSWORD_FILE : path to the file with the password to the MySQL DB for user MISO_DB_USER
 # * MISO_TAG : tag of the MISO Docker containers (migration and webapp)
 #
 ################################################################################
-# USAGE : 
-# mkdir nginx detailed_sample_config
-# wget -P nginx https://raw.githubusercontent.com/miso-lims/miso-lims/master/.docker/nginx/http.conf 
-# wget -P detailed_sample_config https://raw.githubusercontent.com/miso-lims/miso-lims/master/.docker/detailed_sample_config/miso.properties https://raw.githubusercontent.com/miso-lims/miso-lims/master/.docker/detailed_sample_config/V0792__drop-inconvenient-rows.sql https://raw.githubusercontent.com/miso-lims/miso-lims/master/.docker/detailed_sample_config/V0793__detailed_sample_data.sql
+# USAGE :
+# wget https://github.com/miso-lims/miso-lims/archive/master.zip
+# unzip master.zip 'miso-lims-master/.docker/*' && mv miso-lims-master/.docker miso-lims-compose && rm -r master.zip miso-lims-master/
+# cd miso-lims-compose
 # export MISO_DB_USER=tgaclims MISO_DB=lims MISO_DB_PASSWORD_FILE=./.miso_db_password MISO_TAG=latest
 # echo "changeme" > ./.miso_db_password
 # docker-compose -f demo.detailed.yml up
-# 
+#
 ################################################################################
 # Code available at https://github.com/miso-lims/miso-lims under GPL-3.0
 ################################################################################
 
 secrets:
-  lims_password: 
+  lims_password:
     file: ${MISO_DB_PASSWORD_FILE}
 
 services:
@@ -56,7 +56,7 @@ services:
     volumes:
       - "./detailed_sample_config/V0792__drop-inconvenient-rows.sql:/flyway/sql/V0792__drop-inconvenient-rows.sql:ro"
       - "./detailed_sample_config/V0793__detailed_sample_data.sql:/flyway/sql/V0793__detailed_sample_data.sql:ro"
-      
+
   webapp:
     image: misolims/miso-lims-webapp:${MISO_TAG}
     restart: always
@@ -68,13 +68,13 @@ services:
       - db
     volumes:
       - "./detailed_sample_config/miso.properties:/usr/local/tomcat/conf/Catalina/localhost/miso.properties:ro"
-    ports: 
+    ports:
       - "8090:8080"
 
-  
+
   nginx:
     image: nginx:1.15.12-alpine
-    ports: 
+    ports:
       - "3000:3000"
     volumes:
       - "./nginx/http.conf:/etc/nginx/conf.d/default.conf:ro"
@@ -82,4 +82,3 @@ services:
       - webapp
     depends_on:
       - webapp
-

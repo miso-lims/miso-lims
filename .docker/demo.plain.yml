@@ -2,32 +2,34 @@ version: '3.7'
 
 ################################################################################
 # Brings up a MISO LIMS environment in plain sample mode.
-# 
-# Intended for demo purposes only. NOT INTENDED FOR PRODUCTION USE. 
+#
+# Intended for demo purposes only. NOT INTENDED FOR PRODUCTION USE.
 # See the docs for more information: https://miso-lims.github.io/miso-lims/
 #
 #
-# Environment variables must be provided for this file to work. 
-# The .env file or shell environment variables contain: 
-# the following: 
+# Environment variables must be provided for this file to work.
+# The .env file or shell environment variables contain:
+# the following:
 # * MISO_DB_USER : name of the MySQL user who accesses MISO_DB
 # * MISO_DB : name of the LIMS Db in MySql
-# * MISO_DB_PASSWORD_FILE : path to the file with the password to the MySQL DB for user MISO_DB_USER 
+# * MISO_DB_PASSWORD_FILE : path to the file with the password to the MySQL DB for user MISO_DB_USER
 # * MISO_TAG : tag of the MISO Docker containers (migration and webapp)
 #
 ################################################################################
-# USAGE : 
-# wget https://raw.githubusercontent.com/miso-lims/miso-lims/master/.docker/nginx/http.conf && mkdir nginx && mv http.conf nginx
+# USAGE :
+# wget https://github.com/miso-lims/miso-lims/archive/master.zip
+# unzip master.zip 'miso-lims-master/.docker/*' && mv miso-lims-master/.docker miso-lims-compose && rm -r master.zip miso-lims-master/
+# cd miso-lims-compose
 # export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && MISO_TAG=latest
 # echo "changeme" > ./.miso_db_password
 # docker-compose -f demo.plain.yml up
-# 
+#
 ################################################################################
 # Code available at https://github.com/miso-lims/miso-lims under GPL-3.0
 ################################################################################
 
 secrets:
-  lims_password: 
+  lims_password:
     file: ${MISO_DB_PASSWORD_FILE}
 
 services:
@@ -62,10 +64,10 @@ services:
     depends_on:
       - db
 
-  
+
   nginx:
     image: nginx:1.15.12-alpine
-    ports: 
+    ports:
       - "80:80"
     volumes:
       - "./nginx/http.conf:/etc/nginx/conf.d/default.conf:ro"
@@ -73,4 +75,3 @@ services:
       - webapp
     depends_on:
       - webapp
-
