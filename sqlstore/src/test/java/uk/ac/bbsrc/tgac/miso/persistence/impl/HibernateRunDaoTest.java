@@ -95,7 +95,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   @Before
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
     emptyUser.setUserId(1L);
     when(securityDAO.getUserById(Matchers.anyLong())).thenReturn(emptyUser);

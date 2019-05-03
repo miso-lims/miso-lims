@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 @Entity
 @Table(name = "SequencingParameters")
 
-public class SequencingParameters implements Serializable, Comparable<SequencingParameters>
+public class SequencingParameters implements Serializable, Identifiable, Comparable<SequencingParameters>
 {
 
   private static final long serialVersionUID = 1L;
@@ -53,7 +53,7 @@ public class SequencingParameters implements Serializable, Comparable<Sequencing
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long parametersId;
+  private long parametersId;
 
   @ManyToOne(targetEntity = InstrumentModel.class)
   @JoinColumn(name = "instrumentModelId")
@@ -77,7 +77,8 @@ public class SequencingParameters implements Serializable, Comparable<Sequencing
     return creationDate;
   }
 
-  public Long getId() {
+  @Override
+  public long getId() {
     return parametersId;
   }
 
@@ -118,7 +119,8 @@ public class SequencingParameters implements Serializable, Comparable<Sequencing
     this.creationDate = creation;
   }
 
-  public void setId(Long id) {
+  @Override
+  public void setId(long id) {
     this.parametersId = id;
   }
 

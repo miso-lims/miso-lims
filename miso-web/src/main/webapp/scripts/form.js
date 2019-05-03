@@ -26,6 +26,7 @@ FormUtils = (function($) {
    *       means not directly editable. The value may still be changed via javascript, and that updated value will be validated and saved
    *   include: optional boolean; determines whether the field is displayed. Field is displayed by default
    *   initial: optional string; value to initialize field value to for new items
+   *   disabled: optional boolean; whether the field is disabled
    *   required: optional boolean; whether the field is required
    *   maxLength: optional integer; maximum number of characters for text input
    *   regex: optional regex; validation regex for text input
@@ -433,6 +434,9 @@ FormUtils = (function($) {
       } else if (field.type === 'datetime') {
         $('#' + field.data).attr('placeholder', 'YYYY-MM-DD hh:mm:ss');
         Utils.ui.addDateTimePicker(field.data);
+      }
+      if (field.disabled) {
+        Utils.ui.setDisabled('#' + field.data, true);
       }
     });
   }

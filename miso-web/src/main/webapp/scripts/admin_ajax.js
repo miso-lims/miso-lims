@@ -21,6 +21,14 @@
  * *********************************************************************
  */
 
+/**
+ * Catches and logs errors.
+ */
+window.addEventListener('error', function(e) {
+  var error = e.error;
+  console.log(error);
+});
+
 var Admin = Admin
     || {
       clearCache: function() {
