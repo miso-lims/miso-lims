@@ -356,9 +356,6 @@ public class PoolRestController extends RestController {
   public List<PoolDto> serializePools(Collection<Pool> pools, UriComponentsBuilder uriBuilder)
       throws IOException {
     List<PoolDto> poolDtos = pools.stream().map(pool -> Dtos.asDto(pool, false, false)).collect(Collectors.toList());
-    for (PoolDto poolDto : poolDtos) {
-      poolDto.writeUrls(uriBuilder);
-    }
     return poolDtos;
   }
 

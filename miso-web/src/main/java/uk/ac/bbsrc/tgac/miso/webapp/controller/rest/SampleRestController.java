@@ -57,7 +57,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -138,7 +137,6 @@ public class SampleRestController extends RestController {
       throw new RestException("No sample found with ID: " + id, Status.NOT_FOUND);
     } else {
       SampleDto dto = Dtos.asDto(sample, false);
-      dto.writeUrls(uriBuilder);
       return dto;
     }
   }
@@ -149,9 +147,6 @@ public class SampleRestController extends RestController {
     List<Sample> samples = sampleService.list();
     // return all samples
     List<SampleDto> sampleDtos = Dtos.asSampleDtos(samples, true);
-    for (SampleDto sampleDto : sampleDtos) {
-      sampleDto.writeUrls(uriBuilder);
-    }
     return sampleDtos;
   }
 
@@ -200,9 +195,6 @@ public class SampleRestController extends RestController {
     }
 
     SampleDto created = Dtos.asDto(sampleService.get(id), false);
-    UriComponents uriComponents = b.path("/sample/{id}").buildAndExpand(id);
-    created.setUrl(uriComponents.toUri().toString());
-    response.setHeader("Location", uriComponents.toUri().toString());
     return created;
   }
 

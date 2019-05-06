@@ -1,22 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.net.URI;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DetailedQcStatusDto implements WritableUrls {
+public class DetailedQcStatusDto {
 
   private Long id;
-  private String url;
   private Boolean status;
   private String description;
   private boolean noteRequired;
   private Long createdById;
-  private String createdByUrl;
   private String creationDate;
   private Long updatedById;
-  private String updatedByUrl;
   private String lastUpdated;
 
   public Long getId() {
@@ -27,14 +22,6 @@ public class DetailedQcStatusDto implements WritableUrls {
     this.id = id;
   }
 
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
   public String getDescription() {
     return description;
   }
@@ -43,28 +30,12 @@ public class DetailedQcStatusDto implements WritableUrls {
     this.description = description;
   }
 
-  public String getCreatedByUrl() {
-    return createdByUrl;
-  }
-
-  public void setCreatedByUrl(String createdByUrl) {
-    this.createdByUrl = createdByUrl;
-  }
-
   public String getCreationDate() {
     return creationDate;
   }
 
   public void setCreationDate(String creationDate) {
     this.creationDate = creationDate;
-  }
-
-  public String getUpdatedByUrl() {
-    return updatedByUrl;
-  }
-
-  public void setUpdatedByUrl(String updatedByUrl) {
-    this.updatedByUrl = updatedByUrl;
   }
 
   public String getLastUpdated() {
@@ -105,13 +76,6 @@ public class DetailedQcStatusDto implements WritableUrls {
 
   public void setNoteRequired(boolean noteRequired) {
     this.noteRequired = noteRequired;
-  }
-
-  @Override
-  public void writeUrls(URI baseUri) {
-    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/detailedqcstatus/{id}", getId()));
-    setCreatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getCreatedById()));
-    setUpdatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getUpdatedById()));
   }
 
 }

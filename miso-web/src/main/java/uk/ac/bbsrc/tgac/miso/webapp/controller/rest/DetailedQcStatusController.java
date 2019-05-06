@@ -71,7 +71,6 @@ public class DetailedQcStatusController extends RestController {
       throw new RestException("No detailed QC status found with ID: " + id, Status.NOT_FOUND);
     } else {
       DetailedQcStatusDto dto = Dtos.asDto(detailedQcStatus);
-      dto.writeUrls(uriBuilder);
       return dto;
     }
   }
@@ -81,9 +80,6 @@ public class DetailedQcStatusController extends RestController {
   public Set<DetailedQcStatusDto> getDetailedQcStatuses(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<DetailedQcStatus> detailedQcStatuses = detailedQcStatusService.getAll();
     Set<DetailedQcStatusDto> detailedQcStatusDtos = Dtos.asDetailedQcStatusDtos(detailedQcStatuses);
-    for (DetailedQcStatusDto detailedQcStatusDto : detailedQcStatusDtos) {
-      detailedQcStatusDto.writeUrls(uriBuilder);
-    }
     return detailedQcStatusDtos;
   }
 

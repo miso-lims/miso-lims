@@ -69,7 +69,6 @@ public class SampleGroupController extends RestController {
       throw new RestException("No sample group found with ID: " + id, Status.NOT_FOUND);
     } else {
       SampleGroupDto dto = Dtos.asDto(sampleGroup);
-      dto.writeUrls(uriBuilder);
       return dto;
     }
   }
@@ -79,9 +78,6 @@ public class SampleGroupController extends RestController {
   public Set<SampleGroupDto> getSampleGroups(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<SampleGroupId> sampleGroups = sampleGroupService.getAll();
     Set<SampleGroupDto> sampleGroupDtos = Dtos.asSampleGroupDtos(sampleGroups);
-    for (SampleGroupDto sampleGroupDto : sampleGroupDtos) {
-      sampleGroupDto.writeUrls(uriBuilder);
-    }
     return sampleGroupDtos;
   }
 

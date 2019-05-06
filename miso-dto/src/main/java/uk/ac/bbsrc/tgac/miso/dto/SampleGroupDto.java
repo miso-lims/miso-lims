@@ -1,25 +1,18 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.net.URI;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SampleGroupDto implements WritableUrls {
+public class SampleGroupDto {
 
   private Long id;
-  private String url;
   private Long projectId;
-  private String projectUrl;
   private Long subprojectId;
-  private String subprojectUrl;
   private Integer groupId;
   private String description;
   private Long createdById;
-  private String createdByUrl;
   private String creationDate;
   private Long updatedById;
-  private String updatedByUrl;
   private String lastUpdated;
 
   public Long getId() {
@@ -30,14 +23,6 @@ public class SampleGroupDto implements WritableUrls {
     this.id = id;
   }
 
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
   public String getDescription() {
     return description;
   }
@@ -46,28 +31,12 @@ public class SampleGroupDto implements WritableUrls {
     this.description = description;
   }
 
-  public String getCreatedByUrl() {
-    return createdByUrl;
-  }
-
-  public void setCreatedByUrl(String createdByUrl) {
-    this.createdByUrl = createdByUrl;
-  }
-
   public String getCreationDate() {
     return creationDate;
   }
 
   public void setCreationDate(String creationDate) {
     this.creationDate = creationDate;
-  }
-
-  public String getUpdatedByUrl() {
-    return updatedByUrl;
-  }
-
-  public void setUpdatedByUrl(String updatedByUrl) {
-    this.updatedByUrl = updatedByUrl;
   }
 
   public String getLastUpdated() {
@@ -102,28 +71,12 @@ public class SampleGroupDto implements WritableUrls {
     this.projectId = projectId;
   }
 
-  public String getProjectUrl() {
-    return projectUrl;
-  }
-
-  public void setProjectUrl(String projectUrl) {
-    this.projectUrl = projectUrl;
-  }
-
   public Long getSubprojectId() {
     return subprojectId;
   }
 
   public void setSubprojectId(Long subprojectId) {
     this.subprojectId = subprojectId;
-  }
-
-  public String getSubprojectUrl() {
-    return subprojectUrl;
-  }
-
-  public void setSubprojectUrl(String subprojectUrl) {
-    this.subprojectUrl = subprojectUrl;
   }
 
   public Integer getGroupId() {
@@ -136,17 +89,8 @@ public class SampleGroupDto implements WritableUrls {
 
   @Override
   public String toString() {
-    return "SampleGroupDto [id=" + id + ", url=" + url + ", projectId=" + projectId + ", projectUrl=" + projectUrl + ", subprojectId="
-        + subprojectId + ", subprojectUrl=" + subprojectUrl + ", groupId=" + groupId + ", description=" + description + ", createdById="
-        + createdById + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate + ", updatedById=" + updatedById
-        + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + "]";
-  }
-
-  @Override
-  public void writeUrls(URI baseUri) {
-    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/samplegroup/{id}", getId()));
-    setCreatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getCreatedById()));
-    setUpdatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getUpdatedById()));
-
+    return "SampleGroupDto [id=" + id + ", projectId=" + projectId + ", subprojectId=" + subprojectId + ", groupId=" + groupId
+        + ", description=" + description + ", createdById=" + createdById + ", creationDate=" + creationDate + ", updatedById="
+        + updatedById + ", lastUpdated=" + lastUpdated + "]";
   }
 }

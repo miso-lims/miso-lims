@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.net.URI;
 import java.util.Set;
 
 import javax.persistence.EnumType;
@@ -12,10 +11,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class PoolDto extends AbstractBoxableDto implements WritableUrls {
+public class PoolDto extends AbstractBoxableDto {
 
   private Long id;
-  private String url;
   private String name;
   private String alias;
   private String concentration;
@@ -115,10 +113,6 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
     return qcPassed;
   }
 
-  public String getUrl() {
-    return url;
-  }
-
   public void setAlias(String alias) {
     this.alias = alias;
   }
@@ -187,19 +181,6 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setQcPassed(Boolean qcPassed) {
     this.qcPassed = qcPassed;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
-  @Override
-  public void writeUrls(URI baseUri) {
-    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/pool/{id}", getId()));
-    for (DilutionDto ldto : getPooledElements()) {
-      ldto.setLibraryUrl(
-          WritableUrls.buildUriPath(baseUri, "/rest/library/{id}", ldto.getLibrary().getId()));
-    }
   }
 
   public String getVolume() {

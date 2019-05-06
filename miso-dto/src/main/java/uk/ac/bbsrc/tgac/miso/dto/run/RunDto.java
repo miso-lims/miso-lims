@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.dto.run;
 
-import java.net.URI;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -8,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
-import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ @JsonSubTypes.Type(value = RunDto.class, name = "Base"),
@@ -19,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
     @JsonSubTypes.Type(value = PacBioRunDto.class, name = "PacBio"),
     @JsonSubTypes.Type(value = SolidRunDto.class, name = "Solid") })
 @JsonTypeName(value = "Base")
-public class RunDto implements WritableUrls {
+public class RunDto {
   private Long id;
   private String name;
   private String alias;
@@ -35,7 +33,6 @@ public class RunDto implements WritableUrls {
   private String startDate;
   private String endDate;
   private String progress;
-  private String url;
   private Long sequencingParametersId;
   private String sequencingParametersName;
   private String runPath;
@@ -143,19 +140,6 @@ public class RunDto implements WritableUrls {
 
   public void setEndDate(String endDate) {
     this.endDate = endDate;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
-  @Override
-  public void writeUrls(URI baseUri) {
-    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/run/{id}", getId()));
   }
 
   public Long getSequencingParametersId() {

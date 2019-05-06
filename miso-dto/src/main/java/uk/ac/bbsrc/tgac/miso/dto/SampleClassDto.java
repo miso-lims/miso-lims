@@ -1,24 +1,19 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.net.URI;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SampleClassDto implements WritableUrls {
+public class SampleClassDto {
 
   private Long id;
-  private String url;
   private String alias;
   private String sampleCategory;
   private String suffix;
   private boolean archived;
   private boolean directCreationAllowed;
   private Long createdById;
-  private String createdByUrl;
   private String creationDate;
   private Long updatedById;
-  private String updatedByUrl;
   private String lastUpdated;
   private Boolean dnaseTreatable;
 
@@ -28,14 +23,6 @@ public class SampleClassDto implements WritableUrls {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
   }
 
   public String getAlias() {
@@ -54,28 +41,12 @@ public class SampleClassDto implements WritableUrls {
     this.sampleCategory = sampleCategory;
   }
 
-  public String getCreatedByUrl() {
-    return createdByUrl;
-  }
-
-  public void setCreatedByUrl(String createdByUrl) {
-    this.createdByUrl = createdByUrl;
-  }
-
   public String getCreationDate() {
     return creationDate;
   }
 
   public void setCreationDate(String creationDate) {
     this.creationDate = creationDate;
-  }
-
-  public String getUpdatedByUrl() {
-    return updatedByUrl;
-  }
-
-  public void setUpdatedByUrl(String updatedByUrl) {
-    this.updatedByUrl = updatedByUrl;
   }
 
   public String getLastUpdated() {
@@ -135,16 +106,9 @@ public class SampleClassDto implements WritableUrls {
   }
 
   @Override
-  public void writeUrls(URI baseUri) {
-    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/sampleclass/{id}", getId()));
-    setCreatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getCreatedById()));
-    setUpdatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getUpdatedById()));
-  }
-
-  @Override
   public String toString() {
-    return "SampleClassDto [id=" + id + ", url=" + url + ", alias=" + alias + ", sampleCategory=" + sampleCategory + ", suffix=" + suffix
-        + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate + ", updatedById="
-        + updatedById + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + ", dnaseTreatable=" + dnaseTreatable + "]";
+    return "SampleClassDto [id=" + id + ", alias=" + alias + ", sampleCategory=" + sampleCategory + ", suffix=" + suffix
+        + ", createdById=" + createdById + ", creationDate=" + creationDate + ", updatedById=" + updatedById + ", lastUpdated="
+        + lastUpdated + ", dnaseTreatable=" + dnaseTreatable + "]";
   }
 }

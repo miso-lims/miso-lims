@@ -1,24 +1,18 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.net.URI;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SubprojectDto implements WritableUrls {
+public class SubprojectDto {
 
   private Long id;
-  private String url;
   private String alias;
   private String description;
   private Long parentProjectId;
-  private String parentProjectUrl;
   private Boolean priority;
   private Long createdById;
-  private String createdByUrl;
   private String creationDate;
   private Long updatedById;
-  private String updatedByUrl;
   private String lastUpdated;
   private Long referenceGenomeId;
 
@@ -28,14 +22,6 @@ public class SubprojectDto implements WritableUrls {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
   }
 
   public String getAlias() {
@@ -54,28 +40,12 @@ public class SubprojectDto implements WritableUrls {
     this.description = description;
   }
 
-  public String getCreatedByUrl() {
-    return createdByUrl;
-  }
-
-  public void setCreatedByUrl(String createdByUrl) {
-    this.createdByUrl = createdByUrl;
-  }
-
   public String getCreationDate() {
     return creationDate;
   }
 
   public void setCreationDate(String creationDate) {
     this.creationDate = creationDate;
-  }
-
-  public String getUpdatedByUrl() {
-    return updatedByUrl;
-  }
-
-  public void setUpdatedByUrl(String updatedByUrl) {
-    this.updatedByUrl = updatedByUrl;
   }
 
   public String getLastUpdated() {
@@ -110,14 +80,6 @@ public class SubprojectDto implements WritableUrls {
     this.parentProjectId = parentProjectId;
   }
 
-  public String getParentProjectUrl() {
-    return parentProjectUrl;
-  }
-
-  public void setParentProjectUrl(String parentProjectUrl) {
-    this.parentProjectUrl = parentProjectUrl;
-  }
-
   public Boolean getPriority() {
     return priority;
   }
@@ -128,10 +90,9 @@ public class SubprojectDto implements WritableUrls {
 
   @Override
   public String toString() {
-    return "SubprojectDto [id=" + id + ", url=" + url + ", alias=" + alias + ", description=" + description + ", parentProjectId="
-        + parentProjectId + ", parentProjectUrl=" + parentProjectUrl + ", priority=" + priority + ", createdById=" + createdById
-        + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate + ", updatedById=" + updatedById + ", updatedByUrl="
-        + updatedByUrl + ", lastUpdated=" + lastUpdated + "]";
+    return "SubprojectDto [id=" + id + ", alias=" + alias + ", description=" + description + ", parentProjectId=" + parentProjectId
+        + ", priority=" + priority + ", createdById=" + createdById + ", creationDate=" + creationDate + ", updatedById=" + updatedById
+        + ", lastUpdated=" + lastUpdated + "]";
   }
 
   public Long getReferenceGenomeId() {
@@ -140,12 +101,5 @@ public class SubprojectDto implements WritableUrls {
 
   public void setReferenceGenomeId(Long referenceGenomeId) {
     this.referenceGenomeId = referenceGenomeId;
-  }
-
-  @Override
-  public void writeUrls(URI baseUri) {
-    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/subproject/{id}", getId()));
-    setCreatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getCreatedById()));
-    setUpdatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getUpdatedById()));
   }
 }

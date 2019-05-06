@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.net.URI;
 import java.util.List;
 
 import javax.persistence.EnumType;
@@ -11,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 
-public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
+public class DilutionDto extends AbstractBoxableDto {
 
   private Long id;
   private String name;
@@ -28,7 +27,6 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
   private Long targetedSequencingId;
   private Long libraryId;
   private LibraryDto library;
-  private String libraryUrl;
   private String lastModified;
   private List<Long> indexIds;
   private String identityConsentLevel;
@@ -130,21 +128,6 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setLibrary(LibraryDto library) {
     this.library = library;
-  }
-
-  public String getLibraryUrl() {
-    return libraryUrl;
-  }
-
-  public void setLibraryUrl(String libraryUrl) {
-    this.libraryUrl = libraryUrl;
-  }
-
-  @Override
-  public void writeUrls(URI baseUri) {
-    if (library != null) {
-      library.writeUrls(baseUri);
-    }
   }
 
   public String getLastModified() {

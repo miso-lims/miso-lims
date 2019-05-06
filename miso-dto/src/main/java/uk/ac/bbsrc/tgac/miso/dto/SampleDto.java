@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.net.URI;
 import java.util.List;
 
 import javax.persistence.EnumType;
@@ -38,11 +37,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
     @JsonSubTypes.Type(value = SampleSingleCellDto.class, name = SampleSingleCell.SAMPLE_CLASS_NAME),
     @JsonSubTypes.Type(value = SampleDto.class, name = "Plain") })
 @JsonTypeName(value = "Plain")
-public class SampleDto extends AbstractBoxableDto implements WritableUrls {
+public class SampleDto extends AbstractBoxableDto {
 
   private Long id;
-  private String url;
-
   private String accession;
   private String name;
   private String description;
@@ -61,7 +58,6 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
   private String scientificName;
   private String taxonIdentifier;
   private Long rootSampleClassId;
-  private String rootSampleClassUrl;
   private String volume;
   @Enumerated(EnumType.STRING)
   private VolumeUnit volumeUnits;
@@ -69,7 +65,6 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
   @Enumerated(EnumType.STRING)
   private ConcentrationUnit concentrationUnits;
   private Long updatedById;
-  private String updatedByUrl;
   private String lastModified;
   private String qcDv200;
   private String qcRin;
@@ -84,14 +79,6 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
   }
 
   public String getAccession() {
@@ -233,14 +220,6 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
     this.rootSampleClassId = rootSampleClassId;
   }
 
-  public String getRootSampleClassUrl() {
-    return rootSampleClassUrl;
-  }
-
-  public void setRootSampleClassUrl(String rootSampleClassUrl) {
-    this.rootSampleClassUrl = rootSampleClassUrl;
-  }
-
   public String getVolume() {
     return volume;
   }
@@ -263,14 +242,6 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setUpdatedById(Long updatedById) {
     this.updatedById = updatedById;
-  }
-
-  public String getUpdatedByUrl() {
-    return updatedByUrl;
-  }
-
-  public void setUpdatedByUrl(String updatedByUrl) {
-    this.updatedByUrl = updatedByUrl;
   }
 
   public String getLastModified() {
@@ -303,15 +274,6 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setQcs(List<QcDto> qcs) {
     this.qcs = qcs;
-  }
-
-  @Override
-  public void writeUrls(URI baseUri) {
-    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/sample/{id}", getId()));
-    setUpdatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getUpdatedById()));
-    if (getRootSampleClassId() != null) {
-      setRootSampleClassUrl(WritableUrls.buildUriPath(baseUri, "/rest/sampleclass/{id}", getRootSampleClassId()));
-    }
   }
 
   @JsonInclude(JsonInclude.Include.ALWAYS)
