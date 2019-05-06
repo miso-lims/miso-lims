@@ -25,10 +25,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 public class PoolOrderImpl implements PoolOrder, Serializable {
 
   private static final long serialVersionUID = 1L;
+  private static final long UNSAVED_ID = 0;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long poolOrderId;
+  private long poolOrderId = UNSAVED_ID;
 
   @ManyToOne(targetEntity = PoolImpl.class)
   @JoinColumn(name = "poolId", nullable = false)
@@ -160,6 +161,11 @@ public class PoolOrderImpl implements PoolOrder, Serializable {
     return "Pool " + getPool().getId() + " - "
         + getPartitions() + " partitions of "
         + getSequencingParameter().getName();
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

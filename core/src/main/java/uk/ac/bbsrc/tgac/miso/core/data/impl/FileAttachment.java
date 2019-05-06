@@ -21,9 +21,11 @@ public class FileAttachment implements Identifiable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
+  private static final long UNSAVED_ID = 0;
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long attachmentId;
+  private long attachmentId = UNSAVED_ID;
   private String filename;
   private String path;
 
@@ -120,6 +122,11 @@ public class FileAttachment implements Identifiable, Serializable {
       if (other.path != null) return false;
     } else if (!path.equals(other.path)) return false;
     return true;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

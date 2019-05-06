@@ -26,7 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
 public class Printer implements Deletable, Serializable {
 
   private static final long serialVersionUID = 1L;
-  public static final long UNSAVED_ID = 0;
+  private static final long UNSAVED_ID = 0;
 
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
@@ -127,6 +127,11 @@ public class Printer implements Deletable, Serializable {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

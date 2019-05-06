@@ -63,7 +63,7 @@ public class HibernateProgressDao implements ProgressStore {
 
   @Override
   public Progress save(Progress progress) {
-    if (progress.getId() == Progress.UNSAVED_ID) {
+    if (!progress.isSaved()) {
       currentSession().save(progress);
     } else {
       currentSession().update(progress);

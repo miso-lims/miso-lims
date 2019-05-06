@@ -15,10 +15,12 @@ public class LibrarySpikeIn implements Serializable, Aliasable {
 
   private static final long serialVersionUID = 1L;
 
+  private static final long UNSAVED_ID = 0;
+
   @Id
   @Column(name = "spikeInId")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+  private long id = UNSAVED_ID;
 
   private String alias;
 
@@ -39,6 +41,11 @@ public class LibrarySpikeIn implements Serializable, Aliasable {
 
   public void setAlias(String alias) {
     this.alias = alias;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() == UNSAVED_ID;
   }
 
 }

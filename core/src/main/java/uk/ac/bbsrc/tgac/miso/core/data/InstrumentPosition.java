@@ -96,4 +96,9 @@ public class InstrumentPosition implements Serializable, Aliasable {
     return true;
   }
 
+  @Override
+  public boolean isSaved() {
+    return getId() == UNSAVED_ID;
+  }
+
 }

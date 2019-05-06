@@ -110,7 +110,7 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
   @Override
   public long save(Kit kit) throws IOException {
     long id;
-    if (kit.getId() == KitImpl.UNSAVED_ID) {
+    if (!kit.isSaved()) {
       id = (Long) currentSession().save(kit);
     } else {
       currentSession().update(kit);

@@ -35,7 +35,7 @@ public class LibraryTemplate implements Serializable, Deletable {
 
   private static final long serialVersionUID = 1L;
 
-  public static final long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -193,6 +193,11 @@ public class LibraryTemplate implements Serializable, Deletable {
   public String getDeleteDescription() {
     // return getAlias() + " (" + getProjects().getAlias() + ")";
     return getAlias();
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

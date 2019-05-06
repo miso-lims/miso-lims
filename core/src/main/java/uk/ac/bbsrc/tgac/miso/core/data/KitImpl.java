@@ -207,4 +207,9 @@ public class KitImpl implements Kit {
   public String getBarcodeSizeInfo() {
     return null;
   }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
 }

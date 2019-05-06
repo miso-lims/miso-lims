@@ -23,9 +23,11 @@ public class SequencingContainerModel implements Serializable, Barcodable {
 
   private static final long serialVersionUID = 1L;
 
+  private static final long UNSAVD_ID = 0;
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long sequencingContainerModelId;
+  private long sequencingContainerModelId = UNSAVD_ID;
 
   private String alias;
 
@@ -144,5 +146,10 @@ public class SequencingContainerModel implements Serializable, Barcodable {
   @Override
   public String getName() {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVD_ID;
   }
 }

@@ -53,7 +53,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -256,7 +255,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
-      if (detailed.getSubproject() != null && detailed.getSubproject().getId() == SubprojectImpl.UNSAVED_ID) {
+      if (detailed.getSubproject() != null && !detailed.getSubproject().isSaved()) {
         // New subproject
         createSubproject(detailed.getSubproject(), detailed.getProject());
       }

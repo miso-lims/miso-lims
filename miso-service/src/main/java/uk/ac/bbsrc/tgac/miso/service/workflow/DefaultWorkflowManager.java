@@ -103,7 +103,7 @@ public class DefaultWorkflowManager implements WorkflowManager {
 
   private void save(Progress progress) throws IOException {
     if (progress.getUser() != null) authorizationManager.throwIfNotOwner(progress.getUser());
-    if (progress.getId() == Progress.UNSAVED_ID) {
+    if (!progress.isSaved()) {
       create(progress);
     } else {
       update(progress);
@@ -127,7 +127,7 @@ public class DefaultWorkflowManager implements WorkflowManager {
     User user = authorizationManager.getCurrentUser();
     Date now = new Date();
 
-    if (progress.getId() == Progress.UNSAVED_ID) {
+    if (!progress.isSaved()) {
       progress.setUser(user);
       if (progress.getCreationTime() == null) {
         progress.setCreationTime(now);

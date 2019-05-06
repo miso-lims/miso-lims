@@ -361,7 +361,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   private Set<String> stringifyIndices(List<Index> indices) {
     Set<String> original = new HashSet<>();
     for (Index index : indices) {
-      if (index != null && index.getId() != Index.UNSAVED_ID) {
+      if (index != null && index.isSaved()) {
         original.add(index.getFamily().getName() + " - " + index.getLabel());
       }
     }
@@ -426,7 +426,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     }
     List<Index> managedIndices = new ArrayList<>();
     for (Index index : library.getIndices()) {
-      if (index != null && index.getId() != Index.UNSAVED_ID) {
+      if (index != null && index.isSaved()) {
         Index managedIndex = indexService.getIndexById(index.getId());
         if (managedIndex != null) managedIndices.add(managedIndex);
       }

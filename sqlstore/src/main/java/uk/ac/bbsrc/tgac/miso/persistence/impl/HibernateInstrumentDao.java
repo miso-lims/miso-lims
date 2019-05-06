@@ -40,7 +40,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractInstrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
@@ -86,7 +85,7 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   @Override
   public long save(Instrument instrument) throws IOException {
     long id;
-    if (instrument.getId() == AbstractInstrument.UNSAVED_ID) {
+    if (!instrument.isSaved()) {
       id = (Long) currentSession().save(instrument);
     } else {
       currentSession().update(instrument);

@@ -14,7 +14,7 @@ public class PoreVersion implements Serializable, Aliasable {
 
   private static final long serialVersionUID = 1L;
 
-  public static final long UNSAVED_ID = 0;
+  private static final long UNSAVED_ID = 0;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -61,6 +61,11 @@ public class PoreVersion implements Serializable, Aliasable {
     } else if (!alias.equals(other.alias)) return false;
     if (poreVersionId != other.poreVersionId) return false;
     return true;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() == UNSAVED_ID;
   }
 
 }

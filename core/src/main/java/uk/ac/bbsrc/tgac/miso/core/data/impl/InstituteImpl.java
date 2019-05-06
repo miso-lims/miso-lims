@@ -24,7 +24,7 @@ public class InstituteImpl implements Institute {
 
   private static final long serialVersionUID = 1L;
 
-  public static final long UNSAVED_ID = 0;
+  private static final long UNSAVED_ID = 0;
 
   @Id
   @Column(name = "instituteId")
@@ -118,6 +118,11 @@ public class InstituteImpl implements Institute {
   @Override
   public String getDeleteDescription() {
     return getAlias();
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

@@ -51,7 +51,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 public class Index implements Nameable, Serializable {
 
   private static final long serialVersionUID = 1L;
-  public static final Long UNSAVED_ID = 0L;
+  private static final Long UNSAVED_ID = 0L;
 
   public static void sort(final List<Index> indices) {
     Collections.sort(indices, (o1, o2) -> o1.getPosition() - o2.getPosition());
@@ -161,6 +161,11 @@ public class Index implements Nameable, Serializable {
         .append(sequence, other.sequence)
         .append(position, other.position)
         .isEquals();
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

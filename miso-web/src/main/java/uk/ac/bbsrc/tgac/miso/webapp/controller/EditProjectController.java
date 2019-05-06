@@ -82,40 +82,45 @@ public class EditProjectController {
 
   @GetMapping("/new")
   public ModelAndView setupForm(ModelMap model) throws IOException {
-    return setupForm(ProjectImpl.UNSAVED_ID, model);
+    model.put("title", "New Project");
+    return setupForm(new ProjectImpl(), model);
   }
 
   @GetMapping("/shortname/{shortName}")
   public ModelAndView byProjectShortName(@PathVariable String shortName, ModelMap model) throws IOException {
     Project project = projectService.getProjectByShortName(shortName);
-    if (project == null) throw new NotFoundException("No project found for shortname " + shortName);
-    return setupForm(project.getId(), model);
+    if (project == null) {
+      throw new NotFoundException("No project found for shortname " + shortName);
+    }
+    return setupForm(project, model);
   }
 
   @GetMapping("/{projectId}")
   public ModelAndView setupForm(@PathVariable Long projectId, ModelMap model) throws IOException {
-    List<Issue> issues = Collections.emptyList();
-    Project project = null;
-    if (projectId == ProjectImpl.UNSAVED_ID) {
-      project = new ProjectImpl();
-      model.put("title", "New Project");
-    } else {
-      project = projectService.get(projectId);
-      if (project == null) {
-        throw new NotFoundException("No project found for ID " + projectId.toString());
-      }
-      Collection<Subproject> subprojects = subprojectService.getByProjectId(projectId);
+    Project project = projectService.get(projectId);
+    if (project == null) {
+      throw new NotFoundException("No project found for ID " + projectId.toString());
+    }
+    return setupForm(project, model);
+  }
+
+  private ModelAndView setupForm(Project project, ModelMap model) throws IOException {
+    if (project.isSaved()) {
+      Collection<Subproject> subprojects = subprojectService.getByProjectId(project.getId());
       model.put("subprojects", Dtos.asSubprojectDtos(subprojects));
-      model.put("title", "Project " + projectId);
+      model.put("title", "Project " + project.getId());
+      List<Issue> issues = null;
       try {
         issues = issueTrackerManager.getIssuesByTag(project.getShortName());
       } catch (IOException e) {
         log.error("Error retrieving issues", e);
+        issues = Collections.emptyList();
       }
+
+      model.put("projectIssues", issues.stream().map(Dtos::asDto).collect(Collectors.toList()));
+      model.put("projectReportLinks", externalUriBuilder.getUris(project));
     }
 
-    model.put("projectIssues", issues.stream().map(Dtos::asDto).collect(Collectors.toList()));
-    model.put("projectReportLinks", externalUriBuilder.getUris(project));
     model.put("project", project);
 
     ObjectMapper mapper = new ObjectMapper();

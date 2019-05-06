@@ -9,4 +9,6 @@ public interface Identifiable {
 
   public void setId(long id);
 
+  public boolean isSaved();
+
 }

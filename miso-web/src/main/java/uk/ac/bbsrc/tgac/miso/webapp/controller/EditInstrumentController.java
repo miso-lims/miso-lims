@@ -45,7 +45,6 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
@@ -97,7 +96,7 @@ public class EditInstrumentController {
   public ModelAndView processSubmit(@ModelAttribute("instrument") Instrument sr, ModelMap model, SessionStatus session)
       throws IOException {
     Long srId = null;
-    if (sr.getId() == InstrumentImpl.UNSAVED_ID) {
+    if (!sr.isSaved()) {
       srId = instrumentService.create(sr);
     } else {
       instrumentService.update(sr);

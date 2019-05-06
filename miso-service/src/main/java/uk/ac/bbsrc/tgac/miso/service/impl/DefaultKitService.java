@@ -19,7 +19,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
-import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -99,7 +98,7 @@ public class DefaultKitService implements KitService {
   @Override
   public long saveKit(Kit kit) throws IOException {
     authorizationManager.throwIfNotInternal();
-    if (kit.getId() != KitImpl.UNSAVED_ID) {
+    if (kit.isSaved()) {
       Kit original = getKitById(kit.getId());
       original.setIdentificationBarcode(kit.getIdentificationBarcode());
       original.setKitDate(kit.getKitDate());

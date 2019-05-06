@@ -24,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 public class SubprojectImpl implements Subproject {
 
   private static final long serialVersionUID = 1L;
-  public static final long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -174,5 +174,10 @@ public class SubprojectImpl implements Subproject {
         + " - "
         + getAlias()
         + (getAlias().equals(getDescription()) ? "" : " (" + getDescription() + ")");
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 }

@@ -18,9 +18,11 @@ public class ReferenceGenomeImpl implements ReferenceGenome {
 
   private static final long serialVersionUID = 1L;
 
+  private static final long UNSAVED_ID = 0;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long referenceGenomeId;
+  private long referenceGenomeId = UNSAVED_ID;
 
   @Column(unique = true, nullable = false)
   private String alias;
@@ -78,6 +80,11 @@ public class ReferenceGenomeImpl implements ReferenceGenome {
   @Override
   public void setDefaultSciName(String defaultSciName) {
     this.defaultSciName = defaultSciName;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }
