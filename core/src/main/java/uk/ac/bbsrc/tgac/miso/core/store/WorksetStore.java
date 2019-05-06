@@ -1,8 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -22,7 +20,5 @@ public interface WorksetStore extends PaginatedDataSource<Workset> {
   public List<Workset> listByDilution(long dilutionId);
 
   public long save(Workset workset);
-
-  public Map<String, Integer> getColumnSizes() throws IOException;
 
 }

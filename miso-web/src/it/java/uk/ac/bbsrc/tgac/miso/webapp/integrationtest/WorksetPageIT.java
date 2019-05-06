@@ -36,7 +36,7 @@ public class WorksetPageIT extends AbstractIT {
     fields.put(Field.DESCRIPTION, "Test description");
     page.setFields(fields);
 
-    assertEquals("Unsaved", page.getField(Field.ID));
+    assertEquals("", page.getField(Field.ID));
     assertFieldValues("changes pre-save", fields, page);
     WorksetPage savedPage = page.clickSave();
     assertNotNull("Workset should save successfully", savedPage);
