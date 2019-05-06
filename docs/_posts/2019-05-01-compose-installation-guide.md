@@ -538,4 +538,4 @@ With docker-compose builds, the error that caused the problem is often not the l
       ```
       Navigate to http://localhost:8080 to check if MISO is running. If it is,
       the problem is with nginx. Ensure that all three ports in the compose file
-      and `http.conf` file match each other. Be sure to remove the ports
+      and `http.conf` file match each other.
