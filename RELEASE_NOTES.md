@@ -6,6 +6,8 @@ Changes:
   * Changed Edit Run page to show validation messages instead of error page when saving fails
   * Changed Edit Service Record page to show validation messages instead of error page when saving
     fails
+  * Changed Edit Kit Descriptor page to show validation messages instead of error page when saving
+    fails
   * Changed the Edit Project page to show validation messages instead of error page when saving
     fails
   * Changed Edit Workset page to show validation messages instead of error page when saving fails

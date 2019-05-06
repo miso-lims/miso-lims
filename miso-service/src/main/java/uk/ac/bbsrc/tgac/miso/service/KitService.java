@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
 
 import com.eaglegenomics.simlims.core.Note;
 
@@ -38,7 +37,5 @@ public interface KitService extends PaginatedDataSource<KitDescriptor> {
   public KitDescriptor getKitDescriptorById(long kitDescriptorId) throws IOException;
 
   public KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException;
-
-  public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException;
 
 }

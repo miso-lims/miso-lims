@@ -1050,12 +1050,13 @@ public class Dtos {
     KitDescriptorDto dto = new KitDescriptorDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
+    setString(dto::setDescription, from.getDescription());
     dto.setManufacturer(from.getManufacturer());
     dto.setPartNumber(from.getPartNumber());
     dto.setVersion(from.getVersion());
     dto.setStockLevel(from.getStockLevel());
-    dto.setKitType(from.getKitType().getKey());
-    dto.setPlatformType(from.getPlatformType().getKey());
+    setObject(dto::setKitType, from.getKitType(), KitType::getKey);
+    setObject(dto::setPlatformType, from.getPlatformType(), PlatformType::getKey);
     return dto;
   }
 
@@ -1067,6 +1068,7 @@ public class Dtos {
     KitDescriptor to = new KitDescriptor();
     if (from.getId() != null) to.setId(from.getId());
     to.setName(from.getName());
+    setString(to::setDescription, from.getDescription());
     to.setManufacturer(from.getManufacturer());
     to.setPartNumber(from.getPartNumber());
     to.setVersion(from.getVersion());

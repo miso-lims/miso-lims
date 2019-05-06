@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
@@ -10,7 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -54,7 +52,6 @@ public class HibernateKitDaoTest extends AbstractDAOTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
     user.setUserId(1L);
     when(changeLogDAO.listAllById(anyString(), anyLong())).thenReturn(new ArrayList<ChangeLog>());
@@ -187,12 +184,6 @@ public class HibernateKitDaoTest extends AbstractDAOTest {
     kitDescriptor.setPlatformType(PlatformType.ILLUMINA);
     kitDescriptor.setName("FUNNYKITTY");
     return kitDescriptor;
-  }
-
-  @Test
-  public void testGetKitDescriptorColumnSizes() throws IOException {
-    Map<String, Integer> columnSizes = dao.getKitDescriptorColumnSizes();
-    assertThat(columnSizes, hasEntry("name", 255));
   }
 
   @Test

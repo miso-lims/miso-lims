@@ -8,6 +8,7 @@ public class KitDescriptorDto {
   private Long id;
   private String url;
   private String name;
+  private String description;
   private Integer version;
   private String manufacturer;
   private String partNumber;
@@ -37,6 +38,14 @@ public class KitDescriptorDto {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public Integer getVersion() {
