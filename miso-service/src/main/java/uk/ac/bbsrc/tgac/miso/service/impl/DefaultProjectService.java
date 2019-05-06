@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -47,6 +45,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -62,7 +62,6 @@ public class DefaultProjectService implements ProjectService {
   @Autowired
   private NamingScheme namingScheme;
 
-  // GETS
   @Override
   public Project get(long projectId) throws IOException {
     return projectStore.get(projectId);
@@ -76,13 +75,6 @@ public class DefaultProjectService implements ProjectService {
   @Override
   public Project getProjectByShortName(String projectShortName) throws IOException {
     return projectStore.getByShortName(projectShortName);
-  }
-
-  @Override
-  public Map<String, Integer> getProjectColumnSizes() throws IOException {
-    return ValidationUtils.adjustNameLength(
-        ValidationUtils.adjustLength(projectStore.getProjectColumnSizes(), "shortName", namingScheme.projectShortNameLengthAdjustment()),
-        namingScheme);
   }
 
   @Override
@@ -116,15 +108,15 @@ public class DefaultProjectService implements ProjectService {
   public long saveProject(Project project) throws IOException {
     ValidationResult shortNameValidation = namingScheme.validateProjectShortName(project.getShortName());
     if (!shortNameValidation.isValid()) {
-      throw new IOException("Cannot save project - invalid shortName: " + shortNameValidation.getMessage());
+      throw new ValidationException(new ValidationError("shortName", shortNameValidation.getMessage()));
     }
-    if (project.getId() == ProjectImpl.UNSAVED_ID) {
+    if (!project.isSaved()) {
       project.setName(generateTemporaryName());
       projectStore.save(project);
       try {
         project.setName(namingScheme.generateNameFor(project));
       } catch (MisoNamingException e) {
-        throw new IOException("Cannot save Project - issue with naming scheme", e);
+        throw new ValidationException(new ValidationError("name", e.getMessage()));
       }
       validateNameOrThrow(project, namingScheme);
     } else {

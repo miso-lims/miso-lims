@@ -336,4 +336,9 @@ public class ProjectImpl implements Project {
     this.defaultTargetedSequencing = targetedSequencing;
   }
 
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
 }

@@ -28,13 +28,13 @@ public class ReferenceGenomeImpl implements ReferenceGenome {
   private String defaultSciName;
 
   @Override
-  public Long getId() {
+  public long getId() {
     return referenceGenomeId;
   }
 
   @Override
-  public void setId(Long referenceGenomeId) {
-        this.referenceGenomeId = referenceGenomeId;
+  public void setId(long referenceGenomeId) {
+    this.referenceGenomeId = referenceGenomeId;
   }
 
   @Override

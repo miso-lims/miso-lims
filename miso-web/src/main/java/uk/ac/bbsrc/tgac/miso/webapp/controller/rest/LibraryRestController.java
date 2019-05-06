@@ -55,7 +55,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -69,8 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -113,8 +110,6 @@ public class LibraryRestController extends RestController {
   private LibraryService libraryService;
   @Autowired
   private SampleRestController sampleController;
-  @Autowired
-  private NamingScheme namingScheme;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
@@ -212,39 +207,6 @@ public class LibraryRestController extends RestController {
   public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
     return MisoWebUtils.generateSpreadsheet(request, libraryService::get, LibrarySpreadSheets::valueOf, response);
-  }
-
-  private static class AliasValidationDto {
-    private final String alias;
-
-    public AliasValidationDto(@JsonProperty("alias") String alias) {
-      this.alias = alias;
-    }
-
-    public String getAlias() {
-      return alias;
-    }
-  }
-
-  /**
-   * This is a first pass at validating the alias. Further validation is done in the Sample Service, as
-   * validation results may depend on other sample properties.
-   * 
-   * @throws IOException
-   */
-  @PostMapping(value = "/validate-alias", produces = { "application/json" })
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void validateAlias(@RequestBody AliasValidationDto params, HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) {
-    String alias = params.getAlias();
-    if (LimsUtils.isStringEmptyOrNull(alias) && !namingScheme.hasLibraryAliasGenerator()) {
-      throw new RestException("No alias specified, and no alias generator exists", Status.BAD_REQUEST);
-    }
-
-    ValidationResult aliasValidation = namingScheme.validateLibraryAlias(alias);
-    if (!aliasValidation.isValid()) {
-      throw new RestException(aliasValidation.getMessage(), Status.BAD_REQUEST);
-    }
   }
 
   private static Stream<Sample> getSample(Library library) {

@@ -77,7 +77,7 @@ public class HibernateTargetedSequencingDao implements TargetedSequencingStore, 
 
   @Override
   public long save(TargetedSequencing ts) throws IOException {
-    if (ts.getId() == TargetedSequencing.UNSAVED_ID) {
+    if (!ts.isSaved()) {
       throw new UnsupportedOperationException("Create not supported for targeted sequencing");
     } else {
       currentSession().update(ts);

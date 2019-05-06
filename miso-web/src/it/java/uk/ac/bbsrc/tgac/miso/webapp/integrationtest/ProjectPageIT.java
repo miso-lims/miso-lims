@@ -46,7 +46,7 @@ public class ProjectPageIT extends AbstractIT {
     unsaved.put(Fields.ALIAS, "Create New Project via UI");
     unsaved.put(Fields.SHORTNAME, "SUCHNEW");
     unsaved.put(Fields.DESCRIPTION, "New Project via UI");
-    unsaved.put(Fields.PROGRESS, "PROPOSED");
+    unsaved.put(Fields.PROGRESS, "Proposed");
     unsaved.put(Fields.REFERENCE_GENOME, "Human hg18 random");
     
     assertEquals("Project ID is unsaved", unsaved.get(Fields.ID), page.getId());
@@ -78,7 +78,7 @@ public class ProjectPageIT extends AbstractIT {
     updated.put(Fields.ALIAS, "Changed Project");
     updated.put(Fields.DESCRIPTION, "Changed Description");
     updated.put(Fields.SHORTNAME, "NEWER");
-    updated.put(Fields.PROGRESS, "ACTIVE");
+    updated.put(Fields.PROGRESS, "Active");
     updated.put(Fields.REFERENCE_GENOME, "Human hg19 random");
 
     page.setAlias(updated.get(Fields.ALIAS));

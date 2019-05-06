@@ -250,7 +250,6 @@ HotTarget.library = (function() {
       }
     },
     createColumns: function(config, create, data) {
-      var validationCache = {};
       var columns = [
           {
             header: 'Library Name',
@@ -271,43 +270,10 @@ HotTarget.library = (function() {
             include: config.showLibraryAlias,
             unpackAfterSave: true,
             unpack: function(lib, flat, setCellMeta) {
-              validationCache[lib.alias] = true;
               flat.alias = Utils.valOrNull(lib.alias);
               if (lib.nonStandardAlias) {
                 HotUtils.makeCellNSAlias(setCellMeta);
               }
-              setCellMeta('validator', function(value, callback) {
-                (Constants.automaticLibraryAlias ? HotUtils.validator.optionalTextNoSpecialChars
-                    : HotUtils.validator.requiredTextNoSpecialChars)(value, function(result) {
-                  if (!result) {
-                    callback(false);
-                    return;
-                  }
-                  if (!value) {
-                    return callback(Constants.automaticLibraryAlias);
-                  }
-                  if (validationCache.hasOwnProperty(value)) {
-                    return callback(validationCache[value]);
-                  }
-                  if (lib.nonStandardAlias) {
-                    return callback(true);
-                  }
-                  jQuery.ajax({
-                    url: '/miso/rest/library/validate-alias',
-                    type: 'POST',
-                    contentType: 'application/json; charset=utf8',
-                    data: JSON.stringify({
-                      alias: value
-                    })
-                  }).success(function(json) {
-                    validationCache[value] = true;
-                    return callback(true);
-                  }).fail(function(response, textStatus, serverStatus) {
-                    validationCache[value] = false;
-                    return callback(false);
-                  });
-                });
-              });
             },
             pack: function(lib, flat, errorHandler) {
               lib.alias = flat.alias;
