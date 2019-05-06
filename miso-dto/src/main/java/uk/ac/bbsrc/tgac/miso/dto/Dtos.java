@@ -133,6 +133,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotSingleCellImpl;
@@ -182,6 +183,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
@@ -2041,18 +2043,35 @@ public class Dtos {
     ProjectDto dto = new ProjectDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
+    setDateString(dto::setCreationDate, from.getCreationDate());
     dto.setAlias(from.getAlias());
     dto.setShortName(from.getShortName());
     dto.setDescription(from.getDescription());
-    dto.setProgress(from.getProgress().getKey());
+    setObject(dto::setProgress, from.getProgress(), (progress) -> progress.getKey());
     if (from.getReferenceGenome() != null) {
+      dto.setReferenceGenomeId(from.getReferenceGenome().getId());
       dto.setDefaultSciName(from.getReferenceGenome().getDefaultSciName());
     }
+    setId(dto::setDefaultTargetedSequencingId, from.getDefaultTargetedSequencing());
     return dto;
   }
 
   public static List<ProjectDto> asProjectDtos(@Nonnull Collection<Project> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toList());
+  }
+
+  public static Project to(@Nonnull ProjectDto dto) {
+    Project to = new ProjectImpl();
+    setLong(to::setId, dto.getId(), false);
+    setString(to::setName, dto.getName());
+    setDate(to::setCreationDate, dto.getCreationDate());
+    setString(to::setAlias, dto.getAlias());
+    setString(to::setShortName, dto.getShortName());
+    setString(to::setDescription, dto.getDescription());
+    setObject(to::setProgress, dto.getProgress(), (key) -> ProgressType.get(key));
+    setObject(to::setReferenceGenome, ReferenceGenomeImpl::new, dto.getReferenceGenomeId());
+    setObject(to::setDefaultTargetedSequencing, TargetedSequencing::new, dto.getDefaultTargetedSequencingId());
+    return to;
   }
 
   public static LibraryDesignDto asDto(@Nonnull LibraryDesign from) {

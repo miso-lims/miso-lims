@@ -32,84 +32,27 @@
 <div id="maincontent">
 <div id="contentcolumn">
 
-<div id="tab-1">
-
-<form:form id="workset-form" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8">
 <h1>
   <c:choose>
     <c:when test="${pageMode eq 'create'}">Create</c:when>
     <c:otherwise>Edit</c:otherwise>
   </c:choose> Workset
-  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all" onclick="Workset.validateAndSave()">Save</button>
+  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 
-<div class="bs-callout bs-callout-warning hidden">
-  <h2>Oh snap!</h2>
-  <p>This form seems to be invalid</p>
-  <div class="generalErrors"></div>
-</div>
-<br/>
-
-<div id="worksetInfo">
-  <table class="in">
-    <tr>
-      <td class="h">Workset ID:</td>
-      <td><span id="id">Unsaved</span></td>
-    </tr>
-    <tr>
-      <td class="h">Alias:*</td>
-      <td>
-        <input type="text" id="alias"/><span id="aliasCounter" class="counter"></span>
-        <div id="aliasError" class="errorContainer"></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="h">Description:</td>
-      <td>
-        <input type="text" id="description"/><span id="descriptionCounter" class="counter"></span>
-        <div id="descriptionError" class="errorContainer"></div>
-      </td>
-    </tr>
-    <c:if test="${pageMode eq 'edit'}">
-      <tr>
-        <td class="h">Created By:</td>
-        <td><span id="creator"></span></td>
-      </tr>
-    </c:if>
-  </table>
-</div>
-<script>
-jQuery(document).ready(function() {
-  jQuery('#alias').simplyCountable({
-    counter: '#aliasCounter',
-    countType: 'characters',
-    maxCount: ${maxLengths['alias']},
-    countDirection: 'down'
+<form:form id="worksetForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    FormUtils.createForm('worksetForm', 'save', ${empty worksetJson ? '{}' : worksetJson}, 'workset', {});
   });
-
-  jQuery('#description').simplyCountable({
-    counter: '#descriptionCounter',
-    countType: 'characters',
-    maxCount: ${maxLengths['description']},
-    countDirection: 'down'
-  });
-});
 </script>
-</form:form>
 
 <c:if test="${pageMode eq 'edit'}">
   <miso:list-section id="list_samples" name="Samples" target="sample" items="${samples}" config="{worksetId: ${worksetId}}"/>
   <miso:list-section id="list_libraries" name="Libraries" target="library" items="${libraries}" config="{worksetId: ${worksetId}}"/>
   <miso:list-section id="list_dilutions" name="Dilutions" target="dilution" items="${dilutions}" config="{worksetId: ${worksetId}}"/>
-  
-  <script>
-  jQuery(document).ready(function() {
-    Workset.setWorksetJson(${worksetJson});
-  });
-  </script>
 </c:if>
 
-</div>
 </div>
 </div>
 

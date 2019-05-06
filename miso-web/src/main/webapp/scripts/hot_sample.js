@@ -67,7 +67,6 @@ HotTarget.sample = (function() {
     },
 
     createColumns: function(config, create, data) {
-      var validationCache = {};
       var targetCategory = (config.targetSampleClass ? config.targetSampleClass.sampleCategory : null);
       var sourceCategory = (config.sourceSampleClass ? config.sourceSampleClass.sampleCategory : null);
       // (Detailed sample) Columns to show
@@ -129,43 +128,10 @@ HotTarget.sample = (function() {
             type: 'text',
             unpackAfterSave: true,
             unpack: function(sam, flat, setCellMeta) {
-              validationCache[sam.alias] = true;
               flat.alias = Utils.valOrNull(sam.alias);
               if (sam.nonStandardAlias) {
                 HotUtils.makeCellNSAlias(setCellMeta);
               }
-              setCellMeta('validator', function(value, callback) {
-                (Constants.automaticSampleAlias ? HotUtils.validator.optionalTextNoSpecialChars
-                    : HotUtils.validator.requiredTextNoSpecialChars)(value, function(result) {
-                  if (!result) {
-                    callback(false);
-                    return;
-                  }
-                  if (!value) {
-                    return callback(Constants.automaticSampleAlias);
-                  }
-                  if (validationCache.hasOwnProperty(value)) {
-                    return callback(validationCache[value]);
-                  }
-                  if (sam.nonStandardAlias) {
-                    return callback(true);
-                  }
-                  jQuery.ajax({
-                    url: '/miso/rest/sample/validate-alias',
-                    type: 'POST',
-                    contentType: 'application/json; charset=utf8',
-                    data: JSON.stringify({
-                      alias: value
-                    })
-                  }).success(function(json) {
-                    validationCache[value] = true;
-                    return callback(true);
-                  }).fail(function(response, textStatus, serverStatus) {
-                    validationCache[value] = false;
-                    return callback(false);
-                  });
-                });
-              })
             },
             pack: function(sam, flat, errorHandler) {
               sam.alias = flat.alias;
@@ -290,8 +256,8 @@ HotTarget.sample = (function() {
 
           // Detailed Sample
           // parent columns
-          HotUtils.makeColumnForText('Parent Alias', (Constants.isDetailedSample && config.pageMode == 'propagate' && !config.isLibraryReceipt),
-              'parentAlias', {
+          HotUtils.makeColumnForText('Parent Alias',
+              (Constants.isDetailedSample && config.pageMode == 'propagate' && !config.isLibraryReceipt), 'parentAlias', {
                 readOnly: true
               }),
           {
@@ -531,8 +497,8 @@ HotTarget.sample = (function() {
           },
           HotUtils.makeColumnForText('Group ID', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupId', {
             validator: HotUtils.validator.optionalTextAlphanumeric
-          }, config.targetSampleClass && config.targetSampleClass.alias === 'LCM Tube' && config.pageMode != 'edit' ? config.defaultLcmTubeGroupId
-              : null),
+          }, config.targetSampleClass && config.targetSampleClass.alias === 'LCM Tube' && config.pageMode != 'edit'
+              ? config.defaultLcmTubeGroupId : null),
           HotUtils.makeColumnForText('Group Desc.', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupDescription', {},
               config.targetSampleClass && config.targetSampleClass.alias === 'LCM Tube' && config.pageMode != 'edit'
                   ? config.defaultLcmTubeGroupDescription : null),
@@ -817,8 +783,7 @@ HotTarget.sample = (function() {
               }),
           // Aliquot: Single Cell columns
           HotUtils.makeColumnForDecimal('Input into Library',
-              (show['Aliquot'] && config.targetSampleClass.alias.indexOf('Single Cell') != -1), 'inputIntoLibrary', 14, 10, false, false)
-      ];
+              (show['Aliquot'] && config.targetSampleClass.alias.indexOf('Single Cell') != -1), 'inputIntoLibrary', 14, 10, false, false)];
 
       if (!config.isLibraryReceipt) {
         var spliceIndex = columns.indexOf(columns.filter(function(column) {

@@ -36,20 +36,17 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -57,9 +54,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.AttachmentDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
@@ -99,8 +93,6 @@ public class ProjectRestController extends RestController {
   private RunService runService;
   @Autowired
   private SampleGroupService sampleGroupService;
-  @Autowired
-  private NamingScheme namingScheme;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -203,30 +195,26 @@ public class ProjectRestController extends RestController {
     return project.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  private static class ShortNameValidationDto {
-    private final String shortName;
-
-    public ShortNameValidationDto(@JsonProperty("shortName") String shortName) {
-      this.shortName = shortName;
+  @PostMapping
+  public @ResponseBody ProjectDto create(@RequestBody ProjectDto dto) throws IOException {
+    Project project = Dtos.to(dto);
+    if (project.isSaved()) {
+      throw new RestException("Project is already saved", Status.BAD_REQUEST);
     }
-
-    public String getShortName() {
-      return shortName;
-    }
+    long savedId = projectService.saveProject(project);
+    return Dtos.asDto(projectService.get(savedId));
   }
 
-  @PostMapping(value = "/validate-short-name")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void validateShortName(@RequestBody ShortNameValidationDto params, UriComponentsBuilder uriBuilder) {
-    String shortName = params.getShortName();
-    if (LimsUtils.isStringEmptyOrNull(shortName)) {
-      throw new RestException("No short name specified", Status.BAD_REQUEST);
+  @PutMapping("/{projectId}")
+  public @ResponseBody ProjectDto update(@PathVariable long projectId, @RequestBody ProjectDto dto) throws IOException {
+    Project project = Dtos.to(dto);
+    if (project.getId() != projectId) {
+      throw new RestException("Project ID mismatch", Status.BAD_REQUEST);
+    } else if (projectService.get(projectId) == null) {
+      throw new RestException("Project not found", Status.NOT_FOUND);
     }
-
-    ValidationResult validationResult = namingScheme.validateProjectShortName(shortName);
-    if (!validationResult.isValid()) {
-      throw new RestException(validationResult.getMessage(), Status.BAD_REQUEST);
-    }
+    long savedId = projectService.saveProject(project);
+    return Dtos.asDto(projectService.get(savedId));
   }
 
 }

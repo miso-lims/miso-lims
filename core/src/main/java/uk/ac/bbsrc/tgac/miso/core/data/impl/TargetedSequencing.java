@@ -20,27 +20,20 @@ import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 @Entity
 @Table(name = "TargetedSequencing")
-public class TargetedSequencing implements Serializable, Timestamped {
-
-  public static final TargetedSequencing NULL = new TargetedSequencing();
-
-  static {
-    NULL.setId(null);
-    NULL.setAlias("None");
-    NULL.setArchived(false);
-  }
+public class TargetedSequencing implements Identifiable, Serializable, Timestamped {
 
   private static final long serialVersionUID = 1L;
-  public static final Long UNSAVED_ID = 0L;
+  public static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long targetedSequencingId;
+  private long targetedSequencingId = UNSAVED_ID;
 
   @Column(nullable = false)
   private String alias;
@@ -70,11 +63,13 @@ public class TargetedSequencing implements Serializable, Timestamped {
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
-  public Long getId() {
+  @Override
+  public long getId() {
     return targetedSequencingId;
   }
 
-  public void setId(Long targetedSequencingId) {
+  @Override
+  public void setId(long targetedSequencingId) {
     this.targetedSequencingId = targetedSequencingId;
   }
 
@@ -172,13 +167,18 @@ public class TargetedSequencing implements Serializable, Timestamped {
   }
 
   @Override
+  public boolean isSaved() {
+    return targetedSequencingId != UNSAVED_ID;
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((alias == null) ? 0 : alias.hashCode());
     result = prime * result + (archived ? 1231 : 1237);
     result = prime * result + ((description == null) ? 0 : description.hashCode());
-    result = prime * result + ((targetedSequencingId == null) ? 0 : targetedSequencingId.hashCode());
+    result = prime * result + (int) (targetedSequencingId ^ (targetedSequencingId >>> 32));
     return result;
   }
 
@@ -195,15 +195,8 @@ public class TargetedSequencing implements Serializable, Timestamped {
     if (description == null) {
       if (other.description != null) return false;
     } else if (!description.equals(other.description)) return false;
-    if (targetedSequencingId == null) {
-      if (other.targetedSequencingId != null) return false;
-    } else if (!targetedSequencingId.equals(other.targetedSequencingId)) return false;
+    if (targetedSequencingId != other.targetedSequencingId) return false;
     return true;
-  }
-
-  @Override
-  public boolean isSaved() {
-    return targetedSequencingId != UNSAVED_ID;
   }
 
 }

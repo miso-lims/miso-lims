@@ -12,7 +12,6 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -27,7 +26,7 @@ public class ExternalUriBuilder {
   private static final String REPLACEHOLDER = "REPLACE";
 
   public Map<String, String> getUris(Project project) {
-    if (project.getId() == ProjectImpl.UNSAVED_ID || projectUris.isEmpty()) return Collections.emptyMap();
+    if (!project.isSaved() || projectUris.isEmpty()) return Collections.emptyMap();
     return projectUris.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, m -> expandProjectUrl(m.getValue(), project)));
   }
 

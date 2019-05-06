@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 
@@ -58,9 +57,5 @@ public interface ProjectService extends ProviderService<Project> {
    * @throws IOException upon failure to access Projects
    */
   public Collection<Project> listAllProjectsByShortname() throws IOException;
-
-  // DELETES
-
-  public Map<String, Integer> getProjectColumnSizes() throws IOException;
 
 }

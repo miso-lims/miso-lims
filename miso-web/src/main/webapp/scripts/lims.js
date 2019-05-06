@@ -606,7 +606,8 @@ var Utils = Utils
             ids: ids,
             copies: copies
           }, function(result) {
-            Utils.showOkDialog('Printing', [result == ids.length ? 'Barcodes sent to printer.' : (result + ' of ' + ids.length + ' sent to printer.')]);
+            Utils.showOkDialog('Printing', [result == ids.length ? 'Barcodes sent to printer.'
+                : (result + ' of ' + ids.length + ' sent to printer.')]);
           });
         });
       },
@@ -1079,6 +1080,23 @@ Utils.sorting = {
         return ('' + first).localeCompare('' + second);
       }
     };
+  },
+
+  standardSortWithException: function(property, exception, atTop) {
+    var standardSort = Utils.sorting.standardSort(property);
+
+    return function(objectA, objectB) {
+      var a = objectA[property];
+      var b = objectB[property];
+
+      if (a === exception) {
+        return atTop ? -1 : 1;
+      } else if (b === exception) {
+        return atTop ? 1 : -1;
+      } else {
+        return standardSort(objectA, objectB);
+      }
+    }
   },
 
   /**
