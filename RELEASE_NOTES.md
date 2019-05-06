@@ -6,6 +6,7 @@ Changes:
   * Changed Edit Run page to show validation messages instead of error page when saving fails
   * Changed Edit Service Record page to show validation messages instead of error page when saving
     fails
+  * Changed Edit Workset page to show validation messages instead of error page when saving fails
   * Made dilutions and pools distributable
   * Improved "Location" display in list tables
   * Fixed Pinery-MISO failing to reverse compliment indices when appropriate if the container model
