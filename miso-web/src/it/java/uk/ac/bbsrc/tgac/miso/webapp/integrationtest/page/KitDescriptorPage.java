@@ -12,15 +12,15 @@ public class KitDescriptorPage extends FormPage<KitDescriptorPage.Field> {
 
 
   public static enum Field implements FormPage.FieldElement {
-    ID(By.id("kitDescriptorId"), FieldType.LABEL), //
+    ID(By.id("idLabel"), FieldType.LABEL), //
     NAME(By.id("name"), FieldType.TEXT), //
     VERSION(By.id("version"), FieldType.TEXT), //
     MANUFACTURER(By.id("manufacturer"), FieldType.TEXT), //
     PART_NUMBER(By.id("partNumber"), FieldType.TEXT), //
     STOCK_LEVEL(By.id("stockLevel"), FieldType.TEXT), //
     DESCRIPTION(By.id("description"), FieldType.TEXT), //
-    KIT_TYPE(By.id("kitTypes"), FieldType.DROPDOWN), //
-    PLATFORM(By.id("platformTypes"), FieldType.DROPDOWN);
+    KIT_TYPE(By.id("kitType"), FieldType.DROPDOWN), //
+    PLATFORM(By.id("platformType"), FieldType.DROPDOWN);
 
     private final By selector;
     private final FieldType type;

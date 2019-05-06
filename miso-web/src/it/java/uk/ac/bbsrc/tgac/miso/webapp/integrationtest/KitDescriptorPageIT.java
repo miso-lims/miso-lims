@@ -28,12 +28,12 @@ public class KitDescriptorPageIT extends AbstractIT {
     Map<KitDescriptorPage.Field, String> fields = Maps.newLinkedHashMap();
     fields.put(Field.ID, "Unsaved");
     fields.put(Field.NAME, null);
-    fields.put(Field.VERSION, "0");
+    fields.put(Field.VERSION, null);
     fields.put(Field.MANUFACTURER, null);
     fields.put(Field.PART_NUMBER, null);
     fields.put(Field.STOCK_LEVEL, "0");
     fields.put(Field.DESCRIPTION, null);
-    fields.put(Field.KIT_TYPE, "LIBRARY");
+    fields.put(Field.KIT_TYPE, "Library");
     fields.put(Field.PLATFORM, "Illumina");
     assertFieldValues("default values", fields, page1);
 
@@ -45,7 +45,7 @@ public class KitDescriptorPageIT extends AbstractIT {
     changes.put(Field.PART_NUMBER, "123");
     changes.put(Field.STOCK_LEVEL, "11");
     changes.put(Field.DESCRIPTION, "Test Description");
-    changes.put(Field.KIT_TYPE, "CLUSTERING");
+    changes.put(Field.KIT_TYPE, "Clustering");
     page1.setFields(changes);
 
     fields.putAll(changes);
@@ -53,7 +53,6 @@ public class KitDescriptorPageIT extends AbstractIT {
 
     KitDescriptorPage page2 = page1.save();
     fields.remove(Field.ID);
-    fields.put(Field.PLATFORM, "ILLUMINA"); // this changes case post-save
     assertFieldValues("post-save", fields, page2);
 
     long savedId = Long.parseLong(page2.getField(Field.ID));
@@ -73,8 +72,8 @@ public class KitDescriptorPageIT extends AbstractIT {
     fields.put(Field.MANUFACTURER, "TestCo");
     fields.put(Field.PART_NUMBER, "123");
     fields.put(Field.STOCK_LEVEL, "0");
-    fields.put(Field.KIT_TYPE, "LIBRARY");
-    fields.put(Field.PLATFORM, "ILLUMINA");
+    fields.put(Field.KIT_TYPE, "Library");
+    fields.put(Field.PLATFORM, "Illumina");
     assertFieldValues("initial values", fields, page1);
 
     Map<KitDescriptorPage.Field, String> changes = Maps.newLinkedHashMap();
@@ -101,7 +100,7 @@ public class KitDescriptorPageIT extends AbstractIT {
     assertAttribute(Field.PART_NUMBER, expectedValues, kd.getPartNumber());
     assertAttribute(Field.STOCK_LEVEL, expectedValues, kd.getStockLevel().toString());
     assertAttribute(Field.DESCRIPTION, expectedValues, kd.getDescription());
-    assertAttribute(Field.KIT_TYPE, expectedValues, kd.getKitType().toString());
-    assertAttribute(Field.PLATFORM, expectedValues, kd.getPlatformType().toString());
+    assertAttribute(Field.KIT_TYPE, expectedValues, kd.getKitType().getKey());
+    assertAttribute(Field.PLATFORM, expectedValues, kd.getPlatformType().getKey());
   }
 }
