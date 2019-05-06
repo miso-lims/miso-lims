@@ -11,10 +11,6 @@ Docker compose, and is not trivial to set up. We recommend using Docker compose
 if possible by following the
 [Docker compose installation guide](compose-installation-guide).
 
-MISO requires some configuration directly in the source code. While we plan to
-change this over time, running an instance of MISO will require building and
-deploying a fork of the code base with customisations.
-
 <a name="prerequisites"/>
 
 ## Prerequisites
@@ -206,8 +202,8 @@ Use the `security.ad.url` property to indicate the url for the Active Directory.
 Some valid examples are: `ad.oicr.on.ca`, `ldap://ad.oicr.on.ca:389` and
 `ldaps://ad.oicr.on.ca:636`.
 
-The groups used by MISO are `ROLE_INTERNAL` for regular users, `ROLE_EXTERNAL` for
-external collaborators and `ROLE_ADMIN` for administrators. If you find these names
+The groups used by MISO are `ROLE_INTERNAL` for regular users 
+and `ROLE_ADMIN` for administrators. If you find these names
 too general you may wish to add a prefix before adding these groups to your Active
 Directory. For example `MISO_ROLE_INTERNAL` gives a clearer indication as to what
 the group is used for. In this case you will need to set the property

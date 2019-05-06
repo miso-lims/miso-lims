@@ -6,7 +6,16 @@ date: 2016-01-11 13:51:46
 order: 2
 ---
 
-This getting started guide should be all you need to do to get a demonstration version of MISO running on your operating system, provided you can install and use Docker. If you want to install MISO without using Docker, please see the [baremetal installation guide](baremetal-installation-guide)
+This getting started guide should be all you need to do to get a demonstration 
+version of MISO running on your operating system, provided you can install and 
+use Docker. If you want to install MISO without using Docker, please see the 
+[baremetal installation guide](baremetal-installation-guide).
+
+These compose files included in the MISO distribution are intended as a 
+demonstration and __not a permanent installation__. To customize the behaviour 
+of these compose files to be suitable for production systems, look at the 
+[Overview](#overview) and [Recipes](#recipes) sections below.
+
 
 ## Prerequisites
 
@@ -63,7 +72,6 @@ Once you are finished with the container, make sure to run
 `demo.plain.yml` or `demo.detailed.yml`. This will clean up the instances and
 networks and release their resources to the host operating system.
 
-These compose files are intended as a demonstration and __not a permanent installation__. To customize the behaviour of these compose files, read on.
 
 # Overview
 
@@ -102,7 +110,7 @@ We suggest the following:
 
 # Recipes
 
-We provide a number of solutions to common solutions so you can construct your
+We provide a number of solutions to common issues so you can construct your
 own docker-compose files.
 
 ## Adding persistent storage
@@ -179,8 +187,16 @@ inside the container.
 services:
   flyway:
     volumes:
-      - "./detailed_sample_config/V0792__drop-inconvenient-rows.sql:/flyway/sql/V0792__drop-inconvenient-rows.sql:ro"
-      - "./V1000__institution-custom.sql:/flyway/sql/V1000__institution-custom.sql:ro"
+      - type: bind
+        source: "./V0792__drop-inconvenient-rows.sql"
+        target: "/flyway/sql/V0792__drop-inconvenient-rows.sql"
+        volume:
+          nocopy: true
+      - type: bind
+        source: "./V9000__institution-custom.sql"
+        target: "/flyway/sql/V9000__institution-custom.sql"
+        volume:
+           nocopy: true
 ...
 ```
 
@@ -197,8 +213,11 @@ options include:
 * `miso.detailed.sample.enabled` : turns detailed sample mode on and off
 * `miso.instanceName` : displays an instance name in the header on the webapp
   (to distinguish prod and stage, for example).
-* `miso.naming.scheme` : turns on/off various validation options for naming
-  samples. The most complete is `oicr`.
+* `miso.naming.scheme` : turns on/off various validation options for 
+  naming samples.
+  The most rigorous naming validation scheme is `oicr`. See 
+  [Naming schemes](https://miso-lims.github.io/miso-lims/adm/installation-guide.html#naming-schemes-updating-catalina_homeconfcatalinalocalhostmisoproperties) 
+  for more information.
 
 This file should be mounted in the webapp container at
 `/usr/local/tomcat/conf/Catalina/localhost/miso.properties`.
@@ -208,7 +227,11 @@ This file should be mounted in the webapp container at
 services:
   webapp:
     volumes:
-      - "./miso.properties:/usr/local/tomcat/conf/Catalina/localhost/miso.properties:ro"
+      - type: bind
+        source: "./.docker/detailed_sample_config/miso.properties"
+        target: "/usr/local/tomcat/conf/Catalina/localhost/miso.properties"
+        volume:
+          nocopy: true
 ...
 ```
 
@@ -317,9 +340,16 @@ services:
     depends_on:
       - db
     volumes:
-      - "./sql/V0792__drop-inconvenient-rows.sql:/flyway/sql/V0792__drop-inconvenient-rows.sql:ro"
-      - "./sql/V0794__site-specific-migrations.sql:/flyway/sql/V0794__site-specific-migrations.sql:ro"
-
+      - type: bind
+        source: "./V0792__drop-inconvenient-rows.sql"
+        target: "/flyway/sql/V0792__drop-inconvenient-rows.sql"
+        volume:
+          nocopy: true
+      - type: bind
+        source: "./V9000__institution-custom.sql"
+        target: "/flyway/sql/V9000__institution-custom.sql"
+        volume:
+           nocopy: true
 
 
   webapp:
@@ -332,8 +362,16 @@ services:
     depends_on:
       - db
     volumes:
-      - "./miso.properties:/usr/local/tomcat/conf/Catalina/localhost/miso.properties"
-      - "./files:/storage/miso/files/"
+      - type: bind
+        source: "./.docker/detailed_sample_config/miso.properties"
+        target: "/usr/local/tomcat/conf/Catalina/localhost/miso.properties"
+        volume:
+          nocopy: true
+      - type: bind
+        source: "./files"
+        target: "/storage/miso/files"
+        volume:
+          nocopy: true
 
   nginx:
     image: nginx:1.15.12-alpine
@@ -417,7 +455,7 @@ With docker-compose builds, the error that caused the problem is often not the l
   ..../.miso_db_password"**
 
     Make sure that you have password file `.miso_db_password` exists in the
-    current working directory with the LIMS password.
+    current working directory with the DB password.
 
 1.  **Problem on docker-compose up:
   "ERROR: for docker_nginx_1_15442e33d660  Cannot start service nginx: driver
@@ -485,3 +523,19 @@ With docker-compose builds, the error that caused the problem is often not the l
     Statement  : DELETE FROM BoxUse WHERE alias='Libraries'
     DELETE FROM SampleClass WHERE alias='Slide'
     ```
+    
+  1. **MISO started with no errors but the page at http://localhost/miso says 
+    "Server not found" or "Proxy error".**
+    
+      First, to check if the problem with with MISO or nginx, temporarily expose 
+      MISO's port by adding the following section to `webapp`:
+      
+      ```
+      services:
+        webapp:
+            ports: 
+              - "8080:8080"
+      ```
+      Navigate to http://localhost:8080 to check if MISO is running. If it is,
+      the problem is with nginx. Ensure that all three ports in the compose file
+      and `http.conf` file match each other. Be sure to remove the ports
