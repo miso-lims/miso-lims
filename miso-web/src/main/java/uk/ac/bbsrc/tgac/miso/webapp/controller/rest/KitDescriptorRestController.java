@@ -12,7 +12,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
@@ -123,25 +121,30 @@ public class KitDescriptorRestController extends RestController {
   }
 
   @PostMapping(value = "/kitdescriptor", headers = { "Content-type=application/json" })
-  @ResponseBody
   @ResponseStatus(HttpStatus.CREATED)
-  public void createKitDescriptor(@RequestBody KitDescriptorDto kitDescriptorDto) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+  public @ResponseBody KitDescriptorDto createKitDescriptor(@RequestBody KitDescriptorDto kitDescriptorDto) throws IOException {
     KitDescriptor kd = Dtos.to(kitDescriptorDto);
-    kd.setId(KitDescriptor.UNSAVED_ID);
-    kd.setLastModifier(user);
-    kitService.saveKitDescriptor(kd);
+    if (kd.isSaved()) {
+      throw new RestException("Kit descriptor is already saved", Status.BAD_REQUEST);
+    }
+    long savedId = kitService.saveKitDescriptor(kd);
     menuController.refreshConstants();
+    return Dtos.asDto(kitService.getKitDescriptorById(savedId));
   }
 
   @PutMapping(value = "/kitdescriptor/{id}", headers = { "Content-type=application/json" })
-  @ResponseBody
   @ResponseStatus(HttpStatus.OK)
-  public void updateKitDescriptor(@PathVariable("id") Long id, @RequestBody KitDescriptorDto kitDescriptorDto) throws IOException {
+  public @ResponseBody KitDescriptorDto updateKitDescriptor(@PathVariable long id, @RequestBody KitDescriptorDto kitDescriptorDto)
+      throws IOException {
     KitDescriptor kd = Dtos.to(kitDescriptorDto);
-    kd.setId(id);
-    kitService.saveKitDescriptor(kd);
+    if (kd.getId() != id) {
+      throw new RestException("Kit descriptor ID mismatch", Status.BAD_REQUEST);
+    } else if (kitService.getKitDescriptorById(id) == null) {
+      throw new RestException("Kit descriptor not found", Status.NOT_FOUND);
+    }
+    long savedId = kitService.saveKitDescriptor(kd);
     menuController.refreshConstants();
+    return Dtos.asDto(kitService.getKitDescriptorById(savedId));
   }
 
   @GetMapping(value = "/kitdescriptor/dt", produces = "application/json")

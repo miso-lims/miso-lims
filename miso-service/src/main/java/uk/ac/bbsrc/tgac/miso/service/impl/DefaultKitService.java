@@ -1,11 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.isSetAndChanged;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -113,26 +114,46 @@ public class DefaultKitService implements KitService {
   @Override
   public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    if (kitDescriptor.getId() != KitDescriptor.UNSAVED_ID) {
+    if (kitDescriptor.isSaved()) {
       KitDescriptor original = getKitDescriptorById(kitDescriptor.getId());
+      validateChange(kitDescriptor, original);
+      original.setName(kitDescriptor.getName());
+      original.setDescription(kitDescriptor.getDescription());
       original.setVersion(kitDescriptor.getVersion());
       original.setManufacturer(kitDescriptor.getManufacturer());
       original.setPartNumber(kitDescriptor.getPartNumber());
       original.setStockLevel(kitDescriptor.getStockLevel());
       original.setDescription(kitDescriptor.getDescription());
       kitDescriptor = original;
+    } else {
+      validateChange(kitDescriptor, null);
     }
     kitDescriptor.setChangeDetails(authorizationManager.getCurrentUser());
     return kitStore.saveKitDescriptor(kitDescriptor);
+  }
+
+  private void validateChange(KitDescriptor kitDescriptor, KitDescriptor beforeChange) throws IOException {
+    List<ValidationError> errors = new ArrayList<>();
+
+    if (isSetAndChanged(KitDescriptor::getName, kitDescriptor, beforeChange)) {
+      if (kitStore.getKitDescriptorByName(kitDescriptor.getName()) != null) {
+        errors.add(new ValidationError("name", "There is already a kit descriptor with this name"));
+      }
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
+    }
   }
 
   @Override
   public long saveKitDescriptorTargetedSequencingRelationships(KitDescriptor kitDescriptor) throws IOException {
     authorizationManager.throwIfNonAdmin();
     KitDescriptor managed = kitStore.getKitDescriptorById(kitDescriptor.getId());
-    if (managed == null)
+    if (managed == null) {
       throw new IllegalArgumentException("Cannot change kit descriptor-targeted sequencing relationship when kit does not exist");
-    validateChange(managed, kitDescriptor);
+    }
+    validateTargetedSequencingChange(managed, kitDescriptor);
     managed.clearTargetedSequencing();
     for (TargetedSequencing ts : kitDescriptor.getTargetedSequencing()) {
       managed.addTargetedSequencing(ts);
@@ -142,7 +163,7 @@ public class DefaultKitService implements KitService {
     return kitStore.saveKitDescriptor(managed);
   }
 
-  private void validateChange(KitDescriptor managed, KitDescriptor changes) {
+  private void validateTargetedSequencingChange(KitDescriptor managed, KitDescriptor changes) {
     List<ValidationError> errors = new ArrayList<>();
     Collection<TargetedSequencing> removed = CollectionUtils.subtract(managed.getTargetedSequencing(), changes.getTargetedSequencing());
     for (TargetedSequencing ts : removed) {
@@ -194,11 +215,6 @@ public class DefaultKitService implements KitService {
   @Override
   public KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException {
     return kitStore.getKitDescriptorByPartNumber(partNumber);
-  }
-
-  @Override
-  public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException {
-    return kitStore.getKitDescriptorColumnSizes();
   }
 
   @Override

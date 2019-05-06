@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -49,6 +48,8 @@ public interface KitStore extends Store<Kit>, PaginatedDataSource<KitDescriptor>
 
   KitDescriptor getKitDescriptorById(long kitDescriptorId) throws IOException;
 
+  KitDescriptor getKitDescriptorByName(String name) throws IOException;
+
   KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException;
 
   List<KitDescriptor> listAllKitDescriptors() throws IOException;
@@ -56,12 +57,6 @@ public interface KitStore extends Store<Kit>, PaginatedDataSource<KitDescriptor>
   List<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException;
 
   long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
-
-  /**
-   * @return a map containing all column names and max lengths from the Kit Descriptor table
-   * @throws IOException
-   */
-  public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException;
 
   List<LibraryDilution> getDilutionsForKdTsRelationship(KitDescriptor kd, TargetedSequencing ts);
 

@@ -77,17 +77,17 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Identifiable
   private static final long serialVersionUID = 1L;
 
   /** Field UNSAVED_ID */
-  public static final Long UNSAVED_ID = 0L;
+  private static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long kitDescriptorId = KitDescriptor.UNSAVED_ID;
-  private String name = "";
-  private Integer version = 0;
-  private String manufacturer = "";
-  private String partNumber = "";
-  private Integer stockLevel = 0;
-  private String description = "";
+  private String name;
+  private Integer version;
+  private String manufacturer;
+  private String partNumber;
+  private Integer stockLevel;
+  private String description;
 
   @OneToMany(targetEntity = KitDescriptorChangeLog.class, mappedBy = "kitDescriptor")
   private Collection<ChangeLog> changelog = new ArrayList<>();

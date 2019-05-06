@@ -279,7 +279,9 @@ public class ValueTypeLookupTest {
 
   private KitDescriptor makeKit(Long id, String name) {
     KitDescriptor kit = new KitDescriptor();
-    kit.setId(id == null ? KitDescriptor.UNSAVED_ID : id);
+    if (id != null) {
+      kit.setId(id);
+    }
     kit.setName(name);
     return kit;
   }
