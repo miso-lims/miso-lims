@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Objects;
@@ -44,13 +43,11 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
@@ -60,7 +57,6 @@ import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
-import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
@@ -87,8 +83,6 @@ public class EditRunController {
     return Stream.concat(Stream.of(Run::getMetrics), StreamSupport.stream(METRICS.spliterator(), false));
   }
 
-  @Autowired
-  private ChangeLogService changeLogService;
   @Autowired
   private RunService runService;
   @Autowired
@@ -120,17 +114,6 @@ public class EditRunController {
     Run run = instrument.getInstrumentModel().getPlatformType().createRun();
     run.setSequencer(instrument);
     return setupForm(run, model);
-
-  }
-
-  @GetMapping("/rest/{runId}")
-  public @ResponseBody Run jsonRest(@PathVariable Long runId) throws IOException {
-    return runService.get(runId);
-  }
-
-  @GetMapping("/rest/changes")
-  public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return changeLogService.listAll("Run");
   }
 
   @GetMapping("/{runId}")
@@ -138,7 +121,6 @@ public class EditRunController {
     Run run = runService.get(runId);
     if (run == null) throw new NotFoundException("No run found with ID " + runId);
     return setupForm(run, model);
-
   }
 
   @GetMapping("/alias/{runAlias}")

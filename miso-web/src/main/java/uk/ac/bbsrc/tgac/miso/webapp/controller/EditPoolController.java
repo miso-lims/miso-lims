@@ -45,7 +45,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,7 +53,6 @@ import com.google.common.collect.Lists;
 
 import net.sf.json.JSONArray;
 
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -68,7 +66,6 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
@@ -92,9 +89,6 @@ public class EditPoolController {
 
   @Autowired
   private SequencingParametersService sequencingParametersService;
-
-  @Autowired
-  private ChangeLogService changeLogService;
   @Autowired
   private PoolService poolService;
   @Autowired
@@ -115,11 +109,6 @@ public class EditPoolController {
     private static final String PAGE_MODE = "pageMode";
     private static final String EDIT = "edit";
     private static final String CREATE = "create";
-  }
-
-  @GetMapping(value = "/rest/changes")
-  public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return changeLogService.listAll("Pool");
   }
 
   @GetMapping(value = "/new")

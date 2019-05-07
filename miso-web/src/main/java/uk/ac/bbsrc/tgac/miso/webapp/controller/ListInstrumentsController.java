@@ -41,7 +41,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 @Controller
@@ -53,9 +52,6 @@ public class ListInstrumentsController {
 
   @Autowired
   private SecurityManager securityManager;
-
-  @Autowired
-  private InstrumentService instrumentService;
 
   private final TabbedListItemsPage listPage = new TabbedListItemsPage("instrument", "instrumentType",
       Stream.of(InstrumentType.values()), sortByOrdinal, InstrumentType::getLabel, InstrumentType::name) {

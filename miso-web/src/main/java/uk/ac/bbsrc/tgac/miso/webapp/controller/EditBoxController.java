@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -35,7 +34,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
@@ -43,7 +41,6 @@ import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
@@ -57,9 +54,6 @@ public class EditBoxController {
 
   @Autowired
   private BoxService boxService;
-
-  @Autowired
-  private ChangeLogService changeLogService;
 
   public void setBoxService(BoxService boxService) {
     this.boxService = boxService;
@@ -116,16 +110,6 @@ public class EditBoxController {
   @GetMapping(value = "/bulk/edit")
   public ModelAndView editBoxes(@RequestParam("ids") String boxIds, ModelMap model) throws IOException {
     return new BulkEditBoxBackend().edit(boxIds, model);
-  }
-
-  @GetMapping(value = "/rest/{boxId}")
-  public @ResponseBody Box jsonRest(@PathVariable Long boxId) throws IOException {
-    return boxService.get(boxId);
-  }
-
-  @GetMapping(value = "/rest/changes")
-  public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return changeLogService.listAll("Box");
   }
 
   @GetMapping(value = "/new")
