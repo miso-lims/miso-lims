@@ -79,7 +79,7 @@ public class TestWorkflow extends AbstractWorkflow {
     Pool pool = step1.getInput();
     pool.setConcentration((double) step0.getInput());
 
-    workflowExecutor.save(pool);
+    workflowExecutor.update(pool);
   }
 
   private int currentStepNumber() {

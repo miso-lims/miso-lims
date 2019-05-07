@@ -172,7 +172,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   @Override
-  public long save(Pool pool) throws IOException {
+  public long create(Pool pool) throws IOException {
     if (pool.isDiscarded()) {
       pool.setVolume(0.0);
     }
@@ -183,74 +183,85 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
       pool.setVolumeUnits(null);
     }
 
-    long savedId;
-    if (!pool.isSaved()) {
-      pool.setName(generateTemporaryName());
-      loadPoolDilutions(pool.getPoolDilutions(), pool);
-      pool.setChangeDetails(authorizationManager.getCurrentUser());
-      boxService.throwIfBoxPositionIsFilled(pool);
-      validateChange(pool, null);
-      poolStore.save(pool);
+    pool.setName(generateTemporaryName());
+    loadPoolDilutions(pool.getPoolDilutions(), pool);
+    pool.setChangeDetails(authorizationManager.getCurrentUser());
+    boxService.throwIfBoxPositionIsFilled(pool);
+    validateChange(pool, null);
+    poolStore.save(pool);
 
-      if (autoGenerateIdBarcodes) {
-        LimsUtils.generateAndSetIdBarcode(pool);
-      }
-      try {
-        pool.setName(namingScheme.generateNameFor(pool));
-        validateNameOrThrow(pool, namingScheme);
-      } catch (MisoNamingException e) {
-        throw new IOException("Invalid name for pool", e);
-      }
-      savedId = poolStore.save(pool);
-    } else {
-      Pool managed = poolStore.get(pool.getId());
-      boxService.throwIfBoxPositionIsFilled(pool);
-      validateChange(pool, managed);
-      managed.setAlias(pool.getAlias());
-      managed.setConcentration(pool.getConcentration());
-      managed.setConcentrationUnits(pool.getConcentrationUnits());
-      managed.setDescription(pool.getDescription());
-      managed.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(pool.getIdentificationBarcode()));
-      managed.setPlatformType(pool.getPlatformType());
-      managed.setQcPassed(pool.getQcPassed());
-      managed.setDiscarded(pool.isDiscarded());
-      managed.setCreationDate(pool.getCreationDate());
-      if (pool.isDiscarded() || pool.isDistributed()) {
-        managed.setVolume(0.0);
-      } else {
-        managed.setVolume(pool.getVolume());
-      }
-      managed.setVolumeUnits(pool.getVolume() == null ? null : pool.getVolumeUnits());
-      managed.setDistributed(pool.isDistributed());
-      managed.setDistributionDate(pool.getDistributionDate());
-      managed.setDistributionRecipient(pool.getDistributionRecipient());
-
-      Set<String> originalItems = extractDilutionNames(managed.getPoolDilutions());
-      loadPoolDilutions(pool, managed);
-      Set<String> updatedItems = extractDilutionNames(managed.getPoolDilutions());
-
-      Set<String> added = new TreeSet<>(updatedItems);
-      added.removeAll(originalItems);
-      Set<String> removed = new TreeSet<>(originalItems);
-      removed.removeAll(updatedItems);
-
-      managed.setChangeDetails(authorizationManager.getCurrentUser());
-      if (!added.isEmpty() || !removed.isEmpty()) {
-        StringBuilder message = new StringBuilder();
-        message.append("Items");
-        LimsUtils.appendSet(message, added, "added");
-        LimsUtils.appendSet(message, removed, "removed");
-
-        PoolChangeLog changeLog = new PoolChangeLog();
-        changeLog.setPool(managed);
-        changeLog.setColumnsChanged("contents");
-        changeLog.setSummary(message.toString());
-        changeLog.setTime(new Date());
-        changeLog.setUser(managed.getLastModifier());
-        changeLogService.create(changeLog);
-      }
-      savedId = poolStore.save(managed);
+    if (autoGenerateIdBarcodes) {
+      LimsUtils.generateAndSetIdBarcode(pool);
     }
+    try {
+      pool.setName(namingScheme.generateNameFor(pool));
+      validateNameOrThrow(pool, namingScheme);
+    } catch (MisoNamingException e) {
+      throw new IOException("Invalid name for pool", e);
+    }
+    long savedId = poolStore.save(pool);
+    boxService.updateBoxableLocation(pool);
+    return savedId;
+  }
+
+  @Override
+  public long update(Pool pool) throws IOException {
+    if (pool.isDiscarded()) {
+      pool.setVolume(0.0);
+    }
+    if (pool.getConcentration() == null) {
+      pool.setConcentrationUnits(null);
+    }
+    if (pool.getVolume() == null) {
+      pool.setVolumeUnits(null);
+    }
+    Pool managed = poolStore.get(pool.getId());
+    boxService.throwIfBoxPositionIsFilled(pool);
+    validateChange(pool, managed);
+    managed.setAlias(pool.getAlias());
+    managed.setConcentration(pool.getConcentration());
+    managed.setConcentrationUnits(pool.getConcentrationUnits());
+    managed.setDescription(pool.getDescription());
+    managed.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(pool.getIdentificationBarcode()));
+    managed.setPlatformType(pool.getPlatformType());
+    managed.setQcPassed(pool.getQcPassed());
+    managed.setDiscarded(pool.isDiscarded());
+    managed.setCreationDate(pool.getCreationDate());
+    if (pool.isDiscarded() || pool.isDistributed()) {
+      managed.setVolume(0.0);
+    } else {
+      managed.setVolume(pool.getVolume());
+    }
+    managed.setVolumeUnits(pool.getVolume() == null ? null : pool.getVolumeUnits());
+    managed.setDistributed(pool.isDistributed());
+    managed.setDistributionDate(pool.getDistributionDate());
+    managed.setDistributionRecipient(pool.getDistributionRecipient());
+
+    Set<String> originalItems = extractDilutionNames(managed.getPoolDilutions());
+    loadPoolDilutions(pool, managed);
+    Set<String> updatedItems = extractDilutionNames(managed.getPoolDilutions());
+
+    Set<String> added = new TreeSet<>(updatedItems);
+    added.removeAll(originalItems);
+    Set<String> removed = new TreeSet<>(originalItems);
+    removed.removeAll(updatedItems);
+
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
+    if (!added.isEmpty() || !removed.isEmpty()) {
+      StringBuilder message = new StringBuilder();
+      message.append("Items");
+      LimsUtils.appendSet(message, added, "added");
+      LimsUtils.appendSet(message, removed, "removed");
+
+      PoolChangeLog changeLog = new PoolChangeLog();
+      changeLog.setPool(managed);
+      changeLog.setColumnsChanged("contents");
+      changeLog.setSummary(message.toString());
+      changeLog.setTime(new Date());
+      changeLog.setUser(managed.getLastModifier());
+      changeLogService.create(changeLog);
+    }
+    long savedId = poolStore.save(managed);
     boxService.updateBoxableLocation(pool);
     return savedId;
   }

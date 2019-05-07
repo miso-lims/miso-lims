@@ -10,7 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface RunService extends ProviderService<Run>, PaginatedDataSource<Run>, NoteService<Run> {
+public interface RunService extends SaveService<Run>, PaginatedDataSource<Run>, NoteService<Run> {
 
   Collection<Run> list() throws IOException;
 
@@ -43,10 +43,6 @@ public interface RunService extends ProviderService<Run>, PaginatedDataSource<Ru
    * @throws IOException
    */
   Run getLatestRunBySequencerPartitionContainerId(long containerId) throws IOException;
-
-  Long create(Run run) throws IOException;
-
-  void update(Run run) throws IOException;
 
   void saveRuns(Collection<Run> runs) throws IOException;
 

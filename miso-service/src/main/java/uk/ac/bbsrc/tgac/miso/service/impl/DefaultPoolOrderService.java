@@ -113,7 +113,7 @@ public class DefaultPoolOrderService implements PoolOrderService {
   public void beforeDelete(PoolOrder object) throws IOException {
     Pool pool = poolService.get(object.getPool().getId());
     pool.setLastModifier(authorizationManager.getCurrentUser());
-    poolService.save(pool);
+    poolService.update(pool);
   }
 
 }

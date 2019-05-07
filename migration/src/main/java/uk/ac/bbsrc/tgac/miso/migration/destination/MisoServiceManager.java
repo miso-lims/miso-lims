@@ -62,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultIndexService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultInstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultInstrumentService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultKitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultKitService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLabService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDesignCodeService;
@@ -125,6 +126,7 @@ public class MisoServiceManager {
   private DefaultSampleService sampleService;
   private DefaultIndexService indexService;
   private DefaultKitService kitService;
+  private DefaultKitDescriptorService kitDescriptorService;
   private DefaultLabService labService;
   private DefaultLibraryService libraryService;
   private DefaultLibraryDesignService libraryDesignService;
@@ -201,6 +203,7 @@ public class MisoServiceManager {
     m.setDefaultInstituteDao();
     m.setDefaultKitDao();
     m.setDefaultKitService();
+    m.setDefaultKitDescriptorService();
     m.setDefaultLabDao();
     m.setDefaultLabService();
     m.setDefaultLibraryDao();
@@ -330,6 +333,7 @@ public class MisoServiceManager {
     if (runService != null) runService.setAuthorizationManager(authorizationManager);
     if (containerService != null) containerService.setAuthorizationManager(authorizationManager);
     if (instrumentService != null) instrumentService.setAuthorizationManager(authorizationManager);
+    if (kitDescriptorService != null) kitDescriptorService.setAuthorizationManager(authorizationManager);
     if (kitService != null) kitService.setAuthorizationManager(authorizationManager);
     if (changeLogService != null) changeLogService.setAuthorizationManager(authorizationManager);
     if (experimentService != null) experimentService.setAuthorizationManager(authorizationManager);
@@ -588,7 +592,7 @@ public class MisoServiceManager {
     svc.setLibraryDesignService(libraryDesignService);
     svc.setLibraryDesignCodeService(libraryDesignCodeService);
     svc.setIndexService(indexService);
-    svc.setKitService(kitService);
+    svc.setKitDescriptorService(kitDescriptorService);
     svc.setSampleService(sampleService);
     svc.setChangeLogService(changeLogService);
     setLibraryService(svc);
@@ -760,6 +764,7 @@ public class MisoServiceManager {
   }
 
   private void updateKitDaoDependencies() {
+    if (kitDescriptorService != null) kitDescriptorService.setKitStore(kitDao);
     if (kitService != null) kitService.setKitStore(kitDao);
   }
 
@@ -1457,6 +1462,26 @@ public class MisoServiceManager {
     if (libraryService != null) libraryService.setIndexService(indexService);
   }
 
+  public DefaultKitDescriptorService getKitDescriptorService() {
+    return kitDescriptorService;
+  }
+
+  public void setKitDescriptorService(DefaultKitDescriptorService service) {
+    this.kitDescriptorService = service;
+    updateKitDescriptorServiceDependencies();
+  }
+
+  public void setDefaultKitDescriptorService() {
+    DefaultKitDescriptorService service = new DefaultKitDescriptorService();
+    service.setKitStore(kitDao);
+    service.setAuthorizationManager(authorizationManager);
+    setKitDescriptorService(service);
+  }
+
+  private void updateKitDescriptorServiceDependencies() {
+    if (libraryService != null) libraryService.setKitDescriptorService(kitDescriptorService);
+  }
+
   public DefaultKitService getKitService() {
     return kitService;
   }
@@ -1467,14 +1492,13 @@ public class MisoServiceManager {
   }
 
   public void setDefaultKitService() {
-    DefaultKitService service = new DefaultKitService();
+    DefaultKitDescriptorService service = new DefaultKitDescriptorService();
     service.setKitStore(kitDao);
     service.setAuthorizationManager(authorizationManager);
-    setKitService(service);
+    setKitDescriptorService(service);
   }
 
   private void updateKitServiceDependencies() {
-    if (libraryService != null) libraryService.setKitService(kitService);
     if (experimentService != null) experimentService.setKitService(kitService);
   }
 

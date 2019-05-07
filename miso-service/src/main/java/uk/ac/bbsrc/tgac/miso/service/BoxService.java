@@ -14,7 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<Box>, DeleterService<Box> {
+public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<Box>, DeleterService<Box>, SaveService<Box> {
   @Override
   public default EntityType getEntityType() {
     return EntityType.BOX;

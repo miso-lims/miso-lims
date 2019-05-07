@@ -1,14 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,8 +21,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -33,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.KitDescriptorDto;
-import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
@@ -42,11 +38,9 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 public class KitDescriptorRestController extends RestController {
 
   @Autowired
-  private KitService kitService;
+  private KitDescriptorService kitDescriptorService;
   @Autowired
   private TargetedSequencingService targetedSequencingService;
-  @Autowired
-  private SecurityManager securityManager;
 
   @Autowired
   private MenuController menuController;
@@ -60,7 +54,7 @@ public class KitDescriptorRestController extends RestController {
 
     @Override
     protected PaginatedDataSource<KitDescriptor> getSource() throws IOException {
-      return kitService;
+      return kitDescriptorService;
     }
   };
 
@@ -85,66 +79,41 @@ public class KitDescriptorRestController extends RestController {
     }
   }
 
-  public void setKitService(KitService kitService) {
-    this.kitService = kitService;
-  }
-
-  private static KitDescriptorDto writeUrls(KitDescriptorDto kitDescriptorDto, UriComponentsBuilder uriBuilder) {
-    URI baseUri = uriBuilder.build().toUri();
-    kitDescriptorDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/kitdescriptor/{id}")
-        .buildAndExpand(kitDescriptorDto.getId()).toUriString());
-    return kitDescriptorDto;
+  public void setKitService(KitDescriptorService kitService) {
+    this.kitDescriptorService = kitService;
   }
 
   @GetMapping(value = "/kitdescriptor/{id}", produces = { "application/json" })
   @ResponseBody
-  public KitDescriptorDto getKitDescriptor(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) throws IOException {
-    KitDescriptor kd = kitService.getKitDescriptorById(id);
-    if (kd == null) {
-      throw new RestException("No kit descriptor found with ID: " + id, Status.NOT_FOUND);
-    } else {
-      KitDescriptorDto dto = Dtos.asDto(kd);
-      writeUrls(dto, uriBuilder);
-      return dto;
-    }
+  public KitDescriptorDto getKitDescriptor(@PathVariable long id) throws IOException {
+    return RestUtils.getObject("Kit descriptor", id, kitDescriptorService, Dtos::asDto);
   }
 
   @GetMapping(value = "/kitdescriptors", produces = { "application/json" })
   @ResponseBody
-  public Set<KitDescriptorDto> getKitDescriptors(UriComponentsBuilder uriBuilder) throws IOException {
-    Collection<KitDescriptor> kitDescriptors = kitService.listKitDescriptors();
+  public Set<KitDescriptorDto> getKitDescriptors() throws IOException {
+    Collection<KitDescriptor> kitDescriptors = kitDescriptorService.list();
     Set<KitDescriptorDto> dtos = Dtos.asKitDescriptorDtos(kitDescriptors);
-    for (KitDescriptorDto dto : dtos) {
-      writeUrls(dto, uriBuilder);
-    }
     return dtos;
   }
 
   @PostMapping(value = "/kitdescriptor", headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.CREATED)
   public @ResponseBody KitDescriptorDto createKitDescriptor(@RequestBody KitDescriptorDto kitDescriptorDto) throws IOException {
-    KitDescriptor kd = Dtos.to(kitDescriptorDto);
-    if (kd.isSaved()) {
-      throw new RestException("Kit descriptor is already saved", Status.BAD_REQUEST);
-    }
-    long savedId = kitService.saveKitDescriptor(kd);
-    menuController.refreshConstants();
-    return Dtos.asDto(kitService.getKitDescriptorById(savedId));
+    return RestUtils.createObject("Kit descriptor", kitDescriptorDto, Dtos::to, kitDescriptorService, kd -> {
+      menuController.refreshConstants();
+      return Dtos.asDto(kd);
+    });
   }
 
   @PutMapping(value = "/kitdescriptor/{id}", headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.OK)
   public @ResponseBody KitDescriptorDto updateKitDescriptor(@PathVariable long id, @RequestBody KitDescriptorDto kitDescriptorDto)
       throws IOException {
-    KitDescriptor kd = Dtos.to(kitDescriptorDto);
-    if (kd.getId() != id) {
-      throw new RestException("Kit descriptor ID mismatch", Status.BAD_REQUEST);
-    } else if (kitService.getKitDescriptorById(id) == null) {
-      throw new RestException("Kit descriptor not found", Status.NOT_FOUND);
-    }
-    long savedId = kitService.saveKitDescriptor(kd);
-    menuController.refreshConstants();
-    return Dtos.asDto(kitService.getKitDescriptorById(savedId));
+    return RestUtils.updateObject("Kit descriptor", id, kitDescriptorDto, Dtos::to, kitDescriptorService, kd -> {
+      menuController.refreshConstants();
+      return Dtos.asDto(kd);
+    });
   }
 
   @GetMapping(value = "/kitdescriptor/dt", produces = "application/json")
@@ -169,7 +138,7 @@ public class KitDescriptorRestController extends RestController {
   @PutMapping(value = "/kitdescriptor/{id}/targetedsequencing", produces = "application/json")
   public @ResponseBody KitDescriptorDto changeTargetedSequencings(@PathVariable("id") Long id,
       @RequestBody KitChangeTargetedSequencingRequest request) throws IOException {
-    KitDescriptor kitDescriptor = kitService.getKitDescriptorById(id);
+    KitDescriptor kitDescriptor = kitDescriptorService.get(id);
     // remove first
     for (Long idToRemove : request.remove) {
       TargetedSequencing toRemove = targetedSequencingService.get(idToRemove);
@@ -180,7 +149,7 @@ public class KitDescriptorRestController extends RestController {
       TargetedSequencing toAdd = targetedSequencingService.get(idToAdd);
       kitDescriptor.addTargetedSequencing(toAdd);
     }
-    kitService.saveKitDescriptorTargetedSequencingRelationships(kitDescriptor);
-    return Dtos.asDto(kitService.getKitDescriptorById(id));
+    kitDescriptorService.saveTargetedSequencingRelationships(kitDescriptor);
+    return Dtos.asDto(kitDescriptorService.get(id));
   }
 }

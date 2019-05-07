@@ -124,12 +124,8 @@ public class ProjectRestController extends RestController {
   }
 
   @GetMapping(value = "{projectId}", produces = "application/json")
-  public @ResponseBody ProjectDto getProjectById(@PathVariable Long projectId) throws IOException {
-    Project project = projectService.get(projectId);
-    if (project == null) {
-      throw new RestException("No project found with ID: " + projectId, Status.NOT_FOUND);
-    }
-    return Dtos.asDto(project);
+  public @ResponseBody ProjectDto getProjectById(@PathVariable long projectId) throws IOException {
+    return RestUtils.getObject("Project", projectId, projectService, Dtos::asDto);
   }
 
   @GetMapping(value = "{projectId}/samples", produces = "application/json")
@@ -197,24 +193,12 @@ public class ProjectRestController extends RestController {
 
   @PostMapping
   public @ResponseBody ProjectDto create(@RequestBody ProjectDto dto) throws IOException {
-    Project project = Dtos.to(dto);
-    if (project.isSaved()) {
-      throw new RestException("Project is already saved", Status.BAD_REQUEST);
-    }
-    long savedId = projectService.saveProject(project);
-    return Dtos.asDto(projectService.get(savedId));
+    return RestUtils.createObject("Project", dto, Dtos::to, projectService, Dtos::asDto);
   }
 
   @PutMapping("/{projectId}")
   public @ResponseBody ProjectDto update(@PathVariable long projectId, @RequestBody ProjectDto dto) throws IOException {
-    Project project = Dtos.to(dto);
-    if (project.getId() != projectId) {
-      throw new RestException("Project ID mismatch", Status.BAD_REQUEST);
-    } else if (projectService.get(projectId) == null) {
-      throw new RestException("Project not found", Status.NOT_FOUND);
-    }
-    long savedId = projectService.saveProject(project);
-    return Dtos.asDto(projectService.get(savedId));
+    return RestUtils.updateObject("Project", projectId, dto, Dtos::to, projectService, Dtos::asDto);
   }
 
 }

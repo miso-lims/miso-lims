@@ -201,7 +201,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   @Override
-  public Long create(Run run) throws IOException {
+  public long create(Run run) throws IOException {
     validateChanges(null, run);
     saveContainers(run);
     run.setChangeDetails(authorizationManager.getCurrentUser());
@@ -215,13 +215,13 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   @Override
-  public void update(Run run) throws IOException {
+  public long update(Run run) throws IOException {
     Run managed = get(run.getId());
     loadChildEntities(run);
     saveContainers(run);
     applyChanges(managed, run);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
-    save(managed);
+    return save(managed).getId();
   }
 
   private Run save(Run run) throws IOException {

@@ -198,7 +198,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
           project.getStudies().add(study);
         }
 
-        project.setId(serviceManager.getProjectService().saveProject(project));
+        project.setId(serviceManager.getProjectService().create(project));
 
         for (Study study : project.getStudies()) {
           study.setProject(project);
@@ -666,7 +666,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.info("Migrating pools...");
     for (Pool pool : pools) {
       setPoolModifiedDetails(pool);
-      pool.setId(serviceManager.getPoolService().save(pool));
+      pool.setId(serviceManager.getPoolService().create(pool));
       log.debug("Saved pool " + pool.getAlias());
     }
     log.info(pools.size() + " pools migrated.");
@@ -777,7 +777,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       Collection<PoolDilution> toPoolables = toPool.getPoolDilutions();
       toPoolables.addAll(fromPoolables);
       setPoolModifiedDetails(toPool);
-      serviceManager.getPoolService().save(toPool);
+      serviceManager.getPoolService().update(toPool);
       for (Note note : fromPool.getNotes()) {
         serviceManager.getPoolService().addNote(toPool, note);
       }

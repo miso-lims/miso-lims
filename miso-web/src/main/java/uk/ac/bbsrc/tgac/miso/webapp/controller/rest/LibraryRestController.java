@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +51,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -71,6 +69,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -118,12 +117,7 @@ public class LibraryRestController extends RestController {
   @GetMapping(value = "/{libraryId}", produces = "application/json")
   @ResponseBody
   public LibraryDto getLibraryById(@PathVariable Long libraryId) throws IOException {
-    Library l = libraryService.get(libraryId);
-    if (l == null) {
-      throw new RestException("No library found with ID: " + libraryId, Status.NOT_FOUND);
-    }
-    LibraryDto dto = Dtos.asDto(l, false);
-    return dto;
+    return RestUtils.getObject("Library", libraryId, libraryService, lib -> Dtos.asDto(lib, false));
   }
 
   @PostMapping(produces = "application/json")
@@ -131,52 +125,24 @@ public class LibraryRestController extends RestController {
   @ResponseBody
   public LibraryDto createLibrary(@RequestBody LibraryDto libraryDto, UriComponentsBuilder b, HttpServletResponse response)
       throws IOException {
-    if (libraryDto == null) {
-      log.error(
-          "Received null libraryDto from front end; cannot convert to Library. Something likely went wrong in the JS DTO conversion.");
-      throw new RestException("Cannot convert null to Library", Status.BAD_REQUEST);
-    }
-    Long id = null;
-    try {
-      Library library = Dtos.to(libraryDto);
-      if (libraryDto.getSample() != null) {
-        Sample sample = sampleController.buildHierarchy(libraryDto.getSample());
+    return RestUtils.createObject("Library", libraryDto, WhineyFunction.rethrow(dto -> {
+      Library lib = Dtos.to(dto);
+      if (dto.getSample() != null) {
+        Sample sample = sampleController.buildHierarchy(dto.getSample());
         if (LimsUtils.isDetailedSample(sample)) {
           ((DetailedSample) sample).setSynthetic(true);
         }
-        library.setSample(sample);
+        lib.setSample(sample);
       }
-      id = libraryService.create(library);
-    } catch (ConstraintViolationException | IllegalArgumentException e) {
-      log.error("Error while creating library. ", e);
-      RestException restException = new RestException(e.getMessage(), Status.BAD_REQUEST);
-      if (e instanceof ConstraintViolationException) {
-        restException.addData("constraintName", ((ConstraintViolationException) e).getConstraintName());
-      }
-      throw restException;
-    }
-    LibraryDto created = getLibraryById(id);
-    UriComponents uriComponents = b.path("/library/{id}").buildAndExpand(id);
-    response.setHeader("Location", uriComponents.toUri().toString());
-    return created;
+      return lib;
+    }), libraryService, lib -> Dtos.asDto(lib, false));
   }
 
   @PutMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public LibraryDto updateLibrary(@PathVariable("id") Long id, @RequestBody LibraryDto libraryDto) throws IOException {
-    if (libraryDto == null) {
-      log.error(
-          "Received null libraryDto from front end; cannot convert to Library. Something likely went wrong in the JS DTO conversion.");
-      throw new RestException("Cannot convert null to Library", Status.BAD_REQUEST);
-    }
-    Library library = libraryService.get(id);
-    if (library == null) {
-      throw new RestException("No such library.", Status.NOT_FOUND);
-    }
-    library = Dtos.to(libraryDto);
-    libraryService.update(library);
-    return getLibraryById(id);
+  public LibraryDto updateLibrary(@PathVariable("id") long id, @RequestBody LibraryDto libraryDto) throws IOException {
+    return RestUtils.updateObject("Library", id, libraryDto, Dtos::to, libraryService, lib -> Dtos.asDto(lib, false));
   }
 
   @GetMapping(value = "/dt", produces = "application/json")

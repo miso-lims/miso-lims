@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
@@ -130,15 +130,8 @@ public class SampleRestController extends RestController {
 
   @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
-  public SampleDto getSample(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder)
-      throws IOException {
-    Sample sample = sampleService.get(id);
-    if (sample == null) {
-      throw new RestException("No sample found with ID: " + id, Status.NOT_FOUND);
-    } else {
-      SampleDto dto = Dtos.asDto(sample, false);
-      return dto;
-    }
+  public SampleDto getSample(@PathVariable long id) throws IOException {
+    return RestUtils.getObject("Sample", id, sampleService, sam -> Dtos.asDto(sam, false));
   }
 
   @GetMapping(produces = { "application/json" })
@@ -173,29 +166,12 @@ public class SampleRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id), PaginationFilter.arrayed(true));
   }
 
-  @PostMapping(headers = { "Content-type=application/json" })
+  @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
-  public SampleDto createSample(@RequestBody SampleDto sampleDto, UriComponentsBuilder b, HttpServletResponse response) throws IOException {
-    if (sampleDto == null) {
-      log.error("Received null sampleDto from front end; cannot convert to Sample. Something likely went wrong in the JS DTO conversion.");
-      throw new RestException("Cannot convert null to Sample", Status.BAD_REQUEST);
-    }
-    Long id = null;
-    try {
-      Sample sample = buildHierarchy(sampleDto);
-      id = sampleService.create(sample);
-    } catch (ConstraintViolationException | IllegalArgumentException e) {
-      log.error("Error while creating sample. ", e);
-      RestException restException = new RestException(e.getMessage(), Status.BAD_REQUEST);
-      if (e instanceof ConstraintViolationException) {
-        restException.addData("constraintName", ((ConstraintViolationException) e).getConstraintName());
-      }
-      throw restException;
-    }
-
-    SampleDto created = Dtos.asDto(sampleService.get(id), false);
-    return created;
+  public @ResponseBody SampleDto createSample(@RequestBody SampleDto sampleDto)
+      throws IOException {
+    return RestUtils.createObject("Sample", sampleDto, WhineyFunction.rethrow(this::buildHierarchy), sampleService,
+        sam -> Dtos.asDto(sam, false));
   }
 
   /**
@@ -280,18 +256,10 @@ public class SampleRestController extends RestController {
     return parentClass == null ? null : parentClass.getId();
   }
 
-  @PutMapping(value = "/{id}", headers = { "Content-type=application/json" })
-  @ResponseBody
+  @PutMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public SampleDto updateSample(@PathVariable("id") Long id, @RequestBody SampleDto sampleDto, UriComponentsBuilder b) throws IOException {
-    if (sampleDto == null) {
-      log.error("Received null sampleDto from front end; cannot convert to Sample. Something likely went wrong in the JS DTO conversion.");
-      throw new RestException("Cannot convert null to Sample", Status.BAD_REQUEST);
-    }
-    Sample sample = Dtos.to(sampleDto);
-    sample.setId(id);
-    sampleService.update(sample);
-    return getSample(id, b);
+  public @ResponseBody SampleDto updateSample(@PathVariable long id, @RequestBody SampleDto sampleDto) throws IOException {
+    return RestUtils.updateObject("Sample", id, sampleDto, Dtos::to, sampleService, sam -> Dtos.asDto(sam, false));
   }
 
   /**

@@ -98,7 +98,7 @@ import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
-import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
@@ -136,7 +136,7 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private KitService kitService;
+  private KitDescriptorService kitService;
   @Autowired
   private IndexService indexService;
   @Autowired
@@ -300,7 +300,7 @@ public class MenuController implements ServletContextAware {
       dto.setActive(activePlatforms.contains(platform.getId()));
       return dto;
     });
-    createArray(mapper, node, "kitDescriptors", kitService.listKitDescriptors(), Dtos::asDto);
+    createArray(mapper, node, "kitDescriptors", kitService.list(), Dtos::asDto);
     createArray(mapper, node, "sampleClasses", sampleClassService.getAll(), Dtos::asDto);
     createArray(mapper, node, "sampleValidRelationships", relationships, Dtos::asDto);
     createArray(mapper, node, "detailedQcStatuses", detailedQcStatusService.getAll(), Dtos::asDto);

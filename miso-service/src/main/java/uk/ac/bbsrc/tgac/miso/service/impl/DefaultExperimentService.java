@@ -140,7 +140,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
       original.getRunPartitions().forEach(rp -> rp.setExperiment(original));
       Set<Kit> kits = new HashSet<>();
       for (Kit k : experiment.getKits()) {
-        kits.add(kitService.getKitById(k.getId()));
+        kits.add(kitService.get(k.getId()));
       }
       original.setKits(kits);
       original.setChangeDetails(authorizationManager.getCurrentUser());

@@ -8,16 +8,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface LibraryDilutionService extends PaginatedDataSource<LibraryDilution>, BarcodableService<LibraryDilution>,
-    DeleterService<LibraryDilution> {
+    DeleterService<LibraryDilution>, SaveService<LibraryDilution> {
 
   @Override
   default EntityType getEntityType() {
     return EntityType.DILUTION;
   }
-
-  Long create(LibraryDilution dilution) throws IOException;
-
-  void update(LibraryDilution dilution) throws IOException;
 
   int count() throws IOException;
 

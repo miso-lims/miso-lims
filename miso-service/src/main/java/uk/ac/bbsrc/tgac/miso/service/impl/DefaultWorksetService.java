@@ -106,19 +106,20 @@ public class DefaultWorksetService implements WorksetService {
   }
 
   @Override
-  public long save(Workset workset) throws IOException {
-    if (!workset.isSaved()) {
-      loadMembers(workset);
-      validateChange(workset, null);
-      workset.setChangeDetails(authorizationManager.getCurrentUser());
-      return worksetStore.save(workset);
-    } else {
-      Workset managed = worksetStore.get(workset.getId());
-      validateChange(workset, managed);
-      applyChanges(workset, managed);
-      managed.setChangeDetails(authorizationManager.getCurrentUser());
-      return worksetStore.save(managed);
-    }
+  public long create(Workset workset) throws IOException {
+    loadMembers(workset);
+    validateChange(workset, null);
+    workset.setChangeDetails(authorizationManager.getCurrentUser());
+    return worksetStore.save(workset);
+  }
+
+  @Override
+  public long update(Workset workset) throws IOException {
+    Workset managed = worksetStore.get(workset.getId());
+    validateChange(workset, managed);
+    applyChanges(workset, managed);
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
+    return worksetStore.save(managed);
   }
 
   private void loadMembers(Workset newWorkflow) {

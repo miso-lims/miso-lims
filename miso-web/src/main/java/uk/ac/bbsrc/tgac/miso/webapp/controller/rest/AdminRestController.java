@@ -151,7 +151,7 @@ public class AdminRestController extends DefaultRestController {
     response.add(RegenerationResponse.regenerate("samples", sampleService, sampleService::update));
     response.add(RegenerationResponse.regenerate("libraries", libraryService, libraryService::update));
     response.add(RegenerationResponse.regenerate("dilutions", libraryDilutionService, libraryDilutionService::update));
-    response.add(RegenerationResponse.regenerate("pools", poolService, poolService::save));
+    response.add(RegenerationResponse.regenerate("pools", poolService, poolService::update));
     response.add(RegenerationResponse.regenerate("boxes", boxService, boxService::save));
     return response;
 

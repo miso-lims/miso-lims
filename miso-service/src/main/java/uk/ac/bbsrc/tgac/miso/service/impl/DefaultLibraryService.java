@@ -54,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
-import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
@@ -88,7 +88,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   @Autowired
   private SampleService sampleService;
   @Autowired
-  private KitService kitService;
+  private KitDescriptorService kitService;
   @Autowired
   private ChangeLogService changeLogService;
   @Autowired
@@ -154,7 +154,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   @Override
-  public Long create(Library library) throws IOException {
+  public long create(Library library) throws IOException {
     if (library.getSample() != null && library.getSample().getId() == Sample.UNSAVED_ID) {
       Long sampleId = sampleService.create(library.getSample());
       library.getSample().setId(sampleId);
@@ -182,7 +182,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   @Override
-  public void update(Library library) throws IOException {
+  public long update(Library library) throws IOException {
     Library managed = get(library.getId());
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     List<Index> originalIndices = new ArrayList<>(managed.getIndices());
@@ -193,8 +193,9 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     applyChanges(managed, library);
     loadChildEntities(managed);
     makeChangeLogForIndices(originalIndices, managed.getIndices(), managed);
-    save(managed, validateAliasUniqueness);
+    Library saved = save(managed, validateAliasUniqueness);
     boxService.updateBoxableLocation(library);
+    return saved.getId();
   }
 
   @Override
@@ -433,7 +434,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     }
     library.setIndices(managedIndices);
     if (library.getKitDescriptor() != null) {
-      library.setKitDescriptor(kitService.getKitDescriptorById(library.getKitDescriptor().getId()));
+      library.setKitDescriptor(kitService.get(library.getKitDescriptor().getId()));
     }
     if (library.getSpikeIn() != null) {
       library.setSpikeIn(getSpikeIn(library.getSpikeIn().getId()));
@@ -652,7 +653,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     this.sampleService = sampleService;
   }
 
-  public void setKitService(KitService kitService) {
+  public void setKitDescriptorService(KitDescriptorService kitService) {
     this.kitService = kitService;
   }
 
@@ -708,7 +709,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     List<Workset> worksets = worksetService.listByLibrary(object.getId());
     for (Workset workset : worksets) {
       workset.getLibraries().removeIf(lib -> lib.getId() == object.getId());
-      worksetService.save(workset);
+      worksetService.update(workset);
     }
     Box box = object.getBox();
     if (box != null) {

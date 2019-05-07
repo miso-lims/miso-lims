@@ -88,6 +88,7 @@ import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
@@ -146,8 +147,10 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   @Autowired
   private KitService kitService;
   @Autowired
+  private KitDescriptorService kitDescriptorService;
+  @Autowired
   private PoolService poolService;
- @Autowired
+  @Autowired
   private StainService stainService;
   @Autowired
   private RunService runService;
@@ -160,8 +163,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   @Autowired
   private SequencingParametersDao sequencingParametersDao;
 
-  public void setKitService(KitService kitService) {
-    this.kitService = kitService;
+  public void setKitService(KitDescriptorService kitService) {
+    this.kitDescriptorService = kitService;
   }
 
   /**
@@ -530,14 +533,14 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<Kit>(Kit.class) {
       @Override
       public Kit resolveById(long id) throws Exception {
-        return kitService.getKitById(id);
+        return kitService.get(id);
       }
     }.register(binder).register(binder, Set.class, "kits");
 
     new BindingConverterById<KitDescriptor>(KitDescriptor.class) {
       @Override
       public KitDescriptor resolveById(long id) throws Exception {
-        return kitService.getKitDescriptorById(id);
+        return kitDescriptorService.get(id);
       }
     }.register(binder).register(binder, Set.class, "kitDescriptors");
 

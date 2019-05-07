@@ -29,8 +29,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +36,8 @@ import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -136,20 +131,4 @@ public class EditProjectController {
     return new ModelAndView("/WEB-INF/pages/editProject.jsp", model);
   }
 
-  @PostMapping
-  public ModelAndView processSubmit(@ModelAttribute("project") Project project, ModelMap model, SessionStatus session,
-      HttpServletRequest request)
-      throws IOException {
-    try {
-      projectService.saveProject(project);
-      session.setComplete();
-      model.clear();
-      return new ModelAndView("redirect:/miso/project/" + project.getId(), model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save project", ex);
-      }
-      throw ex;
-    }
-  }
 }

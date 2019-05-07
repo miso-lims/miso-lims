@@ -164,21 +164,13 @@ public class RunRestController extends RestController {
   }
 
   @GetMapping(value = "{runId}", produces = "application/json")
-  public @ResponseBody RunDto getRunById(@PathVariable Long runId) throws IOException {
-    Run r = runService.get(runId);
-    if (r == null) {
-      throw new RestException("No run found with ID: " + runId, Status.NOT_FOUND);
-    }
-    return Dtos.asDto(r);
+  public @ResponseBody RunDto getRunById(@PathVariable long runId) throws IOException {
+    return RestUtils.getObject("Run", runId, runService, Dtos::asDto);
   }
 
   @GetMapping(value = "{runId}/full", produces = "application/json")
   public @ResponseBody RunDto getRunByIdFull(@PathVariable Long runId) throws IOException {
-    Run r = runService.get(runId);
-    if (r == null) {
-      throw new RestException("No run found with ID: " + runId, Status.NOT_FOUND);
-    }
-    return Dtos.asDto(r, true, true, true);
+    return RestUtils.getObject("Run", runId, runService, run -> Dtos.asDto(run, true, true, true));
   }
 
   @GetMapping(value = "{runId}/containers", produces = "application/json")
@@ -457,31 +449,21 @@ public class RunRestController extends RestController {
 
   @PostMapping
   public @ResponseBody RunDto createRun(@RequestBody RunDto dto) throws IOException {
-    Run run = Dtos.to(dto);
-    if (run.isSaved()) {
-      throw new RestException("Run is already saved", Status.BAD_REQUEST);
-    }
-    Long savedId = runService.create(run);
-    return Dtos.asDto(runService.get(savedId));
+    return RestUtils.createObject("Run", dto, Dtos::to, runService, Dtos::asDto);
   }
 
   @PutMapping("/{runId}")
   public @ResponseBody RunDto updateRun(@PathVariable long runId, @RequestBody RunDto dto) throws IOException {
-    Run run = Dtos.to(dto);
-    if (run.getId() != runId) {
-      throw new RestException("Run ID mismatch", Status.BAD_REQUEST);
-    }
-    Run existing = runService.get(runId);
-    if (existing == null) {
-      throw new RestException("No run found with ID " + runId, Status.NOT_FOUND);
-    }
-    // Containers cannot be updated in this way
-    run.getRunPositions().clear();
-    for (RunPosition pos : existing.getRunPositions()) {
-      run.addSequencerPartitionContainer(pos.getContainer(), pos.getPosition());
-    }
-    runService.update(run);
-    return Dtos.asDto(runService.get(runId));
+    return RestUtils.updateObject("Run", runId, dto, WhineyFunction.rethrow(d -> {
+      Run run = Dtos.to(d);
+      // Containers cannot be updated in this way
+      Run existing = runService.get(runId);
+      run.getRunPositions().clear();
+      for (RunPosition pos : existing.getRunPositions()) {
+        run.addSequencerPartitionContainer(pos.getContainer(), pos.getPosition());
+      }
+      return run;
+    }), runService, Dtos::asDto);
   }
 
 }

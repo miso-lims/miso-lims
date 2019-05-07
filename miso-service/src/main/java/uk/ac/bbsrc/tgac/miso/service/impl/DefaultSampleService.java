@@ -242,7 +242,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   @Override
-  public Long create(Sample sample) throws IOException {
+  public long create(Sample sample) throws IOException {
     loadChildEntities(sample);
     boxService.throwIfBoxPositionIsFilled(sample);
     sample.setChangeDetails(authorizationManager.getCurrentUser());
@@ -670,7 +670,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   @Override
-  public void update(Sample sample) throws IOException {
+  public long update(Sample sample) throws IOException {
     Sample managed = get(sample.getId());
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     boolean validateAliasUniqueness = !managed.getAlias().equals(sample.getAlias());
@@ -689,6 +689,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
     save(managed, validateAliasUniqueness);
     boxService.updateBoxableLocation(sample);
+    return sample.getId();
   }
 
   private void maybeRemoveFromBox(Sample sample) {
@@ -967,7 +968,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     List<Workset> worksets = worksetService.listBySample(object.getId());
     for (Workset workset : worksets) {
       workset.getSamples().removeIf(sam -> sam.getId() == object.getId());
-      worksetService.save(workset);
+      worksetService.update(workset);
     }
     Box box = object.getBox();
     if (box != null) {
