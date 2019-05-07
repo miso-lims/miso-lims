@@ -183,7 +183,7 @@ HotTarget.dilution = {
         {
           name: 'Edit',
           action: function(items) {
-            window.location = window.location.origin + '/miso/library/dilution/bulk/edit?' + jQuery.param({
+            window.location = window.location.origin + '/miso/dilutions/bulk/edit?' + jQuery.param({
               ids: items.map(Utils.array.getId).join(',')
             });
           },
@@ -195,7 +195,7 @@ HotTarget.dilution = {
           action: function(items) {
             HotUtils.warnIfConsentRevoked(items, function() {
               var fields = [];
-              HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, '/miso/library/dilution/bulk/merge?', function(result) {
+              HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, '/miso/dilutions/bulk/merge?', function(result) {
                 return {
                   ids: items.map(Utils.array.getId).join(',')
                 };
@@ -212,14 +212,13 @@ HotTarget.dilution = {
           action: function(items) {
             HotUtils.warnIfConsentRevoked(items, function() {
               var fields = [];
-              HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, '/miso/library/dilution/bulk/propagate?',
-                  function(result) {
-                    return {
-                      ids: items.map(Utils.array.getId).join(',')
-                    };
-                  }, function(result) {
-                    return items.length;
-                  });
+              HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, '/miso/dilutions/bulk/pool-separate?', function(result) {
+                return {
+                  ids: items.map(Utils.array.getId).join(',')
+                };
+              }, function(result) {
+                return items.length;
+              });
             }, HotTarget.dilution.getLabel);
           },
           allowOnLibraryPage: true
@@ -234,7 +233,7 @@ HotTarget.dilution = {
                 property: 'quantity',
                 type: 'int',
               }];
-              HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, '/miso/library/dilution/bulk/pool?', function(result) {
+              HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, '/miso/dilutions/bulk/pool?', function(result) {
                 console.log(result);
                 return {
                   ids: items.map(Utils.array.getId).join(','),

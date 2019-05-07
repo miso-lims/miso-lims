@@ -3,6 +3,7 @@
 Changes:
 
   * Removed old REST endpoints
+  * Changed /miso/library/dilution URLs to /miso/dilution
 
 # 0.2.176
 

@@ -79,7 +79,7 @@ ListTarget.poolelement = {
           'iSortPriority': 1,
           "mRender": function(data, type, full) {
             if (type === 'display') {
-              return "<a href=\"/miso/dilution/" + full.id + "\">" + data + "</a>";
+              return "<a href=\"/miso/dilutions/" + full.id + "\">" + data + "</a>";
             }
             return data;
           }

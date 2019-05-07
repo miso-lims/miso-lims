@@ -49,8 +49,8 @@ public class BulkPoolPage extends HeaderFooterPage {
 
   private static final By EDIT_BUTTON_TEXT = By.linkText("Edit");
   private static final By MERGE_BUTTON_TEXT = By.linkText("Merge");
-  public static final String POOL_SEPARATELY_URL_FRAGMENT = "miso/library/dilution/bulk/propagate";
-  public static final String POOL_TOGETHER_URL_FRAGMENT = "miso/library/dilution/bulk/merge";
+  public static final String POOL_SEPARATELY_URL_FRAGMENT = "miso/dilutions/bulk/pool-separate";
+  public static final String POOL_TOGETHER_URL_FRAGMENT = "miso/dilutions/bulk/merge";
   public static final String MERGE_URL_FRAGMENT = "miso/pool/bulk/merge";
 
   @FindBy(id = "bulkactions")

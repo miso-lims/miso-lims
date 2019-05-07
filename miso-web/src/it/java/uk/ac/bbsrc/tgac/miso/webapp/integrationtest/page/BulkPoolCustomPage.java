@@ -24,7 +24,7 @@ public class BulkPoolCustomPage extends BulkPoolPage {
 
   public static BulkPoolCustomPage get(WebDriver driver, String baseUrl, Collection<Long> dilutionIds, int poolQuantity) {
     String ids = Joiner.on(',').join(dilutionIds);
-    String url = baseUrl + "miso/library/dilution/bulk/pool?ids=" + ids + "&quantity=" + poolQuantity;
+    String url = baseUrl + "miso/dilutions/bulk/pool?ids=" + ids + "&quantity=" + poolQuantity;
     driver.get(url);
     return new BulkPoolCustomPage(driver);
   }
