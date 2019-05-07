@@ -72,7 +72,7 @@ HotTarget.libraryReceipt = (function() {
         action: function(items) {
           HotUtils.warnIfConsentRevoked(items, function() {
             var fields = [];
-            HotUtils.showDialogForBoxCreation('Make Dilutions', 'Create', fields, '/miso/library/dilutions/bulk/propagate?', function(result) {
+            HotUtils.showDialogForBoxCreation('Make Dilutions', 'Create', fields, '/miso/dilutions/bulk/propagate?', function(result) {
               return {
                 ids: items.map(Utils.array.getId).join(',')
               };
