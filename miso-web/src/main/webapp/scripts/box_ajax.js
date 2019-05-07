@@ -411,7 +411,7 @@ Box.ui = {
                   copies: copies 
                 },
                 function(result) {
-                  Utils.showOkDialog('Printing', [result == input.length ? 'Printing successful.'
+                  Utils.showOkDialog('Printing', [result == input.length ? 'Barcodes sent to printer.'
                       : (result + ' of ' + input.length + ' printed.')]);
                 });
         });

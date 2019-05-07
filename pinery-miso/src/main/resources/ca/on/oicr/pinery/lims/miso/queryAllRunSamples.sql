@@ -1,9 +1,9 @@
-SELECT part.partitionId
+SELECT DISTINCT part.partitionId
   ,ld.name dilutionId
   ,bc1.sequence barcode
   ,bc2.sequence barcode_two
   ,tr.alias targeted_sequencing 
-  ,CASE WHEN scm.fallback THEN 'NONE' ELSE (SELECT DISTINCT dataManglingPolicy FROM InstrumentModel JOIN SequencingContainerModel_InstrumentModel ON SequencingContainerModel_InstrumentModel.instrumentModelId = InstrumentModel.instrumentModelId WHERE SequencingContainerModel_InstrumentModel.sequencingContainerModelId = scm.sequencingContainerModelId) END dataManglingPolicy
+  ,im.dataManglingPolicy dataManglingPolicy
 FROM SequencingContainerModel scm
 JOIN SequencerPartitionContainer spc ON scm.sequencingContainerModelId = spc.sequencingContainerModelId
 JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
@@ -23,3 +23,7 @@ LEFT JOIN (
   JOIN Indices ON Indices.indexId = Library_Index.index_indexId
   WHERE position = 2 
 ) bc2 ON bc2.library_libraryId = l.libraryId
+JOIN Run_SequencerPartitionContainer rspc ON rspc.containers_containerId = spc.containerId
+JOIN Run ON Run.runId = rspc.run_runId
+JOIN Instrument inst ON inst.instrumentId = Run.instrumentId
+JOIN InstrumentModel im ON im.instrumentModelId = inst.instrumentModelId

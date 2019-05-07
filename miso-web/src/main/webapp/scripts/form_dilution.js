@@ -44,6 +44,15 @@ FormTarget.dilution = (function($) {
           type: 'text',
           maxLength: 255
         }, {
+          title: 'Discarded',
+          data: 'discarded',
+          type: 'checkbox',
+          onChange: function(newValue, updateField) {
+            updateField('volume', {
+              disabled: newValue
+            });
+          }
+        }, {
           title: 'Volume',
           data: 'volume',
           type: 'decimal'
@@ -51,9 +60,10 @@ FormTarget.dilution = (function($) {
           title: 'Concentration',
           data: 'concentration',
           type: 'decimal'
-        }, FormUtils.makeUnitsField('concentration'), {
+        }, FormUtils.makeUnitsField('concentration'), FormUtils.makeBoxLocationField(), {
           title: 'Creation Date',
           data: 'creationDate',
+          required: 'true',
           type: 'date'
         }, {
           title: 'Targeted Sequencing',
@@ -79,7 +89,7 @@ FormTarget.dilution = (function($) {
           title: 'Volume of Library Used',
           data: 'volumeUsed',
           type: 'decimal'
-        }]
+        }].concat(FormUtils.makeDistributionFields())
       }];
     }
   };

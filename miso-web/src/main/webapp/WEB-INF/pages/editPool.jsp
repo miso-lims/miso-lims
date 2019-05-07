@@ -71,7 +71,7 @@
           <div id="notesmenu"
                onmouseover="mcancelclosetime()"
                onmouseout="mclosetime()">
-            <a onclick="Pool.ui.showPoolNoteDialog(${pool.id});" href="javascript:void(0);" class="add">Add Note</a>
+            <a onclick="Utils.notes.showNoteDialog('pool', ${pool.id});" href="javascript:void(0);" class="add">Add Note</a>
           </div>
         </li>
       </ul>
@@ -82,15 +82,17 @@
             <b>${note.creationDate}</b>: ${note.text}
               <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
                 <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
-                <span style="color:#000000"><a href='#' onclick="Pool.ui.deletePoolNote('${pool.id}', '${note.noteId}');">
-                  <span class="ui-icon ui-icon-trash note-delete-icon"></span></a></span>
+                  <span style="color:#000000">
+                    <a href='#' onclick="Utils.notes.deleteNote('pool', '${pool.id}', '${note.noteId}'); return false;">
+                      <span class="ui-icon ui-icon-trash note-delete-icon"></span>
+                    </a>
+                  </span>
                 </c:if>
               </span>
           </div>
         </c:forEach>
         </div>
       </c:if>
-      <div id="addNoteDialog" title="Create new Note"></div>
     </div>
     <br/>
 

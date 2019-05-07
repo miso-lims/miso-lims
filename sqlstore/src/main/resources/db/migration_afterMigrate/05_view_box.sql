@@ -28,7 +28,7 @@ JOIN BoxPosition bp
 
 CREATE OR REPLACE VIEW SampleBoxableView AS
   SELECT s.sampleId AS targetId, 'SAMPLE' AS targetType, s.name, s.alias, s.identificationBarcode, s.locationBarcode,
-    s.volume, s.discarded, ds.preMigrationId, ds.sampleClassId, bp.boxId AS boxId, bp.position AS boxPosition,
+    s.volume, s.discarded, s.distributed, ds.preMigrationId, ds.sampleClassId, bp.boxId AS boxId, bp.position AS boxPosition,
     b.name AS boxName, b.alias AS boxAlias, b.locationBarcode AS boxLocationBarcode
   FROM Sample s
   LEFT JOIN DetailedSample ds ON ds.sampleId = s.sampleId
@@ -37,7 +37,7 @@ CREATE OR REPLACE VIEW SampleBoxableView AS
 
 CREATE OR REPLACE VIEW LibraryBoxableView AS
   SELECT l.libraryId AS targetId, 'LIBRARY' AS targetType, l.name, l.alias, l.identificationBarcode, l.locationBarcode,
-    l.volume, l.discarded, dl.preMigrationId, NULL AS sampleClassId, bp.boxId, bp.position AS boxPosition,
+    l.volume, l.discarded, l.distributed, dl.preMigrationId, NULL AS sampleClassId, bp.boxId, bp.position AS boxPosition,
     b.name AS boxName, b.alias AS boxAlias, b.locationBarcode AS boxLocationBarcode
   FROM Library l
   LEFT JOIN DetailedLibrary dl ON dl.libraryId = l.libraryId
@@ -46,7 +46,7 @@ CREATE OR REPLACE VIEW LibraryBoxableView AS
 
 CREATE OR REPLACE VIEW DilutionBoxableView AS
   SELECT dilutionId AS targetId, 'DILUTION' AS targetType, LibraryDilution.name, LibraryDilution.name AS alias,
-    LibraryDilution.identificationBarcode, NULL AS locationBarcode, volume, discarded, preMigrationId,
+    LibraryDilution.identificationBarcode, NULL AS locationBarcode, volume, discarded, distributed, preMigrationId,
     NULL AS sampleClassId, bp.boxId, bp.position AS boxPosition, b.name AS boxName, b.alias AS boxAlias,
     b.locationBarcode AS boxLocationBarcode
   FROM LibraryDilution
@@ -55,7 +55,7 @@ CREATE OR REPLACE VIEW DilutionBoxableView AS
 
 CREATE OR REPLACE VIEW PoolBoxableView AS
   SELECT poolId AS targetId, 'POOL' AS targetType, Pool.name, Pool.alias, Pool.identificationBarcode,
-    NULL AS locationBarcode, volume, discarded, NULL AS preMigrationId, NULL AS sampleClassId, bp.boxId,
+    NULL AS locationBarcode, volume, discarded, distributed, NULL AS preMigrationId, NULL AS sampleClassId, bp.boxId,
     bp.position AS boxPosition, b.name AS boxName, b.alias AS boxAlias, b.locationBarcode AS boxLocationBarcode
   FROM Pool
   LEFT JOIN BoxPosition bp ON bp.targetId = poolId AND bp.targetType = 'POOL'

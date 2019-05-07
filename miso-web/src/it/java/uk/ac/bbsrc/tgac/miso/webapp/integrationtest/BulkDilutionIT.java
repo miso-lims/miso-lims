@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkDilutionPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkDilutionPage.DilColumns;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPoolPage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public class BulkDilutionIT extends AbstractIT {
@@ -29,6 +32,9 @@ public class BulkDilutionIT extends AbstractIT {
       DilColumns.VOLUME_USED, DilColumns.TARGETED_SEQUENCING);
 
   private static final String NO_TAR_SEQ = "(None)";
+
+  private static final Set<String> editColumns = Sets.newHashSet(Columns.DISTRIBUTED, Columns.DISTRIBUTION_DATE,
+      Columns.DISTRIBUTION_RECIPIENT);
 
   private static final double EPSILON = 0.000001;
 
@@ -43,8 +49,9 @@ public class BulkDilutionIT extends AbstractIT {
     BulkDilutionPage page = BulkDilutionPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(304L, 305L));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(columns.size(), headings.size());
-    for (String col : columns) {
+    Set<String> expectedHeadings = Stream.of(columns, editColumns).flatMap(Set::stream).collect(Collectors.toSet());
+    assertEquals(expectedHeadings.size(), headings.size());
+    for (String col : expectedHeadings) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(2, table.getRowCount());

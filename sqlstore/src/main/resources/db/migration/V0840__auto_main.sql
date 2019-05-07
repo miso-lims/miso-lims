@@ -1,3 +1,4 @@
+-- dilution_changelog
 CREATE TABLE DilutionChangeLog (
   dilutionChangeLogId bigint(20) NOT NULL AUTO_INCREMENT,
   dilutionId bigint(20) NOT NULL,
@@ -26,3 +27,4 @@ JOIN LibraryChangeLog c ON c.libraryId = l.libraryId
 
 DELETE FROM LibraryChangeLog WHERE message LIKE 'Library Dilution LDI% created.';
 DELETE FROM LibraryChangeLog WHERE message LIKE 'LDI% %';
+

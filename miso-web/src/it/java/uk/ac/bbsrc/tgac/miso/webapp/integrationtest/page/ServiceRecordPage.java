@@ -11,13 +11,13 @@ import org.openqa.selenium.support.PageFactory;
 public class ServiceRecordPage extends FormPage<ServiceRecordPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
-    ID(By.id("serviceRecordId"), FieldType.LABEL), //
-    INSTRUMENT(By.id("instrumentName"), FieldType.LABEL), //
+    ID(By.id("id"), FieldType.LABEL), //
+    INSTRUMENT(By.id("instrumentIdLabel"), FieldType.LABEL), //
     TITLE(By.id("title"), FieldType.TEXT), //
     DETAILS(By.id("details"), FieldType.TEXTAREA), //
-    SERVICED_BY(By.id("servicedByName"), FieldType.TEXT), //
+    SERVICED_BY(By.id("servicedBy"), FieldType.TEXT), //
     REFERENCE_NUMBER(By.id("referenceNumber"), FieldType.TEXT), //
-    SERVICE_DATE(By.id("serviceDatePicker"), FieldType.DATEPICKER), //
+    SERVICE_DATE(By.id("serviceDate"), FieldType.DATEPICKER), //
     START_TIME(By.id("startTime"), FieldType.DATEPICKER), //
     OUT_OF_SERVICE(By.id("outOfService"), FieldType.CHECKBOX), //
     END_TIME(By.id("endTime"), FieldType.DATEPICKER);

@@ -302,7 +302,7 @@ FormTarget.sample = (function($) {
               data: 'tissueOriginId',
               type: 'dropdown',
               getSource: function() {
-                return Constants.tissueOrigins.sort(makeSortByPropertyWithException('alias', 'nn'));
+                return Constants.tissueOrigins.sort(Utils.sorting.standardSortWithException('alias', 'nn'));
               },
               getItemLabel: function(item) {
                 return item.alias + ' (' + item.description + ')';
@@ -316,7 +316,7 @@ FormTarget.sample = (function($) {
               data: 'tissueTypeId',
               type: 'dropdown',
               getSource: function() {
-                return Constants.tissueTypes.sort(makeSortByPropertyWithException('alias', 'n'));
+                return Constants.tissueTypes.sort(Utils.sorting.standardSortWithException('alias', 'n'));
               },
               getItemLabel: function(item) {
                 var label = item.alias + ' (' + item.description + ')';
@@ -520,25 +520,6 @@ FormTarget.sample = (function($) {
     var textarea = document.createElement('textarea');
     textarea.innerHTML = text;
     return textarea.value;
-  }
-
-  function makeSortByPropertyWithException(property, exception) {
-    return function(objectA, objectB) {
-      var a = objectA[property];
-      var b = objectB[property];
-
-      if (a === exception) {
-        return 1;
-      } else if (b === exception) {
-        return -1;
-      } else if (a < b) {
-        return -1
-      } else if (a > b) {
-        return 1;
-      } else {
-        return 0;
-      }
-    }
   }
 
 })(jQuery);

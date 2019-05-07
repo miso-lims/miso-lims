@@ -279,7 +279,9 @@ public class ValueTypeLookupTest {
 
   private KitDescriptor makeKit(Long id, String name) {
     KitDescriptor kit = new KitDescriptor();
-    kit.setId(id == null ? KitDescriptor.UNSAVED_ID : id);
+    if (id != null) {
+      kit.setId(id);
+    }
     kit.setName(name);
     return kit;
   }
@@ -548,13 +550,13 @@ public class ValueTypeLookupTest {
   @Test
   public void testResolveReferenceGenome() throws Exception {
     assertThat("ref with valid alias", sut.resolve(makeReferenceGenome(VALID_LONG, VALID_STRING)), is(notNullValue()));
-    assertThat("ref with valid alias", sut.resolve(makeReferenceGenome(null, VALID_STRING)), is(notNullValue()));
+    assertThat("ref with valid alias", sut.resolve(makeReferenceGenome(0, VALID_STRING)), is(notNullValue()));
     assertThat("ref with valid alias", sut.resolve(makeReferenceGenome(INVALID_LONG, VALID_STRING)), is(notNullValue()));
-    assertThat("ref with non-existent alias", sut.resolve(makeReferenceGenome(null, INVALID_STRING)), is(nullValue()));
-    assertThat("ref with null alias", sut.resolve(makeReferenceGenome(null, null)), is(nullValue()));
+    assertThat("ref with non-existent alias", sut.resolve(makeReferenceGenome(0, INVALID_STRING)), is(nullValue()));
+    assertThat("ref with null alias", sut.resolve(makeReferenceGenome(0, null)), is(nullValue()));
   }
 
-  private ReferenceGenome makeReferenceGenome(Long id, String alias) {
+  private ReferenceGenome makeReferenceGenome(long id, String alias) {
     ReferenceGenome referenceGenome = new ReferenceGenomeImpl();
     referenceGenome.setId(id);
     referenceGenome.setAlias(alias);
@@ -564,12 +566,12 @@ public class ValueTypeLookupTest {
   @Test
   public void testResolveTargetedSequencing() throws Exception {
     assertNotNull(sut.resolve(makeTargetedSequencing(VALID_LONG, VALID_STRING)));
-    assertNotNull(sut.resolve(makeTargetedSequencing(null, VALID_STRING)));
-    assertNull(sut.resolve(makeTargetedSequencing(null, INVALID_STRING)));
-    assertNull(sut.resolve(makeTargetedSequencing(null, null)));
+    assertNotNull(sut.resolve(makeTargetedSequencing(0, VALID_STRING)));
+    assertNull(sut.resolve(makeTargetedSequencing(0, INVALID_STRING)));
+    assertNull(sut.resolve(makeTargetedSequencing(0, null)));
   }
 
-  private TargetedSequencing makeTargetedSequencing(Long id, String alias) {
+  private TargetedSequencing makeTargetedSequencing(long id, String alias) {
     TargetedSequencing tarSeq = new TargetedSequencing();
     tarSeq.setId(id);
     tarSeq.setAlias(alias);

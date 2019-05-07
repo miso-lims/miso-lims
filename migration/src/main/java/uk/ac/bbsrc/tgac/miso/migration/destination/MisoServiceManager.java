@@ -755,7 +755,6 @@ public class MisoServiceManager {
 
   public void setDefaultKitDao() {
     HibernateKitDao dao = new HibernateKitDao();
-    dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
     setKitDao(dao);
   }
@@ -815,7 +814,6 @@ public class MisoServiceManager {
 
   public void setDefaultRunDao() {
     HibernateRunDao dao = new HibernateRunDao();
-    dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
     setRunDao(dao);
   }

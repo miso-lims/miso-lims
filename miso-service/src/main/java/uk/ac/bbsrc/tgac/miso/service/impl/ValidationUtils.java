@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -124,4 +125,14 @@ public class ValidationUtils {
       throw new ValidationException(new ValidationError("name", val.getMessage()));
     }
   }
+
+  public static <T, R> boolean isSetAndChanged(Function<T, R> getter, T newItem, T beforeChange) {
+    if (beforeChange == null) {
+      return true;
+    }
+    R before = getter.apply(beforeChange);
+    R after = getter.apply(newItem);
+    return after != null && !after.equals(before);
+  }
+
 }

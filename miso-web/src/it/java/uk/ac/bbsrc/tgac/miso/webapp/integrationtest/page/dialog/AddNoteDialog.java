@@ -4,7 +4,9 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 import java.util.function.Function;
 
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -17,8 +19,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.FormPage;
 public class AddNoteDialog<T extends AbstractPage> extends FormPage<AddNoteDialog.Field> {
 
   public static enum Field implements FormPage.FieldElement {
-    INTERNAL_ONLY(By.id("internalOnly"), FieldType.CHECKBOX),
-    TEXT(By.id("notetext"), FieldType.TEXT);
+    INTERNAL_ONLY(By.cssSelector("#dialog input[type='checkbox']"), FieldType.CHECKBOX), //
+    TEXT(By.cssSelector("#dialog textarea"), FieldType.TEXTAREA);
 
     private final By selector;
     private final FieldType type;
@@ -40,7 +42,7 @@ public class AddNoteDialog<T extends AbstractPage> extends FormPage<AddNoteDialo
 
   }
 
-  @FindBy(xpath = "//div[@id='addNoteDialog']/..")
+  @FindBy(id = "dialog")
   private WebElement dialogContainer;
   private final WebElement submitButton;
   private final WebElement cancelButton;
@@ -51,8 +53,8 @@ public class AddNoteDialog<T extends AbstractPage> extends FormPage<AddNoteDialo
     this.parentPageConstructor = parentPageConstructor;
     PageFactory.initElements(driver, this);
     waitUntil(visibilityOf(dialogContainer));
-    submitButton = dialogContainer.findElement(By.xpath("//button/span[text()='Add Note']"));
-    cancelButton = dialogContainer.findElement(By.xpath("//button/span[text()='Cancel']"));
+    submitButton = driver.findElement(By.id("ok"));
+    cancelButton = driver.findElement(By.id("cancel"));
   }
 
   public boolean isDisplayed() {
@@ -71,12 +73,15 @@ public class AddNoteDialog<T extends AbstractPage> extends FormPage<AddNoteDialo
   public T submit() {
     WebElement html = getHtmlElement();
     submitButton.click();
-    // if invalid (e.g. no text), there's no indication and no refresh. Dialog just stays open
-    if (isDisplayed()) {
+    // if invalid, an alert appears
+    try {
+      Alert alert = getDriver().switchTo().alert();
+      alert.accept();
       return null;
+    } catch (NoAlertPresentException e) {
+      waitForPageRefresh(html);
+      return parentPageConstructor.apply(getDriver());
     }
-    waitForPageRefresh(html);
-    return parentPageConstructor.apply(getDriver());
   }
 
   public void cancel() {

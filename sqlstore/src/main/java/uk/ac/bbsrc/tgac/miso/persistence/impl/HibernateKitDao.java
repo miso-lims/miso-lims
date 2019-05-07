@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
@@ -35,10 +34,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,27 +46,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<KitDescriptor> {
-  private static final String DESCRIPTOR_TABLE_NAME = "KitDescriptor";
-
-  protected static final Logger log = LoggerFactory.getLogger(HibernateKitDao.class);
 
   @Autowired
   private SessionFactory sessionFactory;
-  @Autowired
-  private JdbcTemplate jdbcTemplate;
-
-  public JdbcTemplate getJdbcTemplate() {
-    return jdbcTemplate;
-  }
-
-  public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-    this.jdbcTemplate = jdbcTemplate;
-  }
 
   @Override
   public Session currentSession() {
@@ -143,6 +125,13 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
   }
 
   @Override
+  public KitDescriptor getKitDescriptorByName(String name) throws IOException {
+    Criteria criteria = currentSession().createCriteria(KitDescriptor.class);
+    criteria.add(Restrictions.eq("name", name));
+    return (KitDescriptor) criteria.uniqueResult();
+  }
+
+  @Override
   public KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException {
     Criteria criteria = currentSession().createCriteria(KitDescriptor.class);
     criteria.add(Restrictions.eq("partNumber", partNumber));
@@ -172,18 +161,13 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
   @Override
   public long saveKitDescriptor(KitDescriptor kd) throws IOException {
     long id;
-    if (kd.getId() == KitDescriptor.UNSAVED_ID) {
+    if (!kd.isSaved()) {
       id = (Long) currentSession().save(kd);
     } else {
       currentSession().update(kd);
       id = kd.getId();
     }
     return id;
-  }
-
-  @Override
-  public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(jdbcTemplate, DESCRIPTOR_TABLE_NAME);
   }
 
   @Override

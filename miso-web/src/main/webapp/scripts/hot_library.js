@@ -250,7 +250,6 @@ HotTarget.library = (function() {
       }
     },
     createColumns: function(config, create, data) {
-      var validationCache = {};
       var columns = [
           {
             header: 'Library Name',
@@ -271,43 +270,10 @@ HotTarget.library = (function() {
             include: config.showLibraryAlias,
             unpackAfterSave: true,
             unpack: function(lib, flat, setCellMeta) {
-              validationCache[lib.alias] = true;
               flat.alias = Utils.valOrNull(lib.alias);
               if (lib.nonStandardAlias) {
                 HotUtils.makeCellNSAlias(setCellMeta);
               }
-              setCellMeta('validator', function(value, callback) {
-                (Constants.automaticLibraryAlias ? HotUtils.validator.optionalTextNoSpecialChars
-                    : HotUtils.validator.requiredTextNoSpecialChars)(value, function(result) {
-                  if (!result) {
-                    callback(false);
-                    return;
-                  }
-                  if (!value) {
-                    return callback(Constants.automaticLibraryAlias);
-                  }
-                  if (validationCache.hasOwnProperty(value)) {
-                    return callback(validationCache[value]);
-                  }
-                  if (lib.nonStandardAlias) {
-                    return callback(true);
-                  }
-                  jQuery.ajax({
-                    url: '/miso/rest/library/validate-alias',
-                    type: 'POST',
-                    contentType: 'application/json; charset=utf8',
-                    data: JSON.stringify({
-                      alias: value
-                    })
-                  }).success(function(json) {
-                    validationCache[value] = true;
-                    return callback(true);
-                  }).fail(function(response, textStatus, serverStatus) {
-                    validationCache[value] = false;
-                    return callback(false);
-                  });
-                });
-              });
             },
             pack: function(lib, flat, errorHandler) {
               lib.alias = flat.alias;
@@ -796,93 +762,7 @@ HotTarget.library = (function() {
               obj.spikeInId = (Utils.validation.isEmpty(flat.spikeIn) || flat.spikeIn === '(None)') ? null : Utils.array.getIdFromAlias(
                   flat.spikeIn, Constants.spikeIns);
             }
-          }, makeSpikeInDilutionFactorColumn(), makeSpikeInVolumeColumn(), {
-            header: 'Distributed',
-            data: 'distributed',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: ['Sent Out', 'No'],
-            include: !config.create && !config.propagate,
-            unpack: function(lib, flat, setCellMeta) {
-              if (lib.distributed === true) {
-                flat.distributed = 'Sent Out';
-              } else {
-                flat.distributed = 'No';
-              }
-            },
-            pack: function(lib, flat, errorHandler) {
-              if (flat.distributed === 'Sent Out') {
-                lib.distributed = true;
-              } else {
-                lib.distributed = false;
-              }
-            }
-          }, {
-            header: 'Distribution Date',
-            data: 'distributionDate',
-            type: 'date',
-            dateFormat: 'YYYY-MM-DD',
-            datePickerConfig: {
-              firstDay: 0,
-              numberOfMonths: 1
-            },
-            allowEmpty: true,
-            description: 'The date that the library was sent to an external recipient.',
-            include: !config.create && !config.propagate,
-            depends: 'distributed',
-            update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if (value === 'Sent Out') {
-                setReadOnly(false);
-                setOptions({
-                  required: true,
-                  validator: HotUtils.validator.requiredTextNoSpecialChars
-                });
-              } else {
-                setReadOnly(true);
-                setOptions({
-                  validator: HotUtils.validator.requiredEmpty
-                });
-                setData(null);
-              }
-            },
-            unpack: function(lib, flat, setCellMeta) {
-              if (lib.distributionDate) {
-                flat.distributionDate = Utils.valOrNull(lib.distributionDate);
-              }
-            },
-            pack: function(lib, flat, errorHandler) {
-              lib.distributionDate = flat.distributionDate;
-            }
-          }, {
-            header: 'Distribution Recipient',
-            data: 'distributionRecipient',
-            type: 'text',
-            include: !config.create && !config.propagate,
-            depends: 'distributed',
-            update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if (value === 'Sent Out') {
-                setOptions({
-                  required: true,
-                  validator: HotUtils.validator.requiredTextNoSpecialChars
-                });
-                setReadOnly(false);
-              } else {
-                setOptions({
-                  validator: HotUtils.validator.requiredEmpty
-                });
-                setData(null);
-                setReadOnly(true);
-              }
-            },
-            unpack: function(lib, flat, setCellMeta) {
-              if (lib.distributionRecipient) {
-                flat.distributionRecipient = Utils.valOrNull(lib.distributionRecipient);
-              }
-            },
-            pack: function(lib, flat, errorHandler) {
-              lib.distributionRecipient = flat.distributionRecipient;
-            }
-          }];
+          }, makeSpikeInDilutionFactorColumn(), makeSpikeInVolumeColumn()];
 
       var spliceIndex = columns.indexOf(columns.filter(function(column) {
         return column.data === 'identificationBarcode';

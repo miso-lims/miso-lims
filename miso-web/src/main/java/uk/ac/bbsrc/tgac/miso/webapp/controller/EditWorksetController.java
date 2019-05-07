@@ -1,14 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -35,11 +33,6 @@ public class EditWorksetController {
 
   @Autowired
   private WorksetService worksetService;
-
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> getColumnSizes() throws IOException {
-    return worksetService.getColumnSizes();
-  }
   
   @RequestMapping("/new")
   public ModelAndView newArray(ModelMap model) {

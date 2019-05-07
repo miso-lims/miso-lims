@@ -121,7 +121,7 @@ ListTarget.library = {
           "mData": "lastModified",
           "include": true,
           "iSortPriority": 2,
-          "bVisible": (Sample.detailedSample ? "true" : "false")
+          "bVisible": Constants.isDetailedSample
         }, {
           "sTitle": "Barcode",
           "mData": "identificationBarcode",

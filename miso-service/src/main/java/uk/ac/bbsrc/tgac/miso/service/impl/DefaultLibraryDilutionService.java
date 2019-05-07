@@ -153,6 +153,7 @@ public class DefaultLibraryDilutionService
   @Override
   public void update(LibraryDilution dilution) throws IOException {
     LibraryDilution managed = get(dilution.getId());
+    maybeRemoveFromBox(dilution);
     boxService.throwIfBoxPositionIsFilled(dilution);
 
     loadChildEntities(dilution);
@@ -215,6 +216,12 @@ public class DefaultLibraryDilutionService
     }
   }
 
+  private void maybeRemoveFromBox(LibraryDilution dilution) {
+    if (dilution.isDiscarded() || dilution.isDistributed()) {
+      dilution.setBoxPosition(null);
+    }
+  }
+
   /**
    * Copies modifiable fields from the source LibraryDilution into the target LibraryDilution to be persisted
    * 
@@ -225,8 +232,16 @@ public class DefaultLibraryDilutionService
   private void applyChanges(LibraryDilution target, LibraryDilution source) {
     target.setTargetedSequencing(source.getTargetedSequencing());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
-    target.setVolume(source.getVolume());
-    target.setVolumeUnits(target.getVolume() == null ? null : source.getVolumeUnits());
+    target.setDiscarded(source.isDiscarded());
+    if (source.isDiscarded() || source.isDistributed()) {
+      target.setVolume(0.0);
+    } else {
+      target.setVolume(source.getVolume());
+    }
+    target.setVolumeUnits(source.getVolume() == null ? null : source.getVolumeUnits());
+    target.setDistributed(source.isDistributed());
+    target.setDistributionDate(source.getDistributionDate());
+    target.setDistributionRecipient(source.getDistributionRecipient());
     target.setConcentration(source.getConcentration());
     target.setConcentrationUnits(target.getConcentration() == null ? null : source.getConcentrationUnits());
     target.setNgUsed(source.getNgUsed());

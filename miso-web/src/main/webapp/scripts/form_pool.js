@@ -28,7 +28,7 @@ FormTarget.pool = (function($) {
           data: 'name',
           type: 'read-only',
           getDisplayValue: function(pool) {
-            return pool.id || 'Unsaved';
+            return pool.name || 'Unsaved';
           }
         }, {
           title: 'Alias',
@@ -86,7 +86,7 @@ FormTarget.pool = (function($) {
               disabled: newValue
             });
           }
-        }, FormUtils.makeBoxLocationField(true)]
+        }].concat(FormUtils.makeDistributionFields()).concat(FormUtils.makeBoxLocationField(true))
       }];
     },
     confirmSave: function(pool, saveCallback) {

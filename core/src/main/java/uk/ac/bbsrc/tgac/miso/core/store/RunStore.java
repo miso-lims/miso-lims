@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -118,12 +117,6 @@ public interface RunStore extends Store<Run>, PaginatedDataSource<Run> {
    * @return all runs with matching sequencer instrument id
    */
   List<Run> listBySequencerId(long instrumentId) throws IOException;
-
-  /**
-   * @return a map containing all column names and max lengths from the Run table
-   * @throws IOException
-   */
-  public Map<String, Integer> getRunColumnSizes() throws IOException;
 
   public long countRuns() throws IOException;
 

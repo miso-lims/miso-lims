@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -98,11 +97,6 @@ public class DefaultServiceRecordService implements ServiceRecordService {
     return instrument.getInstrumentModel().getPositions().stream()
         .filter(p -> p.getId() == id)
         .findFirst().orElse(null);
-  }
-
-  @Override
-  public Map<String, Integer> getColumnSizes() throws IOException {
-    return serviceRecordDao.getServiceRecordColumnSizes();
   }
 
   public void setServiceRecordDao(ServiceRecordStore serviceRecordDao) {

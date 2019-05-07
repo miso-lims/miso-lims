@@ -2,20 +2,37 @@
 
 Changes:
 
-* Redesigned page header to minimize wasted space. Tabs have been removed and the links relocated:
-  * Home: MISO logo
-  * My Account: Username link near the top right of the screen
-  * My Projects: "Projects" link under Preparation in the navigation menu
-  * Help: "Help" link near the top right of the screen
-* Added single Edit Dilution page
-* Added dilution changelogs, separated from library changelogs
-* Changed Edit Library page to show validation messages instead of error page when saving fails
-* Changed Edit Pool page to show validation messages instead of error page when saving fails
-* Fixed missing Notes section on Edit Sample page
-* Fixed searching dilutions by creator
-* Fixed export function on bulk tables
-* Fixed a bug in the bulk library table where selecting a box position and index family for a
-  library without a library template would cause the table to become unresponsive
+  * Added discarded and box location fields to Edit Dilution page
+  * Changed Edit Run page to show validation messages instead of error page when saving fails
+  * Changed Edit Service Record page to show validation messages instead of error page when saving
+    fails
+  * Changed Edit Kit Descriptor page to show validation messages instead of error page when saving
+    fails
+  * Changed the Edit Project page to show validation messages instead of error page when saving
+    fails
+  * Changed Edit Workset page to show validation messages instead of error page when saving fails
+  * Made dilutions and pools distributable
+  * Improved "Location" display in list tables
+  * Fixed Pinery-MISO failing to reverse compliment indices when appropriate if the container model
+    is not accurately detected
+
+# 0.2.175
+
+Changes:
+ 
+  * Redesigned page header to minimize wasted space. Tabs have been removed and the links relocated:
+    * Home: MISO logo
+    * My Account: Username link near the top right of the screen
+    * My Projects: "Projects" link under Preparation in the navigation menu
+    * Help: "Help" link near the top right of the screen
+  * Added single Edit Dilution page with dilution changelogs
+  * Changed Edit Library and Edit Pool pages to show validation messages instead of error page 
+    when saving fails
+  * Fixed missing Notes section on Edit Sample page
+  * Fixed searching dilutions by creator
+  * Fixed export function on bulk tables
+  * Fixed a bug in the bulk library table where selecting a box position and index family for a
+    library without a library template would cause the table to become unresponsive
 
 # 0.2.174
 

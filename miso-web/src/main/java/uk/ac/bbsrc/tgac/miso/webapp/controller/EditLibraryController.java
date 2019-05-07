@@ -145,6 +145,8 @@ public class EditLibraryController {
     private static final String SORTABLE_LOCATION = "sortableLocation";
     private static final String IS_LIBRARY_RECEIPT = "isLibraryReceipt";
     private static final String DEFAULT_SCI_NAME = "defaultSciName";
+    private static final String PAGE_MODE = "pageMode";
+    private static final String CREATE = "create";
     private static final String PROPAGATE = "propagate";
     private static final String EDIT = "edit";
     private static final String SHOW_LIBRARY_ALIAS = "showLibraryAlias";
@@ -339,7 +341,7 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.put(Config.SORTABLE_LOCATION, true);
-      config.put(Config.EDIT, true);
+      config.put(Config.PAGE_MODE, Config.EDIT);
       writeLibraryConfiguration(config);
     }
   };
@@ -437,7 +439,7 @@ public class EditLibraryController {
         config.put(Config.SORT, sort);
       }
       config.putPOJO(Config.BOX, newBox);
-      config.put(Config.PROPAGATE, true);
+      config.put(Config.PAGE_MODE, Config.PROPAGATE);
     }
 
     public ModelAndView propagate(String idString, String replicates, String sort, ModelMap model) throws IOException {
@@ -530,7 +532,7 @@ public class EditLibraryController {
         config.putPOJO("targetSampleClass", Dtos.asDto(aliquotClass));
         config.put("dnaseTreatable", aliquotClass.hasPathToDnaseTreatable(sampleValidRelationshipService.getAll()));
       }
-      config.put("create", true);
+      config.put(Config.PAGE_MODE, Config.CREATE);
       config.put("hasProject", project != null);
       Map<Long, List<LibraryTemplateDto>> templatesByProjectId = new HashMap<>();
       if (project == null) {
@@ -555,7 +557,7 @@ public class EditLibraryController {
       config.put(Config.SHOW_VOLUME, showVolume);
       config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
       config.put(Config.SORTABLE_LOCATION, false);
-      config.put(Config.PROPAGATE, false);
+      config.put(Config.PAGE_MODE, Config.CREATE);
       config.put(Config.IS_LIBRARY_RECEIPT, true);
       config.putPOJO(Config.BOX, newBox);
       config.putPOJO(Config.TEMPLATES, templatesByProjectId);
@@ -595,6 +597,7 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO(Config.BOX, newBox);
+      config.put(Config.PAGE_MODE, Config.PROPAGATE);
     }
   }
 
@@ -621,6 +624,7 @@ public class EditLibraryController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+      config.put(Config.PAGE_MODE, Config.EDIT);
     }
   };
 
@@ -710,6 +714,7 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO(Config.BOX, newBox);
+      config.put(Config.PAGE_MODE, Config.PROPAGATE);
     }
   }
 
@@ -768,6 +773,7 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO(Config.BOX, newBox);
+      config.put(Config.PAGE_MODE, Config.CREATE);
     }
   }
 
@@ -806,6 +812,7 @@ public class EditLibraryController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.putPOJO("dilutionsToPool", dilutions);
       config.putPOJO(Config.BOX, newBox);
+      config.put(Config.PAGE_MODE, Config.CREATE);
     }
 
     public ModelAndView create(ModelMap model) throws IOException {

@@ -5,7 +5,6 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.titleContains;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -40,9 +39,9 @@ public class ProjectPage extends HeaderFooterPage {
     public static final String RUNS = "project_runs_wrapper";
   }
 
-  @FindBy(id = "projectId")
+  @FindBy(id = "idLabel")
   private WebElement idLabel;
-  @FindBy(id = "name")
+  @FindBy(id = "nameLabel")
   private WebElement nameLabel;
   @FindBy(id = "creationDate")
   private WebElement creationDateLabel;
@@ -52,9 +51,9 @@ public class ProjectPage extends HeaderFooterPage {
   private WebElement shortNameLabel;
   @FindBy(id = "description")
   private WebElement descriptionLabel;
-  @FindBy(name = "progress")
-  private List<WebElement> progressLabel;
-  @FindBy(id = "referenceGenome")
+  @FindBy(id = "progress")
+  private WebElement progressLabel;
+  @FindBy(id = "referenceGenomeId")
   private WebElement referenceGenomeLabel;
   @FindBy(id = "save")
   private WebElement saveButton;
@@ -114,11 +113,11 @@ public class ProjectPage extends HeaderFooterPage {
   }
 
   public String getProgress() {
-    return getSelectedRadioButtonValue(progressLabel);
+    return getSelectedDropdownText(progressLabel);
   }
 
   public void setProgress(String progress) {
-    setRadioButton(progress, progressLabel);
+    setDropdown(progress, progressLabel);
   }
 
   public String getReferenceGenome() {

@@ -1,9 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -11,14 +9,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.store.WorksetStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -29,15 +25,9 @@ public class HibernateWorksetDao implements WorksetStore, HibernatePaginatedData
 
   @Autowired
   private SessionFactory sessionFactory;
-  @Autowired
-  private JdbcTemplate jdbcTemplate;
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
-  }
-
-  public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-    this.jdbcTemplate = jdbcTemplate;
   }
 
   @Override
@@ -147,11 +137,6 @@ public class HibernateWorksetDao implements WorksetStore, HibernatePaginatedData
   @Override
   public String propertyForUserName(Criteria criteria, boolean creator) {
     return creator ? "creator.loginName" : "lastModifier.loginName";
-  }
-
-  @Override
-  public Map<String, Integer> getColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(jdbcTemplate, "Workset");
   }
 
 }
