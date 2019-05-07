@@ -65,7 +65,6 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -99,7 +98,6 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
@@ -163,8 +161,6 @@ public class EditLibraryController {
   private LibraryService libraryService;
   @Autowired
   private SampleService sampleService;
-  @Autowired
-  private ChangeLogService changeLogService;
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
@@ -287,11 +283,6 @@ public class EditLibraryController {
     }
     rtn.put("libraryTypes", rtnLibTypes);
     return rtn;
-  }
-
-  @GetMapping(value = "/rest/changes")
-  public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return changeLogService.listAll("Library");
   }
 
   @GetMapping(value = "/{libraryId}")

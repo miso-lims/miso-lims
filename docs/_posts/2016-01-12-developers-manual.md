@@ -16,17 +16,14 @@ applications.
 
 |Module|Subdirectory|Description|
 |------|------------|-----------|
-|migration|migration|a separate application which can be extended to facilitate migration of data from a different LIMS|
 |MISO Core|core|the heart of MISO which models the domain of NGS metadata and underpins the other modules|
 |miso-dto|miso-dto|data transfer objects primarily to be JSON-serialized in the REST API|
-|miso-external-web|miso-external-web|a limited-feature version of MISO for use by external collaborators. **WARNING: not currently maintained**|
 |MISO Integration Tools|integration-tools|miscellaneous utilities for working with external libraries|
 |MISO MVC|miso-web|web front-end, including Spring MVC and REST Controllers, JSPs, and Javascript|
-|MISO Run Scanner|runscanner|a separate server application that scans sequencer run directories. Integrated with MISO to automate entry of run data|
-|MISO Run Tools|run-tools|miscellaneous utitilies for working with sequencer runs|
 |miso-service|miso-service|service layer containing business logic between the persistence layer and front-end|
-|MISO Spring IoC|spring|additional AJAX utilities, slowly being phased out in preference to the REST API|
 |MISO SQL Store|sqlstore|persistence layer|
+|pinery-miso|pinery-miso|Implementation of [Pinery](https://github.com/oicr-gsi/pinery) REST API for serving MISO LIMS data to other applications|
+|migration|migration|a separate application which can be extended to facilitate migration of data from a different LIMS|
 
 # Core
 
@@ -281,9 +278,9 @@ deep graph of nested objects, they are converted to simpler Data Transfer Object
 
 Signing requests requires 3 elements:
 
-* REST API URL of the service you wish to request (see [REST API]({{ site.baseurl }}{% post_url 2016-01-12-rest-api %}) )
+* REST API URL of the service you wish to request
 * Your MISO username
-* Your MISO API key - this can be found by logging in to MISO as normal, clicking "My Account" and the key is in the top box
+* Your MISO API key - this can be found by logging in to MISO as normal and clicking your username at the top right. The key is in the top box
 
 Producing HMAC keys from these elements for your request is easy:
 
@@ -306,9 +303,9 @@ PROJECTID=$1
 USER=$2
 KEY=$3
 
-SIGNATURE=`echo -n "/miso/rest/project/$PROJECTID/libraries?x-url=/miso/rest/project/$PROJECTID/libraries@x-user=$USER" | openssl sha1 -binary -hmac "$KEY" | openssl base64 | tr -d = | tr +/ -_`
+SIGNATURE=`echo -n "/miso/rest/projects/$PROJECTID/libraries?x-url=/miso/rest/projects/$PROJECTID/libraries@x-user=$USER" | openssl sha1 -binary -hmac "$KEY" | openssl base64 | tr -d = | tr +/ -_`
 
-curl --request GET "http://your.miso.url/miso/rest/project/$PROJECTID/libraries" --header "x-user:$USER" --header "x-signature:$SIGNATURE" --header "x-url:/miso/rest/project/$PROJECTID/libraries"
+curl --request GET "http://your.miso.url/miso/rest/projects/$PROJECTID/libraries" --header "x-user:$USER" --header "x-signature:$SIGNATURE" --header "x-url:/miso/rest/projects/$PROJECTID/libraries"
 ```
 
 # Run Scanner

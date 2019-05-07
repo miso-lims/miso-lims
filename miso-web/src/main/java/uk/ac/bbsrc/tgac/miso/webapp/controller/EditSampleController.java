@@ -49,7 +49,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
@@ -57,7 +56,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -97,7 +95,6 @@ import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
@@ -127,8 +124,6 @@ public class EditSampleController {
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
   @Autowired
-  private ChangeLogService changeLogService;
-  @Autowired
   private PoolService poolService;
   @Autowired
   private RunService runService;
@@ -151,10 +146,6 @@ public class EditSampleController {
 
   public void setSampleValidRelationshipService(SampleValidRelationshipService sampleValidRelationshipService) {
     this.sampleValidRelationshipService = sampleValidRelationshipService;
-  }
-
-  public void setChangeLogService(ChangeLogService changeLogService) {
-    this.changeLogService = changeLogService;
   }
 
   public void setPoolService(PoolService poolService) {
@@ -248,11 +239,6 @@ public class EditSampleController {
   @Autowired
   private SampleClassService sampleClassService;
 
-  @GetMapping(value = "/rest/{sampleId}")
-  public @ResponseBody Sample jsonRest(@PathVariable Long sampleId) throws IOException {
-    return sampleService.get(sampleId);
-  }
-
   @GetMapping(value = "/{sampleId}")
   public ModelAndView setupForm(@PathVariable Long sampleId, ModelMap model) throws IOException {
     Sample sample = sampleService.get(sampleId);
@@ -310,11 +296,6 @@ public class EditSampleController {
       relations.add(Dtos.asDto(LimsUtils.deproxify(child), false));
       addChildren(relations, child.getChildren());
     }
-  }
-
-  @GetMapping(value = "/rest/changes")
-  public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return changeLogService.listAll("Sample");
   }
 
   /**

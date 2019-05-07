@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Removed old REST endpoints
 
 # 0.2.176
 
