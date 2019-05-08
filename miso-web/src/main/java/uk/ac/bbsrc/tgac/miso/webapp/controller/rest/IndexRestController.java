@@ -29,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.IndexDto;
 
 @Controller
-@RequestMapping(value = "/rest/index", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value = "/rest/indices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class IndexRestController extends RestController {
   @Autowired
   private IndexService indexService;

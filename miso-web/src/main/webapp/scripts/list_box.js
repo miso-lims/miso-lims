@@ -24,7 +24,7 @@
 ListTarget.box = {
   name: "Boxes",
   createUrl: function(config, projectId) {
-    return "/miso/rest/box/dt" + (config.boxUse ? "/use/" + config.boxUse : "");
+    return "/miso/rest/boxes/dt" + (config.boxUse ? "/use/" + config.boxUse : "");
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
@@ -35,7 +35,7 @@ ListTarget.box = {
               name: 'Print Contents',
               action: function(items) {
                 Utils.printSelectDialog(function(printer, copies) {
-                  Utils.ajaxWithDialog('Printing', 'POST', window.location.origin + '/miso/rest/printer/' + printer + '/boxcontents', {
+                  Utils.ajaxWithDialog('Printing', 'POST', window.location.origin + '/miso/rest/printers/' + printer + '/boxcontents', {
                     boxes: items.map(Utils.array.getId),
                     copies: copies
                   }, function(result) {

@@ -12,9 +12,9 @@ FormTarget.run = (function($) {
   return {
     getSaveUrl: function(run) {
       if (run.id) {
-        return '/miso/rest/run/' + run.id;
+        return '/miso/rest/runs/' + run.id;
       } else {
-        return '/miso/rest/run';
+        return '/miso/rest/runs';
       }
     },
     getSaveMethod: function(run) {

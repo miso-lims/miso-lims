@@ -25,12 +25,12 @@ ListTarget.pool = {
   name: "Pools",
   createUrl: function(config, projectId) {
     if (projectId) {
-      return "/miso/rest/pool/dt/project/" + projectId;
+      return "/miso/rest/pools/dt/project/" + projectId;
     } else {
-      return "/miso/rest/pool/dt/platform/" + config.platformType;
+      return "/miso/rest/pools/dt/platform/" + config.platformType;
     }
   },
-  queryUrl: "/miso/rest/pool/query",
+  queryUrl: "/miso/rest/pools/query",
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.pool.getBulkActions(config);
     actions.push({
@@ -44,7 +44,7 @@ ListTarget.pool = {
           ids.push(pool.id);
         });
         Utils.showConfirmDialog('Delete Pools', 'Delete', lines, function() {
-          Utils.ajaxWithDialog('Deleting Pools', 'POST', '/miso/rest/pool/bulk-delete', ids, function() {
+          Utils.ajaxWithDialog('Deleting Pools', 'POST', '/miso/rest/pools/bulk-delete', ids, function() {
             Utils.page.pageReload();
           });
         });

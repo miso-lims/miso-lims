@@ -71,7 +71,7 @@ import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
-@RequestMapping("/rest/container")
+@RequestMapping("/rest/containers")
 public class ContainerRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(ContainerRestController.class);
 

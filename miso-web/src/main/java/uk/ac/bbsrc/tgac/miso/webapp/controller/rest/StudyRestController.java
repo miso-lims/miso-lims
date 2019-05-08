@@ -32,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
-@RequestMapping("/rest/study")
+@RequestMapping("/rest/studies")
 public class StudyRestController extends RestController {
   private final JQueryDataTableBackend<Study, StudyDto> jQueryBackend = new JQueryDataTableBackend<Study, StudyDto>() {
     @Override

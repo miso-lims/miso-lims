@@ -34,7 +34,7 @@ import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
-@RequestMapping("/rest")
+@RequestMapping("/rest/kitdescriptors")
 public class KitDescriptorRestController extends RestController {
 
   @Autowired
@@ -83,13 +83,13 @@ public class KitDescriptorRestController extends RestController {
     this.kitDescriptorService = kitService;
   }
 
-  @GetMapping(value = "/kitdescriptor/{id}", produces = { "application/json" })
+  @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
   public KitDescriptorDto getKitDescriptor(@PathVariable long id) throws IOException {
     return RestUtils.getObject("Kit descriptor", id, kitDescriptorService, Dtos::asDto);
   }
 
-  @GetMapping(value = "/kitdescriptors", produces = { "application/json" })
+  @GetMapping(produces = { "application/json" })
   @ResponseBody
   public Set<KitDescriptorDto> getKitDescriptors() throws IOException {
     Collection<KitDescriptor> kitDescriptors = kitDescriptorService.list();
@@ -97,7 +97,7 @@ public class KitDescriptorRestController extends RestController {
     return dtos;
   }
 
-  @PostMapping(value = "/kitdescriptor", headers = { "Content-type=application/json" })
+  @PostMapping(headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.CREATED)
   public @ResponseBody KitDescriptorDto createKitDescriptor(@RequestBody KitDescriptorDto kitDescriptorDto) throws IOException {
     return RestUtils.createObject("Kit descriptor", kitDescriptorDto, Dtos::to, kitDescriptorService, kd -> {
@@ -106,7 +106,7 @@ public class KitDescriptorRestController extends RestController {
     });
   }
 
-  @PutMapping(value = "/kitdescriptor/{id}", headers = { "Content-type=application/json" })
+  @PutMapping(value = "/{id}", headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.OK)
   public @ResponseBody KitDescriptorDto updateKitDescriptor(@PathVariable long id, @RequestBody KitDescriptorDto kitDescriptorDto)
       throws IOException {
@@ -116,14 +116,14 @@ public class KitDescriptorRestController extends RestController {
     });
   }
 
-  @GetMapping(value = "/kitdescriptor/dt", produces = "application/json")
+  @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<KitDescriptorDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
-  @GetMapping(value = "/kitdescriptor/dt/type/{type}", produces = "application/json")
+  @GetMapping(value = "/dt/type/{type}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<KitDescriptorDto> dataTableByType(@PathVariable("type") String type, HttpServletRequest request,
       HttpServletResponse response,
@@ -135,7 +135,7 @@ public class KitDescriptorRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.kitType(kitType));
   }
 
-  @PutMapping(value = "/kitdescriptor/{id}/targetedsequencing", produces = "application/json")
+  @PutMapping(value = "/{id}/targetedsequencing", produces = "application/json")
   public @ResponseBody KitDescriptorDto changeTargetedSequencings(@PathVariable("id") Long id,
       @RequestBody KitChangeTargetedSequencingRequest request) throws IOException {
     KitDescriptor kitDescriptor = kitDescriptorService.get(id);

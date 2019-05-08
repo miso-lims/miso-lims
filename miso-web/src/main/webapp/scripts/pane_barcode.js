@@ -23,7 +23,7 @@
 
 PaneTarget.barcode = (function() {
   var title = "Search";
-  var url = "/miso/rest/barcodable/search";
+  var url = "/miso/rest/barcodables/search";
 
   var transform = function(searchResult) {
     return Tile.make([

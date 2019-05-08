@@ -49,7 +49,7 @@ import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 @Controller
-@RequestMapping("/rest/note")
+@RequestMapping("/rest/notes")
 public class NoteRestController extends RestController {
   public static class NoteRequest {
     private boolean internalOnly;

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
@@ -29,15 +28,14 @@ import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 
 @Controller
-@RequestMapping("/rest")
-@SessionAttributes("sequencingparameters")
+@RequestMapping("/rest/sequencingparameters")
 public class SequencingParametersRestController extends RestController {
   @Autowired
   private SequencingParametersService sequencingParametersService;
   @Autowired
   private InstrumentModelService platformService;
 
-  @GetMapping(value = "/sequencingparameters/{id}", produces = { "application/json" })
+  @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
   public SequencingParametersDto getSequencingParameters(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -49,7 +47,7 @@ public class SequencingParametersRestController extends RestController {
     }
   }
 
-  @GetMapping(value = "/sequencingparameters", produces = { "application/json" })
+  @GetMapping(produces = { "application/json" })
   @ResponseBody
   public List<SequencingParametersDto> getSequencingParametersAlll(UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
@@ -60,7 +58,7 @@ public class SequencingParametersRestController extends RestController {
     return dtos;
   }
 
-  @PostMapping(value = "/sequencingparameters", headers = { "Content-type=application/json" })
+  @PostMapping(headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public SequencingParametersDto createSequencingParameters(@RequestBody SequencingParametersDto sequencingParamtersDto,
@@ -77,7 +75,7 @@ public class SequencingParametersRestController extends RestController {
     return Dtos.asDto(sequencingParametersService.get(id));
   }
 
-  @PutMapping(value = "/sequencingparameters/{id}", headers = { "Content-type=application/json" })
+  @PutMapping(value = "/{id}", headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public SequencingParametersDto updateSequencingParameters(@PathVariable("id") Long id, @RequestBody SequencingParametersDto spDto,

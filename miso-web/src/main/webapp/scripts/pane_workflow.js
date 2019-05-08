@@ -23,7 +23,7 @@
 
 PaneTarget.workflow = (function() {
   var title = "Workflows";
-  var url = "/miso/rest/workflow";
+  var url = "/miso/rest/workflows";
 
   var transform = function(data) {
     return Tile.make([
@@ -67,7 +67,7 @@ PaneTarget.workflow = (function() {
 								return {
 									name : "Add " + workflow.description + " to Favourites",
 									handler : function() {
-										Utils.ajaxWithDialog('Adding Workflow to Favourites', 'POST', "/miso/rest/workflow/favourites/add/" + workflow.workflowName, 
+										Utils.ajaxWithDialog('Adding Workflow to Favourites', 'POST', "/miso/rest/workflows/favourites/add/" + workflow.workflowName, 
 												null, Utils.page.pageReload);
 										}
 								};
@@ -75,7 +75,7 @@ PaneTarget.workflow = (function() {
 								return {
 									name : "Remove " + workflow.description + " from Favourites",
 									handler : function() {
-										Utils.ajaxWithDialog('Removing Workflow from Favourites', 'POST', "/miso/rest/workflow/favourites/remove/" + workflow.workflowName, 
+										Utils.ajaxWithDialog('Removing Workflow from Favourites', 'POST', "/miso/rest/workflows/favourites/remove/" + workflow.workflowName, 
 												null, Utils.page.pageReload);
 										}
 								};

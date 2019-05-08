@@ -34,7 +34,7 @@ import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 
 @Controller
-@RequestMapping("/rest/instrument")
+@RequestMapping("/rest/instruments")
 public class InstrumentRestController extends RestController {
   private final JQueryDataTableBackend<Instrument, InstrumentDto> jQueryBackend = new JQueryDataTableBackend<Instrument, InstrumentDto>() {
     @Override

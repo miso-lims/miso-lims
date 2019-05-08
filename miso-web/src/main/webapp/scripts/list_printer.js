@@ -24,7 +24,7 @@
 ListTarget.printer = {
   name: "Printers",
   createUrl: function(config, projectId) {
-    return "/miso/rest/printer/dt";
+    return "/miso/rest/printers/dt";
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
@@ -33,7 +33,7 @@ ListTarget.printer = {
           "name": "Enable",
           "include": config.isInternal || config.isAdmin,
           "action": function(items) {
-            Utils.ajaxWithDialog('Enabling Printer', 'PUT', '/miso/rest/printer/enable', items.map(Utils.array.getId),
+            Utils.ajaxWithDialog('Enabling Printer', 'PUT', '/miso/rest/printers/enable', items.map(Utils.array.getId),
                 Utils.page.pageReload);
 
           }
@@ -42,7 +42,7 @@ ListTarget.printer = {
           "name": "Disable",
           "include": config.isInternal || config.isAdmin,
           "action": function(items) {
-            Utils.ajaxWithDialog('Disabling Printer', 'PUT', '/miso/rest/printer/disable', items.map(Utils.array.getId),
+            Utils.ajaxWithDialog('Disabling Printer', 'PUT', '/miso/rest/printers/disable', items.map(Utils.array.getId),
                 Utils.page.pageReload);
 
           }
@@ -50,7 +50,7 @@ ListTarget.printer = {
           "name": "Delete",
           "include": config.isAdmin,
           "action": function(items) {
-            Utils.ajaxWithDialog('Deleting Printer', 'DELETE', '/miso/rest/printer', items.map(Utils.array.getId), Utils.page.pageReload);
+            Utils.ajaxWithDialog('Deleting Printer', 'DELETE', '/miso/rest/printers', items.map(Utils.array.getId), Utils.page.pageReload);
           }
         }].filter(function(action) {
       return action.include;
@@ -90,7 +90,7 @@ ListTarget.printer = {
             }
             var save = function(printerConfig) {
 
-              Utils.ajaxWithDialog('Saving Printer', 'POST', '/miso/rest/printer', {
+              Utils.ajaxWithDialog('Saving Printer', 'POST', '/miso/rest/printers', {
                 "id": 0,
                 "available": true,
                 "backend": printer.backend.name,

@@ -1,7 +1,7 @@
 HotTarget.order = (function() {
   return {
-    createUrl: '/miso/rest/poolorder',
-    updateUrl: '/miso/rest/poolorder/',
+    createUrl: '/miso/rest/poolorders',
+    updateUrl: '/miso/rest/poolorders/',
     requestConfiguration: function(config, callback) {
       callback(config)
     },

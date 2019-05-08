@@ -14,18 +14,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCategory;
 import uk.ac.bbsrc.tgac.miso.dto.SampleCategoryDto;
 
-@RequestMapping("/rest")
+@RequestMapping("/rest/samplecategories")
 @Controller
-@SessionAttributes("sampleidentity")
-public class SampleCategoryController {
-  protected static final Logger log = LoggerFactory.getLogger(SampleCategoryController.class);
+public class SampleCategoryRestController {
+  protected static final Logger log = LoggerFactory.getLogger(SampleCategoryRestController.class);
 
-  @GetMapping(value = "/samplecategories", produces = { "application/json" })
+  @GetMapping(produces = { "application/json" })
   @ResponseBody
   public Set<SampleCategoryDto> getSampleCategories(HttpServletResponse response) {
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(true);

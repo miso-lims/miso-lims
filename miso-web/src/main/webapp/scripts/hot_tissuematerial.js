@@ -1,6 +1,6 @@
 HotTarget.tissuematerial = {
-  createUrl: '/miso/rest/tissuematerial',
-  updateUrl: '/miso/rest/tissuematerial/',
+  createUrl: '/miso/rest/tissuematerials',
+  updateUrl: '/miso/rest/tissuematerials/',
   requestConfiguration: function(config, callback) {
     callback(config)
   },
@@ -32,7 +32,7 @@ HotTarget.tissuematerial = {
                 window.location = window.location.origin + '/miso/tissuematerial/list';
                 return;
               }
-              Utils.ajaxWithDialog('Deleting ' + items[index].alias, 'DELETE', '/miso/rest/tissuematerial/' + items[index].id, null,
+              Utils.ajaxWithDialog('Deleting ' + items[index].alias, 'DELETE', '/miso/rest/tissuematerials/' + items[index].id, null,
                   function() {
                     deleteNext(index + 1);
                   });

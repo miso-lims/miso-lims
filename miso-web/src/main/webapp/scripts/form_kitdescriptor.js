@@ -12,7 +12,7 @@ FormTarget.kitdescriptor = (function($) {
 
   return {
     getSaveUrl: function(kit) {
-      return kit.id ? ('/miso/rest/kitdescriptor/' + kit.id) : '/miso/rest/kitdescriptor';
+      return kit.id ? ('/miso/rest/kitdescriptors/' + kit.id) : '/miso/rest/kitdescriptors';
     },
     getSaveMethod: function(kit) {
       return kit.id ? 'PUT' : 'POST';

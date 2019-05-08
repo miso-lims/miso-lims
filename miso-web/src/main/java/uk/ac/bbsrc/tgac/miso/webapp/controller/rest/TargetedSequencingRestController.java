@@ -24,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.dto.TargetedSequencingDto;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 
 @Controller
-@RequestMapping("/rest/targetedsequencing")
+@RequestMapping("/rest/targetedsequencings")
 public class TargetedSequencingRestController extends RestController {
 
   @Autowired

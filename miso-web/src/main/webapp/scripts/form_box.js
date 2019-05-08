@@ -6,9 +6,9 @@ FormTarget.box = (function($) {
   return {
     getSaveUrl: function(box) {
       if (box.id) {
-        return '/miso/rest/box/' + box.id;
+        return '/miso/rest/boxes/' + box.id;
       } else {
-        return '/miso/rest/box';
+        return '/miso/rest/boxes';
       }
     },
     getSaveMethod: function(box) {

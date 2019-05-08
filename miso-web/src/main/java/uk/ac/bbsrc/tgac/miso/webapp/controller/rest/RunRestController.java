@@ -51,7 +51,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.eaglegenomics.simlims.core.User;
@@ -99,8 +98,7 @@ import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
  * @since 0.1.0
  */
 @Controller
-@RequestMapping("/rest/run")
-@SessionAttributes("run")
+@RequestMapping("/rest/runs")
 public class RunRestController extends RestController {
   public static class RunPartitionQCRequest {
     private List<Long> partitionIds;
@@ -163,17 +161,17 @@ public class RunRestController extends RestController {
     this.securityManager = securityManager;
   }
 
-  @GetMapping(value = "{runId}", produces = "application/json")
+  @GetMapping(value = "/{runId}", produces = "application/json")
   public @ResponseBody RunDto getRunById(@PathVariable long runId) throws IOException {
     return RestUtils.getObject("Run", runId, runService, Dtos::asDto);
   }
 
-  @GetMapping(value = "{runId}/full", produces = "application/json")
+  @GetMapping(value = "/{runId}/full", produces = "application/json")
   public @ResponseBody RunDto getRunByIdFull(@PathVariable Long runId) throws IOException {
     return RestUtils.getObject("Run", runId, runService, run -> Dtos.asDto(run, true, true, true));
   }
 
-  @GetMapping(value = "{runId}/containers", produces = "application/json")
+  @GetMapping(value = "/{runId}/containers", produces = "application/json")
   public @ResponseBody List<ContainerDto> getContainersByRunId(@PathVariable Long runId) throws IOException {
     Collection<SequencerPartitionContainer> cc = containerService.listByRunId(runId);
     return Dtos.asContainerDtos(cc, true, true);
@@ -294,7 +292,7 @@ public class RunRestController extends RestController {
     runService.update(run);
   }
 
-  @PostMapping(value = "{runId}/remove", produces = "application/json")
+  @PostMapping(value = "/{runId}/remove", produces = "application/json")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void removeContainer(@PathVariable Long runId, @RequestBody List<Long> containerIds) throws IOException {
     Run run = runService.get(runId);
@@ -302,7 +300,7 @@ public class RunRestController extends RestController {
     runService.update(run);
   }
 
-  @PostMapping(value = "{runId}/qc", produces = "application/json")
+  @PostMapping(value = "/{runId}/qc", produces = "application/json")
   @ResponseStatus(code = HttpStatus.OK)
   public void setQc(@PathVariable Long runId, @RequestBody RunPartitionQCRequest request) throws IOException {
     Run run = runService.get(runId);
@@ -345,7 +343,7 @@ public class RunRestController extends RestController {
     }
   }
 
-  @GetMapping("{runId}/potentialExperiments")
+  @GetMapping("/{runId}/potentialExperiments")
   public @ResponseBody List<StudiesForExperiment> getPotentialExperiments(@PathVariable long runId) throws IOException {
     Run run = getRun(runId);
 
@@ -389,7 +387,7 @@ public class RunRestController extends RestController {
     }
   }
 
-  @GetMapping("{runId}/potentialExperimentExpansions")
+  @GetMapping("/{runId}/potentialExperimentExpansions")
   public @ResponseBody List<AddRequest> getPotentialExperimentExpansions(@PathVariable long runId) throws IOException {
     Run run = getRun(runId);
 

@@ -46,7 +46,7 @@ ListTarget.experiment = {
       actions.push({
         name: 'Create New',
         handler: function() {
-          var url = window.location.origin + '/miso/rest/run/' + config.runId + '/potentialExperiments';
+          var url = window.location.origin + '/miso/rest/runs/' + config.runId + '/potentialExperiments';
           Utils.ajaxWithDialog('Finding potential experiments', 'GET', url, null, function(potentialExperiments) {
             if (!potentialExperiments || !potentialExperiments.length) {
               Utils.showOkDialog('Error',
@@ -81,7 +81,7 @@ ListTarget.experiment = {
                     request.experiment.study = result.study;
                     request.experiment.title = result.title;
 
-                    Utils.ajaxWithDialog('Creating to Experiment', 'POST', '/miso/rest/experiment', request.experiment,
+                    Utils.ajaxWithDialog('Creating to Experiment', 'POST', '/miso/rest/experiments', request.experiment,
                         Utils.page.pageReload);
 
                   }, showCreate);
@@ -97,7 +97,7 @@ ListTarget.experiment = {
       }, {
         name: 'Add to Existing',
         handler: function() {
-          var url = window.location.origin + '/miso/rest/run/' + config.runId + '/potentialExperiments';
+          var url = window.location.origin + '/miso/rest/runs/' + config.runId + '/potentialExperiments';
           Utils.ajaxWithDialog('Finding potential experiments', 'GET', url, null, function(potentialExperiments) {
             if (!potentialExperiments || !potentialExperiments.length) {
               Utils.showOkDialog('Error', ['No existing experiments found']);
@@ -108,7 +108,7 @@ ListTarget.experiment = {
                 name: request.partition.containerName + " " + request.partition.partitionNumber + " (" + request.partition.pool.name
                     + ") to " + request.experiment.name + " (" + request.experiment.alias + ")",
                 handler: function() {
-                  Utils.ajaxWithDialog("Adding to Experiment", "POST", "/miso/rest/experiment/" + request.experiment.id + "/add?"
+                  Utils.ajaxWithDialog("Adding to Experiment", "POST", "/miso/rest/experiments/" + request.experiment.id + "/add?"
                       + jQuery.param({
                         runId: config.runId,
                         partitionId: request.partition.id
@@ -131,7 +131,7 @@ ListTarget.experiment = {
               name: request.partition.containerName + " " + request.partition.partitionNumber + " (" + request.partition.pool.name
                   + ") to " + request.experiment.name + " (" + request.experiment.alias + ")",
               handler: function() {
-                Utils.ajaxWithDialog("Adding to Experiment", "POST", "/miso/rest/experiment/" + request.experiment.id + "/add?"
+                Utils.ajaxWithDialog("Adding to Experiment", "POST", "/miso/rest/experiments/" + request.experiment.id + "/add?"
                     + jQuery.param({
                       runId: config.runId,
                       partitionId: request.partition.id

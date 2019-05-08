@@ -25,13 +25,13 @@ ListTarget.run = {
   name: "Runs",
   createUrl: function(config, projectId) {
     if (projectId) {
-      return "/miso/rest/run/dt/project/" + projectId;
+      return "/miso/rest/runs/dt/project/" + projectId;
     } else if (config.sequencer) {
-      return "/miso/rest/run/dt/sequencer/" + config.sequencer;
+      return "/miso/rest/runs/dt/sequencer/" + config.sequencer;
     } else if (config.platformType) {
-      return "/miso/rest/run/dt/platform/" + config.platformType;
+      return "/miso/rest/runs/dt/platform/" + config.platformType;
     } else {
-      return "/miso/rest/run/dt";
+      return "/miso/rest/runs/dt";
     }
   },
   queryUrl: null,
@@ -45,7 +45,7 @@ ListTarget.run = {
       return [{
         name: "Add " + platformKey + " Run",
         handler: function() {
-          Utils.ajaxWithDialog('Getting Sequencer', 'Get', '/miso/rest/instrument', null, function(instruments) {
+          Utils.ajaxWithDialog('Getting Sequencer', 'Get', '/miso/rest/instruments', null, function(instruments) {
 
             Utils.showWizardDialog("Add " + platformKey + " Run", instruments.filter(
                 function(instrument) {

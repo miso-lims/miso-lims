@@ -24,9 +24,9 @@
 ListTarget.library = {
   name: "Libraries",
   createUrl: function(config, projectId) {
-    return "/miso/rest/library/dt" + (projectId ? '/project/' + projectId : '');
+    return "/miso/rest/libraries/dt" + (projectId ? '/project/' + projectId : '');
   },
-  queryUrl: "/miso/rest/library/query",
+  queryUrl: "/miso/rest/libraries/query",
   createBulkActions: function(config, projectId) {
     return HotTarget.library.getBulkActions(config).concat(
         [{
@@ -40,7 +40,7 @@ ListTarget.library = {
               ids.push(library.id);
             });
             Utils.showConfirmDialog('Delete Libraries', 'Delete', lines, function() {
-              Utils.ajaxWithDialog('Deleting Libraries', 'POST', '/miso/rest/library/bulk-delete', ids, function() {
+              Utils.ajaxWithDialog('Deleting Libraries', 'POST', '/miso/rest/libraries/bulk-delete', ids, function() {
                 Utils.page.pageReload();
               });
             });

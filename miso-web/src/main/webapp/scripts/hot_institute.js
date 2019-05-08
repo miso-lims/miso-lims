@@ -1,6 +1,6 @@
 HotTarget.institute = {
-  createUrl: '/miso/rest/institute',
-  updateUrl: '/miso/rest/institute/',
+  createUrl: '/miso/rest/institutes',
+  updateUrl: '/miso/rest/institutes/',
   requestConfiguration: function(config, callback) {
     callback(config)
   },
@@ -31,7 +31,7 @@ HotTarget.institute = {
             window.location = window.location.origin + '/miso/institute/list';
             return;
           }
-          Utils.ajaxWithDialog('Deleting ' + items[index].alias, 'DELETE', '/miso/rest/institute/' + items[index].id, null, function() {
+          Utils.ajaxWithDialog('Deleting ' + items[index].alias, 'DELETE', '/miso/rest/institutes/' + items[index].id, null, function() {
             deleteNext(index + 1);
           });
         };

@@ -30,11 +30,11 @@ ListTarget.run_position = {
     actions.push({
       name: "Remove",
       action: function(containers) {
-        Utils.ajaxWithDialog('Removing', 'POST', '/miso/rest/run/' + config.runId + '/remove', containers.map(Utils.array.getId),
+        Utils.ajaxWithDialog('Removing', 'POST', '/miso/rest/runs/' + config.runId + '/remove', containers.map(Utils.array.getId),
             Utils.page.pageReload);
       }
     });
-    actions.push(HotUtils.spreadsheetAction('/miso/rest/container/spreadsheet', Constants.partitionSpreadsheets, function(containers,
+    actions.push(HotUtils.spreadsheetAction('/miso/rest/containers/spreadsheet', Constants.partitionSpreadsheets, function(containers,
         spreadsheet) {
       return [];
     }));
@@ -69,7 +69,7 @@ ListTarget.run_position = {
           label: "Serial Number",
           property: "barcode"
         }], function(results) {
-          Utils.ajaxWithDialog('Adding ' + platformType.containerName, 'POST', '/miso/rest/run/' + config.runId + '/add?'
+          Utils.ajaxWithDialog('Adding ' + platformType.containerName, 'POST', '/miso/rest/runs/' + config.runId + '/add?'
               + jQuery.param({
                 position: results.position,
                 barcode: results.barcode

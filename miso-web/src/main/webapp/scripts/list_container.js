@@ -24,7 +24,7 @@
 ListTarget.container = {
   name: "Sequencing Containers",
   createUrl: function(config, projectId) {
-    return "/miso/rest/container/dt" + (config.platformType ? "/platform/" + config.platformType : "");
+    return "/miso/rest/containers/dt" + (config.platformType ? "/platform/" + config.platformType : "");
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
@@ -33,14 +33,14 @@ ListTarget.container = {
       actions.push({
         name: "Remove",
         action: function(containers) {
-          Utils.ajaxWithDialog('Removing', 'POST', '/miso/rest/run/' + config.runId + '/remove', containers.map(Utils.array.getId),
+          Utils.ajaxWithDialog('Removing', 'POST', '/miso/rest/runs/' + config.runId + '/remove', containers.map(Utils.array.getId),
               Utils.page.pageReload);
         }
       });
     } else {
       actions.push(HotUtils.printAction('container'));
     }
-    actions.push(HotUtils.spreadsheetAction('/miso/rest/container/spreadsheet', Constants.partitionSpreadsheets, function(containers,
+    actions.push(HotUtils.spreadsheetAction('/miso/rest/containers/spreadsheet', Constants.partitionSpreadsheets, function(containers,
         spreadsheet) {
       return [];
     }));
@@ -55,7 +55,7 @@ ListTarget.container = {
           ids.push(container.id);
         });
         Utils.showConfirmDialog('Delete Containers', 'Delete', lines, function() {
-          Utils.ajaxWithDialog('Deleting Containers', 'POST', '/miso/rest/container/bulk-delete', ids, function() {
+          Utils.ajaxWithDialog('Deleting Containers', 'POST', '/miso/rest/containers/bulk-delete', ids, function() {
             Utils.page.pageReload();
           });
         });
@@ -81,7 +81,7 @@ ListTarget.container = {
             label: "Serial Number",
             property: "barcode"
           }, ], function(results) {
-            Utils.ajaxWithDialog('Adding ' + platformType.containerName, 'POST', '/miso/rest/run/' + config.runId + '/add?'
+            Utils.ajaxWithDialog('Adding ' + platformType.containerName, 'POST', '/miso/rest/runs/' + config.runId + '/add?'
                 + jQuery.param({
                   barcode: results.barcode
                 }), null, Utils.page.pageReload);

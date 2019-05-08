@@ -23,7 +23,7 @@
 
 PaneTarget.project = (function() {
   var title = "Project";
-  var url = "/miso/rest/project/search";
+  var url = "/miso/rest/projects/search";
 
   var transform = function(project) {
     return Tile.make([Tile.title(project.shortName || project.alias),

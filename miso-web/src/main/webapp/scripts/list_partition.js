@@ -141,7 +141,7 @@ ListTarget.partition = {
               data.concentration = concentration;
               data.units = units;
             }
-            Utils.ajaxWithDialog('Assigning Pool', 'POST', '/miso/rest/pool/' + (pool ? pool.id : 0) + '/assign', data,
+            Utils.ajaxWithDialog('Assigning Pool', 'POST', '/miso/rest/pools/' + (pool ? pool.id : 0) + '/assign', data,
                 Utils.page.pageReload);
           };
           if (pool) {
@@ -186,7 +186,7 @@ ListTarget.partition = {
               property: "query",
               value: defaultQuery
             }, ], function(results) {
-              Utils.ajaxWithDialog('Getting Pools', 'GET', '/miso/rest/pool/picker/search?' + jQuery.param({
+              Utils.ajaxWithDialog('Getting Pools', 'GET', '/miso/rest/pools/picker/search?' + jQuery.param({
                 platform: platformType.name,
                 query: results.query
               }), null, function(response) {
@@ -210,15 +210,15 @@ ListTarget.partition = {
         }, {
           name: "Search",
           handler: makeSearch("", assignDialog)
-        }, config.sequencingParametersId ? assignFromRest('/miso/rest/poolorder/picker/chemistry?' + jQuery.param({
+        }, config.sequencingParametersId ? assignFromRest('/miso/rest/poolorders/picker/chemistry?' + jQuery.param({
           platform: platformType.name,
           seqParamsId: config.sequencingParametersId,
           fulfilled: false
         }), 'Outstanding Orders (Matched Chemistry)', setConcentration, assignDialog) : null,
-            assignFromRest('/miso/rest/poolorder/picker/active?' + jQuery.param({
+            assignFromRest('/miso/rest/poolorders/picker/active?' + jQuery.param({
               platform: platformType.name
             }), 'Outstanding Orders (All)', setConcentration, assignDialog),
-            assignFromRest('/miso/rest/pool/picker/recent?' + jQuery.param({
+            assignFromRest('/miso/rest/pools/picker/recent?' + jQuery.param({
               platform: platformType.name
             }), 'Recently Modified', setConcentration, assignDialog), ].filter(function(x) {
           return x;
@@ -231,7 +231,7 @@ ListTarget.partition = {
         name: "Set QC",
         action: function(partitions) {
           var setQc = function(id, notes) {
-            Utils.ajaxWithDialog('Setting QC', 'POST', '/miso/rest/run/' + config.runId + '/qc', {
+            Utils.ajaxWithDialog('Setting QC', 'POST', '/miso/rest/runs/' + config.runId + '/qc', {
               "partitionIds": partitions.map(Utils.array.getId),
               "qcTypeId": id,
               "notes": notes

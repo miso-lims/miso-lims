@@ -6,13 +6,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class InstituteDto {
   
   private Long id;
-  private String url;
   private String alias;
   private Long createdById;
-  private String createdByUrl;
   private String creationDate;
   private Long updatedById;
-  private String updatedByUrl;
   private String lastUpdated;
   
   public Long getId() {
@@ -21,14 +18,6 @@ public class InstituteDto {
   
   public void setId(Long id) {
     this.id = id;
-  }
-  
-  public String getUrl() {
-    return url;
-  }
-  
-  public void setUrl(String url) {
-    this.url = url;
   }
   
   public String getAlias() {
@@ -47,14 +36,6 @@ public class InstituteDto {
     this.createdById = createdById;
   }
   
-  public String getCreatedByUrl() {
-    return createdByUrl;
-  }
-  
-  public void setCreatedByUrl(String createdByUrl) {
-    this.createdByUrl = createdByUrl;
-  }
-  
   public String getCreationDate() {
     return creationDate;
   }
@@ -71,14 +52,6 @@ public class InstituteDto {
     this.updatedById = updatedById;
   }
   
-  public String getUpdatedByUrl() {
-    return updatedByUrl;
-  }
-  
-  public void setUpdatedByUrl(String updatedByUrl) {
-    this.updatedByUrl = updatedByUrl;
-  }
-  
   public String getLastUpdated() {
     return lastUpdated;
   }
@@ -89,11 +62,8 @@ public class InstituteDto {
 
   @Override
   public String toString() {
-    return "InstituteDto [id=" + id + ", url=" + url + ", alias=" + alias
-        + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl
-        + ", creationDate=" + creationDate + ", updatedById=" + updatedById
-        + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated
-        + "]";
+    return "InstituteDto [id=" + id + ", alias=" + alias + ", createdById=" + createdById + ", creationDate=" + creationDate
+        + ", updatedById=" + updatedById + ", lastUpdated=" + lastUpdated + "]";
   }
   
 }

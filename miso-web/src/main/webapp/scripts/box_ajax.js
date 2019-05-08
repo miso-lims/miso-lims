@@ -96,7 +96,7 @@ var Box = Box
              searchString: null
            };
         }));
-        var url = '/miso/rest/box/' + Box.boxJSON.id + '/bulk-update';
+        var url = '/miso/rest/boxes/' + Box.boxJSON.id + '/bulk-update';
         
         jQuery.ajax({
           url: url,
@@ -117,7 +117,7 @@ Box.scan = {
     var prepareScannerTimeout = setTimeout(Box.prepareScannerDialog.error, 10000); // otherwise box scanner may poll indefinitely
 
     jQuery.ajax({
-      url: '/miso/rest/box/prepare-scan',
+      url: '/miso/rest/boxes/prepare-scan',
       type: 'POST',
       contentType: 'application/json; charset=utf8',
       data: JSON.stringify({
@@ -143,7 +143,7 @@ Box.scan = {
 
   scanBox: function(scannerName) {
     jQuery.ajax({
-      url: '/miso/rest/box/' + Box.boxJSON.id + '/scan',
+      url: '/miso/rest/boxes/' + Box.boxJSON.id + '/scan',
       type: 'POST',
       contentType: 'application/json; charset=utf8',
       data: JSON.stringify({
@@ -280,7 +280,7 @@ Box.ui = {
     Utils.showConfirmDialog('Remove Items', 'Remove', ['Are you sure you wish to set location to unknown for all selected items? You should '
       + 're-home them as soon as possible.'], function() {
       var positions = Box.ui.getSelectedPositions();
-      var url = '/miso/rest/box/' + Box.boxJSON.id + '/bulk-remove';
+      var url = '/miso/rest/boxes/' + Box.boxJSON.id + '/bulk-remove';
       Utils.ajaxWithDialog('Remove Items', 'POST', url, positions, function(responseData) {
         Box.boxJSON = responseData;
         Box.ui.update();
@@ -291,7 +291,7 @@ Box.ui = {
   bulkDiscardItems: function() {
     Utils.showConfirmDialog('Discard Items', 'Discard', ['Are you sure you wish to set discard all selected items?'], function() {
       var positions = Box.ui.getSelectedPositions();
-      var url = '/miso/rest/box/' + Box.boxJSON.id + '/bulk-discard';
+      var url = '/miso/rest/boxes/' + Box.boxJSON.id + '/bulk-discard';
       Utils.ajaxWithDialog('Discard Items', 'POST', url, positions, function(responseData) {
         Box.boxJSON = responseData;
         Box.ui.update();
@@ -321,7 +321,7 @@ Box.ui = {
       return positions.indexOf(boxable.coordinates) >= 0;
     });
     var doUpdate = function() {
-      var url = '/miso/rest/box/' + Box.boxJSON.id + '/bulk-update';
+      var url = '/miso/rest/boxes/' + Box.boxJSON.id + '/bulk-update';
       Utils.ajaxWithDialog('Update Positions', 'POST', url, data, function(responseData) {
         Box.boxJSON = responseData;
         Box.ui.update();
@@ -405,7 +405,7 @@ Box.ui = {
         // Ignore items; it's a mess of different object types
         Utils.printSelectDialog(function(printer, copies) {
         var input = items.length == 0 ? Box.boxJSON.items.map(function(i) { return i.coordinates; }) : positionStrings;
-        Utils.ajaxWithDialog('Printing', 'POST', window.location.origin + '/miso/rest/printer/' + printer + '/boxpositions', {
+        Utils.ajaxWithDialog('Printing', 'POST', window.location.origin + '/miso/rest/printers/' + printer + '/boxpositions', {
                   boxId: Box.boxId,
                   positions:input,
                   copies: copies 
@@ -514,7 +514,7 @@ Box.ui = {
 
   exportBox: function(boxId) {
     jQuery.ajax({
-      url: "/miso/rest/box/" + boxId + "/spreadsheet",
+      url: "/miso/rest/boxes/" + boxId + "/spreadsheet",
       type: "GET",
       contentType: "application/json; charset=utf8",
       dataType: "json",
@@ -550,7 +550,7 @@ Box.ui = {
       Box.ui.showBoxableSearchLoading();
 
       jQuery.ajax({
-        url: '/miso/rest/box/' + Box.boxId + '/position/' + selectedPosition + '?' + jQuery.param({
+        url: '/miso/rest/boxes/' + Box.boxId + '/position/' + selectedPosition + '?' + jQuery.param({
           entity: jQuery('#resultSelect').val()
         }),
         type: "PUT",
@@ -606,7 +606,7 @@ Box.ui = {
       jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
       jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
 
-      var url = '/miso/rest/box/' + Box.boxJSON.id + '/positions/' + selectedPosition;
+      var url = '/miso/rest/boxes/' + Box.boxJSON.id + '/positions/' + selectedPosition;
       Utils.ajaxWithDialog('Remove item', 'DELETE', url, null, function() {
         Utils.page.pageReload();
       }, function() {
@@ -631,7 +631,7 @@ Box.ui = {
       jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
       jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
 
-      var url = '/miso/rest/box/' + Box.boxJSON.id + '/positions/' + selectedPosition + '/discard';
+      var url = '/miso/rest/boxes/' + Box.boxJSON.id + '/positions/' + selectedPosition + '/discard';
       Utils.ajaxWithDialog('Discard item', 'POST', url, null, function() {
         Utils.page.pageReload();
       }, function() {
@@ -643,7 +643,7 @@ Box.ui = {
   },
 
   discardAllContents: function(boxId) {
-    var url = "/miso/rest/box/" + boxId + "/discard-all";
+    var url = "/miso/rest/boxes/" + boxId + "/discard-all";
     var discardBox = function() {
       Utils.ajaxWithDialog('Discard All Contents', 'POST', url, null, function() {
         Utils.page.pageReload();
