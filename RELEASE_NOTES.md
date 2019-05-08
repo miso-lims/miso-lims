@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 0.2.176
+
+Changes:
+
   * Added discarded and box location fields to Edit Dilution page
   * Changed Edit Run page to show validation messages instead of error page when saving fails
   * Changed Edit Service Record page to show validation messages instead of error page when saving
