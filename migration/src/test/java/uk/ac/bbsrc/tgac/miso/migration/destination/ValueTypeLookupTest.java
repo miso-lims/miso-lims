@@ -308,20 +308,20 @@ public class ValueTypeLookupTest {
 
   @Test
   public void testResolveLab() {
-    // assertNotNull(sut.resolve(makeLab(VALID_LONG, null, null, null)));
-    // assertNotNull(sut.resolve(makeLab(null, VALID_STRING, VALID_LONG, null)));
+    assertNotNull(sut.resolve(makeLab(VALID_LONG, null, null, null)));
+    assertNotNull(sut.resolve(makeLab(null, VALID_STRING, VALID_LONG, null)));
     assertNotNull(sut.resolve(makeLab(null, VALID_STRING, null, VALID_STRING)));
     // assumed "Not Specified" lab alias
-    // assertNotNull(sut.resolve(makeLab(null, null, UNSPECIFIED_LAB_INST_ID, null)));
-    // assertNotNull(sut.resolve(makeLab(null, null, null, UNSPECIFIED_LAB_INST_ALIAS)));
-    // assertNull(sut.resolve((Lab) null));
-    // assertNull(sut.resolve(makeLab(null, null, null, null)));
-    // assertNull(sut.resolve(makeLab(INVALID_LONG, null, null, null)));
-    // assertNull(sut.resolve(makeLab(null, VALID_STRING, null)));
-    // assertNull(sut.resolve(makeLab(null, INVALID_STRING, VALID_LONG, null)));
-    // assertNull(sut.resolve(makeLab(null, VALID_STRING, INVALID_LONG, null)));
-    // assertNull(sut.resolve(makeLab(null, INVALID_STRING, null, VALID_STRING)));
-    // assertNull(sut.resolve(makeLab(null, VALID_STRING, null, INVALID_STRING)));
+    assertNotNull(sut.resolve(makeLab(null, null, UNSPECIFIED_LAB_INST_ID, null)));
+    assertNotNull(sut.resolve(makeLab(null, null, null, UNSPECIFIED_LAB_INST_ALIAS)));
+    assertNull(sut.resolve((Lab) null));
+    assertNull(sut.resolve(makeLab(null, null, null, null)));
+    assertNull(sut.resolve(makeLab(INVALID_LONG, null, null, null)));
+    assertNull(sut.resolve(makeLab(null, VALID_STRING, null)));
+    assertNull(sut.resolve(makeLab(null, INVALID_STRING, VALID_LONG, null)));
+    assertNull(sut.resolve(makeLab(null, VALID_STRING, INVALID_LONG, null)));
+    assertNull(sut.resolve(makeLab(null, INVALID_STRING, null, VALID_STRING)));
+    assertNull(sut.resolve(makeLab(null, VALID_STRING, null, INVALID_STRING)));
   }
 
   private Lab makeLab(Long labId, String labAlias, Long instId, String instAlias) {
