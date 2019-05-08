@@ -590,6 +590,9 @@ services:
     command: ["sh", "-c", "./self-sign-cert.sh; nginx -g 'daemon off;'"]
 ```
 
+Launch the process with `docker-compose up --detach` to start the containers in
+the background.
+
 
 
 # Troubleshooting docker-compose files
