@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -36,7 +35,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +42,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
-import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
@@ -55,16 +52,12 @@ public class HibernateProjectDao implements ProjectStore {
 
   private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias",
       "description", "shortName" };
-  private static final String TABLE_NAME = "Project";
 
   @Autowired
   private SecurityStore securityStore;
 
   @Autowired
   private SessionFactory sessionFactory;
-
-  @Autowired
-  private JdbcTemplate template;
 
   @Override
   public int count() throws IOException {
@@ -104,11 +97,6 @@ public class HibernateProjectDao implements ProjectStore {
     return (Project) criteria.uniqueResult();
   }
 
-  @CoverageIgnore
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
-  }
-
   public SecurityStore getSecurityStore() {
     return securityStore;
   }
@@ -146,22 +134,13 @@ public class HibernateProjectDao implements ProjectStore {
 
   @Override
   public long save(Project project) throws IOException {
-    Date timestamp = new Date();
-    project.setLastUpdated(timestamp);
     if (!project.isSaved()) {
-      project.setCreationDate(timestamp);
       return (Long) currentSession().save(project);
     } else {
       currentSession().update(project);
       return project.getId();
     }
   }
-
-  @CoverageIgnore
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
-  }
-
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
   }

@@ -188,6 +188,8 @@
     <miso:list-section-ajax id="project_arraysamples" name="Arrayed Samples" target="sample" project="${project}" config="{arrayed: true}"/>
   </div>
   
+  <miso:changelog item="${project}"/>
+  
   <br/>
   
   <button id="collapse_all" type="button" class="fg-button ui-state-default ui-corner-all" onclick="Utils.ui.collapseClass('expandable_section')">

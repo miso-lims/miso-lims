@@ -168,8 +168,8 @@ public class LoadGeneratorSource implements MigrationSource {
         project.setAlias("LT" + projectNum);
         project.setDescription(projectDescription);
         project.setProgress(ProgressType.ACTIVE);
-        project.setCreationDate(now);
-        project.setLastUpdated(now);
+        project.setCreationTime(now);
+        project.setLastModified(now);
         project.setReferenceGenome(createReferenceGenome());
         projects.add(project);
       }

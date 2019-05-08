@@ -18,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.Group;
 
@@ -36,9 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  *
  */
 public class HibernateProjectDaoTest extends AbstractDAOTest {
-
-  @Autowired
-  private JdbcTemplate jdbcTemplate;
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -60,7 +56,6 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    projectDAO.setJdbcTemplate(jdbcTemplate);
     projectDAO.setSessionFactory(sessionFactory);
     projectDAO.setSecurityStore(securityStore);
 
@@ -69,7 +64,7 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
     referenceGenome.setId(1L);
     referenceGenome.setAlias("hg19");
     project.setReferenceGenome(referenceGenome);
-    project.setLastUpdated(new Date());
+    project.setLastModified(new Date());
 
     when(securityStore.getGroupByName("ProjectWatchers")).thenReturn(group);
   }

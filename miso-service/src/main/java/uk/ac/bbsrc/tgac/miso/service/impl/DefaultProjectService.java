@@ -28,7 +28,6 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.validateNameOrT
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -47,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -61,6 +61,8 @@ public class DefaultProjectService implements ProjectService {
   private TargetedSequencingStore targetedSequencingStore;
   @Autowired
   private NamingScheme namingScheme;
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   @Override
   public Project get(long projectId) throws IOException {
@@ -106,6 +108,7 @@ public class DefaultProjectService implements ProjectService {
 
   @Override
   public long create(Project project) throws IOException {
+    project.setChangeDetails(authorizationManager.getCurrentUser());
     ValidationResult shortNameValidation = namingScheme.validateProjectShortName(project.getShortName());
     if (!shortNameValidation.isValid()) {
       throw new ValidationException(new ValidationError("shortName", shortNameValidation.getMessage()));
@@ -130,7 +133,6 @@ public class DefaultProjectService implements ProjectService {
     Project original = projectStore.get(project.getId());
     original.setAlias(project.getAlias());
     original.setDescription(project.getDescription());
-    original.setLastUpdated(new Date());
     original.setProgress(project.getProgress());
     original.setReferenceGenome(referenceGenomeDao.getReferenceGenome(project.getReferenceGenome().getId()));
     if (project.getDefaultTargetedSequencing() != null) {
@@ -140,6 +142,7 @@ public class DefaultProjectService implements ProjectService {
     }
     original.setShortName(project.getShortName());
     project = original;
+    project.setChangeDetails(authorizationManager.getCurrentUser());
     return projectStore.save(project);
   }
 
@@ -157,6 +160,10 @@ public class DefaultProjectService implements ProjectService {
 
   public void setReferenceGenomeStore(ReferenceGenomeDao referenceGenomeStore) {
     this.referenceGenomeDao = referenceGenomeStore;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
   }
 
 }

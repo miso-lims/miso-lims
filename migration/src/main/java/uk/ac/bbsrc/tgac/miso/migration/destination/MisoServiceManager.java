@@ -409,7 +409,6 @@ public class MisoServiceManager {
 
   public void setDefaultProjectDao() {
     HibernateProjectDao dao = new HibernateProjectDao();
-    dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
     dao.setSecurityStore(securityStore);
     setProjectDao(dao);
