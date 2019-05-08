@@ -83,11 +83,6 @@ public class EditGroupController {
     return adminSetupForm(Group.UNSAVED_ID, model);
   }
 
-  @RequestMapping(value = "/tech/group/new", method = RequestMethod.GET)
-  public ModelAndView techSetupForm(ModelMap model) throws IOException {
-    return techSetupForm(Group.UNSAVED_ID, model);
-  }
-
   @RequestMapping(value = "/admin/group/{groupId}", method = RequestMethod.GET)
   public ModelAndView adminSetupForm(@PathVariable Long groupId, ModelMap model) throws IOException {
     try {
@@ -100,11 +95,6 @@ public class EditGroupController {
       }
       throw ex;
     }
-  }
-
-  @RequestMapping(value = "/tech/group/{groupId}", method = RequestMethod.GET)
-  public ModelAndView techSetupForm(@PathVariable Long groupId, ModelMap model) throws IOException {
-    return adminSetupForm(groupId, model);
   }
 
   @RequestMapping(value = "/admin/group/new", method = RequestMethod.POST)
@@ -125,30 +115,6 @@ public class EditGroupController {
       session.setComplete();
       model.clear();
       return "redirect:/miso/admin/groups";
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save group", ex);
-      }
-      throw ex;
-    }
-  }
-
-  @RequestMapping(value = "/tech/group/new", method = RequestMethod.POST)
-  public String techProcessSubmitNew(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
-    return techProcessSubmit(group, model, session);
-  }
-
-  @RequestMapping(value = "/tech/group/{groupId}", method = RequestMethod.POST)
-  public String techProcessSubmitExisting(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
-    return techProcessSubmit(group, model, session);
-  }
-
-  public String techProcessSubmit(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
-    try {
-      securityManager.saveGroup(group);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/tech/groups";
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save group", ex);

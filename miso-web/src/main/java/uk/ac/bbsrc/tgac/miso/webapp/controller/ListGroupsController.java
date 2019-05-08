@@ -59,11 +59,6 @@ public class ListGroupsController {
     this.securityManager = securityManager;
   }
 
-  @RequestMapping("/tech/groups")
-  public ModelAndView techListGroups(ModelMap model) throws IOException {
-    return groupsPage.list(model, securityManager.listAllGroups().stream().map(Dtos::asDto));
-  }
-
   @ModelAttribute("title")
   public String title() {
     return "Groups";

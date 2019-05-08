@@ -31,11 +31,11 @@ ListTarget.group = {
     return [];
   },
   createStaticActions: function(config, projectId) {
-    if (config.isAdmin || config.isTech) {
+    if (config.isAdmin) {
       return [{
         "name": "Add",
         "handler": function() {
-          window.location = config.isTech ? "/miso/tech/group/new" : "/miso/admin/group/new";
+          window.location = "/miso/admin/group/new";
         }
       }];
     } else {
@@ -52,8 +52,6 @@ ListTarget.group = {
       "mRender": function(data, type, full) {
         if (config.isAdmin) {
           return "<a href=\"/miso/admin/group/" + full.id + "\">" + data + "</a>";
-        } else if (config.isTech) {
-          return "<a href=\"/miso/tech/group/" + full.id + "\">" + data + "</a>";
         } else {
           return data;
         }

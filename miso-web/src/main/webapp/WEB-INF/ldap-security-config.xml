@@ -58,7 +58,6 @@
 
     <security:intercept-url pattern="/miso/constants.js" access="permitAll" />
     <security:intercept-url pattern="/miso/admin/**" access="hasRole('ROLE_ADMIN')" />
-    <security:intercept-url pattern="/miso/tech/**" access="hasRole('ROLE_TECH')" />
     <security:intercept-url pattern="/miso/mainMenu" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
 
     <security:intercept-url pattern="/miso/**" access="hasRole('ROLE_INTERNAL')" />
