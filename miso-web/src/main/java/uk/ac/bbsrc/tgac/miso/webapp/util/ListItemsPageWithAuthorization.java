@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.util;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.function.Supplier;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,7 +25,6 @@ public class ListItemsPageWithAuthorization extends ListItemsPage {
     User user = manager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     config.put("isAdmin", user.isAdmin());
     config.put("isInternal", user.isInternal());
-    config.put("isTech", Arrays.asList(user.getRoles()).contains("ROLE_TECH"));
     config.put("allowCreateUser", manager.canCreateNewUser());
     writeConfigurationExtra(mapper, config);
   }

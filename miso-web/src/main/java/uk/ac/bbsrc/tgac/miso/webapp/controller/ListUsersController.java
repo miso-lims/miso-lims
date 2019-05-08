@@ -81,11 +81,6 @@ public class ListUsersController {
     this.securityManager = securityManager;
   }
 
-  @RequestMapping("/tech/users")
-  public ModelAndView techListUsers(ModelMap model) throws IOException {
-    return adminListUsers(model);
-  }
-
   @ModelAttribute("title")
   public String title() {
     return "Users";

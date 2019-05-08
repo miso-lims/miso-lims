@@ -34,10 +34,6 @@ public class TagUtils {
     return hasRole("ROLE_ADMIN");
   }
 
-  public static boolean isTech() {
-    return hasRole("ROLE_TECH");
-  }
-
   private static boolean hasRole(String role) {
     Authentication auth = getAuthentication();
     if (auth != null && auth.getAuthorities() != null) {

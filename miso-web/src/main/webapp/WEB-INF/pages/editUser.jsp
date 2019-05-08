@@ -51,10 +51,6 @@
                 <c:if test="${miso:isAdmin()}">
                   <form:input id="fullName" path="fullName"/><span id="fullNameCounter" class="counter"></span>
                 </c:if>
-
-                <c:if test="${miso:isTech()}">
-                  ${user.fullName}
-                </c:if>
               </td>
             </tr>
             <tr>
@@ -63,25 +59,14 @@
                 <c:if test="${miso:isAdmin()}">
                   <form:input id="loginName" path="loginName"/><span id="loginNameCounter" class="counter"></span>
                 </c:if>
-
-                <c:if test="${miso:isTech()}">
-                  ${user.loginName}
-                </c:if>
               </td>
             </tr>
             <tr>
               <td>Email Address</td>
               <td>
-                <c:choose>
-                  <c:when test="${miso:isCurrentUser(user.loginName) or miso:isAdmin()}">
-                    <form:input id="email" path="email"/><span id="emailCounter" class="counter"></span>
-                  </c:when>
-                  <c:otherwise>
-                    <c:if test="${miso:isTech()}">
-                      ${user.email}
-                    </c:if>
-                  </c:otherwise>
-                </c:choose>
+                <c:if test="${miso:isCurrentUser(user.loginName) or miso:isAdmin()}">
+                  <form:input id="email" path="email"/><span id="emailCounter" class="counter"></span>
+                </c:if>
               </td>
             </tr>
             <c:if test="${miso:isAdmin()}">

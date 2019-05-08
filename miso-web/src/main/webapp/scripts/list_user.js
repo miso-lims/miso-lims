@@ -65,8 +65,6 @@ ListTarget.user = {
       "mRender": function(data, type, full) {
         if (config.isAdmin) {
           return "<a href=\"/miso/admin/user/" + full.id + "\">" + data + "</a>";
-        } else if (config.isTech) {
-          return "<a href=\"/miso/tech/user/" + full.id + "\">" + data + "</a>";
         } else {
           return data;
         }
