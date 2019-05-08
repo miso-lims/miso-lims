@@ -1,6 +1,6 @@
 HotTarget.lab = {
-  createUrl: '/miso/rest/lab',
-  updateUrl: '/miso/rest/lab/',
+  createUrl: '/miso/rest/labs',
+  updateUrl: '/miso/rest/labs/',
   requestConfiguration: function(config, callback) {
     callback(config)
   },
@@ -34,7 +34,7 @@ HotTarget.lab = {
             window.location = window.location.origin + '/miso/lab/list';
             return;
           }
-          Utils.ajaxWithDialog('Deleting ' + items[index].alias, 'DELETE', '/miso/rest/lab/' + items[index].id, null, function() {
+          Utils.ajaxWithDialog('Deleting ' + items[index].alias, 'DELETE', '/miso/rest/labs/' + items[index].id, null, function() {
             deleteNext(index + 1);
           });
         };

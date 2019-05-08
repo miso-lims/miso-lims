@@ -25,9 +25,9 @@ ListTarget.instrument = {
   name: "Instruments",
   createUrl: function(config, projectId) {
     if (config.instrumentType) {
-      return "/miso/rest/instrument/dt/instrument-type/" + config.instrumentType;
+      return "/miso/rest/instruments/dt/instrument-type/" + config.instrumentType;
     } else {
-      return "/miso/rest/instrument/dt";
+      return "/miso/rest/instruments/dt";
     }
   },
   queryUrl: null,
@@ -68,7 +68,7 @@ ListTarget.instrument = {
             required: false
           }], function(instrument) {
             instrument.id = 0;
-            Utils.ajaxWithDialog('Saving Instrument', 'POST', '/miso/rest/instrument', instrument, Utils.page.pageReload);
+            Utils.ajaxWithDialog('Saving Instrument', 'POST', '/miso/rest/instruments', instrument, Utils.page.pageReload);
           });
 
         }

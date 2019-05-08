@@ -6,7 +6,7 @@ FormTarget.dilution = (function($) {
   return {
     getSaveUrl: function(dilution) {
       if (dilution.id) {
-        return '/miso/rest/librarydilution/' + dilution.id;
+        return '/miso/rest/librarydilutions/' + dilution.id;
       } else {
         throw new Error('Page not intended for new dilution creation');
       }

@@ -232,8 +232,8 @@ HotTarget.library = (function() {
   };
 
   return {
-    createUrl: '/miso/rest/library',
-    updateUrl: '/miso/rest/library/',
+    createUrl: '/miso/rest/libraries',
+    updateUrl: '/miso/rest/libraries/',
     requestConfiguration: function(config, callback) {
       callback(config)
     },
@@ -814,7 +814,7 @@ HotTarget.library = (function() {
           });
         }
       }, HotUtils.printAction('library'),
-          HotUtils.spreadsheetAction('/miso/rest/library/spreadsheet', Constants.librarySpreadsheets, function(libraries, spreadsheet) {
+          HotUtils.spreadsheetAction('/miso/rest/libraries/spreadsheet', Constants.librarySpreadsheets, function(libraries, spreadsheet) {
             var errors = [];
             return errors;
           }),

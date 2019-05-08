@@ -101,8 +101,8 @@ HotTarget.pool = (function() {
     getNotes: function(config) {
       return config.dilutionsToPool ? customPoolNotes : null
     },
-    createUrl: '/miso/rest/pool',
-    updateUrl: '/miso/rest/pool/',
+    createUrl: '/miso/rest/pools',
+    updateUrl: '/miso/rest/pools/',
     requestConfiguration: function(config, callback) {
       callback(config)
     },
@@ -264,7 +264,7 @@ HotTarget.pool = (function() {
           },
 
           HotUtils.printAction('pool'),
-          HotUtils.spreadsheetAction('/miso/rest/pool/spreadsheet', Constants.poolSpreadsheets, function(pools, spreadsheet) {
+          HotUtils.spreadsheetAction('/miso/rest/pools/spreadsheet', Constants.poolSpreadsheets, function(pools, spreadsheet) {
             var errors = [];
             return errors;
           }),

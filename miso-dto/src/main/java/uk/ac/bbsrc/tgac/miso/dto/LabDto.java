@@ -6,17 +6,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class LabDto {
   
   private Long id;
-  private String url;
   private Long instituteId;
-  private String instituteUrl;
   private String instituteAlias;
   private String alias;
   private String label;
   private Long createdById;
-  private String createdByUrl;
   private String creationDate;
   private Long updatedById;
-  private String updatedByUrl;
   private String lastUpdated;
   
   public Long getId() {
@@ -27,28 +23,12 @@ public class LabDto {
     this.id = id;
   }
   
-  public String getUrl() {
-    return url;
-  }
-  
-  public void setUrl(String url) {
-    this.url = url;
-  }
-  
   public Long getInstituteId() {
     return instituteId;
   }
   
   public void setInstituteId(Long instituteId) {
     this.instituteId = instituteId;
-  }
-  
-  public String getInstituteUrl() {
-    return instituteUrl;
-  }
-  
-  public void setInstituteUrl(String instituteUrl) {
-    this.instituteUrl = instituteUrl;
   }
   
   public String getInstituteAlias() {
@@ -83,14 +63,6 @@ public class LabDto {
     this.createdById = createdById;
   }
   
-  public String getCreatedByUrl() {
-    return createdByUrl;
-  }
-  
-  public void setCreatedByUrl(String createdByUrl) {
-    this.createdByUrl = createdByUrl;
-  }
-  
   public String getCreationDate() {
     return creationDate;
   }
@@ -107,14 +79,6 @@ public class LabDto {
     this.updatedById = updatedById;
   }
   
-  public String getUpdatedByUrl() {
-    return updatedByUrl;
-  }
-  
-  public void setUpdatedByUrl(String updatedByUrl) {
-    this.updatedByUrl = updatedByUrl;
-  }
-  
   public String getLastUpdated() {
     return lastUpdated;
   }
@@ -125,11 +89,8 @@ public class LabDto {
 
   @Override
   public String toString() {
-    return "LabDto [id=" + id + ", url=" + url + ", instituteId=" + instituteId
-        + ", instituteUrl=" + instituteUrl + ", alias=" + alias 
-        + ", createdById=" + createdById  + ", createdByUrl=" + createdByUrl 
-        + ", creationDate=" + creationDate + ", updatedById=" + updatedById 
-        + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + "]";
+    return "LabDto [id=" + id + ", instituteId=" + instituteId + ", alias=" + alias + ", createdById=" + createdById + ", creationDate="
+        + creationDate + ", updatedById=" + updatedById + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }

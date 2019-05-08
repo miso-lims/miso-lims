@@ -43,7 +43,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -53,8 +52,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 
 @Controller
-@RequestMapping("/rest")
-@SessionAttributes("detailedqcstatus")
+@RequestMapping("/rest/detailedqcstatuses")
 public class DetailedQcStatusController extends RestController {
 
   protected static final Logger log = LoggerFactory.getLogger(DetailedQcStatusController.class);
@@ -62,7 +60,7 @@ public class DetailedQcStatusController extends RestController {
   @Autowired
   private DetailedQcStatusService detailedQcStatusService;
 
-  @GetMapping(value = "/detailedqcstatus/{id}", produces = { "application/json" })
+  @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
   public DetailedQcStatusDto getDetailedQcStatus(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -75,7 +73,7 @@ public class DetailedQcStatusController extends RestController {
     }
   }
 
-  @GetMapping(value = "/detailedqcstatuses", produces = { "application/json" })
+  @GetMapping(produces = { "application/json" })
   @ResponseBody
   public Set<DetailedQcStatusDto> getDetailedQcStatuses(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<DetailedQcStatus> detailedQcStatuses = detailedQcStatusService.getAll();
@@ -83,7 +81,7 @@ public class DetailedQcStatusController extends RestController {
     return detailedQcStatusDtos;
   }
 
-  @PostMapping(value = "/detailedqcstatus", headers = { "Content-type=application/json" })
+  @PostMapping(headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> createDetailedQcStatus(@RequestBody DetailedQcStatusDto detailedQcStatusDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
@@ -95,7 +93,7 @@ public class DetailedQcStatusController extends RestController {
     return new ResponseEntity<>(headers, HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/detailedqcstatus/{id}", headers = { "Content-type=application/json" })
+  @PutMapping(value = "/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> updateDetailedQcStatus(@PathVariable("id") Long id, @RequestBody DetailedQcStatusDto detailedQcStatusDto,
       HttpServletResponse response) throws IOException {

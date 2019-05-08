@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.dto.QcDto;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 
 @Controller
-@RequestMapping("/rest/qc")
+@RequestMapping("/rest/qcs")
 public class QcRestController extends RestController {
   @Autowired
   private QualityControlService qcService;

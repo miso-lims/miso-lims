@@ -24,7 +24,7 @@
 ListTarget.kit = {
   name: "Kits",
   createUrl: function(config, projectId) {
-    return "/miso/rest/kitdescriptor/dt" + (config.kitType ? "/type/" + config.kitType : "");
+    return "/miso/rest/kitdescriptors/dt" + (config.kitType ? "/type/" + config.kitType : "");
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {

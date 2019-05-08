@@ -102,4 +102,5 @@ public class SubprojectDto {
   public void setReferenceGenomeId(Long referenceGenomeId) {
     this.referenceGenomeId = referenceGenomeId;
   }
+
 }

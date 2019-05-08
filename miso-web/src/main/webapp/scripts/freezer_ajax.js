@@ -373,7 +373,7 @@
             return {
               name: box.alias,
               handler: function() {
-                Utils.ajaxWithDialog('Moving Box', 'POST', '/miso/rest/box/' + box.id + '/setlocation?' + jQuery.param({
+                Utils.ajaxWithDialog('Moving Box', 'POST', '/miso/rest/boxes/' + box.id + '/setlocation?' + jQuery.param({
                   storageId: node.item.id
                 }), {}, Utils.page.pageReload, function(json) {
                   Utils.showOkDialog('Error Moving Box', [json.error]);

@@ -20,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.BarcodableViewService;
 
 @Controller
-@RequestMapping("/rest/barcodable")
+@RequestMapping("/rest/barcodables")
 public class BarcodableSearchRestController extends RestController {
   private static final String BASEURL = "/miso";
 

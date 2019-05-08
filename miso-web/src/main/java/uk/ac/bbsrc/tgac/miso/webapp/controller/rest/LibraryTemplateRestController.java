@@ -60,7 +60,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 
 @Controller
-@RequestMapping("/rest/librarytemplate")
+@RequestMapping("/rest/librarytemplates")
 public class LibraryTemplateRestController extends RestController {
 
   @Autowired

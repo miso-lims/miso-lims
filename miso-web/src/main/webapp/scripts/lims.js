@@ -576,7 +576,7 @@ var Utils = Utils
         request.send(JSON.stringify(data));
       },
       printSelectDialog: function(callback) {
-        Utils.ajaxWithDialog('Getting Printers', 'GET', window.location.origin + '/miso/rest/printer', null, function(printers) {
+        Utils.ajaxWithDialog('Getting Printers', 'GET', window.location.origin + '/miso/rest/printers', null, function(printers) {
           Utils.showDialog('Select Printer', 'Print', [{
             "property": "printer",
             "label": "Printer",
@@ -601,7 +601,7 @@ var Utils = Utils
       },
       printDialog: function(type, ids) {
         Utils.printSelectDialog(function(printer, copies) {
-          Utils.ajaxWithDialog('Printing', 'POST', window.location.origin + '/miso/rest/printer/' + printer, {
+          Utils.ajaxWithDialog('Printing', 'POST', window.location.origin + '/miso/rest/printers/' + printer, {
             type: type,
             ids: ids,
             copies: copies
@@ -694,7 +694,7 @@ var Utils = Utils
                 'If this is intended, please create the box manually before entering the data.']);
             return;
           }
-          Utils.ajaxWithDialog('Creating Box', 'POST', '/miso/rest/box', box, callback);
+          Utils.ajaxWithDialog('Creating Box', 'POST', '/miso/rest/boxes', box, callback);
         });
       },
       getEmptyBoxPositions: function(box) {
@@ -1153,14 +1153,14 @@ Utils.notes = {
   },
 
   addNote: function(entityType, entityId, internalOnly, text) {
-    Utils.ajaxWithDialog('Adding Note', 'POST', window.location.origin + '/miso/rest/note/' + entityType + '/' + entityId, {
+    Utils.ajaxWithDialog('Adding Note', 'POST', window.location.origin + '/miso/rest/notes/' + entityType + '/' + entityId, {
       internalOnly: internalOnly == 'on',
       text: text
     }, Utils.page.pageReload);
   },
   deleteNote: function(entityType, entityId, noteId) {
     Utils.showConfirmDialog('Delete Note', 'Delete', ['Are you sure you wish to delete this note?'], function() {
-      Utils.ajaxWithDialog('Deleting Note', 'DELETE', window.location.origin + '/miso/rest/note/' + entityType + '/' + entityId + '/'
+      Utils.ajaxWithDialog('Deleting Note', 'DELETE', window.location.origin + '/miso/rest/notes/' + entityType + '/' + entityId + '/'
           + noteId, null, Utils.page.pageReload);
     });
   },

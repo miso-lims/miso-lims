@@ -13,7 +13,7 @@ FormTarget.library = (function($) {
   return {
     getSaveUrl: function(library) {
       if (library.id) {
-        return '/miso/rest/library/' + library.id;
+        return '/miso/rest/libraries/' + library.id;
       } else {
         throw new Error('Page not intended for new library creation');
       }

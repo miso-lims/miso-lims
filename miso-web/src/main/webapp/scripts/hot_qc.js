@@ -3,8 +3,8 @@
  */
 HotTarget.qc = function(qcTarget) {
   return {
-    createUrl: '/miso/rest/qc/',
-    updateUrl: '/miso/rest/qc/',
+    createUrl: '/miso/rest/qcs/',
+    updateUrl: '/miso/rest/qcs/',
     requestConfiguration: function(config, callback) {
       callback(config);
     },

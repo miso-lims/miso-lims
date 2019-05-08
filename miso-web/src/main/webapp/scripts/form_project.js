@@ -12,7 +12,7 @@ FormTarget.project = (function($) {
 
   return {
     getSaveUrl: function(project) {
-      return project.id ? ('/miso/rest/project/' + project.id) : '/miso/rest/project';
+      return project.id ? ('/miso/rest/projects/' + project.id) : '/miso/rest/projects';
     },
     getSaveMethod: function(project) {
       return project.id ? 'PUT' : 'POST';

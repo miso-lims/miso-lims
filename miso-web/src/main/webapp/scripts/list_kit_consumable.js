@@ -53,7 +53,7 @@ ListTarget.kit_consumable = {
           required: true
         }], function(result) {
 
-          Utils.ajaxWithDialog("Adding Kit", "POST", "/miso/rest/experiment/" + config.experimentId + "/addkit", result,
+          Utils.ajaxWithDialog("Adding Kit", "POST", "/miso/rest/experiments/" + config.experimentId + "/addkit", result,
               Utils.page.pageReload);
 
         });

@@ -24,7 +24,7 @@
 ListTarget.index = {
   name: "Indices",
   createUrl: function(config, projectId) {
-    return "/miso/rest/index/dt" + (config.platformType ? "/platform/" + config.platformType : "");
+    return "/miso/rest/indices/dt" + (config.platformType ? "/platform/" + config.platformType : "");
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {

@@ -42,7 +42,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
@@ -51,16 +50,15 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleValidRelationshipDto;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 
 @Controller
-@RequestMapping("/rest")
-@SessionAttributes("samplevalidrelationship")
-public class SampleValidRelationshipController extends RestController {
+@RequestMapping("/rest/samplevalidrelationships")
+public class SampleValidRelationshipRestController extends RestController {
 
-  protected static final Logger log = LoggerFactory.getLogger(SampleValidRelationshipController.class);
+  protected static final Logger log = LoggerFactory.getLogger(SampleValidRelationshipRestController.class);
 
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
 
-  @GetMapping(value = "/samplevalidrelationship/{id}", produces = { "application/json" })
+  @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
   public SampleValidRelationshipDto getSampleValidRelationship(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -73,7 +71,7 @@ public class SampleValidRelationshipController extends RestController {
     }
   }
 
-  @GetMapping(value = "/samplevalidrelationships", produces = { "application/json" })
+  @GetMapping(produces = { "application/json" })
   @ResponseBody
   public Set<SampleValidRelationshipDto> getSampleValidRelationships(UriComponentsBuilder uriBuilder, HttpServletResponse response) 
       throws IOException {
@@ -82,7 +80,7 @@ public class SampleValidRelationshipController extends RestController {
     return sampleValidRelationshipDtos;
   }
 
-  @PostMapping(value = "/samplevalidrelationship", headers = { "Content-type=application/json" })
+  @PostMapping(headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public SampleValidRelationshipDto createSampleValidRelationship(@RequestBody SampleValidRelationshipDto sampleValidRelationshipDto,
@@ -93,7 +91,7 @@ public class SampleValidRelationshipController extends RestController {
     return Dtos.asDto(sampleValidRelationshipService.get(id));
   }
 
-  @PutMapping(value = "/samplevalidrelationship/{id}", headers = { "Content-type=application/json" })
+  @PutMapping(value = "/{id}", headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public SampleValidRelationshipDto updateSampleValidRelationship(@PathVariable("id") Long id,

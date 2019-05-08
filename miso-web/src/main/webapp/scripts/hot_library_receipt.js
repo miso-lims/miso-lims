@@ -4,8 +4,8 @@
 
 HotTarget.libraryReceipt = (function() {
   return {
-    createUrl: '/miso/rest/library',
-    updateUrl: '/miso/rest/library/',
+    createUrl: '/miso/rest/libraries',
+    updateUrl: '/miso/rest/libraries/',
     requestConfiguration: function(config, callback) {
       callback(config)
     },

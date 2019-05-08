@@ -24,7 +24,7 @@
 ListTarget.targetedsequencing = {
   name: "Targeted Sequencing",
   createUrl: function(config, kitDescriptorId) {
-    return '/miso/rest/targetedsequencing/dt/kit/' + config.kitDescriptorId + '/' + (config.add ? 'available' : 'included');
+    return '/miso/rest/targetedsequencings/dt/kit/' + config.kitDescriptorId + '/' + (config.add ? 'available' : 'included');
   },
   queryUrl: null,
   createBulkActions: function(config) {
@@ -35,7 +35,7 @@ ListTarget.targetedsequencing = {
           var data = {};
           data[(config.add ? 'add' : 'remove')] = tarseqs.map(Utils.array.getId);
           data[(config.add ? 'remove' : 'add')] = [];
-          Utils.ajaxWithDialog('Changing associated Targeted Sequencing panels', 'PUT', '/miso/rest/kitdescriptor/'
+          Utils.ajaxWithDialog('Changing associated Targeted Sequencing panels', 'PUT', '/miso/rest/kitdescriptors/'
               + config.kitDescriptorId + '/targetedsequencing', data, Utils.page.pageReload);
         };
         doAction();

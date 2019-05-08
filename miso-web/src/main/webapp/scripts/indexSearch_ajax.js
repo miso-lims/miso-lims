@@ -10,7 +10,7 @@
     } else {
       clearResults();
       
-      Utils.ajaxWithDialog('Index Search', 'POST', '/miso/rest/index/search', searchData, function(data) {
+      Utils.ajaxWithDialog('Index Search', 'POST', '/miso/rest/indices/search', searchData, function(data) {
         var results = '';
         if (!data || !data.length) {
           results += 'No input sequences found in any index families';

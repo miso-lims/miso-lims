@@ -55,7 +55,7 @@ import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
-@RequestMapping("/rest/librarydilution")
+@RequestMapping("/rest/librarydilutions")
 public class LibraryDilutionRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(LibraryDilutionRestController.class);
 
@@ -84,7 +84,7 @@ public class LibraryDilutionRestController extends RestController {
     this.dilutionService = dilutionService;
   }
 
-  @GetMapping(value = "{dilutionId}", produces = "application/json")
+  @GetMapping(value = "/{dilutionId}", produces = "application/json")
   @ResponseBody
   public DilutionDto getDilution(@PathVariable Long dilutionId) throws IOException {
     return RestUtils.getObject("Dilution", dilutionId, dilutionService, ldi -> Dtos.asDto(ldi, false, false));
@@ -97,28 +97,28 @@ public class LibraryDilutionRestController extends RestController {
     return RestUtils.createObject("Dilution", dilutionDto, Dtos::to, dilutionService, ldi -> Dtos.asDto(ldi, false, false));
   }
 
-  @PutMapping(value = "{dilutionId}", headers = { "Content-type=application/json" })
+  @PutMapping(value = "/{dilutionId}", headers = { "Content-type=application/json" })
   @ResponseBody
   public DilutionDto updateDilution(@PathVariable Long dilutionId, @RequestBody DilutionDto dilutionDto)
       throws IOException {
     return RestUtils.updateObject("Dilution", dilutionId, dilutionDto, Dtos::to, dilutionService, ldi -> Dtos.asDto(ldi, false, false));
   }
 
-  @GetMapping(value = "dt", produces = "application/json")
+  @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<DilutionDto> getDilutions(HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
-  @GetMapping(value = "dt/project/{id}", produces = "application/json")
+  @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<DilutionDto> getDilutionsByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
   }
 
-  @GetMapping(value = "dt/pool/{id}/available", produces = "application/json")
+  @GetMapping(value = "/dt/pool/{id}/available", produces = "application/json")
   public @ResponseBody DataTablesResponseDto<DilutionDto> availableDilutions(@PathVariable("id") Long poolId, HttpServletRequest request,
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {

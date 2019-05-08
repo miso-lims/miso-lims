@@ -31,7 +31,7 @@ import uk.ac.bbsrc.tgac.miso.service.workflow.WorkflowManager;
  * Responsible for handling all workflow AJAX requests
  */
 @Controller
-@RequestMapping("/rest/workflow")
+@RequestMapping("/rest/workflows")
 public class WorkflowRestController extends RestController {
   @Autowired
   WorkflowManager workflowManager;

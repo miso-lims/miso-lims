@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eaglegenomics.simlims.core.User;
@@ -26,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.EnaSubmissionPreparation;
 import uk.ac.bbsrc.tgac.miso.service.SubmissionService;
 
 @Controller
+@RequestMapping("/rest/submissions")
 public class SubmissionRestController extends RestController {
   @Autowired
   private SubmissionService submissionService;
@@ -33,7 +35,7 @@ public class SubmissionRestController extends RestController {
   private SecurityManager securityManager;
 
   @ResponseBody
-  @GetMapping(path = "/rest/submission/{submissionId}/download")
+  @GetMapping(path = "/{submissionId}/download")
   public byte[] download(@PathVariable("submissionId") Long submissionId, @QueryParam("action") String action,
       @QueryParam("centreName") String centreName, HttpServletResponse response) throws IOException {
     Submission submission = submissionService.get(submissionId);

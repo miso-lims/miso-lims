@@ -1,6 +1,6 @@
 HotTarget.dilution = {
-  createUrl: '/miso/rest/librarydilution',
-  updateUrl: '/miso/rest/librarydilution/',
+  createUrl: '/miso/rest/librarydilutions',
+  updateUrl: '/miso/rest/librarydilutions/',
   requestConfiguration: function(config, callback) {
     callback(config)
   },
@@ -247,7 +247,7 @@ HotTarget.dilution = {
           allowOnLibraryPage: true
         },
         HotUtils.printAction('dilution'),
-        HotUtils.spreadsheetAction('/miso/rest/librarydilution/spreadsheet', Constants.libraryDilutionSpreadsheets, function(dilutions,
+        HotUtils.spreadsheetAction('/miso/rest/librarydilutions/spreadsheet', Constants.libraryDilutionSpreadsheets, function(dilutions,
             spreadsheet) {
           var errors = [];
           return errors;

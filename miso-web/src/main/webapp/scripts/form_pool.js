@@ -5,7 +5,7 @@ FormTarget.pool = (function($) {
 
   return {
     getSaveUrl: function(pool) {
-      return pool.id ? ('/miso/rest/pool/' + pool.id) : '/miso/rest/pool';
+      return pool.id ? ('/miso/rest/pools/' + pool.id) : '/miso/rest/pools';
     },
     getSaveMethod: function(pool) {
       return pool.id ? 'PUT' : 'POST';

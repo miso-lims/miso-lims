@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -44,7 +43,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
@@ -54,11 +52,10 @@ import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
-@RequestMapping("/rest")
-@SessionAttributes("samplepurpose")
-public class SamplePurposeController extends RestController {
+@RequestMapping("/rest/samplepurposes")
+public class SamplePurposeRestController extends RestController {
 
-  protected static final Logger log = LoggerFactory.getLogger(SamplePurposeController.class);
+  protected static final Logger log = LoggerFactory.getLogger(SamplePurposeRestController.class);
 
   @Autowired
   private SamplePurposeService samplePurposeService;
@@ -66,7 +63,7 @@ public class SamplePurposeController extends RestController {
   @Autowired
   private MenuController menuController;
 
-  @GetMapping(value = "/samplepurpose/{id}", produces = { "application/json" })
+  @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
   public SamplePurposeDto getSamplePurpose(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -75,34 +72,19 @@ public class SamplePurposeController extends RestController {
       throw new RestException("No sample purpose found with ID: " + id, Status.NOT_FOUND);
     } else {
       SamplePurposeDto dto = Dtos.asDto(samplePurpose);
-      dto = writeUrls(dto, uriBuilder);
       return dto;
     }
   }
 
-  private static SamplePurposeDto writeUrls(SamplePurposeDto samplePurposeDto, UriComponentsBuilder uriBuilder) {
-    URI baseUri = uriBuilder.build().toUri();
-    samplePurposeDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplepurpose/{id}")
-        .buildAndExpand(samplePurposeDto.getId()).toUriString());
-    samplePurposeDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
-        .buildAndExpand(samplePurposeDto.getCreatedById()).toUriString());
-    samplePurposeDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
-        .buildAndExpand(samplePurposeDto.getUpdatedById()).toUriString());
-    return samplePurposeDto;
-  }
-
-  @GetMapping(value = "/samplepurposes", produces = { "application/json" })
+  @GetMapping(produces = { "application/json" })
   @ResponseBody
   public Set<SamplePurposeDto> getSamplePurposes(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<SamplePurpose> samplePurposes = samplePurposeService.getAll();
     Set<SamplePurposeDto> samplePurposeDtos = Dtos.asSamplePurposeDtos(samplePurposes);
-    for (SamplePurposeDto samplePurposeDto : samplePurposeDtos) {
-      samplePurposeDto = writeUrls(samplePurposeDto, uriBuilder);
-    }
     return samplePurposeDtos;
   }
 
-  @PostMapping(value = "/samplepurpose", headers = { "Content-type=application/json" })
+  @PostMapping(headers = { "Content-type=application/json" })
   @ResponseBody
   public SamplePurposeDto createSamplePurpose(@RequestBody SamplePurposeDto samplePurposeDto, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -112,7 +94,7 @@ public class SamplePurposeController extends RestController {
     return getSamplePurpose(id, uriBuilder, response);
   }
 
-  @PutMapping(value = "/samplepurpose/{id}", headers = { "Content-type=application/json" })
+  @PutMapping(value = "/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
   public SamplePurposeDto updateSamplePurpose(@PathVariable("id") Long id, @RequestBody SamplePurposeDto samplePurposeDto,
       UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
@@ -123,7 +105,7 @@ public class SamplePurposeController extends RestController {
     return getSamplePurpose(id, uriBuilder, response);
   }
 
-  @DeleteMapping(value = "/samplepurpose/{id}")
+  @DeleteMapping(value = "/{id}")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void deleteSamplePurpose(@PathVariable(name = "id", required = true) long id) throws IOException {
     SamplePurpose samplePurpose = samplePurposeService.get(id);

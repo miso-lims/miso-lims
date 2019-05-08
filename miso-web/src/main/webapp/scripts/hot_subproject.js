@@ -1,6 +1,6 @@
 HotTarget.subproject = {
-  createUrl: '/miso/rest/subproject',
-  updateUrl: '/miso/rest/subproject/',
+  createUrl: '/miso/rest/subprojects',
+  updateUrl: '/miso/rest/subprojects/',
   requestConfiguration: function(config, callback) {
     callback(config)
   },
@@ -8,8 +8,8 @@ HotTarget.subproject = {
   },
   createColumns: function(config, create, data) {
     return [
-        HotUtils.makeColumnForConstantsList('Project', create, 'projectAlias', 'parentProjectId', 'id',
-            Constants.isDetailedSample ? 'shortName' : 'alias', config.projects, true, {}, null),
+        HotUtils.makeColumnForConstantsList('Project', create, 'projectAlias', 'parentProjectId', 'id', Constants.isDetailedSample
+            ? 'shortName' : 'alias', config.projects, true, {}, null),
 
         HotUtils.makeColumnForText('Alias', true, 'alias', {
           unpackAfterSave: true,
@@ -42,7 +42,7 @@ HotTarget.subproject = {
           if (index == items.length) {
             window.location = window.location.origin + '/miso/subproject/list';
           }
-          Utils.ajaxWithDialog('Deleting ' + items[index].alias, 'DELETE', '/miso/rest/subproject/' + items[index].id, null, function() {
+          Utils.ajaxWithDialog('Deleting ' + items[index].alias, 'DELETE', '/miso/rest/subprojects/' + items[index].id, null, function() {
             deleteNext(index + 1);
           });
         };

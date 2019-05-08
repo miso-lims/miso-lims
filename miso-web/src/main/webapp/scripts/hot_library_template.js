@@ -14,8 +14,8 @@ HotTarget.libraryTemplate = (function() {
   const none = '(Unspecified)';
 
   return {
-    createUrl: '/miso/rest/librarytemplate',
-    updateUrl: '/miso/rest/librarytemplate/',
+    createUrl: '/miso/rest/librarytemplates',
+    updateUrl: '/miso/rest/librarytemplates/',
     requestConfiguration: function(config, callback) {
       callback(config)
     },

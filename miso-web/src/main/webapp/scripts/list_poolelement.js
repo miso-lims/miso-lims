@@ -24,7 +24,7 @@
 ListTarget.poolelement = {
   name: 'Dilutions',
   createUrl: function(config, projectId) {
-    return '/miso/rest/librarydilution/dt/pool/' + config.poolId + '/' + (config.add ? 'available' : 'included');
+    return '/miso/rest/librarydilutions/dt/pool/' + config.poolId + '/' + (config.add ? 'available' : 'included');
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
@@ -35,7 +35,7 @@ ListTarget.poolelement = {
           var data = {};
           data[(config.add ? 'add' : 'remove')] = elements.map(Utils.array.getId);
           data[(config.add ? 'remove' : 'add')] = [];
-          Utils.ajaxWithDialog('Changing pool', 'PUT', '/miso/rest/pool/' + config.poolId + '/contents', data, Utils.page.pageReload);
+          Utils.ajaxWithDialog('Changing pool', 'PUT', '/miso/rest/pools/' + config.poolId + '/contents', data, Utils.page.pageReload);
         };
         if (config.add) {
           HotUtils.warnIfConsentRevoked(elements, doAction, HotTarget.dilution.getLabel);
@@ -59,7 +59,7 @@ ListTarget.poolelement = {
             });
           });
           Utils.showDialog('Edit Proportions', 'OK', fields, function(output) {
-            Utils.ajaxWithDialog('Setting Proportions', 'PUT', '/miso/rest/pool/' + config.poolId + '/proportions', output,
+            Utils.ajaxWithDialog('Setting Proportions', 'PUT', '/miso/rest/pools/' + config.poolId + '/proportions', output,
                 Utils.page.pageReload);
           });
         }

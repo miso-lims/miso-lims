@@ -48,7 +48,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
-@RequestMapping("/rest/printer")
+@RequestMapping("/rest/printers")
 
 public class PrinterRestController extends RestController {
   public static class BoxPositionPrintRequest {

@@ -53,8 +53,8 @@ HotTarget.sample = (function() {
 
   return {
 
-    createUrl: '/miso/rest/sample',
-    updateUrl: '/miso/rest/sample/',
+    createUrl: '/miso/rest/samples',
+    updateUrl: '/miso/rest/samples/',
     requestConfiguration: function(config, callback) {
       if (Constants.isDetailedSample) {
         config.rnaSamples = config.targetSampleClass.alias.indexOf("RNA") != -1;
@@ -354,7 +354,7 @@ HotTarget.sample = (function() {
               function getIdentities() {
                 // we search by null project in case the user wants to choose an identity from another project
                 jQuery.ajax({
-                  url: "/miso/rest/sample/identitiesLookup?exactMatch=true",
+                  url: "/miso/rest/samples/identitiesLookup?exactMatch=true",
                   data: JSON.stringify({
                     "identitiesSearches": [flat.externalName],
                     "project": null
@@ -939,7 +939,7 @@ HotTarget.sample = (function() {
             }
           },
           HotUtils.printAction('sample'),
-          HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets, function(samples, spreadsheet) {
+          HotUtils.spreadsheetAction('/miso/rest/samples/spreadsheet', Constants.sampleSpreadsheets, function(samples, spreadsheet) {
             var errors = [];
             var invalidSamples = [];
             samples.forEach(function(sample) {

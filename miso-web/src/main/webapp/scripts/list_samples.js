@@ -24,7 +24,7 @@
 ListTarget.sample = {
   name: "Samples",
   createUrl: function(config, projectId) {
-    var url = "/miso/rest/sample/dt";
+    var url = "/miso/rest/samples/dt";
     if (projectId) {
       url += '/project/' + projectId;
       if (config.arrayed) {
@@ -33,7 +33,7 @@ ListTarget.sample = {
     }
     return url;
   },
-  queryUrl: "/miso/rest/sample/query",
+  queryUrl: "/miso/rest/samples/query",
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.sample.getBulkActions(config);
 
@@ -48,7 +48,7 @@ ListTarget.sample = {
           ids.push(sample.id);
         });
         Utils.showConfirmDialog('Delete Samples', 'Delete', lines, function() {
-          Utils.ajaxWithDialog('Deleting Samples', 'POST', '/miso/rest/sample/bulk-delete', ids, function() {
+          Utils.ajaxWithDialog('Deleting Samples', 'POST', '/miso/rest/samples/bulk-delete', ids, function() {
             Utils.page.pageReload();
           });
         });

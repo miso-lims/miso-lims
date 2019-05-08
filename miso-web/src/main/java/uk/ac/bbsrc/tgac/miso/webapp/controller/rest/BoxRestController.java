@@ -84,7 +84,7 @@ import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 
 @Controller
-@RequestMapping("/rest")
+@RequestMapping("/rest/boxes")
 public class BoxRestController extends RestController {
 
   private static final Logger log = LoggerFactory.getLogger(BoxRestController.class);
@@ -137,14 +137,14 @@ public class BoxRestController extends RestController {
     this.boxScanners = boxScanners;
   }
 
-  @GetMapping(value = "/box/dt", produces = "application/json")
+  @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<BoxDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
-  @GetMapping(value = "/box/dt/use/{id}", produces = "application/json")
+  @GetMapping(value = "/dt/use/{id}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<BoxDto> dataTableByUse(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response,
@@ -152,7 +152,7 @@ public class BoxRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.boxUse(id));
   }
 
-  @PutMapping(value = "/box/{boxId}/position/{position}", consumes = { "application/json" }, produces = { "application/json" })
+  @PutMapping(value = "/{boxId}/position/{position}", consumes = { "application/json" }, produces = { "application/json" })
   public @ResponseBody BoxDto setPosition(@PathVariable("boxId") Long boxId, @PathVariable("position") String position,
       @RequestParam("entity") String entity) throws IOException {
     BoxableId id = parseEntityIdentifier(entity);
@@ -179,13 +179,13 @@ public class BoxRestController extends RestController {
     return Dtos.asDtoWithBoxables(saved, savedContents);
   }
 
-  @RequestMapping(value = "/boxes/search")
+  @RequestMapping(value = "/search")
   public @ResponseBody List<BoxDto> search(@RequestParam("q") String search) {
     List<Box> results = boxService.getBySearch(search);
     return Dtos.asBoxDtosWithPositions(results);
   }
 
-  @RequestMapping(value = "/boxes/search/partial")
+  @RequestMapping(value = "/search/partial")
   public @ResponseBody List<BoxDto> partialSearch(@RequestParam("q") String search, @RequestParam("b") boolean onlyMatchBeginning) {
     List<Box> results = boxService.getByPartialSearch(search, onlyMatchBeginning);
     return Dtos.asBoxDtosWithPositions(results);
@@ -198,7 +198,7 @@ public class BoxRestController extends RestController {
    * @param boxId ID of the Box
    * @return JSON object with "hashCode" field representing the hash code of the spreadsheet filename
    */
-  @GetMapping(value = "/box/{boxId}/spreadsheet")
+  @GetMapping(value = "/{boxId}/spreadsheet")
   public @ResponseBody JSONObject createSpreadsheet(@PathVariable("boxId") Long boxId) {
     try {
       return exportBoxContentsForm(boxId);
@@ -361,7 +361,7 @@ public class BoxRestController extends RestController {
    * 
    * @param requestData
    */
-  @PostMapping(value = "/box/prepare-scan")
+  @PostMapping(value = "/prepare-scan")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void prepareBoxScanner(@RequestBody(required = true) ScannerPreparationRequest requestData) {
     if (requestData.getRows() == null || requestData.getColumns() == null) {
@@ -516,7 +516,7 @@ public class BoxRestController extends RestController {
    *         (if
    *         applicable)
    */
-  @PostMapping(value = "/box/{boxId}/scan")
+  @PostMapping(value = "/{boxId}/scan")
   public @ResponseBody ScanResultsDto getBoxScan(@PathVariable(required = true) int boxId,
       @RequestBody(required = true) ScanRequest requestData) {
     try {
@@ -632,7 +632,7 @@ public class BoxRestController extends RestController {
     return !barcode.equals(scan.getNoTubeLabel()) && !barcode.equals(scan.getNoReadLabel());
   }
 
-  @DeleteMapping("/box/{boxId}/positions/{position}")
+  @DeleteMapping("/{boxId}/positions/{position}")
   public @ResponseBody BoxDto removeSingleItem(@PathVariable long boxId, @PathVariable String position) throws IOException {
     Box box = getBox(boxId);
     box.getBoxPositions().remove(position);
@@ -640,14 +640,14 @@ public class BoxRestController extends RestController {
     return getBoxDtoWithBoxables(boxId);
   }
 
-  @PostMapping("/box/{boxId}/positions/{position}/discard")
+  @PostMapping("/{boxId}/positions/{position}/discard")
   public @ResponseBody BoxDto discardSingleItem(@PathVariable long boxId, @PathVariable String position) throws IOException {
     Box box = getBox(boxId);
     boxService.discardSingleItem(box, position);
     return getBoxDtoWithBoxables(boxId);
   }
 
-  @PostMapping("/box/{boxId}/bulk-remove")
+  @PostMapping("/{boxId}/bulk-remove")
   public @ResponseBody BoxDto removeMultipleItems(@PathVariable long boxId, @RequestBody List<String> positions) throws IOException {
     Box box = getBox(boxId);
     for (String position : positions) {
@@ -659,7 +659,7 @@ public class BoxRestController extends RestController {
     return getBoxDtoWithBoxables(boxId);
   }
 
-  @PostMapping("/box/{boxId}/bulk-discard")
+  @PostMapping("/{boxId}/bulk-discard")
   public @ResponseBody BoxDto discardMultipleItems(@PathVariable long boxId, @RequestBody List<String> positions) throws IOException {
     Box box = getBox(boxId);
     for (String position : positions) {
@@ -684,7 +684,7 @@ public class BoxRestController extends RestController {
     return Dtos.asDtoWithBoxables(box, boxables);
   }
 
-  @PostMapping(value = "/box/{boxId}/discard-all")
+  @PostMapping(value = "/{boxId}/discard-all")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void discardEntireBox(@PathVariable long boxId) throws IOException {
     Box box = getBox(boxId);
@@ -713,7 +713,7 @@ public class BoxRestController extends RestController {
 
   }
 
-  @PostMapping(value = "/box/{boxId}/bulk-update")
+  @PostMapping(value = "/{boxId}/bulk-update")
   public @ResponseBody BoxDto bulkUpdatePositions(@PathVariable long boxId, @RequestBody List<BulkUpdateRequestItem> items)
       throws IOException {
     Box box = boxService.get(boxId);
@@ -759,7 +759,7 @@ public class BoxRestController extends RestController {
     return Dtos.asDtoWithBoxables(updated, updatedContents);
   }
 
-  @PostMapping(value = "/box/{boxId}/setlocation")
+  @PostMapping(value = "/{boxId}/setlocation")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody void setBoxLocation(@PathVariable(name = "boxId", required = true) long boxId,
       @RequestParam("storageId") long storageId)
@@ -792,14 +792,14 @@ public class BoxRestController extends RestController {
     boxService.save(box);
   }
 
-  @PostMapping(value = "/box", produces = "application/json")
+  @PostMapping(produces = "application/json")
   @ResponseBody
   public BoxDto createBox(@RequestBody BoxDto dto)
       throws IOException {
     return RestUtils.createObject("Box", dto, Dtos::to, boxService, box -> Dtos.asDto(box, false));
   }
 
-  @PutMapping(value = "/box/{boxId}", produces = "application/json")
+  @PutMapping(value = "/{boxId}", produces = "application/json")
   @ResponseBody
   public BoxDto updateBox(@PathVariable long boxId, @RequestBody BoxDto dto) throws IOException {
     Box original = getBox(boxId);
@@ -811,7 +811,7 @@ public class BoxRestController extends RestController {
     }, boxService, box -> Dtos.asDto(box, false));
   }
 
-  @PostMapping(value = "/boxes/bulk-delete")
+  @PostMapping(value = "/bulk-delete")
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
@@ -829,7 +829,7 @@ public class BoxRestController extends RestController {
     boxService.bulkDelete(boxes);
   }
 
-  @PostMapping("/boxes/{boxId}/positions/fill-by-pattern")
+  @PostMapping("/{boxId}/positions/fill-by-pattern")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void recreateBoxFromPrefix(@PathVariable long boxId, @RequestParam(name = "prefix", required = true) String prefix,
       @RequestParam(name = "suffix", required = true) String suffix) throws IOException {

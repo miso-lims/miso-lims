@@ -36,8 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -50,7 +48,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -88,10 +85,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
  * @since 0.1.0
  */
 @Controller
-@RequestMapping("/rest/library")
-@SessionAttributes("library")
+@RequestMapping("/rest/libraries")
 public class LibraryRestController extends RestController {
-  private static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
 
   private final JQueryDataTableBackend<Library, LibraryDto> jQueryBackend = new JQueryDataTableBackend<Library, LibraryDto>() {
     @Override
@@ -123,7 +118,7 @@ public class LibraryRestController extends RestController {
   @PostMapping(produces = "application/json")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public LibraryDto createLibrary(@RequestBody LibraryDto libraryDto, UriComponentsBuilder b, HttpServletResponse response)
+  public LibraryDto createLibrary(@RequestBody LibraryDto libraryDto)
       throws IOException {
     return RestUtils.createObject("Library", libraryDto, WhineyFunction.rethrow(dto -> {
       Library lib = Dtos.to(dto);
@@ -162,16 +157,14 @@ public class LibraryRestController extends RestController {
 
   @PostMapping(value = "/query", produces = { "application/json" })
   @ResponseBody
-  public List<LibraryDto> getLibariesInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) {
+  public List<LibraryDto> getLibariesInBulk(@RequestBody List<String> names, HttpServletRequest request) {
     return PaginationFilter.bulkSearch(names, libraryService, lib -> Dtos.asDto(lib, false),
         message -> new RestException(message, Status.BAD_REQUEST));
   }
 
   @PostMapping(value = "/spreadsheet")
   @ResponseBody
-  public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) {
+  public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response) {
     return MisoWebUtils.generateSpreadsheet(request, libraryService::get, LibrarySpreadSheets::valueOf, response);
   }
 

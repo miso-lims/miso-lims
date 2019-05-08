@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
@@ -42,63 +43,64 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.SampleGroupDto;
-import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
+import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
+import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 
 @Controller
-@RequestMapping("/rest")
-@SessionAttributes("samplegroup")
-public class SampleGroupController extends RestController {
+@RequestMapping("/rest/sampleclasses")
+public class SampleClassRestController extends RestController {
 
-  protected static final Logger log = LoggerFactory.getLogger(SampleGroupController.class);
+  protected static final Logger log = LoggerFactory.getLogger(SampleClassRestController.class);
 
   @Autowired
-  private SampleGroupService sampleGroupService;
+  private SampleClassService sampleClassService;
 
-  @GetMapping(value = "/samplegroup/{id}", produces = { "application/json" })
+  @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
-  public SampleGroupDto getSampleGroup(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response)
-      throws IOException {
-    SampleGroupId sampleGroup = sampleGroupService.get(id);
-    if (sampleGroup == null) {
-      throw new RestException("No sample group found with ID: " + id, Status.NOT_FOUND);
+  public SampleClassDto getSampleClass(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) throws IOException {
+    SampleClass sampleClass = sampleClassService.get(id);
+    if (sampleClass == null) {
+      throw new RestException("No sample class found with ID: " + id, Status.UNAUTHORIZED);
     } else {
-      SampleGroupDto dto = Dtos.asDto(sampleGroup);
+      SampleClassDto dto = Dtos.asDto(sampleClass);
       return dto;
     }
   }
 
-  @GetMapping(value = "/samplegroups", produces = { "application/json" })
+  @GetMapping(produces = { "application/json" })
   @ResponseBody
-  public Set<SampleGroupDto> getSampleGroups(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
-    Set<SampleGroupId> sampleGroups = sampleGroupService.getAll();
-    Set<SampleGroupDto> sampleGroupDtos = Dtos.asSampleGroupDtos(sampleGroups);
-    return sampleGroupDtos;
+  public Set<SampleClassDto> getSampleClasses(UriComponentsBuilder uriBuilder, HttpServletResponse response)
+      throws IOException {
+    return sampleClassService.getAll().stream().map(sc -> {
+      SampleClassDto dto = Dtos.asDto(sc);
+      return dto;
+    }).collect(Collectors.toSet());
   }
 
-  @PostMapping(value = "/samplegroup", headers = { "Content-type=application/json" })
+  @PostMapping(headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public SampleGroupDto createSampleGroup(@RequestBody SampleGroupDto sampleGroupDto, UriComponentsBuilder b,
+  public SampleClassDto createSampleClass(@RequestBody SampleClassDto sampleClassDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
-    SampleGroupId sampleGroup = Dtos.to(sampleGroupDto);
-    Long id = sampleGroupService.create(sampleGroup, sampleGroupDto.getProjectId(), sampleGroupDto.getSubprojectId());
-    return Dtos.asDto(sampleGroupService.get(id));
+    SampleClass sampleClass = Dtos.to(sampleClassDto);
+    Long id = sampleClassService.create(sampleClass);
+    return Dtos.asDto(sampleClassService.get(id));
   }
 
-  @PutMapping(value = "/samplegroup/{id}", headers = { "Content-type=application/json" })
+  @PutMapping(value = "/{id}", headers = { "Content-type=application/json" })
+  @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public SampleGroupDto updateSampleGroup(@PathVariable("id") Long id, @RequestBody SampleGroupDto sampleGroupDto,
+  public SampleClassDto updateSampleClass(@PathVariable("id") Long id, @RequestBody SampleClassDto sampleClassDto,
       HttpServletResponse response) throws IOException {
-    SampleGroupId sampleGroup = Dtos.to(sampleGroupDto);
-    sampleGroup.setId(id);
-    sampleGroupService.update(sampleGroup);
-    return Dtos.asDto(sampleGroupService.get(id));
+    SampleClass sampleClass = Dtos.to(sampleClassDto);
+    sampleClass.setId(id);
+    sampleClassService.update(sampleClass);
+    return Dtos.asDto(sampleClassService.get(id));
   }
 
 }

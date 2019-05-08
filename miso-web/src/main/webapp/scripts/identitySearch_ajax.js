@@ -11,7 +11,7 @@
       jQuery('#ajaxLoaderDiv').html('<img src="/styles/images/ajax-loader.gif"/>');
        
       $.ajax({
-        url: '/miso/rest/sample/identitiesLookup?exactMatch=' + (exactMatch ? 'true' : 'false'),
+        url: '/miso/rest/samples/identitiesLookup?exactMatch=' + (exactMatch ? 'true' : 'false'),
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json; charset=utf8',

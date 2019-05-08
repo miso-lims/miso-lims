@@ -44,7 +44,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
@@ -54,11 +53,10 @@ import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
-@RequestMapping("/rest")
-@SessionAttributes("tissuematerial")
-public class TissueMaterialController extends RestController {
+@RequestMapping("/rest/tissuematerials")
+public class TissueMaterialRestController extends RestController {
 
-  protected static final Logger log = LoggerFactory.getLogger(TissueMaterialController.class);
+  protected static final Logger log = LoggerFactory.getLogger(TissueMaterialRestController.class);
 
   @Autowired
   private TissueMaterialService tissueMaterialService;
@@ -66,7 +64,7 @@ public class TissueMaterialController extends RestController {
   @Autowired
   private MenuController menuController;
 
-  @GetMapping(value = "/tissuematerial/{id}", produces = { "application/json" })
+  @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
   public TissueMaterialDto getTissueMaterial(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -91,7 +89,7 @@ public class TissueMaterialController extends RestController {
     return tissueMaterialDto;
   }
 
-  @GetMapping(value = "/tissuematerials", produces = { "application/json" })
+  @GetMapping(produces = { "application/json" })
   @ResponseBody
   public Set<TissueMaterialDto> getTissueMaterials(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<TissueMaterial> tissueMaterials = tissueMaterialService.getAll();
@@ -102,7 +100,7 @@ public class TissueMaterialController extends RestController {
     return tissueMaterialDtos;
   }
 
-  @PostMapping(value = "/tissuematerial", headers = { "Content-type=application/json" })
+  @PostMapping(headers = { "Content-type=application/json" })
   @ResponseBody
   public TissueMaterialDto createTissueMaterial(@RequestBody TissueMaterialDto tissueMaterialDto, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -112,7 +110,7 @@ public class TissueMaterialController extends RestController {
     return getTissueMaterial(id, uriBuilder, response);
   }
 
-  @PutMapping(value = "/tissuematerial/{id}", headers = { "Content-type=application/json" })
+  @PutMapping(value = "/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
   public TissueMaterialDto updateTissueMaterial(@PathVariable("id") Long id, @RequestBody TissueMaterialDto tissueMaterialDto,
       UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
@@ -123,7 +121,7 @@ public class TissueMaterialController extends RestController {
     return getTissueMaterial(id, uriBuilder, response);
   }
 
-  @DeleteMapping(value = "/tissuematerial/{id}")
+  @DeleteMapping(value = "/{id}")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void deleteTissueMaterial(@PathVariable(name = "id", required = true) long id) throws IOException {
     TissueMaterial tissueMaterial = tissueMaterialService.get(id);

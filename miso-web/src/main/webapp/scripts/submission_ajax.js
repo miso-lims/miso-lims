@@ -22,7 +22,7 @@
  */
 
 var Submission = {
-validateSubmission:function () {
+  validateSubmission: function() {
     Validate.cleanFields('#submission-form');
     jQuery('#submission-form').parsley().destroy();
 
@@ -46,21 +46,21 @@ validateSubmission:function () {
     jQuery('#submission-form').parsley().validate();
     jQuery('#submission-form').submit();
   },
-download : function(id) {
-                Utils.showDialog("Download XML", "Download", [{
-                  type: 'select',
-                  required: true,
-                  label: "Action",
-                  values: Constants.submissionAction,
-                  property: "action"
-                }, {
-                  type: 'text',
-                  required: 'true',
-                  label: 'Centre Name',
-                  property: 'centerName'
-                }, ], function(results) {
-            window.location = window.location.origin + '/miso/rest/submission/' + id + '/download?'  + jQuery.param(results);
+  download: function(id) {
+    Utils.showDialog("Download XML", "Download", [{
+      type: 'select',
+      required: true,
+      label: "Action",
+      values: Constants.submissionAction,
+      property: "action"
+    }, {
+      type: 'text',
+      required: 'true',
+      label: 'Centre Name',
+      property: 'centerName'
+    }, ], function(results) {
+      window.location = window.location.origin + '/miso/rest/submissions/' + id + '/download?' + jQuery.param(results);
 
-});
-}
+    });
+  }
 }

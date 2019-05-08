@@ -24,7 +24,7 @@
 ListTarget.study = {
   name: "Studies",
   createUrl: function(config, projectId) {
-    return "/miso/rest/study/dt" + (projectId ? "/project/" + projectId : "");
+    return "/miso/rest/studies/dt" + (projectId ? "/project/" + projectId : "");
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
@@ -39,7 +39,7 @@ ListTarget.study = {
                     Utils.page.pageReload();
                     return;
                   }
-                  Utils.ajaxWithDialog('Deleting study', 'DELETE', '/miso/rest/study/' + studies[index].id, null, function() {
+                  Utils.ajaxWithDialog('Deleting study', 'DELETE', '/miso/rest/studies/' + studies[index].id, null, function() {
                     deleter(index + 1);
                   });
                 };

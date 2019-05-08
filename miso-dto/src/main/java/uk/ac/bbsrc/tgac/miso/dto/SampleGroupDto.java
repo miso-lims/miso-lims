@@ -93,4 +93,5 @@ public class SampleGroupDto {
         + ", description=" + description + ", createdById=" + createdById + ", creationDate=" + creationDate + ", updatedById="
         + updatedById + ", lastUpdated=" + lastUpdated + "]";
   }
+
 }

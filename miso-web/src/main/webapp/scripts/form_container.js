@@ -6,9 +6,9 @@ FormTarget.container = (function() {
   return {
     getSaveUrl: function(container) {
       if (container.id) {
-        return '/miso/rest/container/' + container.id;
+        return '/miso/rest/containers/' + container.id;
       } else {
-        return '/miso/rest/container';
+        return '/miso/rest/containers';
       }
     },
     getSaveMethod: function(container) {

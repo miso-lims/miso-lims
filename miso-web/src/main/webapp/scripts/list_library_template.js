@@ -24,9 +24,9 @@
 ListTarget.library_template = {
   name: "Library Templates",
   createUrl: function(config, projectId) {
-    return "/miso/rest/librarytemplate/dt" + (projectId ? '/project/' + projectId : '');
+    return "/miso/rest/librarytemplates/dt" + (projectId ? '/project/' + projectId : '');
   },
-  queryUrl: "/miso/rest/librarytemplate/query",
+  queryUrl: "/miso/rest/librarytemplates/query",
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.libraryTemplate.getBulkActions(config);
     actions.push({
@@ -39,7 +39,7 @@ ListTarget.library_template = {
           ids.push(librarytemplate.id);
         });
         Utils.showConfirmDialog('Delete Library Templates', 'Delete', lines, function() {
-          Utils.ajaxWithDialog('Deleting Library Templates', 'POST', '/miso/rest/librarytemplate/bulk-delete', ids, Utils.page.pageReload);
+          Utils.ajaxWithDialog('Deleting Library Templates', 'POST', '/miso/rest/librarytemplates/bulk-delete', ids, Utils.page.pageReload);
         });
       }
     });
@@ -54,7 +54,7 @@ ListTarget.library_template = {
             property: "query",
             value: ""
           }, ], function(results) {
-            Utils.ajaxWithDialog('Getting Projects', 'GET', '/miso/rest/project/search?' + jQuery.param({
+            Utils.ajaxWithDialog('Getting Projects', 'GET', '/miso/rest/projects/search?' + jQuery.param({
               q: results.query
             }), null, function(response) {
               var projectActions = [];
@@ -66,7 +66,7 @@ ListTarget.library_template = {
                       return template.id;
                     });
                     Utils.ajaxWithDialog("Adding Library Template" + (items.length > 1 ? "s" : "") + " to Project", "POST",
-                        "/miso/rest/librarytemplate/project/add?" + jQuery.param({
+                        "/miso/rest/librarytemplates/project/add?" + jQuery.param({
                           projectId: project.id,
                         }), templateIds, function() {
                           Utils.showOkDialog("Add Project", ["Successfully added Library Template" + (items.length > 1 ? "s" : "")
@@ -91,7 +91,7 @@ ListTarget.library_template = {
               if (!projectIds.hasOwnProperty(id)) {
                 projectIds[id] = true;
                 jQuery.ajax({
-                  url: '/miso/rest/project/' + id,
+                  url: '/miso/rest/projects/' + id,
                   type: 'GET',
                   contentType: 'application/json; charset=utf8',
                 }).success(
@@ -103,7 +103,7 @@ ListTarget.library_template = {
                             return item.id;
                           });
                           Utils.ajaxWithDialog("Removing Library Template " + (items.length > 1 ? "s" : "") + " from Project", "POST",
-                              "/miso/rest/librarytemplate/project/remove?" + jQuery.param({
+                              "/miso/rest/librarytemplates/project/remove?" + jQuery.param({
                                 projectId: id
                               }), templateIds, function() {
                                 Utils.showOkDialog("Add Project", ["Successfully removed Library Template" + (items.length > 1 ? "s" : "")

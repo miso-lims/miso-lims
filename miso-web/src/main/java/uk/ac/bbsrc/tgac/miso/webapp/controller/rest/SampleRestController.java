@@ -55,7 +55,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -95,8 +94,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
-@RequestMapping("/rest/sample")
-@SessionAttributes("sample")
+@RequestMapping("/rest/samples")
 public class SampleRestController extends RestController {
 
   protected static final Logger log = LoggerFactory.getLogger(SampleRestController.class);
@@ -307,16 +305,14 @@ public class SampleRestController extends RestController {
 
   @PostMapping(value = "/query", produces = { "application/json" })
   @ResponseBody
-  public List<SampleDto> getSamplesInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) {
+  public List<SampleDto> getSamplesInBulk(@RequestBody List<String> names) {
     return PaginationFilter.bulkSearch(names, sampleService, sam -> Dtos.asDto(sam, false),
         message -> new RestException(message, Status.BAD_REQUEST));
   }
 
   @PostMapping(value = "/spreadsheet")
   @ResponseBody
-  public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) {
+  public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response) {
     return MisoWebUtils.generateSpreadsheet(request, sampleService::get, SampleSpreadSheets::valueOf, response);
   }
 
@@ -335,8 +331,8 @@ public class SampleRestController extends RestController {
 
   @PostMapping(value = "/parents/{category}")
   @ResponseBody
-  public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
+  public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids)
+      throws JsonProcessingException {
     return parentFinder.list(ids, category);
   }
 
@@ -413,8 +409,8 @@ public class SampleRestController extends RestController {
 
   @PostMapping(value = "/children/{category}")
   @ResponseBody
-  public HttpEntity<byte[]> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
+  public HttpEntity<byte[]> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids)
+      throws JsonProcessingException {
     return childFinder.list(ids, category);
   }
 

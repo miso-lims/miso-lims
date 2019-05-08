@@ -24,9 +24,9 @@
 ListTarget.dilution = {
   name: "Library Dilutions",
   createUrl: function(config, projectId) {
-    return "/miso/rest/librarydilution/dt" + (projectId ? "/project/" + projectId : "");
+    return "/miso/rest/librarydilutions/dt" + (projectId ? "/project/" + projectId : "");
   },
-  queryUrl: "/miso/rest/librarydilution/query",
+  queryUrl: "/miso/rest/librarydilutions/query",
   createBulkActions: function(config, projectId) {
     var actions = config.library ? HotTarget.dilution.getBulkActions(config).filter(function(action) {
       return action.allowOnLibraryPage;
@@ -43,7 +43,7 @@ ListTarget.dilution = {
           ids.push(dilution.id);
         });
         Utils.showConfirmDialog('Delete Library Dilutions', 'Delete', lines, function() {
-          Utils.ajaxWithDialog('Deleting Library Dilutions', 'POST', '/miso/rest/librarydilution/bulk-delete', ids, function() {
+          Utils.ajaxWithDialog('Deleting Library Dilutions', 'POST', '/miso/rest/librarydilutions/bulk-delete', ids, function() {
             Utils.page.pageReload();
           });
         });

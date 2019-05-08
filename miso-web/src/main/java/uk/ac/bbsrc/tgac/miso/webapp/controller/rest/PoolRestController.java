@@ -107,7 +107,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
  * Created by IntelliJ IDEA. User: bianx Date: 17-Aug-2011 Time: 11:34:04
  */
 @Controller
-@RequestMapping("/rest/pool")
+@RequestMapping("/rest/pools")
 public class PoolRestController extends RestController {
   public static class PoolChangeRequest {
     private List<Long> add;

@@ -14,7 +14,7 @@ FormTarget.sample = (function($) {
   return {
     getSaveUrl: function(sample) {
       if (sample.id) {
-        return '/miso/rest/sample/' + sample.id;
+        return '/miso/rest/samples/' + sample.id;
       } else {
         throw new Error('Page not intended for new sample creation');
       }
