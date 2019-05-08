@@ -106,7 +106,7 @@ We suggest the following:
 3. Pre-load desired data (if any) by binding SQL files to the flyway container (see [Pre-loading data with Flyway](#pre-loading-data-with-flyway).
 4. Modify and mount the miso.properties file to have your desired configuration (see [Modifying the miso.properties file](#modifying-the-miso-properties-file).
 5. Change the username and password for the database using the environmental variables
-6. Enable SSL (to be continued)
+6. Enable HTTPS (see [Configuring HTTPS](#configuring-https).
 
 # Recipes
 
@@ -235,6 +235,170 @@ services:
 ...
 ```
 
+## Configuring HTTPS
+
+In order to turn on HTTPS for MISO, configure the nginx container to accept 
+incoming connections from port 443, include the SSL certificate, key, and 
+password, and bind a new configuration file.
+
+The first file necessary is the nginx configuration file, which can be found at 
+[.docker/nginx/ssl.conf](https://github.com/miso-lims/miso-lims/blob/develop/.docker/nginx/ssl.conf).
+
+The configuration below redirects requests from port 80 (http://...) to port 443
+(https://...) and then defines the locations of the ssl password file, ssl 
+certificate, and certificate key. These locations are important since we will 
+have to bind the appropriate files into them through the compose file.
+
+``` bash
+server {
+    listen 80;
+    location / {
+        return 301 https://$host$request_uri;
+    }    
+}
+
+server {
+  listen 443 ssl;
+  listen [::]:443 ssl;
+  
+  ssl_password_file /run/secrets/ssl_password;
+  ssl_certificate /etc/nginx/ssl/cert.pem;
+  ssl_certificate_key /etc/nginx/ssl/key.pem;
+  
+  # If deploying (uploading) war files configure nginx to accept large files from clients
+  client_max_body_size 100M;
+  location / {
+      proxy_set_header X-Forwarded-Host $host;
+      proxy_set_header X-Forwarded-Server $host;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # assumes this is running in docker compose with DNS name 'webapp' pointing to miso
+      proxy_pass http://webapp:8080;
+  }
+}
+```
+
+
+
+### Using a previously-generated security certificate
+
+In the first case, you have a security certificate and key that you want to use
+with your MISO instance. You can request a certificate for your server from
+your local IT department or from a service such as 
+[Let's Encrypt](https://letsencrypt.org/).
+
+In the snippet below, the SSL certificate and key file are located at `./cert.pem` 
+and `./key.pem` respectively, and the SSL certificate password is located in a 
+file located at the environment variable `${SSL_PASSWORD_FILE}`. We also bind
+port 443 on the nginx container to the host machine.
+
+Make sure the target locations of the certificate, certificate key, and password 
+match those specified in the `ssl.conf` file above.
+
+```yaml
+secrets:
+  ssl_password:
+    file: ${SSL_PASSWORD_FILE}
+
+services:
+  nginx:
+    image: nginx:1.15.12-alpine
+    ports: 
+      - "80:80"
+      - "443:443"
+    secrets: 
+      - ssl_password
+    volumes:
+      - type: bind
+        source: "./.docker/nginx/ssl.conf"
+        target: "/etc/nginx/conf.d/default.conf"
+      - type: bind
+        source: "./cert.pem"
+        target: :/etc/nginx/ssl/cert.pem"
+      - type: bind
+        source: "./key.pem"
+        target: :/etc/nginx/ssl/key.pem"
+    links:
+      - webapp
+    depends_on:
+      - webapp
+```
+
+As before, navigate to [http://localhost/miso](http://localhost/miso). You will
+be automatically redirected to the login page at https://localhost/miso and can
+use **admin**/**admin** to log in.
+
+
+### Creating a self-signed certificate on startup
+
+If you don't have a certificate or you are testing, you may want to generate a 
+self-signed certificate on startup for MISO to use. We provide a script for this
+purpose at 
+[.docker/nginx/self-sign-cert.sh](https://github.com/miso-lims/miso-lims/blob/develop/.docker/nginx/self-sign-cert.sh.conf). 
+The SSL password is still required and used to generate the certificate, and we 
+additionally modify the command to generate the certificate as the container is 
+starting.
+
+``` yaml
+secrets:
+  ssl_password:
+    file: ${SSL_PASSWORD_FILE}
+
+services:
+  nginx:
+    image: nginx:1.15.12-alpine
+    ports: 
+      - "80:80"
+      - "443:443"
+    secrets: 
+      - ssl_password
+    volumes:
+      - type: bind
+        source: "./.docker/nginx/ssl.conf"
+        target: "/etc/nginx/conf.d/default.conf"
+        volume:
+          nocopy: true
+      - type: bind
+        source: "./.docker/nginx/self-sign-cert.sh"
+        target: "/self-sign-cert.sh"
+        volume:
+          nocopy: true
+    links:
+      - webapp
+    depends_on:
+      - webapp
+    command: ["sh", "-c", "./self-sign-cert.sh; nginx -g 'daemon off;'"]
+```
+
+As before, navigate to [http://localhost/miso](http://localhost/miso). You will
+be automatically redirected to the login page at https://localhost/miso and can
+use **admin**/**admin** to log in.
+
+The container creates a new self-signed certificate every time it starts up for 
+security reasons: otherwise everyone would use the same certificate, leading to 
+potential trust issues. If you would like to download the certificate for re-use, the files are located at `/etc/nginx/ssl/cert.pem` and `/etc/nginx/ssl/key.pem` in the nginx container, and then follow the steps in [using a previously-generated security certificate](#using-a-previously-generated-security-certificate).
+
+#### Browser security warnings
+
+With self-signed certificates, you will likely get security warnings on Chrome 
+or Firefox when you go to [https://localhost/miso](https://localhost/miso).
+Since you set up the certificate and you (hopefully) trust yourself, these 
+warnings can be ignored. Your data is still protected despite the browser's
+warning.
+
+Here is what your browser will look like, with Chrome on the left and Firefox on 
+the right. To ignore the errors, click the _Advanced_ button on either page.
+
+![Security Warnings in Chrome and Firefox]({{ site.baseurl }}/images/security-warning.png)
+
+Then click either "Proceed to localhost (unsafe)" or "Accept the Risk and 
+Continue".
+
+![Accept Security Warnings in Chrome and Firefox]({{ site.baseurl }}/images/security-warning-accept.png)
+
+The process for [handling self-signed certificates on Internet Explorer or Edge](https://medium.com/@ali.dev/how-to-trust-any-self-signed-ssl-certificate-in-ie11-and-edge-fa7b416cac68) 
+is very similar. Follow the accepted process for trusting self-signed
+certificates.
+
 
 ## Building and running from source
 
@@ -289,25 +453,47 @@ docker volume prune
 ## Production-like dockerfile
 
 This docker-compose file is installed on a production machine called `miso-lims`
-in the `miso` user's home directory. This is what the home directory looks like
-before launching the docker-compose file for the first time:
+in the `miso` user's home directory. 
+
+This environment:
+* mounts the database, MISO logs, and MISO files from the local filesystem. We
+  made the directories `db`, `logs` and `files` to bind to.
+* has site-specific migrations in `V9000__institution-custom.sql`
+* overrides `miso.properties`.
+* has SSL encryption for HTTPS (`ssl.conf` and `.ssl_password`) and 
+  automatically generates the SSL certificate on startup
+* has a `.env` file with environment variables:
+  * `MISO_DB_USER` : the MySQL database version
+  * `MISO_DB` : the MySQL database user
+  * `MISO_DB_PASSWORD_FILE` pointing to `.miso_db_password` for MISO_DB_USER
+  * `MISO_TAG` set to a [specific MISO Docker container version](https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-webapp/tags), and 
+  * `SSL_PASSWORD_FILE` pointing to `.ssl_password`.
+
+
+Create the following home directory before launching the docker-compose 
+file for the first time, including the empty `db`, `files` and `logs` 
+directories.
 
 ```
-`miso-lims:/home/miso$ tree -a
+miso-lims:/home/miso$ tree -a
 .
+├── db
 ├── docker-compose.yml
+├── .env
+├── files
+├── logs
 ├── .miso_db_password
 ├── miso.properties
 ├── nginx
-│   └── http.conf
-└── sql
-    ├── V0792__drop-inconvenient-rows.sql
-    └── V0794__site-specific-migrations.sql
+│   ├── self-sign-cert.sh
+│   └── ssl.conf
+├── sql
+│   ├── V0792__drop-inconvenient-rows.sql
+│   └── V9000__institution_custom.sql
+└── .ssl_password
 ```
 
-This compose file mounts the database, MISO logs, and MISO files to the local
-filesystem, has site-specific migrations in
-`V0794__site-specific-migrations.sql`, and overrides `miso.properties`.
+Here is the complete compose file:
 
 ``` yaml
 version: '3.7'
@@ -315,6 +501,8 @@ version: '3.7'
 secrets:
   lims_password:
     file: ${MISO_DB_PASSWORD_FILE}
+  ssl_password:
+    file: ${SSL_PASSWORD_FILE}
 
 services:
   db:
@@ -328,7 +516,9 @@ services:
     secrets:
       - lims_password
     volumes:
-      - "./db:/var/lib/mysql"
+      - type: bind
+        source: "./db"
+        target: "/var/lib/mysql"
 
   flyway:
     image: misolims/miso-lims-migration:${MISO_TAG}
@@ -363,33 +553,50 @@ services:
       - db
     volumes:
       - type: bind
-        source: "./.docker/detailed_sample_config/miso.properties"
+        source: "./miso.properties"
         target: "/usr/local/tomcat/conf/Catalina/localhost/miso.properties"
         volume:
           nocopy: true
       - type: bind
         source: "./files"
         target: "/storage/miso/files"
-        volume:
-          nocopy: true
+      - type: bind
+        source: "./logs"
+        target: "/storage/miso/log"
 
   nginx:
     image: nginx:1.15.12-alpine
+    restart: always
     ports:
       - "80:80"
+      - "443:443"
+    secrets:
+      - ssl_password
     volumes:
-      - "./nginx/http.conf:/etc/nginx/conf.d/default.conf:ro"
+      - type: bind
+        source: "./nginx/ssl.conf"
+        target: "/etc/nginx/conf.d/default.conf"
+        volume:
+          nocopy: true
+      - type: bind
+        source: "./nginx/self-sign-cert.sh"
+        target: "/self-sign-cert.sh"
+        volume:
+          nocopy: true
     links:
       - webapp
     depends_on:
       - webapp
-
+    command: ["sh", "-c", "./self-sign-cert.sh; nginx -g 'daemon off;'"]
 ```
+
 
 
 # Troubleshooting docker-compose files
 
-With docker-compose builds, the error that caused the problem is often not the last thing you see, but early on in the logs while one or more containers were starting.
+With docker-compose builds, the error that caused the problem is often not the 
+last thing you see, but early on in the logs while one or more containers were 
+starting.
 
 1. **The flyway-migration container is failing with a "Schema `lims` contains a
   failed migration to version 0790!" or  similar error.**
@@ -423,6 +630,26 @@ With docker-compose builds, the error that caused the problem is often not the l
     See the previous answer for how to destroy volumes, or delete the disk
     location where the database was bound.
 
+1. **MISO gives a 404 error on first startup with the database mounted to the 
+  host's disk, and the error says "java.sql.SQLException: Cannot create
+  PoolableConnectionFactory (Could not create connection to database server. 
+  Attempted reconnect 3 times. Giving up.)... Related cause:
+  org.springframework.beans.factory.BeanCreationException: Error creating bean 
+  with name 'dataSource': Invocation of init method failed; nested exception is
+  javax.naming.NameNotFoundException: Name [jdbc/MISODB] is not bound in this 
+  Context. Unable to find [jdbc]."**
+  
+    Sometimes when the database initialization process takes a considerable 
+    time, the webapp doesn't connect properly. To solve this, restart the 
+    `webapp` container. While docker-compose is still up, run the following in 
+    another terminal:
+    
+    ```
+    docker-compose restart webapp
+    ```
+    
+    The `webapp` container will restart in the original docker-compose window.
+    
 1. **You see both "/run/secrets/lims_password: Permission denied" and
   "[Note] Access denied for user 'tgaclims'@'192.168.144.3' (using password:
   YES)"**
@@ -503,8 +730,8 @@ With docker-compose builds, the error that caused the problem is often not the l
     initialized. Both services continue to re-try until the database is
     available. This is normal startup behaviour.
 
-1. **Flyway exits with "WARNING: DB: Trigger does not exist (SQL State: HY000
-  - Error Code: 1360)... WARNING: DB: Unknown table 'lims.CompletedPartitions'
+1. **Flyway exits with "WARNING: DB: Trigger does not exist (SQL State: HY000 - 
+  Error Code: 1360)... WARNING: DB: Unknown table 'lims.CompletedPartitions'
   (SQL State: 42S02 - Error Code: 1051)"**
 
     This is normal startup behaviour. True errors in Flyway will have an error
@@ -524,18 +751,19 @@ With docker-compose builds, the error that caused the problem is often not the l
     DELETE FROM SampleClass WHERE alias='Slide'
     ```
     
-  1. **MISO started with no errors but the page at http://localhost/miso says 
-    "Server not found" or "Proxy error".**
+1. **MISO started with no errors but the page at http://localhost/miso says 
+  "Server not found" or "Proxy error".**
+  
+    First, to check if the problem with with MISO or nginx, temporarily expose 
+    MISO's port by adding the following section to `webapp`:
     
-      First, to check if the problem with with MISO or nginx, temporarily expose 
-      MISO's port by adding the following section to `webapp`:
-      
-      ```
-      services:
-        webapp:
-            ports: 
-              - "8080:8080"
-      ```
-      Navigate to http://localhost:8080 to check if MISO is running. If it is,
-      the problem is with nginx. Ensure that all three ports in the compose file
+    ```
+    services:
+      webapp:
+          ports: 
+            - "8080:8080"
+    ```
+    Navigate to http://localhost:8080 to check if MISO is running. If it is,
+    the problem is with nginx. Ensure that all three ports in the compose file
       and `http.conf` file match each other.
+
