@@ -29,8 +29,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +36,8 @@ import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -82,40 +77,45 @@ public class EditProjectController {
 
   @GetMapping("/new")
   public ModelAndView setupForm(ModelMap model) throws IOException {
-    return setupForm(ProjectImpl.UNSAVED_ID, model);
+    model.put("title", "New Project");
+    return setupForm(new ProjectImpl(), model);
   }
 
   @GetMapping("/shortname/{shortName}")
   public ModelAndView byProjectShortName(@PathVariable String shortName, ModelMap model) throws IOException {
     Project project = projectService.getProjectByShortName(shortName);
-    if (project == null) throw new NotFoundException("No project found for shortname " + shortName);
-    return setupForm(project.getId(), model);
+    if (project == null) {
+      throw new NotFoundException("No project found for shortname " + shortName);
+    }
+    return setupForm(project, model);
   }
 
   @GetMapping("/{projectId}")
   public ModelAndView setupForm(@PathVariable Long projectId, ModelMap model) throws IOException {
-    List<Issue> issues = Collections.emptyList();
-    Project project = null;
-    if (projectId == ProjectImpl.UNSAVED_ID) {
-      project = new ProjectImpl();
-      model.put("title", "New Project");
-    } else {
-      project = projectService.get(projectId);
-      if (project == null) {
-        throw new NotFoundException("No project found for ID " + projectId.toString());
-      }
-      Collection<Subproject> subprojects = subprojectService.getByProjectId(projectId);
+    Project project = projectService.get(projectId);
+    if (project == null) {
+      throw new NotFoundException("No project found for ID " + projectId.toString());
+    }
+    return setupForm(project, model);
+  }
+
+  private ModelAndView setupForm(Project project, ModelMap model) throws IOException {
+    if (project.isSaved()) {
+      Collection<Subproject> subprojects = subprojectService.getByProjectId(project.getId());
       model.put("subprojects", Dtos.asSubprojectDtos(subprojects));
-      model.put("title", "Project " + projectId);
+      model.put("title", "Project " + project.getId());
+      List<Issue> issues = null;
       try {
         issues = issueTrackerManager.getIssuesByTag(project.getShortName());
       } catch (IOException e) {
         log.error("Error retrieving issues", e);
+        issues = Collections.emptyList();
       }
+
+      model.put("projectIssues", issues.stream().map(Dtos::asDto).collect(Collectors.toList()));
+      model.put("projectReportLinks", externalUriBuilder.getUris(project));
     }
 
-    model.put("projectIssues", issues.stream().map(Dtos::asDto).collect(Collectors.toList()));
-    model.put("projectReportLinks", externalUriBuilder.getUris(project));
     model.put("project", project);
 
     ObjectMapper mapper = new ObjectMapper();
@@ -131,20 +131,4 @@ public class EditProjectController {
     return new ModelAndView("/WEB-INF/pages/editProject.jsp", model);
   }
 
-  @PostMapping
-  public ModelAndView processSubmit(@ModelAttribute("project") Project project, ModelMap model, SessionStatus session,
-      HttpServletRequest request)
-      throws IOException {
-    try {
-      projectService.saveProject(project);
-      session.setComplete();
-      model.clear();
-      return new ModelAndView("redirect:/miso/project/" + project.getId(), model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save project", ex);
-      }
-      throw ex;
-    }
-  }
 }

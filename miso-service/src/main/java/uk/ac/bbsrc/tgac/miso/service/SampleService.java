@@ -9,16 +9,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface SampleService extends PaginatedDataSource<Sample>, BarcodableService<Sample>, DeleterService<Sample>, NoteService<Sample> {
+public interface SampleService
+    extends PaginatedDataSource<Sample>, BarcodableService<Sample>, DeleterService<Sample>, NoteService<Sample>, SaveService<Sample> {
 
   @Override
   default EntityType getEntityType() {
     return EntityType.SAMPLE;
   }
-
-  Long create(Sample sample) throws IOException;
-
-  void update(Sample sample) throws IOException;
 
   List<Sample> list() throws IOException;
 

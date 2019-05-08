@@ -7,8 +7,6 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface TissueOrigin extends Aliasable, Deletable, Serializable {
 
-  public static final long UNSAVED_ID = 0L;
-
   public void setAlias(String alias);
 
   public String getDescription();

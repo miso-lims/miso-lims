@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.net.URI;
 import java.util.List;
 
 import javax.persistence.EnumType;
@@ -20,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
     @JsonSubTypes.Type(value = DetailedLibraryDto.class, name = "Detailed"),
     @JsonSubTypes.Type(value = LibraryDto.class, name = "Plain") })
 @JsonTypeName(value = "Plain")
-public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
+public class LibraryDto extends AbstractBoxableDto {
 
   private String alias;
   private String concentration;
@@ -52,7 +51,6 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
   private String index2Label;
   private Long indexFamilyId;
   private String indexFamilyName;
-  private String url;
   private String volume;
   @Enumerated(EnumType.STRING)
   private VolumeUnit volumeUnits;
@@ -222,10 +220,6 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
     return qcs;
   }
 
-  public String getUrl() {
-    return url;
-  }
-
   public String getVolume() {
     return volume;
   }
@@ -356,10 +350,6 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
     this.qcs = qcs;
   }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
   public void setVolume(String volume) {
     this.volume = volume;
   }
@@ -430,11 +420,6 @@ public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setSpikeInDilutionFactor(String spikeInDilutionFactor) {
     this.spikeInDilutionFactor = spikeInDilutionFactor;
-  }
-
-  @Override
-  public void writeUrls(URI baseUri) {
-    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/library/{id}", getId()));
   }
 
 }

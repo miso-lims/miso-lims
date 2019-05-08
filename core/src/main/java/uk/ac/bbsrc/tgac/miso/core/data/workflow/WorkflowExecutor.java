@@ -17,13 +17,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
  */
 public interface WorkflowExecutor {
   /**
-   * Creates or updates a Pool
+   * Updates a Pool
    * 
    * @param pool
    * @return the updated Pool
    * @throws IOException
    */
-  Pool save(Pool pool) throws IOException;
+  Pool update(Pool pool) throws IOException;
 
   /**
    * Creates or updates a SequencerPartitionContainer

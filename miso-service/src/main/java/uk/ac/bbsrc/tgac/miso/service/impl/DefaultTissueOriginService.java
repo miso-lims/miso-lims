@@ -99,7 +99,7 @@ public class DefaultTissueOriginService implements TissueOriginService {
     Date now = new Date();
     tissueOrigin.setUpdatedBy(user);
 
-    if (tissueOrigin.getId() == TissueOrigin.UNSAVED_ID) {
+    if (!tissueOrigin.isSaved()) {
       tissueOrigin.setCreatedBy(user);
       if (tissueOrigin.getCreationDate() == null) {
         tissueOrigin.setCreationDate(now);

@@ -218,7 +218,7 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
   }
 
   @Override
-  public long save(Box box) throws IOException {
+  public long create(Box box) throws IOException {
     box.setChangeDetails(authorizationManager.getCurrentUser());
     if (box.getStorageLocation() != null) {
       box.setStorageLocation(storageLocationService.get(box.getStorageLocation().getId()));
@@ -226,104 +226,117 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
       box.setStorageLocation(null);
     }
     loadChildEntities(box);
-    if (!box.isSaved()) {
-      return saveNewBox(box);
+    return saveNewBox(box);
+  }
+
+  @Override
+  public long update(Box box) throws IOException {
+    box.setChangeDetails(authorizationManager.getCurrentUser());
+    if (box.getStorageLocation() != null) {
+      box.setStorageLocation(storageLocationService.get(box.getStorageLocation().getId()));
     } else {
-      Box managed = boxStore.get(box.getId());
-      logStorageChange(box, managed);
-      validateChange(box, managed);
-      applyChanges(box, managed);
-      StringBuilder message = new StringBuilder();
+      box.setStorageLocation(null);
+    }
+    loadChildEntities(box);
+    Box managed = boxStore.get(box.getId());
+    logStorageChange(box, managed);
+    validateChange(box, managed);
+    applyChanges(box, managed);
+    StringBuilder message = new StringBuilder();
 
-      // get persisted version of new box contents before change
-      List<BoxableId> ids = box.getBoxPositions().values()
-          .stream()
-          .map(BoxPosition::getBoxableId)
-          .collect(Collectors.toList());
-      Map<BoxableId, BoxableView> oldOccupants = boxStore.getBoxableViewsByIdList(ids)
-          .stream()
-          .collect(Collectors.toMap(BoxableView::getId, Functions.identity()));
+    // get persisted version of new box contents before change
+    List<BoxableId> ids = box.getBoxPositions().values()
+        .stream()
+        .map(BoxPosition::getBoxableId)
+        .collect(Collectors.toList());
+    Map<BoxableId, BoxableView> oldOccupants = boxStore.getBoxableViewsByIdList(ids)
+        .stream()
+        .collect(Collectors.toMap(BoxableView::getId, Functions.identity()));
 
-      // Process additions/moves
-      Set<BoxPosition> movedWithinBox = Sets.newHashSet();
-      List<BoxableView> movedFromOtherBoxes = new ArrayList<>();
-      for (Map.Entry<String, BoxPosition> entry : box.getBoxPositions().entrySet()) {
-        BoxPosition managedPos = managed.getBoxPositions().get(entry.getKey());
-        BoxPosition newPos = entry.getValue();
+    // Process additions/moves
+    Set<BoxPosition> movedWithinBox = Sets.newHashSet();
+    List<BoxableView> movedFromOtherBoxes = new ArrayList<>();
+    for (Map.Entry<String, BoxPosition> entry : box.getBoxPositions().entrySet()) {
+      BoxPosition managedPos = managed.getBoxPositions().get(entry.getKey());
+      BoxPosition newPos = entry.getValue();
 
-        if (managedPos != null && newPos.getBoxableId().equals(managedPos.getBoxableId())) {
-          // Unchanged
-          continue;
+      if (managedPos != null && newPos.getBoxableId().equals(managedPos.getBoxableId())) {
+        // Unchanged
+        continue;
+      }
+      if (message.length() > 0) {
+        message.append("\n");
+      }
+
+      BoxableView oldOccupant = oldOccupants.get(newPos.getBoxableId());
+      if (oldOccupant.getBoxId() != null) {
+        if (oldOccupant.getBoxId().longValue() == box.getId()) {
+          // Moved within same box
+          message.append(String.format("Relocated %s (%s) from %s to %s", oldOccupant.getAlias(), oldOccupant.getName(),
+              oldOccupant.getBoxPosition(), entry.getKey()));
+          movedWithinBox.add(newPos);
+        } else {
+          // Moved from a different box
+          Box oldBox = get(oldOccupant.getBoxId());
+          addBoxContentsChangeLog(oldBox, String.format("Removed %s (%s) to %s (%s)", oldOccupant.getAlias(), oldOccupant.getName(),
+              managed.getAlias(), managed.getName()));
+          message.append(String.format("Moved %s (%s) from %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(),
+              oldOccupant.getBoxAlias(), oldOccupant.getBoxName(), entry.getKey()));
+          movedFromOtherBoxes.add(oldOccupant);
         }
+      } else {
+        message.append(String.format("Added %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(), entry.getKey()));
+      }
+    }
+
+    // Process removals
+    List<BoxableId> removedIds = new ArrayList<>();
+    List<BoxableId> movedWithinBoxIds = movedWithinBox.stream().map(BoxPosition::getBoxableId).collect(Collectors.toList());
+    for (Map.Entry<String, BoxPosition> entry : managed.getBoxPositions().entrySet()) {
+      if (box.getBoxPositions().keySet().contains(entry.getKey())
+          && box.getBoxPositions().get(entry.getKey()).getBoxableId().equals(entry.getValue().getBoxableId())) {
+        // Already handled. Only checking for removals at this point
+        continue;
+      }
+      removedIds.add(entry.getValue().getBoxableId());
+    }
+    List<BoxableView> removed = boxStore.getBoxableViewsByIdList(removedIds);
+    for (BoxableView v : removed) {
+      if (!movedWithinBoxIds.contains(v.getId())) {
         if (message.length() > 0) {
           message.append("\n");
         }
-
-        BoxableView oldOccupant = oldOccupants.get(newPos.getBoxableId());
-        if (oldOccupant.getBoxId() != null) {
-          if (oldOccupant.getBoxId().longValue() == box.getId()) {
-            // Moved within same box
-            message.append(String.format("Relocated %s (%s) from %s to %s", oldOccupant.getAlias(), oldOccupant.getName(),
-                oldOccupant.getBoxPosition(), entry.getKey()));
-            movedWithinBox.add(newPos);
-          } else {
-            // Moved from a different box
-            Box oldBox = get(oldOccupant.getBoxId());
-            addBoxContentsChangeLog(oldBox, String.format("Removed %s (%s) to %s (%s)", oldOccupant.getAlias(), oldOccupant.getName(),
-                managed.getAlias(), managed.getName()));
-            message.append(String.format("Moved %s (%s) from %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(),
-                oldOccupant.getBoxAlias(), oldOccupant.getBoxName(), entry.getKey()));
-            movedFromOtherBoxes.add(oldOccupant);
-          }
-        } else {
-          message.append(String.format("Added %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(), entry.getKey()));
-        }
+        message.append(String.format("Removed %s (%s)", v.getAlias(), v.getName()));
       }
-
-      // Process removals
-      List<BoxableId> removedIds = new ArrayList<>();
-      List<BoxableId> movedWithinBoxIds = movedWithinBox.stream().map(BoxPosition::getBoxableId).collect(Collectors.toList());
-      for (Map.Entry<String, BoxPosition> entry : managed.getBoxPositions().entrySet()) {
-        if (box.getBoxPositions().keySet().contains(entry.getKey())
-            && box.getBoxPositions().get(entry.getKey()).getBoxableId().equals(entry.getValue().getBoxableId())) {
-          // Already handled. Only checking for removals at this point
-          continue;
-        }
-        removedIds.add(entry.getValue().getBoxableId());
-      }
-      List<BoxableView> removed = boxStore.getBoxableViewsByIdList(removedIds);
-      for (BoxableView v : removed) {
-        if (!movedWithinBoxIds.contains(v.getId())) {
-          if (message.length() > 0) {
-            message.append("\n");
-          }
-          message.append(String.format("Removed %s (%s)", v.getAlias(), v.getName()));
-        }
-      }
-
-      for (BoxableView v : movedFromOtherBoxes) {
-        boxStore.removeBoxableFromBox(v);
-      }
-      
-      movedWithinBox.forEach(bp -> managed.getBoxPositions().remove(bp.getPosition()));
-      removed.forEach(boxable -> managed.getBoxPositions().remove(boxable.getBoxPosition()));
-      if (!movedWithinBox.isEmpty() || !removed.isEmpty()) {
-        boxStore.save(managed);
-      }
-
-      for (String pos : box.getBoxPositions().keySet()) {
-        if (!managed.getBoxPositions().containsKey(pos)
-            || !managed.getBoxPositions().get(pos).getBoxableId().equals(box.getBoxPositions().get(pos).getBoxableId())) {
-          managed.getBoxPositions().put(pos, new BoxPosition(managed, pos, box.getBoxPositions().get(pos).getBoxableId()));
-        }
-      }
-
-      if (message.length() > 0) {
-        addBoxContentsChangeLog(managed, message.toString());
-      }
-      managed.setChangeDetails(authorizationManager.getCurrentUser());
-      return boxStore.save(managed);
     }
+
+    for (BoxableView v : movedFromOtherBoxes) {
+      boxStore.removeBoxableFromBox(v);
+    }
+
+    movedWithinBox.forEach(bp -> managed.getBoxPositions().remove(bp.getPosition()));
+    removed.forEach(boxable -> managed.getBoxPositions().remove(boxable.getBoxPosition()));
+    if (!movedWithinBox.isEmpty() || !removed.isEmpty()) {
+      boxStore.save(managed);
+    }
+
+    for (String pos : box.getBoxPositions().keySet()) {
+      if (!managed.getBoxPositions().containsKey(pos)
+          || !managed.getBoxPositions().get(pos).getBoxableId().equals(box.getBoxPositions().get(pos).getBoxableId())) {
+        managed.getBoxPositions().put(pos, new BoxPosition(managed, pos, box.getBoxPositions().get(pos).getBoxableId()));
+      }
+    }
+
+    if (message.length() > 0) {
+      addBoxContentsChangeLog(managed, message.toString());
+    }
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
+    return boxStore.save(managed);
+  }
+
+  @Override
+  public long save(Box box) throws IOException {
+    return box.isSaved() ? update(box) : create(box);
   }
 
   private void loadChildEntities(Box box) throws IOException {

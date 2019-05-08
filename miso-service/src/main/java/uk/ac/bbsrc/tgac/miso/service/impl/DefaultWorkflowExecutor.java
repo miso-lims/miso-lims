@@ -60,8 +60,8 @@ public class DefaultWorkflowExecutor implements WorkflowExecutor {
   BoxService boxService;
 
   @Override
-  public Pool save(Pool pool) throws IOException {
-    return poolService.get(poolService.save(pool));
+  public Pool update(Pool pool) throws IOException {
+    return poolService.get(poolService.update(pool));
   }
 
   @Override

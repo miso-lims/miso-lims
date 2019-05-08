@@ -32,6 +32,8 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
 
   private static final long serialVersionUID = 1L;
 
+  private static final long UNSAVED_ID = 0;
+
   @Enumerated(EnumType.STRING)
   private IlluminaChemistry chemistry;
 
@@ -53,7 +55,7 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long parametersId;
+  private long parametersId = UNSAVED_ID;
 
   @ManyToOne(targetEntity = InstrumentModel.class)
   @JoinColumn(name = "instrumentModelId")
@@ -193,6 +195,11 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
     } else {
       return thisSortKey - otherSortKey;
     }
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

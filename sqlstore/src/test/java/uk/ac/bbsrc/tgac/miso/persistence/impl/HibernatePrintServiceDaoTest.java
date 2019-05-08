@@ -57,7 +57,7 @@ public class HibernatePrintServiceDaoTest extends AbstractDAOTest {
     Printer printerOriginal = dao.get(1L);
     assertNotNull(printerOriginal);
     printerOriginal.setName(NEW_NAME);
-    assertTrue(dao.save(printerOriginal) != Printer.UNSAVED_ID);
+    assertTrue(dao.save(printerOriginal) > 0L);
     Printer printerFetched = dao.get(1L);
     assertNotNull(printerFetched);
     assertEquals(printerOriginal.getId(), printerFetched.getId());

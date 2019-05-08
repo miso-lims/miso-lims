@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -91,7 +90,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
-import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.service.AttachmentCategoryService;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
@@ -100,7 +98,7 @@ import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
-import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
@@ -138,7 +136,7 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private KitService kitService;
+  private KitDescriptorService kitService;
   @Autowired
   private IndexService indexService;
   @Autowired
@@ -260,15 +258,12 @@ public class MenuController implements ServletContextAware {
     this.servletContext = servletContext;
   }
 
-  private static <Model, Dto> void createArray(ObjectMapper mapper, URI baseUri, ObjectNode node, String name,
+  private static <Model, Dto> void createArray(ObjectMapper mapper, ObjectNode node, String name,
       Iterable<Model> items,
       Function<Model, Dto> asDto) {
     ArrayNode array = node.putArray(name);
     for (Model item : items) {
       Dto dto = asDto.apply(item);
-      if (dto instanceof WritableUrls) {
-        ((WritableUrls) dto).writeUrls(baseUri);
-      }
       JsonNode itemNode = mapper.valueToTree(dto);
       array.add(itemNode);
     }
@@ -282,7 +277,6 @@ public class MenuController implements ServletContextAware {
     if (constantsJs != null && (System.currentTimeMillis() - constantsJsTime) < 15 * 60 * 1000) {
       return ResponseEntity.ok().cacheControl(CacheControl.maxAge(15, TimeUnit.MINUTES)).body(constantsJs);
     }
-    URI baseUri = uriBuilder.build().toUri();
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode node = mapper.createObjectNode();
     node.put("isDetailedSample", detailedSample);
@@ -293,62 +287,62 @@ public class MenuController implements ServletContextAware {
 
     final Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
 
-    createArray(mapper, baseUri, node, "libraryDesigns", libraryDesignService.list(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "libraryTypes", libraryService.listLibraryTypes(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "librarySelections", libraryService.listLibrarySelectionTypes(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "libraryStrategies", libraryService.listLibraryStrategyTypes(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "libraryDesignCodes", libraryDesignCodeService.list(), Dtos::asDto);
+    createArray(mapper, node, "libraryDesigns", libraryDesignService.list(), Dtos::asDto);
+    createArray(mapper, node, "libraryTypes", libraryService.listLibraryTypes(), Dtos::asDto);
+    createArray(mapper, node, "librarySelections", libraryService.listLibrarySelectionTypes(), Dtos::asDto);
+    createArray(mapper, node, "libraryStrategies", libraryService.listLibraryStrategyTypes(), Dtos::asDto);
+    createArray(mapper, node, "libraryDesignCodes", libraryDesignCodeService.list(), Dtos::asDto);
     Set<Long> activePlatforms = sequencerService.list().stream().filter(Instrument::isActive)
         .map(sequencer -> sequencer.getInstrumentModel().getId())
         .collect(Collectors.toSet());
-    createArray(mapper, baseUri, node, "instrumentModels", instrumentModelService.list(), platform -> {
+    createArray(mapper, node, "instrumentModels", instrumentModelService.list(), platform -> {
       InstrumentModelDto dto = Dtos.asDto(platform);
       dto.setActive(activePlatforms.contains(platform.getId()));
       return dto;
     });
-    createArray(mapper, baseUri, node, "kitDescriptors", kitService.listKitDescriptors(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "sampleClasses", sampleClassService.getAll(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "sampleValidRelationships", relationships, Dtos::asDto);
-    createArray(mapper, baseUri, node, "detailedQcStatuses", detailedQcStatusService.getAll(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "sampleGroups", sampleGroupService.getAll(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "subprojects", subprojectService.getAll(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "labs", labService.getAll(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "tissueOrigins", tissueOriginService.getAll(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "tissueTypes", tissueTypeService.getAll(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "tissueMaterials", tissueMaterialService.getAll(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "stains", stainService.list(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "targetedSequencings", targetedSequencingService.list(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "samplePurposes", samplePurposeService.getAll(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "sequencingParameters", sequencingParametersService.getAll(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "printerBackends", Arrays.asList(Backend.values()), Dtos::asDto);
-    createArray(mapper, baseUri, node, "printerDrivers", Arrays.asList(Driver.values()), Dtos::asDto);
-    createArray(mapper, baseUri, node, "printerLayouts", Arrays.asList(Layout.values()), Dtos::asDto);
-    createArray(mapper, baseUri, node, "boxSizes", boxService.listSizes(), Function.identity());
-    createArray(mapper, baseUri, node, "boxUses", boxService.listUses(), Function.identity());
-    createArray(mapper, baseUri, node, "studyTypes", studyService.listTypes(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "sampleCategories", SampleClass.CATEGORIES, Function.identity());
-    createArray(mapper, baseUri, node, "submissionAction", Arrays.asList(SubmissionActionType.values()), SubmissionActionType::name);
-    createArray(mapper, baseUri, node, "containerModels", containerModelService.list(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "poreVersions", containerService.listPoreVersions(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "spikeIns", libraryService.listSpikeIns(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "attachmentCategories", attachmentCategoryService.list(), Dtos::asDto);
+    createArray(mapper, node, "kitDescriptors", kitService.list(), Dtos::asDto);
+    createArray(mapper, node, "sampleClasses", sampleClassService.getAll(), Dtos::asDto);
+    createArray(mapper, node, "sampleValidRelationships", relationships, Dtos::asDto);
+    createArray(mapper, node, "detailedQcStatuses", detailedQcStatusService.getAll(), Dtos::asDto);
+    createArray(mapper, node, "sampleGroups", sampleGroupService.getAll(), Dtos::asDto);
+    createArray(mapper, node, "subprojects", subprojectService.getAll(), Dtos::asDto);
+    createArray(mapper, node, "labs", labService.getAll(), Dtos::asDto);
+    createArray(mapper, node, "tissueOrigins", tissueOriginService.getAll(), Dtos::asDto);
+    createArray(mapper, node, "tissueTypes", tissueTypeService.getAll(), Dtos::asDto);
+    createArray(mapper, node, "tissueMaterials", tissueMaterialService.getAll(), Dtos::asDto);
+    createArray(mapper, node, "stains", stainService.list(), Dtos::asDto);
+    createArray(mapper, node, "targetedSequencings", targetedSequencingService.list(), Dtos::asDto);
+    createArray(mapper, node, "samplePurposes", samplePurposeService.getAll(), Dtos::asDto);
+    createArray(mapper, node, "sequencingParameters", sequencingParametersService.getAll(), Dtos::asDto);
+    createArray(mapper, node, "printerBackends", Arrays.asList(Backend.values()), Dtos::asDto);
+    createArray(mapper, node, "printerDrivers", Arrays.asList(Driver.values()), Dtos::asDto);
+    createArray(mapper, node, "printerLayouts", Arrays.asList(Layout.values()), Dtos::asDto);
+    createArray(mapper, node, "boxSizes", boxService.listSizes(), Function.identity());
+    createArray(mapper, node, "boxUses", boxService.listUses(), Function.identity());
+    createArray(mapper, node, "studyTypes", studyService.listTypes(), Dtos::asDto);
+    createArray(mapper, node, "sampleCategories", SampleClass.CATEGORIES, Function.identity());
+    createArray(mapper, node, "submissionAction", Arrays.asList(SubmissionActionType.values()), SubmissionActionType::name);
+    createArray(mapper, node, "containerModels", containerModelService.list(), Dtos::asDto);
+    createArray(mapper, node, "poreVersions", containerService.listPoreVersions(), Dtos::asDto);
+    createArray(mapper, node, "spikeIns", libraryService.listSpikeIns(), Dtos::asDto);
+    createArray(mapper, node, "attachmentCategories", attachmentCategoryService.list(), Dtos::asDto);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);
-    createArray(mapper, baseUri, node, "indexFamilies", indexFamilies, Dtos::asDto);
-    createArray(mapper, baseUri, node, "qcTypes", qcService.listQcTypes(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "qcTargets", Arrays.asList(QcTarget.values()), Dtos::asDto);
-    createArray(mapper, baseUri, node, "concentrationUnits", Arrays.asList(ConcentrationUnit.values()), Dtos::asDto);
-    createArray(mapper, baseUri, node, "volumeUnits", Arrays.asList(VolumeUnit.values()), Dtos::asDto);
-    createArray(mapper, baseUri, node, "partitionQcTypes", partitionQCService.listTypes(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "referenceGenomes", referenceGenomeService.listAllReferenceGenomeTypes(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "spreadsheetFormats", Arrays.asList(SpreadSheetFormat.values()), Dtos::asDto);
-    createArray(mapper, baseUri, node, "sampleSpreadsheets", Arrays.asList(SampleSpreadSheets.values()), Dtos::asDto);
-    createArray(mapper, baseUri, node, "librarySpreadsheets", Arrays.asList(LibrarySpreadSheets.values()), Dtos::asDto);
-    createArray(mapper, baseUri, node, "libraryDilutionSpreadsheets", Arrays.asList(LibraryDilutionSpreadSheets.values()), Dtos::asDto);
-    createArray(mapper, baseUri, node, "poolSpreadsheets", Arrays.asList(PoolSpreadSheets.values()), Dtos::asDto);
-    createArray(mapper, baseUri, node, "partitionSpreadsheets", Arrays.asList(PartitionSpreadsheets.values()), Dtos::asDto);
-    createArray(mapper, baseUri, node, "workflows", Arrays.asList(WorkflowName.values()), Dtos::asDto);
+    createArray(mapper, node, "indexFamilies", indexFamilies, Dtos::asDto);
+    createArray(mapper, node, "qcTypes", qcService.listQcTypes(), Dtos::asDto);
+    createArray(mapper, node, "qcTargets", Arrays.asList(QcTarget.values()), Dtos::asDto);
+    createArray(mapper, node, "concentrationUnits", Arrays.asList(ConcentrationUnit.values()), Dtos::asDto);
+    createArray(mapper, node, "volumeUnits", Arrays.asList(VolumeUnit.values()), Dtos::asDto);
+    createArray(mapper, node, "partitionQcTypes", partitionQCService.listTypes(), Dtos::asDto);
+    createArray(mapper, node, "referenceGenomes", referenceGenomeService.listAllReferenceGenomeTypes(), Dtos::asDto);
+    createArray(mapper, node, "spreadsheetFormats", Arrays.asList(SpreadSheetFormat.values()), Dtos::asDto);
+    createArray(mapper, node, "sampleSpreadsheets", Arrays.asList(SampleSpreadSheets.values()), Dtos::asDto);
+    createArray(mapper, node, "librarySpreadsheets", Arrays.asList(LibrarySpreadSheets.values()), Dtos::asDto);
+    createArray(mapper, node, "libraryDilutionSpreadsheets", Arrays.asList(LibraryDilutionSpreadSheets.values()), Dtos::asDto);
+    createArray(mapper, node, "poolSpreadsheets", Arrays.asList(PoolSpreadSheets.values()), Dtos::asDto);
+    createArray(mapper, node, "partitionSpreadsheets", Arrays.asList(PartitionSpreadsheets.values()), Dtos::asDto);
+    createArray(mapper, node, "workflows", Arrays.asList(WorkflowName.values()), Dtos::asDto);
 
     ArrayNode platformTypes = node.putArray("platformTypes");
     Collection<PlatformType> activePlatformTypes = instrumentModelService.listActivePlatformTypes();

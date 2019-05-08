@@ -70,7 +70,6 @@ public class SampleClassController extends RestController {
       throw new RestException("No sample class found with ID: " + id, Status.UNAUTHORIZED);
     } else {
       SampleClassDto dto = Dtos.asDto(sampleClass);
-      dto.writeUrls(uriBuilder);
       return dto;
     }
   }
@@ -82,7 +81,6 @@ public class SampleClassController extends RestController {
       throws IOException {
     return sampleClassService.getAll().stream().map(sc -> {
       SampleClassDto dto = Dtos.asDto(sc);
-      dto.writeUrls(uriBuilder);
       return dto;
     }).collect(Collectors.toSet());
   }

@@ -794,25 +794,21 @@ public class BoxRestController extends RestController {
 
   @PostMapping(value = "/box", produces = "application/json")
   @ResponseBody
-  public BoxDto createBox(@RequestBody BoxDto box, UriComponentsBuilder uriBuilder, HttpServletResponse response)
+  public BoxDto createBox(@RequestBody BoxDto dto)
       throws IOException {
-    Box boxObj = Dtos.to(box);
-    Long id = boxService.save(boxObj);
-    return Dtos.asDto(boxService.get(id), false);
+    return RestUtils.createObject("Box", dto, Dtos::to, boxService, box -> Dtos.asDto(box, false));
   }
 
   @PutMapping(value = "/box/{boxId}", produces = "application/json")
   @ResponseBody
-  public BoxDto updateBox(@PathVariable Long boxId, @RequestBody BoxDto box) throws IOException {
-    if (box.getId() == null || !box.getId().equals(boxId)) {
-      throw new RestException("Invalid Box ID", Status.BAD_REQUEST);
-    }
+  public BoxDto updateBox(@PathVariable long boxId, @RequestBody BoxDto dto) throws IOException {
     Box original = getBox(boxId);
-    Box b = Dtos.to(box);
-    // reset contents in-case they were changed while the box was being edited
-    b.setBoxPositions(original.getBoxPositions());
-    boxService.save(b);
-    return Dtos.asDto(boxService.get(boxId), false);
+    return RestUtils.updateObject("Box", boxId, dto, d -> {
+      Box box = Dtos.to(d);
+      // reset contents in-case they were changed while the box was being edited
+      box.setBoxPositions(original.getBoxPositions());
+      return box;
+    }, boxService, box -> Dtos.asDto(box, false));
   }
 
   @PostMapping(value = "/boxes/bulk-delete")

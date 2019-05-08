@@ -104,7 +104,6 @@ public class EditLibraryTemplateController {
       ModelMap model) throws IOException {
 
     LibraryTemplateDto dto = (isDetailedSampleEnabled() ? new DetailedLibraryTemplateDto() : new LibraryTemplateDto());
-    dto.setId(LibraryTemplate.UNSAVED_ID);
     if (projectId != null) {
       List<Long> projectIds = new ArrayList<>();
       projectIds.add(projectId);

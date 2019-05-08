@@ -25,7 +25,7 @@ public class LabImpl implements Lab {
 
   private static final long serialVersionUID = 1L;
 
-  public static final long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   @Id
   @Column(name = "labId")
@@ -139,6 +139,11 @@ public class LabImpl implements Lab {
   @Override
   public String getDeleteDescription() {
     return getAlias() + " (" + getInstitute().getAlias() + ")";
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

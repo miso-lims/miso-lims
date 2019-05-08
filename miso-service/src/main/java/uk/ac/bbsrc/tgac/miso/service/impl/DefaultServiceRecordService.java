@@ -57,12 +57,12 @@ public class DefaultServiceRecordService implements ServiceRecordService {
   }
 
   @Override
-  public void update(ServiceRecord record) throws IOException {
+  public long update(ServiceRecord record) throws IOException {
     ServiceRecord managed = get(record.getId());
     record.setInstrument(instrumentService.get(managed.getInstrument().getId()));
     validateChange(record, managed);
     applyRecordChanges(managed, record);
-    serviceRecordDao.save(managed);
+    return serviceRecordDao.save(managed);
   }
 
   private void applyRecordChanges(ServiceRecord target, ServiceRecord source) {

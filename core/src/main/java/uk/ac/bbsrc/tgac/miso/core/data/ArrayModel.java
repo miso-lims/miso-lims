@@ -13,12 +13,12 @@ public class ArrayModel implements Serializable, Aliasable {
 
   private static final long serialVersionUID = 1L;
 
-  public static final long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   @Id
   @Column(name = "arrayModelId")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+  private long id = UNSAVED_ID;
   private String alias;
   private int rows;
   private int columns;
@@ -56,6 +56,11 @@ public class ArrayModel implements Serializable, Aliasable {
 
   public void setColumns(int columns) {
     this.columns = columns;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() == UNSAVED_ID;
   }
 
 }

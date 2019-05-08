@@ -33,7 +33,6 @@ public class DefaultPrinterService implements PrinterService {
   @Override
   public long create(Printer printer) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    printer.setId(Printer.UNSAVED_ID);
     return printerStore.save(printer);
   }
 

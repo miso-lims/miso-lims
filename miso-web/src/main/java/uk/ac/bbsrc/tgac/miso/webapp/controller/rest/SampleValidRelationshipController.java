@@ -69,7 +69,6 @@ public class SampleValidRelationshipController extends RestController {
       throw new RestException("No sample valid relationship found with ID: " + id, Status.NOT_FOUND);
     } else {
       SampleValidRelationshipDto dto = Dtos.asDto(sampleValidRelationship);
-      dto.writeUrls(uriBuilder);
       return dto;
     }
   }
@@ -80,9 +79,6 @@ public class SampleValidRelationshipController extends RestController {
       throws IOException {
     Set<SampleValidRelationship> sampleValidRelationships = sampleValidRelationshipService.getAll();
     Set<SampleValidRelationshipDto> sampleValidRelationshipDtos = Dtos.asSampleValidRelationshipDtos(sampleValidRelationships);
-    for (SampleValidRelationshipDto sampleValidRelationshipDto : sampleValidRelationshipDtos) {
-      sampleValidRelationshipDto.writeUrls(uriBuilder);
-    }
     return sampleValidRelationshipDtos;
   }
 

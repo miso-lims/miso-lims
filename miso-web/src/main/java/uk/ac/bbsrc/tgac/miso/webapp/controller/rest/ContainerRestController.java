@@ -56,6 +56,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PartitionSpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -187,38 +188,31 @@ public class ContainerRestController extends RestController {
 
   @PostMapping
   public @ResponseBody ContainerDto create(@RequestBody ContainerDto dto) throws IOException {
-    if (dto.getId() != null) {
-      throw new RestException("Container appears to have been created already", Status.BAD_REQUEST);
-    }
-    SequencerPartitionContainer container = Dtos.to(dto);
-    if (container.getModel() == null) {
+    if (dto.getModel() == null || dto.getModel().getId() == null) {
       throw new RestException("Container model not specified", Status.BAD_REQUEST);
     }
-    container.setModel(containerModelService.get(container.getModel().getId()));
-    if (container.getModel() == null) {
+    SequencingContainerModel model = containerModelService.get(dto.getModel().getId());
+    if (model == null) {
       throw new RestException("Invalid container model", Status.BAD_REQUEST);
     }
-    container.setPartitionLimit(container.getModel().getPartitionCount());
-
-    SequencerPartitionContainer saved = containerService.save(container);
-    return Dtos.asDto(saved);
+    return RestUtils.createObject("Container", dto, d -> {
+      SequencerPartitionContainer container = Dtos.to(d);
+      container.setModel(model);
+      container.setPartitionLimit(model.getPartitionCount());
+      return container;
+    }, containerService, Dtos::asDto);
 
   }
 
   @PutMapping("/{containerId}")
-  public @ResponseBody ContainerDto update(@PathVariable Long containerId, @RequestBody ContainerDto dto) throws IOException {
-    if (containerId == null || !dto.getId().equals(containerId)) {
-      throw new RestException("Invalid container ID", Status.BAD_REQUEST);
-    }
+  public @ResponseBody ContainerDto update(@PathVariable long containerId, @RequestBody ContainerDto dto) throws IOException {
     SequencerPartitionContainer original = containerService.get(containerId);
-    if (original == null) {
-      throw new RestException("Container not found", Status.NOT_FOUND);
-    }
-    SequencerPartitionContainer container = Dtos.to(dto);
-    // reset partitions since they're not intended to be modified by this method
-    container.setPartitions(original.getPartitions());
-    SequencerPartitionContainer saved = containerService.save(container);
-    return Dtos.asDto(saved);
+    return RestUtils.updateObject("Container", containerId, dto, d -> {
+      SequencerPartitionContainer container = Dtos.to(d);
+      // reset partitions since they're not intended to be modified by this method
+      container.setPartitions(original.getPartitions());
+      return container;
+    }, containerService, Dtos::asDto);
   }
 
 }

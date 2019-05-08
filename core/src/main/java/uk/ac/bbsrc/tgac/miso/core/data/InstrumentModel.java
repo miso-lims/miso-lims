@@ -51,7 +51,7 @@ public class InstrumentModel implements Comparable<InstrumentModel>, Identifiabl
 
   private static final long serialVersionUID = 1L;
 
-  public static final Long UNSAVED_ID = 0L;
+  private static final Long UNSAVED_ID = 0L;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "platform")
@@ -181,6 +181,11 @@ public class InstrumentModel implements Comparable<InstrumentModel>, Identifiabl
 
   public void setDataManglingPolicy(InstrumentDataManglingPolicy dataManglingPolicy) {
     this.dataManglingPolicy = dataManglingPolicy;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

@@ -28,10 +28,7 @@ import java.util.Collection;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 
-public interface ProjectService extends ProviderService<Project> {
-
-  // SAVES
-  public long saveProject(Project project) throws IOException;
+public interface ProjectService extends SaveService<Project> {
 
 
   // GETS

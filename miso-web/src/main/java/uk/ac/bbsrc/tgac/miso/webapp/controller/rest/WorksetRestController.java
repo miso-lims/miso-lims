@@ -90,24 +90,13 @@ public class WorksetRestController extends RestController {
 
   @PostMapping
   public @ResponseBody WorksetDto createWorkset(@RequestBody WorksetDto dto) throws IOException {
-    return doSave(dto);
+    return RestUtils.createObject("Workset", dto, Dtos::to, worksetService, Dtos::asDto);
   }
 
   @PutMapping(value = "/{worksetId}")
   public @ResponseBody WorksetDto updateWorkset(@RequestBody WorksetDto dto,
       @PathVariable(value = "worksetId", required = true) long worksetId) throws IOException {
-    if (dto.getId().longValue() != worksetId) {
-      throw new RestException("Workset ID mismatch", Status.BAD_REQUEST);
-    }
-    // call to make sure it exists or throw not found
-    getWorkset(worksetId);
-    return doSave(dto);
-  }
-
-  private WorksetDto doSave(WorksetDto dto) throws IOException {
-    Workset workset = Dtos.to(dto);
-    long savedId = worksetService.save(workset);
-    return Dtos.asDto(worksetService.get(savedId));
+    return RestUtils.updateObject("Workset", worksetId, dto, Dtos::to, worksetService, Dtos::asDto);
   }
 
   @PostMapping(value = "/{worksetId}/samples")
@@ -116,7 +105,7 @@ public class WorksetRestController extends RestController {
       throws IOException {
     Workset workset = getWorkset(worksetId);
     addByIds("Sample", workset.getSamples(), sampleIds, WhineyFunction.rethrow(id -> sampleService.get(id)));
-    worksetService.save(workset);
+    worksetService.update(workset);
   }
 
   @PostMapping(value = "/{worksetId}/libraries")
@@ -125,7 +114,7 @@ public class WorksetRestController extends RestController {
       throws IOException {
     Workset workset = getWorkset(worksetId);
     addByIds("Library", workset.getLibraries(), libraryIds, WhineyFunction.rethrow(id -> libraryService.get(id)));
-    worksetService.save(workset);
+    worksetService.update(workset);
   }
 
   @PostMapping(value = "/{worksetId}/dilutions")
@@ -134,7 +123,7 @@ public class WorksetRestController extends RestController {
       throws IOException {
     Workset workset = getWorkset(worksetId);
     addByIds("Dilution", workset.getDilutions(), dilutionIds, WhineyFunction.rethrow(id -> dilutionService.get(id)));
-    worksetService.save(workset);
+    worksetService.update(workset);
   }
 
   @DeleteMapping("/{worksetId}/samples")
@@ -143,7 +132,7 @@ public class WorksetRestController extends RestController {
       throws IOException {
     Workset workset = getWorkset(worksetId);
     removeByIds("Sample", workset.getSamples(), sampleIds);
-    worksetService.save(workset);
+    worksetService.update(workset);
   }
 
   @DeleteMapping("/{worksetId}/libraries")
@@ -152,7 +141,7 @@ public class WorksetRestController extends RestController {
       throws IOException {
     Workset workset = getWorkset(worksetId);
     removeByIds("Library", workset.getLibraries(), libraryIds);
-    worksetService.save(workset);
+    worksetService.update(workset);
   }
 
   @DeleteMapping("/{worksetId}/dilutions")
@@ -161,7 +150,7 @@ public class WorksetRestController extends RestController {
       throws IOException {
     Workset workset = getWorkset(worksetId);
     removeByIds("Dilution", workset.getDilutions(), dilutionIds);
-    worksetService.save(workset);
+    worksetService.update(workset);
   }
 
   private Workset getWorkset(long id) throws IOException {
@@ -247,7 +236,7 @@ public class WorksetRestController extends RestController {
       workset.getLibraries().addAll(child.getLibraries());
       workset.getDilutions().addAll(child.getDilutions());
     }
-    worksetService.save(workset);
+    worksetService.create(workset);
     return Dtos.asDto(workset);
   }
 

@@ -39,13 +39,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -351,7 +346,7 @@ public class ValueTypeLookup {
    * @param subproject the new (already saved) Subproject
    */
   public void addSubproject(Subproject subproject) {
-    if (subproject.getId() == SubprojectImpl.UNSAVED_ID || subproject.getAlias() == null)
+    if (!subproject.isSaved() || subproject.getAlias() == null)
       throw new IllegalArgumentException("Subproject is not saved");
     subprojectById.put(subproject.getId(), subproject);
     subprojectByAlias.put(subproject.getAlias(), subproject);
@@ -443,7 +438,7 @@ public class ValueTypeLookup {
   @VisibleForTesting
   TissueMaterial resolve(TissueMaterial tissueMaterial) {
     if (tissueMaterial == null) return null;
-    if (tissueMaterial.getId() != TissueMaterialImpl.UNSAVED_ID) return tissueMaterialById.get(tissueMaterial.getId());
+    if (tissueMaterial.isSaved()) return tissueMaterialById.get(tissueMaterial.getId());
     if (tissueMaterial.getAlias() != null) return tissueMaterialByAlias.get(tissueMaterial.getAlias());
     return null;
   }
@@ -480,7 +475,7 @@ public class ValueTypeLookup {
   @VisibleForTesting
   SamplePurpose resolve(SamplePurpose samplePurpose) {
     if (samplePurpose == null) return null;
-    if (samplePurpose.getId() != SamplePurposeImpl.UNSAVED_ID) return samplePurposeById.get(samplePurpose.getId());
+    if (samplePurpose.isSaved()) return samplePurposeById.get(samplePurpose.getId());
     if (samplePurpose.getAlias() != null) return samplePurposeByAlias.get(samplePurpose.getAlias());
     return null;
   }
@@ -501,17 +496,17 @@ public class ValueTypeLookup {
   @VisibleForTesting
   Lab resolve(Lab lab) {
     if (lab == null) return null;
-    if (lab.getId() != LabImpl.UNSAVED_ID) return labsById.get(lab.getId());
+    if (lab.isSaved()) return labsById.get(lab.getId());
     if (lab.getInstitute() != null) {
-      long instId = lab.getInstitute().getId();
-      if (instId == InstituteImpl.UNSAVED_ID && lab.getInstitute().getAlias() != null) {
+      Institute inst = lab.getInstitute();
+      if (!lab.getInstitute().isSaved() && lab.getInstitute().getAlias() != null) {
         Institute i = institutesByAlias.get(lab.getInstitute().getAlias());
-        if (i != null) instId = i.getId();
+        if (i != null) inst = i;
       }
-      if (instId != InstituteImpl.UNSAVED_ID) {
+      if (inst.isSaved()) {
         String labAlias = lab.getAlias();
         if (labAlias == null) labAlias = UNSPECIFIED_LAB;
-        Map<String, Lab> labsByAlias = labsByInstituteId.get(instId);
+        Map<String, Lab> labsByAlias = labsByInstituteId.get(inst.getId());
         if (labsByAlias == null) return null;
         return labsByAlias.get(labAlias);
       }
@@ -533,7 +528,7 @@ public class ValueTypeLookup {
    */
   public TissueOrigin resolve(TissueOrigin tissueOrigin) {
     if (tissueOrigin == null) return null;
-    if (tissueOrigin.getId() != TissueOrigin.UNSAVED_ID) return tissueOriginsById.get(tissueOrigin.getId());
+    if (tissueOrigin.isSaved()) return tissueOriginsById.get(tissueOrigin.getId());
     if (tissueOrigin.getAlias() != null) {
       TissueOrigin byAlias = tissueOriginsByAlias.get(tissueOrigin.getAlias());
       if (byAlias != null) return byAlias;
@@ -655,7 +650,7 @@ public class ValueTypeLookup {
   @VisibleForTesting
   Index resolve(Index index) {
     if (index == null) return null;
-    if (index.getId() != Index.UNSAVED_ID) return indexById.get(index.getId());
+    if (index.isSaved()) return indexById.get(index.getId());
     if (index.getFamily() != null && index.getFamily().getName() != null && index.getSequence() != null) {
       Map<String, Index> mapBySequence = indexByFamilyAndSequence.get(index.getFamily().getName());
       return mapBySequence == null ? null : mapBySequence.get(index.getSequence());
@@ -676,7 +671,7 @@ public class ValueTypeLookup {
    */
   public QcType resolveForSample(QcType qcType) {
     if (qcType == null) return null;
-    if (qcType.getId() != QcType.UNSAVED_ID) return sampleQcTypeById.get(qcType.getId());
+    if (qcType.isSaved()) return sampleQcTypeById.get(qcType.getId());
     if (qcType.getName() != null) return sampleQcTypeByName.get(qcType.getName());
     return null;
   }
@@ -693,7 +688,7 @@ public class ValueTypeLookup {
    */
   public QcType resolveForLibrary(QcType qcType) {
     if (qcType == null) return null;
-    if (qcType.getId() != QcType.UNSAVED_ID) return libraryQcTypeById.get(qcType.getId());
+    if (qcType.isSaved()) return libraryQcTypeById.get(qcType.getId());
     if (qcType.getName() != null) return libraryQcTypeByName.get(qcType.getName());
     return null;
   }
@@ -712,7 +707,7 @@ public class ValueTypeLookup {
   @VisibleForTesting
   Instrument resolve(Instrument instrument) {
     if (instrument == null) return null;
-    if (instrument.getId() != Index.UNSAVED_ID) return instrumentById.get(instrument.getId());
+    if (instrument.isSaved()) return instrumentById.get(instrument.getId());
     if (instrument.getName() != null) return instrumentByName.get(instrument.getName());
     return null;
   }
@@ -731,7 +726,7 @@ public class ValueTypeLookup {
   @VisibleForTesting
   Subproject resolve(Subproject subproject) {
     if (subproject == null) return null;
-    if (subproject.getId() != SubprojectImpl.UNSAVED_ID) return subprojectById.get(subproject.getId());
+    if (subproject.isSaved()) return subprojectById.get(subproject.getId());
     if (subproject.getAlias() != null) return subprojectByAlias.get(subproject.getAlias());
     return null;
   }

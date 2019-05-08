@@ -15,16 +15,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface LibraryService
-    extends PaginatedDataSource<Library>, BarcodableService<Library>, DeleterService<Library>, NoteService<Library> {
+    extends PaginatedDataSource<Library>, BarcodableService<Library>, DeleterService<Library>, NoteService<Library>, SaveService<Library> {
 
   @Override
   default EntityType getEntityType() {
     return EntityType.LIBRARY;
   }
-
-  Long create(Library library) throws IOException;
-
-  void update(Library library) throws IOException;
 
   int count() throws IOException;
 

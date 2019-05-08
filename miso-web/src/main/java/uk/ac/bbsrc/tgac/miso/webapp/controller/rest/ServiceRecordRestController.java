@@ -48,24 +48,12 @@ public class ServiceRecordRestController extends RestController {
 
   @PostMapping
   public @ResponseBody ServiceRecordDto create(@RequestBody ServiceRecordDto dto) throws IOException {
-    ServiceRecord record = Dtos.to(dto);
-    if (record.isSaved()) {
-      throw new RestException("Record already exists", Status.BAD_REQUEST);
-    }
-    long savedId = serviceRecordService.create(record);
-    return Dtos.asDto(serviceRecordService.get(savedId));
+    return RestUtils.createObject("Service record", dto, Dtos::to, serviceRecordService, Dtos::asDto);
   }
 
   @PutMapping("/{recordId}")
   public @ResponseBody ServiceRecordDto update(@PathVariable long recordId, @RequestBody ServiceRecordDto dto) throws IOException {
-    ServiceRecord record = Dtos.to(dto);
-    if (record.getId() != recordId) {
-      throw new RestException("Record ID mismatch", Status.BAD_REQUEST);
-    } else if (serviceRecordService.get(recordId) == null) {
-      throw new RestException("Service record " + recordId + " not found", Status.NOT_FOUND);
-    }
-    serviceRecordService.update(record);
-    return Dtos.asDto(serviceRecordService.get(recordId));
+    return RestUtils.updateObject("Service record", recordId, dto, Dtos::to, serviceRecordService, Dtos::asDto);
   }
 
 }

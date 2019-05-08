@@ -89,7 +89,6 @@ public class SubprojectController extends RestController {
       throw new RestException("No subproject found with ID: " + id, Status.NOT_FOUND);
     } else {
       SubprojectDto dto = Dtos.asDto(subproject);
-      dto.writeUrls(uriBuilder);
       return dto;
     }
   }
@@ -99,9 +98,6 @@ public class SubprojectController extends RestController {
   public Set<SubprojectDto> getSubprojects(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<Subproject> subprojects = subprojectService.getAll();
     Set<SubprojectDto> subprojectDtos = Dtos.asSubprojectDtos(subprojects);
-    for (SubprojectDto subprojectDto : subprojectDtos) {
-      subprojectDto.writeUrls(uriBuilder);
-    }
     return subprojectDtos;
   }
 

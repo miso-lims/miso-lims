@@ -24,6 +24,8 @@ public class TissueOriginImpl implements TissueOrigin {
 
   private static final long serialVersionUID = 1L;
 
+  private static final long UNSAVED_ID = 0;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long tissueOriginId = UNSAVED_ID;
@@ -142,6 +144,11 @@ public class TissueOriginImpl implements TissueOrigin {
   @Override
   public String getDeleteDescription() {
     return getItemLabel();
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

@@ -105,37 +105,42 @@ public class DefaultProjectService implements ProjectService {
   }
 
   @Override
-  public long saveProject(Project project) throws IOException {
+  public long create(Project project) throws IOException {
     ValidationResult shortNameValidation = namingScheme.validateProjectShortName(project.getShortName());
     if (!shortNameValidation.isValid()) {
       throw new ValidationException(new ValidationError("shortName", shortNameValidation.getMessage()));
     }
-    if (!project.isSaved()) {
-      project.setName(generateTemporaryName());
-      projectStore.save(project);
-      try {
-        project.setName(namingScheme.generateNameFor(project));
-      } catch (MisoNamingException e) {
-        throw new ValidationException(new ValidationError("name", e.getMessage()));
-      }
-      validateNameOrThrow(project, namingScheme);
-    } else {
-      Project original = projectStore.get(project.getId());
-      original.setAlias(project.getAlias());
-      original.setDescription(project.getDescription());
-      original.setLastUpdated(new Date());
-      original.setProgress(project.getProgress());
-      original.setReferenceGenome(referenceGenomeDao.getReferenceGenome(project.getReferenceGenome().getId()));
-      if (project.getDefaultTargetedSequencing() != null) {
-        original.setDefaultTargetedSequencing(targetedSequencingStore.get(project.getDefaultTargetedSequencing().getId()));
-      } else {
-        original.setDefaultTargetedSequencing(null);
-      }
-      original.setShortName(project.getShortName());
-      project = original;
+    project.setName(generateTemporaryName());
+    projectStore.save(project);
+    try {
+      project.setName(namingScheme.generateNameFor(project));
+    } catch (MisoNamingException e) {
+      throw new ValidationException(new ValidationError("name", e.getMessage()));
     }
-    long id = projectStore.save(project);
-    return id;
+    validateNameOrThrow(project, namingScheme);
+    return projectStore.save(project);
+  }
+
+  @Override
+  public long update(Project project) throws IOException {
+    ValidationResult shortNameValidation = namingScheme.validateProjectShortName(project.getShortName());
+    if (!shortNameValidation.isValid()) {
+      throw new ValidationException(new ValidationError("shortName", shortNameValidation.getMessage()));
+    }
+    Project original = projectStore.get(project.getId());
+    original.setAlias(project.getAlias());
+    original.setDescription(project.getDescription());
+    original.setLastUpdated(new Date());
+    original.setProgress(project.getProgress());
+    original.setReferenceGenome(referenceGenomeDao.getReferenceGenome(project.getReferenceGenome().getId()));
+    if (project.getDefaultTargetedSequencing() != null) {
+      original.setDefaultTargetedSequencing(targetedSequencingStore.get(project.getDefaultTargetedSequencing().getId()));
+    } else {
+      original.setDefaultTargetedSequencing(null);
+    }
+    original.setShortName(project.getShortName());
+    project = original;
+    return projectStore.save(project);
   }
 
   public void setNamingScheme(NamingScheme namingScheme) {

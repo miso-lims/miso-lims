@@ -48,7 +48,7 @@ public abstract class AbstractInstrument implements Instrument {
 
   private static final long serialVersionUID = 1L;
 
-  public static final Long UNSAVED_ID = 0L;
+  private static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -283,6 +283,11 @@ public abstract class AbstractInstrument implements Instrument {
       if (other.upgradedInstrument != null) return false;
     } else if (!upgradedInstrument.equals(other.upgradedInstrument)) return false;
     return true;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

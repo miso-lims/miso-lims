@@ -124,7 +124,7 @@ public class HibernatePrinterDao implements PrinterStore, HibernatePaginatedData
 
   @Override
   public long save(Printer t) throws IOException {
-    if (t.getId() == Printer.UNSAVED_ID) {
+    if (!t.isSaved()) {
       return (Long) currentSession().save(t);
     } else {
       currentSession().update(t);

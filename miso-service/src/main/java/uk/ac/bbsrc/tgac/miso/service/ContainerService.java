@@ -11,7 +11,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface ContainerService extends PaginatedDataSource<SequencerPartitionContainer>, BarcodableService<SequencerPartitionContainer>,
-    DeleterService<SequencerPartitionContainer> {
+    DeleterService<SequencerPartitionContainer>, SaveService<SequencerPartitionContainer> {
   @Override
   default EntityType getEntityType() {
     return EntityType.CONTAINER;
@@ -24,10 +24,6 @@ public interface ContainerService extends PaginatedDataSource<SequencerPartition
   Collection<SequencerPartitionContainer> listByBarcode(String barcode) throws IOException;
 
   SequencerPartitionContainer save(SequencerPartitionContainer container) throws IOException;
-
-  SequencerPartitionContainer create(SequencerPartitionContainer container) throws IOException;
-
-  SequencerPartitionContainer update(SequencerPartitionContainer container) throws IOException;
 
   Collection<SequencerPartitionContainer> listByRunId(long runId) throws IOException;
 

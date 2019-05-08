@@ -25,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
-import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
@@ -46,7 +46,7 @@ public class DefaultContainerService
   @Autowired
   private PoolService poolService;
   @Autowired
-  private KitService kitService;
+  private KitDescriptorService kitService;
   @Autowired
   private ContainerModelService containerModelService;
 
@@ -82,30 +82,30 @@ public class DefaultContainerService
   }
 
   @Override
-  public SequencerPartitionContainer create(SequencerPartitionContainer container) throws IOException {
+  public long create(SequencerPartitionContainer container) throws IOException {
     loadChildEntities(container);
     validateChange(container, null);
     container.setChangeDetails(authorizationManager.getCurrentUser());
 
-    return containerDao.save(container);
+    return containerDao.save(container).getId();
   }
 
   @Override
-  public SequencerPartitionContainer update(SequencerPartitionContainer container) throws IOException {
+  public long update(SequencerPartitionContainer container) throws IOException {
     SequencerPartitionContainer managed = get(container.getId());
     loadChildEntities(container);
     validateChange(container, managed);
     applyChanges(container, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
-    return containerDao.save(managed);
+    return containerDao.save(managed).getId();
   }
 
   @Override
   public SequencerPartitionContainer save(SequencerPartitionContainer container) throws IOException {
     if (container.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
-      return create(container);
+      return get(create(container));
     } else {
-      return update(container);
+      return get(update(container));
     }
   }
 
@@ -177,14 +177,14 @@ public class DefaultContainerService
   private void loadChildEntities(SequencerPartitionContainer container) throws IOException {
     container.setModel(containerModelService.get(container.getModel().getId()));
     if (container.getClusteringKit() != null) {
-      KitDescriptor descriptor = kitService.getKitDescriptorById(container.getClusteringKit().getId());
+      KitDescriptor descriptor = kitService.get(container.getClusteringKit().getId());
       if (descriptor.getKitType() != KitType.CLUSTERING) {
         throw new IllegalArgumentException(descriptor.getName() + " is not a clustering kit.");
       }
       container.setClusteringKit(descriptor);
     }
     if (container.getMultiplexingKit() != null) {
-      KitDescriptor descriptor = kitService.getKitDescriptorById(container.getMultiplexingKit().getId());
+      KitDescriptor descriptor = kitService.get(container.getMultiplexingKit().getId());
       if (descriptor.getKitType() != KitType.MULTIPLEXING) {
         throw new IllegalArgumentException(descriptor.getName() + " is not a multiplexing kit.");
       }

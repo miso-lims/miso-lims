@@ -110,7 +110,7 @@ public class DefaultLibraryDilutionService
   }
 
   @Override
-  public Long create(LibraryDilution dilution) throws IOException {
+  public long create(LibraryDilution dilution) throws IOException {
     loadChildEntities(dilution);
     dilution.setCreator(authorizationManager.getCurrentUser());
     boxService.throwIfBoxPositionIsFilled(dilution);
@@ -151,7 +151,7 @@ public class DefaultLibraryDilutionService
   }
 
   @Override
-  public void update(LibraryDilution dilution) throws IOException {
+  public long update(LibraryDilution dilution) throws IOException {
     LibraryDilution managed = get(dilution.getId());
     maybeRemoveFromBox(dilution);
     boxService.throwIfBoxPositionIsFilled(dilution);
@@ -170,9 +170,10 @@ public class DefaultLibraryDilutionService
     validateChange(dilution, managed);
     applyChanges(managed, dilution);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
-    save(managed);
+    LibraryDilution saved = save(managed);
     updateLibrary(library);
     boxService.updateBoxableLocation(dilution);
+    return saved.getId();
   }
 
   @Override
@@ -358,7 +359,7 @@ public class DefaultLibraryDilutionService
     List<Workset> worksets = worksetService.listByDilution(object.getId());
     for (Workset workset : worksets) {
       workset.getDilutions().removeIf(ldi -> ldi.getId() == object.getId());
-      worksetService.save(workset);
+      worksetService.update(workset);
     }
     Box box = object.getBox();
     if (box != null) {

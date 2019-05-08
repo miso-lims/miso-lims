@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.KitDescriptorService;
 
 @Controller
 @RequestMapping("/kitdescriptor")
@@ -51,9 +51,9 @@ public class EditKitDescriptorController {
   protected static final Logger log = LoggerFactory.getLogger(EditKitDescriptorController.class);
 
   @Autowired
-  private KitService kitService;
+  private KitDescriptorService kitService;
 
-  public void setKitService(KitService kitService) {
+  public void setKitService(KitDescriptorService kitService) {
     this.kitService = kitService;
   }
 
@@ -65,7 +65,7 @@ public class EditKitDescriptorController {
 
   @GetMapping(value = "/{kitDescriptorId}")
   public ModelAndView setupForm(@PathVariable Long kitDescriptorId, ModelMap model) throws IOException {
-    KitDescriptor kitDescriptor = kitService.getKitDescriptorById(kitDescriptorId);
+    KitDescriptor kitDescriptor = kitService.get(kitDescriptorId);
     if (kitDescriptor == null) {
       throw new NotFoundException("No kit found for ID " + kitDescriptorId.toString());
     }

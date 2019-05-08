@@ -36,9 +36,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 public class ProgressImpl implements Progress {
   private static final long serialVersionUID = 1L;
 
+  private static final long UNSAVED_ID = 0;
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long workflowProgressId = Progress.UNSAVED_ID;
+  private long workflowProgressId = UNSAVED_ID;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "workflowName")
@@ -149,5 +151,10 @@ public class ProgressImpl implements Progress {
     } else if (!user.equals(other.user)) return false;
     if (workflowProgressId != other.workflowProgressId) return false;
     return workflowName == other.workflowName;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 }

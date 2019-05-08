@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class KitDescriptorDto {
   
   private Long id;
-  private String url;
   private String name;
   private String description;
   private Integer version;
@@ -22,14 +21,6 @@ public class KitDescriptorDto {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
   }
 
   public String getName() {
@@ -98,10 +89,8 @@ public class KitDescriptorDto {
 
   @Override
   public String toString() {
-    return "KitDescriptorDto [id=" + id + ", url=" + url + ", name=" + name
-        + ", version=" + version + ", manufacturer=" + manufacturer
-        + ", partNumber=" + partNumber + ", stockLevel=" + stockLevel
-        + ", kitType=" + kitType + ", platformType=" + platformType + "]";
+    return "KitDescriptorDto [id=" + id + ", name=" + name + ", version=" + version + ", manufacturer=" + manufacturer
+        + ", partNumber=" + partNumber + ", stockLevel=" + stockLevel + ", kitType=" + kitType + ", platformType=" + platformType + "]";
   }
 
 }

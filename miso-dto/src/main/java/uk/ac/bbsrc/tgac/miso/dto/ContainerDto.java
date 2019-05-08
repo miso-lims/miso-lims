@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.net.URI;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -11,11 +10,10 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonSubTypes({ @JsonSubTypes.Type(value = ContainerDto.class, name = "Container"),
     @JsonSubTypes.Type(value = OxfordNanoporeContainerDto.class, name = "OxfordNanoporeContainer") })
 @JsonTypeName(value = "Container")
-public class ContainerDto implements WritableUrls {
+public class ContainerDto {
   private Long id;
   // identificationBarcode is displayed as "serial number" to the user
   private String identificationBarcode;
-  private String url;
   private ContainerModelDto model;
   private String description;
   private String lastRunAlias;
@@ -41,14 +39,6 @@ public class ContainerDto implements WritableUrls {
 
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
   }
 
   public ContainerModelDto getModel() {
@@ -89,12 +79,6 @@ public class ContainerDto implements WritableUrls {
 
   public void setLastModified(String lastModified) {
     this.lastModified = lastModified;
-  }
-
-  @Override
-  public void writeUrls(URI baseUri) {
-    setUrl(
-        WritableUrls.buildUriPath(baseUri, "/rest/run/container/{barcode}", getIdentificationBarcode()));
   }
 
   public String getLastSequencerName() {

@@ -24,7 +24,7 @@ public class SamplePurposeImpl implements SamplePurpose {
 
   private static final long serialVersionUID = 1L;
 
-  public static final long UNSAVED_ID = 0;
+  private static final long UNSAVED_ID = 0;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -130,6 +130,11 @@ public class SamplePurposeImpl implements SamplePurpose {
   @Override
   public void setArchived(boolean archived) {
     this.archived = archived;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

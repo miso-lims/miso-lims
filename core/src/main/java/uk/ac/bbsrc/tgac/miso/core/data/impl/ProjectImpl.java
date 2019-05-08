@@ -72,7 +72,7 @@ public class ProjectImpl implements Project {
   /**
    * Use this ID to indicate that a project has not yet been saved, and therefore does not yet have a unique ID.
    */
-  public static final Long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   @Column(updatable = false)
   @Temporal(TemporalType.TIMESTAMP)

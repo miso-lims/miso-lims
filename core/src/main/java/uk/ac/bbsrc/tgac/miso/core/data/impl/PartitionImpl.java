@@ -55,13 +55,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 @Table(name = "_Partition")
 public class PartitionImpl implements Partition {
 
-  public static final Long UNSAVED_ID = 0L;
+  private static final Long UNSAVED_ID = 0L;
   private static final long serialVersionUID = 1L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "partitionId")
-  private long id = PartitionImpl.UNSAVED_ID;
+  private long id = UNSAVED_ID;
 
   @Column(nullable = false)
   private Integer partitionNumber;
@@ -219,6 +219,11 @@ public class PartitionImpl implements Partition {
       sb.append(getPool().getId());
     }
     return sb.toString();
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

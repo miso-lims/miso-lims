@@ -164,12 +164,8 @@ public class PoolRestController extends RestController {
   private LibraryDilutionService dilutionService;
 
   @GetMapping(value = "{poolId}", produces = "application/json")
-  public @ResponseBody PoolDto getPoolById(@PathVariable Long poolId) throws IOException {
-    Pool p = poolService.get(poolId);
-    if (p == null) {
-      throw new RestException("No pool found with ID: " + poolId, Status.NOT_FOUND);
-    }
-    return Dtos.asDto(p, true, false);
+  public @ResponseBody PoolDto getPoolById(@PathVariable long poolId) throws IOException {
+    return RestUtils.getObject("Pool", poolId, poolService, pool -> Dtos.asDto(pool, true, false));
   }
 
   @GetMapping(value = "{poolId}/runs", produces = "application/json")
@@ -180,27 +176,25 @@ public class PoolRestController extends RestController {
 
   @PostMapping(produces = "application/json")
   @ResponseBody
-  public PoolDto createPool(@RequestBody PoolDto pool)
+  public PoolDto createPool(@RequestBody PoolDto dto)
       throws IOException {
-    Pool poolobj = Dtos.to(pool);
-    if (poolobj.getVolume() == null && !poolobj.getPoolDilutions().isEmpty() && poolobj.getPoolDilutions().stream()
-        .map(PoolDilution::getPoolableElementView)
-        .allMatch(view -> view.getDilutionVolumeUsed() != null)) {
-      poolobj.setVolume(poolobj.getPoolDilutions().stream()
+    return RestUtils.createObject("Pool", dto, d -> {
+      Pool pool = Dtos.to(d);
+      if (pool.getVolume() == null && !pool.getPoolDilutions().isEmpty() && pool.getPoolDilutions().stream()
           .map(PoolDilution::getPoolableElementView)
-          .mapToDouble(PoolableElementView::getDilutionVolumeUsed).sum());
-    }
-    Long id = poolService.save(poolobj);
-    return getPoolById(id);
+          .allMatch(view -> view.getDilutionVolumeUsed() != null)) {
+        pool.setVolume(pool.getPoolDilutions().stream()
+            .map(PoolDilution::getPoolableElementView)
+            .mapToDouble(PoolableElementView::getDilutionVolumeUsed).sum());
+      }
+      return pool;
+    }, poolService, p -> Dtos.asDto(p, true, false));
   }
 
   @PutMapping(value = "{poolId}", produces = "application/json")
   @ResponseBody
-  public PoolDto updatePool(@PathVariable Long poolId, @RequestBody PoolDto pool) throws IOException {
-    Pool p = Dtos.to(pool);
-    p.setId(poolId);
-    poolService.save(p);
-    return Dtos.asDto(poolService.get(poolId), true, false);
+  public PoolDto updatePool(@PathVariable long poolId, @RequestBody PoolDto dto) throws IOException {
+    return RestUtils.updateObject("Pool", poolId, dto, Dtos::to, poolService, pool -> Dtos.asDto(pool, true, false));
   }
 
   @PutMapping(value = "/{poolId}/contents", produces = "application/json")
@@ -211,7 +205,7 @@ public class PoolRestController extends RestController {
     Stream<PoolDilution> added = poolableElementViewService.list(request.add).stream()
         .map(view -> new PoolDilution(pool, view));
     pool.setPoolDilutions(Stream.concat(originalMinusRemoved, added).collect(Collectors.toSet()));
-    poolService.save(pool);
+    poolService.update(pool);
     return Dtos.asDto(poolService.get(poolId), true, false);
   }
 
@@ -235,7 +229,7 @@ public class PoolRestController extends RestController {
           .orElseThrow(() -> new RestException("Invalid dilution name: " + entry.getKey(), Status.BAD_REQUEST));
       poolDilution.setProportion(entry.getValue());
     }
-    poolService.save(pool);
+    poolService.update(pool);
     return Dtos.asDto(poolService.get(poolId), true, false);
   }
 
@@ -317,7 +311,7 @@ public class PoolRestController extends RestController {
         }))//
         .forEach(WhineyConsumer.rethrow(containerService::update));
     if (pool != null) {
-      poolService.save(pool);
+      poolService.update(pool);
     }
   }
 
@@ -356,9 +350,6 @@ public class PoolRestController extends RestController {
   public List<PoolDto> serializePools(Collection<Pool> pools, UriComponentsBuilder uriBuilder)
       throws IOException {
     List<PoolDto> poolDtos = pools.stream().map(pool -> Dtos.asDto(pool, false, false)).collect(Collectors.toList());
-    for (PoolDto poolDto : poolDtos) {
-      poolDto.writeUrls(uriBuilder);
-    }
     return poolDtos;
   }
 

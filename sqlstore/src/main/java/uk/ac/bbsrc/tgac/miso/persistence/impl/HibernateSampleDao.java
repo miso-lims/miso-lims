@@ -33,7 +33,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -310,7 +309,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     if (tissue.getParent() == null
         || tissue.getParent().getId() == SampleImpl.UNSAVED_ID
         || tissue.getTissueOrigin() == null
-        || tissue.getTissueOrigin().getId() == TissueOrigin.UNSAVED_ID
+        || !tissue.getTissueOrigin().isSaved()
         || tissue.getTissueType() == null
         || tissue.getTissueType().getId() == TissueTypeImpl.UNSAVED_ID
         || tissue.getTimesReceived() == null

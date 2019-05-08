@@ -51,7 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 public class QcType implements Comparable<QcType>, Serializable, Aliasable {
   private static final long serialVersionUID = 1L;
 
-  public static final long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -273,5 +273,10 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable {
 
   public void setAutoUpdateField(boolean autoUpdateField) {
     this.autoUpdateField = autoUpdateField;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 }
