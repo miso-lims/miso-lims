@@ -93,6 +93,7 @@ DELETE FROM InstrumentModel;
 DELETE FROM StudyChangeLog;
 DELETE FROM Study;
 DELETE FROM SampleNumberPerProject;
+DETELE FROM ProjectChangeLog;
 DELETE FROM Project;
 DELETE FROM ReferenceGenome;
 DELETE FROM Note;

@@ -117,7 +117,7 @@ public class HibernateProjectDao implements ProjectStore {
   public List<Project> listAllWithLimit(long limit) throws IOException {
     Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
     criteria.setMaxResults((int) limit);
-    criteria.addOrder(Order.desc("projectId"));
+    criteria.addOrder(Order.desc("id"));
     @SuppressWarnings("unchecked")
     List<Project> results = criteria.list();
     return results;
