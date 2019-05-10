@@ -84,7 +84,7 @@ public class HibernateInstituteDaoTest extends AbstractDAOTest {
     Institute i = new InstituteImpl();
     i.setAlias(alias);
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
     i.setCreatedBy(user);
     i.setUpdatedBy(user);
     Date now = new Date();

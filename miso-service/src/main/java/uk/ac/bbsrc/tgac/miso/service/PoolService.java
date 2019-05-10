@@ -6,6 +6,7 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface PoolService

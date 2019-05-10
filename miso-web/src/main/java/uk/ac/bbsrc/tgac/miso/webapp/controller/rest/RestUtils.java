@@ -6,8 +6,8 @@ import java.util.function.Function;
 import javax.ws.rs.core.Response.Status;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
-import uk.ac.bbsrc.tgac.miso.service.ProviderService;
-import uk.ac.bbsrc.tgac.miso.service.SaveService;
+import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
+import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 
 public class RestUtils {
 

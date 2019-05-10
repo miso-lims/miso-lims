@@ -41,9 +41,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
+import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 
 /**
  * A Spring filter that checks at a given point in the login filter chain whether an authenticated LDAP user exists in the underlying MISO
@@ -59,17 +59,7 @@ public class MisoLdapAuthenticationFilter extends UsernamePasswordAuthentication
   private SessionAuthenticationStrategy strategy;
 
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
-
-  /**
-   * Sets the securityManager of this MisoLdapAuthenticationFilter object.
-   * 
-   * @param securityManager
-   *          securityManager.
-   */
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
+  private UserService userService;
 
   /**
    * Creates a new MisoLdapAuthenticationFilter instance.
@@ -138,13 +128,13 @@ public class MisoLdapAuthenticationFilter extends UsernamePasswordAuthentication
         // map the LDAP user details to a MISO User
         User u = LimsSecurityUtils.fromLdapUser((InetOrgPerson) p);
         // check if a user exists in the database with this username
-        User dbu = securityManager.getUserByLoginName(u.getLoginName());
+        User dbu = userService.getByLoginName(u.getLoginName());
         if (dbu == null || !dbu.equals(u)) {
-          securityManager.saveUser(u);
+          userService.create(u);
         } else {
           // update user data from LDAP (password, roles, etc.)
           LimsSecurityUtils.updateFromLdapUser(dbu, (InetOrgPerson) p);
-          securityManager.saveUser(dbu);
+          userService.update(dbu);
         }
       }
     } else {

@@ -96,7 +96,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
-    emptyUser.setUserId(1L);
+    emptyUser.setId(1L);
     when(securityDAO.getUserById(Matchers.anyLong())).thenReturn(emptyUser);
     emptySR.setId(1L);
     when(instrumentDAO.get(Matchers.anyLong())).thenReturn(emptySR);
@@ -248,7 +248,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     Instrument instrument = Mockito.mock(InstrumentImpl.class);
     Mockito.when(instrument.getId()).thenReturn(1L);
     User user = Mockito.mock(UserImpl.class);
-    Mockito.when(user.getUserId()).thenReturn(1L);
+    Mockito.when(user.getId()).thenReturn(1L);
     run.setSequencer(instrument);
     run.setFilePath("/far/far/away");
     run.setName("AwesomeRun");
@@ -282,7 +282,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     Instrument instrument = emptySR;
     Date now = new Date();
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
 
     Run run = new IlluminaRun();
     run.setAlias(alias);

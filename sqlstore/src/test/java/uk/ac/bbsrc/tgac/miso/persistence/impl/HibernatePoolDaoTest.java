@@ -45,7 +45,7 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     assertEquals(0, (expected.getCreationTime().getTime() - actual.getCreationTime().getTime()) / 84600000);
     assertEquals(expected.getPlatformType(), actual.getPlatformType());
     assertEquals(expected.getAlias(), actual.getAlias());
-    assertEquals(expected.getLastModifier().getUserId(), actual.getLastModifier().getUserId());
+    assertEquals(expected.getLastModifier().getId(), actual.getLastModifier().getId());
     assertEquals(expected.isDiscarded(), actual.isDiscarded());
     if (!expected.isDiscarded()) {
       assertEquals(expected.getVolume(), actual.getVolume());
@@ -61,7 +61,7 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     final PoolImpl rtn = new PoolImpl();
     final User mockUser = new UserImpl();
 
-    mockUser.setUserId(1L);
+    mockUser.setId(1L);
     mockUser.setLoginName("franklin");
 
     rtn.setConcentration((double) counter);
@@ -127,7 +127,7 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     testPool.setDescription("Description changed");
 
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
     testPool.setLastModifier(user);
     dao.save(testPool);
   }

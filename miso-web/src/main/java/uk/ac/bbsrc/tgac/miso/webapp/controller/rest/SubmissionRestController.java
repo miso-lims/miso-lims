@@ -11,7 +11,6 @@ import javax.ws.rs.core.Response.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,12 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 import uk.ac.bbsrc.tgac.miso.core.util.EnaSubmissionPreparation;
 import uk.ac.bbsrc.tgac.miso.service.SubmissionService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
 @RequestMapping("/rest/submissions")
@@ -32,7 +31,7 @@ public class SubmissionRestController extends RestController {
   @Autowired
   private SubmissionService submissionService;
   @Autowired
-  private SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @ResponseBody
   @GetMapping(path = "/{submissionId}/download")
@@ -42,7 +41,7 @@ public class SubmissionRestController extends RestController {
     if (submission == null) {
       throw new RestException("Submission not found", Status.NOT_FOUND);
     }
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(new MediaType("application", "zip"));
     response.setHeader("Content-Disposition",

@@ -72,7 +72,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     sample.setProject(dao.get(1L).getProject());
     sample.setId(AbstractSample.UNSAVED_ID);
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
     Date now = new Date();
     sample.setCreator(user);
     sample.setCreationTime(now);
@@ -99,7 +99,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     sample.setName(sampleName);
     sample.setAlias("updatedAlias");
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
     sample.setLastModifier(user);
 
     int sizeBefore = dao.listAll().size();

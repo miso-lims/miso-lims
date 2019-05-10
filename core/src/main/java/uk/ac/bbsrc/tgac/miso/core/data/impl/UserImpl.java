@@ -47,8 +47,6 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -68,14 +66,13 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @Entity
 @Table(name = "User")
 public class UserImpl implements User, Serializable {
-  protected static final Logger log = LoggerFactory.getLogger(UserImpl.class);
 
   private static final long serialVersionUID = 1L;
 
   /**
    * Use this ID to indicate that a user has not yet been saved, and therefore does not yet have a unique ID.
    */
-  public static final Long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -115,19 +112,11 @@ public class UserImpl implements User, Serializable {
   }
 
   @Override
-  public Long getUserId() {
-    return userId;
-  }
-
-  @Override
-  public void setUserId(Long userId) {
-    this.userId = userId;
-  }
-
   public long getId() {
     return userId;
   }
 
+  @Override
   public void setId(long userId) {
     this.userId = userId;
   }
@@ -272,16 +261,16 @@ public class UserImpl implements User, Serializable {
     if (obj == this) return true;
     if (!(obj instanceof User)) return false;
     User them = (User) obj;
-    if (getId() == UserImpl.UNSAVED_ID || them.getUserId() == UserImpl.UNSAVED_ID) {
+    if (!isSaved() || !them.isSaved()) {
       return this.getLoginName().equals(them.getLoginName());
     } else {
-      return this.getId() == them.getUserId();
+      return this.getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getId() != UserImpl.UNSAVED_ID) {
+    if (isSaved()) {
       return ((Long) getId()).intValue();
     } else {
       int hashcode = 1;
@@ -310,9 +299,14 @@ public class UserImpl implements User, Serializable {
 
   @Override
   public int compareTo(User t) {
-    if (getId() < t.getUserId()) return -1;
-    if (getId() > t.getUserId()) return 1;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

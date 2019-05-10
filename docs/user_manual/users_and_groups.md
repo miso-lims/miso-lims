@@ -153,9 +153,10 @@ in the table's toolbar that allows you to create new groups.
 {% assign subsub = subsub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub subsub=subsub title="Adding Groups" %}
 
-To get to the Create Group page, click the "Add" button in the toolbar at the top of the table on the Groups list page.
-Once on the Create Group page, enter a name and description for the group. In the Users list, select each of the users
-that you would like to include in the group. Click the "Save" button at the top right to finish creating the group.
+Groups can only be created by MISO administrators. To get to the Create Group page, click the "Add" button in the
+toolbar at the top of the table on the Groups list page. Once on the Create Group page, enter a name and description
+for the group. Click the "Save" button at the top right to finish creating the group. You can add users to the group
+after it has been saved.
 
 {% include userman-toplink.md %}
 
@@ -164,11 +165,11 @@ that you would like to include in the group. Click the "Save" button at the top 
 {% assign subsub = subsub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub subsub=subsub title="Adding/Removing Users from a Group" %}
 
-Group membership can be modified similarly to how users were initially selected for the group. First, go to the Edit
-Group page by clicking on the group name in the Groups list page. The Edit Group page includes a list of users. Any
-user that is selected in this list is a member of the group. To add a new user to the group, check the checkbox beside
-their name in the list. To remove a user from the group, uncheck the checkbox next to their name. Click the "Save"
-button at the top right to confirm your changes.
+Only MISO adminstrators can change group memberships. To get to the Edit Group page, click the group's name on the
+Group List. From here, you can use the Included Users and Available Users lists to modify group memberships. Select
+users in the Available Users list and click the "Add" button in the toolbar at the top of the table to add users to
+the group. Similary, you can select users in the Included Users list and click the "Remove" button to remove users from
+the group.
 
 {% include userman-toplink.md %}
 

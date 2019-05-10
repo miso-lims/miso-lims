@@ -2,9 +2,9 @@ FormUtils = (function($) {
 
   /*
    * FormTarget Structure: {
-   *   getSaveUrl: required function(object) returning string; URL to save object
+   *   getSaveUrl: required function(object, config) returning string; URL to save object
    *   getSaveMethod: required function(object) returning string (POST|PUT); HTTP method to save object
-   *   getEditUrl: required function(object) returning string; URL for the object's edit page
+   *   getEditUrl: required function(object, config) returning string; URL for the object's edit page
    *   getSections: required function(config, object) returning array of FormSections; see below
    *   onLoad: optional function(updateField); called after the form is initialized
    *   confirmSave: optional function(object, saveCallback); called before saving. saveCallback must be invoked to confirm and save
@@ -22,9 +22,12 @@ FormUtils = (function($) {
    *   getDisplayValue: optional function(object) returning string; generate a value to display in a read-only field instead of the
    *       data value
    *   getLink: optional function(object) returning URL string; generate a link URL for read-only field
-   *   type: required string (read-only|text|textarea|dropdown|checkbox|int|decimal|date|datetime|special); type of field. Note: read-only
-   *       means not directly editable. The value may still be changed via javascript, and that updated value will be validated and saved
+   *   type: required string (read-only|text|textarea|password|dropdown|checkbox|int|decimal|date|datetime|special); type of field. Note:
+   *       read-only means not directly editable. The value may still be changed via javascript, and that updated value will be validated
+   *       and saved
    *   include: optional boolean; determines whether the field is displayed. Field is displayed by default
+   *   omit: optional boolean; determines whether field is saved. Field is saved by default. If true, the data property doesn't need to
+   *       exist in the JSON, and won't be updated even if it does
    *   initial: optional string; value to initialize field value to for new items
    *   disabled: optional boolean; whether the field is disabled
    *   required: optional boolean; whether the field is required
@@ -133,7 +136,7 @@ FormUtils = (function($) {
       });
 
       $('#' + saveId).click(function() {
-        validateAndSave(containerId, object, target, sections);
+        validateAndSave(containerId, object, target, sections, config);
       });
 
       sections.forEach(function(section) {
@@ -253,6 +256,7 @@ FormUtils = (function($) {
       return field.getDisplayValue ? control.val() : control.text();
     case 'text':
     case 'textarea':
+    case 'password':
     case 'dropdown':
     case 'date':
     case 'datetime':
@@ -271,6 +275,7 @@ FormUtils = (function($) {
     switch (field.type) {
     case 'text':
     case 'textarea':
+    case 'password':
     case 'dropdown':
     case 'date':
     case 'datetime':
@@ -307,17 +312,17 @@ FormUtils = (function($) {
     return (changeOrder[a] || 0) - (changeOrder[b] || 0);
   }
 
-  function validateAndSave(containerId, object, target, sections) {
+  function validateAndSave(containerId, object, target, sections, config) {
     var selector = '#' + containerId;
     Validate.cleanFields(selector);
     Validate.clearErrors(selector);
 
     sections.forEach(function(section) {
       section.fields.forEach(function(field) {
-        if (field.type !== 'special') { // FormTarget is responsible for managing updates, likely via an additional hidden field
+        if (!field.omit && field.type !== 'special') { // FormTarget is responsible for managing updates, likely via an additional hidden field
           object[field.data] = getFormValue(field);
         }
-        if (['text', 'textarea', 'dropdown', 'date', 'datetime', 'decimal', 'int'].indexOf(field.type) !== -1) {
+        if (['text', 'textarea', 'password', 'dropdown', 'date', 'datetime', 'decimal', 'int'].indexOf(field.type) !== -1) {
           addValidation(field);
         }
       });
@@ -328,7 +333,7 @@ FormUtils = (function($) {
 
     Validate.updateWarningOrSubmit(selector, null, function() {
       var saveCallback = function() {
-        save(containerId, object, target);
+        save(containerId, object, target, config);
       };
 
       if (target.confirmSave) {
@@ -347,7 +352,7 @@ FormUtils = (function($) {
     if (field.maxLength) {
       control.attr('data-parsley-maxlength', field.maxLength);
     }
-    if (field.type === 'text' || field.type === 'textarea') {
+    if (field.type === 'text' || field.type === 'textarea' || field.type === 'password') {
       if (field.regex) {
         control.attr('data-parsley-pattern', field.regex);
       } else {
@@ -378,17 +383,20 @@ FormUtils = (function($) {
       control.attr('data-parsley-pattern', pattern);
       control.attr('data-parsley-error-message', 'Must be a number between ' + min + ' and ' + max);
     }
+    if (field.match) {
+      control.attr('data-parsley-equalto', '#' + field.match);
+    }
   }
 
-  function save(containerId, object, target) {
+  function save(containerId, object, target, config) {
     $.ajax({
-      url: target.getSaveUrl(object),
+      url: target.getSaveUrl(object, config),
       type: target.getSaveMethod(object),
       dataType: 'json',
       contentType: 'application/json; charset=utf8',
       data: JSON.stringify(object)
     }).success(function(data) {
-      window.location.href = target.getEditUrl(data);
+      window.location.href = target.getEditUrl(data, config);
     }).fail(function(response, textStatus, serverStatus) {
       Validate.displayErrors(JSON.parse(response.responseText), '#' + containerId);
     });
@@ -479,6 +487,9 @@ FormUtils = (function($) {
     case 'textarea':
       td.append(makeTextareaInput(field, value));
       break;
+    case 'password':
+      td.append(makeTextInput(field, value, 'password'));
+      break;
     case 'dropdown':
       td.append(makeDropdownInput(field, value, updateField));
       break;
@@ -525,8 +536,8 @@ FormUtils = (function($) {
     return input;
   }
 
-  function makeTextInput(field, value) {
-    var input = $('<input>').attr('id', field.data).attr('type', 'text');
+  function makeTextInput(field, value, type) {
+    var input = $('<input>').attr('id', field.data).attr('type', type || 'text');
     if (value !== null) {
       input.val(value);
     }

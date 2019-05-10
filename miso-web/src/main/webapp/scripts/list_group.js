@@ -31,7 +31,7 @@ ListTarget.group = {
     return [];
   },
   createStaticActions: function(config, projectId) {
-    if (config.isAdmin) {
+    if (config.isAdmin && !config.userId) {
       return [{
         "name": "Add",
         "handler": function() {

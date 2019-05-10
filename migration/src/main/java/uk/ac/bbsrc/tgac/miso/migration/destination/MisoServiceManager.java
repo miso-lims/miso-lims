@@ -83,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultStudyService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultTargetedSequencingService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultUserService;
 
 /**
  * This class is used to simplify creation and wiring of MISO services. Some of the config is currently hardcoded - mainly naming schemes
@@ -146,6 +147,7 @@ public class MisoServiceManager {
   private DefaultTargetedSequencingService targetedSequencingService;
   private DefaultBoxService boxService;
   private DefaultQualityControlService qcService;
+  private DefaultUserService userService;
 
   private HibernateSampleClassDao sampleClassDao;
   private HibernateSampleDao sampleDao;
@@ -257,6 +259,7 @@ public class MisoServiceManager {
     m.setDefaultQualityControlService();
     m.setDefaultQcTypeDao();
     m.setDefaultProjectService();
+    m.setDefaultUserService();
 
     User migrationUser = m.getUserByLoginNameInTransaction(m.getSecurityStore(), username);
     if (migrationUser == null) throw new IllegalArgumentException("User '" + username + "' not found");
@@ -368,13 +371,11 @@ public class MisoServiceManager {
 
   public void setDefaultSecurityStore() {
     HibernateSecurityDao store = new HibernateSecurityDao();
-    store.setJdbcTemplate(jdbcTemplate);
     store.setSessionFactory(sessionFactory);
     setSecurityStore(store);
   }
 
   private void updateSecurityStoreDependencies() {
-    if (securityManager != null) securityManager.setSecurityStore(securityStore);
     if (poolDao != null) poolDao.setSecurityStore(securityStore);
     if (projectDao != null) projectDao.setSecurityStore(securityStore);
   }
@@ -390,12 +391,31 @@ public class MisoServiceManager {
 
   public void setDefaultSecurityManager() {
     LocalSecurityManager mgr = new LocalSecurityManager();
-    mgr.setSecurityStore(securityStore);
     setSecurityManager(mgr);
   }
 
   private void updateSecurityManagerDependencies() {
-    if (runService != null) runService.setSecurityManager(securityManager);
+    if (userService != null) userService.setSecurityManager(securityManager);
+  }
+
+  public DefaultUserService getUserService() {
+    return userService;
+  }
+
+  public void setUserService(DefaultUserService userService) {
+    this.userService = userService;
+    updateUserServiceDependencies();
+  }
+
+  public void setDefaultUserService() {
+    DefaultUserService service = new DefaultUserService();
+    service.setSecurityStore(securityStore);
+    service.setSecurityManager(securityManager);
+    setUserService(service);
+  }
+
+  private void updateUserServiceDependencies() {
+    if (runService != null) runService.setUserService(userService);
   }
 
   public HibernateProjectDao getProjectDao() {
@@ -1331,7 +1351,7 @@ public class MisoServiceManager {
     DefaultRunService service = new DefaultRunService();
     service.setAuthorizationManager(authorizationManager);
     service.setRunDao(runDao);
-    service.setSecurityManager(securityManager);
+    service.setUserService(userService);
     service.setNamingScheme(getNamingScheme());
     service.setContainerService(containerService);
     service.setInstrumentService(instrumentService);

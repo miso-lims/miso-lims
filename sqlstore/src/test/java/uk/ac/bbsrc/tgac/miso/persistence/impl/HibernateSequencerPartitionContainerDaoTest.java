@@ -77,7 +77,7 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
 
-    emptyUser.setUserId(1L);
+    emptyUser.setId(1L);
     when(securityDao.getUserById(Matchers.anyLong())).thenReturn(emptyUser);
   }
 

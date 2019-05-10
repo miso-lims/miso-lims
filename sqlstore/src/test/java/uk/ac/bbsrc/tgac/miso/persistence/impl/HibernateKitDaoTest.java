@@ -53,7 +53,7 @@ public class HibernateKitDaoTest extends AbstractDAOTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
-    user.setUserId(1L);
+    user.setId(1L);
     when(changeLogDAO.listAllById(anyString(), anyLong())).thenReturn(new ArrayList<ChangeLog>());
   }
 

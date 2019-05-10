@@ -75,7 +75,7 @@ public class HibernatePoolQcDaoTest extends AbstractDAOTest {
     pool.setId(1L);
     qc.setPool(pool);
     User mockUser = new UserImpl();
-    mockUser.setUserId(1L);
+    mockUser.setId(1L);
     qc.setCreator(mockUser);
     qc.setDate(new Date());
     QcType type = new QcType();
@@ -96,7 +96,7 @@ public class HibernatePoolQcDaoTest extends AbstractDAOTest {
     PoolQC qc = (PoolQC) dao.get(1L);
     assertNotNull(qc);
     User mockUser = new UserImpl();
-    mockUser.setUserId(1L);
+    mockUser.setId(1L);
 
     qc.setCreator(mockUser);
     qc.setResults(99.99);

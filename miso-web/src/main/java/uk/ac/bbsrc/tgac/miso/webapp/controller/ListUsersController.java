@@ -38,8 +38,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPageWithAuthorization;
 
@@ -54,12 +58,22 @@ public class ListUsersController {
 
   @Autowired
   private SecurityManager securityManager;
+  @Autowired
+  private AuthorizationManager authorizationManager;
+  @Autowired
+  private UserService userService;
 
   @Autowired
   @Qualifier("sessionRegistry")
   private SessionRegistry sessionRegistry;
 
-  private final ListItemsPage usersPage = new ListItemsPageWithAuthorization("user", this::getSecurityManager);
+  private final ListItemsPage usersPage = new ListItemsPageWithAuthorization("user", this::getAuthorizationManager) {
+    @Override
+    protected void writeConfigurationExtra(ObjectMapper mapper, ObjectNode config) throws IOException {
+      config.put("allowCreateUser", securityManager.canCreateNewUser());
+      config.put("listMode", "list");
+    }
+  };
 
   @RequestMapping("/admin/users")
   public ModelAndView adminListUsers(ModelMap model) throws IOException {
@@ -69,16 +83,11 @@ public class ListUsersController {
         .collect(Collectors.toSet());
 
     return usersPage.list(model,
-        securityManager.listAllUsers().stream().map(Dtos::asDto).peek(user -> user.setLoggedIn(loggedIn.contains(user.getLoginName()))));
+        userService.list().stream().map(Dtos::asDto).peek(user -> user.setLoggedIn(loggedIn.contains(user.getLoginName()))));
   }
 
-  public SecurityManager getSecurityManager() {
-    return securityManager;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    assert (securityManager != null);
-    this.securityManager = securityManager;
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
   }
 
   @ModelAttribute("title")

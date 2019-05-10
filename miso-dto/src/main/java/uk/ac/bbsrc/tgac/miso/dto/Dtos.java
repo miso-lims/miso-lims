@@ -161,6 +161,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.DilutionBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
@@ -214,10 +215,10 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setLabel(from.getItemLabel());
-    dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
     return dto;
   }
 
@@ -239,10 +240,10 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setLabel(from.getItemLabel());
-    dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
     return dto;
   }
 
@@ -265,10 +266,10 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setPriority(from.getPriority());
     dto.setParentProjectId(from.getParentProject().getId());
-    dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
     dto.setReferenceGenomeId(from.getReferenceGenomeId());
     return dto;
   }
@@ -294,10 +295,10 @@ public class Dtos {
     dto.setSuffix(from.getSuffix());
     dto.setArchived(from.isArchived());
     dto.setDirectCreationAllowed(from.isDirectCreationAllowed());
-    dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
     dto.setDNAseTreatable(from.getDNAseTreatable());
     return dto;
   }
@@ -323,9 +324,9 @@ public class Dtos {
     dto.setStatus(from.getStatus());
     dto.setDescription(from.getDescription());
     dto.setNoteRequired(from.getNoteRequired());
-    dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setUpdatedById(from.getUpdatedBy().getUserId());
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
     return dto;
   }
@@ -386,7 +387,7 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setDescription(from.getDescription());
-    dto.setUpdatedById(from.getLastModifier().getUserId());
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getLastModifier(), User::getId), true);
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationBarcode(from.getLocationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
@@ -618,10 +619,10 @@ public class Dtos {
     TissueMaterialDto dto = new TissueMaterialDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
-    dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
     return dto;
   }
 
@@ -639,10 +640,10 @@ public class Dtos {
     SamplePurposeDto dto = new SamplePurposeDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
-    dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
     dto.setArchived(from.isArchived());
     return dto;
   }
@@ -664,10 +665,10 @@ public class Dtos {
     dto.setProjectId(from.getProject().getId());
     dto.setSubprojectId(from.getSubproject() == null ? null : from.getSubproject().getId());
     dto.setDescription(from.getDescription());
-    dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
     return dto;
   }
 
@@ -830,10 +831,10 @@ public class Dtos {
     dto.setProjectId(from.getProject().getId());
     dto.setHighestSampleNumber(from.getHighestSampleNumber());
     dto.setPadding(from.getPadding());
-    dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
     return dto;
   }
 
@@ -853,10 +854,10 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setParentId(from.getParent().getId());
     dto.setChildId(from.getChild().getId());
-    dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
     dto.setArchived(from.getArchived());
     return dto;
   }
@@ -874,10 +875,10 @@ public class Dtos {
     InstituteDto dto = new InstituteDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
-    dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
     return dto;
   }
 
@@ -898,10 +899,10 @@ public class Dtos {
     dto.setInstituteAlias(from.getInstitute().getAlias());
     dto.setAlias(from.getAlias());
     dto.setLabel(from.getItemLabel());
-    dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
     return dto;
   }
 
@@ -1164,10 +1165,10 @@ public class Dtos {
     dto.setPool(asDto(from.getPool(), false, false));
     dto.setParameters(asDto(from.getSequencingParameter()));
     dto.setPartitions(from.getPartitions());
-    dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
     dto.setDescription(from.getDescription());
     return dto;
   }
@@ -2325,7 +2326,7 @@ public class Dtos {
 
   public static UserDto asDto(@Nonnull User from) {
     UserDto dto = new UserDto();
-    dto.setId(from.getUserId());
+    setLong(dto::setId, from.getId(), true);
     dto.setActive(from.isActive());
     dto.setAdmin(from.isAdmin());
     dto.setEmail(from.getEmail());
@@ -2336,12 +2337,33 @@ public class Dtos {
     return dto;
   }
 
+  public static User to(@Nonnull UserDto dto) {
+    User user = new UserImpl();
+    setLong(user::setId, dto.getId(), false);
+    setString(user::setFullName, dto.getFullName());
+    setString(user::setLoginName, dto.getLoginName());
+    setString(user::setEmail, dto.getEmail());
+    setBoolean(user::setAdmin, dto.isAdmin(), false);
+    setBoolean(user::setInternal, dto.isInternal(), false);
+    setBoolean(user::setExternal, dto.isExternal(), false);
+    setBoolean(user::setActive, dto.isActive(), false);
+    return user;
+  }
+
   public static GroupDto asDto(@Nonnull Group from) {
     GroupDto dto = new GroupDto();
-    dto.setId(from.getGroupId());
+    dto.setId(from.getId());
     dto.setDescription(from.getDescription());
     dto.setName(from.getName());
     return dto;
+  }
+
+  public static Group to(@Nonnull GroupDto dto) {
+    Group to = new Group();
+    setLong(to::setId, dto.getId(), false);
+    setString(to::setName, dto.getName());
+    setString(to::setDescription, dto.getDescription());
+    return to;
   }
 
   public static InstrumentDto asDto(@Nonnull Instrument from) {

@@ -18,7 +18,7 @@ public interface ChangeLoggable extends Timestamped {
   public ChangeLog createChangeLog(String summary, String columnsChanged, User user);
 
   public default boolean didSomeoneElseChangeColumn(String referenceColumnName, User nonHumanUser) {
-    return getChangeLog().stream().filter(cl -> cl.getUser().getUserId() != nonHumanUser.getUserId())
+    return getChangeLog().stream().filter(cl -> cl.getUser().getId() != nonHumanUser.getId())
         .flatMap(cl -> COMMA.splitAsStream(cl.getColumnsChanged())).anyMatch(colName -> colName.equals(referenceColumnName));
   }
 

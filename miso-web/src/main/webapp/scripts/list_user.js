@@ -28,28 +28,60 @@ ListTarget.user = {
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
-    return [];
+    switch (config.listMode) {
+    case 'list':
+      return [];
+    case 'included':
+      return [{
+        name: 'Remove',
+        action: function(items) {
+          if (!items.length) {
+            Utils.showOkDialog('Error', 'No users selected');
+            return;
+          }
+          Utils.showConfirmDialog('Remove Users', 'Remove', ['Remove '
+              + (items.length == 1 ? 'selected user' : items.length + ' selected users') + ' from the group?'], function() {
+            var url = '/miso/rest/groups/' + config.groupId + '/users/remove';
+            var data = items.map(Utils.array.getId);
+            Utils.ajaxWithDialog('Removing Users', 'POST', url, data, Utils.page.pageReload);
+          });
+        }
+      }];
+    case 'available':
+      return [{
+        name: 'Add',
+        action: function(items) {
+          if (!items.length) {
+            Utils.showOkDialog('Error', 'No users selected');
+            return;
+          }
+          var url = '/miso/rest/groups/' + config.groupId + '/users';
+          var data = items.map(Utils.array.getId);
+          Utils.ajaxWithDialog('Adding Users', 'POST', url, data, Utils.page.pageReload);
+        }
+      }];
+    default:
+      throw new Error('Unknown listMode: ' + config.listMode);
+    }
   },
   createStaticActions: function(config, projectId) {
-    if (config.isAdmin && config.allowCreateUser) {
+    if (config.listMode === 'list' && config.isAdmin && config.allowCreateUser) {
       return [{
         "name": "Add",
         "handler": function() {
           window.location = "/miso/admin/user/new";
         }
-      }
-
-      ];
+      }];
     } else {
       return [];
     }
   },
   createColumns: function(config, projectId) {
-    var permissionColumn = function(headerName, property, sortPriority) {
+    var permissionColumn = function(headerName, property, sortPriority, include) {
       return {
         "sTitle": headerName,
         "mData": property,
-        "include": true,
+        "include": include,
         "iSortPriority": sortPriority,
         "mRender": function(data, type, full) {
           return data ? "✔" : "";
@@ -70,11 +102,12 @@ ListTarget.user = {
         }
       }
     }, {
-      "sTitle": "Use Name",
+      "sTitle": "Full Name",
       "mData": "fullName",
       "include": true,
       "iSortPriority": 0
-    }, permissionColumn("Active", "active", 0), permissionColumn("Admin", "admin", 0), permissionColumn("Internal", "internal", 0),
-        permissionColumn("External", "external", 0), permissionColumn("Logged In", "loggedIn", 2)];
+    }, permissionColumn("Active", "active", 0, true), permissionColumn("Admin", "admin", 0, true),
+        permissionColumn("Internal", "internal", 0, true), permissionColumn("External", "external", 0, true),
+        permissionColumn("Logged In", "loggedIn", 2, config.listMode === 'list')];
   }
 };

@@ -38,7 +38,7 @@ public class HibernateSampleNumberPerProjectDaoTest extends AbstractDAOTest {
     Project project = new ProjectImpl();
     project.setId(1L);
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
     String s = sampleNumberPerProjectDao.nextNumber(project, user, PRO1_PARTIAL_ALIAS);
     assertEquals("0002", s);
   }
@@ -48,7 +48,7 @@ public class HibernateSampleNumberPerProjectDaoTest extends AbstractDAOTest {
     Project project = new ProjectImpl();
     project.setId(1L);
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
     String s1 = sampleNumberPerProjectDao.nextNumber(project, user, PRO1_PARTIAL_ALIAS);
     assertEquals("0002", s1);
 
@@ -64,7 +64,7 @@ public class HibernateSampleNumberPerProjectDaoTest extends AbstractDAOTest {
     Project project = new ProjectImpl();
     project.setId(1L);
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
     String s1 = sampleNumberPerProjectDao.nextNumber(project, user, PRO1_PARTIAL_ALIAS);
     assertEquals("0002", s1);
 
@@ -104,7 +104,7 @@ public class HibernateSampleNumberPerProjectDaoTest extends AbstractDAOTest {
     Project project = new ProjectImpl();
     project.setId(2L);
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
     String s = sampleNumberPerProjectDao.nextNumber(project, user, PRO2_PARTIAL_ALIAS);
     assertEquals("0001", s);
   }
@@ -114,7 +114,7 @@ public class HibernateSampleNumberPerProjectDaoTest extends AbstractDAOTest {
     Project project = new ProjectImpl();
     project.setId(2L);
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
     String s = sampleNumberPerProjectDao.nextNumber(project, user, PRO2_PARTIAL_ALIAS);
     assertEquals("0001", s);
 
@@ -127,7 +127,7 @@ public class HibernateSampleNumberPerProjectDaoTest extends AbstractDAOTest {
     Project project1 = new ProjectImpl();
     project1.setId(1L);
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
 
     Project project2 = new ProjectImpl();
     project2.setId(2L);
@@ -156,7 +156,7 @@ public class HibernateSampleNumberPerProjectDaoTest extends AbstractDAOTest {
     Project project = new ProjectImpl();
     project.setId(3L);
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
     String s = sampleNumberPerProjectDao.nextNumber(project, user, PRO3_PARTIAL_ALIAS);
     assertEquals("10000", s);
 
@@ -169,7 +169,7 @@ public class HibernateSampleNumberPerProjectDaoTest extends AbstractDAOTest {
     Project project = new ProjectImpl();
     project.setId(1L);
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
     String s = sampleNumberPerProjectDao.nextNumber(project, user, PRO1_PARTIAL_ALIAS);
     assertEquals("0002", s);
 

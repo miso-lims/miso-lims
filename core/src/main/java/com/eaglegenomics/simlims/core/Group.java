@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 /**
@@ -28,10 +29,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
  */
 @Entity
 @Table(name = "_Group")
-public class Group implements Serializable, Comparable<Group> {
+public class Group implements Serializable, Comparable<Group>, Identifiable {
 
   private static final long serialVersionUID = 1L;
-  public static final Long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   private String description = "";
   private String name = "";
@@ -44,16 +45,15 @@ public class Group implements Serializable, Comparable<Group> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long groupId = Group.UNSAVED_ID;
+  private long groupId = Group.UNSAVED_ID;
 
-  /**
-   * Internal use only.
-   */
-  public Long getGroupId() {
+  @Override
+  public long getId() {
     return groupId;
   }
 
-  public void setGroupId(Long groupId) {
+  @Override
+  public void setId(long groupId) {
     this.groupId = groupId;
   }
 
@@ -112,5 +112,10 @@ public class Group implements Serializable, Comparable<Group> {
   @Override
   public int compareTo(Group t) {
     return this.equals(t) ? 0 : 1;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 }

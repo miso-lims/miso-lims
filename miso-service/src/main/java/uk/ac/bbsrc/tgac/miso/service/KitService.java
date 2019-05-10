@@ -6,6 +6,7 @@ import java.util.Collection;
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 
 public interface KitService extends ProviderService<Kit> {
 

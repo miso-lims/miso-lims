@@ -82,7 +82,7 @@ public class BoxRestControllerTest {
     box.setUse(use);
     box.setLocationBarcode("freezer");
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
     box.setLastModifier(user);
     return box;
   }

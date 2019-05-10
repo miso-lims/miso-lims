@@ -3,29 +3,27 @@ package uk.ac.bbsrc.tgac.miso.webapp.util;
 import java.io.IOException;
 import java.util.function.Supplier;
 
-import org.springframework.security.core.context.SecurityContextHolder;
-
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
+
 public class ListItemsPageWithAuthorization extends ListItemsPage {
 
-  private final Supplier<SecurityManager> securityManager;
+  private final Supplier<AuthorizationManager> authorizationManager;
 
-  public ListItemsPageWithAuthorization(String targetType, Supplier<SecurityManager> securityManager) {
+  public ListItemsPageWithAuthorization(String targetType, Supplier<AuthorizationManager> authorizationManager) {
     super(targetType);
-    this.securityManager = securityManager;
+    this.authorizationManager = authorizationManager;
   }
 
   @Override
   protected final void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-    SecurityManager manager = securityManager.get();
-    User user = manager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    AuthorizationManager manager = authorizationManager.get();
+    User user = manager.getCurrentUser();
     config.put("isAdmin", user.isAdmin());
     config.put("isInternal", user.isInternal());
-    config.put("allowCreateUser", manager.canCreateNewUser());
     writeConfigurationExtra(mapper, config);
   }
 

@@ -906,13 +906,13 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
   @Override
   public void deleteNote(Sample sample, Long noteId) throws IOException {
-    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
+    if (noteId == null) {
       throw new IllegalArgumentException("Cannot delete an unsaved Note");
     }
     Sample managed = sampleStore.get(sample.getId());
     Note deleteNote = null;
     for (Note note : managed.getNotes()) {
-      if (note.getNoteId().equals(noteId)) {
+      if (note.getId() == noteId.longValue()) {
         deleteNote = note;
         break;
       }

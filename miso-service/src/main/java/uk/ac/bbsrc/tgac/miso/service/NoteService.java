@@ -4,7 +4,10 @@ import java.io.IOException;
 
 import com.eaglegenomics.simlims.core.Note;
 
-public interface NoteService<T> extends ProviderService<T> {
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
+
+public interface NoteService<T extends Identifiable> extends ProviderService<T> {
 
   public void addNote(T entity, Note note) throws IOException;
 

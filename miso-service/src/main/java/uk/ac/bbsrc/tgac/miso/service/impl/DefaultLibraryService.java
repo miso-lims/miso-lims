@@ -334,13 +334,13 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
 
   @Override
   public void deleteNote(Library library, Long noteId) throws IOException {
-    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
+    if (noteId == null) {
       throw new IllegalArgumentException("Cannot delete an unsaved Note");
     }
     Library managed = libraryDao.get(library.getId());
     Note deleteNote = null;
     for (Note note : managed.getNotes()) {
-      if (note.getNoteId().equals(noteId)) {
+      if (note.getId() == noteId.longValue()) {
         deleteNote = note;
         break;
       }

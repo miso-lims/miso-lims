@@ -23,23 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.security;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.eaglegenomics.simlims.core.manager.AbstractSecurityManager;
-
-/**
- * Extension of the basic LocalSecurityManager, this class adds the ability to save users initially authorised by LDAP into the MISO DB so
- * that the security information can be utilised by the SecurityProfile system
- * 
- * @author Rob Davey
- * @since 0.0.2
- */
-@Transactional(rollbackFor = Exception.class)
-public class LDAPSecurityManager extends AbstractSecurityManager {
-  /** Field log */
-  protected static final Logger log = LoggerFactory.getLogger(LDAPSecurityManager.class);
+public class LDAPSecurityManager implements com.eaglegenomics.simlims.core.manager.SecurityManager {
 
   @Override
   public boolean canCreateNewUser() {

@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
@@ -50,7 +49,7 @@ public abstract class AbstractInstituteDefaultsController<Model extends Aliasabl
     }
   };
 
-  private final ListItemsPage listPage = new ListItemsPageWithAuthorization(getType(), this::getSecurityManager) {
+  private final ListItemsPage listPage = new ListItemsPageWithAuthorization(getType(), this::getAuthorizationManager) {
 
     @Override
     protected void writeConfigurationExtra(ObjectMapper mapper, ObjectNode config) throws IOException {
@@ -60,7 +59,7 @@ public abstract class AbstractInstituteDefaultsController<Model extends Aliasabl
   };
 
   @Autowired
-  private SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   protected abstract Dto asDto(Model model);
 
@@ -93,8 +92,8 @@ public abstract class AbstractInstituteDefaultsController<Model extends Aliasabl
 
   protected abstract String getName();
 
-  public SecurityManager getSecurityManager() {
-    return securityManager;
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
   }
 
   protected abstract String getType();
@@ -106,12 +105,8 @@ public abstract class AbstractInstituteDefaultsController<Model extends Aliasabl
         getAll().stream().map(AbstractInstituteDefaultsController.this::asDto));
   }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
   protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     config.put("isAdmin", user.isAdmin());
   }
 
