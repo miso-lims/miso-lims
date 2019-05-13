@@ -47,7 +47,7 @@ Pool workflow and is sufficient for basic laboratory tracking for sequencing.
 Launch the plain sample demo with docker-compose:
 ``` bash
 cd miso-lims-compose
-export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && MISO_TAG=latest
+export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && export MISO_TAG=latest
 echo "changeme" > ./.miso_db_password
 docker-compose -f demo.plain.yml up
 ```
@@ -59,7 +59,7 @@ allows users to build a hierarchy of Samples (e.g. Identity -> Tissue -> Slide
 Launch the detailed sample demo with docker-compose:
 ```bash
 cd miso-lims-compose
-export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && MISO_TAG=latest
+export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && export MISO_TAG=latest
 echo "changeme" > ./.miso_db_password
 docker-compose -f demo.detailed.yml up
 ```
