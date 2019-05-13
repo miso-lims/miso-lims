@@ -21,9 +21,9 @@ The project is configured to run on Github, so build and serve the website like 
 
 ## Deploying to GitHub Pages
 
-The [TGAC/miso-lims](https://github.com/TGAC/miso-lims/) repository on GitHub is configured to deploy the `docs`
+The [miso-lims/miso-lims](https://github.com/miso-lims/miso-lims/) repository on GitHub is configured to deploy the `docs`
 subdirectory of the `master` branch to GitHub Pages automatically:
-[http://tgac.github.io/miso-lims/](http://tgac.github.io/miso-lims/)
+[http://miso-lims.github.io/miso-lims/](http://miso-lims.github.io/miso-lims/)
 
 
 ## Cheat sheet
