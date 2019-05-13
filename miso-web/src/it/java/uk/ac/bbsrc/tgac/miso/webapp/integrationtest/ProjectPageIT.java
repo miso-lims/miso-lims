@@ -51,7 +51,6 @@ public class ProjectPageIT extends AbstractIT {
     
     assertEquals("Project ID is unsaved", unsaved.get(Fields.ID), page.getId());
     assertEquals("Project name is unsaved", unsaved.get(Fields.NAME), page.getName());
-    assertEquals("Project creation date is set to today", unsaved.get(Fields.CREATION_DATE), page.getCreationDate());
     page.setAlias(unsaved.get(Fields.ALIAS));
     page.setShortName(unsaved.get(Fields.SHORTNAME));
     page.setDescription(unsaved.get(Fields.DESCRIPTION));
