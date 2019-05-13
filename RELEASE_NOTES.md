@@ -4,6 +4,7 @@ Changes:
 
   * Removed old REST endpoints
   * Changed /miso/library/dilution URLs to /miso/dilution
+  * Fixed incompatibility of some forms with Firefox versions < 62
 
 # 0.2.176
 
