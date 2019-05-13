@@ -287,8 +287,10 @@ FormUtils = (function($) {
   }
 
   function findField(sections, dataProperty) {
-    var fields = sections.flatMap(function(section) {
+    var fields = sections.map(function(section) {
       return section.fields;
+    }).reduce(function(all, current) {
+      return all.concat(current);
     }).filter(function(field) {
       return field.data === dataProperty;
     });
