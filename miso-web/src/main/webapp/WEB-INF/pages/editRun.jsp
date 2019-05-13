@@ -102,7 +102,7 @@
                 style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
             <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
               <span style="color:#000000">
-                <a href='#' onclick="Utils.notes.deleteNote('run', '${run.id}', '${note.noteId}'); return false;">
+                <a href='#' onclick="Utils.notes.deleteNote('run', '${run.id}', '${note.id}'); return false;">
                   <span class="ui-icon ui-icon-trash note-delete-icon"></span>
                 </a>
               </span>
