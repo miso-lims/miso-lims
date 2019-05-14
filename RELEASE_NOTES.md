@@ -8,6 +8,7 @@ Changes:
   * Changed Edit User and Edit Group pages to show validation messages instead of error page when
     saving fails
   * Fixed incompatibility of some forms with Firefox versions < 62
+  * Upgraded version of Run Scanner to 1.4.5
 
 # 0.2.176
 

@@ -85,7 +85,7 @@
     <orderEntry type="module" module-name="sqlstore" />
     <orderEntry type="library" name="Maven: cglib:cglib-nodep:2.2.2" level="project" />
     <orderEntry type="library" name="Maven: mysql:mysql-connector-java:5.1.10" level="project" />
-    <orderEntry type="library" name="Maven: org.flywaydb:flyway-core:3.2.1" level="project" />
+    <orderEntry type="library" name="Maven: org.flywaydb:flyway-core:5.2.4" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:4.3.18.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-orm:4.3.18.RELEASE" level="project" />
   </component>
