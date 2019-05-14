@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.service;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
+import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface WorksetService extends PaginatedDataSource<Workset>, DeleterService<Workset>, SaveService<Workset> {

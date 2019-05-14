@@ -59,7 +59,7 @@ public class HibernateLibraryQcDaoTest extends AbstractDAOTest {
     qc.setType(new QcType());
     qc.getType().setId(1L);
     qc.setCreator(new UserImpl());
-    qc.getCreator().setUserId(1L);
+    qc.getCreator().setId(1L);
     qc.setCreationTime(new Date());
     qc.setLastModified(new Date());
     long id = dao.save(qc);

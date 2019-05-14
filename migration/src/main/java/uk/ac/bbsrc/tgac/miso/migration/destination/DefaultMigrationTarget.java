@@ -693,7 +693,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     pool.setLastModifier(migrationUser);
     pool.setLastModified(timeStamp);
     for (Note note : pool.getNotes()) {
-      if (note.getNoteId() == Note.UNSAVED_ID) {
+      if (!note.isSaved()) {
         note.setCreationDate(timeStamp);
         note.setOwner(migrationUser);
       }

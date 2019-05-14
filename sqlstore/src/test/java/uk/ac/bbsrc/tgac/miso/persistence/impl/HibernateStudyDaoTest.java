@@ -156,7 +156,7 @@ public class HibernateStudyDaoTest extends AbstractDAOTest {
 
   private Study makeStudy() {
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
     Project project = new ProjectImpl();
     project.setId(1L);
     StudyType studyType = new StudyType();

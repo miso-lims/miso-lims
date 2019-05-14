@@ -8,9 +8,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class DefaultAuthorizationManager implements AuthorizationManager {
@@ -18,7 +18,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
   public static final String UNKNOWN_USER = "Unknown";
 
   @Autowired
-  private SecurityManager securityManager;
+  private UserService userService;
 
   private final SecurityContextHolderStrategy securityContextHolderStrategy;
 
@@ -32,7 +32,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
     if (auth == null) {
       return null;
     }
-    User user = securityManager.getUserByLoginName(auth.getName());
+    User user = userService.getByLoginName(auth.getName());
     if (user == null && auth.isAuthenticated()) {
       user = new UserImpl();
       user.setAdmin(true);
@@ -96,7 +96,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
       throwIfNonAdmin();
     } else {
       User currentUser = getCurrentUser();
-      if (!(currentUser.isAdmin() || currentUser.getUserId().equals(owner.getUserId()))) {
+      if (!(currentUser.isAdmin() || currentUser.getId() == owner.getId())) {
         throw new AuthorizationException("Current user is not admin or owner");
       }
     }
@@ -104,7 +104,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
 
   @Override
   public void throwIfNotOwner(User owner) throws IOException {
-    if (!getCurrentUser().getUserId().equals(owner.getUserId())) {
+    if (getCurrentUser().getId() != owner.getId()) {
       throw new AuthorizationException("Current user is not owner");
     }
   }

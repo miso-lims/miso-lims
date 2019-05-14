@@ -32,31 +32,29 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
+import uk.ac.bbsrc.tgac.miso.core.service.GroupService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPageWithAuthorization;
 
 @Controller
 public class ListGroupsController {
 
-  private final ListItemsPage groupsPage = new ListItemsPageWithAuthorization("group", this::getSecurityManager);
+  private final ListItemsPage groupsPage = new ListItemsPageWithAuthorization("group", this::getAuthorizationManager);
 
   @Autowired
-  private SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
+  @Autowired
+  private GroupService groupService;
 
   @RequestMapping("/admin/groups")
   public ModelAndView adminListGroups(ModelMap model) throws IOException {
-    return groupsPage.list(model, securityManager.listAllGroups().stream().map(Dtos::asDto));
+    return groupsPage.list(model, groupService.list().stream().map(Dtos::asDto));
   }
 
-  public SecurityManager getSecurityManager() {
-    return securityManager;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
   }
 
   @ModelAttribute("title")

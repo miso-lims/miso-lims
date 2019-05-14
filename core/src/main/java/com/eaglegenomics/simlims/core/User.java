@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 
 /**
@@ -16,14 +17,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface User extends Serializable, Comparable<User> {
+public interface User extends Serializable, Comparable<User>, Identifiable {
   boolean isActive();
 
   void setActive(boolean active);
-
-  Long getUserId();
-
-  void setUserId(Long userId);
 
   String getEmail();
 

@@ -14,6 +14,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 /**
@@ -26,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
  */
 @Entity
 @Table(name = "Note")
-public class Note implements Serializable, Comparable<Note> {
+public class Note implements Serializable, Comparable<Note>, Identifiable {
 
   private static final long serialVersionUID = 1L;
 
@@ -34,11 +35,11 @@ public class Note implements Serializable, Comparable<Note> {
    * Use this ID to indicate that a note has not yet been saved, and therefore
    * does not yet have a unique ID.
    */
-  public static final Long UNSAVED_ID = null;
+  public static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long noteId = Note.UNSAVED_ID;
+  private long noteId = Note.UNSAVED_ID;
 
   @Column(nullable = false)
   @Temporal(TemporalType.DATE)
@@ -61,14 +62,13 @@ public class Note implements Serializable, Comparable<Note> {
     setOwner(user);
   }
 
-  /**
-   * Internal use only.
-   */
-  public Long getNoteId() {
+  @Override
+  public long getId() {
     return noteId;
   }
 
-  public void setNoteId(Long noteId) {
+  @Override
+  public void setId(long noteId) {
     this.noteId = noteId;
   }
 
@@ -123,8 +123,8 @@ public class Note implements Serializable, Comparable<Note> {
 
   @Override
   public int hashCode() {
-    if (getNoteId() != null && !getNoteId().equals(Note.UNSAVED_ID)) {
-      return getNoteId().hashCode();
+    if (isSaved()) {
+      return Long.valueOf(getId()).hashCode();
     }
     else {
       int hashcode = 1;
@@ -151,13 +151,18 @@ public class Note implements Serializable, Comparable<Note> {
 
   @Override
   public int compareTo(Note o) {
-    if (getNoteId() != null && o.getNoteId() != null) {
-      if (getNoteId() < o.getNoteId()) return -1;
-      if (getNoteId() > o.getNoteId()) return 1;
+    if (isSaved() && o.isSaved()) {
+      if (getId() < o.getId()) return -1;
+      if (getId() > o.getId()) return 1;
     }
     else if (getText() != null && o.getText() != null) {
       return getText().compareTo(o.getText());
     }
     return 0;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 }

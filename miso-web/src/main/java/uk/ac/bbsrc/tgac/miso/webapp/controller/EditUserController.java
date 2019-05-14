@@ -23,14 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -43,31 +37,28 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
-import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
+import uk.ac.bbsrc.tgac.miso.core.service.UserService;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
-@SessionAttributes("user")
 public class EditUserController {
   protected static final Logger log = LoggerFactory.getLogger(EditUserController.class);
 
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private AuthorizationManager authorizationManager;
+  private UserService userService;
   @Autowired
-  private PasswordCodecService passwordCodecService;
+  private AuthorizationManager authorizationManager;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -77,133 +68,52 @@ public class EditUserController {
     this.authorizationManager = authorizationManager;
   }
 
-  public void setPasswordCodecService(PasswordCodecService passwordCodecService) {
-    this.passwordCodecService = passwordCodecService;
-  }
-
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> maxLengths() throws IOException {
-    return securityManager.getUserColumnSizes();
-  }
-
-  @ModelAttribute("groups")
-  public Collection<Group> populateGroups() throws IOException {
-    try {
-      List<Group> groups = new ArrayList<>(securityManager.listAllGroups());
-      Collections.sort(groups);
-      return groups;
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list groups", ex);
-      }
-      throw ex;
-    }
-  }
-
   @ModelAttribute("mutablePassword")
   public boolean populateMutablePassword() {
     return securityManager.isPasswordMutable();
   }
 
   @GetMapping(value = "/user/{userId}")
-  public ModelAndView userForm(@PathVariable Long userId, ModelMap model, HttpServletRequest request)
+  public ModelAndView userForm(@PathVariable long userId, ModelMap model, HttpServletRequest request)
       throws SecurityException, IOException {
-    try {
-      User user = securityManager.getUserById(userId);
-      if (user != null) {
-        if (authorizationManager.getCurrentUser().getLoginName().equals(user.getLoginName())) {
-          model.put("user", user);
-
-          return new ModelAndView("/WEB-INF/pages/editUser.jsp", model);
-        } else {
-          throw new SecurityException("You can only edit your own user details.");
-        }
-      } else {
-        throw new NotFoundException("No user found for ID " + userId.toString());
-      }
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show user", ex);
-      }
-      throw ex;
+    User user = authorizationManager.getCurrentUser();
+    if (userId != user.getId()) {
+      throw new AuthorizationException("You can only edit your own user details.");
     }
+    return setupForm(user, model);
   }
 
   @GetMapping(value = "/admin/user/new")
   public ModelAndView newSetupForm(ModelMap model, HttpServletRequest request) throws IOException {
-    if (securityManager.canCreateNewUser()) {
-      return adminSetupForm(UserImpl.UNSAVED_ID, model, request);
+    authorizationManager.throwIfNonAdmin();
+    if (!securityManager.canCreateNewUser()) {
+      throw new IOException("Cannot add users through the MISO interface.");
     }
-    throw new IOException(
-        "Cannot add users through the MISO interface.");
+    return setupForm(new UserImpl(), model);
   }
 
   @GetMapping(value = "/admin/user/{userId}")
-  public ModelAndView adminSetupForm(@PathVariable Long userId, ModelMap model, HttpServletRequest request) throws IOException {
-    try {
-      model.put("user", userId == UserImpl.UNSAVED_ID ? new UserImpl() : securityManager.getUserById(userId));
-      model.put("title", userId == UserImpl.UNSAVED_ID ? "New User" : ("User " + userId));
-      return new ModelAndView("/WEB-INF/pages/editUser.jsp", model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show user", ex);
-      }
-      throw ex;
+  public ModelAndView adminSetupForm(@PathVariable long userId, ModelMap model) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+    User user = userService.get(userId);
+    if (user == null) {
+      throw new NotFoundException("No user found for ID " + userId);
     }
+    return setupForm(user, model);
   }
 
-  @PostMapping(value = "/admin/user")
-  public String adminProcessSubmit(@ModelAttribute("user") User user, ModelMap model, SessionStatus session, HttpServletRequest request)
-      throws IOException {
-    if (!authorizationManager.isAdminUser()) {
-      throw new IOException("Only administrator can use admin edit page.");
+  private ModelAndView setupForm(User user, ModelMap model) throws IOException {
+    model.put("title", user.isSaved() ? ("User " + user.getId()) : "New User");
+    model.put("user", user);
+
+    ObjectMapper mapper = new ObjectMapper();
+    model.put("userDto", mapper.writeValueAsString(Dtos.asDto(user)));
+
+    if (user.isSaved()) {
+      model.put("groups", user.getGroups().stream().map(Dtos::asDto).collect(Collectors.toList()));
     }
 
-    user.setPassword(null); // null password has the effect of keeping the current password in AbstractSecurityManager
-    processPasswordInput(request, user);
-
-    securityManager.saveUser(user);
-    session.setComplete();
-    model.clear();
-    return "redirect:/miso/admin/users";
+    return new ModelAndView("/WEB-INF/pages/editUser.jsp", model);
   }
 
-  private void processPasswordInput(HttpServletRequest request, User user) throws IOException {
-    if (!securityManager.isPasswordMutable()) {
-      throw new IOException("Cannot change password in MISO directly. Please change your password as directed by your IT department.");
-    }
-    String newPassword = request.getParameter("newpassword");
-    String confirmPassword = request.getParameter("confirmpassword");
-    if (!isStringEmptyOrNull(newPassword) || !isStringEmptyOrNull(confirmPassword)) {
-      if (isStringEmptyOrNull(newPassword) || isStringEmptyOrNull(confirmPassword)) {
-        throw new IOException("New password cannot be empty");
-      }
-      if (!request.getParameter("newpassword").equals(request.getParameter("confirmpassword"))) {
-        throw new IOException("New password and confirmation don't match.");
-      }
-      user.setPassword(passwordCodecService.encrypt(newPassword));
-    }
-  }
-
-  @PostMapping(value = "/user")
-  public ModelAndView processSubmit(@ModelAttribute("user") User user, ModelMap model, SessionStatus session, HttpServletRequest request)
-      throws IOException {
-    User original = authorizationManager.getCurrentUser();
-    if (!original.getUserId().equals(user.getUserId())) {
-      throw new AuthorizationIOException("Permission denied.");
-    }
-
-    user.setPassword(null); // null password has the effect of keeping the current password in AbstractSecurityManager
-    if (!isStringEmptyOrNull(request.getParameter("currentPassword"))) {
-      if (!passwordCodecService.getEncoder().isPasswordValid(original.getPassword(), request.getParameter("currentPassword"), null)) {
-        throw new IOException("Existing password does not match.");
-      }
-      processPasswordInput(request, user);
-    }
-
-    securityManager.saveUser(user);
-    session.setComplete();
-    model.clear();
-    return new ModelAndView("redirect:/miso/myAccount", model);
-  }
 }

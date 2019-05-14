@@ -69,7 +69,7 @@ public class HibernateSampleQcDaoTest extends AbstractDAOTest {
   public void testGet() throws IOException {
     SampleQC sampleQC = dao.get(1L);
     assertNotNull(sampleQC);
-    assertEquals(1L, sampleQC.getCreator().getUserId().longValue());
+    assertEquals(1L, sampleQC.getCreator().getId());
   }
 
   @Test
@@ -95,7 +95,7 @@ public class HibernateSampleQcDaoTest extends AbstractDAOTest {
     newSampleQC.setType(new QcType());
     newSampleQC.getType().setId(1L);
     newSampleQC.setCreator(new UserImpl());
-    newSampleQC.getCreator().setUserId(1L);
+    newSampleQC.getCreator().setId(1L);
     newSampleQC.setCreationTime(new Date());
     newSampleQC.setLastModified(new Date());
     long id = dao.save(newSampleQC);

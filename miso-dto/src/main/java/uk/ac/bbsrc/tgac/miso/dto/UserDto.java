@@ -10,6 +10,7 @@ public class UserDto {
   private boolean internal;
   private boolean loggedIn;
   private String loginName;
+  private String password;
 
   public String getEmail() {
     return email;
@@ -81,5 +82,13 @@ public class UserDto {
 
   public void setLoginName(String loginName) {
     this.loginName = loginName;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
   }
 }

@@ -48,7 +48,6 @@ import org.springframework.web.context.request.WebRequest;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
@@ -81,7 +80,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.service.GroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
+import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
@@ -116,7 +117,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   private ProjectService projectService;
 
   @Autowired
-  private SecurityManager securityManager;
+  private UserService userService;
+  @Autowired
+  private GroupService groupService;
 
   @Autowired
   private LibraryDesignService libraryDesignService;
@@ -328,17 +331,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   }
 
   /**
-   * Sets the securityManager of this LimsBindingInitializer object.
-   * 
-   * @param securityManager
-   *          securityManager.
-   */
-  public void setSecurityManager(SecurityManager securityManager) {
-    assert (securityManager != null);
-    this.securityManager = securityManager;
-  }
-
-  /**
    * Init this binder, registering all the custom editors to class types
    * 
    * @param binder
@@ -367,14 +359,14 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<Group>(Group.class) {
       @Override
       public Group resolveById(long id) throws Exception {
-        return securityManager.getGroupById(id);
+        return groupService.get(id);
       }
     }.register(binder).register(binder, Set.class, "groups");
 
     new BindingConverterById<User>(User.class) {
       @Override
       public User resolveById(long id) throws Exception {
-        return securityManager.getUserById(id);
+        return userService.get(id);
       }
     }.register(binder, Set.class, "users");
 

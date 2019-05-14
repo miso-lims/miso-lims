@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -105,7 +105,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   @Autowired
   private ChangeLogService changeLogService;
   @Autowired
-  private SecurityManager securityManager;
+  private UserService userService;
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
@@ -181,13 +181,13 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
 
   @Override
   public void deleteNote(Run run, Long noteId) throws IOException {
-    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
+    if (noteId == null) {
       throw new IllegalArgumentException("Cannot delete an unsaved Note");
     }
     Run managed = runDao.get(run.getId());
     Note deleteNote = null;
     for (Note note : managed.getNotes()) {
-      if (note.getNoteId().equals(noteId)) {
+      if (note.getId() == noteId.longValue()) {
         deleteNote = note;
         break;
       }
@@ -455,8 +455,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     changeLogService.create(changeLog);
   }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
+  public void setUserService(UserService userService) {
+    this.userService = userService;
   }
 
   public void setNamingScheme(NamingScheme namingScheme) {
@@ -492,7 +492,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       Predicate<SequencingParameters> filterParameters, GetLaneContents getLaneContents, String positionName)
       throws IOException, MisoNamingException {
     final Date now = new Date();
-    User user = securityManager.getUserByLoginName("notification");
+    User user = userService.getByLoginName("notification");
     final Run target;
 
     Run runFromDb = runDao.getByAlias(source.getAlias());

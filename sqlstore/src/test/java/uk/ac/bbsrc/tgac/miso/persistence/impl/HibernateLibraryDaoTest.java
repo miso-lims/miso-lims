@@ -78,7 +78,7 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
     libraryStrategyType.setId(1L);
     library.setLibraryStrategyType(libraryStrategyType);
     User mockUser = new UserImpl();
-    mockUser.setUserId(1L);
+    mockUser.setId(1L);
     Date now = new Date();
     library.setCreator(mockUser);
     library.setCreationTime(now);

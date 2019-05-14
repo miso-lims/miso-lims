@@ -22,12 +22,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.SuperuserAuthentication;
+import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.core.util.LatencyHistogram;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
@@ -80,12 +80,12 @@ public class RunScannerClient {
   @Autowired
   private RunService runService;
   @Autowired
-  private SecurityManager securityManager;
+  private UserService userService;
   private final ConcurrentMap<String, ProgressiveRequestDto> servers = new ConcurrentHashMap<>();
 
   private void processResults(List<NotificationDto> results) {
     try {
-      User user = securityManager.getUserByLoginName("notification");
+      User user = userService.getByLoginName("notification");
       SecurityContextHolder.getContext().setAuthentication(new SuperuserAuthentication(user));
 
       try (AutoCloseable timer = acquireTime.start()) {

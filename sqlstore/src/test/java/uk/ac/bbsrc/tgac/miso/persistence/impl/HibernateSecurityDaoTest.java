@@ -3,11 +3,9 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 
 import org.hibernate.SessionFactory;
@@ -49,7 +47,6 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
   }
   
@@ -63,7 +60,7 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
   public void testGetUserById() throws IOException {
     User user = dao.getUserById(1L);
     assertNotNull(user);
-    assertEquals(Long.valueOf(1L), user.getUserId());
+    assertEquals(1L, user.getId());
     assertEquals(true, user.isActive());
     assertEquals(false, user.isExternal());
     assertEquals("admin", user.getFullName());
@@ -101,53 +98,8 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
   }
   
   @Test
-  public void testUserByEmail() throws IOException {
-    User user = dao.getUserByEmail("admin@admin");
-    assertNotNull(user);
-    assertEquals("admin@admin", user.getEmail());
-  }
-  
-  @Test
-  public void testGetUserByEmailNone() throws IOException {
-    assertNull(dao.getUserByEmail("nonexistant@email"));
-  }
-  
-  @Test
-  public void testGetUserByEmailNull() throws IOException {
-    assertNull(dao.getUserByEmail(null));
-  }
-  
-  @Test
   public void testListAllUsers() throws IOException {
     assertEquals(3, dao.listAllUsers().size());
-  }
-  
-  @Test
-  public void testListUsersByIds() throws IOException {
-    List<Long> ids = new ArrayList<>();
-    assertEquals(0, dao.listUsersByIds(ids).size());
-    ids.add(1L);
-    assertEquals(1, dao.listUsersByIds(ids).size());
-    ids.add(3L);
-    assertEquals(2, dao.listUsersByIds(ids).size());
-    ids.add(100L);
-    assertEquals(2, dao.listUsersByIds(ids).size());
-  }
-  
-  @Test
-  public void testListUsersByGroup() throws IOException {
-    assertEquals(2, dao.listUsersByGroupName("TestGroup").size());
-  }
-  
-  @Test
-  public void testListUsersByGroupNameNone() throws IOException {
-    assertEquals(0, dao.listUsersByGroupName("nonexistant group").size());
-  }
-  
-  @Test
-  public void testListUsersByGroupNameNull() throws IOException {
-    exception.expect(NullPointerException.class);
-    dao.listUsersByGroupName(null).size();
   }
   
   @Test
@@ -192,7 +144,7 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
   public void testGetGroupById() throws IOException {
     Group group = dao.getGroupById(1L);
     assertNotNull(group);
-    assertEquals(Long.valueOf(1L), group.getGroupId());
+    assertEquals(1L, group.getId());
     assertEquals("TestGroup", group.getName());
     assertEquals("Is full of testing", group.getDescription());
   }
@@ -212,42 +164,23 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
   public void testGetGroupByName() throws IOException {
     Group group = dao.getGroupByName("TestGroup");
     assertNotNull(group);
-    assertEquals(Long.valueOf(1L), group.getGroupId());
+    assertEquals(1L, group.getId());
   }
-  
+
   @Test
   public void testGetGroupByNameNone() throws IOException {
     assertNull(dao.getGroupByName("nonexistant group"));
   }
-  
+
   @Test
   public void testGetGroupByNameNull() throws IOException {
     exception.expect(NullPointerException.class);
     dao.getGroupByName(null);
   }
-  
+
   @Test
   public void testListAllGroups() throws IOException {
     assertEquals(1, dao.listAllGroups().size());
-  }
-  
-  @Test
-  public void testListGroupsByUserId() throws IOException {
-    assertEquals(1, dao.listGroupsByUserId(1L).size());
-    assertEquals(0, dao.listGroupsByUserId(2L).size());
-    assertEquals(1, dao.listGroupsByUserId(3L).size());
-  }
-  
-  @Test
-  public void testListGroupsByIds() throws IOException {
-    List<Long> ids = new ArrayList<>();
-    assertEquals(0, dao.listGroupsByIds(ids).size());
-    ids.add(100L);
-    assertEquals(0, dao.listGroupsByIds(ids).size());
-    ids.add(1L);
-    assertEquals(1, dao.listGroupsByIds(ids).size());
-    ids.add(2L);
-    assertEquals(2, dao.listGroupsByIds(ids).size());
   }
   
   @Test
@@ -272,19 +205,9 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
     Group group = dao.getGroupById(1L);
     assertNotNull(group);
     group.setDescription("new description");
-    assertEquals(group.getGroupId().longValue(), dao.saveGroup(group));
+    assertEquals(group.getId(), dao.saveGroup(group));
     Group saved = dao.getGroupById(1L);
     assertEquals(group.getDescription(), saved.getDescription());
-  }
-  
-  @Test
-  public void testGetUserColumnSizes() throws IOException {
-    assertTrue(dao.getUserColumnSizes().size() > 9);
-  }
-
-  @Test
-  public void testGetGroupColumnSizes() throws IOException {
-    assertTrue(dao.getGroupColumnSizes().size() > 2);
   }
   
 }

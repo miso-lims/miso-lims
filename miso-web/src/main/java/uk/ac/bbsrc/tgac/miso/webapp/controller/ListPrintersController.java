@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -35,10 +34,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 
 @Controller
@@ -46,13 +45,13 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 public class ListPrintersController {
 
   @Autowired
-  private SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   private final ListItemsPage listPage = new ListItemsPage("printer") {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put("isAdmin", securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()).isAdmin());
+      config.put("isAdmin", authorizationManager.getCurrentUser().isAdmin());
     }
 
   };

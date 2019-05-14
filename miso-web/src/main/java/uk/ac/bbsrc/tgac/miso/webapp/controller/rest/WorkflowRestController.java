@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
+import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.WorkflowStateDto;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -37,7 +37,7 @@ public class WorkflowRestController extends RestController {
   WorkflowManager workflowManager;
 
   @Autowired
-  private SecurityManager securityManager;
+  private UserService userService;
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -90,7 +90,7 @@ public class WorkflowRestController extends RestController {
     User user = authorizationManager.getCurrentUser();
     Set<WorkflowName> favouriteWorkflows = user.getFavouriteWorkflows();
     favouriteWorkflows.add(workflowName);
-    securityManager.saveUser(user);
+    userService.update(user);
   }
 
   @PostMapping(value = "/favourites/remove/{workflowName}")
@@ -101,6 +101,6 @@ public class WorkflowRestController extends RestController {
     User user = authorizationManager.getCurrentUser();
     Set<WorkflowName> favouriteWorkflows = user.getFavouriteWorkflows();
     favouriteWorkflows.remove(workflowName);
-    securityManager.saveUser(user);
+    userService.update(user);
   }
 }

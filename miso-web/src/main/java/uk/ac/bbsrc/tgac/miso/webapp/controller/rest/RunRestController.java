@@ -33,14 +33,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,7 +51,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -89,6 +85,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 /**
  * A controller to handle all REST requests for Runs
@@ -130,9 +127,8 @@ public class RunRestController extends RestController {
     }
   }
 
-  protected static final Logger log = LoggerFactory.getLogger(RunRestController.class);
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
   @Autowired
   private RunService runService;
   @Autowired
@@ -156,10 +152,6 @@ public class RunRestController extends RestController {
       return runService;
     }
   };
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
 
   @GetMapping(value = "/{runId}", produces = "application/json")
   public @ResponseBody RunDto getRunById(@PathVariable long runId) throws IOException {
@@ -204,7 +196,7 @@ public class RunRestController extends RestController {
     if (run == null) {
       throw new RestException("Run does not exist.", Status.NOT_FOUND);
     }
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     if (run.getSequencerPartitionContainers().size() != 1) {
       throw new RestException(
           "Expected 1 sequencing container for run " + run.getAlias() + ", but found " + run.getSequencerPartitionContainers().size());

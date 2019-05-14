@@ -5,6 +5,8 @@ Changes:
   * Removed old REST endpoints
   * Changed /miso/library/dilution URLs to /miso/dilution
   * Added project change logs
+  * Changed Edit User and Edit Group pages to show validation messages instead of error page when
+    saving fails
   * Fixed incompatibility of some forms with Firefox versions < 62
 
 # 0.2.176

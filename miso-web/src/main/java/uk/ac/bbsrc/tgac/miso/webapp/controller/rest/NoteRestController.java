@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.eaglegenomics.simlims.core.Note;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.NoteService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
@@ -87,7 +88,7 @@ public class NoteRestController extends RestController {
   @Autowired
   private SampleService sampleService;
 
-  private <T> void addNote(NoteService<T> service, long entityId, NoteRequest request) throws IOException {
+  private <T extends Identifiable> void addNote(NoteService<T> service, long entityId, NoteRequest request) throws IOException {
     T entity = service.get(entityId);
     Note note = new Note();
 
@@ -104,7 +105,7 @@ public class NoteRestController extends RestController {
     addNote(serviceForEntityType(entityType), entityId, request);
   }
 
-  private <T> void deleteNote(NoteService<T> service, long entityId, long noteId) throws IOException {
+  private <T extends Identifiable> void deleteNote(NoteService<T> service, long entityId, long noteId) throws IOException {
     T entity = service.get(entityId);
     service.deleteNote(entity, noteId);
 

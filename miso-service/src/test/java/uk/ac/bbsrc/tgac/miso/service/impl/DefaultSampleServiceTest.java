@@ -182,7 +182,7 @@ public class DefaultSampleServiceTest {
     Sample created = createdCapture.getValue();
     assertEquals("shell project should be replaced by real project", expectedProject.getAlias(), created.getProject().getAlias());
     assertNotNull("modification details should be added", created.getLastModifier());
-    assertEquals("modification details should be added", expectedLastModifier.getUserId(), created.getLastModifier().getUserId());
+    assertEquals("modification details should be added", expectedLastModifier.getId(), created.getLastModifier().getId());
     assertTrue("expected a plain sample", LimsUtils.isPlainSample(created));
 
     // name generators get called after initial save
@@ -546,14 +546,14 @@ public class DefaultSampleServiceTest {
     dbSample.setId(paramSample.getId());
     dbSample.setAlias("persistedSample");
     Note note = new Note();
-    note.setNoteId(3L);
+    note.setId(3L);
     User owner = new UserImpl();
-    owner.setUserId(5L);
+    owner.setId(5L);
     note.setOwner(owner);
     dbSample.addNote(note);
     Mockito.when(sampleStore.get(paramSample.getId())).thenReturn(dbSample);
 
-    sut.deleteNote(paramSample, note.getNoteId());
+    sut.deleteNote(paramSample, note.getId());
 
     Mockito.verify(authorizationManager).throwIfNonAdminOrMatchingOwner(owner);
     ArgumentCaptor<Sample> capture = ArgumentCaptor.forClass(Sample.class);
@@ -652,9 +652,9 @@ public class DefaultSampleServiceTest {
 
   private User mockUser() throws IOException {
     User user = new UserImpl();
-    user.setUserId(15L);
+    user.setId(15L);
     Mockito.when(authorizationManager.getCurrentUser()).thenReturn(user);
-    Mockito.when(securityStore.getUserById(user.getUserId())).thenReturn(user);
+    Mockito.when(securityStore.getUserById(user.getId())).thenReturn(user);
     return user;
   }
 

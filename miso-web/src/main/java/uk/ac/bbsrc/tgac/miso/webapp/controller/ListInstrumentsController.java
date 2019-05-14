@@ -28,7 +28,6 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -36,11 +35,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 @Controller
@@ -51,17 +50,14 @@ public class ListInstrumentsController {
       .compare(InstrumentType.get(a).ordinal(), InstrumentType.get(b).ordinal());
 
   @Autowired
-  private SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   private final TabbedListItemsPage listPage = new TabbedListItemsPage("instrument", "instrumentType",
       Stream.of(InstrumentType.values()), sortByOrdinal, InstrumentType::getLabel, InstrumentType::name) {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put("isAdmin",
-          securityManager
-              .getUserByLoginName(SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication().getName())
-              .isAdmin());
+      config.put("isAdmin", authorizationManager.getCurrentUser().isAdmin());
     }
 
   };

@@ -22,9 +22,6 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 
 public class HibernateChangeLogDaoTest extends AbstractDAOTest {
 
@@ -44,7 +41,7 @@ public class HibernateChangeLogDaoTest extends AbstractDAOTest {
   @Before
   public void setup() throws Exception {
     MockitoAnnotations.initMocks(this);
-    user.setUserId(1L);
+    user.setId(1L);
     when(securityDAO.getUserById(anyLong())).thenReturn(user);
     sut.setSessionFactory(sessionFactory);
     libraryDao.setSessionFactory(sessionFactory);
@@ -96,7 +93,7 @@ public class HibernateChangeLogDaoTest extends AbstractDAOTest {
     assertEquals(1, list.size());
     ChangeLog cl = list.iterator().next();
     assertEquals("qcPassed", cl.getColumnsChanged());
-    assertEquals(Long.valueOf(1L), cl.getUser().getUserId());
+    assertEquals(1L, cl.getUser().getId());
     assertEquals("false -> true", cl.getSummary());
     Date date = new Date(ISODateTimeFormat.dateTimeParser().parseDateTime("2016-07-07T13:31:01").getMillis());
     assertEquals(date, cl.getTime());

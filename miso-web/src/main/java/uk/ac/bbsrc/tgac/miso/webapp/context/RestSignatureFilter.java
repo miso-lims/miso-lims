@@ -35,7 +35,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -45,10 +44,10 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
+import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler;
@@ -62,9 +61,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler.RestErr
  */
 public class RestSignatureFilter extends OncePerRequestFilter {
   @Autowired
-  AuthenticationManager authenticationManager;
-  @Autowired
-  SecurityManager securityManager;
+  private UserService userService;
   
   /** Used during development only. Set this to true to use REST resources without authentication. Good for manual testing/exploration. */
   private static boolean UNAUTHENTICATED_MODE = false;
@@ -89,10 +86,6 @@ public class RestSignatureFilter extends OncePerRequestFilter {
   public RestSignatureFilter(SecurityContextRepository securityContextRepository) {
     super();
     this.securityContextRepository = securityContextRepository;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
   
   @Override
@@ -169,7 +162,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
 
     User userdetails = null;
     com.eaglegenomics.simlims.core.User user;
-    user = securityManager.getUserByLoginName(UNAUTHENTICATED_MODE_USER);
+    user = userService.getByLoginName(UNAUTHENTICATED_MODE_USER);
     if (user != null) {
       userdetails = LimsSecurityUtils.toUserDetails(user);
     }
@@ -214,7 +207,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
     User userdetails = null;
     boolean validSignature = false;
     try {
-      com.eaglegenomics.simlims.core.User user = securityManager.getUserByLoginName(loginName);
+      com.eaglegenomics.simlims.core.User user = userService.getByLoginName(loginName);
       if (loginName.equals("notification")) {
         logger.info("Incoming notification request");
         validSignature = SignatureHelper.validateSignature(request, SignatureHelper.PUBLIC_KEY, signature);

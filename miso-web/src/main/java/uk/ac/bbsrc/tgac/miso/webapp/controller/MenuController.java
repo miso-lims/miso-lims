@@ -42,7 +42,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,7 +54,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -119,6 +117,7 @@ import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 import io.prometheus.client.Gauge;
 
@@ -134,7 +133,7 @@ public class MenuController implements ServletContextAware {
 
   ServletContext servletContext;
   @Autowired
-  private SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
   @Autowired
   private KitDescriptorService kitService;
   @Autowired
@@ -218,7 +217,7 @@ public class MenuController implements ServletContextAware {
   @RequestMapping("/myAccount")
   public ModelAndView myAccountMenu(ModelMap model) {
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      User user = authorizationManager.getCurrentUser();
       String realName = user.getFullName();
       StringBuilder groups = new StringBuilder();
       for (String role : user.getRoles()) {
@@ -226,7 +225,7 @@ public class MenuController implements ServletContextAware {
       }
       model.put("title", "My Account");
       model.put("userRealName", realName);
-      model.put("userId", user.getUserId());
+      model.put("userId", user.getId());
       model.put("apiKey", SignatureHelper.generatePrivateUserKey((user.getLoginName() + "::" + user.getPassword()).getBytes("UTF-8")));
       model.put("userGroups", groups.toString());
       return new ModelAndView("/WEB-INF/pages/myAccount.jsp", model);
@@ -239,13 +238,9 @@ public class MenuController implements ServletContextAware {
     }
   }
 
-  public void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
   @RequestMapping("/mainMenu")
   public ModelAndView mainMenu(ModelMap model) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     model.put("title", "Home");
     ObjectMapper mapper = new ObjectMapper();
     model.put("favouriteWorkflows",
@@ -269,7 +264,7 @@ public class MenuController implements ServletContextAware {
     }
   }
 
-  @RequestMapping(path = "/constants.js")
+  @GetMapping(path = "/constants.js")
   @ResponseBody
   public ResponseEntity<String> constantsScript(HttpServletResponse response, final UriComponentsBuilder uriBuilder) throws IOException {
     response.setContentType("application/javascript");

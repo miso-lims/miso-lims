@@ -151,7 +151,7 @@ public class DefaultWorkflowManager implements WorkflowManager {
 
   @Override
   public List<Workflow> listUserWorkflows() throws IOException {
-    return progressStore.listByUserId(authorizationManager.getCurrentUser().getUserId()).stream()
+    return progressStore.listByUserId(authorizationManager.getCurrentUser().getId()).stream()
         .map(progress -> progress.getWorkflowName().createWorkflow(progress)).collect(Collectors.toList());
   }
 

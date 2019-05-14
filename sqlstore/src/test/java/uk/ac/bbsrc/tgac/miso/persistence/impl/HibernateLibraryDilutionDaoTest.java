@@ -46,7 +46,7 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
   public void setUp() throws MisoNamingException {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
-    emptyUser.setUserId(1L);
+    emptyUser.setId(1L);
   }
 
   @Test

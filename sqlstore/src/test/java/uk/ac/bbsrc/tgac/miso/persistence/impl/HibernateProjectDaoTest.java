@@ -4,7 +4,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Date;
@@ -12,14 +11,12 @@ import java.util.List;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
@@ -50,8 +47,6 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
   // a project to save
   private final Project project = new ProjectImpl();
 
-  private final Group group = new Group();
-
   /**
    * @throws java.lang.Exception
    */
@@ -67,13 +62,11 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
     referenceGenome.setAlias("hg19");
     project.setReferenceGenome(referenceGenome);
     User user = new UserImpl();
-    user.setUserId(1L);
+    user.setId(1L);
     project.setCreator(user);
     project.setCreationTime(new Date());
     project.setLastModifier(user);
     project.setLastModified(new Date());
-
-    when(securityStore.getGroupByName("ProjectWatchers")).thenReturn(group);
   }
 
   /**
@@ -88,19 +81,6 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
 
     Project savedProject = projectDAO.get(savedProjectId);
     assertEquals(testAlias, savedProject.getAlias());
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#saveOverview(uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview)}
-   * .
-   * 
-   * @throws IOException
-   */
-  @Ignore
-  @Test
-  public void testSaveOverview() throws IOException {
-    // TODO: implement.
   }
 
   /**
@@ -135,18 +115,6 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#removeOverview(uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview)}
-   * .
-   */
-  @Ignore
-  @Test
-  public void testRemoveOverview() {
-    // TODO: Uses cache so ignoring test for now.
-    // TODO : Implement
-  }
-
-  /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#get(long)}.
    * 
    * @throws IOException
@@ -155,17 +123,6 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
   public void testGet() throws IOException {
     Project p = projectDAO.get(1);
     assertNotNull(p);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#listBySearch(java.lang.String)} .
-   */
-  @Ignore
-  @Test
-  public void testListBySearch() {
-    // TODO: Delete this method.
-    // It allows you to pass in hard mysql query string to
-    // return a project. I have deprecated it.
   }
 
   /**
@@ -199,38 +156,6 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
   public void testGetByStudyId() throws IOException {
     Project p = projectDAO.getByStudyId(1L);
     assertNotNull(p);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#lazyGetProjectOverviewById(long)} .
-   */
-  @Test
-  public void testLazyGetProjectOverviewById() {
-    // TODO : Implement
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#listOverviewsByProjectId(long)} .
-   */
-  @Test
-  public void testListOverviewsByProjectId() {
-    // TODO : Implement
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#listIssueKeysByProjectId(long)} .
-   */
-  @Test
-  public void testListIssueKeysByProjectId() {
-    // TODO : Implement
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#getProjectColumnSizes()} .
-   */
-  @Test
-  public void testGetProjectColumnSizes() {
-    // TODO : Implement
   }
 
 }

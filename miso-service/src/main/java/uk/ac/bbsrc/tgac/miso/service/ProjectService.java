@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 
 public interface ProjectService extends SaveService<Project> {
 
