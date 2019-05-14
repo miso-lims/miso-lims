@@ -22,12 +22,14 @@
  */
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -48,12 +50,15 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ProjectChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 
@@ -74,13 +79,29 @@ public class ProjectImpl implements Project {
    */
   private static final long UNSAVED_ID = 0L;
 
-  @Column(updatable = false)
-  @Temporal(TemporalType.TIMESTAMP)
-  private Date creationDate = new Date();
   private String description = "";
   private String name = "";
   private String alias = "";
   private String shortName;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
+
+  @Column(name = "created", nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date creationTime;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier", nullable = false)
+  private User lastModifier;
+
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
+
+  @OneToMany(targetEntity = ProjectChangeLog.class, mappedBy = "project", cascade = CascadeType.REMOVE)
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @OneToMany(targetEntity = FileAttachment.class)
   @JoinTable(name = "Project_Attachment", joinColumns = { @JoinColumn(name = "projectId") }, inverseJoinColumns = {
@@ -91,8 +112,9 @@ public class ProjectImpl implements Project {
   private List<FileAttachment> pendingAttachmentDeletions;
 
   @Id
+  @Column(name = "projectId")
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long projectId = UNSAVED_ID;
+  private long id = UNSAVED_ID;
 
   @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.LAZY, mappedBy = "project")
   private Collection<Sample> samples = new HashSet<>();
@@ -111,22 +133,6 @@ public class ProjectImpl implements Project {
   @ManyToOne(targetEntity = TargetedSequencing.class)
   @JoinColumn(name = "targetedSequencingId", referencedColumnName = "targetedSequencingId", nullable = true)
   private TargetedSequencing defaultTargetedSequencing;
-
-
-  @Column(nullable = false)
-  @Temporal(TemporalType.TIMESTAMP)
-  private Date lastUpdated;
-
-  /**
-   * Construct a new Project
-   */
-  public ProjectImpl() {
-  }
-
-  @Override
-  public Date getCreationDate() {
-    return creationDate;
-  }
 
   @Override
   public String getDescription() {
@@ -155,12 +161,12 @@ public class ProjectImpl implements Project {
 
   @Override
   public long getId() {
-    return projectId;
+    return id;
   }
 
   @Override
   public void setId(long id) {
-    this.projectId = id;
+    this.id = id;
   }
 
   @Override
@@ -171,11 +177,6 @@ public class ProjectImpl implements Project {
   @Override
   public Collection<Study> getStudies() {
     return studies;
-  }
-
-  @Override
-  public void setCreationDate(Date date) {
-    this.creationDate = date;
   }
 
   @Override
@@ -219,16 +220,6 @@ public class ProjectImpl implements Project {
   @Override
   public void setProgress(ProgressType progress) {
     this.progress = progress;
-  }
-
-  @Override
-  public Date getLastUpdated() {
-    return lastUpdated;
-  }
-
-  @Override
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
   }
 
   public void addStudy(Study s) {
@@ -282,7 +273,7 @@ public class ProjectImpl implements Project {
     StringBuilder sb = new StringBuilder();
     sb.append(getId());
     sb.append(" : ");
-    sb.append(getCreationDate());
+    sb.append(getCreationTime());
     sb.append(" : ");
     sb.append(getName());
     sb.append(" : ");
@@ -339,6 +330,61 @@ public class ProjectImpl implements Project {
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    ProjectChangeLog change = new ProjectChangeLog();
+    change.setProject(this);
+    change.setSummary(summary);
+    change.setColumnsChanged(columnsChanged);
+    change.setUser(user);
+    return change;
+  }
+
+  @Override
+  public User getCreator() {
+    return creator;
+  }
+
+  @Override
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return creationTime;
+  }
+
+  @Override
+  public void setCreationTime(Date creationTime) {
+    this.creationTime = creationTime;
+  }
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
   }
 
 }

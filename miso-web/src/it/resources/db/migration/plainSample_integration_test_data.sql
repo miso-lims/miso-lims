@@ -123,9 +123,8 @@ INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLen
 INSERT INTO Instrument (instrumentId, name, instrumentModelId) VALUES
   (1, 'T2500', 1);
 
-INSERT INTO Project(projectId, name, alias, shortName, creationDate, description,
-  progress, referenceGenomeId, lastUpdated) VALUES
-  (1, 'PRO1', 'PLAIN', NULL, '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00');
+INSERT INTO Project(projectId, name, alias, shortName, created, description, progress, referenceGenomeId, lastModified, creator, lastModifier) VALUES
+  (1, 'PRO1', 'PLAIN', NULL, '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1);
   
 INSERT INTO Study (studyId, name, project_projectId, alias, studyTypeId, creator, created, lastModifier, lastModified) VALUES
 (1, 'STU1',  1, 'PLAIN Study One', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');

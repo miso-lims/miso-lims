@@ -18,15 +18,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.Group;
+import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -36,9 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  *
  */
 public class HibernateProjectDaoTest extends AbstractDAOTest {
-
-  @Autowired
-  private JdbcTemplate jdbcTemplate;
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -60,7 +58,6 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    projectDAO.setJdbcTemplate(jdbcTemplate);
     projectDAO.setSessionFactory(sessionFactory);
     projectDAO.setSecurityStore(securityStore);
 
@@ -69,7 +66,12 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
     referenceGenome.setId(1L);
     referenceGenome.setAlias("hg19");
     project.setReferenceGenome(referenceGenome);
-    project.setLastUpdated(new Date());
+    User user = new UserImpl();
+    user.setUserId(1L);
+    project.setCreator(user);
+    project.setCreationTime(new Date());
+    project.setLastModifier(user);
+    project.setLastModified(new Date());
 
     when(securityStore.getGroupByName("ProjectWatchers")).thenReturn(group);
   }
@@ -119,7 +121,6 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
   public void testListAllWithLimit() throws IOException {
     List<Project> projects = projectDAO.listAllWithLimit(2L);
     assertEquals(2, projects.size());
-
   }
 
   /**

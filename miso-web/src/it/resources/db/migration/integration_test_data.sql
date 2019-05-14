@@ -354,23 +354,22 @@ INSERT INTO ServiceRecord(recordId, instrumentId, title, details, servicedBy, re
   (151, 101, 'Test 151', NULL, NULL, NULL, '2017-09-12', NULL, NULL, 0),
   (152, 101, 'Test 152', 'details to remove', 'technitchin', 'Riffraff', '2017-09-12', '2017-09-11 11:00:00', '2017-09-12 12:00:00', 1);
 
-INSERT INTO Project(projectId, name, alias, shortName, creationDate, description,
-  progress, referenceGenomeId, lastUpdated) VALUES
-  (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00'),
-  (2, 'PRO2', 'Project Two', 'PRO2', '2017-07-20', 'integration test project for custom identities', 'ACTIVE', 1, '2017-07-20 16:55:00'),
-  (3, 'PRO3', 'Test Data', 'TEST', '2017-06-27', 'integration test project three', 'ACTIVE', 1, '2017-06-27 14:12:00'),
-  (4, 'PRO4', 'Project To Change', 'DELTA', '2017-08-04', 'integration test project for changing fields', 'PROPOSED', 2, '2017-08-04 15:12:00'),
-  (5, 'PRO5', 'Search Tables Project', 'SRCH', '2017-10-10', 'integration test project five', 'ACTIVE', 1, '2017-10-10 10:10:10'),
-  (100001, 'PRO100001', 'BulkLibraryIT', 'LIBT', '2017-07-24', 'bulk library test project', 'ACTIVE', 1, '2017-07-24 16:11:00'),
-  (110001, 'PRO110001', 'SingleLibraryIT', '1LIB', '2017-08-16', 'single library test project', 'ACTIVE', 1, '2017-08-16 16:11:00'),
-  (120001, 'PRO120001', 'SinglePoolIT', '1IPO', '2017-08-22', 'single pool test project', 'ACTIVE', 1, '2017-08-22 16:35:00'),
-  (200001, 'PRO200001', 'BulkPoolIT', 'IPOT', '2017-08-15', 'bulk Pool test project', 'ACTIVE', 1, '2017-08-15 12:22:00'),
-  (200, 'PRO200', 'HotSorting', 'SORT', '2017-08-09', 'test sorting by BoxPosition in Handsontable', 'ACTIVE', 1, '2017-08-09 11:51:00'),
-  (300, 'PRO300', 'BulkDilutionIT', 'DILT', '2017-08-14', 'bulk dilution test project', 'ACTIVE', 1, '2017-08-14 11:54:00'),
-  (400, 'PRO400', 'StudiesIT', 'STUT', '2017-08-16', 'studies test project', 'ACTIVE', 1, '2017-08-16 14:50:00'),
-  (500, 'PRO500', 'Tubes In Boxes', 'TIB', '2017-08-15', 'test tubes in and out of boxes', 'ACTIVE', 1, '2017-08-15 13:45:00'),
-  (4440, 'PRO4440', 'Propagate Samples', 'PROP', '2017-10-26', 'propagate samples', 'ACTIVE', 1, '2017-10-26 14:20:00'),
-  (2200, 'PRO2200', 'Update Via QC', 'UQC', '2018-07-10', 'update via qc', 'ACTIVE', 1, '2018-07-10 12:52:00');
+INSERT INTO Project(projectId, name, alias, shortName, created, description, progress, referenceGenomeId, lastModified, creator, lastModifier) VALUES
+  (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1),
+  (2, 'PRO2', 'Project Two', 'PRO2', '2017-07-20', 'integration test project for custom identities', 'ACTIVE', 1, '2017-07-20 16:55:00', 1, 1),
+  (3, 'PRO3', 'Test Data', 'TEST', '2017-06-27', 'integration test project three', 'ACTIVE', 1, '2017-06-27 14:12:00', 1, 1),
+  (4, 'PRO4', 'Project To Change', 'DELTA', '2017-08-04', 'integration test project for changing fields', 'PROPOSED', 2, '2017-08-04 15:12:00', 1, 1),
+  (5, 'PRO5', 'Search Tables Project', 'SRCH', '2017-10-10', 'integration test project five', 'ACTIVE', 1, '2017-10-10 10:10:10', 1, 1),
+  (100001, 'PRO100001', 'BulkLibraryIT', 'LIBT', '2017-07-24', 'bulk library test project', 'ACTIVE', 1, '2017-07-24 16:11:00', 1, 1),
+  (110001, 'PRO110001', 'SingleLibraryIT', '1LIB', '2017-08-16', 'single library test project', 'ACTIVE', 1, '2017-08-16 16:11:00', 1, 1),
+  (120001, 'PRO120001', 'SinglePoolIT', '1IPO', '2017-08-22', 'single pool test project', 'ACTIVE', 1, '2017-08-22 16:35:00', 1, 1),
+  (200001, 'PRO200001', 'BulkPoolIT', 'IPOT', '2017-08-15', 'bulk Pool test project', 'ACTIVE', 1, '2017-08-15 12:22:00', 1, 1),
+  (200, 'PRO200', 'HotSorting', 'SORT', '2017-08-09', 'test sorting by BoxPosition in Handsontable', 'ACTIVE', 1, '2017-08-09 11:51:00', 1, 1),
+  (300, 'PRO300', 'BulkDilutionIT', 'DILT', '2017-08-14', 'bulk dilution test project', 'ACTIVE', 1, '2017-08-14 11:54:00', 1, 1),
+  (400, 'PRO400', 'StudiesIT', 'STUT', '2017-08-16', 'studies test project', 'ACTIVE', 1, '2017-08-16 14:50:00', 1, 1),
+  (500, 'PRO500', 'Tubes In Boxes', 'TIB', '2017-08-15', 'test tubes in and out of boxes', 'ACTIVE', 1, '2017-08-15 13:45:00', 1, 1),
+  (4440, 'PRO4440', 'Propagate Samples', 'PROP', '2017-10-26', 'propagate samples', 'ACTIVE', 1, '2017-10-26 14:20:00', 1, 1),
+  (2200, 'PRO2200', 'Update Via QC', 'UQC', '2018-07-10', 'update via qc', 'ACTIVE', 1, '2018-07-10 12:52:00', 1, 1);
 
 INSERT INTO SampleNumberPerProject(projectId, highestSampleNumber, padding, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (100001, 1, 4, 1, '2017-10-11 15:33:00', 1, '2017-10-11 15:33:00');

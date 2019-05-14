@@ -2043,7 +2043,7 @@ public class Dtos {
     ProjectDto dto = new ProjectDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
-    setDateString(dto::setCreationDate, from.getCreationDate());
+    setDateString(dto::setCreationDate, from.getCreationTime());
     dto.setAlias(from.getAlias());
     dto.setShortName(from.getShortName());
     dto.setDescription(from.getDescription());
@@ -2064,7 +2064,7 @@ public class Dtos {
     Project to = new ProjectImpl();
     setLong(to::setId, dto.getId(), false);
     setString(to::setName, dto.getName());
-    setDate(to::setCreationDate, dto.getCreationDate());
+    setDate(to::setCreationTime, dto.getCreationDate());
     setString(to::setAlias, dto.getAlias());
     setString(to::setShortName, dto.getShortName());
     setString(to::setDescription, dto.getDescription());

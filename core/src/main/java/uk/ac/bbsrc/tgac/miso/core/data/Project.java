@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Date;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
@@ -39,16 +38,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Project extends Comparable<Project>, Nameable, Serializable, Attachable {
+public interface Project extends Comparable<Project>, Nameable, Serializable, Attachable, ChangeLoggable {
 
   /** Field PREFIX */
   public static final String PREFIX = "PRO";
-  
-  Date getCreationDate();
 
   String getDescription();
-
-  void setCreationDate(Date date);
 
   void setDescription(String description);
 
@@ -132,10 +127,6 @@ public interface Project extends Comparable<Project>, Nameable, Serializable, At
    */
   void setStudies(Collection<Study> studies);
 
-  Date getLastUpdated();
-
-  void setLastUpdated(Date lastUpdated);
-
   public ReferenceGenome getReferenceGenome();
 
   public void setReferenceGenome(ReferenceGenome referenceGenome);
@@ -144,5 +135,6 @@ public interface Project extends Comparable<Project>, Nameable, Serializable, At
 
   public void setDefaultTargetedSequencing(TargetedSequencing defaultTargetedSequencing);
 
+  @Override
   public boolean isSaved();
 }

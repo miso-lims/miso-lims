@@ -138,11 +138,12 @@ INSERT INTO `_Group`(`groupId`, `name`, `description`) VALUES (1, 'TestGroup', '
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (3,1),(1,1);
 
+DELETE FROM ProjectChangeLog;
 DELETE FROM `Project`;
-INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `progress`, `alias`, `shortName`, `lastUpdated`, `referenceGenomeId`) VALUES
-(1,'2015-08-27 15:40:15','Test project','PRO1','ACTIVE','TEST1','TEST1','2015-08-27 19:40:40', 1),
-(2,'2013-11-27 12:20:15','Test project2','PRO2','ACTIVE','TEST2','TEST2','2015-11-30 15:23:18', 1),
-(3,'2016-01-27 11:11:15','Test project3','PRO3','ACTIVE','TEST3','TEST3','2016-02-22 10:43:18', 2);
+INSERT INTO `Project`(`projectId`, `created`, `description`, `name`, `progress`, `alias`, `shortName`, `lastModified`, `referenceGenomeId`, creator, lastModifier) VALUES
+(1,'2015-08-27 15:40:15','Test project','PRO1','ACTIVE','TEST1','TEST1','2015-08-27 19:40:40', 1, 1, 1),
+(2,'2013-11-27 12:20:15','Test project2','PRO2','ACTIVE','TEST2','TEST2','2015-11-30 15:23:18', 1, 1, 1),
+(3,'2016-01-27 11:11:15','Test project3','PRO3','ACTIVE','TEST3','TEST3','2016-02-22 10:43:18', 2, 1, 1);
 
 DELETE FROM Study;
 INSERT INTO Study(studyId, name, description, accession, project_projectId, studyTypeId, alias, creator, created, lastModifier, lastModified)
