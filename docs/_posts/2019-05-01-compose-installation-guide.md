@@ -618,7 +618,7 @@ starting.
     lost.
 
     ``` bash
-    # compose.yml is the location of your development compose file
+    # compose.yml is the location of your compose file
     docker-compose -f compose.yml down
     docker volume prune
     ```
@@ -656,7 +656,7 @@ starting.
     another terminal:
 
     ``` bash
-    # compose.yml is the location of your development compose file
+    # compose.yml is the location of your compose file
     docker-compose -f compose.yml restart webapp
     ```
 
