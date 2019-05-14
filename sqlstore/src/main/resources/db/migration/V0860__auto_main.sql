@@ -1,3 +1,4 @@
+-- project_changelogs
 ALTER TABLE Project ADD COLUMN creator bigint(20) NOT NULL DEFAULT 1;
 ALTER TABLE Project MODIFY COLUMN creator bigint(20) NOT NULL;
 
@@ -21,3 +22,7 @@ CREATE TABLE ProjectChangeLog (
 
 INSERT INTO ProjectChangeLog(projectId, columnsChanged, userId, message, changeTime)
 SELECT projectId, '', 1, 'Project created.', created FROM Project;
+
+-- user_group_constraint
+ALTER TABLE User_Group ADD CONSTRAINT uk_user_group UNIQUE (users_userId, groups_groupId);
+
