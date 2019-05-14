@@ -35,14 +35,14 @@ public class InstrumentPageIT extends AbstractIT {
     fields.put(Field.INSTRUMENT_MODEL, "Illumina - Illumina HiSeq 2500");
     fields.put(Field.NAME, "OldHiSeq_102");
     fields.put(Field.COMMISSIONED, "2017-01-01");
-    fields.put(Field.STATUS, "upgraded");
+    fields.put(Field.STATUS, "Upgraded");
     fields.put(Field.DECOMMISSIONED, "2017-02-01");
     fields.put(Field.UPGRADED_INSTRUMENT, "NewHiSeq_101");
     assertFieldValues("loaded (upgraded)", fields, page);
 
     // set status to retired
     Map<Field, String> retired = Maps.newLinkedHashMap();
-    retired.put(Field.STATUS, "retired");
+    retired.put(Field.STATUS, "Retired");
     page.setFields(retired);
 
     // copy unchanged except for Upgraded Instrument name, which should be hidden
@@ -57,7 +57,7 @@ public class InstrumentPageIT extends AbstractIT {
 
     // set status to production
     Map<Field, String> production = Maps.newLinkedHashMap();
-    production.put(Field.STATUS, "production");
+    production.put(Field.STATUS, "Production");
     page.setFields(production);
 
     // copy unchanged except for Decommissioned date, which should be hidden
@@ -83,7 +83,7 @@ public class InstrumentPageIT extends AbstractIT {
     fields.put(Field.INSTRUMENT_MODEL, "Illumina - Illumina HiSeq 2500");
     fields.put(Field.SERIAL_NUMBER, "100");
     fields.put(Field.NAME, "HiSeq_100");
-    fields.put(Field.STATUS, "production");
+    fields.put(Field.STATUS, "Production");
     assertFieldValues("loaded", fields, page);
 
     // make changes
@@ -91,7 +91,7 @@ public class InstrumentPageIT extends AbstractIT {
     changes.put(Field.NAME, "HiSeq_changed_100");
     changes.put(Field.SERIAL_NUMBER, "100100");
     changes.put(Field.COMMISSIONED, "2017-01-31");
-    changes.put(Field.STATUS, "retired");
+    changes.put(Field.STATUS, "Retired");
     changes.put(Field.DECOMMISSIONED, "2017-10-31");
     page.setFields(changes);
     // need to make sure this is done after the status change is made
@@ -119,8 +119,7 @@ public class InstrumentPageIT extends AbstractIT {
     assertAttribute(Field.SERIAL_NUMBER, expectedValues, sr.getSerialNumber());
     assertAttribute(Field.COMMISSIONED, expectedValues, dateFormatter.print(sr.getDateCommissioned().getTime()));
     assertAttribute(Field.STATUS, expectedValues,
-        (sr.getUpgradedInstrument() != null ? "Upgraded" : (sr.getDateDecommissioned() != null ? "Retired" : "Production"))
-            .toLowerCase());
+        sr.getUpgradedInstrument() != null ? "Upgraded" : (sr.getDateDecommissioned() != null ? "Retired" : "Production"));
     if (expectedValues.containsKey(Field.DECOMMISSIONED)) {
       assertAttribute(Field.DECOMMISSIONED, expectedValues,
           (sr.getDateDecommissioned() == null ? null : dateFormatter.print(sr.getDateDecommissioned().getTime())));

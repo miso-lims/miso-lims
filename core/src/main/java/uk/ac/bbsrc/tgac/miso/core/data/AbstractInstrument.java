@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -208,6 +209,9 @@ public abstract class AbstractInstrument implements Instrument {
 
   @Override
   public Set<InstrumentPosition> getOutOfServicePositions() {
+    if (getInstrumentModel() == null) {
+      return Collections.emptySet();
+    }
     if (isOutOfService()) {
       return getInstrumentModel().getPositions();
     }

@@ -24,8 +24,9 @@ toolbar at the top of the table contains a control for adding new instruments.
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Creating an Instrument" %}
 
-Click the "Add" button in the toolbar at the top of the Instruments list to add a new instrument to MISO. Fill out the
-instrument details in the dialog that appears. When you are done, click the "Add" button to create the instrument.
+Click the "Add" button in the toolbar at the top of the Instruments list to add a new instrument to MISO. This will
+take you to the Create Instrument page, where you can fill out the instrument details. Click the Save button at the top
+right when you are done to save the instrument and go to the Edit Instrument page.
 
 {% include userman-toplink.md %}
 
@@ -53,10 +54,11 @@ required to create two instruments in MISO to accurately represent the different
 important if you are using Run Scanner and it is reporting some runs under the old name and some under the new name.
 You can link these instruments to record this better.
 
-Go to the Edit Instrument page for the instrument with the old name. For "Status," choose "Upgraded." In the
-"Decomissioned" field, record the date that the name was changed. Click the "Save" button at the top right to save your
-changes. Once an instrument is upgraded, the old one will no longer appear in the Sequencer Status widget, or in the
-options list when creating new runs.
+First, create a new instrument using the new name. Next, go to the Edit Instrument page for the instrument with the old
+name. For "Status," choose "Upgraded." In the "Decommissioned" field, record the date that the name was changed, and in
+the Upgraded To dropdown, choose the instrument with the new name. Click the "Save" button at the top right to save
+your changes. Once an instrument is upgraded, the old one will no longer appear in the Sequencer Status widget, or in
+the options list when creating new runs.
 
 {% include userman-toplink.md %}
 

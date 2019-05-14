@@ -127,12 +127,14 @@ public class ValidationUtils {
   }
 
   public static <T, R> boolean isSetAndChanged(Function<T, R> getter, T newItem, T beforeChange) {
-    if (beforeChange == null) {
+    R after = getter.apply(newItem);
+    if (after == null) {
+      return false;
+    } else if (beforeChange == null) {
       return true;
     }
     R before = getter.apply(beforeChange);
-    R after = getter.apply(newItem);
-    return after != null && !after.equals(before);
+    return !after.equals(before);
   }
 
 }

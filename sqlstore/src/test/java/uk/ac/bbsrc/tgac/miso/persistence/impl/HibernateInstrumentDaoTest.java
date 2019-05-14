@@ -14,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
@@ -25,9 +24,6 @@ public class HibernateInstrumentDaoTest extends AbstractDAOTest {
 
   @Rule
   public final ExpectedException exception = ExpectedException.none();
-
-  @Autowired
-  private JdbcTemplate template;
 
   @Mock
   private HibernateInstrumentModelDao platformDAO;
@@ -41,9 +37,7 @@ public class HibernateInstrumentDaoTest extends AbstractDAOTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(template);
     dao.setSessionFactory(sessionFactory);
-    dao.setJdbcTemplate(template);
   }
 
   @Test

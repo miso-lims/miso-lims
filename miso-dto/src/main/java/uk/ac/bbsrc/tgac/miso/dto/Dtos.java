@@ -2368,34 +2368,38 @@ public class Dtos {
 
   public static InstrumentDto asDto(@Nonnull Instrument from) {
     InstrumentDto dto = new InstrumentDto();
-    dto.setId(from.getId());
-    dto.setDateCommissioned(formatDate(from.getDateCommissioned()));
-    dto.setDateDecommissioned(formatDate(from.getDateDecommissioned()));
-    dto.setName(from.getName());
-    dto.setInstrumentModel(asDto(from.getInstrumentModel()));
-    dto.setSerialNumber(from.getSerialNumber());
+    setLong(dto::setId, from.getId(), true);
+    setDateString(dto::setDateCommissioned, from.getDateCommissioned());
+    setDateString(dto::setDateDecommissioned, from.getDateDecommissioned());
+    setString(dto::setName, from.getName());
+    setId(dto::setInstrumentModelId, from.getInstrumentModel());
+    if (from.getInstrumentModel() != null) {
+      setString(dto::setInstrumentModelAlias, from.getInstrumentModel().getAlias());
+      setString(dto::setInstrumentType, from.getInstrumentModel().getInstrumentType().toString());
+      setString(dto::setPlatformType, from.getInstrumentModel().getPlatformType().getKey());
+    }
+    setString(dto::setSerialNumber, from.getSerialNumber());
     if (from.getDateDecommissioned() == null) {
-      if (from.isOutOfService()) {
-        dto.setStatus("Out of Service");
-      } else {
-        dto.setStatus("Production");
-      }
+      dto.setStatus("Production");
     } else if (from.getUpgradedInstrument() != null) {
       dto.setStatus("Upgraded");
     } else {
       dto.setStatus("Retired");
     }
+    setBoolean(dto::setOutOfService, from.isOutOfService(), false);
+    setId(dto::setUpgradedInstrumentId, from.getUpgradedInstrument());
     return dto;
   }
 
   public static Instrument to(@Nonnull InstrumentDto dto) {
     Instrument to = new InstrumentImpl();
-    to.setId(dto.getId());
-    to.setDateCommissioned(parseDate(dto.getDateCommissioned()));
-    to.setDateDecommissioned(parseDate(dto.getDateDecommissioned()));
-    to.setName(dto.getName());
-    to.setInstrumentModel(to(dto.getInstrumentModel()));
-    to.setSerialNumber(dto.getSerialNumber());
+    setLong(to::setId, dto.getId(), false);
+    setDate(to::setDateCommissioned, dto.getDateCommissioned());
+    setDate(to::setDateDecommissioned, dto.getDateDecommissioned());
+    setString(to::setName, dto.getName());
+    setObject(to::setInstrumentModel, InstrumentModel::new, dto.getInstrumentModelId());
+    setString(to::setSerialNumber, dto.getSerialNumber());
+    setObject(to::setUpgradedInstrument, InstrumentImpl::new, dto.getUpgradedInstrumentId());
     return to;
   }
 

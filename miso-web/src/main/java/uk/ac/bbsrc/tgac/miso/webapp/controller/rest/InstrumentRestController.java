@@ -8,20 +8,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
@@ -58,11 +55,7 @@ public class InstrumentRestController extends RestController {
   @GetMapping(value = "/{instrumentId}", produces = "application/json")
   @ResponseBody
   public InstrumentDto getById(@PathVariable Long instrumentId) throws IOException {
-    Instrument r = instrumentService.get(instrumentId);
-    if (r == null) {
-      throw new RestException("No instrument found with ID: " + instrumentId, Status.NOT_FOUND);
-    }
-    return Dtos.asDto(r);
+    return RestUtils.getObject("Instrument", instrumentId, instrumentService, Dtos::asDto);
   }
 
   @GetMapping(produces = "application/json")
@@ -71,32 +64,16 @@ public class InstrumentRestController extends RestController {
     return instrumentService.list().stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  private static final Logger log = LoggerFactory.getLogger(InstrumentRestController.class);
-
   @PostMapping(produces = "application/json")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public InstrumentDto create(@RequestBody InstrumentDto instrumentDto, UriComponentsBuilder b, HttpServletResponse response)
-      throws IOException {
-    if (instrumentDto == null) {
-      throw new RestException("Cannot convert null to instrument", Status.BAD_REQUEST);
-    }
-    Long id = null;
-    try {
-      Instrument instrument = Dtos.to(instrumentDto);
-      id = instrumentService.create(instrument);
-    } catch (ConstraintViolationException | IllegalArgumentException e) {
-      log.error("Error while creating library. ", e);
-      RestException restException = new RestException(e.getMessage(), Status.BAD_REQUEST);
-      if (e instanceof ConstraintViolationException) {
-        restException.addData("constraintName", ((ConstraintViolationException) e).getConstraintName());
-      }
-      throw restException;
-    }
-    InstrumentDto created = getById(id);
-    UriComponents uriComponents = b.path("/instrument/{id}").buildAndExpand(id);
-    response.setHeader("Location", uriComponents.toUri().toString());
-    return created;
+  public InstrumentDto create(@RequestBody InstrumentDto instrumentDto) throws IOException {
+    return RestUtils.createObject("Instrument", instrumentDto, Dtos::to, instrumentService, Dtos::asDto);
+  }
+
+  @PutMapping("/{instrumentId}")
+  public @ResponseBody InstrumentDto update(@PathVariable long instrumentId, @RequestBody InstrumentDto dto) throws IOException {
+    return RestUtils.updateObject("Instrument", instrumentId, dto, Dtos::to, instrumentService, Dtos::asDto);
   }
 
   @GetMapping(value = "/dt", produces = "application/json")
