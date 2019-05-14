@@ -62,9 +62,6 @@ services:
       - db
     depends_on:
       - db
-    ports: 
-      - "8080:8080"
-
   
   nginx:
     image: nginx:1.15.12-alpine

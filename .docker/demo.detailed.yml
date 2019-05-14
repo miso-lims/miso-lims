@@ -80,8 +80,6 @@ services:
         target: "/usr/local/tomcat/conf/Catalina/localhost/miso.properties"
         volume:
           nocopy: true
-    ports:
-      - "8090:8080"
 
 
   nginx:
