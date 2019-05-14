@@ -179,7 +179,6 @@
 
   <bean id="restSignatureFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureFilter">
     <constructor-arg ref="httpSessionSecurityContextRepository" />
-    <property name="securityManager" ref="securityManager" />
   </bean>
 
   <bean id="exposeRequestUrlFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.ExposeRequestUrlFilter">
