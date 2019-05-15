@@ -12,7 +12,7 @@ We recommend
 [using Docker Compose to install and run MISO](compose-installation-guide).
 
 If you cannot use Docker, there is a
-[baremetal installation guide](baremetal-installation-guide}) as well.
+[baremetal installation guide](baremetal-installation-guide) as well.
 
 # Monitoring
 
