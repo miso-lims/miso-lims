@@ -39,38 +39,7 @@ ListTarget.instrument = {
       return [{
         "name": "Add",
         "handler": function() {
-
-          Utils.showDialog("Add Instrument", "Add", [{
-            property: "name",
-            type: "text",
-            label: "Instrument Name",
-            required: true
-          }, {
-            property: "instrumentModel",
-            type: "select",
-            values: Constants.instrumentModels.sort(function(a, b) {
-              return a.platformType.localeCompare(b.platformType) || a.alias.localeCompare(b.alias);
-            }),
-            getLabel: function(instrumentModel) {
-              return instrumentModel.platformType + " - " + instrumentModel.alias;
-            },
-            label: "Platform",
-            required: true
-          }, {
-            property: "serialNumber",
-            type: "text",
-            label: "Serial Number",
-            required: true
-          }, {
-            property: "dateCommissioned",
-            type: "date",
-            label: "Date Commissioned",
-            required: false
-          }], function(instrument) {
-            instrument.id = 0;
-            Utils.ajaxWithDialog('Saving Instrument', 'POST', '/miso/rest/instruments', instrument, Utils.page.pageReload);
-          });
-
+          window.location = '/miso/instrument/new';
         }
       }];
     } else {
@@ -80,20 +49,22 @@ ListTarget.instrument = {
   createColumns: function(config, projectId) {
     return [ListUtils.labelHyperlinkColumn("Instrument Name", "instrument", Utils.array.getId, "name", 1, true), {
       "sTitle": "Platform",
-      "mData": "instrumentModel.platformType",
+      "mData": "platformType",
       "include": true,
-      "iSortPriority": 0,
-      "mRender": ListUtils.render.platformType
+      "iSortPriority": 0
     }, {
       "sTitle": "Instrument Model",
-      "mData": "instrumentModel.alias",
+      "mData": "instrumentModelAlias",
       "include": true,
       "iSortPriority": 0
     }, {
       "sTitle": "Status",
       "mData": "status",
       "include": true,
-      "bSortable": false
+      "bSortable": false,
+      "mRender": function(data, type, full) {
+        return full.outOfService ? "Out of Service" : data;
+      }
     }, {
       "sTitle": "Serial Number",
       "mData": "serialNumber",

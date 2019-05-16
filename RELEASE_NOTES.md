@@ -2,7 +2,9 @@
 
 Changes:
 
-
+  * Changed Edit Instrument page to show validation messages instead of error page when saving
+    fails
+  * Changed Instrument creation to use the Edit Instrument page instead of a dialog
 
 # 0.2.177
 

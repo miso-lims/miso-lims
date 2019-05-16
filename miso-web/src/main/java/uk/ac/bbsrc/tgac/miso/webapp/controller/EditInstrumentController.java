@@ -25,7 +25,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,26 +33,26 @@ import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
 @RequestMapping("/instrument")
-@SessionAttributes("instrument")
 public class EditInstrumentController {
 
   @Autowired
@@ -67,44 +67,57 @@ public class EditInstrumentController {
   public void setInstrumentService(InstrumentService instrumentService) {
     this.instrumentService = instrumentService;
   }
-
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> maxLengths() throws IOException {
-    return instrumentService.getColumnSizes();
+  
+  @GetMapping("/new")
+  public ModelAndView create(ModelMap model) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+    model.put("title", "New Instrument");
+    return setupForm(new InstrumentImpl(), model);
   }
 
   @GetMapping("/{instrumentId}")
   public ModelAndView viewInstrument(@PathVariable(value = "instrumentId") Long instrumentId, ModelMap model) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    Instrument sr = instrumentService.get(instrumentId);
+    Instrument instrument = instrumentService.get(instrumentId);
+    if (instrument == null) {
+      throw new NotFoundException("No instrument found for ID " + instrumentId.toString());
+    }
+    model.put("title", "Instrument " + instrument.getId());
+    
     Collection<ServiceRecord> serviceRecords = serviceRecordService.listByInstrument(instrumentId);
-
-    if (sr == null) throw new NotFoundException("No instrument found for ID " + instrumentId.toString());
-    if (user.isAdmin()) {
-      model.put("otherInstruments",
-          instrumentService.list().stream().filter(other -> other.getId() != instrumentId).collect(Collectors.toList()));
-    }
-    model.put("preUpgradeInstrument", instrumentService.getByUpgradedInstrumentId(sr.getId()));
-
-    model.put("instrument", sr);
     model.put("serviceRecords", serviceRecords.stream().map(Dtos::asDto).collect(Collectors.toList()));
-    model.put("title", "Instrument " + sr.getId());
-    return new ModelAndView("/WEB-INF/pages/editInstrument.jsp", model);
+    return setupForm(instrument, model);
   }
+  
+  private ModelAndView setupForm(Instrument instrument, ModelMap model) throws IOException {
+    InstrumentDto instrumentDto = Dtos.asDto(instrument);
 
-  @PostMapping
-  public ModelAndView processSubmit(@ModelAttribute("instrument") Instrument sr, ModelMap model, SessionStatus session)
-      throws IOException {
-    Long srId = null;
-    if (!sr.isSaved()) {
-      srId = instrumentService.create(sr);
-    } else {
-      instrumentService.update(sr);
-      srId = sr.getId();
+    if (instrument.isSaved()) {
+      Instrument preUpgrade = instrumentService.getByUpgradedInstrumentId(instrument.getId());
+      if (preUpgrade != null) {
+        instrumentDto.setPreUpgradeInstrumentId(preUpgrade.getId());
+        instrumentDto.setPreUpgradeInstrumentName(preUpgrade.getName());
+      }
     }
-    session.setComplete();
-    model.clear();
-    return new ModelAndView("redirect:/miso/instrument/" + srId, model);
+
+    ObjectMapper mapper = new ObjectMapper();
+    model.put("instrument", instrument);
+    model.put("instrumentDto", mapper.writeValueAsString(instrumentDto));
+
+    List<InstrumentDto> otherInstruments = instrumentService.list().stream()
+        .filter(other -> other.getId() != instrument.getId())
+        .map(Dtos::asDto)
+        .collect(Collectors.toList());
+    model.put("otherInstruments", mapper.writeValueAsString(otherInstruments));
+
+    ArrayNode instrumentTypes = mapper.createArrayNode();
+    for (InstrumentType type : InstrumentType.values()) {
+      ObjectNode dto = instrumentTypes.addObject();
+      dto.put("label", type.getLabel());
+      dto.put("value", type.name());
+    }
+    model.put("instrumentTypes", mapper.writeValueAsString(instrumentTypes));
+
+    return new ModelAndView("/WEB-INF/pages/editInstrument.jsp", model);
   }
 
 }

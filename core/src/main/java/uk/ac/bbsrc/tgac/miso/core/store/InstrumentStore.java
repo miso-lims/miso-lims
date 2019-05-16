@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
-import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -50,9 +49,4 @@ public interface InstrumentStore
    */
   Instrument getByUpgradedInstrument(long upgradedInstrumentId) throws IOException;
 
-  /**
-   * @return a map containing all column names and max lengths from the Instrument table
-   * @throws IOException
-   */
-  public Map<String, Integer> getInstrumentColumnSizes() throws IOException;
 }

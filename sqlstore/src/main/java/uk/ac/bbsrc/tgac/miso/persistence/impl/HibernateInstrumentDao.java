@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
@@ -33,10 +32,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,28 +42,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.InstrumentStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginatedDataSource<Instrument> {
 
-  private static final String INSTRUMENT_TABLE_NAME = "Instrument";
-
-  protected static final Logger log = LoggerFactory.getLogger(HibernateInstrumentDao.class);
-
   @Autowired
   private SessionFactory sessionFactory;
-  @Autowired
-  private JdbcTemplate jdbcTemplate;
-
-  public JdbcTemplate getJdbcTemplate() {
-    return jdbcTemplate;
-  }
-
-  public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-    this.jdbcTemplate = jdbcTemplate;
-  }
 
   @Override
   public Session currentSession() {
@@ -128,11 +109,6 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   }
 
   @Override
-  public Map<String, Integer> getInstrumentColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(jdbcTemplate, INSTRUMENT_TABLE_NAME);
-  }
-
-  @Override
   public String getFriendlyName() {
     return "Instrument";
   }
@@ -168,7 +144,14 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
 
   @Override
   public String propertyForSortColumn(String original) {
-    return original;
+    switch (original) {
+    case "platformType":
+      return "instrumentModel.platformType";
+    case "instrumentModelAlias":
+      return "instrumentModel.alias";
+    default:
+      return original;
+    }
   }
 
   @Override

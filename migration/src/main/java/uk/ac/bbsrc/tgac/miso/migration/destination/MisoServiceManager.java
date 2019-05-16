@@ -876,7 +876,6 @@ public class MisoServiceManager {
 
   public void setDefaultInstrumentDao() {
     HibernateInstrumentDao dao = new HibernateInstrumentDao();
-    dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
     setInstrumentDao(dao);
   }
@@ -1360,7 +1359,7 @@ public class MisoServiceManager {
   }
 
   private void updateRunServiceDependencies() {
-    if (instrumentService != null) instrumentService.setRunService(runService);
+
   }
 
   public DefaultContainerService getContainerService() {
@@ -1416,7 +1415,6 @@ public class MisoServiceManager {
     DefaultInstrumentService service = new DefaultInstrumentService();
     service.setAuthorizationManager(authorizationManager);
     service.setInstrumentDao(instrumentDao);
-    service.setRunService(runService);
     setInstrumentService(service);
   }
 

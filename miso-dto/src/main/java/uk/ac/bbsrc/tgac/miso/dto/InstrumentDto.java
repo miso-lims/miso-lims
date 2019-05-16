@@ -1,21 +1,21 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 public class InstrumentDto {
-  private String dateCommissioned;
   
-  private String dateDecommissioned;
-
   private long id;
-
-  private String ip;
-  
   private String name;
-  
-  private InstrumentModelDto instrumentModel;
-  
+  private String instrumentType;
+  private Long instrumentModelId;
+  private String instrumentModelAlias;
+  private String platformType;
   private String serialNumber;
-
   private String status;
+  private boolean outOfService;
+  private String dateCommissioned;
+  private String dateDecommissioned;
+  private Long preUpgradeInstrumentId;
+  private String preUpgradeInstrumentName;
+  private Long upgradedInstrumentId;
 
   public String getDateCommissioned() {
     return dateCommissioned;
@@ -29,16 +29,8 @@ public class InstrumentDto {
     return id;
   }
 
-  public String getIp() {
-    return ip;
-  }
-
   public String getName() {
     return name;
-  }
-
-  public InstrumentModelDto getInstrumentModel() {
-    return instrumentModel;
   }
 
   public String getSerialNumber() {
@@ -61,16 +53,8 @@ public class InstrumentDto {
     this.id = id;
   }
 
-  public void setIp(String ip) {
-    this.ip = ip;
-  }
-
   public void setName(String name) {
     this.name = name;
-  }
-
-  public void setInstrumentModel(InstrumentModelDto instrumentModel) {
-    this.instrumentModel = instrumentModel;
   }
 
   public void setSerialNumber(String serialNumber) {
@@ -79,6 +63,70 @@ public class InstrumentDto {
 
   public void setStatus(String status) {
     this.status = status;
+  }
+
+  public String getInstrumentType() {
+    return instrumentType;
+  }
+
+  public void setInstrumentType(String instrumentType) {
+    this.instrumentType = instrumentType;
+  }
+
+  public Long getInstrumentModelId() {
+    return instrumentModelId;
+  }
+
+  public void setInstrumentModelId(Long instrumentModelId) {
+    this.instrumentModelId = instrumentModelId;
+  }
+
+  public String getInstrumentModelAlias() {
+    return instrumentModelAlias;
+  }
+
+  public void setInstrumentModelAlias(String instrumentModelAlias) {
+    this.instrumentModelAlias = instrumentModelAlias;
+  }
+
+  public String getPlatformType() {
+    return platformType;
+  }
+
+  public void setPlatformType(String platformType) {
+    this.platformType = platformType;
+  }
+
+  public boolean isOutOfService() {
+    return outOfService;
+  }
+
+  public void setOutOfService(boolean outOfService) {
+    this.outOfService = outOfService;
+  }
+
+  public Long getPreUpgradeInstrumentId() {
+    return preUpgradeInstrumentId;
+  }
+
+  public void setPreUpgradeInstrumentId(Long preUpgradeInstrumentId) {
+    this.preUpgradeInstrumentId = preUpgradeInstrumentId;
+  }
+
+  public String getPreUpgradeInstrumentName() {
+    return preUpgradeInstrumentName;
+  }
+
+  public void setPreUpgradeInstrumentName(String preUpgradeInstrumentName) {
+    this.preUpgradeInstrumentName = preUpgradeInstrumentName;
+  }
+
+  public Long getUpgradedInstrumentId() {
+    return upgradedInstrumentId;
+  }
+
+  public void setUpgradedInstrumentId(Long upgradedInstrumentId) {
+    this.upgradedInstrumentId = upgradedInstrumentId;
   }
 
 }

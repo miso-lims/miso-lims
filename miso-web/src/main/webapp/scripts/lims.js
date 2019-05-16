@@ -1068,19 +1068,21 @@ Utils.sorting = {
    */
   standardSort: function(property) {
     return function(a, b) {
-      var first = a[property];
-      var second = b[property];
-      if (typeof first == 'number' && typeof second == 'number') {
-        return first > second ? 1 : (second > first ? -1 : 0);
-      } else if (typeof first == 'string' && typeof second == 'string') {
-        return first.localeCompare(second);
-      } else if (typeof first == 'function' || typeof second == 'function') {
-        throw new Error('Cannot compare function definitions; both are special in their own way');
-      } else {
-        // mixed case; make a best guess
-        return ('' + first).localeCompare('' + second);
-      }
+      return Utils.sorting.standardSortItems(a[property], b[property]);
     };
+  },
+
+  standardSortItems: function(first, second) {
+    if (typeof first == 'number' && typeof second == 'number') {
+      return first > second ? 1 : (second > first ? -1 : 0);
+    } else if (typeof first == 'string' && typeof second == 'string') {
+      return first.localeCompare(second);
+    } else if (typeof first == 'function' || typeof second == 'function') {
+      throw new Error('Cannot compare function definitions; both are special in their own way');
+    } else {
+      // mixed case; make a best guess
+      return ('' + first).localeCompare('' + second);
+    }
   },
 
   standardSortWithException: function(property, exception, atTop) {
@@ -1098,6 +1100,12 @@ Utils.sorting = {
         return standardSort(objectA, objectB);
       }
     }
+  },
+
+  standardSortByCallback: function(callback) {
+    return function(a, b) {
+      return Utils.sorting.standardSortItems(callback(a), callback(b));
+    };
   },
 
   /**

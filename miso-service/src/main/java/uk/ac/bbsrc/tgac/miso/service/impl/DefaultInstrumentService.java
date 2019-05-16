@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.InstrumentStore;
-import uk.ac.bbsrc.tgac.miso.core.store.ServiceRecordStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
-import uk.ac.bbsrc.tgac.miso.service.RunService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional(rollbackFor = Exception.class)
@@ -27,10 +27,6 @@ public class DefaultInstrumentService implements InstrumentService {
   private AuthorizationManager authorizationManager;
   @Autowired
   private InstrumentStore instrumentDao;
-  @Autowired
-  private ServiceRecordStore serviceRecordDao;
-  @Autowired
-  private RunService runService;
 
   @Override
   public Collection<Instrument> list() throws IOException {
@@ -58,23 +54,41 @@ public class DefaultInstrumentService implements InstrumentService {
   }
 
   @Override
-  public Long create(Instrument instrument) throws IOException {
+  public long create(Instrument instrument) throws IOException {
     authorizationManager.throwIfNonAdmin();
     loadChildEntities(instrument);
+    validateChange(instrument, null);
     return save(instrument);
   }
 
   @Override
-  public void update(Instrument instrument) throws IOException {
+  public long update(Instrument instrument) throws IOException {
     authorizationManager.throwIfNonAdmin();
     Instrument managed = get(instrument.getId());
+    validateChange(instrument, managed);
     applyChanges(managed, instrument);
     loadChildEntities(managed);
-    save(managed);
+    return save(managed);
   }
 
   private long save(Instrument instrument) throws IOException {
     return instrumentDao.save(instrument);
+  }
+
+  private void validateChange(Instrument instrument, Instrument beforeChange) throws IOException {
+    List<ValidationError> errors = new ArrayList<>();
+
+    if (ValidationUtils.isSetAndChanged(Instrument::getName, instrument, beforeChange) && getByName(instrument.getName()) != null) {
+      errors.add(new ValidationError("name", "There is already an instrument with this name"));
+    }
+    if (ValidationUtils.isSetAndChanged(Instrument::getUpgradedInstrument, instrument, beforeChange)
+        && getByUpgradedInstrumentId(instrument.getUpgradedInstrument().getId()) != null) {
+      errors.add(new ValidationError("upgradedInstrumentId", "There is already an instrument that has been upgraded to this one"));
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
+    }
   }
 
   private void applyChanges(Instrument target, Instrument source) {
@@ -94,21 +108,12 @@ public class DefaultInstrumentService implements InstrumentService {
     }
   }
 
-  @Override
-  public Map<String, Integer> getColumnSizes() throws IOException {
-    return instrumentDao.getInstrumentColumnSizes();
-  }
-
   public void setInstrumentDao(InstrumentStore instrumentDao) {
     this.instrumentDao = instrumentDao;
   }
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
-  }
-
-  public void setRunService(RunService runService) {
-    this.runService = runService;
   }
 
   @Override
