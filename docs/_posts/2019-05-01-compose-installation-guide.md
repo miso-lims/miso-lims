@@ -411,7 +411,7 @@ source.
 There are two compose files in the main miso-lims source intended for
 developers:
 
-* docker-compose.yml : builds and starts detailed sample demo mode
+* docker-compose.detailed.yml : builds and starts detailed sample demo mode
 * docker-compose.plain.yml : builds and starts plain sample demo mode
 
 The main difference between this and the demo versions it that the two
@@ -427,17 +427,21 @@ file, and run the version as usual.
 ``` bash
 # check out the MISO source and switch to release version v0.2.174
 git clone https://github.com/miso-lims/miso-lims.git
-git checkout tags/v0.2.174 -b v0.2.174
+git checkout tags/v0.2.177 -b v0.2.177
 
-docker-compose build
-docker-compose up
+# compose.yml is one of the two compose files above
+docker-compose -f compose.yml build
+docker-compose -f compose.yml up
 ```
 
-### Improving build times
+The URL [http://localhost/miso](http://localhost/miso) is still where to go and 
+log in with the credentials **admin**/**admin**.
+
+### Improving build times while developing
 
 For faster startup, you may interested in
 [adding persistent storage](#adding-persistent-storage) so that the database
-doesn't re-populate on every startup. This drops the `docker-compose up` time
+doesn't re-populate on every startup. This drops the startup time
 from ~1 minute to about 20 seconds.
 
 **Be cautious** because while developing MISO or messing with the docker-compose
@@ -446,7 +450,8 @@ connections are misbehaving, try pruning your Docker volumes to destroy the
 database and re-building from scratch.
 
 ``` bash
-docker-compose down
+# compose.yml is the location of your development compose file
+docker-compose -f compose.yml down
 docker volume prune
 ```
 
@@ -613,7 +618,8 @@ starting.
     lost.
 
     ``` bash
-    docker-compose down
+    # compose.yml is the location of your compose file
+    docker-compose -f compose.yml down
     docker volume prune
     ```
 
@@ -649,8 +655,9 @@ starting.
     `webapp` container. While docker-compose is still up, run the following in
     another terminal:
 
-    ```
-    docker-compose restart webapp
+    ``` bash
+    # compose.yml is the location of your compose file
+    docker-compose -f compose.yml restart webapp
     ```
 
     The `webapp` container will restart in the original docker-compose window.
