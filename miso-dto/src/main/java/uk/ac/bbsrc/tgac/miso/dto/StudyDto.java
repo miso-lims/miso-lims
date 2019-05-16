@@ -5,10 +5,10 @@ public class StudyDto {
 
   private String alias;
   private String description;
-  private long id;
+  private Long id;
   private String name;
-  private long projectId;
-  private long studyTypeId;
+  private Long projectId;
+  private Long studyTypeId;
 
   public String getAccession() {
     return accession;
@@ -22,7 +22,7 @@ public class StudyDto {
     return description;
   }
 
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
@@ -30,11 +30,11 @@ public class StudyDto {
     return name;
   }
 
-  public long getProjectId() {
+  public Long getProjectId() {
     return projectId;
   }
 
-  public long getStudyTypeId() {
+  public Long getStudyTypeId() {
     return studyTypeId;
   }
 
@@ -50,7 +50,7 @@ public class StudyDto {
     this.description = description;
   }
 
-  public void setId(long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -58,11 +58,11 @@ public class StudyDto {
     this.name = name;
   }
 
-  public void setProjectId(long projectId) {
+  public void setProjectId(Long projectId) {
     this.projectId = projectId;
   }
 
-  public void setStudyTypeId(long studyTypeId) {
+  public void setStudyTypeId(Long studyTypeId) {
     this.studyTypeId = studyTypeId;
   }
 

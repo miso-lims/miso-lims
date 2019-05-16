@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -37,7 +36,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
-import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -60,14 +57,11 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSource<Study> {
-  private static final String TABLE_NAME = "Study";
   private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "description" };
   private static final Iterable<String> STANDARD_ALIASES = Arrays.asList("project", "lastModifier");
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateStudyDao.class);
 
-  @Autowired
-  private JdbcTemplate template;
   @Autowired
   private SessionFactory sessionFactory;
 
@@ -79,15 +73,6 @@ public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSour
     this.sessionFactory = sessionFactory;
   }
 
-  @CoverageIgnore
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
-  }
-
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
-  }
-
   @Override
   public Session currentSession() {
     return getSessionFactory().getCurrentSession();
@@ -96,7 +81,7 @@ public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSour
   @Override
   public long save(Study study) throws IOException {
     long id;
-    if (study.getId() == StudyImpl.UNSAVED_ID) {
+    if (!study.isSaved()) {
       id = (Long) currentSession().save(study);
     } else {
       currentSession().update(study);
@@ -139,6 +124,13 @@ public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSour
   }
 
   @Override
+  public Study getByAlias(String alias) throws IOException {
+    return (Study) currentSession().createCriteria(StudyImpl.class)
+        .add(Restrictions.eq("alias", alias))
+        .uniqueResult();
+  }
+
+  @Override
   public List<Study> listByProjectId(long projectId) throws IOException {
     Criteria criteria = currentSession().createCriteria(StudyImpl.class);
     criteria.createAlias("project", "project");
@@ -154,11 +146,6 @@ public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSour
     @SuppressWarnings("unchecked")
     List<StudyType> results = criteria.list();
     return results;
-  }
-
-  @Override
-  public Map<String, Integer> getStudyColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
 
   @Override

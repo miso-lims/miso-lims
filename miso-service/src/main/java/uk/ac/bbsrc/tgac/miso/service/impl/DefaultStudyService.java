@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.validateNameOrThrow;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -24,6 +23,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional(rollbackFor = Exception.class)
@@ -52,11 +53,6 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
   @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
-  }
-
-  @Override
-  public Map<String, Integer> getColumnSizes() throws IOException {
-    return adjustNameLength(studyStore.getStudyColumnSizes(), namingScheme);
   }
 
   public ProjectStore getProjectStore() {
@@ -93,31 +89,46 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
   }
 
   @Override
-  public long save(Study study) throws IOException {
-    if (study.getId() == StudyImpl.UNSAVED_ID) {
-      study.setChangeDetails(authorizationManager.getCurrentUser());
-      study.setStudyType(studyStore.getType(study.getStudyType().getId()));
-      study.setProject(projectStore.get(study.getProject().getId()));
-      study.setName(LimsUtils.generateTemporaryName());
-      long id = studyStore.save(study);
-      try {
-        study.setName(namingScheme.generateNameFor(study));
-        validateNameOrThrow(study, namingScheme);
-        studyStore.save(study);
-      } catch (MisoNamingException e) {
-        throw new IOException(e);
-      }
-      return id;
-    } else {
-      Study original = studyStore.get(study.getId());
-      original.setAccession(study.getAccession());
-      original.setAlias(study.getAlias());
-      original.setDescription(study.getDescription());
-      original.setChangeDetails(authorizationManager.getCurrentUser());
+  public long create(Study study) throws IOException {
+    study.setStudyType(studyStore.getType(study.getStudyType().getId()));
+    study.setProject(projectStore.get(study.getProject().getId()));
+    validateChange(study, null);
+    study.setChangeDetails(authorizationManager.getCurrentUser());
+    study.setName(LimsUtils.generateTemporaryName());
+    long id = studyStore.save(study);
+    try {
+      study.setName(namingScheme.generateNameFor(study));
+      validateNameOrThrow(study, namingScheme);
+      studyStore.save(study);
+    } catch (MisoNamingException e) {
+      throw new IOException(e);
+    }
+    return id;
+  }
 
-      // project is immutable
-      original.setStudyType(studyStore.getType(study.getStudyType().getId()));
-      return studyStore.save(original);
+  @Override
+  public long update(Study study) throws IOException {
+    Study original = studyStore.get(study.getId());
+    validateChange(study, original);
+    original.setAccession(study.getAccession());
+    original.setAlias(study.getAlias());
+    original.setDescription(study.getDescription());
+    original.setChangeDetails(authorizationManager.getCurrentUser());
+
+    // project is immutable
+    original.setStudyType(studyStore.getType(study.getStudyType().getId()));
+    return studyStore.save(original);
+  }
+
+  private void validateChange(Study study, Study beforeChange) throws IOException {
+    List<ValidationError> errors = new ArrayList<>();
+
+    if (ValidationUtils.isSetAndChanged(Study::getAlias, study, beforeChange) && studyStore.getByAlias(study.getAlias()) != null) {
+      errors.add(new ValidationError("alias", "There is already a study with this alias"));
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
     }
   }
 

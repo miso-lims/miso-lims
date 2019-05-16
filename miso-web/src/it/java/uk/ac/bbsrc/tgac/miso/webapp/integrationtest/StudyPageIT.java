@@ -31,7 +31,7 @@ public class StudyPageIT extends AbstractIT {
 
     Map<String, String> unsaved = new HashMap<>();
     unsaved.put(Fields.ID, "Unsaved");
-    unsaved.put(Fields.PROJECT, "PRO400");
+    unsaved.put(Fields.PROJECT, "STUT");
     unsaved.put(Fields.NAME, "Unsaved");
     unsaved.put(Fields.ALIAS, "Create new Study via UI");
     unsaved.put(Fields.DESCRIPTION, "New Study via UI");

@@ -1,11 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -15,7 +13,6 @@ import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -35,9 +32,6 @@ public class HibernateStudyDaoTest extends AbstractDAOTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @Autowired
-  private JdbcTemplate jdbcTemplate;
-
-  @Autowired
   private SessionFactory sessionFactory;
 
   @InjectMocks
@@ -46,7 +40,6 @@ public class HibernateStudyDaoTest extends AbstractDAOTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
   }
 
@@ -134,12 +127,6 @@ public class HibernateStudyDaoTest extends AbstractDAOTest {
   public void testListAllWithNegativeLimit() throws IOException {
     List<Study> studies = dao.listAllWithLimit(-1L);
     assertTrue(studies.size() > 0);
-  }
-
-  @Test
-  public void testGetStudyColumnSizes() throws Exception {
-    Map<String, Integer> columnSizes = dao.getStudyColumnSizes();
-    assertThat("Column size contains", columnSizes, hasEntry("name", 255));
   }
 
   @Test

@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
@@ -39,6 +38,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * @since version
  */
 public interface StudyStore extends Store<Study>, PaginatedDataSource<Study> {
+
+  Study getByAlias(String alias) throws IOException;
+
   /**
    * List all Studies that match a search criteria
    * 
@@ -79,12 +81,6 @@ public interface StudyStore extends Store<Study>, PaginatedDataSource<Study> {
    *           when the objects cannot be retrieved
    */
   Collection<Study> listAllWithLimit(long limit) throws IOException;
-  
-  /**
-   * @return a map containing all column names and max lengths from the Study table
-   * @throws IOException
-   */
-  public Map<String, Integer> getStudyColumnSizes() throws IOException;
 
   public StudyType getType(long id);
 }

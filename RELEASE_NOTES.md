@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Changed Edit Study page to show validation messages instead of error page when saving fails
   * Changed Edit Instrument page to show validation messages instead of error page when saving
     fails
   * Changed Instrument creation to use the Edit Instrument page instead of a dialog

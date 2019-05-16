@@ -67,7 +67,7 @@ public class DefaultStudyServiceTest {
     when(studyStore.get(1L)).thenReturn(db);
     when(studyStore.save(db)).thenReturn(1L);
 
-    assertEquals(1L, sut.save(s));
+    assertEquals(1L, sut.update(s));
     assertEquals(s.getDescription(), db.getDescription());
     assertNotEquals(s.getName(), db.getName());
   }

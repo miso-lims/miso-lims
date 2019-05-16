@@ -202,7 +202,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
         for (Study study : project.getStudies()) {
           study.setProject(project);
-          study.setId(serviceManager.getStudyService().save(study));
+          study.setId(serviceManager.getStudyService().create(study));
         }
       }
       log.debug("Saved project " + project.getAlias());
