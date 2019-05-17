@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -36,14 +36,11 @@ public class EditFreezerController {
   @Autowired
   private StorageLocationService storageLocationService;
 
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> getColumnSizes() throws IOException {
-    return storageLocationService.getColumnSizes();
-  }
-
   @ModelAttribute("rooms")
-  public List<StorageLocation> getRooms() {
-    return storageLocationService.listRooms();
+  public String getRoomDtos() throws JsonProcessingException {
+    List<StorageLocation> rooms = storageLocationService.listRooms();
+    ObjectMapper mapper = new ObjectMapper();
+    return mapper.writeValueAsString(rooms.stream().map(r -> Dtos.asDto(r, false, false)).collect(Collectors.toList()));
   }
 
   @GetMapping("/new")
@@ -73,6 +70,7 @@ public class EditFreezerController {
     model.addAttribute(MODEL_ATTR_PAGEMODE, "edit");
     ObjectMapper mapper = new ObjectMapper();
     model.put("title", "Freezer " + freezer.getId());
+    model.put("freezer", freezer);
     model.addAttribute(MODEL_ATTR_JSON, mapper.writer().writeValueAsString(Dtos.asDto(freezer, true, true)));
     model.put("boxes", boxesInStorage(freezer).map(box -> Dtos.asDto(box, false)).collect(Collectors.toSet()));
     return new ModelAndView(JSP, model);

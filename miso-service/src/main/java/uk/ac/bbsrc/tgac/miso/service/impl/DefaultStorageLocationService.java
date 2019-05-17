@@ -5,7 +5,6 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.validateUrl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,17 +75,12 @@ public class DefaultStorageLocationService implements StorageLocationService {
   }
 
   @Override
-  public Map<String, Integer> getColumnSizes() throws IOException {
-    return storageLocationStore.getColumnSizes();
-  }
-
-  @Override
   public long createRoom(StorageLocation room) throws IOException {
     if (room.getLocationUnit() != LocationUnit.ROOM) {
       throw new IllegalArgumentException("Location is not a room");
     }
     room.setChangeDetails(authorizationManager.getCurrentUser());
-    if (room.getId() == StorageLocation.UNSAVED_ID) {
+    if (!room.isSaved()) {
       return storageLocationStore.save(room);
     } else {
       throw new IllegalArgumentException("Can not yet update rooms");
@@ -99,7 +93,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
       throw new IllegalArgumentException("Location is not a freezer");
     }
     loadChildEntities(freezer);
-    if (freezer.getId() == StorageLocation.UNSAVED_ID) {
+    if (!freezer.isSaved()) {
       return create(freezer);
     } else {
       return update(freezer);
@@ -147,7 +141,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
     }
 
     validateLocationUnitRelationships(storage, errors);
-    validateUrl(storage.getMapUrl(), true, errors);
+    validateUrl("mapUrl", storage.getMapUrl(), true, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);

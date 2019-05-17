@@ -32,107 +32,23 @@
 <div id="maincontent">
 <div id="contentcolumn">
 
-<div id="tab-1">
-
-<form:form id="freezer-form" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8">
 <h1>
-  <c:choose>
-    <c:when test="${pageMode eq 'create'}">Create</c:when>
-    <c:otherwise>Edit</c:otherwise>
-  </c:choose> Freezer
-  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all" onclick="Freezer.validateAndSave()">Save</button>
+  <c:choose><c:when test="${pageMode eq 'create'}">Create</c:when><c:otherwise>Edit</c:otherwise></c:choose> Freezer
+  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 
-<div class="bs-callout bs-callout-warning hidden">
-  <h2>Oh snap!</h2>
-  <p>This form seems to be invalid</p>
-  <div class="generalErrors"></div>
-</div>
-<br/>
-
-<div id="freezerInfo">
-  <table class="in">
-    <tr>
-      <td class="h">Location ID:</td>
-      <td><span id="id">Unsaved</span></td>
-    </tr>
-    <tr>
-      <td class="h">Room:</td>
-      <td>
-        <select id="room">
-          <option value="">SELECT</option>
-          <c:forEach items="${rooms}" var="room">
-            <option value="${room.id}">${room.alias}</option>
-          </c:forEach>
-        </select>
-      <div id="roomError" class="errorContainer"></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="h">Alias:</td>
-      <td>
-        <input type="text" id="alias"/><span id="aliasCounter" class="counter"></span>
-        <div id="aliasError" class="errorContainer"></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="h">Barcode:</td>
-      <td>
-        <input type="text" id="identificationBarcode"/><span id="identificationBarcodeCounter" class="counter"></span>
-        <div id="identificationBarcodeError" class="errorContainer"></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="h">Map URL:</td>
-      <td>
-        <input type="text" id="mapUrl"/><span id="mapUrlCounter" class="counter"></span>
-        <div id="mapUrlError" class="errorContainer"></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="h">Probe ID:</td>
-      <td>
-        <input type="text" id="probeId"/><span id="probeIdCounter" class="counter"></span>
-        <div id="probeIdError" class="errorContainer"></div>
-      </td>
-    </tr>
-  </table>
-</div>
-
-<script>
-jQuery(document).ready(function() {
-  jQuery('#alias').simplyCountable({
-    counter: '#aliasCounter',
-    countType: 'characters',
-    maxCount: ${maxLengths['alias']},
-    countDirection: 'down'
+<form:form id="freezerForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    Freezer.setFreezerJson(${freezerJson});
+    FormUtils.createForm('freezerForm', 'save', ${empty freezerJson ? '{}' : freezerJson}, 'freezer', {
+      rooms: ${rooms}
+    });
   });
-
-  jQuery('#identificationBarcode').simplyCountable({
-    counter: '#identificationBarcodeCounter',
-    countType: 'characters',
-    maxCount: ${maxLengths['identificationBarcode']},
-    countDirection: 'down'
-  });
-
-  jQuery('#mapUrl').simplyCountable({
-    counter: '#mapUrlCounter',
-    countType: 'characters',
-    maxCount: ${maxLengths['mapUrl']},
-    countDirection: 'down'
-  });
-  
-  jQuery('#probeId').simplyCountable({
-    counter: '#probeIdCounter',
-    countType: 'characters',
-    maxCount: ${maxLengths['probeId']},
-    countDirection: 'down'
-  });
-});
 </script>
-</form:form>
 
-<c:if test="${!empty freezerJson}">
+<c:if test="${pageMode eq 'edit'}">
+  <br/>
   <h1>Layout</h1>
   <div id="layoutSection" style="overflow:auto">
   
@@ -180,20 +96,13 @@ jQuery(document).ready(function() {
     </div>
     
   </div>
-  <script>
-  jQuery(document).ready(function() {
-    Freezer.setFreezerJson(${freezerJson});
-  });
-  </script>
 </c:if>
 
 <miso:list-section id="list_box" name="Boxes" target="box" items="${boxes}" config="{'showFreezerLocation':true, 'boxUse':false, 'showStorageLocation':false}"/>
 
 <br/>
-<h1>Changes</h1>
-<table id='changelog' class='display no-border ui-widget-content'></table>
+<miso:changelog item="${freezer}"/>
 
-</div>
 </div>
 </div>
 
