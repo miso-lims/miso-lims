@@ -35,6 +35,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -85,7 +86,7 @@ public class ExperimentRestController extends RestController {
     if (experiment.getKits().stream().noneMatch(k -> k.getId() == savedKitId)) {
       experiment.addKit(kit);
     }
-    experimentService.save(experiment);
+    experimentService.update(experiment);
     return Dtos.asDto(kit);
   }
 
@@ -116,26 +117,24 @@ public class ExperimentRestController extends RestController {
       rp.setRun(run);
 
       experiment.getRunPartitions().add(rp);
-      experimentService.save(experiment);
+      experimentService.update(experiment);
     }
     return get(experimentId);
   }
 
   @PostMapping(produces = "application/json")
   public @ResponseBody ExperimentDto create(@RequestBody ExperimentDto dto) throws IOException {
-    Experiment experiment = Dtos.to(dto);
-    experiment.setId(Experiment.UNSAVED_ID);
-    long id = experimentService.save(experiment);
-    return get(id);
+    return RestUtils.createObject("Experiment", dto, Dtos::to, experimentService, Dtos::asDto);
+  }
+
+  @PutMapping("/{experimentId}")
+  public @ResponseBody ExperimentDto update(@PathVariable long experimentId, @RequestBody ExperimentDto dto) throws IOException {
+    return RestUtils.updateObject("Experiment", experimentId, dto, Dtos::to, experimentService, Dtos::asDto);
   }
 
   @GetMapping(value = "/{experimentId}", produces = "application/json")
   public @ResponseBody ExperimentDto get(@PathVariable Long experimentId) throws IOException {
-    Experiment experiment = experimentService.get(experimentId);
-    if (experiment == null) {
-      throw new RestException("No such experiment.", Status.NOT_FOUND);
-    }
-    return Dtos.asDto(experiment);
+    return RestUtils.getObject("Experiment", experimentId, experimentService, Dtos::asDto);
   }
 
   @GetMapping(produces = "application/json")

@@ -35,23 +35,14 @@ public class ExperimentDto {
 
   }
   private String accession;
-
   private String alias;
-
   private String description;
-
-  private long id;
-
+  private Long id;
   private LibraryDto library;
-
   private String name;
-
   private List<RunPartitionDto> partitions;
-
   private InstrumentModelDto instrumentModel;
-
   private StudyDto study;
-
   private String title;
 
   public String getAccession() {
@@ -66,7 +57,7 @@ public class ExperimentDto {
     return description;
   }
 
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
@@ -106,7 +97,7 @@ public class ExperimentDto {
     this.description = description;
   }
 
-  public void setId(long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

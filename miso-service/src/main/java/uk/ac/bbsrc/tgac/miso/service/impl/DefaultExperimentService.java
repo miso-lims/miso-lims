@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,11 +59,6 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
     return experimentStore.get(experimentId);
   }
 
-  @Override
-  public Map<String, Integer> getColumnSizes() throws IOException {
-    return experimentStore.getExperimentColumnSizes();
-  }
-
   public NamingScheme getNamingScheme() {
     return namingScheme;
   }
@@ -90,63 +84,70 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
   }
 
   @Override
-  public long save(Experiment experiment) throws IOException {
+  public long create(Experiment experiment) throws IOException {
+    loadRunPartitions(experiment);
+    experiment.setName(DbUtils.generateTemporaryName());
+    experiment.setInstrumentModel(platformService.get(experiment.getInstrumentModel().getId()));
+    experiment.setLibrary(libraryService.get(experiment.getLibrary().getId()));
+    experiment.setStudy(studyService.get(experiment.getStudy().getId()));
+    experiment.setChangeDetails(authorizationManager.getCurrentUser());
+
+    experimentStore.save(experiment);
+    String name;
     try {
-      experiment.setLastModifier(authorizationManager.getCurrentUser());
-      if (experiment.getRunPartitions() == null) {
-        experiment.setRunPartitions(Collections.emptyList());
-      } else {
-        experiment.setRunPartitions(experiment.getRunPartitions().stream().map(WhineyFunction.rethrow(from -> {
-          RunPartition to = new RunPartition();
-          to.setExperiment(experiment);
-          to.setPartition(containerService.getPartition(from.getPartition().getId()));
-          to.setRun(runService.get(from.getRun().getId()));
-          return to;
-        })).collect(
-            Collectors.toList()));
-      }
-      if (experiment.getId() == Experiment.UNSAVED_ID) {
-        experiment.setName(DbUtils.generateTemporaryName());
-        experiment.setInstrumentModel(platformService.get(experiment.getInstrumentModel().getId()));
-        experiment.setLibrary(libraryService.get(experiment.getLibrary().getId()));
-        experiment.setStudy(studyService.get(experiment.getStudy().getId()));
-        experiment.setChangeDetails(authorizationManager.getCurrentUser());
-
-        experimentStore.save(experiment);
-        String name = namingScheme.generateNameFor(experiment);
-        experiment.setName(name);
-
-        ValidationResult nameValidation = namingScheme.validateName(experiment.getName());
-        if (!nameValidation.isValid()) {
-          throw new IOException("Cannot save Experiment - invalid name:" + nameValidation.getMessage());
-        }
-        return experimentStore.save(experiment);
-      }
-      ValidationResult nameValidation = namingScheme.validateName(experiment.getName());
-      if (!nameValidation.isValid()) {
-        throw new IOException("Cannot save Experiment - invalid name:" + nameValidation.getMessage());
-      }
-
-      Experiment original = experimentStore.get(experiment.getId());
-      original.setAccession(experiment.getAccession());
-      original.setAlias(experiment.getAlias());
-      original.setDescription(experiment.getDescription());
-      original.setName(experiment.getName());
-      original.setInstrumentModel(platformService.get(experiment.getInstrumentModel().getId()));
-      original.setLibrary(libraryService.get(experiment.getLibrary().getId()));
-      original.setStudy(studyService.get(experiment.getStudy().getId()));
-      original.setTitle(experiment.getTitle());
-      original.setRunPartitions(experiment.getRunPartitions());// These have been already reloaded.
-      original.getRunPartitions().forEach(rp -> rp.setExperiment(original));
-      Set<Kit> kits = new HashSet<>();
-      for (Kit k : experiment.getKits()) {
-        kits.add(kitService.get(k.getId()));
-      }
-      original.setKits(kits);
-      original.setChangeDetails(authorizationManager.getCurrentUser());
-      return experimentStore.save(original);
+      name = namingScheme.generateNameFor(experiment);
     } catch (MisoNamingException e) {
-      throw new IOException("Cannot save Experiment - issue with naming scheme", e);
+      throw new IOException("Cannot save Experiment - failed to generate a valid name", e);
+    }
+    experiment.setName(name);
+
+    ValidationResult nameValidation = namingScheme.validateName(experiment.getName());
+    if (!nameValidation.isValid()) {
+      throw new IOException("Cannot save Experiment - invalid name:" + nameValidation.getMessage());
+    }
+    return experimentStore.save(experiment);
+  }
+
+  @Override
+  public long update(Experiment experiment) throws IOException {
+    loadRunPartitions(experiment);
+    ValidationResult nameValidation = namingScheme.validateName(experiment.getName());
+    if (!nameValidation.isValid()) {
+      throw new IOException("Cannot save Experiment - invalid name:" + nameValidation.getMessage());
+    }
+
+    Experiment original = experimentStore.get(experiment.getId());
+    original.setAccession(experiment.getAccession());
+    original.setAlias(experiment.getAlias());
+    original.setDescription(experiment.getDescription());
+    original.setName(experiment.getName());
+    original.setInstrumentModel(platformService.get(experiment.getInstrumentModel().getId()));
+    original.setLibrary(libraryService.get(experiment.getLibrary().getId()));
+    original.setStudy(studyService.get(experiment.getStudy().getId()));
+    original.setTitle(experiment.getTitle());
+    original.setRunPartitions(experiment.getRunPartitions());// These have been already reloaded.
+    original.getRunPartitions().forEach(rp -> rp.setExperiment(original));
+    Set<Kit> kits = new HashSet<>();
+    for (Kit k : experiment.getKits()) {
+      kits.add(kitService.get(k.getId()));
+    }
+    original.setKits(kits);
+    original.setChangeDetails(authorizationManager.getCurrentUser());
+    return experimentStore.save(original);
+  }
+
+  public void loadRunPartitions(Experiment experiment) {
+    if (experiment.getRunPartitions() == null) {
+      experiment.setRunPartitions(Collections.emptyList());
+    } else {
+      experiment.setRunPartitions(experiment.getRunPartitions().stream().map(WhineyFunction.rethrow(from -> {
+        RunPartition to = new RunPartition();
+        to.setExperiment(experiment);
+        to.setPartition(containerService.getPartition(from.getPartition().getId()));
+        to.setRun(runService.get(from.getRun().getId()));
+        return to;
+      })).collect(
+          Collectors.toList()));
     }
   }
 

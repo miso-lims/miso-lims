@@ -24,24 +24,17 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,26 +49,10 @@ import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
 @Controller
 @RequestMapping("/experiment")
-@SessionAttributes("experiment")
 public class EditExperimentController {
-  protected static final Logger log = LoggerFactory.getLogger(EditExperimentController.class);
 
   @Autowired
   private ExperimentService experimentService;
-
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> maxLengths() throws IOException {
-    return experimentService.getColumnSizes();
-  }
-
-  @PostMapping
-  public ModelAndView processSubmit(@ModelAttribute("experiment") Experiment experiment, ModelMap model, SessionStatus session)
-      throws IOException {
-    experimentService.save(experiment);
-    session.setComplete();
-    model.clear();
-    return new ModelAndView("redirect:/miso/experiment/" + experiment.getId(), model);
-  }
 
   @GetMapping(value = "/{experimentId}")
   public ModelAndView setupForm(@PathVariable Long experimentId, ModelMap model) throws IOException {
@@ -97,8 +74,8 @@ public class EditExperimentController {
         .forEach(
             consumableConfig.putArray("allowedDescriptors")::addPOJO);
 
-    model.put("formObj", experiment);
     model.put("experiment", experiment);
+    model.put("experimentDto", mapper.writeValueAsString(Dtos.asDto(experiment)));
     model.put("consumables", experiment.getKits().stream().map(Dtos::asDto).collect(Collectors.toList()));
     model.put("consumableConfig", mapper.writeValueAsString(consumableConfig));
     model.put("runPartitions",

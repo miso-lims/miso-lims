@@ -76,7 +76,7 @@ public class DefaultExperimentServiceTest {
     when(libraryService.get(experiment.getLibrary().getId())).thenReturn(experiment.getLibrary());
     when(studyService.get(experiment.getStudy().getId())).thenReturn(experiment.getStudy());
 
-    assertEquals(expectedReturn, sut.save(experiment));
+    assertEquals(expectedReturn, sut.create(experiment));
     verify(experimentStore, times(2)).save(experiment);
   }
 
