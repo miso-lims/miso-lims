@@ -2304,9 +2304,21 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setName(from.getName());
-    dto.setProjectId(from.getProject().getId());
-    dto.setStudyTypeId(from.getStudyType().getId());
+    setId(dto::setProjectId, from.getProject());
+    setId(dto::setStudyTypeId, from.getStudyType());
     return dto;
+  }
+
+  public static Study to(@Nonnull StudyDto dto) {
+    Study to = new StudyImpl();
+    setLong(to::setId, dto.getId(), false);
+    setString(to::setAccession, dto.getAccession());
+    setString(to::setAlias, dto.getAlias());
+    setString(to::setDescription, dto.getDescription());
+    setString(to::setName, dto.getName());
+    setObject(to::setProject, ProjectImpl::new, dto.getProjectId());
+    setObject(to::setStudyType, StudyType::new, dto.getStudyTypeId());
+    return to;
   }
 
   public static StudyTypeDto asDto(@Nonnull StudyType from) {
@@ -2533,12 +2545,6 @@ public class Dtos {
     }).collect(Collectors.toList()));
     to.setStudy(to(dto.getStudy()));
     to.setTitle(dto.getTitle());
-    return to;
-  }
-
-  public static Study to(@Nonnull StudyDto dto) {
-    Study to = new StudyImpl();
-    to.setId(dto.getId());
     return to;
   }
 

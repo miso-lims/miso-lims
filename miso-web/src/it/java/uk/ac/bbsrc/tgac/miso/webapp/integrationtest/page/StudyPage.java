@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.titleContains;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -11,28 +12,28 @@ public class StudyPage extends HeaderFooterPage {
 
   public static class Fields {
     public static final String ID = "id";
-    public static final String PROJECT = "projectName";
+    public static final String PROJECT = "projectId";
     public static final String NAME = "name";
     public static final String ALIAS = "alias";
     public static final String DESCRIPTION = "description";
-    public static final String STUDY_TYPE = "studyType";
+    public static final String STUDY_TYPE = "studyTypeId";
 
     private Fields() {
       throw new IllegalStateException("Util class not intended for instantiation");
     }
   }
 
-  @FindBy(id = "studyId")
+  @FindBy(id = "idLabel")
   private WebElement idLabel;
-  @FindBy(id = "projectName")
+  @FindBy(id = "projectId")
   private WebElement projectLabel;
-  @FindBy(id = "name")
+  @FindBy(id = "nameLabel")
   private WebElement nameLabel;
   @FindBy(id = "alias")
   private WebElement aliasLabel;
   @FindBy(id = "description")
   private WebElement descriptionLabel;
-  @FindBy(id = "studyType")
+  @FindBy(id = "studyTypeId")
   private WebElement studyTypeLabel;
   @FindBy(id = "save")
   private WebElement saveButton;
@@ -54,7 +55,11 @@ public class StudyPage extends HeaderFooterPage {
   }
 
   public String getProject() {
-    return projectLabel.getText();
+    if ("select".equals(projectLabel.getTagName())) {
+      return getSelectedDropdownText(projectLabel);
+    } else {
+      return getDriver().findElement(By.id("projectIdLabel")).getText();
+    }
   }
 
   public String getName() {

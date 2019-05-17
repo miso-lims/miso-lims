@@ -2,18 +2,16 @@ package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
+import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface StudyService extends PaginatedDataSource<Study>, DeleterService<Study> {
+public interface StudyService extends PaginatedDataSource<Study>, DeleterService<Study>, SaveService<Study> {
 
   @Override
   public Study get(long studyId) throws IOException;
-
-  public Map<String, Integer> getColumnSizes() throws IOException;
 
   public StudyType getType(long id);
 
@@ -30,7 +28,5 @@ public interface StudyService extends PaginatedDataSource<Study>, DeleterService
   public Collection<StudyType> listTypes() throws IOException;
 
   public Collection<Study> listWithLimit(long limit) throws IOException;
-
-  public long save(Study study) throws IOException;
 
 }

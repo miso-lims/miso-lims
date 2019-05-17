@@ -24,146 +24,74 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
 @RequestMapping("/study")
-@SessionAttributes("study")
 public class EditStudyController {
-  protected static final Logger log = LoggerFactory.getLogger(EditStudyController.class);
 
-  @Autowired
-  private AuthorizationManager authorizationManager;
   @Autowired
   private ProjectService projectService;
   @Autowired
   private StudyService studyService;
 
-  /**
-   * Retrieves from miso.properties whether detailed sample mode has been enabled
-   */
-  @Value("${miso.detailed.sample.enabled}")
-  private Boolean detailedSample;
-
-  /**
-   * Gets status of detailed sample mode
-   * 
-   * @return whether detailed sample mode has been enabled by miso.properties
-   */
-  @ModelAttribute("detailedSample")
-  private Boolean isDetailedSampleEnabled() {
-    return detailedSample;
-  }
-
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
   }
 
-  public Project populateProject(@PathVariable Long projectId) throws IOException {
-    try {
-      return projectService.get(projectId);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to get parent project", ex);
-      }
-      throw ex;
-    }
-  }
-
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> maxLengths() throws IOException {
-    return studyService.getColumnSizes();
-  }
-
-  @ModelAttribute("studyTypes")
-  public Collection<StudyType> populateStudyTypes() throws IOException {
-    return studyService.listTypes();
-  }
-  
-  /**
-   * Populates 'projects' model attribute with list of projects sorted by name if in plain sample mode, by shortname if in detailed
-   * sample mode.
-   * 
-   * @return Collection of Project sorted by name if in plain sample mode, by shortname if in detailed sample mode
-   * @throws IOException upon failure to access Projects
-   */
-  @ModelAttribute("projects")
-  public Collection<Project> populateProjects() throws IOException {
-    if (detailedSample) {
-      return projectService.listAllProjectsByShortname();
-    } else {
-      return projectService.listAllProjects();
-    }
-  }
-
   @GetMapping(value = "/new")
   public ModelAndView newStudy(ModelMap model) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    Study study = new StudyImpl();
-
-    return setupForm(study, user, "New Study", model);
+    return setupForm(new StudyImpl(), model);
   }
 
   @GetMapping(value = "/new/{projectId}")
-  public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
-    User user = authorizationManager.getCurrentUser();
+  public ModelAndView newAssignedProject(@PathVariable long projectId, ModelMap model) throws IOException {
     Study study = new StudyImpl();
     Project project = projectService.get(projectId);
+    if (project == null) {
+      throw new NotFoundException("No project found with ID " + projectId);
+    }
     study.setProject(project);
-    return setupForm(study, user, "New Study", model);
+    return setupForm(study, model);
   }
 
   @GetMapping(value = "/{studyId}")
   public ModelAndView setupForm(@PathVariable Long studyId, ModelMap model) throws IOException {
-    User user = authorizationManager.getCurrentUser();
     Study study = studyService.get(studyId);
     if (study == null) throw new NotFoundException("No study found for ID " + studyId.toString());
 
-    return setupForm(study, user, "Study " + studyId, model);
+    return setupForm(study, model);
   }
 
-  private ModelAndView setupForm(Study study, User user, String title, ModelMap model) throws IOException {
-    model.put("title", title);
-    model.put("formObj", study);
+  private ModelAndView setupForm(Study study, ModelMap model) throws IOException {
+    model.put("title", study.isSaved() ? ("Study " + study.getId()) : "New Study");
     model.put("study", study);
+
+    ObjectMapper mapper = new ObjectMapper();
+    model.put("studyDto", mapper.writeValueAsString(Dtos.asDto(study)));
+    model.put("projects", mapper.writeValueAsString(projectService.listAllProjects().stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList())));
+
     model.put("experiments", study.getExperiments().stream().map(Dtos::asDto).collect(Collectors.toList()));
     return new ModelAndView("/WEB-INF/pages/editStudy.jsp", model);
-  }
-
-  @PostMapping
-  public ModelAndView processSubmit(@ModelAttribute("study") Study study, ModelMap model, SessionStatus session) throws IOException {
-    studyService.save(study);
-    session.setComplete();
-    model.clear();
-    return new ModelAndView("redirect:/miso/study/" + study.getId(), model);
   }
 }

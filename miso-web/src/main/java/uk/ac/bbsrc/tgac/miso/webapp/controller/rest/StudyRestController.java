@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,20 +14,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.dto.ChangeLogDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.StudyDto;
-import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
@@ -48,8 +47,6 @@ public class StudyRestController extends RestController {
 
   @Autowired
   private StudyService studyService;
-  @Autowired
-  private ChangeLogService changeLogService;
 
   @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
@@ -67,8 +64,8 @@ public class StudyRestController extends RestController {
   }
 
   @GetMapping(value = "/{studyId}")
-  public @ResponseBody StudyDto get(@PathVariable Long studyId) throws IOException {
-    return Dtos.asDto(studyService.get(studyId));
+  public @ResponseBody StudyDto get(@PathVariable long studyId) throws IOException {
+    return RestUtils.getObject("Study", studyId, studyService, Dtos::asDto);
   }
 
   @DeleteMapping(value = "/{id}", produces = "application/json")
@@ -88,9 +85,13 @@ public class StudyRestController extends RestController {
     return studyService.list(0, 0, true, "id").stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  @GetMapping(value = "/changes", produces = "application/json")
-  public @ResponseBody List<ChangeLogDto> getChanges() throws IOException {
-    Collection<ChangeLog> changeLogs = changeLogService.listAll("Study");
-    return changeLogs.stream().map(Dtos::asDto).collect(Collectors.toList());
+  @PostMapping
+  public @ResponseBody StudyDto create(@RequestBody StudyDto dto) throws IOException {
+    return RestUtils.createObject("Study", dto, Dtos::to, studyService, Dtos::asDto);
+  }
+
+  @PutMapping("/{studyId}")
+  public @ResponseBody StudyDto update(@PathVariable long studyId, @RequestBody StudyDto dto) throws IOException {
+    return RestUtils.updateObject("Study", studyId, dto, Dtos::to, studyService, Dtos::asDto);
   }
 }

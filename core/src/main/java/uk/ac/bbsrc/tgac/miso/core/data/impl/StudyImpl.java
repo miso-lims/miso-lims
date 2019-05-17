@@ -62,7 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.StudyChangeLog;
 @Entity
 @Table(name = "Study")
 public class StudyImpl implements Study {
-  public static final Long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   private static final long serialVersionUID = 1L;
 
@@ -82,7 +82,7 @@ public class StudyImpl implements Study {
 
   @Column(name = "name", nullable = false)
   private String name;
-  @Column(name = "description", nullable = false)
+  @Column(name = "description")
   private String description;
   @Column(name = "accession")
   private String accession;
