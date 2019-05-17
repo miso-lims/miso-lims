@@ -28,89 +28,27 @@
 
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form id="submission-form" data-parsley-validate="" action="/miso/submission" method="POST" modelAttribute="submission" autocomplete="off">
-  <sessionConversation:insertSessionConversationId attributeName="submission"/>
   <h1>
-    <c:choose>
-      <c:when test="${submission.id != 0}">Edit</c:when>
-      <c:otherwise>Create</c:otherwise>
-    </c:choose> Submission
-    <button type="button" onclick="return Submission.validateSubmission();" class="fg-button ui-state-default ui-corner-all">Save</button>
+    <c:choose><c:when test="${submission.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose> Submission
+    <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
   </h1>
-<div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
-  <c:if test="${submission.id != 0}">
-    <a href="#" onclick="Submission.download(${submission.id})" class="ui-button ui-state-default">Download</a>
-    <span></span>
-  </c:if>
-</div>
-
-  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
-    <div id="note_arrowclick" class="toggleLeft"></div>
-  </div>
-  <div id="notediv" class="note" style="display:none;">Submission help
-  </div>
-  <h2>Submission Information</h2>
-  <table class="in">
-    <tr>
-      <td class="h">Submission ID:</td>
-      <td>
-        <c:choose>
-          <c:when test="${submission.id != 0}">${submission.id}</c:when>
-          <c:otherwise><i>Unsaved</i></c:otherwise>
-        </c:choose>
-      </td>
-    </tr>
-    <tr>
-      <td class="h">Title:</td>
-      <td><form:input path="title"/><span id="titlecounter" class="counter"></span></td>
-    </tr>
-    <tr>
-      <td class="h">Alias:</td>
-      <td><form:input path="alias"/><span id="aliascounter" class="counter"></span></td>
-    </tr>
-    <tr>
-      <td class="h">Description:</td>
-      <td><form:input path="description"/><span id="descriptioncounter" class="counter"></span></td>
-    </tr>
-    <c:if test="${not empty submission.accession}">
-      <tr>
-        <td class="h">Accession:</td>
-        <td><a href="http://www.ebi.ac.uk/ena/data/view/${submission.accession}"
-               target="_blank">${submission.accession}</a>
-        </td>
-      </tr>
+  <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
+    <c:if test="${submission.id != 0}">
+      <a href="#" onclick="Submission.download(${submission.id})" class="ui-button ui-state-default">Download</a>
+      <span></span>
     </c:if>
-  </table>
+  </div>
+  
+  <form:form id="submissionForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
+  <script>
+    jQuery(document).ready(function () {
+      FormUtils.createForm('submissionForm', 'save', ${submissionDto}, 'submission', {});
+    });
+  </script>
 
-</form:form>
-    <miso:list-section id="list_experiments" name="Experiments" target="experiment" items="${experiments}" config="{ inSubmission: true }"/>
+  <miso:list-section id="list_experiments" name="Experiments" target="experiment" items="${experiments}" config="{ inSubmission: true }"/>
 </div>
 </div>
-
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    jQuery('#title').simplyCountable({
-      counter: '#titlecounter',
-      countType: 'characters',
-      maxCount: ${maxLengths['title']},
-      countDirection: 'down'
-    });
-
-    jQuery('#alias').simplyCountable({
-      counter: '#aliascounter',
-      countType: 'characters',
-      maxCount: ${maxLengths['alias']},
-      countDirection: 'down'
-    });
-
-    jQuery('#description').simplyCountable({
-      counter: '#descriptioncounter',
-      countType: 'characters',
-      maxCount: ${maxLengths['description']},
-      countDirection: 'down'
-    });
-  });
-</script>
 
 <%@ include file="adminsub.jsp" %>
 <%@ include file="../footer.jsp" %>

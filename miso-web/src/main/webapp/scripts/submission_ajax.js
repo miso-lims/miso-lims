@@ -22,30 +22,6 @@
  */
 
 var Submission = {
-  validateSubmission: function() {
-    Validate.cleanFields('#submission-form');
-    jQuery('#submission-form').parsley().destroy();
-
-    // Alias input field validation
-    jQuery('#alias').attr('class', 'form-control');
-    jQuery('#alias').attr('data-parsley-required', 'true');
-    jQuery('#alias').attr('data-parsley-maxlength', '255');
-    jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
-    // Title input field validation
-    jQuery('#title').attr('class', 'form-control');
-    jQuery('#title').attr('data-parsley-maxlength', '255');
-    jQuery('#title').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
-    // Description input field validation
-    jQuery('#description').attr('class', 'form-control');
-    jQuery('#description').attr('data-parsley-maxlength', '255');
-    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
-    jQuery('#submission-form').parsley();
-    jQuery('#submission-form').parsley().validate();
-    jQuery('#submission-form').submit();
-  },
   download: function(id) {
     Utils.showDialog("Download XML", "Download", [{
       type: 'select',

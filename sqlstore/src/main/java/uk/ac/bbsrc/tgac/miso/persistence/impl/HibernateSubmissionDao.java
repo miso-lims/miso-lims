@@ -25,47 +25,31 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
-/**
- * uk.ac.bbsrc.tgac.miso.sqlstore
- * <p/>
- * Info
- *
- * @author Rob Davey
- * @since 0.0.2
- */
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernateSubmissionDao implements SubmissionStore {
-  protected static final Logger log = LoggerFactory.getLogger(HibernateSubmissionDao.class);
-
-  private static final String TABLE_NAME = "Submission";
 
   @Autowired
   private SessionFactory sessionFactory;
-  @Autowired
-  private JdbcTemplate template;
 
-  @Override
-  public int count() throws IOException {
-    long c = (Long) currentSession().createCriteria(Submission.class).setProjection(Projections.rowCount()).uniqueResult();
-    return (int) c;
+  public SessionFactory getSessionFactory() {
+    return sessionFactory;
+  }
+
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
   }
 
   private Session currentSession() {
@@ -73,21 +57,14 @@ public class HibernateSubmissionDao implements SubmissionStore {
   }
 
   @Override
-  public Submission get(long id) throws IOException {
-    return (Submission) currentSession().get(Submission.class, id);
-  }
-
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
-  }
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
+  public int count() throws IOException {
+    long c = (Long) currentSession().createCriteria(Submission.class).setProjection(Projections.rowCount()).uniqueResult();
+    return (int) c;
   }
 
   @Override
-  public Map<String, Integer> getSubmissionColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(template, TABLE_NAME);
+  public Submission get(long id) throws IOException {
+    return (Submission) currentSession().get(Submission.class, id);
   }
 
   @Override
@@ -100,19 +77,11 @@ public class HibernateSubmissionDao implements SubmissionStore {
 
   @Override
   public long save(Submission submission) throws IOException {
-    if (submission.getId() == Submission.UNSAVED_ID) {
+    if (!submission.isSaved()) {
       return (Long) currentSession().save(submission);
     } else {
       currentSession().update(submission);
       return submission.getId();
     }
-  }
-
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
   }
 }

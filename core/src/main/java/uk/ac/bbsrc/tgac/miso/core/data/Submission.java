@@ -41,10 +41,10 @@ import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "Submission")
-public class Submission implements Comparable<Submission>, Serializable
+public class Submission implements Comparable<Submission>, Serializable, Identifiable
 {
 
-  public static final Long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   private static final long serialVersionUID = 1L;
 
@@ -100,6 +100,7 @@ public class Submission implements Comparable<Submission>, Serializable
     return experiments;
   }
 
+  @Override
   public long getId() {
     return submissionId;
   }
@@ -145,6 +146,7 @@ public class Submission implements Comparable<Submission>, Serializable
     this.experiments = experiments;
   }
 
+  @Override
   public void setId(long id) {
     this.submissionId = id;
   }
@@ -159,5 +161,10 @@ public class Submission implements Comparable<Submission>, Serializable
 
   public void setVerified(boolean verified) {
     this.verified = verified;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 }

@@ -2565,7 +2565,31 @@ public class Dtos {
     dto.setSubmittedDate(formatDate(from.getSubmissionDate()));
     dto.setTitle(from.getTitle());
     dto.setVerified(from.isVerified());
+    if (from.getExperiments() != null && !from.getExperiments().isEmpty()) {
+      dto.setExperimentIds(from.getExperiments().stream().map(Experiment::getId).collect(Collectors.toList()));
+    }
     return dto;
+  }
+
+  public static Submission to(@Nonnull SubmissionDto dto) {
+    Submission to = new Submission();
+    setLong(to::setId, dto.getId(), false);
+    setString(to::setAccession, dto.getAccession());
+    setString(to::setAlias, dto.getAlias());
+    to.setCompleted(dto.isCompleted());
+    setDate(to::setCreationDate, dto.getCreationDate());
+    setString(to::setDescription, dto.getDescription());
+    setDate(to::setSubmissionDate, dto.getSubmittedDate());
+    setString(to::setTitle, dto.getTitle());
+    to.setVerified(dto.isVerified());
+    if (dto.getExperimentIds() != null && !dto.getExperimentIds().isEmpty()) {
+      to.setExperiments(dto.getExperimentIds().stream().map(id -> {
+        Experiment exp = new Experiment();
+        exp.setId(id);
+        return exp;
+      }).collect(Collectors.toSet()));
+    }
+    return to;
   }
 
   public static ArrayDto asDto(@Nonnull Array from) {
