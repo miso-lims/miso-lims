@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
+import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.dto.ChangeLogDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.StorageLocationDto;
 import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
@@ -33,6 +33,24 @@ public class StorageLocationRestController extends RestController {
 
   @Autowired
   private StorageLocationService storageLocationService;
+
+  private final SaveService<StorageLocation> freezerSaveService = new SaveService<StorageLocation>() {
+
+    @Override
+    public StorageLocation get(long id) throws IOException {
+      return storageLocationService.get(id);
+    }
+
+    @Override
+    public long create(StorageLocation object) throws IOException {
+      return storageLocationService.saveFreezer(object);
+    }
+
+    @Override
+    public long update(StorageLocation object) throws IOException {
+      return storageLocationService.saveFreezer(object);
+    }
+  };
 
   @GetMapping(value = "/freezers")
   public @ResponseBody List<StorageLocationDto> getFreezers() {
@@ -64,24 +82,13 @@ public class StorageLocationRestController extends RestController {
   @PostMapping(value = "/freezers")
   @ResponseStatus(HttpStatus.CREATED)
   public @ResponseBody StorageLocationDto createFreezer(@RequestBody StorageLocationDto dto) throws IOException {
-    return doSave(dto);
+    return RestUtils.createObject("Freezer", dto, Dtos::to, freezerSaveService, freezer -> Dtos.asDto(freezer, true, true));
   }
 
   @PutMapping(value = "/freezers/{id}")
   public @ResponseBody StorageLocationDto update(@PathVariable(name = "id", required = true) long id, @RequestBody StorageLocationDto dto)
       throws IOException {
-    if (dto.getId() != id) {
-      throw new RestException("Location ID mismatch", Status.BAD_REQUEST);
-    }
-    getFreezer(id); // checks existing freezer
-    return doSave(dto);
-  }
-
-  private StorageLocationDto doSave(StorageLocationDto dto) throws IOException {
-    StorageLocation freezer = Dtos.to(dto);
-    long savedId = storageLocationService.saveFreezer(freezer);
-    StorageLocation saved = storageLocationService.get(savedId);
-    return Dtos.asDto(saved, true, true);
+    return RestUtils.updateObject("Freezer", id, dto, Dtos::to, freezerSaveService, freezer -> Dtos.asDto(freezer, true, true));
   }
 
   @PostMapping(value = "/freezers/{id}/shelves")
@@ -244,17 +251,6 @@ public class StorageLocationRestController extends RestController {
       throw new RestException("Shelf not found", Status.NOT_FOUND);
     }
     return shelf;
-  }
-
-  @GetMapping(value = "/freezers/{freezerId}/changelog")
-  public @ResponseBody List<ChangeLogDto> getFreezerChangelog(@PathVariable(name = "freezerId", required = true) long freezerId) {
-    StorageLocation freezer = storageLocationService.get(freezerId);
-    if (freezer == null) {
-      throw new RestException("Freezer not found", Status.NOT_FOUND);
-    }
-    return freezer.getChangeLog().stream()
-        .map(Dtos::asDto)
-        .collect(Collectors.toList());
   }
 
   @PutMapping(value = "/{locationId}")

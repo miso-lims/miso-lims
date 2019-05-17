@@ -65,7 +65,7 @@ FormTarget.user = (function($) {
           type: 'text',
           required: true,
           maxLength: 255,
-          regex: Utils.validation.emailRegex
+          regex: 'email'
         }, {
           title: 'Admin?',
           data: 'admin',

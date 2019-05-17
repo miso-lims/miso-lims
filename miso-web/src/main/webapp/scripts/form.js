@@ -32,7 +32,7 @@ FormUtils = (function($) {
    *   disabled: optional boolean; whether the field is disabled
    *   required: optional boolean; whether the field is required
    *   maxLength: optional integer; maximum number of characters for text input
-   *   regex: optional regex; validation regex for text input
+   *   regex: optional regex; validation regex for text input. Can be 'url', 'email', or an actual regex
    *   min: minimum value for int or decimal input
    *   precision: maximum precision (length, excluding the decimal) for decimal input
    *   scale: maximum scale (decimal places) for decimal input
@@ -354,7 +354,15 @@ FormUtils = (function($) {
     }
     if (field.type === 'text' || field.type === 'textarea' || field.type === 'password') {
       if (field.regex) {
-        control.attr('data-parsley-pattern', field.regex);
+        switch (field.regex) {
+        case 'url':
+        case 'email':
+          control.attr('data-parsley-type', field.regex);
+          break;
+        default:
+          control.attr('data-parsley-pattern', field.regex);
+          break;
+        }
       } else {
         control.attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
       }
