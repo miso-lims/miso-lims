@@ -40,8 +40,9 @@
 <form:form id="freezerForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 <script type="text/javascript">
   jQuery(document).ready(function () {
-    Freezer.setFreezerJson(${freezerJson});
-    FormUtils.createForm('freezerForm', 'save', ${empty freezerJson ? '{}' : freezerJson}, 'freezer', {
+    var dto = ${empty freezerJson ? '{}' : freezerJson};
+    Freezer.setFreezerJson(dto);
+    FormUtils.createForm('freezerForm', 'save', dto, 'freezer', {
       rooms: ${rooms}
     });
   });
@@ -96,13 +97,12 @@
     </div>
     
   </div>
+
+  <miso:list-section id="list_box" name="Boxes" target="box" items="${boxes}" config="{'showFreezerLocation':true, 'boxUse':false, 'showStorageLocation':false}"/>
+  
+  <br/>
+  <miso:changelog item="${freezer}"/>
 </c:if>
-
-<miso:list-section id="list_box" name="Boxes" target="box" items="${boxes}" config="{'showFreezerLocation':true, 'boxUse':false, 'showStorageLocation':false}"/>
-
-<br/>
-<miso:changelog item="${freezer}"/>
-
 </div>
 </div>
 

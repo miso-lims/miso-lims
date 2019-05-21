@@ -1,6 +1,7 @@
 -- fixes BeforeInsertPool trigger created in V0004
 DROP TRIGGER IF EXISTS BeforeInsertPool;
 
+SET FOREIGN_KEY_CHECKS=0;
 DELETE FROM Workset_Sample;
 DELETE FROM Workset_Library;
 DELETE FROM Workset_Dilution;
@@ -101,3 +102,5 @@ DELETE FROM Deletion;
 DELETE FROM User_Group;
 DELETE FROM User;
 DELETE FROM _Group;
+DELETE FROM StorageLocation;
+SET FOREIGN_KEY_CHECKS=1;

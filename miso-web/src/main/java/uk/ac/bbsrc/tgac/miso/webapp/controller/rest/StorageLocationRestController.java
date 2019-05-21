@@ -82,6 +82,7 @@ public class StorageLocationRestController extends RestController {
   @PostMapping(value = "/freezers")
   @ResponseStatus(HttpStatus.CREATED)
   public @ResponseBody StorageLocationDto createFreezer(@RequestBody StorageLocationDto dto) throws IOException {
+    dto.setLocationUnit(LocationUnit.FREEZER.name());
     return RestUtils.createObject("Freezer", dto, Dtos::to, freezerSaveService, freezer -> Dtos.asDto(freezer, true, true));
   }
 

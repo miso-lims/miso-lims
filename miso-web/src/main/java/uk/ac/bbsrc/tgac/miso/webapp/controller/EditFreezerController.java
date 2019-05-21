@@ -46,7 +46,7 @@ public class EditFreezerController {
   @GetMapping("/new")
   public ModelAndView newStorageLocation(ModelMap model) {
     model.addAttribute(MODEL_ATTR_PAGEMODE, "create");
-    model.put("title", "New Storage Location");
+    model.put("title", "New Freezer");
     return new ModelAndView(JSP, model);
   }
 
