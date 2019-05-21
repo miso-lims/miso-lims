@@ -1,0 +1,1 @@
+ALTER TABLE SequencingParameters ADD COLUMN runType varchar(255);
