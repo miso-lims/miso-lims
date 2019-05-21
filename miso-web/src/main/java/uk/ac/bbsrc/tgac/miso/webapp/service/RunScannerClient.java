@@ -110,7 +110,7 @@ public class RunScannerClient {
             case OXFORDNANOPORE:
               isMatchingSequencingParameters =
                       params -> params.getInstrumentModel().getPlatformType() == PlatformType.OXFORDNANOPORE &&
-                      params.getRunType() == ((OxfordNanoporeNotificationDto) dto).getRunType();
+                      params.getRunType().equals(((OxfordNanoporeNotificationDto) dto).getRunType());
               break;
           default:
             isMatchingSequencingParameters = params -> params.getInstrumentModel()
