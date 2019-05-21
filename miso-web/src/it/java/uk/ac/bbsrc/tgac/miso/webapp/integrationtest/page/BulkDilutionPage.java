@@ -59,14 +59,14 @@ public class BulkDilutionPage extends HeaderFooterPage {
 
   public static BulkDilutionPage getForEdit(WebDriver driver, String baseUrl, Collection<Long> dilutionIds) {
     String ids = Joiner.on(',').join(dilutionIds);
-    String url = baseUrl + "miso/dilutions/bulk/edit?ids=" + ids;
+    String url = baseUrl + "miso/dilution/bulk/edit?ids=" + ids;
     driver.get(url);
     return new BulkDilutionPage(driver);
   }
 
   public static BulkDilutionPage getForPropagate(WebDriver driver, String baseUrl, Collection<Long> libraryIds) {
     String ids = Joiner.on(',').join(libraryIds);
-    String url = baseUrl + "miso/dilutions/bulk/propagate?ids=" + ids;
+    String url = baseUrl + "miso/dilution/bulk/propagate?ids=" + ids;
     driver.get(url);
     return new BulkDilutionPage(driver);
   }

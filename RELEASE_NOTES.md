@@ -2,8 +2,9 @@
 
 Changes:
 
- * Record MinKNOW and Protocol versions for Oxford Nanopore runs as reported by Run Scanner
- * Upgraded Run Scanner version to 1.4.6
+  * Record MinKNOW and Protocol versions for Oxford Nanopore runs as reported by Run Scanner
+  * Upgraded Run Scanner version to 1.4.6
+  * Fixed broken links to dilution-related pages
 
 # 0.2.178
 
@@ -19,6 +20,10 @@ Changes:
     * Edit Array Run
   * Changed Instrument creation to use the Edit Instrument page instead of a dialog
   * Fixed Edit Dilution page URL: /miso/dilution/{id} (was /miso/dilutions/{id})
+
+BAD:
+
+  * Several broken links to dilution-related pages
 
 # 0.2.177
 

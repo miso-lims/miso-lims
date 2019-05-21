@@ -63,7 +63,7 @@ ListTarget.dilution = {
               ids: config.library.id
             }
             var loadPage = function() {
-              window.location = window.location.origin + '/miso/dilutions/bulk/propagate?' + jQuery.param(params);
+              window.location = window.location.origin + '/miso/dilution/bulk/propagate?' + jQuery.param(params);
             }
             if (result.createBox) {
               Utils.createBoxDialog(result, function(result) {
@@ -88,7 +88,7 @@ ListTarget.dilution = {
       "iSortPriority": 1,
       "mRender": function(data, type, full) {
         if (type === 'display') {
-          return "<a href=\"/miso/dilutions/" + data + "\">" + full.name + "</a>";
+          return "<a href=\"/miso/dilution/" + data + "\">" + full.name + "</a>";
         }
         return data;
       }
