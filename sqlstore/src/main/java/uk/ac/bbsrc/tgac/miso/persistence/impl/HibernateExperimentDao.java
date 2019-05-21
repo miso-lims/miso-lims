@@ -27,38 +27,26 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
-import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernateExperimentDao implements ExperimentStore {
-  protected static final Logger log = LoggerFactory.getLogger(HibernateExperimentDao.class);
-
-  private static final String TABLE_NAME = "Experiment";
 
   @Autowired
   private SessionFactory sessionFactory;
-
-  @Autowired
-  private JdbcTemplate template;
-
   @Override
   public int count() throws IOException {
     long c = (Long) currentSession().createCriteria(Experiment.class).setProjection(Projections.rowCount()).uniqueResult();
@@ -72,16 +60,6 @@ public class HibernateExperimentDao implements ExperimentStore {
   @Override
   public Experiment get(long experimentId) throws IOException {
     return (Experiment) currentSession().get(Experiment.class, experimentId);
-  }
-
-  @Override
-  public Map<String, Integer> getExperimentColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(template, TABLE_NAME);
-  }
-
-  @CoverageIgnore
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
   }
 
   public SessionFactory getSessionFactory() {
@@ -133,18 +111,13 @@ public class HibernateExperimentDao implements ExperimentStore {
   @Override
   public long save(Experiment experiment) throws IOException {
     long id;
-    if (experiment.getId() == Experiment.UNSAVED_ID) {
+    if (!experiment.isSaved()) {
       id = (Long) currentSession().save(experiment);
     } else {
       currentSession().update(experiment);
       id = experiment.getId();
     }
     return id;
-  }
-
-  @CoverageIgnore
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
   }
 
   public void setSessionFactory(SessionFactory sessionFactory) {

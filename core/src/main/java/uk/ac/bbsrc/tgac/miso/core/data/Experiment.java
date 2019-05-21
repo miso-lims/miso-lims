@@ -133,13 +133,9 @@ public class Experiment implements Comparable<Experiment>, Nameable, ChangeLogga
     }
   }
 
-  /** Field PREFIX */
-  public static final String PREFIX = "EXP";
-
   private static final long serialVersionUID = 1L;
 
-  /** Field UNSAVED_ID */
-  public static final Long UNSAVED_ID = 0L;
+  private static final Long UNSAVED_ID = 0L;
 
   private String accession;
 

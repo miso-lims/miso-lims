@@ -6,6 +6,7 @@ Changes:
   * Changed Edit Instrument page to show validation messages instead of error page when saving
     fails
   * Changed Edit Submission page to show validation messages instead of error page when saving
+  * Changed Edit Experiment page to show validation messages instead of error page when saving
     fails
   * Changed Instrument creation to use the Edit Instrument page instead of a dialog
 

@@ -37,15 +37,9 @@
 
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form id="experiment-form" data-parsley-validate="" action="/miso/experiment" method="POST" commandName="experiment"
-  autocomplete="off">
-<sessionConversation:insertSessionConversationId attributeName="experiment"/>
 <h1>
-  <c:choose>
-    <c:when test="${experiment.id != 0}">Edit</c:when>
-    <c:otherwise>Create</c:otherwise>
-  </c:choose> Experiment
-  <button onclick="return Experiment.validateExperiment();" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <c:choose><c:when test="${experiment.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose> Experiment
+  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="breadcrumbs">
   <ul>
@@ -82,103 +76,18 @@
   A Pool is attached to an Experiment which is then assigned to an instrument partition (lane/chamber).
 </div>
 
-<div class="bs-callout bs-callout-warning hidden">
-  <h2>Oh snap!</h2>
-  <p>This form seems to be invalid!</p>
-</div>
-
-<h2>Experiment Information</h2>
-<table class="in">
-<tr>
-  <td class="h">Experiment ID:</td>
-  <td>
-    <c:choose>
-      <c:when test="${experiment.id != 0}">${experiment.id}</c:when>
-      <c:otherwise><i>Unsaved</i></c:otherwise>
-    </c:choose>
-  </td>
-</tr>
-<tr>
-  <td class="h">Name:</td>
-  <td>
-    <c:choose>
-      <c:when test="${experiment.id != 0}">${experiment.name}</c:when>
-      <c:otherwise><i>Unsaved</i></c:otherwise>
-    </c:choose>
-  </td>
-</tr>
-<tr>
-  <td class="h">Title:*</td>
-  <td><form:input path="title"/><span id="titlecounter" class="counter"></span></td>
-</tr>
-<tr>
-  <td class="h">Alias:*</td>
-  <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
-</tr>
-<tr>
-  <td class="h">Description:</td>
-  <td><form:input path="description" class="validateable"/><span id="descriptioncounter" class="counter"></span></td>
-</tr>
-<c:if test="${not empty experiment.accession}">
-  <tr>
-    <td class="h">Accession:</td>
-    <td><a href="http://www.ebi.ac.uk/ena/data/view/${experiment.accession}"
-           target="_blank">${experiment.accession}</a>
-    </td>
-  </tr>
-</c:if>
-<tr>
-  <td class="h">Study:</td>
-  <td><a href="/miso/study/${experiment.study.id}">${experiment.study.name} (${experiment.study.alias})</a></td>
-</tr>
-<tr>
-   <td>Platform:</td>
-   <td>${experiment.instrumentModel.platformType.key} - ${experiment.instrumentModel.alias}</td>
-</tr>
-<tr>
-   <td>Library:</td>
-   <td><a href="/miso/library/${experiment.library.id}">${experiment.library.name} (${experiment.library.alias})</td>
-</tr>
-</table>
-
+<form:form id="experimentForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 <script type="text/javascript">
-  jQuery(document).ready(function() {
-    // Attaches a Parsley form validator. 
-    Validate.attachParsley('#experiment-form');
+  jQuery(document).ready(function () {
+    FormUtils.createForm('experimentForm', 'save', ${experimentDto}, 'experiment', {});
   });
 </script>
 
-</form:form>
 <miso:list-section id="list_part_lane" alwaysShow="true" name="${experiment.instrumentModel.platformType.pluralPartitionName}" target="experiment_run_partition" items="${runPartitions}" config="{}"/>
 <miso:list-section id="list_consumable" alwaysShow="true" name="Consumables" target="kit_consumable" items="${consumables}" config="${consumableConfig}"/>
 <miso:changelog item="${experiment}"/>
 </div>
 </div>
-
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    jQuery('#title').simplyCountable({
-      counter: '#titlecounter',
-      countType: 'characters',
-      maxCount: ${maxLengths['title']},
-      countDirection: 'down'
-    });
-
-    jQuery('#alias').simplyCountable({
-      counter: '#aliascounter',
-      countType: 'characters',
-      maxCount: ${maxLengths['alias']},
-      countDirection: 'down'
-    });
-
-    jQuery('#description').simplyCountable({
-      counter: '#descriptioncounter',
-      countType: 'characters',
-      maxCount: ${maxLengths['description']},
-      countDirection: 'down'
-    });
-  });
-</script>
 
 <%@ include file="adminsub.jsp" %>
 
