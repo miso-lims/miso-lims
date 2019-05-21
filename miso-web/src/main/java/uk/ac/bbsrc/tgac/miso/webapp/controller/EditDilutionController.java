@@ -45,7 +45,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
 
 @Controller
-@RequestMapping("/dilutions")
+@RequestMapping("/dilution")
 public class EditDilutionController {
 
   protected static final Comparator<LibraryDilution> DILUTION_COMPARATOR = (a, b) -> {
