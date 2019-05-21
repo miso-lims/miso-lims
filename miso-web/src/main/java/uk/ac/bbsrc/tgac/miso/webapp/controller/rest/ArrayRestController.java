@@ -28,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.ArrayDto;
 import uk.ac.bbsrc.tgac.miso.dto.ChangeLogDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -72,27 +73,19 @@ public class ArrayRestController extends RestController {
   @PostMapping()
   @ResponseStatus(HttpStatus.CREATED)
   public @ResponseBody ArrayDto save(@RequestBody ArrayDto dto) throws IOException {
-    return doSave(dto);
+    return RestUtils.createObject("Array", dto, Dtos::to, arrayService, Dtos::asDto);
   }
 
   @PutMapping(value = "/{arrayId}")
   public @ResponseBody ArrayDto update(@PathVariable(name = "arrayId", required = true) long arrayId, @RequestBody ArrayDto dto)
       throws IOException {
-    if (dto.getId().longValue() != arrayId) {
-      throw new RestException("Array ID mismatch", Status.BAD_REQUEST);
-    }
-    Array existing = arrayService.get(arrayId);
-    if (existing == null) {
-      throw new RestException(ERROR_NOTFOUND, Status.NOT_FOUND);
-    }
-    return doSave(dto);
-  }
-
-  public ArrayDto doSave(ArrayDto dto) throws IOException {
-    Array array = Dtos.to(dto);
-    long savedId = arrayService.save(array);
-    Array saved = arrayService.get(savedId);
-    return Dtos.asDto(saved);
+    return RestUtils.updateObject("Array", arrayId, dto, WhineyFunction.rethrow(d -> {
+      Array existing = arrayService.get(arrayId);
+      Array array = Dtos.to(d);
+      // Can't update samples in this way
+      array.setSamples(existing.getSamples());
+      return array;
+    }), arrayService, Dtos::asDto);
   }
 
   @DeleteMapping(value = "/{arrayId}/positions/{position}")
@@ -110,7 +103,7 @@ public class ArrayRestController extends RestController {
     }
 
     array.setSample(position, null);
-    arrayService.save(array);
+    arrayService.update(array);
 
     Array saved = arrayService.get(arrayId);
     return Dtos.asDto(saved);
@@ -132,7 +125,7 @@ public class ArrayRestController extends RestController {
     }
 
     array.setSample(position, sample);
-    arrayService.save(array);
+    arrayService.update(array);
 
     Array saved = arrayService.get(arrayId);
     return Dtos.asDto(saved);

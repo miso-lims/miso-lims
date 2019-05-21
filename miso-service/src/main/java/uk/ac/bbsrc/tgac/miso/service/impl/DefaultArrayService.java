@@ -84,22 +84,16 @@ public class DefaultArrayService implements ArrayService {
   }
 
   @Override
-  public long save(Array array) throws IOException {
+  public long create(Array array) throws IOException {
     loadChildEntities(array);
-    if (array.getId() == Array.UNSAVED_ID) {
-      return create(array);
-    } else {
-      return update(array);
-    }
-  }
-
-  private long create(Array array) throws IOException {
     array.setChangeDetails(authorizationManager.getCurrentUser());
     validateChange(array, null);
     return arrayStore.save(array);
   }
 
-  private long update(Array array) throws IOException {
+  @Override
+  public long update(Array array) throws IOException {
+    loadChildEntities(array);
     Array managed = get(array.getId());
     validateChange(array, managed);
     applyChanges(array, managed);
@@ -129,7 +123,7 @@ public class DefaultArrayService implements ArrayService {
   private void validateChange(Array array, Array beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
-    if (array.getId() != Array.UNSAVED_ID && beforeChange == null) {
+    if (array.isSaved() && beforeChange == null) {
       errors.add(new ValidationError("Array not found"));
     }
     if (isStringEmptyOrNull(array.getAlias())) {
@@ -201,11 +195,6 @@ public class DefaultArrayService implements ArrayService {
   @Override
   public List<ArrayModel> listArrayModels() throws IOException {
     return arrayStore.listArrayModels();
-  }
-
-  @Override
-  public Map<String, Integer> getColumnSizes() throws IOException {
-    return arrayStore.getArrayColumnSizes();
   }
 
   @Override

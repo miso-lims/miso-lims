@@ -1,14 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -16,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.service.ArrayService;
@@ -37,15 +37,12 @@ public class EditArrayController {
   @Autowired
   private ArrayRunService arrayRunService;
 
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> getColumnSizes() throws IOException {
-    return arrayService.getColumnSizes();
-  }
-
   @RequestMapping("/new")
   public ModelAndView newArray(ModelMap model) throws IOException {
     model.addAttribute(MODEL_ATTR_PAGEMODE, "create");
-    model.addAttribute(MODEL_ATTR_MODELS, arrayService.listArrayModels());
+    List<ArrayModel> models = arrayService.listArrayModels();
+    ObjectMapper mapper = new ObjectMapper();
+    model.addAttribute(MODEL_ATTR_MODELS, mapper.writeValueAsString(models.stream().map(Dtos::asDto).collect(Collectors.toList())));
     return new ModelAndView(JSP, model);
   }
 

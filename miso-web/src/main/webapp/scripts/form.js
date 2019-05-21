@@ -530,7 +530,7 @@ FormUtils = (function($) {
     if (value !== null) {
       input.text(value);
     }
-    if (isLink) {
+    if (isLink && item[field.data]) {
       input.attr('href', field.getLink(item));
     }
     return input;

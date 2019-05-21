@@ -31,7 +31,7 @@ public class ArrayRun implements Serializable, Aliasable, ChangeLoggable {
 
   private static final long serialVersionUID = 1L;
 
-  public static final long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   @Id
   @Column(name = "arrayRunId")

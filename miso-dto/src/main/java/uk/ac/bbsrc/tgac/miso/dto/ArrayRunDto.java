@@ -8,7 +8,8 @@ public class ArrayRunDto {
   private String filePath;
   private Long instrumentId;
   private String instrumentName;
-  private ArrayDto array;
+  private Long arrayId;
+  private String arrayAlias;
   private String status;
   private String startDate;
   private String completionDate;
@@ -62,12 +63,20 @@ public class ArrayRunDto {
     this.instrumentName = instrumentName;
   }
 
-  public ArrayDto getArray() {
-    return array;
+  public Long getArrayId() {
+    return arrayId;
   }
 
-  public void setArray(ArrayDto array) {
-    this.array = array;
+  public void setArrayId(Long arrayId) {
+    this.arrayId = arrayId;
+  }
+
+  public String getArrayAlias() {
+    return arrayAlias;
+  }
+
+  public void setArrayAlias(String arrayAlias) {
+    this.arrayAlias = arrayAlias;
   }
 
   public String getStatus() {

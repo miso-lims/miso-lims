@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -12,7 +11,6 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +21,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.ArrayStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
@@ -38,9 +35,6 @@ public class HibernateArrayDao implements ArrayStore, HibernatePaginatedDataSour
   @Autowired
   private SessionFactory sessionFactory;
 
-  @Autowired
-  private JdbcTemplate jdbcTemplate;
-
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
 
@@ -50,14 +44,6 @@ public class HibernateArrayDao implements ArrayStore, HibernatePaginatedDataSour
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
-  }
-
-  public JdbcTemplate getJdbcTemplate() {
-    return jdbcTemplate;
-  }
-
-  public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-    this.jdbcTemplate = jdbcTemplate;
   }
 
   public void setDetailedSample(boolean isDetailed) {
@@ -71,7 +57,7 @@ public class HibernateArrayDao implements ArrayStore, HibernatePaginatedDataSour
 
   @Override
   public long save(Array array) throws IOException {
-    if (array.getId() == Array.UNSAVED_ID) {
+    if (!array.isSaved()) {
       return (long) currentSession().save(array);
     } else {
       currentSession().update(array);
@@ -217,11 +203,6 @@ public class HibernateArrayDao implements ArrayStore, HibernatePaginatedDataSour
     @SuppressWarnings("unchecked")
     List<ArrayModel> list = criteria.list();
     return list;
-  }
-
-  @Override
-  public Map<String, Integer> getArrayColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(jdbcTemplate, "Array");
   }
 
 }

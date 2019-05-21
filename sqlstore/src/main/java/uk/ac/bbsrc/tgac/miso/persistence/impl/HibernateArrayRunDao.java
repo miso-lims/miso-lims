@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.store.ArrayRunStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
@@ -58,7 +56,7 @@ public class HibernateArrayRunDao implements ArrayRunStore, HibernatePaginatedDa
 
   @Override
   public long save(ArrayRun arrayRun) throws IOException {
-    if (arrayRun.getId() == ArrayRun.UNSAVED_ID) {
+    if (!arrayRun.isSaved()) {
       return (long) currentSession().save(arrayRun);
     } else {
       currentSession().update(arrayRun);
@@ -153,11 +151,6 @@ public class HibernateArrayRunDao implements ArrayRunStore, HibernatePaginatedDa
   @Override
   public String propertyForUserName(Criteria criteria, boolean creator) {
     return creator ? "creator.loginName" : "lastModifier.loginName";
-  }
-
-  @Override
-  public Map<String, Integer> getArrayColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(jdbcTemplate, "ArrayRun");
   }
 
   @Override
