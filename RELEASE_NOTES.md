@@ -2,14 +2,20 @@
 
 Changes:
 
-  * Changed Edit Study page to show validation messages instead of error page when saving fails
-  * Changed Edit Array and Array Run pages to show validation messages instead of error page when
-    saving fails
-  * Changed Edit Instrument page to show validation messages instead of error page when saving
-    fails
-  * Changed Edit Submission page to show validation messages instead of error page when saving
-  * Changed Edit Experiment page to show validation messages instead of error page when saving
-    fails
+
+
+# 0.2.178
+
+Changes:
+
+  * Record Oxford Nanopore sequencing parameters (run type) as reported by Run Scanner
+  * Changed pages to show validation messages instead of error page when saving fails:
+    * Edit Instrument
+    * Edit Study
+    * Edit Experiment
+    * Edit Submission
+    * Edit Array
+    * Edit Array Run
   * Changed Instrument creation to use the Edit Instrument page instead of a dialog
   * Fixed Edit Dilution page URL: /miso/dilution/{id} (was /miso/dilutions/{id})
 
