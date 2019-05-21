@@ -16,9 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -37,9 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
  */
 public class HibernateExperimentDaoTest extends AbstractDAOTest {
 
-  @Autowired
-  @Spy
-  private JdbcTemplate jdbcTemplate;
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -53,7 +48,6 @@ public class HibernateExperimentDaoTest extends AbstractDAOTest {
   @Before
   public void setup() throws Exception {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
     when(namingScheme.generateNameFor(Matchers.any(Experiment.class))).thenReturn("EDI123");
     when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());

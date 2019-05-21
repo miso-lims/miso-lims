@@ -2508,6 +2508,28 @@ public class Dtos {
     return dto;
   }
 
+  public static Experiment to(@Nonnull ExperimentDto dto) {
+    Experiment to = new Experiment();
+    setLong(to::setId, dto.getId(), false);
+    setString(to::setAccession, dto.getAccession());
+    to.setAlias(dto.getAlias());
+    to.setDescription(dto.getDescription());
+    setString(to::setName, dto.getName());
+    to.setLibrary(to(dto.getLibrary()));
+    to.setInstrumentModel(to(dto.getInstrumentModel()));
+    to.setRunPartitions(dto.getPartitions().stream().map(rpDto -> {
+      RunPartition rpTo = new RunPartition();
+      rpTo.setExperiment(to);
+      rpTo.setPartition(to(rpDto.getPartition()));
+      rpTo.setRun(PlatformType.get(rpDto.getRun().getPlatformType()).createRun());
+      rpTo.getRun().setId(rpDto.getRun().getId());
+      return rpTo;
+    }).collect(Collectors.toList()));
+    to.setStudy(to(dto.getStudy()));
+    to.setTitle(dto.getTitle());
+    return to;
+  }
+
   public static KitConsumableDto asDto(@Nonnull Kit from) {
     KitConsumableDto dto = new KitConsumableDto();
     dto.setId(from.getId());
@@ -2525,26 +2547,6 @@ public class Dtos {
     to.setKitDate(parseDate(dto.getDate()));
     to.setKitDescriptor(to(dto.getDescriptor()));
     to.setLotNumber(dto.getLotNumber());
-    return to;
-  }
-
-  public static Experiment to(@Nonnull ExperimentDto dto) {
-    Experiment to = new Experiment();
-    to.setId(dto.getId());
-    to.setAlias(dto.getAlias());
-    to.setDescription(dto.getDescription());
-    to.setLibrary(to(dto.getLibrary()));
-    to.setInstrumentModel(to(dto.getInstrumentModel()));
-    to.setRunPartitions(dto.getPartitions().stream().map(rpDto -> {
-      RunPartition rpTo = new RunPartition();
-      rpTo.setExperiment(to);
-      rpTo.setPartition(to(rpDto.getPartition()));
-      rpTo.setRun(PlatformType.get(rpDto.getRun().getPlatformType()).createRun());
-      rpTo.getRun().setId(rpDto.getRun().getId());
-      return rpTo;
-    }).collect(Collectors.toList()));
-    to.setStudy(to(dto.getStudy()));
-    to.setTitle(dto.getTitle());
     return to;
   }
 
