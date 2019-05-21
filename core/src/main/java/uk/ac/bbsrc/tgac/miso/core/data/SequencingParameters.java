@@ -52,6 +52,8 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
   private String name;
   @Column(nullable = false)
   private boolean paired;
+  @Column
+  private String runType;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -202,4 +204,11 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
     return getId() != UNSAVED_ID;
   }
 
+  public String getRunType() {
+    return runType;
+  }
+
+  public void setRunType(String runType) {
+    this.runType = runType;
+  }
 }

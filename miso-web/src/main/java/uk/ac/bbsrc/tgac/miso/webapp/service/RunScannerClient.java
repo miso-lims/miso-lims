@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 
 import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.ProgressiveRequestDto;
 import ca.on.oicr.gsi.runscanner.dto.ProgressiveResponseDto;
@@ -106,6 +107,11 @@ public class RunScannerClient {
                 && params.isPaired() == ((IlluminaNotificationDto) dto).isPairedEndRun()
                 && params.getChemistry() == Dtos.getMisoIlluminaChemistryFromRunscanner(((IlluminaNotificationDto) dto).getChemistry());
             break;
+            case OXFORDNANOPORE:
+              isMatchingSequencingParameters =
+                      params -> params.getInstrumentModel().getPlatformType() == PlatformType.OXFORDNANOPORE &&
+                      params.getRunType().equals(((OxfordNanoporeNotificationDto) dto).getRunType());
+              break;
           default:
             isMatchingSequencingParameters = params -> params.getInstrumentModel()
                 .getPlatformType() == Dtos.getMisoPlatformTypeFromRunscanner(dto.getPlatformType());
