@@ -104,7 +104,7 @@ public class RunScannerClient {
           case ILLUMINA:
             isMatchingSequencingParameters = params -> params.getInstrumentModel().getPlatformType() == PlatformType.ILLUMINA &&
                 Math.abs(params.getReadLength() - ((IlluminaNotificationDto) dto).getReadLength()) < 2
-                && params.isPaired() == ((IlluminaNotificationDto)dto).isPairedEndRun()
+                && params.isPaired() == ((IlluminaNotificationDto) dto).isPairedEndRun()
                 && params.getChemistry() == Dtos.getMisoIlluminaChemistryFromRunscanner(((IlluminaNotificationDto) dto).getChemistry());
             break;
             case OXFORDNANOPORE:
