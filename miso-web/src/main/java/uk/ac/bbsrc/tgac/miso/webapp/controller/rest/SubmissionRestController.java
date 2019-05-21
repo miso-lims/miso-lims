@@ -14,6 +14,9 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -22,6 +25,8 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 import uk.ac.bbsrc.tgac.miso.core.util.EnaSubmissionPreparation;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.SubmissionDto;
 import uk.ac.bbsrc.tgac.miso.service.SubmissionService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -49,4 +54,15 @@ public class SubmissionRestController extends RestController {
             + String.format("SUBMISSON%d-%s.zip", submission.getId(), new SimpleDateFormat("yyyy-MM-dd").format(new Date())));
     return new EnaSubmissionPreparation(submission, user, centreName, SubmissionActionType.valueOf(action)).toBytes();
   }
+
+  @PostMapping
+  public @ResponseBody SubmissionDto create(@RequestBody SubmissionDto dto) throws IOException {
+    return RestUtils.createObject("Submission", dto, Dtos::to, submissionService, Dtos::asDto);
+  }
+
+  @PutMapping("/{submissionId}")
+  public @ResponseBody SubmissionDto update(@PathVariable long submissionId, @RequestBody SubmissionDto dto) throws IOException {
+    return RestUtils.updateObject("Submission", submissionId, dto, Dtos::to, submissionService, Dtos::asDto);
+  }
+
 }

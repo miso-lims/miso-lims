@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.List;
+
 public class SubmissionDto {
   private String accession;
   private String alias;
@@ -10,6 +12,7 @@ public class SubmissionDto {
   private String submittedDate;
   private String title;
   private boolean verified;
+  private List<Long> experimentIds;
 
   public String getAccession() {
     return accession;
@@ -81,6 +84,14 @@ public class SubmissionDto {
 
   public void setVerified(boolean verified) {
     this.verified = verified;
+  }
+
+  public List<Long> getExperimentIds() {
+    return experimentIds;
+  }
+
+  public void setExperimentIds(List<Long> experimentIds) {
+    this.experimentIds = experimentIds;
   }
 
 }

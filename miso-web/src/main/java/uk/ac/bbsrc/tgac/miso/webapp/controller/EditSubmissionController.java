@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -37,13 +36,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -53,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.service.SubmissionService;
 
 @Controller
 @RequestMapping("/submission")
-@SessionAttributes("submission")
 public class EditSubmissionController {
   protected static final Logger log = LoggerFactory.getLogger(EditSubmissionController.class);
 
@@ -65,11 +62,6 @@ public class EditSubmissionController {
   @Autowired
   private ExperimentService experimentService;
 
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> maxLengths() throws IOException {
-    return submissionService.getColumnSizes();
-  }
-
   @GetMapping(value = "/new")
   public ModelAndView newSubmission(@QueryParam("experimentIds") String experimentIds, ModelMap model) throws IOException {
     Submission submission = new Submission();
@@ -79,32 +71,17 @@ public class EditSubmissionController {
     return setupForm(submission, "New Submission", model);
   }
 
-  @PostMapping
-  public ModelAndView processSubmit(@ModelAttribute("submission") Submission submission, ModelMap model, SessionStatus session)
-      throws IOException {
-    try {
-      submissionService.save(submission);
-      session.setComplete();
-      model.clear();
-      return new ModelAndView("redirect:/miso/submission/" + submission.getId(), model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save submission", ex);
-      }
-      throw ex;
-    }
-  }
-
   @GetMapping(value = "/{submissionId}")
   public ModelAndView setupForm(@PathVariable Long submissionId, ModelMap model) throws IOException {
     Submission submission = submissionService.get(submissionId);
     return setupForm(submission, "Submission " + submissionId, model);
   }
 
-  private ModelAndView setupForm(Submission submission, String title, ModelMap model) {
+  private ModelAndView setupForm(Submission submission, String title, ModelMap model) throws JsonProcessingException {
     model.put("title", title);
-    model.put("formObj", submission);
     model.put("submission", submission);
+    ObjectMapper mapper = new ObjectMapper();
+    model.put("submissionDto", mapper.writeValueAsString(Dtos.asDto(submission)));
     model.put("experiments", submission.getExperiments().stream().map(Dtos::asDto).collect(Collectors.toList()));
     return new ModelAndView("/WEB-INF/pages/editSubmission.jsp", model);
   }
