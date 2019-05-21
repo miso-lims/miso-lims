@@ -101,43 +101,6 @@
     updatePage();
   };
 
-  SampleArray.validateAndSave = function() {
-    Validate.cleanFields('#array-form');
-    Validate.clearErrors('#array-form');
-
-    // ArrayModel input field validation
-    $('#arrayModel').attr('class', 'form-control');
-    $('#arrayModel').attr('data-parsley-required', 'true');
-    $('#arrayModel').attr('data-parsley-errors-container', '#arrayModelError');
-
-    // Alias input field validation
-    $('#alias').attr('class', 'form-control');
-    $('#alias').attr('data-parsley-required', 'true');
-    $('#alias').attr('data-parsley-maxlength', '255');
-    $('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    $('#alias').attr('data-parsley-errors-container', '#aliasError');
-
-    // Serial Number input field validation
-    $('#serialNumber').attr('class', 'form-control');
-    $('#serialNumber').attr('data-parsley-required', 'true');
-    $('#serialNumber').attr('data-parsley-maxlength', '255');
-    $('#serialNumber').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    $('#serialNumber').attr('data-parsley-errors-container', '#serialNumberError');
-
-    // Description input field validation
-    $('#description').attr('class', 'form-control');
-    $('#description').attr('data-parsley-max-length', '255');
-    $('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    $('#description').attr('data-parsley-errors-container', '#descriptionError');
-
-    $('#array-form').parsley();
-    $('#array-form').parsley().validate();
-
-    Validate.updateWarningOrSubmit('#array-form', null, function() {
-      save(!arrayJson || !arrayJson.id);
-    });
-  };
-
   SampleArray.removeSelected = function() {
     showSamplesLoading(true);
     var selectedPosition = visual.selectedItems[0].position;
@@ -299,39 +262,6 @@
       data: arrayJson.samples
     });
     visual.setDisabled(false);
-  }
-
-  function updateJson() {
-    var array = arrayJson || {};
-    array.alias = $('#alias').val();
-    array.serialNumber = $('#serialNumber').val();
-    array.description = $('#description').val();
-    if (!array.id) {
-      array.arrayModelId = $('#arrayModel option:selected').val();
-      array.arrayModelAlias = $('#arrayModel option:selected').text();
-    }
-    arrayJson = array;
-  }
-
-  function save(isNew) {
-    updateJson();
-    var url = '/miso/rest/arrays';
-    if (!isNew) {
-      url += '/' + arrayJson.id;
-    }
-    var type = isNew ? 'POST' : 'PUT';
-
-    $.ajax({
-      url: url,
-      type: type,
-      dataType: 'json',
-      contentType: 'application/json; charset=utf8',
-      data: JSON.stringify(arrayJson)
-    }).success(function(data) {
-      window.location.href = '/miso/array/' + data.id;
-    }).fail(function(response, textStatus, serverStatus) {
-      Validate.displayErrors(JSON.parse(response.responseText), '#array-form');
-    });
   }
 
   function getItemAtPosition(coordinates) {

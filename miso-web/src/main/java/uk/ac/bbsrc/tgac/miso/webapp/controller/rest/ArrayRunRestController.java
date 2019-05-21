@@ -3,11 +3,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,7 +28,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.ArrayDto;
 import uk.ac.bbsrc.tgac.miso.dto.ArrayRunDto;
-import uk.ac.bbsrc.tgac.miso.dto.ChangeLogDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.ArrayRunService;
@@ -78,27 +75,13 @@ public class ArrayRunRestController extends RestController {
   @PostMapping(produces = "application/json")
   @ResponseStatus(HttpStatus.CREATED)
   public @ResponseBody ArrayRunDto save(@RequestBody ArrayRunDto dto) throws IOException {
-    return doSave(dto);
+    return RestUtils.createObject("Array Run", dto, Dtos::to, arrayRunService, Dtos::asDto);
   }
 
   @PutMapping(value = "/{arrayRunId}")
   public @ResponseBody ArrayRunDto update(@PathVariable(name = "arrayRunId", required = true) long arrayRunId,
       @RequestBody ArrayRunDto dto) throws IOException {
-    if (dto.getId().longValue() != arrayRunId) {
-      throw new RestException("Array Run ID mismatch", Status.BAD_REQUEST);
-    }
-    ArrayRun existing = arrayRunService.get(arrayRunId);
-    if (existing == null) {
-      throw new RestException("Array Run not found", Status.NOT_FOUND);
-    }
-    return doSave(dto);
-  }
-
-  public ArrayRunDto doSave(ArrayRunDto dto) throws IOException {
-    ArrayRun run = Dtos.to(dto);
-    long savedId = arrayRunService.save(run);
-    ArrayRun saved = arrayRunService.get(savedId);
-    return Dtos.asDto(saved);
+    return RestUtils.updateObject("Array Run", arrayRunId, dto, Dtos::to, arrayRunService, Dtos::asDto);
   }
 
   @GetMapping(value = "/array-search")
@@ -108,18 +91,6 @@ public class ArrayRunRestController extends RestController {
     }
     List<Array> arrays = arrayService.getArraysBySearch(search);
     return Dtos.asArrayDtos(arrays);
-  }
-
-  @GetMapping(value = "/{arrayRunId}/changelog")
-  public @ResponseBody List<ChangeLogDto> getChangelog(@PathVariable(name = "arrayRunId", required = true) long arrayRunId)
-      throws IOException {
-    ArrayRun run = arrayRunService.get(arrayRunId);
-    if (run == null) {
-      throw new RestException("Array Run not found", Status.NOT_FOUND);
-    }
-    return run.getChangeLog().stream()
-        .map(Dtos::asDto)
-        .collect(Collectors.toList());
   }
 
 }

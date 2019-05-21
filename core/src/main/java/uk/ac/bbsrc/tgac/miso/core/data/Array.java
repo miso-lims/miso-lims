@@ -39,7 +39,7 @@ public class Array implements Serializable, Aliasable, ChangeLoggable {
 
   private static final Pattern positionRegex = Pattern.compile("^R(\\d{2})C(\\d{2})$");
 
-  public static final long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   @Id
   @Column(name = "arrayId")

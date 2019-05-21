@@ -2674,18 +2674,13 @@ public class Dtos {
       dto.setInstrumentName(from.getInstrument().getName());
     }
     if (from.getArray() != null) {
-      dto.setArray(asDto(from.getArray()));
+      setLong(dto::setArrayId, from.getArray().getId(), true);
+      setString(dto::setArrayAlias, from.getArray().getAlias());
     }
     dto.setStatus(from.getHealth().getKey());
-    if (from.getStartDate() != null) {
-      dto.setStartDate(formatDate(from.getStartDate()));
-    }
-    if (from.getCompletionDate() != null) {
-      dto.setCompletionDate(formatDate(from.getCompletionDate()));
-    }
-    if (from.getLastModified() != null) {
-      dto.setLastModified(formatDate(from.getLastModified()));
-    }
+    setDateString(dto::setStartDate, from.getStartDate());
+    setDateString(dto::setCompletionDate, from.getCompletionDate());
+    setDateString(dto::setLastModified, from.getLastModified());
     return dto;
   }
 
@@ -2693,6 +2688,13 @@ public class Dtos {
     return arrays.stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList());
+  }
+
+  public static ArrayModelDto asDto(@Nonnull ArrayModel from) {
+    ArrayModelDto to = new ArrayModelDto();
+    setId(to::setId, from);
+    setString(to::setAlias, from.getAlias());
+    return to;
   }
 
   public static final ArrayRun to(@Nonnull ArrayRunDto from) {
@@ -2703,26 +2705,12 @@ public class Dtos {
     run.setAlias(from.getAlias());
     run.setDescription(nullifyStringIfBlank(from.getDescription()));
     run.setFilePath(nullifyStringIfBlank(from.getFilePath()));
-    run.setInstrument(new InstrumentImpl());
-    if (from.getInstrumentId() != null) {
-      run.getInstrument().setId(from.getInstrumentId());
-    }
-    if (from.getInstrumentName() != null) {
-      run.getInstrument().setName(from.getInstrumentName());
-    }
-    if (from.getArray() != null) {
-      run.setArray(to(from.getArray()));
-    }
+    setObject(run::setInstrument, InstrumentImpl::new, from.getInstrumentId());
+    setObject(run::setArray, Array::new, from.getArrayId());
     run.setHealth(HealthType.get(from.getStatus()));
-    if (from.getStartDate() != null) {
-      run.setStartDate(parseDate(from.getStartDate()));
-    }
-    if (from.getCompletionDate() != null) {
-      run.setCompletionDate(parseDate(from.getCompletionDate()));
-    }
-    if (from.getLastModified() != null) {
-      run.setLastModified(parseDate(from.getLastModified()));
-    }
+    setDate(run::setStartDate, from.getStartDate());
+    setDate(run::setCompletionDate, from.getCompletionDate());
+    setDate(run::setLastModified, from.getLastModified());
     return run;
   }
 

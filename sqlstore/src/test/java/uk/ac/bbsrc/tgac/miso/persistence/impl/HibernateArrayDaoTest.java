@@ -11,7 +11,6 @@ import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -25,9 +24,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 public class HibernateArrayDaoTest extends AbstractDAOTest {
 
   @Autowired
-  private JdbcTemplate template;
-
-  @Autowired
   private SessionFactory sessionFactory;
 
   private HibernateArrayDao sut;
@@ -36,7 +32,6 @@ public class HibernateArrayDaoTest extends AbstractDAOTest {
   public void setup() {
     sut = new HibernateArrayDao();
     sut.setSessionFactory(sessionFactory);
-    sut.setJdbcTemplate(template);
     sut.setDetailedSample(true);
   }
 

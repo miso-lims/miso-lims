@@ -32,97 +32,25 @@
 <div id="maincontent">
 <div id="contentcolumn">
 
-<div id="tab-1">
-
-<form:form id="array-form" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8">
 <h1>
-  <c:choose>
-    <c:when test="${pageMode eq 'create'}">Create</c:when>
-    <c:otherwise>Edit</c:otherwise>
-  </c:choose> Array
-  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all" onclick="SampleArray.validateAndSave()">Save</button>
+  <c:choose><c:when test="${pageMode eq 'create'}">Create</c:when><c:otherwise>Edit</c:otherwise></c:choose> Array
+  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 
-<div class="bs-callout bs-callout-warning hidden">
-  <h2>Oh snap!</h2>
-  <p>This form seems to be invalid</p>
-  <div class="generalErrors"></div>
-</div>
-<br/>
-
-<div id="arrayInfo">
-  <table class="in">
-    <tr>
-      <td class="h">Array ID:</td>
-      <td><span id="id">Unsaved</span></td>
-    </tr>
-    <tr>
-      <td class="h">Array Model:*</td>
-      <td>
-      <c:choose>
-        <c:when test="${pageMode eq 'create'}">
-          <select id="arrayModel">
-            <option value="">SELECT</option>
-            <c:forEach items="${arrayModels}" var="model">
-              <option value="${model.id}">${model.alias}</option>
-            </c:forEach>
-          </select>
-        </c:when>
-        <c:otherwise><span id="arrayModel"></span></c:otherwise>
-      </c:choose>
-      <div id="arrayModelError" class="errorContainer"></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="h">Alias:*</td>
-      <td>
-        <input type="text" id="alias"/><span id="aliasCounter" class="counter"></span>
-        <div id="aliasError" class="errorContainer"></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="h">Serial Number:*</td>
-      <td>
-        <input type="text" id="serialNumber"/><span id="serialNumberCounter" class="counter"></span>
-        <div id="serialNumberError" class="errorContainer"></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="h">Description:</td>
-      <td>
-        <input type="text" id="description"/><span id="descriptionCounter" class="counter"></span>
-        <div id="descriptionError" class="errorContainer"></div>
-      </td>
-    </tr>
-  </table>
-</div>
-<script>
-jQuery(document).ready(function() {
-  jQuery('#alias').simplyCountable({
-    counter: '#aliasCounter',
-    countType: 'characters',
-    maxCount: ${maxLengths['alias']},
-    countDirection: 'down'
+<form:form id="arrayForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    var dto = ${empty arrayJson ? '{}' : arrayJson};
+    var config = {};
+    <c:if test="${pageMode eq 'create'}">
+      config.arrayModels = ${arrayModels};
+    </c:if>
+    FormUtils.createForm('arrayForm', 'save', dto, 'array', config);
   });
-
-  jQuery('#serialNumber').simplyCountable({
-    counter: '#serialNumberCounter',
-    countType: 'characters',
-    maxCount: ${maxLengths['serialNumber']},
-    countDirection: 'down'
-  });
-
-  jQuery('#description').simplyCountable({
-    counter: '#descriptionCounter',
-    countType: 'characters',
-    maxCount: ${maxLengths['description']},
-    countDirection: 'down'
-  });
-});
 </script>
-</form:form>
 
-<c:if test="${!empty arrayJson}">
+<c:if test="${pageMode eq 'edit'}">
+  <br/>
   <h1>Samples</h1>
   <div id="arraySamplesSection">
     <div id="arraySamplesVisual" class="unselectable" style="float:left;margin:20px;"></div>
@@ -195,7 +123,6 @@ jQuery(document).ready(function() {
   </script>
 </c:if>
 
-</div>
 </div>
 </div>
 

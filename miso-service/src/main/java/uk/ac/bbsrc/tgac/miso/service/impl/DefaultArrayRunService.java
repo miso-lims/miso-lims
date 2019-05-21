@@ -5,7 +5,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,22 +100,16 @@ public class DefaultArrayRunService implements ArrayRunService {
   }
 
   @Override
-  public long save(ArrayRun arrayRun) throws IOException {
+  public long create(ArrayRun arrayRun) throws IOException {
     loadChildEntities(arrayRun);
-    if (arrayRun.getId() == ArrayRun.UNSAVED_ID) {
-      return create(arrayRun);
-    } else {
-      return update(arrayRun);
-    }
-  }
-
-  private long create(ArrayRun arrayRun) throws IOException {
     arrayRun.setChangeDetails(authorizationManager.getCurrentUser());
     validateChange(arrayRun, null);
     return arrayRunStore.save(arrayRun);
   }
 
-  private long update(ArrayRun arrayRun) throws IOException {
+  @Override
+  public long update(ArrayRun arrayRun) throws IOException {
+    loadChildEntities(arrayRun);
     ArrayRun managed = get(arrayRun.getId());
     validateChange(arrayRun, managed);
     applyChanges(arrayRun, managed);
@@ -134,7 +127,7 @@ public class DefaultArrayRunService implements ArrayRunService {
   private void validateChange(ArrayRun arrayRun, ArrayRun beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
-    if (arrayRun.getId() != ArrayRun.UNSAVED_ID && beforeChange == null) {
+    if (arrayRun.isSaved() && beforeChange == null) {
       errors.add(new ValidationError("Array Run not found"));
     }
     if (isStringEmptyOrNull(arrayRun.getAlias())) {
@@ -213,11 +206,6 @@ public class DefaultArrayRunService implements ArrayRunService {
     to.setHealth(from.getHealth());
     to.setStartDate(from.getStartDate());
     to.setCompletionDate(from.getCompletionDate());
-  }
-
-  @Override
-  public Map<String, Integer> getColumnSizes() throws IOException {
-    return arrayRunStore.getArrayColumnSizes();
   }
 
 }

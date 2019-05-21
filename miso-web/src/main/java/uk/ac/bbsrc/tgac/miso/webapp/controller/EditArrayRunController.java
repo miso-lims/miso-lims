@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +17,10 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
-import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
 import uk.ac.bbsrc.tgac.miso.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 
@@ -31,20 +30,17 @@ public class EditArrayRunController {
 
   private static final String JSP = "/WEB-INF/pages/editArrayRun.jsp";
 
+  private static final String MODEL_ATTR_TITLE = "title";
   private static final String MODEL_ATTR_PAGEMODE = "pageMode";
   private static final String MODEL_ATTR_SCANNERS = "arrayScanners";
   private static final String MODEL_ATTR_JSON = "arrayRunJson";
+  private static final String MODEL_ATTR_RUN = "arrayRun";
 
   @Autowired
   private ArrayRunService arrayRunService;
 
   @Autowired
   private InstrumentService instrumentService;
-
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> getColumnSizes() throws IOException {
-    return arrayRunService.getColumnSizes();
-  }
 
   @ModelAttribute("healthTypes")
   public Collection<String> populateHealthTypes() {
@@ -53,26 +49,34 @@ public class EditArrayRunController {
 
   @RequestMapping("/new")
   public ModelAndView newArrayRun(ModelMap model) throws IOException {
+    model.addAttribute(MODEL_ATTR_TITLE, "New Array Run");
     model.addAttribute(MODEL_ATTR_PAGEMODE, "create");
-    model.addAttribute(MODEL_ATTR_SCANNERS, getArrayScanners());
+
+    ObjectMapper mapper = new ObjectMapper();
+    model.addAttribute(MODEL_ATTR_SCANNERS, mapper.writeValueAsString(getArrayScannerDtos()));
+
     return new ModelAndView(JSP, model);
   }
 
   @RequestMapping("/{arrayRunId}")
   public ModelAndView setupForm(@PathVariable(name = "arrayRunId", required = true) long arrayRunId, ModelMap model) throws IOException {
-    model.addAttribute(MODEL_ATTR_PAGEMODE, "edit");
     ArrayRun run = arrayRunService.get(arrayRunId);
     if (run == null) {
       throw new NotFoundException("Array Run not found");
     }
+    model.addAttribute(MODEL_ATTR_TITLE, "Array Run " + arrayRunId);
+    model.addAttribute(MODEL_ATTR_PAGEMODE, "edit");
+
     ObjectMapper mapper = new ObjectMapper();
     model.addAttribute(MODEL_ATTR_JSON, mapper.writer().writeValueAsString(Dtos.asDto(run)));
+    model.addAttribute(MODEL_ATTR_RUN, run);
     return new ModelAndView(JSP, model);
   }
 
-  private List<Instrument> getArrayScanners() throws IOException {
+  private List<InstrumentDto> getArrayScannerDtos() throws IOException {
     return instrumentService.list().stream()
         .filter(inst -> inst.getInstrumentModel().getInstrumentType() == InstrumentType.ARRAY_SCANNER)
+        .map(Dtos::asDto)
         .collect(Collectors.toList());
   }
 

@@ -3,6 +3,8 @@
 Changes:
 
   * Changed Edit Study page to show validation messages instead of error page when saving fails
+  * Changed Edit Array and Array Run pages to show validation messages instead of error page when
+    saving fails
   * Changed Edit Instrument page to show validation messages instead of error page when saving
     fails
   * Changed Edit Submission page to show validation messages instead of error page when saving
