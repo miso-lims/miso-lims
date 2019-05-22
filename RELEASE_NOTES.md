@@ -2,7 +2,8 @@
 
 Changes:
 
-
+ * Record MinKNOW and Protocol versions for Oxford Nanopore runs as reported by Run Scanner
+ * Upgraded Run Scanner version to 1.4.6
 
 # 0.2.178
 
