@@ -2177,10 +2177,8 @@ public class Dtos {
 
   private static void setOxfordNanoporeRunValues(@Nonnull OxfordNanoporeNotificationDto from,
                                                  @Nonnull OxfordNanoporeRun to){
-    // software version is "minknowVersion + protocolVersion"
-    String[] softwareVersions = from.getSoftware().split("\\ \\+\\ ");
-    to.setMinKnowVersion(softwareVersions[0]);
-    to.setProtocolVersion(softwareVersions[1]);
+    to.setMinKnowVersion(from.getSoftware());
+    to.setProtocolVersion(from.getProtocolVersion());
   }
 
   private static void setIlluminaRunValues(@Nonnull IlluminaNotificationDto from, @Nonnull IlluminaRun to) {
