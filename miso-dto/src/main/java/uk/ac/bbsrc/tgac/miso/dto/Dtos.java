@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
+import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
 import org.apache.commons.lang.NotImplementedException;
 
 import com.eaglegenomics.simlims.core.Group;
@@ -2161,7 +2162,9 @@ public class Dtos {
 
     switch (to.getPlatformType()) {
     case PACBIO:
+      break;
     case OXFORDNANOPORE:
+      setOxfordNanoporeRunValues((OxfordNanoporeNotificationDto)from, (OxfordNanoporeRun)to);
       break;
     case ILLUMINA:
       setIlluminaRunValues((IlluminaNotificationDto) from, (IlluminaRun) to);
@@ -2170,6 +2173,14 @@ public class Dtos {
       throw new NotImplementedException();
     }
     return to;
+  }
+
+  private static void setOxfordNanoporeRunValues(@Nonnull OxfordNanoporeNotificationDto from,
+                                                 @Nonnull OxfordNanoporeRun to){
+    // software version is "minknowVersion + protocolVersion"
+    String[] softwareVersions = from.getSoftware().split("\\ \\+\\ ");
+    to.setMinKnowVersion(softwareVersions[0]);
+    to.setProtocolVersion(softwareVersions[1]);
   }
 
   private static void setIlluminaRunValues(@Nonnull IlluminaNotificationDto from, @Nonnull IlluminaRun to) {
