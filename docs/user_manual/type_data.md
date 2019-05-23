@@ -22,15 +22,31 @@ new one.
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Sample Types" %}
 
-Sample type is defined by [NCBI](https://www.ncbi.nlm.nih.gov/) and is required in order to submit samples to the SRA
-(see the [SRA section](sra.html)). The values available in MISO should be limited to the default options, which are the
-same as defined in the SRA schema.
+**WARNING**: Sample type is defined by [NCBI](https://www.ncbi.nlm.nih.gov/) and is required in order to submit samples
+to the ENA (see the [ENA section](european_nucleotide_archive_support.html)). The values available in MISO should be
+limited to the default options, which are the same as defined in the ENA schema. If these values are modified, or
+additional options are added, your data may not be valid for ENA submission.
 
 It is possible to archive sample types if they are not used within your organization. An archived sample type will not
 show up in the sample type options when creating or editing samples, unless the samples being edited have already used
-that sample type. Sample types can always be unarchived if they are needed in the future. Archiving sample types can
-only be done in the MISO database directly, so you should talk to a MISO administrator about archiving any unused
-sample types. Unarchiving sample types must similarly be done via direct database access.
+that sample type. Sample types can always be unarchived if they are needed in the future.
+
+The Sample Types list page shows all of the available options and offers controls for MISO administrators to modify
+them. To get to this page, click "Sample Types" in the Misc list in the navigation menu.
+
+To add new sample types, click the “Add” button in the toolbar at the top of the Sample Types list. In the dialog,
+enter the quantity of sample types that you would like to create, and click the “Create” button. This will take you to
+the bulk Create Sample Types page. Enter the names you’d like for the new tissue materials, and click the “Save” button
+at the top right to confirm.
+
+To edit existing materials, go to the Sample Types list page, check the checkboxes beside the types you would like to
+edit, and click the “Edit” button in the toolbar at the top of the table. This will bring you to the bulk Edit Sample
+Types page, which is identical to the Create Sample Types page mentioned above. Here, you can modify sample type names
+and archive or unarchive them. You will not be able to modify a sample type name if that sample type is already in use.
+
+MISO administrators can also delete sample types. To do so, go to the Sample Types list page, check the checkboxes
+beside the types you would like to delete, and click the “Delete” button in the toolbar at the top of the table. You
+will only be allowed to delete a sample type if the option has not been used by any existing samples.
 
 {% include userman-toplink.md %}
 

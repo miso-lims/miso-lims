@@ -65,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryDilutionSpreadSheets;
@@ -108,6 +109,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.SampleTypeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
@@ -170,6 +172,8 @@ public class MenuController implements ServletContextAware {
   private SampleGroupService sampleGroupService;
   @Autowired
   private SamplePurposeService samplePurposeService;
+  @Autowired
+  private SampleTypeService sampleTypeService;
   @Autowired
   private SequencingParametersService sequencingParametersService;
   @Autowired
@@ -351,8 +355,10 @@ public class MenuController implements ServletContextAware {
       dto.put("pluralPartitionName", platformType.getPluralPartitionName());
     }
     ArrayNode sampleTypes = node.putArray("sampleTypes");
-    for (String sampleType : sampleService.listSampleTypes()) {
-      sampleTypes.add(sampleType);
+    for (SampleType sampleType : sampleTypeService.list()) {
+      if (!sampleType.isArchived()) {
+        sampleTypes.add(sampleType.getName());
+      }
     }
     ArrayNode donorSexes = node.putArray("donorSexes");
     for (String label : DonorSex.getLabels()) {

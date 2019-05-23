@@ -1,3 +1,14 @@
+DELETE FROM SampleType;
+INSERT INTO SampleType (typeId, name) VALUES
+(2,'NON GENOMIC'),
+(1,'GENOMIC'),
+(5,'OTHER'),
+(4,'VIRAL RNA'),
+(3,'SYNTHETIC'),
+(6,'TRANSCRIPTOMIC'),
+(7,'METAGENOMIC'),
+(8,'METATRANSCRIPTOMIC');
+
 DELETE FROM AttachmentCategory;
 INSERT INTO AttachmentCategory(categoryId, alias) VALUES
 (1, 'Category One'),

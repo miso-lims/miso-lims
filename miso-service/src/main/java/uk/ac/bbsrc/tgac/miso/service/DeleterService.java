@@ -30,7 +30,7 @@ public interface DeleterService<T extends Deletable> extends ProviderService<T> 
    * @param object item the user is attempting to delete
    * @return a ValidationResult describing whether the item can be deleted. If the deletion is invalid, reasons are included
    */
-  public default ValidationResult validateDeletion(T object) {
+  public default ValidationResult validateDeletion(T object) throws IOException {
     return new ValidationResult();
   }
 

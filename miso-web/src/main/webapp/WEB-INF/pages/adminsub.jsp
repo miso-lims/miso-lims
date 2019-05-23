@@ -71,6 +71,7 @@
       <a href="<c:url value="/miso/indices"/>">Indices</a>
       <a href="<c:url value="/miso/qctype/list"/>">QC Types</a>
       <a href="<c:url value="/miso/attachmentcategories/list"/>">Attachment Categories</a>
+      <a href="<c:url value="/miso/sampletype/list"/>">Sample Types</a>
       <a href="<c:url value="/miso/printers"/>">Printers</a>
       <a href="<c:url value="/miso/deletions"/>">Deletion Log</a>
     </div>

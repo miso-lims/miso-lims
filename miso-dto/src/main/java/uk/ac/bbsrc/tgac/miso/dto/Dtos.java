@@ -98,6 +98,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
@@ -3169,6 +3170,22 @@ public class Dtos {
     setLong(dto::setId, from.getId(), true);
     setString(dto::setAlias, from.getAlias());
     return dto;
+  }
+
+  public static SampleTypeDto asDto(@Nonnull SampleType from) {
+    SampleTypeDto to = new SampleTypeDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setName, from.getName());
+    setBoolean(to::setArchived, from.isArchived(), false);
+    return to;
+  }
+
+  public static SampleType to(@Nonnull SampleTypeDto from) {
+    SampleType to = new SampleType();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
+    setBoolean(to::setArchived, from.isArchived(), false);
+    return to;
   }
 
   private static void setBigDecimal(@Nonnull Consumer<BigDecimal> setter, String value) {

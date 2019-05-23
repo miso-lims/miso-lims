@@ -1,13 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 import javax.ws.rs.core.Response.Status;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
+import uk.ac.bbsrc.tgac.miso.service.DeleterService;
 
 public class RestUtils {
 
@@ -53,6 +57,21 @@ public class RestUtils {
     }
     long savedId = service.update(object);
     return toDto.apply(service.get(savedId));
+  }
+
+  public static <T extends Deletable> void bulkDelete(String type, List<Long> ids, DeleterService<T> service) throws IOException {
+    List<T> items = new ArrayList<>();
+    for (Long id : ids) {
+      if (id == null) {
+        throw new RestException(type + " id cannot be null", Status.BAD_REQUEST);
+      }
+      T item = service.get(id);
+      if (item == null) {
+        throw new RestException(type + " " + id + " not found", Status.BAD_REQUEST);
+      }
+      items.add(item);
+    }
+    service.bulkDelete(items);
   }
 
 }

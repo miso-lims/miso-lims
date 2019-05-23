@@ -4,11 +4,16 @@ Changes:
 
   * Changed Edit Freezer page to show validation messages instead of error pages when saving fails
   * Record MinKNOW and Protocol versions for Oxford Nanopore runs as reported by Run Scanner
-  * Upgraded Run Scanner version to 1.5.0
+  * Added Sample Types list page and interface for administrators to add, edit, and delete sample
+    types
   * Fixed broken links to dilution-related pages
   * Fixed creating library templates and populating library template options when propagating
     libraries in plain sample mode
   * Fixed setting selection and strategy types from library template
+
+Upgrade Notes:
+
+  * Upgraded Run Scanner version to 1.5.0
 
 # 0.2.178
 

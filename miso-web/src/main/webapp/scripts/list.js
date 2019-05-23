@@ -23,7 +23,7 @@
 
 ListState = {};
 ListTarget = {};
-ListUtils = (function() {
+ListUtils = (function($) {
   var updateSelectedLabel = function(state) {
     var hidden = state.selected.reduce(function(acc, item) {
       return acc + (state.data.every(function(d) {
@@ -139,7 +139,7 @@ ListUtils = (function() {
   var makeSearchTooltip = function(searchDivId, target) {
     var searchTooltipId = "searchHelpTooltip_" + target.name.replace(/\s/g, '');
 
-    jQuery("#" + searchDivId).append(
+    $("#" + searchDivId).append(
         '<div id="' + searchTooltipId + '" class="tooltip"> ' + '  <span>'
             + '   <img id="searchHelpQuestionMark" src="/styles/images/question_mark.png"' + '  </span>' + '  <span class="tooltiptext">'
             + makeTooltipHelp(target) + '  </span>' + '</div>');
@@ -189,30 +189,30 @@ ListUtils = (function() {
   };
 
   var makePopupElement = function(parentId, popupId, popupCloseId, target) {
-    jQuery("#" + parentId).append(
+    $("#" + parentId).append(
         '<div id="' + popupId + '" class="popup">' + '  <div class="popup-inner">' + makePopupHelp(target) + '    <a id="' + popupCloseId
             + '" class="popup-close" href="#">x</a>' + '  </div>' + '</div>');
   };
 
   var registerPopupOpen = function(triggerId, popupId) {
-    jQuery("#" + triggerId).click(function() {
-      jQuery("#" + popupId).fadeIn(350);
+    $("#" + triggerId).click(function() {
+      $("#" + popupId).fadeIn(350);
     });
   };
 
   var registerPopupClose = function(popupCloseId, popupId) {
     var closePopup = function(e) {
-      jQuery("#" + popupId).fadeOut(350);
+      $("#" + popupId).fadeOut(350);
       e.preventDefault();
     };
 
     // Close popup when popupCloseId is clicked
-    jQuery("#" + popupCloseId).click(function(e) {
+    $("#" + popupCloseId).click(function(e) {
       closePopup(e);
     });
 
     // Close popup when esc is pressed
-    jQuery(document).keyup(function(e) {
+    $(document).keyup(function(e) {
       if (e.keyCode == 27) {
         closePopup(e);
       }
@@ -226,6 +226,12 @@ ListUtils = (function() {
     makePopupElement(parentId, popupId, popupCloseId, target);
     registerPopupOpen(triggerId, popupId);
     registerPopupClose(popupCloseId, popupId);
+  };
+
+  var makeHeaderMessage = function(text, level) {
+    $('#headerMessage').remove();
+    $('#tableTitle').after(
+        $('<p>').attr('id', 'headerMessage').addClass('big big-' + (level || 'info')).css('margin-top', '.25em').text(text));
   };
 
   var initTable = function(elementId, target, projectId, config, optionModifier) {
@@ -372,7 +378,7 @@ ListUtils = (function() {
 
     }
     var errorMessage = document.createElement('DIV');
-    var jqTable = jQuery('#' + elementId).html('');
+    var jqTable = $('#' + elementId).html('');
     var options = Utils.setSortFromPriority({
       'aoColumns': columns,
       'aLengthMenu': [10, 25, 50, 100, 200, 400, 1000],
@@ -386,7 +392,7 @@ ListUtils = (function() {
       'bProcessing': true,
       'fnDrawCallback': function(oSettings) {
         jqTable.removeClass('disabled');
-        jQuery('#' + elementId + '_paginate').find('.fg-button').removeClass('fg-button');
+        $('#' + elementId + '_paginate').find('.fg-button').removeClass('fg-button');
         updateSelectedLabel(ListState[elementId]);
       },
       'fnPreDrawCallback': function(oSettings) {
@@ -398,13 +404,16 @@ ListUtils = (function() {
     });
     optionModifier(options, jqTable, errorMessage, columns);
     jqTable.dataTable(options);
+    if (target.headerMessage) {
+      makeHeaderMessage(target.headerMessage.text, target.headerMessage.level);
+    }
     if (target.hasOwnProperty("searchTermSelector")) {
       var searchDivId = elementId + '_filter';
 
       var tooltipId = makeSearchTooltip(searchDivId, target);
       makeSearchPopup(searchDivId, tooltipId, target);
     }
-    var filterbox = jQuery('#' + elementId + '_filter :input');
+    var filterbox = $('#' + elementId + '_filter :input');
     filterbox.unbind();
     filterbox.bind('keyup', function(e) {
       if (e.keyCode == 13) {
@@ -463,9 +472,9 @@ ListUtils = (function() {
         options.sAjaxSource = target.createUrl(config, projectId);
         options.fnServerData = function(sSource, aoData, fnCallback) {
           jqTable.addClass('disabled');
-          var filterbox = jQuery('#' + elementId + '_filter :input');
+          var filterbox = $('#' + elementId + '_filter :input');
           filterbox.prop('disabled', true);
-          jQuery.ajax({
+          $.ajax({
             'dataType': 'json',
             'type': 'GET',
             'url': sSource,
@@ -612,4 +621,4 @@ ListUtils = (function() {
       value: false
     }
   };
-})();
+})(jQuery);

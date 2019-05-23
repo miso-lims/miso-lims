@@ -184,15 +184,6 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAllSampleTypes() throws Exception {
-    Collection<String> sampleTypes = dao.listSampleTypes();
-    List<String> types = Arrays
-        .asList("NON GENOMIC", "GENOMIC", "OTHER", "VIRAL RNA", "SYNTHETIC", "TRANSCRIPTOMIC", "METAGENOMIC", "METATRANSCRIPTOMIC");
-
-    assertTrue("Did not find all sample types", sampleTypes.containsAll(types));
-  }
-
-  @Test
   public void getSamplesOffsetZeroWithTwoSamplesPerPageTest() throws Exception {
     List<Sample> samples = dao.list(0, 2, false, "id");
     assertEquals(2, samples.size());
