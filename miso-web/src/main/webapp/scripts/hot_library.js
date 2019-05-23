@@ -188,7 +188,7 @@ HotTarget.library = (function() {
       return null;
     }
     return Utils.array.findFirstOrNull(function(x) {
-      return x.alias == templateAlias && (parentSampleClassId === null || x.designId === null || Constants.libraryDesigns.some(function(l) {
+      return x.alias == templateAlias && (!parentSampleClassId || !x.designId || Constants.libraryDesigns.some(function(l) {
         return l.id == x.designId && l.sampleClassId == parentSampleClassId;
       }));
     }, config.templatesByProjectId[projectId]);
@@ -418,7 +418,7 @@ HotTarget.library = (function() {
               var templates = ['(None)'];
               if (projectId && config.templatesByProjectId[projectId]) {
                 templates = templates.concat(config.templatesByProjectId[projectId].filter(function(x) {
-                  return lib.parentSampleClassId === null || x.designId === null || Constants.libraryDesigns.some(function(l) {
+                  return !lib.parentSampleClassId || !x.designId || Constants.libraryDesigns.some(function(l) {
                     return l.id == x.designId && l.sampleClassId == lib.parentSampleClassId;
                   });
                 }).map(function(template) {
@@ -567,8 +567,8 @@ HotTarget.library = (function() {
                   var design = getDesign(flat.libraryDesignAlias);
                   var projectId = getProjectId(lib, flat, config);
                   var template = getTemplate(config, projectId, lib.parentSampleClassId, flat.templateAlias);
-                  HotUtils.updateFromTemplateOrDesign(design, template, 'selectionId', Constants.librarySelections, 'name', setReadOnly,
-                      setData);
+                  HotUtils.updateFromTemplateOrDesign(design, template, 'selectionTypeId', Constants.librarySelections, 'name',
+                      setReadOnly, setData);
                 }
               }),
           HotUtils.makeColumnForConstantsList('Strategy', true, 'libraryStrategyTypeAlias', 'libraryStrategyTypeId', 'id', 'name',
@@ -578,7 +578,7 @@ HotTarget.library = (function() {
                   var design = getDesign(flat.libraryDesignAlias);
                   var projectId = getProjectId(lib, flat, config);
                   var template = getTemplate(config, projectId, lib.parentSampleClassId, flat.templateAlias);
-                  HotUtils.updateFromTemplateOrDesign(design, template, 'strategyId', Constants.libraryStrategies, 'name', setReadOnly,
+                  HotUtils.updateFromTemplateOrDesign(design, template, 'strategyTypeId', Constants.libraryStrategies, 'name', setReadOnly,
                       setData);
                 }
               }),

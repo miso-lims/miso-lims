@@ -1,6 +1,9 @@
 HotTarget.libraryTemplate = (function() {
 
   var getDesign = function(name) {
+    if (!name) {
+      return null;
+    }
     return Utils.array.findFirstOrNull(Utils.array.namePredicate(name.replace(/\s-.*/, "")), Constants.libraryDesigns);
   };
 

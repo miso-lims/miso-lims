@@ -5,6 +5,9 @@ Changes:
   * Record MinKNOW and Protocol versions for Oxford Nanopore runs as reported by Run Scanner
   * Upgraded Run Scanner version to 1.5.0
   * Fixed broken links to dilution-related pages
+  * Fixed creating library templates and populating library template options when propagating
+    libraries in plain sample mode
+  * Fixed setting selection and strategy types from library template
 
 # 0.2.178
 
