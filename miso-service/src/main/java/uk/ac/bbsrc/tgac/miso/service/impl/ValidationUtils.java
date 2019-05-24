@@ -16,8 +16,10 @@ import java.util.function.Function;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -133,6 +135,16 @@ public class ValidationUtils {
     }
     R before = getter.apply(beforeChange);
     return !after.equals(before);
+  }
+
+  public static <T, R extends Identifiable> void loadChildEntity(T object, R childEntity, ProviderService<R> service, String property)
+      throws IOException {
+    if (childEntity != null) {
+      R item = service.get(childEntity.getId());
+      if (item == null) {
+        throw new ValidationException(new ValidationError(property, "Invalid item ID: " + childEntity.getId()));
+      }
+    }
   }
 
 }

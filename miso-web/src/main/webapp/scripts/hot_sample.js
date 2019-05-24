@@ -567,7 +567,7 @@ HotTarget.sample = (function() {
             trimDropdown: false,
             source: function() {
               var stains = Constants.stains.sort(function(a, b) {
-                return (a.category || '').localeCompare(b.category || '');
+                return (a.categoryName || '').localeCompare(b.categoryName || '');
               }).map(function(s) {
                 return s.name;
               });

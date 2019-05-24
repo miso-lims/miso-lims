@@ -9,6 +9,17 @@ INSERT INTO SampleType (typeId, name) VALUES
 (7,'METAGENOMIC'),
 (8,'METATRANSCRIPTOMIC');
 
+DELETE FROM Stain;
+DELETE FROM StainCategory;
+INSERT INTO StainCategory (stainCategoryId, name) VALUES
+(1, 'Category One'),
+(2, 'Category Two');
+
+INSERT INTO Stain (stainId, stainCategoryId, name) VALUES
+(1, 1, 'Stain One'),
+(2, 1, 'Stain Two'),
+(3, NULL, 'Stain Three');
+
 DELETE FROM AttachmentCategory;
 INSERT INTO AttachmentCategory(categoryId, alias) VALUES
 (1, 'Category One'),

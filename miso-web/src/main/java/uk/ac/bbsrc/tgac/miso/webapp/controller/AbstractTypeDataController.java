@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response.Status;
@@ -14,7 +15,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
@@ -43,6 +46,7 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
       throw new RestException("Must specify quantity to create", Status.BAD_REQUEST);
     }
     ObjectNode config = makeBaseConfig();
+    addHotConfig(config, mapper);
     addHotAttributes("Create " + pluralType, config, true, model);
 
     model.put("input", mapper.writeValueAsString(Collections.nCopies(quantity, makeDto())));
@@ -51,6 +55,7 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
 
   protected final ModelAndView bulkEdit(String idString, ModelMap model) throws IOException {
     ObjectNode config = makeBaseConfig();
+    addHotConfig(config, mapper);
     addHotAttributes("Edit " + pluralType, config, false, model);
 
     List<Long> ids = LimsUtils.parseIds(idString);
@@ -69,6 +74,7 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
 
   protected final ModelAndView listStatic(Collection<T> items, ModelMap model) throws IOException {
     ObjectNode config = makeBaseConfig();
+    model.put("title", pluralType);
     model.put("data", mapper.writeValueAsString(items.stream().map(this::toDto).collect(Collectors.toList())));
     model.put("config", mapper.writeValueAsString(config));
     model.put("targetType", "ListTarget." + listTarget);
@@ -87,6 +93,26 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
     model.put("config", mapper.writeValueAsString(config));
     model.put("targetType", "HotTarget." + hotTarget);
     model.put("create", create);
+  }
+
+  /**
+   * Override to provide additional config fro Handsontable. Default implementation does nothing
+   * 
+   * @param config
+   * @param mapper
+   */
+  protected void addHotConfig(ObjectNode config, ObjectMapper mapper) throws IOException {
+    // Does nothing
+  }
+
+  protected final <U, V> void addConfigArray(ObjectNode config, ObjectMapper mapper, String key, Collection<U> items,
+      Function<U, V> toDto) {
+    ArrayNode array = config.putArray(key);
+    for (U item : items) {
+      V dto = toDto.apply(item);
+      JsonNode itemNode = mapper.valueToTree(dto);
+      array.add(itemNode);
+    }
   }
 
   protected abstract AuthorizationManager getAuthorizationManager();

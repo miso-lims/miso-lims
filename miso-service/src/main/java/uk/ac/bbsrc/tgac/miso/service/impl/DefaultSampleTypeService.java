@@ -70,7 +70,8 @@ public class DefaultSampleTypeService implements SampleTypeService {
       }
       long usage = sampleTypeDao.getUsage(beforeChange);
       if (usage > 0L) {
-        errors.add(new ValidationError("name", "Cannot change name of sample type because it is already in use by " + usage + " samples"));
+        errors
+            .add(new ValidationError("name", "Cannot change name of sample type because it is already in use by " + usage + " sample(s)"));
       }
     }
 
@@ -95,7 +96,7 @@ public class DefaultSampleTypeService implements SampleTypeService {
 
     long usage = sampleTypeDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(new ValidationError("Sample type '" + object.getName() + "' is used by " + usage + " samples"));
+      result.addError(new ValidationError("Sample type '" + object.getName() + "' is used by " + usage + " sample(s)"));
     }
 
     return result;

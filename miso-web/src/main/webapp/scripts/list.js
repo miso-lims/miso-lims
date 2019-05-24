@@ -619,6 +619,47 @@ ListUtils = (function($) {
       type: 'checkbox',
       label: 'Create New Box',
       value: false
+    },
+    createStaticAddAction: function(pluralType, urlFragment) {
+      return {
+        name: 'Add',
+        handler: function() {
+
+          Utils.showDialog('Create ' + pluralType, 'Create', [{
+            property: 'quantity',
+            type: 'int',
+            label: 'Quantity',
+            required: true,
+            value: 1
+          }], function(result) {
+            if (result.quantity < 1) {
+              Utils.showOkDialog('Create ' + pluralType, ["Quantity must be 1 or more."]);
+              return;
+            }
+            window.location = '/miso/' + urlFragment + '/bulk/new?' + jQuery.param({
+              quantity: result.quantity,
+            });
+          });
+        }
+      }
+    },
+    createBulkDeleteAction: function(pluralType, urlFragment, getLabel) {
+      return {
+        name: "Delete",
+        action: function(items) {
+          var lines = ['Are you sure you wish to delete the following items? This cannot be undone.'];
+          var ids = [];
+          jQuery.each(items, function(index, item) {
+            lines.push('* ' + getLabel(item));
+            ids.push(item.id);
+          });
+          Utils.showConfirmDialog('Delete ' + pluralType, 'Delete', lines, function() {
+            Utils.ajaxWithDialog('Deleting ' + pluralType, 'POST', '/miso/rest/' + urlFragment + '/bulk-delete', ids, function() {
+              Utils.page.pageReload();
+            });
+          });
+        }
+      }
     }
   };
 })(jQuery);

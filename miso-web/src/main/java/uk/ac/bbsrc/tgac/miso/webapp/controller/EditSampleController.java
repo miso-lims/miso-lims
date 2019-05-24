@@ -198,7 +198,7 @@ public class EditSampleController {
   }
 
   @ModelAttribute("stains")
-  public List<Stain> populateStains() {
+  public List<Stain> populateStains() throws IOException {
     return stainService.list();
   }
 

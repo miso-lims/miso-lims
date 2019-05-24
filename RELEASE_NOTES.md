@@ -4,8 +4,10 @@ Changes:
 
   * Changed Edit Freezer page to show validation messages instead of error pages when saving fails
   * Record MinKNOW and Protocol versions for Oxford Nanopore runs as reported by Run Scanner
-  * Added Sample Types list page and interface for administrators to add, edit, and delete sample
-    types
+  * Added interface for administrators to add, edit, and delete dropdown options
+    * sample types
+    * stains (detailed sample)
+    * stain categories (detailed sample)
   * Removed change logging of Illumina run cycles
   * Fixed broken links to dilution-related pages
   * Fixed creating library templates and populating library template options when propagating
