@@ -22,8 +22,8 @@ public class LibraryTemplateDto {
   private Double defaultVolume;
   private String platformType;
   private Long libraryTypeId;
-  private Long selectionTypeId;
-  private Long strategyTypeId;
+  private Long selectionId;
+  private Long strategyId;
   private Long kitDescriptorId;
   private Long indexFamilyId;
 
@@ -79,20 +79,20 @@ public class LibraryTemplateDto {
     this.libraryTypeId = libraryTypeId;
   }
 
-  public Long getSelectionTypeId() {
-    return selectionTypeId;
+  public Long getSelectionId() {
+    return selectionId;
   }
 
-  public void setSelectionTypeId(Long selectionTypeId) {
-    this.selectionTypeId = selectionTypeId;
+  public void setSelectionId(Long selectionId) {
+    this.selectionId = selectionId;
   }
 
-  public Long getStrategyTypeId() {
-    return strategyTypeId;
+  public Long getStrategyId() {
+    return strategyId;
   }
 
-  public void setStrategyTypeId(Long strategyTypeId) {
-    this.strategyTypeId = strategyTypeId;
+  public void setStrategyId(Long strategyId) {
+    this.strategyId = strategyId;
   }
 
   public Long getKitDescriptorId() {

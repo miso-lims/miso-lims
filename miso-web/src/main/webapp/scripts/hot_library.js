@@ -567,8 +567,8 @@ HotTarget.library = (function() {
                   var design = getDesign(flat.libraryDesignAlias);
                   var projectId = getProjectId(lib, flat, config);
                   var template = getTemplate(config, projectId, lib.parentSampleClassId, flat.templateAlias);
-                  HotUtils.updateFromTemplateOrDesign(design, template, 'selectionTypeId', Constants.librarySelections, 'name',
-                      setReadOnly, setData);
+                  HotUtils.updateFromTemplateOrDesign(design, template, 'selectionId', Constants.librarySelections, 'name', setReadOnly,
+                      setData);
                 }
               }),
           HotUtils.makeColumnForConstantsList('Strategy', true, 'libraryStrategyTypeAlias', 'libraryStrategyTypeId', 'id', 'name',
@@ -578,7 +578,7 @@ HotTarget.library = (function() {
                   var design = getDesign(flat.libraryDesignAlias);
                   var projectId = getProjectId(lib, flat, config);
                   var template = getTemplate(config, projectId, lib.parentSampleClassId, flat.templateAlias);
-                  HotUtils.updateFromTemplateOrDesign(design, template, 'strategyTypeId', Constants.libraryStrategies, 'name', setReadOnly,
+                  HotUtils.updateFromTemplateOrDesign(design, template, 'strategyId', Constants.libraryStrategies, 'name', setReadOnly,
                       setData);
                 }
               }),

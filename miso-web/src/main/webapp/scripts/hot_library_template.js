@@ -98,7 +98,7 @@ HotTarget.libraryTemplate = (function() {
             }
 
           },
-          HotUtils.makeColumnForConstantsList('Selection', true, 'librarySelectionTypeAlias', 'selectionTypeId', 'id', 'name',
+          HotUtils.makeColumnForConstantsList('Selection', true, 'librarySelectionTypeAlias', 'selectionId', 'id', 'name',
               Constants.librarySelections, false, {
                 depends: 'libraryDesignAlias',
                 update: function(libTemp, flat, flatProperty, value, setReadOnly, setOptions, setData) {
@@ -107,7 +107,7 @@ HotTarget.libraryTemplate = (function() {
                       setData);
                 }
               }, null, none),
-          HotUtils.makeColumnForConstantsList('Strategy', true, 'libraryStrategyTypeAlias', 'strategyTypeId', 'id', 'name',
+          HotUtils.makeColumnForConstantsList('Strategy', true, 'libraryStrategyTypeAlias', 'strategyId', 'id', 'name',
               Constants.libraryStrategies, false, {
                 depends: 'libraryDesignAlias',
                 update: function(libTemp, flat, flatProperty, value, setReadOnly, setOptions, setData) {
