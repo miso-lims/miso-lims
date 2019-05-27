@@ -85,13 +85,10 @@ CREATE TRIGGER RunChangeIllumina BEFORE UPDATE ON RunIllumina
 FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
+  -- Note: cycles are not change logged as they are expected to change a lot via Run Scanner during a run 
   SET log_message = CONCAT_WS(', ',
         CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN CONCAT('ends: ', CASE WHEN OLD.pairedEnd THEN 'paired' ELSE 'single' END, ' → ', CASE WHEN NEW.pairedEnd THEN 'paired' ELSE 'single' END) END,
         CASE WHEN (NEW.runBasesMask IS NULL) <> (OLD.runBasesMask IS NULL) OR NEW.runBasesMask <> OLD.runBasesMask THEN CONCAT('run bases mask: ', COALESCE(OLD.runBasesMask, 'n/a'), ' → ', COALESCE(NEW.runBasesMask, 'n/a')) END,
-        CASE WHEN (NEW.callCycle IS NULL) <> (OLD.callCycle IS NULL) OR NEW.callCycle <> OLD.callCycle THEN CONCAT('called cycles: ', COALESCE(OLD.callCycle, 'n/a'), ' → ', COALESCE(NEW.callCycle, 'n/a')) END,
-        CASE WHEN (NEW.imgCycle IS NULL) <> (OLD.imgCycle IS NULL) OR NEW.imgCycle <> OLD.imgCycle THEN CONCAT('imaged cycles: ', COALESCE(OLD.imgCycle, 'n/a'), ' → ', COALESCE(NEW.imgCycle, 'n/a')) END,
-        CASE WHEN (NEW.numCycles IS NULL) <> (OLD.numCycles IS NULL) OR NEW.numCycles <> OLD.numCycles THEN CONCAT('number of cycles: ', COALESCE(OLD.numCycles, 'n/a'), ' → ', COALESCE(NEW.numCycles, 'n/a')) END,
-        CASE WHEN (NEW.scoreCycle IS NULL) <> (OLD.scoreCycle IS NULL) OR NEW.scoreCycle <> OLD.scoreCycle THEN CONCAT('called cycles: ', COALESCE(OLD.scoreCycle, 'n/a'), ' → ', COALESCE(NEW.scoreCycle, 'n/a')) END,
         CASE WHEN (NEW.workflowType IS NULL) <> (OLD.workflowType IS NULL) OR NEW.workflowType <> OLD.workflowType THEN CONCAT('workflow type: ', COALESCE(OLD.workflowType, 'n/a'), ' → ', COALESCE(NEW.workflowType, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO RunChangeLog(runId, columnsChanged, userId, message, changeTime)
@@ -100,10 +97,6 @@ FOR EACH ROW
       COALESCE(CONCAT_WS(',',
         CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN 'pairedEnd' END,
         CASE WHEN (NEW.runBasesMask IS NULL) <> (OLD.runBasesMask IS NULL) OR NEW.runBasesMask <> OLD.runBasesMask THEN 'runBasesMask' END,
-        CASE WHEN (NEW.callCycle IS NULL) <> (OLD.callCycle IS NULL) OR NEW.callCycle <> OLD.callCycle THEN 'callCycle' END,
-        CASE WHEN (NEW.imgCycle IS NULL) <> (OLD.imgCycle IS NULL) OR NEW.imgCycle <> OLD.imgCycle THEN 'imgCycle' END,
-        CASE WHEN (NEW.numCycles IS NULL) <> (OLD.numCycles IS NULL) OR NEW.numCycles <> OLD.numCycles THEN 'numCycles' END,
-        CASE WHEN (NEW.scoreCycle IS NULL) <> (OLD.scoreCycle IS NULL) OR NEW.scoreCycle <> OLD.scoreCycle THEN 'callCycle' END,
         CASE WHEN (NEW.workflowType IS NULL) <> (OLD.workflowType IS NULL) OR NEW.workflowType <> OLD.workflowType THEN 'workflowType' END), ''),
       lastModifier,
       log_message,
