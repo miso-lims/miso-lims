@@ -12,11 +12,11 @@ public class SampleType implements Deletable, Identifiable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private static final long UNSAVD_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long typeId = UNSAVD_ID;
+  private long typeId = UNSAVED_ID;
   private String name;
   private boolean archived;
 
@@ -32,7 +32,7 @@ public class SampleType implements Deletable, Identifiable, Serializable {
 
   @Override
   public boolean isSaved() {
-    return getId() != UNSAVD_ID;
+    return getId() != UNSAVED_ID;
   }
 
   public String getName() {
