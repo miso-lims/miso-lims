@@ -149,11 +149,6 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public Collection<String> listSampleTypes() throws IOException {
-    return getJdbcTemplate().queryForList("SELECT name FROM SampleType WHERE archived = 0", String.class);
-  }
-
-  @Override
   public Collection<Sample> listByAlias(String alias) throws IOException {
     Criteria criteria = currentSession().createCriteria(SampleImpl.class);
     criteria.add(Restrictions.eq("alias", alias));

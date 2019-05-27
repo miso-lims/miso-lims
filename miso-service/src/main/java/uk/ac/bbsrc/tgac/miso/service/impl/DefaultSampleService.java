@@ -926,11 +926,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   @Override
-  public Collection<String> listSampleTypes() throws IOException {
-    return sampleStore.listSampleTypes();
-  }
-
-  @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
   }
