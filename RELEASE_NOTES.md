@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Changed Edit Freezer page to show validation messages instead of error pages when saving fails
   * Record MinKNOW and Protocol versions for Oxford Nanopore runs as reported by Run Scanner
   * Upgraded Run Scanner version to 1.5.0
   * Fixed broken links to dilution-related pages

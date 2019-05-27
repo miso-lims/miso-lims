@@ -90,25 +90,24 @@ public class ValidationUtils {
     if (distributed && box != null) errors.add(new ValidationError("box", "Distributed item cannot be added to a box"));
   }
 
-  public static void validateUrl(String maybeUrl, boolean allowEmptyUrl, Collection<ValidationError> errors) {
+  public static void validateUrl(String fieldName, String maybeUrl, boolean allowEmptyUrl, Collection<ValidationError> errors) {
     if (isStringEmptyOrNull(maybeUrl) && allowEmptyUrl) return;
-    URL url = parseUrl(maybeUrl, errors);
+    URL url = parseUrl(maybeUrl);
     if (url == null) {
-      errors.add(new ValidationError(URL_FIELD, INVALID_URL));
+      errors.add(new ValidationError(fieldName, INVALID_URL));
       return;
     }
     if (!allowedUrlSchemes.contains(url.getProtocol())) {
-      errors.add(new ValidationError(URL_FIELD, INVALID_URL));
+      errors.add(new ValidationError(fieldName, INVALID_URL));
     }
   }
 
-  private static URL parseUrl(String maybeUrl, Collection<ValidationError> errors) {
+  private static URL parseUrl(String maybeUrl) {
     try {
       return new URL(maybeUrl);
     } catch (MalformedURLException e) {
-      errors.add(new ValidationError(URL_FIELD, INVALID_URL));
+      return null;
     }
-    return null;
   }
 
   private static Set<String> allowedUrlSchemes = new HashSet<>();
@@ -117,7 +116,6 @@ public class ValidationUtils {
     allowedUrlSchemes.add("https");
   }
   private static final String INVALID_URL = "URL is not valid";
-  private static final String URL_FIELD = "url";
 
   public static void validateNameOrThrow(Nameable object, NamingScheme namingScheme) {
     ValidationResult val = namingScheme.validateName(object.getName());

@@ -1,6 +1,5 @@
 (function(Freezer, $, undefined) { // NOSONAR (paranoid assurance that undefined is undefined)
   var freezerJson = null;
-  var changelogInitialised = false;
   var selectedComponent = null;
 
   var heightField = {
@@ -26,44 +25,7 @@
 
   Freezer.setFreezerJson = function(json) {
     freezerJson = json;
-    updatePage();
-  };
-
-  Freezer.validateAndSave = function() {
-    Validate.cleanFields('#freezer-form');
-    Validate.clearErrors('#freezer-form');
-
-    $('#room').attr('class', 'form-control');
-    $('#room').attr('data-parsley-required', 'true');
-    $('#room').attr('data-parsley-errors-container', '#roomError');
-
-    $('#alias').attr('class', 'form-control');
-    $('#alias').attr('data-parsley-required', 'true');
-    $('#alias').attr('data-parsley-maxlength', '255');
-    $('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    $('#alias').attr('data-parsley-errors-container', '#aliasError');
-
-    $('#identificationBarcode').attr('class', 'form-control');
-    $('#identificationBarcode').attr('data-parsley-maxlength', '255');
-    $('#identificationBarcode').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    $('#identificationBarcode').attr('data-parsley-errors-container', '#identificationBarcodeError');
-
-    $('#mapUrl').attr('class', 'form-control');
-    $('#mapUrl').attr('data-parsley-maxlength', '1024');
-    $('#mapUrl').attr('data-parsley-type', 'url');
-    $('#mapUrl').attr('data-parsley-errors-container', '#mapUrlError');
-
-    $('#probeId').attr('class', 'form-control');
-    $('#probeId').attr('data-parsley-maxlength', '50');
-    $('#probeId').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    $('#probeId').attr('data-parsley-errors-container', '#probeIdError');
-
-    $('#freezer-form').parsley();
-    $('#freezer-form').parsley().validate();
-
-    Validate.updateWarningOrSubmit('#freezer-form', null, function() {
-      save(!freezerJson || !freezerJson.id);
-    });
+    updateVisual();
   };
 
   Freezer.validateAndSaveComponent = function() {
@@ -126,9 +88,7 @@
           name: 'Loose Storage',
           handler: function() {
             var url = '/miso/rest/storagelocations/freezers/' + freezerJson.id + '/shelves/' + shelf.id + '/loose';
-            Utils.ajaxWithDialog("Adding Storage", 'POST', url, {}, function(responseData) {
-              window.location.href = '/miso/freezer/' + freezerJson.id;
-            });
+            Utils.ajaxWithDialog("Adding Storage", 'POST', url, {}, Utils.page.pageReload);
           }
         }]);
   };
@@ -145,9 +105,7 @@
           var url = '/miso/rest/storagelocations/freezers/' + freezerJson.id + relativeUrl + '?' + $.param(params);
           var data = [];
           var submitFunction = function() {
-            Utils.ajaxWithDialog("Adding Storage", 'POST', url, data, function(responseData) {
-              window.location.href = '/miso/freezer/' + freezerJson.id;
-            });
+            Utils.ajaxWithDialog("Adding Storage", 'POST', url, data, Utils.page.pageReload);
           };
           if (getChildBarcodeLabelsFunction) {
             var childBarcodeLabels = getChildBarcodeLabelsFunction(output);
@@ -216,20 +174,6 @@
       labels.push(label);
     }
     return labels;
-  }
-
-  function updatePage() {
-    if (freezerJson.id) {
-      // freezer is being edited
-      $('#id').text(freezerJson.id);
-      $('#room').val(freezerJson.parentLocationId);
-      $('#alias').val(freezerJson.alias);
-      $('#identificationBarcode').val(freezerJson.identificationBarcode);
-      $('#mapUrl').val(freezerJson.mapUrl);
-      $('#probeId').val(freezerJson.probeId);
-      updateVisual();
-      updateChangelogs();
-    }
   }
 
   function updateVisual() {
@@ -520,55 +464,6 @@
     table.append(row);
   }
 
-  function updateJson() {
-    var freezer = freezerJson || {};
-    freezer.parentLocationId = $('#room').val();
-    freezer.alias = $('#alias').val();
-    freezer.identificationBarcode = $('#identificationBarcode').val();
-    freezer.mapUrl = $('#mapUrl').val();
-    freezer.probeId = $('#probeId').val();
-    freezer.locationUnit = 'FREEZER';
-    freezerJson = freezer;
-  }
-
-  function save(isNew) {
-    updateJson();
-    var url = '/miso/rest/storagelocations/freezers';
-    if (!isNew) {
-      url += '/' + freezerJson.id;
-    }
-    var type = isNew ? 'POST' : 'PUT';
-
-    $.ajax({
-      url: url,
-      type: type,
-      dataType: 'json',
-      contentType: 'application/json; charset=utf8',
-      data: JSON.stringify(freezerJson)
-    }).success(function(data) {
-      window.location.href = '/miso/freezer/' + data.id;
-    }).fail(function(response, textStatus, serverStatus) {
-      Validate.displayErrors(JSON.parse(response.responseText), '#freezer-form');
-    });
-  }
-
-  function updateChangelogs() {
-    $.ajax({
-      url: '/miso/rest/storagelocations/freezers/' + freezerJson.id + '/changelog',
-      type: 'GET',
-      dataType: 'json'
-    }).success(function(data) {
-      if (changelogInitialised) {
-        $('#changelog').dataTable().fnDestroy();
-        $('#changelog').empty();
-      }
-      changelogInitialised = true;
-      ListUtils.createStaticTable('changelog', ListTarget.changelog, {}, data);
-    }).fail(function(response, textStatus, serverStatus) {
-      Validate.displayErrors(JSON.parse(response.responseText));
-    });
-  }
-
   function saveComponent() {
     var component = {};
     for ( var prop in selectedComponent) {
@@ -582,9 +477,7 @@
       dataType: 'json',
       contentType: 'application/json; charset=utf8',
       data: JSON.stringify(component)
-    }).success(function() {
-      window.location.href = '/miso/freezer/' + freezerJson.id;
-    }).fail(function(response, textStatus, serverStatus) {
+    }).success(Utils.page.pageReload).fail(function(response, textStatus, serverStatus) {
       Validate.displayErrors(JSON.parse(response.responseText), '#freezerComponent-form');
     });
   }

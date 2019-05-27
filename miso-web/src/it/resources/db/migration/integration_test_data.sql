@@ -990,3 +990,8 @@ INSERT INTO Workset_Library(worksetId, libraryId) VALUES
 INSERT INTO Workset_Dilution(worksetId, dilutionId) VALUES
 (1, 120001),
 (1, 120002);
+
+INSERT INTO StorageLocation(locationId, locationUnit, parentLocationId, alias, creator, created, lastModifier, lastModified) VALUES
+(1, 'ROOM', NULL, 'Room One', 1, '2019-05-22 13:10:00', 1, '2019-05-22 13:10:00'),
+(2, 'ROOM', NULL, 'Room Two', 1, '2019-05-22 13:10:00', 1, '2019-05-22 13:10:00'),
+(3, 'FREEZER', 1, 'Freezer One', 1, '2019-05-22 13:10:00', 1, '2019-05-22 13:10:00');

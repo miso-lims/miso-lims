@@ -38,7 +38,7 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
 
   private static final long serialVersionUID = 1L;
 
-  public static final long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   public enum BoxStorageAmount {
     NONE, SINGLE, MULTIPLE;
