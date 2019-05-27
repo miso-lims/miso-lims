@@ -6,6 +6,7 @@ Changes:
   * Record MinKNOW and Protocol versions for Oxford Nanopore runs as reported by Run Scanner
   * Added Sample Types list page and interface for administrators to add, edit, and delete sample
     types
+  * Removed change logging of Illumina run cycles
   * Fixed broken links to dilution-related pages
   * Fixed creating library templates and populating library template options when propagating
     libraries in plain sample mode
