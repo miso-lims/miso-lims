@@ -798,7 +798,7 @@ HotTarget.library = (function() {
                 ids: items.map(Utils.array.getId).join(',')
               }
               var loadPage = function() {
-                window.location = window.location.origin + '/miso/dilutions/bulk/propagate?' + jQuery.param(params);
+                window.location = window.location.origin + '/miso/dilution/bulk/propagate?' + jQuery.param(params);
               }
               if (result.createBox) {
                 Utils.createBoxDialog(result, function(result) {
