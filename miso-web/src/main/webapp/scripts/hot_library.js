@@ -188,7 +188,7 @@ HotTarget.library = (function() {
       return null;
     }
     return Utils.array.findFirstOrNull(function(x) {
-      return x.alias == templateAlias && (parentSampleClassId === null || x.designId === null || Constants.libraryDesigns.some(function(l) {
+      return x.alias == templateAlias && (!parentSampleClassId || !x.designId || Constants.libraryDesigns.some(function(l) {
         return l.id == x.designId && l.sampleClassId == parentSampleClassId;
       }));
     }, config.templatesByProjectId[projectId]);
@@ -418,7 +418,7 @@ HotTarget.library = (function() {
               var templates = ['(None)'];
               if (projectId && config.templatesByProjectId[projectId]) {
                 templates = templates.concat(config.templatesByProjectId[projectId].filter(function(x) {
-                  return lib.parentSampleClassId === null || x.designId === null || Constants.libraryDesigns.some(function(l) {
+                  return !lib.parentSampleClassId || !x.designId || Constants.libraryDesigns.some(function(l) {
                     return l.id == x.designId && l.sampleClassId == lib.parentSampleClassId;
                   });
                 }).map(function(template) {

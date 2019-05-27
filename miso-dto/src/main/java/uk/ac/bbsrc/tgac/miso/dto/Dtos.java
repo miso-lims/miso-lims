@@ -2814,8 +2814,8 @@ public class Dtos {
     dto.setDefaultVolume(from.getDefaultVolume());
     dto.setPlatformType(from.getPlatformType() != null ? from.getPlatformType().name() : null);
     dto.setLibraryTypeId(from.getLibraryType() != null ? from.getLibraryType().getId() : null);
-    dto.setSelectionTypeId(from.getLibrarySelectionType() != null ? from.getLibrarySelectionType().getId() : null);
-    dto.setStrategyTypeId(from.getLibraryStrategyType() != null ? from.getLibraryStrategyType().getId() : null);
+    dto.setSelectionId(from.getLibrarySelectionType() != null ? from.getLibrarySelectionType().getId() : null);
+    dto.setStrategyId(from.getLibraryStrategyType() != null ? from.getLibraryStrategyType().getId() : null);
     dto.setKitDescriptorId(from.getKitDescriptor() != null ? from.getKitDescriptor().getId() : null);
     dto.setIndexFamilyId(from.getIndexFamily() != null ? from.getIndexFamily().getId() : null);
     if (from.getIndexFamily() != null) {
@@ -3104,14 +3104,14 @@ public class Dtos {
       libraryType.setId(from.getLibraryTypeId());
       to.setLibraryType(libraryType);
     }
-    if (from.getSelectionTypeId() != null) {
+    if (from.getSelectionId() != null) {
       LibrarySelectionType librarySelectionType = new LibrarySelectionType();
-      librarySelectionType.setId(from.getSelectionTypeId());
+      librarySelectionType.setId(from.getSelectionId());
       to.setLibrarySelectionType(librarySelectionType);
     }
-    if (from.getStrategyTypeId() != null) {
+    if (from.getStrategyId() != null) {
       LibraryStrategyType libraryStrategyType = new LibraryStrategyType();
-      libraryStrategyType.setId(from.getStrategyTypeId());
+      libraryStrategyType.setId(from.getStrategyId());
       to.setLibraryStrategyType(libraryStrategyType);
     }
     if (from.getKitDescriptorId() != null) {

@@ -29,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
 @RequestMapping("/rest/instruments")
@@ -47,6 +48,9 @@ public class InstrumentRestController extends RestController {
 
   @Autowired
   private InstrumentService instrumentService;
+
+  @Autowired
+  private MenuController menuController;
 
   public void setLibraryService(InstrumentService instrumentService) {
     this.instrumentService = instrumentService;
@@ -68,12 +72,18 @@ public class InstrumentRestController extends RestController {
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public InstrumentDto create(@RequestBody InstrumentDto instrumentDto) throws IOException {
-    return RestUtils.createObject("Instrument", instrumentDto, Dtos::to, instrumentService, Dtos::asDto);
+    return RestUtils.createObject("Instrument", instrumentDto, Dtos::to, instrumentService, inst -> {
+      menuController.refreshConstants();
+      return Dtos.asDto(inst);
+    });
   }
 
   @PutMapping("/{instrumentId}")
   public @ResponseBody InstrumentDto update(@PathVariable long instrumentId, @RequestBody InstrumentDto dto) throws IOException {
-    return RestUtils.updateObject("Instrument", instrumentId, dto, Dtos::to, instrumentService, Dtos::asDto);
+    return RestUtils.updateObject("Instrument", instrumentId, dto, Dtos::to, instrumentService, inst -> {
+      menuController.refreshConstants();
+      return Dtos.asDto(inst);
+    });
   }
 
   @GetMapping(value = "/dt", produces = "application/json")

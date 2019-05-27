@@ -197,7 +197,7 @@ ListTarget.library_template = {
         },
         {
           "sTitle": "Library Selection Type",
-          "mData": "selectionTypeId",
+          "mData": "selectionId",
           "include": true,
           "iSortPriority": 0,
           "mRender": function(data, type, full) {
@@ -208,7 +208,7 @@ ListTarget.library_template = {
         },
         {
           "sTitle": "Library Strategy Type",
-          "mData": "strategyTypeId",
+          "mData": "strategyId",
           "include": true,
           "iSortPriority": 0,
           "mRender": function(data, type, full) {
