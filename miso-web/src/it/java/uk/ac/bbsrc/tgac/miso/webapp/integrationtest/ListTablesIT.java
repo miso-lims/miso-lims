@@ -435,6 +435,46 @@ public class ListTablesIT extends AbstractIT {
     testTabbedColumnsSort(ListTarget.WORKSETS);
   }
 
+  @Test
+  public void testListTissueTypesSetup() throws Exception {
+    testPageSetup(ListTarget.TISSUE_TYPES, Sets.newHashSet(Columns.SORT, Columns.ALIAS, Columns.DESCRIPTION));
+  }
+
+  @Test
+  public void testListTissueTypesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.TISSUE_TYPES);
+  }
+
+  @Test
+  public void testListSampleTypesSetup() throws Exception {
+    testPageSetup(ListTarget.SAMPLE_TYPES, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ARCHIVED));
+  }
+
+  @Test
+  public void testListSampleTypesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.SAMPLE_TYPES);
+  }
+
+  @Test
+  public void testListStainsSetup() throws Exception {
+    testPageSetup(ListTarget.STAINS, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.CATEGORY));
+  }
+
+  @Test
+  public void testListStainsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.STAINS);
+  }
+
+  @Test
+  public void testListStainCategoriesSetup() throws Exception {
+    testPageSetup(ListTarget.STAIN_CATEGORIES, Sets.newHashSet(Columns.SORT, Columns.NAME));
+  }
+
+  @Test
+  public void testListStainCategoriesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.STAIN_CATEGORIES);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     // Goal: confirm that all expected columns are present
     ListPage page = getList(listTarget);
