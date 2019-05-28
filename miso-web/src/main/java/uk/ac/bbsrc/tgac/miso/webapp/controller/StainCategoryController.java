@@ -10,30 +10,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
+import uk.ac.bbsrc.tgac.miso.core.data.StainCategory;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.SampleTypeDto;
-import uk.ac.bbsrc.tgac.miso.service.SampleTypeService;
+import uk.ac.bbsrc.tgac.miso.dto.StainCategoryDto;
+import uk.ac.bbsrc.tgac.miso.service.StainCategoryService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
-@RequestMapping("/sampletype")
-public class SampleTypeController extends AbstractTypeDataController<SampleType, SampleTypeDto> {
-
-  public SampleTypeController() {
-    super("Sample Types", "sampletype", "sampletype");
-  }
+@RequestMapping("/staincategory")
+public class StainCategoryController extends AbstractTypeDataController<StainCategory, StainCategoryDto> {
 
   @Autowired
-  private SampleTypeService sampleTypeService;
+  private StainCategoryService stainCategoryService;
 
   @Autowired
   private AuthorizationManager authorizationManager;
 
+  public StainCategoryController() {
+    super("Stain Categories", "staincategory", "staincategory");
+  }
+
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
-    return listStatic(sampleTypeService.list(), model);
+    return listStatic(stainCategoryService.list(), model);
   }
 
   @GetMapping("/bulk/new")
@@ -52,18 +52,18 @@ public class SampleTypeController extends AbstractTypeDataController<SampleType,
   }
 
   @Override
-  protected ProviderService<SampleType> getService() {
-    return sampleTypeService;
+  protected ProviderService<StainCategory> getService() {
+    return stainCategoryService;
   }
 
   @Override
-  protected SampleTypeDto toDto(SampleType object) {
+  protected StainCategoryDto toDto(StainCategory object) {
     return Dtos.asDto(object);
   }
 
   @Override
-  protected SampleTypeDto makeDto() {
-    return new SampleTypeDto();
+  protected StainCategoryDto makeDto() {
+    return new StainCategoryDto();
   }
 
 }

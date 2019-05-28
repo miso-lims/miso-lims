@@ -10,30 +10,37 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.SampleTypeDto;
-import uk.ac.bbsrc.tgac.miso.service.SampleTypeService;
+import uk.ac.bbsrc.tgac.miso.dto.StainDto;
+import uk.ac.bbsrc.tgac.miso.service.StainCategoryService;
+import uk.ac.bbsrc.tgac.miso.service.StainService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
-@RequestMapping("/sampletype")
-public class SampleTypeController extends AbstractTypeDataController<SampleType, SampleTypeDto> {
-
-  public SampleTypeController() {
-    super("Sample Types", "sampletype", "sampletype");
-  }
+@RequestMapping("/stain")
+public class StainController extends AbstractTypeDataController<Stain, StainDto> {
 
   @Autowired
-  private SampleTypeService sampleTypeService;
+  private StainService stainService;
+
+  @Autowired
+  private StainCategoryService stainCategoryService;
 
   @Autowired
   private AuthorizationManager authorizationManager;
 
+  public StainController() {
+    super("Stains", "stain", "stain");
+  }
+
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
-    return listStatic(sampleTypeService.list(), model);
+    return listStatic(stainService.list(), model);
   }
 
   @GetMapping("/bulk/new")
@@ -47,23 +54,28 @@ public class SampleTypeController extends AbstractTypeDataController<SampleType,
   }
 
   @Override
+  protected void addHotConfig(ObjectNode config, ObjectMapper mapper) throws IOException {
+    addConfigArray(config, mapper, "stainCategories", stainCategoryService.list(), Dtos::asDto);
+  }
+
+  @Override
   protected AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
   }
 
   @Override
-  protected ProviderService<SampleType> getService() {
-    return sampleTypeService;
+  protected ProviderService<Stain> getService() {
+    return stainService;
   }
 
   @Override
-  protected SampleTypeDto toDto(SampleType object) {
+  protected StainDto toDto(Stain object) {
     return Dtos.asDto(object);
   }
 
   @Override
-  protected SampleTypeDto makeDto() {
-    return new SampleTypeDto();
+  protected StainDto makeDto() {
+    return new StainDto();
   }
 
 }

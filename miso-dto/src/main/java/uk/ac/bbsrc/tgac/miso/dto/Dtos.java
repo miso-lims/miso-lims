@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
-import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
 import org.apache.commons.lang.NotImplementedException;
 
 import com.eaglegenomics.simlims.core.Group;
@@ -105,6 +104,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
+import uk.ac.bbsrc.tgac.miso.core.data.StainCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
@@ -207,6 +207,7 @@ import uk.ac.bbsrc.tgac.miso.dto.run.SolidRunDto;
 
 import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
 
 @SuppressWarnings("squid:S3776") // make Sonar ignore cognitive complexity warnings for this file
 public class Dtos {
@@ -2151,10 +2152,19 @@ public class Dtos {
 
   public static StainDto asDto(@Nonnull Stain from) {
     StainDto dto = new StainDto();
-    dto.setId(from.getId());
-    dto.setCategory(from.getCategory() == null ? null : from.getCategory().getName());
-    dto.setName(from.getName());
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setName, from.getName());
+    setId(dto::setCategoryId, from.getCategory());
+    setString(dto::setCategoryName, maybeGetProperty(from.getCategory(), StainCategory::getName));
     return dto;
+  }
+
+  public static Stain to(@Nonnull StainDto from) {
+    Stain to = new Stain();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
+    setObject(to::setCategory, StainCategory::new, from.getCategoryId());
+    return to;
   }
 
   public static Run to(@Nonnull NotificationDto from) {
@@ -3185,6 +3195,20 @@ public class Dtos {
     setLong(to::setId, from.getId(), false);
     setString(to::setName, from.getName());
     setBoolean(to::setArchived, from.isArchived(), false);
+    return to;
+  }
+
+  public static StainCategoryDto asDto(@Nonnull StainCategory from) {
+    StainCategoryDto to = new StainCategoryDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setName, from.getName());
+    return to;
+  }
+
+  public static StainCategory to(@Nonnull StainCategoryDto from) {
+    StainCategory to = new StainCategory();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
     return to;
   }
 

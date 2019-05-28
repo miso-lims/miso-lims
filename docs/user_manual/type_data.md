@@ -4,6 +4,27 @@ title: "5. Type Data"
 section: 5
 ---
 
+Type data describes sets of items listed as dropdown options in various forms throughout MISO. Most of these options
+can be modified to suit your institute. In most cases, only MISO administrators can make these changes.
+
+Each type that can be modified within MISO has a list page. You can find most of these by clicking the appropriate link
+in the Misc list in the navigation menu. Types that are only used in detailed sample mode appear in the Institute
+Defaults list instead.
+
+To add new items, click the “Add” button in the toolbar at the top of the list. In the dialog, enter the quantity that
+you would like to create, and click the “Create” button. This will take you to the bulk Create page. Enter the
+information for the new items, and click the “Save” button at the top right to confirm.
+
+To edit existing items, go to the list page, check the checkboxes beside the items you would like to edit, and click
+the “Edit” button in the toolbar at the top of the table. This will bring you to the bulk Edit page, which is identical
+to the bulk Create page mentioned above. Here, you can modify the existing items. Be sure to click the "Save" button at
+the top right to confirm any changes. Keep in mind that any changes you make will affect all existing items that are
+already using the affected options. For example, if you rename a kit descriptor, existing libraries that are already
+using that kit will be affected.
+
+To delete items, go to the list page, check the checkboxes beside the items you would like to delete, and click the
+“Delete” button in the toolbar at the top of the table. You will only be able to delete items that are not in use.
+
 
 
 {% assign sub = 1 %}
@@ -31,22 +52,9 @@ It is possible to archive sample types if they are not used within your organiza
 show up in the sample type options when creating or editing samples, unless the samples being edited have already used
 that sample type. Sample types can always be unarchived if they are needed in the future.
 
-The Sample Types list page shows all of the available options and offers controls for MISO administrators to modify
-them. To get to this page, click "Sample Types" in the Misc list in the navigation menu.
-
-To add new sample types, click the “Add” button in the toolbar at the top of the Sample Types list. In the dialog,
-enter the quantity of sample types that you would like to create, and click the “Create” button. This will take you to
-the bulk Create Sample Types page. Enter the names you’d like for the new tissue materials, and click the “Save” button
-at the top right to confirm.
-
-To edit existing materials, go to the Sample Types list page, check the checkboxes beside the types you would like to
-edit, and click the “Edit” button in the toolbar at the top of the table. This will bring you to the bulk Edit Sample
-Types page, which is identical to the Create Sample Types page mentioned above. Here, you can modify sample type names
-and archive or unarchive them. You will not be able to modify a sample type name if that sample type is already in use.
-
-MISO administrators can also delete sample types. To do so, go to the Sample Types list page, check the checkboxes
-beside the types you would like to delete, and click the “Delete” button in the toolbar at the top of the table. You
-will only be allowed to delete a sample type if the option has not been used by any existing samples.
+MISO administrators can add, edit, and delete sample types using the standard interface. Sample types can be set as
+archived on the bulk Create or Edit page. A sample type can only be deleted if the option has not been used by any
+existing samples.
 
 {% include userman-toplink.md %}
 
@@ -103,25 +111,8 @@ Note: This item only applies if your site uses [detailed sample mode](site_confi
 Tissue materials describe how the tissue was prepared and may include options such as 'Fresh Frozen,' 'FFPE,' and 'Blood.'
 Tissue material is an optional field for tissue samples.
 
-The Tissue Materials list page shows all of the available options and offers controls to modify them. To get to this
-page, click "Tissue Materials" in the Institute Defaults list near the bottom of the menu on the left side of the
-screen.
-
-To add new tissue materials, click the "Add" button in the toolbar at the top of the Tissue Materials table. In the
-dialog, enter the quantity of tissue materials that you would like to create, and click the "Create" button. This will
-take you to the bulk Create Tissue Material page. Enter the names you'd like for the new tissue materials, and click
-the "Save" button at the top right to confirm.
-
-Tissue materials may only be edited or deleted by MISO administrators. To edit existing materials, go to the Tissue
-Materials list page, check the checkboxes beside the materials you would like to edit, and click the "Edit" button in
-the toolbar at the top of the table. This will bring you to the bulk Edit Tissue Material page, which is identical to
-the Create Tissue Material page mentioned above. Keep in mind that any changes you make will affect all samples that
-are already using the affected tissue materials.
-
-MISO administrators can also delete tissue materials. To do so, go to the Tissue Materials list page, check the
-checkboxes beside the materials you would like to delete, and click the "Delete" button in the toolbar at the top of
-the table. You will only be allowed to delete a tissue material if the option has not been used by any existing
-samples.
+Any user can add tissue materials using the standard inerface. MISO administrators can also edit and delete tissue
+materials. A tissue material can only be deleted if the option has not been used by any existing samples.
 
 {% include userman-toplink.md %}
 
@@ -135,23 +126,8 @@ Note: This item only applies if your site uses [detailed sample mode](site_confi
 Tissue origins describe what part of the donor or organism the sample was taken from. For human donors, options may
 include 'Brain,' 'Lung,' and 'Pancreas.'
 
-The Tissue Origins list page shows all of the available options. To get to this page, click "Tissue Origins" in the
-Institute Defaults list near the bottom of the menu on the left side of the screen. Tissue origins may only be modified
-by MISO administrators. If you are a MISO administrator, the Tissue Origins list page offers controls for doing so.
-
-To add new tissue origins, go to the Tissue Origins list page and click the "Add" button in the toolbar at the top of
-the table. In the dialog, enter the quantity of new tissue origins that you would like to create and click the "Create"
-button. This will take you to the bulk Create Tissue Origins page. Enter the alias and description you would like for
-each of the new tissue origins and click the "Save" button at the top right to confirm.
-
-To edit existing tissue origins, go to the Tissue Origins list page, check the checkboxes next to the tissue origins
-that you would like to modify, and then click the "Edit" button in the toolbar at the top of the table. This will take
-you to the bulk Edit Tissue Origins page, which is identical to the Create Tissue Origins page. Keep in mind that any
-changes you make will affect all samples that are already using the affected tissue origins.
-
-To delete tissue origins, go to the Tissue Origins list page, check the checkboxes beside the origins you would like to
-delete, and click the "Delete" button in the toolbar at the top of the table. You will only be allowed to delete a
-tissue origin if the option has not been used by any existing samples.
+MISO administrators can add, edit, and delete tissue origins using the standard interface. A tissue origin can only be
+deleted if the option has not been used by any existing samples.
 
 {% include userman-toplink.md %}
 
@@ -187,24 +163,8 @@ Note: This item only applies if your site uses [detailed sample mode](site_confi
 Sample purpose describes the reason an aliquot was created. Example purposes include, 'Library,' 'Validation,' and
 'Extra.'
 
-The Sample Purposes list page shows all of the available options and offers controls to modify them. To get to this
-page, click "Sample Purposes" in the Institute Defaults list near the bottom of the menu on the left side of the
-screen.
-
-To add new sample purposes, click the "Add" button in the toolbar at the top of the Sample Purposes table. In the
-dialog, enter the quantity of sample purposes that you would like to create, and click the "Create" button. This will
-take you to the bulk Create Sample Purpose page. Enter the names you'd like for the new sample purposes, and click the
-"Save" button at the top right to confirm.
-
-Sample Purposes may only be edited or deleted by MISO administrators. To edit existing purposes, go to the Sample
-Purposes list page, check the checkboxes beside the purposes you would like to edit, and click the "Edit" button in
-the toolbar at the top of the table. This will bring you to the bulk Edit Sample Purpose page, which is identical to
-the Create Sample Purpose page mentioned above. Keep in mind that any changes you make will affect all samples that
-are already using the affected sample purposes.
-
-MISO administrators can also delete sample purposes. To do so, go to the Sample Purposes list page, check the
-checkboxes beside the purposes you would like to delete, and click the "Delete" button in the toolbar at the top of the
-table. You will only be allowed to delete a sample purposes if the option has not been used by any existing samples.
+MISO administrators can add, edit, and delete sample purposes using the standard interface. A sample purpose can only
+be deleted if the option has not been used by any existing samples.
 
 {% include userman-toplink.md %}
 
@@ -216,37 +176,12 @@ table. You will only be allowed to delete a sample purposes if the option has no
 Note: These items only apply if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
 
 If a sample was received from an external lab, this can be recorded at the tissue level. Each lab belongs to an
-institute. Any user may create new labs and institutes in MISO. Administrators may also edit and delete existing labs
-and institutes.
+institute.
 
-Available institutes can be viewed on the Institutes list page. To get there, click "Institutes" in the Institute
-Defaults list near the bottom of the menu on the left side of the screen. All operations affecting institutes will be
-started from this page.
-
-Available labs can be viewed on the Labs list page. To get there, click "Labs" in the Institute Defaults list near the
-bottom of the menu on the left side of the screen. All operations affecting labs will be started from this page.
-
-To add a new institute, click the "Add" button in the toolbar at the top of the table on the Institutes list page. In
-the dialog, enter the quantity of new institutes that you would like to create and click the "Create" button. This will
-take you to the bulk Create Institutes page. Enter the names you would like for the new institutes, then click the
-"Save" button at the top right to confirm.
-
-To add a new lab, click the "Add" button in the toolbar at the top of the table on the Labs list page. In the dialog,
-enter the quantity of new labs that you would like to create and click the "Create" button. This will take you to the
-bulk Create Labs page. Enter the names you would like for the new labs, and select the institutes that they belong to.
-If you wish to create a new lab in a new institute, you must add the institute first. When you are done, click the
-"Save" button at the top right to confirm.
-
-To edit an existing lab or institute, go to the appropriate list page, check the checkboxes next to the items you wish
-to modify, and click the "Edit" button in the toolbar at the top of the table. This will take you to the corresponding
-bulk Edit page, which is identical to the bulk Create page. Make the changes you would like, then click the "Save"
-button at the top right to confirm. Keep in mind that any changes will affect all samples that are already using the
-affected lab or institute.
-
-To delete a lab or institute, go to the appropriate list page, check the checkboxes next to the items you wish
-to modify, and click the "Delete" button in the toolbar at the top of the table. You will only be allowed to delete a
-lab if it has not been used by any existing samples. You will only be allowed to delete an institute if it has no labs
-associated with it. This means that if you want to delete an institute, you will first have to delete all of its labs.
+Any user may create new labs and institutes in MISO using the standard interface. Administrators may also
+edit and delete existing labs and institutes. You will only be allowed to delete a lab if it has not been used by any
+existing samples. You will only be allowed to delete an institute if it has no labs associated with it. This means that
+if you want to delete an institute, you will first have to delete all of its labs.
 
 {% include userman-toplink.md %}
 
@@ -280,8 +215,14 @@ performed by a MISO administrator.
 
 Note: This item only applies if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
 
-Different stains such as Cresyl Violet and Hematoxylin+Eosin may be used on a slide sample. These options can only be
-modified via direct database access. As such, they can only be modified by a MISO administrator.
+Different stains such as Cresyl Violet and Hematoxylin+Eosin may be used on a slide sample. These stains can be broken
+into categories, which is useful if you use many different stains.
+
+MISO administrators can add, edit, and delete both stains and stain categories using the standard interface. A stain
+can only be deleted if the option has not been used by any existing samples. A stain category can only be deleted if
+there are no stains associated with it.
+
+
 
 {% include userman-toplink.md %}
 
@@ -348,8 +289,7 @@ MISO are:
 * Multiplexing kit - used for sequencing containers
 * Extraction kit - not currently used in MISO
 
-The Kits list page shows all of the available kit descriptors. To get there, click the "Kits" link in the Misc list
-in the menu on the left side of the screen. This page is broken into tabs for the different kit types.
+The Kits lost page is broken into tabs for the different kit types.
 
 To add a new kit descriptor, click the "Add" button in the toolbar at the top of the table on the Kits list page. This
 will take you to the Create Kit Descriptor page. Enter all of the kit details, then click the "Save" button at the top
@@ -430,19 +370,7 @@ containers, or runs. Some QC types may be linked to one of the target's fields. 
 might be linked to a sample's volume. These QCs can be set to auto-update the field, so that when a new QC is entered,
 the item's related field is updated automatically.
 
-The QC Types list page shows all of the available options. To get to this page, click “QC Types” in the Institute
-Defaults list near the bottom of the menu on the left side of the screen. QC Types may only be modified by MISO
-administrators. If you are a MISO administrator, the QC Types list page offers controls for doing so.
-
-To add new QC types, go to the QC Types list page and click the “Add” button in the toolbar at the top of the table. In
-the dialog, enter the quantity of new QC types that you would like to create, and click the “Create” button. This will
-take you to the bulk Create QC Type page. Enter the details for the new QC types and click the “Save” button at the top
-right to confirm.
-
-To edit existing QC types, go to the QC Types list page, check the checkboxes next to the QC types that you would like
-to modify, and then click the “Edit” button in the toolbar at the top of the table. This will take you to the bulk Edit
-QC Type page, which is identical to the Create QC Type page. Keep in mind that any changes you make will affect all
-samples that are already using the affected QC types.
+MISO administrators can add and edit QC types using the standard interface.
 
 {% include userman-toplink.md %}
 
