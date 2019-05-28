@@ -2,8 +2,14 @@
 
 Changes:
 
+
+
+# 0.2.179
+
+Changes:
+
   * Changed Edit Freezer page to show validation messages instead of error pages when saving fails
-  * Record MinKNOW and Protocol versions for Oxford Nanopore runs as reported by Run Scanner
+  * Recorded MinKNOW and Protocol versions for Oxford Nanopore runs as reported by Run Scanner
   * Added interface for administrators to add, edit, and delete dropdown options
     * sample types
     * stains (detailed sample)
