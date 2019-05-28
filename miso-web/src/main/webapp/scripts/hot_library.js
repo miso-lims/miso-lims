@@ -819,8 +819,8 @@ HotTarget.library = (function() {
             return errors;
           }),
 
-          HotUtils.makeParents('library', HotUtils.relationCategoriesForDetailed()),
-          HotUtils.makeChildren('library', [HotUtils.relations.dilution(), HotUtils.relations.pool()])].concat(
+          HotUtils.makeParents('libraries', HotUtils.relationCategoriesForDetailed()),
+          HotUtils.makeChildren('libraries', [HotUtils.relations.dilution(), HotUtils.relations.pool()])].concat(
           HotUtils.makeQcActions("Library")).concat(
           [
               config.worksetId ? HotUtils.makeRemoveFromWorkset('libraries', config.worksetId) : HotUtils.makeAddToWorkset('libraries',
