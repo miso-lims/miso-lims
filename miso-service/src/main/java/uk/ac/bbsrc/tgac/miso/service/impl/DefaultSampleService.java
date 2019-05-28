@@ -620,8 +620,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       if (sai.getSampleClass() != null && sai.getSampleClass().getId() != null) {
         sai.setSampleClass(sampleClassService.get(sai.getSampleClass().getId()));
       }
-      if (sai.getDetailedQcStatus() != null && sai.getDetailedQcStatus().getId() != null) {
-        sai.setDetailedQcStatus(detailedQcStatusDao.getDetailedQcStatus(sai.getDetailedQcStatus().getId()));
+      if (sai.getDetailedQcStatus() != null && sai.getDetailedQcStatus().isSaved()) {
+        sai.setDetailedQcStatus(detailedQcStatusDao.get(sai.getDetailedQcStatus().getId()));
       }
       if (sai.getSubproject() != null && sai.getSubproject().isSaved()) {
         sai.setSubproject(subProjectDao.getSubproject(sai.getSubproject().getId()));

@@ -181,7 +181,7 @@ public class ValueTypeLookupTest {
     HibernateDetailedQcStatusDao detQcStatusDao = Mockito.mock(HibernateDetailedQcStatusDao.class);
     List<DetailedQcStatus> qcStatuses = new ArrayList<>();
     qcStatuses.add(makeDetailedQcStatus(VALID_LONG, VALID_STRING));
-    Mockito.when(detQcStatusDao.getDetailedQcStatus()).thenReturn(qcStatuses);
+    Mockito.when(detQcStatusDao.list()).thenReturn(qcStatuses);
     Mockito.when(mgr.getDetailedQcStatusDao()).thenReturn(detQcStatusDao);
 
     HibernateSubprojectDao subProjDao = Mockito.mock(HibernateSubprojectDao.class);
@@ -542,7 +542,9 @@ public class ValueTypeLookupTest {
 
   private DetailedQcStatus makeDetailedQcStatus(Long id, String description) {
     DetailedQcStatus qcDet = new DetailedQcStatusImpl();
-    qcDet.setId(id);
+    if (id != null) {
+      qcDet.setId(id);
+    }
     qcDet.setDescription(description);
     return qcDet;
   }

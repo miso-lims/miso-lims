@@ -2,7 +2,8 @@
 
 Changes:
 
-
+  * Added interface for administrators to add, edit, and delete dropdown options
+    * detailed QC statuses (detailed sample)
 
 # 0.2.179
 

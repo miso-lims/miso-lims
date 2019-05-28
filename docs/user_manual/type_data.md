@@ -203,8 +203,8 @@ passed, failed, or unknown, but also provides more specific information about th
 * "Refused Consent" (QC status: failed) - indicates that while the sample may have passed QC, the donor has revoked
   consent for it to be used
 
-Modifications to detailed QC statuses can only be made via direct accesss to the MISO database. As such, they must be
-performed by a MISO administrator.
+MISO administrators can add, edit, and delete detailed QC statuses using the standard interface. A detailed QC status
+can only be deleted if the option has not been used by any existing samples.
 
 {% include userman-toplink.md %}
 

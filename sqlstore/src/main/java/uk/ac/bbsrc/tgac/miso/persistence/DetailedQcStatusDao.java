@@ -6,12 +6,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 
 public interface DetailedQcStatusDao {
 
-  List<DetailedQcStatus> getDetailedQcStatus();
+  List<DetailedQcStatus> list();
 
-  DetailedQcStatus getDetailedQcStatus(Long id);
+  DetailedQcStatus get(Long id);
 
-  Long addDetailedQcStatus(DetailedQcStatus detailedQcStatus);
+  DetailedQcStatus getByDescription(String description);
 
-  void update(DetailedQcStatus detailedQcStatus);
+  long create(DetailedQcStatus detailedQcStatus);
+
+  long update(DetailedQcStatus detailedQcStatus);
+
+  long getUsage(DetailedQcStatus detailedQcStatus);
 
 }
