@@ -958,9 +958,9 @@ HotTarget.sample = (function() {
             return errors;
           }),
 
-          Constants.isDetailedSample ? HotUtils.makeParents('sample', HotUtils.relationCategoriesForDetailed()) : null,
+          Constants.isDetailedSample ? HotUtils.makeParents('samples', HotUtils.relationCategoriesForDetailed()) : null,
 
-          HotUtils.makeChildren('sample', HotUtils.relationCategoriesForDetailed().concat(
+          HotUtils.makeChildren('samples', HotUtils.relationCategoriesForDetailed().concat(
               [HotUtils.relations.library(), HotUtils.relations.dilution(), HotUtils.relations.pool()]))].concat(
           HotUtils.makeQcActions("Sample")).concat(
           [

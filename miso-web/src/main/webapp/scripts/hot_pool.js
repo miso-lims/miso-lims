@@ -269,7 +269,7 @@ HotTarget.pool = (function() {
             return errors;
           }),
 
-          HotUtils.makeParents('pool', HotUtils.relationCategoriesForDetailed().concat(
+          HotUtils.makeParents('pools', HotUtils.relationCategoriesForDetailed().concat(
               [HotUtils.relations.library(), HotUtils.relations.dilution()]))
 
       ].concat(HotUtils.makeQcActions("Pool"));

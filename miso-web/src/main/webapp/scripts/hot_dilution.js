@@ -253,8 +253,8 @@ HotTarget.dilution = {
           return errors;
         }),
 
-        HotUtils.makeParents('librarydilution', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library()])),
-        HotUtils.makeChildren('librarydilution', [HotUtils.relations.pool()]),
+        HotUtils.makeParents('librarydilutions', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library()])),
+        HotUtils.makeChildren('librarydilutions', [HotUtils.relations.pool()]),
         config.worksetId ? HotUtils.makeRemoveFromWorkset('dilutions', config.worksetId) : HotUtils.makeAddToWorkset('dilutions',
             'dilutionIds')];
   },

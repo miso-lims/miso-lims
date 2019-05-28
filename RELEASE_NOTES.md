@@ -14,6 +14,7 @@ Changes:
   * Fixed creating library templates and populating library template options when propagating
     libraries in plain sample mode
   * Fixed setting selection and strategy types from library template
+  * Fixed Parents and Children buttons
 
 Upgrade Notes:
 
