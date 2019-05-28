@@ -70,8 +70,8 @@ public class DefaultSampleTypeService implements SampleTypeService {
       }
       long usage = sampleTypeDao.getUsage(beforeChange);
       if (usage > 0L) {
-        errors
-            .add(new ValidationError("name", "Cannot change name of sample type because it is already in use by " + usage + " sample(s)"));
+        errors.add(new ValidationError("name",
+                "Cannot change name of sample type because it is already in use by " + usage + " sample" + (usage > 1L ? "s" : "")));
       }
     }
 
