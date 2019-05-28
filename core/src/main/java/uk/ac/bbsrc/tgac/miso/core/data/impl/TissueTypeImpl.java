@@ -24,7 +24,7 @@ public class TissueTypeImpl implements TissueType {
 
   private static final long serialVersionUID = 1L;
 
-  public static final long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -83,43 +83,43 @@ public class TissueTypeImpl implements TissueType {
   }
 
   @Override
-  public User getCreatedBy() {
+  public User getCreator() {
     return createdBy;
   }
 
   @Override
-  public void setCreatedBy(User createdBy) {
-    this.createdBy = createdBy;
+  public void setCreator(User creator) {
+    this.createdBy = creator;
   }
 
   @Override
-  public Date getCreationDate() {
+  public Date getCreationTime() {
     return creationDate;
   }
 
   @Override
-  public void setCreationDate(Date creationDate) {
-    this.creationDate = creationDate;
+  public void setCreationTime(Date creationTime) {
+    this.creationDate = creationTime;
   }
 
   @Override
-  public User getUpdatedBy() {
+  public User getLastModifier() {
     return updatedBy;
   }
 
   @Override
-  public void setUpdatedBy(User updatedBy) {
-    this.updatedBy = updatedBy;
+  public void setLastModifier(User lastModifier) {
+    this.updatedBy = lastModifier;
   }
 
   @Override
-  public Date getLastUpdated() {
+  public Date getLastModified() {
     return lastUpdated;
   }
 
   @Override
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
+  public void setLastModified(Date lastModified) {
+    this.lastUpdated = lastModified;
   }
 
   /**
@@ -135,6 +135,21 @@ public class TissueTypeImpl implements TissueType {
   public String toString() {
     return "TissueTypeImpl [tissueTypeId=" + tissueTypeId + ", alias=" + alias + ", description=" + description + ", createdBy=" + createdBy
         + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + "]";
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Tissue Type";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias() + " (" + getDescription() + ")";
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

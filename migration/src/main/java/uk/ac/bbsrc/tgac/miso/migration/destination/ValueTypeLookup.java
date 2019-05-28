@@ -41,7 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -108,7 +107,7 @@ public class ValueTypeLookup {
    */
   public ValueTypeLookup(MisoServiceManager misoServiceManager) throws IOException {
     setSampleClasses(misoServiceManager.getSampleClassDao().getSampleClass());
-    setTissueTypes(misoServiceManager.getTissueTypeDao().getTissueType());
+    setTissueTypes(misoServiceManager.getTissueTypeDao().list());
     setTissueMaterials(misoServiceManager.getTissueMaterialDao().getTissueMaterial());
     setKits(misoServiceManager.getKitDao().listAllKitDescriptors());
     setSamplePurposes(misoServiceManager.getSamplePurposeDao().getSamplePurpose());
@@ -419,7 +418,7 @@ public class ValueTypeLookup {
   @VisibleForTesting
   TissueType resolve(TissueType tissueType) {
     if (tissueType == null) return null;
-    if (tissueType.getId() != TissueTypeImpl.UNSAVED_ID) return tissueTypeById.get(tissueType.getId());
+    if (tissueType.isSaved()) return tissueTypeById.get(tissueType.getId());
     if (tissueType.getAlias() != null) return tissueTypeByAlias.get(tissueType.getAlias());
     return null;
   }

@@ -37,7 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
@@ -306,7 +305,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
         || tissue.getTissueOrigin() == null
         || !tissue.getTissueOrigin().isSaved()
         || tissue.getTissueType() == null
-        || tissue.getTissueType().getId() == TissueTypeImpl.UNSAVED_ID
+        || !tissue.getTissueType().isSaved()
         || tissue.getTimesReceived() == null
         || tissue.getTubeNumber() == null) {
       throw new IllegalArgumentException("Missing tissue attributes required for lookup");

@@ -307,7 +307,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, node, "subprojects", subprojectService.getAll(), Dtos::asDto);
     createArray(mapper, node, "labs", labService.getAll(), Dtos::asDto);
     createArray(mapper, node, "tissueOrigins", tissueOriginService.getAll(), Dtos::asDto);
-    createArray(mapper, node, "tissueTypes", tissueTypeService.getAll(), Dtos::asDto);
+    createArray(mapper, node, "tissueTypes", tissueTypeService.list(), Dtos::asDto);
     createArray(mapper, node, "tissueMaterials", tissueMaterialService.getAll(), Dtos::asDto);
     createArray(mapper, node, "stains", stainService.list(), Dtos::asDto);
     createArray(mapper, node, "targetedSequencings", targetedSequencingService.list(), Dtos::asDto);

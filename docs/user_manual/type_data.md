@@ -148,8 +148,8 @@ OICR include the following (and others).
 * Xenograft Tissue: Xenograft derived from some tumour
 * Organoid
 
-Tissue Types can only be modified via direct access to the MISO database. As such, it must be done by a MISO
-administrator.
+MISO administrators can add, edit, and delete tissue types using the standard interface. A tissue type can only be
+deleted if the option has not been used by any existing samples.
 
 {% include userman-toplink.md %}
 

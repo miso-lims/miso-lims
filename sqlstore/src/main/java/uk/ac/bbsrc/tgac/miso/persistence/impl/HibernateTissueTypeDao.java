@@ -1,11 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.TissueTypeDao;
 
@@ -34,7 +36,7 @@ public class HibernateTissueTypeDao implements TissueTypeDao {
   }
 
   @Override
-  public List<TissueType> getTissueType() {
+  public List<TissueType> list() {
     Query query = currentSession().createQuery("from TissueTypeImpl");
     @SuppressWarnings("unchecked")
     List<TissueType> records = query.list();
@@ -42,29 +44,33 @@ public class HibernateTissueTypeDao implements TissueTypeDao {
   }
 
   @Override
-  public TissueType getTissueType(Long id) {
+  public TissueType get(Long id) {
     return (TissueType) currentSession().get(TissueTypeImpl.class, id);
   }
 
   @Override
-  public Long addTissueType(TissueType tissueType) {
-    Date now = new Date();
-    tissueType.setCreationDate(now);
-    tissueType.setLastUpdated(now);
+  public TissueType getByAlias(String alias) {
+    return (TissueType) currentSession().createCriteria(TissueTypeImpl.class)
+        .add(Restrictions.eq("alias", alias))
+        .uniqueResult();
+  }
+
+  @Override
+  public Long create(TissueType tissueType) {
     return (Long) currentSession().save(tissueType);
   }
 
   @Override
-  public void deleteTissueType(TissueType tissueType) {
-    currentSession().delete(tissueType);
-
+  public long update(TissueType tissueType) {
+    currentSession().update(tissueType);
+    return tissueType.getId();
   }
 
   @Override
-  public void update(TissueType tissueType) {
-    Date now = new Date();
-    tissueType.setLastUpdated(now);
-    currentSession().update(tissueType);
+  public long getUsage(TissueType tissueType) {
+    return (long) currentSession().createCriteria(SampleTissueImpl.class)
+        .add(Restrictions.eq("tissueType", tissueType))
+        .setProjection(Projections.rowCount()).uniqueResult();
   }
 
 }

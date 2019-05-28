@@ -24,17 +24,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -44,59 +40,47 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.TissueTypeDto;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
 @RequestMapping("/rest/tissuetypes")
 public class TissueTypeRestController extends RestController {
 
-  protected static final Logger log = LoggerFactory.getLogger(TissueTypeRestController.class);
-
   @Autowired
   private TissueTypeService tissueTypeService;
 
-  @GetMapping(value = "/{id}", produces = { "application/json" })
-  @ResponseBody
-  public TissueTypeDto getTissueType(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) throws IOException {
-    TissueType tissueType = tissueTypeService.get(id);
-    if (tissueType == null) {
-      throw new RestException("No tissue type found with ID: " + id, Status.NOT_FOUND);
-    } else {
-      TissueTypeDto dto = Dtos.asDto(tissueType);
-      return dto;
-    }
-  }
-
-  @GetMapping(produces = { "application/json" })
-  @ResponseBody
-  public Set<TissueTypeDto> getTissueTypes(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
-    Set<TissueType> tissueTypes = tissueTypeService.getAll();
-    Set<TissueTypeDto> tissueTypeDtos = Dtos.asTissueTypeDtos(tissueTypes);
-    return tissueTypeDtos;
-  }
+  @Autowired
+  private MenuController menuController;
 
   @PostMapping(headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public TissueTypeDto createTissueType(@RequestBody TissueTypeDto tissueTypeDto, UriComponentsBuilder b, HttpServletResponse response)
       throws IOException {
-    TissueType tissueType = Dtos.to(tissueTypeDto);
-    Long id = tissueTypeService.create(tissueType);
-    return Dtos.asDto(tissueTypeService.get(id));
+    return RestUtils.createObject("Tissue Type", tissueTypeDto, Dtos::to, tissueTypeService, d -> {
+      menuController.refreshConstants();
+      return Dtos.asDto(d);
+    });
   }
 
   @PutMapping(value = "/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
-  public TissueTypeDto updateTissueType(@PathVariable("id") Long id, @RequestBody TissueTypeDto tissueTypeDto,
+  public TissueTypeDto updateTissueType(@PathVariable long id, @RequestBody TissueTypeDto tissueTypeDto,
       HttpServletResponse response) throws IOException {
-    TissueType tissueType = Dtos.to(tissueTypeDto);
-    tissueType.setId(id);
-    tissueTypeService.update(tissueType);
-    return Dtos.asDto(tissueTypeService.get(id));
+    return RestUtils.updateObject("Tissue Type", id, tissueTypeDto, Dtos::to, tissueTypeService, d -> {
+      menuController.refreshConstants();
+      return Dtos.asDto(d);
+    });
+  }
+
+  @PostMapping(value = "/bulk-delete")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete("Tissue Type", ids, tissueTypeService);
   }
 
 }
