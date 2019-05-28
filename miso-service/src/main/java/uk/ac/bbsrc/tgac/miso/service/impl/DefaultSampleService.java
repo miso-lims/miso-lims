@@ -46,7 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -651,8 +650,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
         if (st.getTissueOrigin() != null && st.getTissueOrigin().isSaved()) {
           st.setTissueOrigin(tissueOriginDao.getTissueOrigin(st.getTissueOrigin().getId()));
         }
-        if (st.getTissueType() != null && st.getTissueType().getId() != TissueTypeImpl.UNSAVED_ID) {
-          st.setTissueType(tissueTypeDao.getTissueType(st.getTissueType().getId()));
+        if (st.getTissueType() != null && st.getTissueType().isSaved()) {
+          st.setTissueType(tissueTypeDao.get(st.getTissueType().getId()));
         }
         if (st.getLab() != null && st.getLab().isSaved()) {
           st.setLab(labService.get(st.getLab().getId()));

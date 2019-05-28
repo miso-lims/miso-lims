@@ -4,15 +4,10 @@ import java.io.IOException;
 import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 
-public interface TissueTypeService {
+public interface TissueTypeService extends DeleterService<TissueType>, SaveService<TissueType> {
 
-  public TissueType get(Long tissueTypeId) throws IOException;
-
-  public Set<TissueType> getAll() throws IOException;
-
-  public Long create(TissueType tissueType) throws IOException;
-
-  public void update(TissueType tissueType) throws IOException;
+  public Set<TissueType> list() throws IOException;
 
 }

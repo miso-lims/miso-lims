@@ -94,7 +94,7 @@ public class ValueTypeLookupTest {
     HibernateTissueTypeDao ttDao = Mockito.mock(HibernateTissueTypeDao.class);
     List<TissueType> tts = new ArrayList<>();
     tts.add(makeTissueType(VALID_LONG, VALID_STRING));
-    Mockito.when(ttDao.getTissueType()).thenReturn(tts);
+    Mockito.when(ttDao.list()).thenReturn(tts);
     Mockito.when(mgr.getTissueTypeDao()).thenReturn(ttDao);
 
     HibernateTissueMaterialDao tmDao = Mockito.mock(HibernateTissueMaterialDao.class);
@@ -235,16 +235,18 @@ public class ValueTypeLookupTest {
   @Test
   public void testResolveTissueType() {
     assertNotNull(sut.resolve(makeTissueType(VALID_LONG, null)));
-    assertNotNull(sut.resolve(makeTissueType(TissueTypeImpl.UNSAVED_ID, VALID_STRING)));
+    assertNotNull(sut.resolve(makeTissueType(null, VALID_STRING)));
     assertNull(sut.resolve((TissueType) null));
-    assertNull(sut.resolve(makeTissueType(TissueTypeImpl.UNSAVED_ID, null)));
+    assertNull(sut.resolve(makeTissueType(null, null)));
     assertNull(sut.resolve(makeTissueType(INVALID_LONG, null)));
-    assertNull(sut.resolve(makeTissueType(TissueTypeImpl.UNSAVED_ID, INVALID_STRING)));
+    assertNull(sut.resolve(makeTissueType(null, INVALID_STRING)));
   }
 
-  private TissueType makeTissueType(long id, String alias) {
+  private TissueType makeTissueType(Long id, String alias) {
     TissueType tt = new TissueTypeImpl();
-    tt.setId(id);
+    if (id != null) {
+      tt.setId(id);
+    }
     tt.setAlias(alias);
     return tt;
   }

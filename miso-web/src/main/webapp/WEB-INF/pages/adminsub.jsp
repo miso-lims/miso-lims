@@ -81,6 +81,7 @@
       <div class="menu">
         <a href="<c:url value="/miso/tissuematerial/list"/>">Tissue Materials</a>
         <a href="<c:url value="/miso/tissueorigin/list"/>">Tissue Origins</a>
+        <a href="<c:url value="/miso/tissuetype/list"/>">Tissue Types</a>
         <a href="<c:url value="/miso/samplepurpose/list"/>">Sample Purposes</a>
         <a href="<c:url value="/miso/subproject/list"/>">Subprojects</a>
         <a href="<c:url value="/miso/institute/list"/>">Institutes</a>

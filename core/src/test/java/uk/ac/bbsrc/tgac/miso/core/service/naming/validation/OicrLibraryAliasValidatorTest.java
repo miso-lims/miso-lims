@@ -45,7 +45,7 @@ public class OicrLibraryAliasValidatorTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     Mockito.when(tissueOriginDao.getTissueOrigin()).thenReturn(makeTissueOrigins());
-    Mockito.when(tissueTypeDao.getTissueType()).thenReturn(makeTissueTypes());
+    Mockito.when(tissueTypeDao.list()).thenReturn(makeTissueTypes());
     Mockito.when(libraryStore.listLibraryTypesByPlatform(PlatformType.ILLUMINA)).thenReturn(makeIlluminaLibTypes());
     Mockito.when(libraryStore.listLibraryTypesByPlatform(PlatformType.OXFORDNANOPORE)).thenReturn(makeOxfordNanoporeLibTypes());
     Mockito.when(libraryDesignCodeDao.getLibraryDesignCodes()).thenReturn(makeDesignCodes());

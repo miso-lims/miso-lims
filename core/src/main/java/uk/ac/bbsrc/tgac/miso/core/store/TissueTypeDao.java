@@ -6,14 +6,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 
 public interface TissueTypeDao {
 
-  public List<TissueType> getTissueType();
+  public List<TissueType> list();
 
-  public TissueType getTissueType(Long id);
+  public TissueType get(Long id);
 
-  public Long addTissueType(TissueType tissueType);
+  public TissueType getByAlias(String alias);
 
-  public void deleteTissueType(TissueType tissueType);
+  public Long create(TissueType tissueType);
 
-  public void update(TissueType tissueType);
+  public long update(TissueType tissueType);
+
+  public long getUsage(TissueType tissueType);
 
 }

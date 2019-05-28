@@ -49,7 +49,7 @@ public class OicrLibraryAliasValidator extends RegexValidator {
     final String identityRegex = "(" + OicrProjectShortNameValidator.REGEX + ")_(\\d{3,}|\\d[CR]\\d{1,2})_"; // PROJ_0001_...
 
     String origins = makeOptionRegex(tissueOriginDao.getTissueOrigin(), TissueOrigin::getAlias);
-    String tissueTypes = makeOptionRegex(tissueTypeDao.getTissueType(), TissueType::getAlias);
+    String tissueTypes = makeOptionRegex(tissueTypeDao.list(), TissueType::getAlias);
     final String tissueRegex = "(" + origins + ")_(" + tissueTypes + ")_"; // ...Pa_P_...
 
     String designCodes = null;

@@ -8,6 +8,7 @@ Changes:
     * sample types
     * stains (detailed sample)
     * stain categories (detailed sample)
+    * tissue types (detailed sample)
   * Removed change logging of Illumina run cycles
   * Fixed broken links to dilution-related pages
   * Fixed creating library templates and populating library template options when propagating
