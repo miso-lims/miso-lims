@@ -40,7 +40,7 @@ public class HibernatePartitionQcDaoTest extends AbstractDAOTest {
 
   @Test
   public void testCreate() throws Exception {
-    PartitionQCType type = dao.listTypes().iterator().next();
+    PartitionQCType type = (PartitionQCType) sessionFactory.getCurrentSession().get(PartitionQCType.class, 1L);
     Run run = (Run) sessionFactory.getCurrentSession().get(Run.class, 2L);
     Partition partition = (Partition) sessionFactory.getCurrentSession().get(PartitionImpl.class, 2L);
     PartitionQC qc = new PartitionQC();
@@ -73,11 +73,6 @@ public class HibernatePartitionQcDaoTest extends AbstractDAOTest {
     Partition partition = (Partition) sessionFactory.getCurrentSession().get(PartitionImpl.class, 2L);
     PartitionQC qc = dao.get(run, partition);
     assertNull(qc);
-  }
-
-  @Test
-  public void testListTypes() throws Exception {
-    assertTrue(dao.listTypes().size() > 0);
   }
 
   @Test

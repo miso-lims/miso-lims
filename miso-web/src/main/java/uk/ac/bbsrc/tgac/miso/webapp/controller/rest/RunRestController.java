@@ -83,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
+import uk.ac.bbsrc.tgac.miso.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -135,6 +136,8 @@ public class RunRestController extends RestController {
   private ContainerService containerService;
   @Autowired
   private PartitionQCService partitionQCService;
+  @Autowired
+  private PartitionQcTypeService partitionQcTypeService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
@@ -296,7 +299,7 @@ public class RunRestController extends RestController {
   @ResponseStatus(code = HttpStatus.OK)
   public void setQc(@PathVariable Long runId, @RequestBody RunPartitionQCRequest request) throws IOException {
     Run run = runService.get(runId);
-    PartitionQCType qcType = partitionQCService.listTypes().stream().filter(qt -> qt.getId() == request.getQcTypeId()).findAny()
+    PartitionQCType qcType = partitionQcTypeService.list().stream().filter(qt -> qt.getId() == request.getQcTypeId()).findAny()
         .orElseThrow(() -> new RestException(Status.BAD_REQUEST));
     run.getSequencerPartitionContainers().stream()//
         .flatMap(container -> container.getPartitions().stream())//

@@ -3,6 +3,12 @@ INSERT INTO DetailedQCStatus (detailedQcStatusId, description, status, noteRequi
 (1, 'Passed', TRUE, FALSE, 1, '2019-05-28 13:17:00', 1, '2019-05-28 13:17:00'),
 (2, 'Failed', FALSE, FALSE, 1, '2019-05-28 13:17:00', 1, '2019-05-28 13:17:00');
 
+DELETE FROM PartitionQCType;
+INSERT INTO PartitionQCType (partitionQcTypeId, description, noteRequired, orderFulfilled, analysisSkipped) VALUES
+(1, 'OK', FALSE, TRUE, FALSE),
+(2, 'Failed: Instrument problem', FALSE, FALSE, TRUE),
+(3, 'Failed: Other problem', TRUE, FALSE, TRUE);
+
 DELETE FROM SampleType;
 INSERT INTO SampleType (typeId, name) VALUES
 (2,'NON GENOMIC'),

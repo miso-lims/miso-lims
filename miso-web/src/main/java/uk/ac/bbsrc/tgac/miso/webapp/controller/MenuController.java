@@ -103,7 +103,7 @@ import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
+import uk.ac.bbsrc.tgac.miso.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
@@ -187,7 +187,7 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private InstrumentService sequencerService;
   @Autowired
-  private PartitionQCService partitionQCService;
+  private PartitionQcTypeService partitionQcTypeService;
   @Autowired
   private StudyService studyService;
   @Autowired
@@ -333,7 +333,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, node, "qcTargets", Arrays.asList(QcTarget.values()), Dtos::asDto);
     createArray(mapper, node, "concentrationUnits", Arrays.asList(ConcentrationUnit.values()), Dtos::asDto);
     createArray(mapper, node, "volumeUnits", Arrays.asList(VolumeUnit.values()), Dtos::asDto);
-    createArray(mapper, node, "partitionQcTypes", partitionQCService.listTypes(), Dtos::asDto);
+    createArray(mapper, node, "partitionQcTypes", partitionQcTypeService.list(), Dtos::asDto);
     createArray(mapper, node, "referenceGenomes", referenceGenomeService.listAllReferenceGenomeTypes(), Dtos::asDto);
     createArray(mapper, node, "spreadsheetFormats", Arrays.asList(SpreadSheetFormat.values()), Dtos::asDto);
     createArray(mapper, node, "sampleSpreadsheets", Arrays.asList(SampleSpreadSheets.values()), Dtos::asDto);

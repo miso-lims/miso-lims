@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,11 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
-import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.store.PartitionQcStore;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
+import uk.ac.bbsrc.tgac.miso.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 
 @Service
@@ -25,22 +24,14 @@ public class DefaultPartitionQCService implements PartitionQCService {
   @Autowired
   private PartitionQcStore partitionQcDao;
   @Autowired
+  private PartitionQcTypeService partitionQcTypeService;
+  @Autowired
   private RunService runService;
 
   @Override
   public PartitionQC get(Run run, Partition partition) throws IOException {
     Run managedRun = runService.get(run.getId());
     return partitionQcDao.get(managedRun, partition);
-  }
-
-  @Override
-  public PartitionQCType getType(long qcTypeId) throws IOException {
-    return partitionQcDao.getType(qcTypeId);
-  }
-
-  @Override
-  public Collection<PartitionQCType> listTypes() throws IOException {
-    return partitionQcDao.listTypes();
   }
 
   @Override
@@ -56,10 +47,10 @@ public class DefaultPartitionQCService implements PartitionQCService {
     if (managedQc == null) {
       qc.setRun(managedRun);
       qc.setPartition(managedPartition);
-      qc.setType(getType(qc.getType().getId()));
+      qc.setType(partitionQcTypeService.get(qc.getType().getId()));
       partitionQcDao.create(qc);
     } else {
-      managedQc.setType(getType(qc.getType().getId()));
+      managedQc.setType(partitionQcTypeService.get(qc.getType().getId()));
       managedQc.setNotes(qc.getNotes());
       partitionQcDao.update(managedQc);
     }

@@ -3,17 +3,18 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PartitionQCTypeDto {
+
   private String description;
-  private long id;
+  private Long id;
   private boolean noteRequired;
-  private boolean orderFulfilled;
+  private boolean orderFulfilled = true;
   private boolean analysisSkipped;
 
   public String getDescription() {
     return description;
   }
 
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
@@ -25,7 +26,7 @@ public class PartitionQCTypeDto {
     this.description = description;
   }
 
-  public void setId(long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
