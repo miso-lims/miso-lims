@@ -444,8 +444,7 @@ public class MisoServiceManager {
   }
 
   private <T> T getService(Class<T> clazz) {
-    @SuppressWarnings("unchecked")
-    T service = (T) services.get(clazz);
+    T service = clazz.cast(services.get(clazz));
     return service;
   }
 
