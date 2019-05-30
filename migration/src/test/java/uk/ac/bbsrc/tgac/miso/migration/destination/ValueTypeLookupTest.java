@@ -213,6 +213,7 @@ public class ValueTypeLookupTest {
     List<BoxSize> boxSizes = Lists.newArrayList();
     boxSizes.add(makeBoxSize(VALID_LONG, 8, 12, true));
     Mockito.when(boxSizeService.list()).thenReturn(boxSizes);
+    Mockito.when(mgr.getBoxSizeService()).thenReturn(boxSizeService);
 
     sut = new ValueTypeLookup(mgr);
   }
