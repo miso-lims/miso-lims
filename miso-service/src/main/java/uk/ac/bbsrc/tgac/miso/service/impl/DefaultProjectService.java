@@ -158,10 +158,6 @@ public class DefaultProjectService implements ProjectService {
     this.referenceGenomeDao = referenceGenomeDao;
   }
 
-  public void setReferenceGenomeStore(ReferenceGenomeDao referenceGenomeStore) {
-    this.referenceGenomeDao = referenceGenomeStore;
-  }
-
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
   }

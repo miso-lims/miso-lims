@@ -23,8 +23,6 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
@@ -41,6 +39,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.service.BoxSizeService;
+import uk.ac.bbsrc.tgac.miso.service.BoxUseService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -61,6 +61,12 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
 
   @Autowired
   private BoxStore boxStore;
+
+  @Autowired
+  private BoxUseService boxUseService;
+
+  @Autowired
+  private BoxSizeService boxSizeService;
 
   @Autowired
   private ChangeLogService changeLogService;
@@ -86,7 +92,7 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
     to.setDescription(from.getDescription());
     to.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(from.getIdentificationBarcode()));
     to.setLocationBarcode(from.getLocationBarcode());
-    to.setUse(boxStore.getUseById(from.getUse().getId()));
+    to.setUse(boxUseService.get(from.getUse().getId()));
     to.setStorageLocation(from.getStorageLocation());
   }
 
@@ -162,11 +168,6 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
   }
 
   @Override
-  public Map<String, Integer> getColumnSizes() throws IOException {
-    return ValidationUtils.adjustNameLength(boxStore.getBoxColumnSizes(), namingScheme);
-  }
-
-  @Override
   public BoxableView getBoxableView(BoxableId id) throws IOException {
     return boxStore.getBoxableView(id);
   }
@@ -195,26 +196,6 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
   @Override
   public List<Box> getByPartialSearch(String search, boolean onlyMatchBeginning) {
     return boxStore.getByPartialSearch(search, onlyMatchBeginning);
-  }
-
-  @Override
-  public Collection<BoxSize> listSizes() throws IOException {
-    return boxStore.listAllBoxSizes();
-  }
-
-  @Override
-  public BoxSize getSize(long id) throws IOException {
-    return boxStore.getSizeById(id);
-  }
-
-  @Override
-  public Collection<BoxUse> listUses() throws IOException {
-    return boxStore.listAllBoxUses();
-  }
-
-  @Override
-  public BoxUse getUse(long id) throws IOException {
-    return boxStore.getUseById(id);
   }
 
   @Override
@@ -341,9 +322,9 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
 
   private void loadChildEntities(Box box) throws IOException {
     if (box.getSize() != null) {
-      box.setSize(getSize(box.getSize().getId()));
+      box.setSize(boxSizeService.get(box.getSize().getId()));
     }
-    box.setUse(getUse(box.getUse().getId()));
+    box.setUse(boxUseService.get(box.getUse().getId()));
     if (box.getStorageLocation() != null) {
       if (box.getStorageLocation().getId() > 0L) {
         box.setStorageLocation(storageLocationService.get(box.getStorageLocation().getId()));
@@ -475,6 +456,14 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
 
   public void setBoxStore(BoxStore boxStore) {
     this.boxStore = boxStore;
+  }
+
+  public void setBoxUseService(BoxUseService boxUseService) {
+    this.boxUseService = boxUseService;
+  }
+
+  public void setBoxSizeService(BoxSizeService boxSizeService) {
+    this.boxSizeService = boxSizeService;
   }
 
   public void setChangeLogService(ChangeLogService changeLogService) {

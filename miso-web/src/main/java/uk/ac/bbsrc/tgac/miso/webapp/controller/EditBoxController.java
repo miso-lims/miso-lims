@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
@@ -75,11 +73,6 @@ public class EditBoxController {
     return boxScanners.keySet();
   }
 
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> maxLengths() throws IOException {
-    return boxService.getColumnSizes();
-  }
-
   @InitBinder
   public void includeForeignKeys(WebDataBinder binder) {
     binder.registerCustomEditor(StorageLocation.class, new PropertyEditorSupport() {
@@ -90,14 +83,6 @@ public class EditBoxController {
         setValue(location);
       }
     });
-  }
-
-  public List<String> boxSizesAsRowsByColumns() throws IOException {
-    List<String> sizes = new ArrayList<>();
-    for (BoxSize boxSize : boxService.listSizes()) {
-      sizes.add("\"" + boxSize.getRowsByColumns() + "\"" + ":" + "\"" + boxSize.getRowsByColumns() + "\"");
-    }
-    return sizes;
   }
 
   @GetMapping(value = "/bulk/new")
@@ -129,38 +114,14 @@ public class EditBoxController {
   }
 
   private ModelAndView setupForm(Box box, ModelMap model) throws IOException {
-    try {
-      model.put("formObj", box);
-      model.put("box", box);
+    model.put("box", box);
 
-      // add all BoxUses
-      model.put("boxUses", boxService.listUses());
+    // add JSON
+    Collection<BoxableView> contents = boxService.getBoxContents(box.getId());
+    ObjectMapper mapper = new ObjectMapper();
+    model.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDtoWithBoxables(box, contents)));
 
-      // add all BoxSizes
-      model.put("boxSizes", boxService.listSizes());
-
-      // add JSON
-      Collection<BoxableView> contents = boxService.getBoxContents(box.getId());
-      ObjectMapper mapper = new ObjectMapper();
-      model.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDtoWithBoxables(box, contents)));
-
-      // add FreezerUrl
-      if (box.getStorageLocation() != null) {
-        StorageLocation freezer = box.getStorageLocation().getFreezerLocation();
-        if (freezer != null) {
-          model.put("freezerURL", "../freezer/" + freezer.getId());
-        } else {
-          model.put("freezerURL", "javascript:void(0)");
-        }
-      }
-
-      return new ModelAndView("/WEB-INF/pages/editBox.jsp", model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.error("Failed to show Box", ex);
-      }
-      throw ex;
-    }
+    return new ModelAndView("/WEB-INF/pages/editBox.jsp", model);
   }
 
   @PostMapping

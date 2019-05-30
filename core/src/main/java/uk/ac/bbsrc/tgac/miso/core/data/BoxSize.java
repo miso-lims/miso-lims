@@ -15,40 +15,44 @@ import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 
 @Entity
 @Table(name = "BoxSize")
-public class BoxSize implements Serializable {
+public class BoxSize implements Deletable, Identifiable, Serializable {
 
   private static final long serialVersionUID = 1L;
+
+  private static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "boxSizeId")
-  private long id;
-  private int rows;
-  private int columns;
+  private long id = UNSAVED_ID;
+  private Integer rows;
+  private Integer columns;
   private boolean scannable;
 
-  public int getColumns() {
-    return columns;
-  }
-
+  @Override
   public long getId() {
     return id;
   }
 
-  public int getRows() {
-    return rows;
-  }
-
-  public void setColumns(int columns) {
-    this.columns = columns;
-  }
-
+  @Override
   public void setId(long id) {
     this.id = id;
   }
 
-  public void setRows(int rows) {
+  public Integer getRows() {
+    return rows;
+  }
+
+  public void setRows(Integer rows) {
     this.rows = rows;
+  }
+
+  public Integer getColumns() {
+    return columns;
+  }
+
+  public void setColumns(Integer columns) {
+    this.columns = columns;
   }
 
   /**
@@ -104,6 +108,21 @@ public class BoxSize implements Serializable {
     if (rows != other.rows) return false;
     if (scannable != other.scannable) return false;
     return true;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Box Size";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getRowsByColumnsWithScan();
   }
 
 }

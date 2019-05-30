@@ -83,8 +83,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.GroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
-import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
+import uk.ac.bbsrc.tgac.miso.service.BoxSizeService;
+import uk.ac.bbsrc.tgac.miso.service.BoxUseService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
@@ -126,7 +127,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   @Autowired
   private LibraryDesignCodeService libraryDesignCodeService;
   @Autowired
-  private BoxStore sqlBoxDAO;
+  private BoxUseService boxUseService;
+  @Autowired
+  private BoxSizeService boxSizeService;
   @Autowired
   private ContainerService containerService;
   @Autowired
@@ -570,7 +573,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<BoxUse>(BoxUse.class) {
       @Override
       public BoxUse resolveById(long id) throws Exception {
-        return sqlBoxDAO.getUseById(id);
+        return boxUseService.get(id);
       }
 
     }.register(binder);
@@ -578,7 +581,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
       @Override
       public BoxSize resolveById(long id) throws Exception {
-        return sqlBoxDAO.getSizeById(id);
+        return boxSizeService.get(id);
       }
 
     }.register(binder);

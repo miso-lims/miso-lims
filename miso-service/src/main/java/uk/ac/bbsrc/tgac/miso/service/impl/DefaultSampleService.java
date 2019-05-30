@@ -934,6 +934,10 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     return deletionStore;
   }
 
+  public void setDeletionStore(DeletionStore deletionStore) {
+    this.deletionStore = deletionStore;
+  }
+
   @Override
   public void authorizeDeletion(Sample object) throws IOException {
     authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());

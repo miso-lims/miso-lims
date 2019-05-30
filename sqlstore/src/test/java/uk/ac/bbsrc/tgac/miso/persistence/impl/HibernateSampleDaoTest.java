@@ -14,7 +14,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -42,9 +41,6 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @Autowired
-  private JdbcTemplate template;
-
-  @Autowired
   private SessionFactory sessionFactory;
 
   private HibernateSampleDao dao;
@@ -53,7 +49,6 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   public void setup() {
     dao = new HibernateSampleDao();
     dao.setSessionFactory(sessionFactory);
-    dao.setJdbcTemplate(template);
   }
 
   @Test

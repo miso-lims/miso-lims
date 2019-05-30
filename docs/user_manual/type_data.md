@@ -397,8 +397,9 @@ A box in MISO describes a physical container that holds multiple samples, librar
 define the possible dimensions of these boxes. A box size may be marked as scannable. This means that the box can be
 scanned using a bulk barcode scanner (see [Barcode Scanners](site_configuration.html#barcode_scanners)).
 
-Modifications to box sizes can only be made via direct access to the MISO database. As such, they must be performed by
-a MISO adminstrator.
+MISO administrators can add, edit, and delete box sizes using the standard interface. Box size dimensions cannot be
+modified if there are any existing boxes using the size. A box size can only be deleted if the size has not been used
+by any existing boxes.
 
 {% include userman-toplink.md %}
 
@@ -410,8 +411,8 @@ a MISO adminstrator.
 A box in MISO describes a physical container that holds multiple samples, libraries, dilutions, and/or pools. Box uses
 are used to categorize these boxes. The Boxes list page is broken into tabs - one for each box use.
 
-Modifications to box uses can only be made via direct access to the MISO database. As such, they must be performed by a
-MISO adminstrator.
+MISO administrators can add, edit, and delete box uses using the standard interface. A box use can only be deleted if
+it has not been used by any existing boxes.
 
 {% include userman-toplink.md %}
 

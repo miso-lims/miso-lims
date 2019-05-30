@@ -3213,6 +3213,42 @@ public class Dtos {
     return to;
   }
 
+  public static BoxUseDto asDto(@Nonnull BoxUse from) {
+    BoxUseDto to = new BoxUseDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
+  public static BoxUse to(@Nonnull BoxUseDto from) {
+    BoxUse to = new BoxUse();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
+  public static BoxSizeDto asDto(@Nonnull BoxSize from) {
+    BoxSizeDto to = new BoxSizeDto();
+    setLong(to::setId, from.getId(), true);
+    setInteger(to::setRows, from.getRows(), true);
+    setInteger(to::setColumns, from.getColumns(), true);
+    setBoolean(to::setScannable, from.getScannable(), false);
+    if (from.isSaved()) {
+      to.setRowsByColumns(from.getRowsByColumns());
+      to.setRowsByColumnsWithScan(from.getRowsByColumnsWithScan());
+    }
+    return to;
+  }
+
+  public static BoxSize to(@Nonnull BoxSizeDto from) {
+    BoxSize to = new BoxSize();
+    setLong(to::setId, from.getId(), false);
+    setInteger(to::setRows, from.getRows(), true);
+    setInteger(to::setColumns, from.getColumns(), true);
+    setBoolean(to::setScannable, from.isScannable(), false);
+    return to;
+  }
+
   private static void setBigDecimal(@Nonnull Consumer<BigDecimal> setter, String value) {
     setter.accept(isStringEmptyOrNull(value) ? null : new BigDecimal(value));
   }
@@ -3222,6 +3258,14 @@ public class Dtos {
       setter.accept(value);
     } else {
       setter.accept(false);
+    }
+  }
+
+  private static void setInteger(@Nonnull Consumer<Integer> setter, Integer value, boolean nullOk) {
+    if (value != null || nullOk) {
+      setter.accept(value);
+    } else {
+      setter.accept(0);
     }
   }
 

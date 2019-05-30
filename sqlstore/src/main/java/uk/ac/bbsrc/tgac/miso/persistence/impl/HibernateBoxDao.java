@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
@@ -18,15 +17,12 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
@@ -37,7 +33,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolBoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleBoxableView;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
@@ -53,13 +48,8 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   private static final List<Class<? extends BoxableView>> VIEW_CLASSES = Lists.newArrayList(SampleBoxableView.class,
       LibraryBoxableView.class, DilutionBoxableView.class, PoolBoxableView.class);
 
-  private static String TABLE_NAME = "Box";
-
   @Autowired
   private SessionFactory sessionFactory;
-
-  @Autowired
-  private JdbcTemplate template;
 
   @Override
   public int count() throws IOException {
@@ -103,11 +93,6 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public Map<String, Integer> getBoxColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(template, TABLE_NAME);
-  }
-
-  @Override
   public List<Box> getByIdList(List<Long> idList) throws IOException {
     if (idList.isEmpty()) {
       return Collections.emptyList();
@@ -121,16 +106,6 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
 
   protected SessionFactory getSessionFactory() {
     return sessionFactory;
-  }
-
-  @Override
-  public BoxSize getSizeById(long id) throws IOException {
-    return (BoxSize) currentSession().get(BoxSize.class, id);
-  }
-
-  @Override
-  public BoxUse getUseById(long id) throws IOException {
-    return (BoxUse) currentSession().get(BoxUse.class, id);
   }
 
   @Override
@@ -188,31 +163,6 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
       }
       return p1.indexOf(search.toLowerCase()) - p2.indexOf(search.toLowerCase());
     });
-    return results;
-  }
-
-  @Override
-  public Collection<BoxSize> listAllBoxSizes() throws IOException {
-    Criteria criteria = currentSession().createCriteria(BoxSize.class);
-    @SuppressWarnings("unchecked")
-    List<BoxSize> results = criteria.list();
-    return results;
-  }
-
-  @Override
-  public Collection<BoxUse> listAllBoxUses() throws IOException {
-    Criteria criteria = currentSession().createCriteria(BoxUse.class);
-    @SuppressWarnings("unchecked")
-    List<BoxUse> results = criteria.list();
-    return results;
-  }
-
-  @Override
-  public List<String> listAllBoxUsesStrings() throws IOException {
-    List<String> results = new ArrayList<>();
-    for (BoxUse use : listAllBoxUses()) {
-      results.add(use.getAlias());
-    }
     return results;
   }
 
@@ -320,10 +270,6 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
         Restrictions.eq("identificationBarcode", search),
         Restrictions.eq("name", search),
         Restrictions.eq(FIELD_ALIAS, search)), Restrictions.eq("discarded", false)));
-  }
-
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
   }
 
   public void setSessionFactory(SessionFactory sessionFactory) {
