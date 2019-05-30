@@ -1,0 +1,7 @@
+main:
+  - title: "User Manual"
+    url: /_pages/user-manual
+  - title: "Developer's Manual"
+    url: /_pages/developers-manual
+  - title: "Installation"
+    url: /_pages/installation

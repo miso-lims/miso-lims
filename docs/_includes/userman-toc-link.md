@@ -16,9 +16,8 @@
 {% else %}
   {% assign title = include.section-title %}
 {% endif %}
-{% assign indent = head-level | minus: 1 | times: 4 %}
+{% assign indent = head-level | minus: 1 | times: 1 %}
 {% assign style = "text-indent: " | append: indent | append: "em;" %}
-{% if head-level == 1 %}
-  {% assign style = style | append: " font-size: 1.6em" %}
-{% endif %}
-<h{{head-level}} style="{{style}}"><a href="{{site.baseurl}}/user_manual/{{url}}">{{num}} {{title}}</a></h{{head-level}}>
+<!--<h{{head-level}} style="{{style}}">-->
+<a style="font-size: 1em; line-height:1; margin-top:0; margin-bottom:0; {{style}} " href="{{site.baseurl}}/user_manual/{{url}}">{{title}}</a>
+<!--</h{{head-level}}>-->

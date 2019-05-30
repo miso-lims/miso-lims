@@ -1,0 +1,572 @@
+🔹 = item only applicable to Detailed Sample mode
+
+um:
+  - title: Site Configuration
+    children:
+    - title: Logging In
+    - title: Issue Trackers
+    - title: Naming Schemes
+    - title: Taxon Lookup
+    - title: Automatic Barcode Generation
+    - title: Barcode Scanners
+    - title: Report Links
+    - title: Default Values
+    - title: Display Options
+    - title: Detailed Sample Mode
+
+  - title: General Navigation
+    children:
+    - title: Home Screen
+    - title: Home Screen Widgets
+    - title: List Pages
+      children:
+      - title: Selecting Items
+      - title: Selecting by Search
+      - title: Searching
+      - title: Sorting
+      - title: Finding Related Items
+    - title: Single Item Create/Edit Pages
+      children:
+      - title: Collapsible Sections
+      - title: Change Logs
+      - title: Notes
+    - title: Bulk Create/Edit Pages
+      children:
+      - title: Autofill
+      - title: Exporting to Spreadsheet
+    - title: Tools
+    - title: My Account Tab
+    - title: My Projects Tab
+    - title: Help Tab
+    - title: Quick Help
+
+  - title: Barcode Label Printers
+    children:
+    - title: Printers List
+    - title: Adding Printers
+    - title: Disabling/Enabling Printers
+    - title: Printing Barcodes
+    - title: Deleting Printers
+
+  - title: Users and Groups
+    children:
+    - title: Users
+      children:
+      - title: Users List
+      - title: Adding Users
+      - title: Editing Users
+      - title: Resetting Passwords
+      - title: User Permissions
+      - title: Disabling/Enabling Users
+    - title: Groups
+      children:
+      - title: Groups List
+      - title: Adding Groups
+      - title: Adding/Removing Users from a Group
+
+  - title: Type Data
+    children:
+    - title: Reference Genomes
+    - title: Sample Types
+    - title: Sample Classes and Categories🔹
+    - title: Tissue Materials🔹
+    - title: Tissue Origins🔹
+    - title: Tissue Types🔹
+    - title: Sample Purposes🔹
+    - title: Labs and Institutes🔹
+    - title: Detailed QC Status🔹
+    - title: Stains🔹
+    - title: Library Types
+    - title: Library Designs🔹
+    - title: Library Selection Types
+    - title: Library Strategy Types
+    - title: Kit Descriptors
+    - title: Indices
+    - title: Library Spike-Ins
+    - title: Targeted Sequencing
+    - title: QC Types
+    - title: Partition QC Types
+    - title: Box Sizes
+    - title: Box Uses
+    - title: Instrument Models
+    - title: Sequencing Container Models
+    - title: Sequencing Parameters
+    - title: Oxford Nanopore Flow Cell Pore Versions
+    - title: Array Models
+    - title: Study Types
+
+  - title: Projects
+    children:
+    - title: Projects List
+    - title: Adding Projects
+      children:
+      - title: Reference Genome
+      - title: Default Targeted Sequencing
+      - title: Permissions
+    - title: Edit Project Page
+      children:
+      - title: Tracked Issues
+      - title: Project Files
+    - title: Subprojects
+      children:
+      - title: Adding Subprojects
+      - title: Editing Subprojects
+      - title: Deleting Subprojects
+
+
+  - title: Samples
+    children:
+    - title: Naming Scheme
+    - title: Samples List
+    - title: Creating Samples
+    - title: Editing Samples
+      children:
+      - title: Editing a Single Sample
+      - title: Editing Samples in Bulk
+    - title: Notes
+    - title: Attaching Files
+    - title: Propagating Samples to Samples🔹
+    - title: Propagating Samples to Libraries
+    - title: Printing Barcodes
+    - title: Downloading Sample Information
+    - title: Selecting Samples by Search
+    - title: Finding Related Items
+    - title: Sample QCs
+    - title: Adding Samples to a Workset
+    - title: Deleting Samples
+
+  - title: Libraries
+    children:
+    - title: Naming scheme
+    - title: Libraries List
+    - title: Propagating Libraries from Samples
+    - title: Receiving Libraries
+    - title: Library Templates
+      children:
+      - title: Library Templates List
+      - title: Creating Library Templates
+      - title: Editing Library Templates
+      - title: Adding/Removing Library Templates from a Project
+      - title: Deleting Library Templates
+    - title: Editing Libraries
+      - title: Editing a Single Library
+      - title: Editing Libraries in Bulk
+{% assign sub = sub | plus: 1 %}
+    - title: Notes
+{% assign sub = sub | plus: 1 %}
+    - title: Attaching Files
+{% assign sub = sub | plus: 1 %}
+    - title: Propagating Libraries to Library Dilutions
+{% assign sub = sub | plus: 1 %}
+    - title: Printing Barcodes
+{% assign sub = sub | plus: 1 %}
+    - title: Downloading Library Information
+{% assign sub = sub | plus: 1 %}
+    - title: Selecting Libraries by Search
+{% assign sub = sub | plus: 1 %}
+    - title: Finding Related Items
+{% assign sub = sub | plus: 1 %}
+    - title: Library QCs
+{% assign sub = sub | plus: 1 %}
+    - title: Adding Libraries to a Workset
+{% assign sub = sub | plus: 1 %}
+    - title: Deleting Libraries
+
+
+{% assign section = section | plus: 1 %}
+  - title: Library Dilutions
+    children:
+
+    - title: Dilutions List
+{% assign sub = sub | plus: 1 %}
+    - title: Propagating Dilutions from Libraries
+{% assign sub = sub | plus: 1 %}
+    - title: Editing Dilutions
+{% assign sub = sub | plus: 1 %}
+    - title: Pooling Dilutions Together
+{% assign sub = sub | plus: 1 %}
+    - title: Pooling Dilutions Separately
+{% assign sub = sub | plus: 1 %}
+    - title: Custom Pooling in Bulk
+{% assign sub = sub | plus: 1 %}
+    - title: Printing Barcodes
+{% assign sub = sub | plus: 1 %}
+    - title: Downloading Dilution Information
+{% assign sub = sub | plus: 1 %}
+    - title: Selecting Dilutions by Search
+{% assign sub = sub | plus: 1 %}
+    - title: Finding Related Items
+{% assign sub = sub | plus: 1 %}
+    - title: Adding Dilutions to a Workset
+{% assign sub = sub | plus: 1 %}
+    - title: Deleting Dilutions
+
+
+{% assign section = section | plus: 1 %}
+  - title: Worksets
+    children:
+
+    - title: Worksets List
+{% assign sub = sub | plus: 1 %}
+    - title: Creating Worksets
+{% assign sub = sub | plus: 1 %}
+    - title: Editing Worksets
+{% assign sub = sub | plus: 1 %}
+    - title: Working with Items in a Workset
+{% assign sub = sub | plus: 1 %}
+    - title: Adding Items to a Workset
+{% assign sub = sub | plus: 1 %}
+    - title: Removing Items from a Workset
+{% assign sub = sub | plus: 1 %}
+    - title: Merging Worksets
+{% assign sub = sub | plus: 1 %}
+    - title: Deleting Worksets
+
+
+{% assign section = section | plus: 1 %}
+  - title: Pools
+    children:
+
+    - title: Pools List
+{% assign sub = sub | plus: 1 %}
+    - title: Creating Pools
+{% assign sub = sub | plus: 1 %}
+    - title: Editing Pools
+{% assign subsub = 1 %}
+      - title: Editing a Single Pool
+{% assign subsub = subsub | plus: 1 %}
+      - title: Editing Pools in Bulk
+{% assign sub = sub | plus: 1 %}
+    - title: Notes
+{% assign sub = sub | plus: 1 %}
+    - title: Attachments
+{% assign sub = sub | plus: 1 %}
+    - title: Adding Dilutions to a Pool
+{% assign sub = sub | plus: 1 %}
+    - title: Removing Dilutions from a Pool
+{% assign sub = sub | plus: 1 %}
+    - title: Creating Pools from Dilutions
+{% assign sub = sub | plus: 1 %}
+    - title: Creating Orders
+{% assign sub = sub | plus: 1 %}
+    - title: Printing Barcodes
+{% assign sub = sub | plus: 1 %}
+    - title: Downloading Pool Information
+{% assign sub = sub | plus: 1 %}
+    - title: Selecting Pools by Search
+{% assign sub = sub | plus: 1 %}
+    - title: Finding Related Items
+{% assign sub = sub | plus: 1 %}
+    - title: Pool QCs
+{% assign sub = sub | plus: 1 %}
+    - title: Deleting Pools
+{% assign sub = sub | plus: 1 %}
+    - title: Merging Pools
+
+
+{% assign section = section | plus: 1 %}
+  - title: Orders
+    children:
+
+    - title: Active Orders List
+{% assign sub = sub | plus: 1 %}
+    - title: All Orders List
+{% assign sub = sub | plus: 1 %}
+    - title: Pending Orders List
+{% assign sub = sub | plus: 1 %}
+    - title: Creating Orders
+{% assign subsub = 1 %}
+      - title: Single
+{% assign subsub = subsub | plus: 1 %}
+      - title: Bulk
+{% assign sub = sub | plus: 1 %}
+    - title: Extending an Order
+{% assign sub = sub | plus: 1 %}
+    - title: Deleting Orders
+
+
+{% assign section = section | plus: 1 %}
+  - title: Freezers and Rooms
+    children:
+
+    - title: Storage Locations List
+{% assign sub = sub | plus: 1 %}
+    - title: Adding a Room
+{% assign sub = sub | plus: 1 %}
+    - title: Adding a Freezer
+{% assign sub = sub | plus: 1 %}
+    - title: Editing a Freezer
+{% assign sub = sub | plus: 1 %}
+    - title: Adding Storage to a Freezer
+{% assign subsub = 1 %}
+      - title: Shelves
+{% assign subsub = subsub | plus: 1 %}
+      - title: Stacks
+{% assign subsub = subsub | plus: 1 %}
+      - title: Racks
+{% assign subsub = subsub | plus: 1 %}
+      - title: Tray Racks
+{% assign subsub = subsub | plus: 1 %}
+      - title: Loose Storage
+{% assign sub = sub | plus: 1 %}
+    - title: Adding Boxes to Storage
+
+
+{% assign section = section | plus: 1 %}
+  - title: Boxes
+    children:
+
+    - title: Boxes List
+{% assign sub = sub | plus: 1 %}
+    - title: Creating Boxes
+{% assign sub = sub | plus: 1 %}
+    - title: Editing Boxes
+{% assign sub = sub | plus: 1 %}
+    - title: Selecting Positions within a Box
+{% assign sub = sub | plus: 1 %}
+    - title: Adding a Single Item to a Box
+{% assign sub = sub | plus: 1 %}
+    - title: Adding Multiple Items to a Box
+{% assign sub = sub | plus: 1 %}
+    - title: Removing a Single Item from a Box
+{% assign sub = sub | plus: 1 %}
+    - title: Discarding a Single Item from a Box
+{% assign sub = sub | plus: 1 %}
+    - title: Discarding All Items from a Box
+{% assign sub = sub | plus: 1 %}
+    - title: Scanning a Box
+{% assign sub = sub | plus: 1 %}
+    - title: Exporting Box Information
+{% assign sub = sub | plus: 1 %}
+    - title: Filling a Box by Barcode Pattern
+{% assign sub = sub | plus: 1 %}
+    - title: Working with Items in a Box
+{% assign sub = sub | plus: 1 %}
+    - title: Printing Barcodes
+{% assign sub = sub | plus: 1 %}
+    - title: Deleting Boxes
+
+
+{% assign section = section | plus: 1 %}
+  - title: Sequencing Containers
+    children:
+
+    - title: Sequencing Containers List
+{% assign sub = sub | plus: 1 %}
+    - title: Creating a Container
+{% assign sub = sub | plus: 1 %}
+    - title: Editing a Container
+{% assign sub = sub | plus: 1 %}
+    - title: Assigning Pools to a Container
+{% assign sub = sub | plus: 1 %}
+    - title: Container QCs
+{% assign sub = sub | plus: 1 %}
+    - title: Printing Barcodes
+{% assign sub = sub | plus: 1 %}
+    - title: Deleting Containers
+
+{% assign section = section | plus: 1 %}
+  - title: Instruments
+    children:
+
+    - title: Instruments List
+{% assign sub = sub | plus: 1 %}
+    - title: Creating an Instrument
+{% assign sub = sub | plus: 1 %}
+    - title: Editing an Instrument
+{% assign sub = sub | plus: 1 %}
+    - title: Upgrading an Instrument
+{% assign sub = sub | plus: 1 %}
+    - title: Retiring an Instrument
+{% assign sub = sub | plus: 1 %}
+    - title: Service Records
+{% assign subsub = 1 %}
+      - title: Adding a Service Record
+{% assign subsub = subsub | plus: 1 %}
+      - title: Editing a Service Record
+{% assign subsub = subsub | plus: 1 %}
+      - title: Attachments
+{% assign subsub = subsub | plus: 1 %}
+      - title: Deleting a Service Record
+
+
+{% assign section = section | plus: 1 %}
+  - title: Sequencer Runs
+    children:
+
+    - title: Sequencer Runs List
+{% assign sub = sub | plus: 1 %}
+    - title: Creating a Run
+{% assign sub = sub | plus: 1 %}
+    - title: Editing a Run
+{% assign sub = sub | plus: 1 %}
+    - title: Adding a Sequencing Container to a Run
+{% assign sub = sub | plus: 1 %}
+    - title: Removing a Sequencing Container from a Run
+{% assign sub = sub | plus: 1 %}
+    - title: Setting Partition QCs
+{% assign sub = sub | plus: 1 %}
+    - title: External Links
+{% assign sub = sub | plus: 1 %}
+    - title: Notes
+{% assign sub = sub | plus: 1 %}
+    - title: Attachments
+{% assign sub = sub | plus: 1 %}
+    - title: Related Issues
+{% assign sub = sub | plus: 1 %}
+    - title: Downloading a Sample Sheet
+{% assign sub = sub | plus: 1 %}
+    - title: Automatically Populate Runs using Run Scanner
+{% assign sub = sub | plus: 1 %}
+    - title: Deleting Runs
+
+
+{% assign section = section | plus: 1 %}
+  - title: Arrays
+    children:
+
+    - title: Arrays List
+{% assign sub = sub | plus: 1 %}
+    - title: Creating an Array
+{% assign sub = sub | plus: 1 %}
+    - title: Editing an Array
+{% assign sub = sub | plus: 1 %}
+    - title: Adding a Sample to an Array
+{% assign sub = sub | plus: 1 %}
+    - title: Removing a Sample from an Array
+
+
+{% assign section = section | plus: 1 %}
+  - title: Array Runs
+    children:
+
+    - title: Array Runs List
+{% assign sub = sub | plus: 1 %}
+    - title: Creating an Array Run
+{% assign sub = sub | plus: 1 %}
+    - title: Editing an Array Run
+
+
+{% assign section = section | plus: 1 %}
+  - title: QCs
+    children:
+
+    - title: Adding QCs
+{% assign sub = sub | plus: 1 %}
+    - title: Editing QCs
+
+
+{% assign section = section | plus: 1 %}
+  - title: Notes
+    children:
+
+    - title: Adding Notes
+{% assign sub = sub | plus: 1 %}
+    - title: Deleting Notes
+
+
+{% assign section = section | plus: 1 %}
+  - title: Attachments
+    children:
+
+    - title: Adding Attachments to a Single Item
+{% assign sub = sub | plus: 1 %}
+    - title: Adding Attachments to Multiple Items
+{% assign sub = sub | plus: 1 %}
+    - title: Linking Project Attachments
+{% assign sub = sub | plus: 1 %}
+    - title: Downloading Attachments
+{% assign sub = sub | plus: 1 %}
+    - title: Deleting Attachments
+
+
+{% assign section = section | plus: 1 %}
+  - title: Deletions
+    children:
+
+    - title: Deletions List
+
+
+{% assign section = section | plus: 1 %}
+  - title: Workflows
+    children:
+
+    - title: Workflows Widget
+{% assign sub = sub | plus: 1 %}
+    - title: Managing Favourite Workflows
+{% assign sub = sub | plus: 1 %}
+    - title: Beginning a New Workflow
+{% assign sub = sub | plus: 1 %}
+    - title: Entering Workflow Data
+{% assign sub = sub | plus: 1 %}
+    - title: Resuming an Incomplete Workflow
+
+
+{% assign section = section | plus: 1 %}
+  - title: European Nucleotide Archive Support
+    children:
+
+
+    - title: Studies
+{% assign subsub = 1 %}
+      - title: Studies List
+{% assign subsub = subsub | plus: 1 %}
+      - title: Adding Studies
+{% assign subsub = subsub | plus: 1 %}
+      - title: Deleting Studies
+
+{% assign sub = sub | plus: 1 %}
+    - title: Experiments
+{% assign subsub = 1 %}
+      - title: Experiments List
+{% assign subsub = subsub | plus: 1 %}
+      - title: Creating an Experiment
+{% assign subsub = subsub | plus: 1 %}
+      - title: Editing an Experiment
+{% assign subsub = subsub | plus: 1 %}
+      - title: Adding Consumables to an Experiment
+
+{% assign sub = sub | plus: 1 %}
+    - title: Submissions
+{% assign subsub = 1 %}
+      - title: Submissions List
+{% assign subsub = subsub | plus: 1 %}
+      - title: Creating a Submission
+{% assign subsub = subsub | plus: 1 %}
+      - title: Downloading a Submission
+
+
+{% assign section = section | plus: 1 %}
+  - title: Home Screen Widgets
+    children:
+
+    - title: Search
+{% assign sub = sub | plus: 1 %}
+    - title: Instrument Status
+{% assign sub = sub | plus: 1 %}
+    - title: Workflows
+{% assign sub = sub | plus: 1 %}
+    - title: Project
+{% assign sub = sub | plus: 1 %}
+    - title: Run
+
+
+{% assign section = section | plus: 1 %}
+  - title: Other MISO Tools
+    children:
+
+    - title: Index Distance
+{% assign sub = sub | plus: 1 %}
+    - title: Index Search
+{% assign sub = sub | plus: 1 %}
+    - title: Identity Search🔹
+
+
+{% assign section = section | plus: 1 %}
+  - title: Related Software
+    children:
+
+    - title: Run Scanner
+{% assign sub = sub | plus: 1 %}
+    - title: Pinery
+
