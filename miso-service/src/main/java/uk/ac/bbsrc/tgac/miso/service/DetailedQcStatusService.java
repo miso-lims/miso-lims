@@ -4,14 +4,9 @@ import java.io.IOException;
 import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 
-public interface DetailedQcStatusService {
-
-  DetailedQcStatus get(Long detailedQcStatus) throws IOException;
-
-  Long create(DetailedQcStatus detailedQcStatus) throws IOException;
-
-  void update(DetailedQcStatus detailedQcStatus) throws IOException;
+public interface DetailedQcStatusService extends DeleterService<DetailedQcStatus>, SaveService<DetailedQcStatus> {
 
   Set<DetailedQcStatus> getAll() throws IOException;
 

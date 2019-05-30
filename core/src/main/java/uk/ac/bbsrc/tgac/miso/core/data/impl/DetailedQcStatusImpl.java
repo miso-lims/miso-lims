@@ -25,9 +25,11 @@ public class DetailedQcStatusImpl implements DetailedQcStatus {
 
   private static final long serialVersionUID = 1L;
 
+  private static final long UNSAVED_ID = 0L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long detailedQcStatusId;
+  private long detailedQcStatusId = UNSAVED_ID;
 
   @Column(nullable = true)
   private Boolean status;
@@ -55,53 +57,53 @@ public class DetailedQcStatusImpl implements DetailedQcStatus {
   private Date lastUpdated;
 
   @Override
-  public Long getId() {
+  public long getId() {
     return detailedQcStatusId;
   }
 
   @Override
-  public void setId(Long detailedQcStatusId) {
+  public void setId(long detailedQcStatusId) {
     this.detailedQcStatusId = detailedQcStatusId;
   }
 
   @Override
-  public User getCreatedBy() {
+  public User getCreator() {
     return createdBy;
   }
 
   @Override
-  public void setCreatedBy(User createdBy) {
+  public void setCreator(User createdBy) {
     this.createdBy = createdBy;
   }
 
   @Override
-  public Date getCreationDate() {
+  public Date getCreationTime() {
     return creationDate;
   }
 
   @Override
-  public void setCreationDate(Date creationDate) {
-    this.creationDate = creationDate;
+  public void setCreationTime(Date creationTime) {
+    this.creationDate = creationTime;
   }
 
   @Override
-  public User getUpdatedBy() {
+  public User getLastModifier() {
     return updatedBy;
   }
 
   @Override
-  public void setUpdatedBy(User updatedBy) {
-    this.updatedBy = updatedBy;
+  public void setLastModifier(User lastModifier) {
+    this.updatedBy = lastModifier;
   }
 
   @Override
-  public Date getLastUpdated() {
+  public Date getLastModified() {
     return lastUpdated;
   }
 
   @Override
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
+  public void setLastModified(Date lastModified) {
+    this.lastUpdated = lastModified;
   }
 
   @Override
@@ -139,5 +141,20 @@ public class DetailedQcStatusImpl implements DetailedQcStatus {
     return "DetailedQcStatusImpl [detailedQcStatusId=" + detailedQcStatusId + ", status=" + status + ", description=" + description
         + ", noteRequired=" + noteRequired + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy 
         + ", lastUpdated=" + lastUpdated + "]"; 
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Detailed QC Status";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getDescription();
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 }

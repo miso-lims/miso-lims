@@ -117,19 +117,19 @@ public class ListTablesIT extends AbstractIT {
   private static final Comparator<String> standardComparator = (s1, s2) -> s1.compareToIgnoreCase(s2);
 
   /**
-   * Comparator for QC Passed columns, which render the boolean values as symbols.
+   * Comparator for columns which render the boolean values as symbols.
    */
-  private static final Comparator<String> qcPassedComparator = (qcPassed1, qcPassed2) -> {
-    return Integer.compare(getQcPassedValue(qcPassed1), getQcPassedValue(qcPassed2));
+  private static final Comparator<String> booleanColumnComparator = (qcPassed1, qcPassed2) -> {
+    return Integer.compare(getBooleanValue(qcPassed1), getBooleanValue(qcPassed2));
   };
 
-  private static int getQcPassedValue(String symbol) {
+  private static int getBooleanValue(String symbol) {
     switch (symbol) {
     case "?":
       return -1;
-    case "✘":
-      return 0;
     case "✔":
+      return 0;
+    case "✘":
       return 1;
     default:
       throw new IllegalArgumentException("Invalid QC Passed symbol");
@@ -475,6 +475,17 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.STAIN_CATEGORIES);
   }
 
+  @Test
+  public void testListDetailedQcStatusSetup() throws Exception {
+    testPageSetup(ListTarget.DETAILED_QC_STATUS,
+        Sets.newHashSet(Columns.SORT, Columns.DESCRIPTION, Columns.QC_PASSED, Columns.NOTE_REQUIRED));
+  }
+
+  @Test
+  public void testListDetailedQcStatusColumnSort() throws Exception {
+    testColumnsSort(ListTarget.DETAILED_QC_STATUS);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     // Goal: confirm that all expected columns are present
     ListPage page = getList(listTarget);
@@ -591,7 +602,8 @@ public class ListTablesIT extends AbstractIT {
   private static Comparator<String> getComparator(String column) {
     switch (column) {
     case Columns.QC_PASSED:
-      return qcPassedComparator;
+    case Columns.NOTE_REQUIRED:
+      return booleanColumnComparator;
     case Columns.LIBRARY_NAME:
     case Columns.NAME:
     case Columns.SAMPLE_NAME:

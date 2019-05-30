@@ -327,10 +327,10 @@ public class Dtos {
     dto.setStatus(from.getStatus());
     dto.setDescription(from.getDescription());
     dto.setNoteRequired(from.getNoteRequired());
-    dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
-    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
-    dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    dto.setCreationDate(formatDateTime(from.getCreationTime()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreator(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getLastModifier(), User::getId), true);
+    dto.setLastUpdated(formatDateTime(from.getLastModified()));
     return dto;
   }
 
@@ -340,9 +340,10 @@ public class Dtos {
 
   public static DetailedQcStatus to(@Nonnull DetailedQcStatusDto from) {
     DetailedQcStatus to = new DetailedQcStatusImpl();
-    to.setStatus(from.getStatus());
-    to.setDescription(from.getDescription());
-    to.setNoteRequired(from.isNoteRequired());
+    setLong(to::setId, from.getId(), false);
+    setBoolean(to::setStatus, from.getStatus(), true);
+    setString(to::setDescription, from.getDescription());
+    setBoolean(to::setNoteRequired, from.isNoteRequired(), false);
     return to;
   }
 

@@ -88,6 +88,7 @@
         <a href="<c:url value="/miso/lab/list"/>">Labs</a>
         <a href="<c:url value="/miso/stain/list"/>">Stains</a>
         <a href="<c:url value="/miso/staincategory/list"/>">Stain Categories</a>
+        <a href="<c:url value="/miso/detailedqcstatus/list"/>">Detailed QC Statuses</a>
       </div>
     </c:if>
 	

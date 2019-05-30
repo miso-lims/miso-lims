@@ -55,6 +55,7 @@ public interface AbstractListPage {
     public static final String MATRIX_BARCODE = "Matrix Barcode";
     public static final String NAME = "Name";
     public static final String NG_USED = "ng Lib. Used";
+    public static final String NOTE_REQUIRED = "Note Required";
     public static final String NUMBER = "Number";
     public static final String ORDER_DESCRIPTION = "Order Description";
     public static final String PART_NUMBER = "Part Number";
@@ -101,6 +102,7 @@ public interface AbstractListPage {
   public static class ListTarget {
     public static final String SAMPLES = "samples";
     public static final String LIBRARIES = "libraries";
+    public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";
     public static final String DILUTIONS = "dilutions";
     public static final String STUDIES = "studies";
     public static final String PRINTERS = "printers";

@@ -1,3 +1,8 @@
+DELETE FROM DetailedQCStatus;
+INSERT INTO DetailedQCStatus (detailedQcStatusId, description, status, noteRequired, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 'Passed', TRUE, FALSE, 1, '2019-05-28 13:17:00', 1, '2019-05-28 13:17:00'),
+(2, 'Failed', FALSE, FALSE, 1, '2019-05-28 13:17:00', 1, '2019-05-28 13:17:00');
+
 DELETE FROM SampleType;
 INSERT INTO SampleType (typeId, name) VALUES
 (2,'NON GENOMIC'),
