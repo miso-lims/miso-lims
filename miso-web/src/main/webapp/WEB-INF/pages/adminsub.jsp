@@ -75,6 +75,7 @@
       <a href="<c:url value="/miso/boxsize/list"/>">Box Sizes</a>
       <a href="<c:url value="/miso/boxuse/list"/>">Box Uses</a>
       <a href="<c:url value="/miso/partitionqctype/list"/>">Partition QC Types</a>
+      <a href="<c:url value="/miso/referencegenome/list"/>">Reference Genomes</a>
       <a href="<c:url value="/miso/printers"/>">Printers</a>
       <a href="<c:url value="/miso/deletions"/>">Deletion Log</a>
     </div>

@@ -1,24 +1,26 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultReferenceGenomeService implements ReferenceGenomeService {
-
-  protected static final Logger log = LoggerFactory.getLogger(DefaultReferenceGenomeService.class);
 
   @Autowired
   private ReferenceGenomeDao referenceGenomeDao;
@@ -26,16 +28,17 @@ public class DefaultReferenceGenomeService implements ReferenceGenomeService {
   @Autowired
   private AuthorizationManager authorizationManager;
 
+  @Autowired
+  private DeletionStore deletionStore;
+
   @Override
-  public Collection<ReferenceGenome> listAllReferenceGenomeTypes() throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    return referenceGenomeDao.listAllReferenceGenomeTypes();
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
   }
 
   @Override
-  public ReferenceGenome get(Long id) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    return referenceGenomeDao.getReferenceGenome(id);
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
   }
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
@@ -44,6 +47,63 @@ public class DefaultReferenceGenomeService implements ReferenceGenomeService {
 
   public void setReferenceGenomeDao(ReferenceGenomeDao referenceGenomeDao) {
     this.referenceGenomeDao = referenceGenomeDao;
+  }
+
+  @Override
+  public Collection<ReferenceGenome> list() throws IOException {
+    authorizationManager.throwIfUnauthenticated();
+    return referenceGenomeDao.list();
+  }
+
+  @Override
+  public ReferenceGenome get(long id) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
+    return referenceGenomeDao.get(id);
+  }
+
+  @Override
+  public long create(ReferenceGenome reference) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+    validateChange(reference, null);
+    return referenceGenomeDao.create(reference);
+  }
+
+  @Override
+  public long update(ReferenceGenome reference) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+    ReferenceGenome managed = get(reference.getId());
+    validateChange(reference, managed);
+    applyChanges(managed, reference);
+    return referenceGenomeDao.update(managed);
+  }
+
+  private void validateChange(ReferenceGenome reference, ReferenceGenome beforeChange) {
+    List<ValidationError> errors = new ArrayList<>();
+
+    if (ValidationUtils.isSetAndChanged(ReferenceGenome::getAlias, reference, beforeChange)
+        && referenceGenomeDao.getByAlias(reference.getAlias()) != null) {
+      errors.add(new ValidationError("alias", "There is already a reference genome with this alias"));
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
+    }
+  }
+
+  private void applyChanges(ReferenceGenome to, ReferenceGenome from) {
+    to.setAlias(from.getAlias());
+    to.setDefaultSciName(from.getDefaultSciName());
+  }
+
+  @Override
+  public ValidationResult validateDeletion(ReferenceGenome object) throws IOException {
+    ValidationResult result = new ValidationResult();
+    long usage = referenceGenomeDao.getUsage(object);
+    if (usage > 0L) {
+      result.addError(
+          new ValidationError("Reference genome '" + object.getAlias() + "' is used by " + usage + " project" + (usage > 1L ? "s" : "")));
+    }
+    return result;
   }
 
 }

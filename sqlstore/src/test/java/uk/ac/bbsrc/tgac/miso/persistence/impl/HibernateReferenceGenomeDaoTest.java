@@ -1,54 +1,100 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateReferenceGenomeDao;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 
 public class HibernateReferenceGenomeDaoTest extends AbstractDAOTest {
 
   @Autowired
   private SessionFactory sessionFactory;
 
-  @InjectMocks
   private HibernateReferenceGenomeDao dao;
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
+    dao = new HibernateReferenceGenomeDao();
     dao.setSessionFactory(sessionFactory);
   }
 
   @Test
   public void testListAllReferenceGeonomesCountIsAtLeastThree() {
     // Three ReferenceGenomes are present in the test database.
-    Collection<ReferenceGenome> referenceGenomes = dao.listAllReferenceGenomeTypes();
+    Collection<ReferenceGenome> referenceGenomes = dao.list();
     assertThat("count of all references", referenceGenomes.size(), is(greaterThanOrEqualTo(3)));
   }
 
   @Test
   public void testGetByIdTwoReturnsHumanReference() throws Exception {
     Long idTwo = 2L; // Id 2 contains 'Human hg19' in the test database.
-    ReferenceGenome actual = dao.getReferenceGenome(idTwo);
+    ReferenceGenome actual = dao.get(idTwo);
     assertThat("alias for reference with id 2", actual.getAlias(), is("Human hg19"));
   }
 
   @Test
   public void testGetNonExistentReferenceGenomeReturnsNull() throws Exception {
     Long idTooLargeToExistInTestData = 999999999999999999L;
-    ReferenceGenome actual = dao.getReferenceGenome(idTooLargeToExistInTestData);
+    ReferenceGenome actual = dao.get(idTooLargeToExistInTestData);
     assertThat("Non exisitent reference", actual, is(nullValue()));
+  }
+
+  @Test
+  public void testGetByAlias() throws IOException {
+    String alias = "Human hg19";
+    ReferenceGenome ref = dao.getByAlias(alias);
+    assertNotNull(ref);
+    assertEquals(alias, ref.getAlias());
+  }
+
+  @Test
+  public void testCreate() throws IOException {
+    String alias = "New Reference";
+    ReferenceGenome ref = new ReferenceGenomeImpl();
+    ref.setAlias(alias);
+    long savedId = dao.create(ref);
+
+    clearSession();
+
+    ReferenceGenome saved = (ReferenceGenome) sessionFactory.getCurrentSession().get(ReferenceGenomeImpl.class, savedId);
+    assertEquals(alias, saved.getAlias());
+  }
+
+  @Test
+  public void testUpdate() throws IOException {
+    long id = 1L;
+    String alias = "New Alias";
+    ReferenceGenome ref = (ReferenceGenome) sessionFactory.getCurrentSession().get(ReferenceGenomeImpl.class, id);
+    assertNotEquals(alias, ref.getAlias());
+    ref.setAlias(alias);
+    dao.update(ref);
+
+    clearSession();
+
+    ReferenceGenome saved = (ReferenceGenome) sessionFactory.getCurrentSession().get(ReferenceGenomeImpl.class, id);
+    assertEquals(alias, saved.getAlias());
+  }
+
+  @Test
+  public void testGetUsage() throws IOException {
+    ReferenceGenome ref = (ReferenceGenome) sessionFactory.getCurrentSession().get(ReferenceGenomeImpl.class, 1L);
+    assertEquals("Human hg19 random", ref.getAlias());
+    assertEquals(2L, dao.getUsage(ref));
+  }
+
+  private void clearSession() {
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
   }
 
 }

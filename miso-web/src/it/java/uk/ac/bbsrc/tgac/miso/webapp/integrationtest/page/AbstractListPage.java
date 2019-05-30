@@ -24,6 +24,7 @@ public interface AbstractListPage {
     public static final String CREATION_DATE = "Creation Date";
     public static final String CREATOR = "Creator";
     public static final String DATE_CREATED = "Date Created";
+    public static final String DEFAULT_SCI_NAME = "Default Scientific Name";
     public static final String DESCRIPTION = "Description";
     public static final String DILUTIONS = "Dilutions";
     public static final String DRIVER = "Driver";
@@ -121,6 +122,7 @@ public interface AbstractListPage {
     public static final String ORDERS_PENDING = "poolorders/pending";
     public static final String PARTITION_QC_TYPE = "partitionqctype/list";
     public static final String CONTAINERS = "containers";
+    public static final String REFERENCE_GENOMES = "referencegenome/list";
     public static final String RUNS = "runs";
     public static final String BOXES = "boxes";
     public static final String KITS = "kitdescriptors";

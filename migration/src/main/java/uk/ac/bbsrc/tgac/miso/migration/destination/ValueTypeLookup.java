@@ -124,7 +124,7 @@ public class ValueTypeLookup {
     setSequencers(misoServiceManager.getInstrumentDao().listAll());
     setSubprojects(misoServiceManager.getSubprojectDao().getSubproject());
     setDetailedQcStatuses(misoServiceManager.getDetailedQcStatusDao().list());
-    setReferenceGenomes(misoServiceManager.getReferenceGenomeService().listAllReferenceGenomeTypes());
+    setReferenceGenomes(misoServiceManager.getReferenceGenomeService().list());
     setTargetedSequencings(misoServiceManager.getTargetedSequencingDao().listAll());
     setBoxUses(misoServiceManager.getBoxUseService().list());
     setBoxSizes(misoServiceManager.getBoxSizeService().list());

@@ -2482,9 +2482,18 @@ public class Dtos {
 
   public static ReferenceGenomeDto asDto(@Nonnull ReferenceGenome from) {
     ReferenceGenomeDto dto = new ReferenceGenomeDto();
-    dto.setId(from.getId());
-    dto.setAlias(from.getAlias());
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setAlias, from.getAlias());
+    setString(dto::setDefaultScientificName, from.getDefaultSciName());
     return dto;
+  }
+
+  public static ReferenceGenome to(@Nonnull ReferenceGenomeDto from) {
+    ReferenceGenome to = new ReferenceGenomeImpl();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    setString(to::setDefaultSciName, from.getDefaultScientificName());
+    return to;
   }
 
   public static PartitionDto asDto(@Nonnull Partition from) {
