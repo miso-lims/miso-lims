@@ -486,6 +486,26 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.DETAILED_QC_STATUS);
   }
 
+  @Test
+  public void testListBoxSizesSetup() throws Exception {
+    testPageSetup(ListTarget.BOX_SIZES, Sets.newHashSet(Columns.SORT, Columns.ROWS, Columns.COLUMNS, Columns.SCANNABLE));
+  }
+
+  @Test
+  public void testListBoxSizesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.BOX_SIZES);
+  }
+
+  @Test
+  public void testListBoxUsesSetup() throws Exception {
+    testPageSetup(ListTarget.BOX_USES, Sets.newHashSet(Columns.SORT, Columns.ALIAS));
+  }
+
+  @Test
+  public void testListBoxUsesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.BOX_USES);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     // Goal: confirm that all expected columns are present
     ListPage page = getList(listTarget);

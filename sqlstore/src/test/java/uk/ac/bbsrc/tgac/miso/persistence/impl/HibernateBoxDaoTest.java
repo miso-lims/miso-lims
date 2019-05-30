@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -40,9 +39,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -66,10 +63,6 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @Autowired
-  @Spy
-  private JdbcTemplate jdbcTemplate;
-
-  @Autowired
   private SessionFactory sessionFactory;
 
   @InjectMocks
@@ -78,7 +71,6 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   @Before
   public void setup() throws IOException, MisoNamingException {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
   }
 
@@ -95,7 +87,7 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     assertEquals("box1", box.getName());
     assertEquals(1L, box.getId());
     assertEquals("identificationbarcode1", box.getIdentificationBarcode());
-    assertEquals(4, box.getSize().getRows());
+    assertEquals(4, box.getSize().getRows().intValue());
     assertEquals("boxuse1", box.getUse().getAlias());
     assertEquals(2, box.getTubeCount());
     BoxPosition a1 = box.getBoxPositions().get("A01");
@@ -113,46 +105,11 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetUseById() throws Exception {
-    BoxUse boxUse = dao.getUseById(1);
-    assertEquals("boxuse1", boxUse.getAlias());
-  }
-
-  @Test
-  public void testGetSizeById() throws Exception {
-    BoxSize boxSize = dao.getSizeById(1);
-    assertEquals(4, boxSize.getRows());
-    assertEquals(4, boxSize.getColumns());
-    assertFalse(boxSize.getScannable());
-  }
-
-  @Test
   public void testListAll() throws Exception {
     Collection<Box> boxes = dao.listAll();
     assertTrue(boxes.size() > 0);
 
     assertEquals(boxes.size(), dao.count());
-  }
-
-  @Test
-  public void testListAllBoxUses() throws IOException {
-    Collection<BoxUse> boxUses = dao.listAllBoxUses();
-    assertTrue(2 == boxUses.size());
-  }
-
-  @Test
-  public void testListAllBoxSizes() throws Exception {
-    Collection<BoxSize> boxSizes = dao.listAllBoxSizes();
-    assertTrue(boxSizes.size() == 1);
-
-  }
-
-  @Test
-  public void testListAllBoxUsesStrings() throws Exception {
-    List<String> strings = dao.listAllBoxUsesStrings();
-    assertTrue(2 == strings.size());
-    assertTrue(strings.contains("boxuse1"));
-    assertTrue(strings.contains("boxuse2"));
   }
 
   @Test
@@ -215,7 +172,7 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     boxSize.setRows(3);
     boxSize.setId(1l);
     box.setSize(boxSize);
-    BoxUse boxuse = dao.getUseById(1);
+    BoxUse boxuse = (BoxUse) sessionFactory.getCurrentSession().get(BoxUse.class, 1L);
     box.setUse(boxuse);
 
     long boxId = dao.save(box);
@@ -226,12 +183,6 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     assertEquals(box.getAlias(), retrieved.getAlias());
     assertEquals(box.getSize().getId(), retrieved.getSize().getId());
     assertEquals(box.getName(), retrieved.getName());
-  }
-
-  @Test
-  public void testGetBoxColumnSizes() throws Exception {
-    Map<String, Integer> boxColumnSizes = dao.getBoxColumnSizes();
-    assertEquals(13, boxColumnSizes.size());
   }
 
   @Test

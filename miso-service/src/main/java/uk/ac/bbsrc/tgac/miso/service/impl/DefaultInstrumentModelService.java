@@ -21,22 +21,22 @@ import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 public class DefaultInstrumentModelService implements InstrumentModelService {
 
   @Autowired
-  private InstrumentModelStore instrumentModelDao;
+  private InstrumentModelStore instrumentModelStore;
 
   @Override
   public InstrumentModel get(long instrumentModelId) throws IOException {
-    return instrumentModelDao.get(instrumentModelId);
+    return instrumentModelStore.get(instrumentModelId);
   }
 
   @Override
   public Collection<InstrumentModel> list() throws IOException {
-    return instrumentModelDao.listAll();
+    return instrumentModelStore.listAll();
   }
 
   @Override
   public Collection<String> listDistinctPlatformTypeNames() throws IOException {
     List<String> names = new ArrayList<>();
-    for (PlatformType type : instrumentModelDao.listDistinctPlatformNames()) {
+    for (PlatformType type : instrumentModelStore.listDistinctPlatformNames()) {
       names.add(type.getKey());
     }
     return names;
@@ -44,16 +44,16 @@ public class DefaultInstrumentModelService implements InstrumentModelService {
 
   @Override
   public Set<PlatformType> listActivePlatformTypes() throws IOException {
-    return instrumentModelDao.listActivePlatformTypes();
+    return instrumentModelStore.listActivePlatformTypes();
   }
 
   @Override
   public InstrumentPosition getInstrumentPosition(long positionId) throws IOException {
-    return instrumentModelDao.getInstrumentPosition(positionId);
+    return instrumentModelStore.getInstrumentPosition(positionId);
   }
 
-  public void setPlatformDao(InstrumentModelStore platformDao) {
-    this.instrumentModelDao = platformDao;
+  public void setInstrumentModelStore(InstrumentModelStore instrumentModelStore) {
+    this.instrumentModelStore = instrumentModelStore;
   }
 
 }

@@ -3,11 +3,8 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
@@ -40,29 +37,13 @@ public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
    */
   List<Box> getByIdList(List<Long> idList) throws IOException;
 
-  BoxUse getUseById(long id) throws IOException;
-
-  BoxSize getSizeById(long id) throws IOException;
-
   public List<Box> getBySearch(String search);
 
   public List<Box> getByPartialSearch(String search, boolean onlyMatchBeginning);
-
-  Collection<BoxUse> listAllBoxUses() throws IOException;
-  
-  Collection<String> listAllBoxUsesStrings() throws IOException;
-
-  Collection<BoxSize> listAllBoxSizes() throws IOException;
   
   void removeBoxableFromBox(Boxable boxable) throws IOException;
 
   void removeBoxableFromBox(BoxableView boxable) throws IOException;
-
-  /**
-   * @return a map containing all column names and max lengths from the Box table
-   * @throws IOException
-   */
-  public Map<String, Integer> getBoxColumnSizes() throws IOException;
 
   public BoxableView getBoxableView(BoxableId id) throws IOException;
 

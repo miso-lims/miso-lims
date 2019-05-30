@@ -11,30 +11,35 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "BoxUse")
-public class BoxUse implements Serializable {
+public class BoxUse implements Aliasable, Deletable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private String alias;
+  private static final long UNSAVED_ID = 0L;
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "boxUseId")
-  private long id;
+  private long id = UNSAVED_ID;
 
-  public String getAlias() {
-    return alias;
-  }
+  private String alias;
 
+  @Override
   public long getId() {
     return id;
   }
 
-  public void setAlias(String alias) {
-    this.alias = alias;
-  }
-
+  @Override
   public void setId(long id) {
     this.id = id;
+  }
+
+  @Override
+  public String getAlias() {
+    return alias;
+  }
+
+  public void setAlias(String alias) {
+    this.alias = alias;
   }
 
   @Override
@@ -57,6 +62,21 @@ public class BoxUse implements Serializable {
     } else if (!alias.equals(other.alias)) return false;
     if (id != other.id) return false;
     return true;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Box Use";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias();
   }
 
 }

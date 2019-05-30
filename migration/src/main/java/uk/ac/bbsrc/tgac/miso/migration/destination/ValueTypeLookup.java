@@ -126,8 +126,8 @@ public class ValueTypeLookup {
     setDetailedQcStatuses(misoServiceManager.getDetailedQcStatusDao().list());
     setReferenceGenomes(misoServiceManager.getReferenceGenomeService().listAllReferenceGenomeTypes());
     setTargetedSequencings(misoServiceManager.getTargetedSequencingDao().listAll());
-    setBoxUses(misoServiceManager.getBoxService().listUses());
-    setBoxSizes(misoServiceManager.getBoxService().listSizes());
+    setBoxUses(misoServiceManager.getBoxUseService().list());
+    setBoxSizes(misoServiceManager.getBoxSizeService().list());
   }
 
   private void setSampleClasses(Collection<SampleClass> sampleClasses) {

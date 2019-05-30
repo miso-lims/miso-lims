@@ -44,7 +44,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
-  private InstrumentModelService platformService;
+  private InstrumentModelService instrumentModelService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
@@ -87,7 +87,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
   public long create(Experiment experiment) throws IOException {
     loadRunPartitions(experiment);
     experiment.setName(DbUtils.generateTemporaryName());
-    experiment.setInstrumentModel(platformService.get(experiment.getInstrumentModel().getId()));
+    experiment.setInstrumentModel(instrumentModelService.get(experiment.getInstrumentModel().getId()));
     experiment.setLibrary(libraryService.get(experiment.getLibrary().getId()));
     experiment.setStudy(studyService.get(experiment.getStudy().getId()));
     experiment.setChangeDetails(authorizationManager.getCurrentUser());
@@ -121,7 +121,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
     original.setAlias(experiment.getAlias());
     original.setDescription(experiment.getDescription());
     original.setName(experiment.getName());
-    original.setInstrumentModel(platformService.get(experiment.getInstrumentModel().getId()));
+    original.setInstrumentModel(instrumentModelService.get(experiment.getInstrumentModel().getId()));
     original.setLibrary(libraryService.get(experiment.getLibrary().getId()));
     original.setStudy(studyService.get(experiment.getStudy().getId()));
     original.setTitle(experiment.getTitle());
@@ -168,8 +168,8 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
     this.kitService = kitService;
   }
 
-  public void setPlatformService(InstrumentModelService platformService) {
-    this.platformService = platformService;
+  public void setInstrumentModelService(InstrumentModelService instrumentModelService) {
+    this.instrumentModelService = instrumentModelService;
   }
 
   public void setStudyService(StudyService studyService) {

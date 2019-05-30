@@ -64,8 +64,9 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
-import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
-import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxSizeService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxUseService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultQualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
 
 public class ValueTypeLookupTest {
@@ -161,7 +162,7 @@ public class ValueTypeLookupTest {
     Mockito.when(iDao.list(0, 0, true, "id")).thenReturn(inds);
     Mockito.when(mgr.getIndexDao()).thenReturn(iDao);
 
-    QualityControlService qcService = Mockito.mock(QualityControlService.class);
+    DefaultQualityControlService qcService = Mockito.mock(DefaultQualityControlService.class);
     List<QcType> sqcs = new ArrayList<>();
     sqcs.add(makeQcType(VALID_LONG, VALID_STRING));
     Mockito.when(qcService.listQcTypes(Mockito.eq(QcTarget.Sample))).thenReturn(sqcs);
@@ -202,15 +203,17 @@ public class ValueTypeLookupTest {
     Mockito.when(tarSeqDao.listAll()).thenReturn(tarSeqs);
     Mockito.when(mgr.getTargetedSequencingDao()).thenReturn(tarSeqDao);
 
-    DefaultBoxService boxService = Mockito.mock(DefaultBoxService.class);
+    DefaultBoxUseService boxUseService = Mockito.mock(DefaultBoxUseService.class);
     List<BoxUse> boxUses = Lists.newArrayList();
     boxUses.add(makeBoxUse(VALID_LONG, VALID_STRING));
-    Mockito.when(boxService.listUses()).thenReturn(boxUses);
-    Mockito.when(mgr.getBoxService()).thenReturn(boxService);
+    Mockito.when(boxUseService.list()).thenReturn(boxUses);
+    Mockito.when(mgr.getBoxUseService()).thenReturn(boxUseService);
 
+    DefaultBoxSizeService boxSizeService = Mockito.mock(DefaultBoxSizeService.class);
     List<BoxSize> boxSizes = Lists.newArrayList();
     boxSizes.add(makeBoxSize(VALID_LONG, 8, 12, true));
-    Mockito.when(boxService.listSizes()).thenReturn(boxSizes);
+    Mockito.when(boxSizeService.list()).thenReturn(boxSizes);
+    Mockito.when(mgr.getBoxSizeService()).thenReturn(boxSizeService);
 
     sut = new ValueTypeLookup(mgr);
   }

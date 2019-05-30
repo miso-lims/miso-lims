@@ -1,6 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.migration.destination;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.BiConsumer;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -17,7 +21,10 @@ import uk.ac.bbsrc.tgac.miso.core.security.SuperuserAuthentication;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateBoxDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateBoxSizeDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateBoxUseDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDeletionDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
@@ -53,9 +60,9 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
-import uk.ac.bbsrc.tgac.miso.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxSizeService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxUseService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultContainerService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultExperimentService;
@@ -91,84 +98,193 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultUserService;
  */
 public class MisoServiceManager {
 
-  private final JdbcTemplate jdbcTemplate;
-  private final SessionFactory sessionFactory;
-
   private final boolean autoGenerateIdBarcodes = false; // TODO: config option
-  private NamingScheme namingScheme;
 
-  private LocalSecurityManager securityManager; // Supports JDBC authentication only
-  private MigrationAuthorizationManager authorizationManager;
+  private final Map<Class<?>, Object> services = new HashMap<>();
+  private static final Map<Class<?>, Map<Class<?>, BiConsumer<?, ?>>> dependencies = new HashMap<>();
 
-  private HibernateSecurityDao securityStore;
-  private HibernateProjectDao projectDao;
-  private HibernateChangeLogDao changeLogDao;
-  private HibernateSampleQcDao sampleQcDao;
-  private HibernateLibraryDao libraryDao;
-  private HibernateLibraryQcDao libraryQcDao;
-  private HibernateLibraryDilutionDao dilutionDao;
-  private HibernateTargetedSequencingDao targetedSequencingDao;
-  private HibernatePoolDao poolDao;
-  private HibernateExperimentDao experimentDao;
-  private HibernateKitDao kitDao;
-  private HibernateInstrumentModelDao platformDao;
-  private HibernateStudyDao studyDao;
-  private HibernateRunDao runDao;
-  private HibernateSequencerPartitionContainerDao sequencerPartitionContainerDao;
-  private HibernateInstrumentDao instrumentDao;
-  private HibernateBoxDao boxDao;
-  private HibernatePoolableElementViewDao poolableElementViewDao;
-  private HibernatePoolOrderDao poolOrderDao;
+  static {
+    addDependency(DefaultProjectService.class, HibernateProjectDao.class, DefaultProjectService::setProjectStore);
+    addDependency(DefaultProjectService.class, NamingScheme.class, DefaultProjectService::setNamingScheme);
+    addDependency(DefaultProjectService.class, HibernateReferenceGenomeDao.class, DefaultProjectService::setReferenceGenomeDao);
+    addDependency(HibernateSecurityDao.class, SessionFactory.class, HibernateSecurityDao::setSessionFactory);
+    addDependency(DefaultUserService.class, HibernateSecurityDao.class, DefaultUserService::setSecurityStore);
+    addDependency(DefaultUserService.class, LocalSecurityManager.class, DefaultUserService::setSecurityManager);
+    addDependency(HibernateProjectDao.class, SessionFactory.class, HibernateProjectDao::setSessionFactory);
+    addDependency(HibernateProjectDao.class, HibernateSecurityDao.class, HibernateProjectDao::setSecurityStore);
+    addDependency(HibernateSampleClassDao.class, SessionFactory.class, HibernateSampleClassDao::setSessionFactory);
+    addDependency(DefaultSampleClassService.class, MigrationAuthorizationManager.class, DefaultSampleClassService::setAuthorizationManager);
+    addDependency(DefaultSampleClassService.class, HibernateSampleClassDao.class, DefaultSampleClassService::setSampleClassDao);
+    addDependency(DefaultSampleService.class, MigrationAuthorizationManager.class, DefaultSampleService::setAuthorizationManager);
+    addDependency(DefaultSampleService.class, NamingScheme.class, DefaultSampleService::setNamingScheme);
+    addDependency(DefaultSampleService.class, HibernateProjectDao.class, DefaultSampleService::setProjectStore);
+    addDependency(DefaultSampleService.class, HibernateDetailedQcStatusDao.class, DefaultSampleService::setDetailedQcStatusDao);
+    addDependency(DefaultSampleService.class, DefaultSampleClassService.class, DefaultSampleService::setSampleClassService);
+    addDependency(DefaultSampleService.class, HibernateSamplePurposeDao.class, DefaultSampleService::setSamplePurposeDao);
+    addDependency(DefaultSampleService.class, DefaultSampleValidRelationshipService.class,
+        DefaultSampleService::setSampleValidRelationshipService);
+    addDependency(DefaultSampleService.class, HibernateSubprojectDao.class, DefaultSampleService::setSubProjectDao);
+    addDependency(DefaultSampleService.class, HibernateTissueMaterialDao.class, DefaultSampleService::setTissueMaterialDao);
+    addDependency(DefaultSampleService.class, HibernateTissueOriginDao.class, DefaultSampleService::setTissueOriginDao);
+    addDependency(DefaultSampleService.class, HibernateTissueTypeDao.class, DefaultSampleService::setTissueTypeDao);
+    addDependency(DefaultSampleService.class, HibernateSampleDao.class, DefaultSampleService::setSampleStore);
+    addDependency(DefaultSampleService.class, DefaultLabService.class, DefaultSampleService::setLabService);
+    addDependency(DefaultSampleService.class, HibernateDeletionDao.class, DefaultSampleService::setDeletionStore);
+    addDependency(HibernateSampleDao.class, SessionFactory.class, HibernateSampleDao::setSessionFactory);
+    addDependency(HibernateSampleDao.class, HibernateBoxDao.class, HibernateSampleDao::setBoxStore);
+    addDependency(HibernateChangeLogDao.class, SessionFactory.class, HibernateChangeLogDao::setSessionFactory);
+    addDependency(HibernateSampleQcDao.class, SessionFactory.class, HibernateSampleQcDao::setSessionFactory);
+    addDependency(HibernateLibraryDao.class, SessionFactory.class, HibernateLibraryDao::setSessionFactory);
+    addDependency(HibernateLibraryDao.class, HibernateBoxDao.class, HibernateLibraryDao::setBoxDao);
+    addDependency(DefaultLibraryService.class, MigrationAuthorizationManager.class, DefaultLibraryService::setAuthorizationManager);
+    addDependency(DefaultLibraryService.class, NamingScheme.class, DefaultLibraryService::setNamingScheme);
+    addDependency(DefaultLibraryService.class, HibernateLibraryDao.class, DefaultLibraryService::setLibraryDao);
+    addDependency(DefaultLibraryService.class, DefaultLibraryDesignService.class, DefaultLibraryService::setLibraryDesignService);
+    addDependency(DefaultLibraryService.class, DefaultLibraryDesignCodeService.class, DefaultLibraryService::setLibraryDesignCodeService);
+    addDependency(DefaultLibraryService.class, DefaultIndexService.class, DefaultLibraryService::setIndexService);
+    addDependency(DefaultLibraryService.class, DefaultKitDescriptorService.class, DefaultLibraryService::setKitDescriptorService);
+    addDependency(DefaultLibraryService.class, DefaultSampleService.class, DefaultLibraryService::setSampleService);
+    addDependency(DefaultLibraryService.class, DefaultChangeLogService.class, DefaultLibraryService::setChangeLogService);
+    addDependency(HibernateLibraryQcDao.class, SessionFactory.class, HibernateLibraryQcDao::setSessionFactory);
+    addDependency(HibernateLibraryDilutionDao.class, SessionFactory.class, HibernateLibraryDilutionDao::setSessionFactory);
+    addDependency(HibernateLibraryDilutionDao.class, HibernateBoxDao.class, HibernateLibraryDilutionDao::setBoxStore);
+    addDependency(DefaultLibraryDilutionService.class, HibernateLibraryDilutionDao.class, DefaultLibraryDilutionService::setDilutionDao);
+    addDependency(DefaultLibraryDilutionService.class, MigrationAuthorizationManager.class,
+        DefaultLibraryDilutionService::setAuthorizationManager);
+    addDependency(DefaultLibraryDilutionService.class, NamingScheme.class, DefaultLibraryDilutionService::setNamingScheme);
+    addDependency(DefaultLibraryDilutionService.class, DefaultLibraryService.class, DefaultLibraryDilutionService::setLibraryService);
+    addDependency(DefaultLibraryDilutionService.class, DefaultTargetedSequencingService.class,
+        DefaultLibraryDilutionService::setTargetedSequencingService);
+    addDependency(HibernateTargetedSequencingDao.class, SessionFactory.class, HibernateTargetedSequencingDao::setSessionFactory);
+    addDependency(HibernatePoolDao.class, HibernateBoxDao.class, HibernatePoolDao::setBoxStore);
+    addDependency(HibernatePoolDao.class, HibernateSecurityDao.class, HibernatePoolDao::setSecurityStore);
+    addDependency(HibernatePoolDao.class, SessionFactory.class, HibernatePoolDao::setSessionFactory);
+    addDependency(DefaultPoolService.class, MigrationAuthorizationManager.class, DefaultPoolService::setAuthorizationManager);
+    addDependency(DefaultPoolService.class, NamingScheme.class, DefaultPoolService::setNamingScheme);
+    addDependency(DefaultPoolService.class, HibernatePoolDao.class, DefaultPoolService::setPoolStore);
+    addDependency(DefaultPoolService.class, DefaultPoolableElementViewService.class, DefaultPoolService::setPoolableElementViewService);
+    addDependency(HibernateExperimentDao.class, SessionFactory.class, HibernateExperimentDao::setSessionFactory);
+    addDependency(HibernateKitDao.class, SessionFactory.class, HibernateKitDao::setSessionFactory);
+    addDependency(HibernateInstrumentModelDao.class, SessionFactory.class, HibernateInstrumentModelDao::setSessionFactory);
+    addDependency(HibernateInstrumentModelDao.class, JdbcTemplate.class, HibernateInstrumentModelDao::setJdbcTemplate);
+    addDependency(HibernateStudyDao.class, SessionFactory.class, HibernateStudyDao::setSessionFactory);
+    addDependency(HibernateRunDao.class, SessionFactory.class, HibernateRunDao::setSessionFactory);
+    addDependency(HibernateSequencerPartitionContainerDao.class, SessionFactory.class,
+        HibernateSequencerPartitionContainerDao::setSessionFactory);
+    addDependency(HibernateInstrumentDao.class, SessionFactory.class, HibernateInstrumentDao::setSessionFactory);
+    addDependency(HibernateBoxDao.class, SessionFactory.class, HibernateBoxDao::setSessionFactory);
+    addDependency(DefaultLabService.class, MigrationAuthorizationManager.class, DefaultLabService::setAuthorizationManager);
+    addDependency(DefaultLabService.class, HibernateInstituteDao.class, DefaultLabService::setInstituteDao);
+    addDependency(DefaultLabService.class, HibernateLabDao.class, DefaultLabService::setLabDao);
+    addDependency(HibernateInstituteDao.class, SessionFactory.class, HibernateInstituteDao::setSessionFactory);
+    addDependency(HibernateDetailedQcStatusDao.class, SessionFactory.class, HibernateDetailedQcStatusDao::setSessionFactory);
+    addDependency(HibernateSubprojectDao.class, SessionFactory.class, HibernateSubprojectDao::setSessionFactory);
+    addDependency(HibernateTissueOriginDao.class, SessionFactory.class, HibernateTissueOriginDao::setSessionFactory);
+    addDependency(HibernateTissueTypeDao.class, SessionFactory.class, HibernateTissueTypeDao::setSessionFactory);
+    addDependency(HibernateSamplePurposeDao.class, SessionFactory.class, HibernateSamplePurposeDao::setSessionFactory);
+    addDependency(HibernateTissueMaterialDao.class, SessionFactory.class, HibernateTissueMaterialDao::setSessionFactory);
+    addDependency(DefaultSampleNumberPerProjectService.class, MigrationAuthorizationManager.class,
+        DefaultSampleNumberPerProjectService::setAuthorizationManager);
+    addDependency(DefaultSampleNumberPerProjectService.class, HibernateSampleNumberPerProjectDao.class,
+        DefaultSampleNumberPerProjectService::setSampleNumberPerProjectDao);
+    addDependency(DefaultSampleNumberPerProjectService.class, HibernateProjectDao.class,
+        DefaultSampleNumberPerProjectService::setProjectStore);
+    addDependency(HibernateSampleNumberPerProjectDao.class, SessionFactory.class, HibernateSampleNumberPerProjectDao::setSessionFactory);
+    addDependency(DefaultSampleValidRelationshipService.class, MigrationAuthorizationManager.class,
+        DefaultSampleValidRelationshipService::setAuthorizationManager);
+    addDependency(DefaultSampleValidRelationshipService.class, HibernateSampleClassDao.class,
+        DefaultSampleValidRelationshipService::setSampleClassDao);
+    addDependency(DefaultSampleValidRelationshipService.class, HibernateSampleValidRelationshipDao.class,
+        DefaultSampleValidRelationshipService::setSampleValidRelationshipDao);
+    addDependency(DefaultStudyService.class, MigrationAuthorizationManager.class, DefaultStudyService::setAuthorizationManager);
+    addDependency(DefaultStudyService.class, HibernateProjectDao.class, DefaultStudyService::setProjectStore);
+    addDependency(DefaultStudyService.class, HibernateStudyDao.class, DefaultStudyService::setStudyStore);
+    addDependency(DefaultStudyService.class, NamingScheme.class, DefaultStudyService::setNamingScheme);
+    addDependency(DefaultReferenceGenomeService.class, MigrationAuthorizationManager.class,
+        DefaultReferenceGenomeService::setAuthorizationManager);
+    addDependency(DefaultReferenceGenomeService.class, HibernateReferenceGenomeDao.class,
+        DefaultReferenceGenomeService::setReferenceGenomeDao);
+    addDependency(HibernateReferenceGenomeDao.class, SessionFactory.class, HibernateReferenceGenomeDao::setSessionFactory);
+    addDependency(HibernateSampleValidRelationshipDao.class, SessionFactory.class, HibernateSampleValidRelationshipDao::setSessionFactory);
+    addDependency(HibernateLibraryDesignDao.class, SessionFactory.class, HibernateLibraryDesignDao::setSessionFactory);
+    addDependency(HibernateLibraryDesignCodeDao.class, SessionFactory.class, HibernateLibraryDesignCodeDao::setSessionFactory);
+    addDependency(HibernateIndexDao.class, SessionFactory.class, HibernateIndexDao::setSessionFactory);
+    addDependency(HibernateSequencingParametersDao.class, SessionFactory.class, HibernateSequencingParametersDao::setSessionFactory);
+    addDependency(HibernatePoolableElementViewDao.class, SessionFactory.class, HibernatePoolableElementViewDao::setSessionFactory);
+    addDependency(HibernateTissueMaterialDao.class, SessionFactory.class, HibernateTissueMaterialDao::setSessionFactory);
+    addDependency(HibernateTissueMaterialDao.class, SessionFactory.class, HibernateTissueMaterialDao::setSessionFactory);
+    addDependency(DefaultPoolableElementViewService.class, HibernatePoolableElementViewDao.class,
+        DefaultPoolableElementViewService::setPoolableElementViewDao);
+    addDependency(DefaultRunService.class, MigrationAuthorizationManager.class, DefaultRunService::setAuthorizationManager);
+    addDependency(DefaultRunService.class, HibernateRunDao.class, DefaultRunService::setRunDao);
+    addDependency(DefaultRunService.class, DefaultUserService.class, DefaultRunService::setUserService);
+    addDependency(DefaultRunService.class, NamingScheme.class, DefaultRunService::setNamingScheme);
+    addDependency(DefaultRunService.class, DefaultContainerService.class, DefaultRunService::setContainerService);
+    addDependency(DefaultRunService.class, DefaultInstrumentService.class, DefaultRunService::setInstrumentService);
+    addDependency(DefaultRunService.class, DefaultSequencingParametersService.class, DefaultRunService::setSequencingParametersService);
+    addDependency(DefaultContainerService.class, MigrationAuthorizationManager.class, DefaultContainerService::setAuthorizationManager);
+    addDependency(DefaultContainerService.class, HibernateSequencerPartitionContainerDao.class, DefaultContainerService::setContainerDao);
+    addDependency(DefaultContainerService.class, DefaultPoolService.class, DefaultContainerService::setPoolService);
+    addDependency(DefaultInstrumentModelService.class, HibernateInstrumentModelDao.class, DefaultInstrumentModelService::setInstrumentModelStore);
+    addDependency(DefaultInstrumentService.class, MigrationAuthorizationManager.class, DefaultInstrumentService::setAuthorizationManager);
+    addDependency(DefaultInstrumentService.class, HibernateInstrumentDao.class, DefaultInstrumentService::setInstrumentDao);
+    addDependency(DefaultLibraryDesignService.class, HibernateLibraryDesignDao.class, DefaultLibraryDesignService::setLibraryDesignDao);
+    addDependency(DefaultLibraryDesignCodeService.class, HibernateLibraryDesignCodeDao.class,
+        DefaultLibraryDesignCodeService::setLibraryDesignCodeDao);
+    addDependency(DefaultIndexService.class, HibernateIndexDao.class, DefaultIndexService::setIndexStore);
+    addDependency(DefaultKitDescriptorService.class, HibernateKitDao.class, DefaultKitDescriptorService::setKitStore);
+    addDependency(DefaultKitDescriptorService.class, MigrationAuthorizationManager.class,
+        DefaultKitDescriptorService::setAuthorizationManager);
+    addDependency(DefaultTargetedSequencingService.class, HibernateTargetedSequencingDao.class,
+        DefaultTargetedSequencingService::setTargetedSequencingDao);
+    addDependency(DefaultChangeLogService.class, HibernateChangeLogDao.class, DefaultChangeLogService::setChangeLogDao);
+    addDependency(DefaultChangeLogService.class, MigrationAuthorizationManager.class, DefaultChangeLogService::setAuthorizationManager);
+    addDependency(DefaultSequencingParametersService.class, HibernateSequencingParametersDao.class,
+        DefaultSequencingParametersService::setSequencingParametersDao);
+    addDependency(DefaultSequencingParametersService.class, MigrationAuthorizationManager.class,
+        DefaultSequencingParametersService::setAuthorizationManager);
+    addDependency(DefaultPoolOrderService.class, HibernatePoolOrderDao.class, DefaultPoolOrderService::setPoolOrderDao);
+    addDependency(DefaultPoolOrderService.class, DefaultSequencingParametersService.class,
+        DefaultPoolOrderService::setSequencingParametersService);
+    addDependency(DefaultPoolOrderService.class, DefaultPoolService.class, DefaultPoolOrderService::setPoolService);
+    addDependency(DefaultPoolOrderService.class, MigrationAuthorizationManager.class, DefaultPoolOrderService::setAuthorizationManager);
+    addDependency(HibernatePoolOrderDao.class, SessionFactory.class, HibernatePoolOrderDao::setSessionFactory);
+    addDependency(DefaultExperimentService.class, MigrationAuthorizationManager.class, DefaultExperimentService::setAuthorizationManager);
+    addDependency(DefaultExperimentService.class, HibernateExperimentDao.class, DefaultExperimentService::setExperimentStore);
+    addDependency(DefaultExperimentService.class, DefaultKitService.class, DefaultExperimentService::setKitService);
+    addDependency(DefaultExperimentService.class, NamingScheme.class, DefaultExperimentService::setNamingScheme);
+    addDependency(DefaultExperimentService.class, DefaultInstrumentModelService.class, DefaultExperimentService::setInstrumentModelService);
+    addDependency(DefaultExperimentService.class, DefaultLibraryService.class, DefaultExperimentService::setLibraryService);
+    addDependency(DefaultExperimentService.class, DefaultStudyService.class, DefaultExperimentService::setStudyService);
+    addDependency(DefaultBoxService.class, HibernateBoxDao.class, DefaultBoxService::setBoxStore);
+    addDependency(DefaultBoxService.class, MigrationAuthorizationManager.class, DefaultBoxService::setAuthorizationManager);
+    addDependency(DefaultBoxService.class, DefaultChangeLogService.class, DefaultBoxService::setChangeLogService);
+    addDependency(DefaultBoxService.class, NamingScheme.class, DefaultBoxService::setNamingScheme);
+    addDependency(DefaultBoxService.class, DefaultBoxUseService.class, DefaultBoxService::setBoxUseService);
+    addDependency(DefaultBoxService.class, DefaultBoxSizeService.class, DefaultBoxService::setBoxSizeService);
+    addDependency(DefaultQualityControlService.class, MigrationAuthorizationManager.class,
+        DefaultQualityControlService::setAuthorizationManager);
+    addDependency(DefaultQualityControlService.class, HibernateLibraryQcDao.class, DefaultQualityControlService::setLibraryQcStore);
+    addDependency(DefaultQualityControlService.class, HibernateSampleQcDao.class, DefaultQualityControlService::setSampleQcStore);
+    addDependency(DefaultQualityControlService.class, HibernateQcTypeDao.class, DefaultQualityControlService::setQcTypeStore);
+    addDependency(HibernateQcTypeDao.class, SessionFactory.class, HibernateQcTypeDao::setSessionFactory);
+    addDependency(DefaultBoxUseService.class, HibernateBoxUseDao.class, DefaultBoxUseService::setBoxUseDao);
+    addDependency(DefaultBoxUseService.class, MigrationAuthorizationManager.class, DefaultBoxUseService::setAuthorizationManager);
+    addDependency(DefaultBoxUseService.class, HibernateDeletionDao.class, DefaultBoxUseService::setDeletionStore);
+    addDependency(HibernateBoxUseDao.class, SessionFactory.class, HibernateBoxUseDao::setSessionFactory);
+    addDependency(DefaultBoxSizeService.class, HibernateBoxSizeDao.class, DefaultBoxSizeService::setBoxSizeDao);
+    addDependency(DefaultBoxSizeService.class, MigrationAuthorizationManager.class, DefaultBoxSizeService::setAuthorizationManager);
+    addDependency(DefaultBoxSizeService.class, HibernateDeletionDao.class, DefaultBoxSizeService::setDeletionStore);
+    addDependency(HibernateBoxSizeDao.class, SessionFactory.class, HibernateBoxSizeDao::setSessionFactory);
+  }
 
-  private DefaultChangeLogService changeLogService;
-  private DefaultContainerService containerService;
-  private DefaultExperimentService experimentService;
-  private DefaultSampleClassService sampleClassService;
-  private DefaultSampleService sampleService;
-  private DefaultIndexService indexService;
-  private DefaultKitService kitService;
-  private DefaultKitDescriptorService kitDescriptorService;
-  private DefaultLabService labService;
-  private DefaultLibraryService libraryService;
-  private DefaultLibraryDesignService libraryDesignService;
-  private DefaultLibraryDesignCodeService libraryDesignCodeService;
-  private DefaultLibraryDilutionService dilutionService;
-  private DefaultInstrumentModelService platformService;
-  private DefaultSampleNumberPerProjectService sampleNumberPerProjectService;
-  private DefaultSampleValidRelationshipService sampleValidRelationshipService;
-  private DefaultReferenceGenomeService referenceGenomeService;
-  private DefaultRunService runService;
-  private DefaultInstrumentService instrumentService;
-  private DefaultSequencingParametersService sequencingParametersService;
-  private DefaultStudyService studyService;
-  private DefaultPoolableElementViewService poolableElementViewService;
-  private DefaultPoolOrderService poolOrderService;
-  private DefaultPoolService poolService;
-  private DefaultTargetedSequencingService targetedSequencingService;
-  private DefaultBoxService boxService;
-  private DefaultQualityControlService qcService;
-  private DefaultUserService userService;
-
-  private HibernateSampleClassDao sampleClassDao;
-  private HibernateSampleDao sampleDao;
-  private HibernateLabDao labDao;
-  private HibernateInstituteDao instituteDao;
-  private HibernateDetailedQcStatusDao detailedQcStatusDao;
-  private HibernateSubprojectDao subprojectDao;
-  private HibernateTissueOriginDao tissueOriginDao;
-  private HibernateTissueTypeDao tissueTypeDao;
-  private HibernateSamplePurposeDao samplePurposeDao;
-  private HibernateTissueMaterialDao tissueMaterialDao;
-  private HibernateSampleNumberPerProjectDao sampleNumberPerProjectDao;
-  private HibernateSampleValidRelationshipDao sampleValidRelationshipDao;
-  private HibernateLibraryDesignDao libraryDesignDao;
-  private HibernateLibraryDesignCodeDao libraryDesignCodeDao;
-  private HibernateIndexDao indexDao;
-  private HibernateSequencingParametersDao sequencingParametersDao;
-  private HibernateReferenceGenomeDao referenceGenomeDao;
-  private HibernateQcTypeDao qcTypeDao;
-
-  private DefaultProjectService projectService;
+  private static <O, D> void addDependency(Class<O> owner, Class<D> dependency, BiConsumer<O, D> setter) {
+    if (!dependencies.containsKey(owner)) {
+      dependencies.put(owner, new HashMap<>());
+    }
+    Map<Class<?>, BiConsumer<?, ?>> deps = dependencies.get(owner);
+    deps.put(dependency, setter);
+  }
 
   /**
    * Constructs a new MisoServiceManager with no services initialized
@@ -177,8 +293,11 @@ public class MisoServiceManager {
    * @param sessionFactory for Hibernate access to the database
    */
   public MisoServiceManager(JdbcTemplate jdbcTemplate, SessionFactory sessionFactory) {
-    this.jdbcTemplate = jdbcTemplate;
-    this.sessionFactory = sessionFactory;
+    setService(JdbcTemplate.class, jdbcTemplate);
+    setService(SessionFactory.class, sessionFactory);
+
+    // TODO: Add naming scheme config instead of hard-coding
+    setService(NamingScheme.class, new OicrNamingScheme());
   }
 
   /**
@@ -193,79 +312,98 @@ public class MisoServiceManager {
   public static MisoServiceManager buildWithDefaults(JdbcTemplate jdbcTemplate, SessionFactory sessionFactory, String username)
       throws IOException {
     MisoServiceManager m = new MisoServiceManager(jdbcTemplate, sessionFactory);
-    m.setDefaultBoxDao();
-    m.setDefaultChangeLogDao();
-    m.setDefaultChangeLogService();
-    m.setDefaultContainerService();
-    m.setDefaultDilutionDao();
-    m.setDefaultDilutionService();
-    m.setDefaultExperimentDao();
-    m.setDefaultExperimentService();
-    m.setDefaultIndexService();
-    m.setDefaultInstituteDao();
-    m.setDefaultKitDao();
-    m.setDefaultKitService();
-    m.setDefaultKitDescriptorService();
-    m.setDefaultLabDao();
-    m.setDefaultLabService();
-    m.setDefaultLibraryDao();
-    m.setDefaultLibraryService();
-    m.setDefaultLibraryDesignService();
-    m.setDefaultLibraryDesignCodeService();
-    m.setDefaultLibraryQcDao();
-    m.setDefaultPlatformDao();
-    m.setDefaultPlatformService();
-    m.setDefaultPoolDao();
-    m.setDefaultPoolOrderDao();
-    m.setDefaultPoolOrderService();
-    m.setDefaultPoolService();
-    m.setDefaultReferenceGenomeDao();
-    m.setDefaultReferenceGenomeService();
-    m.setDefaultRunService();
-    m.setDefaultProjectDao();
-    m.setDefaultDetailedQcStatusDao();
-    m.setDefaultRunDao();
-    m.setDefaultSampleClassDao();
-    m.setDefaultSampleClassService();
-    m.setDefaultSampleDao();
-    m.setDefaultSampleNumberPerProjectService();
-    m.setDefaultSampleNumberPerProjectDao();
-    m.setDefaultSamplePurposeDao();
-    m.setDefaultSampleQcDao();
-    m.setDefaultSampleService();
-    m.setDefaultSampleValidRelationshipDao();
-    m.setDefaultSampleValidRelationshipService();
-    m.setDefaultSecurityManager();
-    m.setDefaultSecurityStore();
-    m.setDefaultSequencerPartitionContainerDao();
-    m.setDefaultInstrumentDao();
-    m.setDefaultInstrumentService();
-    m.setDefaultSequencingParametersService();
-    m.setDefaultStudyDao();
-    m.setDefaultStudyService();
-    m.setDefaultSubprojectDao();
-    m.setDefaultTargetedSequencingDao();
-    m.setDefaultTargetedSequencingService();
-    m.setDefaultTissueMaterialDao();
-    m.setDefaultTissueOriginDao();
-    m.setDefaultTissueTypeDao();
-    m.setDefaultLibraryDesignDao();
-    m.setDefaultLibraryDesignCodeDao();
-    m.setDefaultIndexDao();
-    m.setDefaultSequencingParametersDao();
-    m.setDefaultPoolableElementViewDao();
-    m.setDefaultPoolableElementViewService();
-    m.setDefaultBoxService();
-    m.setDefaultQualityControlService();
-    m.setDefaultQcTypeDao();
-    m.setDefaultProjectService();
-    m.setDefaultUserService();
+    m.setAllDefaults();
 
     User migrationUser = m.getUserByLoginNameInTransaction(m.getSecurityStore(), username);
     if (migrationUser == null) throw new IllegalArgumentException("User '" + username + "' not found");
     m.setUpSecurityContext(migrationUser);
     m.setAuthorizationManagerWithUser(migrationUser);
     return m;
+  }
+
+  public static MisoServiceManager buildWithDefaults(JdbcTemplate jdbcTemplate, SessionFactory sessionFactory, User migrationUser)
+      throws IOException {
+    MisoServiceManager m = new MisoServiceManager(jdbcTemplate, sessionFactory);
+    m.setAllDefaults();
+
+    m.setUpSecurityContext(migrationUser);
+    m.setAuthorizationManagerWithUser(migrationUser);
+    return m;
+  }
+
+  private void setAllDefaults() {
+    setDefaultBoxDao();
+    setDefaultChangeLogDao();
+    setDefaultChangeLogService();
+    setDefaultContainerService();
+    setDefaultDilutionDao();
+    setDefaultDilutionService();
+    setDefaultExperimentDao();
+    setDefaultExperimentService();
+    setDefaultIndexService();
+    setDefaultInstituteDao();
+    setDefaultKitDao();
+    setDefaultKitService();
+    setDefaultKitDescriptorService();
+    setDefaultLabDao();
+    setDefaultLabService();
+    setDefaultLibraryDao();
+    setDefaultLibraryService();
+    setDefaultLibraryDesignService();
+    setDefaultLibraryDesignCodeService();
+    setDefaultLibraryQcDao();
+    setDefaultInstrumentModelDao();
+    setDefaultInstrumentModelService();
+    setDefaultPoolDao();
+    setDefaultPoolOrderDao();
+    setDefaultPoolOrderService();
+    setDefaultPoolService();
+    setDefaultReferenceGenomeDao();
+    setDefaultReferenceGenomeService();
+    setDefaultRunService();
+    setDefaultProjectDao();
+    setDefaultDetailedQcStatusDao();
+    setDefaultRunDao();
+    setDefaultSampleClassDao();
+    setDefaultSampleClassService();
+    setDefaultSampleDao();
+    setDefaultSampleNumberPerProjectService();
+    setDefaultSampleNumberPerProjectDao();
+    setDefaultSamplePurposeDao();
+    setDefaultSampleQcDao();
+    setDefaultSampleService();
+    setDefaultSampleValidRelationshipDao();
+    setDefaultSampleValidRelationshipService();
+    setDefaultSecurityManager();
+    setDefaultSecurityStore();
+    setDefaultSequencerPartitionContainerDao();
+    setDefaultInstrumentDao();
+    setDefaultInstrumentService();
+    setDefaultSequencingParametersService();
+    setDefaultStudyDao();
+    setDefaultStudyService();
+    setDefaultSubprojectDao();
+    setDefaultTargetedSequencingDao();
+    setDefaultTargetedSequencingService();
+    setDefaultTissueMaterialDao();
+    setDefaultTissueOriginDao();
+    setDefaultTissueTypeDao();
+    setDefaultLibraryDesignDao();
+    setDefaultLibraryDesignCodeDao();
+    setDefaultIndexDao();
+    setDefaultSequencingParametersDao();
+    setDefaultPoolableElementViewDao();
+    setDefaultPoolableElementViewService();
+    setDefaultBoxService();
+    setDefaultQualityControlService();
+    setDefaultQcTypeDao();
+    setDefaultProjectService();
+    setDefaultUserService();
+    setDefaultDeletionStore();
+    setDefaultBoxUseDao();
+    setDefaultBoxUseService();
+    setDefaultBoxSizeDao();
+    setDefaultBoxSizeService();
   }
 
   /**
@@ -277,7 +415,7 @@ public class MisoServiceManager {
    */
   public User getUserByLoginNameInTransaction(HibernateSecurityDao securityStore, String username) throws IOException {
 
-    Transaction tx = sessionFactory.getCurrentSession().beginTransaction();
+    Transaction tx = getService(SessionFactory.class).getCurrentSession().beginTransaction();
     User user;
     try {
       user = securityStore.getUserByLoginName(username);
@@ -301,1407 +439,934 @@ public class MisoServiceManager {
     SecurityContextHolder.setContext(context);
   }
 
-  // TODO: Add naming scheme config instead of hard-coding
   public NamingScheme getNamingScheme() {
-    if (namingScheme == null) {
-      namingScheme = new OicrNamingScheme();
+    return getService(NamingScheme.class);
+  }
+
+  private <T> T getService(Class<T> clazz) {
+    T service = clazz.cast(services.get(clazz));
+    return service;
+  }
+
+  private <T> void setService(Class<T> clazz, T service) {
+    setService(clazz, service, true);
+  }
+
+  private <T> void setService(Class<T> clazz, T service, boolean wire) {
+    // wire into existing services
+    for (Entry<Class<?>, Object> entry : services.entrySet()) {
+      Map<Class<?>, BiConsumer<?, ?>> deps = dependencies.get(entry.getKey());
+      if (deps != null && deps.containsKey(clazz)) {
+        setDependency(entry.getValue(), service, deps.get(clazz));
+      }
     }
-    return namingScheme;
+    if (wire) {
+      // wire in existing services
+      Map<Class<?>, BiConsumer<?, ?>> deps = dependencies.get(clazz);
+      if (deps != null) {
+        for (Entry<Class<?>, BiConsumer<?, ?>> entry : deps.entrySet()) {
+          Object existing = services.get(entry.getKey());
+          if (existing != null) {
+            setDependency(service, existing, entry.getValue());
+          }
+        }
+      }
+    }
+    services.put(clazz, service);
+  }
+
+  private static <O, D> void setDependency(O owner, D dependency, BiConsumer<?, ?> setter) {
+    @SuppressWarnings("unchecked")
+    BiConsumer<O, D> castedSetter = (BiConsumer<O, D>) setter;
+    castedSetter.accept(owner, dependency);
   }
 
   public MigrationAuthorizationManager getAuthorizationManager() {
-    return authorizationManager;
+    return getService(MigrationAuthorizationManager.class);
   }
 
   public void setAuthorizationManager(MigrationAuthorizationManager authorizationManager) {
-    this.authorizationManager = authorizationManager;
-    updateAuthorizationManagerDependencies();
+    setService(MigrationAuthorizationManager.class, authorizationManager, false);
   }
 
   public void setAuthorizationManagerWithUser(User migrationUser) {
     setAuthorizationManager(new MigrationAuthorizationManager(migrationUser));
   }
 
-  private void updateAuthorizationManagerDependencies() {
-    if (sampleClassService != null) sampleClassService.setAuthorizationManager(authorizationManager);
-    if (sampleService != null) sampleService.setAuthorizationManager(authorizationManager);
-    if (labService != null) labService.setAuthorizationManager(authorizationManager);
-    if (libraryService != null) libraryService.setAuthorizationManager(authorizationManager);
-    if (sampleNumberPerProjectService != null) sampleNumberPerProjectService.setAuthorizationManager(authorizationManager);
-    if (sampleValidRelationshipService != null) sampleValidRelationshipService.setAuthorizationManager(authorizationManager);
-    if (referenceGenomeService != null) referenceGenomeService.setAuthorizationManager(authorizationManager);
-    if (studyService != null) studyService.setAuthorizationManager(authorizationManager);
-    if (dilutionService != null) dilutionService.setAuthorizationManager(authorizationManager);
-    if (poolService != null) poolService.setAuthorizationManager(authorizationManager);
-    if (runService != null) runService.setAuthorizationManager(authorizationManager);
-    if (containerService != null) containerService.setAuthorizationManager(authorizationManager);
-    if (instrumentService != null) instrumentService.setAuthorizationManager(authorizationManager);
-    if (kitDescriptorService != null) kitDescriptorService.setAuthorizationManager(authorizationManager);
-    if (kitService != null) kitService.setAuthorizationManager(authorizationManager);
-    if (changeLogService != null) changeLogService.setAuthorizationManager(authorizationManager);
-    if (experimentService != null) experimentService.setAuthorizationManager(authorizationManager);
-    if (boxService != null) boxService.setAuthorizationManager(authorizationManager);
-  }
-
   public DefaultProjectService getProjectService() {
-    return projectService;
+    return getService(DefaultProjectService.class);
   }
 
   public void setProjectService(DefaultProjectService projectService) {
-    this.projectService = projectService;
+    setService(DefaultProjectService.class, projectService, false);
   }
 
   public void setDefaultProjectService() {
-    DefaultProjectService projectService = new DefaultProjectService();
-    // Set stores for entities which need names generated before creation and can't be saved via services.
-    projectService.setProjectStore(projectDao);
-    projectService.setNamingScheme(getNamingScheme());
-    projectService.setReferenceGenomeDao(referenceGenomeDao);
-    setProjectService(projectService);
+    setService(DefaultProjectService.class, new DefaultProjectService());
   }
 
   public HibernateSecurityDao getSecurityStore() {
-    return securityStore;
+    return getService(HibernateSecurityDao.class);
   }
 
   public void setSecurityStore(HibernateSecurityDao securityStore) {
-    this.securityStore = securityStore;
-    updateSecurityStoreDependencies();
+    setService(HibernateSecurityDao.class, securityStore, false);
   }
 
   public void setDefaultSecurityStore() {
-    HibernateSecurityDao store = new HibernateSecurityDao();
-    store.setSessionFactory(sessionFactory);
-    setSecurityStore(store);
-  }
-
-  private void updateSecurityStoreDependencies() {
-    if (poolDao != null) poolDao.setSecurityStore(securityStore);
-    if (projectDao != null) projectDao.setSecurityStore(securityStore);
+    setService(HibernateSecurityDao.class, new HibernateSecurityDao());
   }
 
   public LocalSecurityManager getSecurityManager() {
-    return securityManager;
+    return getService(LocalSecurityManager.class);
   }
 
   public void setSecurityManager(LocalSecurityManager securityManager) {
-    this.securityManager = securityManager;
-    updateSecurityManagerDependencies();
+    setService(LocalSecurityManager.class, securityManager, false);
   }
 
   public void setDefaultSecurityManager() {
-    LocalSecurityManager mgr = new LocalSecurityManager();
-    setSecurityManager(mgr);
-  }
-
-  private void updateSecurityManagerDependencies() {
-    if (userService != null) userService.setSecurityManager(securityManager);
+    setService(LocalSecurityManager.class, new LocalSecurityManager());
   }
 
   public DefaultUserService getUserService() {
-    return userService;
+    return getService(DefaultUserService.class);
   }
 
   public void setUserService(DefaultUserService userService) {
-    this.userService = userService;
-    updateUserServiceDependencies();
+    setService(DefaultUserService.class, userService, false);
   }
 
   public void setDefaultUserService() {
-    DefaultUserService service = new DefaultUserService();
-    service.setSecurityStore(securityStore);
-    service.setSecurityManager(securityManager);
-    setUserService(service);
-  }
-
-  private void updateUserServiceDependencies() {
-    if (runService != null) runService.setUserService(userService);
+    setService(DefaultUserService.class, new DefaultUserService());
   }
 
   public HibernateProjectDao getProjectDao() {
-    return projectDao;
+    return getService(HibernateProjectDao.class);
   }
 
   public void setProjectDao(HibernateProjectDao projectDao) {
-    this.projectDao = projectDao;
-    updateProjectDaoDependencies();
+    setService(HibernateProjectDao.class, projectDao, false);
   }
 
   public void setDefaultProjectDao() {
-    HibernateProjectDao dao = new HibernateProjectDao();
-    dao.setSessionFactory(sessionFactory);
-    dao.setSecurityStore(securityStore);
-    setProjectDao(dao);
-  }
-
-  private void updateProjectDaoDependencies() {
-    if (sampleNumberPerProjectService != null) sampleNumberPerProjectService.setProjectStore(projectDao);
-    if (projectService != null) projectService.setProjectStore(projectDao);
-    if (sampleService != null) sampleService.setProjectStore(projectDao);
-    if (studyService != null) studyService.setProjectStore(projectDao);
+    setService(HibernateProjectDao.class, new HibernateProjectDao());
   }
 
   public HibernateSampleClassDao getSampleClassDao() {
-    return sampleClassDao;
+    return getService(HibernateSampleClassDao.class);
   }
 
   public void setSampleClassDao(HibernateSampleClassDao sampleClassDao) {
-    this.sampleClassDao = sampleClassDao;
-    updateSampleClassDaoDependencies();
+    setService(HibernateSampleClassDao.class, sampleClassDao, false);
   }
 
   public void setDefaultSampleClassDao() {
-    HibernateSampleClassDao dao = new HibernateSampleClassDao();
-    dao.setSessionFactory(sessionFactory);
-    setSampleClassDao(dao);
-  }
-
-  private void updateSampleClassDaoDependencies() {
-    if (sampleClassService != null) sampleClassService.setSampleClassDao(sampleClassDao);
-    if (sampleValidRelationshipService != null) sampleValidRelationshipService.setSampleClassDao(sampleClassDao);
+    setService(HibernateSampleClassDao.class, new HibernateSampleClassDao());
   }
 
   public DefaultSampleClassService getSampleClassService() {
-    return sampleClassService;
+    return getService(DefaultSampleClassService.class);
   }
 
   public void setSampleClassService(DefaultSampleClassService sampleClassService) {
-    this.sampleClassService = sampleClassService;
-    updateSampleClassServiceDependencies();
+    setService(DefaultSampleClassService.class, sampleClassService, false);
   }
 
   public void setDefaultSampleClassService() {
-    DefaultSampleClassService svc = new DefaultSampleClassService();
-    svc.setAuthorizationManager(authorizationManager);
-    svc.setSampleClassDao(sampleClassDao);
-    setSampleClassService(svc);
-  }
-
-  private void updateSampleClassServiceDependencies() {
-    if (sampleService != null) sampleService.setSampleClassService(sampleClassService);
+    setService(DefaultSampleClassService.class, new DefaultSampleClassService());
   }
 
   public DefaultSampleService getSampleService() {
-    return sampleService;
+    return getService(DefaultSampleService.class);
   }
 
   public void setSampleService(DefaultSampleService sampleService) {
-    this.sampleService = sampleService;
-    updateSampleServiceDependencies();
+    setService(DefaultSampleService.class, sampleService, false);
   }
 
   public void setDefaultSampleService() {
     DefaultSampleService svc = new DefaultSampleService();
-    svc.setAuthorizationManager(authorizationManager);
-    svc.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
-    svc.setNamingScheme(getNamingScheme());
-    svc.setProjectStore(projectDao);
-    svc.setDetailedQcStatusDao(detailedQcStatusDao);
-    svc.setSampleClassService(sampleClassService);
-    svc.setSamplePurposeDao(samplePurposeDao);
-    svc.setSampleValidRelationshipService(sampleValidRelationshipService);
-    svc.setSubProjectDao(subprojectDao);
-    svc.setTissueMaterialDao(tissueMaterialDao);
-    svc.setTissueOriginDao(tissueOriginDao);
-    svc.setTissueTypeDao(tissueTypeDao);
-    svc.setSampleStore(sampleDao);
-    svc.setLabService(labService);
-    setSampleService(svc);
-  }
-
-  private void updateSampleServiceDependencies() {
-    if (libraryService != null) libraryService.setSampleService(sampleService);
+    svc.setAutoGenerateIdBarcodes(true);
+    setService(DefaultSampleService.class, svc);
   }
 
   public HibernateSampleDao getSampleDao() {
-    return sampleDao;
+    return getService(HibernateSampleDao.class);
   }
 
   public void setSampleDao(HibernateSampleDao sampleDao) {
-    this.sampleDao = sampleDao;
-    updateSampleDaoDependencies();
+    setService(HibernateSampleDao.class, sampleDao, false);
   }
 
   public void setDefaultSampleDao() {
-    HibernateSampleDao dao = new HibernateSampleDao();
-    dao.setSessionFactory(sessionFactory);
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setBoxStore(boxDao);
-    setSampleDao(dao);
-  }
-
-  private void updateSampleDaoDependencies() {
-    if (sampleService != null) sampleService.setSampleStore(sampleDao);
+    setService(HibernateSampleDao.class, new HibernateSampleDao());
   }
 
   public HibernateChangeLogDao getChangeLogDao() {
-    return changeLogDao;
+    return getService(HibernateChangeLogDao.class);
   }
 
   public void setChangeLogDao(HibernateChangeLogDao changeLogDao) {
-    this.changeLogDao = changeLogDao;
-    updateChangeLogDaoDependencies();
+    setService(HibernateChangeLogDao.class, changeLogDao, false);
   }
 
   public void setDefaultChangeLogDao() {
-    HibernateChangeLogDao dao = new HibernateChangeLogDao();
-    dao.setSessionFactory(sessionFactory);
-    setChangeLogDao(dao);
-  }
-
-  private void updateChangeLogDaoDependencies() {
-    if (changeLogService != null) changeLogService.setChangeLogDao(changeLogDao);
+    setService(HibernateChangeLogDao.class, new HibernateChangeLogDao());
   }
 
   public HibernateSampleQcDao getSampleQcDao() {
-    return sampleQcDao;
+    return getService(HibernateSampleQcDao.class);
   }
 
   public void setSampleQcDao(HibernateSampleQcDao sampleQcDao) {
-    this.sampleQcDao = sampleQcDao;
-    updateSampleQcDaoDependencies();
+    setService(HibernateSampleQcDao.class, sampleQcDao, false);
   }
 
   public void setDefaultSampleQcDao() {
-    HibernateSampleQcDao dao = new HibernateSampleQcDao();
-    dao.setSessionFactory(sessionFactory);
-    setSampleQcDao(dao);
-  }
-
-  private void updateSampleQcDaoDependencies() {
-    if (qcService != null) qcService.setSampleQcStore(sampleQcDao);
+    setService(HibernateSampleQcDao.class, new HibernateSampleQcDao());
   }
 
   public HibernateLibraryDao getLibraryDao() {
-    return libraryDao;
+    return getService(HibernateLibraryDao.class);
   }
 
   public void setLibraryDao(HibernateLibraryDao libraryDao) {
-    this.libraryDao = libraryDao;
-    updateLibraryDaoDependencies();
+    setService(HibernateLibraryDao.class, libraryDao, false);
   }
 
   public void setDefaultLibraryDao() {
     HibernateLibraryDao dao = new HibernateLibraryDao();
-    dao.setSessionFactory(sessionFactory);
-    dao.setBoxDao(boxDao);
     dao.setDetailedSampleEnabled(true);
-    setLibraryDao(dao);
-  }
-
-  private void updateLibraryDaoDependencies() {
-    if (libraryService != null) libraryService.setLibraryDao(libraryDao);
+    setService(HibernateLibraryDao.class, dao);
   }
 
   public DefaultLibraryService getLibraryService() {
-    return libraryService;
+    return getService(DefaultLibraryService.class);
   }
 
   public void setLibraryService(DefaultLibraryService libraryService) {
-    this.libraryService = libraryService;
-    updateLibraryServiceDependencies();
+    setService(DefaultLibraryService.class, libraryService, false);
   }
 
   public void setDefaultLibraryService() {
     DefaultLibraryService svc = new DefaultLibraryService();
-    svc.setAuthorizationManager(authorizationManager);
     svc.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
-    svc.setNamingScheme(getNamingScheme());
-    svc.setLibraryDao(libraryDao);
-    svc.setLibraryDesignService(libraryDesignService);
-    svc.setLibraryDesignCodeService(libraryDesignCodeService);
-    svc.setIndexService(indexService);
-    svc.setKitDescriptorService(kitDescriptorService);
-    svc.setSampleService(sampleService);
-    svc.setChangeLogService(changeLogService);
-    setLibraryService(svc);
-  }
-
-  private void updateLibraryServiceDependencies() {
-    if (dilutionService != null) dilutionService.setLibraryService(libraryService);
-    if (experimentService != null) experimentService.setLibraryService(libraryService);
+    setService(DefaultLibraryService.class, svc);
   }
 
   public HibernateLibraryQcDao getLibraryQcDao() {
-    return libraryQcDao;
+    return getService(HibernateLibraryQcDao.class);
   }
 
   public void setLibraryQcDao(HibernateLibraryQcDao libraryQcDao) {
-    this.libraryQcDao = libraryQcDao;
-    updateLibraryQcDaoDependencies();
+    setService(HibernateLibraryQcDao.class, libraryQcDao, false);
   }
 
   public void setDefaultLibraryQcDao() {
-    HibernateLibraryQcDao dao = new HibernateLibraryQcDao();
-    dao.setSessionFactory(sessionFactory);
-    setLibraryQcDao(dao);
-  }
-
-  private void updateLibraryQcDaoDependencies() {
-    if (qcService != null) qcService.setLibraryQcStore(libraryQcDao);
+    setService(HibernateLibraryQcDao.class, new HibernateLibraryQcDao());
   }
 
   public HibernateLibraryDilutionDao getDilutionDao() {
-    return dilutionDao;
+    return getService(HibernateLibraryDilutionDao.class);
   }
 
   public void setDilutionDao(HibernateLibraryDilutionDao dilutionDao) {
-    this.dilutionDao = dilutionDao;
-    updateDilutionDaoDependencies();
+    setService(HibernateLibraryDilutionDao.class, dilutionDao, false);
   }
 
   public void setDefaultDilutionDao() {
-    HibernateLibraryDilutionDao dao = new HibernateLibraryDilutionDao();
-    dao.setSessionFactory(sessionFactory);
-    dao.setBoxStore(boxDao);
-    setDilutionDao(dao);
-  }
-
-  private void updateDilutionDaoDependencies() {
-    if (dilutionService != null) dilutionService.setDilutionDao(dilutionDao);
+    setService(HibernateLibraryDilutionDao.class, new HibernateLibraryDilutionDao());
   }
 
   public DefaultLibraryDilutionService getDilutionService() {
-    return dilutionService;
+    return getService(DefaultLibraryDilutionService.class);
   }
 
   public void setDilutionService(DefaultLibraryDilutionService dilutionService) {
-    this.dilutionService = dilutionService;
-    updateDilutionServiceDependencies();
+    setService(DefaultLibraryDilutionService.class, dilutionService, false);
   }
 
   public void setDefaultDilutionService() {
     DefaultLibraryDilutionService svc = new DefaultLibraryDilutionService();
-    svc.setDilutionDao(dilutionDao);
-    svc.setAuthorizationManager(authorizationManager);
-    svc.setNamingScheme(getNamingScheme());
-    svc.setLibraryService(libraryService);
-    svc.setTargetedSequencingService(targetedSequencingService);
     svc.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
-    setDilutionService(svc);
-  }
-
-  private void updateDilutionServiceDependencies() {
+    setService(DefaultLibraryDilutionService.class, svc);
   }
 
   public HibernateTargetedSequencingDao getTargetedSequencingDao() {
-    return targetedSequencingDao;
+    return getService(HibernateTargetedSequencingDao.class);
   }
 
   public void setTargetedSequencingDao(HibernateTargetedSequencingDao targetedSequencingDao) {
-    this.targetedSequencingDao = targetedSequencingDao;
-    updateTargetedSequencingDaoDependencies();
+    setService(HibernateTargetedSequencingDao.class, targetedSequencingDao, false);
   }
 
   public void setDefaultTargetedSequencingDao() {
-    HibernateTargetedSequencingDao dao = new HibernateTargetedSequencingDao();
-    dao.setSessionFactory(sessionFactory);
-    setTargetedSequencingDao(dao);
-  }
-
-  private void updateTargetedSequencingDaoDependencies() {
-    if (targetedSequencingService != null) targetedSequencingService.setTargetedSequencingDao(targetedSequencingDao);
+    setService(HibernateTargetedSequencingDao.class, new HibernateTargetedSequencingDao());
   }
 
   public HibernatePoolDao getPoolDao() {
-    return poolDao;
+    return getService(HibernatePoolDao.class);
   }
 
   public void setPoolDao(HibernatePoolDao poolDao) {
-    this.poolDao = poolDao;
-    updatePoolDaoDependencies();
+    setService(HibernatePoolDao.class, poolDao, false);
   }
 
   public void setDefaultPoolDao() {
-    HibernatePoolDao dao = new HibernatePoolDao();
-    dao.setBoxStore(boxDao);
-    dao.setSecurityStore(securityStore);
-    dao.setSessionFactory(sessionFactory);
-    setPoolDao(dao);
-  }
-
-  private void updatePoolDaoDependencies() {
-    if (poolService != null) poolService.setPoolStore(poolDao);
+    setService(HibernatePoolDao.class, new HibernatePoolDao());
   }
 
   public DefaultPoolService getPoolService() {
-    return poolService;
+    return getService(DefaultPoolService.class);
   }
 
   public void setPoolService(DefaultPoolService service) {
-    this.poolService = service;
-    updatePoolServiceDependencies();
+    setService(DefaultPoolService.class, service, false);
   }
 
   public void setDefaultPoolService() {
     DefaultPoolService service = new DefaultPoolService();
     service.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
-    service.setAuthorizationManager(authorizationManager);
-    service.setNamingScheme(getNamingScheme());
-    service.setPoolStore(poolDao);
-    service.setPoolableElementViewService(poolableElementViewService);
-    setPoolService(service);
-  }
-
-  private void updatePoolServiceDependencies() {
-    if (containerService != null) containerService.setPoolService(poolService);
+    setService(DefaultPoolService.class, service);
   }
 
   public HibernateExperimentDao getExperimentDao() {
-    return experimentDao;
+    return getService(HibernateExperimentDao.class);
   }
 
   public void setExperimentDao(HibernateExperimentDao experimentDao) {
-    this.experimentDao = experimentDao;
-    updateExperimentDaoDependencies();
+    setService(HibernateExperimentDao.class, experimentDao, false);
   }
 
   public void setDefaultExperimentDao() {
-    HibernateExperimentDao dao = new HibernateExperimentDao();
-    dao.setSessionFactory(sessionFactory);
-    setExperimentDao(dao);
-  }
-
-  private void updateExperimentDaoDependencies() {
-    if (experimentService != null) experimentService.setExperimentStore(experimentDao);
+    setService(HibernateExperimentDao.class, new HibernateExperimentDao());
   }
 
   public HibernateKitDao getKitDao() {
-    return kitDao;
+    return getService(HibernateKitDao.class);
   }
 
   public void setKitDao(HibernateKitDao kitDao) {
-    this.kitDao = kitDao;
-    updateKitDaoDependencies();
+    setService(HibernateKitDao.class, kitDao, false);
   }
 
   public void setDefaultKitDao() {
-    HibernateKitDao dao = new HibernateKitDao();
-    dao.setSessionFactory(sessionFactory);
-    setKitDao(dao);
-  }
-
-  private void updateKitDaoDependencies() {
-    if (kitDescriptorService != null) kitDescriptorService.setKitStore(kitDao);
-    if (kitService != null) kitService.setKitStore(kitDao);
+    setService(HibernateKitDao.class, new HibernateKitDao());
   }
 
   public HibernateInstrumentModelDao getPlatformDao() {
-    return platformDao;
+    return getService(HibernateInstrumentModelDao.class);
   }
 
-  public void setPlatformDao(HibernateInstrumentModelDao platformDao) {
-    this.platformDao = platformDao;
-    updatePlatformDaoDependencies();
+  public void setInstrumentModelDao(HibernateInstrumentModelDao instrumentModelDao) {
+    setService(HibernateInstrumentModelDao.class, instrumentModelDao, false);
   }
 
-  public void setDefaultPlatformDao() {
-    HibernateInstrumentModelDao dao = new HibernateInstrumentModelDao();
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setSessionFactory(sessionFactory);
-    setPlatformDao(dao);
-  }
-
-  private void updatePlatformDaoDependencies() {
-    if (platformService != null) platformService.setPlatformDao(platformDao);
+  public void setDefaultInstrumentModelDao() {
+    setService(HibernateInstrumentModelDao.class, new HibernateInstrumentModelDao());
   }
 
   public HibernateStudyDao getStudyDao() {
-    return studyDao;
+    return getService(HibernateStudyDao.class);
   }
 
   public void setStudyDao(HibernateStudyDao studyDao) {
-    this.studyDao = studyDao;
-    updateStudyDaoDependencies();
+    setService(HibernateStudyDao.class, studyDao, false);
   }
 
   public void setDefaultStudyDao() {
-    HibernateStudyDao dao = new HibernateStudyDao();
-    dao.setSessionFactory(sessionFactory);
-    setStudyDao(dao);
-  }
-
-  private void updateStudyDaoDependencies() {
-    if (studyService != null) studyService.setStudyStore(studyDao);
+    setService(HibernateStudyDao.class, new HibernateStudyDao());
   }
 
   public HibernateRunDao getRunDao() {
-    return runDao;
+    return getService(HibernateRunDao.class);
   }
 
   public void setRunDao(HibernateRunDao runDao) {
-    this.runDao = runDao;
-    updateRunDaoDependencies();
+    setService(HibernateRunDao.class, runDao, false);
   }
 
   public void setDefaultRunDao() {
-    HibernateRunDao dao = new HibernateRunDao();
-    dao.setSessionFactory(sessionFactory);
-    setRunDao(dao);
-  }
-
-  private void updateRunDaoDependencies() {
-    if (runService != null) runService.setRunDao(runDao);
+    setService(HibernateRunDao.class, new HibernateRunDao());
   }
 
   public HibernateSequencerPartitionContainerDao getSequencerPartitionContainerDao() {
-    return sequencerPartitionContainerDao;
+    return getService(HibernateSequencerPartitionContainerDao.class);
   }
 
   public void setSequencerPartitionContainerDao(HibernateSequencerPartitionContainerDao sequencerPartitionContainerDao) {
-    this.sequencerPartitionContainerDao = sequencerPartitionContainerDao;
-    updateSequencerPartitionContainerDaoDependencies();
+    setService(HibernateSequencerPartitionContainerDao.class, sequencerPartitionContainerDao, false);
   }
 
   public void setDefaultSequencerPartitionContainerDao() {
-    HibernateSequencerPartitionContainerDao dao = new HibernateSequencerPartitionContainerDao();
-    dao.setSessionFactory(sessionFactory);
-    setSequencerPartitionContainerDao(dao);
-  }
-
-  private void updateSequencerPartitionContainerDaoDependencies() {
-    if (containerService != null) containerService.setContainerDao(sequencerPartitionContainerDao);
+    setService(HibernateSequencerPartitionContainerDao.class, new HibernateSequencerPartitionContainerDao());
   }
 
   public HibernateInstrumentDao getInstrumentDao() {
-    return instrumentDao;
+    return getService(HibernateInstrumentDao.class);
   }
 
   public void setInstrumentDao(HibernateInstrumentDao instrumentDao) {
-    this.instrumentDao = instrumentDao;
-    updateInstrumentDaoDependencies();
+    setService(HibernateInstrumentDao.class, instrumentDao, false);
   }
 
   public void setDefaultInstrumentDao() {
-    HibernateInstrumentDao dao = new HibernateInstrumentDao();
-    dao.setSessionFactory(sessionFactory);
-    setInstrumentDao(dao);
-  }
-
-  private void updateInstrumentDaoDependencies() {
-    if (instrumentService != null) instrumentService.setInstrumentDao(instrumentDao);
+    setService(HibernateInstrumentDao.class, new HibernateInstrumentDao());
   }
 
   public HibernateBoxDao getBoxDao() {
-    return boxDao;
+    return getService(HibernateBoxDao.class);
   }
 
   public void setBoxDao(HibernateBoxDao boxDao) {
-    this.boxDao = boxDao;
-    updateBoxDaoDependencies();
+    setService(HibernateBoxDao.class, boxDao, false);
   }
 
   public void setDefaultBoxDao() {
-    HibernateBoxDao dao = new HibernateBoxDao();
-    dao.setSessionFactory(sessionFactory);
-    dao.setJdbcTemplate(jdbcTemplate);
-    setBoxDao(dao);
-  }
-
-  private void updateBoxDaoDependencies() {
-    if (poolDao != null) poolDao.setBoxStore(boxDao);
-    if (sampleDao != null) sampleDao.setBoxStore(boxDao);
-    if (libraryDao != null) libraryDao.setBoxDao(boxDao);
-    if (dilutionDao != null) dilutionDao.setBoxStore(boxDao);
-    if (poolDao != null) poolDao.setBoxStore(boxDao);
+    setService(HibernateBoxDao.class, new HibernateBoxDao());
   }
 
   public DefaultLabService getLabService() {
-    return labService;
+    return getService(DefaultLabService.class);
   }
 
   public void setLabService(DefaultLabService labService) {
-    this.labService = labService;
-    updateLabServiceDependencies();
+    setService(DefaultLabService.class, labService, false);
   }
 
   public void setDefaultLabService() {
-    DefaultLabService svc = new DefaultLabService();
-    svc.setAuthorizationManager(authorizationManager);
-    svc.setInstituteDao(instituteDao);
-    svc.setLabDao(labDao);
-    setLabService(svc);
-  }
-
-  private void updateLabServiceDependencies() {
-    if (sampleService != null) sampleService.setLabService(labService);
+    setService(DefaultLabService.class, new DefaultLabService());
   }
 
   public HibernateLabDao getLabDao() {
-    return labDao;
+    return getService(HibernateLabDao.class);
   }
 
   public void setLabDao(HibernateLabDao labDao) {
-    this.labDao = labDao;
-    updateLabDaoDependencies();
+    setService(HibernateLabDao.class, labDao, false);
   }
 
   public void setDefaultLabDao() {
-    HibernateLabDao dao = new HibernateLabDao();
-    dao.setSessionFactory(sessionFactory);
-    setLabDao(dao);
-  }
-
-  private void updateLabDaoDependencies() {
-    if (labService != null) labService.setLabDao(labDao);
+    setService(HibernateLabDao.class, new HibernateLabDao());
   }
 
   public HibernateInstituteDao getInstituteDao() {
-    return instituteDao;
+    return getService(HibernateInstituteDao.class);
   }
 
   public void setInstituteDao(HibernateInstituteDao instituteDao) {
-    this.instituteDao = instituteDao;
-    updateInstituteDaoDependencies();
+    setService(HibernateInstituteDao.class, instituteDao, false);
   }
 
   public void setDefaultInstituteDao() {
-    HibernateInstituteDao dao = new HibernateInstituteDao();
-    dao.setSessionFactory(sessionFactory);
-    setInstituteDao(dao);
-  }
-
-  private void updateInstituteDaoDependencies() {
-    if (labService != null) labService.setInstituteDao(instituteDao);
+    setService(HibernateInstituteDao.class, new HibernateInstituteDao());
   }
 
   public HibernateDetailedQcStatusDao getDetailedQcStatusDao() {
-    return detailedQcStatusDao;
+    return getService(HibernateDetailedQcStatusDao.class);
   }
 
   public void setDetailedQcStatusDao(HibernateDetailedQcStatusDao detailedQcStatus) {
-    this.detailedQcStatusDao = detailedQcStatus;
-    updateDetailedQcStatusDaoDependencies();
+    setService(HibernateDetailedQcStatusDao.class, detailedQcStatus, false);
   }
 
   public void setDefaultDetailedQcStatusDao() {
-    HibernateDetailedQcStatusDao dao = new HibernateDetailedQcStatusDao();
-    dao.setSessionFactory(sessionFactory);
-    setDetailedQcStatusDao(dao);
-  }
-
-  private void updateDetailedQcStatusDaoDependencies() {
-    if (sampleService != null) sampleService.setDetailedQcStatusDao(detailedQcStatusDao);
+    setService(HibernateDetailedQcStatusDao.class, new HibernateDetailedQcStatusDao());
   }
 
   public HibernateSubprojectDao getSubprojectDao() {
-    return subprojectDao;
+    return getService(HibernateSubprojectDao.class);
   }
 
   public void setSubprojectDao(HibernateSubprojectDao subprojectDao) {
-    this.subprojectDao = subprojectDao;
-    updateSubprojectDaoDependencies();
+    setService(HibernateSubprojectDao.class, subprojectDao, false);
   }
 
   public void setDefaultSubprojectDao() {
-    HibernateSubprojectDao dao = new HibernateSubprojectDao();
-    dao.setSessionFactory(sessionFactory);
-    setSubprojectDao(dao);
-  }
-
-  private void updateSubprojectDaoDependencies() {
-    if (sampleService != null) sampleService.setSubProjectDao(subprojectDao);
+    setService(HibernateSubprojectDao.class, new HibernateSubprojectDao());
   }
 
   public HibernateTissueOriginDao getTissueOriginDao() {
-    return tissueOriginDao;
+    return getService(HibernateTissueOriginDao.class);
   }
 
   public void setTissueOriginDao(HibernateTissueOriginDao tissueOriginDao) {
-    this.tissueOriginDao = tissueOriginDao;
-    updateTissueOriginDaoDependencies();
+    setService(HibernateTissueOriginDao.class, tissueOriginDao, false);
   }
 
   public void setDefaultTissueOriginDao() {
-    HibernateTissueOriginDao dao = new HibernateTissueOriginDao();
-    dao.setSessionFactory(sessionFactory);
-    setTissueOriginDao(dao);
-  }
-
-  private void updateTissueOriginDaoDependencies() {
-    if (sampleService != null) sampleService.setTissueOriginDao(tissueOriginDao);
+    setService(HibernateTissueOriginDao.class, new HibernateTissueOriginDao());
   }
 
   public HibernateTissueTypeDao getTissueTypeDao() {
-    return tissueTypeDao;
+    return getService(HibernateTissueTypeDao.class);
   }
 
   public void setTissueTypeDao(HibernateTissueTypeDao tissueTypeDao) {
-    this.tissueTypeDao = tissueTypeDao;
-    updateTissueTypeDaoDependencies();
+    setService(HibernateTissueTypeDao.class, tissueTypeDao, false);
   }
 
   public void setDefaultTissueTypeDao() {
-    HibernateTissueTypeDao dao = new HibernateTissueTypeDao();
-    dao.setSessionFactory(sessionFactory);
-    setTissueTypeDao(dao);
-  }
-
-  private void updateTissueTypeDaoDependencies() {
-    if (sampleService != null) sampleService.setTissueTypeDao(tissueTypeDao);
+    setService(HibernateTissueTypeDao.class, new HibernateTissueTypeDao());
   }
 
   public HibernateSamplePurposeDao getSamplePurposeDao() {
-    return samplePurposeDao;
+    return getService(HibernateSamplePurposeDao.class);
   }
 
   public void setSamplePurposeDao(HibernateSamplePurposeDao samplePurposeDao) {
-    this.samplePurposeDao = samplePurposeDao;
-    updateSamplePurposeDaoDependencies();
+    setService(HibernateSamplePurposeDao.class, samplePurposeDao, false);
   }
 
   public void setDefaultSamplePurposeDao() {
-    HibernateSamplePurposeDao dao = new HibernateSamplePurposeDao();
-    dao.setSessionFactory(sessionFactory);
-    setSamplePurposeDao(dao);
-  }
-
-  private void updateSamplePurposeDaoDependencies() {
-    if (sampleService != null) sampleService.setSamplePurposeDao(samplePurposeDao);
+    setService(HibernateSamplePurposeDao.class, new HibernateSamplePurposeDao());
   }
 
   public HibernateTissueMaterialDao getTissueMaterialDao() {
-    return tissueMaterialDao;
+    return getService(HibernateTissueMaterialDao.class);
   }
 
   public void setTissueMaterialDao(HibernateTissueMaterialDao tissueMaterialDao) {
-    this.tissueMaterialDao = tissueMaterialDao;
-    updateTissueMaterialDaoDependencies();
+    setService(HibernateTissueMaterialDao.class, tissueMaterialDao, false);
   }
 
   public void setDefaultTissueMaterialDao() {
-    HibernateTissueMaterialDao dao = new HibernateTissueMaterialDao();
-    dao.setSessionFactory(sessionFactory);
-    setTissueMaterialDao(dao);
-  }
-
-  private void updateTissueMaterialDaoDependencies() {
-    if (sampleService != null) sampleService.setTissueMaterialDao(tissueMaterialDao);
+    setService(HibernateTissueMaterialDao.class, new HibernateTissueMaterialDao());
   }
 
   public DefaultSampleNumberPerProjectService getSampleNumberPerProjectService() {
-    return sampleNumberPerProjectService;
+    return getService(DefaultSampleNumberPerProjectService.class);
   }
 
   public void setSampleNumberPerProjectService(DefaultSampleNumberPerProjectService sampleNumberPerProjectService) {
-    this.sampleNumberPerProjectService = sampleNumberPerProjectService;
-    updateSampleNumberPerProjectServiceDependencies();
+    setService(DefaultSampleNumberPerProjectService.class, sampleNumberPerProjectService, false);
   }
 
   public void setDefaultSampleNumberPerProjectService() {
-    DefaultSampleNumberPerProjectService svc = new DefaultSampleNumberPerProjectService();
-    svc.setAuthorizationManager(authorizationManager);
-    svc.setSampleNumberPerProjectDao(sampleNumberPerProjectDao);
-    svc.setProjectStore(projectDao);
-    setSampleNumberPerProjectService(svc);
-  }
-
-  private void updateSampleNumberPerProjectServiceDependencies() {
-    // none
+    setService(DefaultSampleNumberPerProjectService.class, new DefaultSampleNumberPerProjectService());
   }
 
   public HibernateSampleNumberPerProjectDao getSampleNumberPerProjectDao() {
-    return sampleNumberPerProjectDao;
+    return getService(HibernateSampleNumberPerProjectDao.class);
   }
 
   public void setSampleNumberPerProjectDao(HibernateSampleNumberPerProjectDao sampleNumberPerProjectDao) {
-    this.sampleNumberPerProjectDao = sampleNumberPerProjectDao;
-    updateSampleNumberPerProjectDaoDependencies();
+    setService(HibernateSampleNumberPerProjectDao.class, sampleNumberPerProjectDao, false);
   }
 
   public void setDefaultSampleNumberPerProjectDao() {
-    HibernateSampleNumberPerProjectDao dao = new HibernateSampleNumberPerProjectDao();
-    dao.setSessionFactory(sessionFactory);
-    setSampleNumberPerProjectDao(dao);
-  }
-
-  private void updateSampleNumberPerProjectDaoDependencies() {
-    if (sampleNumberPerProjectService != null) sampleNumberPerProjectService.setSampleNumberPerProjectDao(sampleNumberPerProjectDao);
+    setService(HibernateSampleNumberPerProjectDao.class, new HibernateSampleNumberPerProjectDao());
   }
 
   public DefaultSampleValidRelationshipService getSampleValidRelationshipService() {
-    return sampleValidRelationshipService;
+    return getService(DefaultSampleValidRelationshipService.class);
   }
 
   public void setSampleValidRelationshipService(DefaultSampleValidRelationshipService sampleValidRelationshipService) {
-    this.sampleValidRelationshipService = sampleValidRelationshipService;
-    updateSampleValidRelationshipServiceDependencies();
+    setService(DefaultSampleValidRelationshipService.class, sampleValidRelationshipService, false);
   }
 
   public void setDefaultSampleValidRelationshipService() {
-    DefaultSampleValidRelationshipService svc = new DefaultSampleValidRelationshipService();
-    svc.setAuthorizationManager(authorizationManager);
-    svc.setSampleClassDao(sampleClassDao);
-    svc.setSampleValidRelationshipDao(sampleValidRelationshipDao);
-    setSampleValidRelationshipService(svc);
-  }
-
-  private void updateSampleValidRelationshipServiceDependencies() {
-    if (sampleService != null) sampleService.setSampleValidRelationshipService(sampleValidRelationshipService);
+    setService(DefaultSampleValidRelationshipService.class, new DefaultSampleValidRelationshipService());
   }
 
   public DefaultStudyService getStudyService() {
-    return studyService;
+    return getService(DefaultStudyService.class);
   }
 
   public void setStudyService(DefaultStudyService studyService) {
-    this.studyService = studyService;
-    updateStudyServiceDependencies();
+    setService(DefaultStudyService.class, studyService, false);
   }
 
   public void setDefaultStudyService() {
-    DefaultStudyService svc = new DefaultStudyService();
-    svc.setAuthorizationManager(authorizationManager);
-    svc.setProjectStore(projectDao);
-    svc.setStudyStore(studyDao);
-    svc.setNamingScheme(getNamingScheme());
-    setStudyService(svc);
-  }
-
-  private void updateStudyServiceDependencies() {
-    if (experimentService != null) experimentService.setStudyService(studyService);
+    setService(DefaultStudyService.class, new DefaultStudyService());
   }
 
   public DefaultReferenceGenomeService getReferenceGenomeService() {
-    return referenceGenomeService;
+    return getService(DefaultReferenceGenomeService.class);
   }
 
-  private void setReferenceGenomeService(DefaultReferenceGenomeService referenceGenomeService) {
-    this.referenceGenomeService = referenceGenomeService;
-    updateReferenceGenomeServiceDependencies();
+  public void setReferenceGenomeService(DefaultReferenceGenomeService referenceGenomeService) {
+    setService(DefaultReferenceGenomeService.class, referenceGenomeService, false);
   }
 
   public void setDefaultReferenceGenomeService() {
-    DefaultReferenceGenomeService svc = new DefaultReferenceGenomeService();
-    svc.setAuthorizationManager(authorizationManager);
-    svc.setReferenceGenomeDao(referenceGenomeDao);
-    setReferenceGenomeService(svc);
-  }
-
-  private void updateReferenceGenomeServiceDependencies() {
-
+    setService(DefaultReferenceGenomeService.class, new DefaultReferenceGenomeService());
   }
 
   public HibernateReferenceGenomeDao getReferenceGenomeDao() {
-    return referenceGenomeDao;
+    return getService(HibernateReferenceGenomeDao.class);
   }
 
   public void setReferenceGenomeDao(HibernateReferenceGenomeDao referenceGenomeDao) {
-    this.referenceGenomeDao = referenceGenomeDao;
-    updateReferenceGenomeDaoDependencies();
+    setService(HibernateReferenceGenomeDao.class, referenceGenomeDao, false);
   }
 
   public void setDefaultReferenceGenomeDao() {
-    HibernateReferenceGenomeDao dao = new HibernateReferenceGenomeDao();
-    dao.setSessionFactory(sessionFactory);
-    setReferenceGenomeDao(dao);
-  }
-
-  private void updateReferenceGenomeDaoDependencies() {
-    if (referenceGenomeService != null) referenceGenomeService.setReferenceGenomeDao(referenceGenomeDao);
-    if (projectService != null) projectService.setReferenceGenomeStore(referenceGenomeDao);
+    setService(HibernateReferenceGenomeDao.class, new HibernateReferenceGenomeDao());
   }
 
   public HibernateSampleValidRelationshipDao getSampleValidRelationshipDao() {
-    return sampleValidRelationshipDao;
+    return getService(HibernateSampleValidRelationshipDao.class);
   }
 
   public void setSampleValidRelationshipDao(HibernateSampleValidRelationshipDao sampleValidRelationshipDao) {
-    this.sampleValidRelationshipDao = sampleValidRelationshipDao;
-    updateSampleValidRelationshipDaoDependencies();
+    setService(HibernateSampleValidRelationshipDao.class, sampleValidRelationshipDao, false);
   }
 
   public void setDefaultSampleValidRelationshipDao() {
-    HibernateSampleValidRelationshipDao dao = new HibernateSampleValidRelationshipDao();
-    dao.setSessionFactory(sessionFactory);
-    setSampleValidRelationshipDao(dao);
-  }
-
-  private void updateSampleValidRelationshipDaoDependencies() {
-    if (sampleValidRelationshipService != null) sampleValidRelationshipService.setSampleValidRelationshipDao(sampleValidRelationshipDao);
+    setService(HibernateSampleValidRelationshipDao.class, new HibernateSampleValidRelationshipDao());
   }
 
   public HibernateLibraryDesignDao getLibraryDesignDao() {
-    return libraryDesignDao;
+    return getService(HibernateLibraryDesignDao.class);
   }
 
   public void setLibraryDesignDao(HibernateLibraryDesignDao libraryDesignDao) {
-    this.libraryDesignDao = libraryDesignDao;
-    updateLibraryDesignDaoDependencies();
+    setService(HibernateLibraryDesignDao.class, libraryDesignDao, false);
   }
 
   public void setDefaultLibraryDesignDao() {
-    HibernateLibraryDesignDao dao = new HibernateLibraryDesignDao();
-    dao.setSessionFactory(sessionFactory);
-    setLibraryDesignDao(dao);
-  }
-
-  private void updateLibraryDesignDaoDependencies() {
-    if (libraryDesignService != null) libraryDesignService.setLibraryDesignDao(libraryDesignDao);
+    setService(HibernateLibraryDesignDao.class, new HibernateLibraryDesignDao());
   }
 
   public HibernateLibraryDesignCodeDao getLibraryDesignCodeDao() {
-    return libraryDesignCodeDao;
+    return getService(HibernateLibraryDesignCodeDao.class);
   }
 
   public void setLibraryDesignCodeDao(HibernateLibraryDesignCodeDao libraryDesignCodeDao) {
-    this.libraryDesignCodeDao = libraryDesignCodeDao;
-    updateLibraryDesignCodeDaoDependencies();
+    setService(HibernateLibraryDesignCodeDao.class, libraryDesignCodeDao, false);
   }
 
   public void setDefaultLibraryDesignCodeDao() {
-    HibernateLibraryDesignCodeDao dao = new HibernateLibraryDesignCodeDao();
-    dao.setSessionFactory(sessionFactory);
-    setLibraryDesignCodeDao(dao);
-  }
-
-  private void updateLibraryDesignCodeDaoDependencies() {
-    if (libraryDesignCodeService != null) libraryDesignCodeService.setLibraryDesignCodeDao(libraryDesignCodeDao);
+    setService(HibernateLibraryDesignCodeDao.class, new HibernateLibraryDesignCodeDao());
   }
 
   public HibernateIndexDao getIndexDao() {
-    return indexDao;
+    return getService(HibernateIndexDao.class);
   }
 
   public void setIndexDao(HibernateIndexDao indexDao) {
-    this.indexDao = indexDao;
-    updateIndexDaoDependencies();
+    setService(HibernateIndexDao.class, indexDao, false);
   }
 
   public void setDefaultIndexDao() {
-    HibernateIndexDao dao = new HibernateIndexDao();
-    dao.setSessionFactory(sessionFactory);
-    setIndexDao(dao);
-  }
-
-  private void updateIndexDaoDependencies() {
-    if (indexService != null) indexService.setIndexStore(indexDao);
-  }
-
-  public void setDefaultSequencingParametersDao() {
-    HibernateSequencingParametersDao dao = new HibernateSequencingParametersDao();
-    dao.setSessionFactory(sessionFactory);
-    setSequencingParametersDao(dao);
+    setService(HibernateIndexDao.class, new HibernateIndexDao());
   }
 
   public HibernateSequencingParametersDao getSequencingParametersDao() {
-    return sequencingParametersDao;
+    return getService(HibernateSequencingParametersDao.class);
   }
 
   public void setSequencingParametersDao(HibernateSequencingParametersDao sequencingParametersDao) {
-    this.sequencingParametersDao = sequencingParametersDao;
-    updateSequencingParametersDaoDependencies();
+    setService(HibernateSequencingParametersDao.class, sequencingParametersDao, false);
   }
 
-  private void updateSequencingParametersDaoDependencies() {
-    if (sequencingParametersService != null) sequencingParametersService.setSequencingParametersDao(sequencingParametersDao);
+  public void setDefaultSequencingParametersDao() {
+    setService(HibernateSequencingParametersDao.class, new HibernateSequencingParametersDao());
   }
 
   public HibernatePoolableElementViewDao getPoolableElementViewDao() {
-    return this.poolableElementViewDao;
+    return getService(HibernatePoolableElementViewDao.class);
   }
 
   public void setPoolableElementViewDao(HibernatePoolableElementViewDao dao) {
-    this.poolableElementViewDao = dao;
-    updatePoolableElementViewDaoDependencies();
+    setService(HibernatePoolableElementViewDao.class, dao, false);
   }
 
   public void setDefaultPoolableElementViewDao() {
-    HibernatePoolableElementViewDao dao = new HibernatePoolableElementViewDao();
-    dao.setSessionFactory(sessionFactory);
-    setPoolableElementViewDao(dao);
-  }
-
-  private void updatePoolableElementViewDaoDependencies() {
-    if (poolableElementViewService != null) poolableElementViewService.setPoolableElementViewDao(poolableElementViewDao);
+    setService(HibernatePoolableElementViewDao.class, new HibernatePoolableElementViewDao());
   }
 
   public DefaultPoolableElementViewService getPoolableElementViewService() {
-    return this.poolableElementViewService;
+    return getService(DefaultPoolableElementViewService.class);
   }
 
   public void setPoolableElementViewService(DefaultPoolableElementViewService service) {
-    this.poolableElementViewService = service;
-    updatePoolableElementViewServiceDependencies();
+    setService(DefaultPoolableElementViewService.class, service, false);
   }
 
   public void setDefaultPoolableElementViewService() {
-    DefaultPoolableElementViewService service = new DefaultPoolableElementViewService();
-    service.setPoolableElementViewDao(poolableElementViewDao);
-    setPoolableElementViewService(service);
-  }
-
-  private void updatePoolableElementViewServiceDependencies() {
-    if (poolService != null) poolService.setPoolableElementViewService(poolableElementViewService);
+    setService(DefaultPoolableElementViewService.class, new DefaultPoolableElementViewService());
   }
 
   public DefaultRunService getRunService() {
-    return runService;
+    return getService(DefaultRunService.class);
   }
 
   public void setRunService(DefaultRunService service) {
-    this.runService = service;
-    updateRunServiceDependencies();
+    setService(DefaultRunService.class, service, false);
   }
 
   public void setDefaultRunService() {
-    DefaultRunService service = new DefaultRunService();
-    service.setAuthorizationManager(authorizationManager);
-    service.setRunDao(runDao);
-    service.setUserService(userService);
-    service.setNamingScheme(getNamingScheme());
-    service.setContainerService(containerService);
-    service.setInstrumentService(instrumentService);
-    service.setSequencingParametersService(sequencingParametersService);
-    setRunService(service);
-  }
-
-  private void updateRunServiceDependencies() {
-
+    setService(DefaultRunService.class, new DefaultRunService());
   }
 
   public DefaultContainerService getContainerService() {
-    return containerService;
+    return getService(DefaultContainerService.class);
   }
 
   public void setContainerService(DefaultContainerService service) {
-    this.containerService = service;
-    updateContainerServiceDependencies();
+    setService(DefaultContainerService.class, service, false);
   }
 
   public void setDefaultContainerService() {
-    DefaultContainerService service = new DefaultContainerService();
-    service.setAuthorizationManager(authorizationManager);
-    service.setContainerDao(sequencerPartitionContainerDao);
-    service.setPoolService(poolService);
-    setContainerService(service);
+    setService(DefaultContainerService.class, new DefaultContainerService());
   }
 
-  private void updateContainerServiceDependencies() {
-    if (runService != null) runService.setContainerService(containerService);
+  public DefaultInstrumentModelService getInstrumentModelService() {
+    return getService(DefaultInstrumentModelService.class);
   }
 
-  public DefaultInstrumentModelService getPlatformService() {
-    return platformService;
+  public void setInstrumentModelService(DefaultInstrumentModelService service) {
+    setService(DefaultInstrumentModelService.class, service, false);
   }
 
-  public void setPlatformService(DefaultInstrumentModelService service) {
-    this.platformService = service;
-    updatePlatformServiceDependencies();
-  }
-
-  public void setDefaultPlatformService() {
-    DefaultInstrumentModelService service = new DefaultInstrumentModelService();
-    service.setPlatformDao(platformDao);
-    setPlatformService(service);
-  }
-
-  private void updatePlatformServiceDependencies() {
-    if (experimentService != null) experimentService.setPlatformService(platformService);
+  public void setDefaultInstrumentModelService() {
+    setService(DefaultInstrumentModelService.class, new DefaultInstrumentModelService());
   }
 
   public DefaultInstrumentService getInstrumentService() {
-    return instrumentService;
+    return getService(DefaultInstrumentService.class);
   }
 
   public void setInstrumentService(DefaultInstrumentService service) {
-    this.instrumentService = service;
-    updateInstrumentServiceDependencies();
+    setService(DefaultInstrumentService.class, service, false);
   }
 
   public void setDefaultInstrumentService() {
-    DefaultInstrumentService service = new DefaultInstrumentService();
-    service.setAuthorizationManager(authorizationManager);
-    service.setInstrumentDao(instrumentDao);
-    setInstrumentService(service);
-  }
-
-  private void updateInstrumentServiceDependencies() {
-    if (runService != null) runService.setInstrumentService(instrumentService);
+    setService(DefaultInstrumentService.class, new DefaultInstrumentService());
   }
 
   public DefaultLibraryDesignService getLibraryDesignService() {
-    return libraryDesignService;
+    return getService(DefaultLibraryDesignService.class);
   }
 
   public void setLibraryDesignService(DefaultLibraryDesignService service) {
-    this.libraryDesignService = service;
-    updateLibraryDesignServiceDependencies();
+    setService(DefaultLibraryDesignService.class, service, false);
   }
 
   public void setDefaultLibraryDesignService() {
-    DefaultLibraryDesignService service = new DefaultLibraryDesignService();
-    service.setLibraryDesignDao(libraryDesignDao);
-    setLibraryDesignService(service);
-  }
-
-  private void updateLibraryDesignServiceDependencies() {
-    if (libraryService != null) libraryService.setLibraryDesignService(libraryDesignService);
+    setService(DefaultLibraryDesignService.class, new DefaultLibraryDesignService());
   }
 
   public DefaultLibraryDesignCodeService getLibraryDesignCodeService() {
-    return libraryDesignCodeService;
+    return getService(DefaultLibraryDesignCodeService.class);
   }
 
   public void setLibraryDesignCodeService(DefaultLibraryDesignCodeService service) {
-    this.libraryDesignCodeService = service;
-    updateLibraryDesignCodeServiceDependencies();
+    setService(DefaultLibraryDesignCodeService.class, service, false);
   }
 
   public void setDefaultLibraryDesignCodeService() {
-    DefaultLibraryDesignCodeService service = new DefaultLibraryDesignCodeService();
-    service.setLibraryDesignCodeDao(libraryDesignCodeDao);
-    setLibraryDesignCodeService(service);
-  }
-
-  private void updateLibraryDesignCodeServiceDependencies() {
-    if (libraryService != null) libraryService.setLibraryDesignCodeService(libraryDesignCodeService);
+    setService(DefaultLibraryDesignCodeService.class, new DefaultLibraryDesignCodeService());
   }
 
   public DefaultIndexService getIndexService() {
-    return indexService;
+    return getService(DefaultIndexService.class);
   }
 
   public void setIndexService(DefaultIndexService service) {
-    this.indexService = service;
-    updateIndexServiceDependencies();
+    setService(DefaultIndexService.class, service, false);
   }
 
   public void setDefaultIndexService() {
-    DefaultIndexService service = new DefaultIndexService();
-    service.setIndexStore(indexDao);
-    setIndexService(service);
-  }
-
-  private void updateIndexServiceDependencies() {
-    if (libraryService != null) libraryService.setIndexService(indexService);
+    setService(DefaultIndexService.class, new DefaultIndexService());
   }
 
   public DefaultKitDescriptorService getKitDescriptorService() {
-    return kitDescriptorService;
+    return getService(DefaultKitDescriptorService.class);
   }
 
   public void setKitDescriptorService(DefaultKitDescriptorService service) {
-    this.kitDescriptorService = service;
-    updateKitDescriptorServiceDependencies();
+    setService(DefaultKitDescriptorService.class, service, false);
   }
 
   public void setDefaultKitDescriptorService() {
-    DefaultKitDescriptorService service = new DefaultKitDescriptorService();
-    service.setKitStore(kitDao);
-    service.setAuthorizationManager(authorizationManager);
-    setKitDescriptorService(service);
-  }
-
-  private void updateKitDescriptorServiceDependencies() {
-    if (libraryService != null) libraryService.setKitDescriptorService(kitDescriptorService);
+    setService(DefaultKitDescriptorService.class, new DefaultKitDescriptorService());
   }
 
   public DefaultKitService getKitService() {
-    return kitService;
+    return getService(DefaultKitService.class);
   }
 
   public void setKitService(DefaultKitService service) {
-    this.kitService = service;
-    updateKitServiceDependencies();
+    setService(DefaultKitService.class, service, false);
   }
 
   public void setDefaultKitService() {
-    DefaultKitDescriptorService service = new DefaultKitDescriptorService();
-    service.setKitStore(kitDao);
-    service.setAuthorizationManager(authorizationManager);
-    setKitDescriptorService(service);
-  }
-
-  private void updateKitServiceDependencies() {
-    if (experimentService != null) experimentService.setKitService(kitService);
+    setService(DefaultKitService.class, new DefaultKitService());
   }
 
   public DefaultTargetedSequencingService getTargetedSequencingService() {
-    return targetedSequencingService;
+    return getService(DefaultTargetedSequencingService.class);
   }
 
   public void setTargetedSequencingService(DefaultTargetedSequencingService service) {
-    this.targetedSequencingService = service;
-    updateTargetedSequencingServiceDependencies();
+    setService(DefaultTargetedSequencingService.class, service, false);
   }
 
   public void setDefaultTargetedSequencingService() {
-    DefaultTargetedSequencingService service = new DefaultTargetedSequencingService();
-    service.setTargetedSequencingDao(targetedSequencingDao);
-    setTargetedSequencingService(service);
-  }
-
-  private void updateTargetedSequencingServiceDependencies() {
-    if (dilutionService != null) dilutionService.setTargetedSequencingService(targetedSequencingService);
+    setService(DefaultTargetedSequencingService.class, new DefaultTargetedSequencingService());
   }
 
   public DefaultChangeLogService getChangeLogService() {
-    return changeLogService;
+    return getService(DefaultChangeLogService.class);
   }
 
   public void setChangeLogService(DefaultChangeLogService service) {
-    this.changeLogService = service;
-    updateChangeLogServiceDependencies();
+    setService(DefaultChangeLogService.class, service, false);
   }
 
   public void setDefaultChangeLogService() {
-    DefaultChangeLogService service = new DefaultChangeLogService();
-    service.setChangeLogDao(changeLogDao);
-    service.setAuthorizationManager(authorizationManager);
-    setChangeLogService(service);
-  }
-
-  private void updateChangeLogServiceDependencies() {
-    if (runService != null) runService.setChangeLogService(changeLogService);
-    if (poolService != null) poolService.setChangeLogService(changeLogService);
-    if (libraryService != null) libraryService.setChangeLogService(changeLogService);
+    setService(DefaultChangeLogService.class, new DefaultChangeLogService());
   }
 
   public DefaultSequencingParametersService getSequencingParametersService() {
-    return sequencingParametersService;
+    return getService(DefaultSequencingParametersService.class);
   }
 
   public void setSequencingParametersService(DefaultSequencingParametersService service) {
-    this.sequencingParametersService = service;
-    updateSequencingParametersServiceDependencies();
+    setService(DefaultSequencingParametersService.class, service, false);
   }
 
   public void setDefaultSequencingParametersService() {
-    DefaultSequencingParametersService service = new DefaultSequencingParametersService();
-    service.setSequencingParametersDao(sequencingParametersDao);
-    service.setAuthorizationManager(authorizationManager);
-    setSequencingParametersService(service);
-  }
-
-  private void updateSequencingParametersServiceDependencies() {
-    if (runService != null) runService.setSequencingParametersService(sequencingParametersService);
-    if (poolOrderService != null) poolOrderService.setSequencingParametersService(sequencingParametersService);
+    setService(DefaultSequencingParametersService.class, new DefaultSequencingParametersService());
   }
 
   public DefaultPoolOrderService getPoolOrderService() {
-    return poolOrderService;
+    return getService(DefaultPoolOrderService.class);
   }
 
   public void setPoolOrderService(DefaultPoolOrderService service) {
-    this.poolOrderService = service;
-    updatePoolOrderServiceDependencies();
+    setService(DefaultPoolOrderService.class, service, false);
   }
 
   public void setDefaultPoolOrderService() {
-    DefaultPoolOrderService service = new DefaultPoolOrderService();
-    service.setPoolOrderDao(poolOrderDao);
-    service.setSequencingParametersService(sequencingParametersService);
-    service.setPoolService(poolService);
-    service.setAuthorizationManager(authorizationManager);
-    setPoolOrderService(service);
-  }
-
-  private void updatePoolOrderServiceDependencies() {
+    setService(DefaultPoolOrderService.class, new DefaultPoolOrderService());
   }
 
   public HibernatePoolOrderDao getPoolOrderDao() {
-    return poolOrderDao;
+    return getService(HibernatePoolOrderDao.class);
   }
 
   public void setPoolOrderDao(HibernatePoolOrderDao dao) {
-    this.poolOrderDao = dao;
-    updatePoolOrderDaoDependencies();
+    setService(HibernatePoolOrderDao.class, dao, false);
   }
 
   public void setDefaultPoolOrderDao() {
-    HibernatePoolOrderDao dao = new HibernatePoolOrderDao();
-    dao.setSessionFactory(sessionFactory);
-    setPoolOrderDao(dao);
-  }
-
-  private void updatePoolOrderDaoDependencies() {
-    if (poolOrderService != null) poolOrderService.setPoolOrderDao(poolOrderDao);
+    setService(HibernatePoolOrderDao.class, new HibernatePoolOrderDao());
   }
 
   public DefaultExperimentService getExperimentService() {
-    return experimentService;
+    return getService(DefaultExperimentService.class);
   }
 
   public void setExperimentService(DefaultExperimentService svc) {
-    this.experimentService = svc;
-    updateExperimentServiceDependencies();
+    setService(DefaultExperimentService.class, svc, false);
   }
 
   public void setDefaultExperimentService() {
-    DefaultExperimentService service = new DefaultExperimentService();
-    service.setAuthorizationManager(authorizationManager);
-    service.setExperimentStore(experimentDao);
-    service.setKitService(kitService);
-    service.setNamingScheme(getNamingScheme());
-    service.setPlatformService(platformService);
-    service.setLibraryService(libraryService);
-    service.setStudyService(studyService);
-    setExperimentService(service);
+    setService(DefaultExperimentService.class, new DefaultExperimentService());
   }
 
-  private void updateExperimentServiceDependencies() {
+  public DefaultBoxService getBoxService() {
+    return getService(DefaultBoxService.class);
+  }
+
+  public void setBoxService(DefaultBoxService service) {
+    setService(DefaultBoxService.class, service, false);
   }
 
   public void setDefaultBoxService() {
     DefaultBoxService service = new DefaultBoxService();
-    service.setBoxStore(boxDao);
-    service.setAuthorizationManager(authorizationManager);
     service.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
-    service.setChangeLogService(changeLogService);
-    service.setNamingScheme(namingScheme);
-    setBoxService(service);
+    setService(DefaultBoxService.class, service);
   }
 
-  public void setBoxService(DefaultBoxService service) {
-    this.boxService = service;
-    updateBoxServiceDependencies();
-  }
-
-  private void updateBoxServiceDependencies() {
-
-  }
-
-  public BoxService getBoxService() {
-    return boxService;
-  }
-
-  private void setDefaultQualityControlService() {
-    DefaultQualityControlService service = new DefaultQualityControlService();
-    service.setAuthorizationManager(authorizationManager);
-    service.setLibraryQcStore(libraryQcDao);
-    // Skip setPoolQcStore
-    service.setSampleQcStore(sampleQcDao);
-    service.setQcTypeStore(qcTypeDao);
-    setQualityControlService(service);
+  public DefaultQualityControlService getQualityControlService() {
+    return getService(DefaultQualityControlService.class);
   }
 
   public void setQualityControlService(DefaultQualityControlService qualityControlService) {
-    this.qcService = qualityControlService;
-    updateQualityServiceDependencies();
+    setService(DefaultQualityControlService.class, qualityControlService, false);
   }
 
-  private void updateQualityServiceDependencies() {
-    // nothing depends on QualityControlService
+  public void setDefaultQualityControlService() {
+    setService(DefaultQualityControlService.class, new DefaultQualityControlService());
   }
 
-  public QualityControlService getQualityControlService() {
-    return qcService;
-  }
-
-  private void setDefaultQcTypeDao() {
-    HibernateQcTypeDao dao = new HibernateQcTypeDao();
-    dao.setSessionFactory(sessionFactory);
-    setQcTypeDao(dao);
+  public HibernateQcTypeDao getQcTypeDao() {
+    return getService(HibernateQcTypeDao.class);
   }
 
   public void setQcTypeDao(HibernateQcTypeDao qcTypeDao) {
-    this.qcTypeDao = qcTypeDao;
-    updateQcTypeDaoDependencies();
+    setService(HibernateQcTypeDao.class, qcTypeDao, false);
   }
 
-  private void updateQcTypeDaoDependencies() {
-    if (qcService != null) qcService.setQcTypeStore(qcTypeDao);
+  public void setDefaultQcTypeDao() {
+    setService(HibernateQcTypeDao.class, new HibernateQcTypeDao());
+  }
+
+  public HibernateDeletionDao getDeletionStore() {
+    return getService(HibernateDeletionDao.class);
+  }
+
+  public void setDeletionStore(HibernateDeletionDao dao) {
+    setService(HibernateDeletionDao.class, dao, false);
+  }
+
+  public void setDefaultDeletionStore() {
+    setService(HibernateDeletionDao.class, new HibernateDeletionDao());
+  }
+
+  public HibernateBoxUseDao getBoxUseDao() {
+    return getService(HibernateBoxUseDao.class);
+  }
+
+  public void setBoxUseDao(HibernateBoxUseDao dao) {
+    setService(HibernateBoxUseDao.class, dao, false);
+  }
+
+  public void setDefaultBoxUseDao() {
+    setService(HibernateBoxUseDao.class, new HibernateBoxUseDao());
+  }
+
+  public DefaultBoxUseService getBoxUseService() {
+    return getService(DefaultBoxUseService.class);
+  }
+
+  public void setBoxUseService(DefaultBoxUseService service) {
+    setService(DefaultBoxUseService.class, service, false);
+  }
+
+  public void setDefaultBoxUseService() {
+    setService(DefaultBoxUseService.class, new DefaultBoxUseService());
+  }
+
+  public HibernateBoxSizeDao getBoxSizeDao() {
+    return getService(HibernateBoxSizeDao.class);
+  }
+
+  public void setBoxSizeDao(HibernateBoxSizeDao dao) {
+    setService(HibernateBoxSizeDao.class, dao, false);
+  }
+
+  public void setDefaultBoxSizeDao() {
+    setService(HibernateBoxSizeDao.class, new HibernateBoxSizeDao());
+  }
+
+  public DefaultBoxSizeService getBoxSizeService() {
+    return getService(DefaultBoxSizeService.class);
+  }
+
+  public void setBoxSizeService(DefaultBoxSizeService service) {
+    setService(DefaultBoxSizeService.class, service, false);
+  }
+
+  public void setDefaultBoxSizeService() {
+    setService(DefaultBoxSizeService.class, new DefaultBoxSizeService());
   }
 
 }

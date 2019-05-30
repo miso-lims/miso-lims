@@ -91,7 +91,8 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.service.AttachmentCategoryService;
-import uk.ac.bbsrc.tgac.miso.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.service.BoxSizeService;
+import uk.ac.bbsrc.tgac.miso.service.BoxUseService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
@@ -108,7 +109,6 @@ import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
-import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleTypeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
@@ -167,8 +167,6 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private SubprojectService subprojectService;
   @Autowired
-  private SampleService sampleService;
-  @Autowired
   private SampleGroupService sampleGroupService;
   @Autowired
   private SamplePurposeService samplePurposeService;
@@ -179,7 +177,9 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private TargetedSequencingService targetedSequencingService;
   @Autowired
-  private BoxService boxService;
+  private BoxSizeService boxSizeService;
+  @Autowired
+  private BoxUseService boxUseService;
   @Autowired
   private QualityControlService qcService;
   @Autowired
@@ -316,8 +316,8 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, node, "printerBackends", Arrays.asList(Backend.values()), Dtos::asDto);
     createArray(mapper, node, "printerDrivers", Arrays.asList(Driver.values()), Dtos::asDto);
     createArray(mapper, node, "printerLayouts", Arrays.asList(Layout.values()), Dtos::asDto);
-    createArray(mapper, node, "boxSizes", boxService.listSizes(), Function.identity());
-    createArray(mapper, node, "boxUses", boxService.listUses(), Function.identity());
+    createArray(mapper, node, "boxSizes", boxSizeService.list(), Dtos::asDto);
+    createArray(mapper, node, "boxUses", boxUseService.list(), Dtos::asDto);
     createArray(mapper, node, "studyTypes", studyService.listTypes(), Dtos::asDto);
     createArray(mapper, node, "sampleCategories", SampleClass.CATEGORIES, Function.identity());
     createArray(mapper, node, "submissionAction", Arrays.asList(SubmissionActionType.values()), SubmissionActionType::name);

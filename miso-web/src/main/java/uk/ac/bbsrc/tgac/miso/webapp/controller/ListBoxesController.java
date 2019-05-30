@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
-import uk.ac.bbsrc.tgac.miso.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.service.BoxUseService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 
@@ -25,11 +25,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 public class ListBoxesController {
 
   @Autowired
-  private BoxService boxService;
-
-  public void setBoxService(BoxService boxService) {
-    this.boxService = boxService;
-  }
+  private BoxUseService boxUseService;
 
   @ModelAttribute("title")
   public String title() {
@@ -38,7 +34,7 @@ public class ListBoxesController {
 
   @RequestMapping("/boxes")
   public ModelAndView listBoxes(ModelMap model) throws Exception {
-    return new TabbedListBoxPage("box", "boxUse", boxService.listUses().stream(), BoxUse::getAlias, BoxUse::getId).list(model);
+    return new TabbedListBoxPage("box", "boxUse", boxUseService.list().stream(), BoxUse::getAlias, BoxUse::getId).list(model);
   }
 
   public class TabbedListBoxPage extends TabbedListItemsPage {

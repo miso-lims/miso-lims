@@ -15,6 +15,7 @@ public interface AbstractListPage {
     public static final String AVG_INSERT_SIZE = "Average Insert Size";
     public static final String BACKEND = "Backend";
     public static final String CATEGORY = "Category";
+    public static final String COLUMNS = "Columns";
     public static final String COMPLETED = "Completed";
     public static final String CONCENTRATION = "Concentration";
     public static final String CONCENTRATION_UNITS = "Conc. Units";
@@ -70,11 +71,13 @@ public interface AbstractListPage {
     public static final String QC_STATUS = "QC Status";
     public static final String REMAINING = "Remaining";
     public static final String REQUESTED = "Requested";
+    public static final String ROWS = "Rows";
     public static final String RUNNING = "Running";
     public static final String SAMPLE_ALIAS = "Sample Alias";
     public static final String SAMPLE_CLASS = "Sample Class";
     public static final String SAMPLE_NAME = "Sample Name";
     public static final String SAMPLE_TYPE = "Type";
+    public static final String SCANNABLE = "Scannable";
     public static final String SEQ_PARAMS = "Seq. Params.";
     public static final String SEQUENCE = "Sequence";
     public static final String SEQUENCING_PARAMETERS = "Sequencing Parameters";
@@ -100,6 +103,8 @@ public interface AbstractListPage {
   }
 
   public static class ListTarget {
+    public static final String BOX_SIZES = "boxsize/list";
+    public static final String BOX_USES = "boxuse/list";
     public static final String SAMPLES = "samples";
     public static final String LIBRARIES = "libraries";
     public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";

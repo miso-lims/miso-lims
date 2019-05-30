@@ -3,12 +3,9 @@ package uk.ac.bbsrc.tgac.miso.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
@@ -29,8 +26,6 @@ public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<
 
   public List<BoxableView> getBoxContents(long id) throws IOException;
 
-  public Map<String, Integer> getColumnSizes() throws IOException;
-
   public List<Box> listByIdList(List<Long> idList) throws IOException;
 
   /**
@@ -41,17 +36,6 @@ public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<
   public List<Box> getBySearch(String search);
 
   public List<Box> getByPartialSearch(String search, boolean onlyMatchBeginning);
-
-  public Collection<BoxSize> listSizes() throws IOException;
-
-  public BoxSize getSize(long id) throws IOException;
-
-  /**
-   * Obtain a list of all of the box uses
-   */
-  public Collection<BoxUse> listUses() throws IOException;
-  
-  public BoxUse getUse(long id) throws IOException;
 
   public long save(Box box) throws IOException;
 

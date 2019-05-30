@@ -24,7 +24,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,9 +54,6 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
 
   @Autowired
   private BoxStore boxStore;
-
-  @Autowired
-  private JdbcTemplate template;
 
   public void setBoxStore(BoxStore boxStore) {
     this.boxStore = boxStore;
@@ -117,10 +113,6 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     @SuppressWarnings("unchecked")
     List<Sample> records = criteria.list();
     return records;
-  }
-
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
   }
 
   @Override
@@ -221,10 +213,6 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
       update(t);
       return t.getId();
     }
-  }
-
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
   }
 
   @Override
