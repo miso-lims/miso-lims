@@ -475,6 +475,17 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.STAIN_CATEGORIES);
   }
 
+  @Test
+  public void testListDetailedQcStatusSetup() throws Exception {
+    testPageSetup(ListTarget.DETAILED_QC_STATUS,
+        Sets.newHashSet(Columns.SORT, Columns.DESCRIPTION, Columns.QC_PASSED, Columns.NOTE_REQUIRED));
+  }
+
+  @Test
+  public void testListDetailedQcStatusColumnSort() throws Exception {
+    testColumnsSort(ListTarget.DETAILED_QC_STATUS);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     // Goal: confirm that all expected columns are present
     ListPage page = getList(listTarget);

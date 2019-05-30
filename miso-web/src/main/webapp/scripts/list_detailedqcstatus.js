@@ -23,13 +23,13 @@ ListTarget.detailedqcstatus = {
       include: true,
       iSortPriority: 1
     }, {
-      sTitle: 'QC Passed?',
+      sTitle: 'QC Passed',
       mData: 'status',
       include: true,
       iSortPriority: 0,
       mRender: ListUtils.render.booleanChecks
     }, {
-      sTitle: 'Note Required?',
+      sTitle: 'Note Required',
       mData: 'noteRequired',
       include: true,
       iSortPriority: 0,

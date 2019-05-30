@@ -204,7 +204,7 @@ passed, failed, or unknown, but also provides more specific information about th
   consent for it to be used
 
 MISO administrators can add, edit, and delete detailed QC statuses using the standard interface. A detailed QC status
-can only be deleted if the option has not been used by any existing samples.
+can only be deleted if the status has not been used by any existing samples.
 
 {% include userman-toplink.md %}
 
