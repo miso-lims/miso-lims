@@ -2344,9 +2344,16 @@ public class Dtos {
 
   public static StudyTypeDto asDto(@Nonnull StudyType from) {
     StudyTypeDto dto = new StudyTypeDto();
-    dto.setId(from.getId());
-    dto.setName(from.getName());
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setName, from.getName());
     return dto;
+  }
+
+  public static StudyType to(@Nonnull StudyTypeDto from) {
+    StudyType to = new StudyType();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
+    return to;
   }
 
   public static ChangeLogDto asDto(@Nonnull ChangeLog from) {

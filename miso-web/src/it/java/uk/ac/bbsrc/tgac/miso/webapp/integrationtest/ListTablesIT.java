@@ -528,6 +528,15 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.PARTITION_QC_TYPE);
   }
 
+  public void testListStudyTypesSetup() throws Exception {
+    testPageSetup(ListTarget.STUDY_TYPES, Sets.newHashSet(Columns.SORT, Columns.NAME));
+  }
+
+  @Test
+  public void testListStudyTypesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.STUDY_TYPES);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     // Goal: confirm that all expected columns are present
     ListPage page = getList(listTarget);

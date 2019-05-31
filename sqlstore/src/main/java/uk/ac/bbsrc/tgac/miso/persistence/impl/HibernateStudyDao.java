@@ -40,7 +40,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
@@ -138,19 +137,6 @@ public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSour
     @SuppressWarnings("unchecked")
     List<Study> results = criteria.list();
     return results;
-  }
-
-  @Override
-  public List<StudyType> listAllStudyTypes() throws IOException {
-    Criteria criteria = currentSession().createCriteria(StudyType.class);
-    @SuppressWarnings("unchecked")
-    List<StudyType> results = criteria.list();
-    return results;
-  }
-
-  @Override
-  public StudyType getType(long id) {
-    return (StudyType) currentSession().get(StudyType.class, id);
   }
 
   @Override

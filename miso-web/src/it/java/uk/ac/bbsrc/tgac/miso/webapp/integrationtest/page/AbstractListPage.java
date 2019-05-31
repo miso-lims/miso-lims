@@ -134,6 +134,7 @@ public interface AbstractListPage {
     public static final String SAMPLE_TYPES = "sampletype/list";
     public static final String STAINS = "stain/list";
     public static final String STAIN_CATEGORIES = "staincategory/list";
+    public static final String STUDY_TYPES = "studytype/list";
   }
 
   public static class ButtonText {

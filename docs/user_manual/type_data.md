@@ -488,9 +488,14 @@ access to the MISO database. As such, they must be performed by a MISO adminstra
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Study Types" %}
 
-Study type is defined by [NCBI](https://www.ncbi.nlm.nih.gov/) as "expressing the overall purpose of the study." This
-property is required in order to submit studies to the SRA (see the [SRA section](sra.html)). The values available in
-MISO should be limited to the default options, which are the same as defined in the SRA schema.
+**WARNING**: Study type is defined by [NCBI](https://www.ncbi.nlm.nih.gov/) as "expressing the overall purpose of the
+study." This property is required in order to submit studies to the ENA (see the
+[ENA section](european_nucleotide_archive_support.html)). The values available in MISO should be limited to the default
+options, which are the same as defined in the ENA schema. If these values are modified, or additional options are
+added, your data may not be valid for ENA submission.
+
+MISO administrators can add, edit, and delete study types using the standard interface. A study type can only be
+deleted if it is not used by any existing studies.
 
 {% include userman-toplink.md %}
 

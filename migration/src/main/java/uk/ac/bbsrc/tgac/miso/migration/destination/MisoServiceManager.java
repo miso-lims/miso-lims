@@ -55,6 +55,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerPartitionContainerDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStudyDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStudyTypeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
@@ -89,6 +90,7 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultStudyService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultStudyTypeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultTargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultUserService;
 
@@ -276,6 +278,10 @@ public class MisoServiceManager {
     addDependency(DefaultBoxSizeService.class, MigrationAuthorizationManager.class, DefaultBoxSizeService::setAuthorizationManager);
     addDependency(DefaultBoxSizeService.class, HibernateDeletionDao.class, DefaultBoxSizeService::setDeletionStore);
     addDependency(HibernateBoxSizeDao.class, SessionFactory.class, HibernateBoxSizeDao::setSessionFactory);
+    addDependency(HibernateStudyTypeDao.class, SessionFactory.class, HibernateStudyTypeDao::setSessionFactory);
+    addDependency(DefaultStudyTypeService.class, HibernateStudyTypeDao.class, DefaultStudyTypeService::setStudyTypeDao);
+    addDependency(DefaultStudyTypeService.class, MigrationAuthorizationManager.class, DefaultStudyTypeService::setAuthorizationManager);
+    addDependency(DefaultStudyTypeService.class, HibernateDeletionDao.class, DefaultStudyTypeService::setDeletionStore);
   }
 
   private static <O, D> void addDependency(Class<O> owner, Class<D> dependency, BiConsumer<O, D> setter) {
@@ -404,6 +410,8 @@ public class MisoServiceManager {
     setDefaultBoxUseService();
     setDefaultBoxSizeDao();
     setDefaultBoxSizeService();
+    setDefaultStudyTypeDao();
+    setDefaultStudyTypeService();
   }
 
   /**
@@ -1367,6 +1375,30 @@ public class MisoServiceManager {
 
   public void setDefaultBoxSizeService() {
     setService(DefaultBoxSizeService.class, new DefaultBoxSizeService());
+  }
+
+  public HibernateStudyTypeDao getStudyTypeDao() {
+    return getService(HibernateStudyTypeDao.class);
+  }
+
+  public void setStudyTypeDao(HibernateStudyTypeDao dao) {
+    setService(HibernateStudyTypeDao.class, dao, false);
+  }
+
+  public void setDefaultStudyTypeDao() {
+    setService(HibernateStudyTypeDao.class, new HibernateStudyTypeDao());
+  }
+
+  public DefaultStudyTypeService getStudyTypeService() {
+    return getService(DefaultStudyTypeService.class);
+  }
+
+  public void setStudyTypeService(DefaultStudyTypeService service) {
+    setService(DefaultStudyTypeService.class, service, false);
+  }
+
+  public void setDefaultStudyTypeService() {
+    setService(DefaultStudyTypeService.class, new DefaultStudyTypeService());
   }
 
 }
