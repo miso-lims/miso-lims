@@ -9,7 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class ArrayModel implements Serializable, Aliasable {
+public class ArrayModel implements Serializable, Aliasable, Deletable {
 
   private static final long serialVersionUID = 1L;
 
@@ -60,7 +60,17 @@ public class ArrayModel implements Serializable, Aliasable {
 
   @Override
   public boolean isSaved() {
-    return getId() == UNSAVED_ID;
+    return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Array Model";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias();
   }
 
 }

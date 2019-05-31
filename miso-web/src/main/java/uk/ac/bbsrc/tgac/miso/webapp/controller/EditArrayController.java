@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.service.ArrayModelService;
 import uk.ac.bbsrc.tgac.miso.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.service.ArrayService;
 
@@ -35,12 +36,15 @@ public class EditArrayController {
   private ArrayService arrayService;
 
   @Autowired
+  private ArrayModelService arrayModelService;
+
+  @Autowired
   private ArrayRunService arrayRunService;
 
   @RequestMapping("/new")
   public ModelAndView newArray(ModelMap model) throws IOException {
     model.addAttribute(MODEL_ATTR_PAGEMODE, "create");
-    List<ArrayModel> models = arrayService.listArrayModels();
+    List<ArrayModel> models = arrayModelService.list();
     ObjectMapper mapper = new ObjectMapper();
     model.addAttribute(MODEL_ATTR_MODELS, mapper.writeValueAsString(models.stream().map(Dtos::asDto).collect(Collectors.toList())));
     return new ModelAndView(JSP, model);

@@ -416,6 +416,16 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
+  public void testListArrayModelsSetup() throws Exception {
+    testPageSetup(ListTarget.ARRAY_MODELS, Sets.newHashSet(Columns.SORT, Columns.ALIAS, Columns.ROWS, Columns.COLUMNS));
+  }
+
+  @Test
+  public void testListArrayModelsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.ARRAY_MODELS);
+  }
+
+  @Test
   public void testListArrayRunsSetup() throws Exception {
     testPageSetup(ListTarget.ARRAYRUNS, arrayRunsColumns);
   }

@@ -2739,8 +2739,19 @@ public class Dtos {
 
   public static ArrayModelDto asDto(@Nonnull ArrayModel from) {
     ArrayModelDto to = new ArrayModelDto();
-    setId(to::setId, from);
+    setLong(to::setId, from.getId(), true);
     setString(to::setAlias, from.getAlias());
+    setInteger(to::setRows, from.getRows(), true);
+    setInteger(to::setColumns, from.getColumns(), true);
+    return to;
+  }
+
+  public static ArrayModel to(@Nonnull ArrayModelDto from) {
+    ArrayModel to = new ArrayModel();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    setInteger(to::setRows, from.getRows(), false);
+    setInteger(to::setColumns, from.getColumns(), false);
     return to;
   }
 

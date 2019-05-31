@@ -169,22 +169,6 @@ public class HibernateArrayDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetArrayModel() throws Exception {
-    ArrayModel model = sut.getArrayModel(1L);
-    assertNotNull(model);
-    assertEquals(1L, model.getId());
-    assertEquals("Test BeadChip", model.getAlias());
-    assertEquals(8, model.getRows());
-    assertEquals(1, model.getColumns());
-  }
-
-  @Test
-  public void testListArrayModels() throws Exception {
-    List<ArrayModel> models = sut.listArrayModels();
-    assertEquals(1, models.size());
-  }
-
-  @Test
   public void testSearch() throws IOException {
     testSearch(PaginationFilter.query("Array"));
   }

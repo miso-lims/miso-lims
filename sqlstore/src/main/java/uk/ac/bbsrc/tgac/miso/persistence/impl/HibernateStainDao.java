@@ -18,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.StainDao;
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernateStainDao implements StainDao {
+
   @Autowired
   private SessionFactory sessionFactory;
 
