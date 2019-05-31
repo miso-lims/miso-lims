@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -22,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.persistence.StudyTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
@@ -43,6 +43,9 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
   private StudyStore studyStore;
 
   @Autowired
+  private StudyTypeDao studyTypeDao;
+
+  @Autowired
   private DeletionStore deletionStore;
 
   @Override
@@ -59,13 +62,29 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
     return projectStore;
   }
 
+  public void setProjectStore(ProjectStore projectStore) {
+    this.projectStore = projectStore;
+  }
+
   public StudyStore getStudyStore() {
     return studyStore;
   }
 
+  public void setStudyStore(StudyStore studyStore) {
+    this.studyStore = studyStore;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
+  }
+
+  public void setNamingScheme(NamingScheme namingScheme) {
+    this.namingScheme = namingScheme;
+  }
+
   @Override
-  public StudyType getType(long id) {
-    return studyStore.getType(id);
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
   }
 
   @Override
@@ -79,18 +98,13 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
   }
 
   @Override
-  public Collection<StudyType> listTypes() throws IOException {
-    return studyStore.listAllStudyTypes();
-  }
-
-  @Override
   public Collection<Study> listWithLimit(long limit) throws IOException {
     return studyStore.listAllWithLimit(limit);
   }
 
   @Override
   public long create(Study study) throws IOException {
-    study.setStudyType(studyStore.getType(study.getStudyType().getId()));
+    study.setStudyType(studyTypeDao.get(study.getStudyType().getId()));
     study.setProject(projectStore.get(study.getProject().getId()));
     validateChange(study, null);
     study.setChangeDetails(authorizationManager.getCurrentUser());
@@ -116,7 +130,7 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
     original.setChangeDetails(authorizationManager.getCurrentUser());
 
     // project is immutable
-    original.setStudyType(studyStore.getType(study.getStudyType().getId()));
+    original.setStudyType(studyTypeDao.get(study.getStudyType().getId()));
     return studyStore.save(original);
   }
 
@@ -130,27 +144,6 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
-  }
-
-  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
-    this.authorizationManager = authorizationManager;
-  }
-
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
-  }
-
-  public void setProjectStore(ProjectStore projectStore) {
-    this.projectStore = projectStore;
-  }
-
-  public void setStudyStore(StudyStore studyStore) {
-    this.studyStore = studyStore;
-  }
-
-  @Override
-  public DeletionStore getDeletionStore() {
-    return deletionStore;
   }
 
   @Override

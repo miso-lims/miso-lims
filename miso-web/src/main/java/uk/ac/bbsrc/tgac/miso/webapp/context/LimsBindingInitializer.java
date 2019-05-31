@@ -103,6 +103,7 @@ import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.StudyTypeService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
@@ -144,6 +145,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   private SampleService sampleService;
   @Autowired
   private StudyService studyService;
+  @Autowired
+  private StudyTypeService studyTypeService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
@@ -428,7 +431,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
       @Override
       public StudyType resolveById(long id) throws Exception {
-        return studyService.getType(id);
+        return studyTypeService.get(id);
       }
     }.register(binder);
 

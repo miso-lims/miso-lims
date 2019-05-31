@@ -129,18 +129,6 @@ public class HibernateStudyDaoTest extends AbstractDAOTest {
     assertTrue(studies.size() > 0);
   }
 
-  @Test
-  public void testListAllStudyTypes() throws Exception {
-    boolean hasCancerGenomics = false;
-    for (StudyType type : dao.listAllStudyTypes()) {
-      if (type.getName().equals("Cancer Genomics")) {
-        hasCancerGenomics = true;
-        break;
-      }
-    }
-    assertTrue(hasCancerGenomics);
-  }
-
   private Study makeStudy() {
     User user = new UserImpl();
     user.setId(1L);

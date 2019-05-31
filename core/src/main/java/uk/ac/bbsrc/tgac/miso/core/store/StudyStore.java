@@ -25,10 +25,8 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
@@ -65,15 +63,6 @@ public interface StudyStore extends Store<Study>, PaginatedDataSource<Study> {
   Collection<Study> listByProjectId(long projectId) throws IOException;
 
   /**
-   * List all StudyTypes
-   * 
-   * @return Collection<String>
-   * @throws IOException
-   *           when
-   */
-  List<StudyType> listAllStudyTypes() throws IOException;
-
-  /**
    * List all persisted objects
    * 
    * @return Collection<Study>
@@ -82,5 +71,4 @@ public interface StudyStore extends Store<Study>, PaginatedDataSource<Study> {
    */
   Collection<Study> listAllWithLimit(long limit) throws IOException;
 
-  public StudyType getType(long id);
 }

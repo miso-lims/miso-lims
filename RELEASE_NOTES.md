@@ -8,6 +8,7 @@ Changes:
     * detailed QC statuses (detailed sample)
     * partition QC types
     * reference genomes
+    * study types
 
 # 0.2.179
 

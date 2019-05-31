@@ -113,7 +113,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleTypeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
-import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.StudyTypeService;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
@@ -189,7 +189,7 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private PartitionQcTypeService partitionQcTypeService;
   @Autowired
-  private StudyService studyService;
+  private StudyTypeService studyTypeService;
   @Autowired
   private ContainerService containerService;
   @Autowired
@@ -318,7 +318,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, node, "printerLayouts", Arrays.asList(Layout.values()), Dtos::asDto);
     createArray(mapper, node, "boxSizes", boxSizeService.list(), Dtos::asDto);
     createArray(mapper, node, "boxUses", boxUseService.list(), Dtos::asDto);
-    createArray(mapper, node, "studyTypes", studyService.listTypes(), Dtos::asDto);
+    createArray(mapper, node, "studyTypes", studyTypeService.list(), Dtos::asDto);
     createArray(mapper, node, "sampleCategories", SampleClass.CATEGORIES, Function.identity());
     createArray(mapper, node, "submissionAction", Arrays.asList(SubmissionActionType.values()), SubmissionActionType::name);
     createArray(mapper, node, "containerModels", containerModelService.list(), Dtos::asDto);

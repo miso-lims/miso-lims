@@ -172,7 +172,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void saveProjects(Collection<Project> projects) throws IOException {
     log.info("Migrating projects...");
     StudyType other = null;
-    for (StudyType st : serviceManager.getStudyService().listTypes()) {
+    for (StudyType st : serviceManager.getStudyTypeService().list()) {
       if (st.getName().equals("Other")) {
         other = st;
         break;

@@ -19,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
+import uk.ac.bbsrc.tgac.miso.persistence.StudyTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 public class DefaultStudyServiceTest {
@@ -31,6 +32,9 @@ public class DefaultStudyServiceTest {
 
   @Mock
   private StudyStore studyStore;
+
+  @Mock
+  private StudyTypeDao studyTypeDao;
 
   @Mock
   private ProjectStore projectStore;
@@ -51,7 +55,7 @@ public class DefaultStudyServiceTest {
     StudyType st = new StudyType();
     st.setId(2L);
     st.setName("Test");
-    when(studyStore.getType(2L)).thenReturn(st);
+    when(studyTypeDao.get(2L)).thenReturn(st);
 
     Study s = new StudyImpl();
     s.setId(1L);
