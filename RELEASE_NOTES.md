@@ -3,6 +3,7 @@
 Changes:
 
   * Added interface for administrators to add, edit, and delete dropdown options
+    * array models
     * box sizes
     * box uses
     * detailed QC statuses (detailed sample)

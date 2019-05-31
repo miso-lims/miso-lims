@@ -478,8 +478,10 @@ such, they must be performed by a MISO adminstrator.
 {% include userman-heading.md section=page.section sub=sub title="Array Models" %}
 
 Array models are similar to sequencing container models, except they describe the chip or cartridge that the array is
-loaded into, including the number of samples it can hold. Modifications to array models can only be made via direct
-access to the MISO database. As such, they must be performed by a MISO adminstrator.
+loaded into, including the number of samples it can hold.
+
+MISO administrators can add, edit, and delete array models using the standard interface. An array model can only be
+deleted if it is not used by any existing arrays.
 
 {% include userman-toplink.md %}
 

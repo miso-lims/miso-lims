@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
-import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.store.ArrayStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.service.ArrayModelService;
 import uk.ac.bbsrc.tgac.miso.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -35,6 +35,9 @@ public class DefaultArrayService implements ArrayService {
   @Autowired
   private ArrayStore arrayStore;
   
+  @Autowired
+  private ArrayModelService arrayModelService;
+
   @Autowired
   private SampleService sampleService;
 
@@ -103,7 +106,7 @@ public class DefaultArrayService implements ArrayService {
 
   private void loadChildEntities(Array array) throws IOException {
     if (array.getArrayModel() != null) {
-      array.setArrayModel(getArrayModel(array.getArrayModel().getId()));
+      array.setArrayModel(arrayModelService.get(array.getArrayModel().getId()));
     }
     Map<String, Sample> samples = new HashMap<>();
     for (Entry<String, Sample> entry : array.getSamples().entrySet()) {
@@ -185,16 +188,6 @@ public class DefaultArrayService implements ArrayService {
         toSamples.put(key, val);
       }
     });
-  }
-
-  @Override
-  public ArrayModel getArrayModel(long id) throws IOException {
-    return arrayStore.getArrayModel(id);
-  }
-
-  @Override
-  public List<ArrayModel> listArrayModels() throws IOException {
-    return arrayStore.listArrayModels();
   }
 
   @Override

@@ -106,6 +106,7 @@ public interface AbstractListPage {
   }
 
   public static class ListTarget {
+    public static final String ARRAY_MODELS = "arraymodel/list";
     public static final String BOX_SIZES = "boxsize/list";
     public static final String BOX_USES = "boxuse/list";
     public static final String SAMPLES = "samples";

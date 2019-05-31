@@ -15,7 +15,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
-import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -190,19 +189,6 @@ public class HibernateArrayDao implements ArrayStore, HibernatePaginatedDataSour
   @Override
   public String propertyForUserName(Criteria criteria, boolean creator) {
     return creator ? "creator.loginName" : "lastModifier.loginName";
-  }
-
-  @Override
-  public ArrayModel getArrayModel(long id) throws IOException {
-    return (ArrayModel) currentSession().get(ArrayModel.class, id);
-  }
-
-  @Override
-  public List<ArrayModel> listArrayModels() throws IOException {
-    Criteria criteria = currentSession().createCriteria(ArrayModel.class);
-    @SuppressWarnings("unchecked")
-    List<ArrayModel> list = criteria.list();
-    return list;
   }
 
 }
