@@ -174,24 +174,18 @@ the `/storage/miso/` directory:
 ## Security Environment (updating `/storage/miso/security.properties`)
 MISO can use either LDAP (`ldap`), Active Directory LDAP (`ad`), or JDBC
 (`jdbc`) as an authentication mechanism. This is set by the `-Dsecurity.method`
-noted in the previous section.
+noted in the previous section, and the same value must be set in `security.properties`.
 
 If you are using JDBC (aka storing usernames and passwords in the database), set the
 security method to `jdbc`.
-The default configuration should work properly.
+No additional configuration is necessary.
 
 For using LDAP, set the security method to `ldap`. Additional settings are
 needed for LDAP in the `security.properties`. Talk to your LDAP administrator.
 
-To use Active Directory, a specific kind of LDAP, set the security method to
-`ad`. Three additional settings are needed for Active Directory in the
+To use Active Directory, a specific kind of LDAP, set the security method to `ad`.
+Some active directory settings are needed in addition to the LDAP settings in the
 `security.properties` file.
-
-| Property                    | Purpose                                                    |
-|-----------------------------|------------------------------------------------------------|
-|`security.ad.emailDomain`    | Domain added to username for lookup (e.g. ad.oicr.on.ca)   |
-|`security.ad.url`            | Url for Active Directory server (e.g. ldap://ad.oicr.on.ca)|
-|`security.ad.stripRolePrefix`| Prefix to be removed from group (e.g. MISO\_)               |
 
 The search for a user is done against `userPrincipalName` which takes the form of
 an email address. To login the user will type their username and to do the lookup
@@ -207,7 +201,7 @@ and `ROLE_ADMIN` for administrators. If you find these names
 too general you may wish to add a prefix before adding these groups to your Active
 Directory. For example `MISO_ROLE_INTERNAL` gives a clearer indication as to what
 the group is used for. In this case you will need to set the property
-`security.ad.stripRolePrefix` to the value `MISO_` to allow MISO to ignore the
+`security.ldap.stripRolePrefix` to the value `MISO_` to allow MISO to ignore the
 prefix.
 
 If using JDBC, once running, you should change the passwords of the `admin` and

@@ -51,7 +51,7 @@ public class LimsSecurityUtils {
   /** Prefix to be removed from each role. */
   private static String rolePrefix = "";
 
-  @Value("${security.ad.stripRolePrefix}")
+  @Value("${security.ldap.stripRolePrefix}")
   public void setRolePrefix(String rolePrefix) {
     LimsSecurityUtils.rolePrefix = rolePrefix;
   }

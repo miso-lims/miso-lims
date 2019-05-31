@@ -9,6 +9,10 @@
                       http://www.springframework.org/schema/security/spring-security.xsd"
   default-autowire="byName">
 
+  <!-- *** Import existing ldap configuration. This one is used with openldap. -->
+
+  <import resource="ldap-security-config.xml" />
+  
   <!-- *** Declare Active Directory specific beans -->
 
   <bean id="ldapActiveDirectoryAuthProvider" class="org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider">
@@ -22,15 +26,8 @@
     </property>
   </bean>
 
-  <!-- Map group names with prefix to expected MISO group names. Removes prefix during Spring authentication. -->
-  <bean id="grantedAuthoritiesMapper" class="uk.ac.bbsrc.tgac.miso.core.security.ad.ActiveDirectoryAuthoritiesMapper" />
-
   <!-- Load as bean to inject group name prefix. Removes prefix when populating database. -->
   <bean class="uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils" />
-
-  <!-- *** Import existing ldap configuration. This one is used with openldap. -->
-
-  <import resource="ldap-security-config.xml" />
 
   <!-- *** Override the general ldap authentication manager with the Active Directory authentication manager. -->
   
