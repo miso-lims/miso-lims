@@ -506,6 +506,17 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.BOX_USES);
   }
 
+  @Test
+  public void testListPartitionQcTypeSetup() throws Exception {
+    testPageSetup(ListTarget.PARTITION_QC_TYPE,
+        Sets.newHashSet(Columns.SORT, Columns.DESCRIPTION, Columns.NOTE_REQUIRED, Columns.ORDER_FULFILLED, Columns.ANALYSIS_SKIPPED));
+  }
+
+  @Test
+  public void testListPartitionQcTypeColumnSort() throws Exception {
+    testColumnsSort(ListTarget.PARTITION_QC_TYPE);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     // Goal: confirm that all expected columns are present
     ListPage page = getList(listTarget);
@@ -623,6 +634,8 @@ public class ListTablesIT extends AbstractIT {
     switch (column) {
     case Columns.QC_PASSED:
     case Columns.NOTE_REQUIRED:
+    case Columns.ORDER_FULFILLED:
+    case Columns.ANALYSIS_SKIPPED:
       return booleanColumnComparator;
     case Columns.LIBRARY_NAME:
     case Columns.NAME:

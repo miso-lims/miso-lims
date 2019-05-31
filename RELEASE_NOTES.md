@@ -6,6 +6,7 @@ Changes:
     * box sizes
     * box uses
     * detailed QC statuses (detailed sample)
+    * partition QC types
 
 # 0.2.179
 

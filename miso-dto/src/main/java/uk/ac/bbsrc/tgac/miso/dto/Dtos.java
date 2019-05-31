@@ -2505,12 +2505,22 @@ public class Dtos {
 
   public static PartitionQCTypeDto asDto(@Nonnull PartitionQCType from) {
     PartitionQCTypeDto dto = new PartitionQCTypeDto();
-    dto.setId(from.getId());
-    dto.setDescription(from.getDescription());
-    dto.setNoteRequired(from.isNoteRequired());
-    dto.setOrderFulfilled(from.isOrderFulfilled());
-    dto.setAnalysisSkipped(from.isAnalysisSkipped());
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setDescription, from.getDescription());
+    setBoolean(dto::setNoteRequired, from.isNoteRequired(), false);
+    setBoolean(dto::setOrderFulfilled, from.isOrderFulfilled(), false);
+    setBoolean(dto::setAnalysisSkipped, from.isAnalysisSkipped(), false);
     return dto;
+  }
+
+  public static PartitionQCType to(@Nonnull PartitionQCTypeDto from) {
+    PartitionQCType to = new PartitionQCType();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setDescription, from.getDescription());
+    setBoolean(to::setNoteRequired, from.isNoteRequired(), false);
+    setBoolean(to::setOrderFulfilled, from.isOrderFulfilled(), false);
+    setBoolean(to::setAnalysisSkipped, from.isAnalysisSkipped(), false);
+    return to;
   }
 
   public static ExperimentDto asDto(@Nonnull Experiment from) {

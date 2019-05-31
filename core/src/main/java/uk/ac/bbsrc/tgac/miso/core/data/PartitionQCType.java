@@ -4,16 +4,22 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "PartitionQCType")
-public class PartitionQCType implements Serializable {
+public class PartitionQCType implements Deletable, Identifiable, Serializable {
+
   private static final long serialVersionUID = 1L;
 
+  private static final long UNSAVED_ID = 0L;
+
   @Id
-  private long partitionQcTypeId;
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long partitionQcTypeId = UNSAVED_ID;
 
   @Column(nullable = false)
   private String description;
@@ -24,10 +30,12 @@ public class PartitionQCType implements Serializable {
 
   private boolean analysisSkipped;
 
+  @Override
   public long getId() {
     return partitionQcTypeId;
   }
 
+  @Override
   public void setId(long partitionQcTypeId) {
     this.partitionQcTypeId = partitionQcTypeId;
   }
@@ -62,6 +70,21 @@ public class PartitionQCType implements Serializable {
 
   public void setAnalysisSkipped(boolean analysisSkipped) {
     this.analysisSkipped = analysisSkipped;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Partition QC Type";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getDescription();
   }
 
 }

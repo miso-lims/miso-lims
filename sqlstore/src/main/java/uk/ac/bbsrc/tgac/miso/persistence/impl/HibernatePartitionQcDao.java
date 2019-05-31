@@ -1,10 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC.PartitionQCId;
-import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.store.PartitionQcStore;
 
@@ -44,19 +40,6 @@ public class HibernatePartitionQcDao implements PartitionQcStore {
 
   public SessionFactory getSessionFactory() {
     return sessionFactory;
-  }
-
-  @Override
-  public PartitionQCType getType(long qcTypeId) throws IOException {
-    return (PartitionQCType) currentSession().get(PartitionQCType.class, qcTypeId);
-  }
-
-  @Override
-  public Collection<PartitionQCType> listTypes() {
-    Criteria criteria = currentSession().createCriteria(PartitionQCType.class);
-    @SuppressWarnings("unchecked")
-    List<PartitionQCType> records = criteria.list();
-    return records;
   }
 
   public void setSessionFactory(SessionFactory sessionFactory) {

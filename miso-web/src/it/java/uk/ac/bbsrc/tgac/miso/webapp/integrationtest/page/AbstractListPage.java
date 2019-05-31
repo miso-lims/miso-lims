@@ -10,6 +10,7 @@ public interface AbstractListPage {
     public static final String ACTIVE = "Active";
     public static final String ADMIN = "Admin";
     public static final String ALIAS = "Alias";
+    public static final String ANALYSIS_SKIPPED = "Analysis Skipped";
     public static final String ARCHIVED = "Archived";
     public static final String AVAILABLE = "Available";
     public static final String AVG_INSERT_SIZE = "Average Insert Size";
@@ -59,6 +60,7 @@ public interface AbstractListPage {
     public static final String NOTE_REQUIRED = "Note Required";
     public static final String NUMBER = "Number";
     public static final String ORDER_DESCRIPTION = "Order Description";
+    public static final String ORDER_FULFILLED = "Order Fulfilled";
     public static final String PART_NUMBER = "Part Number";
     public static final String PLATFORM = "Platform";
     public static final String POOL = "Pool";
@@ -117,6 +119,7 @@ public interface AbstractListPage {
     public static final String ORDERS_ACTIVE = "poolorders/active";
     public static final String ORDERS_ALL = "poolorders/all";
     public static final String ORDERS_PENDING = "poolorders/pending";
+    public static final String PARTITION_QC_TYPE = "partitionqctype/list";
     public static final String CONTAINERS = "containers";
     public static final String RUNS = "runs";
     public static final String BOXES = "boxes";
