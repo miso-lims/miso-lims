@@ -6,8 +6,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 
 public interface ReferenceGenomeDao {
 
-  Collection<ReferenceGenome> listAllReferenceGenomeTypes();
+  public Collection<ReferenceGenome> list();
 
-  ReferenceGenome getReferenceGenome(Long id);
+  public ReferenceGenome get(long id);
+
+  public ReferenceGenome getByAlias(String alias);
+
+  public long create(ReferenceGenome reference);
+
+  public long update(ReferenceGenome reference);
+
+  public long getUsage(ReferenceGenome reference);
 
 }

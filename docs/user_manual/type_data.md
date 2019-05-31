@@ -31,10 +31,11 @@ To delete items, go to the list page, check the checkboxes beside the items you 
 {% include userman-heading.md section=page.section sub=sub title="Reference Genomes" %}
 
 Reference genome refers to a file that sequenced data will be aligned to. This is set at the project level, and can be
-changed on both the Create Project and Edit Project page.
+changed on both the Create Project and Edit Project page. A reference genome may specify a default scientific name to
+be used for new samples within the project.
 
-Reference genomes must be added to the MISO database directly. You should talk to a MISO administrator if you require a
-new one.
+MISO administrators can add, edit, and delete reference genomes using the standard interface. A reference genome can
+only be deleted if it is not used by any existing projects.
 
 {% include userman-toplink.md %}
 

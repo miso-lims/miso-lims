@@ -87,4 +87,14 @@ public class ReferenceGenomeImpl implements ReferenceGenome {
     return getId() != UNSAVED_ID;
   }
 
+  @Override
+  public String getDeleteType() {
+    return "Reference Genome";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias();
+  }
+
 }

@@ -446,6 +446,17 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
+  public void testListReferenceGenomesSetup() throws Exception {
+    testPageSetup(ListTarget.REFERENCE_GENOMES,
+        Sets.newHashSet(Columns.SORT, Columns.ALIAS, Columns.DEFAULT_SCI_NAME));
+  }
+
+  @Test
+  public void testListReferenceGenomesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.REFERENCE_GENOMES);
+  }
+
+  @Test
   public void testListSampleTypesSetup() throws Exception {
     testPageSetup(ListTarget.SAMPLE_TYPES, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ARCHIVED));
   }

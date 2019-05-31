@@ -334,7 +334,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, node, "concentrationUnits", Arrays.asList(ConcentrationUnit.values()), Dtos::asDto);
     createArray(mapper, node, "volumeUnits", Arrays.asList(VolumeUnit.values()), Dtos::asDto);
     createArray(mapper, node, "partitionQcTypes", partitionQcTypeService.list(), Dtos::asDto);
-    createArray(mapper, node, "referenceGenomes", referenceGenomeService.listAllReferenceGenomeTypes(), Dtos::asDto);
+    createArray(mapper, node, "referenceGenomes", referenceGenomeService.list(), Dtos::asDto);
     createArray(mapper, node, "spreadsheetFormats", Arrays.asList(SpreadSheetFormat.values()), Dtos::asDto);
     createArray(mapper, node, "sampleSpreadsheets", Arrays.asList(SampleSpreadSheets.values()), Dtos::asDto);
     createArray(mapper, node, "librarySpreadsheets", Arrays.asList(LibrarySpreadSheets.values()), Dtos::asDto);

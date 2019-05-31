@@ -7,6 +7,7 @@ Changes:
     * box uses
     * detailed QC statuses (detailed sample)
     * partition QC types
+    * reference genomes
 
 # 0.2.179
 

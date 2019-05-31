@@ -6,21 +6,20 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.ReferenceGenomeDao;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateReferenceGenomeDao implements ReferenceGenomeDao {
-
-  protected static final Logger log = LoggerFactory.getLogger(HibernateReferenceGenomeDao.class);
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -34,7 +33,7 @@ public class HibernateReferenceGenomeDao implements ReferenceGenomeDao {
   }
 
   @Override
-  public Collection<ReferenceGenome> listAllReferenceGenomeTypes() {
+  public Collection<ReferenceGenome> list() {
     Query query = currentSession().createQuery("from ReferenceGenomeImpl");
     @SuppressWarnings("unchecked")
     List<ReferenceGenome> records = query.list();
@@ -42,8 +41,33 @@ public class HibernateReferenceGenomeDao implements ReferenceGenomeDao {
   }
 
   @Override
-  public ReferenceGenome getReferenceGenome(Long id) {
+  public ReferenceGenome get(long id) {
     return (ReferenceGenome) currentSession().get(ReferenceGenomeImpl.class, id);
+  }
+
+  @Override
+  public ReferenceGenome getByAlias(String alias) {
+    return (ReferenceGenome) currentSession().createCriteria(ReferenceGenomeImpl.class)
+        .add(Restrictions.eq("alias", alias))
+        .uniqueResult();
+  }
+
+  @Override
+  public long create(ReferenceGenome reference) {
+    return (long) currentSession().save(reference);
+  }
+
+  @Override
+  public long update(ReferenceGenome reference) {
+    currentSession().update(reference);
+    return reference.getId();
+  }
+
+  @Override
+  public long getUsage(ReferenceGenome reference) {
+    return (long) currentSession().createCriteria(ProjectImpl.class)
+        .add(Restrictions.eq("referenceGenome", reference))
+        .setProjection(Projections.rowCount()).uniqueResult();
   }
 
 }

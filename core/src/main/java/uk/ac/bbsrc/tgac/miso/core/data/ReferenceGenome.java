@@ -2,9 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 
-public interface ReferenceGenome extends Identifiable, Serializable {
-
-  String getAlias();
+public interface ReferenceGenome extends Aliasable, Deletable, Serializable {
 
   void setAlias(String alias);
 

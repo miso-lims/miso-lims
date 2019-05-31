@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.util.Collection;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
+import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 
-public interface ReferenceGenomeService {
+public interface ReferenceGenomeService extends DeleterService<ReferenceGenome>, SaveService<ReferenceGenome> {
 
-  public Collection<ReferenceGenome> listAllReferenceGenomeTypes() throws IOException;
-
-  public ReferenceGenome get(Long id) throws IOException;
+  public Collection<ReferenceGenome> list() throws IOException;
 
 }

@@ -134,7 +134,7 @@ public class DefaultProjectService implements ProjectService {
     original.setAlias(project.getAlias());
     original.setDescription(project.getDescription());
     original.setProgress(project.getProgress());
-    original.setReferenceGenome(referenceGenomeDao.getReferenceGenome(project.getReferenceGenome().getId()));
+    original.setReferenceGenome(referenceGenomeDao.get(project.getReferenceGenome().getId()));
     if (project.getDefaultTargetedSequencing() != null) {
       original.setDefaultTargetedSequencing(targetedSequencingStore.get(project.getDefaultTargetedSequencing().getId()));
     } else {

@@ -194,7 +194,7 @@ public class ValueTypeLookupTest {
     DefaultReferenceGenomeService referenceGenomeService = Mockito.mock(DefaultReferenceGenomeService.class);
     List<ReferenceGenome> referenceGenomes = Lists.newArrayList();
     referenceGenomes.add(makeReferenceGenome(VALID_LONG, VALID_STRING));
-    Mockito.when(referenceGenomeService.listAllReferenceGenomeTypes()).thenReturn(referenceGenomes);
+    Mockito.when(referenceGenomeService.list()).thenReturn(referenceGenomes);
     Mockito.when(mgr.getReferenceGenomeService()).thenReturn(referenceGenomeService);
 
     HibernateTargetedSequencingDao tarSeqDao = Mockito.mock(HibernateTargetedSequencingDao.class);
