@@ -46,14 +46,13 @@ ListTarget.run = {
         name: "Add " + platformKey + " Run",
         handler: function() {
           Utils.ajaxWithDialog('Getting Sequencer', 'Get', '/miso/rest/instruments', null, function(instruments) {
-
+            var allowedModels = Constants.instrumentModels.filter(function(model) { return model.platformType === config.platformType && model.instrumentType === 'SEQUENCER'; }).map(function(model) { return model.id; });
             Utils.showWizardDialog("Add " + platformKey + " Run", instruments.filter(
                 function(instrument) {
-                  return instrument.instrumentModel.platformType == config.platformType && !instrument.dateDecommissioned
-                      && instrument.instrumentModel.instrumentType === 'SEQUENCER';
+                  return allowedModels.indexOf(instrument.instrumentModelId) !== -1 && !instrument.dateDecommissioned;
                 }).sort(Utils.sorting.standardSort('name')).map(function(sequencer) {
               return {
-                name: sequencer.name + " (" + sequencer.instrumentModel.alias + ")",
+                name: sequencer.name + " (" + sequencer.instrumentModelAlias + ")",
                 handler: function() {
                   window.location = '/miso/run/new/' + sequencer.id;
                 }
