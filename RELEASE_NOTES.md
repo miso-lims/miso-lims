@@ -25,7 +25,8 @@ Upgrade Notes:
     * The property `security.ad.stripRolePrefix` has been renamed to
       `security.ldap.stripRolePrefix` as it affects both LDAP and AD authentication modes
     * See the example [security.properties](miso-web/src/main/resources/security.properties) file
-      for more information
+      for more information. Your own `security.properties` file is in the MISO storage directory,
+      which is `/storage/miso` by default
 
 # 0.2.179
 
