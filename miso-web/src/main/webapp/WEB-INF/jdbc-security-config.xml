@@ -31,102 +31,23 @@
 
   <bean id="securityManager" name="securityManager" class="com.eaglegenomics.simlims.core.manager.LocalSecurityManager" />
 
-  <security:global-method-security secured-annotations="enabled" />
+  <bean id="passwordEncoder" class="org.springframework.security.crypto.factory.PasswordEncoderFactories" factory-method="createDelegatingPasswordEncoder" />
 
-  <!-- don't want to have a SS filter here as the userless REST auth should have taken care of that -->
-  <security:http pattern="/miso/rest/**" security="none" />
-
-  <security:http pattern="/styles/**" security="none" /><!-- filters="none"/> -->
-  <security:http pattern="/scripts/**" security="none" /><!-- filters="none"/> -->
-  <security:http pattern="/images/**" security="none" /><!-- filters="none"/> -->
-
-  <security:http use-expressions="true" auto-config="false" entry-point-ref="loginUrlAuthenticationEntryPoint">
-
-    <security:access-denied-handler error-page="/miso/accessDenied"/>
-    <security:csrf disabled="true" />
-
-    <security:custom-filter position="FORM_LOGIN_FILTER" ref="jdbcAuthFilter" />
-    <security:remember-me data-source-ref="dataSource" user-service-ref="jdbcUserAuthService" remember-me-parameter="_spring_security_remember_me" />
-
-    <security:logout logout-success-url="/miso/login" />
-
-    <security:intercept-url pattern="/miso/login" access="permitAll" />
-    <security:intercept-url pattern="/miso/accessDenied" access="permitAll" />
-    <security:intercept-url pattern="/miso/error" access="permitAll" />
-
-    <security:intercept-url pattern="/miso/constants.js" access="permitAll" />
-    <security:intercept-url pattern="/miso/admin/**" access="hasRole('ROLE_ADMIN')" />
-    <security:intercept-url pattern="/miso/mainMenu" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
-
-    <security:intercept-url pattern="/miso/**" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
-
-    <security:session-management invalid-session-url="/miso/login" session-fixation-protection="none" />
-  </security:http>
-
-  <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
-
-  <bean id="sas" class="org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy">
-    <constructor-arg>
-      <list>
-        <bean class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy">
-          <constructor-arg ref="sessionRegistry"/>
-        </bean>
-        <bean class="org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy"/>
-        <bean class="org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy">
-          <constructor-arg ref="sessionRegistry"/>
-        </bean>
-      </list>
-    </constructor-arg>
+  <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+    <property name="defaultTargetUrl" value="/miso/mainMenu" />
   </bean>
 
-  <bean id="httpSessionSecurityContextRepository" class="org.springframework.security.web.context.HttpSessionSecurityContextRepository" />
-
+  <bean id="userAuthService" class="uk.ac.bbsrc.tgac.miso.sqlstore.manager.MisoJdbcUserDetailsManager">
+    <property name="usersByUsernameQuery" value="SELECT loginName AS username, password AS password, active AS enabled, roles AS authority FROM User WHERE loginName=?" />
+    <property name="authoritiesByUsernameQuery" value="SELECT loginName AS username, roles AS authority, admin, internal, external FROM User WHERE loginName=?" />
+    <property name="enableAuthorities" value="true" />
+    <property name="jdbcTemplate" ref="interfaceTemplate" />
+  </bean>
+  
   <security:authentication-manager alias="authenticationManager">
-    <security:authentication-provider user-service-ref="jdbcUserAuthService">
+    <security:authentication-provider user-service-ref="userAuthService">
       <security:password-encoder ref="passwordEncoder" />
     </security:authentication-provider>
   </security:authentication-manager>
-
-  <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder" />
-
-  <bean id="passwordCodecService" class="uk.ac.bbsrc.tgac.miso.core.security.ShaPasswordCodecService">
-    <property name="encoder" ref="passwordEncoder" />
-  </bean>
-
-  <bean id="loginUrlAuthenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-    <constructor-arg value="/miso/login" />
-  </bean>
-
-  <bean id="jdbcAuthFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
-    <property name="allowSessionCreation" value="true" />
-    <property name="sessionAuthenticationStrategy" ref="sas" />
-    <property name="authenticationManager" ref="authenticationManager" />
-    <property name="authenticationFailureHandler" ref="failureHandler" />
-    <property name="authenticationSuccessHandler" ref="successHandler" />
-  </bean>
-
-  <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
-    <property name="useReferer" value="true" />
- </bean>
-
-  <bean id="failureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
-    <property name="defaultFailureUrl" value="/miso/login?login_error=1" />
-  </bean>
-
-  <bean id="jdbcUserAuthService" class="uk.ac.bbsrc.tgac.miso.sqlstore.manager.MisoJdbcUserDetailsManager">
-    <property name="usersByUsernameQuery" value="${security.jdbc.usersByUsernameQuery}" />
-    <property name="authoritiesByUsernameQuery" value="${security.jdbc.authoritiesByUsernameQuery}" />
-    <property name="rolePrefix" value="${security.jdbc.rolePrefix}" />
-    <property name="enableAuthorities" value="${security.jdbc.enableAuthorities}" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="restSignatureFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureFilter">
-    <constructor-arg ref="httpSessionSecurityContextRepository" />
-  </bean>
-
-  <bean id="exposeRequestUrlFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.ExposeRequestUrlFilter">
-    <constructor-arg ref="httpSessionSecurityContextRepository" />
-    <property name="applicationContextProvider" ref="applicationContextProvider" />
-  </bean>
+  
 </beans>

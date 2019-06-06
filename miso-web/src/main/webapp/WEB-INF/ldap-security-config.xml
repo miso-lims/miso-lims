@@ -34,96 +34,13 @@
 
   <bean id="securityManager" name="securityManager" class="uk.ac.bbsrc.tgac.miso.core.security.LDAPSecurityManager" />
 
-  <security:global-method-security secured-annotations="enabled" jsr250-annotations="enabled" />
-
-  <!-- don't want to have a SS filter here as the userless REST auth should have taken care of that -->
-  <security:http pattern="/miso/rest/**" security="none" />
-  <security:http pattern="/styles/**" security="none" />
-  <!-- filters="none"/> -->
-  <security:http pattern="/scripts/**" security="none" />
-  <!-- filters="none"/> -->
-  <security:http pattern="/images/**" security="none" />
-  <!-- filters="none"/> -->
-
-  <security:http use-expressions="true" auto-config="false" entry-point-ref="loginUrlAuthenticationEntryPoint">
-
-    <security:access-denied-handler error-page="/miso/accessDenied"/>
-    <security:csrf disabled="true" />
-
-    <security:custom-filter position="FORM_LOGIN_FILTER" ref="misoAuthFilter" />
-    <security:remember-me data-source-ref="dataSource" user-service-ref="ldapUserAuthService" remember-me-parameter="_spring_security_remember_me" />
-    <security:intercept-url pattern="/miso/login" access="permitAll" />
-    <security:intercept-url pattern="/miso/accessDenied" access="permitAll" />
-    <security:intercept-url pattern="/miso/error" access="permitAll" />
-
-    <security:intercept-url pattern="/miso/constants.js" access="permitAll" />
-    <security:intercept-url pattern="/miso/admin/**" access="hasRole('ROLE_ADMIN')" />
-    <security:intercept-url pattern="/miso/mainMenu" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
-
-    <security:intercept-url pattern="/miso/**" access="hasRole('ROLE_INTERNAL')" />
-
-    <security:logout invalidate-session="true" logout-success-url="/miso/login" />
-
-    <security:session-management invalid-session-url="/miso/login" session-fixation-protection="none" />
-  </security:http>
-
-  <bean id="ajaxSessionFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.AjaxSessionFilter">
-    <constructor-arg ref="httpSessionSecurityContextRepository" />
-    <property name="invalidSessionStrategy" ref="invalidSessionStrategy" />
-    <property name="authenticationFailureHandler" ref="failureHandler" />
-  </bean>
-
   <bean id="invalidSessionStrategy" class="org.springframework.security.web.session.SimpleRedirectInvalidSessionStrategy">
     <constructor-arg value="/miso/login" />
     <property name="createNewSession" value="false" />
   </bean>
 
-  <bean id="httpSessionSecurityContextRepository" class="org.springframework.security.web.context.HttpSessionSecurityContextRepository" />
-
-  <bean id="loginUrlAuthenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-    <constructor-arg value="/miso/login" />
-  </bean>
-
-  <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
-
-    <bean id="sas" class="org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy">
-    <constructor-arg>
-      <list>
-        <bean class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy">
-          <constructor-arg ref="sessionRegistry"/>
-        </bean>
-        <bean class="org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy"/>
-        <bean class="org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy">
-          <constructor-arg ref="sessionRegistry"/>
-        </bean>
-      </list>
-    </constructor-arg>
-  </bean>
-
-  <bean id="misoAuthFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.MisoLdapAuthenticationFilter">
-    <property name="allowSessionCreation" value="true" />
-    <property name="sessionAuthenticationStrategy" ref="sas" />
-    <property name="authenticationManager" ref="authenticationManager" />
-    <property name="authenticationFailureHandler" ref="failureHandler" />
-    <property name="authenticationSuccessHandler" ref="successHandler" />
-  </bean>
-  <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
-    <property name="useReferer" value="true" />
-  </bean>
-  <bean id="failureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
-    <property name="defaultFailureUrl" value="/miso/login?login_error=1" />
-  </bean>
-
-  <security:authentication-manager alias="authenticationManager">
-    <security:authentication-provider user-service-ref="ldapUserAuthService">
-      <security:password-encoder ref="passwordEncoder" />
-    </security:authentication-provider>
-  </security:authentication-manager>
-
-  <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.LdapShaPasswordEncoder" />
-
-  <bean id="passwordCodecService" class="uk.ac.bbsrc.tgac.miso.core.security.PassthroughPasswordCodecService">
-    <property name="encoder" ref="passwordEncoder" />
+  <bean id="successHandler" class="uk.ac.bbsrc.tgac.miso.webapp.context.UserSyncHandler">
+    <property name="defaultTargetUrl" value="/miso/mainMenu" />
   </bean>
 
   <bean id="contextSource" class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
@@ -145,7 +62,7 @@
     <constructor-arg index="1" value="${security.ldap.usernameAttribute}" />
   </bean>
 
-  <bean id="ldapUserAuthService" class="org.springframework.security.ldap.userdetails.LdapUserDetailsService">
+  <bean id="userAuthService" class="org.springframework.security.ldap.userdetails.LdapUserDetailsService">
     <constructor-arg index="0" ref="ldapUserSearch" />
     <constructor-arg index="1" ref="ldapAuthPopulator" />
     <property name="userDetailsMapper" ref="ldapInetOrgPersonMapper" />
@@ -167,22 +84,23 @@
     <constructor-arg index="2" ref="contextSource" />
   </bean>
 
-  <bean id="ldapAuthPopulator" class="org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator">
+  <!-- Map group names with prefix to expected MISO group names. Removes prefix during Spring authentication. -->
+  <bean id="grantedAuthoritiesMapper" class="uk.ac.bbsrc.tgac.miso.core.security.PrefixStrippingAuthoritiesMapper" />
+
+  <bean id="ldapAuthPopulator" class="uk.ac.bbsrc.tgac.miso.core.security.LdapMappedAuthoritiesPopulator">
     <constructor-arg ref="contextSource" />
     <constructor-arg value="${security.ldap.groupSearchBase}" />
     <property name="groupRoleAttribute" value="${security.ldap.groupRoleAttribute}" />
     <property name="groupSearchFilter" value="${security.ldap.groupSearchFilter}" />
     <property name="rolePrefix" value="${security.ldap.rolePrefix}" />
-    <property name="searchSubtree" value="${security.ldap.searchSubtree}" />
-    <property name="convertToUpperCase" value="${security.ldap.convertToUpperCase}" />
+    <property name="searchSubtree" value="true" />
+    <property name="convertToUpperCase" value="true" />
+    <property name="grantedAuthoritiesMapper" ref="grantedAuthoritiesMapper" />
   </bean>
-
-  <bean id="restSignatureFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureFilter">
-    <constructor-arg ref="httpSessionSecurityContextRepository" />
-  </bean>
-
-  <bean id="exposeRequestUrlFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.ExposeRequestUrlFilter">
-    <constructor-arg ref="httpSessionSecurityContextRepository" />
-    <property name="applicationContextProvider" ref="applicationContextProvider" />
-  </bean>
+  
+  <security:authentication-manager alias="authenticationManager">
+    <security:authentication-provider ref="ldapAuthPopulator">
+    </security:authentication-provider>
+  </security:authentication-manager>
+  
 </beans>

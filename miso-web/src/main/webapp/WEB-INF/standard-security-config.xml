@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+  ~ MISO project contacts: Robert Davey @ TGAC
+  ~ **********************************************************************
+  ~
+  ~ This file is part of MISO.
+  ~
+  ~ MISO is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ MISO is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ **********************************************************************
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:security="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                      http://www.springframework.org/schema/beans/spring-beans.xsd
+                      http://www.springframework.org/schema/security 
+                      http://www.springframework.org/schema/security/spring-security.xsd"
+  default-autowire="byName">
+
+  <security:global-method-security secured-annotations="enabled" jsr250-annotations="enabled" />
+
+  <!-- don't want to have a SS filter here as the userless REST auth should have taken care of that -->
+  <security:http pattern="/miso/rest/**" security="none" />
+
+  <security:http pattern="/styles/**" security="none" />
+  <security:http pattern="/scripts/**" security="none" />
+  <security:http pattern="/images/**" security="none" />
+
+  <security:http>
+    <security:access-denied-handler error-page="/miso/accessDenied"/>
+    <security:csrf disabled="true" />
+
+    <security:remember-me data-source-ref="dataSource" user-service-ref="userAuthService" remember-me-parameter="_spring_security_remember_me" />
+    
+    <security:intercept-url pattern="/miso/login" access="permitAll" />
+    <security:intercept-url pattern="/miso/accessDenied" access="permitAll" />
+    <security:intercept-url pattern="/miso/error" access="permitAll" />
+    <security:intercept-url pattern="/miso/constants.js" access="permitAll" />
+    <security:intercept-url pattern="/miso/admin/**" access="hasRole('ROLE_ADMIN')" />
+    <security:intercept-url pattern="/miso/mainMenu" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
+
+    <security:intercept-url pattern="/miso/**" access="hasRole('ROLE_INTERNAL')" />
+    
+    <security:form-login login-page="/miso/login"
+        authentication-success-handler-ref="successHandler"
+        authentication-failure-url="/miso/login?login_error=1" />
+    <security:logout logout-success-url="/miso/login" />
+  </security:http>
+
+  <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
+
+  <bean id="httpSessionSecurityContextRepository" class="org.springframework.security.web.context.HttpSessionSecurityContextRepository" />
+
+  <bean id="restSignatureFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureFilter">
+    <constructor-arg ref="httpSessionSecurityContextRepository" />
+  </bean>
+  
+</beans>

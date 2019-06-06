@@ -10,6 +10,23 @@ Changes:
     * partition QC types
     * reference genomes
     * study types
+  * Fixed redirecting to requested page after successful login
+  * Fixed "Stay logged in" feature
+
+Upgrade Notes:
+
+  * There have been changes to the settings in `security.properties`. You may need to make
+    corresponding updates to your configuration
+    * The additional properties for configuring JDBC authentication have been removed as they
+      either had no effect, or would cause errors if changed from the default settings
+    * LDAP settings are now all required when using AD authentication. If these are not configured
+      correctly, errors will occur when MISO attempts to automatically log in a user who chose the
+      "Stay logged in" option
+    * The property `security.ad.stripRolePrefix` has been renamed to
+      `security.ldap.stripRolePrefix` as it affects both LDAP and AD authentication modes
+    * See the example [security.properties](miso-web/src/main/resources/security.properties) file
+      for more information. Your own `security.properties` file is in the MISO storage directory,
+      which is `/storage/miso` by default
 
 # 0.2.179
 

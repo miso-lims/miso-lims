@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.UserDto;
@@ -32,8 +32,8 @@ public class UserRestController extends RestController {
   private UserService userService;
   @Autowired
   private SecurityManager securityManager;
-  @Autowired
-  private PasswordCodecService passwordCodecService;
+  @Autowired(required = false)
+  private PasswordEncoder passwordEncoder; // Will be null if using LDAP/AD authentication
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -44,7 +44,7 @@ public class UserRestController extends RestController {
     }
     return RestUtils.createObject("User", dto, d -> {
       User user = Dtos.to(d);
-      user.setPassword(passwordCodecService.encrypt(d.getPassword()));
+      user.setPassword(passwordEncoder.encode(d.getPassword()));
       return user;
     }, userService, Dtos::asDto);
   }
@@ -91,10 +91,10 @@ public class UserRestController extends RestController {
       throw new RestException("User not found", Status.NOT_FOUND);
     }
     if (authorizationManager.getCurrentUser().getId() == userId
-        && !passwordCodecService.getEncoder().isPasswordValid(user.getPassword(), dto.getOldPassword(), null)) {
+        && !passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
       throw new ValidationException(new ValidationError("oldPassword", "Existing password does not match"));
     }
-    user.setPassword(passwordCodecService.encrypt(dto.getNewPassword()));
+    user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
     userService.update(user);
     return Dtos.asDto(userService.get(userId));
   }
