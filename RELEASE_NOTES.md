@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 0.2.180
+
+Changes:
+
   * Added interface for administrators to add, edit, and delete dropdown options
     * array models
     * box sizes
