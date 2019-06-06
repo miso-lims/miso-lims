@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
-import static org.openqa.selenium.support.ui.ExpectedConditions.titleContains;
+import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -51,6 +51,8 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
 
   @FindBy(id = "save")
   private WebElement saveButton;
+  @FindBy(id = "dialog")
+  private WebElement dialog;
 
   private DataTable samplesTable = null;
   private DataTable librariesTable = null;
@@ -156,10 +158,10 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
       }
     }
     table.clickButton("Remove from Workset");
+    waitUntil(visibilityOf(dialog));
     WebElement ok = getDriver().findElement(okSelector);
-    waitUntil(ExpectedConditions.visibilityOf(ok));
     clickOk();
-    waitUntil(ExpectedConditions.and(ExpectedConditions.stalenessOf(ok), ExpectedConditions.visibilityOfElementLocated(okSelector)));
+    waitUntil(and(stalenessOf(ok), visibilityOfElementLocated(okSelector)));
     clickOk();
     waitForPageRefresh(html);
     return new WorksetPage(getDriver());
