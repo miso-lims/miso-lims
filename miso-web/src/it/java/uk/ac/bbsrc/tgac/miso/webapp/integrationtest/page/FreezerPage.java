@@ -16,7 +16,6 @@ public class FreezerPage extends FormPage<FreezerPage.Field> {
     ROOM(By.id("parentLocationId"), FieldType.DROPDOWN), //
     ALIAS(By.id("alias"), FieldType.TEXT), //
     BARCODE(By.id("identificationBarcode"), FieldType.TEXT), //
-    MAP_URL(By.id("mapUrl"), FieldType.TEXT), //
     PROBE_ID(By.id("probeId"), FieldType.TEXT); //
 
     private final By selector;

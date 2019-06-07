@@ -17,8 +17,10 @@ public class StorageLocationDto {
   private String fullDisplayLocation;
   private List<StorageLocationDto> childLocations;
   private Set<BoxDto> boxes;
-  private String mapUrl;
   private String probeId;
+  private Long mapId;
+  private String mapFilename;
+  private String mapAnchor;
 
   public long getId() {
     return id;
@@ -101,20 +103,36 @@ public class StorageLocationDto {
     this.boxes = set;
   }
 
-  public String getMapUrl() {
-    return mapUrl;
-  }
-
-  public void setMapUrl(String url) {
-    this.mapUrl = url;
-  }
-
   public String getProbeId() {
     return probeId;
   }
 
   public void setProbeId(String probeId) {
     this.probeId = probeId;
+  }
+
+  public Long getMapId() {
+    return mapId;
+  }
+
+  public void setMapId(Long mapId) {
+    this.mapId = mapId;
+  }
+
+  public String getMapFilename() {
+    return mapFilename;
+  }
+
+  public void setMapFilename(String mapFilename) {
+    this.mapFilename = mapFilename;
+  }
+
+  public String getMapAnchor() {
+    return mapAnchor;
+  }
+
+  public void setMapAnchor(String mapAnchor) {
+    this.mapAnchor = mapAnchor;
   }
 
 }

@@ -490,13 +490,13 @@ FormUtils = (function($) {
     case 'decimal':
     case 'date': // treat as text for now. date picker gets added later
     case 'datetime':
-      td.append(makeTextInput(field, value));
+      td.append(makeTextInput(field, value, 'text', updateField));
       break;
     case 'textarea':
       td.append(makeTextareaInput(field, value));
       break;
     case 'password':
-      td.append(makeTextInput(field, value, 'password'));
+      td.append(makeTextInput(field, value, 'password', updateField));
       break;
     case 'dropdown':
       td.append(makeDropdownInput(field, value, updateField));
@@ -544,13 +544,18 @@ FormUtils = (function($) {
     return input;
   }
 
-  function makeTextInput(field, value, type) {
+  function makeTextInput(field, value, type, updateField) {
     var input = $('<input>').attr('id', field.data).attr('type', type || 'text');
     if (value !== null) {
       input.val(value);
     }
     if (field.maxLength) {
       input.attr('maxlength', field.maxlength);
+    }
+    if (field.onChange) {
+      input.change(function() {
+        field.onChange(this.value, updateField);
+      });
     }
     return input;
   }

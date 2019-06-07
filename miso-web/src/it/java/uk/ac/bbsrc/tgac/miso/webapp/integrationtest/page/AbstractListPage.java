@@ -32,6 +32,7 @@ public interface AbstractListPage {
     public static final String EXTERNAL = "External";
     public static final String FAILED = "Failed";
     public static final String FAMILY = "Family";
+    public static final String FILENAME = "Filename";
     public static final String GROUP_NAME = "Group Name";
     public static final String INDEX = "Index(es)";
     public static final String INDEX_NAME = "Index Name";
@@ -111,6 +112,7 @@ public interface AbstractListPage {
     public static final String BOX_USES = "boxuse/list";
     public static final String SAMPLES = "samples";
     public static final String LIBRARIES = "libraries";
+    public static final String LOCATION_MAPS = "locationmap/list";
     public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";
     public static final String DILUTIONS = "dilutions";
     public static final String STUDIES = "studies";

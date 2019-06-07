@@ -119,9 +119,12 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
   @OneToMany(targetEntity = StorageLocationChangeLog.class, mappedBy = "storageLocation", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
-  private String mapUrl;
-
   private String probeId;
+
+  @ManyToOne
+  @JoinColumn(name = "mapId")
+  private StorageLocationMap map;
+  private String mapAnchor;
 
   @Override
   public long getId() {
@@ -292,8 +295,9 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
     result = prime * result + (int) (id ^ (id >>> 32));
     result = prime * result + ((identificationBarcode == null) ? 0 : identificationBarcode.hashCode());
     result = prime * result + ((locationUnit == null) ? 0 : locationUnit.hashCode());
+    result = prime * result + ((map == null) ? 0 : map.hashCode());
+    result = prime * result + ((mapAnchor == null) ? 0 : mapAnchor.hashCode());
     result = prime * result + ((parentLocation == null) ? 0 : parentLocation.hashCode());
-    result = prime * result + ((mapUrl == null) ? 0 : mapUrl.hashCode());
     result = prime * result + ((probeId == null) ? 0 : probeId.hashCode());
     return result;
   }
@@ -318,24 +322,35 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
       if (other.identificationBarcode != null) return false;
     } else if (!identificationBarcode.equals(other.identificationBarcode)) return false;
     if (locationUnit != other.locationUnit) return false;
+    if (map == null) {
+      if (other.map != null) return false;
+    } else if (!map.equals(other.map)) return false;
+    if (mapAnchor == null) {
+      if (other.mapAnchor != null) return false;
+    } else if (!mapAnchor.equals(other.mapAnchor)) return false;
     if (parentLocation == null) {
       if (other.parentLocation != null) return false;
     } else if (!parentLocation.equals(other.parentLocation)) return false;
-    if (mapUrl == null) {
-      if (other.mapUrl != null) return false;
-    } else if (!mapUrl.equals(other.mapUrl)) return false;
     if (probeId == null) {
       if (other.probeId != null) return false;
     } else if (!probeId.equals(other.probeId)) return false;
     return true;
   }
 
-  public String getMapUrl() {
-    return mapUrl;
+  public StorageLocationMap getMap() {
+    return map;
   }
 
-  public void setMapUrl(String url) {
-    this.mapUrl = url;
+  public void setMap(StorageLocationMap map) {
+    this.map = map;
+  }
+
+  public String getMapAnchor() {
+    return mapAnchor;
+  }
+
+  public void setMapAnchor(String mapAnchor) {
+    this.mapAnchor = mapAnchor;
   }
 
 }

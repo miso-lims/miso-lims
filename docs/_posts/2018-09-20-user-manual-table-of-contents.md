@@ -445,6 +445,8 @@ weekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
 {% assign section-title = "Freezers and Rooms" %}
 {% include userman-toc-link.md section=section section-title=section-title %}
 {% assign sub = 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Location Maps" %}
+{% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Storage Locations List" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding a Room" %}

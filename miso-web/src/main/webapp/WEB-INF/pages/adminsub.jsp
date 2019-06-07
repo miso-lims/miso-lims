@@ -66,6 +66,7 @@
     <h2>Misc</h2>
     <div class="menu">
       <a href="<c:url value="/miso/storagelocations"/>">Freezers &amp; Rooms</a>
+      <a href="<c:url value="/miso/locationmap/list"/>">Location Maps</a>
       <a href="<c:url value="/miso/librarytemplates"/>">Library Templates</a>
       <a href="<c:url value="/miso/kitdescriptors"/>">Kits</a>
       <a href="<c:url value="/miso/indices"/>">Indices</a>

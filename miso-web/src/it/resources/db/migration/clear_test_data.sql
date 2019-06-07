@@ -103,4 +103,5 @@ DELETE FROM User_Group;
 DELETE FROM User;
 DELETE FROM _Group;
 DELETE FROM StorageLocation;
+DELETE FROM StorageLocationMap;
 SET FOREIGN_KEY_CHECKS=1;

@@ -21,6 +21,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.StorageLocationMapDto;
+import uk.ac.bbsrc.tgac.miso.service.StorageLocationMapService;
 import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 
@@ -35,6 +37,9 @@ public class EditFreezerController {
 
   @Autowired
   private StorageLocationService storageLocationService;
+
+  @Autowired
+  private StorageLocationMapService mapService;
 
   @ModelAttribute("rooms")
   public String getRoomDtos() throws JsonProcessingException {
@@ -73,11 +78,16 @@ public class EditFreezerController {
     model.put("freezer", freezer);
     model.addAttribute(MODEL_ATTR_JSON, mapper.writer().writeValueAsString(Dtos.asDto(freezer, true, true)));
     model.put("boxes", boxesInStorage(freezer).map(box -> Dtos.asDto(box, false)).collect(Collectors.toSet()));
+    model.put("locationMaps", mapper.writeValueAsString(getLocationMapDtos()));
     return new ModelAndView(JSP, model);
   }
 
   private static Stream<Box> boxesInStorage(StorageLocation storage) {
     return Stream.concat(storage.getBoxes().stream(), storage.getChildLocations().stream().flatMap(EditFreezerController::boxesInStorage));
+  }
+
+  private List<StorageLocationMapDto> getLocationMapDtos() throws IOException {
+    return mapService.list().stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
 }
