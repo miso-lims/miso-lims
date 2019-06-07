@@ -28,7 +28,7 @@
 
     <p>
         &copy; 2010 - <fmt:formatDate value="${timestamp}" pattern="yyyy"/>
-        <a href="https://github.com/miso-lims/miso-lims">MISO-LIMS</a> | Version:
+        <a href="https://github.com/miso-lims/miso-lims">MISO LIMS</a> | Version:
         <%=Version.VERSION%>
     </p>
 </div>
