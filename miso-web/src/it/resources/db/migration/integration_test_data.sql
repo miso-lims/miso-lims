@@ -991,6 +991,11 @@ INSERT INTO Workset_Dilution(worksetId, dilutionId) VALUES
 (1, 120001),
 (1, 120002);
 
+DELETE FROM StorageLocationMap;
+INSERT INTO StorageLocationMap(mapId, filename, description) VALUES
+(1, 'floor_one.html', 'floor one map'),
+(2, 'floor_two.html', 'floor two map');
+
 INSERT INTO StorageLocation(locationId, locationUnit, parentLocationId, alias, creator, created, lastModifier, lastModified) VALUES
 (1, 'ROOM', NULL, 'Room One', 1, '2019-05-22 13:10:00', 1, '2019-05-22 13:10:00'),
 (2, 'ROOM', NULL, 'Room Two', 1, '2019-05-22 13:10:00', 1, '2019-05-22 13:10:00'),

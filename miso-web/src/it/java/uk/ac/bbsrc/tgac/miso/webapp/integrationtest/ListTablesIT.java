@@ -547,6 +547,15 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.STUDY_TYPES);
   }
 
+  public void testListLocationMapsSetup() throws Exception {
+    testPageSetup(ListTarget.LOCATION_MAPS, Sets.newHashSet(Columns.SORT, Columns.FILENAME, Columns.DESCRIPTION));
+  }
+
+  @Test
+  public void testListLocationMapsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.LOCATION_MAPS);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     // Goal: confirm that all expected columns are present
     ListPage page = getList(listTarget);

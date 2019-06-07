@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.validateUrl;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.store.StorageLocationStore;
+import uk.ac.bbsrc.tgac.miso.service.StorageLocationMapService;
 import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
@@ -24,6 +23,9 @@ public class DefaultStorageLocationService implements StorageLocationService {
 
   @Autowired
   private StorageLocationStore storageLocationStore;
+
+  @Autowired
+  private StorageLocationMapService mapService;
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -100,9 +102,12 @@ public class DefaultStorageLocationService implements StorageLocationService {
     }
   }
 
-  private void loadChildEntities(StorageLocation storage) {
+  private void loadChildEntities(StorageLocation storage) throws IOException {
     if (storage.getParentLocation() != null && storage.getParentLocation().isSaved()) {
       storage.setParentLocation(get(storage.getParentLocation().getId()));
+    }
+    if (storage.getMap() != null) {
+      storage.setMap(mapService.get(storage.getMap().getId()));
     }
   }
 
@@ -141,7 +146,6 @@ public class DefaultStorageLocationService implements StorageLocationService {
     }
 
     validateLocationUnitRelationships(storage, errors);
-    validateUrl("mapUrl", storage.getMapUrl(), true, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
@@ -171,8 +175,9 @@ public class DefaultStorageLocationService implements StorageLocationService {
     to.setAlias(from.getAlias());
     to.setIdentificationBarcode(from.getIdentificationBarcode());
     to.setParentLocation(from.getParentLocation());
-    to.setMapUrl(from.getMapUrl());
     to.setProbeId(from.getProbeId());
+    to.setMap(from.getMap());
+    to.setMapAnchor(from.getMapAnchor());
   }
 
   @Override

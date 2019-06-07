@@ -8,7 +8,26 @@ Freezers and rooms describe physical storage locations to help you locate things
 libraries, dilutions and pools can be stored in boxes. Those boxes can be stored in freezers, and the freezers are
 located in rooms.
 
+Location maps can be uploaded, and then links can be made from freezers to these maps to show where they are located.
+Maps may be in any format with likely choices including html, pdf, and image files. If html maps are used, a freezer
+may also specify an anchor link to further help with locating the freezer on the map page.
+
 {% assign sub = 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Location Maps" %}
+
+To get to the Location Maps list, click "Location Maps" in the Misc list in the navigation menu. You can open a map by
+clicking its filename in the list. MISO administrators can upload new maps and delete existing maps from here too.
+
+To upload a new map, click the "Upload" button in the toolbar at the top of the table. In the dialog that appears,
+select the file to upload and optionally enter a description. Click the "Upload" button to finish.
+
+To delete a map, select it in the list and click the "Delete" button in the toolbar at the top of the table. Click
+"Delete" again in the dialog to confirm. A location map can only be deleted if there are no freezers linking to it.
+
+{% include userman-toplink.md %}
+
+
+{% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Storage Locations List" %}
 
 To get to the Storage Locations list, click "Freezers & Rooms" in the Misc list in the menu on the left side of the
@@ -33,10 +52,11 @@ room. Click the "Add" button to save the new room.
 
 To add a freezer, go to the Storage Locations list, ensure that the Freezers tab is selected, and click the "Add"
 button in the toolbar at the top of the list. This will take you to the Create Freezer page where you can enter all of
-the freezer details. If you have a map of where the freezer is located, and it is available online, you can include a
-link to it in the map URL field. If the freezer is connected to a monitoring system, you can include its ID from that
-system in the probe ID field. When you are done, click the "Save" button at the top right. After saving, you will be
-taken to the Edit Freezer page, where you can add dilutions and further modify the pool.
+the freezer details. If you have uploaded a location map that shows the freezer's location, you can select it, and
+optionally enter an anchor tag, to create a link. If the freezer is connected to a monitoring system, you can include
+its ID from that system in the probe ID field. When you are done, click the "Save" button at the top right. After
+saving, you will be taken to the Edit Freezer page, where you can add storage units such as shelving and racks, and
+further modify the freezer.
 
 {% include userman-toplink.md %}
 

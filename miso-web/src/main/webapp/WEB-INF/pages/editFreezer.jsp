@@ -43,7 +43,8 @@
     var dto = ${empty freezerJson ? '{}' : freezerJson};
     Freezer.setFreezerJson(dto);
     FormUtils.createForm('freezerForm', 'save', dto, 'freezer', {
-      rooms: ${rooms}
+      rooms: ${rooms},
+      locationMaps: ${locationMaps}
     });
   });
 </script>

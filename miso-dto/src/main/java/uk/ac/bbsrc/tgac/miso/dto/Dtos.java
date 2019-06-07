@@ -157,6 +157,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
@@ -2965,8 +2966,10 @@ public class Dtos {
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setDisplayLocation(from.getDisplayLocation());
     dto.setFullDisplayLocation(from.getFullDisplayLocation());
-    dto.setMapUrl(from.getMapUrl());
     dto.setProbeId(from.getProbeId());
+    setId(dto::setMapId, from.getMap());
+    setString(dto::setMapFilename, maybeGetProperty(from.getMap(), StorageLocationMap::getFilename));
+    setString(dto::setMapAnchor, from.getMapAnchor());
     if (includeChildLocations) {
       dto.setChildLocations(from.getChildLocations().stream()
           .map(child -> Dtos.asDto(child, recursive, recursive))
@@ -2983,16 +2986,31 @@ public class Dtos {
     if (!LimsUtils.isStringEmptyOrNull(from.getIdentificationBarcode())) {
       location.setIdentificationBarcode(from.getIdentificationBarcode());
     }
-    if (!LimsUtils.isStringEmptyOrNull(from.getMapUrl())) {
-      location.setMapUrl(from.getMapUrl());
-    }
     if (from.getParentLocationId() != null) {
       location.setParentLocation(new StorageLocation());
       location.getParentLocation().setId(from.getParentLocationId());
     }
     location.setLocationUnit(LocationUnit.valueOf(from.getLocationUnit()));
     location.setProbeId(from.getProbeId());
+    setObject(location::setMap, StorageLocationMap::new, from.getMapId());
+    setString(location::setMapAnchor, from.getMapAnchor());
     return location;
+  }
+
+  public static StorageLocationMapDto asDto(@Nonnull StorageLocationMap from) {
+    StorageLocationMapDto to = new StorageLocationMapDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setFilename, from.getFilename());
+    setString(to::setDescription, from.getDescription());
+    return to;
+  }
+
+  public static StorageLocationMap to(@Nonnull StorageLocationMapDto from) {
+    StorageLocationMap to = new StorageLocationMap();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setFilename, from.getFilename());
+    setString(to::setDescription, from.getDescription());
+    return to;
   }
 
   public static QcTargetDto asDto(@Nonnull QcTarget from) {

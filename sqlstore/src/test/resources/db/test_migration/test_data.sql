@@ -1,3 +1,8 @@
+DELETE FROM StorageLocationMap;
+INSERT INTO StorageLocationMap(mapId, filename, description) VALUES
+(1, 'floor_one.html', 'floor one map'),
+(2, 'floor_two.html', 'floor two map');
+
 DELETE FROM DetailedQCStatus;
 INSERT INTO DetailedQCStatus (detailedQcStatusId, description, status, noteRequired, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Passed', TRUE, FALSE, 1, '2019-05-28 13:17:00', 1, '2019-05-28 13:17:00'),

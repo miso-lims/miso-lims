@@ -5,7 +5,8 @@ FormTarget.freezer = (function($) {
 
   /*
    * Expected config {
-   *   rooms: array
+   *   rooms: array,
+   *   locationMaps: array
    * }
    */
 
@@ -52,11 +53,43 @@ FormTarget.freezer = (function($) {
           type: 'text',
           maxLength: 255
         }, {
-          title: 'Map URL',
-          data: 'mapUrl',
+          title: 'Map',
+          data: 'mapId',
+          type: 'dropdown',
+          getSource: function() {
+            return config.locationMaps;
+          },
+          getItemLabel: function(item) {
+            return item.filename;
+          },
+          getItemValue: Utils.array.getId,
+          sortSource: Utils.sorting.standardSort('filename'),
+          onChange: function(newValue, updateField) {
+            var settings = {
+              disabled: !newValue
+            }
+            if (!newValue) {
+              settings.value = null;
+            }
+            updateField('mapAnchor', settings);
+            updateMapLink(updateField);
+          }
+        }, {
+          title: 'Map Anchor',
+          data: 'mapAnchor',
           type: 'text',
-          regex: 'url',
-          maxLength: 1024
+          maxLength: 100,
+          onChange: function(newValue, updateField) {
+            updateMapLink(updateField);
+          }
+        }, {
+          title: 'View Map',
+          data: 'mapLink',
+          type: 'read-only',
+          omit: true,
+          getDisplayValue: function(freezer) {
+            return 'n/a';
+          }
         }, {
           title: 'Probe ID',
           data: 'probeId',
@@ -64,6 +97,20 @@ FormTarget.freezer = (function($) {
           maxLength: 50
         }]
       }];
+    }
+  }
+
+  function updateMapLink(updateField) {
+    var span = $('#mapLinkLabel');
+    span.empty();
+    if ($('#mapId').val()) {
+      var url = '/freezermaps/' + $('#mapId option:selected').html();
+      if ($('#mapAnchor').val()) {
+        url += '#' + $('#mapAnchor').val();
+      }
+      span.append($('<a>').attr('href', url).attr('target', '_blank').text('Open'));
+    } else {
+      span.text('n/a');
     }
   }
 

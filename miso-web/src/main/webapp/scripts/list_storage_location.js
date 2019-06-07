@@ -67,12 +67,13 @@ ListTarget.storage_location = {
     if (config.slug == 'freezers') {
       columns.push({
         "sTitle": "Map",
-        "mData": "mapUrl",
+        "mData": "mapFilename",
         "include": true,
         "iSortPriority": 0,
         "mRender": function(data, type, full) {
           if (type === 'display' && data) {
-            return "<a href=\"" + data + "\">View Map</a>";
+            var url = '/freezermaps/' + data + (full.mapAnchor ? '#' + full.mapAnchor : '');
+            return "<a href=\"" + url + "\">View Map</a>";
           }
           return data || '';
         }

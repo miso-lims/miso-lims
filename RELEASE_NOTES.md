@@ -2,7 +2,15 @@
 
 Changes:
 
+  * Added interface for administrators to upload and delete location maps
+  * Changed the way location maps are specified for freezers
 
+Upgrade Notes:
+
+  * There have been changes to how freezer maps are handled. Existing freezer maps that were hosted
+    by MISO should be maintained, but new maps should now be uploaded via the MISO interface. It is
+    no longer possible to link to a map on another website, and any such existing links will be
+    removed during the migration to this version
 
 # 0.2.180
 
