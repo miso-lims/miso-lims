@@ -92,7 +92,7 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
     assertEquals("a description", insertedLibrary.getDescription());
     assertEquals(4, library.getSample().getId());
     assertEquals(Long.valueOf(1), library.getLibraryType().getId());
-    assertEquals(Long.valueOf(1), library.getLibrarySelectionType().getId());
+    assertEquals(1L, library.getLibrarySelectionType().getId());
     assertEquals(Long.valueOf(1), library.getLibraryStrategyType().getId());
   }
 
@@ -252,21 +252,6 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetLibrarySelectionTypeById() throws Exception {
-    LibrarySelectionType librarySelectionTypeById = dao.getLibrarySelectionTypeById(1l);
-    assertEquals("RT-PCR", librarySelectionTypeById.getName());
-    assertEquals("Source material was selected by reverse transcription PCR", librarySelectionTypeById.getDescription());
-  }
-
-  @Test
-  public void testGetLibrarySelectionTypeByName() throws Exception {
-    LibrarySelectionType chIP = dao.getLibrarySelectionTypeByName("ChIP");
-    assertEquals(Long.valueOf(10), chIP.getId());
-    assertEquals("Chromatin Immunoprecipitation", chIP.getDescription());
-    assertEquals("ChIP", chIP.getName());
-  }
-
-  @Test
   public void testGetLibraryStrategyTypeById() throws Exception {
     LibraryStrategyType libraryStrategyTypeById = dao.getLibraryStrategyTypeById(14);
     assertEquals(Long.valueOf(14), libraryStrategyTypeById.getId());
@@ -296,13 +281,6 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   public void testListAllLibraryTypes() throws Exception {
     List<LibraryType> libraryTypes = dao.listAllLibraryTypes();
     assertEquals(10, libraryTypes.size());
-
-  }
-
-  @Test
-  public void testListAllLibrarySelectionTypes() throws Exception {
-    List<LibrarySelectionType> librarySelectionTypes = dao.listAllLibrarySelectionTypes();
-    assertEquals(2, librarySelectionTypes.size());
   }
 
   @Test

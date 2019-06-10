@@ -262,14 +262,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public List<LibrarySelectionType> listAllLibrarySelectionTypes() throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibrarySelectionType.class);
-    @SuppressWarnings("unchecked")
-    List<LibrarySelectionType> records = criteria.list();
-    return records;
-  }
-
-  @Override
   public List<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryStrategyType.class);
     @SuppressWarnings("unchecked")

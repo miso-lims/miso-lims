@@ -46,7 +46,7 @@ public class HibernateLibraryQcDaoTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO#save(uk.ac.bbsrc.tgac.miso.core.data.LibraryQC)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO#create(uk.ac.bbsrc.tgac.miso.core.data.LibraryQC)}.
    * 
    * @throws IOException
    */

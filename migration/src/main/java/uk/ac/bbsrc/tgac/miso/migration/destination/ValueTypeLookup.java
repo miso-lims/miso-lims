@@ -113,7 +113,7 @@ public class ValueTypeLookup {
     setSamplePurposes(misoServiceManager.getSamplePurposeDao().getSamplePurpose());
     setLabs(misoServiceManager.getLabDao().getLabs());
     setTissueOrigins(misoServiceManager.getTissueOriginDao().getTissueOrigin());
-    setLibrarySelections(misoServiceManager.getLibraryDao().listAllLibrarySelectionTypes());
+    setLibrarySelections(misoServiceManager.getLibrarySelectionService().list());
     setLibraryStrategies(misoServiceManager.getLibraryDao().listAllLibraryStrategyTypes());
     setLibraryTypes(misoServiceManager.getLibraryDao().listAllLibraryTypes());
     setLibraryDesigns(misoServiceManager.getLibraryDesignDao().getLibraryDesigns());
@@ -550,7 +550,7 @@ public class ValueTypeLookup {
   @VisibleForTesting
   LibrarySelectionType resolve(LibrarySelectionType librarySelectionType) {
     if (librarySelectionType == null) return null;
-    if (librarySelectionType.getId() != LibrarySelectionType.UNSAVED_ID) {
+    if (librarySelectionType.isSaved()) {
       return librarySelectionsById.get(librarySelectionType.getId());
     }
     if (librarySelectionType.getName() != null) return librarySelectionsByName.get(librarySelectionType.getName());
@@ -571,7 +571,7 @@ public class ValueTypeLookup {
   @VisibleForTesting
   LibraryStrategyType resolve(LibraryStrategyType libraryStrategyType) {
     if (libraryStrategyType == null) return null;
-    if (libraryStrategyType.getId() != LibrarySelectionType.UNSAVED_ID) {
+    if (libraryStrategyType.getId() != LibraryStrategyType.UNSAVED_ID) {
       return libraryStrategiesById.get(libraryStrategyType.getId());
     }
     if (libraryStrategyType.getName() != null) return libraryStrategiesByName.get(libraryStrategyType.getName());
