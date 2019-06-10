@@ -32,6 +32,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+
 /**
  * Provides model access to the underlying MISO LibrarySelectionType lookup table. These types should match the ENA submission schema for
  * Library selection types.
@@ -43,12 +46,11 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "LibrarySelectionType")
-public class LibrarySelectionType implements Comparable<LibrarySelectionType>, Serializable {
+public class LibrarySelectionType implements Comparable<LibrarySelectionType>, Deletable, Identifiable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /** Field UNSAVED_ID */
-  public static final Long UNSAVED_ID = 0L;
+  private static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -65,7 +67,8 @@ public class LibrarySelectionType implements Comparable<LibrarySelectionType>, S
    * 
    * @return Long librarySelectionTypeId.
    */
-  public Long getId() {
+  @Override
+  public long getId() {
     return librarySelectionTypeId;
   }
 
@@ -76,7 +79,8 @@ public class LibrarySelectionType implements Comparable<LibrarySelectionType>, S
    *          librarySelectionTypeId.
    * 
    */
-  public void setId(Long librarySelectionTypeId) {
+  @Override
+  public void setId(long librarySelectionTypeId) {
     this.librarySelectionTypeId = librarySelectionTypeId;
   }
 
@@ -132,7 +136,7 @@ public class LibrarySelectionType implements Comparable<LibrarySelectionType>, S
   @Override
   public int hashCode() {
     if (getId() != UNSAVED_ID) {
-      return getId().intValue();
+      return new Long(getId()).intValue();
     } else {
       int hashcode = -1;
       if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
@@ -149,5 +153,20 @@ public class LibrarySelectionType implements Comparable<LibrarySelectionType>, S
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Library Selection Type";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName();
   }
 }

@@ -73,6 +73,7 @@
       <a href="<c:url value="/miso/qctype/list"/>">QC Types</a>
       <a href="<c:url value="/miso/attachmentcategories/list"/>">Attachment Categories</a>
       <a href="<c:url value="/miso/sampletype/list"/>">Sample Types</a>
+      <a href="<c:url value="/miso/libraryselection/list"/>">Library Selection Types</a>
       <a href="<c:url value="/miso/boxsize/list"/>">Box Sizes</a>
       <a href="<c:url value="/miso/boxuse/list"/>">Box Uses</a>
       <a href="<c:url value="/miso/arraymodel/list"/>">Array Models</a>

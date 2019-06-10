@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDilutionDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibrarySelectionDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolOrderDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolableElementViewDao;
@@ -76,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLabService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolService;
@@ -282,6 +284,12 @@ public class MisoServiceManager {
     addDependency(DefaultStudyTypeService.class, HibernateStudyTypeDao.class, DefaultStudyTypeService::setStudyTypeDao);
     addDependency(DefaultStudyTypeService.class, MigrationAuthorizationManager.class, DefaultStudyTypeService::setAuthorizationManager);
     addDependency(DefaultStudyTypeService.class, HibernateDeletionDao.class, DefaultStudyTypeService::setDeletionStore);
+    addDependency(HibernateLibrarySelectionDao.class, SessionFactory.class, HibernateLibrarySelectionDao::setSessionFactory);
+    addDependency(DefaultLibrarySelectionService.class, HibernateLibrarySelectionDao.class,
+        DefaultLibrarySelectionService::setLibrarySelectionDao);
+    addDependency(DefaultLibrarySelectionService.class, HibernateDeletionDao.class, DefaultLibrarySelectionService::setDeletionStore);
+    addDependency(DefaultLibrarySelectionService.class, MigrationAuthorizationManager.class,
+        DefaultLibrarySelectionService::setAuthorizationManager);
   }
 
   private static <O, D> void addDependency(Class<O> owner, Class<D> dependency, BiConsumer<O, D> setter) {
@@ -412,6 +420,8 @@ public class MisoServiceManager {
     setDefaultBoxSizeService();
     setDefaultStudyTypeDao();
     setDefaultStudyTypeService();
+    setDefaultLibrarySelectionDao();
+    setDefaultLibrarySelectionService();
   }
 
   /**
@@ -1399,6 +1409,30 @@ public class MisoServiceManager {
 
   public void setDefaultStudyTypeService() {
     setService(DefaultStudyTypeService.class, new DefaultStudyTypeService());
+  }
+
+  public HibernateLibrarySelectionDao getLibrarySelectionDao() {
+    return getService(HibernateLibrarySelectionDao.class);
+  }
+
+  public void setLibrarySelectionDao(HibernateLibrarySelectionDao dao) {
+    setService(HibernateLibrarySelectionDao.class, dao, false);
+  }
+
+  public void setDefaultLibrarySelectionDao() {
+    setService(HibernateLibrarySelectionDao.class, new HibernateLibrarySelectionDao());
+  }
+
+  public DefaultLibrarySelectionService getLibrarySelectionService() {
+    return getService(DefaultLibrarySelectionService.class);
+  }
+
+  public void setLibrarySelectionService(DefaultLibrarySelectionService service) {
+    setService(DefaultLibrarySelectionService.class, service, false);
+  }
+
+  public void setDefaultLibrarySelectionService() {
+    setService(DefaultLibrarySelectionService.class, new DefaultLibrarySelectionService());
   }
 
 }

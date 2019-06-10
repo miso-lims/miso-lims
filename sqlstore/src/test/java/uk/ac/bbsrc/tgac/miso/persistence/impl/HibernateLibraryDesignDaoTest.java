@@ -18,7 +18,6 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 
@@ -38,9 +37,6 @@ public class HibernateLibraryDesignDaoTest extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
 
-    LibrarySelectionType selType = new LibrarySelectionType();
-    selType.setId(1L);
-    Mockito.when(libraryStore.getLibrarySelectionTypeById(Mockito.anyLong())).thenReturn(selType);
     LibraryStrategyType stratType = new LibraryStrategyType();
     stratType.setId(1L);
     Mockito.when(libraryStore.getLibraryStrategyTypeById(Mockito.anyLong())).thenReturn(stratType);

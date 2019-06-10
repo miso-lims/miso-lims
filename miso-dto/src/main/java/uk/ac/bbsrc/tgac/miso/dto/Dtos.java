@@ -1337,11 +1337,7 @@ public class Dtos {
       to.setSample(new SampleImpl());
       to.getSample().setId(from.getParentSampleId());
     }
-    if (from.getLibrarySelectionTypeId() != null) {
-      LibrarySelectionType sel = new LibrarySelectionType();
-      sel.setId(from.getLibrarySelectionTypeId());
-      to.setLibrarySelectionType(sel);
-    }
+    setObject(to::setLibrarySelectionType, LibrarySelectionType::new, from.getLibrarySelectionTypeId());
     if (from.getLibraryStrategyTypeId() != null) {
       LibraryStrategyType strat = new LibraryStrategyType();
       strat.setId(from.getLibraryStrategyTypeId());
@@ -2102,10 +2098,18 @@ public class Dtos {
 
   public static LibrarySelectionTypeDto asDto(@Nonnull LibrarySelectionType from) {
     LibrarySelectionTypeDto dto = new LibrarySelectionTypeDto();
-    dto.setId(from.getId());
-    dto.setAlias(from.getDescription());
-    dto.setName(from.getName());
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setName, from.getName());
+    setString(dto::setDescription, from.getDescription());
     return dto;
+  }
+
+  public static LibrarySelectionType to(@Nonnull LibrarySelectionTypeDto from) {
+    LibrarySelectionType to = new LibrarySelectionType();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
+    setString(to::setDescription, from.getDescription());
+    return to;
   }
 
   public static LibraryStrategyTypeDto asDto(@Nonnull LibraryStrategyType from) {
@@ -3171,11 +3175,7 @@ public class Dtos {
       libraryType.setId(from.getLibraryTypeId());
       to.setLibraryType(libraryType);
     }
-    if (from.getSelectionId() != null) {
-      LibrarySelectionType librarySelectionType = new LibrarySelectionType();
-      librarySelectionType.setId(from.getSelectionId());
-      to.setLibrarySelectionType(librarySelectionType);
-    }
+    setObject(to::setLibrarySelectionType, LibrarySelectionType::new, from.getSelectionId());
     if (from.getStrategyId() != null) {
       LibraryStrategyType libraryStrategyType = new LibraryStrategyType();
       libraryStrategyType.setId(from.getStrategyId());

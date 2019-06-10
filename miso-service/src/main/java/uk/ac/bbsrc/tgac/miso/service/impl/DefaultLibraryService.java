@@ -39,7 +39,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -57,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
+import uk.ac.bbsrc.tgac.miso.service.LibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.WorksetService;
@@ -79,6 +79,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   private AuthorizationManager authorizationManager;
   @Autowired
   private NamingScheme namingScheme;
+  @Autowired
+  private LibrarySelectionService librarySelectionService;
   @Autowired
   private LibraryDesignService libraryDesignService;
   @Autowired
@@ -284,21 +286,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   @Override
-  public LibrarySelectionType getLibrarySelectionTypeById(Long librarySelectionTypeId) throws IOException {
-    return libraryDao.getLibrarySelectionTypeById(librarySelectionTypeId);
-  }
-
-  @Override
-  public LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException {
-    return libraryDao.getLibrarySelectionTypeByName(name);
-  }
-
-  @Override
-  public Collection<LibrarySelectionType> listLibrarySelectionTypes() throws IOException {
-    return libraryDao.listAllLibrarySelectionTypes();
-  }
-
-  @Override
   public LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException {
     return libraryDao.getLibraryStrategyTypeById(libraryStrategyTypeId);
   }
@@ -420,7 +407,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       library.setLibraryType(getLibraryTypeById(library.getLibraryType().getId()));
     }
     if (library.getLibrarySelectionType() != null) {
-      library.setLibrarySelectionType(getLibrarySelectionTypeById(library.getLibrarySelectionType().getId()));
+      library.setLibrarySelectionType(librarySelectionService.get(library.getLibrarySelectionType().getId()));
     }
     if (library.getLibraryStrategyType() != null) {
       library.setLibraryStrategyType(getLibraryStrategyTypeById(library.getLibraryStrategyType().getId()));

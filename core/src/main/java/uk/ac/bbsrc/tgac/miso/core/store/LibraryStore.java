@@ -171,14 +171,6 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
   Collection<LibraryType> listLibraryTypesByPlatform(PlatformType platform) throws IOException;
 
   /**
-   * List all LibrarySelectionTypes
-   *
-   * @return Collection<LibrarySelectionType>
-   * @throws IOException when
-   */
-  Collection<LibrarySelectionType> listAllLibrarySelectionTypes() throws IOException;
-
-  /**
    * List all LibraryStrategyTypes
    *
    * @return Collection<LibraryStrategyType>

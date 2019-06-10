@@ -66,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxSizeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxUseService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultQualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
 
@@ -129,12 +130,13 @@ public class ValueTypeLookupTest {
     Mockito.when(toDao.getTissueOrigin()).thenReturn(tos);
     Mockito.when(mgr.getTissueOriginDao()).thenReturn(toDao);
 
-    HibernateLibraryDao libDao = Mockito.mock(HibernateLibraryDao.class);
+    DefaultLibrarySelectionService selectionService = Mockito.mock(DefaultLibrarySelectionService.class);
     List<LibrarySelectionType> lsts = new ArrayList<>();
     lsts.add(makeLibrarySelection(VALID_LONG, VALID_STRING));
-    Mockito.when(libDao.listAllLibrarySelectionTypes()).thenReturn(lsts);
-    Mockito.when(mgr.getLibraryDao()).thenReturn(libDao);
+    Mockito.when(selectionService.list()).thenReturn(lsts);
+    Mockito.when(mgr.getLibrarySelectionService()).thenReturn(selectionService);
 
+    HibernateLibraryDao libDao = Mockito.mock(HibernateLibraryDao.class);
     List<LibraryStrategyType> lstrats = new ArrayList<>();
     lstrats.add(makeLibraryStrategy(VALID_LONG, VALID_STRING));
     Mockito.when(libDao.listAllLibraryStrategyTypes()).thenReturn(lstrats);
@@ -396,7 +398,9 @@ public class ValueTypeLookupTest {
 
   private LibrarySelectionType makeLibrarySelection(Long id, String name) {
     LibrarySelectionType ls = new LibrarySelectionType();
-    ls.setId(id == null ? LibrarySelectionType.UNSAVED_ID : id);
+    if (id != null) {
+      ls.setId(id);
+    }
     ls.setName(name);
     return ls;
   }
