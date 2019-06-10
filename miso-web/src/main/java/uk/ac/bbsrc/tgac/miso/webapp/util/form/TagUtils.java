@@ -5,6 +5,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import uk.ac.bbsrc.tgac.miso.Version;
+
 public class TagUtils {
 
   private static final Logger log = Logger.getLogger(TagUtils.class);
@@ -48,6 +50,14 @@ public class TagUtils {
 
   private static Authentication getAuthentication() {
     return SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
+  }
+
+  public static String docsVersion() {
+    if (Version.VERSION.matches("^\\d*\\.\\d*\\.\\d*$")) {
+      return Version.VERSION.substring(0, Version.VERSION.lastIndexOf(".")) + ".x";
+    } else {
+      return "latest";
+    }
   }
 
 }

@@ -420,6 +420,12 @@
         <function-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.TagUtils</function-class>
         <function-signature>boolean isAdmin()</function-signature>
     </function>
+    
+    <function>
+        <name>docsVersion</name>
+        <function-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.TagUtils</function-class>
+        <function-signature>String docsVersion()</function-signature>
+    </function>
 
 
 </taglib>

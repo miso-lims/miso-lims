@@ -115,7 +115,7 @@
   <div class="cell">
     <sec:authorize access="isAuthenticated()">
       <div id="loggedInBanner">
-        <a href="http://miso-lims.github.io/miso-lims/usr/user-manual-table-of-contents.html">Help</a> |
+        <a href="http://miso-lims.github.io/miso-lims/${miso:docsVersion()}/usr/user-manual-table-of-contents.html">Help</a> |
         <a href="https://gitter.im/miso-lims/users">Chat</a> |
         <c:if test="${misoBugUrl != null}">
           <a href="${misoBugUrl}" target="_blank">Report a problem</a> |
