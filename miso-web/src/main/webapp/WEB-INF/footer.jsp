@@ -28,9 +28,7 @@
 
     <p>
         &copy; 2010 - <fmt:formatDate value="${timestamp}" pattern="yyyy"/>
-        Brought to you by <a href="http://www.tgac.ac.uk/" target="_blank">The Genome Analysis Centre</a>,
-        <a href="http://oicr.on.ca/" target="_blank">The Ontario Institute for Cancer Research</a>,
-        and the element <a href="http://en.wikipedia.org/wiki/Sodium" target="_blank">sodium</a> | Version:
+        <a href="https://github.com/miso-lims/miso-lims">MISO LIMS</a> | Version:
         <%=Version.VERSION%>
     </p>
 </div>
