@@ -39,7 +39,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -58,6 +57,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryStrategyService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -81,6 +81,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   private NamingScheme namingScheme;
   @Autowired
   private LibrarySelectionService librarySelectionService;
+  @Autowired
+  private LibraryStrategyService libraryStrategyService;
   @Autowired
   private LibraryDesignService libraryDesignService;
   @Autowired
@@ -286,21 +288,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   @Override
-  public LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException {
-    return libraryDao.getLibraryStrategyTypeById(libraryStrategyTypeId);
-  }
-
-  @Override
-  public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException {
-    return libraryDao.getLibraryStrategyTypeByName(name);
-  }
-
-  @Override
-  public Collection<LibraryStrategyType> listLibraryStrategyTypes() throws IOException {
-    return libraryDao.listAllLibraryStrategyTypes();
-  }
-
-  @Override
   public List<LibrarySpikeIn> listSpikeIns() throws IOException {
     return libraryDao.listSpikeIns();
   }
@@ -410,7 +397,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       library.setLibrarySelectionType(librarySelectionService.get(library.getLibrarySelectionType().getId()));
     }
     if (library.getLibraryStrategyType() != null) {
-      library.setLibraryStrategyType(getLibraryStrategyTypeById(library.getLibraryStrategyType().getId()));
+      library.setLibraryStrategyType(libraryStrategyService.get(library.getLibraryStrategyType().getId()));
     }
     List<Index> managedIndices = new ArrayList<>();
     for (Index index : library.getIndices()) {

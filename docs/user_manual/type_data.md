@@ -274,9 +274,14 @@ type can only be deleted if it has not been used by any existing libraries.
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Library Strategy Types" %}
 
-Library strategy type is defined by [NCBI](https://www.ncbi.nlm.nih.gov/) as the "sequencing type intended for this
-library." This property is required in order to submit libraries to the SRA (see the [SRA section](sra.html)). The
-values available in MISO should be limited to the default options, which are the same as defined in the SRA schema.
+**WARNING**: Library strategy type is defined by [NCBI](https://www.ncbi.nlm.nih.gov/) as the "sequencing type intended
+for this library" and is required in order to submit libraries to the ENA (see the
+[ENA section](european_nucleotide_archive_support.html)). The values available in MISO should be limited to the default
+options, which are the same as defined in the ENA schema. If these values are modified, or additional options are
+added, your data may not be valid for ENA submission.
+
+MISO administrators can add, edit, and delete library strategy types using the standard interface. A library strategy
+type can only be deleted if it has not been used by any existing libraries.
 
 {% include userman-toplink.md %}
 

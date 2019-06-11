@@ -8,7 +8,6 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
@@ -55,12 +54,6 @@ public interface LibraryService
   Collection<LibraryType> listLibraryTypes() throws IOException;
 
   Collection<LibraryType> listLibraryTypesByPlatform(PlatformType platformType) throws IOException;
-
-  LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException;
-
-  LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException;
-
-  Collection<LibraryStrategyType> listLibraryStrategyTypes() throws IOException;
 
   List<LibrarySpikeIn> listSpikeIns() throws IOException;
 

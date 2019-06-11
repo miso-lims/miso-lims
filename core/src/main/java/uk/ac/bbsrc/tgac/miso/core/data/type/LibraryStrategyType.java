@@ -32,6 +32,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+
 /**
  * Provides model access to the underlying MISO LibraryStrategyType lookup table. These types should match the ENA submission schema for
  * Library strategy types.
@@ -43,12 +46,11 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "LibraryStrategyType")
-public class LibraryStrategyType implements Comparable<LibraryStrategyType>, Serializable {
+public class LibraryStrategyType implements Comparable<LibraryStrategyType>, Deletable, Identifiable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /** Field UNSAVED_ID */
-  public static final Long UNSAVED_ID = 0L;
+  private static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -65,7 +67,8 @@ public class LibraryStrategyType implements Comparable<LibraryStrategyType>, Ser
    * 
    * @return Long libraryStrategyTypeId.
    */
-  public Long getId() {
+  @Override
+  public long getId() {
     return libraryStrategyTypeId;
   }
 
@@ -75,7 +78,8 @@ public class LibraryStrategyType implements Comparable<LibraryStrategyType>, Ser
    * @param libraryStrategyTypeId
    *          libraryStrategyTypeId.
    */
-  public void setId(Long libraryStrategyTypeId) {
+  @Override
+  public void setId(long libraryStrategyTypeId) {
     this.libraryStrategyTypeId = libraryStrategyTypeId;
   }
 
@@ -131,7 +135,7 @@ public class LibraryStrategyType implements Comparable<LibraryStrategyType>, Ser
   @Override
   public int hashCode() {
     if (getId() != UNSAVED_ID) {
-      return getId().intValue();
+      return new Long(getId()).intValue();
     } else {
       int hashcode = -1;
       if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
@@ -148,5 +152,20 @@ public class LibraryStrategyType implements Comparable<LibraryStrategyType>, Ser
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Library Strategy Type";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName();
   }
 }

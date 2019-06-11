@@ -30,8 +30,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
@@ -217,34 +215,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public LibrarySelectionType getLibrarySelectionTypeById(long librarySelectionTypeId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibrarySelectionType.class);
-    criteria.add(Restrictions.eq("id", librarySelectionTypeId));
-    return (LibrarySelectionType) criteria.uniqueResult();
-  }
-
-  @Override
-  public LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibrarySelectionType.class);
-    criteria.add(Restrictions.eq("name", name));
-    return (LibrarySelectionType) criteria.uniqueResult();
-  }
-
-  @Override
-  public LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryStrategyType.class);
-    criteria.add(Restrictions.eq("id", libraryStrategyTypeId));
-    return (LibraryStrategyType) criteria.uniqueResult();
-  }
-
-  @Override
-  public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryStrategyType.class);
-    criteria.add(Restrictions.eq("name", name));
-    return (LibraryStrategyType) criteria.uniqueResult();
-  }
-
-  @Override
   public List<LibraryType> listAllLibraryTypes() throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryType.class);
     @SuppressWarnings("unchecked")
@@ -258,14 +228,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     criteria.add(Restrictions.eq("platformType", platformType));
     @SuppressWarnings("unchecked")
     List<LibraryType> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public List<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryStrategyType.class);
-    @SuppressWarnings("unchecked")
-    List<LibraryStrategyType> records = criteria.list();
     return records;
   }
 

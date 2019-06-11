@@ -113,6 +113,7 @@ public interface AbstractListPage {
     public static final String SAMPLES = "samples";
     public static final String LIBRARIES = "libraries";
     public static final String LIBRARY_SELECTION_TYPES = "libraryselection/list";
+    public static final String LIBRARY_STRATEGY_TYPES = "librarystrategy/list";
     public static final String LOCATION_MAPS = "locationmap/list";
     public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";
     public static final String DILUTIONS = "dilutions";

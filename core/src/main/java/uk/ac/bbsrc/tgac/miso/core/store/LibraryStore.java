@@ -31,8 +31,6 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -118,42 +116,6 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
   LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException;
 
   /**
-   * Get a LibrarySelectionType given a LibrarySelectionType ID
-   *
-   * @param librarySelectionTypeId of type long
-   * @return LibrarySelectionType
-   * @throws IOException when
-   */
-  LibrarySelectionType getLibrarySelectionTypeById(long librarySelectionTypeId) throws IOException;
-
-  /**
-   * Get a LibrarySelectionType given a LibrarySelectionType name
-   *
-   * @param name of type String
-   * @return LibrarySelectionType
-   * @throws IOException when
-   */
-  LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException;
-
-  /**
-   * Get a LibraryStrategyType given a LibraryStrategyType ID
-   *
-   * @param libraryStrategyTypeId of type long
-   * @return LibraryStrategyType
-   * @throws IOException when
-   */
-  LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException;
-
-  /**
-   * Get a LibraryStrategyType given a LibraryStrategyType name
-   *
-   * @param name of type String
-   * @return LibraryStrategyType
-   * @throws IOException when
-   */
-  LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException;
-
-  /**
    * List all LibraryTypes
    *
    * @return Collection<LibraryType>
@@ -169,14 +131,6 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
    * @throws IOException when
    */
   Collection<LibraryType> listLibraryTypesByPlatform(PlatformType platform) throws IOException;
-
-  /**
-   * List all LibraryStrategyTypes
-   *
-   * @return Collection<LibraryStrategyType>
-   * @throws IOException when
-   */
-  Collection<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException;
 
   /**
    * Return the Library associated with a given positionId

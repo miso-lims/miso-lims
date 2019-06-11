@@ -565,6 +565,15 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.LIBRARY_SELECTION_TYPES);
   }
 
+  public void testListLibraryStrategySetup() throws Exception {
+    testPageSetup(ListTarget.LIBRARY_STRATEGY_TYPES, Sets.newHashSet(Columns.NAME, Columns.DESCRIPTION));
+  }
+
+  @Test
+  public void testListLibraryStrategyColumnSort() throws Exception {
+    testColumnsSort(ListTarget.LIBRARY_STRATEGY_TYPES);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     // Goal: confirm that all expected columns are present
     ListPage page = getList(listTarget);

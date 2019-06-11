@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,7 +17,6 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 
 public class HibernateLibraryDesignDaoTest extends AbstractDAOTest {
@@ -36,10 +34,6 @@ public class HibernateLibraryDesignDaoTest extends AbstractDAOTest {
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
-
-    LibraryStrategyType stratType = new LibraryStrategyType();
-    stratType.setId(1L);
-    Mockito.when(libraryStore.getLibraryStrategyTypeById(Mockito.anyLong())).thenReturn(stratType);
   }
   
   @Test

@@ -114,7 +114,7 @@ public class ValueTypeLookup {
     setLabs(misoServiceManager.getLabDao().getLabs());
     setTissueOrigins(misoServiceManager.getTissueOriginDao().getTissueOrigin());
     setLibrarySelections(misoServiceManager.getLibrarySelectionService().list());
-    setLibraryStrategies(misoServiceManager.getLibraryDao().listAllLibraryStrategyTypes());
+    setLibraryStrategies(misoServiceManager.getLibraryStrategyService().list());
     setLibraryTypes(misoServiceManager.getLibraryDao().listAllLibraryTypes());
     setLibraryDesigns(misoServiceManager.getLibraryDesignDao().getLibraryDesigns());
     setLibraryDesignCodes(misoServiceManager.getLibraryDesignCodeDao().getLibraryDesignCodes());
@@ -571,7 +571,7 @@ public class ValueTypeLookup {
   @VisibleForTesting
   LibraryStrategyType resolve(LibraryStrategyType libraryStrategyType) {
     if (libraryStrategyType == null) return null;
-    if (libraryStrategyType.getId() != LibraryStrategyType.UNSAVED_ID) {
+    if (libraryStrategyType.isSaved()) {
       return libraryStrategiesById.get(libraryStrategyType.getId());
     }
     if (libraryStrategyType.getName() != null) return libraryStrategiesByName.get(libraryStrategyType.getName());

@@ -5,6 +5,7 @@ Changes:
   * Added interface for administrators to upload and delete location maps
   * Added interface for administrators to add, edit, and delete dropdown options
     * library selection types
+    * library strategy types
   * Changed the way location maps are specified for freezers
 
 Upgrade Notes:
