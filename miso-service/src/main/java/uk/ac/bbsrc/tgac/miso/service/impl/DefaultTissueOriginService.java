@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
-import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -113,9 +111,9 @@ public class DefaultTissueOriginService implements TissueOriginService {
   }
 
   @Override
-  public Set<TissueOrigin> getAll() throws IOException {
+  public List<TissueOrigin> list() throws IOException {
     authorizationManager.throwIfUnauthenticated();
-    return Sets.newHashSet(tissueOriginDao.getTissueOrigin());
+    return tissueOriginDao.getTissueOrigin();
   }
 
   @Override

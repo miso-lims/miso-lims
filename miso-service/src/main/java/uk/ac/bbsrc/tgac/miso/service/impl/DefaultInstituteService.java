@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
-import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -61,9 +60,9 @@ public class DefaultInstituteService implements InstituteService {
   }
 
   @Override
-  public Set<Institute> getAll() throws IOException {
+  public List<Institute> list() throws IOException {
     authorizationManager.throwIfUnauthenticated();
-    return Sets.newHashSet(instituteDao.getInstitute());
+    return instituteDao.getInstitute();
   }
 
   @Override

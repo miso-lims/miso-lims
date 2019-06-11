@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.core.Response.Status;
@@ -50,7 +51,7 @@ public class LabRestController extends RestController {
   @GetMapping(produces = { "application/json" })
   @ResponseBody
   public Set<LabDto> getLabs(UriComponentsBuilder uriBuilder) throws IOException {
-    Set<Lab> labs = labService.getAll();
+    List<Lab> labs = labService.list();
     Set<LabDto> labDtos = Dtos.asLabDtos(labs);
     return labDtos;
   }

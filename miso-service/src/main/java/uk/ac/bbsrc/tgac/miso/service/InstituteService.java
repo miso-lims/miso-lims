@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
-import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
+import uk.ac.bbsrc.tgac.miso.core.service.ListService;
 
-public interface InstituteService extends DeleterService<Institute> {
+public interface InstituteService extends DeleterService<Institute>, ListService<Institute> {
   
   /**
    * Saves a new Institute
@@ -23,10 +23,5 @@ public interface InstituteService extends DeleterService<Institute> {
    * @throws IOException
    */
   void update(Institute institute) throws IOException;
-  
-  /**
-   * @return a list of all Institutes
-   */
-  Set<Institute> getAll() throws IOException;
   
 }

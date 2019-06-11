@@ -572,7 +572,7 @@ public class EditSampleController {
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_ID, defaultLcmTubeGroupId);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_DESC, defaultLcmTubeGroupDesc);
       if (project == null) {
-        projectService.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
+        projectService.list().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
         config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
       } else {
         config.putPOJO("project", Dtos.asDto(project));

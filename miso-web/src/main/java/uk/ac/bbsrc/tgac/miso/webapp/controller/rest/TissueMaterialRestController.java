@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -92,7 +93,7 @@ public class TissueMaterialRestController extends RestController {
   @GetMapping(produces = { "application/json" })
   @ResponseBody
   public Set<TissueMaterialDto> getTissueMaterials(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
-    Set<TissueMaterial> tissueMaterials = tissueMaterialService.getAll();
+    List<TissueMaterial> tissueMaterials = tissueMaterialService.list();
     Set<TissueMaterialDto> tissueMaterialDtos = Dtos.asTissueMaterialDtos(tissueMaterials);
     for (TissueMaterialDto tissueMaterialDto : tissueMaterialDtos) {
       tissueMaterialDto = writeUrls(tissueMaterialDto, uriBuilder);

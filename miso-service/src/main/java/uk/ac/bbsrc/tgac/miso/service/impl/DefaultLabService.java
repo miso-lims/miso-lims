@@ -1,14 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
-import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -75,9 +74,9 @@ public class DefaultLabService implements LabService {
   }
 
   @Override
-  public Set<Lab> getAll() throws IOException {
+  public List<Lab> list() throws IOException {
     authorizationManager.throwIfUnauthenticated();
-    return Sets.newHashSet(labDao.getLabs());
+    return labDao.getLabs();
   }
 
   @Override

@@ -30,7 +30,7 @@ public class TissueMaterialDefaultsController extends AbstractInstituteDefaultsC
 
   @Override
   protected Collection<TissueMaterial> getAll() throws IOException {
-    return service.getAll();
+    return service.list();
   }
 
   @Override

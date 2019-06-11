@@ -77,7 +77,7 @@ public class HibernateArrayRunDao implements ArrayRunStore, HibernatePaginatedDa
   }
 
   @Override
-  public List<ArrayRun> listAll() throws IOException {
+  public List<ArrayRun> list() throws IOException {
     Criteria criteria = currentSession().createCriteria(ArrayRun.class);
     @SuppressWarnings("unchecked")
     List<ArrayRun> list = criteria.list();

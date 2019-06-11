@@ -30,7 +30,7 @@ public class SamplePurposeDefaultsController extends AbstractInstituteDefaultsCo
 
   @Override
   protected Collection<SamplePurpose> getAll() throws IOException {
-    return service.getAll();
+    return service.list();
   }
 
   @Override

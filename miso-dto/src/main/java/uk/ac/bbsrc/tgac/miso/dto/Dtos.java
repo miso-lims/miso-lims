@@ -226,7 +226,7 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<TissueOriginDto> asTissueOriginDtos(@Nonnull Set<TissueOrigin> from) {
+  public static Set<TissueOriginDto> asTissueOriginDtos(@Nonnull Collection<TissueOrigin> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
@@ -631,7 +631,7 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<TissueMaterialDto> asTissueMaterialDtos(@Nonnull Set<TissueMaterial> from) {
+  public static Set<TissueMaterialDto> asTissueMaterialDtos(@Nonnull Collection<TissueMaterial> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
@@ -653,7 +653,7 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<SamplePurposeDto> asSamplePurposeDtos(@Nonnull Set<SamplePurpose> from) {
+  public static Set<SamplePurposeDto> asSamplePurposeDtos(@Nonnull Collection<SamplePurpose> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
@@ -887,7 +887,7 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<InstituteDto> asInstituteDtos(@Nonnull Set<Institute> from) {
+  public static Set<InstituteDto> asInstituteDtos(@Nonnull Collection<Institute> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
@@ -3220,9 +3220,16 @@ public class Dtos {
 
   public static LibrarySpikeInDto asDto(@Nonnull LibrarySpikeIn from) {
     LibrarySpikeInDto dto = new LibrarySpikeInDto();
-    dto.setId(from.getId());
+    setLong(dto::setId, from.getId(), true);
     setString(dto::setAlias, from.getAlias());
     return dto;
+  }
+
+  public static LibrarySpikeIn to(@Nonnull LibrarySpikeInDto from) {
+    LibrarySpikeIn to = new LibrarySpikeIn();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    return to;
   }
 
   public static AttachmentCategoryDto asDto(@Nonnull AttachmentCategory from) {

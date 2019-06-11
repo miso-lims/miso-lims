@@ -139,7 +139,7 @@ public class ExperimentRestController extends RestController {
 
   @GetMapping(produces = "application/json")
   public @ResponseBody List<ExperimentDto> list() throws IOException {
-    Collection<Experiment> experiments = experimentService.listAll();
+    Collection<Experiment> experiments = experimentService.list();
     return experiments.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 

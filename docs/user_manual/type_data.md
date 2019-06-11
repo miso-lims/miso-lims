@@ -348,8 +348,9 @@ adminstrator.
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Library Spike-Ins" %}
 
-A library spike-in is a control added to a library for normalization. Modifications to library spike-ins can only be
-made via direct access to the MISO database. As such, they must be performed by a MISO adminstrator.
+A library spike-in is a control added to a library for normalization. MISO administrators can add, edit, and delete
+library spike-ins using the standard interface. A library spike-in can only be deleted if it has not been used by any
+existing libraries.
 
 {% include userman-toplink.md %}
 

@@ -80,7 +80,7 @@ public class DefaultProjectService implements ProjectService {
   }
 
   @Override
-  public Collection<Project> listAllProjects() throws IOException {
+  public List<Project> list() throws IOException {
     return projectStore.listAll();
   }
 

@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +49,7 @@ public class DefaultReferenceGenomeService implements ReferenceGenomeService {
   }
 
   @Override
-  public Collection<ReferenceGenome> list() throws IOException {
+  public List<ReferenceGenome> list() throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return referenceGenomeDao.list();
   }

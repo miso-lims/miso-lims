@@ -64,7 +64,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
   }
 
   @Override
-  public Collection<Experiment> listAll() throws IOException {
+  public List<Experiment> list() throws IOException {
     return experimentStore.listAll();
   }
 

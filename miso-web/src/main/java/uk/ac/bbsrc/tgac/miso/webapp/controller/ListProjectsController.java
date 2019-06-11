@@ -47,6 +47,6 @@ public class ListProjectsController {
 
   @RequestMapping("/projects")
   public ModelAndView listProjects(ModelMap model) throws Exception {
-    return new ListItemsPage("project").list(model, projectService.listAllProjects().stream().map(Dtos::asDto));
+    return new ListItemsPage("project").list(model, projectService.list().stream().map(Dtos::asDto));
   }
 }

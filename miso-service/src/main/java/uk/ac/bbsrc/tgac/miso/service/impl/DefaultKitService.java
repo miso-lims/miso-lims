@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class DefaultKitService implements KitService {
   }
 
   @Override
-  public Collection<Kit> listKits() throws IOException {
+  public List<Kit> list() throws IOException {
     return kitStore.listAll();
   }
 

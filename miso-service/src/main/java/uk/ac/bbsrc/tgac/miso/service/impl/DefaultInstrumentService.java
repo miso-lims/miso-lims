@@ -29,7 +29,7 @@ public class DefaultInstrumentService implements InstrumentService {
   private InstrumentStore instrumentDao;
 
   @Override
-  public Collection<Instrument> list() throws IOException {
+  public List<Instrument> list() throws IOException {
     return instrumentDao.listAll();
   }
 

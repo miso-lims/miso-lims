@@ -39,7 +39,7 @@ public class LabDefaultsController extends AbstractInstituteDefaultsController<L
 
   @Override
   protected Collection<Lab> getAll() throws IOException {
-    return service.getAll();
+    return service.list();
   }
 
   @Override
@@ -65,7 +65,7 @@ public class LabDefaultsController extends AbstractInstituteDefaultsController<L
   @Override
   protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
     ArrayNode node = config.putArray("institutes");
-    instituteService.getAll().stream().map(Dtos::asDto).forEach(node::addPOJO);
+    instituteService.list().stream().map(Dtos::asDto).forEach(node::addPOJO);
   }
 
 }

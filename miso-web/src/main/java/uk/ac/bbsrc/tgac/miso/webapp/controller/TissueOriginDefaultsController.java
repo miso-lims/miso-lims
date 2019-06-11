@@ -31,7 +31,7 @@ public class TissueOriginDefaultsController extends AbstractInstituteDefaultsCon
 
   @Override
   protected Collection<TissueOrigin> getAll() throws IOException {
-    return tissueOriginService.getAll();
+    return tissueOriginService.list();
   }
 
   @Override

@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -33,7 +32,7 @@ public class HibernateReferenceGenomeDao implements ReferenceGenomeDao {
   }
 
   @Override
-  public Collection<ReferenceGenome> list() {
+  public List<ReferenceGenome> list() {
     Query query = currentSession().createQuery("from ReferenceGenomeImpl");
     @SuppressWarnings("unchecked")
     List<ReferenceGenome> records = query.list();

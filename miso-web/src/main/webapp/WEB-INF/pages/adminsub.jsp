@@ -75,6 +75,7 @@
       <a href="<c:url value="/miso/sampletype/list"/>">Sample Types</a>
       <a href="<c:url value="/miso/libraryselection/list"/>">Library Selection Types</a>
       <a href="<c:url value="/miso/librarystrategy/list"/>">Library Strategy Types</a>
+      <a href="<c:url value="/miso/libraryspikein/list"/>">Library Spike-Ins</a>
       <a href="<c:url value="/miso/boxsize/list"/>">Box Sizes</a>
       <a href="<c:url value="/miso/boxuse/list"/>">Box Uses</a>
       <a href="<c:url value="/miso/arraymodel/list"/>">Array Models</a>
