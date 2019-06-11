@@ -52,7 +52,7 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
     }
     for (DetailedSample parent = detailed.getParent(); parent != null; parent = parent.getParent()) {
       if (isAliquotSample(parent)) {
-        return addSiblingTag(parent.getAlias(), detailed);
+          continue;
       }
       if (isTissueSample(parent)) {
         if (isTissueSample(detailed)) {
