@@ -90,7 +90,7 @@ public class OicrSampleAliasGeneratorTest {
 
   @Test
   public void generateForAliquotFromAliquotTest() throws Exception {
-    assertEquals("PROJ_1234567_nn_n_nn_1-1_R_12_MR_2", sut.generate(makeAliquotFromAliquot()));
+    assertEquals("PROJ_0001_nn_n_nn_1-1_MR_2", sut.generate(makeAliquotFromAliquot()));
   }
 
   private SampleAliquot makeAliquotFromAliquot() throws Exception {
