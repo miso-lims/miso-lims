@@ -1,10 +1,10 @@
-HotTarget.libraryselection = {
-  createUrl: '/miso/rest/libraryselections',
-  updateUrl: '/miso/rest/libraryselections/',
+HotTarget.librarystrategy = {
+  createUrl: '/miso/rest/librarystrategies',
+  updateUrl: '/miso/rest/librarystrategies/',
   requestConfiguration: function(config, callback) {
     callback(config)
   },
-  fixUp: function(libraryselection, errorHandler) {
+  fixUp: function(librarystrategy, errorHandler) {
   },
   createColumns: function(config, create, data) {
     return [HotUtils.makeColumnForText('Name', true, 'name', {
@@ -18,7 +18,7 @@ HotTarget.libraryselection = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + '/miso/libraryselection/bulk/edit?' + jQuery.param({
+        window.location = window.location.origin + '/miso/librarystrategy/bulk/edit?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

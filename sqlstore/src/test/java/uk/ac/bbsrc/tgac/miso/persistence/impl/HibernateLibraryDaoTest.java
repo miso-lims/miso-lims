@@ -93,7 +93,7 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
     assertEquals(4, library.getSample().getId());
     assertEquals(Long.valueOf(1), library.getLibraryType().getId());
     assertEquals(1L, library.getLibrarySelectionType().getId());
-    assertEquals(Long.valueOf(1), library.getLibraryStrategyType().getId());
+    assertEquals(1L, library.getLibraryStrategyType().getId());
   }
 
   @Test
@@ -252,22 +252,6 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetLibraryStrategyTypeById() throws Exception {
-    LibraryStrategyType libraryStrategyTypeById = dao.getLibraryStrategyTypeById(14);
-    assertEquals(Long.valueOf(14), libraryStrategyTypeById.getId());
-    assertEquals("Concatenated Tag Sequencing", libraryStrategyTypeById.getDescription());
-    assertEquals("CTS", libraryStrategyTypeById.getName());
-  }
-
-  @Test
-  public void testGetLibraryStrategyTypeByName() throws Exception {
-    LibraryStrategyType est = dao.getLibraryStrategyTypeByName("EST");
-    assertEquals(Long.valueOf(12), est.getId());
-    assertEquals("Single pass sequencing of cDNA templates", est.getDescription());
-    assertEquals("EST", est.getName());
-  }
-
-  @Test
   public void testListLibraryTypesByPlatform() throws Exception {
     List<LibraryType> libraryTypes = dao.listLibraryTypesByPlatform(PlatformType.SOLID);
     assertEquals(5, libraryTypes.size());
@@ -281,12 +265,6 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   public void testListAllLibraryTypes() throws Exception {
     List<LibraryType> libraryTypes = dao.listAllLibraryTypes();
     assertEquals(10, libraryTypes.size());
-  }
-
-  @Test
-  public void testListAllLibraryStrategyTypes() throws Exception {
-    List<LibraryStrategyType> libraryStrategyTypes = dao.listAllLibraryStrategyTypes();
-    assertEquals(3, libraryStrategyTypes.size());
   }
 
   @Test

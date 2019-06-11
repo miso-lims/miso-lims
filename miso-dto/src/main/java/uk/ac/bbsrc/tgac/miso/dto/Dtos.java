@@ -2114,10 +2114,18 @@ public class Dtos {
 
   public static LibraryStrategyTypeDto asDto(@Nonnull LibraryStrategyType from) {
     LibraryStrategyTypeDto dto = new LibraryStrategyTypeDto();
-    dto.setId(from.getId());
-    dto.setDescription(from.getDescription());
-    dto.setName(from.getName());
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setName, from.getName());
+    setString(dto::setDescription, from.getDescription());
     return dto;
+  }
+
+  public static LibraryStrategyType to(@Nonnull LibraryStrategyTypeDto from) {
+    LibraryStrategyType to = new LibraryStrategyType();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
+    setString(to::setDescription, from.getDescription());
+    return to;
   }
 
   public static IndexDto asDto(@Nonnull Index from) {

@@ -97,6 +97,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryStrategyService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
@@ -152,6 +153,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   private LibraryService libraryService;
   @Autowired
   private LibrarySelectionService librarySelectionService;
+  @Autowired
+  private LibraryStrategyService libraryStrategyService;
   @Autowired
   private ReferenceGenomeService referenceGenomeService;
   @Autowired
@@ -497,7 +500,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<LibraryStrategyType>(LibraryStrategyType.class) {
       @Override
       public LibraryStrategyType resolveById(long id) throws Exception {
-        return libraryService.getLibraryStrategyTypeById(id);
+        return libraryStrategyService.get(id);
       }
     }.register(binder).register(binder, Set.class, "libraryStrategyTypes");
 

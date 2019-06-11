@@ -67,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxSizeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxUseService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibrarySelectionService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryStrategyService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultQualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
 
@@ -136,15 +137,17 @@ public class ValueTypeLookupTest {
     Mockito.when(selectionService.list()).thenReturn(lsts);
     Mockito.when(mgr.getLibrarySelectionService()).thenReturn(selectionService);
 
-    HibernateLibraryDao libDao = Mockito.mock(HibernateLibraryDao.class);
+    DefaultLibraryStrategyService strategyService = Mockito.mock(DefaultLibraryStrategyService.class);
     List<LibraryStrategyType> lstrats = new ArrayList<>();
     lstrats.add(makeLibraryStrategy(VALID_LONG, VALID_STRING));
-    Mockito.when(libDao.listAllLibraryStrategyTypes()).thenReturn(lstrats);
-    Mockito.when(mgr.getLibraryDao()).thenReturn(libDao);
+    Mockito.when(strategyService.list()).thenReturn(lstrats);
+    Mockito.when(mgr.getLibraryStrategyService()).thenReturn(strategyService);
 
+    HibernateLibraryDao libDao = Mockito.mock(HibernateLibraryDao.class);
     List<LibraryType> lts = new ArrayList<>();
     lts.add(makeLibraryType(VALID_LONG, "Illumina", VALID_STRING));
     Mockito.when(libDao.listAllLibraryTypes()).thenReturn(lts);
+    Mockito.when(mgr.getLibraryDao()).thenReturn(libDao);
 
     HibernateLibraryDesignDao ldDao = Mockito.mock(HibernateLibraryDesignDao.class);
     List<LibraryDesign> lds = new ArrayList<>();
@@ -407,7 +410,9 @@ public class ValueTypeLookupTest {
 
   private LibraryStrategyType makeLibraryStrategy(Long id, String name) {
     LibraryStrategyType ls = new LibraryStrategyType();
-    ls.setId(id == null ? LibraryStrategyType.UNSAVED_ID : id);
+    if (id != null) {
+      ls.setId(id);
+    }
     ls.setName(name);
     return ls;
   }

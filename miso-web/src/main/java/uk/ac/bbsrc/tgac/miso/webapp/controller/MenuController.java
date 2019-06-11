@@ -104,6 +104,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryStrategyService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
@@ -159,6 +160,8 @@ public class MenuController implements ServletContextAware {
   private LibraryService libraryService;
   @Autowired
   private LibrarySelectionService librarySelectionService;
+  @Autowired
+  private LibraryStrategyService libraryStrategyService;
   @Autowired
   private LibraryDesignService libraryDesignService;
   @Autowired
@@ -292,7 +295,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, node, "libraryDesigns", libraryDesignService.list(), Dtos::asDto);
     createArray(mapper, node, "libraryTypes", libraryService.listLibraryTypes(), Dtos::asDto);
     createArray(mapper, node, "librarySelections", librarySelectionService.list(), Dtos::asDto);
-    createArray(mapper, node, "libraryStrategies", libraryService.listLibraryStrategyTypes(), Dtos::asDto);
+    createArray(mapper, node, "libraryStrategies", libraryStrategyService.list(), Dtos::asDto);
     createArray(mapper, node, "libraryDesignCodes", libraryDesignCodeService.list(), Dtos::asDto);
     Set<Long> activePlatforms = sequencerService.list().stream().filter(Instrument::isActive)
         .map(sequencer -> sequencer.getInstrumentModel().getId())

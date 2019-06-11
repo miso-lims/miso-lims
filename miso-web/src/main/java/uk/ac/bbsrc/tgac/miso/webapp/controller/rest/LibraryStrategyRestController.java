@@ -15,32 +15,32 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.LibrarySelectionTypeDto;
-import uk.ac.bbsrc.tgac.miso.service.LibrarySelectionService;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryStrategyTypeDto;
+import uk.ac.bbsrc.tgac.miso.service.LibraryStrategyService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
-@RequestMapping("/rest/libraryselections")
-public class LibrarySelectionRestController extends RestController {
+@RequestMapping("/rest/librarystrategies")
+public class LibraryStrategyRestController extends RestController {
 
   @Autowired
-  private LibrarySelectionService librarySelectionService;
+  private LibraryStrategyService libraryStrategyService;
 
   @Autowired
   private MenuController menuController;
 
   @PostMapping
-  public @ResponseBody LibrarySelectionTypeDto create(@RequestBody LibrarySelectionTypeDto dto) throws IOException {
-    return RestUtils.createObject("Library Selection Type", dto, Dtos::to, librarySelectionService, d -> {
+  public @ResponseBody LibraryStrategyTypeDto create(@RequestBody LibraryStrategyTypeDto dto) throws IOException {
+    return RestUtils.createObject("Library Strategy Type", dto, Dtos::to, libraryStrategyService, d -> {
       menuController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
 
   @PutMapping("/{typeId}")
-  public @ResponseBody LibrarySelectionTypeDto update(@PathVariable long typeId, @RequestBody LibrarySelectionTypeDto dto)
+  public @ResponseBody LibraryStrategyTypeDto update(@PathVariable long typeId, @RequestBody LibraryStrategyTypeDto dto)
       throws IOException {
-    return RestUtils.updateObject("Library Selection Type", typeId, dto, Dtos::to, librarySelectionService, d -> {
+    return RestUtils.updateObject("Library Strategy Type", typeId, dto, Dtos::to, libraryStrategyService, d -> {
       menuController.refreshConstants();
       return Dtos.asDto(d);
     });
@@ -50,7 +50,7 @@ public class LibrarySelectionRestController extends RestController {
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
-    RestUtils.bulkDelete("Library Selection Type", ids, librarySelectionService);
+    RestUtils.bulkDelete("Library Strategy Type", ids, libraryStrategyService);
   }
 
 }
