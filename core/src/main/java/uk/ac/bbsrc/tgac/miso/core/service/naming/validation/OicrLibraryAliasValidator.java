@@ -54,7 +54,7 @@ public class OicrLibraryAliasValidator extends RegexValidator {
 
     String designCodes = null;
     try {
-      designCodes = makeOptionRegex(libraryDesignCodeDao.getLibraryDesignCodes(), LibraryDesignCode::getCode);
+      designCodes = makeOptionRegex(libraryDesignCodeDao.list(), LibraryDesignCode::getCode);
     } catch (IOException e) {
       success = false;
       log.error("LibraryDesignCode lookup failed. Falling back to simple validation pattern", e);

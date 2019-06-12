@@ -5,25 +5,20 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 
 public class HibernateLibrarySelectionDaoTest extends AbstractDAOTest {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
   private HibernateLibrarySelectionDao sut;
 
   @Before
   public void setup() {
     sut = new HibernateLibrarySelectionDao();
-    sut.setSessionFactory(sessionFactory);
+    sut.setSessionFactory(getSessionFactory());
   }
 
   @Test
@@ -59,7 +54,7 @@ public class HibernateLibrarySelectionDaoTest extends AbstractDAOTest {
 
     clearSession();
 
-    LibrarySelectionType saved = (LibrarySelectionType) sessionFactory.getCurrentSession().get(LibrarySelectionType.class, savedId);
+    LibrarySelectionType saved = (LibrarySelectionType) getSessionFactory().getCurrentSession().get(LibrarySelectionType.class, savedId);
     assertEquals(name, saved.getName());
   }
 
@@ -67,27 +62,22 @@ public class HibernateLibrarySelectionDaoTest extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String name = "New Name";
-    LibrarySelectionType type = (LibrarySelectionType) sessionFactory.getCurrentSession().get(LibrarySelectionType.class, id);
+    LibrarySelectionType type = (LibrarySelectionType) getSessionFactory().getCurrentSession().get(LibrarySelectionType.class, id);
     assertNotEquals(name, type.getName());
     type.setName(name);
     sut.update(type);
 
     clearSession();
 
-    LibrarySelectionType saved = (LibrarySelectionType) sessionFactory.getCurrentSession().get(LibrarySelectionType.class, id);
+    LibrarySelectionType saved = (LibrarySelectionType) getSessionFactory().getCurrentSession().get(LibrarySelectionType.class, id);
     assertEquals(name, saved.getName());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    LibrarySelectionType type = (LibrarySelectionType) sessionFactory.getCurrentSession().get(LibrarySelectionType.class, 1L);
+    LibrarySelectionType type = (LibrarySelectionType) getSessionFactory().getCurrentSession().get(LibrarySelectionType.class, 1L);
     assertEquals("RT-PCR", type.getName());
     assertEquals(15L, sut.getUsage(type));
-  }
-
-  private void clearSession() {
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
   }
 
 }

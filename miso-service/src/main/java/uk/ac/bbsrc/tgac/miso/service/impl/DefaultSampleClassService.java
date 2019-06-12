@@ -48,7 +48,7 @@ public class DefaultSampleClassService implements SampleClassService {
   }
 
   @Override
-  public SampleClass get(Long sampleClassId) throws IOException {
+  public SampleClass get(long sampleClassId) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return sampleClassDao.getSampleClass(sampleClassId);
   }
@@ -107,12 +107,12 @@ public class DefaultSampleClassService implements SampleClassService {
     SampleClass stockClass = getNotNullClass(childClassId);
     List<SampleValidRelationship> relationships = sampleValidRelationshipDao.getSampleValidRelationship();
     if (relationships.stream().anyMatch(relationship -> !relationship.getArchived()
-        && relationship.getChild().getId().equals(childClassId)
+        && relationship.getChild().getId() == childClassId
         && relationship.getParent().getSampleCategory().equals(SampleTissue.CATEGORY_NAME))) {
       return null;
     }
     List<SampleClass> parentClasses = relationships.stream().filter(relationship -> !relationship.getArchived()
-        && relationship.getChild().getId().equals(childClassId)
+        && relationship.getChild().getId() == childClassId
         && relationship.getParent().getSampleCategory().equals(SampleTissueProcessing.CATEGORY_NAME))
         .map(SampleValidRelationship::getParent)
         .collect(Collectors.toList());

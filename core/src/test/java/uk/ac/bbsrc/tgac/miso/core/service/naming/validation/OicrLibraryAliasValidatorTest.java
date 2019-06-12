@@ -48,7 +48,7 @@ public class OicrLibraryAliasValidatorTest {
     Mockito.when(tissueTypeDao.list()).thenReturn(makeTissueTypes());
     Mockito.when(libraryStore.listLibraryTypesByPlatform(PlatformType.ILLUMINA)).thenReturn(makeIlluminaLibTypes());
     Mockito.when(libraryStore.listLibraryTypesByPlatform(PlatformType.OXFORDNANOPORE)).thenReturn(makeOxfordNanoporeLibTypes());
-    Mockito.when(libraryDesignCodeDao.getLibraryDesignCodes()).thenReturn(makeDesignCodes());
+    Mockito.when(libraryDesignCodeDao.list()).thenReturn(makeDesignCodes());
   }
 
   @Test

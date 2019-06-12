@@ -5,25 +5,20 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.StainCategory;
 
 public class HibernateStainCategoryDaoTest extends AbstractDAOTest {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
   private HibernateStainCategoryDao sut;
 
   @Before
   public void setup() {
     sut = new HibernateStainCategoryDao();
-    sut.setSessionFactory(sessionFactory);
+    sut.setSessionFactory(getSessionFactory());
   }
 
   @Test
@@ -58,7 +53,7 @@ public class HibernateStainCategoryDaoTest extends AbstractDAOTest {
 
     clearSession();
 
-    StainCategory saved = (StainCategory) sessionFactory.getCurrentSession().get(StainCategory.class, savedId);
+    StainCategory saved = (StainCategory) getSessionFactory().getCurrentSession().get(StainCategory.class, savedId);
     assertEquals(name, saved.getName());
   }
 
@@ -66,27 +61,22 @@ public class HibernateStainCategoryDaoTest extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String name = "New Name";
-    StainCategory cat = (StainCategory) sessionFactory.getCurrentSession().get(StainCategory.class, id);
+    StainCategory cat = (StainCategory) getSessionFactory().getCurrentSession().get(StainCategory.class, id);
     assertNotEquals(name, cat.getName());
     cat.setName(name);
     sut.update(cat);
 
     clearSession();
 
-    StainCategory saved = (StainCategory) sessionFactory.getCurrentSession().get(StainCategory.class, id);
+    StainCategory saved = (StainCategory) getSessionFactory().getCurrentSession().get(StainCategory.class, id);
     assertEquals(name, saved.getName());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    StainCategory cat = (StainCategory) sessionFactory.getCurrentSession().get(StainCategory.class, 1L);
+    StainCategory cat = (StainCategory) getSessionFactory().getCurrentSession().get(StainCategory.class, 1L);
     assertEquals("Category One", cat.getName());
     assertEquals(2L, sut.getUsage(cat));
-  }
-
-  private void clearSession() {
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
   }
 
 }

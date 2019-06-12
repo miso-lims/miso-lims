@@ -1,16 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.service.ListService;
+import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 
-public interface LibraryDesignService {
+public interface LibraryDesignService extends DeleterService<LibraryDesign>, ListService<LibraryDesign>, SaveService<LibraryDesign> {
 
-  Collection<LibraryDesign> list() throws IOException;
+  List<LibraryDesign> listByClass(SampleClass sampleClass) throws IOException;
 
-  Collection<LibraryDesign> listByClass(SampleClass sampleClass) throws IOException;
-
-  LibraryDesign get(long libraryDesignId) throws IOException;
 }

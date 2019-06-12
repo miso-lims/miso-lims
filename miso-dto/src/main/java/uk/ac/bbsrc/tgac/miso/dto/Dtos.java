@@ -1086,19 +1086,19 @@ public class Dtos {
 
   public static LibraryDesignCodeDto asDto(@Nonnull LibraryDesignCode from) {
     LibraryDesignCodeDto dto = new LibraryDesignCodeDto();
-    dto.setId(from.getId());
-    dto.setCode(from.getCode());
-    dto.setDescription(from.getDescription());
-    dto.setTargetedSequencingRequired(from.isTargetedSequencingRequired());
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setCode, from.getCode());
+    setString(dto::setDescription, from.getDescription());
+    setBoolean(dto::setTargetedSequencingRequired, from.isTargetedSequencingRequired(), true);
     return dto;
   }
 
   public static LibraryDesignCode to(@Nonnull LibraryDesignCodeDto from) {
     LibraryDesignCode to = new LibraryDesignCode();
-    if (from.getId() != null) to.setId(from.getId());
-    to.setCode(from.getCode());
-    to.setDescription(from.getDescription());
-    to.setTargetedSequencingRequired(from.isTargetedSequencingRequired());
+    setLong(to::setId, from.getId(), false);
+    setString(to::setCode, from.getCode());
+    setString(to::setDescription, from.getDescription());
+    setBoolean(to::setTargetedSequencingRequired, from.isTargetedSequencingRequired(), true);
     return to;
   }
 
@@ -1144,14 +1144,8 @@ public class Dtos {
   public static DetailedLibrary toDetailedLibrary(DetailedLibraryDto from) {
     if (from == null) return null;
     DetailedLibrary to = new DetailedLibraryImpl();
-    if (from.getLibraryDesignId() != null) {
-      LibraryDesign design = new LibraryDesign();
-      design.setId(from.getLibraryDesignId());
-      to.setLibraryDesign(design);
-    }
-    LibraryDesignCode ldCode = new LibraryDesignCode();
-    ldCode.setId(from.getLibraryDesignCodeId());
-    to.setLibraryDesignCode(ldCode);
+    setObject(to::setLibraryDesign, LibraryDesign::new, from.getLibraryDesignId());
+    setObject(to::setLibraryDesignCode, LibraryDesignCode::new, from.getLibraryDesignCodeId());
 
     if (from.getArchived() != null) to.setArchived(from.getArchived());
     to.setNonStandardAlias(from.getNonStandardAlias());
@@ -2077,14 +2071,29 @@ public class Dtos {
   }
 
   public static LibraryDesignDto asDto(@Nonnull LibraryDesign from) {
-    LibraryDesignDto dto = new LibraryDesignDto();
-    dto.setId(from.getId());
-    dto.setName(from.getName());
-    dto.setDesignCodeId(from.getLibraryDesignCode().getId());
-    dto.setSampleClassId(from.getSampleClass().getId());
-    dto.setSelectionId(from.getLibrarySelectionType().getId());
-    dto.setStrategyId(from.getLibraryStrategyType().getId());
-    return dto;
+    LibraryDesignDto to = new LibraryDesignDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setName, from.getName());
+    setId(to::setDesignCodeId, from.getLibraryDesignCode());
+    setString(to::setDesignCodeLabel, maybeGetProperty(from.getLibraryDesignCode(), LibraryDesignCode::getCode));
+    setId(to::setSampleClassId, from.getSampleClass());
+    setString(to::setSampleClassAlias, maybeGetProperty(from.getSampleClass(), SampleClass::getAlias));
+    setId(to::setSelectionId, from.getLibrarySelectionType());
+    setString(to::setSelectionName, maybeGetProperty(from.getLibrarySelectionType(), LibrarySelectionType::getName));
+    setId(to::setStrategyId, from.getLibraryStrategyType());
+    setString(to::setStrategyName, maybeGetProperty(from.getLibraryStrategyType(), LibraryStrategyType::getName));
+    return to;
+  }
+
+  public static LibraryDesign to(@Nonnull LibraryDesignDto from) {
+    LibraryDesign to = new LibraryDesign();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
+    setObject(to::setSampleClass, SampleClassImpl::new, from.getSampleClassId());
+    setObject(to::setLibraryDesignCode, LibraryDesignCode::new, from.getDesignCodeId());
+    setObject(to::setLibrarySelectionType, LibrarySelectionType::new, from.getSelectionId());
+    setObject(to::setLibraryStrategyType, LibraryStrategyType::new, from.getStrategyId());
+    return to;
   }
 
   public static LibraryTypeDto asDto(@Nonnull LibraryType from) {
@@ -3205,16 +3214,8 @@ public class Dtos {
   public static DetailedLibraryTemplate toDetailedLibraryTemplate(DetailedLibraryTemplateDto from) {
     if (from == null) return null;
     DetailedLibraryTemplate to = new DetailedLibraryTemplate();
-    if (from.getDesignId() != null) {
-      LibraryDesign design = new LibraryDesign();
-      design.setId(from.getDesignId());
-      to.setLibraryDesign(design);
-    }
-    if (from.getDesignCodeId() != null) {
-      LibraryDesignCode ldCode = new LibraryDesignCode();
-      ldCode.setId(from.getDesignCodeId());
-      to.setLibraryDesignCode(ldCode);
-    }
+    setObject(to::setLibraryDesign, LibraryDesign::new, from.getDesignId());
+    setObject(to::setLibraryDesignCode, LibraryDesignCode::new, from.getDesignCodeId());
     return to;
   }
 

@@ -246,10 +246,15 @@ database. As such, they must be performed by a MISO adminstrator.
 
 Note: This item only applies if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
 
-A library design is a grouping of [selection](#library_selection_types) and [strategy](#library_strategy_types) types.
-The library designs that are available for a library depend on the sample class of the aliquot that the library was
-propagated from. Modifications to library designs can only be made via direct access to the MISO database. As such,
-they must be performed by a MISO adminstrator.
+A library design is a grouping of [selection](#library_selection_types) and [strategy](#library_strategy_types) types
+and a design code. The library designs that are available for a library depend on the sample class of the aliquot that
+the library was propagated from.
+
+MISO administrators can add, edit, and delete both library designs and library design codes using the standard
+interface. Most attributes of a library design cannot be modified if the design has been used by any existing
+libraries, as this would cause the libraries' attributes to be out of sync. A library design can only be deleted if it
+has not been used by any existing libraries. A library design code can only be deleted if it has not been used by any
+existing libraries or library designs.
 
 {% include userman-toplink.md %}
 

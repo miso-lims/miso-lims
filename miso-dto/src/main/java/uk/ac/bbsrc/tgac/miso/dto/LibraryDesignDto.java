@@ -1,58 +1,94 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 public class LibraryDesignDto {
-  private long designCodeId;
-  private long id;
+  private Long id;
   private String name;
-  private long sampleClassId;
-  private long selectionId;
-  private long strategyId;
+  private Long designCodeId;
+  private String designCodeLabel;
+  private Long sampleClassId;
+  private String sampleClassAlias;
+  private Long selectionId;
+  private String selectionName;
+  private Long strategyId;
+  private String strategyName;
 
-  public long getDesignCodeId() {
-    return designCodeId;
+  public Long getId() {
+    return id;
   }
 
-  public long getId() {
-    return id;
+  public void setId(Long id) {
+    this.id = id;
   }
 
   public String getName() {
     return name;
   }
 
-  public long getSampleClassId() {
-    return sampleClassId;
-  }
-
-  public long getSelectionId() {
-    return selectionId;
-  }
-
-  public long getStrategyId() {
-    return strategyId;
-  }
-
-  public void setDesignCodeId(long designCodeId) {
-    this.designCodeId = designCodeId;
-  }
-
-  public void setId(long id) {
-    this.id = id;
-  }
-
   public void setName(String name) {
     this.name = name;
   }
 
-  public void setSampleClassId(long sampleClassId) {
+  public Long getDesignCodeId() {
+    return designCodeId;
+  }
+
+  public void setDesignCodeId(Long designCodeId) {
+    this.designCodeId = designCodeId;
+  }
+
+  public String getDesignCodeLabel() {
+    return designCodeLabel;
+  }
+
+  public void setDesignCodeLabel(String designCodeLabel) {
+    this.designCodeLabel = designCodeLabel;
+  }
+
+  public Long getSampleClassId() {
+    return sampleClassId;
+  }
+
+  public void setSampleClassId(Long sampleClassId) {
     this.sampleClassId = sampleClassId;
   }
 
-  public void setSelectionId(long selectionId) {
+  public String getSampleClassAlias() {
+    return sampleClassAlias;
+  }
+
+  public void setSampleClassAlias(String sampleClassAlias) {
+    this.sampleClassAlias = sampleClassAlias;
+  }
+
+  public Long getSelectionId() {
+    return selectionId;
+  }
+
+  public void setSelectionId(Long selectionId) {
     this.selectionId = selectionId;
   }
 
-  public void setStrategyId(long strategyId) {
+  public String getSelectionName() {
+    return selectionName;
+  }
+
+  public void setSelectionName(String selectionName) {
+    this.selectionName = selectionName;
+  }
+
+  public Long getStrategyId() {
+    return strategyId;
+  }
+
+  public void setStrategyId(Long strategyId) {
     this.strategyId = strategyId;
+  }
+
+  public String getStrategyName() {
+    return strategyName;
+  }
+
+  public void setStrategyName(String strategyName) {
+    this.strategyName = strategyName;
   }
 }

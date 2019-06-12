@@ -5,25 +5,20 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 
 public class HibernateLibraryStrategyDaoTest extends AbstractDAOTest {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
   private HibernateLibraryStrategyDao sut;
 
   @Before
   public void setup() {
     sut = new HibernateLibraryStrategyDao();
-    sut.setSessionFactory(sessionFactory);
+    sut.setSessionFactory(getSessionFactory());
   }
 
   @Test
@@ -59,7 +54,7 @@ public class HibernateLibraryStrategyDaoTest extends AbstractDAOTest {
 
     clearSession();
 
-    LibraryStrategyType saved = (LibraryStrategyType) sessionFactory.getCurrentSession().get(LibraryStrategyType.class, savedId);
+    LibraryStrategyType saved = (LibraryStrategyType) getSessionFactory().getCurrentSession().get(LibraryStrategyType.class, savedId);
     assertEquals(name, saved.getName());
   }
 
@@ -67,27 +62,22 @@ public class HibernateLibraryStrategyDaoTest extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String name = "New Name";
-    LibraryStrategyType type = (LibraryStrategyType) sessionFactory.getCurrentSession().get(LibraryStrategyType.class, id);
+    LibraryStrategyType type = (LibraryStrategyType) getSessionFactory().getCurrentSession().get(LibraryStrategyType.class, id);
     assertNotEquals(name, type.getName());
     type.setName(name);
     sut.update(type);
 
     clearSession();
 
-    LibraryStrategyType saved = (LibraryStrategyType) sessionFactory.getCurrentSession().get(LibraryStrategyType.class, id);
+    LibraryStrategyType saved = (LibraryStrategyType) getSessionFactory().getCurrentSession().get(LibraryStrategyType.class, id);
     assertEquals(name, saved.getName());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    LibraryStrategyType type = (LibraryStrategyType) sessionFactory.getCurrentSession().get(LibraryStrategyType.class, 1L);
+    LibraryStrategyType type = (LibraryStrategyType) getSessionFactory().getCurrentSession().get(LibraryStrategyType.class, 1L);
     assertEquals("WGS", type.getName());
     assertEquals(15L, sut.getUsage(type));
-  }
-
-  private void clearSession() {
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
   }
 
 }

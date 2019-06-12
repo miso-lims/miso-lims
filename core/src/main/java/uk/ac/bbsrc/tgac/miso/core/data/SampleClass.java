@@ -9,14 +9,10 @@ import java.util.List;
 
 import com.eaglegenomics.simlims.core.User;
 
-public interface SampleClass extends Serializable {
+public interface SampleClass extends Identifiable, Serializable {
 
   List<String> CATEGORIES = Collections.unmodifiableList(Arrays.asList(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
   SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME));
-
-  Long getId();
-
-  void setId(Long sampleClassId);
 
   String getAlias();
 

@@ -5,25 +5,20 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 
 public class HibernateBoxUseDaoTest extends AbstractDAOTest {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
   private HibernateBoxUseDao sut;
 
   @Before
   public void setup() {
     sut = new HibernateBoxUseDao();
-    sut.setSessionFactory(sessionFactory);
+    sut.setSessionFactory(getSessionFactory());
   }
 
   @Test
@@ -58,7 +53,7 @@ public class HibernateBoxUseDaoTest extends AbstractDAOTest {
 
     clearSession();
 
-    BoxUse saved = (BoxUse) sessionFactory.getCurrentSession().get(BoxUse.class, savedId);
+    BoxUse saved = (BoxUse) getSessionFactory().getCurrentSession().get(BoxUse.class, savedId);
     assertEquals(alias, saved.getAlias());
   }
 
@@ -66,27 +61,22 @@ public class HibernateBoxUseDaoTest extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Alias";
-    BoxUse boxUse = (BoxUse) sessionFactory.getCurrentSession().get(BoxUse.class, id);
+    BoxUse boxUse = (BoxUse) getSessionFactory().getCurrentSession().get(BoxUse.class, id);
     assertNotEquals(alias, boxUse.getAlias());
     boxUse.setAlias(alias);
     sut.update(boxUse);
 
     clearSession();
 
-    BoxUse saved = (BoxUse) sessionFactory.getCurrentSession().get(BoxUse.class, id);
+    BoxUse saved = (BoxUse) getSessionFactory().getCurrentSession().get(BoxUse.class, id);
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    BoxUse boxUse = (BoxUse) sessionFactory.getCurrentSession().get(BoxUse.class, 1L);
+    BoxUse boxUse = (BoxUse) getSessionFactory().getCurrentSession().get(BoxUse.class, 1L);
     assertEquals("boxuse1", boxUse.getAlias());
     assertEquals(1L, sut.getUsage(boxUse));
-  }
-
-  private void clearSession() {
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
   }
 
 }

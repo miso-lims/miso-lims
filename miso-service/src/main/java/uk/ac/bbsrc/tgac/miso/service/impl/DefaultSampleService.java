@@ -617,7 +617,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     }
     if (isDetailedSample(sample)) {
       DetailedSample sai = (DetailedSample) sample;
-      if (sai.getSampleClass() != null && sai.getSampleClass().getId() != null) {
+      if (sai.getSampleClass() != null && sai.getSampleClass().isSaved()) {
         sai.setSampleClass(sampleClassService.get(sai.getSampleClass().getId()));
       }
       if (sai.getDetailedQcStatus() != null && sai.getDetailedQcStatus().isSaved()) {

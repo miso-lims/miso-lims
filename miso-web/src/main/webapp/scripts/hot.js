@@ -945,8 +945,7 @@ var HotUtils = {
         } else if (obj[property] === false) {
           result = 'False';
         } else if (required) {
-          errorHandler(headerName + ' is missing');
-          return;
+          result = 'False';
         } else {
           result = 'Unknown';
         }

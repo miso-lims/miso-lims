@@ -152,13 +152,13 @@ public class ValueTypeLookupTest {
     HibernateLibraryDesignDao ldDao = Mockito.mock(HibernateLibraryDesignDao.class);
     List<LibraryDesign> lds = new ArrayList<>();
     lds.add(makeLibraryDesign(VALID_LONG, VALID_STRING));
-    Mockito.when(ldDao.getLibraryDesigns()).thenReturn(lds);
+    Mockito.when(ldDao.list()).thenReturn(lds);
     Mockito.when(mgr.getLibraryDesignDao()).thenReturn(ldDao);
 
     HibernateLibraryDesignCodeDao ldcDao = Mockito.mock(HibernateLibraryDesignCodeDao.class);
     List<LibraryDesignCode> ldcs = new ArrayList<>();
     ldcs.add(makeLibraryDesignCode(VALID_LONG, VALID_STRING));
-    Mockito.when(ldcDao.getLibraryDesignCodes()).thenReturn(ldcs);
+    Mockito.when(ldcDao.list()).thenReturn(ldcs);
     Mockito.when(mgr.getLibraryDesignCodeDao()).thenReturn(ldcDao);
 
     HibernateIndexDao iDao = Mockito.mock(HibernateIndexDao.class);
@@ -235,7 +235,9 @@ public class ValueTypeLookupTest {
 
   private SampleClass makeSampleClass(Long id, String alias) {
     SampleClass sc = new SampleClassImpl();
-    sc.setId(id);
+    if (id != null) {
+      sc.setId(id);
+    }
     sc.setAlias(alias);
     return sc;
   }
@@ -449,7 +451,9 @@ public class ValueTypeLookupTest {
 
   private LibraryDesign makeLibraryDesign(Long id, String name) {
     LibraryDesign ld = new LibraryDesign();
-    ld.setId(id);
+    if (id != null) {
+      ld.setId(id);
+    }
     ld.setName(name);
     ld.setSampleClass(makeSampleClass(VALID_LONG, VALID_STRING));
     return ld;
@@ -467,7 +471,9 @@ public class ValueTypeLookupTest {
 
   private LibraryDesignCode makeLibraryDesignCode(Long id, String code) {
     LibraryDesignCode ldc = new LibraryDesignCode();
-    ldc.setId(id);
+    if (id != null) {
+      ldc.setId(id);
+    }
     ldc.setCode(code);
     return ldc;
   }

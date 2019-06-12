@@ -5,25 +5,20 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
 
 public class HibernateStorageLocationMapDaoTest extends AbstractDAOTest {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
   private HibernateStorageLocationMapDao sut;
 
   @Before
   public void setup() {
     sut = new HibernateStorageLocationMapDao();
-    sut.setSessionFactory(sessionFactory);
+    sut.setSessionFactory(getSessionFactory());
   }
 
   @Test
@@ -58,7 +53,7 @@ public class HibernateStorageLocationMapDaoTest extends AbstractDAOTest {
 
     clearSession();
 
-    StorageLocationMap saved = (StorageLocationMap) sessionFactory.getCurrentSession().get(StorageLocationMap.class, savedId);
+    StorageLocationMap saved = (StorageLocationMap) getSessionFactory().getCurrentSession().get(StorageLocationMap.class, savedId);
     assertEquals(filename, saved.getFilename());
   }
 
@@ -66,27 +61,22 @@ public class HibernateStorageLocationMapDaoTest extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String filename = "renamed.html";
-    StorageLocationMap map = (StorageLocationMap) sessionFactory.getCurrentSession().get(StorageLocationMap.class, id);
+    StorageLocationMap map = (StorageLocationMap) getSessionFactory().getCurrentSession().get(StorageLocationMap.class, id);
     assertNotEquals(filename, map.getFilename());
     map.setFilename(filename);
     sut.update(map);
 
     clearSession();
 
-    StorageLocationMap saved = (StorageLocationMap) sessionFactory.getCurrentSession().get(StorageLocationMap.class, id);
+    StorageLocationMap saved = (StorageLocationMap) getSessionFactory().getCurrentSession().get(StorageLocationMap.class, id);
     assertEquals(filename, saved.getFilename());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    StorageLocationMap map = (StorageLocationMap) sessionFactory.getCurrentSession().get(StorageLocationMap.class, 1L);
+    StorageLocationMap map = (StorageLocationMap) getSessionFactory().getCurrentSession().get(StorageLocationMap.class, 1L);
     assertEquals("floor_one.html", map.getFilename());
     assertEquals(0L, sut.getUsage(map));
-  }
-
-  private void clearSession() {
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
   }
 
 }
