@@ -158,7 +158,7 @@ public class ProjectRestController extends RestController {
 
   @GetMapping(produces = "application/json")
   public @ResponseBody List<ProjectDto> listAllProjects() throws IOException {
-    Collection<Project> lp = projectService.listAllProjects();
+    Collection<Project> lp = projectService.list();
     return Dtos.asProjectDtos(lp);
   }
 

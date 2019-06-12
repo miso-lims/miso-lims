@@ -5,12 +5,11 @@ import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.service.ListService;
 import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 
-public interface ExperimentService extends SaveService<Experiment> {
-
-  public Collection<Experiment> listAll() throws IOException;
+public interface ExperimentService extends ListService<Experiment>, SaveService<Experiment> {
 
   public Collection<Experiment> listAllByLibraryId(long id) throws AuthorizationException, IOException;
 

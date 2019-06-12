@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -79,7 +80,7 @@ public class TissueOriginRestController extends RestController {
   @GetMapping(produces = { "application/json" })
   @ResponseBody
   public Set<TissueOriginDto> getTissueOrigins(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
-    Set<TissueOrigin> tissueOrigins = tissueOriginService.getAll();
+    List<TissueOrigin> tissueOrigins = tissueOriginService.list();
     Set<TissueOriginDto> tissueOriginDtos = Dtos.asTissueOriginDtos(tissueOrigins);
     return tissueOriginDtos;
   }

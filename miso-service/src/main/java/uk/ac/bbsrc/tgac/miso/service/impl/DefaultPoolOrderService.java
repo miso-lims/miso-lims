@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,9 +69,9 @@ public class DefaultPoolOrderService implements PoolOrderService {
   }
 
   @Override
-  public Set<PoolOrder> getAll() throws IOException {
+  public List<PoolOrder> list() throws IOException {
     authorizationManager.throwIfNonAdmin();
-    return Sets.newHashSet(poolOrderDao.getPoolOrder());
+    return poolOrderDao.getPoolOrder();
   }
 
   @Override

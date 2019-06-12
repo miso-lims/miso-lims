@@ -27,9 +27,10 @@ import java.io.IOException;
 import java.util.Collection;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.service.ListService;
 import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 
-public interface ProjectService extends SaveService<Project> {
+public interface ProjectService extends ListService<Project>, SaveService<Project> {
 
 
   // GETS
@@ -38,11 +39,6 @@ public interface ProjectService extends SaveService<Project> {
   public Project getProjectByShortName(String projectShortName) throws IOException;
 
   // LISTS
-  /**
-   * Obtain a list of all the projects the user has access to. Access is defined as either read or write access.
-   */
-  public Collection<Project> listAllProjects() throws IOException;
-
   public Collection<Project> listAllProjectsWithLimit(long limit) throws IOException;
 
   public Collection<Project> listAllProjectsBySearch(String query) throws IOException;

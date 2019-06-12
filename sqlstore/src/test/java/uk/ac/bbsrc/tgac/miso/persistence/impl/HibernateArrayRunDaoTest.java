@@ -112,8 +112,8 @@ public class HibernateArrayRunDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAll() throws Exception {
-    List<ArrayRun> runs = sut.listAll();
+  public void testList() throws Exception {
+    List<ArrayRun> runs = sut.list();
     assertNotNull(runs);
     assertEquals(1, runs.size());
   }

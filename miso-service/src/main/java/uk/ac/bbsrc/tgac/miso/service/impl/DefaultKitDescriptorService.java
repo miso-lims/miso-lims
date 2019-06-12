@@ -48,7 +48,7 @@ public class DefaultKitDescriptorService implements KitDescriptorService {
   }
 
   @Override
-  public Collection<KitDescriptor> list() throws IOException {
+  public List<KitDescriptor> list() throws IOException {
     return kitStore.listAllKitDescriptors();
   }
 

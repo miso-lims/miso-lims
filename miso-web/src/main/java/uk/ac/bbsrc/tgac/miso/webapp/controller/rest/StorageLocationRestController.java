@@ -50,6 +50,7 @@ public class StorageLocationRestController extends RestController {
     public long update(StorageLocation object) throws IOException {
       return storageLocationService.saveFreezer(object);
     }
+
   };
 
   @GetMapping(value = "/freezers")

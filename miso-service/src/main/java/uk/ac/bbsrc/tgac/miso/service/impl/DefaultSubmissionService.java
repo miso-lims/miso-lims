@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class DefaultSubmissionService implements SubmissionService {
   }
 
   @Override
-  public Collection<Submission> list() throws IOException {
+  public List<Submission> list() throws IOException {
     return submissionStore.listAll();
   }
 

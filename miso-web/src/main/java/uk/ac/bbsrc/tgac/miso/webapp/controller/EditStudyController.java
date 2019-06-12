@@ -87,7 +87,7 @@ public class EditStudyController {
 
     ObjectMapper mapper = new ObjectMapper();
     model.put("studyDto", mapper.writeValueAsString(Dtos.asDto(study)));
-    model.put("projects", mapper.writeValueAsString(projectService.listAllProjects().stream()
+    model.put("projects", mapper.writeValueAsString(projectService.list().stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList())));
 

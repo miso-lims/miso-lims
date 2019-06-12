@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import java.util.Collection;
+import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 
 public interface ReferenceGenomeDao {
 
-  public Collection<ReferenceGenome> list();
+  public List<ReferenceGenome> list();
 
   public ReferenceGenome get(long id);
 

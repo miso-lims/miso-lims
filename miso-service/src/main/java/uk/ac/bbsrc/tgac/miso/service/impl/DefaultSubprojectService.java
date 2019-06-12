@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -69,9 +70,9 @@ public class DefaultSubprojectService implements SubprojectService {
   }
 
   @Override
-  public Set<Subproject> getAll() throws IOException {
+  public List<Subproject> list() throws IOException {
     authorizationManager.throwIfUnauthenticated();
-    return Sets.newHashSet(subprojectDao.getSubproject());
+    return subprojectDao.getSubproject();
   }
 
   @Override

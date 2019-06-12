@@ -31,7 +31,7 @@ public class InstituteDefaultsController extends AbstractInstituteDefaultsContro
 
   @Override
   protected Collection<Institute> getAll() throws IOException {
-    return service.getAll();
+    return service.list();
   }
 
   @Override

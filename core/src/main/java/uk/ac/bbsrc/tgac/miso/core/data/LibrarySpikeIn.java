@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "LibrarySpikeIn")
-public class LibrarySpikeIn implements Serializable, Aliasable {
+public class LibrarySpikeIn implements Serializable, Aliasable, Deletable {
 
   private static final long serialVersionUID = 1L;
 
@@ -45,7 +45,17 @@ public class LibrarySpikeIn implements Serializable, Aliasable {
 
   @Override
   public boolean isSaved() {
-    return getId() == UNSAVED_ID;
+    return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Library Spike-In";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias();
   }
 
 }

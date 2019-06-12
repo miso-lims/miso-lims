@@ -5,12 +5,11 @@ import java.util.Collection;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.service.ListService;
 import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface KitDescriptorService extends PaginatedDataSource<KitDescriptor>, SaveService<KitDescriptor> {
-
-  public Collection<KitDescriptor> list() throws IOException;
+public interface KitDescriptorService extends ListService<KitDescriptor>, PaginatedDataSource<KitDescriptor>, SaveService<KitDescriptor> {
 
   public Collection<KitDescriptor> listByType(KitType kitType) throws IOException;
 

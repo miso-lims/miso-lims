@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -86,7 +87,7 @@ public class SubprojectController extends RestController {
   @GetMapping(produces = { "application/json" })
   @ResponseBody
   public Set<SubprojectDto> getSubprojects(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
-    Set<Subproject> subprojects = subprojectService.getAll();
+    List<Subproject> subprojects = subprojectService.list();
     Set<SubprojectDto> subprojectDtos = Dtos.asSubprojectDtos(subprojects);
     return subprojectDtos;
   }

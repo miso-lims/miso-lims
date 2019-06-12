@@ -519,7 +519,7 @@ public class EditLibraryController {
       config.put("hasProject", project != null);
       Map<Long, List<LibraryTemplateDto>> templatesByProjectId = new HashMap<>();
       if (project == null) {
-        projectService.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
+        projectService.list().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
         List<LibraryTemplate> templates = libraryTemplateService.list();
         for (LibraryTemplate template : templates) {
           LibraryTemplateDto dto = Dtos.asDto(template);

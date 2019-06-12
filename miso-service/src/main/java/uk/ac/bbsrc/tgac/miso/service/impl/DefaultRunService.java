@@ -120,7 +120,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   private ContainerModelService containerModelService;
 
   @Override
-  public Collection<Run> list() throws IOException {
+  public List<Run> list() throws IOException {
     return runDao.listAll();
   }
 

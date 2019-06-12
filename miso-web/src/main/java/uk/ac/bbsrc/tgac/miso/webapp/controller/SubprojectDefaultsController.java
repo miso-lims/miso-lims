@@ -38,7 +38,7 @@ public class SubprojectDefaultsController extends AbstractInstituteDefaultsContr
 
   @Override
   protected Collection<Subproject> getAll() throws IOException {
-    return service.getAll();
+    return service.list();
   }
 
   @Override
@@ -66,7 +66,7 @@ public class SubprojectDefaultsController extends AbstractInstituteDefaultsContr
   @Override
   protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
     ArrayNode projects = config.putArray("projects");
-    projectService.listAllProjects().stream().map(Dtos::asDto).forEach(projects::addPOJO);
+    projectService.list().stream().map(Dtos::asDto).forEach(projects::addPOJO);
   }
 
 }

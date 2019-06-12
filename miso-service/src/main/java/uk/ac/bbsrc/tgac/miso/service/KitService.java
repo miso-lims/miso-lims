@@ -1,16 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
-import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
+import uk.ac.bbsrc.tgac.miso.core.service.ListService;
 
-public interface KitService extends ProviderService<Kit> {
-
-  public Collection<Kit> listKits() throws IOException;
+public interface KitService extends ListService<Kit> {
 
   public void deleteKitNote(Kit kit, Long noteId) throws IOException;
 

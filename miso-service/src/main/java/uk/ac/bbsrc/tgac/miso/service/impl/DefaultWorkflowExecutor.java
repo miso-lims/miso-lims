@@ -118,7 +118,7 @@ public class DefaultWorkflowExecutor implements WorkflowExecutor {
           }
         })
         .findFirst().orElse(null));
-    aliquot.setSamplePurpose(samplePurposeService.getAll().stream().filter(samplePurpose -> samplePurpose.getAlias().equals("Library"))
+    aliquot.setSamplePurpose(samplePurposeService.list().stream().filter(samplePurpose -> samplePurpose.getAlias().equals("Library"))
         .findFirst().orElse(null));
     aliquot.setProject(sample.getProject());
 

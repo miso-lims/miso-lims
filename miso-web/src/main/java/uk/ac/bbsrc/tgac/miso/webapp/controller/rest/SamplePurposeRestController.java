@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -79,7 +80,7 @@ public class SamplePurposeRestController extends RestController {
   @GetMapping(produces = { "application/json" })
   @ResponseBody
   public Set<SamplePurposeDto> getSamplePurposes(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
-    Set<SamplePurpose> samplePurposes = samplePurposeService.getAll();
+    List<SamplePurpose> samplePurposes = samplePurposeService.list();
     Set<SamplePurposeDto> samplePurposeDtos = Dtos.asSamplePurposeDtos(samplePurposes);
     return samplePurposeDtos;
   }

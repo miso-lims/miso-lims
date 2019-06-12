@@ -1,3 +1,8 @@
+DELETE FROM LibrarySpikeIn;
+INSERT INTO LibrarySpikeIn(spikeInId, alias) VALUES
+(1, 'ERCC Mix 1'),
+(2, 'ERCC Mix 2');
+
 DELETE FROM StorageLocationMap;
 INSERT INTO StorageLocationMap(mapId, filename, description) VALUES
 (1, 'floor_one.html', 'floor one map'),
