@@ -110,8 +110,8 @@ public class DefaultWorkflowExecutor implements WorkflowExecutor {
             return sampleClass.getSampleCategory().equals("Aliquot") && sampleValidRelationshipService.getAll().stream()
                 .anyMatch(
                     validRelationship -> !validRelationship.getArchived()
-                        && validRelationship.getChild().getId().equals(sampleClass.getId())
-                        && validRelationship.getParent().getId().equals(sample.getSampleClass().getId()));
+                        && validRelationship.getChild().getId() == sampleClass.getId()
+                        && validRelationship.getParent().getId() == sample.getSampleClass().getId());
           } catch (IOException e) {
             log.error("Error getting SampleValidRelationship", e);
             return false;

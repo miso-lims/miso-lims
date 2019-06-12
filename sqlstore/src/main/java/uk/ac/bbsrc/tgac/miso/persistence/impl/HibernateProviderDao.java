@@ -7,6 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,19 +17,26 @@ import uk.ac.bbsrc.tgac.miso.core.store.ProviderDao;
 @Repository
 public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
 
+  @Autowired
+  private SessionFactory sessionFactory;
+
   private final Class<T> entityClass;
 
   public HibernateProviderDao(Class<T> entityClass) {
     this.entityClass = entityClass;
   }
 
+  public SessionFactory getSessionFactory() {
+    return sessionFactory;
+  }
+
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
+  }
+
   protected Class<T> getEntityClass() {
     return entityClass;
   }
-
-  public abstract SessionFactory getSessionFactory();
-
-  public abstract void setSessionFactory(SessionFactory sessionFactory);
 
   protected Session currentSession() {
     return getSessionFactory().getCurrentSession();

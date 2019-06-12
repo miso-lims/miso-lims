@@ -99,6 +99,8 @@
         <a href="<c:url value="/miso/stain/list"/>">Stains</a>
         <a href="<c:url value="/miso/staincategory/list"/>">Stain Categories</a>
         <a href="<c:url value="/miso/detailedqcstatus/list"/>">Detailed QC Statuses</a>
+        <a href="<c:url value="/miso/librarydesigncode/list"/>">Library Design Codes</a>
+        <a href="<c:url value="/miso/librarydesign/list"/>">Library Designs</a>
       </div>
     </c:if>
 	

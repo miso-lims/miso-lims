@@ -4,6 +4,8 @@ Changes:
 
   * Added interface for administrators to upload and delete location maps
   * Added interface for administrators to add, edit, and delete dropdown options
+    * library designs (detailed sample)
+    * library design codes (detailed sample)
     * library selection types
     * library spike-ins
     * library strategy types

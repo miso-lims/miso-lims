@@ -116,8 +116,8 @@ public class ValueTypeLookup {
     setLibrarySelections(misoServiceManager.getLibrarySelectionService().list());
     setLibraryStrategies(misoServiceManager.getLibraryStrategyService().list());
     setLibraryTypes(misoServiceManager.getLibraryDao().listAllLibraryTypes());
-    setLibraryDesigns(misoServiceManager.getLibraryDesignDao().getLibraryDesigns());
-    setLibraryDesignCodes(misoServiceManager.getLibraryDesignCodeDao().getLibraryDesignCodes());
+    setLibraryDesigns(misoServiceManager.getLibraryDesignDao().list());
+    setLibraryDesignCodes(misoServiceManager.getLibraryDesignCodeDao().list());
     setIndices(misoServiceManager.getIndexDao().list(0, 0, true, "id"));
     setSampleQcTypes(misoServiceManager.getQualityControlService().listQcTypes(QcTarget.Sample));
     setLibraryQcTypes(misoServiceManager.getQualityControlService().listQcTypes(QcTarget.Library));
@@ -400,7 +400,7 @@ public class ValueTypeLookup {
   @VisibleForTesting
   SampleClass resolve(SampleClass sampleClass) {
     if (sampleClass == null) return null;
-    if (sampleClass.getId() != null) return sampleClassById.get(sampleClass.getId());
+    if (sampleClass.isSaved()) return sampleClassById.get(sampleClass.getId());
     if (sampleClass.getAlias() != null) return sampleClassByAlias.get(sampleClass.getAlias());
     return null;
   }
@@ -615,7 +615,7 @@ public class ValueTypeLookup {
   @VisibleForTesting
   LibraryDesign resolve(LibraryDesign libraryDesign) {
     if (libraryDesign == null) return null;
-    if (libraryDesign.getId() != null) return libraryDesignById.get(libraryDesign.getId());
+    if (libraryDesign.isSaved()) return libraryDesignById.get(libraryDesign.getId());
     if (libraryDesign.getSampleClass() != null && libraryDesign.getSampleClass().getAlias() != null && libraryDesign.getName() != null) {
       Map<String, LibraryDesign> mapByName = libraryDesignBySampleClassAliasAndName.get(libraryDesign.getSampleClass().getAlias());
       return mapByName == null ? null : mapByName.get(libraryDesign.getName());
@@ -634,7 +634,7 @@ public class ValueTypeLookup {
   @VisibleForTesting
   LibraryDesignCode resolve(LibraryDesignCode libraryDesignCode) {
     if (libraryDesignCode == null) return null;
-    if (libraryDesignCode.getId() != null) return libraryDesignCodeById.get(libraryDesignCode.getId());
+    if (libraryDesignCode.isSaved()) return libraryDesignCodeById.get(libraryDesignCode.getId());
     if (libraryDesignCode.getCode() != null) return libraryDesignCodeByCode.get(libraryDesignCode.getCode());
     return null;
   }

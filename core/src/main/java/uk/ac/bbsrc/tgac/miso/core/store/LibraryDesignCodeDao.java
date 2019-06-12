@@ -1,13 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
-import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 
-public interface LibraryDesignCodeDao {
+public interface LibraryDesignCodeDao extends SaveDao<LibraryDesignCode> {
 
-  List<LibraryDesignCode> getLibraryDesignCodes() throws IOException;
+  public LibraryDesignCode getByCode(String code) throws IOException;
 
-  LibraryDesignCode getLibraryDesignCode(Long id) throws IOException;
+  public long getUsageByLibraries(LibraryDesignCode code) throws IOException;
+
+  public long getUsageByLibraryDesigns(LibraryDesignCode code) throws IOException;
+
 }

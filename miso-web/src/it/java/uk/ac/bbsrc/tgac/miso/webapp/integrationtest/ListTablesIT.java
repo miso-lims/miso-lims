@@ -583,6 +583,27 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.LIBRARY_SPIKE_INS);
   }
 
+  public void testListLibraryDesignCodesSetup() throws Exception {
+    testPageSetup(ListTarget.LIBRARY_DESIGN_CODES,
+        Sets.newHashSet(Columns.SORT, Columns.CODE, Columns.DESCRIPTION, Columns.TARGETED_SEQUENCING_REQD));
+  }
+
+  @Test
+  public void testListLibraryDesignCodesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.LIBRARY_DESIGN_CODES);
+  }
+
+  public void testListLibraryDesignsSetup() throws Exception {
+    testPageSetup(ListTarget.LIBRARY_DESIGNS,
+        Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.SAMPLE_CLASS, Columns.LIBRARY_SELECTION, Columns.LIBRARY_STRATEGY,
+            Columns.LIBRARY_DESIGN_CODE));
+  }
+
+  @Test
+  public void testListLibraryDesignsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.LIBRARY_DESIGNS);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     // Goal: confirm that all expected columns are present
     ListPage page = getList(listTarget);

@@ -33,9 +33,11 @@ public class SampleClassImpl implements SampleClass {
 
   private static final long serialVersionUID = 1L;
 
+  private static final long UNSAVED_ID = 0L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long sampleClassId;
+  private long sampleClassId = UNSAVED_ID;
 
   @Column(nullable = false)
   private String alias;
@@ -68,12 +70,12 @@ public class SampleClassImpl implements SampleClass {
   private Boolean dnaseTreatable;
 
   @Override
-  public Long getId() {
+  public long getId() {
     return sampleClassId;
   }
 
   @Override
-  public void setId(Long sampleClassId) {
+  public void setId(long sampleClassId) {
     this.sampleClassId = sampleClassId;
   }
 
@@ -193,7 +195,7 @@ public class SampleClassImpl implements SampleClass {
     return relationships.stream()
         .filter(relationship -> !relationship.getArchived()
             && !relationship.getParent().isArchived()
-            && relationship.getChild().getId().equals(from.getId())
+            && relationship.getChild().getId() == from.getId()
             && !checked.contains(relationship.getParent().getId()))
         .anyMatch(relationship -> hasPathToDnaseTreatable(relationship.getParent(), checked, relationships));
   }
@@ -220,5 +222,10 @@ public class SampleClassImpl implements SampleClass {
         .append(sampleCategory, other.sampleCategory)
         .append(suffix, other.suffix)
         .isEquals();
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 }

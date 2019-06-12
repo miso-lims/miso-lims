@@ -4,17 +4,22 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "LibraryDesignCode")
-public class LibraryDesignCode implements Serializable {
+public class LibraryDesignCode implements Deletable, Identifiable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
+  private static final long UNSAVED_ID = 0L;
+
   @Id
-  private Long libraryDesignCodeId;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long libraryDesignCodeId = UNSAVED_ID;
 
   @Column(unique = true, nullable = false)
   private String code;
@@ -25,11 +30,13 @@ public class LibraryDesignCode implements Serializable {
   @Column(nullable = false)
   private Boolean targetedSequencingRequired;
 
-  public Long getId() {
+  @Override
+  public long getId() {
     return libraryDesignCodeId;
   };
 
-  public void setId(Long id) {
+  @Override
+  public void setId(long id) {
     this.libraryDesignCodeId = id;
   }
 
@@ -56,4 +63,48 @@ public class LibraryDesignCode implements Serializable {
   public void setTargetedSequencingRequired(Boolean targetedSequencingRequired) {
     this.targetedSequencingRequired = targetedSequencingRequired;
   }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Library Design Code";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getCode() + " (" + getDescription() + ")";
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((code == null) ? 0 : code.hashCode());
+    result = prime * result + ((description == null) ? 0 : description.hashCode());
+    result = prime * result + ((targetedSequencingRequired == null) ? 0 : targetedSequencingRequired.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    LibraryDesignCode other = (LibraryDesignCode) obj;
+    if (code == null) {
+      if (other.code != null) return false;
+    } else if (!code.equals(other.code)) return false;
+    if (description == null) {
+      if (other.description != null) return false;
+    } else if (!description.equals(other.description)) return false;
+    if (targetedSequencingRequired == null) {
+      if (other.targetedSequencingRequired != null) return false;
+    } else if (!targetedSequencingRequired.equals(other.targetedSequencingRequired)) return false;
+    return true;
+  }
+
 }

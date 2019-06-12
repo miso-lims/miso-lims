@@ -40,13 +40,13 @@ public class DtosTest {
     assertTrue(LimsUtils.isStockSample(sample));
     SampleStock analyte = (SampleStock) sample;
     assertNotNull(analyte.getSampleClass());
-    assertEquals(Long.valueOf(3L), analyte.getSampleClass().getId());
+    assertEquals(3L, analyte.getSampleClass().getId());
 
     assertNotNull(analyte.getParent());
     assertTrue(LimsUtils.isTissueSample(analyte.getParent()));
     SampleTissue tissue = (SampleTissue) analyte.getParent();
     assertNotNull(tissue.getSampleClass());
-    assertEquals(Long.valueOf(2L), tissue.getSampleClass().getId());
+    assertEquals(2L, tissue.getSampleClass().getId());
     assertNotNull(tissue.getTissueOrigin());
     assertEquals(4L, tissue.getTissueOrigin().getId());
     assertNotNull(tissue.getTissueType());
@@ -74,18 +74,18 @@ public class DtosTest {
     assertTrue(LimsUtils.isAliquotSample(sample));
     SampleAliquot aliquot = (SampleAliquot) sample;
     assertNotNull(aliquot.getSampleClass());
-    assertEquals(Long.valueOf(4L), aliquot.getSampleClass().getId());
+    assertEquals(4L, aliquot.getSampleClass().getId());
 
     assertNotNull(aliquot.getParent());
     assertTrue(LimsUtils.isStockSample(aliquot.getParent()));
     SampleStock stock = (SampleStock) aliquot.getParent();
-    assertEquals(Long.valueOf(3L), stock.getSampleClass().getId());
+    assertEquals(3L, stock.getSampleClass().getId());
 
     assertNotNull(stock.getParent());
     assertTrue(LimsUtils.isTissueSample(stock.getParent()));
     SampleTissue tissue = (SampleTissue) stock.getParent();
     assertNotNull(tissue.getSampleClass());
-    assertEquals(Long.valueOf(2L), tissue.getSampleClass().getId());
+    assertEquals(2L, tissue.getSampleClass().getId());
     assertNotNull(tissue.getTissueOrigin());
     assertEquals(4L, tissue.getTissueOrigin().getId());
     assertNotNull(tissue.getTissueType());
@@ -113,7 +113,7 @@ public class DtosTest {
     assertTrue(LimsUtils.isAliquotSample(sample));
     SampleAliquot analyte = (SampleAliquot) sample;
     assertNotNull(analyte.getSampleClass());
-    assertEquals(Long.valueOf(3L), analyte.getSampleClass().getId());
+    assertEquals(3L, analyte.getSampleClass().getId());
 
     assertNotNull(analyte.getParent());
     assertTrue(LimsUtils.isDetailedSample(analyte.getParent()));

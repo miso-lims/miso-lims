@@ -3,8 +3,10 @@ package uk.ac.bbsrc.tgac.miso.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 import uk.ac.bbsrc.tgac.miso.core.store.SaveDao;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -56,6 +58,13 @@ public abstract class AbstractSaveService<T extends Identifiable> implements Sav
    */
   protected void loadChildEntities(T object) throws IOException {
     // do nothing
+  }
+
+  protected static <U extends Identifiable> void loadChildEntity(U member, Consumer<U> setter, ProviderService<U> service)
+      throws IOException {
+    if (member != null) {
+      setter.accept(service.get(member.getId()));
+    }
   }
 
   protected void validateChange(T object, T beforeChange) throws IOException {

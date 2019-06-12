@@ -5,25 +5,20 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 
 public class HibernateBoxSizeDaoTest extends AbstractDAOTest {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
   private HibernateBoxSizeDao sut;
 
   @Before
   public void setup() {
     sut = new HibernateBoxSizeDao();
-    sut.setSessionFactory(sessionFactory);
+    sut.setSessionFactory(getSessionFactory());
   }
 
   @Test
@@ -52,7 +47,7 @@ public class HibernateBoxSizeDaoTest extends AbstractDAOTest {
 
     clearSession();
 
-    BoxSize saved = (BoxSize) sessionFactory.getCurrentSession().get(BoxSize.class, savedId);
+    BoxSize saved = (BoxSize) getSessionFactory().getCurrentSession().get(BoxSize.class, savedId);
     assertEquals(rows, saved.getRows().intValue());
     assertEquals(cols, saved.getColumns().intValue());
   }
@@ -62,7 +57,7 @@ public class HibernateBoxSizeDaoTest extends AbstractDAOTest {
     long id = 1L;
     int rows = 7;
     int cols = 5;
-    BoxSize boxSize = (BoxSize) sessionFactory.getCurrentSession().get(BoxSize.class, id);
+    BoxSize boxSize = (BoxSize) getSessionFactory().getCurrentSession().get(BoxSize.class, id);
     assertNotEquals(rows, boxSize.getRows().intValue());
     assertNotEquals(cols, boxSize.getColumns().intValue());
     boxSize.setRows(rows);
@@ -71,21 +66,16 @@ public class HibernateBoxSizeDaoTest extends AbstractDAOTest {
 
     clearSession();
 
-    BoxSize saved = (BoxSize) sessionFactory.getCurrentSession().get(BoxSize.class, id);
+    BoxSize saved = (BoxSize) getSessionFactory().getCurrentSession().get(BoxSize.class, id);
     assertEquals(rows, saved.getRows().intValue());
     assertEquals(cols, saved.getColumns().intValue());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    BoxSize boxSize = (BoxSize) sessionFactory.getCurrentSession().get(BoxSize.class, 1L);
+    BoxSize boxSize = (BoxSize) getSessionFactory().getCurrentSession().get(BoxSize.class, 1L);
     assertNotNull(boxSize);
     assertEquals(2L, sut.getUsage(boxSize));
-  }
-
-  private void clearSession() {
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
   }
 
 }

@@ -425,7 +425,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
         lai.setLibraryStrategyType(design.getLibraryStrategyType());
         lai.setLibraryDesignCode(design.getLibraryDesignCode());
         SampleClass sampleClass = ((DetailedSample) library.getSample()).getSampleClass();
-        if (!sampleClass.getId().equals(design.getSampleClass().getId())) {
+        if (sampleClass.getId() != design.getSampleClass().getId()) {
           throw new IllegalArgumentException(
               "Cannot use design " + design.getName() + " for a library from a sample of type " + sampleClass.getAlias());
         }

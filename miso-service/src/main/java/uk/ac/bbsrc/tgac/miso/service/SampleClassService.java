@@ -5,10 +5,9 @@ import java.util.List;
 import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 
-public interface SampleClassService {
-
-  SampleClass get(Long sampleClassId) throws IOException;
+public interface SampleClassService extends ProviderService<SampleClass> {
 
   Long create(SampleClass sampleClass) throws IOException;
 

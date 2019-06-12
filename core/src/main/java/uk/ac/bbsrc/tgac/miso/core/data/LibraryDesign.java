@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -18,7 +20,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 
 @Entity
 @Table(name = "LibraryDesign")
-public class LibraryDesign implements Serializable {
+public class LibraryDesign implements Deletable, Identifiable, Serializable {
+
   public static boolean validate(Library library, Iterable<LibraryDesign> rules) {
     // Return true if the ruleset is empty.
     boolean first = true;
@@ -31,8 +34,11 @@ public class LibraryDesign implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
+  private static final long UNSAVED_ID = 0L;
+
   @Id
-  private Long libraryDesignId;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long libraryDesignId = UNSAVED_ID;
 
   @ManyToOne
   @JoinColumn(name = "librarySelectionType")
@@ -41,8 +47,10 @@ public class LibraryDesign implements Serializable {
   @ManyToOne
   @JoinColumn(name = "libraryStrategyType")
   private LibraryStrategyType libraryStrategyType;
+
   @Column(nullable = false)
   private String name;
+
   @ManyToOne(targetEntity = SampleClassImpl.class)
   @JoinColumn(name = "sampleClassId", nullable = false)
   private SampleClass sampleClass;
@@ -51,48 +59,50 @@ public class LibraryDesign implements Serializable {
   @JoinColumn(name = "libraryDesignCodeId")
   private LibraryDesignCode libraryDesignCode;
 
-  public Long getId() {
+  @Override
+  public long getId() {
     return libraryDesignId;
+  }
+
+  @Override
+  public void setId(long libraryDesignId) {
+    this.libraryDesignId = libraryDesignId;
   }
 
   public LibrarySelectionType getLibrarySelectionType() {
     return librarySelectionType;
   }
 
-  public LibraryStrategyType getLibraryStrategyType() {
-    return libraryStrategyType;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public SampleClass getSampleClass() {
-    return sampleClass;
-  }
-
-  public LibraryDesignCode getLibraryDesignCode() {
-    return libraryDesignCode;
-  }
-
-  public void setId(Long libraryDesignId) {
-    this.libraryDesignId = libraryDesignId;
-  }
-
   public void setLibrarySelectionType(LibrarySelectionType librarySelectionType) {
     this.librarySelectionType = librarySelectionType;
+  }
+
+  public LibraryStrategyType getLibraryStrategyType() {
+    return libraryStrategyType;
   }
 
   public void setLibraryStrategyType(LibraryStrategyType libraryStrategyType) {
     this.libraryStrategyType = libraryStrategyType;
   }
 
+  public String getName() {
+    return name;
+  }
+
   public void setName(String name) {
     this.name = name;
   }
 
+  public SampleClass getSampleClass() {
+    return sampleClass;
+  }
+
   public void setSampleClass(SampleClass sampleClass) {
     this.sampleClass = sampleClass;
+  }
+
+  public LibraryDesignCode getLibraryDesignCode() {
+    return libraryDesignCode;
   }
 
   public void setLibraryDesignCode(LibraryDesignCode libraryDesignCode) {
@@ -131,5 +141,20 @@ public class LibraryDesign implements Serializable {
         .append(sampleClass, other.sampleClass)
         .append(libraryDesignCode, other.libraryDesignCode)
         .isEquals();
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Library Design";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName();
   }
 }

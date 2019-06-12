@@ -16,6 +16,7 @@ public interface AbstractListPage {
     public static final String AVG_INSERT_SIZE = "Average Insert Size";
     public static final String BACKEND = "Backend";
     public static final String CATEGORY = "Category";
+    public static final String CODE = "Code";
     public static final String COLUMNS = "Columns";
     public static final String COMPLETED = "Completed";
     public static final String CONCENTRATION = "Concentration";
@@ -50,7 +51,10 @@ public interface AbstractListPage {
     public static final String LAST_SEQUENCER = "Last Sequencer Used";
     public static final String LAYOUT = "Layout";
     public static final String LIBRARY_ALIAS = "Library Alias";
+    public static final String LIBRARY_DESIGN_CODE = "Design Code";
     public static final String LIBRARY_NAME = "Library Name";
+    public static final String LIBRARY_SELECTION = "Selection";
+    public static final String LIBRARY_STRATEGY = "Strategy";
     public static final String LOCATION = "Location";
     public static final String LOGGED_IN = "Logged In";
     public static final String LOGIN_NAME = "Login Name";
@@ -96,6 +100,7 @@ public interface AbstractListPage {
     public static final String STOPPED = "Stopped";
     public static final String STORAGE_LOCATION = "Storage Location";
     public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
+    public static final String TARGETED_SEQUENCING_REQD = "Targeted Sequencing Required";
     public static final String TYPE = "Type";
     public static final String UNKNOWN = "Unknown";
     public static final String USER_NAME = "User Name";
@@ -112,6 +117,8 @@ public interface AbstractListPage {
     public static final String BOX_USES = "boxuse/list";
     public static final String SAMPLES = "samples";
     public static final String LIBRARIES = "libraries";
+    public static final String LIBRARY_DESIGNS = "librarydesign/list";
+    public static final String LIBRARY_DESIGN_CODES = "librarydesigncode/list";
     public static final String LIBRARY_SELECTION_TYPES = "libraryselection/list";
     public static final String LIBRARY_SPIKE_INS = "libraryspikein/list";
     public static final String LIBRARY_STRATEGY_TYPES = "librarystrategy/list";

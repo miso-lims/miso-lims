@@ -23,7 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,5 +35,21 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration("/h2-db-test-context.xml")
 @Transactional
 public abstract class AbstractDAOTest {
+
+  @Autowired
+  private SessionFactory sessionFactory;
+
+  protected SessionFactory getSessionFactory() {
+    return sessionFactory;
+  }
+
+  protected Session currentSession() {
+    return getSessionFactory().getCurrentSession();
+  }
+
+  protected void clearSession() {
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+  }
 
 }
