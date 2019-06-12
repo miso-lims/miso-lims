@@ -74,12 +74,12 @@ ListTarget.poolelement = {
     return [
         {
           'sTitle': 'Dilution Name',
-          'mData': 'name',
+          'mData': 'id', // for sorting purposes
           'include': true,
           'iSortPriority': 1,
           "mRender": function(data, type, full) {
             if (type === 'display') {
-              return "<a href=\"/miso/dilution/" + full.id + "\">" + data + "</a>";
+              return "<a href=\"/miso/dilution/" + full.id + "\">" + full.name + "</a>";
             }
             return data;
           }
