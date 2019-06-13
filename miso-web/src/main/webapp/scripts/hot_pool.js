@@ -108,6 +108,9 @@ HotTarget.pool = (function() {
     },
     fixUp: function(lib, errorHandler) {
     },
+    getFixedColumns: function(config) {
+      return 2;
+    },
     createColumns: function(config, create, data) {
       var columns = [{
         header: 'Pool Name',

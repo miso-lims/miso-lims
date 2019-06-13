@@ -53,7 +53,9 @@ HotTarget.libraryReceipt = (function() {
       return libColumns.splice(0, 4).concat(samColumns).concat(libColumns);
     },
 
-    fixedColumns: 0,
+    getFixedColumns: function(config) {
+      return Constants.automaticLibraryAlias ? 0 : 2;
+    },
 
     getCustomActions: function(table) {
       return HotTarget.library.getCustomActions(table);
