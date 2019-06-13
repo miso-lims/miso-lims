@@ -613,13 +613,13 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListLibraryTypesSetup() throws Exception {
-    testPageSetup(ListTarget.LIBRARY_DESIGNS,
+    testPageSetup(ListTarget.LIBRARY_TYPES,
         Sets.newHashSet(Columns.SORT, Columns.DESCRIPTION, Columns.PLATFORM, Columns.ABBREVIATION, Columns.ARCHIVED));
   }
 
   @Test
   public void testListLibraryTypesColumnSort() throws Exception {
-    testColumnsSort(ListTarget.LIBRARY_DESIGNS);
+    testColumnsSort(ListTarget.LIBRARY_TYPES);
   }
 
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
