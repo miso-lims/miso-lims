@@ -239,7 +239,7 @@ HotTarget.library = (function() {
     },
     fixUp: function(lib, errorHandler) {
       lib.paired = Constants.libraryTypes.reduce(function(acc, type) {
-        return acc || type.id == lib.libraryTypeId && type.alias.indexOf('Pair') != -1;
+        return acc || type.id == lib.libraryTypeId && type.description.indexOf('Pair') != -1;
       }, lib.paired);
     },
     onLoad: function(config, table) {
@@ -523,7 +523,7 @@ HotTarget.library = (function() {
           },
           {
             'header': 'Type',
-            'data': 'libraryTypeAlias',
+            'data': 'libraryTypeDescription',
             'type': 'dropdown',
             'trimDropdown': false,
             'source': [''],
@@ -531,13 +531,14 @@ HotTarget.library = (function() {
             'include': true,
             'depends': ['platformType', 'templateAlias'],
             'unpack': function(lib, flat, setCellMeta) {
-              flat.libraryTypeAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(lib.libraryTypeId),
-                  Constants.libraryTypes), 'alias')
+              flat.libraryTypeDescription = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
+                  .idPredicate(lib.libraryTypeId), Constants.libraryTypes), 'description')
                   || '';
             },
             'pack': function(lib, flat, errorHander) {
-              lib.libraryTypeId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
-                  .aliasPredicate(flat.libraryTypeAlias), Constants.libraryTypes), 'id');
+              lib.libraryTypeId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
+                return item.description == flat.libraryTypeDescription;
+              }, Constants.libraryTypes), 'id');
             },
             update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               if (flatProperty === 'platformType' || flatProperty === '*start') {
@@ -546,14 +547,14 @@ HotTarget.library = (function() {
                   'source': Constants.libraryTypes.filter(function(lt) {
                     return lt.platform == pt && (!lt.archived || lib.libraryTypeId == lt.id);
                   }).map(function(lt) {
-                    return lt.alias;
+                    return lt.description;
                   }).sort()
                 });
               }
               if (flat.templateAlias) {
                 var projectId = getProjectId(lib, flat, config);
                 var template = getTemplate(config, projectId, lib.parentSampleClassId, flat.templateAlias);
-                updateFromTemplate(template, 'libraryTypeId', Constants.libraryTypes, 'alias', setReadOnly, setData);
+                updateFromTemplate(template, 'libraryTypeId', Constants.libraryTypes, 'description', setReadOnly, setData);
               } else {
                 setReadOnly(false);
               }

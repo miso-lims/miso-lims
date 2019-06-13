@@ -33,14 +33,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
-import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -57,7 +54,9 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.LibrarySpikeInService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryStrategyService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryTypeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -80,6 +79,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
+  private LibraryTypeService libraryTypeService;
+  @Autowired
   private LibrarySelectionService librarySelectionService;
   @Autowired
   private LibraryStrategyService libraryStrategyService;
@@ -87,6 +88,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   private LibraryDesignService libraryDesignService;
   @Autowired
   private LibraryDesignCodeService libraryDesignCodeService;
+  @Autowired
+  private LibrarySpikeInService librarySpikeInService;
   @Autowired
   private IndexService indexService;
   @Autowired
@@ -268,36 +271,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   @Override
-  public LibraryType getLibraryTypeById(long libraryTypeId) throws IOException {
-    return libraryDao.getLibraryTypeById(libraryTypeId);
-  }
-
-  @Override
-  public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
-    return libraryDao.getLibraryTypeByDescriptionAndPlatform(description, platformType);
-  }
-
-  @Override
-  public Collection<LibraryType> listLibraryTypes() throws IOException {
-    return libraryDao.listAllLibraryTypes();
-  }
-
-  @Override
-  public Collection<LibraryType> listLibraryTypesByPlatform(PlatformType platform) throws IOException {
-    return libraryDao.listLibraryTypesByPlatform(platform);
-  }
-
-  @Override
-  public List<LibrarySpikeIn> listSpikeIns() throws IOException {
-    return libraryDao.listSpikeIns();
-  }
-
-  @Override
-  public LibrarySpikeIn getSpikeIn(long spikeInId) throws IOException {
-    return libraryDao.getSpikeIn(spikeInId);
-  }
-
-  @Override
   public void addNote(Library library, Note note) throws IOException {
     Library managed = libraryDao.get(library.getId());
     note.setCreationDate(new Date());
@@ -391,7 +364,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       library.setSample(sampleService.get(library.getSample().getId()));
     }
     if (library.getLibraryType() != null) {
-      library.setLibraryType(getLibraryTypeById(library.getLibraryType().getId()));
+      library.setLibraryType(libraryTypeService.get(library.getLibraryType().getId()));
     }
     if (library.getLibrarySelectionType() != null) {
       library.setLibrarySelectionType(librarySelectionService.get(library.getLibrarySelectionType().getId()));
@@ -411,7 +384,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       library.setKitDescriptor(kitService.get(library.getKitDescriptor().getId()));
     }
     if (library.getSpikeIn() != null) {
-      library.setSpikeIn(getSpikeIn(library.getSpikeIn().getId()));
+      library.setSpikeIn(librarySpikeInService.get(library.getSpikeIn().getId()));
     }
     if (isDetailedLibrary(library)) {
       DetailedLibrary lai = (DetailedLibrary) library;

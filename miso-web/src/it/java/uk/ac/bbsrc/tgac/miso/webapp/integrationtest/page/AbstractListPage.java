@@ -7,6 +7,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 public interface AbstractListPage {
 
   public static class Columns {
+    public static final String ABBREVIATION = "Abbreviation";
     public static final String ACTIVE = "Active";
     public static final String ADMIN = "Admin";
     public static final String ALIAS = "Alias";
@@ -122,6 +123,7 @@ public interface AbstractListPage {
     public static final String LIBRARY_SELECTION_TYPES = "libraryselection/list";
     public static final String LIBRARY_SPIKE_INS = "libraryspikein/list";
     public static final String LIBRARY_STRATEGY_TYPES = "librarystrategy/list";
+    public static final String LIBRARY_TYPES = "librarytype/list";
     public static final String LOCATION_MAPS = "locationmap/list";
     public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";
     public static final String DILUTIONS = "dilutions";

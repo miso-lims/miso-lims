@@ -1,40 +1,51 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 public class LibraryTypeDto {
-  private String alias;
-  private boolean archived;
-  private long id;
-  private String platform;
 
-  public String getAlias() {
-    return alias;
+  private Long id;
+  private String description;
+  private String platform;
+  private String abbreviation;
+  private boolean archived;
+
+  public Long getId() {
+    return id;
   }
 
-  public long getId() {
-    return id;
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String alias) {
+    this.description = alias;
   }
 
   public String getPlatform() {
     return platform;
   }
 
-  public boolean isArchived() {
-    return archived;
+  public void setPlatform(String platform) {
+    this.platform = platform;
   }
 
-  public void setAlias(String alias) {
-    this.alias = alias;
+  public String getAbbreviation() {
+    return abbreviation;
+  }
+
+  public void setAbbreviation(String abbreviation) {
+    this.abbreviation = abbreviation;
+  }
+
+  public boolean isArchived() {
+    return archived;
   }
 
   public void setArchived(boolean archived) {
     this.archived = archived;
   }
 
-  public void setId(long id) {
-    this.id = id;
-  }
-
-  public void setPlatform(String platform) {
-    this.platform = platform;
-  }
 }

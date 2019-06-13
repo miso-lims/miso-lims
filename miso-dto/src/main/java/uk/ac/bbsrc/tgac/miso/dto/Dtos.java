@@ -2097,12 +2097,23 @@ public class Dtos {
   }
 
   public static LibraryTypeDto asDto(@Nonnull LibraryType from) {
-    LibraryTypeDto dto = new LibraryTypeDto();
-    dto.setId(from.getId());
-    dto.setAlias(from.getDescription());
-    dto.setArchived(from.getArchived());
-    dto.setPlatform(from.getPlatformType().name());
-    return dto;
+    LibraryTypeDto to = new LibraryTypeDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setDescription, from.getDescription());
+    setString(to::setPlatform, maybeGetProperty(from.getPlatformType(), PlatformType::name));
+    setString(to::setAbbreviation, from.getAbbreviation());
+    setBoolean(to::setArchived, from.getArchived(), false);
+    return to;
+  }
+
+  public static LibraryType to(@Nonnull LibraryTypeDto from) {
+    LibraryType to = new LibraryType();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setDescription, from.getDescription());
+    setObject(to::setPlatformType, from.getPlatform(), str -> PlatformType.valueOf(str));
+    setString(to::setAbbreviation, from.getAbbreviation());
+    setBoolean(to::setArchived, from.isArchived(), false);
+    return to;
   }
 
   public static LibrarySelectionTypeDto asDto(@Nonnull LibrarySelectionType from) {

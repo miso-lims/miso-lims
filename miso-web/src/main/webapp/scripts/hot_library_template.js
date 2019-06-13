@@ -68,7 +68,7 @@ HotTarget.libraryTemplate = (function() {
           },
           {
             header: 'Type',
-            data: 'libraryTypeAlias',
+            data: 'libraryTypeDescription',
             type: 'dropdown',
             trimDropdown: false,
             source: [none],
@@ -76,20 +76,21 @@ HotTarget.libraryTemplate = (function() {
             include: true,
             depends: 'platformType',
             unpack: function(libTemp, flat, setCellMeta) {
-              flat.libraryTypeAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
-                  .idPredicate(libTemp.libraryTypeId), Constants.libraryTypes), 'alias')
+              flat.libraryTypeDescription = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
+                  .idPredicate(libTemp.libraryTypeId), Constants.libraryTypes), 'description')
                   || none;
             },
             'pack': function(libTemp, flat, errorHander) {
-              libTemp.libraryTypeId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
-                  .aliasPredicate(flat.libraryTypeAlias), Constants.libraryTypes), 'id');
+              libTemp.libraryTypeId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
+                return item.description == flat.libraryTypeDescription;
+              }, Constants.libraryTypes), 'id');
             },
             update: function(libTemp, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               var pt = HotUtils.getPlatformType(flat.platformType);
               var types = Constants.libraryTypes.filter(function(lt) {
                 return lt.platform == pt && (!lt.archived || libTemp.libraryTypeId == lt.id);
               }).map(function(lt) {
-                return lt.alias;
+                return lt.description;
               }).sort();
               types.unshift(none);
               setOptions({

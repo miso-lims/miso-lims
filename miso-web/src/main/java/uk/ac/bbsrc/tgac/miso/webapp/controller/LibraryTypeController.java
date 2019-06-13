@@ -10,30 +10,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.LibrarySpikeInDto;
-import uk.ac.bbsrc.tgac.miso.service.LibrarySpikeInService;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryTypeDto;
+import uk.ac.bbsrc.tgac.miso.service.LibraryTypeService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
-@RequestMapping("/libraryspikein")
-public class LibrarySpikeInController extends AbstractTypeDataController<LibrarySpikeIn, LibrarySpikeInDto> {
+@RequestMapping("/librarytype")
+public class LibraryTypeController extends AbstractTypeDataController<LibraryType, LibraryTypeDto> {
 
   @Autowired
-  private LibrarySpikeInService librarySpikeInService;
+  private LibraryTypeService libraryTypeService;
 
   @Autowired
   private AuthorizationManager authorizationManager;
 
-  public LibrarySpikeInController() {
-    super("Library Spike-Ins", "libraryspikein", "libraryspikein");
+  public LibraryTypeController() {
+    super("Library Types", "librarytype", "librarytype");
   }
 
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
-    return listStatic(librarySpikeInService.list(), model);
+    return listStatic(libraryTypeService.list(), model);
   }
 
   @GetMapping("/bulk/new")
@@ -52,18 +52,18 @@ public class LibrarySpikeInController extends AbstractTypeDataController<Library
   }
 
   @Override
-  protected ProviderService<LibrarySpikeIn> getService() {
-    return librarySpikeInService;
+  protected ProviderService<LibraryType> getService() {
+    return libraryTypeService;
   }
 
   @Override
-  protected LibrarySpikeInDto toDto(LibrarySpikeIn object) {
+  protected LibraryTypeDto toDto(LibraryType object) {
     return Dtos.asDto(object);
   }
 
   @Override
-  protected LibrarySpikeInDto makeDto() {
-    return new LibrarySpikeInDto();
+  protected LibraryTypeDto makeDto() {
+    return new LibraryTypeDto();
   }
 
 }

@@ -538,6 +538,7 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.PARTITION_QC_TYPE);
   }
 
+  @Test
   public void testListStudyTypesSetup() throws Exception {
     testPageSetup(ListTarget.STUDY_TYPES, Sets.newHashSet(Columns.SORT, Columns.NAME));
   }
@@ -547,6 +548,7 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.STUDY_TYPES);
   }
 
+  @Test
   public void testListLocationMapsSetup() throws Exception {
     testPageSetup(ListTarget.LOCATION_MAPS, Sets.newHashSet(Columns.SORT, Columns.FILENAME, Columns.DESCRIPTION));
   }
@@ -556,8 +558,9 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.LOCATION_MAPS);
   }
 
+  @Test
   public void testListLibrarySelectionSetup() throws Exception {
-    testPageSetup(ListTarget.LIBRARY_SELECTION_TYPES, Sets.newHashSet(Columns.NAME, Columns.DESCRIPTION));
+    testPageSetup(ListTarget.LIBRARY_SELECTION_TYPES, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.DESCRIPTION));
   }
 
   @Test
@@ -565,8 +568,9 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.LIBRARY_SELECTION_TYPES);
   }
 
+  @Test
   public void testListLibraryStrategySetup() throws Exception {
-    testPageSetup(ListTarget.LIBRARY_STRATEGY_TYPES, Sets.newHashSet(Columns.NAME, Columns.DESCRIPTION));
+    testPageSetup(ListTarget.LIBRARY_STRATEGY_TYPES, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.DESCRIPTION));
   }
 
   @Test
@@ -574,6 +578,7 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.LIBRARY_STRATEGY_TYPES);
   }
 
+  @Test
   public void testListLibrarySpikeInsSetup() throws Exception {
     testPageSetup(ListTarget.LIBRARY_SPIKE_INS, Sets.newHashSet(Columns.SORT, Columns.ALIAS));
   }
@@ -583,6 +588,7 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.LIBRARY_SPIKE_INS);
   }
 
+  @Test
   public void testListLibraryDesignCodesSetup() throws Exception {
     testPageSetup(ListTarget.LIBRARY_DESIGN_CODES,
         Sets.newHashSet(Columns.SORT, Columns.CODE, Columns.DESCRIPTION, Columns.TARGETED_SEQUENCING_REQD));
@@ -593,6 +599,7 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.LIBRARY_DESIGN_CODES);
   }
 
+  @Test
   public void testListLibraryDesignsSetup() throws Exception {
     testPageSetup(ListTarget.LIBRARY_DESIGNS,
         Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.SAMPLE_CLASS, Columns.LIBRARY_SELECTION, Columns.LIBRARY_STRATEGY,
@@ -601,6 +608,17 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListLibraryDesignsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.LIBRARY_DESIGNS);
+  }
+
+  @Test
+  public void testListLibraryTypesSetup() throws Exception {
+    testPageSetup(ListTarget.LIBRARY_DESIGNS,
+        Sets.newHashSet(Columns.SORT, Columns.DESCRIPTION, Columns.PLATFORM, Columns.ABBREVIATION, Columns.ARCHIVED));
+  }
+
+  @Test
+  public void testListLibraryTypesColumnSort() throws Exception {
     testColumnsSort(ListTarget.LIBRARY_DESIGNS);
   }
 

@@ -233,9 +233,13 @@ there are no stains associated with it.
 {% include userman-heading.md section=page.section sub=sub title="Library Types" %}
 
 Library type is a classifier for libraries that depends on the platform type. Library types for Illumina libraries
-include 'Paired End,' 'Single End,' and 'Mate Pair,' for example. Library types may be archived so that the option is
-no longer available for new libraries. Modifications to library types can only be made via direct access to the MISO
-database. As such, they must be performed by a MISO adminstrator.
+include 'Paired End,' 'Single End,' and 'Mate Pair,' for example. Depending on your naming scheme, the library type
+abbreviation may be included in library aliases. Library types may be archived so that they are no longer available for
+new libraries.
+
+MISO administrators can add, edit, and delete library types using the standard interface. The platform a library type
+is linked to cannot be changed if the library type has been used for any existing libraries or library templates. A
+library type can only be deleted if the status has not been used by any existing libraries or library templates.
 
 {% include userman-toplink.md %}
 

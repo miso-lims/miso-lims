@@ -91,7 +91,7 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
     assertEquals("theAlias", insertedLibrary.getAlias());
     assertEquals("a description", insertedLibrary.getDescription());
     assertEquals(4, library.getSample().getId());
-    assertEquals(Long.valueOf(1), library.getLibraryType().getId());
+    assertEquals(1L, library.getLibraryType().getId());
     assertEquals(1L, library.getLibrarySelectionType().getId());
     assertEquals(1L, library.getLibraryStrategyType().getId());
   }
@@ -237,7 +237,7 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   public void testGetLibraryTypeById() throws Exception {
     LibraryType libraryTypeById = dao.getLibraryTypeById(5);
 
-    assertEquals(Long.valueOf(5), libraryTypeById.getId());
+    assertEquals(5L, libraryTypeById.getId());
     assertEquals(PlatformType.LS454, libraryTypeById.getPlatformType());
     assertEquals("Rapid Shotgun", libraryTypeById.getDescription());
 
@@ -246,7 +246,7 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   @Test
   public void testGetLibraryTypeByDescriptionAndPlatform() throws Exception {
     LibraryType libraryTypeByDescriptionAndPlatform = dao.getLibraryTypeByDescriptionAndPlatform("8kbp Paired End", PlatformType.LS454);
-    assertEquals(Long.valueOf(4), libraryTypeByDescriptionAndPlatform.getId());
+    assertEquals(4L, libraryTypeByDescriptionAndPlatform.getId());
     assertEquals(PlatformType.LS454, libraryTypeByDescriptionAndPlatform.getPlatformType());
     assertEquals("8kbp Paired End", libraryTypeByDescriptionAndPlatform.getDescription());
   }

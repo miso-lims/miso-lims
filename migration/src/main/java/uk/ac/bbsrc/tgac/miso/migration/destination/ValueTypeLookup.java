@@ -592,7 +592,7 @@ public class ValueTypeLookup {
   @VisibleForTesting
   LibraryType resolve(LibraryType libraryType) {
     if (libraryType == null) return null;
-    if (libraryType.getId() != LibraryType.UNSAVED_ID) return libraryTypeById.get(libraryType.getId());
+    if (libraryType.isSaved()) return libraryTypeById.get(libraryType.getId());
     if (libraryType.getDescription() != null && libraryType.getPlatformType() != null) {
       Map<String, LibraryType> mapByDesc = libraryTypeByPlatformAndDescription.get(libraryType.getPlatformType());
       return mapByDesc == null ? null : mapByDesc.get(libraryType.getDescription());

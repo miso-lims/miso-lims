@@ -433,7 +433,9 @@ public class ValueTypeLookupTest {
 
   private LibraryType makeLibraryType(Long id, String platform, String desc) {
     LibraryType lt = new LibraryType();
-    lt.setId(id == null ? LibraryType.UNSAVED_ID : id);
+    if (id != null) {
+      lt.setId(id);
+    }
     lt.setPlatformType(PlatformType.get(platform));
     lt.setDescription(desc);
     return lt;

@@ -98,6 +98,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryStrategyService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryTypeService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
@@ -151,6 +152,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   private StudyTypeService studyTypeService;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private LibraryTypeService libraryTypeService;
   @Autowired
   private LibrarySelectionService librarySelectionService;
   @Autowired
@@ -485,7 +488,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<LibraryType>(LibraryType.class) {
       @Override
       public LibraryType resolveById(long id) throws Exception {
-        return libraryService.getLibraryTypeById(id);
+        return libraryTypeService.get(id);
       }
 
     }.register(binder).register(binder, Set.class, "libraryTypes");
