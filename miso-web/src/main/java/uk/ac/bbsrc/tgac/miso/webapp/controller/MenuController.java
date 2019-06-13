@@ -248,6 +248,12 @@ public class MenuController implements ServletContextAware {
     }
   }
 
+  @GetMapping("/")
+  public ModelAndView redirectMisoRoot(ModelMap model) {
+    model.clear();
+    return new ModelAndView("redirect:mainMenu", model);
+  }
+
   @RequestMapping("/mainMenu")
   public ModelAndView mainMenu(ModelMap model) throws IOException {
     User user = authorizationManager.getCurrentUser();
