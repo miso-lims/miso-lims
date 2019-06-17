@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.ArrayModelDao;
 import uk.ac.bbsrc.tgac.miso.service.ArrayModelService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -86,11 +87,11 @@ public class DefaultArrayModelService implements ArrayModelService {
       if (usage > 0L) {
         if (ValidationUtils.isSetAndChanged(ArrayModel::getRows, model, beforeChange)) {
           errors.add(new ValidationError("rows",
-              "Cannot resize because array model is already used by " + usage + " array" + (usage > 1L ? "s" : "")));
+              "Cannot resize because array model is already used by " + usage + " " + Pluralizer.arrays(usage)));
         }
         if (ValidationUtils.isSetAndChanged(ArrayModel::getColumns, model, beforeChange)) {
           errors.add(new ValidationError("columns",
-              "Cannot resize because array model is already used by " + usage + " array" + (usage > 1L ? "s" : "")));
+              "Cannot resize because array model is already used by " + usage + " " + Pluralizer.arrays(usage)));
         }
       }
     }
@@ -116,8 +117,7 @@ public class DefaultArrayModelService implements ArrayModelService {
     ValidationResult result = new ValidationResult();
     long usage = arrayModelDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(new ValidationError(
-          "Array model '" + object.getAlias() + "' is used by " + usage + " array" + (usage > 1L ? "s" : "")));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.arrays(usage)));
     }
     return result;
   }

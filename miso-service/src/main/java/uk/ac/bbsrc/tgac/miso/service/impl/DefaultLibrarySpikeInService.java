@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SaveDao;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.LibrarySpikeInDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 import uk.ac.bbsrc.tgac.miso.service.LibrarySpikeInService;
@@ -74,8 +75,7 @@ public class DefaultLibrarySpikeInService extends AbstractSaveService<LibrarySpi
     ValidationResult result = new ValidationResult();
     long usage = librarySpikeInDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(
-          new ValidationError("Library spike-in '" + object.getAlias() + "' is used by " + usage + " librar" + (usage > 1L ? "ies" : "y")));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.libraries(usage)));
     }
     return result;
   }

@@ -11,6 +11,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.InstituteDao;
 import uk.ac.bbsrc.tgac.miso.persistence.LabDao;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
@@ -95,8 +96,7 @@ public class DefaultLabService implements LabService {
 
     long usage = labDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(new ValidationError(usage + " sample" + (usage > 1L ? "s are" : " is") + " associated with lab '" + object.getAlias()
-          + "'"));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
     }
 
     return result;

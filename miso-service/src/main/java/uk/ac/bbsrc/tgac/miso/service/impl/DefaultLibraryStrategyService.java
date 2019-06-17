@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStrategyDao;
 import uk.ac.bbsrc.tgac.miso.service.LibraryStrategyService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -101,8 +102,7 @@ public class DefaultLibraryStrategyService implements LibraryStrategyService {
     ValidationResult result = new ValidationResult();
     long usage = libraryStrategyDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(
-          new ValidationError("Library strategy '" + object.getName() + "' is used by " + usage + " librar" + (usage > 1L ? "ies" : "y")));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.libraries(usage)));
     }
     return result;
   }

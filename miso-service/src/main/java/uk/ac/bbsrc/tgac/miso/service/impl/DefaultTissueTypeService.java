@@ -13,6 +13,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.TissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
@@ -97,8 +98,7 @@ public class DefaultTissueTypeService implements TissueTypeService {
     ValidationResult result = new ValidationResult();
     long usage = tissueTypeDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(
-          new ValidationError("Tissue type '" + object.getAlias() + "' is used by " + usage + " sample" + (usage > 1L ? "s" : "")));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
     }
     return result;
   }

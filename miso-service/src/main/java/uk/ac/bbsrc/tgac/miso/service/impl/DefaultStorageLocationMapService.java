@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.StorageLocationMapDao;
 import uk.ac.bbsrc.tgac.miso.service.StorageLocationMapService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -123,8 +124,7 @@ public class DefaultStorageLocationMapService implements StorageLocationMapServi
     ValidationResult result = new ValidationResult();
     long usage = storageLocationMapDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(
-          new ValidationError("Map file '" + object.getFilename() + "' is used by " + usage + " freezer" + (usage > 1L ? "s" : "")));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.freezers(usage)));
     }
     return result;
   }

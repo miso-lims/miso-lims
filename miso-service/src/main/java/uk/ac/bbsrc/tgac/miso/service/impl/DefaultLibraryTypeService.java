@@ -11,6 +11,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SaveDao;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryTypeService;
@@ -73,8 +74,8 @@ public class DefaultLibraryTypeService extends AbstractSaveService<LibraryType> 
     long tempUsage = libraryTypeDao.getUsageByLibraryTemplates(beforeChange);
     if ((libUsage > 0L || tempUsage > 0L) && ValidationUtils.isSetAndChanged(LibraryType::getPlatformType, object, beforeChange)) {
       errors.add(new ValidationError("platform",
-          String.format("Cannot be changed because library type is already used by %d librar%s and %d library template%s", libUsage,
-              libUsage == 1L ? "y" : "ies", tempUsage, tempUsage == 1L ? "" : "s")));
+          String.format("Cannot be changed because library type is already used by %d %s and %d library %s", libUsage,
+              Pluralizer.libraries(libUsage), tempUsage, Pluralizer.templates(tempUsage))));
     }
   }
 
@@ -91,15 +92,11 @@ public class DefaultLibraryTypeService extends AbstractSaveService<LibraryType> 
     ValidationResult result = new ValidationResult();
     long libUsage = libraryTypeDao.getUsageByLibraries(object);
     if (libUsage > 0L) {
-      result.addError(
-          new ValidationError(
-              "Library type '" + object.getDescription() + "' is used by " + libUsage + " librar" + (libUsage > 1L ? "ies" : "y")));
+      result.addError(ValidationError.forDeletionUsage(object, libUsage, Pluralizer.libraries(libUsage)));
     }
     long tempUsage = libraryTypeDao.getUsageByLibraryTemplates(object);
     if (tempUsage > 0L) {
-      result.addError(
-          new ValidationError("Library type '" + object.getDescription() + "' is used by " + tempUsage + " library template"
-              + (tempUsage > 1L ? "s" : "")));
+      result.addError(ValidationError.forDeletionUsage(object, tempUsage, Pluralizer.libraryTemplates(tempUsage)));
     }
     return result;
   }

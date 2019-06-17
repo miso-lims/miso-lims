@@ -12,6 +12,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.store.SaveDao;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
@@ -107,19 +108,19 @@ public class DefaultLibraryDesignService extends AbstractSaveService<LibraryDesi
       if (usage > 0L) {
         if (ValidationUtils.isSetAndChanged(LibraryDesign::getSampleClass, object, beforeChange)) {
           errors.add(new ValidationError("sampleClass",
-              "Cannot change sample class because library design is in use by " + usage + " librar" + (usage > 1L ? "ies" : "y")));
+              "Cannot change sample class because library design is in use by " + usage + " " + Pluralizer.libraries(usage)));
         }
         if (ValidationUtils.isSetAndChanged(LibraryDesign::getLibraryDesignCode, object, beforeChange)) {
           errors.add(new ValidationError("libraryDesignCode",
-              "Cannot change design code because library design is in use by " + usage + " librar" + (usage > 1L ? "ies" : "y")));
+              "Cannot change design code because library design is in use by " + usage + " " + Pluralizer.libraries(usage)));
         }
         if (ValidationUtils.isSetAndChanged(LibraryDesign::getLibrarySelectionType, object, beforeChange)) {
           errors.add(new ValidationError("librarySelectionType",
-              "Cannot change selection type because library design is in use by " + usage + " librar" + (usage > 1L ? "ies" : "y")));
+              "Cannot change selection type because library design is in use by " + usage + " " + Pluralizer.libraries(usage)));
         }
         if (ValidationUtils.isSetAndChanged(LibraryDesign::getLibraryStrategyType, object, beforeChange)) {
           errors.add(new ValidationError("libraryStrategyType",
-              "Cannot change strategy type because library design is in use by " + usage + " librar" + (usage > 1L ? "ies" : "y")));
+              "Cannot change strategy type because library design is in use by " + usage + " " + Pluralizer.libraries(usage)));
         }
       }
     }
@@ -139,8 +140,7 @@ public class DefaultLibraryDesignService extends AbstractSaveService<LibraryDesi
     ValidationResult result = new ValidationResult();
     long usage = libraryDesignDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(
-          new ValidationError("Library design '" + object.getName() + "' is used by " + usage + " librar" + (usage > 1L ? "ies" : "y")));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.libraries(usage)));
     }
     return result;
   }

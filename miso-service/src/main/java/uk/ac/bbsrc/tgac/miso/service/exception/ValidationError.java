@@ -2,6 +2,8 @@ package uk.ac.bbsrc.tgac.miso.service.exception;
 
 import java.io.Serializable;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
+
 public class ValidationError implements Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -26,6 +28,11 @@ public class ValidationError implements Serializable {
     } else {
       this.message = property == null ? DEFAULT_GENERAL_MESSAGE : DEFAULT_PROPERTY_MESSAGE;
     }
+  }
+
+  public static ValidationError forDeletionUsage(Deletable object, long usage, String pluralizedUser) {
+    return new ValidationError(
+        String.format("%s %s is used by %d %s", object.getDeleteType(), object.getDeleteDescription(), usage, pluralizedUser));
   }
 
   /**

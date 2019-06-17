@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.store.AttachmentCategoryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.service.AttachmentCategoryService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
@@ -86,7 +87,7 @@ public class DefaultAttachmentCategoryService implements AttachmentCategoryServi
 
     long usage = attachmentCategoryStore.getUsage(object);
     if (usage > 0L) {
-      result.addError(new ValidationError("Attachment category '" + object.getAlias() + "' is used by " + usage + " attachments"));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.attachments(usage)));
     }
 
     return result;

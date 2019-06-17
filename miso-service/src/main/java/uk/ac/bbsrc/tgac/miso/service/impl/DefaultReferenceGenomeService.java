@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ReferenceGenomeDao;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
@@ -99,8 +100,7 @@ public class DefaultReferenceGenomeService implements ReferenceGenomeService {
     ValidationResult result = new ValidationResult();
     long usage = referenceGenomeDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(
-          new ValidationError("Reference genome '" + object.getAlias() + "' is used by " + usage + " project" + (usage > 1L ? "s" : "")));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.projects(usage)));
     }
     return result;
   }

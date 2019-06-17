@@ -16,6 +16,7 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -104,8 +105,7 @@ public class DefaultDetailedQcStatusService implements DetailedQcStatusService {
     ValidationResult result = new ValidationResult();
     long usage = detailedQcStatusDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(new ValidationError(
-          "Detailed QC status '" + object.getDescription() + "' is used by " + usage + " sample" + (usage > 1L ? "s" : "")));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
     }
     return result;
   }

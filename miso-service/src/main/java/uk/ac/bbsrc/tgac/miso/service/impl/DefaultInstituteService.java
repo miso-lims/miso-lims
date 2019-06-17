@@ -13,6 +13,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.InstituteDao;
 import uk.ac.bbsrc.tgac.miso.service.InstituteService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -81,8 +82,7 @@ public class DefaultInstituteService implements InstituteService {
 
     long usage = instituteDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(new ValidationError(usage + " lab" + (usage > 1L ? "s are" : " is") + " associated with institute '"
-          + object.getAlias() + "'"));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.labs(usage)));
     }
 
     return result;
