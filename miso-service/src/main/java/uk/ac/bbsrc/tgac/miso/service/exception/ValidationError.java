@@ -30,9 +30,9 @@ public class ValidationError implements Serializable {
     }
   }
 
-  public static ValidationError forDeletionUsage(Deletable object, long usage, String pluralizedUser) {
+  public static ValidationError forDeletionUsage(Deletable object, long usage, String pluralizedReferrer) {
     return new ValidationError(
-        String.format("%s %s is used by %d %s", object.getDeleteType(), object.getDeleteDescription(), usage, pluralizedUser));
+        String.format("%s %s is used by %d %s", object.getDeleteType(), object.getDeleteDescription(), usage, pluralizedReferrer));
   }
 
   /**
