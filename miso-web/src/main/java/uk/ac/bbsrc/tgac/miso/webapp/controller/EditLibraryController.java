@@ -98,6 +98,7 @@ import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryTemplateService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryTypeService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
@@ -153,6 +154,8 @@ public class EditLibraryController {
   private IndexService indexService;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private LibraryTypeService libraryTypeService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -268,7 +271,7 @@ public class EditLibraryController {
     final JSONObject rtn = new JSONObject();
     final List<String> rtnLibTypes = new ArrayList<>();
     if (!isStringEmptyOrNull(platform)) {
-      final Collection<LibraryType> libTypes = libraryService.listLibraryTypesByPlatform(PlatformType.get(platform));
+      final Collection<LibraryType> libTypes = libraryTypeService.listByPlatform(PlatformType.get(platform));
       for (final LibraryType type : libTypes) {
         rtnLibTypes.add(type.getDescription());
       }

@@ -17,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -97,8 +98,7 @@ public class DefaultSubprojectService implements SubprojectService {
 
     long usage = subprojectDao.getUsage(object);
     if (usage > 1L) {
-      result.addError(new ValidationError(usage + " sample" + (usage > 1L ? "s are" : " is") + " associated with subproject '"
-          + object.getAlias() + "'"));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
     }
 
     return result;

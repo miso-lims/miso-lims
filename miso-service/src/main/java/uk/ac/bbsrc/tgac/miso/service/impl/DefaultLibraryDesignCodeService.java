@@ -11,6 +11,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.SaveDao;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -80,16 +81,11 @@ public class DefaultLibraryDesignCodeService extends AbstractSaveService<Library
     ValidationResult result = new ValidationResult();
     long libUsage = libraryDesignCodeDao.getUsageByLibraries(object);
     if (libUsage > 0L) {
-      result.addError(
-          new ValidationError(
-              "Library design code '" + object.getCode() + "' is used by " + libUsage + " librar" + (libUsage > 1L ? "ies" : "y")));
+      result.addError(ValidationError.forDeletionUsage(object, libUsage, Pluralizer.libraries(libUsage)));
     }
     long designUsage = libraryDesignCodeDao.getUsageByLibraryDesigns(object);
     if (libUsage > 0L) {
-      result.addError(
-          new ValidationError(
-              "Library design code '" + object.getCode() + "' is used by " + designUsage + " library design"
-                  + (designUsage > 1L ? "s" : "")));
+      result.addError(ValidationError.forDeletionUsage(object, designUsage, Pluralizer.libraryDesigns(designUsage)));
     }
     return result;
   }

@@ -13,6 +13,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -81,7 +82,7 @@ public class DefaultTissueMaterialService implements TissueMaterialService {
 
     long usage = tissueMaterialDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(new ValidationError("Tissue Material '" + object.getAlias() + "' is used by " + usage + " samples"));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
     }
 
     return result;

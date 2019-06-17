@@ -17,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
@@ -132,7 +133,7 @@ public class DefaultTissueOriginService implements TissueOriginService {
 
     long usage = tissueOriginDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(new ValidationError("Tissue Origin '" + object.getAlias() + "' is used by " + usage + " samples"));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
     }
 
     return result;

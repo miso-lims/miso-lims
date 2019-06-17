@@ -34,18 +34,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-/**
- * Provides model access to the underlying MISO LibraryType lookup table. These types should match the ENA submission schema for Library
- * types.
- * <p/>
- * See:
- * 
- * @author Rob Davey
- * @since 0.0.2
- */
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+
 @Entity
 @Table(name = "LibraryType")
-public class LibraryType implements Comparable<LibraryType>, Serializable {
+public class LibraryType implements Comparable<LibraryType>, Deletable, Identifiable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -63,7 +57,7 @@ public class LibraryType implements Comparable<LibraryType>, Serializable {
   private PlatformType platformType;
 
   @Column(nullable = false)
-  private Boolean archived;
+  private boolean archived = false;
 
   private String abbreviation;
 
@@ -72,7 +66,8 @@ public class LibraryType implements Comparable<LibraryType>, Serializable {
    * 
    * @return Long libraryTypeId.
    */
-  public Long getId() {
+  @Override
+  public long getId() {
     return libraryTypeId;
   }
 
@@ -82,7 +77,8 @@ public class LibraryType implements Comparable<LibraryType>, Serializable {
    * @param libraryTypeId
    *          libraryTypeId.
    */
-  public void setId(Long libraryTypeId) {
+  @Override
+  public void setId(long libraryTypeId) {
     this.libraryTypeId = libraryTypeId;
   }
 
@@ -124,11 +120,11 @@ public class LibraryType implements Comparable<LibraryType>, Serializable {
     this.platformType = platformType;
   }
 
-  public Boolean getArchived() {
+  public boolean getArchived() {
     return archived;
   }
 
-  public void setArchived(Boolean archived) {
+  public void setArchived(boolean archived) {
     this.archived = archived;
   }
 
@@ -154,7 +150,7 @@ public class LibraryType implements Comparable<LibraryType>, Serializable {
   @Override
   public int hashCode() {
     if (getId() != UNSAVED_ID) {
-      return getId().intValue();
+      return new Long(getId()).intValue();
     } else {
       int hashcode = -1;
       if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
@@ -167,4 +163,20 @@ public class LibraryType implements Comparable<LibraryType>, Serializable {
   public int compareTo(LibraryType t) {
     return getDescription().compareTo(t.getDescription());
   }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Library Type";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getDescription() + " (" + getPlatformType().getKey() + ")";
+  }
+
 }

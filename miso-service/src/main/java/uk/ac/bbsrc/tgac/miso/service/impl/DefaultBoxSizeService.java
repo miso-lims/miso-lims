@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.BoxSizeDao;
 import uk.ac.bbsrc.tgac.miso.service.BoxSizeService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -83,11 +84,11 @@ public class DefaultBoxSizeService implements BoxSizeService {
     if (usage > 0L) {
       if (ValidationUtils.isSetAndChanged(BoxSize::getRows, boxSize, beforeChange)) {
         errors.add(new ValidationError("rows",
-            "Cannot resize because box size is already used by " + usage + " box" + (usage > 1L ? "es" : "")));
+            "Cannot resize because box size is already used by " + usage + " " + Pluralizer.boxes(usage)));
       }
       if (ValidationUtils.isSetAndChanged(BoxSize::getColumns, boxSize, beforeChange)) {
         errors.add(new ValidationError("columns",
-            "Cannot resize because box size is already used by " + usage + " box" + (usage > 1L ? "es" : "")));
+            "Cannot resize because box size is already used by " + usage + " " + Pluralizer.boxes(usage)));
       }
     }
     
@@ -112,8 +113,7 @@ public class DefaultBoxSizeService implements BoxSizeService {
     ValidationResult result = new ValidationResult();
     long usage = boxSizeDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(new ValidationError(
-          "Box size '" + object.getRowsByColumnsWithScan() + "' is used by " + usage + " box" + (usage > 1L ? "es" : "")));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.boxes(usage)));
     }
     return result;
   }

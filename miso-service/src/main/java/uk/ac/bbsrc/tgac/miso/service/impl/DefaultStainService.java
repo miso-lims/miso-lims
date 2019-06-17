@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.StainDao;
 import uk.ac.bbsrc.tgac.miso.service.StainCategoryService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
@@ -98,7 +99,7 @@ public class DefaultStainService implements StainService {
     ValidationResult result = new ValidationResult();
     long usage = stainDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(new ValidationError("Stain '" + object.getName() + "' is used by " + usage + " sample" + (usage > 1L ? "s" : "")));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
     }
     return result;
   }

@@ -1,15 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
@@ -46,17 +42,5 @@ public interface LibraryService
   List<Library> listBySampleId(long sampleId) throws IOException;
 
   List<Library> listByProjectId(long projectId) throws IOException;
-
-  LibraryType getLibraryTypeById(long libraryTypeId) throws IOException;
-
-  LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException;
-
-  Collection<LibraryType> listLibraryTypes() throws IOException;
-
-  Collection<LibraryType> listLibraryTypesByPlatform(PlatformType platformType) throws IOException;
-
-  List<LibrarySpikeIn> listSpikeIns() throws IOException;
-
-  LibrarySpikeIn getSpikeIn(long spikeInId) throws IOException;
 
 }

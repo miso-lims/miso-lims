@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.PartitionQcTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -103,8 +104,7 @@ public class DefaultPartitionQcTypeService implements PartitionQcTypeService {
     ValidationResult result = new ValidationResult();
     long usage = partitionQcTypeDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(new ValidationError(
-          "Partition QC type '" + object.getDescription() + "' is used by " + usage + " partition" + (usage > 1L ? "s" : "")));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.partitions(usage)));
     }
     return result;
   }

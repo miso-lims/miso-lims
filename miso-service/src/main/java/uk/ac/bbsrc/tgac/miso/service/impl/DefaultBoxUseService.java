@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.BoxUseDao;
 import uk.ac.bbsrc.tgac.miso.service.BoxUseService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -99,7 +100,7 @@ public class DefaultBoxUseService implements BoxUseService {
     ValidationResult result = new ValidationResult();
     long usage = boxUseDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(new ValidationError("Box use '" + object.getAlias() + "' is used by " + usage + " box" + (usage > 1L ? "es" : "")));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.boxes(usage)));
     }
     return result;
   }

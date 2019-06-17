@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleTypeService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -71,7 +72,7 @@ public class DefaultSampleTypeService implements SampleTypeService {
       long usage = sampleTypeDao.getUsage(beforeChange);
       if (usage > 0L) {
         errors.add(new ValidationError("name",
-                "Cannot change name of sample type because it is already in use by " + usage + " sample" + (usage > 1L ? "s" : "")));
+            "Cannot change name of sample type because it is already in use by " + usage + " " + Pluralizer.samples(usage)));
       }
     }
 
@@ -96,7 +97,7 @@ public class DefaultSampleTypeService implements SampleTypeService {
 
     long usage = sampleTypeDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(new ValidationError("Sample type '" + object.getName() + "' is used by " + usage + " sample(s)"));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
     }
 
     return result;

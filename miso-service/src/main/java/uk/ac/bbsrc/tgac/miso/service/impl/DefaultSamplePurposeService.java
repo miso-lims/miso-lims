@@ -13,6 +13,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -81,7 +82,7 @@ public class DefaultSamplePurposeService implements SamplePurposeService {
 
     long usage = samplePurposeDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(new ValidationError("Sample Purpose '" + object.getAlias() + "' is used by " + usage + " samples"));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
     }
 
     return result;

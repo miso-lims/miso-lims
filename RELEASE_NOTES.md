@@ -9,6 +9,7 @@ Changes:
     * library selection types
     * library spike-ins
     * library strategy types
+    * library types
   * Changed the way location maps are specified for freezers
 
 Upgrade Notes:

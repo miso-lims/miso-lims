@@ -125,9 +125,9 @@ FormTarget.library = (function($) {
               return libraryType.platform === platformName;
             });
           },
-          sortSource: Utils.sorting.standardSort('alias'),
+          sortSource: Utils.sorting.standardSort('description'),
           getItemLabel: function(item) {
-            return item.alias;
+            return item.description;
           },
           getItemValue: function(item) {
             return item.id;

@@ -190,7 +190,7 @@ ListTarget.library_template = {
           "include": true,
           "iSortPriority": 0,
           "mRender": function(data, type, full) {
-            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.libraryTypes), 'alias')
+            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.libraryTypes), 'description')
                 || '';
           },
           "bSortable": false

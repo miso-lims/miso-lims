@@ -103,8 +103,9 @@ import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibrarySelectionService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.LibrarySpikeInService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryStrategyService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryTypeService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
@@ -157,7 +158,7 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private TissueTypeService tissueTypeService;
   @Autowired
-  private LibraryService libraryService;
+  private LibraryTypeService libraryTypeService;
   @Autowired
   private LibrarySelectionService librarySelectionService;
   @Autowired
@@ -166,6 +167,8 @@ public class MenuController implements ServletContextAware {
   private LibraryDesignService libraryDesignService;
   @Autowired
   private LibraryDesignCodeService libraryDesignCodeService;
+  @Autowired
+  private LibrarySpikeInService librarySpikeInService;
   @Autowired
   private InstrumentModelService instrumentModelService;
   @Autowired
@@ -299,7 +302,7 @@ public class MenuController implements ServletContextAware {
     final Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
 
     createArray(mapper, node, "libraryDesigns", libraryDesignService.list(), Dtos::asDto);
-    createArray(mapper, node, "libraryTypes", libraryService.listLibraryTypes(), Dtos::asDto);
+    createArray(mapper, node, "libraryTypes", libraryTypeService.list(), Dtos::asDto);
     createArray(mapper, node, "librarySelections", librarySelectionService.list(), Dtos::asDto);
     createArray(mapper, node, "libraryStrategies", libraryStrategyService.list(), Dtos::asDto);
     createArray(mapper, node, "libraryDesignCodes", libraryDesignCodeService.list(), Dtos::asDto);
@@ -335,7 +338,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, node, "submissionAction", Arrays.asList(SubmissionActionType.values()), SubmissionActionType::name);
     createArray(mapper, node, "containerModels", containerModelService.list(), Dtos::asDto);
     createArray(mapper, node, "poreVersions", containerService.listPoreVersions(), Dtos::asDto);
-    createArray(mapper, node, "spikeIns", libraryService.listSpikeIns(), Dtos::asDto);
+    createArray(mapper, node, "spikeIns", librarySpikeInService.list(), Dtos::asDto);
     createArray(mapper, node, "attachmentCategories", attachmentCategoryService.list(), Dtos::asDto);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
