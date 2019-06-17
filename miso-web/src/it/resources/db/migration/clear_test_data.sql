@@ -25,7 +25,7 @@ DELETE FROM RunOxfordNanopore;
 DELETE FROM RunChangeLog;
 DELETE FROM Run;
 DELETE FROM PoolQC;
-DELETE FROM PoolOrder;
+DELETE FROM SequencingOrder;
 DELETE FROM Pool_Dilution;
 DELETE FROM Pool_Note;
 DELETE FROM PoolChangeLog;

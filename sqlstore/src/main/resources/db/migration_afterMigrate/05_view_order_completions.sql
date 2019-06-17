@@ -12,10 +12,10 @@ CREATE OR REPLACE VIEW RunPartitionsByHealth AS
 
 CREATE OR REPLACE VIEW DesiredPartitions AS 
   SELECT poolId, parametersId, SUM(partitions) AS num_partitions, MAX(lastUpdated) as lastUpdated, GROUP_CONCAT(description SEPARATOR '; ') as description
-    FROM PoolOrder
+    FROM SequencingOrder
     GROUP BY poolId, parametersId;
 
-CREATE OR REPLACE VIEW OrderCompletion_Backing AS
+CREATE OR REPLACE VIEW SequencingOrderCompletion_Backing AS
   (SELECT
     `RunPartitionsByHealth`.`poolId` AS `poolId`,
     `RunPartitionsByHealth`.`parametersId` AS `parametersId`,
@@ -33,7 +33,7 @@ CREATE OR REPLACE VIEW OrderCompletion_Backing AS
     `DesiredPartitions`.`description` AS `description` 
     FROM `DesiredPartitions`);
 
-CREATE OR REPLACE VIEW OrderCompletion AS SELECT
+CREATE OR REPLACE VIEW SequencingOrderCompletion AS SELECT
     poolId,
     parametersId,
     MAX(lastUpdated) as lastUpdated,
@@ -45,12 +45,12 @@ CREATE OR REPLACE VIEW OrderCompletion AS SELECT
     COALESCE((SELECT COUNT(*)
           FROM SequencerPartitionContainer_Partition
            JOIN _Partition ON SequencerPartitionContainer_Partition.partitions_partitionId = _Partition.partitionId
-        WHERE _Partition.pool_poolId = OrderCompletion_Backing.poolId
+        WHERE _Partition.pool_poolId = SequencingOrderCompletion_Backing.poolId
           AND NOT EXISTS(SELECT *
             FROM Run_SequencerPartitionContainer
             WHERE Run_SequencerPartitionContainer.containers_containerId = SequencerPartitionContainer_Partition.container_containerId)), 0) AS loaded,
     GROUP_CONCAT(description SEPARATOR '; ') as description
-  FROM OrderCompletion_Backing
+  FROM SequencingOrderCompletion_Backing
   GROUP BY poolId, parametersId;
 
-CREATE OR REPLACE VIEW OrderCompletion_Items AS SELECT poolId, parametersId, health, num_partitions FROM OrderCompletion_Backing;
+CREATE OR REPLACE VIEW SequencingOrderCompletion_Items AS SELECT poolId, parametersId, health, num_partitions FROM SequencingOrderCompletion_Backing;

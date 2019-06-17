@@ -12,10 +12,10 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
-import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
-import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
+import uk.ac.bbsrc.tgac.miso.persistence.SequencingOrderDao;
+import uk.ac.bbsrc.tgac.miso.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
@@ -23,10 +23,10 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultPoolOrderService implements PoolOrderService {
+public class DefaultSequencingOrderService implements SequencingOrderService {
 
   @Autowired
-  private PoolOrderDao poolOrderDao;
+  private SequencingOrderDao sequencingOrderDao;
 
   @Autowired
   private DeletionStore deletionStore;
@@ -41,46 +41,47 @@ public class DefaultPoolOrderService implements PoolOrderService {
   private AuthorizationManager authorizationManager;
 
   @Override
-  public PoolOrder get(long poolOrderId) throws IOException {
-    return poolOrderDao.getPoolOrder(poolOrderId);
+  public SequencingOrder get(long id) throws IOException {
+    return sequencingOrderDao.get(id);
   }
 
   @Override
-  public Long create(PoolOrder poolOrder) throws IOException {
-    Pool pool = poolService.get(poolOrder.getPool().getId());
+  public long create(SequencingOrder seqOrder) throws IOException {
+    Pool pool = poolService.get(seqOrder.getPool().getId());
     if (pool == null) {
-      throw new IOException("No such pool: " + poolOrder.getPool().getId());
+      throw new IOException("No such pool: " + seqOrder.getPool().getId());
     }
 
     User user = authorizationManager.getCurrentUser();
-    poolOrder.setPool(pool);
-    poolOrder.setSequencingParameters(sequencingParametersService.get(poolOrder.getSequencingParameter().getId()));
-    poolOrder.setCreatedBy(user);
-    poolOrder.setUpdatedBy(user);
-    return poolOrderDao.addPoolOrder(poolOrder);
+    seqOrder.setPool(pool);
+    seqOrder.setSequencingParameters(sequencingParametersService.get(seqOrder.getSequencingParameter().getId()));
+    seqOrder.setCreatedBy(user);
+    seqOrder.setUpdatedBy(user);
+    return sequencingOrderDao.create(seqOrder);
   }
 
   @Override
-  public void update(PoolOrder poolOrder) throws IOException {
+  public long update(SequencingOrder seqOrder) throws IOException {
     User user = authorizationManager.getCurrentUser();
-    poolOrder.setCreatedBy(user);
-    poolOrder.setUpdatedBy(user);
-    poolOrderDao.update(poolOrder);
+    seqOrder.setCreatedBy(user);
+    seqOrder.setUpdatedBy(user);
+    sequencingOrderDao.update(seqOrder);
+    return seqOrder.getId();
   }
 
   @Override
-  public List<PoolOrder> list() throws IOException {
+  public List<SequencingOrder> list() throws IOException {
     authorizationManager.throwIfNonAdmin();
-    return poolOrderDao.getPoolOrder();
+    return sequencingOrderDao.list();
   }
 
   @Override
-  public Set<PoolOrder> getByPool(Long id) throws AuthorizationException, IOException {
-    return Sets.newHashSet(poolOrderDao.getByPool(id));
+  public Set<SequencingOrder> getByPool(Pool pool) throws AuthorizationException, IOException {
+    return Sets.newHashSet(sequencingOrderDao.listByPool(pool));
   }
 
-  public void setPoolOrderDao(PoolOrderDao poolOrderDao) {
-    this.poolOrderDao = poolOrderDao;
+  public void setSequencingOrderDao(SequencingOrderDao sequencingOrderDao) {
+    this.sequencingOrderDao = sequencingOrderDao;
   }
 
   public void setSequencingParametersService(SequencingParametersService sequencingParametersService) {
@@ -106,12 +107,12 @@ public class DefaultPoolOrderService implements PoolOrderService {
   }
 
   @Override
-  public void authorizeDeletion(PoolOrder order) throws IOException {
+  public void authorizeDeletion(SequencingOrder order) throws IOException {
     authorizationManager.throwIfNotInternal();
   }
 
   @Override
-  public void beforeDelete(PoolOrder object) throws IOException {
+  public void beforeDelete(SequencingOrder object) throws IOException {
     Pool pool = poolService.get(object.getPool().getId());
     pool.setLastModifier(authorizationManager.getCurrentUser());
     poolService.update(pool);

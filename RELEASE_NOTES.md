@@ -18,6 +18,8 @@ Changes:
     * libraries
     * dilutions
     * pools
+  * Renamed the existing orders to "sequencing orders" as they are orders for sequencing. This is
+    in advance of the addition of "pool orders" which will be orders for pooling
 
 Upgrade Notes:
 

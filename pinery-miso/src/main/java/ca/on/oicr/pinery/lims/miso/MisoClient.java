@@ -75,9 +75,9 @@ public class MisoClient implements Lims {
 
   // Order queries
   private static final String QUERY_ALL_ORDERS = getResourceAsString("queryAllOrders.sql");
-  private static final String QUERY_ORDER_BY_ID = QUERY_ALL_ORDERS + " AND poolOrderId = ?";
+  private static final String QUERY_ORDER_BY_ID = QUERY_ALL_ORDERS + " AND sequencingOrderId = ?";
   private static final String QUERY_ALL_ORDER_SAMPLES = getResourceAsString("queryAllOrderSamples.sql");
-  private static final String QUERY_ORDER_SAMPLES_BY_ORDER_ID = QUERY_ALL_ORDER_SAMPLES + " WHERE poolOrderId = ?";
+  private static final String QUERY_ORDER_SAMPLES_BY_ORDER_ID = QUERY_ALL_ORDER_SAMPLES + " WHERE sequencingOrderId = ?";
 
   // User queries
   private static final String QUERY_ALL_USERS = "SELECT u.userId, u.fullname, u.email, u.active " + "FROM User AS u";

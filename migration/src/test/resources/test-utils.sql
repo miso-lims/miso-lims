@@ -50,7 +50,7 @@ BEGIN
     DELETE FROM ExperimentChangeLog;
     DELETE FROM Experiment;
     DELETE FROM Pool_Note;
-    DELETE FROM PoolOrder;
+    DELETE FROM SequencingOrder;
     DELETE FROM Pool_Dilution;
     DELETE FROM PoolChangeLog;
     DELETE FROM Pool;

@@ -24,7 +24,7 @@ import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -39,7 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
-import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
+import uk.ac.bbsrc.tgac.miso.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -69,7 +69,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   @Autowired
   private PoolableElementViewService poolableElementViewService;
   @Autowired
-  private PoolOrderService poolOrderService;
+  private SequencingOrderService sequencingOrderService;
   @Autowired
   private FileAttachmentService fileAttachmentService;
 
@@ -354,8 +354,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
 
   @Override
   public void beforeDelete(Pool object) throws IOException {
-    Set<PoolOrder> orders = poolOrderService.getByPool(object.getId());
-    poolOrderService.bulkDelete(orders);
+    Set<SequencingOrder> orders = sequencingOrderService.getByPool(object);
+    sequencingOrderService.bulkDelete(orders);
 
     Box box = object.getBox();
     if (box != null) {

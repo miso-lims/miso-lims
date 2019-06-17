@@ -118,7 +118,7 @@ Note that the sequencing platform must be in all caps, and the instrumentModel m
 
 ## Sequencing Parameters
 
-Runs have sequencing parameters, and pool Orders are requested with a given set of sequencing parameters. MISO determines whether a pool Order has been completed by looking at the run(s) associated with the pool and seeing if their sequencing parameters match the requested sequencing parameters. While it is possible to add all possible sequencing parameter combinations to this table, it may be easier to add the parameters used most often and describing all infrequently-used parameters with the 'Custom' label.
+Runs have sequencing parameters, and sequencing orders are requested with a given set of sequencing parameters. MISO determines whether a sequencing order has been completed by looking at the run(s) associated with the pool and seeing if their sequencing parameters match the requested sequencing parameters. While it is possible to add all possible sequencing parameter combinations to this table, it may be easier to add the parameters used most often and describing all infrequently-used parameters with the 'Custom' label.
 
 ```
 addSequencingParameters(name, platform, instrumentModel, readLength, paired, chemistryVersion);

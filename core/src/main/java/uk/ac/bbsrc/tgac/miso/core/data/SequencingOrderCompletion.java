@@ -25,20 +25,21 @@ import javax.persistence.TemporalType;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion.PoolOrderCompletionId;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrderCompletion.SequencingOrderCompletionId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 
 /**
- * Information about completion (success/failure/pending/requested) lanes. This maps over a view in the database for pool orders and run
- * information.
+ * Information about completion (success/failure/pending/requested) lanes. This maps over a view in the database for sequencing orders and
+ * run information.
  */
 @Entity
-@Table(name = "OrderCompletion")
-@IdClass(PoolOrderCompletionId.class)
-public class PoolOrderCompletion implements Serializable {
+@Table(name = "SequencingOrderCompletion")
+@IdClass(SequencingOrderCompletionId.class)
+public class SequencingOrderCompletion implements Serializable {
+
   @Embeddable
-  public static class PoolOrderCompletionId implements Serializable {
+  public static class SequencingOrderCompletionId implements Serializable {
     private static final long serialVersionUID = -2890725144995338712L;
     @ManyToOne
     @JoinColumn(name = "parametersId", nullable = false)
@@ -47,7 +48,7 @@ public class PoolOrderCompletion implements Serializable {
     @JoinColumn(name = "poolId")
     Pool pool;
 
-    public PoolOrderCompletionId() {
+    public SequencingOrderCompletionId() {
     }
 
     @Override
@@ -55,7 +56,7 @@ public class PoolOrderCompletion implements Serializable {
       if (this == obj) return true;
       if (obj == null) return false;
       if (getClass() != obj.getClass()) return false;
-      PoolOrderCompletionId other = (PoolOrderCompletionId) obj;
+      SequencingOrderCompletionId other = (SequencingOrderCompletionId) obj;
       if (parameters == null) {
         if (other.parameters != null) return false;
       } else if (!parameters.equals(other.parameters)) return false;
@@ -100,7 +101,7 @@ public class PoolOrderCompletion implements Serializable {
   private SequencingParameters parameters;
 
   @ElementCollection(targetClass = Integer.class, fetch = FetchType.EAGER)
-  @CollectionTable(name = "OrderCompletion_Items", joinColumns = { @JoinColumn(name = "poolId", referencedColumnName = "poolId"),
+  @CollectionTable(name = "SequencingOrderCompletion_Items", joinColumns = { @JoinColumn(name = "poolId", referencedColumnName = "poolId"),
       @JoinColumn(name = "parametersId", referencedColumnName = "parametersId") })
   @Column(name = "num_partitions")
   @MapKeyClass(HealthType.class)

@@ -14,15 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderCompletionDao;
+import uk.ac.bbsrc.tgac.miso.persistence.SequencingOrderCompletionDao;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao, HibernatePaginatedDataSource<PoolOrderCompletion> {
+public class HibernateSequencingOrderCompletionDao implements SequencingOrderCompletionDao, HibernatePaginatedDataSource<SequencingOrderCompletion> {
   private static final String[] SEARCH_PROPERTIES = new String[] { "pool.alias", "pool.name", "pool.identificationBarcode",
       "pool.description" };
   private static final List<String> STANDARD_ALIASES = Arrays.asList("pool", "parameters");
@@ -45,8 +45,8 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao, 
   }
 
   @Override
-  public Class<? extends PoolOrderCompletion> getRealClass() {
-    return PoolOrderCompletion.class;
+  public Class<? extends SequencingOrderCompletion> getRealClass() {
+    return SequencingOrderCompletion.class;
   }
 
   @Override

@@ -98,7 +98,7 @@
 
   <miso:attachments item="${pool}"/>
   <miso:qcs id="list_qcs" item="${pool}"/>
-  <miso:list-section id="list_order" name="Requested Orders" target="order" alwaysShow="true" items="${orders}" config="{ pool: ${poolDto}, platformType: '${pool.platformType.name()}' }"/>
+  <miso:list-section id="list_order" name="Requested Orders" target="sequencingorder" alwaysShow="true" items="${orders}" config="{ pool: ${poolDto}, platformType: '${pool.platformType.name()}' }"/>
   <miso:list-section-ajax id="list_completion" name="Order Status" target="completion" config="{ poolId: ${pool.id} }"/>
   <miso:list-section id="list_run" name="Runs" target="run" items="${runs}" config="{ poolId: ${pool.id} }"/>
   <miso:list-section id="list_partition" name="${pool.platformType.pluralPartitionName}" target="partition" items="${partitions}" config="{'showContainer': true, 'showPool': false}"/>

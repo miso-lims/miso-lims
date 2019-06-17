@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.eaglegenomics.simlims.core.User;
 
-public interface PoolOrder extends Deletable {
+public interface SequencingOrder extends Deletable {
 
   public Pool getPool();
 

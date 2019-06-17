@@ -22,12 +22,12 @@
  */
 
 ListTarget.completion = {
-  name: "Pool Orders",
+  name: "Sequencing Orders",
   createUrl: function(config, projectId) {
     if (config.poolId) {
       return '/miso/rest/pools/' + config.poolId + '/dt/completions';
     }
-    return '/miso/rest/poolorders/dt/completions/' + config.slug + '/' + config.platform;
+    return '/miso/rest/sequencingorders/dt/completions/' + config.slug + '/' + config.platform;
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {

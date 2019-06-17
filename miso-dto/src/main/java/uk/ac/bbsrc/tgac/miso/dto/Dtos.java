@@ -72,8 +72,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -132,7 +132,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
@@ -1158,8 +1158,8 @@ public class Dtos {
     return to;
   }
 
-  public static PoolOrderDto asDto(@Nonnull PoolOrder from) {
-    PoolOrderDto dto = new PoolOrderDto();
+  public static SequencingOrderDto asDto(@Nonnull SequencingOrder from) {
+    SequencingOrderDto dto = new SequencingOrderDto();
     dto.setId(from.getId());
     dto.setPool(asDto(from.getPool(), false, false));
     dto.setParameters(asDto(from.getSequencingParameter()));
@@ -1172,12 +1172,12 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<PoolOrderDto> asPoolOrderDtos(@Nonnull Collection<PoolOrder> from) {
+  public static Set<SequencingOrderDto> asSequencingOrderDtos(@Nonnull Collection<SequencingOrder> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
-  public static PoolOrder to(@Nonnull PoolOrderDto from) {
-    PoolOrder to = new PoolOrderImpl();
+  public static SequencingOrder to(@Nonnull SequencingOrderDto from) {
+    SequencingOrder to = new SequencingOrderImpl();
     if (from.getId() != null) to.setId(from.getId());
     to.setPool(to(from.getPool()));
     to.setSequencingParameters(to(from.getParameters()));
@@ -1991,8 +1991,8 @@ public class Dtos {
     return qcTypeSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  public static PoolOrderCompletionDto asDto(@Nonnull PoolOrderCompletion from) {
-    PoolOrderCompletionDto dto = new PoolOrderCompletionDto();
+  public static SequencingOrderCompletionDto asDto(@Nonnull SequencingOrderCompletion from) {
+    SequencingOrderCompletionDto dto = new SequencingOrderCompletionDto();
     dto.setId(from.getPool().getId() + "_" + from.getSequencingParameters().getId());
     dto.setPool(asDto(from.getPool(), false, false));
     dto.setParameters(asDto(from.getSequencingParameters()));

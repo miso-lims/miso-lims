@@ -11,21 +11,21 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
-import uk.ac.bbsrc.tgac.miso.dto.PoolOrderCompletionDto;
+import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderCompletionDto;
 
 public class PoolPickerResponse {
 
   public static class PoolPickerEntry {
-    private final List<PoolOrderCompletionDto> orders;
+    private final List<SequencingOrderCompletionDto> orders;
     private final PoolDto pool;
 
-    public PoolPickerEntry(PoolDto pool, List<PoolOrderCompletionDto> orders) {
+    public PoolPickerEntry(PoolDto pool, List<SequencingOrderCompletionDto> orders) {
       super();
       this.pool = pool;
       this.orders = orders;
     }
 
-    public List<PoolOrderCompletionDto> getOrders() {
+    public List<SequencingOrderCompletionDto> getOrders() {
       return orders;
     }
 
@@ -48,7 +48,7 @@ public class PoolPickerResponse {
     Map<Long, List<PoolPickerEntry>> groupedByPool = source.list(errorHandler, 0, limit, sortOrder, sortColumn, filters)
         .stream().map(WhineyFunction.rethrow(transform)).collect(Collectors.groupingBy(entry -> entry.getPool().getId()));
     items = groupedByPool.values().stream().map(listOfPicks -> {
-      List<PoolOrderCompletionDto> completionsByPool = listOfPicks.stream().flatMap(pick -> pick.getOrders().stream())
+      List<SequencingOrderCompletionDto> completionsByPool = listOfPicks.stream().flatMap(pick -> pick.getOrders().stream())
           .collect(Collectors.toList());
       PoolDto pool = listOfPicks.get(0).getPool();
       return new PoolPickerEntry(pool, completionsByPool);

@@ -67,7 +67,7 @@ import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
-import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
+import uk.ac.bbsrc.tgac.miso.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
@@ -94,7 +94,7 @@ public class EditPoolController {
   @Autowired
   private RunService runService;
   @Autowired
-  private PoolOrderService poolOrderService;
+  private SequencingOrderService sequencingOrderService;
   @Autowired
   private ContainerService containerService;
   @Autowired
@@ -136,7 +136,7 @@ public class EditPoolController {
     model.put("partitions", containerService.listPartitionsByPoolId(poolId).stream().map(Dtos::asDto).collect(Collectors.toList()));
     model.put("runs", poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(runService.listByPoolId(poolId)));
     model.put("orders",
-        poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asPoolOrderDtos(poolOrderService.getByPool(poolId)));
+        poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asSequencingOrderDtos(sequencingOrderService.getByPool(pool)));
 
     model.put("duplicateIndicesSequences", mapper.writeValueAsString(pool.getDuplicateIndicesSequences()));
     model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(pool.getNearDuplicateIndicesSequences()));

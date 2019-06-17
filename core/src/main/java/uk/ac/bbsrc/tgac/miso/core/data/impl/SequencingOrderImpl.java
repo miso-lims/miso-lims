@@ -17,19 +17,19 @@ import javax.persistence.TemporalType;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 
 @Entity
-@Table(name = "PoolOrder")
-public class PoolOrderImpl implements PoolOrder, Serializable {
+@Table(name = "SequencingOrder")
+public class SequencingOrderImpl implements SequencingOrder, Serializable {
 
   private static final long serialVersionUID = 1L;
   private static final long UNSAVED_ID = 0;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long poolOrderId = UNSAVED_ID;
+  private long sequencingOrderId = UNSAVED_ID;
 
   @ManyToOne(targetEntity = PoolImpl.class)
   @JoinColumn(name = "poolId", nullable = false)
@@ -63,12 +63,12 @@ public class PoolOrderImpl implements PoolOrder, Serializable {
 
   @Override
   public long getId() {
-    return poolOrderId;
+    return sequencingOrderId;
   }
 
   @Override
   public void setId(long id) {
-    this.poolOrderId = id;
+    this.sequencingOrderId = id;
   }
 
   @Override
@@ -153,7 +153,7 @@ public class PoolOrderImpl implements PoolOrder, Serializable {
 
   @Override
   public String getDeleteType() {
-    return "Pool Order";
+    return "Sequencing Order";
   }
 
   @Override
