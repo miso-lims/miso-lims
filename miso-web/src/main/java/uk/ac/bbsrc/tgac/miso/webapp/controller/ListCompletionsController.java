@@ -26,7 +26,7 @@ public class ListCompletionsController {
     private final String slug;
 
     public OrderListPage(String slug) throws IOException {
-      super("completion", "platform", getPlatformTypes(instrumentModelService), PlatformType::getKey,
+      super("sequencingordercompletion", "platform", getPlatformTypes(instrumentModelService), PlatformType::getKey,
           PlatformType::name);
       this.slug = slug;
     }

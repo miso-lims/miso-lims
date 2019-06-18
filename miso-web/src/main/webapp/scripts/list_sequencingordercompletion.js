@@ -21,7 +21,7 @@
  * *********************************************************************
  */
 
-ListTarget.completion = {
+ListTarget.sequencingordercompletion = {
   name: "Sequencing Orders",
   createUrl: function(config, projectId) {
     if (config.poolId) {
