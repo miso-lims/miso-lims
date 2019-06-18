@@ -80,7 +80,7 @@ FormTarget.arrayrun = (function($) {
         }, {
           title: 'Change Array',
           type: 'special',
-          makeControls: function() {
+          makeControls: function(form) {
             return [$('<button>').addClass('ui-state-default').attr('type', 'button').text('Search').click(function() {
               Utils.showDialog('Array Search', 'Search', [{
                 label: 'Search',
@@ -99,9 +99,11 @@ FormTarget.arrayrun = (function($) {
                       return {
                         name: array.alias,
                         handler: function() {
-                          $('#arrayId').val(array.id);
-                          $('#arrayIdLabel').text(array.alias);
-                          $('#arrayIdLabel').attr('href', '/miso/array/' + array.id);
+                          form.updateField('arrayId', {
+                            value: array.id,
+                            label: array.alias,
+                            link: Urls.ui.arrays.edit(array.id)
+                          });
                           updateSamplesTable(array);
                         }
                       };
@@ -110,11 +112,13 @@ FormTarget.arrayrun = (function($) {
                 });
               });
             }), $('<button>').addClass('ui-state-default').attr('type', 'button').text('Remove').click(function() {
-              if ($('#arrayId').val()) {
+              if (form.get('arrayId')) {
                 Utils.showConfirmDialog("Remove Array", "Remove", ["Remove the array from this array run?"], function() {
-                  $('#arrayId').val(null);
-                  $('#arrayIdLabel').text('');
-                  $('#arrayIdLabel').removeAttr('href');
+                  form.updateField('arrayId', {
+                    value: null,
+                    label: '',
+                    link: null
+                  });
                   updateSamplesTable(null);
                 });
               } else {
@@ -136,17 +140,17 @@ FormTarget.arrayrun = (function($) {
           getItemValue: function(item) {
             return item.label;
           },
-          onChange: function(newValue, updateField) {
+          onChange: function(newValue, form) {
             var status = getStatus(newValue);
             var updates = {
               required: status.isDone,
               // Editable if run is done and either there's no value set or user is admin
-              disabled: !status.isDone || ($('#completionDate').val() && !config.isAdmin)
+              disabled: !status.isDone || (form.get('completionDate') && !config.isAdmin)
             };
             if (!status.isDone) {
               updates.value = null;
             }
-            updateField('completionDate', updates);
+            form.updateField('completionDate', updates);
           },
           // Only editable by admin if run is done
           disabled: !object.status ? false : (getStatus(object.status).isDone && !config.isAdmin)

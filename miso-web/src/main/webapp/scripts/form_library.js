@@ -100,16 +100,16 @@ FormTarget.library = (function($) {
           getItemValue: function(item) {
             return item.key;
           },
-          onChange: function(newValue, updateField) {
+          onChange: function(newValue, form) {
             var name = Utils.array.findUniqueOrThrow(function(item) {
               return item.key === newValue;
             }, Constants.platformTypes).name;
-            updateField('libraryTypeId', {
+            form.updateField('libraryTypeId', {
               source: Constants.libraryTypes.filter(function(item) {
                 return item.platform === name;
               })
             });
-            updateField('indexFamilyId', {
+            form.updateField('indexFamilyId', {
               source: Constants.indexFamilies.filter(function(item) {
                 return item.platformType === name;
               })
@@ -149,29 +149,29 @@ FormTarget.library = (function($) {
           getItemValue: function(item) {
             return item.id;
           },
-          onChange: function(newValue, updateField) {
+          onChange: function(newValue, form) {
             if (newValue) {
               var design = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), Constants.libraryDesigns);
-              updateField('libraryDesignCodeId', {
+              form.updateField('libraryDesignCodeId', {
                 disabled: true,
                 value: design.designCodeId
               });
-              updateField('librarySelectionTypeId', {
+              form.updateField('librarySelectionTypeId', {
                 disabled: true,
                 value: design.selectionId
               });
-              updateField('libraryStrategyTypeId', {
+              form.updateField('libraryStrategyTypeId', {
                 disabled: true,
                 value: design.strategyId
               });
             } else {
-              updateField('libraryDesignCodeId', {
+              form.updateField('libraryDesignCodeId', {
                 disabled: false
               });
-              updateField('librarySelectionTypeId', {
+              form.updateField('librarySelectionTypeId', {
                 disabled: false
               });
-              updateField('libraryStrategyTypeId', {
+              form.updateField('libraryStrategyTypeId', {
                 disabled: false
               });
             }
@@ -237,13 +237,13 @@ FormTarget.library = (function($) {
           getItemValue: function(item) {
             return item.id;
           },
-          onChange: function(newValue, updateField) {
+          onChange: function(newValue, form) {
             if (!newValue) {
-              updateField('index2Id', {
+              form.updateField('index2Id', {
                 source: [],
                 disabled: true
               });
-              updateField('index1Id', {
+              form.updateField('index1Id', {
                 source: [],
                 disabled: true,
                 required: false
@@ -251,11 +251,11 @@ FormTarget.library = (function($) {
             } else {
               // update index 2 dropdown before index 1 because index 1 may effect index 2
               var indices2 = getIndices(newValue, 2);
-              updateField('index2Id', {
+              form.updateField('index2Id', {
                 source: indices2,
                 disabled: !indices2 || !indices2.length
               });
-              updateField('index1Id', {
+              form.updateField('index1Id', {
                 source: getIndices(newValue, 1),
                 disabled: false,
                 required: true
@@ -276,8 +276,8 @@ FormTarget.library = (function($) {
           title: 'Discarded',
           data: 'discarded',
           type: 'checkbox',
-          onChange: function(newValue, updateField) {
-            updateField('volume', {
+          onChange: function(newValue, form) {
+            form.updateField('volume', {
               disabled: newValue
             });
           }
@@ -285,11 +285,11 @@ FormTarget.library = (function($) {
           title: 'Volume',
           data: 'volume',
           type: 'decimal'
-        }, FormUtils.makeUnitsField('volume'), {
+        }, FormUtils.makeUnitsField(object, 'volume'), {
           title: 'Concentration',
           data: 'concentration',
           type: 'decimal'
-        }, FormUtils.makeUnitsField('concentration')].concat(FormUtils.makeDistributionFields()).concat([{
+        }, FormUtils.makeUnitsField(object, 'concentration')].concat(FormUtils.makeDistributionFields()).concat([{
           title: 'Location',
           data: 'locationBarcode',
           type: 'text',
@@ -325,7 +325,7 @@ FormTarget.library = (function($) {
           getItemValue: function(item) {
             return item.id;
           },
-          onChange: function(newValue, updateField) {
+          onChange: function(newValue, form) {
             var options = {
               disabled: !newValue,
               required: !!newValue
@@ -333,8 +333,8 @@ FormTarget.library = (function($) {
             if (!newValue) {
               options.value = '';
             }
-            updateField('spikeInDilutionFactor', options);
-            updateField('spikeInVolume', options);
+            form.updateField('spikeInDilutionFactor', options);
+            form.updateField('spikeInVolume', options);
           }
         }, {
           title: 'Spike-In Dilution Factor',
@@ -409,15 +409,15 @@ FormTarget.library = (function($) {
       }
     }
     if (position === 1) {
-      field.onChange = function(newValue, updateField) {
-        var indexFamilyId = $('#indexFamilyId').val();
+      field.onChange = function(newValue, form) {
+        var indexFamilyId = form.get('indexFamilyId');
         var indexFamily = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(indexFamilyId), Constants.indexFamilies);
         if (indexFamily.uniqueDualIndex) {
           var index1 = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), indexFamily.indices);
           var index2 = Utils.array.findUniqueOrThrow(function(index) {
             return index.position === 2 && index.name === index1.name;
           }, indexFamily.indices);
-          updateField('index2Id', {
+          form.updateField('index2Id', {
             value: index2.id
           });
         }

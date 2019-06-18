@@ -50,6 +50,7 @@ FormTarget.pool = (function($) {
           title: 'Platform Type',
           data: 'platformType',
           type: 'dropdown',
+          include: !object.platformType,
           required: true,
           getSource: function() {
             return Constants.platformTypes.filter(function(platformType) {
@@ -64,10 +65,18 @@ FormTarget.pool = (function($) {
             return item.name;
           }
         }, {
+          title: 'Platform Type',
+          data: 'platformType',
+          type: 'read-only',
+          include: !!object.platformType,
+          getDisplayValue: function(pool) {
+            return Utils.array.findUniqueOrThrow(Utils.array.namePredicate(pool.platformType), Constants.platformTypes).key;
+          }
+        }, {
           title: 'Concentration',
           data: 'concentration',
           type: 'decimal'
-        }, FormUtils.makeUnitsField('concentration'), {
+        }, FormUtils.makeUnitsField(object, 'concentration'), {
           title: 'Creation Date',
           data: 'creationDate',
           type: 'date',
@@ -77,12 +86,12 @@ FormTarget.pool = (function($) {
           title: 'Volume',
           data: 'volume',
           type: 'decimal'
-        }, FormUtils.makeUnitsField('volume'), {
+        }, FormUtils.makeUnitsField(object, 'volume'), {
           title: 'Discarded',
           data: 'discarded',
           type: 'checkbox',
-          onChange: function(newValue, updateField) {
-            updateField('volume', {
+          onChange: function(newValue, form) {
+            form.updateField('volume', {
               disabled: newValue
             });
           }

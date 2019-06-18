@@ -41,8 +41,8 @@ public class ListTablesIT extends AbstractIT {
   private static final Set<String> poolsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
       Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.LIBRARY_ALIQUOTS, Columns.CONCENTRATION, Columns.LOCATION, Columns.AVG_INSERT_SIZE,
       Columns.LAST_MODIFIED);
-  private static final Set<String> ordersColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.ORDER_DESCRIPTION,
-      Columns.POOL_DESCRIPTION, Columns.INSTRUMENT_MODEL, Columns.LONGEST_INDEX, Columns.SEQUENCING_PARAMETERS,
+  private static final Set<String> ordersColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.PURPOSE,
+      Columns.ORDER_DESCRIPTION, Columns.POOL_DESCRIPTION, Columns.INSTRUMENT_MODEL, Columns.LONGEST_INDEX, Columns.SEQUENCING_PARAMETERS,
       Columns.REMAINING, Columns.LAST_MODIFIED);
   private static final Set<String> containersColumns = Sets.newHashSet(Columns.SORT, Columns.ID, Columns.SERIAL_NUMBER,
       Columns.LAST_RUN_NAME, Columns.LAST_RUN_ALIAS, Columns.LAST_SEQUENCER, Columns.LAST_MODIFIED);
@@ -95,6 +95,7 @@ public class ListTablesIT extends AbstractIT {
     tabs.put(ListTarget.INDICES, indicesTabs);
     tabs.put(ListTarget.WORKSETS, worksetsTabs);
     tabs.put(ListTarget.STORAGE_LOCATIONS, storageLocationTabs);
+    tabs.put(ListTarget.POOL_ORDERS, Sets.newHashSet(Tabs.OUTSTANDING, Tabs.FULFILLED, Tabs.DRAFT));
     tabsForTarget = Collections.unmodifiableMap(tabs);
   }
 
@@ -115,6 +116,7 @@ public class ListTablesIT extends AbstractIT {
     preferredTab.put(ListTarget.KITS, Tabs.LIBRARY);
     preferredTab.put(ListTarget.INDICES, Tabs.ILLUMINA);
     preferredTab.put(ListTarget.WORKSETS, Tabs.MINE);
+    preferredTab.put(ListTarget.POOL_ORDERS, Tabs.OUTSTANDING);
     sortOnTab = Collections.unmodifiableMap(preferredTab);
   }
 
@@ -634,6 +636,28 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListStorageLocationsColumnSort() throws Exception {
     testColumnsSort(ListTarget.STORAGE_LOCATIONS);
+  }
+
+  @Test
+  public void testListOrderPurposesSetup() throws Exception {
+    testPageSetup(ListTarget.ORDER_PURPOSES,
+        Sets.newHashSet(Columns.SORT, Columns.ALIAS));
+  }
+
+  @Test
+  public void testListOrderPurposesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.ORDER_PURPOSES);
+  }
+
+  @Test
+  public void testListPoolOrdersSetup() throws Exception {
+    testTabbedPageSetup(ListTarget.POOL_ORDERS, Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.PURPOSE,
+        Columns.DESCRIPTION, Columns.LIBRARY_ALIQUOTS, Columns.INSTRUMENT_MODEL, Columns.SEQUENCING_PARAMETERS, Columns.PARTITIONS));
+  }
+
+  @Test
+  public void testListPoolOrdersColumnSort() throws Exception {
+    testTabbedColumnsSort(ListTarget.POOL_ORDERS);
   }
 
   private void testPageSetup(String listTarget, Set<String> targetColumns) {

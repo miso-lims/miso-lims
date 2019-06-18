@@ -60,10 +60,11 @@ var Validate = Validate || {
 
   /**
    * Display all errors from a RestError. Errors may apply to a specific field, or be "general" errors which belong to no specific field.
-   * The form should include error containers with ID '[fieldName]Error' e.g. 'aliasError' for alias, and one container with class
-   * 'generalErrors'
+   * The form should include error containers with ID '<formId>_<fieldName>Error' e.g. 'sampleForm_aliasError', and one container with
+   * class 'generalErrors'
    */
-  displayErrors: function(restError, formSelector) {
+  displayErrors: function(restError, formId) {
+    var formSelector = '#' + formId;
     Validate.clearErrors(formSelector);
     jQuery(formSelector + ' .bs-callout-warning').removeClass('hidden');
 
@@ -71,7 +72,7 @@ var Validate = Validate || {
       Validate.displayError(formSelector, 'GENERAL', 'Something has gone terribly wrong. Please report this to your MISO administrator.');
     } else {
       jQuery.each(restError.data, function(key, value) {
-        Validate.displayError(formSelector, key, value);
+        Validate.displayError(formId, key, value);
       });
     }
   },
@@ -79,13 +80,13 @@ var Validate = Validate || {
   /**
    * Displays an error in the appropriate container. See Validate.displayErrors above
    */
-  displayError: function(formSelector, property, message) {
+  displayError: function(formId, property, message) {
     var messages = message.split('\n');
     var container = null;
     if (property === 'GENERAL') {
-      container = jQuery(formSelector + ' .generalErrors');
+      container = jQuery('#' + formId + ' .generalErrors');
     } else {
-      container = jQuery(formSelector + ' #' + property + 'Error');
+      container = jQuery('#' + formId + ' #' + formId + '_' + property + 'Error');
     }
     var list = container.find('.errorList');
     if (!list.length) {

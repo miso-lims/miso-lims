@@ -127,8 +127,8 @@ FormTarget.instrument = (function($) {
         return item.value;
       },
       initial: 'SEQUENCER',
-      onChange: function(newValue, updateField) {
-        updateField('instrumentModelId', {
+      onChange: function(newValue, form) {
+        form.updateField('instrumentModelId', {
           source: Constants.instrumentModels.filter(function(model) {
             return model.instrumentType === newValue;
           })
@@ -187,7 +187,7 @@ FormTarget.instrument = (function($) {
       getSource: function() {
         return ['Production', 'Retired', 'Upgraded'];
       },
-      onChange: function(newValue, updateField) {
+      onChange: function(newValue, form) {
         var decommissioned = {
           disabled: true,
           required: false
@@ -215,8 +215,8 @@ FormTarget.instrument = (function($) {
         default:
           throw new Error('Unexpected status value: ' + newValue);
         }
-        updateField('dateDecommissioned', decommissioned);
-        updateField('upgradedInstrumentId', upgrade);
+        form.updateField('dateDecommissioned', decommissioned);
+        form.updateField('upgradedInstrumentId', upgrade);
       }
     }, {
       title: 'Decommissioned',

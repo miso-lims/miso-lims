@@ -382,12 +382,17 @@ public class PoolRestController extends RestController {
     return new PoolPickerEntry(Dtos.asDto(pool, true, false), completions);
   }
 
-  @PostMapping(value = "query", produces = { "application/json" })
+  @PostMapping(value = "/query", produces = { "application/json" })
   @ResponseBody
   public List<PoolDto> getPoolsInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
     return PaginationFilter.bulkSearch(names, poolService, p -> Dtos.asDto(p, false, false),
         message -> new RestException(message, Status.BAD_REQUEST));
+  }
+
+  @GetMapping(value = "/search")
+  public @ResponseBody List<PoolDto> search(@RequestParam("q") String search) throws IOException {
+    return poolService.listBySearch(search).stream().map(pool -> Dtos.asDto(pool, true, false)).collect(Collectors.toList());
   }
 
   @PostMapping(value = "/spreadsheet")

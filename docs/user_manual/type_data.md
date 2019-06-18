@@ -383,6 +383,19 @@ be performed by a MISO adminstrator.
 
 
 {% assign sub = sub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Order Purposes" %}
+
+Order purposes describe the reason for a sequencing order, such as QC or production. A pool order may also specify an
+order purpose if it includes sequencing requirements.
+
+MISO administrators can add, edit, and delete order purposes using the standard interface. An order purpose can only be
+deleted if it has not been used by any existing pool orders or sequencing orders.
+
+{% include userman-toplink.md %}
+
+
+
+{% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="QC Types" %}
 
 QC types identify instruments or methods used to QC an item. A QC type may target samples, libraries, pools, sequencing

@@ -11,26 +11,23 @@ import org.openqa.selenium.support.PageFactory;
 public class ContainerPage extends FormPage<ContainerPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
-    ID(By.id("id"), By.id("idLabel"), FieldType.LABEL), //
-    SERIAL_NUMBER(By.id("identificationBarcode"), FieldType.TEXT), //
-    MODEL(By.id("model.id"), By.id("model.idLabel"), FieldType.LABEL), //
-    CLUSTERING_KIT(By.id("clusteringKitId"), FieldType.DROPDOWN), //
-    MULTIPLEXING_KIT(By.id("multiplexingKitId"), FieldType.DROPDOWN);
+    ID(By.id("containerForm_id"), By.id("containerForm_idLabel")), //
+    SERIAL_NUMBER(By.id("containerForm_identificationBarcode")), //
+    MODEL(By.id("containerForm_model.id"), By.id("containerForm_model.idLabel")), //
+    CLUSTERING_KIT(By.id("containerForm_clusteringKitId")), //
+    MULTIPLEXING_KIT(By.id("containerForm_multiplexingKitId"));
 
     private final By selector;
     private final By labelSelector;
-    private final FieldType type;
 
-    private Field(By selector, FieldType type) {
+    private Field(By selector) {
       this.selector = selector;
       this.labelSelector = null;
-      this.type = type;
     }
 
-    private Field(By selector, By labelSelector, FieldType type) {
+    private Field(By selector, By labelSelector) {
       this.selector = selector;
       this.labelSelector = labelSelector;
-      this.type = type;
     }
 
     @Override
@@ -41,11 +38,6 @@ public class ContainerPage extends FormPage<ContainerPage.Field> {
     @Override
     public By getLabelSelector() {
       return labelSelector;
-    }
-
-    @Override
-    public FieldType getType() {
-      return type;
     }
   } // end Field enum
 

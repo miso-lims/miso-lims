@@ -42,6 +42,10 @@ public class Pluralizer {
     return pluralize(count, "library template", "library templates");
   }
 
+  public static String orders(long count) {
+    return pluralize(count, "order", "orders");
+  }
+
   public static String partitions(long count) {
     return pluralize(count, "partition", "partitions");
   }

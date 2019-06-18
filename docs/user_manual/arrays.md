@@ -1,7 +1,7 @@
 ---
 layout: page
-title: "18. Arrays"
-section: 18
+title: "19. Arrays"
+section: 19
 ---
 
 

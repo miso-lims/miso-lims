@@ -1,7 +1,7 @@
 ---
 layout: page
-title: "16. Instruments"
-section: 16
+title: "17. Instruments"
+section: 17
 ---
 
 Instruments in MISO may include sequencers and array scanners, which are used for sequencing runs and array runs

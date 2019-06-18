@@ -15,18 +15,19 @@ import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
-public class BulkOrderPage extends HeaderFooterPage {
+public class BulkSequencingOrderPage extends HeaderFooterPage {
 
   public static class Columns {
     public static final String NAME = "Pool Name";
     public static final String ALIAS = "Pool Alias";
+    public static final String PURPOSE = "Purpose";
     public static final String INSTRUMENT_MODEL = "Instrument Model";
     public static final String PARAMETERS = "Sequencing Parameters";
     public static final String PARTITIONS = "Partitions";
     public static final String DESCRIPTION = "Description";
 
     public static List<String> all() {
-      return Lists.newArrayList(NAME, ALIAS, INSTRUMENT_MODEL, PARAMETERS, PARTITIONS, DESCRIPTION);
+      return Lists.newArrayList(NAME, ALIAS, PURPOSE, INSTRUMENT_MODEL, PARAMETERS, PARTITIONS, DESCRIPTION);
     }
 
     private Columns() {
@@ -41,18 +42,18 @@ public class BulkOrderPage extends HeaderFooterPage {
 
   private final HandsOnTable table;
 
-  public BulkOrderPage(WebDriver driver) {
+  public BulkSequencingOrderPage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(titleContains("Create Sequencing Orders from Pools "));
     table = new HandsOnTable(driver);
   }
 
-  public static BulkOrderPage getForCreate(WebDriver driver, String baseUrl, Collection<Long> poolIds) {
+  public static BulkSequencingOrderPage getForCreate(WebDriver driver, String baseUrl, Collection<Long> poolIds) {
     String ids = Joiner.on("%2C").join(poolIds);
     String url = baseUrl + CREATE_URL_FRAGMENT + "?ids=" + ids;
     driver.get(url);
-    return new BulkOrderPage(driver);
+    return new BulkSequencingOrderPage(driver);
   }
 
   public HandsOnTable getTable() {

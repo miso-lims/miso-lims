@@ -14,31 +14,24 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 public class InstrumentPage extends FormPage<InstrumentPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
-    ID(By.id("id"), FieldType.LABEL), //
-    INSTRUMENT_MODEL(By.id("instrumentModelId"), FieldType.LABEL), //
-    SERIAL_NUMBER(By.id("serialNumber"), FieldType.TEXT), //
-    NAME(By.id("name"), FieldType.TEXT), //
-    COMMISSIONED(By.id("dateCommissioned"), FieldType.DATEPICKER), //
-    DECOMMISSIONED(By.id("dateDecommissioned"), FieldType.DATEPICKER), //
-    STATUS(By.id("status"), FieldType.DROPDOWN), //
-    UPGRADED_INSTRUMENT(By.id("upgradedInstrumentId"), FieldType.DROPDOWN);
+    ID(By.id("instrumentForm_id")), //
+    INSTRUMENT_MODEL(By.id("instrumentForm_instrumentModelId")), //
+    SERIAL_NUMBER(By.id("instrumentForm_serialNumber")), //
+    NAME(By.id("instrumentForm_name")), //
+    COMMISSIONED(By.id("instrumentForm_dateCommissioned")), //
+    DECOMMISSIONED(By.id("instrumentForm_dateDecommissioned")), //
+    STATUS(By.id("instrumentForm_status")), //
+    UPGRADED_INSTRUMENT(By.id("instrumentForm_upgradedInstrumentId"));
 
     private final By selector;
-    private final FieldType type;
 
-    private Field(By selector, FieldType type) {
+    private Field(By selector) {
       this.selector = selector;
-      this.type = type;
     }
 
     @Override
     public By getSelector() {
       return selector;
-    }
-
-    @Override
-    public FieldType getType() {
-      return type;
     }
   } // end Field enum
 

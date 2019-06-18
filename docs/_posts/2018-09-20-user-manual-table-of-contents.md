@@ -29,7 +29,7 @@ In 2015, the [Genome Sequence Informatics](http://labs.oicr.on.ca/genome-sequenc
 as their new LIMS. OICR did not want to fork MISO entirely, so together the team at Earlham and OICR worked out a
 development plan to better support multiple institutes with the same code base. All active work is visible on GitHub
 and undergoes thorough code reviews and testing before being integrated into the mainline branches. Releases are pushed
-weekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
+biweekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
 
 ## Contents
 
@@ -186,6 +186,8 @@ weekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Library Spike-Ins" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Targeted Sequencing" %}
+{% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Order Purposes" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="QC Types" %}
 {% assign sub = sub | plus: 1 %}
@@ -381,6 +383,27 @@ weekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Merging Worksets" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Deleting Worksets" %}
+
+
+{% assign section = section | plus: 1 %}
+{% assign section-title = "Pool Orders" %}
+{% include userman-toc-link.md section=section section-title=section-title %}
+{% assign sub = 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Pool Orders List" %}
+{% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Creating Pool Orders" %}
+{% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Fulfilling Pool Orders" %}
+{% assign subsub = 1 %}
+{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Creating a Pool" %}
+{% assign subsub = subsub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Linking an Existing Pool" %}
+{% assign subsub = subsub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Creating a Sequencing Order" %}
+{% assign subsub = subsub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Linking an Existing Sequencing Order" %}
+{% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Deleting Pool Orders" %}
 
 
 {% assign section = section | plus: 1 %}
@@ -731,4 +754,3 @@ weekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Run Scanner" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Pinery" %}
-

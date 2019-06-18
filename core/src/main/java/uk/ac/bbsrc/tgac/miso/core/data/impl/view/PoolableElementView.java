@@ -8,11 +8,13 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -40,6 +42,10 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   @Id
   private long aliquotId = LibraryAliquot.UNSAVED_ID;
+
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "aliquotId")
+  private LibraryAliquot aliquot;
 
   private String aliquotName;
 
@@ -223,6 +229,14 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   public void setAliquotId(long aliquotId) {
     this.aliquotId = aliquotId;
+  }
+
+  public LibraryAliquot getAliquot() {
+    return aliquot;
+  }
+
+  public void setAliquot(LibraryAliquot aliquot) {
+    this.aliquot = aliquot;
   }
 
   public String getAliquotName() {

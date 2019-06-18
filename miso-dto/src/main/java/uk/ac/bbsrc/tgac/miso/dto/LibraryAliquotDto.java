@@ -45,6 +45,7 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
   private Boolean libraryQcPassed;
   private String libraryPlatformType;
   private Long parentAliquotId;
+  private List<Long> parentAliquotIds;
   private String parentAliquotAlias;
   private String parentName;
   private String parentVolume;
@@ -230,6 +231,14 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
 
   public void setParentAliquotId(Long parentAliquotId) {
     this.parentAliquotId = parentAliquotId;
+  }
+
+  public List<Long> getParentAliquotIds() {
+    return parentAliquotIds;
+  }
+
+  public void setParentAliquotIds(List<Long> parentAliquotIds) {
+    this.parentAliquotIds = parentAliquotIds;
   }
 
   public String getParentAliquotAlias() {

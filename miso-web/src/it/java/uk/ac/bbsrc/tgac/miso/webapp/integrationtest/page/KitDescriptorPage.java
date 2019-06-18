@@ -12,32 +12,25 @@ public class KitDescriptorPage extends FormPage<KitDescriptorPage.Field> {
 
 
   public static enum Field implements FormPage.FieldElement {
-    ID(By.id("idLabel"), FieldType.LABEL), //
-    NAME(By.id("name"), FieldType.TEXT), //
-    VERSION(By.id("version"), FieldType.TEXT), //
-    MANUFACTURER(By.id("manufacturer"), FieldType.TEXT), //
-    PART_NUMBER(By.id("partNumber"), FieldType.TEXT), //
-    STOCK_LEVEL(By.id("stockLevel"), FieldType.TEXT), //
-    DESCRIPTION(By.id("description"), FieldType.TEXT), //
-    KIT_TYPE(By.id("kitType"), FieldType.DROPDOWN), //
-    PLATFORM(By.id("platformType"), FieldType.DROPDOWN);
+    ID(By.id("kitDescriptorForm_idLabel")), //
+    NAME(By.id("kitDescriptorForm_name")), //
+    VERSION(By.id("kitDescriptorForm_version")), //
+    MANUFACTURER(By.id("kitDescriptorForm_manufacturer")), //
+    PART_NUMBER(By.id("kitDescriptorForm_partNumber")), //
+    STOCK_LEVEL(By.id("kitDescriptorForm_stockLevel")), //
+    DESCRIPTION(By.id("kitDescriptorForm_description")), //
+    KIT_TYPE(By.id("kitDescriptorForm_kitType")), //
+    PLATFORM(By.id("kitDescriptorForm_platformType"));
 
     private final By selector;
-    private final FieldType type;
 
-    private Field(By selector, FieldType type) {
+    private Field(By selector) {
       this.selector = selector;
-      this.type = type;
     }
 
     @Override
     public By getSelector() {
       return selector;
-    }
-
-    @Override
-    public FieldType getType() {
-      return type;
     }
 
   } // end Field enum

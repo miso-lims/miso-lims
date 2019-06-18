@@ -21,39 +21,32 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 public class RunPage extends FormPage<RunPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
-    ID(By.id("id"), FieldType.LABEL), //
-    NAME(By.id("name"), FieldType.LABEL), //
-    ALIAS(By.id("alias"), FieldType.TEXT), //
-    PLATFORM(By.id("platformType"), FieldType.LABEL), //
-    SEQUENCER(By.id("instrumentIdLabel"), FieldType.LABEL), //
-    SEQ_PARAMS(By.id("sequencingParametersId"), FieldType.DROPDOWN), //
-    DESCRIPTION(By.id("description"), FieldType.TEXT), //
-    FILE_PATH(By.id("runPath"), FieldType.TEXT), //
-    NUM_CYCLES(By.id("numCycles"), FieldType.TEXT), //
-    CALL_CYCLE(By.id("calledCycles"), FieldType.TEXT), //
-    IMG_CYCLE(By.id("imagedCycles"), FieldType.TEXT), //
-    SCORE_CYCLE(By.id("scoredCycles"), FieldType.TEXT), //
-    PAIRED_END(By.id("pairedEnd"), FieldType.CHECKBOX), //
-    STATUS(By.id("status"), FieldType.DROPDOWN), //
-    START_DATE(By.id("startDate"), FieldType.DATEPICKER), //
-    COMPLETION_DATE(By.id("endDate"), FieldType.DATEPICKER);
+    ID(By.id("runForm_id")), //
+    NAME(By.id("runForm_name")), //
+    ALIAS(By.id("runForm_alias")), //
+    PLATFORM(By.id("runForm_platformType")), //
+    SEQUENCER(By.id("runForm_instrumentIdLabel")), //
+    SEQ_PARAMS(By.id("runForm_sequencingParametersId")), //
+    DESCRIPTION(By.id("runForm_description")), //
+    FILE_PATH(By.id("runForm_runPath")), //
+    NUM_CYCLES(By.id("runForm_numCycles")), //
+    CALL_CYCLE(By.id("runForm_calledCycles")), //
+    IMG_CYCLE(By.id("runForm_imagedCycles")), //
+    SCORE_CYCLE(By.id("runForm_scoredCycles")), //
+    PAIRED_END(By.id("runForm_pairedEnd")), //
+    STATUS(By.id("runForm_status")), //
+    START_DATE(By.id("runForm_startDate")), //
+    COMPLETION_DATE(By.id("runForm_endDate"));
 
     private final By selector;
-    private final FieldType type;
 
-    private Field(By selector, FieldType type) {
+    private Field(By selector) {
       this.selector = selector;
-      this.type = type;
     }
 
     @Override
     public By getSelector() {
       return selector;
-    }
-
-    @Override
-    public FieldType getType() {
-      return type;
     }
   } // end Field enum
 

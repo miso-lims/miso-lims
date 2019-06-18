@@ -9,12 +9,14 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
 
@@ -32,41 +34,47 @@ public class HibernateSequencingParametersDao implements SequencingParametersDao
   }
 
   @Override
-  public List<SequencingParameters> getSequencingParameters() throws IOException {
+  public List<SequencingParameters> list() throws IOException {
     Criteria query = currentSession().createCriteria(SequencingParameters.class);
     @SuppressWarnings("unchecked")
     List<SequencingParameters> records = query.list();
     return records;
-
   }
 
   @Override
-  public SequencingParameters getSequencingParameters(Long id) throws IOException {
-    if (id == null) {
-      return null;
-    }
+  public List<SequencingParameters> listByInstrumentModel(InstrumentModel instrumentModel) throws IOException {
+    @SuppressWarnings("unchecked")
+    List<SequencingParameters> results = currentSession().createCriteria(SequencingParameters.class)
+        .add(Restrictions.eq("instrumentModel", instrumentModel))
+        .list();
+    return results;
+  }
+
+  @Override
+  public SequencingParameters get(long id) throws IOException {
     return (SequencingParameters) currentSession().get(SequencingParameters.class, id);
   }
 
   @Override
-  public Long addSequencingParameters(SequencingParameters sequencingParameters) {
+  public long create(SequencingParameters sequencingParameters) {
     Date now = new Date();
     sequencingParameters.setCreationDate(now);
     sequencingParameters.setLastUpdated(now);
-    return (Long) currentSession().save(sequencingParameters);
+    return (long) currentSession().save(sequencingParameters);
   }
 
   @Override
-  public void update(SequencingParameters sequencingParameters) {
+  public long update(SequencingParameters sequencingParameters) {
     Date now = new Date();
     sequencingParameters.setLastUpdated(now);
     currentSession().update(sequencingParameters);
+    return sequencingParameters.getId();
   }
 
   @Override
   public Iterator<SequencingParameters> iterator() {
     try {
-      return getSequencingParameters().iterator();
+      return list().iterator();
     } catch (IOException e) {
       log.error("Failed to get sequencing parameters", e);
       return Collections.emptyIterator();

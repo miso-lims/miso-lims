@@ -651,7 +651,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       final Instrument sequencer) throws IOException {
     // If the sequencing parameters haven't been updated by a human, see if we can find exactly one that matches.
     if (!target.didSomeoneElseChangeColumn("parameters", user)) {
-      List<SequencingParameters> possibleParameters = sequencingParametersService.getForInstrumentModel(sequencer.getInstrumentModel().getId()).stream()
+      List<SequencingParameters> possibleParameters = sequencingParametersService.listByInstrumentModelId(sequencer.getInstrumentModel().getId()).stream()
           .filter(parameters -> !parameters.getName().startsWith("Custom")).filter(filterParameters).collect(Collectors.toList());
       if (possibleParameters.size() == 1) {
         if (target.getSequencingParameters() == null

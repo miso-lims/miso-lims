@@ -1,7 +1,7 @@
 ---
 layout: page
-title: "21. Notes"
-section: 21
+title: "22. Notes"
+section: 22
 ---
 
 Notes can be used to add additional information to an item that is not otherwise represented in MISO. Because this

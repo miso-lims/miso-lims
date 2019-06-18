@@ -330,7 +330,7 @@
       changelogInitialised = true;
       ListUtils.createStaticTable('changelog', ListTarget.changelog, {}, data);
     }).fail(function(response, textStatus, serverStatus) {
-      Validate.displayErrors(JSON.parse(response.responseText));
+      showAjaxErrorDialog(response, textStatus, serverStatus);
     });
   }
 

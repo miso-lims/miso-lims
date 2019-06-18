@@ -9,56 +9,58 @@ import org.openqa.selenium.support.PageFactory;
 public class SamplePage extends FormPage<SamplePage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
-    ID(By.id("sampleId"), FieldType.LABEL), NAME(By.id("name"), FieldType.LABEL), ALIAS(By.id("alias"), FieldType.TEXT), PROJECT(By
-        .id("project"), FieldType.DROPDOWN), DESCRIPTION(By.id("description"), FieldType.TEXT), RECEIVED_DATE(By
-            .id("receiveddatepicker"), FieldType.TEXT), SCIENTIFIC_NAME(By.id("scientificName"), FieldType.TEXT), SAMPLE_TYPE(By.id(
-                "sampleTypes"), FieldType.DROPDOWN), DETAILED_QC_STATUS(By.id("detailedQcStatus"), FieldType.DROPDOWN), QC_STATUS_NOTE(By
-                    .id("qcStatusNote"), FieldType.TEXT), VOLUME(By.id("volume"), FieldType.TEXT), DISCARDED(By
-                        .id("discarded"), FieldType.CHECKBOX), IDENTITY(By.id("identityId"), FieldType.LABEL), EXTERNAL_NAME(By
-                            .id("externalName"), FieldType.TEXT), DONOR_SEX(By.id("donorSex"), FieldType.DROPDOWN), PARENT_ALIAS(By.id(
-                                "parentAlias"), FieldType.LABEL), SAMPLE_CLASS(By.id("sampleClass"), FieldType.LABEL), SAMPLE_CLASS_ALIAS(By
-                                    .id("sampleClassAlias"), FieldType.LABEL), SUBPROJECT(By.id(
-                                        "subProject"), FieldType.DROPDOWN), GROUP_ID(By.id("groupId"), FieldType.TEXT), GROUP_DESCRIPTION(By
-                                            .id("groupDescription"), FieldType.TEXT), CONCENTRATION(By
-                                                .id("concentration"), FieldType.TEXT), TISSUE_CLASS(By
-                                                    .id("tissueClass"), FieldType.DROPDOWN), TISSUE_ORIGIN(By
-                                                        .id("tissueOrigin"), FieldType.DROPDOWN), TISSUE_TYPE(By
-                                                            .id("tissueType"), FieldType.DROPDOWN), PASSAGE_NUMBER(By
-                                                                .id("passageNumber"), FieldType.TEXT), TIMES_RECEIVED(By
-                                                                    .id("timesReceived"), FieldType.TEXT), TUBE_NUMBER(By
-                                                                        .id("tubeNumber"), FieldType.TEXT), SECONDARY_IDENTIFIER(By
-                                                                            .id("secondaryIdentifier"), FieldType.TEXT), LAB(By
-                                                                                .id("lab"), FieldType.DROPDOWN), TISSUE_MATERIAL(By.id(
-                                                                                    "tissueMaterial"), FieldType.DROPDOWN), REGION(By.id(
-                                                                                        "region"), FieldType.TEXT), SLIDES_REMAINING(By.id(
-                                                                                            "slidesRemaining"), FieldType.LABEL), SLIDES(By
-                                                                                                .id("slides"), FieldType.TEXT), DISCARDS(By
-                                                                                                    .id("discards"), FieldType.TEXT), THICKNESS(By
-                                                                                                        .id("thickness"), FieldType.TEXT), STAIN(By
-                                                                                                            .id("stain"), FieldType.DROPDOWN), SLIDES_CONSUMED(By
-                                                                                                                .id("slidesConsumed"), FieldType.TEXT), STR_STATUS(By
-                                                                                                                    .id("strStatus"), FieldType.TEXT), DNASE_TREATED(By
-                                                                                                                        .id("DNAseTreated"), FieldType.CHECKBOX), SAMPLE_PURPOSE(By
-                                                                                                                            .id("samplePurpose"), FieldType.DROPDOWN),
+    ID(By.id("sampleForm_sampleId")), //
+    NAME(By.id("sampleForm_name")), //
+    ALIAS(By.id("sampleForm_alias")), //
+    PROJECT(By.id("sampleForm_project")), //
+    DESCRIPTION(By.id("sampleForm_description")), //
+    RECEIVED_DATE(By.id("sampleForm_receiveddatepicker")), //
+    SCIENTIFIC_NAME(By.id("sampleForm_scientificName")), //
+    SAMPLE_TYPE(By.id("sampleForm_sampleTypes")), //
+    DETAILED_QC_STATUS(By.id("sampleForm_detailedQcStatus")), //
+    QC_STATUS_NOTE(By.id("sampleForm_qcStatusNote")), //
+    VOLUME(By.id("sampleForm_volume")), //
+    DISCARDED(By.id("sampleForm_discarded")), //
+    IDENTITY(By.id("sampleForm_identityId")), //
+    EXTERNAL_NAME(By.id("sampleForm_externalName")), //
+    DONOR_SEX(By.id("sampleForm_donorSex")), //
+    PARENT_ALIAS(By.id("sampleForm_parentAlias")), //
+    SAMPLE_CLASS(By.id("sampleForm_sampleClass")), //
+    SAMPLE_CLASS_ALIAS(By.id("sampleForm_sampleClassAlias")), //
+    SUBPROJECT(By.id("sampleForm_subProject")), //
+    GROUP_ID(By.id("sampleForm_groupId")), //
+    GROUP_DESCRIPTION(By.id("sampleForm_groupDescription")), //
+    CONCENTRATION(By.id("sampleForm_concentration")), //
+    TISSUE_CLASS(By.id("sampleForm_tissueClass")), //
+    TISSUE_ORIGIN(By.id("sampleForm_tissueOrigin")), //
+    TISSUE_TYPE(By.id("sampleForm_tissueType")), //
+    PASSAGE_NUMBER(By.id("sampleForm_passageNumber")), //
+    TIMES_RECEIVED(By.id("sampleForm_timesReceived")), //
+    TUBE_NUMBER(By.id("sampleForm_tubeNumber")), //
+    SECONDARY_IDENTIFIER(By.id("sampleForm_secondaryIdentifier")), //
+    LAB(By.id("sampleForm_lab")), //
+    TISSUE_MATERIAL(By.id("sampleForm_tissueMaterial")), //
+    REGION(By.id("sampleForm_region")), //
+    SLIDES_REMAINING(By.id("sampleForm_slidesRemaining")), //
+    SLIDES(By.id("sampleForm_slides")), //
+    DISCARDS(By.id("sampleForm_discards")), //
+    THICKNESS(By.id("sampleForm_thickness")), //
+    STAIN(By.id("sampleForm_stain")), //
+    SLIDES_CONSUMED(By.id("sampleForm_strStatus")), //
+    DNASE_TREATED(By.id("sampleForm_DNAseTreated")), //
+    SAMPLE_PURPOSE(By.id("sampleForm_samplePurpose")), //
 
-    WARNINGS(By.className("big"), FieldType.LABEL);
+    WARNINGS(By.className("big")); //
 
     private final By selector;
-    private final FieldType type;
 
-    private Field(By selector, FieldType type) {
+    private Field(By selector) {
       this.selector = selector;
-      this.type = type;
     }
 
     @Override
     public By getSelector() {
       return selector;
-    }
-
-    @Override
-    public FieldType getType() {
-      return type;
     }
   }
 

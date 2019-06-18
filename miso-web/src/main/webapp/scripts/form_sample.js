@@ -128,7 +128,7 @@ FormTarget.sample = (function($) {
                   },
                   required: false,
                   include: config.detailedSample,
-                  onChange: function(newValue, updateField) {
+                  onChange: function(newValue, form) {
                     var noteRequired = newValue ? Utils.array.findUniqueOrThrow(function(item) {
                       return item.id === Number(newValue);
                     }, Constants.detailedQcStatuses).noteRequired : false;
@@ -139,7 +139,7 @@ FormTarget.sample = (function($) {
                     if (!noteRequired) {
                       updates.value = null;
                     }
-                    updateField('detailedQcStatusNote', updates);
+                    form.updateField('detailedQcStatusNote', updates);
                   }
                 }, {
                   title: 'QC Status Note',
@@ -151,8 +151,8 @@ FormTarget.sample = (function($) {
                   title: 'Discarded',
                   data: 'discarded',
                   type: 'checkbox',
-                  onChange: function(newValue, updateField) {
-                    updateField('volume', {
+                  onChange: function(newValue, form) {
+                    form.updateField('volume', {
                       disabled: newValue
                     });
                   }
@@ -160,39 +160,11 @@ FormTarget.sample = (function($) {
                   title: 'Volume',
                   data: 'volume',
                   type: 'decimal'
-                }, {
-                  title: 'Volume Units',
-                  data: 'volumeUnits',
-                  type: 'dropdown',
-                  getSource: function() {
-                    return Constants.volumeUnits;
-                  },
-                  getItemLabel: function(item) {
-                    return decodeHtmlString(item.units);
-                  },
-                  getItemValue: function(item) {
-                    return item.name;
-                  },
-                  required: true
-                }, {
+                }, FormUtils.makeUnitsField(object, 'volume'), {
                   title: 'Concentration',
                   data: 'concentration',
                   type: 'decimal'
-                }, {
-                  title: 'Concentration Units',
-                  data: 'concentrationUnits',
-                  type: 'dropdown',
-                  getSource: function() {
-                    return Constants.concentrationUnits;
-                  },
-                  getItemLabel: function(item) {
-                    return decodeHtmlString(item.units);
-                  },
-                  getItemValue: function(item) {
-                    return item.name;
-                  },
-                  required: true
-                }].concat(FormUtils.makeDistributionFields()).concat([{
+                }, FormUtils.makeUnitsField(object, 'concentration')].concat(FormUtils.makeDistributionFields()).concat([{
               title: 'Location',
               data: 'locationBarcode',
               type: 'text',

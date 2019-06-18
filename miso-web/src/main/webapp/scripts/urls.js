@@ -89,6 +89,14 @@ Urls = (function() {
     edit: idUrlFunction(freezerUiBase)
   };
 
+  // Freezer Maps
+  var freezerMapUiBase = baseUrl + '/freezermap';
+  ui.freezerMaps = {
+    view: function(filename, anchor) {
+      return freezerMapUiBase + '/' + filename + (anchor ? '#' + anchor : '');
+    }
+  }
+
   // Institutes
   var instituteRestBase = restBase + '/institutes';
   rest.institutes = {
@@ -214,6 +222,18 @@ Urls = (function() {
     update: idUrlFunction(libraryTypeRestBase)
   };
 
+  // Order Purposes
+  var orderPurposeBase = baseUrl + '/orderpurpose';
+  ui.orderPurposes = {
+    bulkEdit: orderPurposeBase + '/bulk/edit'
+  }
+
+  var orderPurposeRestBase = restBase + '/orderpurposes';
+  rest.orderPurposes = {
+    create: orderPurposeRestBase,
+    update: idUrlFunction(orderPurposeRestBase)
+  };
+
   // Partition QC Types
   var partitionQcTypeRestBase = restBase + '/partitionqctypes';
   rest.partitionQcTypes = {
@@ -233,7 +253,21 @@ Urls = (function() {
     create: poolRestBase,
     update: idUrlFunction(poolRestBase),
     parents: idUrlFunction(poolRestBase + '/parents'),
-    query: poolRestBase + '/query'
+    query: poolRestBase + '/query',
+    search: poolRestBase + '/search'
+  };
+
+  // Pool Orders
+  var poolOrderUiBase = baseUrl + '/poolorder';
+  ui.poolOrders = {
+    create: poolOrderUiBase + '/new',
+    edit: idUrlFunction(poolOrderUiBase)
+  };
+
+  var poolOrderRestBase = restBase + '/poolorders';
+  rest.poolOrders = {
+    create: poolOrderRestBase,
+    update: idUrlFunction(poolOrderRestBase)
   };
 
   // Projects
@@ -303,7 +337,8 @@ Urls = (function() {
   var sequencingOrderRestBase = restBase + '/sequencingorders';
   rest.sequencingOrders = {
     create: sequencingOrderRestBase,
-    update: idUrlFunction(sequencingOrderRestBase)
+    update: idUrlFunction(sequencingOrderRestBase),
+    search: sequencingOrderRestBase + '/search'
   };
 
   // Service Records

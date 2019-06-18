@@ -83,7 +83,7 @@
               <td class="h">Barcode:</td>
               <td>
                 <input id="storageComponentBarcode" type="text">
-                <div id="storageComponentBarcodeError" class="errorContainer"></div>
+                <div id="freezerComponent-form_storageComponentBarcodeError" class="errorContainer"></div>
               </td>
             </tr>
           </tbody>

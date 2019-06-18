@@ -25,6 +25,8 @@ Boxes are categorized by tabs, with one tab for each box use. Each box will only
 tab, and searching for a box only searches the current tab. The toolbar at the top of each table includes many
 controls for working with boxes.
 
+{% include userman-toplink.md %}
+
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Creating Boxes" %}
 
@@ -131,7 +133,7 @@ near the Search field.
 
 On the Edit Box page, select the target position in the Contents diagram. In the information section that
 appears adjacent to the Contents diagram (see figure {{figure}}), scan the item's barcode, or type its name,
-alias, or barcode into the "Search" field and press the Enter key or click "Lookup". 
+alias, or barcode into the "Search" field and press the Enter key or click "Lookup".
 
 {% include userman-figure.md num=figure cap="Additional information when one position is selected"
 img="one-position-selected.png" %}
@@ -152,7 +154,7 @@ new box before or after saving the new item to the target position.
 
 On the Edit Box page, select the target positions in the Contents diagram. Find the Position and Search rows
 adjacent to the Contents diagram (see figure {{figure}}), and scan each target item's barcode or type its
-name, alias, or barcode into the Search field for its target position. 
+name, alias, or barcode into the Search field for its target position.
 
 {% include userman-figure.md num=figure cap="Additional information when multiple positions are selected"
 img="multiple-positions-selected.png" %}
@@ -225,7 +227,7 @@ far right of the heading; hover over it to reveal the menu, and click "Scan with
 \<scanner-name\> is a box scanner that your MISO is configured for. If "Scan with \<scanner-name\>" is not visible
 in the list, your box may not be scannable or MISO may not be configured to use this box scanner.
 
-Wait until the Scan dialog box prompts you to place the box on the scanner. It will automatically scan the box. 
+Wait until the Scan dialog box prompts you to place the box on the scanner. It will automatically scan the box.
 Once the scan is complete, the diagram will display the tubes which the scanner found.
 
 Once a successful scan is made, review the changes that would be made (see figure {{figure}}) and click "Save".
@@ -289,7 +291,7 @@ matches the column numbers on the box Contents diagram.
 
 Before filling by barcode pattern on the Edit Box page, the items must first be saved with the barcodes
 representing the box positions, as above.
-Then, go to the Edit Box page by clicking on the box name in the Boxes list page. The Contents section heading 
+Then, go to the Edit Box page by clicking on the box name in the Boxes list page. The Contents section heading
 has an Options menu on the far right of the heading; hover over it to reveal the menu, and click "Fill by
 Barcode Pattern".
 
@@ -305,7 +307,7 @@ items that were in the box before the Fill By Barcode Pattern was applied will b
 
 Actions can be performed on all selected items in a box.
 
-First, go to the Edit Box page by clicking on the box name in the Boxes list page. 
+First, go to the Edit Box page by clicking on the box name in the Boxes list page.
 [Select the target positions](#selecting-positions-within-a-box) of the items you wish to act upon.
 In the toolbar at the top of the contents table, several actions are available for the selected items,
 provided that they are all of the same type (sample, library, library aliquot, pool). The actions available are the
@@ -333,4 +335,3 @@ It is recommended that you add them to a new box if you wish their location to b
 only be deleted by its creator or a MISO admin user.
 
 {% include userman-toplink.md %}
-

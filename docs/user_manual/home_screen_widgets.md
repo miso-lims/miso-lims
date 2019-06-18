@@ -1,7 +1,7 @@
 ---
 layout: page
-title: "26. Home Screen Widgets"
-section: 26
+title: "27. Home Screen Widgets"
+section: 27
 ---
 
 

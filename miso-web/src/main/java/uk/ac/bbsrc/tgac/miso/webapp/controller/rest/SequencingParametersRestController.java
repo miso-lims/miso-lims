@@ -51,7 +51,7 @@ public class SequencingParametersRestController extends RestController {
   @ResponseBody
   public List<SequencingParametersDto> getSequencingParametersAlll(UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
-    List<SequencingParametersDto> dtos = Dtos.asSequencingParametersDtos(sequencingParametersService.getAll());
+    List<SequencingParametersDto> dtos = Dtos.asSequencingParametersDtos(sequencingParametersService.list());
     for (SequencingParametersDto dto : dtos) {
       writeUrls(dto, uriBuilder);
     }

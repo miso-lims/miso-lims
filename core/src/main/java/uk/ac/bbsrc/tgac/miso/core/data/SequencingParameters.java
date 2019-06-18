@@ -211,4 +211,39 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
   public void setRunType(String runType) {
     this.runType = runType;
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((chemistry == null) ? 0 : chemistry.hashCode());
+    result = prime * result + ((instrumentModel == null) ? 0 : instrumentModel.hashCode());
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + (paired ? 1231 : 1237);
+    result = prime * result + readLength;
+    result = prime * result + ((runType == null) ? 0 : runType.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    SequencingParameters other = (SequencingParameters) obj;
+    if (chemistry != other.chemistry) return false;
+    if (instrumentModel == null) {
+      if (other.instrumentModel != null) return false;
+    } else if (!instrumentModel.equals(other.instrumentModel)) return false;
+    if (name == null) {
+      if (other.name != null) return false;
+    } else if (!name.equals(other.name)) return false;
+    if (paired != other.paired) return false;
+    if (readLength != other.readLength) return false;
+    if (runType == null) {
+      if (other.runType != null) return false;
+    } else if (!runType.equals(other.runType)) return false;
+    return true;
+  }
+
 }

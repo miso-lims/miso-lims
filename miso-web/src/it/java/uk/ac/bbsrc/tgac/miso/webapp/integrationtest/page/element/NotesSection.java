@@ -37,7 +37,7 @@ public class NotesSection<T extends AbstractPage> extends AbstractElement {
 
   public AddNoteDialog<T> openAddNoteDialog() {
     notesMenu.clickOption("Add Note");
-    return new AddNoteDialog<T>(getDriver(), parentPageConstructor);
+    return new AddNoteDialog<>(getDriver(), parentPageConstructor);
   }
 
   public List<Note> getNotes() {

@@ -1,8 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.compress.utils.Sets;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -11,17 +14,14 @@ import org.openqa.selenium.WebElement;
  */
 public abstract class FormPage<T extends FormPage.FieldElement> extends HeaderFooterPage {
 
+  private static final Set<String> editableTags = Sets.newHashSet("select", "textarea");
+  private static final Set<String> editableInputTypes = Sets.newHashSet("text", "checkbox");
+
   public interface FieldElement {
     public By getSelector();
 
     public default By getLabelSelector() {
       return null;
-    }
-
-    public FieldType getType();
-
-    public default boolean isEditable(WebDriver driver) {
-      return getType().isEditable(driver, getSelector());
     }
 
     public default String get(WebDriver driver) {
@@ -61,10 +61,44 @@ public abstract class FormPage<T extends FormPage.FieldElement> extends HeaderFo
     }
 
     public default void set(WebDriver driver, String value) {
-      if (isEditable(driver)) {
-        getType().setValue(driver, getSelector(), value);
+      WebElement element = driver.findElement(getSelector());
+      switch (element.getTagName()) {
+      case "input":
+        switch (element.getAttribute("type")) {
+        case "text":
+          setText(value, element);
+          if (element.getAttribute("className").contains("hasDatepicker")) {
+            ((JavascriptExecutor) driver).executeScript("jQuery('.ui-datepicker').hide();");
+          }
+          break;
+        case "checkbox":
+          if (!value.equalsIgnoreCase(Boolean.TRUE.toString()) && !value.equalsIgnoreCase(Boolean.FALSE.toString())) {
+            throw new IllegalArgumentException("Checkbox value must be 'true' or 'false'");
+          }
+          setCheckbox(Boolean.valueOf(value), element);
+          break;
+        default:
+          throw new IllegalArgumentException("Unhandled input type: " + element.getAttribute("type"));
+        }
+        break;
+      case "select":
+        setDropdown(value, element);
+        break;
+      case "textarea":
+        setText(value, element);
+        break;
+      default:
+        throw new IllegalArgumentException("Unhandled element type: " + element.getTagName());
+      }
+    }
+
+    public default boolean isEditable(WebDriver driver) {
+      WebElement element = findElementIfExists(driver, getSelector());
+      if (element == null || !element.isDisplayed() || !element.isEnabled() || element.getAttribute("readonly") != null) {
+        return false;
       } else {
-        throw new IllegalStateException(this.toString() + " is read-only");
+        return editableTags.contains(element.getTagName())
+            || (element.getTagName().equals("input") && editableInputTypes.contains(element.getAttribute("type")));
       }
     }
   }

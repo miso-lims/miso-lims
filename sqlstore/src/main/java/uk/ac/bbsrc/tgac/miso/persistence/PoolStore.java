@@ -94,6 +94,8 @@ public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
    */
   Pool getByBarcode(String barcode) throws IOException;
 
+  Pool getByAlias(String alias) throws IOException;
+
   List<Pool> listPoolsById(List<Long> poolIds);
 
   public long getPartitionCount(Pool pool);

@@ -1,7 +1,7 @@
 ---
 layout: page
-title: "13. Freezers and Rooms"
-section: 13
+title: "14. Freezers and Rooms"
+section: 14
 ---
 
 Freezers and rooms describe physical storage locations to help you locate things in the real world. In MISO, samples,

@@ -1,18 +1,26 @@
 # Unreleased
+
 Changes:
 
-  * Show _Assignee_ column in _Issue_ tables
+  * Added Pool Orders - see user manual for more details
+  * Added Assignee column to Issue tables
+  * Added Strict Index Checking option, which when enabled prevents library aliquots from being
+    added to pool when that would cause near-/duplicate indices
+  * Changed single item create/edit pages to warn you when leaving with unsaved changes
   * Fixed bug that broke List Freezers page
   * Fixed bug in 'Pool custom'
-  * Introduces Strict Index Checking option, which when enabled prevents library aliquots from being added to pool when that would cause near-/duplicate indices
-  
+  * Fixed broken menu link to Sequencing Orders list page
+
 Upgrade Notes:
 
-  * miso.pools.strictIndexChecking now present in miso.properties. Default value is false, if property is not found 'false' is assumed.  
+  * `miso.pools.strictIndexChecking` now present in `miso.properties`. Default value is false, if
+    property is not found 'false' is assumed.  
 
 # 0.2.185:
 
-  * Added missing migration that should have been in 0.2.185
+Changes:
+
+  * Added missing migration that should have been in 0.2.184
 
 BAD:
 

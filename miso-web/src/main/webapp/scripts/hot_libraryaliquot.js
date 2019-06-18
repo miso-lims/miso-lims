@@ -242,6 +242,16 @@ HotTarget.libraryaliquot = {
           }
         },
         {
+          name: 'Create Order',
+          action: function(items) {
+            HotUtils.warnIfConsentRevoked(items, function() {
+              window.location = Urls.ui.poolOrders.create + '?' + jQuery.param({
+                aliquotIds: items.map(Utils.array.getId).join(',')
+              });
+            }, HotTarget.libraryaliquot.getLabel);
+          }
+        },
+        {
           name: 'Pool together',
           title: 'Create one pool from many library aliquots',
           action: function(items) {

@@ -13,50 +13,43 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.NotesSection;
 public class LibraryPage extends FormPage<LibraryPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
-    ID(By.id("id"), FieldType.LABEL), //
-    NAME(By.id("name"), FieldType.LABEL), //
-    ALIAS(By.id("alias"), FieldType.TEXT), //
-    BARCODE(By.id("identificationBarcode"), FieldType.TEXT), //
-    DESCRIPTION(By.id("description"), FieldType.TEXT), //
-    CREATION_DATE(By.id("creationDate"), FieldType.DATEPICKER), //
-    PLATFORM(By.id("platformType"), FieldType.DROPDOWN), //
-    LIBRARY_TYPE(By.id("libraryTypeId"), FieldType.DROPDOWN), //
-    DESIGN(By.id("libraryDesignId"), FieldType.DROPDOWN), //
-    DESIGN_CODE(By.id("libraryDesignCodeId"), FieldType.DROPDOWN), //
-    SELECTION(By.id("librarySelectionTypeId"), FieldType.DROPDOWN), //
-    STRATEGY(By.id("libraryStrategyTypeId"), FieldType.DROPDOWN), //
-    INDEX_FAMILY(By.id("indexFamilyId"), FieldType.DROPDOWN), //
-    INDEX_1(By.id("index1Id"), FieldType.DROPDOWN), //
-    INDEX_2(By.id("index2Id"), FieldType.DROPDOWN), //
-    QC_PASSED(By.id("qcPassed"), FieldType.DROPDOWN), //
-    LOW_QUALITY(By.id("lowQuality"), FieldType.CHECKBOX), //
-    SIZE(By.id("dnaSize"), FieldType.TEXT), //
-    VOLUME(By.id("volume"), FieldType.TEXT), //
-    DISCARDED(By.id("discarded"), FieldType.CHECKBOX), //
-    LOCATION(By.id("locationBarcode"), FieldType.TEXT), //
-    BOX_LOCATION(By.id("boxPositionLabel"), FieldType.LABEL), //
-    KIT(By.id("kitDescriptorId"), FieldType.DROPDOWN), //
-    CONCENTRATION(By.id("concentration"), FieldType.TEXT), //
-    ARCHIVED(By.id("archived"), FieldType.CHECKBOX), //
+    ID(By.id("libraryForm_id")), //
+    NAME(By.id("libraryForm_name")), //
+    ALIAS(By.id("libraryForm_alias")), //
+    BARCODE(By.id("libraryForm_identificationBarcode")), //
+    DESCRIPTION(By.id("libraryForm_description")), //
+    CREATION_DATE(By.id("libraryForm_creationDate")), //
+    PLATFORM(By.id("libraryForm_platformType")), //
+    LIBRARY_TYPE(By.id("libraryForm_libraryTypeId")), //
+    DESIGN(By.id("libraryForm_libraryDesignId")), //
+    DESIGN_CODE(By.id("libraryForm_libraryDesignCodeId")), //
+    SELECTION(By.id("libraryForm_librarySelectionTypeId")), //
+    STRATEGY(By.id("libraryForm_libraryStrategyTypeId")), //
+    INDEX_FAMILY(By.id("libraryForm_indexFamilyId")), //
+    INDEX_1(By.id("libraryForm_index1Id")), //
+    INDEX_2(By.id("libraryForm_index2Id")), //
+    QC_PASSED(By.id("libraryForm_qcPassed")), //
+    LOW_QUALITY(By.id("libraryForm_lowQuality")), //
+    SIZE(By.id("libraryForm_dnaSize")), //
+    VOLUME(By.id("libraryForm_volume")), //
+    DISCARDED(By.id("libraryForm_discarded")), //
+    LOCATION(By.id("libraryForm_locationBarcode")), //
+    BOX_LOCATION(By.id("libraryForm_boxPositionLabel")), //
+    KIT(By.id("libraryForm_kitDescriptorId")), //
+    CONCENTRATION(By.id("libraryForm_concentration")), //
+    ARCHIVED(By.id("libraryForm_archived")), //
 
-    WARNINGS(By.className("big"), FieldType.LABEL);
+    WARNINGS(By.className("big"));
 
     private final By selector;
-    private final FieldType type;
 
-    private Field(By selector, FieldType type) {
+    private Field(By selector) {
       this.selector = selector;
-      this.type = type;
     }
 
     @Override
     public By getSelector() {
       return selector;
-    }
-
-    @Override
-    public FieldType getType() {
-      return type;
     }
   } // end Field enum
 
