@@ -2,7 +2,7 @@ SELECT
   o.sequencingOrderId orderId,
   o.creationDate createdDate,
   o.createdBy createdById, 
-  o.lastUpdated modifiedDate,avg
+  o.lastUpdated modifiedDate,
   o.updatedBy modifiedById,
   pool.platformType platform
 FROM SequencingOrder o 
