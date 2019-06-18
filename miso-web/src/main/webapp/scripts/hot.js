@@ -169,7 +169,7 @@ var HotUtils = {
     var anyInvalidCells = false;
     var table = new Handsontable(hotContainer, {
       debug: true,
-      fixedColumnsLeft: target.fixedColumns === undefined ? 1 : target.fixedColumns,
+      fixedColumnsLeft: target.hasOwnProperty('getFixedColumns') ? target.getFixedColumns(config) : 1,
       manualColumnResize: true,
       rowHeaders: false,
       colHeaders: columns.map(function(c) {

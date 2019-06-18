@@ -6,6 +6,9 @@ HotTarget.dilution = {
   },
   fixUp: function(lib, errorHandler) {
   },
+  getFixedColumns: function(config) {
+    return config.pageMode == 'edit' ? 1 : 0;
+  },
   createColumns: function(config, create, data) {
     var columns = [
         {

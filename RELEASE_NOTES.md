@@ -11,6 +11,13 @@ Changes:
     * library strategy types
     * library types
   * Changed the way location maps are specified for freezers
+  * Changed the number of frozen columns on the following bulk create/edit pages. The alias column
+    will now be frozen when editing, and when creating items without auto-generated aliases. The
+    name alias columns will otherwise not be frozen when creating or propagating new items
+    * samples
+    * libraries
+    * dilutions
+    * pools
 
 Upgrade Notes:
 

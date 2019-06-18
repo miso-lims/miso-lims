@@ -65,7 +65,9 @@ HotTarget.sample = (function() {
     fixUp: function(sam, errorHandler) {
 
     },
-
+    getFixedColumns: function(config) {
+      return config.pageMode === 'edit' || !Constants.automaticSampleAlias ? 2 : 0;
+    },
     createColumns: function(config, create, data) {
       var targetCategory = (config.targetSampleClass ? config.targetSampleClass.sampleCategory : null);
       var sourceCategory = (config.sourceSampleClass ? config.sourceSampleClass.sampleCategory : null);

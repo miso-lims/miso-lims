@@ -249,6 +249,9 @@ HotTarget.library = (function() {
         HotUtils.sortTable(table, sortColIndex, sortOption.sortFunction);
       }
     },
+    getFixedColumns: function(config) {
+      return config.pageMode === 'edit' || !Constants.automaticLibraryAlias ? 2 : 0;
+    },
     createColumns: function(config, create, data) {
       var columns = [
           {
