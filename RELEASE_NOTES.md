@@ -27,6 +27,7 @@ Upgrade Notes:
     by MISO should be maintained, but new maps should now be uploaded via the MISO interface. It is
     no longer possible to link to a map on another website, and any such existing links will be
     removed during the migration to this version
+  * Upgraded to Run Scanner v1.6.0
 
 # 0.2.180
 
