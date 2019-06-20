@@ -30,7 +30,7 @@ COPY ./miso-dto/ /miso-lims/miso-dto/
 COPY ./pinery-miso/ /miso-lims/pinery-miso/
 COPY ./migration/ /miso-lims/migration/
 
-RUN mvn clean && mvn package -P external -DskipTests
+RUN mvn clean && mvn package -DskipTests
 
 
 #######################################################

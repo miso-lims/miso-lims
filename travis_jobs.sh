@@ -9,16 +9,16 @@ if [ "$JOB" = "SONAR_AND_UNIT_TESTS" ]; then
         echo "[WARN] SonarCloud cannot run on pull requests from forks."
     fi
     # Unit Tests
-    mvn -P external clean test
+    mvn clean test
 elif [ "$JOB" = "PLAIN_WEB_IT" ]; then
     cd miso-web
-    mvn -P external clean verify -DskipUTs=true -DrunPlainITs
+    mvn clean verify -DskipUTs=true -DrunPlainITs
 elif [ "$JOB" = "BULK_WEB_IT" ]; then
     cd miso-web
-    mvn -P external clean verify -DskipUTs=true -DskipITs=false -Dit.test='Bulk*'
+    mvn clean verify -DskipUTs=true -DskipITs=false -Dit.test='Bulk*'
 elif [ "$JOB" = "OTHER_WEB_IT" ]; then
     cd miso-web
-    mvn -P external clean verify -DskipUTs=true -DskipITs=false -Dit.test='!PlainSampleITs, !Bulk*'
+    mvn clean verify -DskipUTs=true -DskipITs=false -Dit.test='!PlainSampleITs, !Bulk*'
 elif [ "$JOB" = "PINERY_IT" ]; then
     cd pinery-miso
     mvn clean verify -DskipUTs=true -DskipITs=false

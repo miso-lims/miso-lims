@@ -111,6 +111,7 @@
     <module>sqlstore</module>
     <module>miso-dto</module>
     <module>pinery-miso</module>
+    <module>migration</module>
   </modules>
   <!-- SVN connection -->
   <scm>
@@ -880,19 +881,4 @@
       </plugin>
     </plugins>
   </reporting>
-  <profiles>
-    <profile>
-      <id>external</id>
-      <activation>
-        <property>
-          <name>release</name>
-          <value>external</value>
-        </property>
-      </activation>
-      <modules>
-        <module>sqlstore</module>
-        <module>migration</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>
