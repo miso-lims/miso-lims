@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 0.2.181
+
+Changes:
+
   * Added interface for administrators to upload and delete location maps
   * Added interface for administrators to add, edit, and delete dropdown options
     * library designs (detailed sample)
@@ -20,6 +26,8 @@ Changes:
     * pools
   * Renamed the existing orders to "sequencing orders" as they are orders for sequencing. This is
     in advance of the addition of "pool orders" which will be orders for pooling
+  * Fixed sorting of dilutions on the Edit Pool page
+  * Fixed generated aliases for aliquots parented to aliquots (OicrSampleAliasGenerator)
 
 Upgrade Notes:
 
