@@ -34,7 +34,7 @@ public class BulkOrderPage extends HeaderFooterPage {
     }
   };
 
-  public static final String CREATE_URL_FRAGMENT = "miso/order/bulk/create";
+  public static final String CREATE_URL_FRAGMENT = "miso/sequencingorder/bulk/create";
 
   @FindBy(id = "bulkactions")
   private WebElement toolbar;
@@ -44,7 +44,7 @@ public class BulkOrderPage extends HeaderFooterPage {
   public BulkOrderPage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
-    waitWithTimeout().until(titleContains("Create Orders from Pools "));
+    waitWithTimeout().until(titleContains("Create Sequencing Orders from Pools "));
     table = new HandsOnTable(driver);
   }
 

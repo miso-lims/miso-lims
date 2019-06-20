@@ -1,11 +1,11 @@
-SELECT o.poolOrderId orderId 
+SELECT o.sequencingOrderId orderId 
         ,lib.NAME libraryId 
         ,bc1.sequence barcode 
         ,bc2.sequence barcode_two 
         ,sp.paired paired 
         ,sp.readLength read_length 
         ,tr.alias targeted_sequencing 
-FROM PoolOrder o 
+FROM SequencingOrder o 
 LEFT JOIN SequencingParameters sp ON sp.parametersId = o.parametersId 
 LEFT JOIN Pool p ON p.poolId = o.poolId 
 LEFT JOIN Pool_Dilution pe ON pe.pool_poolId = p.poolId 

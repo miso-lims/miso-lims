@@ -14,9 +14,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkOrderPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkOrderPage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
@@ -68,7 +68,7 @@ public class BulkOrderIT extends AbstractIT {
 
     Pool pool = (Pool) getSession().get(PoolImpl.class, 120001L);
     @SuppressWarnings("unchecked")
-    List<PoolOrder> orders = getSession().createCriteria(PoolOrderImpl.class)
+    List<SequencingOrder> orders = getSession().createCriteria(SequencingOrderImpl.class)
         .add(Restrictions.eq("pool", pool))
         .list();
     assertEquals(1, orders.size());

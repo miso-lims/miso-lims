@@ -18,7 +18,7 @@ DELETE FROM RunPacBio;
 DELETE FROM RunOxfordNanopore;
 DELETE FROM RunChangeLog;
 DELETE FROM Run;
-DELETE FROM PoolOrder;
+DELETE FROM SequencingOrder;
 DELETE FROM Pool_Dilution;
 DELETE FROM Pool_Note;
 DELETE FROM PoolChangeLog;
@@ -290,6 +290,6 @@ INSERT INTO RunIllumina (runId, pairedEnd) VALUES
 INSERT INTO Run_SequencerPartitionContainer (Run_runId, containers_containerId) VALUES
 (1, 1);
 
-INSERT INTO PoolOrder (poolOrderId, poolId, partitions, parametersId, createdBy, updatedBy, creationDate, lastUpdated) VALUES
+INSERT INTO SequencingOrder (sequencingOrderId, poolId, partitions, parametersId, createdBy, updatedBy, creationDate, lastUpdated) VALUES
 (1, 1, 2, 4, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00'),
 (2, 1, 1, 1, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00');

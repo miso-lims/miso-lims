@@ -85,7 +85,7 @@ import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
-import uk.ac.bbsrc.tgac.miso.dto.PoolOrderCompletionDto;
+import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
@@ -93,7 +93,7 @@ import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.service.PoolOrderCompletionService;
+import uk.ac.bbsrc.tgac.miso.service.SequencingOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
@@ -157,7 +157,7 @@ public class PoolRestController extends RestController {
   @Autowired
   private PoolableElementViewService poolableElementViewService;
   @Autowired
-  private PoolOrderCompletionService poolOrderCompletionService;
+  private SequencingOrderCompletionService sequencingOrderCompletionService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
@@ -377,7 +377,7 @@ public class PoolRestController extends RestController {
   }
 
   private PoolPickerEntry poolTransform(Pool pool) throws IOException {
-    List<PoolOrderCompletionDto> completions = poolOrderCompletionService.getByPoolId(pool.getId()).stream()
+    List<SequencingOrderCompletionDto> completions = sequencingOrderCompletionService.listByPoolId(pool.getId()).stream()
         .map(Dtos::asDto).collect(Collectors.toList());
     return new PoolPickerEntry(Dtos.asDto(pool, true, false), completions);
   }

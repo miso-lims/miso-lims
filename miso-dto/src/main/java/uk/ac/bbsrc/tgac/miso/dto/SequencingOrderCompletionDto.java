@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-public class PoolOrderCompletionDto {
+public class SequencingOrderCompletionDto {
   private int completed;
   private int failed;
   private String id;

@@ -210,12 +210,12 @@ ListTarget.partition = {
         }, {
           name: "Search",
           handler: makeSearch("", assignDialog)
-        }, config.sequencingParametersId ? assignFromRest('/miso/rest/poolorders/picker/chemistry?' + jQuery.param({
+        }, config.sequencingParametersId ? assignFromRest('/miso/rest/sequencingorders/picker/chemistry?' + jQuery.param({
           platform: platformType.name,
           seqParamsId: config.sequencingParametersId,
           fulfilled: false
         }), 'Outstanding Orders (Matched Chemistry)', setConcentration, assignDialog) : null,
-            assignFromRest('/miso/rest/poolorders/picker/active?' + jQuery.param({
+            assignFromRest('/miso/rest/sequencingorders/picker/active?' + jQuery.param({
               platform: platformType.name
             }), 'Outstanding Orders (All)', setConcentration, assignDialog),
             assignFromRest('/miso/rest/pools/picker/recent?' + jQuery.param({

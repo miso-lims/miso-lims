@@ -29,7 +29,7 @@ CREATE PROCEDURE deletePool(
     WHERE Note.noteId = Pool_Note.notes_noteId
     AND Pool_Note.pool_poolId = iPoolId;
 
-  DELETE FROM PoolOrder WHERE poolId = iPoolId;
+  DELETE FROM SequencingOrder WHERE poolId = iPoolId;
   DELETE FROM PoolQC WHERE pool_poolId = iPoolId;
   DELETE FROM Pool_Watcher WHERE poolId = iPoolId;
   DELETE FROM PoolChangeLog WHERE poolId = iPoolId;

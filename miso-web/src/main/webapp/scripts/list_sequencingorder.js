@@ -21,8 +21,8 @@
  * *********************************************************************
  */
 
-ListTarget.order = {
-  name: "Pool Orders",
+ListTarget.sequencingorder = {
+  name: "Sequencing Orders",
   createUrl: function(config, projectId) {
     throw new Error("Orders can only be shown statically.");
   },
@@ -47,7 +47,7 @@ ListTarget.order = {
             }
             var copy = JSON.parse(JSON.stringify(orders[index]));
             copy.partitions += results.count;
-            Utils.ajaxWithDialog('Updating Order', 'PUT', '/miso/rest/poolorders/' + orders[index].id, copy, function() {
+            Utils.ajaxWithDialog('Updating Order', 'PUT', '/miso/rest/sequencingorders/' + orders[index].id, copy, function() {
               updateNext(index + 1)
             });
           };
@@ -62,7 +62,7 @@ ListTarget.order = {
             Utils.page.pageReload();
             return;
           }
-          Utils.ajaxWithDialog('Deleting Order', 'DELETE', '/miso/rest/poolorders/' + orders[index].id, null, function() {
+          Utils.ajaxWithDialog('Deleting Order', 'DELETE', '/miso/rest/sequencingorders/' + orders[index].id, null, function() {
             deleteNext(index + 1)
           });
         };
@@ -78,7 +78,7 @@ ListTarget.order = {
       return [{
         name: "Create",
         handler: function() {
-          window.location = window.location.origin + '/miso/order/bulk/create?' + jQuery.param({
+          window.location = window.location.origin + '/miso/sequencingorder/bulk/create?' + jQuery.param({
             ids: config.pool.id
           });
         }

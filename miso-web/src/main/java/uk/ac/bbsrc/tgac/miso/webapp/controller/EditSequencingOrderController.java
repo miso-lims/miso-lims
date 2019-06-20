@@ -16,23 +16,23 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto;
+import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderDto;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
 
 @Controller
-@RequestMapping("/order")
-public class EditOrderController {
+@RequestMapping("/sequencingorder")
+public class EditSequencingOrderController {
 
   @Autowired
   private PoolService poolService;
 
-  private final BulkPropagateTableBackend<Pool, PoolOrderDto> orderBulkPropagateBackend = new BulkPropagateTableBackend<Pool, PoolOrderDto>(
-      "order", PoolOrderDto.class, "Orders", "Pools") {
+  private final BulkPropagateTableBackend<Pool, SequencingOrderDto> orderBulkPropagateBackend = new BulkPropagateTableBackend<Pool, SequencingOrderDto>(
+      "sequencingorder", SequencingOrderDto.class, "Sequencing Orders", "Pools") {
 
     @Override
-    protected PoolOrderDto createDtoFromParent(Pool item) {
-      PoolOrderDto dto = new PoolOrderDto();
+    protected SequencingOrderDto createDtoFromParent(Pool item) {
+      SequencingOrderDto dto = new SequencingOrderDto();
       dto.setPool(Dtos.asDto(item, false, false));
       return dto;
     }

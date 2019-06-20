@@ -126,7 +126,7 @@ public enum HealthType {
   /**
    * Whether is health type may be used as a status from a sequencer.
    * 
-   * Some health information is used for pool order completions that cannot be a state of an actual sequencer run's status.
+   * Some health information is used for sequencing order completions that cannot be a state of an actual sequencer run's status.
    */
   public boolean isAllowedFromSequencer() {
     return allowedFromSequencer;

@@ -1,8 +1,8 @@
 -- StartNoTest
 DELIMITER //
 
-DROP TRIGGER IF EXISTS PoolOrderInsert//
-CREATE TRIGGER PoolOrderInsert AFTER INSERT ON PoolOrder
+DROP TRIGGER IF EXISTS SequencingOrderInsert//
+CREATE TRIGGER SequencingOrderInsert AFTER INSERT ON SequencingOrder
 FOR EACH ROW
   INSERT INTO PoolChangeLog(poolId, columnsChanged, userId, message) VALUES (
     NEW.poolId,
@@ -14,8 +14,8 @@ FOR EACH ROW
       ' of ',
       COALESCE((SELECT CONCAT(InstrumentModel.alias, ' ', SequencingParameters.name) FROM SequencingParameters JOIN InstrumentModel ON SequencingParameters.instrumentModelId = InstrumentModel.instrumentModelId WHERE SequencingParameters.parametersId = NEW.parametersId), 'n/a')))//
 
-DROP TRIGGER IF EXISTS PoolOrderDelete//
-CREATE TRIGGER PoolOrderDelete AFTER DELETE ON PoolOrder
+DROP TRIGGER IF EXISTS SequencingOrderDelete//
+CREATE TRIGGER SequencingOrderDelete AFTER DELETE ON SequencingOrder
 FOR EACH ROW
   INSERT INTO PoolChangeLog(poolId, columnsChanged, userId, message) VALUES (
     OLD.poolId,
@@ -27,8 +27,8 @@ FOR EACH ROW
       ' of ',
       COALESCE((SELECT CONCAT(InstrumentModel.alias, ' ', SequencingParameters.name) FROM SequencingParameters JOIN InstrumentModel ON SequencingParameters.instrumentModelId = InstrumentModel.instrumentModelId WHERE SequencingParameters.parametersId = OLD.parametersId), 'n/a')))//
 
-DROP TRIGGER IF EXISTS PoolOrderChange//
-CREATE TRIGGER PoolOrderChange BEFORE UPDATE ON PoolOrder
+DROP TRIGGER IF EXISTS SequencingOrderChange//
+CREATE TRIGGER SequencingOrderChange BEFORE UPDATE ON SequencingOrder
 FOR EACH ROW
   BEGIN
   IF NEW.partitions <> OLD.partitions OR (NEW.parametersId IS NULL) <> (OLD.parametersId IS NULL) OR NEW.parametersId <> OLD.parametersId THEN

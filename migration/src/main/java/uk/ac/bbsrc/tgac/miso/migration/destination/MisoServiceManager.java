@@ -41,7 +41,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibrarySelectionDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryStrategyDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolOrderDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencingOrderDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolableElementViewDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateQcTypeDao;
@@ -81,7 +81,7 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryStrategyService;
-import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolOrderService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultProjectService;
@@ -249,12 +249,12 @@ public class MisoServiceManager {
         DefaultSequencingParametersService::setSequencingParametersDao);
     addDependency(DefaultSequencingParametersService.class, MigrationAuthorizationManager.class,
         DefaultSequencingParametersService::setAuthorizationManager);
-    addDependency(DefaultPoolOrderService.class, HibernatePoolOrderDao.class, DefaultPoolOrderService::setPoolOrderDao);
-    addDependency(DefaultPoolOrderService.class, DefaultSequencingParametersService.class,
-        DefaultPoolOrderService::setSequencingParametersService);
-    addDependency(DefaultPoolOrderService.class, DefaultPoolService.class, DefaultPoolOrderService::setPoolService);
-    addDependency(DefaultPoolOrderService.class, MigrationAuthorizationManager.class, DefaultPoolOrderService::setAuthorizationManager);
-    addDependency(HibernatePoolOrderDao.class, SessionFactory.class, HibernatePoolOrderDao::setSessionFactory);
+    addDependency(DefaultSequencingOrderService.class, HibernateSequencingOrderDao.class, DefaultSequencingOrderService::setSequencingOrderDao);
+    addDependency(DefaultSequencingOrderService.class, DefaultSequencingParametersService.class,
+        DefaultSequencingOrderService::setSequencingParametersService);
+    addDependency(DefaultSequencingOrderService.class, DefaultPoolService.class, DefaultSequencingOrderService::setPoolService);
+    addDependency(DefaultSequencingOrderService.class, MigrationAuthorizationManager.class, DefaultSequencingOrderService::setAuthorizationManager);
+    addDependency(HibernateSequencingOrderDao.class, SessionFactory.class, HibernateSequencingOrderDao::setSessionFactory);
     addDependency(DefaultExperimentService.class, MigrationAuthorizationManager.class, DefaultExperimentService::setAuthorizationManager);
     addDependency(DefaultExperimentService.class, HibernateExperimentDao.class, DefaultExperimentService::setExperimentStore);
     addDependency(DefaultExperimentService.class, DefaultKitService.class, DefaultExperimentService::setKitService);
@@ -377,8 +377,8 @@ public class MisoServiceManager {
     setDefaultInstrumentModelDao();
     setDefaultInstrumentModelService();
     setDefaultPoolDao();
-    setDefaultPoolOrderDao();
-    setDefaultPoolOrderService();
+    setDefaultSequencingOrderDao();
+    setDefaultSequencingOrderService();
     setDefaultPoolService();
     setDefaultReferenceGenomeDao();
     setDefaultReferenceGenomeService();
@@ -1263,28 +1263,28 @@ public class MisoServiceManager {
     setService(DefaultSequencingParametersService.class, new DefaultSequencingParametersService());
   }
 
-  public DefaultPoolOrderService getPoolOrderService() {
-    return getService(DefaultPoolOrderService.class);
+  public DefaultSequencingOrderService getSequencingOrderService() {
+    return getService(DefaultSequencingOrderService.class);
   }
 
-  public void setPoolOrderService(DefaultPoolOrderService service) {
-    setService(DefaultPoolOrderService.class, service, false);
+  public void setSequencingOrderService(DefaultSequencingOrderService service) {
+    setService(DefaultSequencingOrderService.class, service, false);
   }
 
-  public void setDefaultPoolOrderService() {
-    setService(DefaultPoolOrderService.class, new DefaultPoolOrderService());
+  public void setDefaultSequencingOrderService() {
+    setService(DefaultSequencingOrderService.class, new DefaultSequencingOrderService());
   }
 
-  public HibernatePoolOrderDao getPoolOrderDao() {
-    return getService(HibernatePoolOrderDao.class);
+  public HibernateSequencingOrderDao getSequencingOrderDao() {
+    return getService(HibernateSequencingOrderDao.class);
   }
 
-  public void setPoolOrderDao(HibernatePoolOrderDao dao) {
-    setService(HibernatePoolOrderDao.class, dao, false);
+  public void setSequencingOrderDao(HibernateSequencingOrderDao dao) {
+    setService(HibernateSequencingOrderDao.class, dao, false);
   }
 
-  public void setDefaultPoolOrderDao() {
-    setService(HibernatePoolOrderDao.class, new HibernatePoolOrderDao());
+  public void setDefaultSequencingOrderDao() {
+    setService(HibernateSequencingOrderDao.class, new HibernateSequencingOrderDao());
   }
 
   public DefaultExperimentService getExperimentService() {

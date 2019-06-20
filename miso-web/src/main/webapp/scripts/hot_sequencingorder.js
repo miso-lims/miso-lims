@@ -1,7 +1,7 @@
-HotTarget.order = (function() {
+HotTarget.sequencingorder = (function() {
   return {
-    createUrl: '/miso/rest/poolorders',
-    updateUrl: '/miso/rest/poolorders/',
+    createUrl: '/miso/rest/sequencingorders',
+    updateUrl: '/miso/rest/sequencingorders/',
     requestConfiguration: function(config, callback) {
       callback(config)
     },
