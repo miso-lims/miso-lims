@@ -34,7 +34,7 @@ public class BulkOrderPage extends HeaderFooterPage {
     }
   };
 
-  public static final String CREATE_URL_FRAGMENT = "miso/order/bulk/create";
+  public static final String CREATE_URL_FRAGMENT = "miso/sequencingorder/bulk/create";
 
   @FindBy(id = "bulkactions")
   private WebElement toolbar;
