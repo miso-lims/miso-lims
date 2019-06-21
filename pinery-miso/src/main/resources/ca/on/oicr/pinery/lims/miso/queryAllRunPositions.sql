@@ -3,6 +3,7 @@ SELECT p.partitionId
   ,pqt.analysisSkipped AS analysis_skipped
   ,pqt.description AS qc_status
   ,r_spc.Run_runId
+  ,pool.poolId
   ,pool.alias AS pool_name
   ,pool.identificationBarcode AS pool_barcode
   ,pool.description AS pool_description

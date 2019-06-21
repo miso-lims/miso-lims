@@ -3,6 +3,7 @@
 Changes:
 
   * Added partition number and library alias to Cell Ranger sample sheets
+  * Added pool ID to Pinery-MISO run positions
   * Renamed library dilutions to library aliquots
   * Renamed sequencing order states
     * Active -> Outstanding
