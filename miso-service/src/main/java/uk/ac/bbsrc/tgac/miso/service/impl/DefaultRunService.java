@@ -324,7 +324,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     target.setHealth(source.getHealth());
     target.setStartDate(source.getStartDate());
     target.setCompletionDate(source.getCompletionDate());
-    target.setMetrics(source.getMetrics());
 
     makeContainerChangesChangeLog(target, target.getSequencerPartitionContainers(), source.getSequencerPartitionContainers());
     applyContainerChanges(target, source);

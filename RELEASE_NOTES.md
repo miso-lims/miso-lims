@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Fixed run metrics disappearing when saving a run on the Edit Run page
 
 
 # 0.2.181
@@ -37,6 +38,10 @@ Upgrade Notes:
     removed during the migration to this version
   * Upgraded to Run Scanner v1.6.0
 
+BAD:
+
+  * Run metrics disappear when saving a run on the Edit Run page
+
 # 0.2.180
 
 Changes:
@@ -67,6 +72,10 @@ Upgrade Notes:
       for more information. Your own `security.properties` file is in the MISO storage directory,
       which is `/storage/miso` by default
 
+BAD:
+
+  * Run metrics disappear when saving a run on the Edit Run page
+
 # 0.2.179
 
 Changes:
@@ -89,6 +98,10 @@ Upgrade Notes:
 
   * Upgraded Run Scanner version to 1.5.0
 
+BAD:
+
+  * Run metrics disappear when saving a run on the Edit Run page
+
 # 0.2.178
 
 Changes:
@@ -107,6 +120,7 @@ Changes:
 BAD:
 
   * Several broken links to dilution-related pages
+  * Run metrics disappear when saving a run on the Edit Run page
 
 # 0.2.177
 
@@ -119,6 +133,10 @@ Changes:
     saving fails
   * Fixed incompatibility of some forms with Firefox versions < 62
   * Upgraded version of Run Scanner to 1.4.5
+
+BAD:
+
+  * Run metrics disappear when saving a run on the Edit Run page
 
 # 0.2.176
 
@@ -137,6 +155,10 @@ Changes:
   * Improved "Location" display in list tables
   * Fixed Pinery-MISO failing to reverse compliment indices when appropriate if the container model
     is not accurately detected
+
+BAD:
+
+  * Run metrics disappear when saving a run on the Edit Run page
 
 # 0.2.175
 
