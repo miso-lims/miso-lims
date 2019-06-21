@@ -636,6 +636,7 @@ public class MisoClient implements Lims {
       p.setPosition(rs.getInt("partitionNumber"));
       p.setRunId(rs.getInt("Run_runId"));
       p.setPartitionId(rs.getInt("partitionId"));
+      p.setPoolId(rs.getInt("poolId"));
       p.setPoolName(rs.getString("pool_name"));
       p.setPoolDescription(rs.getString("pool_description"));
       p.setPoolBarcode(rs.getString("pool_barcode"));

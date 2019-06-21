@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Added pool ID to Pinery-MISO run positions
 
 # 0.2.181
 
