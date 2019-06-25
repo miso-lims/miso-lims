@@ -131,7 +131,7 @@ public enum SampleSheet {
 
     @Override
     protected Stream<String> getColumns() {
-      return Stream.of("Sample_ID", "index", "Sample_Project");
+      return Stream.of("Lane", "Sample_ID", "Sample_Name", "index", "Sample_Project");
     }
 
     @Override
@@ -141,9 +141,11 @@ public enum SampleSheet {
 
     @Override
     protected void makeColumns(Run run, Partition partition, PoolableElementView dilution, String userName, String[] output) {
-      output[0] = dilution.getDilutionName();
-      output[1] = dilution.getIndices().stream().findFirst().map(Index::getSequence).orElse("");
-      output[2] = dilution.getProjectShortName();
+      output[0] = Integer.toString(partition.getPartitionNumber());
+      output[1] = dilution.getDilutionName();
+      output[2] = dilution.getLibraryAlias();
+      output[3] = dilution.getIndices().stream().findFirst().map(Index::getSequence).orElse("");
+      output[4] = dilution.getProjectShortName();
     }
   };
   private static char complement(char nt) {
