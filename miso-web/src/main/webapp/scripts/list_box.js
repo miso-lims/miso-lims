@@ -26,7 +26,7 @@ ListTarget.box = {
   createUrl: function(config, projectId) {
     return "/miso/rest/boxes/dt" + (config.boxUse ? "/use/" + config.boxUse : "");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     return HotTarget.box.getBulkActions(config).concat(
         [
@@ -92,8 +92,8 @@ ListTarget.box = {
     }];
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.idHyperlinkColumn("Name", "box", "id", Utils.array.getName, 1, true),
-        ListUtils.labelHyperlinkColumn("Alias", "box", Utils.array.getId, "alias", 0, true), {
+    return [ListUtils.idHyperlinkColumn("Name", Urls.ui.boxes.edit, "id", Utils.array.getName, 1, true),
+        ListUtils.labelHyperlinkColumn("Alias", Urls.ui.boxes.edit, Utils.array.getId, "alias", 0, true), {
           "sTitle": "Description",
           "mData": "description",
           "include": true,

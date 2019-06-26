@@ -635,7 +635,7 @@ var HotUtils = {
                                     invokeNext(index + 1);
                                   }
                                 };
-                                xhr.open(create ? 'POST' : 'PUT', create ? target.createUrl : (target.updateUrl + data[index].id));
+                                xhr.open(create ? 'POST' : 'PUT', create ? target.getCreateUrl() : (target.getUpdateUrl(data[index].id)));
                                 xhr.setRequestHeader('Content-Type', 'application/json');
                                 xhr.setRequestHeader('Accept', 'application/json');
                                 xhr.send(JSON.stringify(data[index]));
@@ -1169,15 +1169,15 @@ var HotUtils = {
     }, ];
   },
 
-  makeParents: function(slug, parentCategories) {
-    return HotUtils.makeRelations(slug + '/parents', 'Parents', parentCategories, true);
+  makeParents: function(parentsByCategoryUrlFunction, parentCategories) {
+    return HotUtils.makeRelations(parentsByCategoryUrlFunction, 'Parents', parentCategories, true);
   },
 
-  makeChildren: function(slug, childCategories) {
-    return HotUtils.makeRelations(slug + '/children', 'Children', childCategories, false);
+  makeChildren: function(childrenByCategoryUrlFunction, childCategories) {
+    return HotUtils.makeRelations(childrenByCategoryUrlFunction, 'Children', childCategories, false);
   },
 
-  makeRelations: function(slug, relationship, relationCategories, useParentBound) {
+  makeRelations: function(categoryUrlFunction, relationship, relationCategories, useParentBound) {
 
     return {
       name: relationship,
@@ -1223,7 +1223,7 @@ var HotUtils = {
           return {
             "name": category.name,
             "handler": function() {
-              Utils.ajaxWithDialog('Searching', 'POST', '/miso/rest/' + slug + '/' + category.name, items.map(function(s) {
+              Utils.ajaxWithDialog('Searching', 'POST', categoryUrlFunction(category.name), items.map(function(s) {
                 return s.id;
               }), function(relations) {
                 var selectedActions = category.target.getBulkActions(category.config).filter(function(bulkAction) {
@@ -1261,7 +1261,7 @@ var HotUtils = {
     };
   },
 
-  makeAddToWorkset: function(typePlural, idsField) {
+  makeAddToWorkset: function(pluralLabel, idsField, getAddUrlForWorksetId) {
     return {
       name: 'Add to Workset',
       action: function(items) {
@@ -1289,11 +1289,10 @@ var HotUtils = {
                           selectFields.push({
                             name: workset.alias,
                             handler: function() {
-                              Utils.ajaxWithDialog('Adding to Workset', 'POST', '/miso/rest/worksets/' + workset.id + '/' + typePlural,
-                                  ids, function() {
-                                    Utils.showOkDialog('Add to Workset', ['The selected ' + typePlural + ' have been added to workset \''
-                                        + workset.alias + '\'.']);
-                                  });
+                              Utils.ajaxWithDialog('Adding to Workset', 'POST', getAddUrlForWorksetId(workset.id), ids, function() {
+                                Utils.showOkDialog('Add to Workset', ['The selected ' + pluralLabel + ' have been added to workset \''
+                                    + workset.alias + '\'.']);
+                              });
                             }
                           });
                           Utils.showWizardDialog('Add to Existing Workset', selectFields);
@@ -1335,20 +1334,19 @@ var HotUtils = {
     }
   },
 
-  makeRemoveFromWorkset: function(typePlural, worksetId) {
+  makeRemoveFromWorkset: function(pluralLabel, url) {
     return {
       name: 'Remove from Workset',
       action: function(items) {
-        Utils.showConfirmDialog('Remove ' + typePlural, 'Remove',
-            ['Remove these ' + items.length + ' ' + typePlural + ' from the workset?'], function() {
-              var ids = items.map(Utils.array.getId);
-              Utils.ajaxWithDialog('Removing ' + typePlural, 'DELETE', '/miso/rest/worksets/' + worksetId + '/' + typePlural, ids,
-                  function() {
-                    Utils.showOkDialog('Removed', [items.length + ' ' + typePlural + ' removed.'], function() {
-                      Utils.page.pageReload();
-                    });
-                  });
+        Utils.showConfirmDialog('Remove ' + pluralLabel, 'Remove', ['Remove these ' + items.length + ' ' + pluralLabel
+            + ' from the workset?'], function() {
+          var ids = items.map(Utils.array.getId);
+          Utils.ajaxWithDialog('Removing ' + pluralLabel, 'DELETE', url, ids, function() {
+            Utils.showOkDialog('Removed', [items.length + ' ' + pluralLabel + ' removed.'], function() {
+              Utils.page.pageReload();
             });
+          });
+        });
       }
     }
   },
@@ -1403,10 +1401,10 @@ var HotUtils = {
         "index": Constants.sampleCategories.length + 1
       };
     },
-    dilution: function() {
+    libraryAliquot: function() {
       return {
-        "name": "Dilution",
-        "target": HotTarget.dilution,
+        "name": "Library Aliquot",
+        "target": HotTarget.libraryaliquot,
         "config": {},
         "index": Constants.sampleCategories.length + 2
       };
@@ -1475,7 +1473,7 @@ var HotUtils = {
         return;
       }
       var loadPage = function() {
-        window.location = window.location.origin + pageURL + jQuery.param(params);
+        window.location = window.location.origin + pageURL + '?' + jQuery.param(params);
       }
       if (result.createBox) {
         Utils.createBoxDialog(result, getItemCount, function(newBox) {

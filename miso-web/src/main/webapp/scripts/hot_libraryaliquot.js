@@ -1,6 +1,10 @@
-HotTarget.dilution = {
-  createUrl: '/miso/rest/librarydilutions',
-  updateUrl: '/miso/rest/librarydilutions/',
+HotTarget.libraryaliquot = {
+  getCreateUrl: function() {
+    return Urls.rest.libraryAliquots.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.libraryAliquots.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },
@@ -12,7 +16,7 @@ HotTarget.dilution = {
   createColumns: function(config, create, data) {
     var columns = [
         {
-          header: 'Dilution Name',
+          header: 'Library Aliquot Name',
           data: 'name',
           readOnly: true,
           include: true,
@@ -186,7 +190,7 @@ HotTarget.dilution = {
         {
           name: 'Edit',
           action: function(items) {
-            window.location = window.location.origin + '/miso/dilution/bulk/edit?' + jQuery.param({
+            window.location = Urls.ui.libraryAliquots.bulkEdit + '?' + jQuery.param({
               ids: items.map(Utils.array.getId).join(',')
             });
           },
@@ -194,41 +198,43 @@ HotTarget.dilution = {
         },
         {
           name: 'Pool together',
-          title: 'Create one pool from many dilutions',
+          title: 'Create one pool from many library aliquots',
           action: function(items) {
             HotUtils.warnIfConsentRevoked(items, function() {
               var fields = [];
-              HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, '/miso/dilution/bulk/merge?', function(result) {
-                return {
-                  ids: items.map(Utils.array.getId).join(',')
-                };
-              }, function(result) {
-                return 1;
-              });
-            }, HotTarget.dilution.getLabel);
+              HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolTogether,
+                  function(result) {
+                    return {
+                      ids: items.map(Utils.array.getId).join(',')
+                    };
+                  }, function(result) {
+                    return 1;
+                  });
+            }, HotTarget.libraryaliquot.getLabel);
           },
           allowOnLibraryPage: false
         },
         {
           name: 'Pool separately',
-          title: 'Create a pool for each dilution',
+          title: 'Create a pool for each library aliquot',
           action: function(items) {
             HotUtils.warnIfConsentRevoked(items, function() {
               var fields = [];
-              HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, '/miso/dilution/bulk/pool-separate?', function(result) {
-                return {
-                  ids: items.map(Utils.array.getId).join(',')
-                };
-              }, function(result) {
-                return items.length;
-              });
-            }, HotTarget.dilution.getLabel);
+              HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolSeparate,
+                  function(result) {
+                    return {
+                      ids: items.map(Utils.array.getId).join(',')
+                    };
+                  }, function(result) {
+                    return items.length;
+                  });
+            }, HotTarget.libraryaliquot.getLabel);
           },
           allowOnLibraryPage: true
         },
         {
           name: 'Pool custom',
-          title: 'Divide dilutions into several pools',
+          title: 'Divide library aliquots into several pools',
           action: function(items) {
             HotUtils.warnIfConsentRevoked(items, function() {
               var fields = [{
@@ -236,7 +242,7 @@ HotTarget.dilution = {
                 property: 'quantity',
                 type: 'int',
               }];
-              HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, '/miso/dilution/bulk/pool?', function(result) {
+              HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolCustom, function(result) {
                 console.log(result);
                 return {
                   ids: items.map(Utils.array.getId).join(','),
@@ -245,33 +251,34 @@ HotTarget.dilution = {
               }, function(result) {
                 return result.quantity;
               })
-            }, HotTarget.dilution.getLabel);
+            }, HotTarget.libraryaliquot.getLabel);
           },
           allowOnLibraryPage: true
         },
-        HotUtils.printAction('dilution'),
-        HotUtils.spreadsheetAction('/miso/rest/librarydilutions/spreadsheet', Constants.libraryDilutionSpreadsheets, function(dilutions,
+        HotUtils.printAction('libraryaliquot'),
+        HotUtils.spreadsheetAction(Urls.rest.libraryAliquots.spreadsheet, Constants.libraryAliquotSpreadsheets, function(aliquots,
             spreadsheet) {
           var errors = [];
           return errors;
         }),
 
-        HotUtils.makeParents('librarydilutions', HotUtils.relationCategoriesForDetailed().concat([HotUtils.relations.library()])),
-        HotUtils.makeChildren('librarydilutions', [HotUtils.relations.pool()]),
-        config.worksetId ? HotUtils.makeRemoveFromWorkset('dilutions', config.worksetId) : HotUtils.makeAddToWorkset('dilutions',
-            'dilutionIds')];
+        HotUtils.makeParents(Urls.rest.libraryAliquots.parents, HotUtils.relationCategoriesForDetailed().concat(
+            [HotUtils.relations.library()])),
+        HotUtils.makeChildren(Urls.rest.libraryAliquots.children, [HotUtils.relations.pool()]),
+        config.worksetId ? HotUtils.makeRemoveFromWorkset('library aliquots', Urls.rest.worksets.removeLibraryAliquots(config.worksetId))
+            : HotUtils.makeAddToWorkset('library aliquots', 'libraryAliquotIds', Urls.rest.worksets.addLibraryAliquots)];
   },
 
   confirmSave: function(flatObjects, isCreate, config, table) {
     var deferred = jQuery.Deferred();
 
-    var dilutions = table.getDtoData();
+    var aliquots = table.getDtoData();
 
     var seen = {};
-    var libraries = dilutions.filter(function(dilution) {
-      return !(Utils.validation.isEmpty(dilution.volumeUsed) || dilution.volumeUsed <= 0);
-    }).map(function(dilution) {
-      return dilution.library;
+    var libraries = aliquots.filter(function(aliquot) {
+      return !(Utils.validation.isEmpty(aliquot.volumeUsed) || aliquot.volumeUsed <= 0);
+    }).map(function(aliquot) {
+      return aliquot.library;
     }).filter(function(library) {
       return library != null;
     }).filter(function(library) {
@@ -285,12 +292,12 @@ HotTarget.dilution = {
       return deferred.promise();
     }
 
-    dilutions.filter(function(dilution) {
-      return dilution.library != null && dilution.library.volume != null && dilution.volumeUsed != null;
-    }).forEach(function(dilution) {
+    aliquots.filter(function(aliquot) {
+      return aliquot.library != null && aliquot.library.volume != null && aliquot.volumeUsed != null;
+    }).forEach(function(aliquot) {
       libraries.find(function(library) {
-        return library.id == dilution.library.id;
-      }).volume -= dilution.volumeUsed;
+        return library.id == aliquot.library.id;
+      }).volume -= aliquot.volumeUsed;
     });
 
     var overUsedCount = libraries.filter(function(library) {

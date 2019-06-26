@@ -80,7 +80,7 @@
 </div>
 <div id="notediv" class="note" style="display:none;">A Sample contains information about the material upon which the
   sequencing experiments are to be based. Samples can be used in any number of sequencing Experiments in the form
-  of a Library that is often processed further into pooled Dilutions.
+  of a Library that is often processed further into pooled library aliquots.
 </div>
 
 <div id="warnings"></div>

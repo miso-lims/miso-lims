@@ -26,7 +26,7 @@ ListTarget.storage_location = {
   createUrl: function(config, projectId) {
     throw new Error("Storage locations must be specified statically.");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     return [];
   },

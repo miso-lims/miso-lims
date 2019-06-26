@@ -5,7 +5,7 @@ section: 15
 ---
 
 A Box represents a physical storage container with defined positions, and can be used to track where samples,
-libraries, dilutions, and/or pools are stored. There are several important box properties:
+libraries, library aliquots, and/or pools are stored. There are several important box properties:
   * Box size: the number of rows and columns in the box. See [Type Data](type_data.html#box_sizes) for more
     information.
     * The `scannable` property of a box is also stored in the box size. A box is scannable if it can be read
@@ -308,9 +308,9 @@ Actions can be performed on all selected items in a box.
 First, go to the Edit Box page by clicking on the box name in the Boxes list page. 
 [Select the target positions](#selecting-positions-within-a-box) of the items you wish to act upon.
 In the toolbar at the top of the contents table, several actions are available for the selected items,
-provided that they are all of the same type (sample, library, dilution, pool). The actions available are the
+provided that they are all of the same type (sample, library, library aliquot, pool). The actions available are the
 same as those found on the [Samples](samples.html#samples-list), [Libraries](libraries.html#libraries-list),
-[Dilutions](library_dilutions.html#dilutions-list), and [Pools](pools.html#pools-list) list pages.
+[Library Aliquots](library_aliquots.html#library-aliquots-list), and [Pools](pools.html#pools-list) list pages.
 
 {% include userman-toplink.md %}
 

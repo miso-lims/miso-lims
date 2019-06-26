@@ -1,6 +1,10 @@
 HotTarget.referencegenome = {
-  createUrl: '/miso/rest/referencegenomes',
-  updateUrl: '/miso/rest/referencegenomes/',
+  getCreateUrl: function() {
+    return Urls.rest.referenceGenomes.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.referenceGenomes.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

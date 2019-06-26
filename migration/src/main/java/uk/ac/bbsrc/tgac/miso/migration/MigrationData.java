@@ -9,7 +9,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 
 public class MigrationData {
@@ -17,7 +17,7 @@ public class MigrationData {
   private Collection<Project> projects;
   private Collection<Sample> samples;
   private Collection<Library> libraries;
-  private Collection<LibraryDilution> dilutions;
+  private Collection<LibraryAliquot> libraryAliquots;
   private Collection<Pool> pools;
   private Collection<Run> runs;
   private Collection<Box> boxes;
@@ -59,20 +59,20 @@ public class MigrationData {
   }
 
   /**
-   * @return all LibraryDilutions to be migrated. Note: Saving these will likely require that
-   * Libraries have been saved first in order to generate foreign keys
+   * @return all LibraryAliquots to be migrated. Note: Saving these will likely require that
+   *         Libraries have been saved first in order to generate foreign keys
    */
-  public Collection<LibraryDilution> getDilutions() {
-    return dilutions;
+  public Collection<LibraryAliquot> getLibraryAliquots() {
+    return libraryAliquots;
   }
 
-  public void setDilutions(Collection<LibraryDilution> dilutions) {
-    this.dilutions = dilutions;
+  public void setLibraryAliquots(Collection<LibraryAliquot> libraryAliquots) {
+    this.libraryAliquots = libraryAliquots;
   }
 
   /**
-   * @return all Pools to be migrated. Note: Saving these will likely require that LibraryDilutions
-   * have been saved first in order to generate foreign keys
+   * @return all Pools to be migrated. Note: Saving these will likely require that LibraryAliquots
+   *         have been saved first in order to generate foreign keys
    */
   public Collection<Pool> getPools() {
     return pools;

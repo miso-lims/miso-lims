@@ -65,8 +65,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.DilutionBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.DilutionChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryAliquotChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -79,16 +79,16 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @since 0.0.2
  */
 @Entity
-@Table(name = "LibraryDilution")
-public class LibraryDilution extends AbstractBoxable
-    implements Barcodable, ChangeLoggable, Comparable<LibraryDilution>, Nameable, Boxable, Deletable, Serializable, Timestamped {
+@Table(name = "LibraryAliquot")
+public class LibraryAliquot extends AbstractBoxable
+    implements Barcodable, ChangeLoggable, Comparable<LibraryAliquot>, Nameable, Boxable, Deletable, Serializable, Timestamped {
 
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long dilutionId = LibraryDilution.UNSAVED_ID;
+  private long aliquotId = LibraryAliquot.UNSAVED_ID;
 
   @Column(nullable = false)
   private String name;
@@ -113,7 +113,7 @@ public class LibraryDilution extends AbstractBoxable
   @JoinColumn(name = "creator", nullable = false, updatable = false)
   private User creator;
   @ManyToOne(targetEntity = LibraryImpl.class)
-  @JoinColumn(name = "library_libraryId")
+  @JoinColumn(name = "libraryId")
   private Library library;
 
   @ManyToOne
@@ -121,9 +121,8 @@ public class LibraryDilution extends AbstractBoxable
   private TargetedSequencing targetedSequencing;
 
   @ManyToMany(targetEntity = PoolImpl.class)
-  @JoinTable(name = "Pool_Dilution",
-      joinColumns = { @JoinColumn(name = "dilution_dilutionId") },
-      inverseJoinColumns = { @JoinColumn(name = "pool_poolId") })
+  @JoinTable(name = "Pool_LibraryAliquot", joinColumns = { @JoinColumn(name = "aliquotId") }, inverseJoinColumns = {
+      @JoinColumn(name = "poolId") })
   private Set<Pool> pools;
 
   @ManyToOne(targetEntity = UserImpl.class)
@@ -140,18 +139,18 @@ public class LibraryDilution extends AbstractBoxable
 
   @OneToOne(optional = true)
   @PrimaryKeyJoinColumn
-  private DilutionBoxPosition boxPosition;
+  private LibraryAliquotBoxPosition boxPosition;
 
   private Double ngUsed;
 
   private Double volumeUsed;
 
-  @OneToMany(targetEntity = DilutionChangeLog.class, mappedBy = "dilution", cascade = CascadeType.REMOVE)
+  @OneToMany(targetEntity = LibraryAliquotChangeLog.class, mappedBy = "libraryAliquot", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Override
   public Boxable.EntityType getEntityType() {
-    return Boxable.EntityType.DILUTION;
+    return Boxable.EntityType.LIBRARY_ALIQUOT;
   }
 
   public Library getLibrary() {
@@ -182,12 +181,12 @@ public class LibraryDilution extends AbstractBoxable
 
   @Override
   public long getId() {
-    return dilutionId;
+    return aliquotId;
   }
 
   @Override
   public void setId(long id) {
-    this.dilutionId = id;
+    this.aliquotId = id;
   }
 
   @Override
@@ -294,11 +293,11 @@ public class LibraryDilution extends AbstractBoxable
   public boolean equals(Object obj) {
     if (obj == null) return false;
     if (obj == this) return true;
-    if (!(obj instanceof LibraryDilution)) return false;
-    final LibraryDilution them = (LibraryDilution) obj;
+    if (!(obj instanceof LibraryAliquot)) return false;
+    final LibraryAliquot them = (LibraryAliquot) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (LibraryDilution.UNSAVED_ID == getId() || LibraryDilution.UNSAVED_ID == them.getId()) {
+    if (LibraryAliquot.UNSAVED_ID == getId() || LibraryAliquot.UNSAVED_ID == them.getId()) {
       if (name == null) {
         if (them.getName() != null)
           return false;
@@ -350,7 +349,7 @@ public class LibraryDilution extends AbstractBoxable
   @CoverageIgnore
   @Override
   public int hashCode() {
-    if (LibraryDilution.UNSAVED_ID != getId()) {
+    if (LibraryAliquot.UNSAVED_ID != getId()) {
       return (int) getId();
     } else {
       final int PRIME = 37;
@@ -363,7 +362,7 @@ public class LibraryDilution extends AbstractBoxable
   }
 
   @Override
-  public int compareTo(LibraryDilution o) {
+  public int compareTo(LibraryAliquot o) {
     if (getId() < o.getId()) return -1;
     if (getId() > o.getId()) return 1;
     return 0;
@@ -384,7 +383,7 @@ public class LibraryDilution extends AbstractBoxable
     return boxPosition == null ? null : boxPosition.getPosition();
   }
 
-  public void setBoxPosition(DilutionBoxPosition boxPosition) {
+  public void setBoxPosition(LibraryAliquotBoxPosition boxPosition) {
     this.boxPosition = boxPosition;
   }
 
@@ -431,7 +430,7 @@ public class LibraryDilution extends AbstractBoxable
 
   @Override
   public String getDeleteType() {
-    return "Library Dilution";
+    return "Library Aliquot";
   }
 
   @Override
@@ -477,8 +476,8 @@ public class LibraryDilution extends AbstractBoxable
 
   @Override
   public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
-    DilutionChangeLog change = new DilutionChangeLog();
-    change.setDilution(this);
+    LibraryAliquotChangeLog change = new LibraryAliquotChangeLog();
+    change.setLibraryAliquot(this);
     change.setSummary(summary);
     change.setColumnsChanged(columnsChanged);
     change.setUser(user);

@@ -5,14 +5,11 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,19 +22,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryAliquotStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.service.WorksetService;
@@ -48,13 +43,11 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultLibraryDilutionService
-    implements LibraryDilutionService, PaginatedDataSource<LibraryDilution> {
-
-  protected static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
+public class DefaultLibraryAliquotService
+    implements LibraryAliquotService, PaginatedDataSource<LibraryAliquot> {
 
   @Autowired
-  private LibraryDilutionStore dilutionDao;
+  private LibraryAliquotStore libraryAliquotDao;
   @Autowired
   private DeletionStore deletionStore;
   @Autowired
@@ -68,27 +61,25 @@ public class DefaultLibraryDilutionService
   @Autowired
   private BoxService boxService;
   @Autowired
-  private ChangeLogService changeLogService;
-  @Autowired
   private WorksetService worksetService;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
   @Override
-  public LibraryDilution get(long dilutionId) throws IOException {
-    LibraryDilution dilution = dilutionDao.get(dilutionId);
-    return dilution;
+  public LibraryAliquot get(long id) throws IOException {
+    LibraryAliquot aliquot = libraryAliquotDao.get(id);
+    return aliquot;
   }
 
-  private LibraryDilution save(LibraryDilution dilution) throws IOException {
-    dilution.setLastModifier(authorizationManager.getCurrentUser());
+  private LibraryAliquot save(LibraryAliquot aliquot) throws IOException {
+    aliquot.setLastModifier(authorizationManager.getCurrentUser());
     try {
-      Long newId = dilutionDao.save(dilution);
-      LibraryDilution managed = dilutionDao.get(newId);
+      Long newId = libraryAliquotDao.save(aliquot);
+      LibraryAliquot managed = libraryAliquotDao.get(newId);
 
       // post-save field generation
       boolean needsUpdate = false;
-      if (hasTemporaryName(dilution)) {
+      if (hasTemporaryName(aliquot)) {
         managed.setName(namingScheme.generateNameFor(managed));
         validateNameOrThrow(managed, namingScheme);
         needsUpdate = true;
@@ -98,7 +89,7 @@ public class DefaultLibraryDilutionService
         generateAndSetIdBarcode(managed);
         needsUpdate = true;
       }
-      if (needsUpdate) dilutionDao.save(managed);
+      if (needsUpdate) libraryAliquotDao.save(managed);
       return managed;
     } catch (MisoNamingException e) {
       throw new IllegalArgumentException("Name generator failed to generate valid name for library");
@@ -110,31 +101,31 @@ public class DefaultLibraryDilutionService
   }
 
   @Override
-  public long create(LibraryDilution dilution) throws IOException {
-    loadChildEntities(dilution);
-    dilution.setCreator(authorizationManager.getCurrentUser());
-    boxService.throwIfBoxPositionIsFilled(dilution);
+  public long create(LibraryAliquot aliquot) throws IOException {
+    loadChildEntities(aliquot);
+    aliquot.setCreator(authorizationManager.getCurrentUser());
+    boxService.throwIfBoxPositionIsFilled(aliquot);
 
-    if (dilution.getConcentration() == null) {
-      dilution.setConcentrationUnits(null);
+    if (aliquot.getConcentration() == null) {
+      aliquot.setConcentrationUnits(null);
     }
-    if (dilution.getVolume() == null) {
-      dilution.setVolumeUnits(null);
-    }
-
-    Library library = dilution.getLibrary();
-    if (dilution.getVolumeUsed() != null && library.getVolume() != null) {
-      library.setVolume(library.getVolume() - dilution.getVolumeUsed());
+    if (aliquot.getVolume() == null) {
+      aliquot.setVolumeUnits(null);
     }
 
-    dilution.setChangeDetails(authorizationManager.getCurrentUser());
+    Library library = aliquot.getLibrary();
+    if (aliquot.getVolumeUsed() != null && library.getVolume() != null) {
+      library.setVolume(library.getVolume() - aliquot.getVolumeUsed());
+    }
+
+    aliquot.setChangeDetails(authorizationManager.getCurrentUser());
 
     // pre-save field generation
-    dilution.setName(generateTemporaryName());
-    validateChange(dilution, null);
-    long savedId = save(dilution).getId();
+    aliquot.setName(generateTemporaryName());
+    validateChange(aliquot, null);
+    long savedId = save(aliquot).getId();
     updateLibrary(library);
-    boxService.updateBoxableLocation(dilution);
+    boxService.updateBoxableLocation(aliquot);
     return savedId;
   }
 
@@ -151,86 +142,85 @@ public class DefaultLibraryDilutionService
   }
 
   @Override
-  public long update(LibraryDilution dilution) throws IOException {
-    LibraryDilution managed = get(dilution.getId());
-    maybeRemoveFromBox(dilution);
-    boxService.throwIfBoxPositionIsFilled(dilution);
+  public long update(LibraryAliquot aliquot) throws IOException {
+    LibraryAliquot managed = get(aliquot.getId());
+    maybeRemoveFromBox(aliquot);
+    boxService.throwIfBoxPositionIsFilled(aliquot);
 
-    loadChildEntities(dilution);
-    Library library = dilution.getLibrary();
+    loadChildEntities(aliquot);
+    Library library = aliquot.getLibrary();
     if (library.getVolume() != null) {
-      if (dilution.getVolumeUsed() != null && managed.getVolumeUsed() != null) {
-        library.setVolume(library.getVolume() + managed.getVolumeUsed() - dilution.getVolumeUsed());
+      if (aliquot.getVolumeUsed() != null && managed.getVolumeUsed() != null) {
+        library.setVolume(library.getVolume() + managed.getVolumeUsed() - aliquot.getVolumeUsed());
       } else if (managed.getVolumeUsed() != null) {
         library.setVolume(library.getVolume() + managed.getVolumeUsed());
-      } else if (dilution.getVolumeUsed() != null) {
-        library.setVolume(library.getVolume() - dilution.getVolumeUsed());
+      } else if (aliquot.getVolumeUsed() != null) {
+        library.setVolume(library.getVolume() - aliquot.getVolumeUsed());
       }
     }
-    validateChange(dilution, managed);
-    applyChanges(managed, dilution);
+    validateChange(aliquot, managed);
+    applyChanges(managed, aliquot);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
-    LibraryDilution saved = save(managed);
+    LibraryAliquot saved = save(managed);
     updateLibrary(library);
-    boxService.updateBoxableLocation(dilution);
+    boxService.updateBoxableLocation(aliquot);
     return saved.getId();
   }
 
   @Override
   public int count() throws IOException {
-    return dilutionDao.count();
+    return libraryAliquotDao.count();
   }
 
   @Override
-  public List<LibraryDilution> list() throws IOException {
-    return dilutionDao.listAll();
+  public List<LibraryAliquot> list() throws IOException {
+    return libraryAliquotDao.listAll();
   }
 
   @Override
-  public List<LibraryDilution> listByLibraryId(Long libraryId) throws IOException {
-    return dilutionDao.listByLibraryId(libraryId);
+  public List<LibraryAliquot> listByLibraryId(Long libraryId) throws IOException {
+    return libraryAliquotDao.listByLibraryId(libraryId);
   }
 
   @Override
-  public LibraryDilution getByBarcode(String barcode) throws IOException {
-    return dilutionDao.getByBarcode(barcode);
+  public LibraryAliquot getByBarcode(String barcode) throws IOException {
+    return libraryAliquotDao.getByBarcode(barcode);
   }
 
   /**
-   * Loads persisted objects into LibraryDilution fields. Should be called before saving LibraryDilutions. Loads all member objects
+   * Loads persisted objects into LibraryAliquot fields. Should be called before saving LibraryAliquots. Loads all member objects
    * <b>except</b>
    * <ul>
    * <li>creator/lastModifier User objects</li>
    * </ul>
    * 
-   * @param libraryDilution the LibraryDilution to load entities into. Must contain at least the IDs of objects to load (e.g. to load the
-   *          persisted Library
-   *          into dilution.library, dilution.library.id must be set)
+   * @param aliquot the LibraryAliquot to load entities into. Must contain at least the IDs of objects to load (e.g. to load the
+   *          persisted Library into aliquot.library, aliquot.library.id must be set)
    * @throws IOException
    */
-  private void loadChildEntities(LibraryDilution dilution) throws IOException {
-    if (dilution.getLibrary() != null) {
-      dilution.setLibrary(libraryService.get(dilution.getLibrary().getId()));
+  private void loadChildEntities(LibraryAliquot aliquot) throws IOException {
+    if (aliquot.getLibrary() != null) {
+      aliquot.setLibrary(libraryService.get(aliquot.getLibrary().getId()));
     }
-    if (dilution.getTargetedSequencing() != null) {
-      dilution.setTargetedSequencing(targetedSequencingService.get(dilution.getTargetedSequencing().getId()));
+    if (aliquot.getTargetedSequencing() != null) {
+      aliquot.setTargetedSequencing(targetedSequencingService.get(aliquot.getTargetedSequencing().getId()));
     }
   }
 
-  private void maybeRemoveFromBox(LibraryDilution dilution) {
-    if (dilution.isDiscarded() || dilution.isDistributed()) {
-      dilution.setBoxPosition(null);
+  private void maybeRemoveFromBox(LibraryAliquot aliquot) {
+    if (aliquot.isDiscarded() || aliquot.isDistributed()) {
+      aliquot.setBoxPosition(null);
     }
   }
 
   /**
-   * Copies modifiable fields from the source LibraryDilution into the target LibraryDilution to be persisted
+   * Copies modifiable fields from the source LibraryAliquot into the target LibraryAliquot to be persisted
    * 
-   * @param target the persisted LibraryDilution to modify
-   * @param source the modified LibraryDilution to copy modifiable fields from
+   * @param target the persisted LibraryAliquot to modify
+   * @param source the modified LibraryAliquot to copy modifiable fields from
    * @throws IOException
    */
-  private void applyChanges(LibraryDilution target, LibraryDilution source) {
+  private void applyChanges(LibraryAliquot target, LibraryAliquot source) {
     target.setTargetedSequencing(source.getTargetedSequencing());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setDiscarded(source.isDiscarded());
@@ -250,22 +240,22 @@ public class DefaultLibraryDilutionService
     target.setCreationDate(source.getCreationDate());
   }
 
-  private void validateChange(LibraryDilution dilution, LibraryDilution beforeChange) throws IOException {
+  private void validateChange(LibraryAliquot aliquot, LibraryAliquot beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
-    validateConcentrationUnits(dilution.getConcentration(), dilution.getConcentrationUnits(), errors);
-    validateVolumeUnits(dilution.getVolume(), dilution.getVolumeUnits(), errors);
-    validateBarcodeUniqueness(dilution, beforeChange, dilutionDao::getByBarcode, errors, "dilution");
-    validateTargetedSequencing(dilution, errors);
+    validateConcentrationUnits(aliquot.getConcentration(), aliquot.getConcentrationUnits(), errors);
+    validateVolumeUnits(aliquot.getVolume(), aliquot.getVolumeUnits(), errors);
+    validateBarcodeUniqueness(aliquot, beforeChange, libraryAliquotDao::getByBarcode, errors, "library aliquot");
+    validateTargetedSequencing(aliquot, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
   }
 
-  private void validateTargetedSequencing(LibraryDilution dilution, List<ValidationError> errors) {
-    TargetedSequencing ts = dilution.getTargetedSequencing();
-    Library library = dilution.getLibrary();
+  private void validateTargetedSequencing(LibraryAliquot aliquot, List<ValidationError> errors) {
+    TargetedSequencing ts = aliquot.getTargetedSequencing();
+    Library library = aliquot.getLibrary();
 
     if (ts == null) {
       if (isTargetedSequencingRequired(library)) {
@@ -288,8 +278,8 @@ public class DefaultLibraryDilutionService
     return library.getKitDescriptor().getTargetedSequencing().contains(ts);
   }
 
-  public void setDilutionDao(LibraryDilutionStore dilutionDao) {
-    this.dilutionDao = dilutionDao;
+  public void setLibraryAliquotDao(LibraryAliquotStore libraryAliquotDao) {
+    this.libraryAliquotDao = libraryAliquotDao;
   }
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
@@ -326,8 +316,8 @@ public class DefaultLibraryDilutionService
   }
 
   @Override
-  public List<LibraryDilution> listByIdList(List<Long> idList) throws IOException {
-    return dilutionDao.listByIdList(idList);
+  public List<LibraryAliquot> listByIdList(List<Long> idList) throws IOException {
+    return libraryAliquotDao.listByIdList(idList);
 
   }
 
@@ -337,13 +327,13 @@ public class DefaultLibraryDilutionService
   }
 
   @Override
-  public void authorizeDeletion(LibraryDilution object) throws IOException {
+  public void authorizeDeletion(LibraryAliquot object) throws IOException {
     User creator = object.getCreator();
     authorizationManager.throwIfNonAdminOrMatchingOwner(creator);
   }
 
   @Override
-  public ValidationResult validateDeletion(LibraryDilution object) {
+  public ValidationResult validateDeletion(LibraryAliquot object) {
     ValidationResult result = new ValidationResult();
 
     if (object.getPools() != null && !object.getPools().isEmpty()) {
@@ -355,10 +345,10 @@ public class DefaultLibraryDilutionService
   }
 
   @Override
-  public void beforeDelete(LibraryDilution object) throws IOException {
-    List<Workset> worksets = worksetService.listByDilution(object.getId());
+  public void beforeDelete(LibraryAliquot object) throws IOException {
+    List<Workset> worksets = worksetService.listByLibraryAliquot(object.getId());
     for (Workset workset : worksets) {
-      workset.getDilutions().removeIf(ldi -> ldi.getId() == object.getId());
+      workset.getLibraryAliquots().removeIf(ldi -> ldi.getId() == object.getId());
       worksetService.update(workset);
     }
     Box box = object.getBox();
@@ -369,25 +359,14 @@ public class DefaultLibraryDilutionService
   }
 
   @Override
-  public void afterDelete(LibraryDilution object) throws IOException {
-    LibraryChangeLog changeLog = new LibraryChangeLog();
-    changeLog.setLibrary(object.getLibrary());
-    changeLog.setColumnsChanged(object.getName());
-    changeLog.setSummary("Deleted dilution " + object.getName() + ".");
-    changeLog.setTime(new Date());
-    changeLog.setUser(authorizationManager.getCurrentUser());
-    changeLogService.create(changeLog);
-  }
-
-  @Override
   public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
-    return dilutionDao.count(errorHandler, filter);
+    return libraryAliquotDao.count(errorHandler, filter);
   }
 
   @Override
-  public List<LibraryDilution> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+  public List<LibraryAliquot> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
       PaginationFilter... filter) throws IOException {
-    return dilutionDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+    return libraryAliquotDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
 }

@@ -30,6 +30,10 @@ public class Pluralizer {
     return pluralize(count, "library", "libraries");
   }
 
+  public static String libraryAliquots(long count) {
+    return pluralize(count, "library aliquot", "library aliquots");
+  }
+
   public static String libraryDesigns(long count) {
     return pluralize(count, "library design", "library designs");
   }

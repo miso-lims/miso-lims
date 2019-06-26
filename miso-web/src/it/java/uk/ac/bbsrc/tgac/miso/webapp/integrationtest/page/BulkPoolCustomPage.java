@@ -19,12 +19,12 @@ public class BulkPoolCustomPage extends BulkPoolPage {
 
   public BulkPoolCustomPage(WebDriver driver) {
     super(driver);
-    waitWithTimeout().until(titleContains("Create Pools from Dilutions "));
+    waitWithTimeout().until(titleContains("Create Pools from Library Aliquots "));
   }
 
-  public static BulkPoolCustomPage get(WebDriver driver, String baseUrl, Collection<Long> dilutionIds, int poolQuantity) {
-    String ids = Joiner.on(',').join(dilutionIds);
-    String url = baseUrl + "miso/dilution/bulk/pool?ids=" + ids + "&quantity=" + poolQuantity;
+  public static BulkPoolCustomPage get(WebDriver driver, String baseUrl, Collection<Long> aliquotIds, int poolQuantity) {
+    String ids = Joiner.on(',').join(aliquotIds);
+    String url = baseUrl + "miso/libraryaliquot/bulk/pool?ids=" + ids + "&quantity=" + poolQuantity;
     driver.get(url);
     return new BulkPoolCustomPage(driver);
   }
@@ -34,8 +34,8 @@ public class BulkPoolCustomPage extends BulkPoolPage {
     return new HandsOnTable(getDriver());
   }
 
-  public void switchToDilutionView() {
-    switchView("Choose Dilutions");
+  public void switchToLibraryAliquotView() {
+    switchView("Choose Library Aliquots");
   }
 
   public void switchToPoolView() {

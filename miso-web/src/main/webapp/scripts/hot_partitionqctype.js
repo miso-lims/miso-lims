@@ -1,6 +1,10 @@
 HotTarget.partitionqctype = {
-  createUrl: '/miso/rest/partitionqctypes',
-  updateUrl: '/miso/rest/partitionqctypes/',
+  getCreateUrl: function() {
+    return Urls.rest.partitionQcTypes.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.partitionQcTypes.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

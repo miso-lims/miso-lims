@@ -1,6 +1,10 @@
 HotTarget.studytype = {
-  createUrl: '/miso/rest/studytypes',
-  updateUrl: '/miso/rest/studytypes/',
+  getCreateUrl: function() {
+    return Urls.rest.studyTypes.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.studyTypes.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

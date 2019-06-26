@@ -16,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 
 public enum SampleSheet {
@@ -45,13 +45,13 @@ public enum SampleSheet {
     }
 
     @Override
-    protected void makeColumns(Run run, Partition partition, PoolableElementView dilution, String userName, String[] output) {
-      output[0] = dilution.getLibraryName();
-      output[1] = dilution.getLibraryAlias();
-      final Optional<Index> firstIndex = dilution.getIndices().stream().filter(i -> i.getPosition() == 1).findFirst();
+    protected void makeColumns(Run run, Partition partition, PoolableElementView aliquot, String userName, String[] output) {
+      output[0] = aliquot.getLibraryName();
+      output[1] = aliquot.getLibraryAlias();
+      final Optional<Index> firstIndex = aliquot.getIndices().stream().filter(i -> i.getPosition() == 1).findFirst();
       output[2] = firstIndex.map(Index::getName).orElse("");
       output[3] = firstIndex.map(Index::getSequence).orElse("");
-      final Optional<Index> secondIndex = dilution.getIndices().stream().filter(i -> i.getPosition() == 2).findFirst();
+      final Optional<Index> secondIndex = aliquot.getIndices().stream().filter(i -> i.getPosition() == 2).findFirst();
       output[4] = secondIndex.map(Index::getName).orElse("");
       output[5] = secondIndex.map(Index::getSequence)
           .map(run.getSequencer().getInstrumentModel().getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
@@ -78,13 +78,13 @@ public enum SampleSheet {
     }
 
     @Override
-    protected void makeColumns(Run run, Partition p, PoolableElementView dilution, String userName, String[] output) {
+    protected void makeColumns(Run run, Partition p, PoolableElementView aliquot, String userName, String[] output) {
       output[0] = p.getSequencerPartitionContainer().getIdentificationBarcode();
       output[1] = p.getPartitionNumber().toString();
-      output[2] = String.format("%d_%s_%s", p.getSequencerPartitionContainer().getId(), dilution.getLibraryName(),
-          dilution.getDilutionName());
-      output[3] = dilution.getSampleAlias().replaceAll("\\s", "");
-      output[4] = dilution.getIndices().stream()//
+      output[2] = String.format("%d_%s_%s", p.getSequencerPartitionContainer().getId(), aliquot.getLibraryName(),
+          aliquot.getAliquotName());
+      output[3] = aliquot.getSampleAlias().replaceAll("\\s", "");
+      output[4] = aliquot.getIndices().stream()//
           .sorted(Comparator.comparingInt(Index::getPosition))//
           .map(i -> {
             if (run.getSequencer().getInstrumentModel().getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
@@ -94,7 +94,7 @@ public enum SampleSheet {
             return i.getSequence();
           })//
           .collect(Collectors.joining("-"));
-      output[5] = dilution.getLibraryDescription();
+      output[5] = aliquot.getLibraryDescription();
       output[6] = "N";
       output[7] = "NA";
       output[8] = userName;
@@ -118,9 +118,9 @@ public enum SampleSheet {
     }
 
     @Override
-    protected void makeColumns(Run run, Partition partition, PoolableElementView dilution, String userName, String[] output) {
-      SampleSheet.CASAVA_1_7.makeColumns(run, partition, dilution, userName, output);
-      output[9] = dilution.getProjectAlias().replaceAll("\\s", "");
+    protected void makeColumns(Run run, Partition partition, PoolableElementView aliquot, String userName, String[] output) {
+      SampleSheet.CASAVA_1_7.makeColumns(run, partition, aliquot, userName, output);
+      output[9] = aliquot.getProjectAlias().replaceAll("\\s", "");
     }
   },
   CELL_RANGER("CellRanger") {
@@ -140,12 +140,12 @@ public enum SampleSheet {
     }
 
     @Override
-    protected void makeColumns(Run run, Partition partition, PoolableElementView dilution, String userName, String[] output) {
+    protected void makeColumns(Run run, Partition partition, PoolableElementView aliquot, String userName, String[] output) {
       output[0] = Integer.toString(partition.getPartitionNumber());
-      output[1] = dilution.getDilutionName();
-      output[2] = dilution.getLibraryAlias();
-      output[3] = dilution.getIndices().stream().findFirst().map(Index::getSequence).orElse("");
-      output[4] = dilution.getProjectShortName();
+      output[1] = aliquot.getAliquotName();
+      output[2] = aliquot.getLibraryAlias();
+      output[3] = aliquot.getIndices().stream().findFirst().map(Index::getSequence).orElse("");
+      output[4] = aliquot.getProjectShortName();
     }
   };
   private static char complement(char nt) {
@@ -212,11 +212,11 @@ public enum SampleSheet {
   public abstract boolean allowedFor(Run run);
 
   private Stream<String> createRowsForPartition(Run run, User user, List<String> columns, Partition partition) {
-    return partition.getPool().getPoolDilutions().stream()//
-        .map(PoolDilution::getPoolableElementView)
-        .map(dilution -> {
+    return partition.getPool().getPoolContents().stream()//
+        .map(PoolElement::getPoolableElementView)
+        .map(aliquot -> {
           final String[] output = new String[columns.size()];
-          makeColumns(run, partition, dilution, user.getLoginName(), output);
+          makeColumns(run, partition, aliquot, user.getLoginName(), output);
           return String.join(",", output);
         });
   }
@@ -236,5 +236,5 @@ public enum SampleSheet {
 
   protected abstract String header(Run run);
 
-  protected abstract void makeColumns(Run run, Partition partition, PoolableElementView dilution, String userName, String[] output);
+  protected abstract void makeColumns(Run run, Partition partition, PoolableElementView aliquot, String userName, String[] output);
 }

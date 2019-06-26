@@ -16,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
@@ -259,7 +259,7 @@ public class BoxPageIT extends AbstractIT {
     Box initial = (Box) getSession().get(BoxImpl.class, 500L);
     assertNotNull(initial.getBoxPositions().get(position));
 
-    LibraryDilution initialLD = (LibraryDilution) getSession().get(LibraryDilution.class, 504L);
+    LibraryAliquot initialLD = (LibraryAliquot) getSession().get(LibraryAliquot.class, 504L);
     assertFalse("check that boxable is not discarded", initialLD.isDiscarded());
     assertFalse("check that boxable location is not EMPTY", "EMPTY".equals(BoxUtils.makeLocationLabel(initialLD)));
 
@@ -275,7 +275,7 @@ public class BoxPageIT extends AbstractIT {
     Box box = (Box) getSession().get(BoxImpl.class, 500L);
     assertNull(box.getBoxPositions().get(position));
 
-    LibraryDilution boxable = (LibraryDilution) getSession().get(LibraryDilution.class, 504L);
+    LibraryAliquot boxable = (LibraryAliquot) getSession().get(LibraryAliquot.class, 504L);
     assertTrue("check that boxable is discarded", boxable.isDiscarded());
     assertTrue("check that boxable volume is null", boxable.getVolume().equals(Double.valueOf(0D)));
     assertEquals("check that boxable location is empty", "EMPTY", BoxUtils.makeLocationLabel(boxable));
@@ -303,10 +303,10 @@ public class BoxPageIT extends AbstractIT {
     BoxPage post = getBoxPage(500L);
     BoxVisualization postVis = post.getVisualization();
     assertFalse("check that position D01 is still full", postVis.isEmptyPosition(position));
-    assertTrue("check that D01 is now a dilution", postVis.getPositionTitle(position).contains("LDI"));
+    assertTrue("check that D01 is now a library aliquot", postVis.getPositionTitle(position).contains("LDI"));
 
     Box box = (Box) getSession().get(BoxImpl.class, 500L);
-    assertEquals("check that D01 now contains dilution", EntityType.DILUTION,
+    assertEquals("check that D01 now contains library aliquot", EntityType.LIBRARY_ALIQUOT,
         box.getBoxPositions().get(position).getBoxableId().getTargetType());
   }
 

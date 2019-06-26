@@ -61,15 +61,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
-import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
@@ -212,16 +212,16 @@ public class LibraryRestController extends RestController {
       return libraryService.get(id);
     }
   })//
-      .add(new RelationFinder.RelationAdapter<Library, LibraryDilution, DilutionDto>("Dilution") {
+      .add(new RelationFinder.RelationAdapter<Library, LibraryAliquot, LibraryAliquotDto>("Library Aliquot") {
 
         @Override
-        public DilutionDto asDto(LibraryDilution model) {
+        public LibraryAliquotDto asDto(LibraryAliquot model) {
           return Dtos.asDto(model, false, false);
         }
 
         @Override
-        public Stream<LibraryDilution> find(Library model, Consumer<String> emitError) {
-          Collection<LibraryDilution> children = model.getLibraryDilutions();
+        public Stream<LibraryAliquot> find(Library model, Consumer<String> emitError) {
+          Collection<LibraryAliquot> children = model.getLibraryAliquots();
           if (children.isEmpty()) {
             emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
             return Stream.empty();
@@ -238,7 +238,7 @@ public class LibraryRestController extends RestController {
 
         @Override
         public Stream<Pool> find(Library model, Consumer<String> emitError) {
-          Set<Pool> children = model.getLibraryDilutions().stream().flatMap(dilution -> dilution.getPools().stream())
+          Set<Pool> children = model.getLibraryAliquots().stream().flatMap(aliquot -> aliquot.getPools().stream())
               .collect(Collectors.toSet());
           if (children.isEmpty()) {
             emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));

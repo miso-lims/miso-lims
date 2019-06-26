@@ -23,12 +23,12 @@
 
 WarningTarget.pool = {
   getWarnings: function(pool) {
-    var revokedDilutions = [];
+    var revokedAliquots = [];
     if (pool.pooledElements) {
-      revokedDilutions = pool.pooledElements.filter(function(dilution) {
-        return dilution.identityConsentLevel === 'Revoked';
-      }).map(function(dilution) {
-        return dilution.name;
+      revokedAliquots = pool.pooledElements.filter(function(element) {
+        return element.identityConsentLevel === 'Revoked';
+      }).map(function(element) {
+        return element.name;
       })
     }
     return [
@@ -63,8 +63,8 @@ WarningTarget.pool = {
           tableMessage: '(LOW QUALITY LIBRARIES)',
           tileMessage: 'LOW QUALITY LIBRARIES'
         }, {
-          include: revokedDilutions.length > 0,
-          headerMessage: "Donor has revoked consent for " + revokedDilutions.toString(),
+          include: revokedAliquots.length > 0,
+          headerMessage: "Donor has revoked consent for " + revokedAliquots.toString(),
           tableMessage: '(CONSENT REVOKED)',
           tileMessage: 'CONSENT REVOKED'
         }];

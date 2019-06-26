@@ -24,10 +24,10 @@
 WarningTarget.poolelement = {
   makeTarget: function(duplicateSequences, nearDuplicateSequences) {
     return {
-      getWarnings: function(dilution) {
+      getWarnings: function(element) {
         var indices = Constants.indexFamilies.reduce(function(acc, family) {
           return acc.concat(family.indices.filter(function(index) {
-            return dilution.indexIds.indexOf(index.id) != -1;
+            return element.indexIds.indexOf(index.id) != -1;
           }));
         }, []).sort(function(a, b) {
           return a.position - b.position;
@@ -39,12 +39,12 @@ WarningTarget.poolelement = {
 
         return [
             {
-              include: dilution.subprojectPriority,
-              tableMessage: 'PRIORITY (' + dilution.subprojectAlias + ')',
+              include: element.subprojectPriority,
+              tableMessage: 'PRIORITY (' + element.subprojectAlias + ')',
               level: 'important'
             },
             {
-              include: dilution.library.lowQuality,
+              include: element.library.lowQuality,
               tableMessage: '(LOW QUALITY LIBRARY)'
             },
             {
@@ -59,7 +59,7 @@ WarningTarget.poolelement = {
               include: Utils.validation.isEmpty(combined),
               tableMessage: "(NO INDEX)"
             }, {
-              include: dilution.identityConsentLevel === 'Revoked',
+              include: element.identityConsentLevel === 'Revoked',
               tableMessage: '(CONSENT REVOKED)'
             }];
       }

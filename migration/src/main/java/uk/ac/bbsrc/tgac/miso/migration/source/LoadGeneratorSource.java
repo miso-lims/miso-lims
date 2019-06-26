@@ -33,7 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -49,7 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -62,7 +62,7 @@ import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
 
 /**
  * This MigrationSource is used for generating bulk data for load-testing. It creates projects, detailed samples, libraries, library
- * dilutions, pools, and runs. The detailed samples generated include identities, tissue, analyte stock, and aliquots. Runs include
+ * aliquots, pools, and runs. The detailed samples generated include identities, tissue, analyte stock, and aliquots. Runs include
  * sequencing containers with pools loaded
  */
 public class LoadGeneratorSource implements MigrationSource {
@@ -122,7 +122,7 @@ public class LoadGeneratorSource implements MigrationSource {
   private List<Project> projects = null;
   private List<Sample> samples = null;
   private List<Library> libraries = null;
-  private List<LibraryDilution> libraryDilutions = null;
+  private List<LibraryAliquot> libraryAliquots = null;
   private List<Pool> pools = null;
   private List<Run> runs = null;
 
@@ -374,48 +374,48 @@ public class LoadGeneratorSource implements MigrationSource {
     return root;
   }
 
-  public List<LibraryDilution> getLibraryDilutions() {
-    if (this.libraryDilutions == null) {
-      log.info("Generating " + libraryCount + " dilutions (1 per library)...");
-      List<LibraryDilution> libraryDilutions = new ArrayList<>();
+  public List<LibraryAliquot> getLibraryAliquots() {
+    if (this.libraryAliquots == null) {
+      log.info("Generating " + libraryCount + " library aliquots (1 per library)...");
+      List<LibraryAliquot> libraryAliquots = new ArrayList<>();
       List<Library> libs = getLibraries();
       for (int i = 0; i < libs.size(); i++) {
-        libraryDilutions.add(createLibraryDilution(libs.get(i), i + 1));
+        libraryAliquots.add(createLibraryAliquot(libs.get(i), i + 1));
       }
-      this.libraryDilutions = libraryDilutions;
-      log.info(libraryDilutions.size() + " dilutions generated.");
+      this.libraryAliquots = libraryAliquots;
+      log.info(libraryAliquots.size() + " library aliquots generated.");
     }
-    return this.libraryDilutions;
+    return this.libraryAliquots;
   }
 
-  private static LibraryDilution createLibraryDilution(Library library, int dilutionNum) {
-    LibraryDilution ldi = new LibraryDilution();
+  private static LibraryAliquot createLibraryAliquot(Library library, int aliquotNum) {
+    LibraryAliquot ldi = new LibraryAliquot();
     UserImpl user = new UserImpl();
     user.setId(5L);
     user.setFullName("load-test");
     ldi.setLibrary(library);
     ldi.setConcentration(1D);
     ldi.setCreator(user);
-    // preMigrationId is used to link Dilutions/PoolableElementViews to Pools before they are saved
-    ldi.setPreMigrationId((long) dilutionNum);
+    // preMigrationId is used to link Library Aliquots/PoolableElementViews to Pools before they are saved
+    ldi.setPreMigrationId((long) aliquotNum);
     return ldi;
   }
 
   public List<Pool> getPools() {
     if (this.pools == null) {
-      log.info("Generating " + poolCount + " pools, each containing " + poolSize + " dilutions...");
+      log.info("Generating " + poolCount + " pools, each containing " + poolSize + " library aliquots...");
       List<Pool> pools = new ArrayList<>();
-      List<LibraryDilution> libraryDilutions = getLibraryDilutions();
-      if (libraryDilutions.size() < poolSize) {
+      List<LibraryAliquot> libraryAliquots = getLibraryAliquots();
+      if (libraryAliquots.size() < poolSize) {
         throw new IllegalStateException(
-            "The pools need to have " + poolSize + " elements, but only " + libraryDilutions.size() + " dilutions are available.");
+            "The pools need to have " + poolSize + " elements, but only " + libraryAliquots.size() + " library aliquots are available.");
       }
       for (int poolNum = 1, libNum = 0; poolNum <= poolCount; poolNum++) {
-        Set<LibraryDilution> ldis = new HashSet<>();
+        Set<LibraryAliquot> ldis = new HashSet<>();
         while (ldis.size() < poolSize) {
-          ldis.add(libraryDilutions.get(libNum));
+          ldis.add(libraryAliquots.get(libNum));
           libNum++;
-          if (libNum >= libraryDilutions.size()) libNum = 0;
+          if (libNum >= libraryAliquots.size()) libNum = 0;
         }
         pools.add(createPool(ldis, poolNum));
       }
@@ -425,15 +425,15 @@ public class LoadGeneratorSource implements MigrationSource {
     return this.pools;
   }
 
-  private Pool createPool(Set<LibraryDilution> libraryDilutions, int poolNum) {
+  private Pool createPool(Set<LibraryAliquot> libraryAliquots, int poolNum) {
     Pool p = new PoolImpl();
     p.setAlias("Test_Pool_" + poolNum);
-    Set<PoolDilution> poolables = Sets.newHashSet();
-    for (LibraryDilution ldi : libraryDilutions) {
-      PoolDilution pd = new PoolDilution(p, PoolableElementView.fromDilution(ldi));
+    Set<PoolElement> poolables = Sets.newHashSet();
+    for (LibraryAliquot ldi : libraryAliquots) {
+      PoolElement pd = new PoolElement(p, PoolableElementView.fromLibraryAliquot(ldi));
       poolables.add(pd);
     }
-    p.setPoolDilutions(poolables);
+    p.setPoolElements(poolables);
     p.setConcentration(2D);
     p.setPlatformType(PlatformType.ILLUMINA);
     return p;
@@ -519,7 +519,7 @@ public class LoadGeneratorSource implements MigrationSource {
       data.setProjects(getProjects());
       data.setSamples(getSamples());
       data.setLibraries(getLibraries());
-      data.setDilutions(getLibraryDilutions());
+      data.setLibraryAliquots(getLibraryAliquots());
       data.setPools(getPools());
       data.setRuns(getRuns());
       migrationData = data;

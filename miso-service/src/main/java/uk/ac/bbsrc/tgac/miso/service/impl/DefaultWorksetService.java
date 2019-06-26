@@ -20,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.WorksetStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.WorksetService;
@@ -39,7 +39,7 @@ public class DefaultWorksetService implements WorksetService {
   @Autowired
   private LibraryService libraryService;
   @Autowired
-  private LibraryDilutionService dilutionService;
+  private LibraryAliquotService libraryAliquotService;
   @Autowired
   private DeletionStore deletionStore;
   @Autowired
@@ -57,8 +57,8 @@ public class DefaultWorksetService implements WorksetService {
     this.libraryService = libraryService;
   }
 
-  public void setDilutionService(LibraryDilutionService dilutionService) {
-    this.dilutionService = dilutionService;
+  public void setLibraryAliquotService(LibraryAliquotService libraryAliquotService) {
+    this.libraryAliquotService = libraryAliquotService;
   }
 
   public void setDeletionStore(DeletionStore deletionStore) {
@@ -101,8 +101,8 @@ public class DefaultWorksetService implements WorksetService {
   }
 
   @Override
-  public List<Workset> listByDilution(long dilutionId) {
-    return worksetStore.listByDilution(dilutionId);
+  public List<Workset> listByLibraryAliquot(long aliquotId) {
+    return worksetStore.listByLibraryAliquot(aliquotId);
   }
 
   @Override
@@ -125,7 +125,8 @@ public class DefaultWorksetService implements WorksetService {
   private void loadMembers(Workset newWorkflow) {
     newWorkflow.setSamples(loadMembers("Sample", newWorkflow.getSamples(), WhineyFunction.rethrow(id -> sampleService.get(id))));
     newWorkflow.setLibraries(loadMembers("Library", newWorkflow.getLibraries(), WhineyFunction.rethrow(id -> libraryService.get(id))));
-    newWorkflow.setDilutions(loadMembers("Dilution", newWorkflow.getDilutions(), WhineyFunction.rethrow(id -> dilutionService.get(id))));
+    newWorkflow.setLibraryAliquots(
+        loadMembers("Library Aliquot", newWorkflow.getLibraryAliquots(), WhineyFunction.rethrow(id -> libraryAliquotService.get(id))));
   }
 
   private <T extends Identifiable> Set<T> loadMembers(String typeName, Collection<T> items, Function<Long, T> getter) {
@@ -149,7 +150,7 @@ public class DefaultWorksetService implements WorksetService {
   private void applyMemberChanges(Workset changed, Workset managed) {
     applyMemberChanges(changed.getSamples(), managed.getSamples(), WhineyFunction.rethrow(ids -> sampleService.listByIdList(ids)));
     applyMemberChanges(changed.getLibraries(), managed.getLibraries(), WhineyFunction.rethrow(ids -> libraryService.listByIdList(ids)));
-    applyMemberChanges(changed.getDilutions(), managed.getDilutions(), WhineyFunction.rethrow(ids -> dilutionService.listByIdList(ids)));
+    applyMemberChanges(changed.getLibraryAliquots(), managed.getLibraryAliquots(), WhineyFunction.rethrow(ids -> libraryAliquotService.listByIdList(ids)));
   }
 
   private <T extends Identifiable> void applyMemberChanges(Set<T> changed, Set<T> managed,

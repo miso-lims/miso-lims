@@ -24,8 +24,8 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @Repository
 public class HibernatePoolableElementViewDao implements PoolableElementViewDao, HibernatePaginatedDataSource<PoolableElementView> {
 
-  // Make sure these match the HiberateLibraryDilutionDao
-  private static final String[] SEARCH_PROPERTIES = new String[] { "dilutionName", "dilutionBarcode", "libraryName", "libraryAlias",
+  // Make sure these match the HiberateLibraryAliquotDao
+  private static final String[] SEARCH_PROPERTIES = new String[] { "aliquotName", "aliquotBarcode", "libraryName", "libraryAlias",
       "libraryDescription" };
 
   @Autowired
@@ -41,15 +41,15 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
-  public PoolableElementView get(Long dilutionId) throws IOException {
-    return (PoolableElementView) currentSession().get(PoolableElementView.class, dilutionId);
+  public PoolableElementView get(Long aliquotId) throws IOException {
+    return (PoolableElementView) currentSession().get(PoolableElementView.class, aliquotId);
   }
 
   @Override
   public PoolableElementView getByBarcode(String barcode) throws IOException {
     if (barcode == null) throw new IOException("Barcode cannot be null!");
     Criteria criteria = currentSession().createCriteria(PoolableElementView.class);
-    criteria.add(Restrictions.eq("dilutionBarcode", barcode));
+    criteria.add(Restrictions.eq("aliquotBarcode", barcode));
     return (PoolableElementView) criteria.uniqueResult();
   }
 
@@ -72,12 +72,12 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
-  public List<PoolableElementView> list(List<Long> dilutionIds) throws IOException {
-    if (dilutionIds.size() == 0) {
+  public List<PoolableElementView> list(List<Long> aliquotIds) throws IOException {
+    if (aliquotIds.size() == 0) {
       return Collections.emptyList();
     }
     Criteria criteria = currentSession().createCriteria(PoolableElementView.class);
-    criteria.add(Restrictions.in("id", dilutionIds));
+    criteria.add(Restrictions.in("id", aliquotIds));
     @SuppressWarnings("unchecked")
     List<PoolableElementView> results = criteria.list();
     return results;
@@ -92,13 +92,13 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   public String propertyForSortColumn(String original) {
     switch (original) {
     case "id":
-      return "dilutionId";
+      return "aliquotId";
     case "name":
-      return "dilutionName";
+      return "aliquotName";
     case "volume":
-      return "dilutionVolume";
+      return "aliquotVolume";
     case "identificationBarcode":
-      return "dilutionBarcode";
+      return "aliquotBarcode";
     case "library.id":
       return "libraryId";
     case "library.alias":
@@ -107,20 +107,18 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
       return "sampleId";
     case "library.parentSampleAlias":
       return "sampleAlias";
-    case "dilutionUserName":
-      return "creatorName";
     case "creationDate":
       return "created";
     case "library.platformType":
       return "platformType";
     case "concentration":
-      return "dilutionConcentration";
+      return "aliquotConcentration";
     case "concentrationUnits":
-      return "dilutionConcentrationUnits";
+      return "aliquotConcentrationUnits";
     case "ngUsed":
-      return "dilutionNgUsed";
+      return "aliquotNgUsed";
     case "volumeUsed":
-      return "dilutionVolumeUsed";
+      return "aliquotVolumeUsed";
     default:
       return original;
     }
@@ -134,7 +132,7 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   @Override
   public void restrictPaginationByPoolId(Criteria criteria, long poolId, Consumer<String> errorHandler) {
     criteria
-        .add(Restrictions.sqlRestriction("EXISTS(SELECT * FROM Pool_Dilution WHERE pool_poolId = ? AND dilution_dilutionId = dilutionId)",
+        .add(Restrictions.sqlRestriction("EXISTS(SELECT * FROM Pool_LibraryAliquot WHERE poolId = ? AND aliquotId = aliquotId)",
             poolId, LongType.INSTANCE));
   }
 
@@ -173,6 +171,6 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
 
   @Override
   public String getFriendlyName() {
-    return "Dilution";
+    return "Library Aliquot";
   }
 }

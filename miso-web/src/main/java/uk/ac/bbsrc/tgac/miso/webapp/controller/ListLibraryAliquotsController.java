@@ -21,17 +21,27 @@
  * *********************************************************************
  */
 
-WarningTarget.dilution = {
-  getWarnings: function(dilution) {
-    return [{
-      include: dilution.subprojectPriority,
-      headerMessage: 'Belongs to high priority subproject \'' + dilution.subprojectAlias + '\'',
-      tableMessage: 'PRIORITY (' + dilution.subprojectAlias + ')',
-      level: "important"
-    }, {
-      include: dilution.identityConsentLevel === 'Revoked',
-      headerMessage: 'Donor has revoked consent',
-      tableMessage: '(CONSENT REVOKED)'
-    }];
-  },
-};
+package uk.ac.bbsrc.tgac.miso.webapp.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
+
+@Controller
+public class ListLibraryAliquotsController {
+
+  @ModelAttribute("title")
+  public String title() {
+    return "Library Aliquots";
+  }
+
+  @RequestMapping("/libraryaliquots")
+  public ModelAndView list(ModelMap model) throws Exception {
+    return new ListItemsPage("libraryaliquot").list(model);
+  }
+
+}

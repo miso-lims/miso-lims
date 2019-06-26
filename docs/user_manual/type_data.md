@@ -315,10 +315,10 @@ will take you to the Create Kit Descriptor page. Enter all of the kit details, t
 right to create the kit descriptor.
 
 Once a kit has been created, it is possible to link existing [Targeted Sequencing](#targeted_sequencing) values to the
-kit descriptor. Then, if a library is prepared using this kit descriptor, dilutions created from the library can be 
+kit descriptor. Then, if a library is prepared using this kit descriptor, aliquots created from the library can be 
 assigned a targeted sequencing from the targeted sequencings linked to the kit descriptor. This means that if a desired
-targeted sequencing is not available for a dilution, this can be solved by linking the targeted sequencing to the kit
-descriptor of the dilution's parent library.
+targeted sequencing is not available for a library aliquot, this can be solved by linking the targeted sequencing to
+the kit descriptor of the library aliquot's parent library.
 
 {% include userman-toplink.md %}
 
@@ -369,11 +369,11 @@ existing libraries.
 {% include userman-heading.md section=page.section sub=sub title="Targeted Sequencing" %}
 
 Targeted sequencing allows specific sections of the genome to be sequenced resulting in more depth and lower cost. The
-targeted sequencing value specified on a library dilution should be associated with a .bed file that will be used for
+targeted sequencing value specified on a library aliquot should be associated with a .bed file that will be used for
 analysis and QC, though this file is not tracked within MISO.
 
 Targeted sequencing values may be archived if they are no longer needed. This will prevent them from showing up in the
-options when creating new library dilutions.
+options when creating new library aliquots.
 
 Modifications to targeted sequencing values can only be made via direct access to the MISO database. As such, they must
 be performed by a MISO adminstrator.
@@ -413,9 +413,9 @@ only be deleted if the type has not been used by any existing partitions.
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Box Sizes" %}
 
-A box in MISO describes a physical container that holds multiple samples, libraries, dilutions, and/or pools. Box sizes
-define the possible dimensions of these boxes. A box size may be marked as scannable. This means that the box can be
-scanned using a bulk barcode scanner (see [Barcode Scanners](site_configuration.html#barcode_scanners)).
+A box in MISO describes a physical container that holds multiple samples, libraries, library aliquots, and/or pools.
+Box sizes define the possible dimensions of these boxes. A box size may be marked as scannable. This means that the box
+can be scanned using a bulk barcode scanner (see [Barcode Scanners](site_configuration.html#barcode_scanners)).
 
 MISO administrators can add, edit, and delete box sizes using the standard interface. Box size dimensions cannot be
 modified if there are any existing boxes using the size. A box size can only be deleted if the size has not been used
@@ -428,8 +428,8 @@ by any existing boxes.
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Box Uses" %}
 
-A box in MISO describes a physical container that holds multiple samples, libraries, dilutions, and/or pools. Box uses
-are used to categorize these boxes. The Boxes list page is broken into tabs - one for each box use.
+A box in MISO describes a physical container that holds multiple samples, libraries, library aliquots, and/or pools.
+Box uses are used to categorize these boxes. The Boxes list page is broken into tabs - one for each box use.
 
 MISO administrators can add, edit, and delete box uses using the standard interface. A box use can only be deleted if
 it has not been used by any existing boxes.

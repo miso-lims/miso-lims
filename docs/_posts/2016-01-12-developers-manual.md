@@ -55,13 +55,13 @@ to wrap up the synonymous objects so that SRA XMLs can be generated.
 |Study|represents more fine-grained information about the sequencing Project|
 |Sample|the physical material received upon which sample preparation, QC and library preparations are carried out|
 |Library|the first step in constructing sequenceable material from a Sample|
-|LibraryDilution|diluted portion of a library ready to be added to a pool|
-|Pool|contains one or more Dilutions that are ready to be sequenced|
+|LibraryAliquot|portion of a library, possibly diluted, ready to be added to a pool|
+|Pool|contains one or more library aliquots that are ready to be sequenced|
 |Order|a request for sequencing a specific pool using specific run parameters|
 |SequencerPartitionContainer|the physical unit that holds pools during sequencing (Flowcell/Slide)|
 |Run|a sequencer run|
 |SequencerReference|a hardware sequencer|
-|Box|storage box which holds barcoded sample/library/dilution/pool tubes|
+|Box|storage box which holds barcoded sample/library/library aliquot/pool tubes|
 
 ## Enumerated Types
 

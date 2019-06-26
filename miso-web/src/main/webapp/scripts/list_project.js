@@ -26,7 +26,7 @@ ListTarget.project = {
   createUrl: function(config, projectId) {
     throw new Error("Static display only");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     return [];
   },
@@ -39,9 +39,9 @@ ListTarget.project = {
     }];
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.idHyperlinkColumn("Name", "project", "id", Utils.array.getName, 0, true),
-        ListUtils.labelHyperlinkColumn("Alias", "project", Utils.array.getId, "alias", 1, true),
-        ListUtils.labelHyperlinkColumn("Short Name", "project", Utils.array.getId, "shortName", 0, true),
+    return [ListUtils.idHyperlinkColumn("Name", Urls.ui.projects.edit, "id", Utils.array.getName, 0, true),
+        ListUtils.labelHyperlinkColumn("Alias", Urls.ui.projects.edit, Utils.array.getId, "alias", 1, true),
+        ListUtils.labelHyperlinkColumn("Short Name", Urls.ui.projects.edit, Utils.array.getId, "shortName", 0, true),
 
         {
           "sTitle": "Description",

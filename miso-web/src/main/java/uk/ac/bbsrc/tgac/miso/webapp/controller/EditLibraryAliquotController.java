@@ -24,18 +24,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.AlphanumericComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
-import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
@@ -45,16 +45,16 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
 
 @Controller
-@RequestMapping("/dilution")
-public class EditDilutionController {
+@RequestMapping("/libraryaliquot")
+public class EditLibraryAliquotController {
 
-  protected static final Comparator<LibraryDilution> DILUTION_COMPARATOR = (a, b) -> {
+  protected static final Comparator<LibraryAliquot> LIBRARY_ALIQUOT_COMPARATOR = (a, b) -> {
     int nameComparison = AlphanumericComparator.INSTANCE.compare(a.getName(), b.getName());
     return nameComparison == 0 ? new AliasComparator<>().compare(a.getLibrary(), b.getLibrary()) : nameComparison;
   };
 
   @Autowired
-  private LibraryDilutionService dilutionService;
+  private LibraryAliquotService libraryAliquotService;
   @Autowired
   private PoolService poolService;
   @Autowired
@@ -64,37 +64,37 @@ public class EditDilutionController {
   @Autowired
   private BoxService boxService;
 
-  @GetMapping("/{dilutionId}")
-  public ModelAndView editDilution(ModelMap model, @PathVariable long dilutionId) throws IOException {
-    LibraryDilution dilution = dilutionService.get(dilutionId);
-    if (dilution == null) {
-      throw new NotFoundException("Dilution not found");
+  @GetMapping("/{aliquotId}")
+  public ModelAndView edit(ModelMap model, @PathVariable long aliquotId) throws IOException {
+    LibraryAliquot aliquot = libraryAliquotService.get(aliquotId);
+    if (aliquot == null) {
+      throw new NotFoundException("Library aliquot not found");
     }
 
     ObjectMapper mapper = new ObjectMapper();
-    model.put("dilution", dilution);
-    model.put("dilutionDto", mapper.writeValueAsString(Dtos.asDto(dilution, false, false)));
-    List<Pool> pools = poolService.listByDilutionId(dilutionId);
-    model.put("dilutionPools",
+    model.put("aliquot", aliquot);
+    model.put("aliquotDto", mapper.writeValueAsString(Dtos.asDto(aliquot, false, false)));
+    List<Pool> pools = poolService.listByLibraryAliquotId(aliquotId);
+    model.put("aliquotPools",
         pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
-    model.put("dilutionRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
+    model.put("aliquotRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
         .collect(Collectors.toList()));
 
-    return new ModelAndView("/WEB-INF/pages/editDilution.jsp", model);
+    return new ModelAndView("/WEB-INF/pages/editLibraryAliquot.jsp", model);
   }
 
-  private final class BulkPropagateLibraryBackend extends BulkPropagateTableBackend<Library, DilutionDto> {
+  private final class BulkPropagateLibraryBackend extends BulkPropagateTableBackend<Library, LibraryAliquotDto> {
 
     private final BoxDto newBox;
 
     private BulkPropagateLibraryBackend(BoxDto newBox) {
-      super("dilution", DilutionDto.class, "Dilutions", "Libraries");
+      super("libraryaliquot", LibraryAliquotDto.class, "Library Aliquots", "Libraries");
       this.newBox = newBox;
     }
 
     @Override
-    protected DilutionDto createDtoFromParent(Library item) {
-      DilutionDto dto = new DilutionDto();
+    protected LibraryAliquotDto createDtoFromParent(Library item) {
+      LibraryAliquotDto dto = new LibraryAliquotDto();
       dto.setLibrary(Dtos.asDto(item, false));
       if (item.getSample().getProject().getDefaultTargetedSequencing() != null) {
         dto.setTargetedSequencingId(item.getSample().getProject().getDefaultTargetedSequencing().getId());
@@ -120,24 +120,24 @@ public class EditDilutionController {
   }
 
   @GetMapping(value = "/bulk/propagate")
-  public ModelAndView propagateDilutions(@RequestParam("ids") String libraryIds,
+  public ModelAndView propagate(@RequestParam("ids") String libraryIds,
       @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model) throws IOException {
-    BulkPropagateLibraryBackend bulkPropagateDilutionBackend = new BulkPropagateLibraryBackend(
+    BulkPropagateLibraryBackend bulkPropagateBackend = new BulkPropagateLibraryBackend(
         boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null);
-    return bulkPropagateDilutionBackend.propagate(libraryIds, model);
+    return bulkPropagateBackend.propagate(libraryIds, model);
   }
 
-  private final BulkEditTableBackend<LibraryDilution, DilutionDto> dilutionBulkEditBackend = new BulkEditTableBackend<LibraryDilution, DilutionDto>(
-      "dilution", DilutionDto.class, "Dilutions") {
+  private final BulkEditTableBackend<LibraryAliquot, LibraryAliquotDto> bulkEditBackend = new BulkEditTableBackend<LibraryAliquot, LibraryAliquotDto>(
+      "libraryaliquot", LibraryAliquotDto.class, "Library Aliquots") {
 
     @Override
-    protected DilutionDto asDto(LibraryDilution model) {
+    protected LibraryAliquotDto asDto(LibraryAliquot model) {
       return Dtos.asDto(model, true, true);
     }
 
     @Override
-    protected Stream<LibraryDilution> load(List<Long> modelIds) throws IOException {
-      return dilutionService.listByIdList(modelIds).stream().sorted(DILUTION_COMPARATOR);
+    protected Stream<LibraryAliquot> load(List<Long> modelIds) throws IOException {
+      return libraryAliquotService.listByIdList(modelIds).stream().sorted(LIBRARY_ALIQUOT_COMPARATOR);
     }
 
     @Override
@@ -147,26 +147,26 @@ public class EditDilutionController {
   };
 
   @GetMapping(value = "/bulk/edit")
-  public ModelAndView editDilutions(@RequestParam("ids") String dilutionIds, ModelMap model) throws IOException {
-    return dilutionBulkEditBackend.edit(dilutionIds, model);
+  public ModelAndView bulkEdit(@RequestParam("ids") String aliquotIds, ModelMap model) throws IOException {
+    return bulkEditBackend.edit(aliquotIds, model);
   }
 
-  private final class BulkMergeDilutionBackend extends BulkMergeTableBackend<PoolDto> {
+  private final class BulkMergeBackend extends BulkMergeTableBackend<PoolDto> {
 
     private final BoxDto newBox;
 
-    private BulkMergeDilutionBackend(BoxDto newBox) {
-      super("pool", PoolDto.class, "Pools", "Dilutions");
+    private BulkMergeBackend(BoxDto newBox) {
+      super("pool", PoolDto.class, "Pools", "Library Aliquots");
       this.newBox = newBox;
     }
 
     @Override
     protected PoolDto createDtoFromParents(List<Long> ids) throws IOException {
-      List<LibraryDilution> parents = dilutionService.listByIdList(ids);
+      List<LibraryAliquot> parents = libraryAliquotService.listByIdList(ids);
       if (parents.isEmpty()) {
-        throw new IllegalStateException("Cannot have no dilutions for pool propagation.");
+        throw new IllegalStateException("Cannot have no library aliquots for pool propagation.");
       }
-      List<PlatformType> platformTypes = parents.stream().map(dilution -> dilution.getLibrary().getPlatformType()).distinct()
+      List<PlatformType> platformTypes = parents.stream().map(aliquot -> aliquot.getLibrary().getPlatformType()).distinct()
           .collect(Collectors.toList());
       if (platformTypes.size() > 1) {
         throw new IllegalArgumentException("Cannot create a pool for multiple platforms: "
@@ -179,7 +179,7 @@ public class EditDilutionController {
         dto.setAlias(parents.get(0).getLibrary().getAlias() + "_POOL");
       } else {
         String commonPrefix = LimsUtils
-            .findCommonPrefix(parents.stream().map(dilution -> dilution.getLibrary().getAlias()).toArray(String[]::new));
+            .findCommonPrefix(parents.stream().map(aliquot -> aliquot.getLibrary().getAlias()).toArray(String[]::new));
         if (commonPrefix != null) {
           dto.setAlias(commonPrefix + "_POOL");
         }
@@ -203,39 +203,39 @@ public class EditDilutionController {
   }
 
   @GetMapping(value = "/bulk/merge")
-  public ModelAndView propagatePoolsMerged(@RequestParam("ids") String dilutionIds,
+  public ModelAndView propagatePoolsMerged(@RequestParam("ids") String aliquotIds,
       @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model) throws IOException {
-    BulkMergeDilutionBackend bulkMergeDilutionBackend = new BulkMergeDilutionBackend(
+    BulkMergeBackend bulkMergeBackend = new BulkMergeBackend(
         (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null));
-    return bulkMergeDilutionBackend.propagate(dilutionIds, model);
+    return bulkMergeBackend.propagate(aliquotIds, model);
   }
 
   private static class BulkCustomPoolTableBackend extends BulkTableBackend<PoolDto> {
 
     private final int poolQuantity;
-    private final List<DilutionDto> dilutions;
+    private final List<LibraryAliquotDto> aliquots;
     private final PlatformType platformType;
     private final BoxDto newBox;
 
-    public BulkCustomPoolTableBackend(int poolQuantity, String idString, LibraryDilutionService dilutionService,
+    public BulkCustomPoolTableBackend(int poolQuantity, String idString, LibraryAliquotService libraryAliquotService,
         BoxDto newBox) throws IOException {
       super("pool", PoolDto.class);
       this.poolQuantity = poolQuantity;
-      List<LibraryDilution> ldis = dilutionService.listByIdList(parseIds(idString));
-      List<PlatformType> platformTypes = ldis.stream().map(dilution -> dilution.getLibrary().getPlatformType()).distinct()
+      List<LibraryAliquot> ldis = libraryAliquotService.listByIdList(parseIds(idString));
+      List<PlatformType> platformTypes = ldis.stream().map(aliquot -> aliquot.getLibrary().getPlatformType()).distinct()
           .collect(Collectors.toList());
       if (platformTypes.size() > 1) {
         throw new IllegalArgumentException("Cannot create a pool for multiple platforms: "
             + String.join(", ", platformTypes.stream().map(Enum::name).toArray(CharSequence[]::new)));
       }
-      this.dilutions = ldis.stream().map(ldi -> Dtos.asDto(ldi, false, false)).collect(Collectors.toList());
+      this.aliquots = ldis.stream().map(ldi -> Dtos.asDto(ldi, false, false)).collect(Collectors.toList());
       this.platformType = platformTypes.get(0);
       this.newBox = newBox;
     }
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.putPOJO("dilutionsToPool", dilutions);
+      config.putPOJO("aliquotsToPool", aliquots);
       config.putPOJO("box", newBox);
       config.put("pageMode", "create");
     }
@@ -244,30 +244,30 @@ public class EditDilutionController {
       PoolDto dto = new PoolDto();
       dto.setPlatformType(this.platformType.name());
       dto.setBox(newBox);
-      return prepare(model, true, "Create Pools from Dilutions", Collections.nCopies(poolQuantity, dto));
+      return prepare(model, true, "Create Pools from Library Aliquots", Collections.nCopies(poolQuantity, dto));
     }
 
   }
 
   @GetMapping(value = "/bulk/pool")
-  public ModelAndView propagatePoolsCustom(@RequestParam("ids") String dilutionIds, @RequestParam("quantity") int poolQuantity,
+  public ModelAndView propagatePoolsCustom(@RequestParam("ids") String aliquotIds, @RequestParam("quantity") int poolQuantity,
       @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model)
       throws IOException {
-    BulkCustomPoolTableBackend bulkCustomPoolTableBackend = new BulkCustomPoolTableBackend(poolQuantity, dilutionIds, dilutionService,
+    BulkCustomPoolTableBackend bulkCustomPoolTableBackend = new BulkCustomPoolTableBackend(poolQuantity, aliquotIds, libraryAliquotService,
         (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null));
     return bulkCustomPoolTableBackend.create(model);
   }
 
-  private final class BulkPropagateDilutionBackend extends BulkPropagateTableBackend<LibraryDilution, PoolDto> {
+  private final class BulkPropagateBackend extends BulkPropagateTableBackend<LibraryAliquot, PoolDto> {
     private final BoxDto newBox;
 
-    private BulkPropagateDilutionBackend(BoxDto newBox) {
-      super("pool", PoolDto.class, "Pools", "Dilutions");
+    private BulkPropagateBackend(BoxDto newBox) {
+      super("pool", PoolDto.class, "Pools", "Library Aliquots");
       this.newBox = newBox;
     }
 
     @Override
-    protected PoolDto createDtoFromParent(LibraryDilution item) {
+    protected PoolDto createDtoFromParent(LibraryAliquot item) {
       PoolDto dto = new PoolDto();
       dto.setAlias(item.getLibrary().getAlias() + "_POOL");
       dto.setPooledElements(Collections.singleton(Dtos.asDto(item, false, false)));
@@ -284,8 +284,8 @@ public class EditDilutionController {
     }
 
     @Override
-    protected Stream<LibraryDilution> loadParents(List<Long> ids) throws IOException {
-      return dilutionService.listByIdList(ids).stream().sorted(DILUTION_COMPARATOR);
+    protected Stream<LibraryAliquot> loadParents(List<Long> ids) throws IOException {
+      return libraryAliquotService.listByIdList(ids).stream().sorted(LIBRARY_ALIQUOT_COMPARATOR);
     }
 
     @Override
@@ -296,11 +296,11 @@ public class EditDilutionController {
   }
 
   @GetMapping(value = "/bulk/pool-separate")
-  public ModelAndView propagatePoolsIndividual(@RequestParam("ids") String dilutionIds,
+  public ModelAndView propagatePoolsIndividual(@RequestParam("ids") String aliquotIds,
       @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model) throws IOException {
-    BulkPropagateDilutionBackend bulkPropagateDilutionBackend = new BulkPropagateDilutionBackend(
+    BulkPropagateBackend bulkPropagateBackend = new BulkPropagateBackend(
         (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null));
-    return bulkPropagateDilutionBackend.propagate(dilutionIds, model);
+    return bulkPropagateBackend.propagate(aliquotIds, model);
   }
 
 }

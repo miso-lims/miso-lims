@@ -58,7 +58,7 @@ ListTarget.servicerecord = {
       mData: 'serviceDate',
       include: true,
       iSortPriority: 1
-    }, ListUtils.labelHyperlinkColumn('Title', 'instrument/servicerecord', Utils.array.getId, function(record) {
+    }, ListUtils.labelHyperlinkColumn('Title', Urls.ui.serviceRecords.edit, Utils.array.getId, function(record) {
       return record.title;
     }, 0, true), {
       sTitle: 'Position',

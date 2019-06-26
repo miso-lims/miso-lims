@@ -38,9 +38,9 @@ ListTarget.array = {
     }];
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.idHyperlinkColumn('ID', 'array', 'id', Utils.array.getId, 0, true),
-        ListUtils.idHyperlinkColumn('Alias', 'array', 'id', Utils.array.getAlias, 0, true),
-        ListUtils.idHyperlinkColumn('Serial Number', 'array', 'id', function(item) {
+    return [ListUtils.idHyperlinkColumn('ID', Urls.ui.arrays.edit, 'id', Utils.array.getId, 0, true),
+        ListUtils.idHyperlinkColumn('Alias', Urls.ui.arrays.edit, 'id', Utils.array.getAlias, 0, true),
+        ListUtils.idHyperlinkColumn('Serial Number', Urls.ui.arrays.edit, 'id', function(item) {
           return item.serialNumber;
         }, 0, true), {
           sTitle: 'Last Modified',

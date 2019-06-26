@@ -53,8 +53,12 @@ HotTarget.sample = (function() {
 
   return {
 
-    createUrl: '/miso/rest/samples',
-    updateUrl: '/miso/rest/samples/',
+    getCreateUrl: function() {
+      return Urls.rest.samples.create;
+    },
+    getUpdateUrl: function(id) {
+      return Urls.rest.samples.update(id);
+    },
     requestConfiguration: function(config, callback) {
       if (Constants.isDetailedSample) {
         config.rnaSamples = config.targetSampleClass.alias.indexOf("RNA") != -1;
@@ -960,14 +964,15 @@ HotTarget.sample = (function() {
             return errors;
           }),
 
-          Constants.isDetailedSample ? HotUtils.makeParents('samples', HotUtils.relationCategoriesForDetailed()) : null,
+          Constants.isDetailedSample ? HotUtils.makeParents(Urls.rest.samples.parents, HotUtils.relationCategoriesForDetailed()) : null,
 
-          HotUtils.makeChildren('samples', HotUtils.relationCategoriesForDetailed().concat(
-              [HotUtils.relations.library(), HotUtils.relations.dilution(), HotUtils.relations.pool()]))].concat(
+          HotUtils.makeChildren(Urls.rest.samples.children, HotUtils.relationCategoriesForDetailed().concat(
+              [HotUtils.relations.library(), HotUtils.relations.libraryAliquot(), HotUtils.relations.pool()]))].concat(
           HotUtils.makeQcActions("Sample")).concat(
           [
-              config && config.worksetId ? HotUtils.makeRemoveFromWorkset('samples', config.worksetId) : HotUtils.makeAddToWorkset(
-                  'samples', 'sampleIds'), HotUtils.makeAttachFile('sample', function(sample) {
+              config && config.worksetId ? HotUtils.makeRemoveFromWorkset('samples', Urls.rest.worksets.removeSamples(config.worksetId))
+                  : HotUtils.makeAddToWorkset('samples', 'sampleIds', Urls.rest.worksets.addSamples),
+              HotUtils.makeAttachFile('sample', function(sample) {
                 return sample.projectId;
               })]);
     },

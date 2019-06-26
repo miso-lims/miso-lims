@@ -8,10 +8,10 @@ SELECT o.sequencingOrderId orderId
 FROM SequencingOrder o 
 LEFT JOIN SequencingParameters sp ON sp.parametersId = o.parametersId 
 LEFT JOIN Pool p ON p.poolId = o.poolId 
-LEFT JOIN Pool_Dilution pe ON pe.pool_poolId = p.poolId 
-LEFT JOIN LibraryDilution ld ON ld.dilutionId = pe.dilution_dilutionId 
+LEFT JOIN Pool_LibraryAliquot pe ON pe.poolId = p.poolId 
+LEFT JOIN LibraryAliquot ld ON ld.aliquotId = pe.aliquotId 
 LEFT JOIN TargetedSequencing tr ON tr.targetedSequencingId = ld.targetedSequencingId 
-LEFT JOIN Library lib ON lib.libraryId = ld.library_libraryId 
+LEFT JOIN Library lib ON lib.libraryId = ld.libraryId 
 LEFT JOIN ( 
         SELECT library_libraryId 
                 ,sequence 

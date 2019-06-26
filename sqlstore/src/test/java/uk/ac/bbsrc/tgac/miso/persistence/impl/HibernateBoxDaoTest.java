@@ -266,10 +266,10 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     assertNotNull(library);
     assertEquals("LIB1", library.getName());
 
-    BoxableId goodDilutionId = new BoxableId(EntityType.DILUTION, 1L);
-    BoxableView dilution = dao.getBoxableView(goodDilutionId);
-    assertNotNull(dilution);
-    assertEquals("LDI1", dilution.getName());
+    BoxableId goodLibraryAliquotId = new BoxableId(EntityType.LIBRARY_ALIQUOT, 1L);
+    BoxableView libraryAliquot = dao.getBoxableView(goodLibraryAliquotId);
+    assertNotNull(libraryAliquot);
+    assertEquals("LDI1", libraryAliquot.getName());
 
     BoxableId goodPoolId = new BoxableId(EntityType.POOL, 1L);
     BoxableView pool = dao.getBoxableView(goodPoolId);
@@ -304,7 +304,7 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     assertNotNull(empty);
     assertTrue(empty.isEmpty());
 
-    List<BoxableId> ids = Arrays.asList(new BoxableId(EntityType.DILUTION, 1L), new BoxableId(EntityType.POOL, 1L));
+    List<BoxableId> ids = Arrays.asList(new BoxableId(EntityType.LIBRARY_ALIQUOT, 1L), new BoxableId(EntityType.POOL, 1L));
     List<BoxableView> list = dao.getBoxableViewsByIdList(ids);
     assertNotNull(list);
     assertEquals(2, list.size());

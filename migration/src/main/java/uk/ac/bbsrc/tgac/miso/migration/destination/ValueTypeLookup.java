@@ -39,7 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -968,13 +968,13 @@ public class ValueTypeLookup {
     }
   }
 
-  public void resolveAll(LibraryDilution dilution) throws IOException {
-    if (dilution.getTargetedSequencing() != null) { // optional field
-      TargetedSequencing tarSeq = resolve(dilution.getTargetedSequencing());
+  public void resolveAll(LibraryAliquot aliquot) throws IOException {
+    if (aliquot.getTargetedSequencing() != null) { // optional field
+      TargetedSequencing tarSeq = resolve(aliquot.getTargetedSequencing());
       if (tarSeq == null) {
-        throw new IOException(String.format("TargetedSequencing not found (alias=%s)", dilution.getTargetedSequencing().getAlias()));
+        throw new IOException(String.format("TargetedSequencing not found (alias=%s)", aliquot.getTargetedSequencing().getAlias()));
       }
-      dilution.setTargetedSequencing(tarSeq);
+      aliquot.setTargetedSequencing(tarSeq);
     }
   }
 

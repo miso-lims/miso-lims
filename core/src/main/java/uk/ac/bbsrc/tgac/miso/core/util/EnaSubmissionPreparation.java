@@ -40,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
@@ -60,12 +60,12 @@ public class EnaSubmissionPreparation {
     public abstract String name();
   }
 
-  private final class DilutionXmlSubfile extends XmlSubmissionFromSet<Pair<PoolableElementView, Partition>> {
+  private final class LibraryAliquotXmlSubfile extends XmlSubmissionFromSet<Pair<PoolableElementView, Partition>> {
 
     @Override
     protected Stream<Pair<PoolableElementView, Partition>> items() {
       return submission.getExperiments().stream().flatMap(experiment -> experiment.getRunPartitions().stream()).flatMap(
-          rp -> rp.getPartition().getPool().getPoolDilutions().stream()
+          rp -> rp.getPartition().getPool().getPoolContents().stream()
               .map(pd -> new Pair<>(pd.getPoolableElementView(), rp.getPartition())));
     }
 
@@ -79,7 +79,7 @@ public class EnaSubmissionPreparation {
       Run r = entry.getValue().getSequencerPartitionContainer().getLastRun();
 
       xml.setAttribute("alias",
-          "L00" + entry.getValue().getPartitionNumber() + ":" + entry.getKey().getDilutionName() + ":" + r.getAlias());
+          "L00" + entry.getValue().getPartitionNumber() + ":" + entry.getKey().getAliquotName() + ":" + r.getAlias());
       xml.setAttribute("run_center", centreName);
       if (r.getHealth() == HealthType.Completed) {
         xml.setAttribute("run_date", DF_TIMESTAMP.format(r.getCompletionDate()));
@@ -95,9 +95,9 @@ public class EnaSubmissionPreparation {
 
       Element dataBlock = xml.getOwnerDocument().createElementNS(null, "DATA_BLOCK");
       dataBlock.setAttribute("sector", Integer.toString(entry.getValue().getPartitionNumber()));
-      if (entry.getValue().getPool().getPoolDilutions().size() > 1) {
+      if (entry.getValue().getPool().getPoolContents().size() > 1) {
         // multiplexed
-        dataBlock.setAttribute("member_name", entry.getKey().getDilutionName());
+        dataBlock.setAttribute("member_name", entry.getKey().getAliquotName());
       }
 
     }
@@ -158,26 +158,26 @@ public class EnaSubmissionPreparation {
       }
 
       experiment.getRunPartitions().stream().map(RunPartition::getPartition).map(Partition::getPool).distinct()
-          .filter(pool -> pool.getPoolDilutions().size() > 1).forEach(pool -> {
+          .filter(pool -> pool.getPoolContents().size() > 1).forEach(pool -> {
             // multiplexed pool
             Element xmlPool = xml.getOwnerDocument().createElementNS(null, "POOL");
             sampleDescriptor.appendChild(xmlPool);
 
-            pool.getPoolDilutions().stream().map(PoolDilution::getPoolableElementView).forEach(dilution -> {
+            pool.getPoolContents().stream().map(PoolElement::getPoolableElementView).forEach(aliquot -> {
               Element xmlMember = xml.getOwnerDocument().createElementNS(null, "MEMBER");
-              xmlMember.setAttribute("member_name", dilution.getDilutionName());
+              xmlMember.setAttribute("member_name", aliquot.getAliquotName());
               xmlMember.setAttribute("refcenter", centreName);
-              xmlMember.setAttribute("refname", dilution.getSampleAlias());
-              if (!isStringEmptyOrNull(dilution.getSampleAccession())) {
-                sampleDescriptor.setAttribute("accession", dilution.getSampleAccession());
+              xmlMember.setAttribute("refname", aliquot.getSampleAlias());
+              if (!isStringEmptyOrNull(aliquot.getSampleAccession())) {
+                sampleDescriptor.setAttribute("accession", aliquot.getSampleAccession());
               }
               xmlPool.appendChild(xmlMember);
 
               Element xmlReadLabel = xml.getOwnerDocument().createElementNS(null, "READ_LABEL");
-              if (!dilution.getIndices().isEmpty()) {
+              if (!aliquot.getIndices().isEmpty()) {
                 StringBuilder tsb = new StringBuilder();
                 StringBuilder vsb = new StringBuilder();
-                for (Index index : dilution.getIndices()) {
+                for (Index index : aliquot.getIndices()) {
                   tsb.append(index.getSequence());
                   vsb.append(index.getName());
                 }
@@ -227,7 +227,7 @@ public class EnaSubmissionPreparation {
 
       Element poolingStrategy = xml.getOwnerDocument().createElementNS(null, "POOLING_STRATEGY");
       boolean isMultiplexed = experiment.getRunPartitions().stream().map(RunPartition::getPartition).map(Partition::getPool)
-          .map(Pool::getPoolDilutions)
+          .map(Pool::getPoolContents)
           .mapToInt(Set::size).anyMatch(x -> x > 1);
       poolingStrategy.setTextContent(isMultiplexed ? "multiplexed libraries" : "none");
       libraryDescriptor.appendChild(poolingStrategy);
@@ -405,7 +405,7 @@ public class EnaSubmissionPreparation {
   private final Submission submission;
 
   private final ChildSubmissionFile[] FILES = new ChildSubmissionFile[] { new StudyXmlSubfile(), new SampleXmlSubfile(),
-      new DilutionXmlSubfile(),
+      new LibraryAliquotXmlSubfile(),
       new ExperimentXmlSubfile() };
 
   private final SubmissionActionType submissionAction;

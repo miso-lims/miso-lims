@@ -1,8 +1,12 @@
 HotTarget.box = (function(box) {
 
   return {
-    createUrl: '/miso/rest/boxes',
-    updateUrl: '/miso/rest/boxes/',
+    getCreateUrl: function() {
+      return Urls.rest.boxes.create;
+    },
+    getUpdateUrl: function(id) {
+      return Urls.rest.boxes.update(id);
+    },
     requestConfiguration: function(config, callback) {
       callback(config);
     },

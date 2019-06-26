@@ -26,7 +26,7 @@ ListTarget.sequencingorder = {
   createUrl: function(config, projectId) {
     throw new Error("Orders can only be shown statically.");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     var platformType = Utils.array.findFirstOrNull(function(pt) {
       return pt.name == config.platformType;

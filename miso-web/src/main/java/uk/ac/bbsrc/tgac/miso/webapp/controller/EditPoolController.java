@@ -56,20 +56,20 @@ import net.sf.json.JSONArray;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
-import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
-import uk.ac.bbsrc.tgac.miso.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
+import uk.ac.bbsrc.tgac.miso.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
@@ -141,7 +141,7 @@ public class EditPoolController {
     model.put("duplicateIndicesSequences", mapper.writeValueAsString(pool.getDuplicateIndicesSequences()));
     model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(pool.getNearDuplicateIndicesSequences()));
 
-    model.put("includedDilutions", Dtos.asDto(pool, true, false).getPooledElements());
+    model.put("includedLibraryAliquots", Dtos.asDto(pool, true, false).getPooledElements());
 
     return new ModelAndView("/WEB-INF/pages/editPool.jsp", model);
   }
@@ -212,17 +212,17 @@ public class EditPoolController {
         dto.setAlias(commonPrefix + "_POOL");
       }
 
-      Set<DilutionDto> dilutionDtos = new HashSet<>();
+      Set<LibraryAliquotDto> aliquotDtos = new HashSet<>();
       for (Pool parent : parents) {
         for (int i = 0; i < parentIds.size(); i++) {
           if (parentIds.get(i).equals(Long.valueOf(parent.getId()))) {
-            for (PoolDilution pd : parent.getPoolDilutions()) {
-              DilutionDto existing = dilutionDtos.stream().filter(d -> d.getId().equals(pd.getPoolableElementView().getDilutionId()))
+            for (PoolElement pd : parent.getPoolContents()) {
+              LibraryAliquotDto existing = aliquotDtos.stream().filter(d -> d.getId().equals(pd.getPoolableElementView().getAliquotId()))
                   .findFirst().orElse(null);
               if (existing == null) {
-                DilutionDto ldiDto = Dtos.asDto(pd.getPoolableElementView());
+                LibraryAliquotDto ldiDto = Dtos.asDto(pd.getPoolableElementView());
                 ldiDto.setProportion(pd.getProportion() * proportions.get(i));
-                dilutionDtos.add(ldiDto);
+                aliquotDtos.add(ldiDto);
               } else {
                 existing.setProportion(existing.getProportion() + pd.getProportion() * proportions.get(i));
               }
@@ -231,7 +231,7 @@ public class EditPoolController {
           }
         }
       }
-      dto.setPooledElements(dilutionDtos);
+      dto.setPooledElements(aliquotDtos);
 
       List<VolumeUnit> volumeUnits = parents.stream().map(Pool::getVolumeUnits).filter(Objects::nonNull).distinct()
           .collect(Collectors.toList());

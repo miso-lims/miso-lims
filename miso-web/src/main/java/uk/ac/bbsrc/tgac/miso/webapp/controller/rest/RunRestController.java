@@ -61,7 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -407,8 +407,8 @@ public class RunRestController extends RestController {
     return run.getSequencerPartitionContainers().stream()//
         .flatMap(container -> container.getPartitions().stream())//
         .filter(partition -> partition.getPool() != null)//
-        .flatMap(partition -> partition.getPool().getPoolDilutions().stream()//
-            .map(PoolDilution::getPoolableElementView)//
+        .flatMap(partition -> partition.getPool().getPoolContents().stream()//
+            .map(PoolElement::getPoolableElementView)//
             .map(PoolableElementView::getLibraryId)//
             .distinct()
             .map(libraryId -> new Pair<>(libraryId, partition)))//

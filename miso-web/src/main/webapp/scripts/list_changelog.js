@@ -26,7 +26,7 @@ ListTarget.changelog = {
   createUrl: function(config, projectId) {
     throw new Error("Static data only");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     return [];
   },

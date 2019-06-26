@@ -73,7 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 
@@ -350,20 +350,20 @@ public class LimsUtils {
   }
 
   /**
-   * Generates a unique barcode for a Nameable entity, and sets the identificationBarcode property for Boxables and LibraryDilutions.
+   * Generates a unique barcode for a Nameable entity, and sets the identificationBarcode property for Boxables and LibraryAliquots.
    * 
    * @param nameable Nameable object
    * @throws IOException
    */
   public static void generateAndSetIdBarcode(Nameable nameable) throws IOException {
     String barcode = null;
-    if (nameable instanceof LibraryDilution && nameable.getName() != null) {
+    if (nameable instanceof LibraryAliquot && nameable.getName() != null) {
       barcode = nameable.getName();
-      if (((LibraryDilution) nameable).getLibrary() != null
-          && ((LibraryDilution) nameable).getLibrary().getAlias() != null) {
-        barcode += "::" + ((LibraryDilution) nameable).getLibrary().getAlias();
+      if (((LibraryAliquot) nameable).getLibrary() != null
+          && ((LibraryAliquot) nameable).getLibrary().getAlias() != null) {
+        barcode += "::" + ((LibraryAliquot) nameable).getLibrary().getAlias();
       }
-      ((LibraryDilution) nameable).setIdentificationBarcode(barcode);
+      ((LibraryAliquot) nameable).setIdentificationBarcode(barcode);
     } else if (nameable instanceof Boxable && nameable.getName() != null) {
       barcode = nameable.getName();
       if (((Boxable) nameable).getAlias() != null) {

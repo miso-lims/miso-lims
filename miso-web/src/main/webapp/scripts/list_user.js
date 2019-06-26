@@ -26,7 +26,7 @@ ListTarget.user = {
   createUrl: function(config, projectId) {
     throw new Error("Static data only");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     switch (config.listMode) {
     case 'list':

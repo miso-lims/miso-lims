@@ -69,7 +69,7 @@
   </div>
 </div>
 
-<miso:list-section-ajax id="list_samples" name="Samples" target="sample" config=""/>
+<miso:list-section-ajax id="list_samples" name="Samples" target="sample" config="{}"/>
 
 </div>
 </div>

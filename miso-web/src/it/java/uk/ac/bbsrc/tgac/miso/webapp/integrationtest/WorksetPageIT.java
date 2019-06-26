@@ -128,15 +128,15 @@ public class WorksetPageIT extends AbstractIT {
   }
 
   @Test
-  public void testRemoveDilutions() {
+  public void testRemoveLibraryAliquots() {
     WorksetPage page = getWorksetPage(1L);
     List<String> names = Lists.newArrayList("LDI120001", "LDI120002");
-    List<String> dilutions = page.getDilutionNames();
+    List<String> aliquotNames = page.getLibraryAliquotNames();
     for (String name : names) {
-      assertTrue(String.format("%s should be in workset before delete", name), dilutions.contains(name));
+      assertTrue(String.format("%s should be in workset before delete", name), aliquotNames.contains(name));
     }
-    WorksetPage updatedPage = page.removeDilutionsByName(names);
-    List<String> updated = updatedPage.getDilutionNames();
+    WorksetPage updatedPage = page.removeLibraryAliquotsByName(names);
+    List<String> updated = updatedPage.getLibraryAliquotNames();
     for (String name : names) {
       assertFalse(String.format("%s should be removed", name), updated.contains(name));
     }

@@ -4,8 +4,12 @@
 
 HotTarget.libraryReceipt = (function() {
   return {
-    createUrl: '/miso/rest/libraries',
-    updateUrl: '/miso/rest/libraries/',
+    getCreateUrl: function() {
+      return Urls.rest.libraries.create;
+    },
+    getUpdateUrl: function(id) {
+      return Urls.rest.libraries.update(id);
+    },
     requestConfiguration: function(config, callback) {
       callback(config)
     },
@@ -70,11 +74,11 @@ HotTarget.libraryReceipt = (function() {
           });
         }
       }, {
-        name: 'Make dilutions',
+        name: 'Make aliquots',
         action: function(items) {
           HotUtils.warnIfConsentRevoked(items, function() {
             var fields = [];
-            HotUtils.showDialogForBoxCreation('Make Dilutions', 'Create', fields, '/miso/dilution/bulk/propagate?', function(result) {
+            HotUtils.showDialogForBoxCreation('Make Aliquots', 'Create', fields, Urls.ui.libraryAliquots.bulkPropagate, function(result) {
               return {
                 ids: items.map(Utils.array.getId).join(',')
               };

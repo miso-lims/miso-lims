@@ -45,7 +45,7 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
 
   private static final String samplesTableWrapper = "list_samples_wrapper";
   private static final String librariesTableWrapper = "list_libraries_wrapper";
-  private static final String dilutionsTableWrapper = "list_dilutions_wrapper";
+  private static final String libraryAliquotsTableWrapper = "list_libraryAliquots_wrapper";
 
   private static final By okSelector = By.id("ok");
 
@@ -56,7 +56,7 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
 
   private DataTable samplesTable = null;
   private DataTable librariesTable = null;
-  private DataTable dilutionsTable = null;
+  private DataTable libraryAliquotsTable = null;
 
   public WorksetPage(WebDriver driver) {
     super(driver);
@@ -68,8 +68,8 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
     if (findElementIfExists(By.id(librariesTableWrapper)) != null) {
       librariesTable = new DataTable(driver, librariesTableWrapper);
     }
-    if (findElementIfExists(By.id(dilutionsTableWrapper)) != null) {
-      dilutionsTable = new DataTable(driver, dilutionsTableWrapper);
+    if (findElementIfExists(By.id(libraryAliquotsTableWrapper)) != null) {
+      libraryAliquotsTable = new DataTable(driver, libraryAliquotsTableWrapper);
     }
   }
 
@@ -125,8 +125,8 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
     return getNames(librariesTable);
   }
 
-  public List<String> getDilutionNames() {
-    return getNames(dilutionsTable);
+  public List<String> getLibraryAliquotNames() {
+    return getNames(libraryAliquotsTable);
   }
 
   private List<String> getNames(DataTable table) {
@@ -145,8 +145,8 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
     return removeMembersByName(names, librariesTable);
   }
 
-  public WorksetPage removeDilutionsByName(List<String> names) {
-    return removeMembersByName(names, dilutionsTable);
+  public WorksetPage removeLibraryAliquotsByName(List<String> names) {
+    return removeMembersByName(names, libraryAliquotsTable);
   }
 
   private WorksetPage removeMembersByName(List<String> names, DataTable table) {

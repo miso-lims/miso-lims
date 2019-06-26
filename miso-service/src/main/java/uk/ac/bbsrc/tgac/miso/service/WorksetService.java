@@ -14,6 +14,6 @@ public interface WorksetService extends PaginatedDataSource<Workset>, DeleterSer
 
   public List<Workset> listByLibrary(long libraryId);
 
-  public List<Workset> listByDilution(long dilutionId);
+  public List<Workset> listByLibraryAliquot(long aliquotId);
 
 }

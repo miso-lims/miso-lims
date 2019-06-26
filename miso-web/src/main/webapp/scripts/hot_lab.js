@@ -1,6 +1,10 @@
 HotTarget.lab = {
-  createUrl: '/miso/rest/labs',
-  updateUrl: '/miso/rest/labs/',
+  getCreateUrl: function() {
+    return Urls.rest.labs.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.labs.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

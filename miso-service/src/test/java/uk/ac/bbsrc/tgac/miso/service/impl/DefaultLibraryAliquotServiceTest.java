@@ -11,8 +11,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
-public class DefaultLibraryDilutionServiceTest {
-  private DefaultLibraryDilutionService service;
+public class DefaultLibraryAliquotServiceTest {
+  private DefaultLibraryAliquotService service;
   private DetailedLibrary library;
   private final Long id = 42L;
   private final String alias = "test alias";
@@ -21,7 +21,7 @@ public class DefaultLibraryDilutionServiceTest {
 
   @Before
   public void setUp() {
-    service = new DefaultLibraryDilutionService();
+    service = new DefaultLibraryAliquotService();
     library = new DetailedLibraryImpl();
     KitDescriptor libraryKd = new KitDescriptor();
     library.setKitDescriptor(libraryKd);

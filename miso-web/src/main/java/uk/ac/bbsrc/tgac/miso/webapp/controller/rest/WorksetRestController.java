@@ -35,7 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.WorksetDto;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.WorksetService;
@@ -52,7 +52,7 @@ public class WorksetRestController extends RestController {
   @Autowired
   private LibraryService libraryService;
   @Autowired
-  private LibraryDilutionService dilutionService;
+  private LibraryAliquotService libraryAliquotService;
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -104,7 +104,7 @@ public class WorksetRestController extends RestController {
   public void addSamples(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> sampleIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
-    addByIds("Sample", workset.getSamples(), sampleIds, WhineyFunction.rethrow(id -> sampleService.get(id)));
+    addByIds("Sample", workset.getSamples(), sampleIds, WhineyFunction.rethrow(sampleService::get));
     worksetService.update(workset);
   }
 
@@ -113,16 +113,16 @@ public class WorksetRestController extends RestController {
   public void addLibraries(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> libraryIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
-    addByIds("Library", workset.getLibraries(), libraryIds, WhineyFunction.rethrow(id -> libraryService.get(id)));
+    addByIds("Library", workset.getLibraries(), libraryIds, WhineyFunction.rethrow(libraryService::get));
     worksetService.update(workset);
   }
 
-  @PostMapping(value = "/{worksetId}/dilutions")
+  @PostMapping(value = "/{worksetId}/libraryaliquots")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void addDilutions(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> dilutionIds)
+  public void addLibraryAliquots(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> aliquotIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
-    addByIds("Dilution", workset.getDilutions(), dilutionIds, WhineyFunction.rethrow(id -> dilutionService.get(id)));
+    addByIds("Library aliquot", workset.getLibraryAliquots(), aliquotIds, WhineyFunction.rethrow(libraryAliquotService::get));
     worksetService.update(workset);
   }
 
@@ -144,12 +144,12 @@ public class WorksetRestController extends RestController {
     worksetService.update(workset);
   }
 
-  @DeleteMapping("/{worksetId}/dilutions")
+  @DeleteMapping("/{worksetId}/libraryaliquots")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void removeDilutions(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> dilutionIds)
+  public void removeLibraryAliquots(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> aliquotIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
-    removeByIds("Dilution", workset.getDilutions(), dilutionIds);
+    removeByIds("Library aliquot", workset.getLibraryAliquots(), aliquotIds);
     worksetService.update(workset);
   }
 
@@ -234,7 +234,7 @@ public class WorksetRestController extends RestController {
       }
       workset.getSamples().addAll(child.getSamples());
       workset.getLibraries().addAll(child.getLibraries());
-      workset.getDilutions().addAll(child.getDilutions());
+      workset.getLibraryAliquots().addAll(child.getLibraryAliquots());
     }
     worksetService.create(workset);
     return Dtos.asDto(workset);

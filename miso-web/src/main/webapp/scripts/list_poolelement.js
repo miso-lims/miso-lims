@@ -22,11 +22,12 @@
  */
 
 ListTarget.poolelement = {
-  name: 'Dilutions',
+  name: 'Library Aliquots',
   createUrl: function(config, projectId) {
-    return '/miso/rest/librarydilutions/dt/pool/' + config.poolId + '/' + (config.add ? 'available' : 'included');
+    return config.add ? Urls.rest.libraryAliquots.availableForPoolDatatable(config.poolId) : Urls.rest.libraryAliquots
+        .includedInPoolDatatable(config.poolId);
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     var actions = [{
       'name': config.add ? 'Add' : 'Remove',
@@ -38,7 +39,7 @@ ListTarget.poolelement = {
           Utils.ajaxWithDialog('Changing pool', 'PUT', '/miso/rest/pools/' + config.poolId + '/contents', data, Utils.page.pageReload);
         };
         if (config.add) {
-          HotUtils.warnIfConsentRevoked(elements, doAction, HotTarget.dilution.getLabel);
+          HotUtils.warnIfConsentRevoked(elements, doAction, HotTarget.libraryaliquot.getLabel);
         } else {
           doAction();
         }
@@ -73,13 +74,13 @@ ListTarget.poolelement = {
   createColumns: function(config, projectId) {
     return [
         {
-          'sTitle': 'Dilution Name',
+          'sTitle': 'Library Aliquot Name',
           'mData': 'id', // for sorting purposes
           'include': true,
           'iSortPriority': 1,
           "mRender": function(data, type, full) {
             if (type === 'display') {
-              return "<a href=\"/miso/dilution/" + full.id + "\">" + full.name + "</a>";
+              return '<a href="' + Urls.ui.libraryAliquots.edit(full.id) + '">' + full.name + '</a>';
             }
             return data;
           }
@@ -99,14 +100,15 @@ ListTarget.poolelement = {
           'mData': 'proportion',
           'include': !config.add,
           'iSortPriority': 0
-        }, ListUtils.idHyperlinkColumn("Library Name", "library", "library.id", function(dilution) {
-          return dilution.library.name;
-        }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Library Alias", "library", function(dilution) {
-          return dilution.library.id;
-        }, "library.alias", 0, true), ListUtils.idHyperlinkColumn("Sample Name", "sample", "library.parentSampleId", function(dilution) {
-          return "SAM" + dilution.library.parentSampleId;
-        }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Sample Alias", "sample", function(dilution) {
-          return dilution.library.parentSampleId;
+        }, ListUtils.idHyperlinkColumn("Library Name", Urls.ui.libraries.edit, "library.id", function(aliquot) {
+          return aliquot.library.name;
+        }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Library Alias", Urls.ui.libraries.edit, function(aliquot) {
+          return aliquot.library.id;
+        }, "library.alias", 0, true),
+        ListUtils.idHyperlinkColumn("Sample Name", Urls.ui.samples.edit, "library.parentSampleId", function(aliquot) {
+          return "SAM" + aliquot.library.parentSampleId;
+        }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Sample Alias", Urls.ui.samples.edit, function(aliquot) {
+          return aliquot.library.parentSampleId;
         }, "library.parentSampleAlias", 0, true, "noPrint"), {
           'sTitle': 'Conc.',
           'sType': 'numeric',

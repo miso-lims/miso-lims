@@ -29,7 +29,7 @@ ListTarget.sequencingordercompletion = {
     }
     return '/miso/rest/sequencingorders/dt/completions/' + config.slug + '/' + config.platform;
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     if (config.poolId) {
       return [];
@@ -58,9 +58,9 @@ ListTarget.sequencingordercompletion = {
         return x != 0;
       });
     }
-    return [ListUtils.idHyperlinkColumn("Name", "pool", "pool.id", function(completion) {
+    return [ListUtils.idHyperlinkColumn("Name", Urls.ui.pools.edit, "pool.id", function(completion) {
       return completion.pool.name;
-    }, 1, !config.poolId), ListUtils.labelHyperlinkColumn("Alias", "pool", function(completion) {
+    }, 1, !config.poolId), ListUtils.labelHyperlinkColumn("Alias", Urls.ui.pools.edit, function(completion) {
       return completion.pool.id;
     }, "pool.alias", 0, !config.poolId), {
       "sTitle": "Order Description",

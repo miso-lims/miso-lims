@@ -30,9 +30,9 @@ import java.util.Set;
 
 import com.eaglegenomics.simlims.core.Note;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
@@ -40,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * provide the link between the {@link Sample} tree and the {@link Run} tree of the MISO data model, which means that multiple samples from
  * multiple {@link Project}s can be pooled together.
  * <p/>
- * Pools are typed by the {@link Poolable} interface type they can accept, and as such, Pools can accept {@link LibraryDilution}
+ * Pools are typed by the {@link Poolable} interface type they can accept, and as such, Pools can accept {@link LibraryAliquot}
  * objects at present. At creation time, a Pool is said to be "ready to run", which makes it easy to categorise and list Pools according to
  * whether they have been placed on a {@link SequencerPoolPartition} (at which point ready to run becomes false) or not.
  * 
@@ -79,12 +79,12 @@ public interface Pool
   /**
    * Returns the elements of this Pool object.
    */
-  public Set<PoolDilution> getPoolDilutions();
+  public Set<PoolElement> getPoolContents();
 
   /**
    * Sets the elements of this Pool object.
    */
-  public void setPoolDilutions(Set<PoolDilution> poolDilutions);
+  public void setPoolElements(Set<PoolElement> poolElements);
 
   /**
    * Returns the concentration of this Pool object.

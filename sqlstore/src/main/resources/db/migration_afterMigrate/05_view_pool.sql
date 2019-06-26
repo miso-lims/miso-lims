@@ -1,14 +1,14 @@
 CREATE OR REPLACE VIEW PoolableElementView
 AS SELECT
-    d.dilutionId,
-    d.name AS dilutionName,
-    d.concentration AS dilutionConcentration,
-    d.concentrationUnits AS dilutionConcentrationUnits,
-    d.volume AS dilutionVolume,
-    d.volumeUnits AS dilutionVolumeUnits,
-    d.ngUsed AS dilutionNgUsed,
-    d.volumeUsed AS dilutionVolumeUsed,
-    d.identificationBarcode AS dilutionBarcode,
+    d.aliquotId,
+    d.name AS aliquotName,
+    d.concentration AS aliquotConcentration,
+    d.concentrationUnits AS aliquotConcentrationUnits,
+    d.volume AS aliquotVolume,
+    d.volumeUnits AS aliquotVolumeUnits,
+    d.ngUsed AS aliquotNgUsed,
+    d.volumeUsed AS aliquotVolumeUsed,
+    d.identificationBarcode AS aliquotBarcode,
     d.lastUpdated AS lastModified,
     d.creationDate AS created,
     createUser.loginName AS creatorName,
@@ -45,15 +45,15 @@ AS SELECT
     box.name AS boxName,
     box.identificationBarcode AS boxIdentificationBarcode,
     box.locationBarcode AS boxLocationBarcode
-  FROM LibraryDilution d
+  FROM LibraryAliquot d
     LEFT JOIN User modUser ON modUser.userId = d.lastModifier
     JOIN User createUser ON createUser.userId = d.creator
-    JOIN Library l ON l.libraryId = d.library_libraryId
+    JOIN Library l ON l.libraryId = d.libraryId
     JOIN Sample s ON s.sampleId = l.sample_sampleId
     JOIN Project p ON p.projectId = s.project_projectId
     LEFT JOIN DetailedSample ds ON ds.sampleId = s.sampleId
     LEFT JOIN Subproject sub ON sub.subprojectId = ds.subprojectId
     LEFT JOIN LibrarySelectionType sel ON sel.librarySelectionTypeId = l.librarySelectionType
     LEFT JOIN LibraryStrategyType strat ON strat.libraryStrategyTypeId = l.libraryStrategyType
-    LEFT JOIN DilutionBoxPosition dbp ON dbp.dilutionId = d.dilutionId
+    LEFT JOIN LibraryAliquotBoxPosition dbp ON dbp.aliquotId = d.aliquotId
     LEFT JOIN Box box ON box.boxId = dbp.boxId;

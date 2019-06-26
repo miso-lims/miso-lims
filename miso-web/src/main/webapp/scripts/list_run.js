@@ -34,7 +34,7 @@ ListTarget.run = {
       return "/miso/rest/runs/dt";
     }
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     return [];
   },
@@ -46,11 +46,14 @@ ListTarget.run = {
         name: "Add " + platformKey + " Run",
         handler: function() {
           Utils.ajaxWithDialog('Getting Sequencer', 'Get', '/miso/rest/instruments', null, function(instruments) {
-            var allowedModels = Constants.instrumentModels.filter(function(model) { return model.platformType === config.platformType && model.instrumentType === 'SEQUENCER'; }).map(function(model) { return model.id; });
-            Utils.showWizardDialog("Add " + platformKey + " Run", instruments.filter(
-                function(instrument) {
-                  return allowedModels.indexOf(instrument.instrumentModelId) !== -1 && !instrument.dateDecommissioned;
-                }).sort(Utils.sorting.standardSort('name')).map(function(sequencer) {
+            var allowedModels = Constants.instrumentModels.filter(function(model) {
+              return model.platformType === config.platformType && model.instrumentType === 'SEQUENCER';
+            }).map(function(model) {
+              return model.id;
+            });
+            Utils.showWizardDialog("Add " + platformKey + " Run", instruments.filter(function(instrument) {
+              return allowedModels.indexOf(instrument.instrumentModelId) !== -1 && !instrument.dateDecommissioned;
+            }).sort(Utils.sorting.standardSort('name')).map(function(sequencer) {
               return {
                 name: sequencer.name + " (" + sequencer.instrumentModelAlias + ")",
                 handler: function() {
@@ -67,8 +70,8 @@ ListTarget.run = {
     }
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.idHyperlinkColumn("Name", "run", "id", Utils.array.getName, 1, true),
-        ListUtils.labelHyperlinkColumn("Alias", "run", Utils.array.getId, "alias", 0, true), {
+    return [ListUtils.idHyperlinkColumn("Name", Urls.ui.runs.edit, "id", Utils.array.getName, 1, true),
+        ListUtils.labelHyperlinkColumn("Alias", Urls.ui.runs.edit, Utils.array.getId, "alias", 0, true), {
           "sTitle": "Seq. Params.",
           "mData": "sequencingParametersName",
           "include": true,

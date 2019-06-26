@@ -30,7 +30,7 @@ ListTarget.instrument = {
       return "/miso/rest/instruments/dt";
     }
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     return [];
   },
@@ -47,7 +47,7 @@ ListTarget.instrument = {
     }
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.labelHyperlinkColumn("Instrument Name", "instrument", Utils.array.getId, "name", 1, true), {
+    return [ListUtils.labelHyperlinkColumn("Instrument Name", Urls.ui.instruments.edit, Utils.array.getId, "name", 1, true), {
       "sTitle": "Platform",
       "mData": "platformType",
       "include": true,

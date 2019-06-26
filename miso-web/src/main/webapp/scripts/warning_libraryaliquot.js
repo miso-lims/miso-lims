@@ -21,25 +21,17 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.webapp.controller;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
-
-import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
-
-@Controller
-public class ListDilutionsController {
-  @ModelAttribute("title")
-  public String title() {
-    return "Dilutions";
-  }
-  @RequestMapping("/dilutions")
-  public ModelAndView listDilutions(ModelMap model) throws Exception {
-    return new ListItemsPage("dilution").list(model);
-  }
-
-}
+WarningTarget.libraryaliquot = {
+  getWarnings: function(aliquot) {
+    return [{
+      include: aliquot.subprojectPriority,
+      headerMessage: 'Belongs to high priority subproject \'' + aliquot.subprojectAlias + '\'',
+      tableMessage: 'PRIORITY (' + aliquot.subprojectAlias + ')',
+      level: "important"
+    }, {
+      include: aliquot.identityConsentLevel === 'Revoked',
+      headerMessage: 'Donor has revoked consent',
+      tableMessage: '(CONSENT REVOKED)'
+    }];
+  },
+};

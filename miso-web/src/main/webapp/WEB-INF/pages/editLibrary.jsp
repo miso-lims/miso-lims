@@ -78,7 +78,7 @@
   <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="notediv" class="note" style="display:none;">A Library is the first step in constructing sequenceable
-  material from an initial Sample. A Library is then diluted down to a Dilution, and put in a Pool.
+  material from an initial Sample. A Library is then diluted down to a library aliquot, and put in a Pool.
 </div>
 
 <div id="warnings"></div>
@@ -142,7 +142,7 @@
 <c:if test="${library.id != 0}">
   <miso:attachments item="${library}" projectId="${library.sample.project.id}"/>
   <miso:qcs id="list_qcs" item="${library}"/>
-  <miso:list-section id="list_dilution" name="Dilutions" target="dilution" items="${libraryDilutions}" config="${libraryDilutionsConfig}"/>
+  <miso:list-section id="list_aliquot" name="Library Aliquots" target="libraryaliquot" items="${libraryAliquots}" config="${libraryAliquotsConfig}"/>
   <miso:list-section id="list_pool" name="Pools" target="pool" items="${libraryPools}"/>
   <miso:list-section id="list_run" name="Runs" target="run" items="${libraryRuns}"/>
   <miso:list-section id="list_experiment" name="Experiments" target="experiment" items="${experiments}" config="{ libraryId: ${library.id} }"/>

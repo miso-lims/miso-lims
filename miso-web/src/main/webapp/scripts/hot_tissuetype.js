@@ -1,6 +1,10 @@
 HotTarget.tissuetype = {
-  createUrl: '/miso/rest/tissuetypes',
-  updateUrl: '/miso/rest/tissuetypes/',
+  getCreateUrl: function() {
+    return Urls.rest.tissueTypes.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.tissueTypes.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

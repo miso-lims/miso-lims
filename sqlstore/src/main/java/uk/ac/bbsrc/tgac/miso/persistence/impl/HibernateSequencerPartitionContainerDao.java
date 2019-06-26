@@ -214,9 +214,9 @@ public class HibernateSequencerPartitionContainerDao
   public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
     criteria.createAlias("partitions", "partitions");
     criteria.createAlias("partitions.pool", "pool");
-    criteria.createAlias("pool.poolDilutions", "poolDilution");
-    criteria.createAlias("poolDilution.poolableElementView", "dilutionForIndex");
-    criteria.createAlias("dilutionForIndex.indices", "indices");
+    criteria.createAlias("pool.poolElements", "poolElement");
+    criteria.createAlias("poolElement.poolableElementView", "aliquotForIndex");
+    criteria.createAlias("aliquotForIndex.indices", "indices");
     HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
   }
 

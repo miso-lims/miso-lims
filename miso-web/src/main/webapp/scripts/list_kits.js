@@ -26,7 +26,7 @@ ListTarget.kit = {
   createUrl: function(config, projectId) {
     return "/miso/rest/kitdescriptors/dt" + (config.kitType ? "/type/" + config.kitType : "");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
 
     return [];
@@ -44,7 +44,7 @@ ListTarget.kit = {
     return actions;
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.labelHyperlinkColumn("Kit Name", "kitdescriptor", Utils.array.getId, "name", 1, true), {
+    return [ListUtils.labelHyperlinkColumn("Kit Name", Urls.ui.kitDescriptors.edit, Utils.array.getId, "name", 1, true), {
       "sTitle": "Version",
       "include": true,
       "iSortPriority": 0,

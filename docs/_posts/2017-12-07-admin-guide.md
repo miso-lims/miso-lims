@@ -165,7 +165,7 @@ Note that the kit type and sequencing platform must be entered in all caps.
 
 ## Targeted Sequencing
 
-A Targeted Sequencing panel has a name, description, and name of the library kit with which it is to be used. Targeted Sequencing values can be added to Library Dilutions to assist with analysis.
+A Targeted Sequencing panel has a name, description, and name of the library kit with which it is to be used. Targeted Sequencing values can be added to library aliquots to assist with analysis.
 
 ```
 addTargetedSequencing(alias, description, kitName, archived);
@@ -181,10 +181,10 @@ Note: the library kit must already exist in MISO.
 
 # Removing Lab-entered data
 
-Lab members are now able to delete samples, libraries, dilutions, and pools. Generally, they are only able 
+Lab members are now able to delete samples, libraries, library aliquots, and pools. Generally, they are only able 
 to delete items they have created, but some exceptions apply. An item can only be deleted if it has no
-realted downstream-processing items; for example, a library with associated dilutions and pools can only 
-be deleted after the pools and then the dilutions are deleted.
+related downstream-processing items; for example, a library with associated library aliquots and pools can only 
+be deleted after the pools and then the library aliquots are deleted.
 
 Deleting an item deletes all of the associated entities (QCs, sequencing parameters, position in box or sequencing container, changelogs, etc.). Deletions are final and cannot be undone.
 
@@ -214,13 +214,13 @@ CALL deletePool(poolId, poolAlias);
 <a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_pool.sql">Source</a>
 
 
-## Dilutions
+## Library Aliquots
 
 ```
-CALL deleteDilution(dilutionId, libraryId, userName);
+CALL deleteLibraryAliquot(aliquotId, libraryId, userName);
 ```
-Note: deleting a dilution adds a changelog entry to the library.
-<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_librarydilution.sql">Source</a>
+
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_libraryaliquot.sql">Source</a>
 
 
 ## Libraries

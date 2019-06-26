@@ -1,6 +1,10 @@
 HotTarget.libraryspikein = {
-  createUrl: '/miso/rest/libraryspikeins',
-  updateUrl: '/miso/rest/libraryspikeins/',
+  getCreateUrl: function() {
+    return Urls.rest.librarySpikeIns.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.librarySpikeIns.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

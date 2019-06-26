@@ -365,7 +365,7 @@ INSERT INTO Project(projectId, name, alias, shortName, created, description, pro
   (120001, 'PRO120001', 'SinglePoolIT', '1IPO', '2017-08-22', 'single pool test project', 'ACTIVE', 1, '2017-08-22 16:35:00', 1, 1),
   (200001, 'PRO200001', 'BulkPoolIT', 'IPOT', '2017-08-15', 'bulk Pool test project', 'ACTIVE', 1, '2017-08-15 12:22:00', 1, 1),
   (200, 'PRO200', 'HotSorting', 'SORT', '2017-08-09', 'test sorting by BoxPosition in Handsontable', 'ACTIVE', 1, '2017-08-09 11:51:00', 1, 1),
-  (300, 'PRO300', 'BulkDilutionIT', 'DILT', '2017-08-14', 'bulk dilution test project', 'ACTIVE', 1, '2017-08-14 11:54:00', 1, 1),
+  (300, 'PRO300', 'BulkLibraryAliquotIT', 'DILT', '2017-08-14', 'bulk library aliquot test project', 'ACTIVE', 1, '2017-08-14 11:54:00', 1, 1),
   (400, 'PRO400', 'StudiesIT', 'STUT', '2017-08-16', 'studies test project', 'ACTIVE', 1, '2017-08-16 14:50:00', 1, 1),
   (500, 'PRO500', 'Tubes In Boxes', 'TIB', '2017-08-15', 'test tubes in and out of boxes', 'ACTIVE', 1, '2017-08-15 13:45:00', 1, 1),
   (4440, 'PRO4440', 'Propagate Samples', 'PROP', '2017-10-26', 'propagate samples', 'ACTIVE', 1, '2017-10-26 14:20:00', 1, 1),
@@ -721,7 +721,7 @@ INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (603, 8),
   (604, 8);
 
-INSERT INTO LibraryDilution (dilutionId, name, concentration, concentrationUnits, library_libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated) VALUES
+INSERT INTO LibraryAliquot (aliquotId, name, concentration, concentrationUnits, libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated) VALUES
 (1, 'LDI1', 5.9, 'NANOGRAMS_PER_MICROLITRE', 1, '12321', '2017-07-20', 1, 1, '2017-07-20 09:01:00'),
 (304, 'LDI304', 7.97, 'NANOGRAMS_PER_MICROLITRE', 304, '300304', '2017-08-14', 1, 1, '2017-08-14 12:25:00'),
 (305, 'LDI305', 7.97, 'NANOGRAMS_PER_MICROLITRE', 305, '300305', '2017-08-14', 1, 1, '2017-08-14 12:25:00'),
@@ -740,7 +740,7 @@ INSERT INTO LibraryDilution (dilutionId, name, concentration, concentrationUnits
 (804, 'LDI804', 2.2, 'NANOGRAMS_PER_MICROLITRE', 604, 'same_index_2', '2018-06-26', 1, 1, '2018-06-26 11:39:00');
 
 
-INSERT INTO LibraryDilution (dilutionId, name, concentration, concentrationUnits, library_libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated, volumeUsed) VALUES
+INSERT INTO LibraryAliquot (aliquotId, name, concentration, concentrationUnits, libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated, volumeUsed) VALUES
 (901, 'LDI901', 4.3, 'NANOGRAMS_PER_MICROLITRE', 504, 'auto_calculate_pool_1', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 14.7),
 (902, 'LDI902', 1.7, 'NANOGRAMS_PER_MICROLITRE', 504, 'auto_calculate_pool_2', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 21.3),
 (1001, 'LDI1001', 1.7, 'NANOGRAMS_PER_MICROLITRE', 804, 'edit_volumeused_1', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 40),
@@ -771,8 +771,8 @@ INSERT INTO Pool (poolId, concentration, concentrationUnits, volume, volumeUnits
 (5103, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5103', 'POOL_WITH_ORDERS', 'ipobar5103', 'sergeant', '2017-09-27', 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
 (5104, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5104', 'POOL_WITH_COMPLETED_ORDERS', 'ipobar5104', 'mission accomplished', '2017-09-27', 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
 (5105, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5105', 'POOL_NOT_READY', 'ipobar5105', 'unprepared', '2017-09-27', 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
-(701, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO701', 'TEST_POOLING_DILUTIONS', 'ipobar701', 'test pool', '2017-10-17', 'ILLUMINA', 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL),
-(702, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO702', 'TEST_REMOVING_DILUTIONS', 'ipobar702', 'test pool', '2017-10-17', 'ILLUMINA', 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL),
+(701, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO701', 'TEST_POOLING_ALIQUOTS', 'ipobar701', 'test pool', '2017-10-17', 'ILLUMINA', 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL),
+(702, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO702', 'TEST_REMOVING_ALIQUOTS', 'ipobar702', 'test pool', '2017-10-17', 'ILLUMINA', 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL),
 (801, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO801', 'TEST_NO_INDEX_WARNING', 'ipobar801', 'no indices', '2018-06-22', 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
 (802, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO802', 'TEST_SIMILAR_INDEX_WARNING', 'ipobar802', 'similar index', '2018-06-22', 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
 (803, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO803', 'TEST_SAME_INDEX_WARNING', 'ipobar803', 'same index', '2018-06-22', 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
@@ -781,7 +781,7 @@ INSERT INTO Pool (poolId, concentration, concentrationUnits, volume, volumeUnits
 INSERT INTO Pool (poolId, concentration, concentrationUnits, volume, volumeUnits, name, alias, identificationBarcode, description, creationDate, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
 (2201, 50, 'NANOGRAMS_PER_MICROLITRE', 60, 'MICROLITRES', 'IPO2201', 'AUTO_UPDATE_QC', 'ipobar2201', 'autoupdate qc', '2018-06-22', 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL);
 
-INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
+INSERT INTO Pool_LibraryAliquot (poolId, aliquotId) VALUES
 (1, 1),
 (120001, 120001),
 (120001, 120002),
@@ -828,7 +828,7 @@ INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, lastModifier, creator,
 INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
 (1, 1,   'LIBRARY',  'A01'),
 (1, 205, 'SAMPLE',   'A07'),
-(1, 1,   'DILUTION', 'B02'),
+(1, 1,   'LIBRARY_ALIQUOT', 'B02'),
 (1, 206, 'SAMPLE',   'B05'),
 (1, 1,   'POOL',     'C03'),
 (1, 204, 'SAMPLE',   'C06'),
@@ -837,8 +837,13 @@ INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
 (1, 4,   'SAMPLE',   'F06'),
 (1, 7,   'SAMPLE',   'G07'),
 (1, 8,   'SAMPLE',   'H08'),
-(500, 502, 'SAMPLE', 'A01'), (500, 504, 'LIBRARY', 'B01'), (500, 504, 'DILUTION', 'C01'), (500, 501, 'POOL', 'D01'), (500, 505, 'LIBRARY', 'F10'),
-(100001, 100006, 'LIBRARY', 'A02'), (100001, 100007, 'LIBRARY', 'A03'); 
+(500, 502, 'SAMPLE', 'A01'),
+(500, 504, 'LIBRARY', 'B01'),
+(500, 504, 'LIBRARY_ALIQUOT', 'C01'),
+(500, 501, 'POOL', 'D01'),
+(500, 505, 'LIBRARY', 'F10'),
+(100001, 100006, 'LIBRARY', 'A02'),
+(100001, 100007, 'LIBRARY', 'A03'); 
 
 INSERT INTO SequencerPartitionContainer (containerId, identificationBarcode, sequencingContainerModelId, lastModifier, creator, created, lastModified) VALUES
 (1, 'MISEQXX', 1, 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01'),
@@ -987,7 +992,7 @@ INSERT INTO Workset_Library(worksetId, libraryId) VALUES
 (1, 100002),
 (1, 100003);
 
-INSERT INTO Workset_Dilution(worksetId, dilutionId) VALUES
+INSERT INTO Workset_LibraryAliquot(worksetId, aliquotId) VALUES
 (1, 120001),
 (1, 120002);
 

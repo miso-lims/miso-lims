@@ -72,8 +72,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -100,6 +98,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
@@ -126,13 +126,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
@@ -155,6 +154,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
@@ -165,14 +165,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.DilutionBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
@@ -1485,11 +1485,11 @@ public class Dtos {
     return to;
   }
 
-  private static DilutionDto asDto(@Nonnull LibraryDilution from, @Nonnull LibraryDto libraryDto, boolean includeBoxPositions) {
-    DilutionDto dto = new DilutionDto();
+  private static LibraryAliquotDto asDto(@Nonnull LibraryAliquot from, @Nonnull LibraryDto libraryDto, boolean includeBoxPositions) {
+    LibraryAliquotDto dto = new LibraryAliquotDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
-    dto.setDilutionUserName(from.getCreator().getFullName());
+    dto.setCreatorName(from.getCreator().getFullName());
     dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
     dto.setConcentrationUnits(from.getConcentrationUnits());
     dto.setVolume(from.getVolume() == null ? null : from.getVolume().toString());
@@ -1526,7 +1526,7 @@ public class Dtos {
     return dto;
   }
 
-  public static DilutionDto asDto(@Nonnull LibraryDilution from, boolean includeFullLibrary, boolean includeBoxPositions) {
+  public static LibraryAliquotDto asDto(@Nonnull LibraryAliquot from, boolean includeFullLibrary, boolean includeBoxPositions) {
     LibraryDto libDto = null;
     if (includeFullLibrary) {
       libDto = asDto(from.getLibrary(), false);
@@ -1551,22 +1551,22 @@ public class Dtos {
     return asDto(from, libDto, includeBoxPositions);
   }
 
-  public static DilutionDto asDto(@Nonnull PoolableElementView from) {
-    DilutionDto dto = new DilutionDto();
-    dto.setId(from.getDilutionId());
-    dto.setName(from.getDilutionName());
-    dto.setDilutionUserName(from.getCreatorFullName());
-    dto.setConcentration(from.getDilutionConcentration() == null ? null : from.getDilutionConcentration().toString());
-    dto.setConcentrationUnits(from.getDilutionConcentrationUnits());
+  public static LibraryAliquotDto asDto(@Nonnull PoolableElementView from) {
+    LibraryAliquotDto dto = new LibraryAliquotDto();
+    dto.setId(from.getAliquotId());
+    dto.setName(from.getAliquotName());
+    dto.setCreatorName(from.getCreatorFullName());
+    dto.setConcentration(from.getAliquotConcentration() == null ? null : from.getAliquotConcentration().toString());
+    dto.setConcentrationUnits(from.getAliquotConcentrationUnits());
     dto.setLastModified(formatDateTime(from.getLastModified()));
     dto.setCreationDate(formatDate(from.getCreated()));
-    dto.setIdentificationBarcode(from.getDilutionBarcode());
+    dto.setIdentificationBarcode(from.getAliquotBarcode());
     dto.setIndexIds(from.getIndices().stream().map(Index::getId).collect(Collectors.toList()));
     dto.setTargetedSequencingId(from.getTargetedSequencingId());
-    dto.setVolume(from.getDilutionVolume() == null ? null : from.getDilutionVolume().toString());
-    dto.setVolumeUnits(from.getDilutionVolumeUnits());
-    dto.setNgUsed(from.getDilutionNgUsed() == null ? null : from.getDilutionNgUsed().toString());
-    dto.setVolumeUsed(from.getDilutionVolumeUsed() == null ? null : from.getDilutionVolumeUsed().toString());
+    dto.setVolume(from.getAliquotVolume() == null ? null : from.getAliquotVolume().toString());
+    dto.setVolumeUnits(from.getAliquotVolumeUnits());
+    dto.setNgUsed(from.getAliquotNgUsed() == null ? null : from.getAliquotNgUsed().toString());
+    dto.setVolumeUsed(from.getAliquotVolumeUsed() == null ? null : from.getAliquotVolumeUsed().toString());
 
     LibraryDto ldto = new LibraryDto();
     ldto.setId(from.getLibraryId());
@@ -1594,8 +1594,8 @@ public class Dtos {
     return dto;
   }
 
-  public static LibraryDilution to(@Nonnull DilutionDto from) {
-    LibraryDilution to = new LibraryDilution();
+  public static LibraryAliquot to(@Nonnull LibraryAliquotDto from) {
+    LibraryAliquot to = new LibraryAliquot();
     if (from.getId() != null) to.setId(from.getId());
     if (!isStringEmptyOrNull(from.getName())) {
       to.setName(from.getName());
@@ -1613,7 +1613,7 @@ public class Dtos {
       to.setTargetedSequencing(new TargetedSequencing());
       to.getTargetedSequencing().setId(from.getTargetedSequencingId());
     }
-    to.setBoxPosition((DilutionBoxPosition) makeBoxablePosition(from, to));
+    to.setBoxPosition((LibraryAliquotBoxPosition) makeBoxablePosition(from, to));
     to.setDiscarded(from.isDiscarded());
     to.setDistributed(from.isDistributed());
     to.setDistributionDate(parseDate(from.getDistributionDate()));
@@ -1640,18 +1640,18 @@ public class Dtos {
     }
     dto.setLongestIndex(from.getLongestIndex());
     dto.setLastModified(formatDateTime(from.getLastModified()));
-    dto.setDilutionCount(from.getPoolDilutions().size());
-    from.getPoolDilutions().stream()//
-        .map(PoolDilution::getPoolableElementView)//
+    dto.setLibraryAliquotCount(from.getPoolContents().size());
+    from.getPoolContents().stream()//
+        .map(PoolElement::getPoolableElementView)//
         .map(PoolableElementView::getLibraryDnaSize)//
         .filter(Objects::nonNull)//
         .mapToDouble(Long::doubleValue)//
         .average()//
         .ifPresent(dto::setInsertSize);
     if (includeContents) {
-      Set<DilutionDto> pooledElements = new HashSet<>();
-      for (PoolDilution pd : from.getPoolDilutions()) {
-        DilutionDto ldi = asDto(pd.getPoolableElementView());
+      Set<LibraryAliquotDto> pooledElements = new HashSet<>();
+      for (PoolElement pd : from.getPoolContents()) {
+        LibraryAliquotDto ldi = asDto(pd.getPoolableElementView());
         ldi.setProportion(pd.getProportion());
         pooledElements.add(ldi);
       }
@@ -2286,15 +2286,15 @@ public class Dtos {
     to.setVolumeUnits(dto.getVolumeUnits());
     to.setPlatformType(PlatformType.valueOf(dto.getPlatformType()));
     if (dto.getPooledElements() != null) {
-      to.setPoolDilutions(dto.getPooledElements().stream().map(dilution -> {
+      to.setPoolElements(dto.getPooledElements().stream().map(aliquot -> {
         PoolableElementView view = new PoolableElementView();
-        view.setDilutionId(dilution.getId());
-        view.setDilutionName(dilution.getName());
-        view.setDilutionVolumeUsed(dilution.getVolumeUsed() == null ? null : Double.valueOf(dilution.getVolumeUsed()));
+        view.setAliquotId(aliquot.getId());
+        view.setAliquotName(aliquot.getName());
+        view.setAliquotVolumeUsed(aliquot.getVolumeUsed() == null ? null : Double.valueOf(aliquot.getVolumeUsed()));
   
-        PoolDilution link = new PoolDilution(to, view);
-        if (dilution.getProportion() != null) {
-          link.setProportion(dilution.getProportion());
+        PoolElement link = new PoolElement(to, view);
+        if (aliquot.getProportion() != null) {
+          link.setProportion(aliquot.getProportion());
         }
         return link;
       }).collect(Collectors.toSet()));
@@ -3135,8 +3135,8 @@ public class Dtos {
     if (!from.getLibraries().isEmpty()) {
       dto.setLibraryIds(from.getLibraries().stream().map(Identifiable::getId).collect(Collectors.toList()));
     }
-    if (!from.getDilutions().isEmpty()) {
-      dto.setDilutionIds(from.getDilutions().stream().map(Identifiable::getId).collect(Collectors.toList()));
+    if (!from.getLibraryAliquots().isEmpty()) {
+      dto.setLibraryAliquotIds(from.getLibraryAliquots().stream().map(Identifiable::getId).collect(Collectors.toList()));
     }
     dto.setCreator(from.getCreator().getFullName());
     dto.setLastModified(formatDateTime(from.getLastModified()));
@@ -3164,9 +3164,9 @@ public class Dtos {
         return l;
       }).collect(Collectors.toSet()));
     }
-    if (from.getDilutionIds() != null && !from.getDilutionIds().isEmpty()) {
-      workset.setDilutions(from.getDilutionIds().stream().map(id -> {
-        LibraryDilution d = new LibraryDilution();
+    if (from.getLibraryAliquotIds() != null && !from.getLibraryAliquotIds().isEmpty()) {
+      workset.setLibraryAliquots(from.getLibraryAliquotIds().stream().map(id -> {
+        LibraryAliquot d = new LibraryAliquot();
         d.setId(id);
         return d;
       }).collect(Collectors.toSet()));

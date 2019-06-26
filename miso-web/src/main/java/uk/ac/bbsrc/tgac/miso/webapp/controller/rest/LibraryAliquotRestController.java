@@ -11,8 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -37,31 +35,30 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
-import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryDilutionSpreadSheets;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
-import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
-@RequestMapping("/rest/librarydilutions")
-public class LibraryDilutionRestController extends RestController {
-  protected static final Logger log = LoggerFactory.getLogger(LibraryDilutionRestController.class);
+@RequestMapping("/rest/libraryaliquots")
+public class LibraryAliquotRestController extends RestController {
 
-  private final JQueryDataTableBackend<PoolableElementView, DilutionDto> jQueryBackend = new JQueryDataTableBackend<PoolableElementView, DilutionDto>() {
+  private final JQueryDataTableBackend<PoolableElementView, LibraryAliquotDto> jQueryBackend = new JQueryDataTableBackend<PoolableElementView, LibraryAliquotDto>() {
     @Override
-    protected DilutionDto asDto(PoolableElementView model) {
+    protected LibraryAliquotDto asDto(PoolableElementView model) {
       return Dtos.asDto(model);
     }
 
@@ -72,7 +69,7 @@ public class LibraryDilutionRestController extends RestController {
   };
 
   @Autowired
-  private LibraryDilutionService dilutionService;
+  private LibraryAliquotService libraryAliquotService;
 
   @Autowired
   private PoolableElementViewService poolableElementViewService;
@@ -80,46 +77,46 @@ public class LibraryDilutionRestController extends RestController {
   @Autowired
   private PoolService poolService;
 
-  public void setDilutionService(LibraryDilutionService dilutionService) {
-    this.dilutionService = dilutionService;
+  public void setLibraryAliquotService(LibraryAliquotService libraryAliquotService) {
+    this.libraryAliquotService = libraryAliquotService;
   }
 
-  @GetMapping(value = "/{dilutionId}", produces = "application/json")
+  @GetMapping(value = "/{aliquotId}", produces = "application/json")
   @ResponseBody
-  public DilutionDto getDilution(@PathVariable Long dilutionId) throws IOException {
-    return RestUtils.getObject("Dilution", dilutionId, dilutionService, ldi -> Dtos.asDto(ldi, false, false));
+  public LibraryAliquotDto get(@PathVariable Long aliquotId) throws IOException {
+    return RestUtils.getObject("Library Aliquot", aliquotId, libraryAliquotService, ldi -> Dtos.asDto(ldi, false, false));
   }
 
   @PostMapping(headers = { "Content-type=application/json" })
   @ResponseBody
-  public DilutionDto createDilution(@RequestBody DilutionDto dilutionDto)
+  public LibraryAliquotDto create(@RequestBody LibraryAliquotDto aliquotDto)
       throws IOException {
-    return RestUtils.createObject("Dilution", dilutionDto, Dtos::to, dilutionService, ldi -> Dtos.asDto(ldi, false, false));
+    return RestUtils.createObject("Library Aliquot", aliquotDto, Dtos::to, libraryAliquotService, ldi -> Dtos.asDto(ldi, false, false));
   }
 
-  @PutMapping(value = "/{dilutionId}", headers = { "Content-type=application/json" })
+  @PutMapping(value = "/{aliquotId}", headers = { "Content-type=application/json" })
   @ResponseBody
-  public DilutionDto updateDilution(@PathVariable Long dilutionId, @RequestBody DilutionDto dilutionDto)
-      throws IOException {
-    return RestUtils.updateObject("Dilution", dilutionId, dilutionDto, Dtos::to, dilutionService, ldi -> Dtos.asDto(ldi, false, false));
+  public LibraryAliquotDto update(@PathVariable Long aliquotId, @RequestBody LibraryAliquotDto aliquotDto) throws IOException {
+    return RestUtils.updateObject("Library Aliquot", aliquotId, aliquotDto, Dtos::to, libraryAliquotService,
+        ldi -> Dtos.asDto(ldi, false, false));
   }
 
   @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<DilutionDto> getDilutions(HttpServletRequest request,
+  public DataTablesResponseDto<LibraryAliquotDto> getLibraryAliquots(HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
   @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<DilutionDto> getDilutionsByProject(@PathVariable("id") Long id, HttpServletRequest request,
+  public DataTablesResponseDto<LibraryAliquotDto> getByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
   }
 
   @GetMapping(value = "/dt/pool/{id}/available", produces = "application/json")
-  public @ResponseBody DataTablesResponseDto<DilutionDto> availableDilutions(@PathVariable("id") Long poolId, HttpServletRequest request,
+  public @ResponseBody DataTablesResponseDto<LibraryAliquotDto> getAvailable(@PathVariable("id") Long poolId, HttpServletRequest request,
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
 
@@ -129,10 +126,10 @@ public class LibraryDilutionRestController extends RestController {
 
   @PostMapping(value = "query", produces = { "application/json" })
   @ResponseBody
-  public List<DilutionDto> getLibraryDilutionsInBulk(@RequestBody List<String> names, HttpServletRequest request,
+  public List<LibraryAliquotDto> getLibraryAliquotsInBulk(@RequestBody List<String> names, HttpServletRequest request,
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
-    return PaginationFilter.bulkSearch(names, dilutionService, ldi -> Dtos.asDto(ldi, false, false),
+    return PaginationFilter.bulkSearch(names, libraryAliquotService, ldi -> Dtos.asDto(ldi, false, false),
         message -> new RestException(message, Status.BAD_REQUEST));
   }
 
@@ -140,26 +137,26 @@ public class LibraryDilutionRestController extends RestController {
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
-    return MisoWebUtils.generateSpreadsheet(request, dilutionService::get, LibraryDilutionSpreadSheets::valueOf, response);
+    return MisoWebUtils.generateSpreadsheet(request, libraryAliquotService::get, LibraryAliquotSpreadSheets::valueOf, response);
   }
 
-  private static Stream<Sample> getSample(LibraryDilution dilution) {
-    return Stream.of(dilution.getLibrary().getSample());
+  private static Stream<Sample> getSample(LibraryAliquot aliquot) {
+    return Stream.of(aliquot.getLibrary().getSample());
   }
-  private final RelationFinder<LibraryDilution> parentFinder = (new RelationFinder<LibraryDilution>() {
+  private final RelationFinder<LibraryAliquot> parentFinder = (new RelationFinder<LibraryAliquot>() {
 
     @Override
-    protected LibraryDilution fetch(long id) throws IOException {
-      return dilutionService.get(id);
+    protected LibraryAliquot fetch(long id) throws IOException {
+      return libraryAliquotService.get(id);
     }
   })//
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, LibraryDilutionRestController::getSample))//
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, LibraryDilutionRestController::getSample))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, LibraryAliquotRestController::getSample))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, LibraryAliquotRestController::getSample))//
       .add(new RelationFinder.ParentSampleAdapter<>(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class,
-          LibraryDilutionRestController::getSample))//
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class, LibraryDilutionRestController::getSample))//
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class, LibraryDilutionRestController::getSample))//
-      .add(new RelationFinder.RelationAdapter<LibraryDilution, Sample, SampleDto>("Sample") {
+          LibraryAliquotRestController::getSample))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class, LibraryAliquotRestController::getSample))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class, LibraryAliquotRestController::getSample))//
+      .add(new RelationFinder.RelationAdapter<LibraryAliquot, Sample, SampleDto>("Sample") {
 
         @Override
         public SampleDto asDto(Sample model) {
@@ -167,11 +164,11 @@ public class LibraryDilutionRestController extends RestController {
         }
 
         @Override
-        public Stream<Sample> find(LibraryDilution model, Consumer<String> emitError) {
+        public Stream<Sample> find(LibraryAliquot model, Consumer<String> emitError) {
           return Stream.of(model.getLibrary().getSample());
         }
       })//
-      .add(new RelationFinder.RelationAdapter<LibraryDilution, Library, LibraryDto>("Library") {
+      .add(new RelationFinder.RelationAdapter<LibraryAliquot, Library, LibraryDto>("Library") {
 
         @Override
         public LibraryDto asDto(Library model) {
@@ -179,7 +176,7 @@ public class LibraryDilutionRestController extends RestController {
         }
 
         @Override
-        public Stream<Library> find(LibraryDilution model, Consumer<String> emitError) {
+        public Stream<Library> find(LibraryAliquot model, Consumer<String> emitError) {
           return Stream.of(model.getLibrary());
         }
       });
@@ -191,14 +188,14 @@ public class LibraryDilutionRestController extends RestController {
     return parentFinder.list(ids, category);
   }
 
-  private final RelationFinder<LibraryDilution> childFinder = (new RelationFinder<LibraryDilution>() {
+  private final RelationFinder<LibraryAliquot> childFinder = (new RelationFinder<LibraryAliquot>() {
 
     @Override
-    protected LibraryDilution fetch(long id) throws IOException {
-      return dilutionService.get(id);
+    protected LibraryAliquot fetch(long id) throws IOException {
+      return libraryAliquotService.get(id);
     }
   })//
-      .add(new RelationFinder.RelationAdapter<LibraryDilution, Pool, PoolDto>("Pool") {
+      .add(new RelationFinder.RelationAdapter<LibraryAliquot, Pool, PoolDto>("Pool") {
 
         @Override
         public PoolDto asDto(Pool model) {
@@ -206,7 +203,7 @@ public class LibraryDilutionRestController extends RestController {
         }
 
         @Override
-        public Stream<Pool> find(LibraryDilution model, Consumer<String> emitError) {
+        public Stream<Pool> find(LibraryAliquot model, Consumer<String> emitError) {
           Set<Pool> children = model.getPools();
           if (children.isEmpty()) {
             emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
@@ -227,18 +224,18 @@ public class LibraryDilutionRestController extends RestController {
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
-    List<LibraryDilution> dilutions = new ArrayList<>();
+    List<LibraryAliquot> aliquots = new ArrayList<>();
     for (Long id : ids) {
       if (id == null) {
-        throw new RestException("Cannot delete null library dilution", Status.BAD_REQUEST);
+        throw new RestException("Cannot delete null library aliquot", Status.BAD_REQUEST);
       }
-      LibraryDilution dilution = dilutionService.get(id);
-      if (dilution == null) {
-        throw new RestException("Library Dilution " + id + " not found", Status.BAD_REQUEST);
+      LibraryAliquot aliquot = libraryAliquotService.get(id);
+      if (aliquot == null) {
+        throw new RestException("Library aliquot " + id + " not found", Status.BAD_REQUEST);
       }
-      dilutions.add(dilution);
+      aliquots.add(aliquot);
     }
-    dilutionService.bulkDelete(dilutions);
+    libraryAliquotService.bulkDelete(aliquots);
   }
 
 }

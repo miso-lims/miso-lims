@@ -1,9 +1,9 @@
 HotTarget.pool = (function() {
 
-  var customPoolNotes = ['Switch between Pool and Dilution views using the \'Choose Dilutions\'/\'Edit Pools\' buttons'];
+  var customPoolNotes = ['Switch between Pool and Library Aliquot views using the \'Choose Library Aliquots\'/\'Edit Pools\' buttons'];
 
-  // used for custom pooling - table is rebuilt when switching between dilution/pool views
-  var dilutions = null;
+  // used for custom pooling - table is rebuilt when switching between aliquot/pool views
+  var aliquots = null;
   var pools = null;
 
   function destroyTable(table) {
@@ -13,55 +13,55 @@ HotTarget.pool = (function() {
   }
 
   function switchToPoolsTable(table, config) {
-    dilutions = table.getDtoData();
+    aliquots = table.getDtoData();
     destroyTable(table);
     HotUtils.makeTable(HotTarget.pool, true, pools, config);
   }
 
-  function switchToDilutionsTable(table, config) {
+  function switchToAliquotsTable(table, config) {
     pools = table.getDtoData();
-    if (!dilutions) {
-      dilutions = config.dilutionsToPool;
+    if (!aliquots) {
+      aliquots = config.aliquotsToPool;
     }
     destroyTable(table);
-    HotUtils.makeTable(dilutionPoolTarget, false, dilutions, config);
+    HotUtils.makeTable(aliquotPoolTarget, false, aliquots, config);
   }
 
-  var dilutionPoolTarget = {
+  var aliquotPoolTarget = {
     getNotes: function(config) {
       return customPoolNotes;
     },
     createColumns: function(config, create, data) {
       return [{
-        header: 'Dilution Name',
+        header: 'Library Aliquot Name',
         data: 'name',
         readOnly: true,
         include: true,
-        unpack: function(dil, flat, setCellMeta) {
-          flat.name = Utils.valOrNull(dil.name);
+        unpack: function(aliquot, flat, setCellMeta) {
+          flat.name = Utils.valOrNull(aliquot.name);
         },
-        pack: function(dil, flat, errorHandler) {
-          dil.name = flat.name;
+        pack: function(aliquot, flat, errorHandler) {
+          aliquot.name = flat.name;
         }
       }, {
         header: 'Library Alias',
         data: 'libraryAlias',
         readOnly: true,
         include: true,
-        unpack: function(dil, flat, setCellMeta) {
-          flat.libraryAlias = dil.library.alias;
+        unpack: function(aliquot, flat, setCellMeta) {
+          flat.libraryAlias = aliquot.library.alias;
         },
-        pack: function(dil, flat, errorHandler) {
+        pack: function(aliquot, flat, errorHandler) {
         }
       }, {
         header: 'Library Size',
         data: 'librarySize',
         readOnly: true,
         include: true,
-        unpack: function(dil, flat, setCellMeta) {
-          flat.librarySize = dil.library.dnaSize;
+        unpack: function(aliquot, flat, setCellMeta) {
+          flat.librarySize = aliquot.library.dnaSize;
         },
-        pack: function(dil, flat, errorHandler) {
+        pack: function(aliquot, flat, errorHandler) {
         }
       }, {
         header: 'Pool',
@@ -70,11 +70,11 @@ HotTarget.pool = (function() {
         type: 'dropdown',
         trimDropdown: false,
         validator: HotUtils.validator.requiredAutocomplete,
-        unpack: function(dil, flat, setCellMeta) {
-          flat.pool = dil.pool;
+        unpack: function(aliquot, flat, setCellMeta) {
+          flat.pool = aliquot.pool;
         },
-        pack: function(dil, flat, errorHandler) {
-          dil.pool = flat.pool;
+        pack: function(aliquot, flat, errorHandler) {
+          aliquot.pool = flat.pool;
         },
         source: pools ? pools.filter(function(pool) {
           return pool.alias;
@@ -99,10 +99,14 @@ HotTarget.pool = (function() {
 
   return {
     getNotes: function(config) {
-      return config.dilutionsToPool ? customPoolNotes : null
+      return config.aliquotsToPool ? customPoolNotes : null
     },
-    createUrl: '/miso/rest/pools',
-    updateUrl: '/miso/rest/pools/',
+    getCreateUrl: function() {
+      return Urls.rest.pools.create;
+    },
+    getUpdateUrl: function(id) {
+      return Urls.rest.pools.update(id);
+    },
     requestConfiguration: function(config, callback) {
       callback(config)
     },
@@ -235,11 +239,11 @@ HotTarget.pool = (function() {
 
     getCustomActions: function(table, config) {
       var actions = HotTarget.boxable.getCustomActions(table);
-      if (config.dilutionsToPool) {
+      if (config.aliquotsToPool) {
         actions.unshift({
-          buttonText: 'Choose Dilutions',
+          buttonText: 'Choose Library Aliquots',
           eventHandler: function() {
-            switchToDilutionsTable(table, config);
+            switchToAliquotsTable(table, config);
           }
         });
       }
@@ -272,8 +276,8 @@ HotTarget.pool = (function() {
             return errors;
           }),
 
-          HotUtils.makeParents('pools', HotUtils.relationCategoriesForDetailed().concat(
-              [HotUtils.relations.library(), HotUtils.relations.dilution()]))
+          HotUtils.makeParents(Urls.rest.pools.parents, HotUtils.relationCategoriesForDetailed().concat(
+              [HotUtils.relations.library(), HotUtils.relations.libraryAliquot()]))
 
       ].concat(HotUtils.makeQcActions("Pool"));
     },
@@ -281,8 +285,8 @@ HotTarget.pool = (function() {
     confirmSave: function(flatObjects, isCreate, config, table) {
       var deferred = jQuery.Deferred();
 
-      if (config.dilutionsToPool) {
-        // ensure Pool aliases are unique, so we can sort the dilutions correctly
+      if (config.aliquotsToPool) {
+        // ensure Pool aliases are unique, so we can sort the aliquots correctly
         pools = table.getDtoData();
 
         var duplicateAliases = false;
@@ -300,45 +304,45 @@ HotTarget.pool = (function() {
           return deferred.promise();
         }
 
-        // sort dilutions and ensure they're all added to pools
+        // sort aliquots and ensure they're all added to pools
         pools.forEach(function(pool) {
           pool.pooledElements = [];
         });
 
-        if (!dilutions) {
-          dilutions = config.dilutionsToPool;
+        if (!aliquots) {
+          aliquots = config.aliquotsToPool;
         }
-        var dilutionPoolMissing = false;
-        dilutions.forEach(function(dilution) {
-          if (!dilution.pool) {
-            dilutionPoolMissing = true;
+        var aliquotPoolMissing = false;
+        aliquots.forEach(function(aliquot) {
+          if (!aliquot.pool) {
+            aliquotPoolMissing = true;
             return deferred.promise();
           }
           var pool = Utils.array.findFirstOrNull(function(pool) {
-            return pool.alias === dilution.pool;
+            return pool.alias === aliquot.pool;
           }, pools);
           if (!pool) {
-            dilutionPoolMissing = true;
+            aliquotPoolMissing = true;
           } else {
-            pool.pooledElements.push(dilution);
+            pool.pooledElements.push(aliquot);
           }
         });
-        if (dilutionPoolMissing) {
-          Utils.showOkDialog('Error', ['All dilutions must be added to pools'], function() {
-            switchToDilutionsTable(table, config);
+        if (aliquotPoolMissing) {
+          Utils.showOkDialog('Error', ['All aliquots must be added to pools'], function() {
+            switchToAliquotsTable(table, config);
             deferred.reject();
           });
           return deferred.promise();
         }
 
-        // check that all pools have dilutions in them
+        // check that all pools have aliquots in them
         var empties = pools.filter(function(pool) {
           return !pool.pooledElements || !pool.pooledElements.length;
         });
         if (empties.length) {
           Utils.showOkDialog('Error', [empties.length > 1 ? 'There are empty pools' : 'Pool \'' + empties[0].alias + '\' is empty'],
               function() {
-                switchToDilutionsTable(table, config);
+                switchToAliquotsTable(table, config);
                 deferred.reject();
               });
           return deferred.promise();

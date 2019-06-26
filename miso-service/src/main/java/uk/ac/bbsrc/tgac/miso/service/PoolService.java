@@ -33,7 +33,7 @@ public interface PoolService
 
   public List<Pool> listByLibraryId(long libraryId) throws IOException;
 
-  public List<Pool> listByDilutionId(long dilutionId) throws IOException;
+  public List<Pool> listByLibraryAliquotId(long aliquotId) throws IOException;
 
   public Pool getByBarcode(String barcode) throws IOException;
 

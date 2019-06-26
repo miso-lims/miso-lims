@@ -58,8 +58,8 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     public static final String REQUESTED_ORDERS = "list_order_wrapper";
     public static final String ORDER_STATUS = "list_completion_wrapper";
     public static final String RUNS = "list_run_wrapper";
-    public static final String INCLUDED_DILUTIONS = "list_included_wrapper";
-    public static final String AVAILABLE_DILUTIONS = "list_available_wrapper";
+    public static final String INCLUDED_LIBRARY_ALIQUOTS = "list_included_wrapper";
+    public static final String AVAILABLE_LIBRARY_ALIQUOTS = "list_available_wrapper";
     public static final String CHANGES = "changelog_wrapper";
   }
 
@@ -100,12 +100,12 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     return new PoolPage(getDriver());
   }
 
-  public PoolPage addSelectedDilutions() {
+  public PoolPage addSelectedAliquots() {
     clickLinkButtonAndGetUrl(ButtonText.ADD, null, false);
     return new PoolPage(getDriver());
   }
 
-  public PoolPage removeSelectedDilutions() {
+  public PoolPage removeSelectedAliquots() {
     clickLinkButtonAndGetUrl(ButtonText.REMOVE, null, false);
     return new PoolPage(getDriver());
   }

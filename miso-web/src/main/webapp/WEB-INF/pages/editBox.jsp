@@ -56,7 +56,7 @@
   <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="notediv" class="note" style="display:none;">
-  A Box is subdivided into rows and columns which hold Samples, Libraries, Dilutions, or Pools.
+  A Box is subdivided into rows and columns which hold Samples, Libraries, Library Aliquots, or Pools.
 </div>
 
 <form:form id="boxForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>

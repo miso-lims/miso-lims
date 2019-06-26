@@ -21,7 +21,7 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ButtonText;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ListTarget;
@@ -39,7 +39,7 @@ public class BulkPoolIT extends AbstractIT {
       Columns.BOX_ALIAS, Columns.BOX_POSITION, Columns.DISCARDED, Columns.CREATE_DATE, Columns.CONCENTRATION, Columns.CONCENTRATION_UNITS,
       Columns.VOLUME, Columns.VOLUME_UNITS, Columns.QC_PASSED, Columns.DESCRIPTION);
 
-  private static final Set<String> dilutionsToPoolColumns = Sets.newHashSet(Columns.DILUTION_NAME, Columns.LIBRARY_ALIAS,
+  private static final Set<String> libraryAliquotsToPoolColumns = Sets.newHashSet(Columns.LIBRARY_ALIQUOT_NAME, Columns.LIBRARY_ALIAS,
       Columns.LIBRARY_SIZE, Columns.POOL);
 
   private static final Set<String> editColumns = Sets.newHashSet(Columns.DISTRIBUTED, Columns.DISTRIBUTION_DATE,
@@ -77,16 +77,16 @@ public class BulkPoolIT extends AbstractIT {
 
   @Test
   public void testSelectForPoolTogether() {
-    // goal: confirm that using the List Dilutions page to select dilutions for pooling together
-    // directs the page to the correct link with the correct dilutions
-    ListPage listDilutions = ListPage.getListPage(getDriver(), getBaseUrl(), ListTarget.DILUTIONS);
-    DataTable dilutions = listDilutions.getTable();
-    dilutions.searchFor("LDI70"); // should get LDI701 and LDI702
-    assertEquals(2, dilutions.countRows());
+    // goal: confirm that using the List Aliquots page to select aliquots for pooling together
+    // directs the page to the correct link with the correct aliquots
+    ListPage listLibraryAliquots = ListPage.getListPage(getDriver(), getBaseUrl(), ListTarget.LIBRARY_ALIQUOTS);
+    DataTable aliquots = listLibraryAliquots.getTable();
+    aliquots.searchFor("LDI70"); // should get LDI701 and LDI702
+    assertEquals(2, aliquots.countRows());
 
-    dilutions.checkBoxForRow(0);
-    dilutions.checkBoxForRow(1);
-    String newUrl = listDilutions.clickButtonAndGetUrlWithConfirm(ButtonText.POOL_TOGETHER);
+    aliquots.checkBoxForRow(0);
+    aliquots.checkBoxForRow(1);
+    String newUrl = listLibraryAliquots.clickButtonAndGetUrlWithConfirm(ButtonText.POOL_TOGETHER);
 
     assertTrue(newUrl.contains(BulkPoolPage.POOL_TOGETHER_URL_FRAGMENT));
     List<String> ids = Arrays.asList(newUrl.split("=")[1].split("%2C"));
@@ -97,16 +97,16 @@ public class BulkPoolIT extends AbstractIT {
 
   @Test
   public void testSelectForPoolSeparately() {
-    // goal: confirm that using the List Dilutions page to select dilutions for pooling separately
-    // directs the page to the correct link with the correct dilutions
-    ListPage listDilutions = ListPage.getListPage(getDriver(), getBaseUrl(), ListTarget.DILUTIONS);
-    DataTable dilutions = listDilutions.getTable();
-    dilutions.searchFor("LDI70"); // should get LDI701 and LDI702
-    assertEquals(2, dilutions.countRows());
+    // goal: confirm that using the List Library Aliquots page to select aliquots for pooling separately
+    // directs the page to the correct link with the correct aliquotss
+    ListPage listLibraryAliquots = ListPage.getListPage(getDriver(), getBaseUrl(), ListTarget.LIBRARY_ALIQUOTS);
+    DataTable aliquots = listLibraryAliquots.getTable();
+    aliquots.searchFor("LDI70"); // should get LDI701 and LDI702
+    assertEquals(2, aliquots.countRows());
 
-    dilutions.checkBoxForRow(0);
-    dilutions.checkBoxForRow(1);
-    String newUrl = listDilutions.clickButtonAndGetUrlWithConfirm(ButtonText.POOL_SEPARATELY);
+    aliquots.checkBoxForRow(0);
+    aliquots.checkBoxForRow(1);
+    String newUrl = listLibraryAliquots.clickButtonAndGetUrlWithConfirm(ButtonText.POOL_SEPARATELY);
 
 
     assertTrue(newUrl.contains(BulkPoolPage.POOL_SEPARATELY_URL_FRAGMENT));
@@ -133,8 +133,8 @@ public class BulkPoolIT extends AbstractIT {
     BulkPoolCustomPage page = BulkPoolCustomPage.get(getDriver(), getBaseUrl(), Sets.newHashSet(200001L, 200002L), 2);
     assertExpectedColumnsAndRows(page.getTable(), commonColumns, 2);
 
-    page.switchToDilutionView();
-    assertExpectedColumnsAndRows(page.getTable(), dilutionsToPoolColumns, 2);
+    page.switchToLibraryAliquotView();
+    assertExpectedColumnsAndRows(page.getTable(), libraryAliquotsToPoolColumns, 2);
   }
 
   private void assertExpectedColumnsAndRows(HandsOnTable table, Set<String> expectedHeadings, int expectedRowCount) {
@@ -395,7 +395,7 @@ public class BulkPoolIT extends AbstractIT {
     fillRow(table, 1, row1);
     assertColumnValues(table, 1, row1, "row 1 changes pre-save");
 
-    page.switchToDilutionView();
+    page.switchToLibraryAliquotView();
     table = page.getTable();
 
     table.enterText(Columns.POOL, 0, pool1);
@@ -419,21 +419,21 @@ public class BulkPoolIT extends AbstractIT {
 
     Pool saved0 = (Pool) getSession().get(PoolImpl.class, savedId0);
     assertPoolAttributes(row0, saved0);
-    assertEquals(2, saved0.getPoolDilutions().size());
-    List<Long> pool0DilutionIds = saved0.getPoolDilutions().stream()
-        .map(pd -> pd.getPoolableElementView().getDilutionId())
+    assertEquals(2, saved0.getPoolContents().size());
+    List<Long> pool0AliquotIds = saved0.getPoolContents().stream()
+        .map(pd -> pd.getPoolableElementView().getAliquotId())
         .collect(Collectors.toList());
-    assertTrue(pool0DilutionIds.contains(Long.valueOf(504L)));
-    assertTrue(pool0DilutionIds.contains(Long.valueOf(505L)));
+    assertTrue(pool0AliquotIds.contains(Long.valueOf(504L)));
+    assertTrue(pool0AliquotIds.contains(Long.valueOf(505L)));
 
     Pool saved1 = (Pool) getSession().get(PoolImpl.class, savedId1);
     assertPoolAttributes(row1, saved1);
-    assertEquals(2, saved1.getPoolDilutions().size());
-    List<Long> pool1DilutionIds = saved1.getPoolDilutions().stream()
-        .map(pd -> pd.getPoolableElementView().getDilutionId())
+    assertEquals(2, saved1.getPoolContents().size());
+    List<Long> pool1AliquotIds = saved1.getPoolContents().stream()
+        .map(pd -> pd.getPoolableElementView().getAliquotId())
         .collect(Collectors.toList());
-    assertTrue(pool1DilutionIds.contains(Long.valueOf(701L)));
-    assertTrue(pool1DilutionIds.contains(Long.valueOf(702L)));
+    assertTrue(pool1AliquotIds.contains(Long.valueOf(701L)));
+    assertTrue(pool1AliquotIds.contains(Long.valueOf(702L)));
   }
 
   @Test
@@ -729,14 +729,14 @@ public class BulkPoolIT extends AbstractIT {
   }
 
   private static void assertPoolableElementViews(Pool pool, List<Long> ids, List<Integer> proportions) {
-    assertTrue("Incorrect number of pooled elements in pool", pool.getPoolDilutions().size() == ids.size());
+    assertTrue("Incorrect number of pooled elements in pool", pool.getPoolContents().size() == ids.size());
     for (int i = 0; i < ids.size(); i++) {
       final Long id = ids.get(i);
-      PoolDilution poolDilution = pool.getPoolDilutions().stream()
-          .filter(pd -> Long.valueOf(pd.getPoolableElementView().getDilutionId()).equals(id))
+      PoolElement poolElement = pool.getPoolContents().stream()
+          .filter(pd -> Long.valueOf(pd.getPoolableElementView().getAliquotId()).equals(id))
           .findFirst().orElse(null);
-      assertNotNull("Pool does not contain element with id " + id, poolDilution);
-      assertEquals("Saved PoolDilution has incorrect proportion", proportions.get(i), Integer.valueOf(poolDilution.getProportion()));
+      assertNotNull("Pool does not contain element with id " + id, poolElement);
+      assertEquals("Saved PoolElement has incorrect proportion", proportions.get(i), Integer.valueOf(poolElement.getProportion()));
     }
   }
 

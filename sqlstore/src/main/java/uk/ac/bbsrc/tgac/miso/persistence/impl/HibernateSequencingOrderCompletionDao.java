@@ -108,9 +108,9 @@ public class HibernateSequencingOrderCompletionDao implements SequencingOrderCom
 
   @Override
   public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
-    criteria.createAlias("pool.poolDilutions", "poolDilution");
-    criteria.createAlias("poolDilution.poolableElementView", "dilutionForIndex");
-    criteria.createAlias("dilutionForIndex.indices", "indices");
+    criteria.createAlias("pool.poolElements", "poolElement");
+    criteria.createAlias("poolElement.poolableElementView", "aliquotForIndex");
+    criteria.createAlias("aliquotForIndex.indices", "indices");
     HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
   }
 

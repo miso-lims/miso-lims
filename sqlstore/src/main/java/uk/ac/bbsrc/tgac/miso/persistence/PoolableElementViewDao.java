@@ -8,11 +8,11 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface PoolableElementViewDao extends PaginatedDataSource<PoolableElementView> {
 
-  public PoolableElementView get(Long dilutionId) throws IOException;
+  public PoolableElementView get(Long aliquotId) throws IOException;
 
   public PoolableElementView getByBarcode(String barcode) throws IOException;
 
   public PoolableElementView getByPreMigrationId(Long preMigrationId) throws IOException;
 
-  public List<PoolableElementView> list(List<Long> dilutionIds) throws IOException;
+  public List<PoolableElementView> list(List<Long> aliquotIds) throws IOException;
 }

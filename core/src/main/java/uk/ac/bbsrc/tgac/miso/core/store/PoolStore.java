@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
@@ -41,18 +41,14 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
 
   /**
-   * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Library} by means of that Library's
-   * {@link LibraryDilution} objects
-   *
    * @param libraryId
-   *          of type long
-   * @return List<Pool<? extends Poolable<?,?>>
+   * @return a list all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Library} by means of that Library's
+   *         {@link LibraryAliquot} objects
    * @throws IOException
-   *           when
    */
   List<Pool> listByLibraryId(long libraryId) throws IOException;
 
-  List<Pool> listByDilutionId(long dilutionId) throws IOException;
+  List<Pool> listByLibraryAliquotId(long aliquotId) throws IOException;
 
   /**
    * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Project}

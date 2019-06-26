@@ -10,7 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 
 /**
  * This enum represents the set of prefixes for MISO objects, used in naming schemes
@@ -23,7 +23,7 @@ public enum DefaultMisoEntityPrefix {
   BOX(Box.class), //
   EXP(Experiment.class), //
   LIB(Library.class), //
-  LDI(LibraryDilution.class), //
+  LDI(LibraryAliquot.class), //
   PRO(Project.class), //
   RUN(Run.class), //
   SAM(Sample.class), //

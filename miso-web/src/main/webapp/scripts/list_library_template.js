@@ -26,7 +26,9 @@ ListTarget.library_template = {
   createUrl: function(config, projectId) {
     return "/miso/rest/librarytemplates/dt" + (projectId ? '/project/' + projectId : '');
   },
-  queryUrl: "/miso/rest/librarytemplates/query",
+  getQueryUrl: function() {
+    return Urls.rest.libraryTemplates.query;
+  },
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.libraryTemplate.getBulkActions(config);
     actions.push({

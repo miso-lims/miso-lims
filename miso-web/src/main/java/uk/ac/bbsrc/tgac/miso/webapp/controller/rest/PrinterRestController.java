@@ -40,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PrinterDto;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
@@ -153,7 +153,7 @@ public class PrinterRestController extends RestController {
   private ContainerService containerService;
 
   @Autowired
-  private LibraryDilutionService dilutionService;
+  private LibraryAliquotService libraryAliquotService;
 
   private final JQueryDataTableBackend<Printer, PrinterDto> jQueryBackend = new JQueryDataTableBackend<Printer, PrinterDto>() {
 
@@ -271,8 +271,8 @@ public class PrinterRestController extends RestController {
   private Barcodable loadBarcodable(Entry<String, BoxPosition> e) throws IOException {
     long id = e.getValue().getBoxableId().getTargetId();
     switch (e.getValue().getBoxableId().getTargetType()) {
-    case DILUTION:
-      return dilutionService.get(id);
+    case LIBRARY_ALIQUOT:
+      return libraryAliquotService.get(id);
     case LIBRARY:
       return libraryService.get(id);
     case SAMPLE:
@@ -322,8 +322,8 @@ public class PrinterRestController extends RestController {
     case "container":
       fetcher = containerService::get;
       break;
-    case "dilution":
-      fetcher = dilutionService::get;
+    case "libraryaliquot":
+      fetcher = libraryAliquotService::get;
       break;
     case "library":
       fetcher = libraryService::get;

@@ -125,7 +125,7 @@ LEFT JOIN (
         ) newestQpcr ON newestQpcr.sample_sampleId = s.sampleId
 LEFT JOIN SampleQC qpcr ON qpcr.qcId = newestQpcr.qcId
 LEFT JOIN BoxPosition pos ON pos.targetId = s.sampleId 
-        AND pos.targetType LIKE 'Sample%' 
+        AND pos.targetType = 'SAMPLE' 
 LEFT JOIN Box box ON box.boxId = pos.boxId 
  
 UNION ALL
@@ -243,7 +243,7 @@ LEFT JOIN (
                 WHERE position = 2 
         ) bc2 ON bc2.library_libraryId = l.libraryId 
 LEFT JOIN BoxPosition pos ON pos.targetId = l.libraryId 
-        AND pos.targetType LIKE 'Library%' 
+        AND pos.targetType = 'LIBRARY' 
 LEFT JOIN Box box ON box.boxId = pos.boxId
  
 UNION ALL
@@ -296,7 +296,7 @@ SELECT parent.alias name
         ,NULL paired 
         ,NULL readLength 
         ,ts.alias targeted_sequencing 
-        ,'Dilution' miso_type 
+        ,'Library Aliquot' miso_type 
         ,d.preMigrationId premigration_id 
         ,NULL organism 
         ,NULL subproject
@@ -309,11 +309,14 @@ SELECT parent.alias name
         ,NULL isSynthetic
         ,NULL distributed
         ,NULL distribution_date
-FROM LibraryDilution d 
-JOIN Library parent ON parent.libraryId = d.library_libraryId 
+FROM LibraryAliquot d 
+JOIN Library parent ON parent.libraryId = d.libraryId 
 JOIN Sample s ON s.sampleId = parent.sample_sampleId
 JOIN Project sp ON sp.projectId = s.project_projectId
 JOIN LibraryType lt ON lt.libraryTypeId = parent.libraryType 
 LEFT JOIN DetailedLibrary lai ON lai.libraryId = parent.libraryId 
 LEFT JOIN LibraryDesignCode ldc ON lai.libraryDesignCodeId = ldc.libraryDesignCodeId
 LEFT JOIN TargetedSequencing ts ON d.targetedSequencingId = ts.targetedSequencingId
+LEFT JOIN BoxPosition pos ON pos.targetId = d.aliquotId 
+        AND pos.targetType = 'LIBRARY_ALIQUOT' 
+LEFT JOIN Box box ON box.boxId = pos.boxId

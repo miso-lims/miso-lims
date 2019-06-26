@@ -38,8 +38,8 @@ ListTarget.arrayrun = {
     }];
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.idHyperlinkColumn('ID', 'arrayrun', 'id', Utils.array.getId, 0, true),
-        ListUtils.idHyperlinkColumn('Alias', 'arrayrun', 'id', Utils.array.getAlias, 0, true), {
+    return [ListUtils.idHyperlinkColumn('ID', Urls.ui.arrayRuns.edit, 'id', Utils.array.getId, 0, true),
+        ListUtils.idHyperlinkColumn('Alias', Urls.ui.arrayRuns.edit, 'id', Utils.array.getAlias, 0, true), {
           sTitle: 'Status',
           mData: 'status',
           mRender: function(data, type, full) {

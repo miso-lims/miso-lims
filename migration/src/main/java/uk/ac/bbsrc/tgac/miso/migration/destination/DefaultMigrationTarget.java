@@ -49,12 +49,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
@@ -151,7 +151,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     saveProjects(data.getProjects());
     saveSamples(data.getSamples());
     saveLibraries(data.getLibraries());
-    saveLibraryDilutions(data.getDilutions());
+    saveLibraryAliquots(data.getLibraryAliquots());
 
     // Resolution of run also resolves pool PlatformType. Note: this currently assumes that all pools are
     // included in runs. Any pool not attached to a run will not have its value types resolved
@@ -501,27 +501,27 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
   }
 
-  public void saveLibraryDilutions(final Collection<LibraryDilution> libraryDilutions) throws IOException {
-    log.info("Migrating library dilutions...");
-    for (LibraryDilution ldi : libraryDilutions) {
+  public void saveLibraryAliquots(final Collection<LibraryAliquot> libraryAliquots) throws IOException {
+    log.info("Migrating library aliquots...");
+    for (LibraryAliquot ldi : libraryAliquots) {
       try {
-        saveLibraryDilution(ldi);
+        saveLibraryAliquot(ldi);
       } catch (Exception e) {
         handleException(e);
       }
     }
-    log.info(libraryDilutions.size() + " library dilutions migrated.");
+    log.info(libraryAliquots.size() + " library aliquots migrated.");
   }
 
-  private void saveLibraryDilution(LibraryDilution ldi) throws IOException {
+  private void saveLibraryAliquot(LibraryAliquot ldi) throws IOException {
     String friendlyName = "of " + ldi.getLibrary().getAlias();
     if (ldi.getPreMigrationId() != null) {
       friendlyName += " with pre-migration id " + ldi.getPreMigrationId();
     }
-    log.debug("Saving library dilution " + friendlyName);
+    log.debug("Saving library aliquot " + friendlyName);
     if (replaceChangeLogs) {
       if (ldi.getCreationDate() == null || ldi.getLastModified() == null) {
-        throw new IOException("Cannot save dilution due to missing timestamps");
+        throw new IOException("Cannot save library aliquot due to missing timestamps");
       }
     } else {
       ldi.setCreationDate(timeStamp);
@@ -529,7 +529,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
 
     Collection<ChangeLog> ghostChangeLog = null;
-    if (ldi.getLibrary().getId() == LibraryDilution.UNSAVED_ID && ldi.getLibrary() instanceof DetailedLibrary
+    if (ldi.getLibrary().getId() == LibraryAliquot.UNSAVED_ID && ldi.getLibrary() instanceof DetailedLibrary
         && ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId() != null) {
       ghostChangeLog = ldi.getLibrary().getChangeLog();
       Long preMigrationId = ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId();
@@ -539,12 +539,12 @@ public class DefaultMigrationTarget implements MigrationTarget {
       }
     }
     valueTypeLookup.resolveAll(ldi);
-    ldi.setId(serviceManager.getDilutionService().create(ldi));
-    fixDilutionChangeLog(ldi, ghostChangeLog);
-    log.debug("Saved library dilution " + friendlyName);
+    ldi.setId(serviceManager.getLibraryAliquotService().create(ldi));
+    fixLibraryAliquotChangeLog(ldi, ghostChangeLog);
+    log.debug("Saved library aliquot " + friendlyName);
   }
 
-  private void fixDilutionChangeLog(LibraryDilution ldi, Collection<ChangeLog> ghostChangeLog) throws IOException {
+  private void fixLibraryAliquotChangeLog(LibraryAliquot ldi, Collection<ChangeLog> ghostChangeLog) throws IOException {
     Library lib = ldi.getLibrary();
     Collection<ChangeLog> changes = lib.getChangeLog();
     Collection<ChangeLog> fixedChanges = Lists.newArrayList();
@@ -554,8 +554,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
     String gsleTag = "GSLE" + ldi.getPreMigrationId();
     String misoTag = ldi.getName() != null ? ldi.getName() : "LDI" + ldi.getId();
     for (ChangeLog change : changes) {
-      if (("Library dilution " + misoTag + " created.").equals(change.getSummary())) {
-        // omit dilution created changelog created by DB trigger
+      if (("Library aliquot " + misoTag + " created.").equals(change.getSummary())) {
+        // omit library aliquot created changelog created by DB trigger
         continue;
       }
       if (change.getSummary().matches("^" + gsleTag + ".*")) {
@@ -674,7 +674,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   private void resolvePoolables(Pool pool) throws IOException {
     PoolableElementViewService svc = serviceManager.getPoolableElementViewService();
-    for (PoolDilution pd : pool.getPoolDilutions()) {
+    for (PoolElement pd : pool.getPoolContents()) {
       PoolableElementView resolved = svc.getByPreMigrationId(pd.getPoolableElementView().getPreMigrationId());
       if (resolved == null) {
         throw new IllegalArgumentException(
@@ -773,8 +773,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
    */
   private void mergePools(Pool fromPool, Pool toPool) throws IOException {
     if (fromPool.getId() == PoolImpl.UNSAVED_ID) {
-      Collection<PoolDilution> fromPoolables = fromPool.getPoolDilutions();
-      Collection<PoolDilution> toPoolables = toPool.getPoolDilutions();
+      Collection<PoolElement> fromPoolables = fromPool.getPoolContents();
+      Collection<PoolElement> toPoolables = toPool.getPoolContents();
       toPoolables.addAll(fromPoolables);
       setPoolModifiedDetails(toPool);
       serviceManager.getPoolService().update(toPool);

@@ -1,6 +1,10 @@
 HotTarget.arraymodel = {
-  createUrl: '/miso/rest/arraymodels',
-  updateUrl: '/miso/rest/arraymodels/',
+  getCreateUrl: function() {
+    return Urls.rest.arrayModels.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.arrayModels.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

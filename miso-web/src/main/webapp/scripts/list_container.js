@@ -26,7 +26,7 @@ ListTarget.container = {
   createUrl: function(config, projectId) {
     return "/miso/rest/containers/dt" + (config.platformType ? "/platform/" + config.platformType : "");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     var actions = HotUtils.makeQcActions('Container');
     if (config.runId) {
@@ -122,17 +122,17 @@ ListTarget.container = {
     }, ];
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.labelHyperlinkColumn("ID", "container", Utils.array.getId, "id", 1, true),
-        ListUtils.labelHyperlinkColumn("Serial Number", "container", Utils.array.getId, "identificationBarcode", 1, true), {
+    return [ListUtils.labelHyperlinkColumn("ID", Urls.ui.containers.edit, Utils.array.getId, "id", 1, true),
+        ListUtils.labelHyperlinkColumn("Serial Number", Urls.ui.containers.edit, Utils.array.getId, "identificationBarcode", 1, true), {
           "sTitle": "Platform",
           "mData": "platform",
           "include": !config.platformType,
           "iSortPriority": 0
-        }, ListUtils.idHyperlinkColumn("Last Run Name", "run", "lastRunId", function(container) {
+        }, ListUtils.idHyperlinkColumn("Last Run Name", Urls.ui.runs.edit, "lastRunId", function(container) {
           return "RUN" + container.lastRunId;
-        }, -1, true), ListUtils.labelHyperlinkColumn("Last Run Alias", "run", function(container) {
+        }, -1, true), ListUtils.labelHyperlinkColumn("Last Run Alias", Urls.ui.runs.edit, function(container) {
           return container.lastRunId;
-        }, "lastRunAlias", -1, true), ListUtils.labelHyperlinkColumn("Last Sequencer Used", "sequencer", function(container) {
+        }, "lastRunAlias", -1, true), ListUtils.labelHyperlinkColumn("Last Sequencer Used", Urls.ui.instruments.edit, function(container) {
           return container.lastSequencerId;
         }, "lastSequencerName", -1, true), {
           "sTitle": "Last Modified",

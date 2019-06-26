@@ -120,20 +120,20 @@ column heading again to reverse the sorting order.
 {% assign subsub = subsub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub subsub=subsub title="Finding Related Items" %}
 
-Several tables (Samples, Libraries, Dilutions, and Pools) have toolbar buttons labelled "Parents" and "Children." These
-allow you to find items related to the ones you have selected. For instance, you can select a number of dilutions on
-the Dilutions list page, click "Parents," and choose "Library" from the dialog. This will select all of the Libraries
-from which the selected Dilutions were propagated. You can then select an action to perform on the libraries. This will
-be the same set of options that are available on the Libraries list page. One item is said to be the "parent" of
-another if the other item was created using the first. A library is the parent of a library dilution because the
-dilution was made from the library.
+Several tables (Samples, Libraries, Library Aliquots, and Pools) have toolbar buttons labelled "Parents" and
+"Children." These allow you to find items related to the ones you have selected. For instance, you can select a number
+of library aliquots on the Library Aliquots list page, click "Parents," and choose "Library" from the dialog. This will
+select all of the Libraries from which the selected library aliquots were propagated. You can then select an action to
+perform on the libraries. This will be the same set of options that are available on the Libraries list page. One item
+is said to be the "parent" of another if the other item was created using the first. A library is the parent of a
+library aliquot because the aliquot was made from the library.
 
 Here is a list of all the related item types that can be selected using the "Parents" and "Children" buttons where
 lower-numbered items are parents of the higher-numbered items:
 
 1. Samples
 1. Libraries
-1. Library Dilutions
+1. Library Aliquots
 1. Pools
 
 If your site uses detailed sample mode, samples are broken into several additional types:
@@ -217,7 +217,7 @@ record any number of details about the item. For more information on working wit
 In addition to creating and editing single items, it is often useful to work with many items at once. MISO provides
 many bulk create/edit pages to facilitate this (see figure {{figure}}). These bulk pages feature a spreadsheet-like
 interface with features similar to popular spreadsheet software.
-{% include userman-figure.md num=figure cap="Bulk propagate dilutions page" img="general-nav-bulk-page.png" %}
+{% include userman-figure.md num=figure cap="Bulk propagate library aliquots page" img="general-nav-bulk-page.png" %}
 
 Any cells that are invalid will be highlighted in red. This includes any required cells which are left blank. Upon
 saving the table, it is possible that some items save successfully while others fail for various reasons. Any row

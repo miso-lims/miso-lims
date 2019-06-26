@@ -26,7 +26,7 @@ ListTarget.study = {
   createUrl: function(config, projectId) {
     return "/miso/rest/studies/dt" + (projectId ? "/project/" + projectId : "");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     if (config.isAdmin) {
       return [{
@@ -62,8 +62,8 @@ ListTarget.study = {
     }]
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.idHyperlinkColumn("Name", "study", "id", Utils.array.getName, 1, true),
-        ListUtils.labelHyperlinkColumn("Alias", "study", Utils.array.getId, "alias", 0, true), {
+    return [ListUtils.idHyperlinkColumn("Name", Urls.ui.studies.edit, "id", Utils.array.getName, 1, true),
+        ListUtils.labelHyperlinkColumn("Alias", Urls.ui.studies.edit, Utils.array.getId, "alias", 0, true), {
           "sTitle": "Description",
           "mData": "description",
           "include": true,

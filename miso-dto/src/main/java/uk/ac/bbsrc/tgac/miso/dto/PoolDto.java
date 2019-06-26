@@ -27,7 +27,7 @@ public class PoolDto extends AbstractBoxableDto {
   private boolean nearDuplicateIndices;
   private Set<String> nearDuplicateIndicesSequences;
   private Integer avgInsertSize;
-  private Set<DilutionDto> pooledElements;
+  private Set<LibraryAliquotDto> pooledElements;
   private String creationDate;
   private String lastModified;
   private String description;
@@ -37,7 +37,7 @@ public class PoolDto extends AbstractBoxableDto {
   private String platformType;
   private String longestIndex;
   private boolean hasLowQualityLibraries;
-  private int dilutionCount;
+  private int libraryAliquotCount;
   private Double insertSize;
   private boolean hasEmptySequence;
   private Set<String> prioritySubprojectAliases;
@@ -105,7 +105,7 @@ public class PoolDto extends AbstractBoxableDto {
     return name;
   }
 
-  public Set<DilutionDto> getPooledElements() {
+  public Set<LibraryAliquotDto> getPooledElements() {
     return pooledElements;
   }
 
@@ -175,7 +175,7 @@ public class PoolDto extends AbstractBoxableDto {
     this.name = name;
   }
 
-  public void setPooledElements(Set<DilutionDto> pooledElements) {
+  public void setPooledElements(Set<LibraryAliquotDto> pooledElements) {
     this.pooledElements = pooledElements;
   }
 
@@ -223,12 +223,12 @@ public class PoolDto extends AbstractBoxableDto {
     this.hasLowQualityLibraries = hasLowQualityLibraries;
   }
 
-  public int getDilutionCount() {
-    return dilutionCount;
+  public int getLibraryAliquotCount() {
+    return libraryAliquotCount;
   }
 
-  public void setDilutionCount(int dilutionCount) {
-    this.dilutionCount = dilutionCount;
+  public void setLibraryAliquotCount(int libraryAliquotCount) {
+    this.libraryAliquotCount = libraryAliquotCount;
   }
 
   public Double getInsertSize() {

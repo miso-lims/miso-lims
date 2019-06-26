@@ -8,11 +8,11 @@
 <div id="contentcolumn">
 
 <h1>
-  Edit Dilution
+  Edit Library Aliquot
   <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
-  <c:if test="${not empty dilution.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('dilution', [${dilution.id}]);">Print Barcode</span></c:if>
+  <c:if test="${not empty aliquot.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('libraryaliquot', [${aliquot.id}]);">Print Barcode</span></c:if>
 </div>
 
 <div class="breadcrumbs">
@@ -23,30 +23,30 @@
     <li>
       <div class="breadcrumbsbubbleInfo">
         <div class="trigger">
-          <a href='<c:url value="/miso/project/${dilution.library.sample.project.id}"/>'>${dilution.library.sample.project.alias}</a>
+          <a href='<c:url value="/miso/project/${aliquot.library.sample.project.id}"/>'>${aliquot.library.sample.project.alias}</a>
         </div>
         <div class="breadcrumbspopup">
-            ${dilution.library.sample.project.name}
+            ${aliquot.library.sample.project.name}
         </div>
       </div>
     </li>
     <li>
       <div class="breadcrumbsbubbleInfo">
         <div class="trigger">
-          <a href='<c:url value="/miso/sample/${dilution.library.sample.id}"/>'>${dilution.library.sample.alias}</a>
+          <a href='<c:url value="/miso/sample/${aliquot.library.sample.id}"/>'>${aliquot.library.sample.alias}</a>
         </div>
         <div class="breadcrumbspopup">
-            ${dilution.library.sample.name}
+            ${aliquot.library.sample.name}
         </div>
       </div>
     </li>
     <li>
       <div class="breadcrumbsbubbleInfo">
         <div class="trigger">
-          <a href='<c:url value="/miso/library/${dilution.library.id}"/>'>${dilution.library.alias}</a>
+          <a href='<c:url value="/miso/library/${aliquot.library.id}"/>'>${aliquot.library.alias}</a>
         </div>
         <div class="breadcrumbspopup">
-            ${dilution.library.name}
+            ${aliquot.library.name}
         </div>
       </div>
     </li>
@@ -56,21 +56,21 @@
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
-<div id="notediv" class="note" style="display:none;">A dilution is a portion of a library that has been prepared for pooling.</div>
+<div id="notediv" class="note" style="display:none;">A library aliquot is a portion of a library that has been prepared for pooling.</div>
 
 <div id="warnings"></div>
 
-<form:form id="dilutionForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
+<form:form id="libraryAliquotForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 <script type="text/javascript">
   jQuery(document).ready(function () {
-    Warning.generateHeaderWarnings('warnings', WarningTarget.dilution, ${dilutionDto});
-    FormUtils.createForm('dilutionForm', 'save', ${dilutionDto}, 'dilution', {});
+    Warning.generateHeaderWarnings('warnings', WarningTarget.libraryaliquot, ${aliquotDto});
+    FormUtils.createForm('libraryAliquotForm', 'save', ${aliquotDto}, 'libraryaliquot', {});
   });
 </script>
 
-<miso:list-section id="list_pool" name="Pools" target="pool" items="${dilutionPools}"/>
-<miso:list-section id="list_run" name="Runs" target="run" items="${dilutionRuns}"/>
-<miso:changelog item="${dilution}"/>
+<miso:list-section id="list_pool" name="Pools" target="pool" items="${aliquotPools}"/>
+<miso:list-section id="list_run" name="Runs" target="run" items="${aliquotRuns}"/>
+<miso:changelog item="${aliquot}"/>
 
 </div>
 </div>

@@ -37,14 +37,14 @@ GROUP BY l.libraryType
 UNION 
  
 SELECT NULL NAME 
-        ,'Dilution' miso_type 
+        ,'Library Aliquot' miso_type 
         ,lt.platformType sampleType_platform 
         ,lt.description sampleType_description 
         ,COUNT(*) count 
         ,0 archivedCount 
         ,MIN(d.creationDate) earliest 
         ,MAX(d.lastUpdated) latest 
-FROM LibraryDilution d 
-INNER JOIN Library l ON l.libraryId = d.library_libraryId 
+FROM LibraryAliquot d 
+INNER JOIN Library l ON l.libraryId = d.libraryId 
 INNER JOIN LibraryType lt ON lt.libraryTypeId = l.libraryType 
 GROUP BY l.libraryType

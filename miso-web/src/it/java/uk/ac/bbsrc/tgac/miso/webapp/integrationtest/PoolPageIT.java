@@ -262,44 +262,45 @@ public class PoolPageIT extends AbstractIT {
   }
 
   @Test
-  public void testAddDilutions() {
-    // goal: add one dilution by selecting it from the list of available dilutions on the pool page
+  public void testAddAliquots() {
+    // goal: add one library aliquot by selecting it from the list of available aliquots on the pool page
     PoolPage page1 = PoolPage.getForEdit(getDriver(), getBaseUrl(), 701L);
-    DataTable includedTable = page1.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
+    DataTable includedTable = page1.getTable(PoolTableWrapperId.INCLUDED_LIBRARY_ALIQUOTS);
     assertEquals(0, includedTable.countRows());
 
-    DataTable available = page1.getTable(PoolTableWrapperId.AVAILABLE_DILUTIONS);
+    DataTable available = page1.getTable(PoolTableWrapperId.AVAILABLE_LIBRARY_ALIQUOTS);
     available.searchFor("LDI701");
     available.checkBoxForRow(0);
-    PoolPage page2 = page1.addSelectedDilutions();
-    DataTable includedTable2 = page2.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
+    PoolPage page2 = page1.addSelectedAliquots();
+    DataTable includedTable2 = page2.getTable(PoolTableWrapperId.INCLUDED_LIBRARY_ALIQUOTS);
     assertEquals(1, includedTable2.countRows());
   }
 
   @Test
-  public void testRemoveDilutions() {
-    // goal: remove one dilution from a pool via the pool page
+  public void testRemoveAliquots() {
+    // goal: remove one library aliquot from a pool via the pool page
     PoolPage page1 = PoolPage.getForEdit(getDriver(), getBaseUrl(), 702L);
-    DataTable includedTable = page1.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
+    DataTable includedTable = page1.getTable(PoolTableWrapperId.INCLUDED_LIBRARY_ALIQUOTS);
     assertEquals(1, includedTable.countRows());
 
     includedTable.checkBoxForRow(0);
-    PoolPage page2 = page1.removeSelectedDilutions();
-    DataTable includedTable2 = page2.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
+    PoolPage page2 = page1.removeSelectedAliquots();
+    DataTable includedTable2 = page2.getTable(PoolTableWrapperId.INCLUDED_LIBRARY_ALIQUOTS);
     assertEquals(0, includedTable2.countRows());
   }
 
   @Test
-  public void testDilutionTableWarnings() {
-    testDilutionTableWarningOnPoolWithError(801L, "(NO INDEX)");
-    testDilutionTableWarningOnPoolWithError(802L, "(NEAR-DUPLICATE INDEX)");
-    testDilutionTableWarningOnPoolWithError(803L, "(DUPLICATE INDEX)");
+  public void testLibraryAliquotTableWarnings() {
+    testLibraryAliquotTableWarningOnPoolWithError(801L, "(NO INDEX)");
+    testLibraryAliquotTableWarningOnPoolWithError(802L, "(NEAR-DUPLICATE INDEX)");
+    testLibraryAliquotTableWarningOnPoolWithError(803L, "(DUPLICATE INDEX)");
   }
 
-  public void testDilutionTableWarningOnPoolWithError(long id, String warning) {
+  public void testLibraryAliquotTableWarningOnPoolWithError(long id, String warning) {
     PoolPage page = PoolPage.getForEdit(getDriver(), getBaseUrl(), id);
-    DataTable table = page.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
-    assertTrue("Dilution table fails to show '" + warning + "' warning", table.doesColumnContainSubstring(Columns.WARNINGS, warning));
+    DataTable table = page.getTable(PoolTableWrapperId.INCLUDED_LIBRARY_ALIQUOTS);
+    assertTrue("Library aliquot table fails to show '" + warning + "' warning",
+        table.doesColumnContainSubstring(Columns.WARNINGS, warning));
   }
 
   @Test
@@ -318,7 +319,7 @@ public class PoolPageIT extends AbstractIT {
   @Test
   public void testWarningsOnPoolWithNoErrors() {
     PoolPage page = PoolPage.getForEdit(getDriver(), getBaseUrl(), 120001L);
-    DataTable table = page.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
+    DataTable table = page.getTable(PoolTableWrapperId.INCLUDED_LIBRARY_ALIQUOTS);
     assertFalse(table.doesColumnContainSubstring(Columns.INDICES, "(NO INDEX)"));
     assertFalse(table.doesColumnContainSubstring(Columns.INDICES, "(NEAR-DUPLICATE INDEX)"));
     assertFalse(table.doesColumnContainSubstring(Columns.INDICES, "(DUPLICATE INDICES)"));

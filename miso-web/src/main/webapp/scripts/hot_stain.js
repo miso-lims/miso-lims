@@ -1,6 +1,10 @@
 HotTarget.stain = {
-  createUrl: '/miso/rest/stains',
-  updateUrl: '/miso/rest/stains/',
+  getCreateUrl: function() {
+    return Urls.rest.stains.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.stains.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

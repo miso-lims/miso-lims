@@ -3,7 +3,7 @@ ListTarget.detailedqcstatus = {
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.detailedqcstatus.getBulkActions(config);
     if (config.isAdmin) {

@@ -1,6 +1,10 @@
 HotTarget.sampletype = {
-  createUrl: '/miso/rest/sampletypes',
-  updateUrl: '/miso/rest/sampletypes/',
+  getCreateUrl: function() {
+    return Urls.rest.sampleTypes.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.sampleTypes.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

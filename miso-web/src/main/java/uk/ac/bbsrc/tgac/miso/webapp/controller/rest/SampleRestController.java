@@ -71,15 +71,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
-import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
@@ -368,17 +368,17 @@ public class SampleRestController extends RestController {
         }
       })
 
-      .add(new RelationFinder.RelationAdapter<Sample, LibraryDilution, DilutionDto>("Dilution") {
+      .add(new RelationFinder.RelationAdapter<Sample, LibraryAliquot, LibraryAliquotDto>("Library Aliquot") {
 
         @Override
-        public DilutionDto asDto(LibraryDilution model) {
+        public LibraryAliquotDto asDto(LibraryAliquot model) {
           return Dtos.asDto(model, false, false);
         }
 
         @Override
-        public Stream<LibraryDilution> find(Sample model, Consumer<String> emitError) {
-          Set<LibraryDilution> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model)
-              .flatMap(library -> library.getLibraryDilutions().stream()).collect(Collectors.toSet());
+        public Stream<LibraryAliquot> find(Sample model, Consumer<String> emitError) {
+          Set<LibraryAliquot> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model)
+              .flatMap(library -> library.getLibraryAliquots().stream()).collect(Collectors.toSet());
           if (children.isEmpty()) {
             emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
             return Stream.empty();
@@ -397,7 +397,7 @@ public class SampleRestController extends RestController {
         @Override
         public Stream<Pool> find(Sample model, Consumer<String> emitError) {
           Set<Pool> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model)
-              .flatMap(library -> library.getLibraryDilutions().stream().flatMap(dilution -> dilution.getPools().stream()))
+              .flatMap(library -> library.getLibraryAliquots().stream().flatMap(aliquot -> aliquot.getPools().stream()))
               .collect(Collectors.toSet());
           if (children.isEmpty()) {
             emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));

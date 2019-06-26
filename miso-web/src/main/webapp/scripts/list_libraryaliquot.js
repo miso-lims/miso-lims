@@ -21,29 +21,31 @@
  * *********************************************************************
  */
 
-ListTarget.dilution = {
-  name: "Library Dilutions",
+ListTarget.libraryaliquot = {
+  name: "Library Aliquots",
   createUrl: function(config, projectId) {
-    return "/miso/rest/librarydilutions/dt" + (projectId ? "/project/" + projectId : "");
+    return projectId ? Urls.rest.libraryAliquots.projectDatatable(projectId) : Urls.rest.libraryAliquots.datatable;
   },
-  queryUrl: "/miso/rest/librarydilutions/query",
+  getQueryUrl: function() {
+    return Urls.rest.libraryAliquots.query;
+  },
   createBulkActions: function(config, projectId) {
-    var actions = config.library ? HotTarget.dilution.getBulkActions(config).filter(function(action) {
+    var actions = config.library ? HotTarget.libraryaliquot.getBulkActions(config).filter(function(action) {
       return action.allowOnLibraryPage;
-    }) : HotTarget.dilution.getBulkActions(config);
+    }) : HotTarget.libraryaliquot.getBulkActions(config);
 
     actions.push({
       name: "Delete",
       action: function(items) {
-        var lines = ['Are you sure you wish to delete the following library dilutions? This cannot be undone.',
-            'Note: a dilution may only be deleted by its creator or an admin.'];
+        var lines = ['Are you sure you wish to delete the following library aliquots? This cannot be undone.',
+            'Note: a library aliquot may only be deleted by its creator or an admin.'];
         var ids = [];
-        jQuery.each(items, function(index, dilution) {
-          lines.push('* ' + dilution.name + ' (' + dilution.library.alias + ')');
-          ids.push(dilution.id);
+        jQuery.each(items, function(index, aliquot) {
+          lines.push('* ' + aliquot.name + ' (' + aliquot.library.alias + ')');
+          ids.push(aliquot.id);
         });
-        Utils.showConfirmDialog('Delete Library Dilutions', 'Delete', lines, function() {
-          Utils.ajaxWithDialog('Deleting Library Dilutions', 'POST', '/miso/rest/librarydilutions/bulk-delete', ids, function() {
+        Utils.showConfirmDialog('Delete Library Aliquots', 'Delete', lines, function() {
+          Utils.ajaxWithDialog('Deleting Library Aliquots', 'POST', Urls.rest.libraryAliquots.bulkDelete, ids, function() {
             Utils.page.pageReload();
           });
         });
@@ -58,12 +60,12 @@ ListTarget.dilution = {
       "handler": function() {
         HotUtils.warnIfConsentRevoked([config.library], function() {
           var fields = [ListUtils.createBoxField];
-          Utils.showDialog('Make Dilution', 'Create', fields, function(result) {
+          Utils.showDialog('Make Library Aliquot', 'Create', fields, function(result) {
             var params = {
               ids: config.library.id
             }
             var loadPage = function() {
-              window.location = window.location.origin + '/miso/dilution/bulk/propagate?' + jQuery.param(params);
+              window.location = Urls.ui.libraryAliquots.bulkPropagate + '?' + jQuery.param(params);
             }
             if (result.createBox) {
               Utils.createBoxDialog(result, function(result) {
@@ -88,22 +90,22 @@ ListTarget.dilution = {
       "iSortPriority": 1,
       "mRender": function(data, type, full) {
         if (type === 'display') {
-          return "<a href=\"/miso/dilution/" + data + "\">" + full.name + "</a>";
+          return '<a href="' + Urls.ui.libraryAliquots.edit(data) + '">' + full.name + '</a>';
         }
         return data;
       }
     }, {
       "sTitle": "Warnings",
       "mData": null,
-      "mRender": Warning.tableWarningRenderer(WarningTarget.dilution),
+      "mRender": Warning.tableWarningRenderer(WarningTarget.libraryaliquot),
       "include": true,
       "iSortPriority": 0,
       "bVisible": true,
       "bSortable": false
-    }, ListUtils.idHyperlinkColumn("Library Name", "library", "library.id", function(dilution) {
-      return dilution.library.name;
-    }, 0, !config.library), ListUtils.labelHyperlinkColumn("Library Alias", "library", function(dilution) {
-      return dilution.library.id;
+    }, ListUtils.idHyperlinkColumn("Library Name", Urls.ui.libraries.edit, "library.id", function(aliquot) {
+      return aliquot.library.name;
+    }, 0, !config.library), ListUtils.labelHyperlinkColumn("Library Alias", Urls.ui.libraries.edit, function(aliquot) {
+      return aliquot.library.id;
     }, "library.alias", 0, !config.library), {
       "sTitle": "Platform",
       "mData": "library.platformType",
@@ -165,7 +167,7 @@ ListTarget.dilution = {
       "iSortPriority": 0
     }, {
       "sTitle": "Creator",
-      "mData": "dilutionUserName",
+      "mData": "creatorName",
       "include": true,
       "iSortPriority": 0
     }, {

@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -58,6 +58,6 @@ public interface KitStore extends Store<Kit>, PaginatedDataSource<KitDescriptor>
 
   long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
 
-  List<LibraryDilution> getDilutionsForKdTsRelationship(KitDescriptor kd, TargetedSequencing ts);
+  List<LibraryAliquot> getLibraryAliquotsForKdTsRelationship(KitDescriptor kd, TargetedSequencing ts);
 
 }

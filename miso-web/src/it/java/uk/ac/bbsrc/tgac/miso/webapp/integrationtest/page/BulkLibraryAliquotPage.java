@@ -14,10 +14,10 @@ import com.google.common.base.Joiner;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
-public class BulkDilutionPage extends HeaderFooterPage {
+public class BulkLibraryAliquotPage extends HeaderFooterPage {
 
-  public static class DilColumns {
-    public static final String NAME = "Dilution Name";
+  public static class LibraryAliquotColumns {
+    public static final String NAME = "Library Aliquot Name";
     public static final String ID_BARCODE = "Matrix Barcode";
     public static final String BOX_SEARCH = "Box Search";
     public static final String BOX_ALIAS = "Box Alias";
@@ -36,7 +36,7 @@ public class BulkDilutionPage extends HeaderFooterPage {
     public static final String CREATION_DATE = "Creation Date";
     public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
 
-    private DilColumns() {
+    private LibraryAliquotColumns() {
       throw new IllegalStateException("Util class not intended for instantiation");
     }
   };
@@ -50,36 +50,36 @@ public class BulkDilutionPage extends HeaderFooterPage {
 
   private final HandsOnTable table;
 
-  public BulkDilutionPage(WebDriver driver) {
+  public BulkLibraryAliquotPage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
-    waitWithTimeout().until(or(titleContains("Create Dilutions from Libraries "), titleContains("Edit Dilutions ")));
+    waitWithTimeout().until(or(titleContains("Create Library Aliquots from Libraries "), titleContains("Edit Library Aliquots ")));
     table = new HandsOnTable(driver);
   }
 
-  public static BulkDilutionPage getForEdit(WebDriver driver, String baseUrl, Collection<Long> dilutionIds) {
-    String ids = Joiner.on(',').join(dilutionIds);
-    String url = baseUrl + "miso/dilution/bulk/edit?ids=" + ids;
+  public static BulkLibraryAliquotPage getForEdit(WebDriver driver, String baseUrl, Collection<Long> aliquotIds) {
+    String ids = Joiner.on(',').join(aliquotIds);
+    String url = baseUrl + "miso/libraryaliquot/bulk/edit?ids=" + ids;
     driver.get(url);
-    return new BulkDilutionPage(driver);
+    return new BulkLibraryAliquotPage(driver);
   }
 
-  public static BulkDilutionPage getForPropagate(WebDriver driver, String baseUrl, Collection<Long> libraryIds) {
+  public static BulkLibraryAliquotPage getForPropagate(WebDriver driver, String baseUrl, Collection<Long> libraryIds) {
     String ids = Joiner.on(',').join(libraryIds);
-    String url = baseUrl + "miso/dilution/bulk/propagate?ids=" + ids;
+    String url = baseUrl + "miso/libraryaliquot/bulk/propagate?ids=" + ids;
     driver.get(url);
-    return new BulkDilutionPage(driver);
+    return new BulkLibraryAliquotPage(driver);
   }
 
   public HandsOnTable getTable() {
     return table;
   }
 
-  public BulkDilutionPage chainEdit() {
+  public BulkLibraryAliquotPage chainEdit() {
     WebElement html = getHtmlElement();
     toolbar.findElement(EDIT_BUTTON_TEXT).click();
     waitForPageRefresh(html);
-    return new BulkDilutionPage(getDriver());
+    return new BulkLibraryAliquotPage(getDriver());
   }
 
   public BulkPoolPage chainPoolTogether() {

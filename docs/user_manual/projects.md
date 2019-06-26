@@ -6,8 +6,8 @@ section: 6
 
 
 A project is a grouping of samples, libraries, sequencer runs, and other related items. Each sample in MISO belongs to
-a specific project. By association, a sample's libraries and dilutions belong to the same project. Some other items,
-such as pools and sequencer runs, may include items from multiple projects.
+a specific project. By association, a sample's libraries and library aliquots belong to the same project. Some other
+items, such as pools and sequencer runs, may include items from multiple projects.
 
 
 
@@ -52,7 +52,7 @@ samples created in the project will have a default scientific name of "Homo sapi
 {% include userman-heading.md section=page.section sub=sub subsub=subsub title="Default Targeted Sequencing" %}
 
 Default Targeted Sequencing is a project-level property. Whichever targeted sequencing is selected here will be the
-default value for all library dilutions created within the project. Note, however, that a library dilution's targeted
+default value for all library aliquots created within the project. Note, however, that a library aliquot's targeted
 sequencing options depend on the library kit used on the library. If the default targeted sequencing value is not
 compatible with the library kit, it will not be selected automatically, nor will it be available for selection.
 

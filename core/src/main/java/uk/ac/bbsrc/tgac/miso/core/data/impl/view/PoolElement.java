@@ -11,14 +11,14 @@ import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution.PoolDilutionId;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement.PoolElementId;
 
 @Entity
-@Table(name = "Pool_Dilution")
-@IdClass(PoolDilutionId.class)
-public class PoolDilution implements Serializable {
+@Table(name = "Pool_LibraryAliquot")
+@IdClass(PoolElementId.class)
+public class PoolElement implements Serializable {
 
-  public static class PoolDilutionId implements Serializable {
+  public static class PoolElementId implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -55,7 +55,7 @@ public class PoolDilution implements Serializable {
       if (this == obj) return true;
       if (obj == null) return false;
       if (getClass() != obj.getClass()) return false;
-      PoolDilutionId other = (PoolDilutionId) obj;
+      PoolElementId other = (PoolElementId) obj;
       if (pool == null) {
         if (other.pool != null) return false;
       } else if (!pool.equals(other.pool)) return false;
@@ -71,26 +71,26 @@ public class PoolDilution implements Serializable {
 
   @Id
   @ManyToOne(targetEntity = PoolImpl.class)
-  @JoinColumn(name = "pool_poolId")
+  @JoinColumn(name = "poolId")
   private Pool pool;
 
   @Id
   @ManyToOne
-  @JoinColumn(name = "dilution_dilutionId")
+  @JoinColumn(name = "aliquotId")
   private PoolableElementView poolableElementView;
 
   private int proportion = 1;
 
-  public PoolDilution() {
+  public PoolElement() {
     // Default constructor
   }
 
-  public PoolDilution(Pool pool, PoolableElementView poolableElementView) {
+  public PoolElement(Pool pool, PoolableElementView poolableElementView) {
     this.pool = pool;
     this.poolableElementView = poolableElementView;
   }
 
-  public PoolDilution(Pool pool, PoolableElementView poolableElementView, int proportion) {
+  public PoolElement(Pool pool, PoolableElementView poolableElementView, int proportion) {
     this(pool, poolableElementView);
     this.proportion = proportion;
   }

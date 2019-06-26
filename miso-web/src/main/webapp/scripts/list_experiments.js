@@ -26,7 +26,7 @@ ListTarget.experiment = {
   createUrl: function(config, projectId) {
     throw new Error("Experiments must be provided statically");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     if (config.inSubmission) {
       return [];
@@ -145,19 +145,20 @@ ListTarget.experiment = {
     return actions;
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.idHyperlinkColumn("Name", "experiment", "id", Utils.array.getName, 1, true),
-        ListUtils.labelHyperlinkColumn("Alias", "experiment", Utils.array.getId, "alias", 0, true), {
+    return [ListUtils.idHyperlinkColumn("Name", Urls.ui.experiments.edit, "id", Utils.array.getName, 1, true),
+        ListUtils.labelHyperlinkColumn("Alias", Urls.ui.experiments.edit, Utils.array.getId, "alias", 0, true), {
           "sTitle": "Platform",
           "mData": "instrumentModel.alias",
           "include": true,
           "iSortPriority": 0,
-        }, ListUtils.labelHyperlinkColumn("Library Name", "library", function(experiment) {
+        }, ListUtils.labelHyperlinkColumn("Library Name", Urls.ui.libraries.edit, function(experiment) {
           return experiment.library.id;
-        }, "library.name", 0, !config.libraryId), ListUtils.labelHyperlinkColumn("Library Alias", "library", function(experiment) {
+        }, "library.name", 0, !config.libraryId),
+        ListUtils.labelHyperlinkColumn("Library Alias", Urls.ui.libraries.edit, function(experiment) {
           return experiment.library.id;
-        }, "library.alias", 0, !config.libraryId), ListUtils.labelHyperlinkColumn("Study Name", "study", function(experiment) {
+        }, "library.alias", 0, !config.libraryId), ListUtils.labelHyperlinkColumn("Study Name", Urls.ui.studies.edit, function(experiment) {
           return experiment.study.id;
-        }, "study.name", 0, !config.studyId), ListUtils.labelHyperlinkColumn("Study Alias", "study", function(experiment) {
+        }, "study.name", 0, !config.studyId), ListUtils.labelHyperlinkColumn("Study Alias", Urls.ui.studies.edit, function(experiment) {
           return experiment.study.id;
         }, "study.alias", 0, !config.studyId), ];
   }

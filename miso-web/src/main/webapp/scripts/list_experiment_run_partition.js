@@ -26,7 +26,7 @@ ListTarget.experiment_run_partition = {
   createUrl: function(config, projectId) {
     throw new Error("Must be created statically.");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     return [];
   },
@@ -34,9 +34,9 @@ ListTarget.experiment_run_partition = {
     return [];
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.idHyperlinkColumn("Run Name", "run", "run.id", function(pair) {
+    return [ListUtils.idHyperlinkColumn("Run Name", Urls.ui.runs.edit, "run.id", function(pair) {
       return pair.run.name;
-    }, 1, true), ListUtils.labelHyperlinkColumn("Run Alias", "run", function(pair) {
+    }, 1, true), ListUtils.labelHyperlinkColumn("Run Alias", Urls.ui.runs.edit, function(pair) {
       return pair.run.id;
     }, "run.alias", 0, true), {
       "sTitle": "Status",
@@ -46,7 +46,7 @@ ListTarget.experiment_run_partition = {
       },
       "include": true,
       "iSortPriority": 0
-    }, ListUtils.labelHyperlinkColumn("Container", "container", function(pair) {
+    }, ListUtils.labelHyperlinkColumn("Container", Urls.ui.containers.edit, function(pair) {
       return pair.partition.containerId;
     }, "partition.containerName", 0, true), {
       "sTitle": "Number",

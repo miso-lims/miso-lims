@@ -20,13 +20,13 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkDilutionPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkDilutionPage.DilColumns;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage.LibraryAliquotColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryPage.LibColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
@@ -41,14 +41,16 @@ public class PlainSampleITs extends AbstractIT {
       SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.QC_PASSED);
 
   private static final Set<String> libraryColumns = Sets.newHashSet(LibColumns.NAME, LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
-      LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED, LibColumns.CREATION_DATE, LibColumns.PLATFORM,
-      LibColumns.LIBRARY_TYPE, LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2,
-      LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS,
-      LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
+      LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED, LibColumns.CREATION_DATE,
+      LibColumns.PLATFORM, LibColumns.LIBRARY_TYPE, LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1,
+      LibColumns.INDEX_2, LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.CONCENTRATION,
+      LibColumns.CONCENTRATION_UNITS, LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
 
-  private static final Set<String> dilutionColumns = Sets.newHashSet(DilColumns.NAME, DilColumns.LIBRARY_ALIAS, DilColumns.BOX_SEARCH,
-      DilColumns.BOX_ALIAS, DilColumns.BOX_POSITION, DilColumns.DISCARDED, DilColumns.CONCENTRATION, DilColumns.CONCENTRATION_UNITS,
-      DilColumns.VOLUME, DilColumns.VOLUME_UNITS, DilColumns.NG_USED, DilColumns.VOLUME_USED, DilColumns.CREATION_DATE);
+  private static final Set<String> libraryAliquotColumns = Sets.newHashSet(LibraryAliquotColumns.NAME, LibraryAliquotColumns.LIBRARY_ALIAS,
+      LibraryAliquotColumns.BOX_SEARCH, LibraryAliquotColumns.BOX_ALIAS, LibraryAliquotColumns.BOX_POSITION,
+      LibraryAliquotColumns.DISCARDED, LibraryAliquotColumns.CONCENTRATION, LibraryAliquotColumns.CONCENTRATION_UNITS,
+      LibraryAliquotColumns.VOLUME, LibraryAliquotColumns.VOLUME_UNITS, LibraryAliquotColumns.NG_USED, LibraryAliquotColumns.VOLUME_USED,
+      LibraryAliquotColumns.CREATION_DATE);
 
   @Before
   public void setup() {
@@ -198,43 +200,43 @@ public class PlainSampleITs extends AbstractIT {
   }
 
   @Test
-  public void testCreatePlainDilutionSetup() {
+  public void testCreatePlainLibraryAliquotSetup() {
     // Goal: ensure all expected fields are present and no extra and that data can be entered in date field
     // (date field cannot be entered when table is broken)
-    BulkDilutionPage page = BulkDilutionPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L));
+    BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(dilutionColumns.size(), headings.size());
-    dilutionColumns.forEach(col -> assertTrue("Check for column: '" + col + "'", headings.contains(col)));
+    assertEquals(libraryAliquotColumns.size(), headings.size());
+    libraryAliquotColumns.forEach(col -> assertTrue("Check for column: '" + col + "'", headings.contains(col)));
     assertEquals(1, table.getRowCount());
 
     String creationDate = "2017-10-11";
-    table.enterText(DilColumns.CREATION_DATE, 0, creationDate);
-    assertEquals(creationDate, table.getText(DilColumns.CREATION_DATE, 0));
+    table.enterText(LibraryAliquotColumns.CREATION_DATE, 0, creationDate);
+    assertEquals(creationDate, table.getText(LibraryAliquotColumns.CREATION_DATE, 0));
   }
 
   @Test
-  public void testCreateOnePlainDilution() {
-    // Goal: ensure one dilution can be saved
-    BulkDilutionPage page = BulkDilutionPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L));
+  public void testCreateOnePlainLibraryAliquot() {
+    // Goal: ensure one library aliquot can be saved
+    BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
-    attrs.put(DilColumns.CONCENTRATION, "2.2");
-    attrs.put(DilColumns.VOLUME, "22");
-    attrs.put(DilColumns.CREATION_DATE, "2017-10-11");
+    attrs.put(LibraryAliquotColumns.CONCENTRATION, "2.2");
+    attrs.put(LibraryAliquotColumns.VOLUME, "22");
+    attrs.put(LibraryAliquotColumns.CREATION_DATE, "2017-10-11");
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
     HandsOnTableSaveResult result = table.save();
 
-    assertTrue("Dilution save", result.getItemsSaved() == 1);
+    assertTrue("Library aliquot save", result.getItemsSaved() == 1);
     assertTrue("Server errors", result.getServerErrors().isEmpty());
     assertTrue("Save errors", result.getSaveErrors().isEmpty());
 
-    Long savedId = Long.valueOf(table.getText(DilColumns.NAME, 0).substring(3));
-    LibraryDilution saved = (LibraryDilution) getSession().get(LibraryDilution.class, savedId);
-    assertTrue("Dilution name generation", saved.getName().contains("LDI"));
-    assertTrue("Dilution barcode generation", !isStringEmptyOrNull(saved.getIdentificationBarcode()));
+    Long savedId = Long.valueOf(table.getText(LibraryAliquotColumns.NAME, 0).substring(3));
+    LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, savedId);
+    assertTrue("Library aliquot name generation", saved.getName().contains("LDI"));
+    assertTrue("Library aliquot barcode generation", !isStringEmptyOrNull(saved.getIdentificationBarcode()));
   }
 
   @Test
@@ -247,7 +249,7 @@ public class PlainSampleITs extends AbstractIT {
     slugs.add("projects");
     slugs.add("samples");
     slugs.add("libraries");
-    slugs.add("dilutions");
+    slugs.add("libraryaliquots");
     slugs.add("pools");
     slugs.add("sequencingorders/active");
     slugs.add("sequencingorders/all");

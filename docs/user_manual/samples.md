@@ -91,7 +91,7 @@ To get to the single Edit Sample page, click on the sample's name or alias in th
 Sample page appear on several pages for related items as well, including:
 
 * "Parent Sample" link in the Library Information section of the Edit Library page
-* Sample Name and Sample Alias columns of the Dilutions tables on the Edit Pool page
+* Sample Name and Sample Alias columns of the Library Aliquots tables on the Edit Pool page
 
 The Sample Information section of the Edit Sample page contains a list of fields, most of which may be modified. If
 your site uses detailed sample mode, the fields that are included will depend on the sample class of the sample being
