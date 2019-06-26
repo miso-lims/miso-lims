@@ -316,85 +316,26 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <webResources>
+            <resource>
+              <directory>src/main/resources</directory>
+              <targetPath>WEB-INF/classes</targetPath>
+              <filtering>true</filtering>
+              <excludes>
+                <exclude>internal/*</exclude>
+                <exclude>external/*</exclude>
+              </excludes>
+            </resource>
+          </webResources>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <profiles>
-    <profile>
-      <id>sql</id>
-      <activation>
-        <property>
-          <name>database</name>
-          <value>sql</value>
-        </property>
-      </activation>
-      <build>
-        <resources>
-          <resource>
-            <filtering>true</filtering>
-            <directory>src/main/resources</directory>
-          </resource>
-        </resources>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-      <properties>
-        <spring-version>${spring-version}</spring-version>
-      </properties>
-    </profile>
-    <profile>
-      <id>external</id>
-      <activation>
-        <property>
-          <name>release</name>
-          <value>external</value>
-        </property>
-      </activation>
-      <build>
-        <resources>
-          <resource>
-            <filtering>true</filtering>
-            <directory>src/main/resources/external</directory>
-            <includes>
-              <include>miso.properties</include>
-            </includes>
-            <excludes>
-              <exclude>../internal/*</exclude>
-            </excludes>
-          </resource>
-          <resource>
-            <filtering>true</filtering>
-            <directory>src/main/resources</directory>
-            <excludes>
-              <exclude>../internal/*</exclude>
-              <exclude>../external/*</exclude>
-            </excludes>
-          </resource>
-        </resources>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <configuration>
-              <webResources>
-                <resource>
-                  <directory>src/main/resources</directory>
-                  <targetPath>WEB-INF/classes</targetPath>
-                  <filtering>true</filtering>
-                  <excludes>
-                    <exclude>internal/*</exclude>
-                    <exclude>external/*</exclude>
-                  </excludes>
-                </resource>
-              </webResources>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
     <profile>
       <id>integration-test-setup</id>
       <activation>

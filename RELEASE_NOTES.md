@@ -4,12 +4,17 @@ Changes:
 
 
 
+Upgrade Notes:
+
+  * The 'external' Maven profile has been removed, so if you are building MISO from source, it is
+    no longer necessary to use the parameter `-P external`. Documentation has been updated
+    accordingly
+
 # 0.2.182
 
 Changes:
 
   * Fixed run metrics disappearing when saving a run on the Edit Run page
-
 
 # 0.2.181
 

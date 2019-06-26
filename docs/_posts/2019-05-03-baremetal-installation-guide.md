@@ -307,7 +307,7 @@ Once complete, edit `$CATALINA_HOME/conf/Catalina/localhost/miso.properties` of 
 `cd` into `$MISO_SRC`.
 Build the application using:
 
-    mvn clean package -P external
+    mvn clean package
 
 There will be an important build artefact: `miso-web/target/ROOT.war`
 

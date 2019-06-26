@@ -26,11 +26,11 @@ these are used. This keeps the diff clean, so it is easier to review your change
 We have several types of automated testing:
 
 * Unit tests
-  * Run with `mvn clean install -P external`
+  * Run with `mvn clean install`
 * Integration tests in `miso-web` for plain sample mode
-  * Run with `cd miso-web; mvn clean verify -P external -DrunPlainITs`
+  * Run with `cd miso-web; mvn clean verify -DrunPlainITs`
 * Integration tests in `miso-web` for detailed sample mode (also contains tests which are relevant to both modes)
-  * Run with `cd miso-web; mvn clean verify -P external -DskipITs=false`
+  * Run with `cd miso-web; mvn clean verify -DskipITs=false`
   * Run individual test classes or methods by adding `-Dit.test=ClassName` or `Dit.test=ClassName#methodName`
 * Integration tests for `pinery-miso`
   * Run with `cd pinery-miso; mvn clean verify -DskipITs=false`

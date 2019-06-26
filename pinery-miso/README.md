@@ -28,7 +28,7 @@ from these. Clients can then use the flatfile webapp instead, to reduce strain o
 
     ```
     cd miso-lims
-    mvn clean install -P external
+    mvn clean install
     ```
 
 2. Stop tomcat

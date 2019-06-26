@@ -176,7 +176,7 @@ The MISO database is created and updated using [Flyway](https://flywaydb.org/) m
     * If you just want the base MISO data, this should be tgac/develop, or another branch derived from it
 2. Next, build the entire MISO project
 
-        mvn clean install -P external
+        mvn clean install
 
 3. If you don't yet have a MySQL Database, create one. Also create a user with write access. e.g.
 
@@ -370,15 +370,15 @@ UI integration tests should all extend `AbstractIT` for similar reasons as the D
 The UI tests run Selenium against a Tomcat instance using MySQL in Docker.
 UI integration tests can be run using:
 
-    mvn -P external clean verify -DskipITs=false -DrunPlainITs
+    mvn clean verify -DskipITs=false -DrunPlainITs
 
 To run a specific IT test class, use:
 
-    mvn -P external clean verify -DskipITs=false -Dit.test=NameOfITTestClass
+    mvn clean verify -DskipITs=false -Dit.test=NameOfITTestClass
 
 To spin up an instance of Tomcat populated with the IT test data, use:
 
-    mvn -P external clean verify -DskipITs=false -DcargoInitGoal=run
+    mvn clean verify -DskipITs=false -DcargoInitGoal=run
 
 This will cause Tomcat to start but will not run any tests. You can access this Tomcat at
 `http://localhost:$PORT`, where $PORT is the port listed in the console
