@@ -641,6 +641,8 @@ public class MisoClient implements Lims {
       p.setPoolBarcode(rs.getString("pool_barcode"));
       p.setPoolCreatedById(rs.getInt("pool_createdById"));
       p.setPoolCreated(rs.getDate("pool_created"));
+      p.setPoolModifiedById(rs.getInt("pool_modifiedById"));
+      p.setPoolModified(rs.getDate("pool_modified"));
       p.setAnalysisSkipped(rs.getBoolean("analysis_skipped"));
       p.setQcStatus(rs.getString("qc_status"));
 

@@ -8,6 +8,8 @@ SELECT p.partitionId
   ,pool.description AS pool_description
   ,pool.creator AS pool_createdById
   ,pool.creationDate AS pool_created
+  ,pool.lastModifier AS pool_modifiedById
+  ,pool.lastModified AS pool_modified
 FROM _Partition AS p
 LEFT JOIN Pool pool ON pool.poolId = p.pool_poolId
 JOIN SequencerPartitionContainer_Partition AS spc_p ON spc_p.partitions_partitionId = p.partitionId
