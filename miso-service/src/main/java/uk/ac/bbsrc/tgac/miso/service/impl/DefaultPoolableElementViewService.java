@@ -16,7 +16,6 @@ import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class DefaultPoolableElementViewService implements PoolableElementViewService {
-  // TODO: authorization (View model will need full Library Aliquot Security Profile)
 
   @Autowired
   private PoolableElementViewDao poolableElementViewDao;
