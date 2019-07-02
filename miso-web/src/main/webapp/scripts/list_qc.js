@@ -27,7 +27,7 @@ ListTarget.qc = function(qcTarget) {
     createUrl: function(config, projectId) {
       throw new Error("QCs can only be generated statically");
     },
-    queryUrl: null,
+    getQueryUrl: null,
     createBulkActions: function(config, projectId) {
       return HotTarget.qc(qcTarget).getBulkActions(config);
     },

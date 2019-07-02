@@ -8,7 +8,7 @@ public class SampleTypeConverter {
   private static final Logger log = LoggerFactory.getLogger(SampleTypeConverter.class);
 
   private static final String MISO_TYPE_LIBRARY = "Library";
-  private static final String MISO_TYPE_DILUTION = "Dilution";
+  private static final String MISO_TYPE_LIBRARY_ALIQUOT = "Library Aliquot";
 
   private static final String PLATFORM_ILLUMINA = "ILLUMINA";
 
@@ -31,19 +31,19 @@ public class SampleTypeConverter {
     TOTAL_RNA("Illumina_totalRNA_Library", "Illumina_totalRNA_Library_Seq");
 
     private final String libraryType;
-    private final String dilutionType;
+    private final String libraryAliquotType;
 
-    private IlluminaSampleType(String libraryType, String dilutionType) {
+    private IlluminaSampleType(String libraryType, String libraryAliquotType) {
       this.libraryType = libraryType;
-      this.dilutionType = dilutionType;
+      this.libraryAliquotType = libraryAliquotType;
     }
 
     public String getLibraryType() {
       return libraryType;
     }
 
-    public String getDilutionType() {
-      return dilutionType;
+    public String getLibraryAliquotType() {
+      return libraryAliquotType;
     }
   }
 
@@ -70,9 +70,9 @@ public class SampleTypeConverter {
   }
 
   /**
-   * Determines the correct Pinery Sample Type to assign to a MISO Library of Library Dilution
+   * Determines the correct Pinery Sample Type to assign to a MISO Library of Library Aliquot
    * 
-   * @param misoType "Library" or "Dilution"
+   * @param misoType "Library" or "Library Aliquot"
    * @param platformName MISO LibraryType platformType
    * @param libraryType MISO LibraryType description
    * @return The Pinery SampleType String that corresponds to the parameters given, or "Unknown" if it cannot be determined
@@ -120,8 +120,8 @@ public class SampleTypeConverter {
       switch (misoType) {
       case MISO_TYPE_LIBRARY:
         return sType.getLibraryType();
-      case MISO_TYPE_DILUTION:
-        return sType.getDilutionType();
+      case MISO_TYPE_LIBRARY_ALIQUOT:
+        return sType.getLibraryAliquotType();
       default:
         log.debug("Unexpected MISO type: {}. Cannot determine Sample Type", misoType);
         return SAMPLE_TYPE_UNKNOWN;

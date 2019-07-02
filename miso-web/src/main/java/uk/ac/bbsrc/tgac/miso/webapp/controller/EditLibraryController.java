@@ -75,7 +75,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -125,7 +125,7 @@ public class EditLibraryController {
 
   private static final IndexFamily INDEX_FAMILY_NEEDS_PLATFORM = new IndexFamily();
 
-  protected static final Comparator<LibraryDilution> DILUTION_COMPARATOR = (a, b) -> {
+  protected static final Comparator<LibraryAliquot> LIBRARY_ALIQUOT_COMPARATOR = (a, b) -> {
     int nameComparison = AlphanumericComparator.INSTANCE.compare(a.getName(), b.getName());
     return nameComparison == 0 ? new AliasComparator<>().compare(a.getLibrary(), b.getLibrary()) : nameComparison;
   };
@@ -293,12 +293,12 @@ public class EditLibraryController {
     model.put("libraryPools", pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
     model.put("libraryRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
         .collect(Collectors.toList()));
-    model.put("libraryDilutions", library.getLibraryDilutions().stream()
+    model.put("libraryAliquots", library.getLibraryAliquots().stream()
         .map(ldi -> Dtos.asDto(ldi, false, false)).collect(Collectors.toList()));
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode config = mapper.createObjectNode();
     config.putPOJO("library", Dtos.asDto(library, false));
-    model.put("libraryDilutionsConfig", mapper.writeValueAsString(config));
+    model.put("libraryAliquotsConfig", mapper.writeValueAsString(config));
     model.put("experiments", experimentService.listAllByLibraryId(library.getId()).stream().map(Dtos::asDto)
         .collect(Collectors.toList()));
     model.put("libraryDto", mapper.writeValueAsString(Dtos.asDto(library, false)));
@@ -554,47 +554,33 @@ public class EditLibraryController {
   @PostMapping
   public ModelAndView processSubmit(@ModelAttribute("library") Library library, ModelMap model, SessionStatus session)
       throws IOException {
-    try {
-      if (library.getId() == AbstractLibrary.UNSAVED_ID) {
-        libraryService.create(library);
-      } else {
-        libraryService.update(library);
-      }
-
-      session.setComplete();
-      model.clear();
-      return new ModelAndView("redirect:/miso/library/" + library.getId(), model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save library", ex);
-      }
-      throw ex;
+    if (library.getId() == AbstractLibrary.UNSAVED_ID) {
+      libraryService.create(library);
+    } else {
+      libraryService.update(library);
     }
+
+    session.setComplete();
+    model.clear();
+    return new ModelAndView("redirect:/miso/library/" + library.getId(), model);
   }
 
   @PostMapping(value = "/bulk/create")
   public String processBulkSubmit(@RequestBody JSONArray librariesDtos) throws IOException {
-    try {
-      if (librariesDtos != null && librariesDtos.size() > 0) {
-        List<Long> savedLibraryIds = new ArrayList<>();
+    if (librariesDtos != null && librariesDtos.size() > 0) {
+      List<Long> savedLibraryIds = new ArrayList<>();
 
-        for (Object lDto : librariesDtos) {
-          ObjectMapper mapper = new ObjectMapper();
-          LibraryDto libDto = mapper.readValue(lDto.toString(), LibraryDto.class);
-          Library library = Dtos.to(libDto);
+      for (Object lDto : librariesDtos) {
+        ObjectMapper mapper = new ObjectMapper();
+        LibraryDto libDto = mapper.readValue(lDto.toString(), LibraryDto.class);
+        Library library = Dtos.to(libDto);
 
-          Long savedId = libraryService.create(library);
-          savedLibraryIds.add(savedId);
-        }
-        return "redirect:/miso/library/bulk/edit/" + savedLibraryIds.toString();
-      } else {
-        throw new IOException("There are no libraries to save!");
+        Long savedId = libraryService.create(library);
+        savedLibraryIds.add(savedId);
       }
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save library", ex);
-      }
-      throw ex;
+      return "redirect:/miso/library/bulk/edit/" + savedLibraryIds.toString();
+    } else {
+      throw new IOException("There are no libraries to save!");
     }
   }
 }

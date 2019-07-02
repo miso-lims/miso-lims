@@ -308,7 +308,7 @@ weekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Attaching Files" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Propagating Libraries to Library Dilutions" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Propagating Libraries to Library Aliquots" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Printing Barcodes" %}
 {% assign sub = sub | plus: 1 %}
@@ -326,36 +326,36 @@ weekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
 
 
 {% assign section = section | plus: 1 %}
-{% assign section-title = "Library Dilutions" %}
+{% assign section-title = "Library Aliquots" %}
 {% include userman-toc-link.md section=section section-title=section-title %}
 {% assign sub = 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Dilutions List" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Library Aliquots List" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Propagating Dilutions from Libraries" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Propagating Library Aliquots from Libraries" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Editing Dilutions" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Editing Library Aliquots" %}
 {% assign subsub = 1 %}
-{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Editing a Single Dilution" %}
+{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Editing a Single Library Aliquot" %}
 {% assign subsub = subsub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Editing Dilutions in Bulk" %}
+{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Editing Library Aliquots in Bulk" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Pooling Dilutions Together" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Pooling Library Aliquots Together" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Pooling Dilutions Separately" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Pooling Library Aliquots Separately" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Custom Pooling in Bulk" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Printing Barcodes" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Downloading Dilution Information" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Downloading Library Aliquot Information" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Selecting Dilutions by Search" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Selecting Library Aliquots by Search" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Finding Related Items" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding Dilutions to a Workset" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding Library Aliquots to a Workset" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Deleting Dilutions" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Deleting Library Aliquots" %}
 
 
 {% assign section = section | plus: 1 %}
@@ -397,11 +397,11 @@ weekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Attachments" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding Dilutions to a Pool" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding Library Aliquots to a Pool" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Removing Dilutions from a Pool" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Removing Library Aliquots from a Pool" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Creating Pools from Dilutions" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Creating Pools from Library Aliquots" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Creating Orders" %}
 {% assign sub = sub | plus: 1 %}

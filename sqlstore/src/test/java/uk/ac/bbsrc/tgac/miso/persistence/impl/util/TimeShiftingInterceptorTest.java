@@ -20,7 +20,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -78,7 +78,7 @@ public class TimeShiftingInterceptorTest extends AbstractDAOTest {
     // Make sure date (without time) is not affected. Otherwise, this could result in +/- 1 day being displayed
     Transaction tx = session.beginTransaction();
     DateFormatter formatter = new DateFormatter("yyyy-MM-dd");
-    LibraryDilution ldi = new LibraryDilution();
+    LibraryAliquot ldi = new LibraryAliquot();
     UserImpl user = new UserImpl();
     user.setId(1L);
     user.setFullName("me");
@@ -95,7 +95,7 @@ public class TimeShiftingInterceptorTest extends AbstractDAOTest {
     Long newId = (Long) session.save(ldi);
     session.evict(ldi);
 
-    LibraryDilution saved = (LibraryDilution) session.get(LibraryDilution.class, newId);
+    LibraryAliquot saved = (LibraryAliquot) session.get(LibraryAliquot.class, newId);
     assertNotNull(saved);
     assertEquals(date.getTime(), saved.getCreationDate().getTime());
     tx.rollback();

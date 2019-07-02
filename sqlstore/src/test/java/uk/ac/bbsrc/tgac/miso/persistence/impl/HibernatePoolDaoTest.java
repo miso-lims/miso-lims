@@ -26,7 +26,7 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
@@ -452,44 +452,44 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testRemoveDilution() throws IOException {
+  public void testRemoveAliquot() throws IOException {
     Pool pool = dao.get(3L);
-    int originalSize = pool.getPoolDilutions().size();
-    pool.getPoolDilutions().removeIf(pd -> pd.getPoolableElementView().getDilutionId() == 10L);
-    assertEquals("LDI8 should be removed from collection", originalSize - 1, pool.getPoolDilutions().size());
+    int originalSize = pool.getPoolContents().size();
+    pool.getPoolContents().removeIf(pd -> pd.getPoolableElementView().getAliquotId() == 10L);
+    assertEquals("LDI8 should be removed from collection", originalSize - 1, pool.getPoolContents().size());
     dao.save(pool);
 
     sessionFactory.getCurrentSession().flush();
     sessionFactory.getCurrentSession().clear();
 
     Pool saved = dao.get(3L);
-    int savedSize = saved.getPoolDilutions().size();
+    int savedSize = saved.getPoolContents().size();
     assertEquals("LDI8 should not be present in saved collection", originalSize - 1, savedSize);
   }
 
   @Test
-  public void testAddDilution() throws IOException {
+  public void testAddAliquot() throws IOException {
     Pool pool = dao.get(1L);
-    int originalSize = pool.getPoolDilutions().size();
+    int originalSize = pool.getPoolContents().size();
     PoolableElementView ldi = (PoolableElementView) sessionFactory.getCurrentSession().get(PoolableElementView.class, 14L);
-    PoolDilution pd = new PoolDilution(pool, ldi);
-    pool.getPoolDilutions().add(pd);
+    PoolElement element = new PoolElement(pool, ldi);
+    pool.getPoolContents().add(element);
     dao.save(pool);
 
     sessionFactory.getCurrentSession().flush();
     sessionFactory.getCurrentSession().clear();
 
     Pool saved = dao.get(1L);
-    int savedSize = saved.getPoolDilutions().size();
+    int savedSize = saved.getPoolContents().size();
     assertEquals("LDI14 should present in saved collection", originalSize + 1, savedSize);
   }
 
   @Test
   public void testEditProportions() throws IOException {
     Pool pool = dao.get(1L);
-    assertFalse("Test pool should contain dilutions", pool.getPoolDilutions().isEmpty());
-    pool.getPoolDilutions().forEach(pd -> {
-      assertEquals(String.format("Original proportion of %s should be 1", pd.getPoolableElementView().getDilutionName()), 1,
+    assertFalse("Test pool should contain aliquots", pool.getPoolContents().isEmpty());
+    pool.getPoolContents().forEach(pd -> {
+      assertEquals(String.format("Original proportion of %s should be 1", pd.getPoolableElementView().getAliquotName()), 1,
           pd.getProportion());
       pd.setProportion(3);
     });
@@ -499,8 +499,8 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     sessionFactory.getCurrentSession().clear();
 
     Pool saved = dao.get(1L);
-    saved.getPoolDilutions().forEach(pd -> {
-      assertEquals(String.format("Saved proportion of %s should be 3", pd.getPoolableElementView().getDilutionName()), 3,
+    saved.getPoolContents().forEach(pd -> {
+      assertEquals(String.format("Saved proportion of %s should be 3", pd.getPoolableElementView().getAliquotName()), 3,
           pd.getProportion());
     });
   }

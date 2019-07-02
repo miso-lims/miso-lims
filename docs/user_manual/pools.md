@@ -27,10 +27,10 @@ on the main Pools list page.
 
 Clicking the "Add" button in the toolbar at the top of the Pools list will take you to the Create Pool page. Here, you
 can enter all of the pool information and then click the "Save" button at the top right to save the pool. After saving,
-you will be taken to the single Edit Pool page, where you can add dilutions and further modify the pool.
+you will be taken to the single Edit Pool page, where you can add library aliquots and further modify the pool.
 
-It is also possible to create pools with dilutions already in them. See
-[Creating Pools from Dilutions](#creating_pools_from_dilutions) below.
+It is also possible to create pools with library aliquots already in them. See
+[Creating Pools from Library Aliquots](#creating_pools_from_library_aliquots) below.
 
 {% include userman-toplink.md %}
 
@@ -64,8 +64,8 @@ can make any changes you would like and then click the "Save" button at the top 
 
 Below, there are sections for Notes, Attachments, and QC's, which are discussed in other parts of this section of the
 user manual. Other sections list the orders that have been made for sequencing the pool, the runs and lanes that the
-pool has been included in, dilutions that are included in the pool, dilutions that could be added to the pool, and the
-pool's change log.
+pool has been included in, library aliquots that are included in the pool, library aliquots that could be added to the
+pool, and the pool's change log.
 
 {% include userman-toplink.md %}
 
@@ -107,51 +107,52 @@ spreadsheet of pool data provided by a collaborator. For more information, see t
 
 
 {% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Adding Dilutions to a Pool" %}
+{% include userman-heading.md section=page.section sub=sub title="Adding Library Aliquots to a Pool" %}
 
-Dilutions can be added to a pool using the single Edit Pool page. In the Available Dilutions list, find and select the
-dilutions that you wish to add to the pool. You can search dilutions using the search box at the top of the table. Once
-you have selected the appropriate dilutions, click the "Add" button in the toolbar at the top of the table to add the
-dilutions to the pool.
-
-{% include userman-toplink.md %}
-
-
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Removing Dilutions from a Pool" %}
-
-Dilutions can be removed from a pool using the single Edit Pool page. In the Included Dilutions list, find and select
-the dilutions that you wish to remove from the pool. Click the "Remove" button in the toolbar at the top of the table
-to remove the dilutions from the pool.
+Library aliquots can be added to a pool using the single Edit Pool page. In the Available Library Aliquots list, find
+and select the aliquots that you wish to add to the pool. You can search aliquots using the search box at the top of
+the table. Once you have selected the appropriate aliquots, click the "Add" button in the toolbar at the top of the
+table to add the library aliquots to the pool.
 
 {% include userman-toplink.md %}
 
 
 
 {% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Creating Pools from Dilutions" %}
+{% include userman-heading.md section=page.section sub=sub title="Removing Library Aliquots from a Pool" %}
 
-To create pools from dilutions, go to the Dilutions list and select the dilutions to be included in the pools. There
-are three options for creating pools from this selection. Click one of these buttons in the toolbar at the top of the
-table to continue:
+Library aliquots can be removed from a pool using the single Edit Pool page. In the Included Library Aliquots list,
+find and select the aliquots that you wish to remove from the pool. Click the "Remove" button in the toolbar at the top
+of the table to remove the library aliquots from the pool.
 
-* Pool Together: Create a single pool containing all of the selected dilutions
-* Pool Separately: Create multiple pools, each containing one of the selected dilutions
-* Pool Custom: Create multiple pools, each containing a variable number of the selected dilutions
+{% include userman-toplink.md %}
+
+
+
+{% assign sub = sub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Creating Pools from Library Aliquots" %}
+
+To create pools from library aliquots, go to the Library Aliquots list and select the aliquots to be included in the
+pools. There are three options for creating pools from this selection. Click one of these buttons in the toolbar at the
+top of the table to continue:
+
+* Pool Together: Create a single pool containing all of the selected aliquots
+* Pool Separately: Create multiple pools, each containing one of the selected aliquots
+* Pool Custom: Create multiple pools, each containing a variable number of the selected aliquots
 
 In the dialog that appears, choose whether you'd like to create a new box for these pools. See
 [Creating Boxes](boxes.html#creating_boxes) in the box section more more information on this feature. If you chose the
 "Pool Custom" option, set the quantity of pools that you would like to create. When you are done in the dialog, click
 the "Create" button to proceed.
 
-This will take you to the Create Pools from Dilutions page. Enter all of the pool information here. For additional
-information regarding some of the fields in the table, check the Quick Help section near the top of the screen.
+This will take you to the Create Pools from Library Aliquots page. Enter all of the pool information here. For
+additional information regarding some of the fields in the table, check the Quick Help section near the top of the
+screen.
 
-If you chose the "Pool Custom" option, there will be a "Choose Dilutions" button in the toolbar at the top of the
-table. Click this button to switch to the Dilutions view, where you can choose which pool to add each dilution to. You
-will have to enter aliases in the Pools view before they show up as options here. To return to the Pools view, click
-the "Edit Pools" button in the toolbar.
+If you chose the "Pool Custom" option, there will be a "Choose Library Aliquots" button in the toolbar at the top of
+the table. Click this button to switch to the Library Aliquots view, where you can choose which pool to add each
+aliquot to. You will have to enter aliases in the Pools view before they show up as options here. To return to the
+Pools view, click the "Edit Pools" button in the toolbar.
 
 Click the "Save" button at the top right of the screen when you are done. If any of the pools fail to save,
 a message will be displayed at the top of the screen explaining the problem(s). You can then make the appropriate
@@ -246,11 +247,11 @@ before it can be deleted. A pool can only be deleted by its creator or a MISO ad
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Merging Pools" %}
 
-Multiple pools may be merged to create a new pool containing all of the dilutions from each of the merged pools. To do
-this, select the pools to merge from the Pools list, then click the "Merge" button in the toolbar at the top of the
-table. In the dialog, choose the proportions to merge the pools at. Click the "Merge" button to proceed. This will take
-you to the Merge Pools page, which functions the same as the bulk Create Pools from Dilutions page. Enter the pool
-information, then click "Save" at the top right to create the new pool.
+Multiple pools may be merged to create a new pool containing all of the library aliquots from each of the merged pools.
+To do this, select the pools to merge from the Pools list, then click the "Merge" button in the toolbar at the top of
+the table. In the dialog, choose the proportions to merge the pools at. Click the "Merge" button to proceed. This will
+take you to the Merge Pools page, which functions the same as the bulk Create Pools from Library Aliquots page. Enter
+the pool information, then click "Save" at the top right to create the new pool.
 
 {% include userman-toplink.md %}
 

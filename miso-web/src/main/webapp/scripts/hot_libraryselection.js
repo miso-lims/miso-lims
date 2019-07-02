@@ -1,6 +1,10 @@
 HotTarget.libraryselection = {
-  createUrl: '/miso/rest/libraryselections',
-  updateUrl: '/miso/rest/libraryselections/',
+  getCreateUrl: function() {
+    return Urls.rest.librarySelections.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.librarySelections.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

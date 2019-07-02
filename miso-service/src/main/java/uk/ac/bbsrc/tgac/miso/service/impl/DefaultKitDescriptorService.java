@@ -16,12 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
@@ -117,11 +118,11 @@ public class DefaultKitDescriptorService implements KitDescriptorService {
     List<ValidationError> errors = new ArrayList<>();
     Collection<TargetedSequencing> removed = CollectionUtils.subtract(managed.getTargetedSequencing(), changes.getTargetedSequencing());
     for (TargetedSequencing ts : removed) {
-      List<LibraryDilution> affectedDilutions = kitStore.getDilutionsForKdTsRelationship(managed, ts);
-      if (!affectedDilutions.isEmpty()) {
+      List<LibraryAliquot> affectedAliquots = kitStore.getLibraryAliquotsForKdTsRelationship(managed, ts);
+      if (!affectedAliquots.isEmpty()) {
         errors.add(new ValidationError(
-            String.format("Cannot unlink targeted sequencing '%s' from kit '%s' as %d dilutions already use this link.", ts.getAlias(),
-                managed.getName(), affectedDilutions.size())));
+            String.format("Cannot unlink targeted sequencing '%s' from kit '%s' as %d %s already use this link.", ts.getAlias(),
+                managed.getName(), affectedAliquots.size(), Pluralizer.libraryAliquots(affectedAliquots.size()))));
       }
     }
     if (!errors.isEmpty()) {

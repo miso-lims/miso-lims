@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 
-public class DilutionDto extends AbstractBoxableDto {
+public class LibraryAliquotDto extends AbstractBoxableDto {
 
   private Long id;
   private String name;
@@ -23,7 +23,7 @@ public class DilutionDto extends AbstractBoxableDto {
   @Enumerated(EnumType.STRING)
   private VolumeUnit volumeUnits;
   private String creationDate;
-  private String dilutionCreatorName;
+  private String creatorName;
   private Long targetedSequencingId;
   private Long libraryId;
   private LibraryDto library;
@@ -98,12 +98,12 @@ public class DilutionDto extends AbstractBoxableDto {
     this.creationDate = creationDate;
   }
 
-  public String getDilutionUserName() {
-    return dilutionCreatorName;
+  public String getCreatorName() {
+    return creatorName;
   }
 
-  public void setDilutionUserName(String userName) {
-    this.dilutionCreatorName = userName;
+  public void setCreatorName(String userName) {
+    this.creatorName = userName;
   }
 
   public Long getTargetedSequencingId() {

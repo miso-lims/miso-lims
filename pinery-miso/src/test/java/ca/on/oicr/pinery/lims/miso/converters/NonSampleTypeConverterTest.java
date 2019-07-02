@@ -4,19 +4,18 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import ca.on.oicr.pinery.lims.miso.converters.SampleTypeConverter;
-
 public class NonSampleTypeConverterTest {
 
   @Test
   public void testGetSampleType() throws Exception {
     // No library design code
     assertEquals("Illumina PE Library", SampleTypeConverter.getNonSampleSampleType("Library", "ILLUMINA", "Paired End"));
-    assertEquals("Illumina PE Library Seq", SampleTypeConverter.getNonSampleSampleType("Dilution", "ILLUMINA", "Paired End"));
+    assertEquals("Illumina PE Library Seq", SampleTypeConverter.getNonSampleSampleType("Library Aliquot", "ILLUMINA", "Paired End"));
 
     // matching library type and design code
     assertEquals("Illumina WT Library", SampleTypeConverter.getNonSampleSampleType("Library", "ILLUMINA", "Whole Transcriptome"));
-    assertEquals("Illumina WT Library Seq", SampleTypeConverter.getNonSampleSampleType("Dilution", "ILLUMINA", "Whole Transcriptome"));
+    assertEquals("Illumina WT Library Seq",
+        SampleTypeConverter.getNonSampleSampleType("Library Aliquot", "ILLUMINA", "Whole Transcriptome"));
   }
 
   @Test

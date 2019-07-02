@@ -33,7 +33,7 @@ CREATE PROCEDURE deletePool(
   DELETE FROM PoolQC WHERE pool_poolId = iPoolId;
   DELETE FROM Pool_Watcher WHERE poolId = iPoolId;
   DELETE FROM PoolChangeLog WHERE poolId = iPoolId;
-  DELETE FROM Pool_Dilution WHERE pool_poolId = iPoolId;
+  DELETE FROM Pool_LibraryAliquot WHERE poolId = iPoolId;
   DELETE FROM Pool WHERE poolId = iPoolId;
   
   SELECT ROW_COUNT() AS number_deleted;

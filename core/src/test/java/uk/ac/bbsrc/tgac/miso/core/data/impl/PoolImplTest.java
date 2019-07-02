@@ -7,7 +7,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 
 public class PoolImplTest {
@@ -49,8 +49,8 @@ public class PoolImplTest {
   private void addElement(PoolImpl pool, Index... indices) {
     PoolableElementView ldi = new PoolableElementView();
     ldi.setIndices(Lists.newArrayList(indices));
-    PoolDilution pd = new PoolDilution(pool, ldi);
-    pool.getPoolDilutions().add(pd);
+    PoolElement element = new PoolElement(pool, ldi);
+    pool.getPoolContents().add(element);
   }
 
   private Index makeIndex(String sequence, int position) {

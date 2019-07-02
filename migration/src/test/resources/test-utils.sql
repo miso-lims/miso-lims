@@ -24,7 +24,7 @@ BEGIN
     UNION SELECT 'Libraries',COUNT(*) FROM Library
     UNION SELECT 'DetailedLibrary',COUNT(*) FROM DetailedLibrary
     UNION SELECT 'LibraryChangeLogs',COUNT(*) FROM LibraryChangeLog
-    UNION SELECT 'LibraryDilutions',COUNT(*) FROM LibraryDilution
+    UNION SELECT 'LibraryAliquots',COUNT(*) FROM LibraryAliquot
     UNION SELECT 'Pool_Elements',COUNT(*) FROM Pool_Elements
     UNION SELECT 'Pools',COUNT(*) FROM Pool
     UNION SELECT 'Partitions',COUNT(*) FROM _Partition
@@ -51,10 +51,10 @@ BEGIN
     DELETE FROM Experiment;
     DELETE FROM Pool_Note;
     DELETE FROM SequencingOrder;
-    DELETE FROM Pool_Dilution;
+    DELETE FROM Pool_LibraryAliquot;
     DELETE FROM PoolChangeLog;
     DELETE FROM Pool;
-    DELETE FROM LibraryDilution;
+    DELETE FROM LibraryAliquot;
     DELETE FROM DetailedLibrary;
     DELETE FROM Library_Note;
     DELETE FROM Library_Index;

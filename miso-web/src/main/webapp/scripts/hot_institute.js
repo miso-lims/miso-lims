@@ -1,6 +1,10 @@
 HotTarget.institute = {
-  createUrl: '/miso/rest/institutes',
-  updateUrl: '/miso/rest/institutes/',
+  getCreateUrl: function() {
+    return Urls.rest.institutes.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.institutes.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

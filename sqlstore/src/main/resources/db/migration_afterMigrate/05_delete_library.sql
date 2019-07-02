@@ -23,10 +23,10 @@ CREATE PROCEDURE deleteLibrary(
     SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
   END IF;
 
-  -- confirm that the library has no dilution children
-  IF EXISTS (SELECT * FROM LibraryDilution WHERE library_libraryId = iLibraryId)
+  -- confirm that the library has no aliquot children
+  IF EXISTS (SELECT * FROM LibraryAliquot WHERE libraryId = iLibraryId)
   THEN
-    SET errorMessage = CONCAT('Cannot delete library with ID ', iLibraryId, ' due to child dilutions.');
+    SET errorMessage = CONCAT('Cannot delete library with ID ', iLibraryId, ' due to child aliquots.');
     SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
   END IF;
 

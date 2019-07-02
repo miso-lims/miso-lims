@@ -30,7 +30,9 @@ ListTarget.pool = {
       return "/miso/rest/pools/dt/platform/" + config.platformType;
     }
   },
-  queryUrl: "/miso/rest/pools/query",
+  getQueryUrl: function() {
+    return Urls.rest.pools.query;
+  },
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.pool.getBulkActions(config);
     actions.push({
@@ -63,7 +65,7 @@ ListTarget.pool = {
           };
         });
 
-        HotUtils.showDialogForBoxCreation("Merge Proportions", "Merge", fields, '/miso/pool/bulk/merge?', function(output) {
+        HotUtils.showDialogForBoxCreation("Merge Proportions", "Merge", fields, Urls.ui.pools.bulkMerge, function(output) {
           var ids = pools.map(Utils.array.getId);
           var proportions = ids.map(function(id) {
             return output['pool' + id];
@@ -88,8 +90,8 @@ ListTarget.pool = {
     }];
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.idHyperlinkColumn("Name", "pool", "id", Utils.array.getName, 1, true),
-        ListUtils.labelHyperlinkColumn("Alias", "pool", Utils.array.getId, "alias", 0, true), {
+    return [ListUtils.idHyperlinkColumn("Name", Urls.ui.pools.edit, "id", Utils.array.getName, 1, true),
+        ListUtils.labelHyperlinkColumn("Alias", Urls.ui.pools.edit, Utils.array.getId, "alias", 0, true), {
           "sTitle": "Description",
           "mData": "description",
           "mRender": Warning.tableWarningRenderer(WarningTarget.pool),
@@ -102,8 +104,8 @@ ListTarget.pool = {
           "include": true,
           "iSortPriority": 0
         }, {
-          "sTitle": "Dilutions",
-          "mData": "dilutionCount",
+          "sTitle": "Library Aliquots",
+          "mData": "libraryAliquotCount",
           "include": true,
           "iSortPriority": 0,
           "bSortable": false,

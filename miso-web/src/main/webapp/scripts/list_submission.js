@@ -26,7 +26,7 @@ ListTarget.submission = {
   createUrl: function(config, projectId) {
     throw new Error("Submissions must be provided statically");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     return [];
   },
@@ -34,8 +34,8 @@ ListTarget.submission = {
     return [];
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.idHyperlinkColumn("ID", "submission", "id", Utils.array.getId, 1, true),
-        ListUtils.labelHyperlinkColumn("Alias", "submission", Utils.array.getId, "alias", 0, true), {
+    return [ListUtils.idHyperlinkColumn("ID", Urls.ui.submissions.edit, "id", Utils.array.getId, 1, true),
+        ListUtils.labelHyperlinkColumn("Alias", Urls.ui.submissions.edit, Utils.array.getId, "alias", 0, true), {
           "sTitle": "Created Date",
           "mData": "creationDate",
           "include": true,

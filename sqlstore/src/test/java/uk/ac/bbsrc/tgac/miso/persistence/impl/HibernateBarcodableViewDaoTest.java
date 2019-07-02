@@ -35,7 +35,7 @@ public class HibernateBarcodableViewDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testSearchDilution() {
+  public void testSearchLibraryAliquot() {
     searchForBarcodeReturnsId("LDI1::TEST_0001_Bn_P_PE_300_WG", 1);
   }
 
@@ -66,7 +66,7 @@ public class HibernateBarcodableViewDaoTest extends AbstractDAOTest {
 
   @Test
   public void testSearchByUnknownBarcodeAndEntityType() {
-    assertTrue(dao.searchByBarcode("not a barcode", Collections.singletonList(EntityType.DILUTION)).isEmpty());
+    assertTrue(dao.searchByBarcode("not a barcode", Collections.singletonList(EntityType.LIBRARY_ALIQUOT)).isEmpty());
   }
 
   @Test
@@ -81,12 +81,12 @@ public class HibernateBarcodableViewDaoTest extends AbstractDAOTest {
 
   @Test
   public void testSearchForCorrectEntityType() {
-    searchForBarcodeAndEntityReturnsId("LDI1::TEST_0001_Bn_P_PE_300_WG", Collections.singletonList(EntityType.DILUTION), 1);
+    searchForBarcodeAndEntityReturnsId("LDI1::TEST_0001_Bn_P_PE_300_WG", Collections.singletonList(EntityType.LIBRARY_ALIQUOT), 1);
   }
 
   @Test
   public void testSearchForMultipleEntityTypes() {
-    searchForBarcodeAndEntityReturnsId("LDI1::TEST_0001_Bn_P_PE_300_WG", Arrays.asList(EntityType.BOX, EntityType.DILUTION), 1);
+    searchForBarcodeAndEntityReturnsId("LDI1::TEST_0001_Bn_P_PE_300_WG", Arrays.asList(EntityType.BOX, EntityType.LIBRARY_ALIQUOT), 1);
   }
 
   private void searchForBarcodeAndEntityReturnsId(String identificationBarcode, Collection<EntityType> typeFilter, long targetId) {

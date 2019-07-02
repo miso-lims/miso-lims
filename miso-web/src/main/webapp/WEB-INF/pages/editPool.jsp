@@ -38,9 +38,9 @@
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
-<div id="notediv" class="note" style="display:none;">A Pool contains <b>one or more</b> Dilutions that are
+<div id="notediv" class="note" style="display:none;">A Pool contains <b>one or more</b> library aliquots that are
   to be placed, as part of an Experiment, in a sequencer instrument Run partition (lane/chamber/cell). Pools
-  with more than one Dilution are said to be multiplexed.
+  with more than one library aliquot are said to be multiplexed.
 </div>
 
 <div id="warnings"></div>
@@ -102,9 +102,9 @@
   <miso:list-section-ajax id="list_completion" name="Order Status" target="sequencingordercompletion" config="{ poolId: ${pool.id} }"/>
   <miso:list-section id="list_run" name="Runs" target="run" items="${runs}" config="{ poolId: ${pool.id} }"/>
   <miso:list-section id="list_partition" name="${pool.platformType.pluralPartitionName}" target="partition" items="${partitions}" config="{'showContainer': true, 'showPool': false}"/>
-  <miso:list-section id="list_included" name="Included Dilutions" target="poolelement" alwaysShow="true" items="${includedDilutions}" config="{ poolId: ${pool.id}, add: false, duplicateIndicesSequences: ${duplicateIndicesSequences}, nearDuplicateIndicesSequences: ${nearDuplicateIndicesSequences}}"/>
+  <miso:list-section id="list_included" name="Included Library Aliquots" target="poolelement" alwaysShow="true" items="${includedLibraryAliquots}" config="{ poolId: ${pool.id}, add: false, duplicateIndicesSequences: ${duplicateIndicesSequences}, nearDuplicateIndicesSequences: ${nearDuplicateIndicesSequences}}"/>
   <div class="noPrint">
-    <miso:list-section-ajax id="list_available" name="Available Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: true }"/>
+    <miso:list-section-ajax id="list_available" name="Available Library Aliquots" target="poolelement" config="{ poolId: ${pool.id}, add: true }"/>
   </div>
 </c:if>
 <div class="noPrint">

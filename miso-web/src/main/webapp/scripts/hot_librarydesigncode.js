@@ -1,6 +1,10 @@
 HotTarget.librarydesigncode = {
-  createUrl: '/miso/rest/librarydesigncodes',
-  updateUrl: '/miso/rest/librarydesigncodes/',
+  getCreateUrl: function() {
+    return Urls.rest.libraryDesignCodes.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.libraryDesignCodes.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

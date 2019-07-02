@@ -16,7 +16,6 @@ import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class DefaultPoolableElementViewService implements PoolableElementViewService {
-  // TODO: authorization (View model will need full Dilution Security Profile)
 
   @Autowired
   private PoolableElementViewDao poolableElementViewDao;
@@ -26,8 +25,8 @@ public class DefaultPoolableElementViewService implements PoolableElementViewSer
   }
 
   @Override
-  public PoolableElementView get(Long dilutionId) throws IOException {
-    return poolableElementViewDao.get(dilutionId);
+  public PoolableElementView get(Long aliquotId) throws IOException {
+    return poolableElementViewDao.get(aliquotId);
   }
 
   @Override
@@ -53,8 +52,8 @@ public class DefaultPoolableElementViewService implements PoolableElementViewSer
   }
 
   @Override
-  public List<PoolableElementView> list(List<Long> dilutionIds) throws IOException {
-    return poolableElementViewDao.list(dilutionIds);
+  public List<PoolableElementView> list(List<Long> aliquotIds) throws IOException {
+    return poolableElementViewDao.list(aliquotIds);
   }
 
 }

@@ -298,7 +298,7 @@ ListUtils = (function($) {
           updateSelectedLabel(state);
         }
       });
-      if (!projectId && target.queryUrl) {
+      if (!projectId && target.getQueryUrl) {
         staticActions.push({
           "name": "📋",
           "title": "Select by names",
@@ -321,7 +321,7 @@ ListUtils = (function($) {
                 if (names.length == 0) {
                   return;
                 }
-                Utils.ajaxWithDialog('Searching', 'POST', target.queryUrl, names, function(items) {
+                Utils.ajaxWithDialog('Searching', 'POST', target.getQueryUrl(), names, function(items) {
                   var title = items.length + ' ' + target.name;
                   var selectedActions = bulkActions.filter(function(bulkAction) {
                     return !!bulkAction;
@@ -557,17 +557,17 @@ ListUtils = (function($) {
       }
       updateSelectedLabel(state);
     },
-    idHyperlinkColumn: function(headerName, urlFragment, id, getLabel, priority, include, addClass) {
+    idHyperlinkColumn: function(headerName, getEditUrlById, idProperty, getLabel, priority, include, addClass) {
       return {
         "sTitle": headerName,
-        "mData": id,
+        "mData": idProperty,
         "include": include,
         "iSortPriority": priority,
         "bSortable": priority >= 0,
         "sClass": addClass,
         "mRender": function(data, type, full) {
           if (type === 'display') {
-            return data ? "<a href=\"/miso/" + urlFragment + "/" + data + "\">" + getLabel(full) + "</a>" : "";
+            return data ? '<a href="' + getEditUrlById(data) + '">' + getLabel(full) + '</a>' : '';
           } else if (type === 'filter') {
             return getLabel(full);
           }
@@ -575,10 +575,10 @@ ListUtils = (function($) {
         }
       };
     },
-    labelHyperlinkColumn: function(headerName, urlFragment, getId, label, priority, include, addClass) {
+    labelHyperlinkColumn: function(headerName, getEditUrlById, getId, labelProperty, priority, include, addClass) {
       return {
         "sTitle": headerName,
-        "mData": label,
+        "mData": labelProperty,
         "include": include,
         "iSortPriority": priority,
         "bSortDirection": true,
@@ -586,7 +586,7 @@ ListUtils = (function($) {
         "sClass": addClass,
         "mRender": function(data, type, full) {
           if (type === 'display') {
-            return data ? "<a href=\"/miso/" + urlFragment + "/" + getId(full) + "\">" + data + "</a>" : "";
+            return data ? '<a href="' + getEditUrlById(getId(full)) + '">' + data + '</a>' : '';
           }
           return data;
         }

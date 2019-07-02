@@ -26,7 +26,9 @@ ListTarget.library = {
   createUrl: function(config, projectId) {
     return "/miso/rest/libraries/dt" + (projectId ? '/project/' + projectId : '');
   },
-  queryUrl: "/miso/rest/libraries/query",
+  getQueryUrl: function() {
+    return Urls.rest.libraries.query;
+  },
   createBulkActions: function(config, projectId) {
     return HotTarget.library.getBulkActions(config).concat(
         [{
@@ -69,7 +71,7 @@ ListTarget.library = {
             getLabel: Utils.array.getAlias
           });
         }
-        HotUtils.showDialogForBoxCreation('Receive Libraries', 'Receive', fields, '/miso/library/bulk/receive?', function(result) {
+        HotUtils.showDialogForBoxCreation('Receive Libraries', 'Receive', fields, Urls.ui.libraries.bulkReceive, function(result) {
           if (result.quantity < 1) {
             Utils.showOkDialog('Receive Libraries', ["That's a peculiar number of libraries to receive."]);
             return;
@@ -86,11 +88,11 @@ ListTarget.library = {
     }];
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.idHyperlinkColumn("Name", "library", "id", Utils.array.getName, 1, true),
-        ListUtils.labelHyperlinkColumn("Alias", "library", Utils.array.getId, "alias", 0, true),
-        ListUtils.idHyperlinkColumn("Sample Name", "sample", "parentSampleId", function(library) {
+    return [ListUtils.idHyperlinkColumn("Name", Urls.ui.libraries.edit, "id", Utils.array.getName, 1, true),
+        ListUtils.labelHyperlinkColumn("Alias", Urls.ui.libraries.edit, Utils.array.getId, "alias", 0, true),
+        ListUtils.idHyperlinkColumn("Sample Name", Urls.ui.samples.edit, "parentSampleId", function(library) {
           return "SAM" + library.parentSampleId;
-        }, 0, true), ListUtils.labelHyperlinkColumn("Sample Alias", "sample", function(library) {
+        }, 0, true), ListUtils.labelHyperlinkColumn("Sample Alias", Urls.ui.samples.edit, function(library) {
           return library.parentSampleId;
         }, "parentSampleAlias", 0, true), {
           "sTitle": "QC Passed",

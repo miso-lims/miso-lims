@@ -34,7 +34,7 @@ public class ProjectPage extends HeaderFooterPage {
     public static final String STUDIES = "project_studies_wrapper";
     public static final String SAMPLES = "project_samples_wrapper";
     public static final String LIBRARIES = "project_libraries_wrapper";
-    public static final String DILUTIONS = "project_dilutions_wrapper";
+    public static final String LIBRARY_ALIQUOTS = "project_libraryAliquots_wrapper";
     public static final String POOLS = "project_pools_wrapper";
     public static final String RUNS = "project_runs_wrapper";
   }

@@ -40,7 +40,7 @@ Please make sure to add or update the relevant tests for your changes.
 ## Commits
 
 * Make sure your commit messages begin with the issue number. e.g. "#1234: fixed display of
-  dilution concentration units"
+  library aliquot concentration units"
 * Edit the **Unreleased** section in `RELEASE_NOTES.md` to detail any user-visible **Changes** or
   **Update Notes** (Additional steps that must be taken when upgrading to the MISO version
   containing your change)

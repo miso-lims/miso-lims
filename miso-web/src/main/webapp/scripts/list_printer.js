@@ -26,7 +26,7 @@ ListTarget.printer = {
   createUrl: function(config, projectId) {
     return "/miso/rest/printers/dt";
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     return [
         {

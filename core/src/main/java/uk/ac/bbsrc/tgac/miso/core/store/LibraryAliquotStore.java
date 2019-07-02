@@ -27,40 +27,34 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
- * Defines a DAO interface for storing Dilutions
+ * Defines a DAO interface for storing Library Aliquots
  *
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface LibraryDilutionStore
-    extends Store<LibraryDilution>, PaginatedDataSource<LibraryDilution> {
+public interface LibraryAliquotStore extends Store<LibraryAliquot>, PaginatedDataSource<LibraryAliquot> {
+
   /**
-   * List all LibraryDilutions by a given parent library ID
-   *
    * @param libraryId
-   *          of type long
-   * @return Collection<LibraryDilution>
+   * @return list of all LibraryAliquots by a given parent library ID
    * @throws IOException
-   *           when
    */
-  List<LibraryDilution> listByLibraryId(long libraryId) throws IOException;
+  List<LibraryAliquot> listByLibraryId(long libraryId) throws IOException;
 
-  List<LibraryDilution> listByIdList(List<Long> idList) throws IOException;
+  List<LibraryAliquot> listByIdList(List<Long> idList) throws IOException;
 
   /**
-   * Get a LibraryDilution by ID barcode
+   * Get a LibraryAliquot by ID barcode
    *
    * @param barcode
-   *          of type String
-   * @return LibraryDilution
+   * @return the matching LibraryAliquot
    * @throws IOException
-   *           when
    */
-  LibraryDilution getByBarcode(String barcode) throws IOException;
+  LibraryAliquot getByBarcode(String barcode) throws IOException;
 
-  Collection<LibraryDilution> getByBarcodeList(Collection<String> barcodeList) throws IOException;
+  Collection<LibraryAliquot> getByBarcodeList(Collection<String> barcodeList) throws IOException;
 }

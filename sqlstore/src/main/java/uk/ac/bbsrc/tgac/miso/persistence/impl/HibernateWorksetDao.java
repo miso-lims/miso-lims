@@ -80,11 +80,11 @@ public class HibernateWorksetDao implements WorksetStore, HibernatePaginatedData
   }
 
   @Override
-  public List<Workset> listByDilution(long dilutionId) {
+  public List<Workset> listByLibraryAliquot(long aliquotId) {
     @SuppressWarnings("unchecked")
     List<Workset> results = currentSession().createCriteria(Workset.class)
-        .createAlias("dilutions", "dilution")
-        .add(Restrictions.eq("dilution.id", dilutionId))
+        .createAlias("libraryAliquots", "aliquot")
+        .add(Restrictions.eq("aliquot.id", aliquotId))
         .list();
     return results;
   }

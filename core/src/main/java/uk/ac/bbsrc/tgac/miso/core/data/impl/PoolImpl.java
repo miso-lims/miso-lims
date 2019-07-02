@@ -74,7 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -142,7 +142,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private PlatformType platformType;
 
   @OneToMany(mappedBy = "pool", orphanRemoval = true, cascade = CascadeType.ALL)
-  private Set<PoolDilution> poolDilutions = new HashSet<>();
+  private Set<PoolElement> poolElements = new HashSet<>();
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -203,7 +203,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     if (!(obj instanceof Pool)) return false;
     Pool other = (Pool) obj;
     return new EqualsBuilder().appendSuper(super.equals(obj)).append(description, other.getDescription())
-        .append(poolDilutions, other.getPoolDilutions())
+        .append(poolElements, other.getPoolContents())
         .append(concentration, other.getConcentration())
         .append(identificationBarcode, other.getIdentificationBarcode())
         .append(qcPassed, other.getQcPassed())
@@ -252,7 +252,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public boolean getHasLowQualityMembers() {
-    return poolDilutions.stream().map(PoolDilution::getPoolableElementView).anyMatch(PoolableElementView::isLibraryLowQuality);
+    return poolElements.stream().map(PoolElement::getPoolableElementView).anyMatch(PoolableElementView::isLibraryLowQuality);
   }
 
   @Override
@@ -342,7 +342,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   private Set<String> getIndexSequencesWithMinimumEditDistance(int minimumDistance) {
     Set<String> sequences = new HashSet<>();
-    List<PoolableElementView> views = getPoolDilutions().stream().map(PoolDilution::getPoolableElementView).collect(Collectors.toList());
+    List<PoolableElementView> views = getPoolContents().stream().map(PoolElement::getPoolableElementView).collect(Collectors.toList());
     if (minimumDistance > 1 && views.stream().allMatch(PoolImpl::hasFakeSequence)) return Collections.emptySet();
     for (int i = 0; i < views.size(); i++) {
       String sequence1 = getCombinedIndexSequences(views.get(i));
@@ -383,12 +383,12 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public boolean hasLibrariesWithoutIndex() {
-    return getPoolDilutions().stream().map(PoolDilution::getPoolableElementView).anyMatch(v -> v.getIndices().isEmpty());
+    return getPoolContents().stream().map(PoolElement::getPoolableElementView).anyMatch(v -> v.getIndices().isEmpty());
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(23, 47).appendSuper(super.hashCode()).append(description).append(poolDilutions)
+    return new HashCodeBuilder(23, 47).appendSuper(super.hashCode()).append(description).append(poolElements)
         .append(concentration).append(identificationBarcode).append(qcPassed).toHashCode();
   }
 
@@ -473,9 +473,9 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     sb.append(getId());
     sb.append(" : ");
     sb.append(getName());
-    if (!getPoolDilutions().isEmpty()) {
+    if (!getPoolContents().isEmpty()) {
       sb.append(" : ");
-      sb.append(getPoolDilutions());
+      sb.append(getPoolContents());
     }
     return sb.toString();
   }
@@ -491,13 +491,13 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public Set<PoolDilution> getPoolDilutions() {
-    return poolDilutions;
+  public Set<PoolElement> getPoolContents() {
+    return poolElements;
   }
 
   @Override
-  public void setPoolDilutions(Set<PoolDilution> poolDilutions) {
-    this.poolDilutions = poolDilutions;
+  public void setPoolElements(Set<PoolElement> poolElements) {
+    this.poolElements = poolElements;
   }
 
   @Override
@@ -542,7 +542,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public String getLongestIndex() {
-    Map<Integer, Integer> lengths = poolDilutions.stream()
+    Map<Integer, Integer> lengths = poolElements.stream()
         .flatMap(element -> element.getPoolableElementView().getIndices().stream())
         .collect(Collectors.toMap(Index::getPosition, index -> index.getSequence().length(), Integer::max));
     if (lengths.isEmpty()) {
@@ -593,8 +593,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public Set<String> getPrioritySubprojectAliases() {
-    return poolDilutions.stream()
-        .map(PoolDilution::getPoolableElementView).filter(view -> view.getSubprojectPriority() != null && view.getSubprojectPriority())
+    return poolElements.stream()
+        .map(PoolElement::getPoolableElementView).filter(view -> view.getSubprojectPriority() != null && view.getSubprojectPriority())
         .map(view -> view.getSubprojectAlias()).collect(Collectors.toSet());
   }
 }

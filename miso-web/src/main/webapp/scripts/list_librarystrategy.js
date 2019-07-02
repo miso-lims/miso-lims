@@ -3,7 +3,7 @@ ListTarget.librarystrategy = {
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   headerMessage: {
     text: 'WARNING: Adding or modifying library strategy types may cause your data to be invalid for ENA submission',
     level: 'important'

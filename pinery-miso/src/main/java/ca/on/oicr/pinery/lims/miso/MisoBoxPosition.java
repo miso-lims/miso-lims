@@ -55,7 +55,7 @@ public class MisoBoxPosition extends DefaultBox implements BoxPosition {
       return "SAM";
     case "LIBRARY":
       return "LIB";
-    case "DILUTION":
+    case "LIBRARY_ALIQUOT":
       return "LDI";
     default:
       throw new IllegalArgumentException("TargetType does not seem to be a Sample, Library, or Pool");

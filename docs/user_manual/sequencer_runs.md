@@ -13,7 +13,7 @@ the screen. This list includes all sequencer runs that have been created in MISO
 different sequencing platforms. Only platforms for which there are active sequencers or existing libraries or pools are
 included. The toolbar at the top of the table includes a button for creating new runs.
 
-There is also a Runs list on the Edit Project page. This list shows only the runs that include library dilutions
+There is also a Runs list on the Edit Project page. This list shows only the runs that include library aliquots
 belonging to the project.
 
 {% include userman-toplink.md %}

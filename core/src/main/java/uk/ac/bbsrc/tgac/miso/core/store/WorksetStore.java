@@ -17,7 +17,7 @@ public interface WorksetStore extends PaginatedDataSource<Workset> {
 
   public List<Workset> listByLibrary(long libraryId);
 
-  public List<Workset> listByDilution(long dilutionId);
+  public List<Workset> listByLibraryAliquot(long aliquotId);
 
   public long save(Workset workset);
 

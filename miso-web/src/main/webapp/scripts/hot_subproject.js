@@ -1,6 +1,10 @@
 HotTarget.subproject = {
-  createUrl: '/miso/rest/subprojects',
-  updateUrl: '/miso/rest/subprojects/',
+  getCreateUrl: function() {
+    return Urls.rest.subprojects.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.subprojects.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

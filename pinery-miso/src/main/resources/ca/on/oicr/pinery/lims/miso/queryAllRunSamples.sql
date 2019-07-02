@@ -1,5 +1,5 @@
 SELECT DISTINCT part.partitionId
-  ,ld.name dilutionId
+  ,ld.name aliquotId
   ,bc1.sequence barcode
   ,bc2.sequence barcode_two
   ,tr.alias targeted_sequencing 
@@ -9,9 +9,9 @@ JOIN SequencerPartitionContainer spc ON scm.sequencingContainerModelId = spc.seq
 JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
 JOIN _Partition part ON part.partitionId = spcp.partitions_partitionId
 JOIN Pool pool ON pool.poolId = part.pool_poolId 
-JOIN Pool_Dilution ele ON ele.pool_poolId = pool.poolId 
-JOIN LibraryDilution ld ON ld.dilutionId = ele.dilution_dilutionId 
-JOIN Library l ON l.libraryId = ld.library_libraryId 
+JOIN Pool_LibraryAliquot ele ON ele.poolId = pool.poolId 
+JOIN LibraryAliquot ld ON ld.aliquotId = ele.aliquotId 
+JOIN Library l ON l.libraryId = ld.libraryId 
 LEFT JOIN TargetedSequencing tr ON tr.targetedSequencingId = ld.targetedSequencingId
 LEFT JOIN ( 
   SELECT library_libraryId, sequence FROM Library_Index 

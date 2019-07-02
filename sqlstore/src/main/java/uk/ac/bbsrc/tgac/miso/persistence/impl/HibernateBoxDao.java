@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.DilutionBoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.LibraryAliquotBoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.LibraryBoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolBoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleBoxableView;
@@ -46,7 +46,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator", "size", "use");
 
   private static final List<Class<? extends BoxableView>> VIEW_CLASSES = Lists.newArrayList(SampleBoxableView.class,
-      LibraryBoxableView.class, DilutionBoxableView.class, PoolBoxableView.class);
+      LibraryBoxableView.class, LibraryAliquotBoxableView.class, PoolBoxableView.class);
 
   @Autowired
   private SessionFactory sessionFactory;

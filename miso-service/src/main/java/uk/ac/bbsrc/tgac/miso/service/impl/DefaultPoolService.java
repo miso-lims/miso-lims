@@ -26,7 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -39,9 +39,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
-import uk.ac.bbsrc.tgac.miso.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
+import uk.ac.bbsrc.tgac.miso.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
@@ -146,8 +146,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   @Override
-  public List<Pool> listByDilutionId(long dilutionId) throws IOException {
-    return poolStore.listByDilutionId(dilutionId);
+  public List<Pool> listByLibraryAliquotId(long aliquotId) throws IOException {
+    return poolStore.listByLibraryAliquotId(aliquotId);
   }
 
   @Override
@@ -184,7 +184,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     }
 
     pool.setName(generateTemporaryName());
-    loadPoolDilutions(pool.getPoolDilutions(), pool);
+    loadPoolElements(pool.getPoolContents(), pool);
     pool.setChangeDetails(authorizationManager.getCurrentUser());
     boxService.throwIfBoxPositionIsFilled(pool);
     validateChange(pool, null);
@@ -237,9 +237,9 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     managed.setDistributionDate(pool.getDistributionDate());
     managed.setDistributionRecipient(pool.getDistributionRecipient());
 
-    Set<String> originalItems = extractDilutionNames(managed.getPoolDilutions());
-    loadPoolDilutions(pool, managed);
-    Set<String> updatedItems = extractDilutionNames(managed.getPoolDilutions());
+    Set<String> originalItems = extractAliquotNames(managed.getPoolContents());
+    loadPoolElements(pool, managed);
+    Set<String> updatedItems = extractAliquotNames(managed.getPoolContents());
 
     Set<String> added = new TreeSet<>(updatedItems);
     added.removeAll(originalItems);
@@ -278,22 +278,22 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     }
   }
 
-  private void loadPoolDilutions(Collection<PoolDilution> source, Pool target) throws IOException {
-    Set<PoolDilution> targetDilutions = target.getPoolDilutions();
-    targetDilutions.removeIf(notInOther(source));
-    Set<PoolDilution> additions = source.stream()
-        .filter(notInOther(targetDilutions))
+  private void loadPoolElements(Collection<PoolElement> source, Pool target) throws IOException {
+    Set<PoolElement> targetAliquots = target.getPoolContents();
+    targetAliquots.removeIf(notInOther(source));
+    Set<PoolElement> additions = source.stream()
+        .filter(notInOther(targetAliquots))
         .collect(Collectors.toSet());
-    for (PoolDilution sourcePd : additions) {
-      PoolableElementView v = poolableElementViewService.get(sourcePd.getPoolableElementView().getDilutionId());
+    for (PoolElement sourcePd : additions) {
+      PoolableElementView v = poolableElementViewService.get(sourcePd.getPoolableElementView().getAliquotId());
       if (v == null) {
-        throw new IllegalStateException("Pool contains an unsaved dilution");
+        throw new IllegalStateException("Pool contains an unsaved library aliquot");
       }
-      targetDilutions.add(new PoolDilution(target, v, sourcePd.getProportion()));
+      targetAliquots.add(new PoolElement(target, v, sourcePd.getProportion()));
     }
-    for (PoolDilution targetPd : targetDilutions) {
-      PoolDilution sourcePd = source.stream()
-          .filter(spd -> spd.getPoolableElementView().getDilutionId() == targetPd.getPoolableElementView().getDilutionId())
+    for (PoolElement targetPd : targetAliquots) {
+      PoolElement sourcePd = source.stream()
+          .filter(spd -> spd.getPoolableElementView().getAliquotId() == targetPd.getPoolableElementView().getAliquotId())
           .findFirst().orElse(null);
       if (sourcePd != null) {
         targetPd.setProportion(sourcePd.getProportion());
@@ -301,19 +301,19 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     }
   }
 
-  private Predicate<PoolDilution> notInOther(Collection<PoolDilution> otherCollection) {
+  private Predicate<PoolElement> notInOther(Collection<PoolElement> otherCollection) {
     return t -> otherCollection.stream()
-        .noneMatch(other -> other.getPoolableElementView().getDilutionId() == t.getPoolableElementView().getDilutionId());
+        .noneMatch(other -> other.getPoolableElementView().getAliquotId() == t.getPoolableElementView().getAliquotId());
   }
 
-  private void loadPoolDilutions(Pool source, Pool target) throws IOException {
-    loadPoolDilutions(source.getPoolDilutions(), target);
+  private void loadPoolElements(Pool source, Pool target) throws IOException {
+    loadPoolElements(source.getPoolContents(), target);
   }
 
-  private Set<String> extractDilutionNames(Set<PoolDilution> dilutions) {
+  private Set<String> extractAliquotNames(Set<PoolElement> elements) {
     Set<String> original = new HashSet<>();
-    for (PoolDilution dilution : dilutions) {
-      original.add(dilution.getPoolableElementView().getDilutionName());
+    for (PoolElement element : elements) {
+      original.add(element.getPoolableElementView().getAliquotName());
     }
     return original;
   }

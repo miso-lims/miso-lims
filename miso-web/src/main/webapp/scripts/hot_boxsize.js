@@ -1,6 +1,10 @@
 HotTarget.boxsize = {
-  createUrl: '/miso/rest/boxsizes',
-  updateUrl: '/miso/rest/boxsizes/',
+  getCreateUrl: function() {
+    return Urls.rest.boxSizes.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.boxSizes.update(id)
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

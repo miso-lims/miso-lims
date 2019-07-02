@@ -1,6 +1,10 @@
 HotTarget.detailedqcstatus = {
-  createUrl: '/miso/rest/detailedqcstatuses',
-  updateUrl: '/miso/rest/detailedqcstatuses/',
+  getCreateUrl: function() {
+    return Urls.rest.detailedQcStatuses.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.detailedQcStatuses.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

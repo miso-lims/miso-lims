@@ -35,11 +35,11 @@ public class ListTablesIT extends AbstractIT {
   private static final Set<String> librariesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
       Columns.SAMPLE_NAME, Columns.SAMPLE_ALIAS, Columns.QC_PASSED, Columns.INDEX, Columns.LOCATION, Columns.LAST_MODIFIED,
       Columns.WARNINGS);
-  private static final Set<String> dilutionsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.LIBRARY_NAME,
-      Columns.LIBRARY_ALIAS, Columns.MATRIX_BARCODE, Columns.PLATFORM, Columns.TARGETED_SEQUENCING, Columns.CONCENTRATION, Columns.VOLUME,
-      Columns.NG_USED, Columns.VOLUME_USED, Columns.CREATOR, Columns.CREATION_DATE, Columns.WARNINGS);
+  private static final Set<String> libraryAliquotsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.WARNINGS,
+      Columns.LIBRARY_NAME, Columns.LIBRARY_ALIAS, Columns.PLATFORM, Columns.TARGETED_SEQUENCING, Columns.VOLUME, Columns.CONCENTRATION,
+      Columns.NG_USED, Columns.VOLUME_USED, Columns.MATRIX_BARCODE, Columns.CREATOR, Columns.CREATION_DATE);
   private static final Set<String> poolsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
-      Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.DILUTIONS, Columns.CONCENTRATION, Columns.LOCATION, Columns.AVG_INSERT_SIZE,
+      Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.LIBRARY_ALIQUOTS, Columns.CONCENTRATION, Columns.LOCATION, Columns.AVG_INSERT_SIZE,
       Columns.LAST_MODIFIED);
   private static final Set<String> ordersColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.ORDER_DESCRIPTION,
       Columns.POOL_DESCRIPTION, Columns.INSTRUMENT_MODEL, Columns.LONGEST_INDEX, Columns.SEQUENCING_PARAMETERS,
@@ -245,15 +245,15 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
-  public void testListDilutionsPageSetup() throws Exception {
+  public void testListLibraryAliquotsPageSetup() throws Exception {
     // Goal: ensure all expected columns are present and no extra
-    testPageSetup(ListTarget.DILUTIONS, dilutionsColumns);
+    testPageSetup(ListTarget.LIBRARY_ALIQUOTS, libraryAliquotsColumns);
   }
 
   @Test
-  public void testListDilutionsColumnSort() throws Exception {
+  public void testListLibraryAliquotsColumnSort() throws Exception {
     // Goal: ensure all sortable columns can be sorted without errors
-    testColumnsSort(ListTarget.DILUTIONS);
+    testColumnsSort(ListTarget.LIBRARY_ALIQUOTS);
   }
 
   @Test

@@ -1,6 +1,10 @@
 HotTarget.qctype = {
-  createUrl: '/miso/rest/qctypes',
-  updateUrl: '/miso/rest/qctypes/',
+  getCreateUrl: function() {
+    return Urls.rest.qcTypes.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.qcTypes.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

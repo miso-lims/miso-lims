@@ -1,27 +1,27 @@
 if (typeof FormTarget === 'undefined') {
   FormTarget = {};
 }
-FormTarget.dilution = (function($) {
+FormTarget.libraryaliquot = (function($) {
 
   return {
-    getSaveUrl: function(dilution) {
-      if (dilution.id) {
-        return '/miso/rest/librarydilutions/' + dilution.id;
+    getSaveUrl: function(aliquot) {
+      if (aliquot.id) {
+        return '/miso/rest/libraryaliquots/' + aliquot.id;
       } else {
-        throw new Error('Page not intended for new dilution creation');
+        throw new Error('Page not intended for new library aliquot creation');
       }
     },
-    getSaveMethod: function(dilution) {
+    getSaveMethod: function(aliquot) {
       return 'PUT';
     },
-    getEditUrl: function(dilution) {
-      return '/miso/dilution/' + dilution.id;
+    getEditUrl: function(aliquot) {
+      return '/miso/libraryaliquot/' + aliquot.id;
     },
     getSections: function(config, object) {
       return [{
-        title: 'Dilution Information',
+        title: 'Library Aliquot Information',
         fields: [{
-          title: 'Dilution ID',
+          title: 'Library Aliquot ID',
           data: 'id',
           type: 'read-only'
         }, {
@@ -32,11 +32,11 @@ FormTarget.dilution = (function($) {
           title: 'Parent Library',
           data: 'libraryId',
           type: 'read-only',
-          getDisplayValue: function(dilution) {
-            return dilution.library.alias;
+          getDisplayValue: function(aliquot) {
+            return aliquot.library.alias;
           },
-          getLink: function(dilution) {
-            return '/miso/library/' + dilution.library.id;
+          getLink: function(aliquot) {
+            return Urls.ui.libraries.edit(aliquot.library.id);
           }
         }, {
           title: 'Matrix Barcode',

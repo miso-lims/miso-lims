@@ -28,7 +28,7 @@ public interface AbstractListPage {
     public static final String DATE_CREATED = "Date Created";
     public static final String DEFAULT_SCI_NAME = "Default Scientific Name";
     public static final String DESCRIPTION = "Description";
-    public static final String DILUTIONS = "Dilutions";
+    public static final String LIBRARY_ALIQUOTS = "Library Aliquots";
     public static final String DRIVER = "Driver";
     public static final String END_DATE = "End Date";
     public static final String EXTERNAL = "External";
@@ -126,7 +126,7 @@ public interface AbstractListPage {
     public static final String LIBRARY_TYPES = "librarytype/list";
     public static final String LOCATION_MAPS = "locationmap/list";
     public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";
-    public static final String DILUTIONS = "dilutions";
+    public static final String LIBRARY_ALIQUOTS = "libraryaliquots";
     public static final String STUDIES = "studies";
     public static final String PRINTERS = "printers";
     public static final String PROJECTS = "projects";
@@ -160,7 +160,7 @@ public interface AbstractListPage {
     public static final String ADD_QCS = "Add QCs";
     public static final String EDIT_QCS = "Edit QCs";
     public static final String RECEIVE = "Receive";
-    public static final String MAKE_DILUTIONS = "Make dilutions";
+    public static final String MAKE_ALIQUOTS = "Make aliquots";
     public static final String POOL_TOGETHER = "Pool together";
     public static final String POOL_SEPARATELY = "Pool separately";
     public static final String ADD = "Add";

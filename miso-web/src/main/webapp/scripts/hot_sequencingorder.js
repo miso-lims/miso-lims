@@ -1,7 +1,11 @@
 HotTarget.sequencingorder = (function() {
   return {
-    createUrl: '/miso/rest/sequencingorders',
-    updateUrl: '/miso/rest/sequencingorders/',
+    getCreateUrl: function() {
+      return Urls.rest.sequencingOrders.create;
+    },
+    getUpdateUrl: function(id) {
+      return Urls.rest.sequencingOrders.update(id);
+    },
     requestConfiguration: function(config, callback) {
       callback(config)
     },

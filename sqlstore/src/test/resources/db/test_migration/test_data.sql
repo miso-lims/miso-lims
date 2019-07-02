@@ -342,8 +342,8 @@ INSERT INTO TargetedSequencing_KitDescriptor(targetedSequencingId, kitDescriptor
 (2,1),
 (2,2);
 
-DELETE FROM `LibraryDilution`;
-INSERT INTO `LibraryDilution`(`dilutionId`, `concentration`, `library_libraryId`, `identificationBarcode`, `creationDate`, `creator`, `lastModifier`, `name`) 
+DELETE FROM `LibraryAliquot`;
+INSERT INTO `LibraryAliquot`(`aliquotId`, `concentration`, `libraryId`, `identificationBarcode`, `creationDate`, `creator`, `lastModifier`, `name`) 
 VALUES (1,2,1,'LDI1::TEST_0001_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI1'),
 (2,2,2,'LDI2::TEST_0001_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI2'),
 (3,2,3,'LDI3::TEST_0002_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI3'),
@@ -395,8 +395,8 @@ VALUES (1,2,'IPO1::Illumina','IPO1','TEST','2015-08-27','ILLUMINA','Pool 1',NULL
 (9,2,'IPO9::Illumina','IPO9','TEST','2015-08-27','ILLUMINA','Pool 9',NULL,1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05'),
 (10,2,'IPO10::Illumina','IPO10','TEST','2015-08-27','ILLUMINA','Pool 10',NULL,1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07');
 
-DELETE FROM `Pool_Dilution`;
-INSERT INTO `Pool_Dilution`(`pool_poolId`, `dilution_dilutionId`) 
+DELETE FROM `Pool_LibraryAliquot`;
+INSERT INTO `Pool_LibraryAliquot`(`poolId`, `aliquotId`) 
 VALUES (1,2),
 (2,6),
 (2,5),

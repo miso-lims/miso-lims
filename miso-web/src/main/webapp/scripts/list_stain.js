@@ -3,7 +3,7 @@ ListTarget.stain = {
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.stain.getBulkActions(config);
     if (config.isAdmin) {

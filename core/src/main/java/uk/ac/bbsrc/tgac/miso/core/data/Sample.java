@@ -29,14 +29,14 @@ import java.util.Date;
 
 import com.eaglegenomics.simlims.core.Note;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 
 /**
  * A Sample contains information about the original material upon which a sequencing experiment is to be based.
  * <p/>
  * Samples can be used in any number of sequencing {@link Experiment}s in the form of a {@link Library} that is processed further into
- * pooled {@link LibraryDilution}s. Samples can be described further by a scientific name which, when enabled, will be checked against the
+ * pooled {@link LibraryAliquot}s. Samples can be described further by a scientific name which, when enabled, will be checked against the
  * NCBI
  * Taxonomy database.
  * <p/>

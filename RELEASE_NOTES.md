@@ -2,7 +2,9 @@
 
 Changes:
 
-
+  * Added partition number and library alias to Cell Ranger sample sheets
+  * Renamed library dilutions to library aliquots
+  * Fixed missing storage location for library aliquots in Pinery-MISO
 
 Upgrade Notes:
 

@@ -54,7 +54,7 @@ You are now ready to run MISO.
 To bring up a demo environment, install the pre-requisites above and run the
 following commands.
 
-**Plain sample mode** has a straightforward Sample -> Library -> Dilution ->
+**Plain sample mode** has a straightforward Sample -> Library -> Library Aliquot ->
 Pool workflow and is sufficient for basic laboratory tracking for sequencing.
 
 Launch the plain sample demo with docker-compose:

@@ -26,7 +26,7 @@ ListTarget.targetedsequencing = {
   createUrl: function(config, kitDescriptorId) {
     return '/miso/rest/targetedsequencings/dt/kit/' + config.kitDescriptorId + '/' + (config.add ? 'available' : 'included');
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config) {
     var actions = [{
       'name': config.add ? 'Add' : 'Remove',

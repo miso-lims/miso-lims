@@ -23,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
@@ -98,7 +98,7 @@ public class AdminRestController extends DefaultRestController {
   private BoxService boxService;
 
   @Autowired
-  private LibraryDilutionService libraryDilutionService;
+  private LibraryAliquotService libraryAliquotService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
@@ -150,7 +150,7 @@ public class AdminRestController extends DefaultRestController {
     List<RegenerationResponse> response = new ArrayList<>();
     response.add(RegenerationResponse.regenerate("samples", sampleService, sampleService::update));
     response.add(RegenerationResponse.regenerate("libraries", libraryService, libraryService::update));
-    response.add(RegenerationResponse.regenerate("dilutions", libraryDilutionService, libraryDilutionService::update));
+    response.add(RegenerationResponse.regenerate("libraryaliquots", libraryAliquotService, libraryAliquotService::update));
     response.add(RegenerationResponse.regenerate("pools", poolService, poolService::update));
     response.add(RegenerationResponse.regenerate("boxes", boxService, boxService::save));
     return response;

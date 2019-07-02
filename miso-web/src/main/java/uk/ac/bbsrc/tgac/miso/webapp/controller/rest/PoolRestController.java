@@ -70,9 +70,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -81,22 +81,22 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
-import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
-import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.service.SequencingOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
+import uk.ac.bbsrc.tgac.miso.service.SequencingOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
@@ -161,7 +161,7 @@ public class PoolRestController extends RestController {
   @Autowired
   private LibraryService libraryService;
   @Autowired
-  private LibraryDilutionService dilutionService;
+  private LibraryAliquotService libraryAliquotService;
 
   @GetMapping(value = "{poolId}", produces = "application/json")
   public @ResponseBody PoolDto getPoolById(@PathVariable long poolId) throws IOException {
@@ -180,12 +180,12 @@ public class PoolRestController extends RestController {
       throws IOException {
     return RestUtils.createObject("Pool", dto, d -> {
       Pool pool = Dtos.to(d);
-      if (pool.getVolume() == null && !pool.getPoolDilutions().isEmpty() && pool.getPoolDilutions().stream()
-          .map(PoolDilution::getPoolableElementView)
-          .allMatch(view -> view.getDilutionVolumeUsed() != null)) {
-        pool.setVolume(pool.getPoolDilutions().stream()
-            .map(PoolDilution::getPoolableElementView)
-            .mapToDouble(PoolableElementView::getDilutionVolumeUsed).sum());
+      if (pool.getVolume() == null && !pool.getPoolContents().isEmpty() && pool.getPoolContents().stream()
+          .map(PoolElement::getPoolableElementView)
+          .allMatch(view -> view.getAliquotVolumeUsed() != null)) {
+        pool.setVolume(pool.getPoolContents().stream()
+            .map(PoolElement::getPoolableElementView)
+            .mapToDouble(PoolableElementView::getAliquotVolumeUsed).sum());
       }
       return pool;
     }, poolService, p -> Dtos.asDto(p, true, false));
@@ -200,11 +200,11 @@ public class PoolRestController extends RestController {
   @PutMapping(value = "/{poolId}/contents", produces = "application/json")
   public @ResponseBody PoolDto changePoolContents(@PathVariable Long poolId, @RequestBody PoolChangeRequest request) throws IOException {
     Pool pool = poolService.get(poolId);
-    Stream<PoolDilution> originalMinusRemoved = pool.getPoolDilutions().stream()
-        .filter(element -> !request.remove.contains(element.getPoolableElementView().getDilutionId()));
-    Stream<PoolDilution> added = poolableElementViewService.list(request.add).stream()
-        .map(view -> new PoolDilution(pool, view));
-    pool.setPoolDilutions(Stream.concat(originalMinusRemoved, added).collect(Collectors.toSet()));
+    Stream<PoolElement> originalMinusRemoved = pool.getPoolContents().stream()
+        .filter(element -> !request.remove.contains(element.getPoolableElementView().getAliquotId()));
+    Stream<PoolElement> added = poolableElementViewService.list(request.add).stream()
+        .map(view -> new PoolElement(pool, view));
+    pool.setPoolElements(Stream.concat(originalMinusRemoved, added).collect(Collectors.toSet()));
     poolService.update(pool);
     return Dtos.asDto(poolService.get(poolId), true, false);
   }
@@ -223,11 +223,11 @@ public class PoolRestController extends RestController {
       if (entry.getValue() == null || entry.getValue() < 1) {
         throw new RestException("Invalid proportion: " + entry.getValue(), Status.BAD_REQUEST);
       }
-      PoolDilution poolDilution = pool.getPoolDilutions().stream()
-          .filter(pd -> pd.getPoolableElementView().getDilutionName().equals(entry.getKey()))
+      PoolElement poolElement = pool.getPoolContents().stream()
+          .filter(pd -> pd.getPoolableElementView().getAliquotName().equals(entry.getKey()))
           .findFirst()
-          .orElseThrow(() -> new RestException("Invalid dilution name: " + entry.getKey(), Status.BAD_REQUEST));
-      poolDilution.setProportion(entry.getValue());
+          .orElseThrow(() -> new RestException("Invalid library aliquot name: " + entry.getKey(), Status.BAD_REQUEST));
+      poolElement.setProportion(entry.getValue());
     }
     poolService.update(pool);
     return Dtos.asDto(poolService.get(poolId), true, false);
@@ -271,7 +271,7 @@ public class PoolRestController extends RestController {
     // Determine if this pool transition is allowed for this experiment. If removing a pool, it strictly isn't. If the new pool contains the
     // same library as the experiment, it's fine.
     Predicate<Experiment> isTransitionValid = pool == null ? experiment -> false
-        : experiment -> pool.getPoolDilutions().stream().map(pd -> pd.getPoolableElementView().getLibraryId())
+        : experiment -> pool.getPoolContents().stream().map(pd -> pd.getPoolableElementView().getLibraryId())
             .anyMatch(id -> id == experiment.getLibrary().getId());
 
     request.getPartitionIds().stream()//
@@ -416,7 +416,7 @@ public class PoolRestController extends RestController {
   }
 
   private static Stream<Sample> getSamples(Pool pool) {
-    return pool.getPoolDilutions().stream().map(pd -> pd.getPoolableElementView().getSample());
+    return pool.getPoolContents().stream().map(pd -> pd.getPoolableElementView().getSample());
   }
 
   private final RelationFinder<Pool> parentFinder = (new RelationFinder<Pool>() {
@@ -454,21 +454,21 @@ public class PoolRestController extends RestController {
 
         @Override
         public Stream<Library> find(Pool model, Consumer<String> emitError) {
-          return model.getPoolDilutions().stream()
+          return model.getPoolContents().stream()
               .map(WhineyFunction.rethrow(pd -> libraryService.get(pd.getPoolableElementView().getLibraryId())));
         }
       })
-      .add(new RelationFinder.RelationAdapter<Pool, LibraryDilution, DilutionDto>("Dilution") {
+      .add(new RelationFinder.RelationAdapter<Pool, LibraryAliquot, LibraryAliquotDto>("Library Aliquot") {
 
         @Override
-        public DilutionDto asDto(LibraryDilution model) {
+        public LibraryAliquotDto asDto(LibraryAliquot model) {
           return Dtos.asDto(model, false, false);
         }
 
         @Override
-        public Stream<LibraryDilution> find(Pool model, Consumer<String> emitError) {
-          return model.getPoolDilutions().stream()
-              .map(WhineyFunction.rethrow(pd -> dilutionService.get(pd.getPoolableElementView().getDilutionId())));
+        public Stream<LibraryAliquot> find(Pool model, Consumer<String> emitError) {
+          return model.getPoolContents().stream()
+              .map(WhineyFunction.rethrow(pd -> libraryAliquotService.get(pd.getPoolableElementView().getAliquotId())));
         }
       });
 

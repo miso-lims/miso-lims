@@ -24,7 +24,7 @@
 ListTarget.run_position = {
   name: 'Sequencing Containers',
   createUrl: null,
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     var actions = HotUtils.makeQcActions('Container');
     actions.push({
@@ -89,8 +89,8 @@ ListTarget.run_position = {
       mRender: function(data, type, full) {
         return data || 'n/a';
       }
-    }, ListUtils.labelHyperlinkColumn("ID", "container", Utils.array.getId, "id", 1, true),
-        ListUtils.labelHyperlinkColumn("Serial Number", "container", Utils.array.getId, "identificationBarcode", 1, true), {
+    }, ListUtils.labelHyperlinkColumn("ID", Urls.ui.containers.edit, Utils.array.getId, "id", 1, true),
+        ListUtils.labelHyperlinkColumn("Serial Number", Urls.ui.containers.edit, Utils.array.getId, "identificationBarcode", 1, true), {
       sTitle: "Model",
       mData: "containerModel.alias",
       include: true

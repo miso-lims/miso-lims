@@ -5,8 +5,8 @@ section: 13
 ---
 
 Freezers and rooms describe physical storage locations to help you locate things in the real world. In MISO, samples,
-libraries, dilutions and pools can be stored in boxes. Those boxes can be stored in freezers, and the freezers are
-located in rooms.
+libraries, library aliquots and pools can be stored in boxes. Those boxes can be stored in freezers, and the freezers
+are located in rooms.
 
 Location maps can be uploaded, and then links can be made from freezers to these maps to show where they are located.
 Maps may be in any format with likely choices including html, pdf, and image files. If html maps are used, a freezer

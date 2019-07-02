@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -39,25 +39,25 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
   private static final long serialVersionUID = 1L;
 
   @Id
-  private long dilutionId = LibraryDilution.UNSAVED_ID;
+  private long aliquotId = LibraryAliquot.UNSAVED_ID;
 
-  private String dilutionName;
+  private String aliquotName;
 
-  private Double dilutionConcentration;
-
-  @Enumerated(EnumType.STRING)
-  private ConcentrationUnit dilutionConcentrationUnits;
-
-  private String dilutionBarcode;
-
-  private Double dilutionVolume;
+  private Double aliquotConcentration;
 
   @Enumerated(EnumType.STRING)
-  private VolumeUnit dilutionVolumeUnits;
+  private ConcentrationUnit aliquotConcentrationUnits;
 
-  private Double dilutionNgUsed;
+  private String aliquotBarcode;
 
-  private Double dilutionVolumeUsed;
+  private Double aliquotVolume;
+
+  @Enumerated(EnumType.STRING)
+  private VolumeUnit aliquotVolumeUnits;
+
+  private Double aliquotNgUsed;
+
+  private Double aliquotVolumeUsed;
 
   private Long preMigrationId;
 
@@ -146,26 +146,26 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
           @JoinColumn(name = "index_indexId", nullable = false) })
   private List<Index> indices = new ArrayList<>();
 
-  public static PoolableElementView fromDilution(LibraryDilution dilution) {
+  public static PoolableElementView fromLibraryAliquot(LibraryAliquot aliquot) {
     PoolableElementView v = new PoolableElementView();
-    v.setDilutionBarcode(dilution.getIdentificationBarcode());
-    v.setDilutionConcentration(dilution.getConcentration());
-    v.setDilutionConcentrationUnits(dilution.getConcentrationUnits());
-    v.setDilutionNgUsed(dilution.getNgUsed());
-    v.setDilutionId(dilution.getId());
-    v.setDilutionName(dilution.getName());
-    v.setDilutionVolume(dilution.getVolume());
-    v.setDilutionVolumeUsed(dilution.getVolumeUsed());
-    v.setLastModified(dilution.getLastModified());
-    v.setPreMigrationId(dilution.getPreMigrationId());
-    if (dilution.getBox() != null) {
-      v.setBoxName(dilution.getBox().getName());
-      v.setBoxAlias(dilution.getBox().getAlias());
-      v.setBoxIdentificationBarcode(dilution.getBox().getIdentificationBarcode());
-      v.setBoxLocationBarcode(dilution.getBox().getLocationBarcode());
+    v.setAliquotBarcode(aliquot.getIdentificationBarcode());
+    v.setAliquotConcentration(aliquot.getConcentration());
+    v.setAliquotConcentrationUnits(aliquot.getConcentrationUnits());
+    v.setAliquotNgUsed(aliquot.getNgUsed());
+    v.setAliquotId(aliquot.getId());
+    v.setAliquotName(aliquot.getName());
+    v.setAliquotVolume(aliquot.getVolume());
+    v.setAliquotVolumeUsed(aliquot.getVolumeUsed());
+    v.setLastModified(aliquot.getLastModified());
+    v.setPreMigrationId(aliquot.getPreMigrationId());
+    if (aliquot.getBox() != null) {
+      v.setBoxName(aliquot.getBox().getName());
+      v.setBoxAlias(aliquot.getBox().getAlias());
+      v.setBoxIdentificationBarcode(aliquot.getBox().getIdentificationBarcode());
+      v.setBoxLocationBarcode(aliquot.getBox().getLocationBarcode());
     }
     
-    Library lib = dilution.getLibrary();
+    Library lib = aliquot.getLibrary();
     if (lib != null) {
       v.setIndices(lib.getIndices());
       v.setLibraryAlias(lib.getAlias());
@@ -215,52 +215,52 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     this.indices = indices;
   }
 
-  public long getDilutionId() {
-    return dilutionId;
+  public long getAliquotId() {
+    return aliquotId;
   }
 
-  public void setDilutionId(long dilutionId) {
-    this.dilutionId = dilutionId;
+  public void setAliquotId(long aliquotId) {
+    this.aliquotId = aliquotId;
   }
 
-  public String getDilutionName() {
-    return dilutionName;
+  public String getAliquotName() {
+    return aliquotName;
   }
 
-  public void setDilutionName(String dilutionName) {
-    this.dilutionName = dilutionName;
+  public void setAliquotName(String aliquotName) {
+    this.aliquotName = aliquotName;
   }
 
-  public Double getDilutionConcentration() {
-    return dilutionConcentration;
+  public Double getAliquotConcentration() {
+    return aliquotConcentration;
   }
 
-  public void setDilutionConcentration(Double dilutionConcentration) {
-    this.dilutionConcentration = dilutionConcentration;
+  public void setAliquotConcentration(Double aliquotConcentration) {
+    this.aliquotConcentration = aliquotConcentration;
   }
 
-  public ConcentrationUnit getDilutionConcentrationUnits() {
-    return dilutionConcentrationUnits;
+  public ConcentrationUnit getAliquotConcentrationUnits() {
+    return aliquotConcentrationUnits;
   }
 
-  public void setDilutionConcentrationUnits(ConcentrationUnit dilutionConcentrationUnits) {
-    this.dilutionConcentrationUnits = dilutionConcentrationUnits;
+  public void setAliquotConcentrationUnits(ConcentrationUnit aliquotConcentrationUnits) {
+    this.aliquotConcentrationUnits = aliquotConcentrationUnits;
   }
 
-  public Double getDilutionNgUsed() {
-    return dilutionNgUsed;
+  public Double getAliquotNgUsed() {
+    return aliquotNgUsed;
   }
 
-  public void setDilutionNgUsed(Double dilutionNmUsed) {
-    this.dilutionNgUsed = dilutionNmUsed;
+  public void setAliquotNgUsed(Double aliquotNmUsed) {
+    this.aliquotNgUsed = aliquotNmUsed;
   }
 
-  public Double getDilutionVolumeUsed() {
-    return dilutionVolumeUsed;
+  public Double getAliquotVolumeUsed() {
+    return aliquotVolumeUsed;
   }
 
-  public void setDilutionVolumeUsed(Double dilutionVolumeUsed) {
-    this.dilutionVolumeUsed = dilutionVolumeUsed;
+  public void setAliquotVolumeUsed(Double aliquotVolumeUsed) {
+    this.aliquotVolumeUsed = aliquotVolumeUsed;
   }
 
   public String getProjectShortName() {
@@ -319,12 +319,12 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     this.subprojectPriority = subprojectPriority;
   }
 
-  public String getDilutionBarcode() {
-    return dilutionBarcode;
+  public String getAliquotBarcode() {
+    return aliquotBarcode;
   }
 
-  public void setDilutionBarcode(String dilutionBarcode) {
-    this.dilutionBarcode = dilutionBarcode;
+  public void setAliquotBarcode(String aliquotBarcode) {
+    this.aliquotBarcode = aliquotBarcode;
   }
 
   public Long getPreMigrationId() {
@@ -514,8 +514,8 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
   @Override
   public int compareTo(PoolableElementView o) {
     PoolableElementView t = o;
-    if (getDilutionId() < t.getDilutionId()) return -1;
-    if (getDilutionId() > t.getDilutionId()) return 1;
+    if (getAliquotId() < t.getAliquotId()) return -1;
+    if (getAliquotId() > t.getAliquotId()) return 1;
     return 0;
   }
 
@@ -527,20 +527,20 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     this.targetedSequencingId = targetedSequencingId;
   }
 
-  public Double getDilutionVolume() {
-    return dilutionVolume;
+  public Double getAliquotVolume() {
+    return aliquotVolume;
   }
 
-  public void setDilutionVolume(Double dilutionVolume) {
-    this.dilutionVolume = dilutionVolume;
+  public void setAliquotVolume(Double aliquotVolume) {
+    this.aliquotVolume = aliquotVolume;
   }
 
-  public VolumeUnit getDilutionVolumeUnits() {
-    return dilutionVolumeUnits;
+  public VolumeUnit getAliquotVolumeUnits() {
+    return aliquotVolumeUnits;
   }
 
-  public void setDilutionVolumeUnits(VolumeUnit dilutionVolumeUnits) {
-    this.dilutionVolumeUnits = dilutionVolumeUnits;
+  public void setAliquotVolumeUnits(VolumeUnit aliquotVolumeUnits) {
+    this.aliquotVolumeUnits = aliquotVolumeUnits;
   }
 
   public String getBoxAlias() {
@@ -578,7 +578,7 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
   /**
    * Note: this field is lazy-loaded and retrieval can impact performance
    * 
-   * @return the dilution's Sample parent
+   * @return the aliquot's Sample parent
    */
   public Sample getSample() {
     return sample;
@@ -607,14 +607,14 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     result = prime * result + ((created == null) ? 0 : created.hashCode());
     result = prime * result + ((creatorName == null) ? 0 : creatorName.hashCode());
     result = prime * result + ((creatorFullName == null) ? 0 : creatorFullName.hashCode());
-    result = prime * result + ((dilutionBarcode == null) ? 0 : dilutionBarcode.hashCode());
-    result = prime * result + ((dilutionConcentration == null) ? 0 : dilutionConcentration.hashCode());
-    result = prime * result + ((dilutionConcentrationUnits == null) ? 0 : dilutionConcentrationUnits.hashCode());
-    result = prime * result + (int) (dilutionId ^ (dilutionId >>> 32));
-    result = prime * result + ((dilutionName == null) ? 0 : dilutionName.hashCode());
-    result = prime * result + ((dilutionNgUsed == null) ? 0 : dilutionNgUsed.hashCode());
-    result = prime * result + ((dilutionVolume == null) ? 0 : dilutionVolume.hashCode());
-    result = prime * result + ((dilutionVolumeUsed == null) ? 0 : dilutionVolumeUsed.hashCode());
+    result = prime * result + ((aliquotBarcode == null) ? 0 : aliquotBarcode.hashCode());
+    result = prime * result + ((aliquotConcentration == null) ? 0 : aliquotConcentration.hashCode());
+    result = prime * result + ((aliquotConcentrationUnits == null) ? 0 : aliquotConcentrationUnits.hashCode());
+    result = prime * result + (int) (aliquotId ^ (aliquotId >>> 32));
+    result = prime * result + ((aliquotName == null) ? 0 : aliquotName.hashCode());
+    result = prime * result + ((aliquotNgUsed == null) ? 0 : aliquotNgUsed.hashCode());
+    result = prime * result + ((aliquotVolume == null) ? 0 : aliquotVolume.hashCode());
+    result = prime * result + ((aliquotVolumeUsed == null) ? 0 : aliquotVolumeUsed.hashCode());
     result = prime * result + ((indices == null) ? 0 : indices.hashCode());
     result = prime * result + ((lastModified == null) ? 0 : lastModified.hashCode());
     result = prime * result + ((lastModifierName == null) ? 0 : lastModifierName.hashCode());
@@ -671,28 +671,28 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     if (creatorFullName == null) {
       if (other.creatorFullName != null) return false;
     } else if (!creatorFullName.equals(other.creatorFullName)) return false;
-    if (dilutionBarcode == null) {
-      if (other.dilutionBarcode != null) return false;
-    } else if (!dilutionBarcode.equals(other.dilutionBarcode)) return false;
-    if (dilutionConcentration == null) {
-      if (other.dilutionConcentration != null) return false;
-    } else if (!dilutionConcentration.equals(other.dilutionConcentration)) return false;
-    if (dilutionConcentrationUnits == null) {
-      if (other.dilutionConcentrationUnits != null) return false;
-    } else if (!dilutionConcentrationUnits.equals(other.dilutionConcentrationUnits)) return false;
-    if (dilutionId != other.dilutionId) return false;
-    if (dilutionName == null) {
-      if (other.dilutionName != null) return false;
-    } else if (!dilutionName.equals(other.dilutionName)) return false;
-    if (dilutionNgUsed == null) {
-      if (other.dilutionNgUsed != null) return false;
-    } else if (!dilutionNgUsed.equals(other.dilutionNgUsed)) return false;
-    if (dilutionVolume == null) {
-      if (other.dilutionVolume != null) return false;
-    } else if (!dilutionVolume.equals(other.dilutionVolume)) return false;
-    if (dilutionVolumeUsed == null) {
-      if (other.dilutionVolumeUsed != null) return false;
-    } else if (!dilutionVolumeUsed.equals(other.dilutionVolumeUsed)) return false;
+    if (aliquotBarcode == null) {
+      if (other.aliquotBarcode != null) return false;
+    } else if (!aliquotBarcode.equals(other.aliquotBarcode)) return false;
+    if (aliquotConcentration == null) {
+      if (other.aliquotConcentration != null) return false;
+    } else if (!aliquotConcentration.equals(other.aliquotConcentration)) return false;
+    if (aliquotConcentrationUnits == null) {
+      if (other.aliquotConcentrationUnits != null) return false;
+    } else if (!aliquotConcentrationUnits.equals(other.aliquotConcentrationUnits)) return false;
+    if (aliquotId != other.aliquotId) return false;
+    if (aliquotName == null) {
+      if (other.aliquotName != null) return false;
+    } else if (!aliquotName.equals(other.aliquotName)) return false;
+    if (aliquotNgUsed == null) {
+      if (other.aliquotNgUsed != null) return false;
+    } else if (!aliquotNgUsed.equals(other.aliquotNgUsed)) return false;
+    if (aliquotVolume == null) {
+      if (other.aliquotVolume != null) return false;
+    } else if (!aliquotVolume.equals(other.aliquotVolume)) return false;
+    if (aliquotVolumeUsed == null) {
+      if (other.aliquotVolumeUsed != null) return false;
+    } else if (!aliquotVolumeUsed.equals(other.aliquotVolumeUsed)) return false;
     if (indices == null) {
       if (other.indices != null) return false;
     } else if (!indices.equals(other.indices)) return false;

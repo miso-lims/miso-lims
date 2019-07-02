@@ -63,7 +63,7 @@ public class BulkLibraryPage extends HeaderFooterPage {
   };
 
   private static final By EDIT_BUTTON_TEXT = By.linkText("Edit");
-  private static final By PROPAGATE_BUTTON_TEXT = By.linkText("Make dilutions");
+  private static final By PROPAGATE_BUTTON_TEXT = By.linkText("Make aliquots");
   private static final By SORT_BY_SAMPLE_LOCATION_ROWS = By.id("sortrows");
   private static final By SORT_BY_SAMPLE_LOCATION_COLS = By.id("sortcolumns");
 
@@ -113,10 +113,10 @@ public class BulkLibraryPage extends HeaderFooterPage {
     return new BulkLibraryPage(getDriver());
   }
 
-  public BulkDilutionPage chainPropagateDilutions() {
+  public BulkLibraryAliquotPage chainPropagateLibraryAliquots() {
     toolbar.findElement(PROPAGATE_BUTTON_TEXT).click();
     clickOk();
-    return new BulkDilutionPage(getDriver());
+    return new BulkLibraryAliquotPage(getDriver());
   }
 
   public void sortBySampleLocationRows() {

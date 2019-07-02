@@ -9,7 +9,7 @@ public class WorksetDto {
   private String description;
   private List<Long> sampleIds;
   private List<Long> libraryIds;
-  private List<Long> dilutionIds;
+  private List<Long> libraryAliquotIds;
   private String creator;
   private String lastModified;
 
@@ -53,12 +53,12 @@ public class WorksetDto {
     this.libraryIds = libraryIds;
   }
 
-  public List<Long> getDilutionIds() {
-    return dilutionIds;
+  public List<Long> getLibraryAliquotIds() {
+    return libraryAliquotIds;
   }
 
-  public void setDilutionIds(List<Long> dilutionIds) {
-    this.dilutionIds = dilutionIds;
+  public void setLibraryAliquotIds(List<Long> libraryAliquotIds) {
+    this.libraryAliquotIds = libraryAliquotIds;
   }
 
   public String getCreator() {

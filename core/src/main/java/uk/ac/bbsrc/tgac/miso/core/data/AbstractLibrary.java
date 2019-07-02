@@ -59,7 +59,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
@@ -129,8 +129,8 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @OneToMany(targetEntity = LibraryQC.class, mappedBy = "library", cascade = CascadeType.ALL)
   private final Collection<LibraryQC> libraryQCs = new TreeSet<>();
 
-  @OneToMany(targetEntity = LibraryDilution.class, mappedBy = "library", cascade = CascadeType.ALL)
-  private final Collection<LibraryDilution> libraryDilutions = new HashSet<>();
+  @OneToMany(targetEntity = LibraryAliquot.class, mappedBy = "library", cascade = CascadeType.ALL)
+  private final Collection<LibraryAliquot> libraryAliquots = new HashSet<>();
 
   @ManyToOne(targetEntity = SampleImpl.class)
   @JoinColumn(name = "sample_sampleId")
@@ -363,14 +363,14 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public void addDilution(LibraryDilution libraryDilution) {
-    this.libraryDilutions.add(libraryDilution);
-    libraryDilution.setLibrary(this);
+  public void addLibraryAliquot(LibraryAliquot libraryAliquot) {
+    this.libraryAliquots.add(libraryAliquot);
+    libraryAliquot.setLibrary(this);
   }
 
   @Override
-  public Collection<LibraryDilution> getLibraryDilutions() {
-    return libraryDilutions;
+  public Collection<LibraryAliquot> getLibraryAliquots() {
+    return libraryAliquots;
   }
 
   @Override

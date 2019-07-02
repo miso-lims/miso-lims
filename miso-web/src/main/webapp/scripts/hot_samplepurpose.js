@@ -1,6 +1,10 @@
 HotTarget.samplepurpose = {
-  createUrl: '/miso/rest/samplepurposes',
-  updateUrl: '/miso/rest/samplepurposes/',
+  getCreateUrl: function() {
+    return Urls.rest.samplePurposes.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.samplePurposes.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

@@ -36,7 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
@@ -46,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.FileAttachmentService;
@@ -488,7 +489,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
         errors);
     validateUnboxableFields(library.isDiscarded(), library.isDistributed(), library.getBox(), errors);
     if (isDetailedLibrary(library) && beforeChange != null) {
-      validateTargetedSequencing(((DetailedLibrary) library).getLibraryDesignCode(), beforeChange.getLibraryDilutions(), errors);
+      validateTargetedSequencing(((DetailedLibrary) library).getLibraryDesignCode(), beforeChange.getLibraryAliquots(), errors);
     }
 
     if (library.getSpikeIn() != null) {
@@ -505,19 +506,20 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     }
   }
 
-  private void validateTargetedSequencing(LibraryDesignCode libraryDesignCode, Collection<LibraryDilution> libraryDilutions,
+  private void validateTargetedSequencing(LibraryDesignCode libraryDesignCode, Collection<LibraryAliquot> libraryAliquots,
       List<ValidationError> errors) throws IOException {
-    if (libraryDilutions == null || libraryDilutions.isEmpty()) {
+    if (libraryAliquots == null || libraryAliquots.isEmpty()) {
       return;
     }
     libraryDesignCode = libraryDesignCodeService.get(libraryDesignCode.getId());
     if (libraryDesignCode.isTargetedSequencingRequired()) {
-      List<String> badDilutions = libraryDilutions.stream().filter(dilution -> dilution.getTargetedSequencing() == null)
-          .map(LibraryDilution::getName).collect(Collectors.toList());
-      if (!badDilutions.isEmpty()) {
+      List<String> badAliquots = libraryAliquots.stream().filter(aliquot -> aliquot.getTargetedSequencing() == null)
+          .map(LibraryAliquot::getName).collect(Collectors.toList());
+      if (!badAliquots.isEmpty()) {
         errors.add(new ValidationError("libraryDesignCode",
-            String.format("Targeted sequencing must be assigned to the affected dilutions (%s) to use this library design code: %s",
-                String.join(", ", badDilutions),
+            String.format("Targeted sequencing must be assigned to the affected %s (%s) to use this library design code: %s",
+                Pluralizer.libraryAliquots(badAliquots.size()),
+                String.join(", ", badAliquots),
                 libraryDesignCode.getCode())));
       }
     }
@@ -644,9 +646,9 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   public ValidationResult validateDeletion(Library object) {
     ValidationResult result = new ValidationResult();
 
-    if (object.getLibraryDilutions() != null && !object.getLibraryDilutions().isEmpty()) {
-      result.addError(new ValidationError(object.getName() + " has " + object.getLibraryDilutions().size() + " dilution"
-          + (object.getLibraryDilutions().size() > 1 ? "s" : "")));
+    if (object.getLibraryAliquots() != null && !object.getLibraryAliquots().isEmpty()) {
+      result.addError(new ValidationError(object.getName() + " has " + object.getLibraryAliquots().size() + " "
+          + Pluralizer.libraryAliquots(object.getLibraryAliquots().size())));
     }
     return result;
   }

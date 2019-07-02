@@ -30,7 +30,7 @@
         <a href="<c:url value="/miso/projects"/>">Projects</a>
         <a href="<c:url value="/miso/samples"/>">Samples</a>
         <a href="<c:url value="/miso/libraries"/>">Libraries</a>
-        <a href="<c:url value="/miso/dilutions"/>">Dilutions</a>
+        <a href="<c:url value="/miso/libraryaliquots"/>">Library Aliquots</a>
         <a href="<c:url value="/miso/worksets"/>">Worksets</a>
         <a href="<c:url value="/miso/pools"/>">Pools</a>
         <a href="<c:url value="/miso/boxes"/>">Boxes</a>

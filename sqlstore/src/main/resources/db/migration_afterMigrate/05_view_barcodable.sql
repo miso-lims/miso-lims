@@ -1,11 +1,11 @@
 CREATE OR REPLACE VIEW BarcodableView AS
   SELECT
-    dilutionId AS targetId,
+    aliquotId AS targetId,
     identificationBarcode,
     name,
     NULL       AS alias,
-    'DILUTION' AS targetType
-  FROM LibraryDilution
+    'LIBRARY_ALIQUOT' AS targetType
+  FROM LibraryAliquot
   UNION ALL SELECT
               poolId,
               identificationBarcode,

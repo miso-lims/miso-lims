@@ -1,6 +1,10 @@
 HotTarget.staincategory = {
-  createUrl: '/miso/rest/staincategories',
-  updateUrl: '/miso/rest/staincategories/',
+  getCreateUrl: function() {
+    return Urls.rest.stainCategories.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.stainCategories.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

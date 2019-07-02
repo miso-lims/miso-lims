@@ -1,6 +1,10 @@
 HotTarget.attachmentcategory = {
-  createUrl: '/miso/rest/attachmentcategories',
-  updateUrl: '/miso/rest/attachmentcategories/',
+  getCreateUrl: function() {
+    return Urls.rest.attachmentCategories.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.attachmentCategories.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

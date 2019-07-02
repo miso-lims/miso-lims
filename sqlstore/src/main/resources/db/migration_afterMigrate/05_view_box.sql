@@ -12,12 +12,12 @@ JOIN BoxPosition bp
   ON bp.targetType = 'LIBRARY'
   AND bp.targetId = l.libraryId;
 
-CREATE OR REPLACE VIEW DilutionBoxPosition
-AS SELECT d.dilutionId, bp.boxId, bp.position
-FROM LibraryDilution d
+CREATE OR REPLACE VIEW LibraryAliquotBoxPosition
+AS SELECT d.aliquotId, bp.boxId, bp.position
+FROM LibraryAliquot d
 JOIN BoxPosition bp
-  ON bp.targetType = 'DILUTION'
-  AND bp.targetId = d.dilutionId;
+  ON bp.targetType = 'LIBRARY_ALIQUOT'
+  AND bp.targetId = d.aliquotId;
 
 CREATE OR REPLACE VIEW PoolBoxPosition
 AS SELECT p.poolId, bp.boxId, bp.position
@@ -44,13 +44,13 @@ CREATE OR REPLACE VIEW LibraryBoxableView AS
   LEFT JOIN BoxPosition bp ON bp.targetId = l.libraryId AND bp.targetType = 'LIBRARY'
   LEFT JOIN Box b ON b.boxId = bp.boxId;
 
-CREATE OR REPLACE VIEW DilutionBoxableView AS
-  SELECT dilutionId AS targetId, 'DILUTION' AS targetType, LibraryDilution.name, LibraryDilution.name AS alias,
-    LibraryDilution.identificationBarcode, NULL AS locationBarcode, volume, discarded, distributed, preMigrationId,
+CREATE OR REPLACE VIEW LibraryAliquotBoxableView AS
+  SELECT aliquotId AS targetId, 'LIBRARY_ALIQUOT' AS targetType, LibraryAliquot.name, LibraryAliquot.name AS alias,
+    LibraryAliquot.identificationBarcode, NULL AS locationBarcode, volume, discarded, distributed, preMigrationId,
     NULL AS sampleClassId, bp.boxId, bp.position AS boxPosition, b.name AS boxName, b.alias AS boxAlias,
     b.locationBarcode AS boxLocationBarcode
-  FROM LibraryDilution
-  LEFT JOIN BoxPosition bp ON bp.targetId = dilutionId AND bp.targetType = 'DILUTION'
+  FROM LibraryAliquot
+  LEFT JOIN BoxPosition bp ON bp.targetId = aliquotId AND bp.targetType = 'LIBRARY_ALIQUOT'
   LEFT JOIN Box b ON b.boxId = bp.boxId;
 
 CREATE OR REPLACE VIEW PoolBoxableView AS

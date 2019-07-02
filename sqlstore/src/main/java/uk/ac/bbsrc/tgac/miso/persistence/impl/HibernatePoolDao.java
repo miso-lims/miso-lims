@@ -21,7 +21,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -137,8 +137,8 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   public List<Pool> listByLibraryId(long libraryId) throws IOException {
     Criteria idCriteria = currentSession().createCriteria(LibraryImpl.class);
     idCriteria.add(Restrictions.eq("id", libraryId));
-    idCriteria.createAlias("libraryDilutions", "libraryDilutions");
-    idCriteria.createAlias("libraryDilutions.pools", "pools");
+    idCriteria.createAlias("libraryAliquots", "libraryAliquots");
+    idCriteria.createAlias("libraryAliquots.pools", "pools");
     idCriteria.setProjection(Projections.distinct(Projections.property("pools.id")));
     @SuppressWarnings("unchecked")
     List<Long> ids = idCriteria.list();
@@ -146,9 +146,9 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
-  public List<Pool> listByDilutionId(long dilutionId) throws IOException {
-    Criteria idCriteria = currentSession().createCriteria(LibraryDilution.class)
-        .add(Restrictions.eq("id", dilutionId))
+  public List<Pool> listByLibraryAliquotId(long aliquotId) throws IOException {
+    Criteria idCriteria = currentSession().createCriteria(LibraryAliquot.class)
+        .add(Restrictions.eq("id", aliquotId))
         .createAlias("pools", "pool")
         .setProjection(Projections.distinct(Projections.property("pool.id")));
     @SuppressWarnings("unchecked")
@@ -170,9 +170,9 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   @Override
   public List<Pool> listByProjectId(long projectId) throws IOException {
     Criteria idCriteria = currentSession().createCriteria(PoolImpl.class, "p");
-    idCriteria.createAlias("p.poolDilutions", "poolDilution");
-    idCriteria.createAlias("poolDilution.poolableElementView", "dilution");
-    idCriteria.add(Restrictions.eq("dilution.projectId", projectId));
+    idCriteria.createAlias("p.poolElements", "poolElement");
+    idCriteria.createAlias("poolElement.poolableElementView", "aliquot");
+    idCriteria.add(Restrictions.eq("aliquot.projectId", projectId));
     idCriteria.setProjection(Projections.distinct(Projections.property("p.id")));
     @SuppressWarnings("unchecked")
     List<Long> ids = idCriteria.list();
@@ -232,7 +232,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   @Override
   public String getProjectColumn() {
-    return "dilution.projectId";
+    return "aliquot.projectId";
   }
 
   @Override
@@ -249,8 +249,8 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   @Override
   public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
-    criteria.createAlias("poolDilutions", "poolDilution");
-    criteria.createAlias("poolDilution.poolableElementView", "dilution");
+    criteria.createAlias("poolElements", "poolElement");
+    criteria.createAlias("poolElement.poolableElementView", "aliquot");
     HibernatePaginatedBoxableSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
   }
 
@@ -283,9 +283,9 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   @Override
   public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
-    criteria.createAlias("poolDilutions", "poolDilution");
-    criteria.createAlias("poolDilution.poolableElementView", "dilutionForIndex");
-    criteria.createAlias("dilutionForIndex.indices", "indices");
+    criteria.createAlias("poolElements", "poolElement");
+    criteria.createAlias("poolElement.poolableElementView", "aliquotForIndex");
+    criteria.createAlias("aliquotForIndex.indices", "indices");
     HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
   }
 

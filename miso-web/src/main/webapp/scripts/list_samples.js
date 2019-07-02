@@ -33,7 +33,9 @@ ListTarget.sample = {
     }
     return url;
   },
-  queryUrl: "/miso/rest/samples/query",
+  getQueryUrl: function() {
+    return Urls.rest.samples.query;
+  },
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.sample.getBulkActions(config);
 
@@ -80,7 +82,7 @@ ListTarget.sample = {
             getLabel: Utils.array.getAlias
           });
         }
-        HotUtils.showDialogForBoxCreation('Create Samples', 'Create', fields, '/miso/sample/bulk/new?', function(result) {
+        HotUtils.showDialogForBoxCreation('Create Samples', 'Create', fields, Urls.ui.samples.bulkCreate, function(result) {
           if (result.quantity < 1) {
             Utils.showOkDialog('Create Samples', ["That's a peculiar number of samples to create."]);
             return;
@@ -101,8 +103,8 @@ ListTarget.sample = {
     }];
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.idHyperlinkColumn("Name", "sample", "id", Utils.array.getName, 1, true),
-        ListUtils.labelHyperlinkColumn("Alias", "sample", Utils.array.getId, "alias", 0, true), {
+    return [ListUtils.idHyperlinkColumn("Name", Urls.ui.samples.edit, "id", Utils.array.getName, 1, true),
+        ListUtils.labelHyperlinkColumn("Alias", Urls.ui.samples.edit, Utils.array.getId, "alias", 0, true), {
           "sTitle": "Sample Class",
           "mData": "sampleClassId",
           "include": Constants.isDetailedSample,

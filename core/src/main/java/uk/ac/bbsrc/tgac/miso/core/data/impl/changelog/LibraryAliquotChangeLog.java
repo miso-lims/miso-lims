@@ -9,37 +9,37 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 
 @Entity
-public class DilutionChangeLog extends AbstractChangeLog {
+public class LibraryAliquotChangeLog extends AbstractChangeLog {
 
   private static final long serialVersionUID = 1L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long dilutionChangeLogId;
+  private Long aliquotChangeLogId;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "dilutionId", nullable = false, updatable = false)
-  private LibraryDilution dilution;
+  @JoinColumn(name = "aliquotId", nullable = false, updatable = false)
+  private LibraryAliquot libraryAliquot;
 
   @Override
   public Long getId() {
-    return dilutionChangeLogId;
+    return aliquotChangeLogId;
   }
 
   @Override
   public void setId(Long id) {
-    this.dilutionChangeLogId = id;
+    this.aliquotChangeLogId = id;
   }
 
-  public LibraryDilution getDilution() {
-    return dilution;
+  public LibraryAliquot getLibraryAliquot() {
+    return libraryAliquot;
   }
 
-  public void setDilution(LibraryDilution dilution) {
-    this.dilution = dilution;
+  public void setLibraryAliquot(LibraryAliquot aliquot) {
+    this.libraryAliquot = aliquot;
   }
 
 }

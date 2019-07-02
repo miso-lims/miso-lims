@@ -72,7 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.IlluminaWorkflowType;
@@ -92,9 +92,9 @@ import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryStrategyService;
@@ -137,7 +137,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   @Autowired
   private ContainerService containerService;
   @Autowired
-  private LibraryDilutionService dilutionService;
+  private LibraryAliquotService libraryAliquotService;
   @Autowired
   private ExperimentService experimentService;
   @Autowired
@@ -468,22 +468,22 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
     }.register(binder).register(binder, Set.class, "libraries");
 
-    new BindingConverterByPrefixedId<LibraryDilution>(LibraryDilution.class, "LDI") {
+    new BindingConverterByPrefixedId<LibraryAliquot>(LibraryAliquot.class, "LDI") {
 
       @Override
-      public LibraryDilution resolveById(long id) throws Exception {
-        return dilutionService.get(id);
+      public LibraryAliquot resolveById(long id) throws Exception {
+        return libraryAliquotService.get(id);
       }
     }.register(binder).register(binder,
-        Set.class, "dilutions").register(binder, Set.class,
+        Set.class, "aliquots").register(binder, Set.class,
             "poolableElements");
 
-    new BindingConverterById<LibraryDilution>(LibraryDilution.class) {
+    new BindingConverterById<LibraryAliquot>(LibraryAliquot.class) {
       @Override
-      public LibraryDilution resolveById(long id) throws Exception {
-        return dilutionService.get(id);
+      public LibraryAliquot resolveById(long id) throws Exception {
+        return libraryAliquotService.get(id);
       }
-    }.register(binder).register(binder, Set.class, "libraryDilutions");
+    }.register(binder).register(binder, Set.class, "libraryAliquots");
 
     new BindingConverterById<LibraryType>(LibraryType.class) {
       @Override
@@ -633,8 +633,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     this.libraryService = libraryService;
   }
 
-  public void setDilutionService(LibraryDilutionService dilutionService) {
-    this.dilutionService = dilutionService;
+  public void setLibraryAliquotService(LibraryAliquotService libraryAliquotService) {
+    this.libraryAliquotService = libraryAliquotService;
   }
 
   public void setSampleService(SampleService sampleService) {

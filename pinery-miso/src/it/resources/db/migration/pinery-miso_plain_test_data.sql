@@ -19,12 +19,12 @@ DELETE FROM RunOxfordNanopore;
 DELETE FROM RunChangeLog;
 DELETE FROM Run;
 DELETE FROM SequencingOrder;
-DELETE FROM Pool_Dilution;
+DELETE FROM Pool_LibraryAliquot;
 DELETE FROM Pool_Note;
 DELETE FROM PoolChangeLog;
 DELETE FROM Pool;
-DELETE FROM DilutionChangeLog;
-DELETE FROM LibraryDilution;
+DELETE FROM LibraryAliquotChangeLog;
+DELETE FROM LibraryAliquot;
 DELETE FROM DetailedLibrary;
 DELETE FROM Library_Index;
 DELETE FROM Library_Note;
@@ -250,13 +250,13 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
 INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (1, 5);
 
-INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated) VALUES
+INSERT INTO LibraryAliquot (aliquotId, name, concentration, libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated) VALUES
 (1, 'LDI1', 5.9, 1, '12321', '2017-07-20', 1, 1, '2017-07-20 09:01:00');
 
 INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
 (1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL);
 
-INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
+INSERT INTO Pool_LibraryAliquot (poolId, aliquotId) VALUES
 (1, 1);
 
 INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, lastModifier, creator, created, lastModified) VALUES
@@ -264,7 +264,7 @@ INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, lastModifier, creator,
 
 INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
 (1, 1, 'LIBRARY', 'A01'),
-(1, 1, 'DILUTION', 'B02'),
+(1, 1, 'LIBRARY_ALIQUOT', 'B02'),
 (1, 1, 'POOL', 'C03'),
 (1, 2, 'SAMPLE', 'D04'),
 (1, 3, 'SAMPLE', 'E05'),

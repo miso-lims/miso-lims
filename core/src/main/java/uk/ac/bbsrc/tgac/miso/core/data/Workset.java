@@ -19,7 +19,7 @@ import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -50,10 +50,10 @@ public class Workset implements Serializable, Aliasable, Timestamped, Deletable 
       @JoinColumn(name = "libraryId") })
   private Set<Library> libraries;
 
-  @ManyToMany(targetEntity = LibraryDilution.class)
-  @JoinTable(name = "Workset_Dilution", joinColumns = { @JoinColumn(name = "worksetId") }, inverseJoinColumns = {
-      @JoinColumn(name = "dilutionId") })
-  private Set<LibraryDilution> dilutions;
+  @ManyToMany(targetEntity = LibraryAliquot.class)
+  @JoinTable(name = "Workset_LibraryAliquot", joinColumns = { @JoinColumn(name = "worksetId") }, inverseJoinColumns = {
+      @JoinColumn(name = "aliquotId") })
+  private Set<LibraryAliquot> libraryAliquots;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -120,15 +120,15 @@ public class Workset implements Serializable, Aliasable, Timestamped, Deletable 
     this.libraries = libraries;
   }
 
-  public Set<LibraryDilution> getDilutions() {
-    if (dilutions == null) {
-      dilutions = new HashSet<>();
+  public Set<LibraryAliquot> getLibraryAliquots() {
+    if (libraryAliquots == null) {
+      libraryAliquots = new HashSet<>();
     }
-    return dilutions;
+    return libraryAliquots;
   }
 
-  public void setDilutions(Set<LibraryDilution> dilutions) {
-    this.dilutions = dilutions;
+  public void setLibraryAliquots(Set<LibraryAliquot> aliquots) {
+    this.libraryAliquots = aliquots;
   }
 
   @Override

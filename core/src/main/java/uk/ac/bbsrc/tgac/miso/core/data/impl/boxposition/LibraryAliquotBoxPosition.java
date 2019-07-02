@@ -11,21 +11,21 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 
 @Entity
 @Immutable
-@Table(name = "DilutionBoxPosition")
-@Synchronize("LibraryDilution")
-public class DilutionBoxPosition extends AbstractBoxPosition {
+@Table(name = "LibraryAliquotBoxPosition")
+@Synchronize("LibraryAliquot")
+public class LibraryAliquotBoxPosition extends AbstractBoxPosition {
 
   private static final long serialVersionUID = 1L;
 
   @Id
-  private Long dilutionId;
+  private Long aliquotId;
 
-  public Long getDilutionId() {
-    return dilutionId;
+  public Long getLibraryAliquotId() {
+    return aliquotId;
   }
 
-  public void setSampleId(Long dilutionId) {
-    this.dilutionId = dilutionId;
+  public void setLibraryAliquotId(Long aliquotId) {
+    this.aliquotId = aliquotId;
   }
 
 }

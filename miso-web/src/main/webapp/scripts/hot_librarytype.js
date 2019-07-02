@@ -1,6 +1,10 @@
 HotTarget.librarytype = {
-  createUrl: '/miso/rest/librarytypes',
-  updateUrl: '/miso/rest/librarytypes/',
+  getCreateUrl: function() {
+    return Urls.rest.libraryTypes.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.libraryTypes.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

@@ -31,7 +31,7 @@ import java.util.List;
 
 import com.eaglegenomics.simlims.core.Note;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
@@ -42,7 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
  * A Library is the first step in constructing sequenceable material from an initial {@link Sample}. A Library is then diluted down to a
- * {@link LibraryDilution}, and put in a {@link Pool}, which is then sequenced.
+ * {@link LibraryAliquot}, and put in a {@link Pool}, which is then sequenced.
  * <p/>
  * Libraries also have a target {@link InstrumentModel} and can be uniquely identified via {@link Index} objects for multiplexing purposes.
  * 
@@ -135,21 +135,16 @@ public interface Library
   public Collection<Note> getNotes();
 
   /**
-   * Registers that a LibraryDilution has been carried out using this Library
+   * Registers that a LibraryAliquot has been carried out using this Library
    * 
-   * @param libraryDilution
-   *          of type LibraryDilution
-   * @throws MalformedDilutionException
-   *           when the LibraryDilution being added is not valid
+   * @param libraryAliquot
    */
-  public void addDilution(LibraryDilution libraryDilution);
+  public void addLibraryAliquot(LibraryAliquot libraryAliquot);
 
   /**
-   * Returns the libraryDilutions of this Library object.
-   * 
-   * @return Collection<LibraryDilution> libraryDilutions.
+   * @return the libraryAliquots of this Library object.
    */
-  public Collection<LibraryDilution> getLibraryDilutions();
+  public Collection<LibraryAliquot> getLibraryAliquots();
 
   /**
    * Returns the paired attribute of this Library object.

@@ -1,6 +1,10 @@
 HotTarget.tissueorigin = {
-  createUrl: '/miso/rest/tissueorigins',
-  updateUrl: '/miso/rest/tissueorigins/',
+  getCreateUrl: function() {
+    return Urls.rest.tissueOrigins.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.tissueOrigins.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

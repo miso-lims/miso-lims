@@ -60,7 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.BoxStorageAmount;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
@@ -76,7 +76,7 @@ import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
@@ -106,7 +106,7 @@ public class BoxRestController extends RestController {
   private LibraryService libraryService;
 
   @Autowired
-  private LibraryDilutionService libraryDilutionService;
+  private LibraryAliquotService libraryAliquotService;
 
   @Autowired
   private StorageLocationService storageLocationService;
@@ -264,8 +264,8 @@ public class BoxRestController extends RestController {
     case LIBRARY:
       detailedSample = (DetailedSample) extractLibrary(boxableView).getSample();
       break;
-    case DILUTION:
-      detailedSample = (DetailedSample) extractDilution(boxableView).getLibrary().getSample();
+    case LIBRARY_ALIQUOT:
+      detailedSample = (DetailedSample) extractLibraryAliquot(boxableView).getLibrary().getSample();
       break;
     default: // Can't find external name for a Pool or otherwise
       return "n/a";
@@ -295,8 +295,8 @@ public class BoxRestController extends RestController {
     return libraryService.get(boxableView.getId().getTargetId());
   }
 
-  private LibraryDilution extractDilution(BoxableView boxableView) throws IOException {
-    return libraryDilutionService.get(boxableView.getId().getTargetId());
+  private LibraryAliquot extractLibraryAliquot(BoxableView boxableView) throws IOException {
+    return libraryAliquotService.get(boxableView.getId().getTargetId());
   }
 
   private String findNumSlides(BoxableView boxableView) throws IOException {

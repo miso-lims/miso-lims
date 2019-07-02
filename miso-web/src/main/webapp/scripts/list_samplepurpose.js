@@ -26,7 +26,7 @@ ListTarget.samplepurpose = {
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     return HotTarget.samplepurpose.getBulkActions(config);
   },

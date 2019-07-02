@@ -26,7 +26,7 @@ ListTarget.qctype = {
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     return HotTarget.qctype.getBulkActions(config);
   },

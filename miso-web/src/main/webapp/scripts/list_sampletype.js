@@ -3,7 +3,7 @@ ListTarget.sampletype = {
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   headerMessage: {
     text: 'WARNING: Adding or modifying sample types may cause your data to be invalid for ENA submission',
     level: 'important'

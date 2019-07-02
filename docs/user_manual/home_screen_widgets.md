@@ -8,7 +8,7 @@ section: 26
 {% assign sub = 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Search" %}
 
-The Search widget can be used to quickly find an item in MISO. This includes samples, libraries, library dilutions,
+The Search widget can be used to quickly find an item in MISO. This includes samples, libraries, library aliquots,
 pools, sequencing containers, and boxes. Note that there are separate search widgets for projects and runs, detailed
 below. You can search for an item by its name, alias, or barcode. Scanning an item's barcode using a barcode scanner
 also works. The search returns exact matches only, so you must enter the entire name, alias, or barcode to find what

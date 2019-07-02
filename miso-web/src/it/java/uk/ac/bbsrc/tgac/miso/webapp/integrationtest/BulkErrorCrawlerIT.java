@@ -23,7 +23,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("projects");
     slugs.add("samples");
     slugs.add("libraries");
-    slugs.add("dilutions");
+    slugs.add("libraryaliquots");
     slugs.add("pools");
     slugs.add("sequencingorders/active");
     slugs.add("sequencingorders/all");

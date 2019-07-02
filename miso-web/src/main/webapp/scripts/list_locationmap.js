@@ -3,7 +3,7 @@ ListTarget.locationmap = {
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     return !config.isAdmin ? [] : [ListUtils.createBulkDeleteAction('Location Maps', 'locationmaps', function(map) {
       return map.filename;

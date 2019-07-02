@@ -6,11 +6,11 @@ import java.util.function.Supplier;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.DilutionBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
@@ -24,7 +24,7 @@ public interface Boxable extends Nameable, Barcodable, Serializable {
   public enum EntityType {
     SAMPLE(SampleImpl.class, SampleBoxPosition::new),
     LIBRARY(LibraryImpl.class, LibraryBoxPosition::new),
-    DILUTION(LibraryDilution.class, DilutionBoxPosition::new),
+    LIBRARY_ALIQUOT(LibraryAliquot.class, LibraryAliquotBoxPosition::new),
     POOL(PoolImpl.class, PoolBoxPosition::new);
 
     private final Class<? extends Boxable> persistClass;

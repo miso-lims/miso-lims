@@ -232,8 +232,12 @@ HotTarget.library = (function() {
   };
 
   return {
-    createUrl: '/miso/rest/libraries',
-    updateUrl: '/miso/rest/libraries/',
+    getCreateUrl: function() {
+      return Urls.rest.libraries.create;
+    },
+    getUpdateUrl: function(id) {
+      return Urls.rest.libraries.update(id);
+    },
     requestConfiguration: function(config, callback) {
       callback(config)
     },
@@ -793,16 +797,16 @@ HotTarget.library = (function() {
           });
         }
       }, {
-        name: 'Make dilutions',
+        name: 'Make aliquots',
         action: function(items) {
           HotUtils.warnIfConsentRevoked(items, function() {
             var fields = [ListUtils.createBoxField];
-            Utils.showDialog('Make Dilutions', 'Create', fields, function(result) {
+            Utils.showDialog('Make Aliquots', 'Create', fields, function(result) {
               var params = {
                 ids: items.map(Utils.array.getId).join(',')
               }
               var loadPage = function() {
-                window.location = window.location.origin + '/miso/dilution/bulk/propagate?' + jQuery.param(params);
+                window.location = window.location.origin + Urls.ui.libraryAliquots.bulkPropagate + '?' + jQuery.param(params);
               }
               if (result.createBox) {
                 Utils.createBoxDialog(result, function(result) {
@@ -823,12 +827,13 @@ HotTarget.library = (function() {
             return errors;
           }),
 
-          HotUtils.makeParents('libraries', HotUtils.relationCategoriesForDetailed()),
-          HotUtils.makeChildren('libraries', [HotUtils.relations.dilution(), HotUtils.relations.pool()])].concat(
+          HotUtils.makeParents(Urls.rest.libraries.parents, HotUtils.relationCategoriesForDetailed()),
+          HotUtils.makeChildren(Urls.rest.libraries.children, [HotUtils.relations.libraryAliquot(), HotUtils.relations.pool()])].concat(
           HotUtils.makeQcActions("Library")).concat(
           [
-              config.worksetId ? HotUtils.makeRemoveFromWorkset('libraries', config.worksetId) : HotUtils.makeAddToWorkset('libraries',
-                  'libraryIds'), HotUtils.makeAttachFile('library', function(library) {
+              config.worksetId ? HotUtils.makeRemoveFromWorkset('libraries', Urls.rest.worksets.removeLibraries(config.worksetId))
+                  : HotUtils.makeAddToWorkset('libraries', 'libraryIds', Urls.rest.worksets.addLibraries),
+              HotUtils.makeAttachFile('library', function(library) {
                 return library.parentSampleProjectId;
               })]);
     }

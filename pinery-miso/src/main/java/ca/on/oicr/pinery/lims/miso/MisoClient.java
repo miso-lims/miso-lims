@@ -963,7 +963,7 @@ public class MisoClient implements Lims {
     public MisoRunSample mapRow(ResultSet rs, int rowNum) throws SQLException {
       MisoRunSample s = new MisoRunSample();
 
-      s.setId(rs.getString("dilutionId"));
+      s.setId(rs.getString("aliquotId"));
       s.setPartitionId(rs.getInt("partitionId"));
       s.setBarcode(AttributeKey.BARCODE.extractStringValueFrom(rs));
       String barcode2 = AttributeKey.BARCODE_TWO.extractStringValueFrom(rs);

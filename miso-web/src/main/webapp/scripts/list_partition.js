@@ -26,12 +26,12 @@ ListTarget.partition = {
   createUrl: function(config, projectId) {
     throw new Error("Can only be created statically");
   },
-  queryUrl: null,
+  getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     if (!config.showPool) {
       return [];
     }
-    var maxDilutions = 5;
+    var maxAliquots = 5;
     var platformType = Utils.array.findFirstOrNull(function(pt) {
       return pt.name == config.platformType;
     }, Constants.platformTypes);
@@ -50,13 +50,13 @@ ListTarget.partition = {
       });
 
       response.items.forEach(function(item) {
-        var dilutionInfo = item.pool.pooledElements.filter(function(element, index, array) {
-          return array.length < maxDilutions || index < maxDilutions - 1;
-        }).map(function(dilution) {
-          return dilution.name + " - " + dilution.library.name + " (" + dilution.library.alias + ")";
+        var aliquotInfo = item.pool.pooledElements.filter(function(element, index, array) {
+          return array.length < maxAliquots || index < maxAliquots - 1;
+        }).map(function(aliquot) {
+          return aliquot.name + " - " + aliquot.library.name + " (" + aliquot.library.alias + ")";
         });
-        if (item.pool.pooledElements.length >= maxDilutions) {
-          dilutionInfo.push("...and " + (item.pool.pooledElements.length - maxDilutions + 1) + " more dilutions");
+        if (item.pool.pooledElements.length >= maxAliquots) {
+          aliquotInfo.push("...and " + (item.pool.pooledElements.length - maxAliquots + 1) + " more aliquots");
         }
 
         var orderInfo = item.orders.filter(function(order) {
@@ -69,7 +69,7 @@ ListTarget.partition = {
 
         var tileParts = [Tile.titleAndStatus(item.pool.name + " (" + item.pool.alias + ")", Warning.hasTileWarnings(WarningTarget.pool,
             item.pool) ? Tile.statusBad('Warning') : null)].concat(Warning.generateTileWarnings(WarningTarget.pool, item.pool));
-        tileParts.push(Tile.lines(dilutionInfo, false));
+        tileParts.push(Tile.lines(aliquotInfo, false));
         tileParts.push(Tile.lines(orderInfo, true));
 
         dialogArea.appendChild(Tile.make(tileParts, function() {
@@ -147,7 +147,7 @@ ListTarget.partition = {
           if (pool) {
             HotUtils.warnIfConsentRevoked(pool.pooledElements, function() {
               doAssign();
-            }, HotTarget.dilution.getLabel);
+            }, HotTarget.libraryaliquot.getLabel);
           } else {
             doAssign();
           }
@@ -265,7 +265,7 @@ ListTarget.partition = {
     return [];
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.labelHyperlinkColumn("Container", "container", function(partition) {
+    return [ListUtils.labelHyperlinkColumn("Container", Urls.ui.containers.edit, function(partition) {
       return partition.containerId;
     }, "containerName", 2, config.showContainer), {
       "sTitle": "Number",
@@ -284,14 +284,14 @@ ListTarget.partition = {
         return full.pool ? ('/miso/pool/' + full.pool.id) : null;
       })
     }, {
-      "sTitle": "Dilutions",
+      "sTitle": "Library Aliquots",
       "mData": "pool",
       "include": true,
       "iSortPriority": 0,
       "bSortable": false,
       "mRender": function(data, type, full) {
         if (data) {
-          return data.dilutionCount;
+          return data.libraryAliquotCount;
         } else {
           if (type === 'display') {
             return "(None)";

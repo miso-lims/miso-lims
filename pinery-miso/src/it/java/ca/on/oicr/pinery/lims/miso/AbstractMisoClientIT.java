@@ -89,11 +89,11 @@ public abstract class AbstractMisoClientIT {
   }
 
   @Test
-  public void testGetDilutionSampleById() throws Exception {
-    String dilutionId = "LDI1";
-    Sample d = sut.getSample(dilutionId);
+  public void testGetLibraryAliquotSampleById() throws Exception {
+    String aliquotId = "LDI1";
+    Sample d = sut.getSample(aliquotId);
     assertNotNull(d);
-    assertEquals(dilutionId, d.getId());
+    assertEquals(aliquotId, d.getId());
   }
 
   @Test

@@ -606,8 +606,8 @@ public class BulkLibraryIT extends AbstractIT {
     DetailedLibrary saved2 = (DetailedLibrary) getSession().get(LibraryImpl.class, newId);
     assertDetailedLibraryAttributes(attrs, saved2);
 
-    // chain propagate library to dilution
-    assertNotNull(page2.chainPropagateDilutions());
+    // chain propagate library to library aliquot
+    assertNotNull(page2.chainPropagateLibraryAliquots());
   }
 
   @Test

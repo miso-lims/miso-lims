@@ -36,7 +36,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDilutionDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAliquotDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibrarySelectionDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryStrategyDao;
@@ -77,7 +77,7 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultKitService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLabService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDesignService;
-import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryStrategyService;
@@ -152,15 +152,15 @@ public class MisoServiceManager {
     addDependency(DefaultLibraryService.class, DefaultSampleService.class, DefaultLibraryService::setSampleService);
     addDependency(DefaultLibraryService.class, DefaultChangeLogService.class, DefaultLibraryService::setChangeLogService);
     addDependency(HibernateLibraryQcDao.class, SessionFactory.class, HibernateLibraryQcDao::setSessionFactory);
-    addDependency(HibernateLibraryDilutionDao.class, SessionFactory.class, HibernateLibraryDilutionDao::setSessionFactory);
-    addDependency(HibernateLibraryDilutionDao.class, HibernateBoxDao.class, HibernateLibraryDilutionDao::setBoxStore);
-    addDependency(DefaultLibraryDilutionService.class, HibernateLibraryDilutionDao.class, DefaultLibraryDilutionService::setDilutionDao);
-    addDependency(DefaultLibraryDilutionService.class, MigrationAuthorizationManager.class,
-        DefaultLibraryDilutionService::setAuthorizationManager);
-    addDependency(DefaultLibraryDilutionService.class, NamingScheme.class, DefaultLibraryDilutionService::setNamingScheme);
-    addDependency(DefaultLibraryDilutionService.class, DefaultLibraryService.class, DefaultLibraryDilutionService::setLibraryService);
-    addDependency(DefaultLibraryDilutionService.class, DefaultTargetedSequencingService.class,
-        DefaultLibraryDilutionService::setTargetedSequencingService);
+    addDependency(HibernateLibraryAliquotDao.class, SessionFactory.class, HibernateLibraryAliquotDao::setSessionFactory);
+    addDependency(HibernateLibraryAliquotDao.class, HibernateBoxDao.class, HibernateLibraryAliquotDao::setBoxStore);
+    addDependency(DefaultLibraryAliquotService.class, HibernateLibraryAliquotDao.class, DefaultLibraryAliquotService::setLibraryAliquotDao);
+    addDependency(DefaultLibraryAliquotService.class, MigrationAuthorizationManager.class,
+        DefaultLibraryAliquotService::setAuthorizationManager);
+    addDependency(DefaultLibraryAliquotService.class, NamingScheme.class, DefaultLibraryAliquotService::setNamingScheme);
+    addDependency(DefaultLibraryAliquotService.class, DefaultLibraryService.class, DefaultLibraryAliquotService::setLibraryService);
+    addDependency(DefaultLibraryAliquotService.class, DefaultTargetedSequencingService.class,
+        DefaultLibraryAliquotService::setTargetedSequencingService);
     addDependency(HibernateTargetedSequencingDao.class, SessionFactory.class, HibernateTargetedSequencingDao::setSessionFactory);
     addDependency(HibernatePoolDao.class, HibernateBoxDao.class, HibernatePoolDao::setBoxStore);
     addDependency(HibernatePoolDao.class, HibernateSecurityDao.class, HibernatePoolDao::setSecurityStore);
@@ -358,8 +358,8 @@ public class MisoServiceManager {
     setDefaultChangeLogDao();
     setDefaultChangeLogService();
     setDefaultContainerService();
-    setDefaultDilutionDao();
-    setDefaultDilutionService();
+    setDefaultLibraryAliquotDao();
+    setDefaultLibraryAliquotService();
     setDefaultExperimentDao();
     setDefaultExperimentService();
     setDefaultIndexService();
@@ -695,30 +695,30 @@ public class MisoServiceManager {
     setService(HibernateLibraryQcDao.class, new HibernateLibraryQcDao());
   }
 
-  public HibernateLibraryDilutionDao getDilutionDao() {
-    return getService(HibernateLibraryDilutionDao.class);
+  public HibernateLibraryAliquotDao getLibraryAliquotDao() {
+    return getService(HibernateLibraryAliquotDao.class);
   }
 
-  public void setDilutionDao(HibernateLibraryDilutionDao dilutionDao) {
-    setService(HibernateLibraryDilutionDao.class, dilutionDao, false);
+  public void setLibraryAliquotDao(HibernateLibraryAliquotDao libraryAliquotDao) {
+    setService(HibernateLibraryAliquotDao.class, libraryAliquotDao, false);
   }
 
-  public void setDefaultDilutionDao() {
-    setService(HibernateLibraryDilutionDao.class, new HibernateLibraryDilutionDao());
+  public void setDefaultLibraryAliquotDao() {
+    setService(HibernateLibraryAliquotDao.class, new HibernateLibraryAliquotDao());
   }
 
-  public DefaultLibraryDilutionService getDilutionService() {
-    return getService(DefaultLibraryDilutionService.class);
+  public DefaultLibraryAliquotService getLibraryAliquotService() {
+    return getService(DefaultLibraryAliquotService.class);
   }
 
-  public void setDilutionService(DefaultLibraryDilutionService dilutionService) {
-    setService(DefaultLibraryDilutionService.class, dilutionService, false);
+  public void setLibraryAliquotService(DefaultLibraryAliquotService libraryAliquotService) {
+    setService(DefaultLibraryAliquotService.class, libraryAliquotService, false);
   }
 
-  public void setDefaultDilutionService() {
-    DefaultLibraryDilutionService svc = new DefaultLibraryDilutionService();
+  public void setDefaultLibraryAliquotService() {
+    DefaultLibraryAliquotService svc = new DefaultLibraryAliquotService();
     svc.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
-    setService(DefaultLibraryDilutionService.class, svc);
+    setService(DefaultLibraryAliquotService.class, svc);
   }
 
   public HibernateTargetedSequencingDao getTargetedSequencingDao() {

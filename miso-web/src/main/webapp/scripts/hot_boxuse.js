@@ -1,6 +1,10 @@
 HotTarget.boxuse = {
-  createUrl: '/miso/rest/boxuses',
-  updateUrl: '/miso/rest/boxuses/',
+  getCreateUrl: function() {
+    return Urls.rest.boxUses.create;
+  },
+  getUpdateUrl: function(id) {
+    return Urls.rest.boxUses.update(id);
+  },
   requestConfiguration: function(config, callback) {
     callback(config)
   },

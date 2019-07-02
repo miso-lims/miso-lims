@@ -194,15 +194,15 @@ you to see a more detailed view of the library.
 To get to the single Edit Library page, click on the library's name or alias in the Libraries list. Links to the Edit
 Library page appear on several pages for related items as well, including:
 
-* Library Name and Library Alias columns of the Dilutions tables on the Edit Pool page
-* Library Name and Library Alias columns of the Dilutions list page
+* Library Name and Library Alias columns of the Library Aliquots tables on the Edit Pool page
+* Library Name and Library Alias columns of the Library Aliquots list page
 
 The Library Information section of the Edit Library page contains a list of fields, most of which may be modified. You
 can make any changes you would like and then click the "Save" button at the top right to confirm the changes.
 
 Below, there are sections for Notes and QC's, which are discussed in other parts of this section of the user manual.
-Other sections list the dilutions that have been created from the library, the pools that those dilutions have been
-added to, the runs that those pools have been loaded into, and the library's change log.
+Other sections list the library aliquots that have been created from the library, the pools that those library aliquots
+have been added to, the runs that those pools have been loaded into, and the library's change log.
 
 {% include userman-toplink.md %}
 
@@ -246,12 +246,12 @@ spreadsheet of library data provided by a collaborator. For more information, se
 
 
 {% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Propagating Libraries to Library Dilutions" %}
+{% include userman-heading.md section=page.section sub=sub title="Propagating Libraries to Library Aliquots" %}
 
-To make dilutions from libraries, go to the Libraries list, check the checkboxes next to the libraries you wish to
-propagate from, then click the "Make Dilutions" button in the toolbar at the top of the table. Further details of
-propagating libraries to dilutions will be discussed in the
-[Library Dilutions section - Propagating Dilutions from Libraries](library_dilutions.html#propagating_dilutions_from_libraries).
+To make library aliquots from libraries, go to the Libraries list, check the checkboxes next to the libraries you wish
+to propagate from, then click the "Make aliquots" button in the toolbar at the top of the table. Further details of
+propagating libraries to library aliquots will be discussed in the
+[Library Aliquots section - Propagating Library Aliquots from Libraries](library_aliquots.html#propagating_library_aliquots_from_libraries).
 
 {% include userman-toplink.md %}
 
@@ -329,9 +329,9 @@ this feature, see the [Worksets section](worksets.html).
 {% include userman-heading.md section=page.section sub=sub title="Deleting Libraries" %}
 
 To delete libraries, go to the Libraries list, check the checkboxes next to the libraries that you wish to delete, and
-click the "Delete" button in the toolbar at the top of the table. A library can only be deleted if it has no dilutions.
-Any dilutions must be deleted before the library can be deleted. A library can only be deleted by its creator or a MISO
-administrator.
+click the "Delete" button in the toolbar at the top of the table. A library can only be deleted if it has no library
+aliquots. Any library aliquots must be deleted before the library can be deleted. A library can only be deleted by its
+creator or a MISO administrator.
 
 {% include userman-toplink.md %}
 

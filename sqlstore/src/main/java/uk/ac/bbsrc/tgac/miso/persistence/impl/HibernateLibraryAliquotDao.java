@@ -16,16 +16,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryAliquotStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateLibraryDilutionDao
-    implements LibraryDilutionStore, HibernatePaginatedBoxableSource<LibraryDilution> {
+public class HibernateLibraryAliquotDao
+    implements LibraryAliquotStore, HibernatePaginatedBoxableSource<LibraryAliquot> {
 
   // Make sure these match the HiberatePoolableElementViewDao
   private final static String[] SEARCH_PROPERTIES = new String[] { "name", "identificationBarcode", "library.name", "library.alias",
@@ -48,65 +48,65 @@ public class HibernateLibraryDilutionDao
   }
 
   @Override
-  public long save(LibraryDilution dilution) throws IOException {
+  public long save(LibraryAliquot aliquot) throws IOException {
     long id;
-    if (dilution.getId() == LibraryDilution.UNSAVED_ID) {
-      id = (long) currentSession().save(dilution);
+    if (aliquot.getId() == LibraryAliquot.UNSAVED_ID) {
+      id = (long) currentSession().save(aliquot);
     } else {
-      if (dilution.isDiscarded()) {
-        boxStore.removeBoxableFromBox(dilution);
+      if (aliquot.isDiscarded()) {
+        boxStore.removeBoxableFromBox(aliquot);
       }
-      currentSession().update(dilution);
-      id = dilution.getId();
+      currentSession().update(aliquot);
+      id = aliquot.getId();
     }
     return id;
   }
 
   @Override
-  public LibraryDilution get(long id) throws IOException {
-    return (LibraryDilution) currentSession().get(LibraryDilution.class, id);
+  public LibraryAliquot get(long id) throws IOException {
+    return (LibraryAliquot) currentSession().get(LibraryAliquot.class, id);
   }
 
   @Override
-  public List<LibraryDilution> listAll() throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
+  public List<LibraryAliquot> listAll() throws IOException {
+    Criteria criteria = currentSession().createCriteria(LibraryAliquot.class);
     @SuppressWarnings("unchecked")
-    List<LibraryDilution> records = criteria.list();
+    List<LibraryAliquot> records = criteria.list();
     return records;
   }
 
   @Override
   public int count() throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
+    Criteria criteria = currentSession().createCriteria(LibraryAliquot.class);
     return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
   }
 
   @Override
-  public List<LibraryDilution> listByLibraryId(long libraryId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
+  public List<LibraryAliquot> listByLibraryId(long libraryId) throws IOException {
+    Criteria criteria = currentSession().createCriteria(LibraryAliquot.class);
     criteria.add(Restrictions.eq("library.id", libraryId));
     @SuppressWarnings("unchecked")
-    List<LibraryDilution> records = criteria.list();
+    List<LibraryAliquot> records = criteria.list();
     return records;
   }
 
   @Override
-  public LibraryDilution getByBarcode(String barcode) throws IOException {
+  public LibraryAliquot getByBarcode(String barcode) throws IOException {
     if (barcode == null) throw new IOException("Barcode cannot be null!");
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
+    Criteria criteria = currentSession().createCriteria(LibraryAliquot.class);
     criteria.add(Restrictions.eq("identificationBarcode", barcode));
-    return (LibraryDilution) criteria.uniqueResult();
+    return (LibraryAliquot) criteria.uniqueResult();
   }
 
   @Override
-  public Collection<LibraryDilution> getByBarcodeList(Collection<String> barcodeList) throws IOException {
+  public Collection<LibraryAliquot> getByBarcodeList(Collection<String> barcodeList) throws IOException {
     if (barcodeList.isEmpty()) {
       return Collections.emptyList();
     }
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
+    Criteria criteria = currentSession().createCriteria(LibraryAliquot.class);
     criteria.add(Restrictions.in("identificationBarcode", barcodeList));
     @SuppressWarnings("unchecked")
-    List<LibraryDilution> records = criteria.list();
+    List<LibraryAliquot> records = criteria.list();
     return records;
   }
 
@@ -124,8 +124,8 @@ public class HibernateLibraryDilutionDao
   }
 
   @Override
-  public Class<? extends LibraryDilution> getRealClass() {
-    return LibraryDilution.class;
+  public Class<? extends LibraryAliquot> getRealClass() {
+    return LibraryAliquot.class;
   }
 
   @Override
@@ -186,18 +186,18 @@ public class HibernateLibraryDilutionDao
 
   @Override
   public String getFriendlyName() {
-    return "Dilution";
+    return "Library Aliquot";
   }
 
   @Override
-  public List<LibraryDilution> listByIdList(List<Long> idList) throws IOException {
+  public List<LibraryAliquot> listByIdList(List<Long> idList) throws IOException {
     if (idList.isEmpty()) {
       return Collections.emptyList();
     }
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
+    Criteria criteria = currentSession().createCriteria(LibraryAliquot.class);
     criteria.add(Restrictions.in("id", idList));
     @SuppressWarnings("unchecked")
-    List<LibraryDilution> records = criteria.list();
+    List<LibraryAliquot> records = criteria.list();
     return records;
   }
 }

@@ -49,7 +49,7 @@
 </div>
 <div id="notediv" class="note" style="display:none;">A Project contains information about a set of Studies that may
   comprise many different Samples, Experiments and Runs. Samples are attached to Projects as they are often
-  processed into Dilutions, which are then Pooled and sequenced.
+  processed into library aliquots, which are then Pooled and sequenced.
 </div>
 
 <form:form id="projectForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
@@ -148,12 +148,12 @@
     <miso:list-section-ajax id="project_librarytemplates" name="Library Templates" target="library_template" project="${project}" config="{}"/>
   </div>
   
-  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#dilutions_section_arrowclick'), 'dilutions_section');">
-    Dilutions
-  <div id="dilutions_section_arrowclick" class="toggleLeftDown"></div>
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#libraryAliquots_section_arrowclick'), 'libraryAliquots_section');">
+    Library Aliquots
+  <div id="libraryAliquots_section_arrowclick" class="toggleLeftDown"></div>
   </div>
-  <div id="dilutions_section" class="expandable_section">
-    <miso:list-section-ajax id="project_dilutions" name="Dilutions" target="dilution" project="${project}" config="{}"/>
+  <div id="libraryAliquots_section" class="expandable_section">
+    <miso:list-section-ajax id="project_libraryAliquots" name="Library Aliquots" target="libraryaliquot" project="${project}" config="{}"/>
   </div>
   
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#pools_section_arrowclick'), 'pools_section');">

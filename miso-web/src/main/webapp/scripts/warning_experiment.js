@@ -41,8 +41,8 @@ WarningTarget.experiment_run_partition = {
       include: pool.hasLowQualityLibraries,
       tableMessage: "(LOW QUALITY LIBRARIES)"
     }, {
-      include: pool.pooledElements && pool.pooledElements.some(function(dilution) {
-        return dilution.identityConsentLevel === 'Revoked';
+      include: pool.pooledElements && pool.pooledElements.some(function(element) {
+        return element.identityConsentLevel === 'Revoked';
       }),
       tableMessage: "(CONSENT REVOKED)"
     }];

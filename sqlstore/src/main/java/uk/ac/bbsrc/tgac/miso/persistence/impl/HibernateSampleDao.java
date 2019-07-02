@@ -164,7 +164,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
 
   @Override
   public void restrictPaginationByExternalName(Criteria criteria, String name, Consumer<String> errorHandler) {
-    // TODO: this should extends to the children of the entity with this external name (including libraries and dilutions)
+    // TODO: this should extend to the children of the entity with this external name (including libraries and library aliquots)
     String query = DbUtils.convertStringToSearchQuery(name, false);
     Disjunction or = Restrictions.disjunction();
     or.add(externalNameCheck(SampleIdentityImpl.class, "externalName", query));
@@ -179,7 +179,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
 
   @Override
   public void restrictPaginationByInstitute(Criteria criteria, String name, Consumer<String> errorHandler) {
-    // TODO: this should extends to the children of the entity with this lab (including libraries and dilutions)
+    // TODO: this should extend to the children of the entity with this lab (including libraries and library aliquots)
     criteria.createAlias("lab", "lab");
     criteria.createAlias("lab.institute", "institute");
     criteria.add(DbUtils.searchRestrictions(name, false, "lab.alias", "institute.alias"));
