@@ -82,9 +82,9 @@ public class ListTablesIT extends AbstractIT {
   static {
     Map<String, Set<String>> tabs = new HashMap<>();
     tabs.put(ListTarget.POOLS, poolsTabs);
-    tabs.put(ListTarget.ORDERS_ACTIVE, ordersTabs);
+    tabs.put(ListTarget.ORDERS_OUTSTANDING, ordersTabs);
     tabs.put(ListTarget.ORDERS_ALL, ordersTabs);
-    tabs.put(ListTarget.ORDERS_PENDING, ordersTabs);
+    tabs.put(ListTarget.ORDERS_IN_PROGRESS, ordersTabs);
     tabs.put(ListTarget.CONTAINERS, containersTabs);
     tabs.put(ListTarget.RUNS, runsTabs);
     tabs.put(ListTarget.BOXES, boxesTabs);
@@ -102,9 +102,9 @@ public class ListTablesIT extends AbstractIT {
   static {
     Map<String, String> preferredTab = new HashMap<>();
     preferredTab.put(ListTarget.POOLS, Tabs.ILLUMINA);
-    preferredTab.put(ListTarget.ORDERS_ACTIVE, Tabs.ILLUMINA);
+    preferredTab.put(ListTarget.ORDERS_OUTSTANDING, Tabs.ILLUMINA);
     preferredTab.put(ListTarget.ORDERS_ALL, Tabs.ILLUMINA);
-    preferredTab.put(ListTarget.ORDERS_PENDING, Tabs.ILLUMINA);
+    preferredTab.put(ListTarget.ORDERS_IN_PROGRESS, Tabs.ILLUMINA);
     preferredTab.put(ListTarget.CONTAINERS, Tabs.ILLUMINA);
     preferredTab.put(ListTarget.RUNS, Tabs.ILLUMINA);
     preferredTab.put(ListTarget.BOXES, Tabs.STORAGE);
@@ -278,7 +278,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListOrdersSetup() throws Exception {
-    for (String pageName : new String[] { ListTarget.ORDERS_ALL,  ListTarget.ORDERS_ACTIVE,  ListTarget.ORDERS_PENDING }) {
+    for (String pageName : new String[] { ListTarget.ORDERS_ALL,  ListTarget.ORDERS_OUTSTANDING,  ListTarget.ORDERS_IN_PROGRESS }) {
       // this one is special because the number of order completion states is variable
       ListTabbedPage page = getTabbedList(pageName);
       DataTable table = page.getTable();
@@ -303,8 +303,8 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListOrdersColumnSort() throws Exception {
     testTabbedColumnsSort(ListTarget.ORDERS_ALL);
-    testTabbedColumnsSort(ListTarget.ORDERS_ACTIVE);
-    testTabbedColumnsSort(ListTarget.ORDERS_PENDING);
+    testTabbedColumnsSort(ListTarget.ORDERS_OUTSTANDING);
+    testTabbedColumnsSort(ListTarget.ORDERS_IN_PROGRESS);
   }
 
   @Test
