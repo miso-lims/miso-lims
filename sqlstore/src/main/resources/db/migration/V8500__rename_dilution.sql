@@ -92,4 +92,6 @@ DROP VIEW IF EXISTS DilutionBoxPosition;
 
 -- StartNoTest
 DROP PROCEDURE IF EXISTS deleteDilution;
+
+UPDATE BoxPosition SET targetType = 'LIBRARY_ALIQUOT' WHERE targetType = 'DILUTION';
 -- EndNoTest
