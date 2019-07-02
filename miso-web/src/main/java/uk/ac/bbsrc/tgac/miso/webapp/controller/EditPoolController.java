@@ -216,15 +216,15 @@ public class EditPoolController {
       for (Pool parent : parents) {
         for (int i = 0; i < parentIds.size(); i++) {
           if (parentIds.get(i).equals(Long.valueOf(parent.getId()))) {
-            for (PoolElement pd : parent.getPoolContents()) {
-              LibraryAliquotDto existing = aliquotDtos.stream().filter(d -> d.getId().equals(pd.getPoolableElementView().getAliquotId()))
+            for (PoolElement element : parent.getPoolContents()) {
+              LibraryAliquotDto existing = aliquotDtos.stream().filter(d -> d.getId().equals(element.getPoolableElementView().getAliquotId()))
                   .findFirst().orElse(null);
               if (existing == null) {
-                LibraryAliquotDto ldiDto = Dtos.asDto(pd.getPoolableElementView());
-                ldiDto.setProportion(pd.getProportion() * proportions.get(i));
+                LibraryAliquotDto ldiDto = Dtos.asDto(element.getPoolableElementView());
+                ldiDto.setProportion(element.getProportion() * proportions.get(i));
                 aliquotDtos.add(ldiDto);
               } else {
-                existing.setProportion(existing.getProportion() + pd.getProportion() * proportions.get(i));
+                existing.setProportion(existing.getProportion() + element.getProportion() * proportions.get(i));
               }
             }
             break;

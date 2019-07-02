@@ -674,13 +674,13 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   private void resolvePoolables(Pool pool) throws IOException {
     PoolableElementViewService svc = serviceManager.getPoolableElementViewService();
-    for (PoolElement pd : pool.getPoolContents()) {
-      PoolableElementView resolved = svc.getByPreMigrationId(pd.getPoolableElementView().getPreMigrationId());
+    for (PoolElement element : pool.getPoolContents()) {
+      PoolableElementView resolved = svc.getByPreMigrationId(element.getPoolableElementView().getPreMigrationId());
       if (resolved == null) {
         throw new IllegalArgumentException(
-            "No PoolableElement found with preMigrationId " + pd.getPoolableElementView().getPreMigrationId());
+            "No PoolableElement found with preMigrationId " + element.getPoolableElementView().getPreMigrationId());
       }
-      pd.setPoolableElementView(resolved);
+      element.setPoolableElementView(resolved);
     }
   }
 

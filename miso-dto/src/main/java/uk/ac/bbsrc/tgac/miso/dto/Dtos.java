@@ -1650,9 +1650,9 @@ public class Dtos {
         .ifPresent(dto::setInsertSize);
     if (includeContents) {
       Set<LibraryAliquotDto> pooledElements = new HashSet<>();
-      for (PoolElement pd : from.getPoolContents()) {
-        LibraryAliquotDto ldi = asDto(pd.getPoolableElementView());
-        ldi.setProportion(pd.getProportion());
+      for (PoolElement element : from.getPoolContents()) {
+        LibraryAliquotDto ldi = asDto(element.getPoolableElementView());
+        ldi.setProportion(element.getProportion());
         pooledElements.add(ldi);
       }
       dto.setPooledElements(pooledElements);

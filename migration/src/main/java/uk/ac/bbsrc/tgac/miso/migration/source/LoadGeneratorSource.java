@@ -430,8 +430,8 @@ public class LoadGeneratorSource implements MigrationSource {
     p.setAlias("Test_Pool_" + poolNum);
     Set<PoolElement> poolables = Sets.newHashSet();
     for (LibraryAliquot ldi : libraryAliquots) {
-      PoolElement pd = new PoolElement(p, PoolableElementView.fromLibraryAliquot(ldi));
-      poolables.add(pd);
+      PoolElement element = new PoolElement(p, PoolableElementView.fromLibraryAliquot(ldi));
+      poolables.add(element);
     }
     p.setPoolElements(poolables);
     p.setConcentration(2D);

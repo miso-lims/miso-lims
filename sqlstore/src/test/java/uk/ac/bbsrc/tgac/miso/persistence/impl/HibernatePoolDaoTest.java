@@ -472,8 +472,8 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     Pool pool = dao.get(1L);
     int originalSize = pool.getPoolContents().size();
     PoolableElementView ldi = (PoolableElementView) sessionFactory.getCurrentSession().get(PoolableElementView.class, 14L);
-    PoolElement pd = new PoolElement(pool, ldi);
-    pool.getPoolContents().add(pd);
+    PoolElement element = new PoolElement(pool, ldi);
+    pool.getPoolContents().add(element);
     dao.save(pool);
 
     sessionFactory.getCurrentSession().flush();

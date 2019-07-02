@@ -49,8 +49,8 @@ public class PoolImplTest {
   private void addElement(PoolImpl pool, Index... indices) {
     PoolableElementView ldi = new PoolableElementView();
     ldi.setIndices(Lists.newArrayList(indices));
-    PoolElement pd = new PoolElement(pool, ldi);
-    pool.getPoolContents().add(pd);
+    PoolElement element = new PoolElement(pool, ldi);
+    pool.getPoolContents().add(element);
   }
 
   private Index makeIndex(String sequence, int position) {
