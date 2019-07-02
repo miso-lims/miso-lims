@@ -163,13 +163,14 @@ adjustments and click the "Save" button to try again.
 
 
 {% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Creating Orders" %}
+{% include userman-heading.md section=page.section sub=sub title="Creating Sequencing Orders" %}
 
 Orders are used to track which pools are ready to be sequenced, how much sequencing needs to be done for a given pool,
 and whether that required sequencing has been completed. To create an order for a single pool, go to the Edit Pool page
 and click the "Create" button in the toolbar at the top of the Requested Orders section. To create orders for multiple
 pools at once, select the pools to order from the Pools list and click the "Create Orders" button in the toolbar at the
-top of the table. Further details of this process will be discussed in [Creating Orders](orders.html#creating_orders).
+top of the table. Further details of this process will be discussed in
+[Creating Sequencing Orders](sequencing_orders.html#creating_sequencing_orders).
 
 {% include userman-toplink.md %}
 

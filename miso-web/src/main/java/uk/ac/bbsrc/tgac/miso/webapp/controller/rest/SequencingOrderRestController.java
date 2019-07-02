@@ -101,9 +101,9 @@ public class SequencingOrderRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 
-  @GetMapping(value = "/sequencingorders/dt/completions/active/{platform}", produces = { "application/json" })
+  @GetMapping(value = "/sequencingorders/dt/completions/outstanding/{platform}", produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<SequencingOrderCompletionDto> getDtCompletionsUnfulfilled(@PathVariable String platform,
+  public DataTablesResponseDto<SequencingOrderCompletionDto> getDtCompletionsOutstanding(@PathVariable String platform,
       UriComponentsBuilder uriBuilder, HttpServletRequest request,
       HttpServletResponse response)
       throws IOException {
@@ -111,9 +111,9 @@ public class SequencingOrderRestController extends RestController {
         PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 
-  @GetMapping(value = "/sequencingorders/dt/completions/pending/{platform}", produces = { "application/json" })
+  @GetMapping(value = "/sequencingorders/dt/completions/in-progress/{platform}", produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<SequencingOrderCompletionDto> getDtCompletionsPending(@PathVariable String platform,
+  public DataTablesResponseDto<SequencingOrderCompletionDto> getDtCompletionsInProgress(@PathVariable String platform,
       UriComponentsBuilder uriBuilder, HttpServletRequest request,
       HttpServletResponse response)
       throws IOException {

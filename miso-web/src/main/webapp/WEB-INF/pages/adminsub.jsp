@@ -40,8 +40,8 @@
     <div class="menu">
         <a href="<c:url value="/miso/sequencingorders/active"/>">Sequencing Orders</a>
           <a class="submenu" href="<c:url value="/miso/sequencingorders/all"/>">All</a>
-          <a class="submenu" href="<c:url value="/miso/sequencingorders/active"/>">Active</a>
-          <a class="submenu" href="<c:url value="/miso/sequencingorders/pending"/>">Pending</a>
+          <a class="submenu" href="<c:url value="/miso/sequencingorders/outstanding"/>">Outstanding</a>
+          <a class="submenu" href="<c:url value="/miso/sequencingorders/in-progress"/>">In-Progress</a>
         
         <a href="<c:url value="/miso/runs"/>">Sequencing</a>
           <a class="submenu" href="<c:url value="/miso/containers"/>">Containers</a>
