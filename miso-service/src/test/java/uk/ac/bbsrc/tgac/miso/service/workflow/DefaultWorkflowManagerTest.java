@@ -25,10 +25,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.IntegerProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.PoolProgressStep;
-import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.manager.ProgressStepFactory;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.service.workflow.factory.BarcodableProgressStepFactory;
 import uk.ac.bbsrc.tgac.miso.service.workflow.factory.IntegerProgressStepFactory;
-import uk.ac.bbsrc.tgac.miso.service.workflow.factory.ProgressStepFactory;
 
 public class DefaultWorkflowManagerTest {
   private static final String INTEGER_INPUT = "1";

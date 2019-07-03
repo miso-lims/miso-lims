@@ -16,10 +16,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.service.ArrayModelService;
-import uk.ac.bbsrc.tgac.miso.service.ArrayRunService;
-import uk.ac.bbsrc.tgac.miso.service.ArrayService;
 
 @Controller
 @RequestMapping("/array")

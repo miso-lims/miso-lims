@@ -11,15 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 
 public class DefaultLibraryAliasGenerator implements NameGenerator<Library> {
 
   @Autowired
-  private LibraryStore libraryStore;
+  private LibraryService libraryService;
 
-  public void setLibraryStore(LibraryStore libraryStore) {
-    this.libraryStore = libraryStore;
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
   @Override
@@ -29,7 +29,7 @@ public class DefaultLibraryAliasGenerator implements NameGenerator<Library> {
       Matcher m = samplePattern.matcher(library.getSample().getAlias());
 
       if (m.matches()) {
-        Collection<Library> siblings = libraryStore.listBySampleId(library.getSample().getId());
+        Collection<Library> siblings = libraryService.listBySampleId(library.getSample().getId());
         Set<String> siblingAliases = siblings.stream()
             .map(Library::getAlias)
             .collect(Collectors.toSet());

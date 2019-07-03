@@ -45,9 +45,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleValidRelationshipDto;
-import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 
 @Controller
 @RequestMapping("/rest/samplevalidrelationships")

@@ -14,15 +14,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.QualityControlEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLoggableStore;
-import uk.ac.bbsrc.tgac.miso.core.store.ContainerQcStore;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
-import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
-import uk.ac.bbsrc.tgac.miso.core.store.QcTargetStore;
-import uk.ac.bbsrc.tgac.miso.core.store.QualityControlTypeStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
-import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
+import uk.ac.bbsrc.tgac.miso.persistence.ChangeLoggableStore;
+import uk.ac.bbsrc.tgac.miso.persistence.ContainerQcStore;
+import uk.ac.bbsrc.tgac.miso.persistence.LibraryQcStore;
+import uk.ac.bbsrc.tgac.miso.persistence.PoolQcStore;
+import uk.ac.bbsrc.tgac.miso.persistence.QcTargetStore;
+import uk.ac.bbsrc.tgac.miso.persistence.QualityControlTypeStore;
+import uk.ac.bbsrc.tgac.miso.persistence.SampleQcStore;
 
 @Service
 @Transactional(rollbackFor = Exception.class)

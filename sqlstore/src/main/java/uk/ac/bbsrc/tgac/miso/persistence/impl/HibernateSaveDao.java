@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
-import uk.ac.bbsrc.tgac.miso.core.store.SaveDao;
+import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository

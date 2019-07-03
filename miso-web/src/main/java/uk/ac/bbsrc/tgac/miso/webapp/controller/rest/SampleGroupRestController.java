@@ -45,9 +45,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleGroupDto;
-import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 
 @Controller
 @RequestMapping("/rest/samplegroups")

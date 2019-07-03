@@ -31,8 +31,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.LibraryAliquotBoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.LibraryBoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolBoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleBoxableView;
-import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.persistence.BoxStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository

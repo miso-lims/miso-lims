@@ -25,12 +25,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowExecutor;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.ProgressImpl;
-import uk.ac.bbsrc.tgac.miso.core.store.ProgressStore;
+import uk.ac.bbsrc.tgac.miso.core.manager.ProgressStepFactory;
+import uk.ac.bbsrc.tgac.miso.core.manager.WorkflowManager;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
-import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.service.workflow.factory.ProgressStepFactory;
+import uk.ac.bbsrc.tgac.miso.persistence.ProgressStore;
 
 @Service
 @Transactional(rollbackFor = Exception.class)

@@ -12,10 +12,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
+import uk.ac.bbsrc.tgac.miso.core.service.InstituteService;
+import uk.ac.bbsrc.tgac.miso.core.service.LabService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LabDto;
-import uk.ac.bbsrc.tgac.miso.service.InstituteService;
-import uk.ac.bbsrc.tgac.miso.service.LabService;
 
 @Controller
 @RequestMapping("/lab")

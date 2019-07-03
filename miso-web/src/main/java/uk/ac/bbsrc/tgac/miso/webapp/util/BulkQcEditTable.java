@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.stream.Stream;
 
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcDto;
-import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 
 public class BulkQcEditTable extends BulkQcTable {
 

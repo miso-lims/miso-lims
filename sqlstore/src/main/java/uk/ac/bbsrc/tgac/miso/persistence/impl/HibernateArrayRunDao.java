@@ -16,8 +16,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
-import uk.ac.bbsrc.tgac.miso.core.store.ArrayRunStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.persistence.ArrayRunStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository

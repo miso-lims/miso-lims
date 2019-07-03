@@ -10,12 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
-import uk.ac.bbsrc.tgac.miso.core.store.StorageLocationStore;
-import uk.ac.bbsrc.tgac.miso.service.StorageLocationMapService;
-import uk.ac.bbsrc.tgac.miso.service.StorageLocationService;
-import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
-import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationMapService;
+import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationService;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.persistence.StorageLocationStore;
 
 @Service
 @Transactional(rollbackFor = Exception.class)

@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.store.InstrumentModelStore;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
+import uk.ac.bbsrc.tgac.miso.persistence.InstrumentModelStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Service

@@ -259,10 +259,6 @@
       <artifactId>miso-service</artifactId>
     </dependency>
     <dependency>
-      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-      <artifactId>sqlstore</artifactId>
-    </dependency>
-    <dependency>
       <!-- Do not remove - used by container -->
       <groupId>xml-apis</groupId>
       <artifactId>xml-apis</artifactId>

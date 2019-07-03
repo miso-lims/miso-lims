@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
-import uk.ac.bbsrc.tgac.miso.core.store.AttachmentCategoryStore;
+import uk.ac.bbsrc.tgac.miso.persistence.AttachmentCategoryStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)

@@ -46,7 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.store.InstrumentStore;
+import uk.ac.bbsrc.tgac.miso.persistence.InstrumentStore;
 
 public class HibernateServiceRecordDaoTest extends AbstractDAOTest {
 

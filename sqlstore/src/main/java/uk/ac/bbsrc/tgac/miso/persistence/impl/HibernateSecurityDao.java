@@ -38,7 +38,7 @@ import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
+import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore

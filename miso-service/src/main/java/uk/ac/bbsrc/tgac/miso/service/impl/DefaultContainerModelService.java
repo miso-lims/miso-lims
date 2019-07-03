@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
-import uk.ac.bbsrc.tgac.miso.core.store.SequencingContainerModelStore;
-import uk.ac.bbsrc.tgac.miso.service.ContainerModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.ContainerModelService;
+import uk.ac.bbsrc.tgac.miso.persistence.SequencingContainerModelStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Service

@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC.PartitionQCId;
+import uk.ac.bbsrc.tgac.miso.persistence.PartitionQcStore;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.store.PartitionQcStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)

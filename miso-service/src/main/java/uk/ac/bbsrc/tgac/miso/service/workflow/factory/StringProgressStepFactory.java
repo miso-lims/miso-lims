@@ -12,6 +12,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.FactoryType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.StringProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.manager.ProgressStepFactory;
 
 @Service
 @Transactional(rollbackFor = Exception.class)

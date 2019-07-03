@@ -5,7 +5,6 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.store.SaveDao;
 
 public interface LibraryTypeDao extends SaveDao<LibraryType> {
 
