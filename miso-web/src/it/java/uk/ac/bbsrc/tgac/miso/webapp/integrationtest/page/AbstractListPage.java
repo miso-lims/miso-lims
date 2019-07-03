@@ -132,9 +132,9 @@ public interface AbstractListPage {
     public static final String PROJECTS = "projects";
     public static final String INSTRUMENTS = "instruments";
     public static final String POOLS = "pools";
-    public static final String ORDERS_ACTIVE = "sequencingorders/active";
+    public static final String ORDERS_OUTSTANDING = "sequencingorders/outstanding";
     public static final String ORDERS_ALL = "sequencingorders/all";
-    public static final String ORDERS_PENDING = "sequencingorders/pending";
+    public static final String ORDERS_IN_PROGRESS = "sequencingorders/in-progress";
     public static final String PARTITION_QC_TYPE = "partitionqctype/list";
     public static final String CONTAINERS = "containers";
     public static final String REFERENCE_GENOMES = "referencegenome/list";

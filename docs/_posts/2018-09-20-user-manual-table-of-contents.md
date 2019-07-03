@@ -403,7 +403,7 @@ weekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Creating Pools from Library Aliquots" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Creating Orders" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Creating Sequencing Orders" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Printing Barcodes" %}
 {% assign sub = sub | plus: 1 %}
@@ -421,24 +421,24 @@ weekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
 
 
 {% assign section = section | plus: 1 %}
-{% assign section-title = "Orders" %}
+{% assign section-title = "Sequencing Orders" %}
 {% include userman-toc-link.md section=section section-title=section-title %}
 {% assign sub = 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Active Orders List" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Outstanding Sequencing Orders List" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="All Orders List" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="All Sequencing Orders List" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Pending Orders List" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="In-Progress Sequencing Orders List" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Creating Orders" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Creating Sequencing Orders" %}
 {% assign subsub = 1 %}
 {% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Single" %}
 {% assign subsub = subsub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Bulk" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Extending an Order" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Extending a Sequencing Order" %}
 {% assign sub = sub | plus: 1 %}
-{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Deleting Orders" %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Deleting Sequencing Orders" %}
 
 
 {% assign section = section | plus: 1 %}

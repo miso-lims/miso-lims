@@ -251,9 +251,9 @@ public class PlainSampleITs extends AbstractIT {
     slugs.add("libraries");
     slugs.add("libraryaliquots");
     slugs.add("pools");
-    slugs.add("sequencingorders/active");
+    slugs.add("sequencingorders/outstanding");
     slugs.add("sequencingorders/all");
-    slugs.add("sequencingorders/pending");
+    slugs.add("sequencingorders/in-progress");
     slugs.add("containers");
     slugs.add("runs");
     slugs.add("boxes");

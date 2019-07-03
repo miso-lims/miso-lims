@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 @Controller
 @RequestMapping("/sequencingorders")
-public class ListCompletionsController {
+public class ListSequencingOrdersController {
 
   class OrderListPage extends TabbedListItemsPage {
 
@@ -43,22 +43,22 @@ public class ListCompletionsController {
   @Autowired
   private InstrumentModelService instrumentModelService;
 
-  @GetMapping("/active")
+  @GetMapping("/outstanding")
   public ModelAndView listActive(ModelMap model) throws IOException {
-    model.addAttribute(MODEL_ATTR_TITLE, "Active Orders");
-    return new OrderListPage("active").list(model);
+    model.addAttribute(MODEL_ATTR_TITLE, "Outstanding Sequencing Orders");
+    return new OrderListPage("outstanding").list(model);
   }
 
   @GetMapping("/all")
   public ModelAndView listAll(ModelMap model) throws IOException {
-    model.addAttribute(MODEL_ATTR_TITLE, "All Orders");
+    model.addAttribute(MODEL_ATTR_TITLE, "All Sequencing Orders");
     return new OrderListPage("all").list(model);
   }
 
-  @GetMapping("/pending")
+  @GetMapping("/in-progress")
   public ModelAndView listPools(ModelMap model) throws IOException {
-    model.addAttribute(MODEL_ATTR_TITLE, "Pending Orders");
-    return new OrderListPage("pending").list(model);
+    model.addAttribute(MODEL_ATTR_TITLE, "In-Progress Sequencing Orders");
+    return new OrderListPage("in-progress").list(model);
   }
 
   @ModelAttribute("title")
