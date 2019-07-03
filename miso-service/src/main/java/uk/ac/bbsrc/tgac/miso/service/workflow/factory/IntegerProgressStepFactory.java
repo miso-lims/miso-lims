@@ -12,6 +12,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.FactoryType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.IntegerProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.manager.ProgressStepFactory;
 
 /**
  * Attempt to create an IntegerProgressStep by casting the user's input to an int

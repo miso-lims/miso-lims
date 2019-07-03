@@ -12,6 +12,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.FactoryType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.PositiveDoubleProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.manager.ProgressStepFactory;
 
 /**
  * Attempt to create an PositiveDoubleProgressStep by casting the user's input to an integer

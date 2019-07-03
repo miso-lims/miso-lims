@@ -15,6 +15,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.google.common.collect.Lists;
+
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
@@ -22,21 +24,21 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.TissueOriginDao;
-import uk.ac.bbsrc.tgac.miso.core.store.TissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignCodeService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.TissueOriginService;
+import uk.ac.bbsrc.tgac.miso.core.service.TissueTypeService;
 
 public class OicrLibraryAliasValidatorTest {
 
   @Mock
-  private TissueOriginDao tissueOriginDao;
+  private TissueOriginService tissueOriginService;
   @Mock
-  private TissueTypeDao tissueTypeDao;
+  private TissueTypeService tissueTypeService;
   @Mock
-  private LibraryStore libraryStore;
+  private LibraryDesignCodeService libraryDesignCodeService;
   @Mock
-  private LibraryDesignCodeDao libraryDesignCodeDao;
+  private LibraryTypeService libraryTypeService;
 
   @InjectMocks
   private OicrLibraryAliasValidator sut;
@@ -44,11 +46,10 @@ public class OicrLibraryAliasValidatorTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    Mockito.when(tissueOriginDao.getTissueOrigin()).thenReturn(makeTissueOrigins());
-    Mockito.when(tissueTypeDao.list()).thenReturn(makeTissueTypes());
-    Mockito.when(libraryStore.listLibraryTypesByPlatform(PlatformType.ILLUMINA)).thenReturn(makeIlluminaLibTypes());
-    Mockito.when(libraryStore.listLibraryTypesByPlatform(PlatformType.OXFORDNANOPORE)).thenReturn(makeOxfordNanoporeLibTypes());
-    Mockito.when(libraryDesignCodeDao.list()).thenReturn(makeDesignCodes());
+    Mockito.when(tissueOriginService.list()).thenReturn(makeTissueOrigins());
+    Mockito.when(tissueTypeService.list()).thenReturn(makeTissueTypes());
+    Mockito.when(libraryTypeService.list()).thenReturn(makeLibraryTypes());
+    Mockito.when(libraryDesignCodeService.list()).thenReturn(makeDesignCodes());
   }
 
   @Test
@@ -104,20 +105,9 @@ public class OicrLibraryAliasValidatorTest {
     });
   }
 
-  private static List<LibraryType> makeIlluminaLibTypes() {
-    return makeList(new String[] { "PE", "SE" }, alias -> {
-      LibraryType lt = new LibraryType();
-      lt.setAbbreviation(alias);
-      return lt;
-    });
-  }
-
-  private static List<LibraryType> makeOxfordNanoporeLibTypes() {
-    return makeList(new String[] { "LIG", "1D2" }, alias -> {
-      LibraryType lt = new LibraryType();
-      lt.setAbbreviation(alias);
-      return lt;
-    });
+  private static List<LibraryType> makeLibraryTypes() {
+    return Lists.newArrayList(makeLibraryType("PE", PlatformType.ILLUMINA), makeLibraryType("SE", PlatformType.ILLUMINA),
+        makeLibraryType("LIG", PlatformType.OXFORDNANOPORE), makeLibraryType("1D2", PlatformType.OXFORDNANOPORE));
   }
 
   private static List<LibraryDesignCode> makeDesignCodes() {
@@ -132,6 +122,13 @@ public class OicrLibraryAliasValidatorTest {
     return Arrays.stream(aliases)
         .map(alias -> constructor.apply(alias))
         .collect(Collectors.toList());
+  }
+
+  private static LibraryType makeLibraryType(String alias, PlatformType platform) {
+    LibraryType lt = new LibraryType();
+    lt.setAbbreviation(alias);
+    lt.setPlatformType(platform);
+    return lt;
   }
 
 }

@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
+import uk.ac.bbsrc.tgac.miso.core.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
+import uk.ac.bbsrc.tgac.miso.persistence.TargetedSequencingStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Service

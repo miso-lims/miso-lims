@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPositionStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.store.InstrumentStatusStore;
+import uk.ac.bbsrc.tgac.miso.persistence.InstrumentStatusStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)

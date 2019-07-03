@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 
 public class MisoServiceManagerTest {
 

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
-import uk.ac.bbsrc.tgac.miso.core.store.InstrumentStatusStore;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentStatusService;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentStatusService;
+import uk.ac.bbsrc.tgac.miso.persistence.InstrumentStatusStore;
 
 @Service
 @Transactional(rollbackFor = Exception.class)

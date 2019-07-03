@@ -45,7 +45,7 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.store.InstrumentModelStore;
+import uk.ac.bbsrc.tgac.miso.persistence.InstrumentModelStore;
 
 /**
  * uk.ac.bbsrc.tgac.miso.hibernate.persistence.impl

@@ -9,9 +9,9 @@ import javax.ws.rs.core.Response.Status;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+import uk.ac.bbsrc.tgac.miso.core.service.DeleterService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
-import uk.ac.bbsrc.tgac.miso.service.DeleterService;
 
 public class RestUtils {
 

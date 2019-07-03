@@ -40,8 +40,6 @@
   <context:component-scan annotation-config="true" base-package="com.eaglegenomics.simlims" />
   <context:component-scan annotation-config="true" base-package="uk.ac.bbsrc.tgac.miso" />
 
-  <bean name="webBindingInitializer" class="uk.ac.bbsrc.tgac.miso.webapp.context.LimsBindingInitializer" />
-
   <bean id="propertyConfigurer" class="uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter">
     <property name="location" value="${miso.propertiesFile}" />
   </bean>

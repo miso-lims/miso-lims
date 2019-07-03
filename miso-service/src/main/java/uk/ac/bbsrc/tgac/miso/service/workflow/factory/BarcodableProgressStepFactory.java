@@ -23,9 +23,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.PoolProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SampleProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SequencerPartitionContainerProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SequencingContainerModelProgressStep;
-import uk.ac.bbsrc.tgac.miso.service.BarcodableViewService;
-import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
-import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.manager.ProgressStepFactory;
+import uk.ac.bbsrc.tgac.miso.core.service.BarcodableViewService;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 
 /**
  * Attempts to create a ProgressStep by using a BarcodableViewService to search for a barcode, and then retrieving the appropriate entity.

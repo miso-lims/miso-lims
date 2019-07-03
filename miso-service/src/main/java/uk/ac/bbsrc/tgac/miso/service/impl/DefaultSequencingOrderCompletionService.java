@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrderCompletion;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingOrderCompletionDao;
-import uk.ac.bbsrc.tgac.miso.service.SequencingOrderCompletionService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service

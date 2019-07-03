@@ -14,14 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
-import uk.ac.bbsrc.tgac.miso.core.store.ArrayRunStore;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.service.ArrayRunService;
-import uk.ac.bbsrc.tgac.miso.service.ArrayService;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
-import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
-import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.persistence.ArrayRunStore;
 
 @Service
 @Transactional(rollbackFor = Exception.class)

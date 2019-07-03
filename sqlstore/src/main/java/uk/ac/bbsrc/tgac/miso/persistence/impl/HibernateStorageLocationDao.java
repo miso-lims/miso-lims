@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
-import uk.ac.bbsrc.tgac.miso.core.store.StorageLocationStore;
+import uk.ac.bbsrc.tgac.miso.persistence.StorageLocationStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository

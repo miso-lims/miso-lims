@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Progress;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.ProgressImpl;
-import uk.ac.bbsrc.tgac.miso.core.store.ProgressStore;
+import uk.ac.bbsrc.tgac.miso.persistence.ProgressStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository

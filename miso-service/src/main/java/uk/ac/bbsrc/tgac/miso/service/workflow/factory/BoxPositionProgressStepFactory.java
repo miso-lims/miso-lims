@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.FactoryType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.InputType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.BoxPositionProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.manager.ProgressStepFactory;
 
 @Service
 @Transactional(rollbackFor = Exception.class)

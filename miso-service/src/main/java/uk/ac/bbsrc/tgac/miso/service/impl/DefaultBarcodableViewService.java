@@ -14,9 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
+import uk.ac.bbsrc.tgac.miso.core.service.BarcodableService;
+import uk.ac.bbsrc.tgac.miso.core.service.BarcodableViewService;
 import uk.ac.bbsrc.tgac.miso.persistence.BarcodableViewDao;
-import uk.ac.bbsrc.tgac.miso.service.BarcodableService;
-import uk.ac.bbsrc.tgac.miso.service.BarcodableViewService;
 
 @Service
 @Transactional(rollbackFor = Exception.class)

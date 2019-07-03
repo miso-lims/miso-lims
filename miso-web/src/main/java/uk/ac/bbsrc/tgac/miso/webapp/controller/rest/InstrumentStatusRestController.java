@@ -38,9 +38,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentStatusService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentStatusDto;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentStatusService;
 
 @Controller
 @RequestMapping("/rest/instrumentstatus")

@@ -15,7 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.QualityControlEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.store.ContainerQcStore;
+import uk.ac.bbsrc.tgac.miso.persistence.ContainerQcStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository

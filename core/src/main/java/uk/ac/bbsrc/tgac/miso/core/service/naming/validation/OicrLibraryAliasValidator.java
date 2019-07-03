@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming.validation;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -10,29 +10,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.TissueOriginDao;
-import uk.ac.bbsrc.tgac.miso.core.store.TissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignCodeService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.ListService;
+import uk.ac.bbsrc.tgac.miso.core.service.TissueOriginService;
+import uk.ac.bbsrc.tgac.miso.core.service.TissueTypeService;
 
 public class OicrLibraryAliasValidator extends RegexValidator {
 
   private static final Logger log = LoggerFactory.getLogger(OicrLibraryAliasValidator.class);
 
   @Autowired
-  private TissueOriginDao tissueOriginDao;
+  private TissueOriginService tissueOriginService;
   @Autowired
-  private TissueTypeDao tissueTypeDao;
+  private TissueTypeService tissueTypeService;
   @Autowired
-  private LibraryStore libraryStore;
+  private LibraryTypeService libraryTypeService;
   @Autowired
-  private LibraryDesignCodeDao libraryDesignCodeDao;
+  private LibraryDesignCodeService libraryDesignCodeService;
 
+  private boolean lookupsSuccessful;
   private Pattern pattern = null;
 
   public OicrLibraryAliasValidator() {
@@ -44,42 +47,24 @@ public class OicrLibraryAliasValidator extends RegexValidator {
     return pattern == null ? initializePattern() : pattern;
   }
 
-  private Pattern initializePattern() {
-    boolean success = true;
+  private synchronized Pattern initializePattern() {
+    lookupsSuccessful = true;
     final String identityRegex = "(" + OicrProjectShortNameValidator.REGEX + ")_(\\d{3,}|\\d[CR]\\d{1,2})_"; // PROJ_0001_...
 
-    String origins = makeOptionRegex(tissueOriginDao.getTissueOrigin(), TissueOrigin::getAlias);
-    String tissueTypes = makeOptionRegex(tissueTypeDao.list(), TissueType::getAlias);
+    String origins = makeOptionRegex("Tissue origins", tissueOriginService, null, TissueOrigin::getAlias, "[A-Z][a-z]");
+    String tissueTypes = makeOptionRegex("Tissue types", tissueTypeService, null, TissueType::getAlias, "[A-Z]");
+
     final String tissueRegex = "(" + origins + ")_(" + tissueTypes + ")_"; // ...Pa_P_...
 
-    String designCodes = null;
-    try {
-      designCodes = makeOptionRegex(libraryDesignCodeDao.list(), LibraryDesignCode::getCode);
-    } catch (IOException e) {
-      success = false;
-      log.error("LibraryDesignCode lookup failed. Falling back to simple validation pattern", e);
-      designCodes = "[A-Z]{2}";
-    }
+    String designCodes = makeOptionRegex("Library design codes", libraryDesignCodeService, null, LibraryDesignCode::getCode, "[A-Z]{2}");
     final String designCodeRegex = "(" + designCodes + "|\\?\\?)";
 
-    String illuminaLibTypes = null;
-    try {
-      illuminaLibTypes = makeOptionRegex(libraryStore.listLibraryTypesByPlatform(PlatformType.ILLUMINA), LibraryType::getAbbreviation);
-    } catch (IOException e) {
-      success = false;
-      log.error("Illumina LibraryType lookup failed. Falling back to simple validation pattern", e);
-      illuminaLibTypes = "[A-Z]{2}";
-    }
+    String illuminaLibTypes = makeOptionRegex("Library types", libraryTypeService, lt -> lt.getPlatformType() == PlatformType.ILLUMINA,
+        LibraryType::getAbbreviation, "[A-Z]{2}");
     final String illuminaRegex = "(" + illuminaLibTypes + "|\\?\\?)_(nn|\\d{2,6}|\\dK)_" + designCodeRegex; // ...PE_700_WG
 
-    String ontLibTypes = null;
-    try {
-      ontLibTypes = makeOptionRegex(libraryStore.listLibraryTypesByPlatform(PlatformType.OXFORDNANOPORE), LibraryType::getAbbreviation);
-    } catch (IOException e) {
-      success = false;
-      log.error("Oxford Nanopore LibraryType lookup failed. Falling back to simple validation pattern", e);
-      ontLibTypes = "[A-Z\\d]{3,4}";
-    }
+    String ontLibTypes = makeOptionRegex("Library types", libraryTypeService, lt -> lt.getPlatformType() == PlatformType.OXFORDNANOPORE,
+        LibraryType::getAbbreviation, "[A-Z\\d]{3,4}");
     final String ontRegex = "(" + ontLibTypes + ")_" + designCodeRegex + "_\\d+"; // ...1D2_WG_1
 
     final String pacbioRegex = "\\d{8}_\\d+"; // ...20170913_1
@@ -87,7 +72,7 @@ public class OicrLibraryAliasValidator extends RegexValidator {
     // PROJ_0001_Pa_P_PE_700_WG (Illumina) or PROJ_0001_20170913_1 (PacBio) or PROJ_0001_Pa_P_1D2_WG_1 (Oxford Nanopore)
     String finalRegex = String.format("^%s(%s|%s(%s|%s))$", identityRegex, pacbioRegex, tissueRegex, illuminaRegex, ontRegex);
 
-    if (success) {
+    if (lookupsSuccessful) {
       // Save if everything initialized properly. This means the lookups aren't required every time,
       // but also that MISO must be restarted to update values for validation
       pattern = Pattern.compile(finalRegex);
@@ -95,8 +80,18 @@ public class OicrLibraryAliasValidator extends RegexValidator {
     return pattern;
   }
 
-  private static <T> String makeOptionRegex(Collection<T> items, Function<T, String> mapFunction) {
-    return String.join("|", items.stream().map(mapFunction).collect(Collectors.toSet()));
+  private <T extends Identifiable> String makeOptionRegex(String type, ListService<T> service, Predicate<T> filter,
+      Function<T, String> mapFunction, String simpleRegex) {
+    try {
+      return service.list().stream()
+          .filter(filter == null ? (i -> true) : filter)
+          .map(mapFunction)
+          .collect(Collectors.joining("|"));
+    } catch (IOException e) {
+      lookupsSuccessful = false;
+      log.error("{} lookup failed. Falling back to simple validation pattern", type);
+      return simpleRegex;
+    }
   }
 
   @Override
@@ -119,20 +114,20 @@ public class OicrLibraryAliasValidator extends RegexValidator {
     return false;
   }
 
-  public void setTissueOriginDao(TissueOriginDao tissueOriginDao) {
-    this.tissueOriginDao = tissueOriginDao;
+  public void setTissueOriginService(TissueOriginService tissueOriginService) {
+    this.tissueOriginService = tissueOriginService;
   }
 
-  public void setTissueTypeDao(TissueTypeDao tissueTypeDao) {
-    this.tissueTypeDao = tissueTypeDao;
+  public void setTissueTypeService(TissueTypeService tissueTypeService) {
+    this.tissueTypeService = tissueTypeService;
   }
 
-  public void setLibraryStore(LibraryStore libraryStore) {
-    this.libraryStore = libraryStore;
+  public void setLibraryDesignCodeService(LibraryDesignCodeService libraryDesignCodeService) {
+    this.libraryDesignCodeService = libraryDesignCodeService;
   }
 
-  public void setLibraryDesignCodeDao(LibraryDesignCodeDao libraryDesignCodeDao) {
-    this.libraryDesignCodeDao = libraryDesignCodeDao;
+  public void setLibraryTypeService(LibraryTypeService libraryTypeService) {
+    this.libraryTypeService = libraryTypeService;
   }
 
 }

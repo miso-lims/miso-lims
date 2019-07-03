@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 
 /**
  * Custom AuthorizationManager that sets the user to attribute migration to and authorizes that user to do everything. This basically

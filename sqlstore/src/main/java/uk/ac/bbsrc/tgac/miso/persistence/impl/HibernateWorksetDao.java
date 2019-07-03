@@ -13,8 +13,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
-import uk.ac.bbsrc.tgac.miso.core.store.WorksetStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.persistence.WorksetStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)

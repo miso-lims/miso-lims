@@ -16,11 +16,11 @@ import org.mockito.MockitoAnnotations;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
-import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
+import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
+import uk.ac.bbsrc.tgac.miso.persistence.StudyStore;
 import uk.ac.bbsrc.tgac.miso.persistence.StudyTypeDao;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 public class DefaultStudyServiceTest {
 

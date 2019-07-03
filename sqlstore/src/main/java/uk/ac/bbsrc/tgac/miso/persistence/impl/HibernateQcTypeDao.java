@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.store.QualityControlTypeStore;
+import uk.ac.bbsrc.tgac.miso.persistence.QualityControlTypeStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)

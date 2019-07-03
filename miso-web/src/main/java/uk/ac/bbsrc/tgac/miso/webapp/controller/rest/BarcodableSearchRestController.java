@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
+import uk.ac.bbsrc.tgac.miso.core.service.BarcodableViewService;
 import uk.ac.bbsrc.tgac.miso.dto.BarcodableDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.service.BarcodableViewService;
 
 @Controller
 @RequestMapping("/rest/barcodables")

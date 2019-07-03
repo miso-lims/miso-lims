@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.SkipProgressStep;
+import uk.ac.bbsrc.tgac.miso.core.manager.ProgressStepFactory;
 
 /**
  * Attempts to create a SkipProgressStep if the user has sent the appropriate keyword.

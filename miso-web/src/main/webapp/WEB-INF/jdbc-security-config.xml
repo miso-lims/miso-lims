@@ -37,7 +37,7 @@
     <property name="defaultTargetUrl" value="/miso/mainMenu" />
   </bean>
 
-  <bean id="userAuthService" class="uk.ac.bbsrc.tgac.miso.sqlstore.manager.MisoJdbcUserDetailsManager">
+  <bean id="userAuthService" class="uk.ac.bbsrc.tgac.miso.webapp.context.MisoJdbcUserDetailsManager">
     <property name="usersByUsernameQuery" value="SELECT loginName AS username, password AS password, active AS enabled, roles AS authority FROM User WHERE loginName=?" />
     <property name="authoritiesByUsernameQuery" value="SELECT loginName AS username, roles AS authority, admin, internal, external FROM User WHERE loginName=?" />
     <property name="enableAuthorities" value="true" />

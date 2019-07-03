@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
+import uk.ac.bbsrc.tgac.miso.persistence.LibraryDesignCodeDao;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)

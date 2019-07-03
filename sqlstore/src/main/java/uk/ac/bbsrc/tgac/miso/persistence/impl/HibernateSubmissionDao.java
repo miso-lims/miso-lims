@@ -35,7 +35,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore;
+import uk.ac.bbsrc.tgac.miso.persistence.SubmissionStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository

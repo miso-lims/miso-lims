@@ -9,11 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.store.PartitionQcStore;
-import uk.ac.bbsrc.tgac.miso.service.ContainerService;
-import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
-import uk.ac.bbsrc.tgac.miso.service.PartitionQcTypeService;
-import uk.ac.bbsrc.tgac.miso.service.RunService;
+import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.core.service.PartitionQCService;
+import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunService;
+import uk.ac.bbsrc.tgac.miso.persistence.PartitionQcStore;
 
 @Service
 @Transactional(rollbackFor = Exception.class)

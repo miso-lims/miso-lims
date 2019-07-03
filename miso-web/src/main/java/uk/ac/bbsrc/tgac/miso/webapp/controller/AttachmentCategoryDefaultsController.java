@@ -8,9 +8,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
+import uk.ac.bbsrc.tgac.miso.core.service.AttachmentCategoryService;
 import uk.ac.bbsrc.tgac.miso.dto.AttachmentCategoryDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.service.AttachmentCategoryService;
 
 @Controller
 @RequestMapping("/attachmentcategories")
