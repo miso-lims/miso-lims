@@ -3,11 +3,14 @@ SELECT p.partitionId
   ,pqt.analysisSkipped AS analysis_skipped
   ,pqt.description AS qc_status
   ,r_spc.Run_runId
+  ,pool.poolId
   ,pool.alias AS pool_name
   ,pool.identificationBarcode AS pool_barcode
   ,pool.description AS pool_description
   ,pool.creator AS pool_createdById
   ,pool.creationDate AS pool_created
+  ,pool.lastModifier AS pool_modifiedById
+  ,pool.lastModified AS pool_modified
 FROM _Partition AS p
 LEFT JOIN Pool pool ON pool.poolId = p.pool_poolId
 JOIN SequencerPartitionContainer_Partition AS spc_p ON spc_p.partitions_partitionId = p.partitionId

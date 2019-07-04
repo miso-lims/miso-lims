@@ -602,6 +602,13 @@ public class MisoClient implements Lims {
 
   private static class RunRowMapper implements RowMapper<Run> {
 
+    private static final Map<String, String> workflowTypeMapper = new HashMap<>();
+
+    static {
+      workflowTypeMapper.put("NOVASEQ_XP", "NovaSeqXp");
+      workflowTypeMapper.put("NOVASEQ_STANDARD", "NovaSeqStandard");
+    }
+
     @Override
     public Run mapRow(ResultSet rs, int rowNum) throws SQLException {
       Run r = new DefaultRun();
@@ -621,6 +628,11 @@ public class MisoClient implements Lims {
       r.setRunDirectory(rs.getString("filePath"));
       r.setRunBasesMask(rs.getString("runBasesMask"));
       r.setSequencingParameters(rs.getString("sequencingParameters"));
+      String rawWorkflowType = rs.getString("workflowType");
+      if (!rs.wasNull()) {
+        String workflowType = workflowTypeMapper.get(rawWorkflowType);
+        r.setWorkflowType(workflowType != null ? workflowType : rawWorkflowType);
+      }
 
       return r;
     }
@@ -636,11 +648,14 @@ public class MisoClient implements Lims {
       p.setPosition(rs.getInt("partitionNumber"));
       p.setRunId(rs.getInt("Run_runId"));
       p.setPartitionId(rs.getInt("partitionId"));
+      p.setPoolId(rs.getInt("poolId"));
       p.setPoolName(rs.getString("pool_name"));
       p.setPoolDescription(rs.getString("pool_description"));
       p.setPoolBarcode(rs.getString("pool_barcode"));
       p.setPoolCreatedById(rs.getInt("pool_createdById"));
       p.setPoolCreated(rs.getDate("pool_created"));
+      p.setPoolModifiedById(rs.getInt("pool_modifiedById"));
+      p.setPoolModified(rs.getDate("pool_modified"));
       p.setAnalysisSkipped(rs.getBoolean("analysis_skipped"));
       p.setQcStatus(rs.getString("qc_status"));
 
