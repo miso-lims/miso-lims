@@ -89,7 +89,7 @@ networks and release their resources to the host operating system.
 
 These compose files are intended as a demonstration and __not a permanent installation__.
 
-Please see the [Docker Compose Guide](http://miso-lims.github.io/miso-lims/adm/compose-installation-guide) for more information on configuring the containers and the compose files.
+Please see the [Docker Compose Guide](http://miso-lims.github.io/miso-lims/latest/adm/compose-installation-guide) for more information on configuring the containers and the compose files.
 
 
 ## User Tutorial
@@ -108,7 +108,7 @@ lab's specific needs.
 To run your own MISO instance in the long term, download the
 [latest release](https://github.com/miso-lims/miso-lims/releases/latest).
 
-Installation and configuration details can be found in the [MISO installation guide](http://miso-lims.github.io/miso-lims/adm/installation-guide.html).
+Installation and configuration details can be found in the [MISO installation guide](http://miso-lims.github.io/miso-lims/latest/adm/installation-guide.html).
 
 ## Contact and Community
 
