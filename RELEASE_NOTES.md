@@ -2,7 +2,14 @@
 
 Changes:
 
-
+  * Added library aliquot attributes which may override attributes on the library
+    * alias (will be validated the same way as library aliases)
+    * size (bp)
+    * library design code (detailed sample)
+    * group ID (detailed sample)
+    * group description (detailed sample)
+  * Added readLength for libraries and library aliquots in Pinery-MISO
+  * Fixed missing storage location for library aliquots in Pinery-MISO (for real this time)
 
 # 0.2.183
 

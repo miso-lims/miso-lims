@@ -35,7 +35,7 @@ public class ListTablesIT extends AbstractIT {
   private static final Set<String> librariesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
       Columns.SAMPLE_NAME, Columns.SAMPLE_ALIAS, Columns.QC_PASSED, Columns.INDEX, Columns.LOCATION, Columns.LAST_MODIFIED,
       Columns.WARNINGS);
-  private static final Set<String> libraryAliquotsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.WARNINGS,
+  private static final Set<String> libraryAliquotsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.WARNINGS,
       Columns.LIBRARY_NAME, Columns.LIBRARY_ALIAS, Columns.PLATFORM, Columns.TARGETED_SEQUENCING, Columns.VOLUME, Columns.CONCENTRATION,
       Columns.NG_USED, Columns.VOLUME_USED, Columns.MATRIX_BARCODE, Columns.CREATOR, Columns.CREATION_DATE);
   private static final Set<String> poolsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,

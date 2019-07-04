@@ -205,3 +205,6 @@ INSERT INTO `SampleAliquot` (sampleId, samplePurposeId) VALUES
 
 INSERT INTO DetailedLibrary(libraryId, archived, libraryDesign, libraryDesignCodeId) VALUES
   (1, 0, 1, 7);
+
+INSERT INTO DetailedLibraryAliquot (aliquotId, libraryDesignCodeId) VALUES
+(1, 7);

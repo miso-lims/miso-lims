@@ -2,9 +2,8 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
-public interface DetailedSample extends Sample {
+public interface DetailedSample extends Sample, GroupIdentifiable {
 
   public DetailedSample getParent();
 
@@ -43,34 +42,6 @@ public interface DetailedSample extends Sample {
   void setSiblingNumber(Integer siblingNumber);
 
   /**
-   * Gets the Group ID string of this sample analyte.
-   * 
-   * @return String groupId
-   */
-  String getGroupId();
-
-  /**
-   * Sets the Group ID string of this sample analyte.
-   * 
-   * @param Long groupId
-   */
-  void setGroupId(String groupId);
-
-  /**
-   * Gets the Group Description string of this sample analyte.
-   * 
-   * @return String groupDescription
-   */
-  String getGroupDescription();
-
-  /**
-   * Sets the Group Description string of this sample analyte.
-   * 
-   * @param String groupDescription
-   */
-  void setGroupDescription(String groupDescription);
-
-  /**
    * True if the entity is not a physical sample, but one created to create the appearance of a complete hierarchy when partially processed
    * sample is received by the lab.
    */
@@ -106,13 +77,6 @@ public interface DetailedSample extends Sample {
   Long getIdentityId();
 
   void setIdentityId(Long identityId);
-
-  /**
-   * Searches the sample hierarchy until a Group ID is found. Returns null if no sample has a Group ID.
-   * 
-   * @return Sample nearest sample with a non-empty group ID. May be the current sample.
-   */
-  Optional<DetailedSample> getEffectiveGroupIdSample();
 
   /**
    * Field for storing the date of sample creation. This is not the date that the sample was entered into MISO.

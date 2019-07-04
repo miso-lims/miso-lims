@@ -22,6 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
@@ -36,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.AlphanumericComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
+import uk.ac.bbsrc.tgac.miso.dto.DetailedLibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
@@ -94,7 +96,18 @@ public class EditLibraryAliquotController {
 
     @Override
     protected LibraryAliquotDto createDtoFromParent(Library item) {
-      LibraryAliquotDto dto = new LibraryAliquotDto();
+      LibraryAliquotDto dto = null;
+      if (LimsUtils.isDetailedLibrary(item)) {
+        DetailedLibraryAliquotDto detailed = new DetailedLibraryAliquotDto();
+        DetailedLibrary detailedLibrary = (DetailedLibrary) item;
+        detailed.setNonStandardAlias(detailedLibrary.hasNonStandardAlias());
+        detailed.setLibraryDesignCodeId(detailedLibrary.getLibraryDesignCode().getId());
+        dto = detailed;
+      } else {
+        dto = new LibraryAliquotDto();
+      }
+      dto.setAlias(item.getAlias());
+      dto.setDnaSize(item.getDnaSize());
       dto.setLibrary(Dtos.asDto(item, false));
       if (item.getSample().getProject().getDefaultTargetedSequencing() != null) {
         dto.setTargetedSequencingId(item.getSample().getProject().getDefaultTargetedSequencing().getId());

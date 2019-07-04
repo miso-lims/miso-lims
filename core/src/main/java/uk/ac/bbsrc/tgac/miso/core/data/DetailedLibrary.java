@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-public interface DetailedLibrary extends Library {
+public interface DetailedLibrary extends Library, GroupIdentifiable {
 
   Boolean getArchived();
 
@@ -29,13 +29,5 @@ public interface DetailedLibrary extends Library {
   LibraryDesignCode getLibraryDesignCode();
 
   void setLibraryDesignCode(LibraryDesignCode libraryDesignCode);
-
-  String getGroupId();
-
-  void setGroupId(String groupId);
-
-  String getGroupDescription();
-
-  void setGroupDescription(String groupDescription);
 
 }

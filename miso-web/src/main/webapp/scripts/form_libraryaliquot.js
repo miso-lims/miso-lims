@@ -3,6 +3,12 @@ if (typeof FormTarget === 'undefined') {
 }
 FormTarget.libraryaliquot = (function($) {
 
+  /*
+   * Expected config {
+   *   detailedSample: boolean
+   * }
+   */
+
   return {
     getSaveUrl: function(aliquot) {
       if (aliquot.id) {
@@ -39,10 +45,38 @@ FormTarget.libraryaliquot = (function($) {
             return Urls.ui.libraries.edit(aliquot.library.id);
           }
         }, {
+          title: 'Alias',
+          data: 'alias',
+          type: 'text',
+          required: true,
+          maxLength: 100
+        }, {
           title: 'Matrix Barcode',
           data: 'identificationBarcode',
           type: 'text',
           maxLength: 255
+        }, {
+          title: 'Design Code',
+          data: 'libraryDesignCodeId',
+          type: 'dropdown',
+          include: config.detailedSample,
+          required: true,
+          getSource: function() {
+            return Constants.libraryDesignCodes;
+          },
+          sortSource: Utils.sorting.standardSort('code'),
+          getItemLabel: function(item) {
+            return item.code + ' (' + item.description + ')';
+          },
+          getItemValue: function(item) {
+            return item.id;
+          }
+        }, {
+          title: 'Size (bp)',
+          data: 'dnaSize',
+          type: 'int',
+          maxLength: 10,
+          min: 1
         }, {
           title: 'Discarded',
           data: 'discarded',
@@ -90,6 +124,32 @@ FormTarget.libraryaliquot = (function($) {
           data: 'volumeUsed',
           type: 'decimal'
         }].concat(FormUtils.makeDistributionFields())
+      }, {
+        title: 'Details',
+        include: config.detailedSample,
+        fields: [{
+          title: 'Effective Group ID',
+          data: 'effectiveGroupId',
+          type: 'read-only',
+          getDisplayValue: function(library) {
+            if (library.hasOwnProperty('effectiveGroupId') && library.effectiveGroupId !== null) {
+              return library.effectiveGroupId + ' (' + library.effectiveGroupIdSample + ')';
+            } else {
+              return 'None';
+            }
+          }
+        }, {
+          title: 'Group ID',
+          data: 'groupId',
+          type: 'text',
+          maxLength: 100,
+          regex: Utils.validation.alphanumRegex
+        }, {
+          title: 'Group Description',
+          data: 'groupDescription',
+          type: 'text',
+          maxLength: 255
+        }]
       }];
     }
   };

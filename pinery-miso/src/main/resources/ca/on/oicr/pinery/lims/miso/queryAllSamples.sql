@@ -175,8 +175,8 @@ SELECT l.alias NAME
         ,box.locationBarcode boxLocation 
         ,box.alias boxAlias 
         ,pos.position boxPosition 
-        ,NULL paired 
-        ,NULL readLength 
+        ,l.paired paired 
+        ,l.dnaSize readLength 
         ,NULL targeted_sequencing 
         ,'Library' miso_type 
         ,lai.preMigrationId premigration_id 
@@ -248,7 +248,7 @@ LEFT JOIN Box box ON box.boxId = pos.boxId
  
 UNION ALL
  
-SELECT parent.alias name 
+SELECT d.alias name 
         ,NULL description 
         ,d.NAME id 
         ,parent.name parentId 
@@ -280,8 +280,8 @@ SELECT parent.alias name
         ,NULL tissue_region 
         ,NULL tube_id 
         ,NULL str_result 
-        ,NULL group_id 
-        ,NULL group_id_description 
+        ,dla.groupId group_id 
+        ,dla.groupDescription group_id_description 
         ,NULL purpose 
         ,NULL qubit_concentration 
         ,NULL nanodrop_concentration 
@@ -290,11 +290,11 @@ SELECT parent.alias name
         ,NULL qpcr_percentage_human 
         ,1 qcPassed 
         ,NULL detailedQcStatus 
-        ,NULL boxLocation 
-        ,NULL boxAlias 
-        ,NULL boxPosition 
-        ,NULL paired 
-        ,NULL readLength 
+        ,box.locationBarcode boxLocation 
+        ,box.alias boxAlias 
+        ,pos.position boxPosition 
+        ,parent.paired paired 
+        ,d.dnaSize readLength 
         ,ts.alias targeted_sequencing 
         ,'Library Aliquot' miso_type 
         ,d.preMigrationId premigration_id 
@@ -307,15 +307,15 @@ SELECT parent.alias name
         ,NULL slides_consumed
         ,NULL pdac
         ,NULL isSynthetic
-        ,NULL distributed
-        ,NULL distribution_date
+        ,d.distributed distributed
+        ,d.distributionDate distribution_date
 FROM LibraryAliquot d 
 JOIN Library parent ON parent.libraryId = d.libraryId 
 JOIN Sample s ON s.sampleId = parent.sample_sampleId
 JOIN Project sp ON sp.projectId = s.project_projectId
 JOIN LibraryType lt ON lt.libraryTypeId = parent.libraryType 
-LEFT JOIN DetailedLibrary lai ON lai.libraryId = parent.libraryId 
-LEFT JOIN LibraryDesignCode ldc ON lai.libraryDesignCodeId = ldc.libraryDesignCodeId
+LEFT JOIN DetailedLibraryAliquot dla ON dla.aliquotId = d.aliquotId 
+LEFT JOIN LibraryDesignCode ldc ON ldc.libraryDesignCodeId = dla.libraryDesignCodeId
 LEFT JOIN TargetedSequencing ts ON d.targetedSequencingId = ts.targetedSequencingId
 LEFT JOIN BoxPosition pos ON pos.targetId = d.aliquotId 
         AND pos.targetType = 'LIBRARY_ALIQUOT' 

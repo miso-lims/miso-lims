@@ -39,6 +39,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -70,16 +72,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryAliquotChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-/**
- * uk.ac.bbsrc.tgac.miso.core.data.impl
- * <p/>
- * Info
- * 
- * @author Rob Davey
- * @since 0.0.2
- */
 @Entity
 @Table(name = "LibraryAliquot")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class LibraryAliquot extends AbstractBoxable
     implements Barcodable, ChangeLoggable, Comparable<LibraryAliquot>, Nameable, Boxable, Deletable, Serializable, Timestamped {
 
@@ -92,6 +87,9 @@ public class LibraryAliquot extends AbstractBoxable
 
   @Column(nullable = false)
   private String name;
+
+  private String alias;
+
   @Column(nullable = false)
   @Temporal(TemporalType.DATE)
   private Date creationDate;
@@ -105,6 +103,9 @@ public class LibraryAliquot extends AbstractBoxable
   @Enumerated(EnumType.STRING)
   @Column(nullable = true)
   private ConcentrationUnit concentrationUnits;
+
+  private Integer dnaSize;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = true)
   private VolumeUnit volumeUnits;
@@ -112,6 +113,7 @@ public class LibraryAliquot extends AbstractBoxable
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
   private User creator;
+
   @ManyToOne(targetEntity = LibraryImpl.class)
   @JoinColumn(name = "libraryId")
   private Library library;
@@ -230,6 +232,14 @@ public class LibraryAliquot extends AbstractBoxable
 
   public void setConcentrationUnits(ConcentrationUnit concentrationUnits) {
     this.concentrationUnits = concentrationUnits;
+  }
+
+  public Integer getDnaSize() {
+    return dnaSize;
+  }
+
+  public void setDnaSize(Integer dnaSize) {
+    this.dnaSize = dnaSize;
   }
 
   public VolumeUnit getVolumeUnits() {
@@ -370,7 +380,12 @@ public class LibraryAliquot extends AbstractBoxable
 
   @Override
   public String getAlias() {
-    return name;
+    return alias;
+  }
+
+  @Override
+  public void setAlias(String alias) {
+    this.alias = alias;
   }
 
   @Override
@@ -405,11 +420,6 @@ public class LibraryAliquot extends AbstractBoxable
   @Override
   public String getLocationBarcode() {
     return identificationBarcode;
-  }
-
-  @Override
-  public void setAlias(String alias) {
-    name = alias;
   }
 
   @Override

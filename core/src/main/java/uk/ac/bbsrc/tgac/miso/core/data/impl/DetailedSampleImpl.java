@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.persistence.Column;
@@ -24,6 +23,7 @@ import javax.persistence.Transient;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -167,15 +167,6 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   }
 
   @Override
-  public Optional<DetailedSample> getEffectiveGroupIdSample() {
-    for (DetailedSample sample = this; sample != null; sample = sample.getParent()) {
-      String groupId = sample.getGroupId();
-      if (!LimsUtils.isStringEmptyOrNull(groupId)) return Optional.of(sample);
-    }
-    return Optional.empty();
-  }
-
-  @Override
   public Boolean isSynthetic() {
     return isSynthetic;
   }
@@ -246,6 +237,11 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @Override
   public Date getBarcodeDate() {
     return Stream.of(getReceivedDate(), getCreationDate(), getCreationTime()).filter(Objects::nonNull).findFirst().orElse(null);
+  }
+
+  @Override
+  public GroupIdentifiable getGroupIdentifiableParent() {
+    return getParent();
   }
 
 }

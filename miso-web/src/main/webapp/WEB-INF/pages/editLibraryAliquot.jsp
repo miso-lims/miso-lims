@@ -64,7 +64,9 @@
 <script type="text/javascript">
   jQuery(document).ready(function () {
     Warning.generateHeaderWarnings('warnings', WarningTarget.libraryaliquot, ${aliquotDto});
-    FormUtils.createForm('libraryAliquotForm', 'save', ${aliquotDto}, 'libraryaliquot', {});
+    FormUtils.createForm('libraryAliquotForm', 'save', ${aliquotDto}, 'libraryaliquot', {
+      detailedSample: Constants.isDetailedSample
+    });
   });
 </script>
 

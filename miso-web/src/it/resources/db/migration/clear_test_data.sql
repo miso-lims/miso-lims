@@ -38,6 +38,7 @@ DELETE FROM Array;
 DELETE FROM ArrayModel;
 DELETE FROM LibraryQC;
 DELETE FROM LibraryAliquotChangeLog;
+DELETE FROM DetailedLibraryAliquot;
 DELETE FROM LibraryAliquot;
 DELETE FROM DetailedLibrary;
 DELETE FROM Library_Index;
