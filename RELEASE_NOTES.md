@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 0.2.183
+
+Changes:
+
   * Added partition number and library alias to Cell Ranger sample sheets
   * Added pool ID and modification details to Pinery-MISO run positions
   * Renamed library dilutions to library aliquots

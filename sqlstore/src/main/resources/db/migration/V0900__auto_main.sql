@@ -1,3 +1,4 @@
+-- rename_dilution
 CREATE TABLE LibraryAliquot (
   aliquotId bigint(20) NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
@@ -95,3 +96,4 @@ DROP PROCEDURE IF EXISTS deleteDilution;
 
 UPDATE BoxPosition SET targetType = 'LIBRARY_ALIQUOT' WHERE targetType = 'DILUTION';
 -- EndNoTest
+
