@@ -46,11 +46,9 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -72,7 +70,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
@@ -407,49 +404,6 @@ public class EditSampleController {
     }
     detailedTemplate.setSampleClassId(target.getId());
     return detailedTemplate;
-  }
-
-  @PostMapping
-  public ModelAndView processSubmit(@ModelAttribute("sample") Sample sample, ModelMap model, SessionStatus session)
-      throws IOException {
-    if (sample instanceof DetailedSampleBuilder) {
-      DetailedSampleBuilder builder = (DetailedSampleBuilder) sample;
-      builder.setSampleClass(sampleClassService.get(builder.getSampleClass().getId()));
-      if (builder.getTissueClass() != null) {
-        builder.setTissueClass(sampleClassService.get(builder.getTissueClass().getId()));
-      }
-      if (builder.getParent() == null) {
-        SampleClass stockClass = null;
-        if (builder.getSampleClass().getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)) {
-          stockClass = sampleClassService.inferParentFromChild(builder.getSampleClass().getId(), SampleAliquot.CATEGORY_NAME,
-              SampleStock.CATEGORY_NAME);
-          builder.setStockClass(stockClass);
-          if (builder.getStockClass() == null) {
-            throw new IllegalStateException(String.format("%s class with id %d has no %s parents", SampleAliquot.CATEGORY_NAME,
-                builder.getSampleClass().getId(), SampleStock.CATEGORY_NAME));
-          }
-        } else if (builder.getSampleClass().getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
-          stockClass = builder.getSampleClass();
-        }
-        if (builder.getTissueProcessingClass() == null && stockClass != null) {
-          builder.setTissueProcessingClass(sampleClassService.getRequiredTissueProcessingClass(stockClass.getId()));
-        }
-      }
-      sample = builder.build();
-    }
-    try {
-      if (sample.getId() == Sample.UNSAVED_ID) {
-        sampleService.create(sample);
-      } else {
-        sampleService.update(sample);
-      }
-      session.setComplete();
-      model.clear();
-      return new ModelAndView("redirect:/miso/sample/" + sample.getId(), model);
-    } catch (IOException ex) {
-      log.debug("Failed to save sample", ex);
-      throw ex;
-    }
   }
 
   private final class BulkEditSampleBackend extends BulkEditTableBackend<Sample, SampleDto> {

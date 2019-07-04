@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
@@ -45,8 +46,8 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Subproject",
           (sam-> (LimsUtils.isDetailedSample(sam) && ((DetailedSample) sam).getSubproject() != null ? 
               ((DetailedSample) sam).getSubproject().getAlias() : ""))), //
-      Column.forString("Group ID", effectiveGroupIdProperty(DetailedSample::getGroupId)), //
-      Column.forString("Group Description", effectiveGroupIdProperty(DetailedSample::getGroupDescription))
+      Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
+      Column.forString("Group Description", effectiveGroupIdProperty(GroupIdentifiable::getGroupDescription))
 	);
   
   private static <S extends DetailedSample, T> Function<Sample, T> detailedSample(Class<S> clazz, Function<S, T> function, T defaultValue) {
@@ -64,10 +65,10 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
     };
   }
 
-  private static Function<Sample, String> effectiveGroupIdProperty(Function<DetailedSample, String> getter) {
+  private static Function<Sample, String> effectiveGroupIdProperty(Function<GroupIdentifiable, String> getter) {
     return s -> {
       if (LimsUtils.isDetailedSample(s)) {
-        DetailedSample parent = ((DetailedSample) s).getEffectiveGroupIdSample().orElse(null);
+        GroupIdentifiable parent = ((DetailedSample) s).getEffectiveGroupIdEntity();
         if (parent != null) {
           return getter.apply(parent);
         }

@@ -11,7 +11,7 @@ HotTarget.libraryaliquot = {
   fixUp: function(lib, errorHandler) {
   },
   getFixedColumns: function(config) {
-    return config.pageMode == 'edit' ? 1 : 0;
+    return 2;
   },
   createColumns: function(config, create, data) {
     var columns = [
@@ -28,10 +28,9 @@ HotTarget.libraryaliquot = {
           pack: function(dil, flat, errorHandler) {
             dil.name = flat.name;
           }
-
         },
-        HotUtils.makeColumnForText('Matrix Barcode', !Constants.automaticBarcodes, 'identificationBarcode', {
-          validator: HotUtils.validator.optionalTextNoSpecialChars
+        HotUtils.makeColumnForText('Library Aliquot Alias', true, 'alias', {
+          validator: HotUtils.validator.requiredTextNoSpecialChars
         }),
         {
           header: 'Library Alias',
@@ -44,6 +43,36 @@ HotTarget.libraryaliquot = {
           pack: function(dil, flat, errorHandler) {
           }
         },
+        HotUtils.makeColumnForText('Matrix Barcode', !Constants.automaticBarcodes, 'identificationBarcode', {
+          validator: HotUtils.validator.optionalTextNoSpecialChars
+        }),
+        {
+          header: 'Effective Group ID',
+          data: 'effectiveGroupId',
+          include: Constants.isDetailedSample,
+          type: 'text',
+          readOnly: true,
+          depends: 'groupId',
+          update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+            if (flatProperty === 'groupId')
+              setData(flat.groupId);
+          },
+          unpack: function(lib, flat, setCellMeta) {
+            flat.effectiveGroupId = lib.effectiveGroupId ? lib.effectiveGroupId : '(None)';
+          },
+          pack: function(lib, flat, errorHandler) {
+            // left blank as this will never be deserialized into the Library model
+          }
+        },
+        HotUtils.makeColumnForText('Group ID', Constants.isDetailedSample, 'groupId', {
+          validator: HotUtils.validator.optionalTextAlphanumeric
+        }),
+        HotUtils.makeColumnForText('Group Desc.', Constants.isDetailedSample, 'groupDescription', {}),
+        HotUtils.makeColumnForConstantsList('Design Code', Constants.isDetailedSample, 'libraryDesignCode', 'libraryDesignCodeId', 'id',
+            'code', Constants.libraryDesignCodes, true, {
+              validator: HotUtils.validator.requiredAutocomplete
+            }),
+        HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false),
         HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false),
         {
           header: 'Conc. Units',

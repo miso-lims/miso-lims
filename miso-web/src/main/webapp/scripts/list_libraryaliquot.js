@@ -94,7 +94,7 @@ ListTarget.libraryaliquot = {
         }
         return data;
       }
-    }, {
+    }, ListUtils.labelHyperlinkColumn("Alias", Urls.ui.libraryAliquots.edit, Utils.array.getId, "alias", 0, true), {
       "sTitle": "Warnings",
       "mData": null,
       "mRender": Warning.tableWarningRenderer(WarningTarget.libraryaliquot),

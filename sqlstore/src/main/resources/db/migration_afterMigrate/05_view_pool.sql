@@ -2,6 +2,7 @@ CREATE OR REPLACE VIEW PoolableElementView
 AS SELECT
     d.aliquotId,
     d.name AS aliquotName,
+    d.alias AS aliquotAlias,
     d.concentration AS aliquotConcentration,
     d.concentrationUnits AS aliquotConcentrationUnits,
     d.volume AS aliquotVolume,

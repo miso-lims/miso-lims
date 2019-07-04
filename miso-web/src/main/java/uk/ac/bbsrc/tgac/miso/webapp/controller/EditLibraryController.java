@@ -33,7 +33,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -66,6 +65,7 @@ import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -362,10 +362,10 @@ public class EditLibraryController {
         if (sample.getBox() != null) {
           detailedDto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(sample.getBox().getAlias(), sample.getBoxPosition()));
         }
-        Optional<DetailedSample> effective = sample.getEffectiveGroupIdSample();
-        if (effective.isPresent()) {
-          detailedDto.setEffectiveGroupId(effective.get().getGroupId());
-          detailedDto.setEffectiveGroupIdSample(effective.get().getAlias());
+        GroupIdentifiable effective = sample.getEffectiveGroupIdEntity();
+        if (effective != null) {
+          detailedDto.setEffectiveGroupId(effective.getGroupId());
+          detailedDto.setEffectiveGroupIdSample(effective.getAlias());
         }
         dto = detailedDto;
       } else {

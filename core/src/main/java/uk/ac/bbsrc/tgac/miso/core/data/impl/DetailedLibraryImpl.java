@@ -14,8 +14,11 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 @Table(name = "DetailedLibrary")
@@ -137,6 +140,11 @@ public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary 
         .append(nonStandardAlias, other.nonStandardAlias)
         .append(preMigrationId, other.preMigrationId)
         .isEquals();
+  }
+
+  @Override
+  public GroupIdentifiable getGroupIdentifiableParent() {
+    return getSample() != null && LimsUtils.isDetailedSample(getSample()) ? (DetailedSample) getSample() : null;
   }
 
 }

@@ -24,6 +24,7 @@ DELETE FROM Pool_Note;
 DELETE FROM PoolChangeLog;
 DELETE FROM Pool;
 DELETE FROM LibraryAliquotChangeLog;
+DELETE FROM DetailedLibraryAliquot;
 DELETE FROM LibraryAliquot;
 DELETE FROM DetailedLibrary;
 DELETE FROM Library_Index;
@@ -250,8 +251,8 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
 INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (1, 5);
 
-INSERT INTO LibraryAliquot (aliquotId, name, concentration, libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated) VALUES
-(1, 'LDI1', 5.9, 1, '12321', '2017-07-20', 1, 1, '2017-07-20 09:01:00');
+INSERT INTO LibraryAliquot (aliquotId, name, alias, concentration, libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated) VALUES
+(1, 'LDI1', 'TEST_0001_Bn_R_PE_300_WG', 5.9, 1, '12321', '2017-07-20', 1, 1, '2017-07-20 09:01:00');
 
 INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
 (1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL);

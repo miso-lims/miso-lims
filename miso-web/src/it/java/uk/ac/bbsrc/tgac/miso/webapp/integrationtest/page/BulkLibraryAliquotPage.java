@@ -18,6 +18,8 @@ public class BulkLibraryAliquotPage extends HeaderFooterPage {
 
   public static class LibraryAliquotColumns {
     public static final String NAME = "Library Aliquot Name";
+    public static final String ALIAS = "Library Aliquot Alias";
+    public static final String LIBRARY_ALIAS = "Library Alias";
     public static final String ID_BARCODE = "Matrix Barcode";
     public static final String BOX_SEARCH = "Box Search";
     public static final String BOX_ALIAS = "Box Alias";
@@ -26,7 +28,11 @@ public class BulkLibraryAliquotPage extends HeaderFooterPage {
     public static final String DISTRIBUTED = "Distributed";
     public static final String DISTRIBUTION_DATE = "Distribution Date";
     public static final String DISTRIBUTION_RECIPIENT = "Distribution Recipient";
-    public static final String LIBRARY_ALIAS = "Library Alias";
+    public static final String EFFECTIVE_GROUP_ID = "Effective Group ID";
+    public static final String GROUP_ID = "Group ID";
+    public static final String GROUP_DESCRIPTION = "Group Desc.";
+    public static final String DESIGN_CODE = "Design Code";
+    public static final String SIZE = "Size (bp)";
     public static final String CONCENTRATION = "Conc.";
     public static final String CONCENTRATION_UNITS = "Conc. Units";
     public static final String VOLUME = "Volume";

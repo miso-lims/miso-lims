@@ -26,10 +26,14 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public class BulkLibraryAliquotIT extends AbstractIT {
 
-  private static final Set<String> columns = Sets.newHashSet(LibraryAliquotColumns.NAME, LibraryAliquotColumns.ID_BARCODE, LibraryAliquotColumns.BOX_SEARCH,
-      LibraryAliquotColumns.BOX_ALIAS, LibraryAliquotColumns.DISCARDED, LibraryAliquotColumns.BOX_POSITION, LibraryAliquotColumns.LIBRARY_ALIAS, LibraryAliquotColumns.CONCENTRATION,
-      LibraryAliquotColumns.CONCENTRATION_UNITS, LibraryAliquotColumns.CREATION_DATE, LibraryAliquotColumns.VOLUME, LibraryAliquotColumns.VOLUME_UNITS, LibraryAliquotColumns.NG_USED,
-      LibraryAliquotColumns.VOLUME_USED, LibraryAliquotColumns.TARGETED_SEQUENCING);
+  private static final Set<String> columns = Sets.newHashSet(LibraryAliquotColumns.NAME, LibraryAliquotColumns.ALIAS,
+      LibraryAliquotColumns.LIBRARY_ALIAS, LibraryAliquotColumns.ID_BARCODE, LibraryAliquotColumns.BOX_SEARCH,
+      LibraryAliquotColumns.BOX_ALIAS, LibraryAliquotColumns.BOX_POSITION, LibraryAliquotColumns.DISCARDED,
+      LibraryAliquotColumns.EFFECTIVE_GROUP_ID, LibraryAliquotColumns.GROUP_ID, LibraryAliquotColumns.GROUP_DESCRIPTION,
+      LibraryAliquotColumns.DESIGN_CODE, LibraryAliquotColumns.SIZE, LibraryAliquotColumns.CONCENTRATION,
+      LibraryAliquotColumns.CONCENTRATION_UNITS, LibraryAliquotColumns.VOLUME, LibraryAliquotColumns.VOLUME_UNITS,
+      LibraryAliquotColumns.NG_USED, LibraryAliquotColumns.VOLUME_USED, LibraryAliquotColumns.CREATION_DATE,
+      LibraryAliquotColumns.TARGETED_SEQUENCING);
 
   private static final String NO_TAR_SEQ = "(None)";
 

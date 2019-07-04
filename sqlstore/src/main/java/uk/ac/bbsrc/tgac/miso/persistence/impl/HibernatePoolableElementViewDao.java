@@ -95,6 +95,8 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
       return "aliquotId";
     case "name":
       return "aliquotName";
+    case "alias":
+      return "aliquotAlias";
     case "volume":
       return "aliquotVolume";
     case "identificationBarcode":

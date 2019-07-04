@@ -22,12 +22,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
@@ -57,6 +59,8 @@ public class DefaultLibraryAliquotService
   @Autowired
   private LibraryService libraryService;
   @Autowired
+  private LibraryDesignCodeService libraryDesignCodeService;
+  @Autowired
   private TargetedSequencingService targetedSequencingService;
   @Autowired
   private BoxService boxService;
@@ -72,7 +76,7 @@ public class DefaultLibraryAliquotService
   }
 
   private LibraryAliquot save(LibraryAliquot aliquot) throws IOException {
-    aliquot.setLastModifier(authorizationManager.getCurrentUser());
+    validateAlias(aliquot);
     try {
       Long newId = libraryAliquotDao.save(aliquot);
       LibraryAliquot managed = libraryAliquotDao.get(newId);
@@ -97,6 +101,16 @@ public class DefaultLibraryAliquotService
       // Send the nested root cause message to the user, since it contains the actual error.
       throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),
           e.getConstraintName());
+    }
+  }
+
+  private void validateAlias(LibraryAliquot aliquot) {
+    if (!isDetailedLibraryAliquot(aliquot) || !((DetailedLibraryAliquot) aliquot).isNonStandardAlias()) {
+      uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation = namingScheme
+          .validateLibraryAlias(aliquot.getAlias());
+      if (!aliasValidation.isValid()) {
+        throw new ValidationException(new ValidationError("alias", aliasValidation.getMessage()));
+      }
     }
   }
 
@@ -205,6 +219,13 @@ public class DefaultLibraryAliquotService
     if (aliquot.getTargetedSequencing() != null) {
       aliquot.setTargetedSequencing(targetedSequencingService.get(aliquot.getTargetedSequencing().getId()));
     }
+
+    if (isDetailedLibraryAliquot(aliquot)) {
+      DetailedLibraryAliquot detailed = (DetailedLibraryAliquot) aliquot;
+      if (detailed.getLibraryDesignCode() != null) {
+        detailed.setLibraryDesignCode(libraryDesignCodeService.get(detailed.getLibraryDesignCode().getId()));
+      }
+    }
   }
 
   private void maybeRemoveFromBox(LibraryAliquot aliquot) {
@@ -221,6 +242,7 @@ public class DefaultLibraryAliquotService
    * @throws IOException
    */
   private void applyChanges(LibraryAliquot target, LibraryAliquot source) {
+    target.setAlias(source.getAlias());
     target.setTargetedSequencing(source.getTargetedSequencing());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setDiscarded(source.isDiscarded());
@@ -233,11 +255,20 @@ public class DefaultLibraryAliquotService
     target.setDistributed(source.isDistributed());
     target.setDistributionDate(source.getDistributionDate());
     target.setDistributionRecipient(source.getDistributionRecipient());
+    target.setDnaSize(source.getDnaSize());
     target.setConcentration(source.getConcentration());
     target.setConcentrationUnits(target.getConcentration() == null ? null : source.getConcentrationUnits());
     target.setNgUsed(source.getNgUsed());
     target.setVolumeUsed(source.getVolumeUsed());
     target.setCreationDate(source.getCreationDate());
+
+    if (isDetailedLibraryAliquot(target)) {
+      DetailedLibraryAliquot dTarget = (DetailedLibraryAliquot) target;
+      DetailedLibraryAliquot dSource = (DetailedLibraryAliquot) source;
+      dTarget.setLibraryDesignCode(dSource.getLibraryDesignCode());
+      dTarget.setGroupId(dSource.getGroupId());
+      dTarget.setGroupDescription(dSource.getGroupDescription());
+    }
   }
 
   private void validateChange(LibraryAliquot aliquot, LibraryAliquot beforeChange) throws IOException {

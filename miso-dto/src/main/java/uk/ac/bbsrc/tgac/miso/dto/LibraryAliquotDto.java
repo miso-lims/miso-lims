@@ -6,14 +6,23 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = DetailedLibraryAliquotDto.class, name = "Detailed"),
+    @JsonSubTypes.Type(value = LibraryAliquotDto.class, name = "Plain") })
+@JsonTypeName(value = "Plain")
 public class LibraryAliquotDto extends AbstractBoxableDto {
 
   private Long id;
   private String name;
+  private String alias;
   private String identificationBarcode;
   private String locationLabel;
   private String concentration;
@@ -32,6 +41,7 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
   private String identityConsentLevel;
   private String ngUsed;
   private String volumeUsed;
+  private Integer dnaSize;
   private Integer proportion;
   private String subprojectAlias;
   private Boolean subprojectPriority;
@@ -53,6 +63,14 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getAlias() {
+    return alias;
+  }
+
+  public void setAlias(String alias) {
+    this.alias = alias;
   }
 
   @JsonInclude(JsonInclude.Include.ALWAYS)
@@ -185,6 +203,14 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
 
   public void setVolumeUsed(String volumeUsed) {
     this.volumeUsed = volumeUsed;
+  }
+
+  public Integer getDnaSize() {
+    return dnaSize;
+  }
+
+  public void setDnaSize(Integer dnaSize) {
+    this.dnaSize = dnaSize;
   }
 
   public Integer getProportion() {

@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -46,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
@@ -118,6 +118,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
@@ -466,10 +467,10 @@ public class Dtos {
       SampleIdentity identity = LimsUtils.getParent(SampleIdentity.class, from);
       dto.setEffectiveExternalNames(identity.getExternalName());
     }
-    Optional<DetailedSample> effective = from.getEffectiveGroupIdSample();
-    if (effective.isPresent()) {
-      dto.setEffectiveGroupId(effective.get().getGroupId());
-      dto.setEffectiveGroupIdSample(effective.get().getAlias());
+    GroupIdentifiable effective = from.getEffectiveGroupIdEntity();
+    if (effective != null) {
+      dto.setEffectiveGroupId(effective.getGroupId());
+      dto.setEffectiveGroupIdSample(effective.getAlias());
     }
     if (from.getGroupId() != null) {
       dto.setGroupId(from.getGroupId());
@@ -1111,16 +1112,10 @@ public class Dtos {
     dto.setPreMigrationId(from.getPreMigrationId());
     dto.setArchived(from.getArchived());
     dto.setNonStandardAlias(from.hasNonStandardAlias());
-    if (from.getGroupId() != null) {
-      dto.setGroupId(from.getGroupId());
-      dto.setEffectiveGroupId(from.getGroupId());
-      dto.setEffectiveGroupIdSample(from.getAlias());
-    } else {
-      Optional<DetailedSample> effective = ((DetailedSample) from.getSample()).getEffectiveGroupIdSample();
-      effective.ifPresent(upstream -> {
-        dto.setEffectiveGroupId(upstream.getGroupId());
-        dto.setEffectiveGroupIdSample(upstream.getAlias());
-      });
+    GroupIdentifiable effective = from.getEffectiveGroupIdEntity();
+    if (effective != null) {
+      dto.setEffectiveGroupId(effective.getGroupId());
+      dto.setEffectiveGroupIdSample(effective.getAlias());
     }
     if (from.getGroupDescription() != null) {
       dto.setGroupDescription(from.getGroupDescription());
@@ -1486,9 +1481,15 @@ public class Dtos {
   }
 
   private static LibraryAliquotDto asDto(@Nonnull LibraryAliquot from, @Nonnull LibraryDto libraryDto, boolean includeBoxPositions) {
-    LibraryAliquotDto dto = new LibraryAliquotDto();
+    LibraryAliquotDto dto = null;
+    if (isDetailedLibraryAliquot(from)) {
+      dto = asDetailedDto((DetailedLibraryAliquot) from);
+    } else {
+      dto = new LibraryAliquotDto();
+    }
     dto.setId(from.getId());
     dto.setName(from.getName());
+    setString(dto::setAlias, from.getAlias());
     dto.setCreatorName(from.getCreator().getFullName());
     dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
     dto.setConcentrationUnits(from.getConcentrationUnits());
@@ -1496,6 +1497,7 @@ public class Dtos {
     dto.setVolumeUnits(from.getVolumeUnits());
     dto.setNgUsed(from.getNgUsed() == null ? null : from.getNgUsed().toString());
     dto.setVolumeUsed(from.getVolumeUsed() == null ? null : from.getVolumeUsed().toString());
+    setInteger(dto::setDnaSize, from.getDnaSize(), true);
     if (from.getCreationDate() != null) {
       dto.setCreationDate(formatDate(from.getCreationDate()));
     }
@@ -1523,6 +1525,20 @@ public class Dtos {
         dto.setSubprojectPriority(detailed.getSubproject().getPriority());
       }
     }
+    return dto;
+  }
+  
+  private static DetailedLibraryAliquotDto asDetailedDto(DetailedLibraryAliquot from) {
+    DetailedLibraryAliquotDto dto = new DetailedLibraryAliquotDto();
+    setId(dto::setLibraryDesignCodeId, from.getLibraryDesignCode());
+    setBoolean(dto::setNonStandardAlias, from.isNonStandardAlias(), false);
+    GroupIdentifiable effective = from.getEffectiveGroupIdEntity();
+    if (effective != null) {
+      dto.setEffectiveGroupId(effective.getGroupId());
+      dto.setEffectiveGroupIdSample(effective.getAlias());
+    }
+    setString(dto::setGroupId, from.getGroupId());
+    setString(dto::setGroupDescription, from.getGroupDescription());
     return dto;
   }
 
@@ -1555,6 +1571,7 @@ public class Dtos {
     LibraryAliquotDto dto = new LibraryAliquotDto();
     dto.setId(from.getAliquotId());
     dto.setName(from.getAliquotName());
+    setString(dto::setAlias, from.getAliquotAlias());
     dto.setCreatorName(from.getCreatorFullName());
     dto.setConcentration(from.getAliquotConcentration() == null ? null : from.getAliquotConcentration().toString());
     dto.setConcentrationUnits(from.getAliquotConcentrationUnits());
@@ -1595,11 +1612,18 @@ public class Dtos {
   }
 
   public static LibraryAliquot to(@Nonnull LibraryAliquotDto from) {
-    LibraryAliquot to = new LibraryAliquot();
+    LibraryAliquot to = null;
+    if (from instanceof DetailedLibraryAliquotDto) {
+      to = toDetailed((DetailedLibraryAliquotDto) from);
+    } else {
+      to = new LibraryAliquot();
+    }
     if (from.getId() != null) to.setId(from.getId());
     if (!isStringEmptyOrNull(from.getName())) {
       to.setName(from.getName());
     }
+    setString(to::setAlias, from.getAlias());
+    setInteger(to::setDnaSize, from.getDnaSize(), true);
     to.setIdentificationBarcode(from.getIdentificationBarcode());
     to.setConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
     to.setConcentrationUnits(from.getConcentrationUnits());
@@ -1618,6 +1642,15 @@ public class Dtos {
     to.setDistributed(from.isDistributed());
     to.setDistributionDate(parseDate(from.getDistributionDate()));
     to.setDistributionRecipient(from.getDistributionRecipient());
+    return to;
+  }
+
+  private static DetailedLibraryAliquot toDetailed(DetailedLibraryAliquotDto from) {
+    DetailedLibraryAliquot to = new DetailedLibraryAliquot();
+    setBoolean(to::setNonStandardAlias, from.isNonStandardAlias(), false);
+    setObject(to::setLibraryDesignCode, LibraryDesignCode::new, from.getLibraryDesignCodeId());
+    setString(to::setGroupId, from.getGroupId());
+    setString(to::setGroupDescription, from.getGroupDescription());
     return to;
   }
 

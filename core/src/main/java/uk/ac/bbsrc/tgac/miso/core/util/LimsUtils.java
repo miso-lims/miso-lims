@@ -73,6 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
@@ -266,6 +267,10 @@ public class LimsUtils {
 
   public static boolean isDetailedLibrary(Library library) {
     return library instanceof DetailedLibrary;
+  }
+
+  public static boolean isDetailedLibraryAliquot(LibraryAliquot aliquot) {
+    return aliquot instanceof DetailedLibraryAliquot;
   }
 
   public static ConsentLevel getIdentityConsentLevel(DetailedSample sample) {

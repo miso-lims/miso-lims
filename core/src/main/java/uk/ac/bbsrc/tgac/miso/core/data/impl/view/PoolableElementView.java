@@ -43,6 +43,8 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private String aliquotName;
 
+  private String aliquotAlias;
+
   private Double aliquotConcentration;
 
   @Enumerated(EnumType.STRING)
@@ -229,6 +231,14 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   public void setAliquotName(String aliquotName) {
     this.aliquotName = aliquotName;
+  }
+
+  public String getAliquotAlias() {
+    return aliquotAlias;
+  }
+
+  public void setAliquotAlias(String aliquotAlias) {
+    this.aliquotAlias = aliquotAlias;
   }
 
   public Double getAliquotConcentration() {

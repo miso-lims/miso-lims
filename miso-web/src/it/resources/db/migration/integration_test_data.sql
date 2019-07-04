@@ -697,6 +697,19 @@ INSERT INTO DetailedLibrary(libraryId, archived, libraryDesign, libraryDesignCod
   (306, 0, NULL, 7),
   (504, 0, NULL, 7),
   (505, 0, NULL, 7),
+  (601, 0, NULL, 7),
+  (602, 0, NULL, 7),
+  (603, 0, NULL, 7),
+  (604, 0, NULL, 7),
+  (700, 0, NULL, 7),
+  (701, 0, NULL, 7),
+  (801, 0, NULL, 7),
+  (802, 0, NULL, 7),
+  (803, 0, NULL, 7),
+  (804, 0, NULL, 7),
+  (805, 0, NULL, 7),
+  (806, 0, NULL, 7),
+  (807, 0, NULL, 7),
   (901, 0, NULL, 7);
 
 INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
@@ -721,32 +734,53 @@ INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (603, 8),
   (604, 8);
 
-INSERT INTO LibraryAliquot (aliquotId, name, concentration, concentrationUnits, libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated) VALUES
-(1, 'LDI1', 5.9, 'NANOGRAMS_PER_MICROLITRE', 1, '12321', '2017-07-20', 1, 1, '2017-07-20 09:01:00'),
-(304, 'LDI304', 7.97, 'NANOGRAMS_PER_MICROLITRE', 304, '300304', '2017-08-14', 1, 1, '2017-08-14 12:25:00'),
-(305, 'LDI305', 7.97, 'NANOGRAMS_PER_MICROLITRE', 305, '300305', '2017-08-14', 1, 1, '2017-08-14 12:25:00'),
-(120001, 'LDI120001', 4, 'NANOGRAMS_PER_MICROLITRE', 120001, NULL, '2017-08-15', 1, 1, '2017-08-15 09:01:00'),
-(120002, 'LDI120002', 4, 'NANOGRAMS_PER_MICROLITRE', 120002, NULL, '2017-08-15', 1, 1, '2017-08-15 09:01:00'),
-(200001, 'LDI200001', 4, 'NANOGRAMS_PER_MICROLITRE', 200001, NULL, '2017-08-15', 1, 1, '2017-08-15 09:01:00'),
-(200002, 'LDI200002', 3, 'NANOGRAMS_PER_MICROLITRE', 200002, NULL, '2017-08-15', 1, 1, '2017-08-15 09:01:00'),
-(504, 'LDI504', 5.9, 'NANOGRAMS_PER_MICROLITRE', 504, 'TIB_Dil', '2017-08-15', 1, 1, '2017-08-15 13:55:00'),
-(505, 'LDI505', 3.3, 'NANOGRAMS_PER_MICROLITRE', 504, 'TIB_replaceDil', '2017-08-15', 1, 1, '2017-08-15 13:55:00'),
-(701, 'LDI701', 2.2, 'NANOGRAMS_PER_MICROLITRE', 504, 'test_pooling_1', '2017-10-16', 1, 1, '2017-10-16 15:59:00'),
-(702, 'LDI702', 2.2, 'NANOGRAMS_PER_MICROLITRE', 504, 'test_pooling_2', '2017-10-16', 1, 1, '2017-10-16 15:59:00'),
-(800, 'LDI800', 2.2, 'NANOGRAMS_PER_MICROLITRE', 600, 'low_quality_library', '2018-06-26', 1, 1, '2018-06-26 11:39:00'),
-(801, 'LDI801', 2.2, 'NANOGRAMS_PER_MICROLITRE', 601, 'similar_index_1', '2018-06-26', 1, 1, '2018-06-26 11:39:00'),
-(802, 'LDI802', 2.2, 'NANOGRAMS_PER_MICROLITRE', 602, 'similar_index_2', '2018-06-26', 1, 1, '2018-06-26 11:39:00'),
-(803, 'LDI803', 2.2, 'NANOGRAMS_PER_MICROLITRE', 603, 'same_index_1', '2018-06-26', 1, 1, '2018-06-26 11:39:00'),
-(804, 'LDI804', 2.2, 'NANOGRAMS_PER_MICROLITRE', 604, 'same_index_2', '2018-06-26', 1, 1, '2018-06-26 11:39:00');
+INSERT INTO LibraryAliquot (aliquotId, name, alias, concentration, concentrationUnits, libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated, volumeUsed) VALUES
+(1, 'LDI1', 'TEST_0001_Bn_R_PE_300_WG', 5.9, 'NANOGRAMS_PER_MICROLITRE', 1, '12321', '2017-07-20', 1, 1, '2017-07-20 09:01:00', NULL),
+(304, 'LDI304', 'DILT_0001_nn_n_PE_304_WG', 7.97, 'NANOGRAMS_PER_MICROLITRE', 304, '300304', '2017-08-14', 1, 1, '2017-08-14 12:25:00', NULL),
+(305, 'LDI305', 'DILT_0001_nn_n_PE_305_WG', 7.97, 'NANOGRAMS_PER_MICROLITRE', 305, '300305', '2017-08-14', 1, 1, '2017-08-14 12:25:00', NULL),
+(120001, 'LDI120001', '1IPO_0001_Ly_P_PE_251_WG', 4, 'NANOGRAMS_PER_MICROLITRE', 120001, NULL, '2017-08-15', 1, 1, '2017-08-15 09:01:00', NULL),
+(120002, 'LDI120002', '1IPO_0001_Ly_P_PE_252_WG', 4, 'NANOGRAMS_PER_MICROLITRE', 120002, NULL, '2017-08-15', 1, 1, '2017-08-15 09:01:00', NULL),
+(200001, 'LDI200001', 'IPOT_0001_Pa_P_PE_251_WG', 4, 'NANOGRAMS_PER_MICROLITRE', 200001, NULL, '2017-08-15', 1, 1, '2017-08-15 09:01:00', NULL),
+(200002, 'LDI200002', 'IPOT_0001_Pa_P_PE_252_WG', 3, 'NANOGRAMS_PER_MICROLITRE', 200002, NULL, '2017-08-15', 1, 1, '2017-08-15 09:01:00', NULL),
+(504, 'LDI504', 'TIB_0001_nn_n_PE_404_WG', 5.9, 'NANOGRAMS_PER_MICROLITRE', 504, 'TIB_Dil', '2017-08-15', 1, 1, '2017-08-15 13:55:00', NULL),
+(505, 'LDI505', 'TIB_0001_nn_n_PE_404_WG', 3.3, 'NANOGRAMS_PER_MICROLITRE', 504, 'TIB_replaceDil', '2017-08-15', 1, 1, '2017-08-15 13:55:00', NULL),
+(701, 'LDI701', 'TIB_0001_nn_n_PE_404_WG', 2.2, 'NANOGRAMS_PER_MICROLITRE', 504, 'test_pooling_1', '2017-10-16', 1, 1, '2017-10-16 15:59:00', NULL),
+(702, 'LDI702', 'TIB_0001_nn_n_PE_404_WG', 2.2, 'NANOGRAMS_PER_MICROLITRE', 504, 'test_pooling_2', '2017-10-16', 1, 1, '2017-10-16 15:59:00', NULL),
+(800, 'LDI800', 'TIB_0001_nn_n_PE_600_WG', 2.2, 'NANOGRAMS_PER_MICROLITRE', 600, 'low_quality_library', '2018-06-26', 1, 1, '2018-06-26 11:39:00', NULL),
+(801, 'LDI801', 'TIB_0001_nn_n_PE_601_WG', 2.2, 'NANOGRAMS_PER_MICROLITRE', 601, 'similar_index_1', '2018-06-26', 1, 1, '2018-06-26 11:39:00', NULL),
+(802, 'LDI802', 'TIB_0001_nn_n_PE_602_WG', 2.2, 'NANOGRAMS_PER_MICROLITRE', 602, 'similar_index_2', '2018-06-26', 1, 1, '2018-06-26 11:39:00', NULL),
+(803, 'LDI803', 'TIB_0001_nn_n_PE_603_WG', 2.2, 'NANOGRAMS_PER_MICROLITRE', 603, 'same_index_1', '2018-06-26', 1, 1, '2018-06-26 11:39:00', NULL),
+(804, 'LDI804', 'TIB_0001_nn_n_PE_604_WG', 2.2, 'NANOGRAMS_PER_MICROLITRE', 604, 'same_index_2', '2018-06-26', 1, 1, '2018-06-26 11:39:00', NULL),
+(901, 'LDI901', 'TIB_0001_nn_n_PE_404_WG', 4.3, 'NANOGRAMS_PER_MICROLITRE', 504, 'auto_calculate_pool_1', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 14.7),
+(902, 'LDI902', 'TIB_0001_nn_n_PE_404_WG', 1.7, 'NANOGRAMS_PER_MICROLITRE', 504, 'auto_calculate_pool_2', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 21.3),
+(1001, 'LDI1001', 'TIB_0001_nn_n_PE_804_WG', 1.7, 'NANOGRAMS_PER_MICROLITRE', 804, 'edit_volumeused_1', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 40),
+(1002, 'LDI1002', 'TIB_0001_nn_n_PE_805_WG', 1.7, 'NANOGRAMS_PER_MICROLITRE', 805, 'edit_volumeused_2', '2018-07-12', 1, 1, '2018-07-12 09:43:00', NULL),
+(1003, 'LDI1003', 'TIB_0001_nn_n_PE_806_WG', 1.7, 'NANOGRAMS_PER_MICROLITRE', 806, 'edit_volumeused_3', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 40),
+(1004, 'LDI1004', 'TIB_0001_nn_n_PE_807_WG', 1.7, 'NANOGRAMS_PER_MICROLITRE', 807, 'edit_volumeused_4', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 40);
 
-
-INSERT INTO LibraryAliquot (aliquotId, name, concentration, concentrationUnits, libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated, volumeUsed) VALUES
-(901, 'LDI901', 4.3, 'NANOGRAMS_PER_MICROLITRE', 504, 'auto_calculate_pool_1', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 14.7),
-(902, 'LDI902', 1.7, 'NANOGRAMS_PER_MICROLITRE', 504, 'auto_calculate_pool_2', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 21.3),
-(1001, 'LDI1001', 1.7, 'NANOGRAMS_PER_MICROLITRE', 804, 'edit_volumeused_1', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 40),
-(1002, 'LDI1002', 1.7, 'NANOGRAMS_PER_MICROLITRE', 805, 'edit_volumeused_2', '2018-07-12', 1, 1, '2018-07-12 09:43:00', NULL),
-(1003, 'LDI1003', 1.7, 'NANOGRAMS_PER_MICROLITRE', 806, 'edit_volumeused_3', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 40),
-(1004, 'LDI1004', 1.7, 'NANOGRAMS_PER_MICROLITRE', 807, 'edit_volumeused_4', '2018-07-12', 1, 1, '2018-07-12 09:43:00', 40);
+INSERT INTO DetailedLibraryAliquot (aliquotId, libraryDesignCodeId) VALUES
+(1, 7),
+(304, 7),
+(305, 7),
+(120001, 7),
+(120002, 7),
+(200001, 7),
+(200002, 7),
+(504, 7),
+(505, 7),
+(701, 7),
+(702, 7),
+(800, 7),
+(801, 7),
+(802, 7),
+(803, 7),
+(804, 7),
+(901, 7),
+(902, 7),
+(1001, 7),
+(1002, 7),
+(1003, 7),
+(1004, 7);
 
 INSERT INTO Pool (poolId, concentration, concentrationUnits, volume, volumeUnits, name, alias, identificationBarcode, description, creationDate, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
 (1, 8.25, 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL),
