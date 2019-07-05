@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
  * This interface simply describes an object that can be placed into a box. i.e. Sample, Library
  * 
  */
-public interface Boxable extends Nameable, Barcodable, Serializable {
+public interface Boxable extends Nameable, Barcodable, Distributable, Serializable {
 
   public enum EntityType {
     SAMPLE(SampleImpl.class, SampleBoxPosition::new),
@@ -110,17 +110,5 @@ public interface Boxable extends Nameable, Barcodable, Serializable {
    * Remove Box and position information from this Boxable
    */
   public void removeFromBox();
-
-  public boolean isDistributed();
-
-  void setDistributed(boolean distributed);
-
-  Date getDistributionDate();
-
-  void setDistributionDate(Date distributionDate);
-
-  String getDistributionRecipient();
-
-  void setDistributionRecipient(String distributionRecipient);
 
 }

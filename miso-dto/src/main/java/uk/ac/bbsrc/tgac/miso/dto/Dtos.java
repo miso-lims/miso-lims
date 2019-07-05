@@ -46,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
+import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
@@ -1480,13 +1481,29 @@ public class Dtos {
     return to;
   }
 
-  private static LibraryAliquotDto asDto(@Nonnull LibraryAliquot from, @Nonnull LibraryDto libraryDto, boolean includeBoxPositions) {
+  public static LibraryAliquotDto asDto(@Nonnull LibraryAliquot from, boolean includeBoxPositions) {
     LibraryAliquotDto dto = null;
     if (isDetailedLibraryAliquot(from)) {
       dto = asDetailedDto((DetailedLibraryAliquot) from);
     } else {
       dto = new LibraryAliquotDto();
     }
+    Library library = from.getLibrary();
+    if (library != null) {
+      setLong(dto::setLibraryId, library.getId(), true);
+      setString(dto::setLibraryName, library.getName());
+      setString(dto::setLibraryAlias, library.getAlias());
+      setId(dto::setLibraryKitDescriptorId, library.getKitDescriptor());
+      setBoolean(dto::setLibraryLowQuality, library.isLowQuality(), false);
+      setBoolean(dto::setLibraryQcPassed, library.getQcPassed(), true);
+      setString(dto::setLibraryPlatformType, library.getPlatformType().getKey());
+    }
+    if (from.getParentAliquot() != null) {
+      setLong(dto::setParentAliquotId, from.getParentAliquot().getId(), true);
+      setString(dto::setParentAliquotAlias, from.getParentAliquot().getAlias());
+    }
+    setString(dto::setParentName, maybeGetProperty(from.getParent(), HierarchyEntity::getName));
+    setString(dto::setParentVolume, maybeGetProperty(from.getParent(), HierarchyEntity::getVolume));
     dto.setId(from.getId());
     dto.setName(from.getName());
     setString(dto::setAlias, from.getAlias());
@@ -1506,8 +1523,6 @@ public class Dtos {
     if (from.getTargetedSequencing() != null) {
       dto.setTargetedSequencingId(from.getTargetedSequencing().getId());
     }
-    dto.setLibraryId(libraryDto.getId());
-    dto.setLibrary(libraryDto);
     if (from.getBox() != null) {
       dto.setBox(asDto(from.getBox(), includeBoxPositions));
       dto.setBoxPosition(from.getBoxPosition());
@@ -1542,31 +1557,6 @@ public class Dtos {
     return dto;
   }
 
-  public static LibraryAliquotDto asDto(@Nonnull LibraryAliquot from, boolean includeFullLibrary, boolean includeBoxPositions) {
-    LibraryDto libDto = null;
-    if (includeFullLibrary) {
-      libDto = asDto(from.getLibrary(), false);
-    } else {
-      Library lib = from.getLibrary();
-      if (isDetailedLibrary(lib)) {
-        libDto = new DetailedLibraryDto();
-      } else {
-        libDto = new LibraryDto();
-      }
-      libDto.setId(lib.getId());
-      libDto.setName(lib.getName());
-      libDto.setAlias(lib.getAlias());
-      libDto.setIdentificationBarcode(lib.getIdentificationBarcode());
-      if (lib.getPlatformType() != null) {
-        libDto.setPlatformType(lib.getPlatformType().getKey());
-      }
-      if (lib.getKitDescriptor() != null) {
-        libDto.setKitDescriptorId(lib.getKitDescriptor().getId());
-      }
-    }
-    return asDto(from, libDto, includeBoxPositions);
-  }
-
   public static LibraryAliquotDto asDto(@Nonnull PoolableElementView from) {
     LibraryAliquotDto dto = new LibraryAliquotDto();
     dto.setId(from.getAliquotId());
@@ -1585,19 +1575,15 @@ public class Dtos {
     dto.setNgUsed(from.getAliquotNgUsed() == null ? null : from.getAliquotNgUsed().toString());
     dto.setVolumeUsed(from.getAliquotVolumeUsed() == null ? null : from.getAliquotVolumeUsed().toString());
 
-    LibraryDto ldto = new LibraryDto();
-    ldto.setId(from.getLibraryId());
-    ldto.setName(from.getLibraryName());
-    ldto.setAlias(from.getLibraryAlias());
-    ldto.setIdentificationBarcode(from.getLibraryBarcode());
-    ldto.setLowQuality(from.isLibraryLowQuality());
-    ldto.setParentSampleId(from.getSampleId());
-    ldto.setParentSampleAlias(from.getSampleAlias());
-    if (from.getPlatformType() != null) {
-      ldto.setPlatformType(from.getPlatformType().getKey());
-    }
-    ldto.setQcPassed(from.getLibraryQcPassed());
-    dto.setLibrary(ldto);
+    dto.setLibraryId(from.getLibraryId());
+    dto.setLibraryName(from.getLibraryName());
+    dto.setLibraryAlias(from.getLibraryAlias());
+    dto.setLibraryLowQuality(from.isLibraryLowQuality());
+    dto.setLibraryQcPassed(from.getLibraryQcPassed());
+    dto.setLibraryPlatformType(from.getPlatformType().getKey());
+    dto.setSampleId(from.getSampleId());
+    dto.setSampleName(from.getSampleName());
+    dto.setSampleAlias(from.getSampleAlias());
 
     Sample sample = from.getSample();
     if (isDetailedSample(sample)) {
@@ -1617,6 +1603,8 @@ public class Dtos {
       to = toDetailed((DetailedLibraryAliquotDto) from);
     } else {
       to = new LibraryAliquot();
+      setObject(to::setLibrary, LibraryImpl::new, from.getLibraryId());
+      setObject(to::setParentAliquot, LibraryAliquot::new, from.getParentAliquotId());
     }
     if (from.getId() != null) to.setId(from.getId());
     if (!isStringEmptyOrNull(from.getName())) {
@@ -1631,7 +1619,6 @@ public class Dtos {
     to.setVolume(from.getVolume() == null ? null : Double.valueOf(from.getVolume()));
     to.setVolumeUnits(from.getVolumeUnits());
     to.setVolumeUsed(from.getVolumeUsed() == null ? null : Double.valueOf(from.getVolumeUsed()));
-    to.setLibrary(to(from.getLibrary()));
     to.setCreationDate(parseDate(from.getCreationDate()));
     if (from.getTargetedSequencingId() != null) {
       to.setTargetedSequencing(new TargetedSequencing());
@@ -1651,6 +1638,8 @@ public class Dtos {
     setObject(to::setLibraryDesignCode, LibraryDesignCode::new, from.getLibraryDesignCodeId());
     setString(to::setGroupId, from.getGroupId());
     setString(to::setGroupDescription, from.getGroupDescription());
+    setObject(to::setLibrary, DetailedLibraryImpl::new, from.getLibraryId());
+    setObject(to::setParentAliquot, DetailedLibraryAliquot::new, from.getParentAliquotId());
     return to;
   }
 
@@ -1676,7 +1665,7 @@ public class Dtos {
     dto.setLibraryAliquotCount(from.getPoolContents().size());
     from.getPoolContents().stream()//
         .map(PoolElement::getPoolableElementView)//
-        .map(PoolableElementView::getLibraryDnaSize)//
+        .map(PoolableElementView::getAliquotDnaSize)//
         .filter(Objects::nonNull)//
         .mapToDouble(Long::doubleValue)//
         .average()//
@@ -3386,6 +3375,10 @@ public class Dtos {
 
   private static void setString(@Nonnull Consumer<String> setter, BigDecimal value) {
     setter.accept(toNiceString(value));
+  }
+
+  private static void setString(@Nonnull Consumer<String> setter, Double value) {
+    setter.accept(value == null ? null : value.toString());
   }
 
   private static void setString(@Nonnull Consumer<String> setter, String value) {

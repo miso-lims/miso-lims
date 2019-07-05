@@ -20,6 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
@@ -127,9 +128,9 @@ public class DefaultLibraryAliquotService
       aliquot.setVolumeUnits(null);
     }
 
-    Library library = aliquot.getLibrary();
-    if (aliquot.getVolumeUsed() != null && library.getVolume() != null) {
-      library.setVolume(library.getVolume() - aliquot.getVolumeUsed());
+    HierarchyEntity parent = aliquot.getParent();
+    if (aliquot.getVolumeUsed() != null && parent.getVolume() != null) {
+      parent.setVolume(parent.getVolume() - aliquot.getVolumeUsed());
     }
 
     aliquot.setChangeDetails(authorizationManager.getCurrentUser());
@@ -138,18 +139,22 @@ public class DefaultLibraryAliquotService
     aliquot.setName(generateTemporaryName());
     validateChange(aliquot, null);
     long savedId = save(aliquot).getId();
-    updateLibrary(library);
+    updateParent(parent);
     boxService.updateBoxableLocation(aliquot);
     return savedId;
   }
 
-  private void updateLibrary(Library library) throws IOException {
+  private void updateParent(HierarchyEntity parent) throws IOException {
     try {
-      libraryService.update(library);
+      if (parent instanceof LibraryAliquot) {
+        update((LibraryAliquot) parent);
+      } else {
+        libraryService.update((Library) parent);
+      }
     } catch (ValidationException e) {
       List<ValidationError> newErrors = new ArrayList<>();
       for (ValidationError error : e.getErrors()) {
-        newErrors.add(new ValidationError(String.format("Library %s: %s", error.getProperty(), error.getMessage())));
+        newErrors.add(new ValidationError(String.format("Parent %s: %s", error.getProperty(), error.getMessage())));
       }
       throw new ValidationException(newErrors);
     }
@@ -162,21 +167,21 @@ public class DefaultLibraryAliquotService
     boxService.throwIfBoxPositionIsFilled(aliquot);
 
     loadChildEntities(aliquot);
-    Library library = aliquot.getLibrary();
-    if (library.getVolume() != null) {
+    HierarchyEntity parent = aliquot.getParent();
+    if (parent.getVolume() != null) {
       if (aliquot.getVolumeUsed() != null && managed.getVolumeUsed() != null) {
-        library.setVolume(library.getVolume() + managed.getVolumeUsed() - aliquot.getVolumeUsed());
+        parent.setVolume(parent.getVolume() + managed.getVolumeUsed() - aliquot.getVolumeUsed());
       } else if (managed.getVolumeUsed() != null) {
-        library.setVolume(library.getVolume() + managed.getVolumeUsed());
+        parent.setVolume(parent.getVolume() + managed.getVolumeUsed());
       } else if (aliquot.getVolumeUsed() != null) {
-        library.setVolume(library.getVolume() - aliquot.getVolumeUsed());
+        parent.setVolume(parent.getVolume() - aliquot.getVolumeUsed());
       }
     }
     validateChange(aliquot, managed);
     applyChanges(managed, aliquot);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     LibraryAliquot saved = save(managed);
-    updateLibrary(library);
+    updateParent(parent);
     boxService.updateBoxableLocation(aliquot);
     return saved.getId();
   }
@@ -215,6 +220,9 @@ public class DefaultLibraryAliquotService
   private void loadChildEntities(LibraryAliquot aliquot) throws IOException {
     if (aliquot.getLibrary() != null) {
       aliquot.setLibrary(libraryService.get(aliquot.getLibrary().getId()));
+    }
+    if (aliquot.getParentAliquot() != null) {
+      aliquot.setParentAliquot(get(aliquot.getParentAliquot().getId()));
     }
     if (aliquot.getTargetedSequencing() != null) {
       aliquot.setTargetedSequencing(targetedSequencingService.get(aliquot.getTargetedSequencing().getId()));
@@ -292,16 +300,13 @@ public class DefaultLibraryAliquotService
       if (isTargetedSequencingRequired(library)) {
         errors.add(new ValidationError("targetedSequencingId", "Value is required (based on library design code)"));
       }
-    } else {
-      if (!isTargetedSequencingCompatible(ts, library)) {
-        errors.add(new ValidationError("targetedSequencingId", "Selected value not compatible with the library kit"));
-      }
+    } else if (!isTargetedSequencingCompatible(ts, library)) {
+      errors.add(new ValidationError("targetedSequencingId", "Selected value not compatible with the library kit"));
     }
   }
 
   private boolean isTargetedSequencingRequired(Library library) {
-    return LimsUtils.isDetailedLibrary(library)
-        && ((DetailedLibrary) library).getLibraryDesignCode().isTargetedSequencingRequired();
+    return LimsUtils.isDetailedLibrary(library) && ((DetailedLibrary) library).getLibraryDesignCode().isTargetedSequencingRequired();
   }
 
   @VisibleForTesting

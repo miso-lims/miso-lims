@@ -41,7 +41,7 @@ ListTarget.libraryaliquot = {
             'Note: a library aliquot may only be deleted by its creator or an admin.'];
         var ids = [];
         jQuery.each(items, function(index, aliquot) {
-          lines.push('* ' + aliquot.name + ' (' + aliquot.library.alias + ')');
+          lines.push('* ' + aliquot.name + ' (' + aliquot.alias + ')');
           ids.push(aliquot.id);
         });
         Utils.showConfirmDialog('Delete Library Aliquots', 'Delete', lines, function() {
@@ -102,13 +102,13 @@ ListTarget.libraryaliquot = {
       "iSortPriority": 0,
       "bVisible": true,
       "bSortable": false
-    }, ListUtils.idHyperlinkColumn("Library Name", Urls.ui.libraries.edit, "library.id", function(aliquot) {
-      return aliquot.library.name;
+    }, ListUtils.idHyperlinkColumn("Library Name", Urls.ui.libraries.edit, "libraryId", function(aliquot) {
+      return aliquot.libraryName;
     }, 0, !config.library), ListUtils.labelHyperlinkColumn("Library Alias", Urls.ui.libraries.edit, function(aliquot) {
-      return aliquot.library.id;
-    }, "library.alias", 0, !config.library), {
+      return aliquot.libraryId;
+    }, "libraryAlias", 0, !config.library), {
       "sTitle": "Platform",
-      "mData": "library.platformType",
+      "mData": "libraryPlatformType",
       "include": true,
       "iSortPriority": 0
     }, {

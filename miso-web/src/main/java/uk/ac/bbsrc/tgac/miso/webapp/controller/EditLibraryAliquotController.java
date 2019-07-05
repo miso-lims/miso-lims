@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -75,7 +76,7 @@ public class EditLibraryAliquotController {
 
     ObjectMapper mapper = new ObjectMapper();
     model.put("aliquot", aliquot);
-    model.put("aliquotDto", mapper.writeValueAsString(Dtos.asDto(aliquot, false, false)));
+    model.put("aliquotDto", mapper.writeValueAsString(Dtos.asDto(aliquot, false)));
     List<Pool> pools = poolService.listByLibraryAliquotId(aliquotId);
     model.put("aliquotPools",
         pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
@@ -108,7 +109,12 @@ public class EditLibraryAliquotController {
       }
       dto.setAlias(item.getAlias());
       dto.setDnaSize(item.getDnaSize());
-      dto.setLibrary(Dtos.asDto(item, false));
+      dto.setLibraryId(item.getId());
+      dto.setLibraryName(item.getName());
+      dto.setLibraryAlias(item.getAlias());
+      dto.setLibraryKitDescriptorId(item.getKitDescriptor() == null ? null : item.getKitDescriptor().getId());
+      dto.setParentName(item.getName());
+      dto.setParentVolume(item.getVolume() == null ? null : item.getVolume().toString());
       if (item.getSample().getProject().getDefaultTargetedSequencing() != null) {
         dto.setTargetedSequencingId(item.getSample().getProject().getDefaultTargetedSequencing().getId());
       }
@@ -132,6 +138,61 @@ public class EditLibraryAliquotController {
     }
   }
 
+  private final class BulkPropagateAliquotBackend extends BulkPropagateTableBackend<LibraryAliquot, LibraryAliquotDto> {
+
+    private final BoxDto newBox;
+
+    private BulkPropagateAliquotBackend(BoxDto newBox) {
+      super("libraryaliquot", LibraryAliquotDto.class, "Library Aliquots", "Library ALiquots");
+      this.newBox = newBox;
+    }
+
+    @Override
+    protected LibraryAliquotDto createDtoFromParent(LibraryAliquot item) {
+      LibraryAliquotDto dto = null;
+      if (LimsUtils.isDetailedLibraryAliquot(item)) {
+        DetailedLibraryAliquotDto detailed = new DetailedLibraryAliquotDto();
+        DetailedLibraryAliquot detailedParent = (DetailedLibraryAliquot) item;
+        detailed.setNonStandardAlias(detailedParent.isNonStandardAlias());
+        detailed.setLibraryDesignCodeId(detailedParent.getLibraryDesignCode().getId());
+        dto = detailed;
+      } else {
+        dto = new LibraryAliquotDto();
+      }
+      dto.setAlias(item.getAlias());
+      dto.setDnaSize(item.getDnaSize());
+      dto.setParentAliquotId(item.getId());
+      dto.setLibraryId(item.getLibrary().getId());
+      dto.setLibraryName(item.getLibrary().getName());
+      dto.setLibraryAlias(item.getLibrary().getAlias());
+      dto.setLibraryKitDescriptorId(item.getLibrary().getKitDescriptor() == null ? null : item.getLibrary().getKitDescriptor().getId());
+      dto.setParentName(item.getName());
+      dto.setParentVolume(item.getVolume() == null ? null : item.getVolume().toString());
+      if (item.getTargetedSequencing() != null) {
+        dto.setTargetedSequencingId(item.getTargetedSequencing().getId());
+      } else if (item.getLibrary().getSample().getProject().getDefaultTargetedSequencing() != null) {
+        dto.setTargetedSequencingId(item.getLibrary().getSample().getProject().getDefaultTargetedSequencing().getId());
+      }
+      dto.setBox(newBox);
+      if (item.getConcentration() != null) {
+        dto.setConcentration(item.getConcentration().toString());
+        dto.setConcentrationUnits(item.getConcentrationUnits());
+      }
+      return dto;
+    }
+
+    @Override
+    protected Stream<LibraryAliquot> loadParents(List<Long> ids) throws IOException {
+      return libraryAliquotService.listByIdList(ids).stream();
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+      config.putPOJO("box", newBox);
+      config.put("pageMode", "propagate");
+    }
+  }
+
   @GetMapping(value = "/bulk/propagate")
   public ModelAndView propagate(@RequestParam("ids") String libraryIds,
       @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model) throws IOException {
@@ -140,12 +201,20 @@ public class EditLibraryAliquotController {
     return bulkPropagateBackend.propagate(libraryIds, model);
   }
 
+  @GetMapping(value = "/bulk/repropagate")
+  public ModelAndView repropagate(@RequestParam("ids") String aliquotIds,
+      @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model) throws IOException {
+    BulkPropagateAliquotBackend bulkPropagateBackend = new BulkPropagateAliquotBackend(
+        boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null);
+    return bulkPropagateBackend.propagate(aliquotIds, model);
+  }
+
   private final BulkEditTableBackend<LibraryAliquot, LibraryAliquotDto> bulkEditBackend = new BulkEditTableBackend<LibraryAliquot, LibraryAliquotDto>(
       "libraryaliquot", LibraryAliquotDto.class, "Library Aliquots") {
 
     @Override
     protected LibraryAliquotDto asDto(LibraryAliquot model) {
-      return Dtos.asDto(model, true, true);
+      return Dtos.asDto(model, true);
     }
 
     @Override
@@ -179,7 +248,9 @@ public class EditLibraryAliquotController {
       if (parents.isEmpty()) {
         throw new IllegalStateException("Cannot have no library aliquots for pool propagation.");
       }
-      List<PlatformType> platformTypes = parents.stream().map(aliquot -> aliquot.getLibrary().getPlatformType()).distinct()
+      List<PlatformType> platformTypes = parents.stream()
+          .map(aliquot -> aliquot.getLibrary().getPlatformType())
+          .distinct()
           .collect(Collectors.toList());
       if (platformTypes.size() > 1) {
         throw new IllegalArgumentException("Cannot create a pool for multiple platforms: "
@@ -192,12 +263,12 @@ public class EditLibraryAliquotController {
         dto.setAlias(parents.get(0).getLibrary().getAlias() + "_POOL");
       } else {
         String commonPrefix = LimsUtils
-            .findCommonPrefix(parents.stream().map(aliquot -> aliquot.getLibrary().getAlias()).toArray(String[]::new));
+            .findCommonPrefix(parents.stream().map(LibraryAliquot::getAlias).toArray(String[]::new));
         if (commonPrefix != null) {
           dto.setAlias(commonPrefix + "_POOL");
         }
       }
-      dto.setPooledElements(parents.stream().map(ldi -> Dtos.asDto(ldi, false, false)).collect(Collectors.toSet()));
+      dto.setPooledElements(parents.stream().map(ldi -> Dtos.asDto(ldi, false)).collect(Collectors.toSet()));
       if (dto.getPooledElements().stream().allMatch(element -> element.getVolumeUsed() != null)) {
         dto.setVolume(
             Double.toString(dto.getPooledElements().stream().mapToDouble(element -> Double.parseDouble(element.getVolumeUsed())).sum()));
@@ -235,13 +306,15 @@ public class EditLibraryAliquotController {
       super("pool", PoolDto.class);
       this.poolQuantity = poolQuantity;
       List<LibraryAliquot> ldis = libraryAliquotService.listByIdList(parseIds(idString));
-      List<PlatformType> platformTypes = ldis.stream().map(aliquot -> aliquot.getLibrary().getPlatformType()).distinct()
+      List<PlatformType> platformTypes = ldis.stream()
+          .map(aliquot -> aliquot.getLibrary().getPlatformType())
+          .distinct()
           .collect(Collectors.toList());
       if (platformTypes.size() > 1) {
         throw new IllegalArgumentException("Cannot create a pool for multiple platforms: "
             + String.join(", ", platformTypes.stream().map(Enum::name).toArray(CharSequence[]::new)));
       }
-      this.aliquots = ldis.stream().map(ldi -> Dtos.asDto(ldi, false, false)).collect(Collectors.toList());
+      this.aliquots = ldis.stream().map(ldi -> Dtos.asDto(ldi, false)).collect(Collectors.toList());
       this.platformType = platformTypes.get(0);
       this.newBox = newBox;
     }
@@ -283,7 +356,7 @@ public class EditLibraryAliquotController {
     protected PoolDto createDtoFromParent(LibraryAliquot item) {
       PoolDto dto = new PoolDto();
       dto.setAlias(item.getLibrary().getAlias() + "_POOL");
-      dto.setPooledElements(Collections.singleton(Dtos.asDto(item, false, false)));
+      dto.setPooledElements(Collections.singleton(Dtos.asDto(item, false)));
       dto.setPlatformType(item.getLibrary().getPlatformType().name());
       if (item.getVolumeUsed() != null) {
         dto.setVolume(item.getVolumeUsed().toString());

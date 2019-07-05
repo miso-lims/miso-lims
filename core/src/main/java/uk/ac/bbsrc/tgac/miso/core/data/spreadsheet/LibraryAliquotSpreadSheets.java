@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
@@ -35,12 +36,13 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
 
   private static <S extends DetailedSample, T> Function<LibraryAliquot, T> detailedSample(Class<S> clazz, Function<S, T> function,
       T defaultValue) {
-    return d -> {
-      if (clazz.isInstance(d.getLibrary().getSample())) {
-        return function.apply(clazz.cast(d.getLibrary().getSample()));
+    return aliquot -> {
+      Sample sample = aliquot.getLibrary().getSample();
+      if (clazz.isInstance(sample)) {
+        return function.apply(clazz.cast(sample));
       }
-      if (LimsUtils.isDetailedSample(d.getLibrary().getSample())) {
-        S parent = LimsUtils.getParent(clazz, (DetailedSample) d.getLibrary().getSample());
+      if (LimsUtils.isDetailedSample(sample)) {
+        S parent = LimsUtils.getParent(clazz, (DetailedSample) sample);
         if (parent != null) {
           return function.apply(parent);
         }

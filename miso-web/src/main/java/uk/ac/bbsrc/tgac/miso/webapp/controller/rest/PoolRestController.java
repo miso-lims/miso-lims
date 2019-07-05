@@ -462,7 +462,7 @@ public class PoolRestController extends RestController {
 
         @Override
         public LibraryAliquotDto asDto(LibraryAliquot model) {
-          return Dtos.asDto(model, false, false);
+          return Dtos.asDto(model, false);
         }
 
         @Override

@@ -49,7 +49,7 @@ HotTarget.pool = (function() {
         readOnly: true,
         include: true,
         unpack: function(aliquot, flat, setCellMeta) {
-          flat.libraryAlias = aliquot.library.alias;
+          flat.libraryAlias = aliquot.libraryAlias;
         },
         pack: function(aliquot, flat, errorHandler) {
         }
@@ -59,7 +59,7 @@ HotTarget.pool = (function() {
         readOnly: true,
         include: true,
         unpack: function(aliquot, flat, setCellMeta) {
-          flat.librarySize = aliquot.library.dnaSize;
+          flat.librarySize = aliquot.dnaSize;
         },
         pack: function(aliquot, flat, errorHandler) {
         }

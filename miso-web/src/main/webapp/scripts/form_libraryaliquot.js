@@ -35,14 +35,26 @@ FormTarget.libraryaliquot = (function($) {
           data: 'name',
           type: 'read-only'
         }, {
-          title: 'Parent Library',
-          data: 'libraryId',
+          title: 'Parent Library Aliquot',
+          data: 'parentAliquotId',
+          include: !!object.parentAliquotId,
           type: 'read-only',
           getDisplayValue: function(aliquot) {
-            return aliquot.library.alias;
+            return aliquot.parentAliquotAlias;
           },
           getLink: function(aliquot) {
-            return Urls.ui.libraries.edit(aliquot.library.id);
+            return Urls.ui.libraryAliquots.edit(aliquot.parentAliquotId);
+          }
+        }, {
+          title: 'Parent Library',
+          data: 'libraryId',
+          include: !object.parentAliquotId,
+          type: 'read-only',
+          getDisplayValue: function(aliquot) {
+            return aliquot.libraryAlias;
+          },
+          getLink: function(aliquot) {
+            return Urls.ui.libraries.edit(aliquot.libraryId);
           }
         }, {
           title: 'Alias',
@@ -70,6 +82,12 @@ FormTarget.libraryaliquot = (function($) {
           },
           getItemValue: function(item) {
             return item.id;
+          },
+          onChange: function(newValue, updateField) {
+            var designCode = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), Constants.libraryDesignCodes);
+            updateField('targetedSequencingId', {
+              required: designCode.targetedSequencingRequired
+            });
           }
         }, {
           title: 'Size (bp)',
@@ -105,7 +123,7 @@ FormTarget.libraryaliquot = (function($) {
           type: 'dropdown',
           getSource: function() {
             return Constants.targetedSequencings.filter(function(targetedSequencing) {
-              return targetedSequencing.kitDescriptorIds.indexOf(object.library.kitDescriptorId) > -1;
+              return targetedSequencing.kitDescriptorIds.indexOf(object.libraryKitDescriptorId) > -1;
             });
           },
           sortSource: Utils.sorting.standardSort('alias'),
@@ -116,11 +134,11 @@ FormTarget.libraryaliquot = (function($) {
             return item.id;
           }
         }, {
-          title: 'ng of Library Used',
+          title: 'Parent ng Used',
           data: 'ngUsed',
           type: 'decimal'
         }, {
-          title: 'Volume of Library Used',
+          title: 'Parent Volume Used',
           data: 'volumeUsed',
           type: 'decimal'
         }].concat(FormUtils.makeDistributionFields())

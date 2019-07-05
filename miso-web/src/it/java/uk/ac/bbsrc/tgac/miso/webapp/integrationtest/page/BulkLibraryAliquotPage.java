@@ -17,9 +17,9 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 public class BulkLibraryAliquotPage extends HeaderFooterPage {
 
   public static class LibraryAliquotColumns {
-    public static final String NAME = "Library Aliquot Name";
-    public static final String ALIAS = "Library Aliquot Alias";
-    public static final String LIBRARY_ALIAS = "Library Alias";
+    public static final String NAME = "Name";
+    public static final String ALIAS = "Alias";
+    public static final String PARENT_ALIAS = "Parent Alias";
     public static final String ID_BARCODE = "Matrix Barcode";
     public static final String BOX_SEARCH = "Box Search";
     public static final String BOX_ALIAS = "Box Alias";
@@ -37,8 +37,8 @@ public class BulkLibraryAliquotPage extends HeaderFooterPage {
     public static final String CONCENTRATION_UNITS = "Conc. Units";
     public static final String VOLUME = "Volume";
     public static final String VOLUME_UNITS = "Vol. Units";
-    public static final String NG_USED = "ng Lib. Used";
-    public static final String VOLUME_USED = "Vol. Lib. Used";
+    public static final String NG_USED = "Parent ng Used";
+    public static final String VOLUME_USED = "Parent Vol. Used";
     public static final String CREATION_DATE = "Creation Date";
     public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
 
@@ -59,7 +59,7 @@ public class BulkLibraryAliquotPage extends HeaderFooterPage {
   public BulkLibraryAliquotPage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
-    waitWithTimeout().until(or(titleContains("Create Library Aliquots from Libraries "), titleContains("Edit Library Aliquots ")));
+    waitWithTimeout().until(or(titleContains("Create Library Aliquots from "), titleContains("Edit Library Aliquots ")));
     table = new HandsOnTable(driver);
   }
 
@@ -73,6 +73,13 @@ public class BulkLibraryAliquotPage extends HeaderFooterPage {
   public static BulkLibraryAliquotPage getForPropagate(WebDriver driver, String baseUrl, Collection<Long> libraryIds) {
     String ids = Joiner.on(',').join(libraryIds);
     String url = baseUrl + "miso/libraryaliquot/bulk/propagate?ids=" + ids;
+    driver.get(url);
+    return new BulkLibraryAliquotPage(driver);
+  }
+
+  public static BulkLibraryAliquotPage getForRepropagate(WebDriver driver, String baseUrl, Collection<Long> aliquotIds) {
+    String ids = Joiner.on(',').join(aliquotIds);
+    String url = baseUrl + "miso/libraryaliquot/bulk/repropagate?ids=" + ids;
     driver.get(url);
     return new BulkLibraryAliquotPage(driver);
   }

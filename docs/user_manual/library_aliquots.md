@@ -48,6 +48,17 @@ make the appropriate adjustments and click the "Save" button to try again.
 
 
 {% assign sub = sub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Propagating Library Aliquots from Library Aliquots" %}
+
+Making library aliquots from library aliquots works exactly like making them from libraries except that you start by
+selecting library aliquots to propagate from on the Library Aliquots list and clicking the "Propagate" button at the
+top of the table.
+
+{% include userman-toplink.md %}
+
+
+
+{% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Editing Library Aliquots" %}
 
 Library aliquots can be edited individually or in bulk. Bulk editing is convenient when you have several library

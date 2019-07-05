@@ -34,8 +34,20 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
   private String creationDate;
   private String creatorName;
   private Long targetedSequencingId;
+  private Long sampleId;
+  private String sampleName;
+  private String sampleAlias;
   private Long libraryId;
-  private LibraryDto library;
+  private String libraryName;
+  private String libraryAlias;
+  private Long libraryKitDescriptorId;
+  private boolean libraryLowQuality;
+  private Boolean libraryQcPassed;
+  private String libraryPlatformType;
+  private Long parentAliquotId;
+  private String parentAliquotAlias;
+  private String parentName;
+  private String parentVolume;
   private String lastModified;
   private List<Long> indexIds;
   private String identityConsentLevel;
@@ -132,6 +144,30 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
     this.targetedSequencingId = targetedSequencingId;
   }
 
+  public Long getSampleId() {
+    return sampleId;
+  }
+
+  public void setSampleId(Long sampleId) {
+    this.sampleId = sampleId;
+  }
+
+  public String getSampleName() {
+    return sampleName;
+  }
+
+  public void setSampleName(String sampleName) {
+    this.sampleName = sampleName;
+  }
+
+  public String getSampleAlias() {
+    return sampleAlias;
+  }
+
+  public void setSampleAlias(String sampleAlias) {
+    this.sampleAlias = sampleAlias;
+  }
+
   public Long getLibraryId() {
     return libraryId;
   }
@@ -140,12 +176,84 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
     this.libraryId = libraryId;
   }
 
-  public LibraryDto getLibrary() {
-    return library;
+  public String getLibraryName() {
+    return libraryName;
   }
 
-  public void setLibrary(LibraryDto library) {
-    this.library = library;
+  public void setLibraryName(String libraryName) {
+    this.libraryName = libraryName;
+  }
+
+  public String getLibraryAlias() {
+    return libraryAlias;
+  }
+
+  public void setLibraryAlias(String libraryAlias) {
+    this.libraryAlias = libraryAlias;
+  }
+
+  public Long getLibraryKitDescriptorId() {
+    return libraryKitDescriptorId;
+  }
+
+  public void setLibraryKitDescriptorId(Long libraryKitDescriptorId) {
+    this.libraryKitDescriptorId = libraryKitDescriptorId;
+  }
+
+  public boolean isLibraryLowQuality() {
+    return libraryLowQuality;
+  }
+
+  public void setLibraryLowQuality(boolean libraryLowQuality) {
+    this.libraryLowQuality = libraryLowQuality;
+  }
+
+  public Boolean getLibraryQcPassed() {
+    return libraryQcPassed;
+  }
+
+  public void setLibraryQcPassed(Boolean libraryQcPassed) {
+    this.libraryQcPassed = libraryQcPassed;
+  }
+
+  public String getLibraryPlatformType() {
+    return libraryPlatformType;
+  }
+
+  public void setLibraryPlatformType(String libraryPlatformType) {
+    this.libraryPlatformType = libraryPlatformType;
+  }
+
+  public Long getParentAliquotId() {
+    return parentAliquotId;
+  }
+
+  public void setParentAliquotId(Long parentAliquotId) {
+    this.parentAliquotId = parentAliquotId;
+  }
+
+  public String getParentAliquotAlias() {
+    return parentAliquotAlias;
+  }
+
+  public void setParentAliquotAlias(String parentAliquotAlias) {
+    this.parentAliquotAlias = parentAliquotAlias;
+  }
+
+  public String getParentName() {
+    return parentName;
+  }
+
+  public void setParentName(String parentName) {
+    this.parentName = parentName;
+  }
+
+  public String getParentVolume() {
+    return parentVolume;
+  }
+
+  public void setParentVolume(String parentVolume) {
+    this.parentVolume = parentVolume;
   }
 
   public String getLastModified() {
