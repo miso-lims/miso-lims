@@ -251,7 +251,7 @@ UNION ALL
 SELECT d.alias name 
         ,NULL description 
         ,d.NAME id 
-        ,parent.name parentId 
+        ,COALESCE(laParent.name, lib.name) parentId 
         ,NULL sampleType 
         ,NULL sample_category
         ,lt.platformType sampleType_platform 
@@ -293,7 +293,7 @@ SELECT d.alias name
         ,box.locationBarcode boxLocation 
         ,box.alias boxAlias 
         ,pos.position boxPosition 
-        ,parent.paired paired 
+        ,lib.paired paired 
         ,d.dnaSize readLength 
         ,ts.alias targeted_sequencing 
         ,'Library Aliquot' miso_type 
@@ -310,10 +310,11 @@ SELECT d.alias name
         ,d.distributed distributed
         ,d.distributionDate distribution_date
 FROM LibraryAliquot d 
-JOIN Library parent ON parent.libraryId = d.libraryId 
-JOIN Sample s ON s.sampleId = parent.sample_sampleId
+LEFT JOIN LibraryAliquot laParent ON laParent.aliquotId = d.parentAliquotId
+JOIN Library lib ON lib.libraryId = d.libraryId 
+JOIN Sample s ON s.sampleId = lib.sample_sampleId
 JOIN Project sp ON sp.projectId = s.project_projectId
-JOIN LibraryType lt ON lt.libraryTypeId = parent.libraryType 
+JOIN LibraryType lt ON lt.libraryTypeId = lib.libraryType 
 LEFT JOIN DetailedLibraryAliquot dla ON dla.aliquotId = d.aliquotId 
 LEFT JOIN LibraryDesignCode ldc ON ldc.libraryDesignCodeId = dla.libraryDesignCodeId
 LEFT JOIN TargetedSequencing ts ON d.targetedSequencingId = ts.targetedSequencingId

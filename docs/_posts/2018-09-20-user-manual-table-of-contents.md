@@ -333,6 +333,8 @@ weekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Propagating Library Aliquots from Libraries" %}
 {% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Propagating Library Aliquots from Library Aliquots" %}
+{% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Editing Library Aliquots" %}
 {% assign subsub = 1 %}
 {% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Editing a Single Library Aliquot" %}

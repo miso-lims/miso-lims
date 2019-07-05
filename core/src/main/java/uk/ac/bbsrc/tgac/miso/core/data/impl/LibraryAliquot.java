@@ -55,17 +55,14 @@ import javax.persistence.TemporalType;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
+import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryAliquotChangeLog;
@@ -76,7 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @Table(name = "LibraryAliquot")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class LibraryAliquot extends AbstractBoxable
-    implements Barcodable, ChangeLoggable, Comparable<LibraryAliquot>, Nameable, Boxable, Deletable, Serializable, Timestamped {
+    implements Comparable<LibraryAliquot>, Deletable, HierarchyEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
@@ -117,6 +114,10 @@ public class LibraryAliquot extends AbstractBoxable
   @ManyToOne(targetEntity = LibraryImpl.class)
   @JoinColumn(name = "libraryId")
   private Library library;
+
+  @ManyToOne
+  @JoinColumn(name = "parentAliquotId")
+  private LibraryAliquot parentAliquot;
 
   @ManyToOne
   @JoinColumn(name = "targetedSequencingId")
@@ -161,6 +162,14 @@ public class LibraryAliquot extends AbstractBoxable
 
   public void setLibrary(Library library) {
     this.library = library;
+  }
+
+  public LibraryAliquot getParentAliquot() {
+    return parentAliquot;
+  }
+
+  public void setParentAliquot(LibraryAliquot parentAliquot) {
+    this.parentAliquot = parentAliquot;
   }
 
   public TargetedSequencing getTargetedSequencing() {
@@ -445,7 +454,8 @@ public class LibraryAliquot extends AbstractBoxable
 
   @Override
   public String getDeleteDescription() {
-    return getName() + (getLibrary() == null || getLibrary().getAlias() == null ? "" : " (" + getLibrary().getAlias() + ")");
+    return getName()
+        + (getLibrary() == null || getLibrary().getAlias() == null ? "" : " (" + getLibrary().getAlias() + ")");
   }
 
   public Double getNgUsed() {
@@ -492,6 +502,11 @@ public class LibraryAliquot extends AbstractBoxable
     change.setColumnsChanged(columnsChanged);
     change.setUser(user);
     return change;
+  }
+
+  @Override
+  public HierarchyEntity getParent() {
+    return getParentAliquot() != null ? getParentAliquot() : getLibrary();
   }
 
 }

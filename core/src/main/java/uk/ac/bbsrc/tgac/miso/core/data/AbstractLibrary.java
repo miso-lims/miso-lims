@@ -754,4 +754,9 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     this.pendingAttachmentDeletions = pendingAttachmentDeletions;
   }
 
+  @Override
+  public HierarchyEntity getParent() {
+    return getSample();
+  }
+
 }

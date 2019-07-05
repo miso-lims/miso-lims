@@ -16,7 +16,7 @@ HotTarget.libraryaliquot = {
   createColumns: function(config, create, data) {
     var columns = [
         {
-          header: 'Library Aliquot Name',
+          header: 'Name',
           data: 'name',
           readOnly: true,
           include: true,
@@ -29,18 +29,18 @@ HotTarget.libraryaliquot = {
             dil.name = flat.name;
           }
         },
-        HotUtils.makeColumnForText('Library Aliquot Alias', true, 'alias', {
+        HotUtils.makeColumnForText('Alias', true, 'alias', {
           validator: HotUtils.validator.requiredTextNoSpecialChars
         }),
         {
-          header: 'Library Alias',
-          data: 'libraryAlias',
+          header: 'Parent Alias',
+          data: 'parentAlias',
           readOnly: true,
           include: true,
-          unpack: function(dil, flat, setCellMeta) {
-            flat.libraryAlias = dil.library.alias;
+          unpack: function(aliquot, flat, setCellMeta) {
+            flat.parentAlias = aliquot.parentAliquotAlias ? aliquot.parentAliquotAlias : aliquot.libraryAlias;
           },
-          pack: function(dil, flat, errorHandler) {
+          pack: function(aliquot, flat, errorHandler) {
           }
         },
         HotUtils.makeColumnForText('Matrix Barcode', !Constants.automaticBarcodes, 'identificationBarcode', {
@@ -123,8 +123,8 @@ HotTarget.libraryaliquot = {
             obj['volumeUnits'] = !!units ? units.name : null;
           }
         },
-        HotUtils.makeColumnForFloat('ng Lib. Used', true, 'ngUsed', false),
-        HotUtils.makeColumnForFloat('Vol. Lib. Used', true, 'volumeUsed', false),
+        HotUtils.makeColumnForFloat('Parent ng Used', true, 'ngUsed', false),
+        HotUtils.makeColumnForFloat('Parent Vol. Used', true, 'volumeUsed', false),
         {
           header: 'Creation Date',
           data: 'creationDate',
@@ -157,9 +157,9 @@ HotTarget.libraryaliquot = {
           include: Constants.isDetailedSample,
           unpack: function(dil, flat, setCellMeta) {
             var missingValueString;
-            // whether targeted sequencing is required depends on library's design code
+            // whether targeted sequencing is required depends on design code
             var designCode = Utils.array.findFirstOrNull(function(code) {
-              return dil.library.libraryDesignCodeId == code.id;
+              return dil.libraryDesignCodeId == code.id;
             }, Constants.libraryDesignCodes);
             if (Utils.array.maybeGetProperty(designCode, 'targetedSequencingRequired')) {
               setCellMeta('validator', HotUtils.validator.requiredAutocomplete);
@@ -176,7 +176,7 @@ HotTarget.libraryaliquot = {
           },
           pack: function(dil, flat, errorHandler) {
             dil.targetedSequencingId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(tarSeq) {
-              return flat.targetedSequencingAlias == tarSeq.alias && tarSeq.kitDescriptorIds.indexOf(dil.library.kitDescriptorId) != -1;
+              return flat.targetedSequencingAlias == tarSeq.alias && tarSeq.kitDescriptorIds.indexOf(dil.libraryKitDescriptorId) != -1;
             }, Constants.targetedSequencings), 'id');
           },
           depends: '*start', // This is a dummy value that gets this run on
@@ -184,7 +184,7 @@ HotTarget.libraryaliquot = {
           update: function(dil, flat, flatProperty, value, setReadOnly, setOptions, setData) {
             var baseOptionList;
             var designCode = Utils.array.findFirstOrNull(function(code) {
-              return dil.library.libraryDesignCodeId == code.id;
+              return dil.libraryDesignCodeId == code.id;
             }, Constants.libraryDesignCodes);
             if (Utils.array.maybeGetProperty(designCode, 'targetedSequencingRequired')) {
               baseOptionList = [];
@@ -193,7 +193,7 @@ HotTarget.libraryaliquot = {
             }
             setOptions({
               source: baseOptionList.concat(Constants.targetedSequencings.filter(function(targetedSequencing) {
-                return targetedSequencing.kitDescriptorIds.indexOf(dil.library.kitDescriptorId) != -1;
+                return targetedSequencing.kitDescriptorIds.indexOf(dil.libraryKitDescriptorId) != -1;
               }).map(Utils.array.getAlias).sort())
             });
           }
@@ -211,7 +211,7 @@ HotTarget.libraryaliquot = {
   },
 
   getLabel: function(item) {
-    return item.name + ' (' + item.library.alias + ')';
+    return item.name + ' (' + item.alias + ')';
   },
 
   getBulkActions: function(config) {
@@ -224,6 +224,22 @@ HotTarget.libraryaliquot = {
             });
           },
           allowOnLibraryPage: true
+        },
+        {
+          name: 'Propagate',
+          action: function(items) {
+            HotUtils.warnIfConsentRevoked(items, function() {
+              var fields = [];
+              HotUtils.showDialogForBoxCreation('Create Library Aliquots', 'Create', fields, Urls.ui.libraryAliquots.bulkRepropagate,
+                  function(result) {
+                    return {
+                      ids: items.map(Utils.array.getId).join(',')
+                    };
+                  }, function(result) {
+                    return items.length;
+                  });
+            }, HotTarget.libraryaliquot.getLabel);
+          }
         },
         {
           name: 'Pool together',
@@ -303,39 +319,28 @@ HotTarget.libraryaliquot = {
 
     var aliquots = table.getDtoData();
 
-    var seen = {};
-    var libraries = aliquots.filter(function(aliquot) {
-      return !(Utils.validation.isEmpty(aliquot.volumeUsed) || aliquot.volumeUsed <= 0);
-    }).map(function(aliquot) {
-      return aliquot.library;
-    }).filter(function(library) {
-      return library != null;
-    }).filter(function(library) {
-      return seen.hasOwnProperty(library.id) ? false : (seen[library.id] = true);
-    }).map(function(library) {
-      return jQuery.extend(true, {}, library);
+    var parentVolumes = {};
+    aliquots.forEach(function(aliquot) {
+      if (aliquot.parentVolume) {
+        parentVolumes[aliquot.parentName] = aliquot.parentVolume;
+      }
+    });
+    aliquots.forEach(function(aliquot) {
+      if (aliquot.volumeUsed != null && parentVolumes.hasOwnProperty(aliquot.name)) {
+        parentVolumes[aliquot.parentName] -= aliquot.volumeUsed;
+      }
     });
 
-    if (libraries.length == 0) {
-      deferred.resolve();
-      return deferred.promise();
+    var overused = 0;
+    for ( var parent in parentVolumes) {
+      if (parentVolumes[parent] < 0) {
+        overused++;
+      }
     }
 
-    aliquots.filter(function(aliquot) {
-      return aliquot.library != null && aliquot.library.volume != null && aliquot.volumeUsed != null;
-    }).forEach(function(aliquot) {
-      libraries.find(function(library) {
-        return library.id == aliquot.library.id;
-      }).volume -= aliquot.volumeUsed;
-    });
-
-    var overUsedCount = libraries.filter(function(library) {
-      return library.volume < 0;
-    }).length
-
-    if (overUsedCount) {
-      Utils.showConfirmDialog('Not Enough Library Volume', 'Save', ['Saving will cause ' + overUsedCount
-          + (overUsedCount > 1 ? ' libraries to have negative volumes. ' : ' library to have a negative volume. ')
+    if (overused) {
+      Utils.showConfirmDialog('Not Enough Library Volume', 'Save', ['Saving will cause ' + overused
+          + (overused > 1 ? ' libraries to have negative volumes. ' : ' library to have a negative volume. ')
           + 'Are you sure you want to proceed?'], function() {
         deferred.resolve();
       }, function() {

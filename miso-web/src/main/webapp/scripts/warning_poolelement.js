@@ -44,7 +44,7 @@ WarningTarget.poolelement = {
               level: 'important'
             },
             {
-              include: element.library.lowQuality,
+              include: element.libraryLowQuality,
               tableMessage: '(LOW QUALITY LIBRARY)'
             },
             {

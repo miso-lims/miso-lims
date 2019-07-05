@@ -50,8 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @since 0.0.2
  */
 public interface Library
-    extends Comparable<Library>, Barcodable, Locatable, Boxable, ChangeLoggable, Aliasable, Serializable,
-    QualityControllable<LibraryQC>, Deletable, Attachable, Distributable {
+    extends Attachable, Comparable<Library>, Deletable, HierarchyEntity, Locatable, QualityControllable<LibraryQC>, Serializable {
 
   /** Field UNSAVED_ID */
   public static final long UNSAVED_ID = 0L;

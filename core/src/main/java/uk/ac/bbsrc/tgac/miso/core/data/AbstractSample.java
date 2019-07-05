@@ -558,4 +558,9 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     this.pendingAttachmentDeletions = pendingAttachmentDeletions;
   }
 
+  @Override
+  public HierarchyEntity getParent() {
+    return null;
+  }
+
 }

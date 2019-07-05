@@ -45,8 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
  * @since 0.0.2
  */
 public interface Sample
-    extends Locatable, Comparable<Sample>, Boxable, ChangeLoggable, Aliasable, Serializable,
-    QualityControllable<SampleQC>, Deletable, Attachable, Distributable {
+    extends Attachable, Comparable<Sample>, Deletable, HierarchyEntity, Locatable, QualityControllable<SampleQC>, Serializable {
 
   /** Field UNSAVED_ID */
   public static final long UNSAVED_ID = 0L;

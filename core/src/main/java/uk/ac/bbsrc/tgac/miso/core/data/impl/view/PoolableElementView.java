@@ -45,6 +45,8 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private String aliquotAlias;
 
+  private Long aliquotDnaSize;
+
   private Double aliquotConcentration;
 
   @Enumerated(EnumType.STRING)
@@ -78,8 +80,6 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
   private String libraryDescription;
 
   private String libraryBarcode;
-
-  private Long libraryDnaSize;
 
   private boolean libraryPaired;
 
@@ -160,6 +160,9 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     v.setAliquotVolumeUsed(aliquot.getVolumeUsed());
     v.setLastModified(aliquot.getLastModified());
     v.setPreMigrationId(aliquot.getPreMigrationId());
+    if (aliquot.getDnaSize() != null) {
+      v.setAliquotDnaSize(aliquot.getDnaSize().longValue());
+    }
     if (aliquot.getBox() != null) {
       v.setBoxName(aliquot.getBox().getName());
       v.setBoxAlias(aliquot.getBox().getAlias());
@@ -173,9 +176,6 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
       v.setLibraryAlias(lib.getAlias());
       v.setLibraryBarcode(lib.getIdentificationBarcode());
       v.setLibraryDescription(lib.getDescription());
-      if (lib.getDnaSize() != null) {
-        v.setLibraryDnaSize(lib.getDnaSize().longValue());
-      }
       v.setLibraryId(lib.getId());
       v.setLibraryName(lib.getName());
       v.setLibraryPaired(lib.getPaired());
@@ -239,6 +239,14 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   public void setAliquotAlias(String aliquotAlias) {
     this.aliquotAlias = aliquotAlias;
+  }
+
+  public Long getAliquotDnaSize() {
+    return aliquotDnaSize;
+  }
+
+  public void setAliquotDnaSize(Long aliquotDnaSize) {
+    this.aliquotDnaSize = aliquotDnaSize;
   }
 
   public Double getAliquotConcentration() {
@@ -383,14 +391,6 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   public void setLibraryBarcode(String libraryBarcode) {
     this.libraryBarcode = libraryBarcode;
-  }
-
-  public Long getLibraryDnaSize() {
-    return libraryDnaSize;
-  }
-
-  public void setLibraryDnaSize(Long libraryDnaSize) {
-    this.libraryDnaSize = libraryDnaSize;
   }
 
   public boolean isLibraryPaired() {
@@ -618,6 +618,7 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     result = prime * result + ((creatorName == null) ? 0 : creatorName.hashCode());
     result = prime * result + ((creatorFullName == null) ? 0 : creatorFullName.hashCode());
     result = prime * result + ((aliquotBarcode == null) ? 0 : aliquotBarcode.hashCode());
+    result = prime * result + ((aliquotDnaSize == null) ? 0 : aliquotDnaSize.hashCode());
     result = prime * result + ((aliquotConcentration == null) ? 0 : aliquotConcentration.hashCode());
     result = prime * result + ((aliquotConcentrationUnits == null) ? 0 : aliquotConcentrationUnits.hashCode());
     result = prime * result + (int) (aliquotId ^ (aliquotId >>> 32));
@@ -631,7 +632,6 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     result = prime * result + ((libraryAlias == null) ? 0 : libraryAlias.hashCode());
     result = prime * result + ((libraryBarcode == null) ? 0 : libraryBarcode.hashCode());
     result = prime * result + ((libraryDescription == null) ? 0 : libraryDescription.hashCode());
-    result = prime * result + ((libraryDnaSize == null) ? 0 : libraryDnaSize.hashCode());
     result = prime * result + ((libraryId == null) ? 0 : libraryId.hashCode());
     result = prime * result + ((libraryName == null) ? 0 : libraryName.hashCode());
     result = prime * result + (libraryPaired ? 1231 : 1237);
@@ -684,6 +684,9 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     if (aliquotBarcode == null) {
       if (other.aliquotBarcode != null) return false;
     } else if (!aliquotBarcode.equals(other.aliquotBarcode)) return false;
+    if (aliquotDnaSize == null) {
+      if (other.aliquotDnaSize != null) return false;
+    } else if (!aliquotDnaSize.equals(other.aliquotDnaSize)) return false;
     if (aliquotConcentration == null) {
       if (other.aliquotConcentration != null) return false;
     } else if (!aliquotConcentration.equals(other.aliquotConcentration)) return false;
@@ -721,9 +724,6 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     if (libraryDescription == null) {
       if (other.libraryDescription != null) return false;
     } else if (!libraryDescription.equals(other.libraryDescription)) return false;
-    if (libraryDnaSize == null) {
-      if (other.libraryDnaSize != null) return false;
-    } else if (!libraryDnaSize.equals(other.libraryDnaSize)) return false;
     if (libraryId == null) {
       if (other.libraryId != null) return false;
     } else if (!libraryId.equals(other.libraryId)) return false;

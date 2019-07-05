@@ -109,6 +109,8 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
       return "sampleId";
     case "library.parentSampleAlias":
       return "sampleAlias";
+    case "libraryPlatformType":
+      return "platformType";
     case "creationDate":
       return "created";
     case "library.platformType":

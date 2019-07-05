@@ -84,21 +84,21 @@ public class LibraryAliquotRestController extends RestController {
   @GetMapping(value = "/{aliquotId}", produces = "application/json")
   @ResponseBody
   public LibraryAliquotDto get(@PathVariable Long aliquotId) throws IOException {
-    return RestUtils.getObject("Library Aliquot", aliquotId, libraryAliquotService, ldi -> Dtos.asDto(ldi, false, false));
+    return RestUtils.getObject("Library Aliquot", aliquotId, libraryAliquotService, ldi -> Dtos.asDto(ldi, false));
   }
 
   @PostMapping(headers = { "Content-type=application/json" })
   @ResponseBody
   public LibraryAliquotDto create(@RequestBody LibraryAliquotDto aliquotDto)
       throws IOException {
-    return RestUtils.createObject("Library Aliquot", aliquotDto, Dtos::to, libraryAliquotService, ldi -> Dtos.asDto(ldi, false, false));
+    return RestUtils.createObject("Library Aliquot", aliquotDto, Dtos::to, libraryAliquotService, ldi -> Dtos.asDto(ldi, false));
   }
 
   @PutMapping(value = "/{aliquotId}", headers = { "Content-type=application/json" })
   @ResponseBody
   public LibraryAliquotDto update(@PathVariable Long aliquotId, @RequestBody LibraryAliquotDto aliquotDto) throws IOException {
     return RestUtils.updateObject("Library Aliquot", aliquotId, aliquotDto, Dtos::to, libraryAliquotService,
-        ldi -> Dtos.asDto(ldi, false, false));
+        ldi -> Dtos.asDto(ldi, false));
   }
 
   @GetMapping(value = "/dt", produces = "application/json")
@@ -129,7 +129,7 @@ public class LibraryAliquotRestController extends RestController {
   public List<LibraryAliquotDto> getLibraryAliquotsInBulk(@RequestBody List<String> names, HttpServletRequest request,
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
-    return PaginationFilter.bulkSearch(names, libraryAliquotService, ldi -> Dtos.asDto(ldi, false, false),
+    return PaginationFilter.bulkSearch(names, libraryAliquotService, ldi -> Dtos.asDto(ldi, false),
         message -> new RestException(message, Status.BAD_REQUEST));
   }
 

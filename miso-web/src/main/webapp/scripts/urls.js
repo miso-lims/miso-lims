@@ -131,6 +131,7 @@ Urls = (function() {
     edit: idUrlFunction(libraryAliquotUiBase),
     bulkEdit: libraryAliquotUiBase + '/bulk/edit',
     bulkPropagate: libraryAliquotUiBase + '/bulk/propagate',
+    bulkRepropagate: libraryAliquotUiBase + '/bulk/repropagate',
     bulkPoolTogether: libraryAliquotUiBase + '/bulk/merge',
     bulkPoolSeparate: libraryAliquotUiBase + '/bulk/pool-separate',
     bulkPoolCustom: libraryAliquotUiBase + '/bulk/pool'

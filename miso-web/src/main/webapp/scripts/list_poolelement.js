@@ -53,7 +53,7 @@ ListTarget.poolelement = {
           elements.forEach(function(element) {
             fields.push({
               type: 'int',
-              label: element.name + ' (' + element.library.alias + ')',
+              label: element.name + ' (' + element.alias + ')',
               value: element.proportion,
               property: element.name,
               required: true
@@ -74,11 +74,11 @@ ListTarget.poolelement = {
   createColumns: function(config, projectId) {
     return [
         {
-          'sTitle': 'Library Aliquot Name',
-          'mData': 'id', // for sorting purposes
-          'include': true,
-          'iSortPriority': 1,
-          "mRender": function(data, type, full) {
+          sTitle: 'Library Aliquot Name',
+          mData: 'id', // for sorting purposes
+          include: true,
+          iSortPriority: 1,
+          mRender: function(data, type, full) {
             if (type === 'display') {
               return '<a href="' + Urls.ui.libraryAliquots.edit(full.id) + '">' + full.name + '</a>';
             }
@@ -86,36 +86,41 @@ ListTarget.poolelement = {
           }
         },
         {
-          "sTitle": "Warnings",
-          "mData": null,
-          "mRender": Warning.tableWarningRenderer(WarningTarget.poolelement.makeTarget(config.duplicateIndicesSequences,
+          sTitle: 'Library Aliquot Alias',
+          mData: 'alias',
+          include: true,
+          iSortPriority: 0
+        },
+        {
+          sTitle: "Warnings",
+          mData: null,
+          mRender: Warning.tableWarningRenderer(WarningTarget.poolelement.makeTarget(config.duplicateIndicesSequences,
               config.nearDuplicateIndicesSequences)),
-          "include": true,
-          "iSortPriority": 0,
-          "bVisible": true,
-          "bSortable": false
+          include: true,
+          iSortPriority: 0,
+          bVisible: true,
+          bSortable: false
         }, {
-          'sTitle': 'Proportion',
-          'sType': 'numeric',
-          'mData': 'proportion',
-          'include': !config.add,
-          'iSortPriority': 0
-        }, ListUtils.idHyperlinkColumn("Library Name", Urls.ui.libraries.edit, "library.id", function(aliquot) {
-          return aliquot.library.name;
+          sTitle: 'Proportion',
+          sType: 'numeric',
+          mData: 'proportion',
+          include: !config.add,
+          iSortPriority: 0
+        }, ListUtils.idHyperlinkColumn("Library Name", Urls.ui.libraries.edit, "libraryId", function(aliquot) {
+          return aliquot.libraryName;
         }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Library Alias", Urls.ui.libraries.edit, function(aliquot) {
-          return aliquot.library.id;
-        }, "library.alias", 0, true),
-        ListUtils.idHyperlinkColumn("Sample Name", Urls.ui.samples.edit, "library.parentSampleId", function(aliquot) {
-          return "SAM" + aliquot.library.parentSampleId;
+          return aliquot.libraryId;
+        }, "libraryAlias", 0, true), ListUtils.idHyperlinkColumn("Sample Name", Urls.ui.samples.edit, "sampleId", function(aliquot) {
+          return aliquot.sampleName;
         }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Sample Alias", Urls.ui.samples.edit, function(aliquot) {
-          return aliquot.library.parentSampleId;
-        }, "library.parentSampleAlias", 0, true, "noPrint"), {
-          'sTitle': 'Conc.',
-          'sType': 'numeric',
-          'mData': 'concentration',
-          'include': true,
-          'iSortPriority': 0,
-          'mRender': function(data, type, full) {
+          return aliquot.sampleId;
+        }, "sampleAlias", 0, true, "noPrint"), {
+          sTitle: 'Conc.',
+          sType: 'numeric',
+          mData: 'concentration',
+          include: true,
+          iSortPriority: 0,
+          mRender: function(data, type, full) {
             if (type === 'display' && !!data) {
               var units = Constants.concentrationUnits.find(function(unit) {
                 return unit.name == full.concentrationUnits;
@@ -127,19 +132,19 @@ ListTarget.poolelement = {
             return data;
           }
         }, {
-          "sTitle": "Targeted Sequencing",
-          "mData": "targetedSequencingId",
-          "include": Constants.isDetailedSample,
-          "mRender": ListUtils.render.textFromId(Constants.targetedSequencings, 'alias', '(None)'),
-          "iSortPriority": 0,
-          "bSortable": false
+          sTitle: "Targeted Sequencing",
+          mData: "targetedSequencingId",
+          include: Constants.isDetailedSample,
+          mRender: ListUtils.render.textFromId(Constants.targetedSequencings, 'alias', '(None)'),
+          iSortPriority: 0,
+          bSortable: false
         }, {
-          'sTitle': 'Indices',
-          'mData': 'indexIds',
-          'include': true,
-          'bSortable': false,
-          'iSortPriority': 0,
-          'mRender': function(data, type, full) {
+          sTitle: 'Indices',
+          mData: 'indexIds',
+          include: true,
+          bSortable: false,
+          iSortPriority: 0,
+          mRender: function(data, type, full) {
             var indices = Constants.indexFamilies.reduce(function(acc, family) {
               return acc.concat(family.indices.filter(function(index) {
                 return data.indexOf(index.id) != -1;
@@ -159,18 +164,18 @@ ListTarget.poolelement = {
             return html;
           }
         }, {
-          'sTitle': 'Last Modified',
-          'mData': 'lastModified',
-          'include': true,
-          'iSortPriority': 0,
-          'sClass': 'noPrint'
+          sTitle: 'Last Modified',
+          mData: 'lastModified',
+          include: true,
+          iSortPriority: 0,
+          sClass: 'noPrint'
         }, {
-          "sTitle": "QC Passed",
-          "mData": "library.qcPassed",
-          "include": true,
-          "iSortPriority": 0,
-          "mRender": ListUtils.render.booleanChecks,
-          "bSortable": false
+          sTitle: "QC Passed",
+          mData: "libraryQcPassed",
+          include: true,
+          iSortPriority: 0,
+          mRender: ListUtils.render.booleanChecks,
+          bSortable: false
         }];
   }
 };

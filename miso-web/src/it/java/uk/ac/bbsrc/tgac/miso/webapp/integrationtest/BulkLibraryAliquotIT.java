@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 public class BulkLibraryAliquotIT extends AbstractIT {
 
   private static final Set<String> columns = Sets.newHashSet(LibraryAliquotColumns.NAME, LibraryAliquotColumns.ALIAS,
-      LibraryAliquotColumns.LIBRARY_ALIAS, LibraryAliquotColumns.ID_BARCODE, LibraryAliquotColumns.BOX_SEARCH,
+      LibraryAliquotColumns.PARENT_ALIAS, LibraryAliquotColumns.ID_BARCODE, LibraryAliquotColumns.BOX_SEARCH,
       LibraryAliquotColumns.BOX_ALIAS, LibraryAliquotColumns.BOX_POSITION, LibraryAliquotColumns.DISCARDED,
       LibraryAliquotColumns.EFFECTIVE_GROUP_ID, LibraryAliquotColumns.GROUP_ID, LibraryAliquotColumns.GROUP_DESCRIPTION,
       LibraryAliquotColumns.DESIGN_CODE, LibraryAliquotColumns.SIZE, LibraryAliquotColumns.CONCENTRATION,
@@ -74,7 +74,23 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     }
     assertEquals(1, table.getRowCount());
 
-    assertEquals("DILT_0001_nn_n_PE_304_WG", table.getText(LibraryAliquotColumns.LIBRARY_ALIAS, 0));
+    assertEquals("DILT_0001_nn_n_PE_304_WG", table.getText(LibraryAliquotColumns.PARENT_ALIAS, 0));
+  }
+
+  @Test
+  public void testRepropagateSetup() throws Exception {
+    // Goal: ensure all expected fields are present and no extra
+    BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForRepropagate(getDriver(), getBaseUrl(),
+        Sets.newHashSet(304L));
+    HandsOnTable table = page.getTable();
+    List<String> headings = table.getColumnHeadings();
+    assertEquals(columns.size(), headings.size());
+    for (String col : columns) {
+      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+    }
+    assertEquals(1, table.getRowCount());
+
+    assertEquals("DILT_0001_nn_n_PE_304_WG", table.getText(LibraryAliquotColumns.PARENT_ALIAS, 0));
   }
 
   @Test
@@ -96,7 +112,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     HandsOnTable table = page.getTable();
 
     assertFalse(table.isWritable(LibraryAliquotColumns.NAME, 0));
-    assertFalse(table.isWritable(LibraryAliquotColumns.LIBRARY_ALIAS, 0));
+    assertFalse(table.isWritable(LibraryAliquotColumns.PARENT_ALIAS, 0));
   }
   
   @Test
@@ -109,6 +125,30 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     attrs.put(LibraryAliquotColumns.CONCENTRATION, "3.45");
     attrs.put(LibraryAliquotColumns.CREATION_DATE, "2017-08-14");
     attrs.put(LibraryAliquotColumns.TARGETED_SEQUENCING, "Test TarSeq Two");
+
+    fillRow(table, 0, attrs);
+
+    assertColumnValues(table, 0, attrs, "pre-save");
+
+    saveAndAssertSuccess(table);
+    assertColumnValues(table, 0, attrs, "post-save");
+
+    Long newId = getSavedId(table, 0);
+    LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
+    assertLibraryAliquotAttributes(attrs, saved);
+  }
+
+  @Test
+  public void testRepropagate() throws Exception {
+    BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForRepropagate(getDriver(), getBaseUrl(), Sets.newHashSet(305L));
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> attrs = Maps.newLinkedHashMap();
+    attrs.put(LibraryAliquotColumns.ID_BARCODE, "987654");
+    attrs.put(LibraryAliquotColumns.CONCENTRATION, "5.55");
+    attrs.put(LibraryAliquotColumns.CREATION_DATE, "2019-07-08");
+    attrs.put(LibraryAliquotColumns.DESIGN_CODE, "EX");
+    attrs.put(LibraryAliquotColumns.ALIAS, "DILT_0001_nn_n_PE_304_EX");
 
     fillRow(table, 0, attrs);
 
@@ -176,7 +216,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     fillRow(table, 0, attrs);
 
     assertColumnValues(table, 0, attrs, "pre-save");
-    saveAndAssertSuccess(table, true);
+    saveAndAssertSuccess(table, false);
     assertColumnValues(table, 0, attrs, "post-save");
 
     Long newId = getSavedId(table, 0);
@@ -248,7 +288,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
     assertColumnValues(table, 0, row0, "pre-save row 0");
     assertColumnValues(table, 1, row1, "pre-save row 1");
-    saveAndAssertSuccess(table, true);
+    saveAndAssertSuccess(table, false);
     assertColumnValues(table, 0, row0, "post-save row 0");
     assertColumnValues(table, 1, row1, "post-save row 1");
 
@@ -383,7 +423,8 @@ public class BulkLibraryAliquotIT extends AbstractIT {
   private void assertLibraryAliquotAttributes(Map<String, String> attributes, LibraryAliquot aliquot) {
     testLibraryAliquotAttribute(LibraryAliquotColumns.NAME, attributes, aliquot, LibraryAliquot::getName);
     testLibraryAliquotAttribute(LibraryAliquotColumns.ID_BARCODE, attributes, aliquot, LibraryAliquot::getIdentificationBarcode);
-    testLibraryAliquotAttribute(LibraryAliquotColumns.LIBRARY_ALIAS, attributes, aliquot, dil -> dil.getLibrary().getAlias());
+    testLibraryAliquotAttribute(LibraryAliquotColumns.PARENT_ALIAS, attributes, aliquot,
+        dil -> dil.getLibrary().getAlias());
     testLibraryAliquotAttribute(LibraryAliquotColumns.CONCENTRATION, attributes, aliquot, dil -> dil.getConcentration().toString());
     testLibraryAliquotAttribute(LibraryAliquotColumns.VOLUME, attributes, aliquot, dil -> dil.getVolume().toString());
     testLibraryAliquotAttribute(LibraryAliquotColumns.CREATION_DATE, attributes, aliquot, dil -> dil.getCreationDate().toString());

@@ -53,7 +53,7 @@ ListTarget.partition = {
         var aliquotInfo = item.pool.pooledElements.filter(function(element, index, array) {
           return array.length < maxAliquots || index < maxAliquots - 1;
         }).map(function(aliquot) {
-          return aliquot.name + " - " + aliquot.library.name + " (" + aliquot.library.alias + ")";
+          return aliquot.name + " (" + aliquot.alias + ")";
         });
         if (item.pool.pooledElements.length >= maxAliquots) {
           aliquotInfo.push("...and " + (item.pool.pooledElements.length - maxAliquots + 1) + " more aliquots");

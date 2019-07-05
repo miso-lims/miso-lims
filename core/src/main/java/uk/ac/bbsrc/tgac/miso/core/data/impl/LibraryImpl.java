@@ -63,4 +63,5 @@ public class LibraryImpl extends AbstractLibrary {
     changeLog.setUser(user);
     return changeLog;
   }
+
 }

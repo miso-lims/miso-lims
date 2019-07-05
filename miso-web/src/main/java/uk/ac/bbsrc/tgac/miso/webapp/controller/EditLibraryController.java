@@ -294,7 +294,7 @@ public class EditLibraryController {
     model.put("libraryRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
         .collect(Collectors.toList()));
     model.put("libraryAliquots", library.getLibraryAliquots().stream()
-        .map(ldi -> Dtos.asDto(ldi, false, false)).collect(Collectors.toList()));
+        .map(ldi -> Dtos.asDto(ldi, false)).collect(Collectors.toList()));
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode config = mapper.createObjectNode();
     config.putPOJO("library", Dtos.asDto(library, false));
