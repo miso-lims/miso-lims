@@ -174,6 +174,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
@@ -1702,6 +1704,44 @@ public class Dtos {
     dto.setPrioritySubprojectAliases(from.getPrioritySubprojectAliases());
 
     return dto;
+  }
+
+  public static PoolDto asDto(@Nonnull ListPoolView from) {
+    PoolDto to = new PoolDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setName, from.getName());
+    setString(to::setAlias, from.getAlias());
+    setString(to::setDescription, from.getDescription());
+    setDateString(to::setCreationDate, from.getCreationTime());
+    setString(to::setConcentration, from.getConcentration());
+    to.setConcentrationUnits(from.getConcentrationUnits());
+    if (from.getBoxId() != null) {
+      to.setBox(new BoxDto());
+      to.getBox().setId(from.getBoxId());
+    }
+    to.setLocationLabel(BoxUtils.makeLocationLabel(from.isDiscarded(), from.isDistributed(), null, from.getBoxAlias(),
+        from.getBoxPosition(), from.getBoxLocationBarcode()));
+    from.getElements().stream()
+        .map(ListPoolViewElement::getDnaSize)
+        .filter(Objects::nonNull)
+        .mapToDouble(Long::doubleValue)
+        .average()
+        .ifPresent(to::setInsertSize);
+    to.setLibraryAliquotCount(from.getElements().size());
+    setDateTimeString(to::setLastModified, from.getLastModified());
+    to.setDuplicateIndices(!from.getDuplicateIndicesSequences().isEmpty());
+    to.setNearDuplicateIndices(!from.getNearDuplicateIndicesSequences().isEmpty());
+    to.setHasEmptySequence(from.getElements().stream().anyMatch(element -> element.getIndices() == null || element.getIndices().isEmpty()));
+    to.setPrioritySubprojectAliases(from.getPrioritySubprojectAliases());
+    to.setPooledElements(from.getElements().stream()
+        .map(element -> {
+          LibraryAliquotDto dto = new LibraryAliquotDto();
+          dto.setIdentityConsentLevel(element.getConsentLevel().getLabel());
+          return dto;
+        })
+        .collect(Collectors.toSet()));
+    to.setHasLowQualityLibraries(from.hasLowQualityMembers());
+    return to;
   }
 
   public static RunDto asDto(@Nonnull Run from) {
