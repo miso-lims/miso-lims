@@ -6,9 +6,7 @@ public enum MisoAuthority implements GrantedAuthority {
   /** Administrator */
   ROLE_ADMIN,
   /** Regular User */
-  ROLE_INTERNAL,
-  /** External collaborator */
-  ROLE_EXTERNAL;
+  ROLE_INTERNAL;
 
   @Override
   public String getAuthority() {

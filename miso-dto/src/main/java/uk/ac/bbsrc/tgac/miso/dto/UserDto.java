@@ -4,7 +4,6 @@ public class UserDto {
   private boolean active;
   private boolean admin;
   private String email;
-  private boolean external;
   private String fullName;
   private long id;
   private boolean internal;
@@ -36,10 +35,6 @@ public class UserDto {
     return admin;
   }
 
-  public boolean isExternal() {
-    return external;
-  }
-
   public boolean isInternal() {
     return internal;
   }
@@ -58,10 +53,6 @@ public class UserDto {
 
   public void setEmail(String email) {
     this.email = email;
-  }
-
-  public void setExternal(boolean external) {
-    this.external = external;
   }
 
   public void setFullName(String fullName) {

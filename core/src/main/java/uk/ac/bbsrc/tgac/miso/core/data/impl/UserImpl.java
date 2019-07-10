@@ -82,7 +82,6 @@ public class UserImpl implements User, Serializable {
   private String email;
   private String password;
   private boolean internal = false;
-  private boolean external = false;
   private boolean admin = false;
   private boolean active = true;
 
@@ -176,21 +175,12 @@ public class UserImpl implements User, Serializable {
       auths.add(MisoAuthority.ROLE_INTERNAL);
     }
 
-    if (isExternal()) {
-      auths.add(MisoAuthority.ROLE_EXTERNAL);
-    }
-
     return auths;
   }
 
   @Override
   public boolean isAdmin() {
     return admin;
-  }
-
-  @Override
-  public boolean isExternal() {
-    return external;
   }
 
   @Override
@@ -201,11 +191,6 @@ public class UserImpl implements User, Serializable {
   @Override
   public void setAdmin(boolean admin) {
     this.admin = admin;
-  }
-
-  @Override
-  public void setExternal(boolean external) {
-    this.external = external;
   }
 
   @Override
@@ -292,7 +277,6 @@ public class UserImpl implements User, Serializable {
     sb.append(":").append(isActive());
     sb.append(":").append(isAdmin());
     sb.append(":").append(isInternal());
-    sb.append(":").append(isExternal());
     sb.append("[").append(String.join(",", getRoles())).append("]");
     return sb.toString();
   }

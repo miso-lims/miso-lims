@@ -14,11 +14,10 @@ section: 4
 
 If you are a MISO administrator, you can find a list of all MISO users by clicking the "Users" link in the User
 Administration list at the bottom of the menu on the left side of the screen. This list is not available to regular
-(non-admin) users. The list shows some permissions, including whether the user is an admin, internal user, and/or
-external user. Clicking on a user's login name will take you the Edit User page, where you will see more user details.
-If your site is configured to use the MISO database for user accounts (see
-[Logging In](site_configuration.html#logging_in)), the toolbar at the top of the table includes an "Add" button for
-creating new user accounts.
+(non-admin) users. The list shows some permissions, including whether the user is an admin or internal user. Clicking
+on a user's login name will take you the Edit User page, where you will see more user details. If your site is
+configured to use the MISO database for user accounts (see [Logging In](site_configuration.html#logging_in)), the
+toolbar at the top of the table includes an "Add" button for creating new user accounts.
 
 {% include userman-toplink.md %}
 
@@ -33,8 +32,7 @@ the "Add" button in the toolbar at the top of the table.
 
 Be sure to give the user the appropriate permissions. They must be marked as "Internal" to have access to the majority
 of the MISO website. Marking the user "Admin" will give them additional privileges within MISO, such as creating new
-users. "External" is intended for users external to the organization, who should have very limited capabilities within
-MISO. External users currently have no access to MISO, however.
+users.
 
 If your site is configured to use LDAP or Active Directory for user accounts, then user accounts must be created in
 that separate service before they can be used for logging into MISO.
@@ -92,9 +90,6 @@ must be assigned within that separate service.
 The roles in MISO are:
 
 * Internal: A user belonging to the organization. This role grants access to the majority of MISO.
-* External: An external collaborator. This role is intended to grant a limited read-only view of items relevant to the
-  collaborator; however, this area of MISO has not been fully developed, and the role currently does not allow any
-  access.
 * Admin: A MISO administrator who has more control over MISO and the items stored within it. Administrators have access
   to everything in MISO.
 

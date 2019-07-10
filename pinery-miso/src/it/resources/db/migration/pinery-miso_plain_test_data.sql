@@ -82,8 +82,8 @@ DELETE FROM User_Group;
 DELETE FROM User;
 DELETE FROM _Group;
 
-INSERT INTO User (userId, active, admin, external, fullName, internal, loginName, password, email) VALUES
-(1,1,1,0,'admin',1,'admin','admin','admin@admin.admin');
+INSERT INTO User (userId, active, admin, fullName, internal, loginName, password, email) VALUES
+(1,1,1,'admin',1,'admin','admin','admin@admin.admin');
 
 INSERT INTO `_Group` (description, name) VALUES
 ('TestGroup1', 'TestGroup1');

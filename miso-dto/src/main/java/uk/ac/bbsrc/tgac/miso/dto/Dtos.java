@@ -2468,7 +2468,6 @@ public class Dtos {
     dto.setActive(from.isActive());
     dto.setAdmin(from.isAdmin());
     dto.setEmail(from.getEmail());
-    dto.setExternal(from.isExternal());
     dto.setFullName(from.getFullName());
     dto.setInternal(from.isInternal());
     dto.setLoginName(from.getLoginName());
@@ -2483,7 +2482,6 @@ public class Dtos {
     setString(user::setEmail, dto.getEmail());
     setBoolean(user::setAdmin, dto.isAdmin(), false);
     setBoolean(user::setInternal, dto.isInternal(), false);
-    setBoolean(user::setExternal, dto.isExternal(), false);
     setBoolean(user::setActive, dto.isActive(), false);
     return user;
   }

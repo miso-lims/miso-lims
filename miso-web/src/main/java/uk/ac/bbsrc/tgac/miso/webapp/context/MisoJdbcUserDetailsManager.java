@@ -76,7 +76,6 @@ public class MisoJdbcUserDetailsManager extends JdbcUserDetailsManager {
 
             try {
               if (rs.getBoolean("admin")) roleList.add(MisoAuthority.ROLE_ADMIN);
-              if (rs.getBoolean("external")) roleList.add(MisoAuthority.ROLE_EXTERNAL);
               if (rs.getBoolean("internal")) roleList.add(MisoAuthority.ROLE_INTERNAL);
             } catch (SQLException e) {
               log.error("Couldn't retrieve a user property to convert to a role", e);

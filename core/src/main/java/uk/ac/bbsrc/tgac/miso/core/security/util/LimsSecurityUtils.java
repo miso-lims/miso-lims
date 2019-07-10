@@ -85,7 +85,6 @@ public class LimsSecurityUtils {
 
     target.setActive(ldapUserDetails.isAccountNonExpired());
     target.setAdmin(roles.contains(MisoAuthority.ROLE_ADMIN.name()));
-    target.setExternal(roles.contains(MisoAuthority.ROLE_EXTERNAL.name()));
     target.setInternal(roles.contains(MisoAuthority.ROLE_INTERNAL.name()));
 
     target.setPassword(ldapUserDetails.getPassword());
