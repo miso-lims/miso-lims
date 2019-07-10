@@ -68,6 +68,11 @@ public class EditUserController {
     this.authorizationManager = authorizationManager;
   }
 
+  @ModelAttribute("usersEditable")
+  public boolean populateUsersEditable() {
+    return securityManager.canCreateNewUser();
+  }
+
   @ModelAttribute("mutablePassword")
   public boolean populateMutablePassword() {
     return securityManager.isPasswordMutable();

@@ -17,6 +17,7 @@ Changes:
   * Fixed non-internal users being able to log in. Users must now be marked internal (via role if
     using LDAP) to log in at all. Previously, non-internal users could log in, though their view
     was very limited
+  * Fixed users being editable when using LDAP/AD authentication
 
 # 0.2.183
 

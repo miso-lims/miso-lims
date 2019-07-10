@@ -51,6 +51,9 @@ public class UserRestController extends RestController {
 
   @PutMapping("/{userId}")
   public @ResponseBody UserDto update(@PathVariable long userId, @RequestBody UserDto dto) throws IOException {
+    if (!securityManager.canCreateNewUser()) {
+      throw new RestException("Cannot modify users in MISO directly.", Status.BAD_REQUEST);
+    }
     return RestUtils.updateObject("User", userId, dto, d -> {
       User user = Dtos.to(d);
       user.setPassword(null); // null password has the effect of keeping the current password in DefaultUserService

@@ -7,6 +7,7 @@ FormTarget.user = (function($) {
    * Expected config {
    *   isAdmin: boolean
    *   isSelf: boolean
+   *   usersEditable: boolean
    * }
    */
 
@@ -23,67 +24,110 @@ FormTarget.user = (function($) {
     getSections: function(config, object) {
       return [{
         title: 'User Information',
-        fields: [{
-          title: 'User ID',
-          data: 'id',
-          type: 'read-only',
-          getDisplayValue: function(user) {
-            return user.id || 'Unsaved';
-          }
-        }, {
-          title: 'Full Name',
-          data: 'fullName',
-          type: 'text',
-          required: true,
-          maxLength: 255
-        }, {
-          title: 'Login Name',
-          data: 'loginName',
-          type: 'text',
-          required: true,
-          maxLength: 255,
-          disabled: !config.isAdmin
-        }, {
-          title: 'Password',
-          data: 'password',
-          type: 'password',
-          required: true,
-          maxLength: 100,
-          include: !object.id
-        }, {
-          title: 'Confirm Password',
-          data: 'passwordConfirm',
-          omit: true,
-          type: 'password',
-          required: true,
-          maxLength: 100,
-          include: !object.id,
-          match: 'password'
-        }, {
-          title: 'Email Address',
-          data: 'email',
-          type: 'text',
-          required: true,
-          maxLength: 255,
-          regex: 'email'
-        }, {
-          title: 'Admin?',
-          data: 'admin',
-          type: 'checkbox',
-          disabled: !config.isAdmin || config.isSelf
-        }, {
-          title: 'Internal?',
-          data: 'internal',
-          type: 'checkbox',
-          disabled: !config.isAdmin
-        }, {
-          title: 'Active?',
-          data: 'active',
-          type: 'checkbox',
-          disabled: !config.isAdmin || config.isSelf
-        }]
+        fields: config.usersEditable ? getEditableFields(config, object) : getReadOnlyFields(config, object)
       }];
     }
+  }
+
+  function getEditableFields(config, object) {
+    return [{
+      title: 'User ID',
+      data: 'id',
+      type: 'read-only',
+      getDisplayValue: function(user) {
+        return user.id || 'Unsaved';
+      }
+    }, {
+      title: 'Full Name',
+      data: 'fullName',
+      type: 'text',
+      required: true,
+      maxLength: 255
+    }, {
+      title: 'Login Name',
+      data: 'loginName',
+      type: 'text',
+      required: true,
+      maxLength: 255,
+      disabled: !config.isAdmin
+    }, {
+      title: 'Password',
+      data: 'password',
+      type: 'password',
+      required: true,
+      maxLength: 100,
+      include: !object.id
+    }, {
+      title: 'Confirm Password',
+      data: 'passwordConfirm',
+      omit: true,
+      type: 'password',
+      required: true,
+      maxLength: 100,
+      include: !object.id,
+      match: 'password'
+    }, {
+      title: 'Email Address',
+      data: 'email',
+      type: 'text',
+      required: true,
+      maxLength: 255,
+      regex: 'email'
+    }, {
+      title: 'Admin?',
+      data: 'admin',
+      type: 'checkbox',
+      disabled: !config.isAdmin || config.isSelf
+    }, {
+      title: 'Internal?',
+      data: 'internal',
+      type: 'checkbox',
+      disabled: !config.isAdmin
+    }, {
+      title: 'Active?',
+      data: 'active',
+      type: 'checkbox',
+      disabled: !config.isAdmin || config.isSelf
+    }];
+  }
+
+  function getReadOnlyFields(config, object) {
+    $('#save').remove();
+    return [{
+      title: 'User ID',
+      data: 'id',
+      type: 'read-only',
+      getDisplayValue: function(user) {
+        return user.id || 'Unsaved';
+      }
+    }, {
+      title: 'Full Name',
+      data: 'fullName',
+      type: 'read-only'
+    }, {
+      title: 'Login Name',
+      data: 'loginName',
+      type: 'read-only'
+    }, {
+      title: 'Email Address',
+      data: 'email',
+      type: 'read-only'
+    }, {
+      title: 'Admin?',
+      data: 'admin',
+      type: 'checkbox',
+      disabled: true
+    }, {
+      title: 'Internal?',
+      data: 'internal',
+      type: 'checkbox',
+      disabled: true
+    }, {
+      title: 'Active?',
+      data: 'active',
+      type: 'checkbox',
+      disabled: true
+    }];
   }
 
 })(jQuery);
