@@ -35,29 +35,32 @@
       jQuery(document).ready(function () {
         FormUtils.createForm('userForm', 'save', ${userDto}, 'user', {
           isAdmin: ${miso:isAdmin()},
-          isSelf: ${miso:isCurrentUser(user.loginName)}
+          isSelf: ${miso:isCurrentUser(user.loginName)},
+          usersEditable: ${usersEditable}
         });
       });
     </script>
     
     <c:if test="${user.id != 0}">
-      <form:form id="passwordForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
-      <table class="in">
-        <tr>
-          <td class="h"></td>
-          <td><button id="savePassword" type="button" class="ui-state-default">Submit</button></td>
-        </tr>
-      </table>
-      
-      <script>
-        jQuery(document).ready(function () {
-          FormUtils.createForm('passwordForm', 'savePassword', {}, 'passwordreset', {
-            userId: ${user.id},
-            isAdmin: ${miso:isAdmin()},
-            isSelf: ${miso:isCurrentUser(user.loginName)}
+      <c:if test="${usersEditable}">
+        <form:form id="passwordForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
+        <table class="in">
+          <tr>
+            <td class="h"></td>
+            <td><button id="savePassword" type="button" class="ui-state-default">Submit</button></td>
+          </tr>
+        </table>
+        
+        <script>
+          jQuery(document).ready(function () {
+            FormUtils.createForm('passwordForm', 'savePassword', {}, 'passwordreset', {
+              userId: ${user.id},
+              isAdmin: ${miso:isAdmin()},
+              isSelf: ${miso:isCurrentUser(user.loginName)}
+            });
           });
-        });
-      </script>
+        </script>
+      </c:if>
       
       <miso:list-section id="list_groups" name="Groups" target="group" alwaysShow="true" items="${groups}" config="{userId: ${user.id}, isAdmin: ${miso:isAdmin()}}"/>
     </c:if>
