@@ -14,6 +14,9 @@ Changes:
   * Added readLength for libraries and library aliquots in Pinery-MISO
   * Fixed missing storage location for library aliquots in Pinery-MISO (for real this time)
   * Fixed missing time in Pinery-MISO pool timestamps
+  * Fixed non-internal users being able to log in. Users must now be marked internal (via role if
+    using LDAP) to log in at all. Previously, non-internal users could log in, though their view
+    was very limited
 
 # 0.2.183
 
