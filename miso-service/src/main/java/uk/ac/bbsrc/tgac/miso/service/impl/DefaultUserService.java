@@ -37,26 +37,32 @@ public class DefaultUserService implements UserService {
 
   @Override
   public long create(User user) throws IOException {
-    authorizationManager.throwIfNonAdmin();
+    // Skip auth check if no user is logged in so that security manager can sync user during login
+    if (authorizationManager.getCurrentUser() != null) {
+      authorizationManager.throwIfNonAdmin();
+    }
     return securityStore.saveUser(user);
   }
 
   @Override
   public long update(User user) throws IOException {
     User original = get(user.getId());
-    authorizationManager.throwIfNonAdminOrMatchingOwner(original);
+    User currentUser = authorizationManager.getCurrentUser();
+    // Skip auth check if no user is logged in so that security manager can sync user during login
+    if (currentUser != null) {
+      authorizationManager.throwIfNonAdminOrMatchingOwner(original);
+    }
     validateChange(user, original);
 
     original.setFullName(user.getFullName());
     original.setEmail(user.getEmail());
     original.setFavouriteWorkflows(user.getFavouriteWorkflows());
-    User currentUser = authorizationManager.getCurrentUser();
-    if (currentUser.isAdmin()) {
+    if (currentUser == null || currentUser.isAdmin()) {
       original.setExternal(user.isExternal());
       original.setInternal(user.isInternal());
       original.setRoles(user.getRoles());
       original.setLoginName(user.getLoginName());
-      if (currentUser.getId() != original.getId()) {
+      if (currentUser == null || currentUser.getId() != original.getId()) {
         original.setActive(user.isActive());
         original.setAdmin(user.isAdmin());
       }

@@ -36,13 +36,41 @@
 
   <security:http pattern="/styles/**" security="none" />
   <security:http pattern="/scripts/**" security="none" />
-  <security:http pattern="/images/**" security="none" />
 
-  <security:http>
+  <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+    <property name="defaultTargetUrl" value="/miso/mainMenu" />
+  </bean>
+  <bean id="failureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+    <property name="defaultFailureUrl" value="/miso/login?login_error=1" />
+  </bean>
+
+  <security:http pattern="/images/**" security="none" />
+  
+  <bean id="loginUrlEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+    <constructor-arg value="/miso/login" />
+  </bean>
+  
+  <bean id="tokenRepository" class="org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl">
+    <property name="dataSource" ref="dataSource" />
+  </bean>
+  
+  <bean id="rememberMeServices" class="org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices">
+    <constructor-arg value="miso" />
+    <constructor-arg ref="userAuthService" />
+    <constructor-arg ref="tokenRepository" />
+    <property name="parameter" value="_spring_security_remember_me" />
+  </bean>
+
+  <bean id="loginFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.MisoLoginFilter">
+    <property name="authenticationManager" ref="authenticationManager" />
+    <property name="authenticationSuccessHandler" ref="successHandler" />
+    <property name="authenticationFailureHandler" ref="failureHandler" />
+    <property name="rememberMeServices" ref="rememberMeServices" />
+  </bean>
+
+  <security:http entry-point-ref="loginUrlEntryPoint">
     <security:access-denied-handler error-page="/miso/accessDenied"/>
     <security:csrf disabled="true" />
-
-    <security:remember-me data-source-ref="dataSource" user-service-ref="userAuthService" remember-me-parameter="_spring_security_remember_me" />
     
     <security:intercept-url pattern="/miso/login" access="permitAll" />
     <security:intercept-url pattern="/miso/accessDenied" access="permitAll" />
@@ -54,9 +82,8 @@
 
     <security:intercept-url pattern="/miso/**" access="hasRole('ROLE_INTERNAL')" />
     
-    <security:form-login login-page="/miso/login"
-        authentication-success-handler-ref="successHandler"
-        authentication-failure-url="/miso/login?login_error=1" />
+    <security:custom-filter position="FORM_LOGIN_FILTER" ref="loginFilter"/>
+    <security:remember-me services-ref="rememberMeServices" key="miso" />
     <security:logout logout-success-url="/miso/login" />
   </security:http>
 

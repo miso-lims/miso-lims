@@ -39,10 +39,6 @@
     <property name="createNewSession" value="false" />
   </bean>
 
-  <bean id="successHandler" class="uk.ac.bbsrc.tgac.miso.webapp.context.UserSyncHandler">
-    <property name="defaultTargetUrl" value="/miso/mainMenu" />
-  </bean>
-
   <bean id="contextSource" class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
     <constructor-arg index="0" value="${security.ldap.url}" />
     <property name="userDn" value="${security.ldap.userDn}" />
