@@ -1,6 +1,6 @@
-INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `roles`, `password`, `email`) VALUES
-(1,1,1,0,'admin',1,'admin','ROLE_ADMIN,ROLE_INTERNAL','{SHA-1}d033e22ae348aeb5660fc2140aec35850c4da997','admin@admin'),
-(3,1,0,0,'user',1,'user','ROLE_INTERNAL','user','user@user.user');
+INSERT INTO `User` (`userId`, `active`, `admin`, `fullName`, `internal`, `loginName`, `roles`, `password`, `email`) VALUES
+(1,1,1,'admin',1,'admin','ROLE_ADMIN,ROLE_INTERNAL','{SHA-1}d033e22ae348aeb5660fc2140aec35850c4da997','admin@admin'),
+(3,1,0,'user',1,'user','ROLE_INTERNAL','user','user@user.user');
 
 INSERT INTO `_Group` (description, name) VALUES
 ('TestGroup1', 'TestGroup1'), ('TestGroup2', 'TestGroup2');

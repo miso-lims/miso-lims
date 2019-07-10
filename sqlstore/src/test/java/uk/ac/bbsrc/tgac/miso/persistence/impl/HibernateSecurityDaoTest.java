@@ -62,7 +62,6 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
     assertNotNull(user);
     assertEquals(1L, user.getId());
     assertEquals(true, user.isActive());
-    assertEquals(false, user.isExternal());
     assertEquals("admin", user.getFullName());
     assertEquals(true, user.isInternal());
     assertEquals("admin", user.getLoginName());
@@ -107,7 +106,6 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
     User user = new UserImpl();
     user.setAdmin(false);
     user.setInternal(true);
-    user.setExternal(true);
     user.setActive(true);
     user.setEmail("new@user.test");
     user.setFullName("Test User");
@@ -131,12 +129,10 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
     User user = dao.getUserById(3L);
     assertNotNull(user);
     user.setFullName("Test Edit");
-    user.setExternal(false);
     user.setEmail("edited@user.test");
     assertEquals(3L, dao.saveUser(user));
     User saved = dao.getUserById(3L);
     assertEquals(user.getFullName(), saved.getFullName());
-    assertEquals(user.isExternal(), saved.isExternal());
     assertEquals(user.getEmail(), saved.getEmail());
   }
   

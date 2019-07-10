@@ -58,7 +58,6 @@ public class DefaultUserService implements UserService {
     original.setEmail(user.getEmail());
     original.setFavouriteWorkflows(user.getFavouriteWorkflows());
     if (currentUser == null || currentUser.isAdmin()) {
-      original.setExternal(user.isExternal());
       original.setInternal(user.isInternal());
       original.setRoles(user.getRoles());
       original.setLoginName(user.getLoginName());

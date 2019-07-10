@@ -173,8 +173,8 @@ INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Human h
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (2, 'Human hg19');
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (3, 'Human hg18 random');
 
-INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `password`, `email`)
-VALUES (3,1,0,0,'user',1,'user','user','user@user.user');
+INSERT INTO `User` (`userId`, `active`, `admin`, `fullName`, `internal`, `loginName`, `password`, `email`)
+VALUES (3,1,0,'user',1,'user','user','user@user.user');
 
 DELETE FROM `_Group`;
 INSERT INTO `_Group`(`groupId`, `name`, `description`) VALUES (1, 'TestGroup', 'Is full of testing');

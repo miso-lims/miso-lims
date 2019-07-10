@@ -30,8 +30,6 @@ public class PrefixStrippingAuthoritiesMapper implements GrantedAuthoritiesMappe
         roles.add(MisoAuthority.ROLE_ADMIN);
       } else if ((rolePrefix + MisoAuthority.ROLE_INTERNAL.name()).equals(a.getAuthority())) {
         roles.add(MisoAuthority.ROLE_INTERNAL);
-      } else if ((rolePrefix + MisoAuthority.ROLE_EXTERNAL.name()).equals(a.getAuthority())) {
-        roles.add(MisoAuthority.ROLE_EXTERNAL);
       }
     }
 

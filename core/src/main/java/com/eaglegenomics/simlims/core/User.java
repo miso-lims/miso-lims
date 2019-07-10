@@ -42,15 +42,11 @@ public interface User extends Serializable, Comparable<User>, Identifiable {
 
   boolean isAdmin();
 
-  boolean isExternal();
-
   boolean isInternal();
 
   Set<WorkflowName> getFavouriteWorkflows();
 
   void setAdmin(boolean admin);
-
-  void setExternal(boolean external);
 
   void setFullName(String fullName);
 

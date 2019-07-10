@@ -107,7 +107,6 @@ ListTarget.user = {
       "include": true,
       "iSortPriority": 0
     }, permissionColumn("Active", "active", 0, true), permissionColumn("Admin", "admin", 0, true),
-        permissionColumn("Internal", "internal", 0, true), permissionColumn("External", "external", 0, true),
-        permissionColumn("Logged In", "loggedIn", 2, config.listMode === 'list')];
+        permissionColumn("Internal", "internal", 0, true), permissionColumn("Logged In", "loggedIn", 2, config.listMode === 'list')];
   }
 };

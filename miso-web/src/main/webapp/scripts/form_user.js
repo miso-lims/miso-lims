@@ -77,11 +77,6 @@ FormTarget.user = (function($) {
           type: 'checkbox',
           disabled: !config.isAdmin
         }, {
-          title: 'External?',
-          data: 'external',
-          type: 'checkbox',
-          disabled: !config.isAdmin
-        }, {
           title: 'Active?',
           data: 'active',
           type: 'checkbox',
