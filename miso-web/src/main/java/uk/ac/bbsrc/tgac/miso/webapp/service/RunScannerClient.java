@@ -24,7 +24,10 @@ import org.springframework.web.client.RestTemplate;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.SuperuserAuthentication;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
@@ -33,8 +36,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.LatencyHistogram;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
 import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
-import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.ProgressiveRequestDto;
 import ca.on.oicr.gsi.runscanner.dto.ProgressiveResponseDto;
 
@@ -48,6 +51,9 @@ public class RunScannerClient {
 
   private static final Gauge badRunCount = Gauge.build()
       .name("miso_runscanner_client_bad_runs").help("The number of runs that failed to save.").register();
+
+  private static final Gauge fallbackContainerModelCount = Gauge.build()
+      .name("miso_runscanner_client_bad_container_models").help("The number of runs that have unknown container models.").register();
 
   private static final Logger log = LoggerFactory.getLogger(RunScannerClient.class);
 
@@ -76,6 +82,8 @@ public class RunScannerClient {
   private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
   private final Set<String> badRuns = new HashSet<>();
+
+  private final Set<String> fallbackContainerModelRuns = new HashSet<>();
 
   private final Semaphore lock = new Semaphore(1);
   @Autowired
@@ -129,21 +137,38 @@ public class RunScannerClient {
             }
           };
 
-          (runService.processNotification(Dtos.to(dto), dto.getLaneCount(), dto.getContainerModel(), dto.getContainerSerialNumber(),
-              dto.getSequencerName(), isMatchingSequencingParameters, laneContents, dto.getSequencerPosition()) ? saveNew : saveUpdate).inc();
+          Run notificationRun = Dtos.to(dto);
+          boolean isNew = runService.processNotification(notificationRun, dto.getLaneCount(), dto.getContainerModel(), dto.getContainerSerialNumber(),
+              dto.getSequencerName(), isMatchingSequencingParameters, laneContents, dto.getSequencerPosition());
+          (isNew ? saveNew : saveUpdate).inc();
           saveCount.inc();
           badRuns.remove(dto.getRunAlias());
+          Run saved = runService.getRunByAlias(notificationRun.getAlias());
+          if (hasFallbackContainerModel(saved)) {
+            if (isNew) {
+              fallbackContainerModelRuns.add(saved.getAlias());
+            }
+          } else {
+            fallbackContainerModelRuns.remove(saved.getAlias());
+          }
         } catch (Exception e) {
           log.error("Failed to save run: " + dto.getRunAlias(), e);
           saveFailures.inc();
           badRuns.add(dto.getRunAlias());
         }
         badRunCount.set(badRuns.size());
+        fallbackContainerModelCount.set(fallbackContainerModelRuns.size());
       }
       lock.release();
     } catch (IOException e) {
       log.error("Failed to save runs", e);
     }
+  }
+
+  private static boolean hasFallbackContainerModel(Run run) {
+    return run.getSequencerPartitionContainers().stream()
+        .map(SequencerPartitionContainer::getModel)
+        .anyMatch(SequencingContainerModel::isFallback);
   }
 
   @Scheduled(fixedDelayString = "${miso.runscanner.interval:300000}")
