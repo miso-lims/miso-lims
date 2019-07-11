@@ -9,6 +9,7 @@ Changes:
     * group ID (detailed sample)
     * group description (detailed sample)
   * Added the ability to propagate library aliquots from library aliquots
+  * Added Prometheus metric to track unknown sequencing container models reported by Run Scanner
   * Added readLength for libraries and library aliquots in Pinery-MISO
   * Fixed missing storage location for library aliquots in Pinery-MISO (for real this time)
 
