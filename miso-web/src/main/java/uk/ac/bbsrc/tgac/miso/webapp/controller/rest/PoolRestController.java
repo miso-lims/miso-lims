@@ -39,8 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -72,6 +70,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
@@ -80,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.core.service.ListPoolViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
@@ -130,26 +130,26 @@ public class PoolRestController extends RestController {
     }
   }
 
-  private final JQueryDataTableBackend<Pool, PoolDto> jQueryBackend = new JQueryDataTableBackend<Pool, PoolDto>() {
+  private final JQueryDataTableBackend<ListPoolView, PoolDto> jQueryBackend = new JQueryDataTableBackend<ListPoolView, PoolDto>() {
 
     @Override
-    protected PoolDto asDto(Pool model) {
-      return Dtos.asDto(model, true, false);
+    protected PoolDto asDto(ListPoolView model) {
+      return Dtos.asDto(model);
     }
 
     @Override
-    protected PaginatedDataSource<Pool> getSource() throws IOException {
-      return poolService;
+    protected PaginatedDataSource<ListPoolView> getSource() throws IOException {
+      return listPoolViewService;
     }
 
   };
-
-  protected static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
 
   @Autowired
   private ExperimentService experimentService;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private ListPoolViewService listPoolViewService;
   @Autowired
   private RunService runService;
   @Autowired

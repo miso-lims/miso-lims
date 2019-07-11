@@ -130,7 +130,7 @@ ListTarget.pool = {
           "mData": "locationLabel",
           "bSortable": false,
           "mRender": function(data, type, full) {
-            return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
+            return full.box ? "<a href='/miso/box/" + full.box.id + "'>" + data + "</a>" : data;
           },
           "include": true,
           "iSortPriority": 0
@@ -151,7 +151,7 @@ ListTarget.pool = {
         }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['fulfilled'], searchTerms['active'], searchTerms['created'], searchTerms['changed'], searchTerms['creator'],
-        searchTerms['changedby'], searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box']]
+    return [searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'],
+        searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box']]
   }
 };

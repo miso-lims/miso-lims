@@ -26,7 +26,6 @@ public class PoolDto extends AbstractBoxableDto {
   private Set<String> duplicateIndicesSequences;
   private boolean nearDuplicateIndices;
   private Set<String> nearDuplicateIndicesSequences;
-  private Integer avgInsertSize;
   private Set<LibraryAliquotDto> pooledElements;
   private String creationDate;
   private String lastModified;
@@ -47,10 +46,6 @@ public class PoolDto extends AbstractBoxableDto {
 
   public String getAlias() {
     return alias;
-  }
-
-  public Integer getAvgInsertSize() {
-    return avgInsertSize;
   }
 
   public String getConcentration() {
@@ -115,10 +110,6 @@ public class PoolDto extends AbstractBoxableDto {
 
   public void setAlias(String alias) {
     this.alias = alias;
-  }
-
-  public void setAvgInsertSize(Integer avgInsertSize) {
-    this.avgInsertSize = avgInsertSize;
   }
 
   public void setConcentration(String concentration) {

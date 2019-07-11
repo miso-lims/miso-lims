@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Improved performance of the Pools list page
   * Added library aliquot attributes which may override attributes on the library
     * alias (will be validated the same way as library aliases)
     * size (bp)

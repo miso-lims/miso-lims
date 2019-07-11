@@ -669,7 +669,6 @@ public class BulkPoolIT extends AbstractIT {
     ListPoolsPage listPools = ListPoolsPage.getListPage(getDriver(), getBaseUrl());
     DataTable pools = listPools.getTable();
     pools.searchFor("IPO20000"); // should get IPO200001 and IPO200002
-
     pools.checkBoxForRow(0);
     pools.checkBoxForRow(1);
     
