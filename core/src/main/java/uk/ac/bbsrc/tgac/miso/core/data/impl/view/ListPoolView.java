@@ -44,6 +44,7 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
   private long poolId = UNSAVED_ID;
   private String name;
   private String alias;
+  private String identificationBarcode;
   private String description;
 
   @Enumerated(EnumType.STRING)
@@ -108,6 +109,14 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
 
   public void setAlias(String alias) {
     this.alias = alias;
+  }
+
+  public String getIdentificationBarcode() {
+    return identificationBarcode;
+  }
+
+  public void setIdentificationBarcode(String identificationBarcode) {
+    this.identificationBarcode = identificationBarcode;
   }
 
   public String getDescription() {

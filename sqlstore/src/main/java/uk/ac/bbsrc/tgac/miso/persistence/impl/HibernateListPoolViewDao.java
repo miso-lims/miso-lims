@@ -86,6 +86,9 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
 
   @Override
   public String propertyForSortColumn(String original) {
+    if ("creationDate".equals(original)) {
+      return "creationTime";
+    }
     return original;
   }
 
@@ -101,9 +104,8 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
 
   @Override
   public void restrictPaginationByBox(Criteria criteria, String name, Consumer<String> errorHandler) {
-    criteria.createAlias("elements", "element");
-    criteria.add(Restrictions.or(Restrictions.ilike("element.boxName", name, MatchMode.ANYWHERE),
-        Restrictions.ilike("element.boxAlias", name, MatchMode.ANYWHERE)));
+    criteria.add(Restrictions.or(Restrictions.ilike("boxName", name, MatchMode.ANYWHERE),
+        Restrictions.ilike("boxAlias", name, MatchMode.ANYWHERE)));
   }
 
   @Override

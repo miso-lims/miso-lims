@@ -1711,6 +1711,7 @@ public class Dtos {
     setLong(to::setId, from.getId(), true);
     setString(to::setName, from.getName());
     setString(to::setAlias, from.getAlias());
+    setString(to::setIdentificationBarcode, from.getIdentificationBarcode());
     setString(to::setDescription, from.getDescription());
     setDateString(to::setCreationDate, from.getCreationTime());
     setString(to::setConcentration, from.getConcentration());
@@ -1736,7 +1737,9 @@ public class Dtos {
     to.setPooledElements(from.getElements().stream()
         .map(element -> {
           LibraryAliquotDto dto = new LibraryAliquotDto();
-          dto.setIdentityConsentLevel(element.getConsentLevel().getLabel());
+          if (element.getConsentLevel() != null) {
+            dto.setIdentityConsentLevel(element.getConsentLevel().getLabel());
+          }
           return dto;
         })
         .collect(Collectors.toSet()));

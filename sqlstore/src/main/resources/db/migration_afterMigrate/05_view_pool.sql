@@ -64,6 +64,7 @@ SELECT
   p.poolId,
   p.name,
   p.alias,
+  p.identificationBarcode,
   p.description,
   p.platformType,
   p.creator,
