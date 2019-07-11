@@ -12,6 +12,7 @@ Changes:
   * Added the ability to propagate library aliquots from library aliquots
   * Added readLength for libraries and library aliquots in Pinery-MISO
   * Fixed missing storage location for library aliquots in Pinery-MISO (for real this time)
+  * Fixed missing time in Pinery-MISO pool timestamps
 
 # 0.2.183
 
