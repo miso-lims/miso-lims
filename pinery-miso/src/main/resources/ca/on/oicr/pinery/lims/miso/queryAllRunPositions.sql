@@ -8,7 +8,7 @@ SELECT p.partitionId
   ,pool.identificationBarcode AS pool_barcode
   ,pool.description AS pool_description
   ,pool.creator AS pool_createdById
-  ,pool.creationDate AS pool_created
+  ,pool.created AS pool_created
   ,pool.lastModifier AS pool_modifiedById
   ,pool.lastModified AS pool_modified
 FROM _Partition AS p
