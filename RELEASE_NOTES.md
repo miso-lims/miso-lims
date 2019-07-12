@@ -18,6 +18,7 @@ Changes:
     using LDAP) to log in at all. Previously, non-internal users could log in, though their view
     was very limited
   * Fixed users being editable when using LDAP/AD authentication
+  * Fixed migration that altered library aliquot created dates
 
 # 0.2.183
 
@@ -36,6 +37,10 @@ Upgrade Notes:
   * The 'external' Maven profile has been removed, so if you are building MISO from source, it is
     no longer necessary to use the parameter `-P external`. Documentation has been updated
     accordingly
+
+BAD:
+
+  * Migration altered all library aliquot creation dates to current date
 
 # 0.2.182
 

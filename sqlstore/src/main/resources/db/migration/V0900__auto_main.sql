@@ -33,10 +33,10 @@ CREATE TABLE LibraryAliquot (
 
 INSERT INTO LibraryAliquot(aliquotId, name, libraryId, preMigrationId, identificationBarcode, volumeUsed, volume, volumeUnits, discarded,
   concentration, concentrationUnits, targetedSequencingId, ngUsed, distributed, distributionDate, distributionRecipient, creationDate,
-  creator, lastUpdated, lastModifier)
+  creator, lastUpdated, lastModifier, created)
 SELECT dilutionId, name, library_libraryId, preMigrationId, identificationBarcode, volumeUsed, volume, volumeUnits, discarded,
   concentration, concentrationUnits, targetedSequencingId, ngUsed, distributed, distributionDate, distributionRecipient, creationDate,
-  creator, lastUpdated, lastModifier
+  creator, lastUpdated, lastModifier, created
 FROM LibraryDilution;
 
 CREATE TABLE LibraryAliquotChangeLog (
