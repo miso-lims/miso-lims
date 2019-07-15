@@ -7,7 +7,7 @@ CREATE TABLE `BoxSize` (
   `boxSizeId` bigint(20) NOT NULL AUTO_INCREMENT,
   `boxSizeRows` bigint(20) NOT NULL,
   `boxSizeColumns` bigint(20) NOT NULL,
-  `scannable` boolean DEFAULT 0,
+  `scannable` boolean DEFAULT 0 NOT NULL,
   PRIMARY KEY (`boxSizeId`),
   UNIQUE (`boxSizeRows`, `boxSizeColumns`, `scannable`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

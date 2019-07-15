@@ -10,7 +10,7 @@ CREATE PROCEDURE addBoxSize(
 ) BEGIN
   IF NOT EXISTS (SELECT 1 FROM BoxSize WHERE `boxSizeRows` = iRows AND `boxSizeColumns` = iColumns AND scannable = iScannable)
   THEN
-    INSERT INTO BoxSize(`boxSizeRows`, `bSizeColumns`, scannable)
+    INSERT INTO BoxSize(`boxSizeRows`, `boxSizeColumns`, scannable)
     VALUES (iRows, iColumns, iScannable);
   END IF;
 END//
