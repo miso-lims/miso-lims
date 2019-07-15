@@ -250,7 +250,7 @@ INSERT INTO TargetedSequencing_KitDescriptor (targetedSequencingId, kitDescripto
 INSERT INTO BoxUse (boxUseId, alias) VALUES 
 (1, 'DNA'), (2, 'RNA'), (3, 'Libraries'), (4, 'Sequencing'), (5, 'Storage'), (6, 'Tissue');
 
-INSERT INTO BoxSize (boxSizeId, `rows`, `columns`, `scannable`) VALUES 
+INSERT INTO BoxSize (boxSizeId, `boxSizeRows`, `boxSizeColumns`, `scannable`) VALUES
 (1, 8, 12, 1),
 (2, 10, 10, 0);
 
