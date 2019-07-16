@@ -596,7 +596,7 @@ VALUES
 (2, 1, 1);
 
 DELETE FROM `BoxSize`;
-INSERT INTO `BoxSize` (`boxSizeId`, `rows`, `columns`, `scannable`)
+INSERT INTO `BoxSize` (`boxSizeId`, `boxSizeRows`, `boxSizeColumns`, `scannable`)
 VALUES
 ('1', '4', '4', '0');
 

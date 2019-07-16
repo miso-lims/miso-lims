@@ -1102,8 +1102,8 @@ public class MisoClient implements Lims {
       pos.setName(rs.getString("alias"));
       pos.setDescription(rs.getString("description"));
       pos.setLocation(rs.getString("locationBarcode"));
-      pos.setRows(rs.getInt("rows"));
-      pos.setColumns(rs.getInt("columns"));
+      pos.setRows(rs.getInt("boxSizeRows"));
+      pos.setColumns(rs.getInt("boxSizeColumns"));
       pos.setPosition(rs.getString("position"));
       String targetType = rs.getString("targetType");
       if (!rs.wasNull()) {
