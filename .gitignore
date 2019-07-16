@@ -10,6 +10,11 @@ test_file.txt
 .idea
 /*.jar
 
+# Intellij IDE files
+*.iml
+*.ipr
+*.iws
+
 # Maven build directory.
 target/
 .m2
