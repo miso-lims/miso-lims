@@ -3120,6 +3120,7 @@ public class Dtos {
 
   public static IssueDto asDto(@Nonnull Issue from) {
     IssueDto dto = new IssueDto();
+    dto.setAssignee(from.getAssignee());
     dto.setKey(from.getKey());
     dto.setSummary(from.getSummary());
     dto.setUrl(from.getUrl());

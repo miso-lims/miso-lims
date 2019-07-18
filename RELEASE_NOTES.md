@@ -1,6 +1,7 @@
 # Unreleased
 
   * Fixed bug that broke List Freezers page
+  * Show _Assignee_ column in _Issue_ tables
 
 # 0.2.185:
 

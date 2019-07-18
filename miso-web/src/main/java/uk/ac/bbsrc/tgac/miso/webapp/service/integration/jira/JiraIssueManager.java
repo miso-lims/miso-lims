@@ -176,6 +176,8 @@ public class JiraIssueManager implements IssueTrackerManager {
     issue.setUrl(baseTrackerUrl + "/browse/" + key);
     JSONObject status = fields.getJSONObject("status");
     issue.setStatus(status.getString("name"));
+    JSONObject assignee = fields.getJSONObject("assignee");
+    issue.setAssignee(assignee.has("displayName") ? assignee.getString("displayName") : "(Unassigned)");
     try {
       issue.setLastUpdated(iso8601Format.parse(fields.getString("updated")));
     } catch (ParseException e) {

@@ -61,6 +61,11 @@ ListTarget.issue = {
       "include": true,
       "iSortPriority": 0
     }, {
+      "sTitle": "Assignee",
+      "mData": "assignee",
+      "include": true,
+      "iSortPriority": 0
+    }, {
       "sTitle": "Last Updated",
       "mData": "lastUpdated",
       "include": true,
