@@ -29,19 +29,27 @@
           
           var identityAliasTd = document.createElement('TD');
           // create custom buttons for each found identity
-          result[searchTerm].map(function (sam) {
+          if (!result[searchTerm].length) {
+            // Explicitly tell the user that no results were found
             var span = document.createElement('SPAN');
-            span.className = 'small-gap-right clickable-non-link';
-            var label = sam.alias + ' (' + sam.externalName + ')';
-            var txt = document.createTextNode(IdentitySearch.unbreakString(label));
+            var txt = document.createTextNode('(None found)');
             span.appendChild(txt);
-            span.dataset.alias = sam.alias
-            span.onclick = IdentitySearch.sampleSearchFor;
-            return span;
-          }).map(function (span) {
             identityAliasTd.appendChild(span);
-            identityAliasTd.appendChild(document.createTextNode(' '));
-          });
+          } else {
+            result[searchTerm].map(function (sam) {
+              var span = document.createElement('SPAN');
+              span.className = 'small-gap-right clickable-non-link';
+              var label = sam.alias + ' (' + sam.externalName + ')';
+              var txt = document.createTextNode(IdentitySearch.unbreakString(label));
+              span.appendChild(txt);
+              span.dataset.alias = sam.alias
+              span.onclick = IdentitySearch.sampleSearchFor;
+              return span;
+            }).map(function (span) {
+              identityAliasTd.appendChild(span);
+              identityAliasTd.appendChild(document.createTextNode(' '));
+            });
+          }
           tr.appendChild(identityAliasTd);
           tbody.appendChild(tr);
         });
