@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Added missing migration that should have been in 0.2.185
 
 # 0.2.184
 
@@ -26,6 +26,10 @@ Changes:
     was very limited
   * Fixed users being editable when using LDAP/AD authentication
   * Fixed migration that altered library aliquot created dates
+
+BAD:
+
+  * Was missing a migration
 
 # 0.2.183
 
