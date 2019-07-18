@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class Issue {
 
+  private String assignee;
   private String key;
   private String summary;
   private String url;
@@ -76,6 +77,14 @@ public class Issue {
       if (other.summary != null) return false;
     } else if (!summary.equals(other.summary)) return false;
     return true;
+  }
+
+  public String getAssignee() {
+    return assignee;
+  }
+
+  public void setAssignee(String assignee) {
+    this.assignee = assignee;
   }
 
 }

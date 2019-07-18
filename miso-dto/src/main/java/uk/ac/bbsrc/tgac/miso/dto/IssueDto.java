@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 public class IssueDto {
 
+  private String assignee;
   private String key;
   private String summary;
   private String url;
@@ -46,6 +47,14 @@ public class IssueDto {
 
   public void setLastUpdated(String lastUpdated) {
     this.lastUpdated = lastUpdated;
+  }
+
+  public String getAssignee() {
+    return assignee;
+  }
+
+  public void setAssignee(String assignee) {
+    this.assignee = assignee;
   }
 
 }
