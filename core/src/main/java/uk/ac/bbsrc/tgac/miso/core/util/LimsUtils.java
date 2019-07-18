@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -431,6 +432,10 @@ public class LimsUtils {
 
   public static Date toBadDate(LocalDateTime localDate) {
     return localDate == null ? null : toBadDate(localDate.toLocalDate());
+  }
+
+  public static Date toBadDate(Instant instant) {
+    return instant == null ? null : toBadDate(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDate());
   }
 
   public static <T> Predicate<T> rejectUntil(Predicate<T> check) {

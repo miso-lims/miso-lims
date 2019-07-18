@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 import org.junit.Test;
@@ -146,14 +147,16 @@ public class DtosTest {
   public void testConvertToUtilDate_Illumina() throws ParseException {
     NotificationDto dto = fullyPopulatedIlluminaNotificationDto("RUN_B");
     Run run = Dtos.to(dto);
-    assertThat(dto.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE), is(LimsUtils.formatDate(run.getStartDate())));
+    assertThat(DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneId.systemDefault()).format(dto.getStartDate()),
+        is(LimsUtils.formatDate(run.getStartDate())));
   }
 
   @Test
   public void testConvertToUtilDate_PacBio() throws ParseException {
     NotificationDto dto = fullyPopulatedPacBioNotificationDto("RUN_B");
     Run run = Dtos.to(dto);
-    assertThat(dto.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE), is(LimsUtils.formatDate(run.getStartDate())));
+    assertThat(DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneId.systemDefault()).format(dto.getStartDate()),
+        is(LimsUtils.formatDate(run.getStartDate())));
   }
 
   static IlluminaNotificationDto fullyPopulatedIlluminaNotificationDto(String sequencerName) {
@@ -164,8 +167,8 @@ public class DtosTest {
     notificationDto.setSequencerName(sequencerName);
     notificationDto.setLaneCount(8);
     notificationDto.setHealthType(HealthType.RUNNING);
-    notificationDto.setStartDate(LocalDateTime.of(2017, 2, 23, 0, 0));
-    notificationDto.setCompletionDate(LocalDateTime.of(2017, 2, 27, 0, 0));
+    notificationDto.setStartDate(LocalDateTime.of(2017, 2, 23, 0, 0).atZone(ZoneId.systemDefault()).toInstant());
+    notificationDto.setCompletionDate(LocalDateTime.of(2017, 2, 27, 0, 0).atZone(ZoneId.systemDefault()).toInstant());
     notificationDto.setPairedEndRun(true);
     notificationDto.setSoftware("Fido Opus SEAdog Standard Interface Layer");
     notificationDto.setRunBasesMask("y151,I8,y151");
@@ -184,8 +187,8 @@ public class DtosTest {
     notificationDto.setSequencerName(sequencerName);
     notificationDto.setLaneCount(8);
     notificationDto.setHealthType(HealthType.RUNNING);
-    notificationDto.setStartDate(LocalDateTime.of(2017, 2, 23, 0, 0));
-    notificationDto.setCompletionDate(LocalDateTime.of(2017, 2, 27, 0, 0));
+    notificationDto.setStartDate(LocalDateTime.of(2017, 2, 23, 0, 0).atZone(ZoneId.systemDefault()).toInstant());
+    notificationDto.setCompletionDate(LocalDateTime.of(2017, 2, 27, 0, 0).atZone(ZoneId.systemDefault()).toInstant());
     notificationDto.setPairedEndRun(true);
     notificationDto.setSoftware("Fido Opus SEAdog Standard Interface Layer");
     return notificationDto;
