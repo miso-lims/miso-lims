@@ -2,6 +2,13 @@
 
 Changes:
 
+
+
+# 0.2.184
+
+Changes:
+
+  * Fixed Edit Library group ID bug (detailed sample)
   * Improved performance of the Pools list page
   * Added library aliquot attributes which may override attributes on the library
     * alias (will be validated the same way as library aliases)
