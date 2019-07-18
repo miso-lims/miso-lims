@@ -1120,6 +1120,9 @@ public class Dtos {
       dto.setEffectiveGroupId(effective.getGroupId());
       dto.setEffectiveGroupIdSample(effective.getAlias());
     }
+    if (from.getGroupId() != null) {
+      dto.setGroupId(from.getGroupId());
+    }
     if (from.getGroupDescription() != null) {
       dto.setGroupDescription(from.getGroupDescription());
     }
