@@ -19,6 +19,7 @@ HotTarget.libraryReceipt = (function() {
       var libColumns = HotTarget.library.createColumns(config, create, data);
 
       samColumns.forEach(function(col, colIndex) {
+        col.initialData = col.data;
         col.data = 'sample.' + col.data;
         if (col.depends) {
           if (Array.isArray(col.depends)) {
@@ -48,7 +49,7 @@ HotTarget.libraryReceipt = (function() {
           // Sometimes sample properties don't go into the nested subobject, but become a field called
           // "sample.[name]". If this happens, it breaks validation on save. Move it back.
           if(flat.hasOwnProperty(col.data)){
-            eval("flat.sample." + col.data.substring(7) + " = '" + flat[col.data] + "';");
+            flat.sample[col.initialData] = flat[col.data];
           }
 
           col.libraryPack(lib.sample, flat.sample, errorHandler);
