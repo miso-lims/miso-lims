@@ -34,13 +34,23 @@ HotTarget.libraryReceipt = (function() {
           if (!flat.sample) {
             flat.sample = {};
           }
+
           col.libraryUnpack(lib.sample, flat.sample, setCellMeta);
+
+
         };
         col.libraryPack = col.pack;
         col.pack = function(lib, flat, errorHandler) {
           if (!flat.sample) {
             flat.sample = {};
           }
+
+          // Sometimes sample properties don't go into the nested subobject, but become a field called
+          // "sample.[name]". If this happens, it breaks validation on save. Move it back.
+          if(Object.keys(flat).filter(function(s){return s === col.data}).length > 0){
+            eval("flat.sample." + col.data.substring(7) + " = '" + flat[col.data] + "';");
+          }
+
           col.libraryPack(lib.sample, flat.sample, errorHandler);
         };
         if (col.update) {
