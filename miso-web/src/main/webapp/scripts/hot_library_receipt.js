@@ -47,7 +47,7 @@ HotTarget.libraryReceipt = (function() {
 
           // Sometimes sample properties don't go into the nested subobject, but become a field called
           // "sample.[name]". If this happens, it breaks validation on save. Move it back.
-          if(Object.keys(flat).filter(function(s){return s === col.data}).length > 0){
+          if(flat.hasOwnProperty(col.data)){
             eval("flat.sample." + col.data.substring(7) + " = '" + flat[col.data] + "';");
           }
 
