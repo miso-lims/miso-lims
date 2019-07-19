@@ -430,12 +430,12 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListArrayRunsSetup() throws Exception {
-    testPageSetup(ListTarget.ARRAYRUNS, arrayRunsColumns);
+    testPageSetup(ListTarget.ARRAY_RUNS, arrayRunsColumns);
   }
 
   @Test
   public void testListArrayRunsColumnSort() throws Exception {
-    testColumnsSort(ListTarget.ARRAYRUNS);
+    testColumnsSort(ListTarget.ARRAY_RUNS);
   }
 
   @Test

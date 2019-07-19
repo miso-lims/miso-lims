@@ -115,11 +115,19 @@ public interface AbstractListPage {
   }
 
   public static class ListTarget {
+    public static final String ARRAYS = "arrays";
+    public static final String ARRAY_RUNS = "arrayruns";
     public static final String ARRAY_MODELS = "arraymodel/list";
     public static final String BOX_SIZES = "boxsize/list";
     public static final String BOX_USES = "boxuse/list";
-    public static final String SAMPLES = "samples";
+    public static final String BOXES = "boxes";
+    public static final String CONTAINERS = "containers";
+    public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";
+    public static final String INDICES = "indices";
+    public static final String INSTRUMENTS = "instruments";
+    public static final String KITS = "kitdescriptors";
     public static final String LIBRARIES = "libraries";
+    public static final String LIBRARY_ALIQUOTS = "libraryaliquots";
     public static final String LIBRARY_DESIGNS = "librarydesign/list";
     public static final String LIBRARY_DESIGN_CODES = "librarydesigncode/list";
     public static final String LIBRARY_SELECTION_TYPES = "libraryselection/list";
@@ -127,32 +135,24 @@ public interface AbstractListPage {
     public static final String LIBRARY_STRATEGY_TYPES = "librarystrategy/list";
     public static final String LIBRARY_TYPES = "librarytype/list";
     public static final String LOCATION_MAPS = "locationmap/list";
-    public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";
-    public static final String LIBRARY_ALIQUOTS = "libraryaliquots";
-    public static final String STUDIES = "studies";
-    public static final String PRINTERS = "printers";
-    public static final String PROJECTS = "projects";
-    public static final String INSTRUMENTS = "instruments";
-    public static final String POOLS = "pools";
-    public static final String ORDERS_OUTSTANDING = "sequencingorders/outstanding";
     public static final String ORDERS_ALL = "sequencingorders/all";
     public static final String ORDERS_IN_PROGRESS = "sequencingorders/in-progress";
+    public static final String ORDERS_OUTSTANDING = "sequencingorders/outstanding";
     public static final String PARTITION_QC_TYPE = "partitionqctype/list";
-    public static final String CONTAINERS = "containers";
+    public static final String POOLS = "pools";
+    public static final String PRINTERS = "printers";
+    public static final String PROJECTS = "projects";
     public static final String REFERENCE_GENOMES = "referencegenome/list";
     public static final String RUNS = "runs";
-    public static final String BOXES = "boxes";
-    public static final String KITS = "kitdescriptors";
-    public static final String INDICES = "indices";
-    public static final String ARRAYS = "arrays";
-    public static final String ARRAYRUNS = "arrayruns";
-    public static final String WORKSETS = "worksets";
-    public static final String TISSUE_TYPES = "tissuetype/list";
+    public static final String SAMPLES = "samples";
     public static final String SAMPLE_TYPES = "sampletype/list";
     public static final String STAINS = "stain/list";
     public static final String STAIN_CATEGORIES = "staincategory/list";
     public static final String STORAGE_LOCATIONS = "storagelocations";
+    public static final String STUDIES = "studies";
     public static final String STUDY_TYPES = "studytype/list";
+    public static final String TISSUE_TYPES = "tissuetype/list";
+    public static final String WORKSETS = "worksets";
   }
 
   public static class ButtonText {
