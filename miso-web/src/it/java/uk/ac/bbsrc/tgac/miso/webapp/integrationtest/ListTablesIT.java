@@ -66,6 +66,7 @@ public class ListTablesIT extends AbstractIT {
       Columns.END_DATE, Columns.LAST_MODIFIED);
   private static final Set<String> worksetsColumns = Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.ITEMS,
       Columns.DESCRIPTION, Columns.LAST_MODIFIED);
+  private static final Set<String> storageLocationsColumns = Sets.newHashSet(Columns.FREEZER_NAME, Columns.IDENTIFICATION_BARCODE);
 
   private static final Set<String> poolsTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
   private static final Set<String> ordersTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
@@ -77,6 +78,7 @@ public class ListTablesIT extends AbstractIT {
       Tabs.SEQUENCING);
   private static final Set<String> indicesTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
   private static final Set<String> worksetsTabs = Sets.newHashSet(Tabs.MINE, Tabs.ALL);
+  private static final Set<String> storageLocationTabs = Sets.newHashSet(Tabs.FREEZERS, Tabs.ROOMS);
 
   private static final Map<String, Set<String>> tabsForTarget;
   static {
@@ -91,6 +93,7 @@ public class ListTablesIT extends AbstractIT {
     tabs.put(ListTarget.KITS, kitsTabs);
     tabs.put(ListTarget.INDICES, indicesTabs);
     tabs.put(ListTarget.WORKSETS, worksetsTabs);
+    tabs.put(ListTarget.STORAGE_LOCATIONS, storageLocationTabs);
     tabsForTarget = Collections.unmodifiableMap(tabs);
   }
 
@@ -620,6 +623,16 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListLibraryTypesColumnSort() throws Exception {
     testColumnsSort(ListTarget.LIBRARY_TYPES);
+  }
+
+  @Test
+  public void testListTabbedStorageLocationsSetup() throws Exception {
+    testTabbedPageSetup(ListTarget.STORAGE_LOCATIONS, storageLocationsColumns);
+  }
+
+  @Test
+  public void testListStorageLocationsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.STORAGE_LOCATIONS);
   }
 
   private void testPageSetup(String listTarget, Set<String> targetColumns) {

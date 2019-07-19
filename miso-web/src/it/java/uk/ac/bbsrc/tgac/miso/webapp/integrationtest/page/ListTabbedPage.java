@@ -17,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage {
 
   public static class Tabs {
+    public static final String FREEZERS = "Freezers";
     public static final String ILLUMINA = "Illumina";
     public static final String LS454 = "LS454";
     public static final String PACBIO = "PacBio";
@@ -24,6 +25,7 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
     public static final String OXFORD_NANOPORE = "OxfordNanopore";
     public static final String DNA = "DNA";
     public static final String RNA = "RNA";
+    public static final String ROOMS = "Rooms";
     public static final String LIBRARIES = "Libraries";
     public static final String STORAGE = "Storage";
     public static final String TISSUE = "Tissue";

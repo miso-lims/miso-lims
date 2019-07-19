@@ -35,7 +35,9 @@ public interface AbstractListPage {
     public static final String FAILED = "Failed";
     public static final String FAMILY = "Family";
     public static final String FILENAME = "Filename";
+    public static final String FREEZER_NAME = "Freezer Name";
     public static final String GROUP_NAME = "Group Name";
+    public static final String IDENTIFICATION_BARCODE = "Identification Barcode";
     public static final String INDEX = "Index(es)";
     public static final String INDEX_NAME = "Index Name";
     public static final String INDICES = "Indices";
@@ -149,6 +151,7 @@ public interface AbstractListPage {
     public static final String SAMPLE_TYPES = "sampletype/list";
     public static final String STAINS = "stain/list";
     public static final String STAIN_CATEGORIES = "staincategory/list";
+    public static final String STORAGE_LOCATIONS = "storagelocations";
     public static final String STUDY_TYPES = "studytype/list";
   }
 
