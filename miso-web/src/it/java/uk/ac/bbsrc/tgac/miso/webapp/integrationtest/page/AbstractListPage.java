@@ -63,6 +63,7 @@ public interface AbstractListPage {
     public static final String LOGIN_NAME = "Login Name";
     public static final String LONGEST_INDEX = "Longest Index";
     public static final String MANUFACTURER = "Manufacturer";
+    public static final String MAP = "Map";
     public static final String MATRIX_BARCODE = "Matrix Barcode";
     public static final String NAME = "Name";
     public static final String NG_USED = "ng Lib. Used";
