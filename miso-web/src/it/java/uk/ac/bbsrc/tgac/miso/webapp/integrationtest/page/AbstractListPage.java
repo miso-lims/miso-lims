@@ -35,7 +35,9 @@ public interface AbstractListPage {
     public static final String FAILED = "Failed";
     public static final String FAMILY = "Family";
     public static final String FILENAME = "Filename";
+    public static final String FREEZER_NAME = "Freezer Name";
     public static final String GROUP_NAME = "Group Name";
+    public static final String IDENTIFICATION_BARCODE = "Identification Barcode";
     public static final String INDEX = "Index(es)";
     public static final String INDEX_NAME = "Index Name";
     public static final String INDICES = "Indices";
@@ -61,6 +63,7 @@ public interface AbstractListPage {
     public static final String LOGIN_NAME = "Login Name";
     public static final String LONGEST_INDEX = "Longest Index";
     public static final String MANUFACTURER = "Manufacturer";
+    public static final String MAP = "Map";
     public static final String MATRIX_BARCODE = "Matrix Barcode";
     public static final String NAME = "Name";
     public static final String NG_USED = "ng Lib. Used";
@@ -113,11 +116,19 @@ public interface AbstractListPage {
   }
 
   public static class ListTarget {
+    public static final String ARRAYS = "arrays";
+    public static final String ARRAY_RUNS = "arrayruns";
     public static final String ARRAY_MODELS = "arraymodel/list";
     public static final String BOX_SIZES = "boxsize/list";
     public static final String BOX_USES = "boxuse/list";
-    public static final String SAMPLES = "samples";
+    public static final String BOXES = "boxes";
+    public static final String CONTAINERS = "containers";
+    public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";
+    public static final String INDICES = "indices";
+    public static final String INSTRUMENTS = "instruments";
+    public static final String KITS = "kitdescriptors";
     public static final String LIBRARIES = "libraries";
+    public static final String LIBRARY_ALIQUOTS = "libraryaliquots";
     public static final String LIBRARY_DESIGNS = "librarydesign/list";
     public static final String LIBRARY_DESIGN_CODES = "librarydesigncode/list";
     public static final String LIBRARY_SELECTION_TYPES = "libraryselection/list";
@@ -125,31 +136,24 @@ public interface AbstractListPage {
     public static final String LIBRARY_STRATEGY_TYPES = "librarystrategy/list";
     public static final String LIBRARY_TYPES = "librarytype/list";
     public static final String LOCATION_MAPS = "locationmap/list";
-    public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";
-    public static final String LIBRARY_ALIQUOTS = "libraryaliquots";
-    public static final String STUDIES = "studies";
-    public static final String PRINTERS = "printers";
-    public static final String PROJECTS = "projects";
-    public static final String INSTRUMENTS = "instruments";
-    public static final String POOLS = "pools";
-    public static final String ORDERS_OUTSTANDING = "sequencingorders/outstanding";
     public static final String ORDERS_ALL = "sequencingorders/all";
     public static final String ORDERS_IN_PROGRESS = "sequencingorders/in-progress";
+    public static final String ORDERS_OUTSTANDING = "sequencingorders/outstanding";
     public static final String PARTITION_QC_TYPE = "partitionqctype/list";
-    public static final String CONTAINERS = "containers";
+    public static final String POOLS = "pools";
+    public static final String PRINTERS = "printers";
+    public static final String PROJECTS = "projects";
     public static final String REFERENCE_GENOMES = "referencegenome/list";
     public static final String RUNS = "runs";
-    public static final String BOXES = "boxes";
-    public static final String KITS = "kitdescriptors";
-    public static final String INDICES = "indices";
-    public static final String ARRAYS = "arrays";
-    public static final String ARRAYRUNS = "arrayruns";
-    public static final String WORKSETS = "worksets";
-    public static final String TISSUE_TYPES = "tissuetype/list";
+    public static final String SAMPLES = "samples";
     public static final String SAMPLE_TYPES = "sampletype/list";
     public static final String STAINS = "stain/list";
     public static final String STAIN_CATEGORIES = "staincategory/list";
+    public static final String STORAGE_LOCATIONS = "storagelocations";
+    public static final String STUDIES = "studies";
     public static final String STUDY_TYPES = "studytype/list";
+    public static final String TISSUE_TYPES = "tissuetype/list";
+    public static final String WORKSETS = "worksets";
   }
 
   public static class ButtonText {

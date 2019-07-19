@@ -53,7 +53,7 @@ ListTarget.storage_location = {
   createColumns: function(config, projectId) {
     var columns = [
         config.slug == "freezers" ? ListUtils
-            .labelHyperlinkColumn("Freezer Name", "freezer", Utils.array.getId, "displayLocation", 1, true) : {
+            .labelHyperlinkColumn("Freezer Name", Urls.ui.freezers.edit, Utils.array.getId, "displayLocation", 1, true) : {
           "sTitle": "Name",
           "mData": "displayLocation",
           "include": true,

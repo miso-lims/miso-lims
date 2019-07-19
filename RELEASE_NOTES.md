@@ -1,10 +1,14 @@
 # Unreleased
 
-
+  * Fixed bug that broke List Freezers page
 
 # 0.2.185:
 
   * Added missing migration that should have been in 0.2.185
+
+BAD:
+
+  * List Freezers page still broken
 
 # 0.2.184
 
@@ -32,6 +36,7 @@ Changes:
 BAD:
 
   * Was missing a migration
+  * List Freezers page still broken
 
 # 0.2.183
 
@@ -54,6 +59,7 @@ Upgrade Notes:
 BAD:
 
   * Migration altered all library aliquot creation dates to current date
+  * Broke List Freezers page
 
 # 0.2.182
 

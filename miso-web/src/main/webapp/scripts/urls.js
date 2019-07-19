@@ -83,6 +83,12 @@ Urls = (function() {
     edit: idUrlFunction(experimentUiBase)
   };
 
+  // Freezers
+  var freezerUiBase = baseUrl + '/freezer';
+  ui.freezers = {
+    edit: idUrlFunction(freezerUiBase)
+  };
+
   // Institutes
   var instituteRestBase = restBase + '/institutes';
   rest.institutes = {
