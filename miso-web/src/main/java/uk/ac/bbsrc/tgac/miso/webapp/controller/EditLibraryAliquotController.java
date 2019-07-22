@@ -143,7 +143,7 @@ public class EditLibraryAliquotController {
     private final BoxDto newBox;
 
     private BulkPropagateAliquotBackend(BoxDto newBox) {
-      super("libraryaliquot", LibraryAliquotDto.class, "Library Aliquots", "Library ALiquots");
+      super("libraryaliquot", LibraryAliquotDto.class, "Library Aliquots", "Library Aliquots");
       this.newBox = newBox;
     }
 
