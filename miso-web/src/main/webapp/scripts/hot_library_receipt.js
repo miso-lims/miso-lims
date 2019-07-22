@@ -19,6 +19,7 @@ HotTarget.libraryReceipt = (function() {
       var libColumns = HotTarget.library.createColumns(config, create, data);
 
       samColumns.forEach(function(col, colIndex) {
+        col.initialData = col.data;
         col.data = 'sample.' + col.data;
         if (col.depends) {
           if (Array.isArray(col.depends)) {
@@ -29,6 +30,7 @@ HotTarget.libraryReceipt = (function() {
             col.depends = 'sample.' + col.depends;
           }
         }
+
         col.libraryUnpack = col.unpack;
         col.unpack = function(lib, flat, setCellMeta) {
           if (!flat.sample) {
@@ -36,13 +38,20 @@ HotTarget.libraryReceipt = (function() {
           }
           col.libraryUnpack(lib.sample, flat.sample, setCellMeta);
         };
+
         col.libraryPack = col.pack;
         col.pack = function(lib, flat, errorHandler) {
           if (!flat.sample) {
             flat.sample = {};
           }
+          // Sometimes sample properties don't go into the nested subobject, but become a field called
+          // "sample.[name]". If this happens, it breaks validation on save. Move it back.
+          if(flat.hasOwnProperty(col.data)){
+            flat.sample[col.initialData] = flat[col.data];
+          }
           col.libraryPack(lib.sample, flat.sample, errorHandler);
         };
+
         if (col.update) {
           col.libraryUpdate = col.update;
           col.update = function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {

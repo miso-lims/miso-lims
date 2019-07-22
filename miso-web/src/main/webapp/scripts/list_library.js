@@ -82,7 +82,7 @@ ListTarget.library = {
             sampleClassId: Constants.isDetailedSample ? result.sampleClass.id : null
           };
         }, function(result) {
-          return result.quanitity;
+          return result.quantity;
         });
       }
     }];
