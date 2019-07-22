@@ -19,6 +19,7 @@ Changes:
     was very limited
   * Fixed users being editable when using LDAP/AD authentication
   * Fixed migration that altered library aliquot created dates
+  * Fixed intermittent bug preventing receiving libraries due to Scientific Name (and potentially other fields) not saving correctly
 
 # 0.2.183
 
