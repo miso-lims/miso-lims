@@ -7,6 +7,7 @@ Changes:
   * Added Strict Index Checking option, which when enabled prevents library aliquots from being
     added to pool when that would cause near-/duplicate indices
   * Changed single item create/edit pages to warn you when leaving with unsaved changes
+  * Box contents table now displays library aliquot alias
   * Fixed bug that broke List Freezers page
   * Fixed bug in 'Pool custom'
   * Fixed broken menu link to Sequencing Orders list page
