@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -66,6 +67,10 @@ public class EditLibraryAliquotController {
   private LibraryService libraryService;
   @Autowired
   private BoxService boxService;
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
 
   @GetMapping("/{aliquotId}")
   public ModelAndView edit(ModelMap model, @PathVariable long aliquotId) throws IOException {
@@ -79,7 +84,7 @@ public class EditLibraryAliquotController {
     model.put("aliquotDto", mapper.writeValueAsString(Dtos.asDto(aliquot, false)));
     List<Pool> pools = poolService.listByLibraryAliquotId(aliquotId);
     model.put("aliquotPools",
-        pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
+        pools.stream().map(p -> Dtos.asDto(p, false, false, errorEditDistance, warningEditDistance)).collect(Collectors.toList()));
     model.put("aliquotRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
         .collect(Collectors.toList()));
 

@@ -44,29 +44,29 @@ WarningTarget.pool = {
           level: 'important'
         }, {
           include: pool.duplicateIndices,
-          headerMessage: 'This pool contains duplicate indices!',
-          tableMessage: '(DUPLICATE INDICES)',
-          tileMessage: 'DUPLICATE INDICES'
+          headerMessage: Constants.warningMessages.duplicateIndices,
+          tableMessage: Constants.warningMessages.duplicateIndices,
+          tileMessage: Constants.warningMessages.duplicateIndices
         }, {
           include: pool.nearDuplicateIndices && !pool.duplicateIndices,
-          headerMessage: 'This pool contains near-duplicate indices!',
-          tableMessage: '(NEAR-DUPLICATE INDICES)',
-          tileMessage: 'NEAR-DUPLICATE INDICES'
+          headerMessage: Constants.warningMessages.nearDuplicateIndices,
+          tableMessage: '(' + Constants.warningMessages.nearDuplicateIndices + ')',
+          tileMessage: Constants.warningMessages.nearDuplicateIndices
         }, {
           include: pool.hasEmptySequence,
           headerMessage: 'This pool contains at least one library with no index!',
-          tableMessage: '(MISSING INDEX)',
-          tileMessage: 'MISSING INDEX'
+          tableMessage: '(' + Constants.warningMessages.missingIndex + ')',
+          tileMessage: Constants.warningMessages.missingIndex
         }, {
           include: pool.hasLowQualityLibraries,
           headerMessage: 'This pool contains at least one low quality library!',
-          tableMessage: '(LOW QUALITY LIBRARIES)',
-          tileMessage: 'LOW QUALITY LIBRARIES'
+          tableMessage: '(' + Constants.warningMessages.lowQualityLibraries + ')',
+          tileMessage: Constants.warningMessages.lowQualityLibraries
         }, {
           include: revokedAliquots.length > 0,
           headerMessage: "Donor has revoked consent for " + revokedAliquots.toString(),
-          tableMessage: '(CONSENT REVOKED)',
-          tileMessage: 'CONSENT REVOKED'
+          tableMessage: '(' + Constants.warningMessages.consentRevoked + ')',
+          tileMessage: Constants.warningMessages.consentRevoked
         }];
   }
 

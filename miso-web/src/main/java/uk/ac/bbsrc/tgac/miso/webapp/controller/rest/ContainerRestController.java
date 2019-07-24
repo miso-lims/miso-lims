@@ -38,6 +38,7 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -79,12 +80,16 @@ public class ContainerRestController extends RestController {
   private ContainerService containerService;
   @Autowired
   private ContainerModelService containerModelService;
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
 
   private final JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto> jQueryBackend = new JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto>() {
 
     @Override
     protected ContainerDto asDto(SequencerPartitionContainer model) {
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, errorEditDistance, warningEditDistance);
     }
 
     @Override
@@ -96,7 +101,8 @@ public class ContainerRestController extends RestController {
 
   @GetMapping(value = "/{containerBarcode}", produces = "application/json")
   public @ResponseBody List<ContainerDto> jsonRest(@PathVariable String containerBarcode) throws IOException {
-    return containerService.listByBarcode(containerBarcode).stream().map(Dtos::asDto).collect(Collectors.toList());
+    return containerService.listByBarcode(containerBarcode).stream()
+        .map(container -> Dtos.asDto(container, errorEditDistance, warningEditDistance)).collect(Collectors.toList());
   }
 
   @GetMapping(value = "/dt", produces = "application/json")
@@ -200,7 +206,7 @@ public class ContainerRestController extends RestController {
       container.setModel(model);
       container.setPartitionLimit(model.getPartitionCount());
       return container;
-    }, containerService, Dtos::asDto);
+    }, containerService, container -> Dtos.asDto(container, errorEditDistance, warningEditDistance));
 
   }
 
@@ -212,7 +218,7 @@ public class ContainerRestController extends RestController {
       // reset partitions since they're not intended to be modified by this method
       container.setPartitions(original.getPartitions());
       return container;
-    }, containerService, Dtos::asDto);
+    }, containerService, container -> Dtos.asDto(container, errorEditDistance, warningEditDistance));
   }
 
 }

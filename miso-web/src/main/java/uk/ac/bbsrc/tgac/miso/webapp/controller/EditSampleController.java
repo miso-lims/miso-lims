@@ -169,6 +169,10 @@ public class EditSampleController {
   private String defaultLcmTubeGroupId;
   @Value("${miso.defaults.sample.lcmtube.groupdescription:}")
   private String defaultLcmTubeGroupDesc;
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
 
   private Boolean isDetailedSampleEnabled() {
     return detailedSample;
@@ -256,7 +260,8 @@ public class EditSampleController {
     List<RunDto> runDtos = pools.stream().flatMap(WhineyFunction.flatRethrow(pool -> runService.listByPoolId(pool.getId())))
         .map(Dtos::asDto)
         .collect(Collectors.toList());
-    model.put("samplePools", pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
+    model.put("samplePools",
+        pools.stream().map(p -> Dtos.asDto(p, false, false, errorEditDistance, warningEditDistance)).collect(Collectors.toList()));
     model.put("sampleRuns", runDtos);
     model.put("sampleRelations", getRelations(sample));
     addArrayData(sampleId, model);

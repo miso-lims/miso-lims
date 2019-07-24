@@ -36,6 +36,7 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -91,6 +92,10 @@ public class ProjectRestController extends RestController {
   private RunService runService;
   @Autowired
   private SampleGroupService sampleGroupService;
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -147,7 +152,7 @@ public class ProjectRestController extends RestController {
   @GetMapping(value = "/{projectId}/pools", produces = "application/json")
   public @ResponseBody List<PoolDto> getProjectPools(@PathVariable Long projectId) throws IOException {
     Collection<Pool> pp = poolService.listByProjectId(projectId);
-    return pp.stream().map(pool -> Dtos.asDto(pool, true, false)).collect(Collectors.toList());
+    return pp.stream().map(pool -> Dtos.asDto(pool, true, false, errorEditDistance, warningEditDistance)).collect(Collectors.toList());
   }
 
   @GetMapping(value = "/{projectId}/runs", produces = "application/json")

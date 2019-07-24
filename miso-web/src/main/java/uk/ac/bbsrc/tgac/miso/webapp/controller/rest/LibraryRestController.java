@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -104,6 +105,10 @@ public class LibraryRestController extends RestController {
   private LibraryService libraryService;
   @Autowired
   private SampleRestController sampleController;
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
@@ -233,7 +238,7 @@ public class LibraryRestController extends RestController {
 
         @Override
         public PoolDto asDto(Pool model) {
-          return Dtos.asDto(model, false, false);
+          return Dtos.asDto(model, false, false, errorEditDistance, warningEditDistance);
         }
 
         @Override

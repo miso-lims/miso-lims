@@ -37,6 +37,7 @@ import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -87,17 +88,18 @@ public class EditRunController {
   private RunService runService;
   @Autowired
   private PartitionQCService partitionQCService;
-
   @Autowired
   private InstrumentService instrumentService;
   @Autowired
   private ExperimentService experimentService;
-
   @Autowired
   private IssueTrackerManager issueTrackerManager;
-
   @Autowired
   private ExternalUriBuilder externalUriBuilder;
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
 
   public void setRunService(RunService runService) {
     this.runService = runService;
@@ -157,7 +159,7 @@ public class EditRunController {
     model.put("runPositions", run.getRunPositions().stream().map(Dtos::asDto).collect(Collectors.toList()));
     model.put("runPartitions", run.getSequencerPartitionContainers().stream().flatMap(container -> container.getPartitions().stream())
         .map(WhineyFunction.rethrow(partition -> {
-          PartitionDto dto = Dtos.asDto(partition, false);
+          PartitionDto dto = Dtos.asDto(partition, false, errorEditDistance, warningEditDistance);
           PartitionQC qc = partitionQCService.get(run, partition);
           if (qc != null) {
             dto.setQcType(qc.getType().getId());
@@ -186,7 +188,7 @@ public class EditRunController {
     partitionConfig.put("showPool", true);
     model.put("partitionConfig", mapper.writeValueAsString(partitionConfig));
     model.put("experiments",
-        experimentService.listAllByRunId(run.getId()).stream().map(Dtos::asDto)
+        experimentService.listAllByRunId(run.getId()).stream().map(expt -> Dtos.asDto(expt, errorEditDistance, warningEditDistance))
             .collect(Collectors.toList()));
     ObjectNode experimentConfig = mapper.createObjectNode();
     experimentConfig.put("runId", run.getId());

@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -53,6 +54,10 @@ public class EditExperimentController {
 
   @Autowired
   private ExperimentService experimentService;
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
 
   @GetMapping(value = "/{experimentId}")
   public ModelAndView setupForm(@PathVariable Long experimentId, ModelMap model) throws IOException {
@@ -75,12 +80,13 @@ public class EditExperimentController {
             consumableConfig.putArray("allowedDescriptors")::addPOJO);
 
     model.put("experiment", experiment);
-    model.put("experimentDto", mapper.writeValueAsString(Dtos.asDto(experiment)));
+    model.put("experimentDto", mapper.writeValueAsString(Dtos.asDto(experiment, errorEditDistance, warningEditDistance)));
     model.put("consumables", experiment.getKits().stream().map(Dtos::asDto).collect(Collectors.toList()));
     model.put("consumableConfig", mapper.writeValueAsString(consumableConfig));
     model.put("runPartitions",
         experiment.getRunPartitions().stream()
-            .map(entry -> new ExperimentDto.RunPartitionDto(Dtos.asDto(entry.getRun()), Dtos.asDto(entry.getPartition())))
+            .map(entry -> new ExperimentDto.RunPartitionDto(Dtos.asDto(entry.getRun()),
+                Dtos.asDto(entry.getPartition(), errorEditDistance, warningEditDistance)))
             .collect(Collectors.toList()));
     model.put("title", "Edit Experiment");
     return new ModelAndView("/WEB-INF/pages/editExperiment.jsp", model);

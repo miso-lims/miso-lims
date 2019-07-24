@@ -216,6 +216,14 @@ public class MenuController implements ServletContextAware {
   private Boolean autoGenerateIdBarcodes;
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.error.edit.distance.message:DUPLICATE INDICES}")
+  public String errorEditDistanceMessage;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
+  @Value("${miso.warning.edit.distance.message:Near-Duplicate Indices}")
+  public String warningEditDistanceMessage;
 
   @Resource
   private Boolean boxScannerEnabled;
@@ -408,6 +416,16 @@ public class MenuController implements ServletContextAware {
       dto.put("label", wf.getLabel());
       dto.put("value", wf.getRawValue());
     }
+
+    ObjectNode warningsNode = mapper.createObjectNode();
+    warningsNode.put("consentRevoked", "CONSENT REVOKED");
+    warningsNode.put("duplicateIndices", errorEditDistanceMessage);
+    warningsNode.put("nearDuplicateIndices", warningEditDistanceMessage);
+    warningsNode.put("lowQualityLibraries", "Low Quality Libraries");
+    warningsNode.put("missingIndex", "MISSING INDEX");
+    node.set("warningMessages", warningsNode);
+    node.put("errorEditDistance", errorEditDistance);
+    node.put("warningEditDistance", warningEditDistance);
 
     // Save the regenerated file in cache. This has a race condition where multiple concurrent requests could results in regenerating this
     // file and updating the cache. Since the cache is two variables (data and time), they can also be torn. Given the nature of the cached

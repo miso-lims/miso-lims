@@ -27,7 +27,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -328,57 +327,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public void setPendingAttachmentDeletions(List<FileAttachment> pendingAttachmentDeletions) {
     this.pendingAttachmentDeletions = pendingAttachmentDeletions;
-  }
-
-  @Override
-  public Set<String> getDuplicateIndicesSequences() {
-    return getIndexSequencesWithMinimumEditDistance(1);
-  }
-
-  @Override
-  public Set<String> getNearDuplicateIndicesSequences() {
-    return getIndexSequencesWithMinimumEditDistance(3);
-  }
-
-  private Set<String> getIndexSequencesWithMinimumEditDistance(int minimumDistance) {
-    Set<String> sequences = new HashSet<>();
-    List<PoolableElementView> views = getPoolContents().stream().map(PoolElement::getPoolableElementView).collect(Collectors.toList());
-    if (minimumDistance > 1 && views.stream().allMatch(PoolImpl::hasFakeSequence)) return Collections.emptySet();
-    for (int i = 0; i < views.size(); i++) {
-      String sequence1 = getCombinedIndexSequences(views.get(i));
-      if (sequence1.length() == 0) {
-        continue;
-      }
-      for (int j = i + 1; j < views.size(); j++) {
-        String sequence2 = getCombinedIndexSequences(views.get(j));
-        if (sequence2.length() == 0 || !isCheckNecessary(views.get(i), views.get(j), minimumDistance)) {
-          continue;
-        }
-        if (Index.checkEditDistance(sequence1, sequence2) < minimumDistance) {
-          sequences.add(sequence1);
-          sequences.add(sequence2);
-        }
-      }
-    }
-    return sequences;
-  }
-
-  private static boolean isCheckNecessary(PoolableElementView view1, PoolableElementView view2, int minimumDistance) {
-    return !((hasFakeSequence(view1) || hasFakeSequence(view2))
-        && (minimumDistance > 1 || getCombinedIndexSequences(view1).length() != getCombinedIndexSequences(view2).length()));
-  }
-
-  private static String getCombinedIndexSequences(PoolableElementView view) {
-    return view.getIndices().stream()
-        .sorted((i1, i2) -> Integer.compare(i1.getPosition(), i2.getPosition()))
-        .map(Index::getSequence)
-        .collect(Collectors.joining());
-  }
-
-  private static boolean hasFakeSequence(PoolableElementView view) {
-    return view.getIndices().stream()
-        .map(Index::getFamily)
-        .anyMatch(f -> f.hasFakeSequence());
   }
 
   @Override

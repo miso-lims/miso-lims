@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -73,6 +74,16 @@ public class SequencingOrderRestController extends RestController {
   private PoolService poolService;
   @Autowired
   private OrderPurposeService orderPurposeService;
+  public static int ERROR_EDIT_DISTANCE;
+  private void setErrorEditDistance(@Value("${miso.error.edit.distance:2}") int errorEditDistance) {
+    ERROR_EDIT_DISTANCE = errorEditDistance;
+  }
+
+  public static int WARNING_EDIT_DISTANCE;
+
+  private void setWarningEditDistance(@Value("${miso.warning.edit.distance:3}") int warningEditDistance) {
+    WARNING_EDIT_DISTANCE = warningEditDistance;
+  }
 
   @GetMapping(value = "/pools/{id}/dt/completions", produces = { "application/json" })
   @ResponseBody
@@ -90,7 +101,7 @@ public class SequencingOrderRestController extends RestController {
     if (result == null) {
       throw new RestException("No sequencing order found with ID: " + id, Status.NOT_FOUND);
     } else {
-      return Dtos.asDto(result);
+      return Dtos.asDto(result, ERROR_EDIT_DISTANCE, WARNING_EDIT_DISTANCE);
     }
   }
 
@@ -102,7 +113,7 @@ public class SequencingOrderRestController extends RestController {
     SequencingOrder seqOrder = Dtos.to(orderDto);
     Long id = sequencingOrderService.create(seqOrder);
     SequencingOrder saved = sequencingOrderService.get(id);
-    return Dtos.asDto(saved);
+    return Dtos.asDto(saved, ERROR_EDIT_DISTANCE, WARNING_EDIT_DISTANCE);
   }
   
   @GetMapping(value = "/sequencingorders/dt/completions/all/{platform}", produces = { "application/json" })
@@ -183,12 +194,14 @@ public class SequencingOrderRestController extends RestController {
 
   private PoolPickerResponse getPoolPickerWithFilters(Integer limit, PaginationFilter... filters) throws IOException {
     PoolPickerResponse ppr = new PoolPickerResponse();
-    ppr.populate(sequencingOrderCompletionService, true, "lastUpdated", limit, SequencingOrderRestController::orderTransform, filters);
+    ppr.populate(sequencingOrderCompletionService, true, "lastUpdated", limit, SequencingOrderRestController::orderTransform,
+        filters);
     return ppr;
   }
 
   private static PoolPickerEntry orderTransform(SequencingOrderCompletion order) {
-    return new PoolPickerEntry(Dtos.asDto(order.getPool(), true, false), Collections.singletonList(Dtos.asDto(order)));
+    return new PoolPickerEntry(Dtos.asDto(order.getPool(), true, false, ERROR_EDIT_DISTANCE, WARNING_EDIT_DISTANCE),
+        Collections.singletonList(Dtos.asDto(order)));
   }
 
   @GetMapping(value = "/sequencingorders/search")

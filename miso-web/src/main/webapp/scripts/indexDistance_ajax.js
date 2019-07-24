@@ -36,14 +36,19 @@
         data: JSON.stringify(data)
       }).success(function(data) {
         var results = '';
-        if (!data || !data.length) {
+        if (data.warningEditDistance > data.errorEditDistance) {
+          results += 'Indices with edit distance of less than ' + Constants.warningEditDistance + ' are considered near-matches.\n';
+        }
+        results += 'Indices with edit distance of less than ' + Constants.errorEditDistance + ' are considered DUPLICATES.\n\n';
+        results += 'Indices were compared at the length of the shortest Index 1, which is ' + data.shortestIndexLength + ' bp.\n';
+        if (!data.collisions || !data.collisions.length) {
           results += 'All sequences are at least ' + minDistance + ' edits apart';
           $('#results').css('color', 'green');
           $('#results').val(results);
         } else {
-          $.each(data, function(index, item) {
+          $.each(data.collisions, function(index, item) {
             results += (item.editDistance === 0) ? 'Duplicate' : 'Near match (' + item.editDistance + ')';
-            results += ': ' + item.indices.join(', ') + '\n';
+            results += ': "' + item.indices.join('", "') + '"\n';
           });
           showError(results);
         }

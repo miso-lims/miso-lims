@@ -176,6 +176,10 @@ public class EditLibraryController {
   private LibraryTemplateService libraryTemplateService;
   @Autowired
   private BoxService boxService;
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
 
   public NamingScheme getNamingScheme() {
     return namingScheme;
@@ -290,7 +294,8 @@ public class EditLibraryController {
     addAdjacentLibraries(library, model);
 
     Collection<Pool> pools = poolService.listByLibraryId(library.getId());
-    model.put("libraryPools", pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
+    model.put("libraryPools",
+        pools.stream().map(p -> Dtos.asDto(p, false, false, errorEditDistance, warningEditDistance)).collect(Collectors.toList()));
     model.put("libraryRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
         .collect(Collectors.toList()));
     model.put("libraryAliquots", library.getLibraryAliquots().stream()
@@ -299,7 +304,8 @@ public class EditLibraryController {
     ObjectNode config = mapper.createObjectNode();
     config.putPOJO("library", Dtos.asDto(library, false));
     model.put("libraryAliquotsConfig", mapper.writeValueAsString(config));
-    model.put("experiments", experimentService.listAllByLibraryId(library.getId()).stream().map(Dtos::asDto)
+    model.put("experiments",
+        experimentService.listAllByLibraryId(library.getId()).stream().map(exp -> Dtos.asDto(exp, errorEditDistance, warningEditDistance))
         .collect(Collectors.toList()));
     model.put("libraryDto", mapper.writeValueAsString(Dtos.asDto(library, false)));
 

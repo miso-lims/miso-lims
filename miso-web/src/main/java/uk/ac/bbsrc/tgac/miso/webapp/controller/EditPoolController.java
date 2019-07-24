@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -99,6 +100,10 @@ public class EditPoolController {
   private ContainerService containerService;
   @Autowired
   private BoxService boxService;
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
 
   public void setRunService(RunService runService) {
     this.runService = runService;
@@ -128,20 +133,24 @@ public class EditPoolController {
     }
 
     if (pool == null) throw new NotFoundException("No pool found for ID " + poolId.toString());
-
+    PoolDto poolDto = Dtos.asDto(pool, true, false, errorEditDistance, warningEditDistance);
+    
     ObjectMapper mapper = new ObjectMapper();
     model.put("pool", pool);
-    model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "{}" : mapper.writeValueAsString(Dtos.asDto(pool, true, false)));
+    model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "{}"
+        : mapper.writeValueAsString(poolDto));
 
-    model.put("partitions", containerService.listPartitionsByPoolId(poolId).stream().map(Dtos::asDto).collect(Collectors.toList()));
+    model.put("partitions", containerService.listPartitionsByPoolId(poolId).stream()
+        .map(partition -> Dtos.asDto(partition, errorEditDistance, warningEditDistance)).collect(Collectors.toList()));
     model.put("runs", poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(runService.listByPoolId(poolId)));
     model.put("orders",
-        poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asSequencingOrderDtos(sequencingOrderService.getByPool(pool)));
+        poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList()
+            : Dtos.asSequencingOrderDtos(sequencingOrderService.getByPool(pool), errorEditDistance, warningEditDistance));
 
-    model.put("duplicateIndicesSequences", mapper.writeValueAsString(pool.getDuplicateIndicesSequences()));
-    model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(pool.getNearDuplicateIndicesSequences()));
+    model.put("duplicateIndicesSequences", mapper.writeValueAsString(poolDto.getDuplicateIndicesSequences()));
+    model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(poolDto.getNearDuplicateIndicesSequences()));
 
-    model.put("includedLibraryAliquots", Dtos.asDto(pool, true, false).getPooledElements());
+    model.put("includedLibraryAliquots", Dtos.asDto(pool, true, false, errorEditDistance, warningEditDistance).getPooledElements());
 
     return new ModelAndView("/WEB-INF/pages/editPool.jsp", model);
   }
@@ -159,7 +168,7 @@ public class EditPoolController {
 
     @Override
     protected PoolDto asDto(Pool model) {
-      return Dtos.asDto(model, true, true);
+      return Dtos.asDto(model, true, true, errorEditDistance, warningEditDistance);
     }
 
     @Override

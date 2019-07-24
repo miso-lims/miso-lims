@@ -696,12 +696,14 @@
     hyperlinkifyBoxable: function(name, id, text) {
       var path = "/miso/";
       var prefix = name.substring(0, 3);
-      if (prefix == "SAM" || prefix == "LIB" || prefix.substring(1, 3) == "PO") {
+      if (prefix == "SAM" || prefix == "LIB" || prefix == "LDI" || prefix.substring(1, 3) == "PO") {
         if (prefix == "SAM") {
           path += "sample/";
         } else if (prefix == "LIB") {
           path += "library/";
-        } else {
+        } else if (prefix == "LDI") {
+          path += "libraryaliquot/";
+        } else if (prefix == "IPO") {
           path += "pool/";
         }
         path += id;

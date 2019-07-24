@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -70,12 +71,14 @@ public class LibraryAliquotRestController extends RestController {
 
   @Autowired
   private LibraryAliquotService libraryAliquotService;
-
   @Autowired
   private PoolableElementViewService poolableElementViewService;
-
   @Autowired
   private PoolService poolService;
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
 
   public void setLibraryAliquotService(LibraryAliquotService libraryAliquotService) {
     this.libraryAliquotService = libraryAliquotService;
@@ -199,7 +202,7 @@ public class LibraryAliquotRestController extends RestController {
 
         @Override
         public PoolDto asDto(Pool model) {
-          return Dtos.asDto(model, false, false);
+          return Dtos.asDto(model, false, false, errorEditDistance, warningEditDistance);
         }
 
         @Override

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,10 @@ public class EditSequencingOrderController {
 
   @Autowired
   private PoolService poolService;
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
 
   private final BulkPropagateTableBackend<Pool, SequencingOrderDto> orderBulkPropagateBackend = new BulkPropagateTableBackend<Pool, SequencingOrderDto>(
       "sequencingorder", SequencingOrderDto.class, "Sequencing Orders", "Pools") {
@@ -33,7 +38,7 @@ public class EditSequencingOrderController {
     @Override
     protected SequencingOrderDto createDtoFromParent(Pool item) {
       SequencingOrderDto dto = new SequencingOrderDto();
-      dto.setPool(Dtos.asDto(item, false, false));
+      dto.setPool(Dtos.asDto(item, false, false, errorEditDistance, warningEditDistance));
       return dto;
     }
 

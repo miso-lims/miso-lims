@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -40,6 +41,11 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 public class ListExperimentsController {
   @Autowired
   private ExperimentService experimentService;
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
+
   @ModelAttribute("title")
   public String title() {
     return "Experiments";
@@ -47,6 +53,7 @@ public class ListExperimentsController {
 
   @RequestMapping("/experiments")
   public ModelAndView listExperiments(ModelMap model) throws IOException {
-    return new ListItemsPage("experiment").list(model, experimentService.list().stream().map(Dtos::asDto));
+    return new ListItemsPage("experiment").list(model,
+        experimentService.list().stream().map(expt -> Dtos.asDto(expt, errorEditDistance, warningEditDistance)));
   }
 }

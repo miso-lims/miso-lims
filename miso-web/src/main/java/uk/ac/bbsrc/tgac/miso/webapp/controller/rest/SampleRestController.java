@@ -108,6 +108,10 @@ public class SampleRestController extends RestController {
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
 
   public Boolean isDetailedSampleEnabled() {
     return detailedSample;
@@ -391,7 +395,7 @@ public class SampleRestController extends RestController {
 
         @Override
         public PoolDto asDto(Pool model) {
-          return Dtos.asDto(model, false, false);
+          return Dtos.asDto(model, false, false, errorEditDistance, warningEditDistance);
         }
 
         @Override
