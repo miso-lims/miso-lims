@@ -51,6 +51,9 @@ import uk.ac.bbsrc.tgac.miso.persistence.PoolStore;
 @Service
 public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool> {
 
+  @Value("${miso.pools.strict:false}")
+  private Boolean strictPools;
+
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
@@ -272,7 +275,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     validateConcentrationUnits(pool.getConcentration(), pool.getConcentrationUnits(), errors);
     validateVolumeUnits(pool.getVolume(), pool.getVolumeUnits(), errors);
     validateBarcodeUniqueness(pool, beforeChange, poolStore::getByBarcode, errors, "pool");
-    validateIndices(pool, errors);
+    if (strictPools) validateIndices(pool, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);

@@ -13,7 +13,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
+import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -22,6 +27,13 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 
 public class ValidationUtils {
+
+
+
+
+  // TODO: Doesn't seem like this is resolving
+  @Autowired
+  private static PoolableElementViewService poolableElementViewService;
 
   private ValidationUtils() {
     throw new IllegalStateException("Static util class not intended for instantiation");
@@ -48,7 +60,22 @@ public class ValidationUtils {
     }
   }
 
+  private static void refreshPoolElements(Pool pool, Collection<ValidationError> errors){
+    Set<PoolElement> pes = new HashSet<>();
+    for(PoolElement oldPe : pool.getPoolContents()){
+      PoolElement newPe = new PoolElement();
+      newPe.setPool(pool);
+      newPe.setProportion(oldPe.getProportion());
+      try {
+        newPe.setPoolableElementView(poolableElementViewService.get(oldPe.getPoolableElementView().getAliquotId()));
+      } catch (IOException e) {
+        errors.add(new ValidationError("poolElements", "Failed to reconstruct PoolableElementView"));
+      }
+    }
+  }
+
   public static void validateIndices(Pool pool, Collection<ValidationError> errors){
+    //refreshPoolElements(pool, errors);
     Set<String> indices = pool.getDuplicateIndicesSequences();
     indices.addAll(pool.getNearDuplicateIndicesSequences());
 
