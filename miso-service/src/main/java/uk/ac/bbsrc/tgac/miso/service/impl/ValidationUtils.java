@@ -13,12 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
-import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -50,6 +45,15 @@ public class ValidationUtils {
         && (beforeChange == null || !barcodable.getIdentificationBarcode().equals(beforeChange.getIdentificationBarcode()))
         && lookupByBarcode.apply(barcodable.getIdentificationBarcode()) != null) {
       errors.add(new ValidationError("identificationBarcode", String.format("There is already a %s with this barcode", typeLabel)));
+    }
+  }
+
+  public static void validateIndices(Pool pool, Collection<ValidationError> errors){
+    Set<String> indices = pool.getDuplicateIndicesSequences();
+    indices.addAll(pool.getNearDuplicateIndicesSequences());
+
+    if(!indices.isEmpty()){
+      errors.add(new ValidationError("poolElements", "Pools may not contain Library Aliquots with indices with 2 or fewer positions of difference"));
     }
   }
 
