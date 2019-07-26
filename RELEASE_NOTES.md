@@ -1,7 +1,8 @@
 # Unreleased
 
-  * Fixed bug that broke List Freezers page
   * Show _Assignee_ column in _Issue_ tables
+  * Fixed bug that broke List Freezers page
+  * Fixed bug in 'Pool custom'
 
 # 0.2.185:
 
