@@ -386,7 +386,7 @@ public class PoolRestController extends RestController {
 
   private PoolPickerEntry poolTransform(Pool pool) throws IOException {
     List<SequencingOrderCompletionDto> completions = sequencingOrderCompletionService.listByPoolId(pool.getId()).stream()
-        .map(Dtos::asDto).collect(Collectors.toList());
+        .map(oc -> Dtos.asDto(oc, errorEditDistance, warningEditDistance)).collect(Collectors.toList());
     return new PoolPickerEntry(Dtos.asDto(pool, true, false, errorEditDistance, warningEditDistance), completions);
   }
 

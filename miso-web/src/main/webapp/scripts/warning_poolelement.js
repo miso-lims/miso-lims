@@ -45,7 +45,7 @@ WarningTarget.poolelement = {
             },
             {
               include: element.libraryLowQuality,
-              tableMessage: Constants.warningMessages.lowQualityLibraries
+              tableMessage: '(' + Constants.warningMessages.lowQualityLibraries + ')'
             },
             {
               include: duplicateSequences && duplicateSequences.indexOf(combined) != -1,
@@ -54,13 +54,13 @@ WarningTarget.poolelement = {
             {
               include: nearDuplicateSequences && nearDuplicateSequences.indexOf(combined) != -1
                   && !(duplicateSequences && duplicateSequences.indexOf(combined) != -1),
-              tableMessage: Constants.warningMessages.nearDuplicateIndices
+              tableMessage: '(' + Constants.warningMessages.nearDuplicateIndices + ')'
             }, {
               include: Utils.validation.isEmpty(combined),
-              tableMessage: Constants.warningMessages.missingIndex
+              tableMessage: '(' + Constants.warningMessages.missingIndex + ')'
             }, {
               include: element.identityConsentLevel === 'Revoked',
-              tableMessage: Constants.warningMessages.consentRevoked
+              tableMessage: '(' + Constants.warningMessages.consentRevoked + ')'
             }];
       }
     }

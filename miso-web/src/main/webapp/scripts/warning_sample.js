@@ -31,7 +31,7 @@ WarningTarget.sample = {
     }, {
       include: sample.identityConsentLevel === 'Revoked',
       headerMessage: 'Donor has revoked consent',
-      tableMessage: '(CONSENT REVOKED)'
+      tableMessage: '(' + Constants.warningMessages.consentRevoked + ')'
     }, {
       include: sample.synthetic,
       headerMessage: 'This entity does not exist except for sample tracking purposes!',

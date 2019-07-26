@@ -2132,12 +2132,11 @@ public class Dtos {
     return qcTypeSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  public static SequencingOrderCompletionDto asDto(@Nonnull SequencingOrderCompletion from) {
+  public static SequencingOrderCompletionDto asDto(@Nonnull SequencingOrderCompletion from, int errorEditDistance,
+      int warningEditDistance) {
     SequencingOrderCompletionDto dto = new SequencingOrderCompletionDto();
     dto.setId(from.getPool().getId() + "_" + from.getSequencingParameters().getId());
-    dto.setPool(asDto(from.getPool(), false, false, 16, 16)); // "16" is fake numbers because we never want to display duplicate indices
-                                                              // warnings on
-                                                      // the Sequencing Order Completion views
+    dto.setPool(asDto(from.getPool(), false, false, errorEditDistance, warningEditDistance));
     dto.setParameters(asDto(from.getSequencingParameters()));
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
     dto.setRemaining(from.getRemaining());

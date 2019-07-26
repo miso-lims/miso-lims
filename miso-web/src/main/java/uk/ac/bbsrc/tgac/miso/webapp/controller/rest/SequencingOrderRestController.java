@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderDto;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
@@ -50,19 +51,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
 @Controller
 @RequestMapping("/rest")
 public class SequencingOrderRestController extends RestController {
-
-  private final JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto> jQueryBackend = new JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto>() {
-
-    @Override
-    protected PaginatedDataSource<SequencingOrderCompletion> getSource() throws IOException {
-      return sequencingOrderCompletionService;
-    }
-
-    @Override
-    protected SequencingOrderCompletionDto asDto(SequencingOrderCompletion model) {
-      return Dtos.asDto(model);
-    }
-  };
 
   @Autowired
   private SequencingOrderService sequencingOrderService;
@@ -74,16 +62,23 @@ public class SequencingOrderRestController extends RestController {
   private PoolService poolService;
   @Autowired
   private OrderPurposeService orderPurposeService;
-  public static int ERROR_EDIT_DISTANCE;
-  private void setErrorEditDistance(@Value("${miso.error.edit.distance:2}") int errorEditDistance) {
-    ERROR_EDIT_DISTANCE = errorEditDistance;
-  }
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
 
-  public static int WARNING_EDIT_DISTANCE;
+  private final JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto> jQueryBackend = new JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto>() {
 
-  private void setWarningEditDistance(@Value("${miso.warning.edit.distance:3}") int warningEditDistance) {
-    WARNING_EDIT_DISTANCE = warningEditDistance;
-  }
+    @Override
+    protected PaginatedDataSource<SequencingOrderCompletion> getSource() throws IOException {
+      return sequencingOrderCompletionService;
+    }
+
+    @Override
+    protected SequencingOrderCompletionDto asDto(SequencingOrderCompletion model) {
+      return Dtos.asDto(model, errorEditDistance, warningEditDistance);
+    }
+  };
 
   @GetMapping(value = "/pools/{id}/dt/completions", produces = { "application/json" })
   @ResponseBody
@@ -101,7 +96,7 @@ public class SequencingOrderRestController extends RestController {
     if (result == null) {
       throw new RestException("No sequencing order found with ID: " + id, Status.NOT_FOUND);
     } else {
-      return Dtos.asDto(result, ERROR_EDIT_DISTANCE, WARNING_EDIT_DISTANCE);
+      return Dtos.asDto(result, errorEditDistance, warningEditDistance);
     }
   }
 
@@ -113,7 +108,7 @@ public class SequencingOrderRestController extends RestController {
     SequencingOrder seqOrder = Dtos.to(orderDto);
     Long id = sequencingOrderService.create(seqOrder);
     SequencingOrder saved = sequencingOrderService.get(id);
-    return Dtos.asDto(saved, ERROR_EDIT_DISTANCE, WARNING_EDIT_DISTANCE);
+    return Dtos.asDto(saved, errorEditDistance, warningEditDistance);
   }
   
   @GetMapping(value = "/sequencingorders/dt/completions/all/{platform}", produces = { "application/json" })
@@ -194,14 +189,17 @@ public class SequencingOrderRestController extends RestController {
 
   private PoolPickerResponse getPoolPickerWithFilters(Integer limit, PaginationFilter... filters) throws IOException {
     PoolPickerResponse ppr = new PoolPickerResponse();
-    ppr.populate(sequencingOrderCompletionService, true, "lastUpdated", limit, SequencingOrderRestController::orderTransform,
+    ppr.populate(sequencingOrderCompletionService, true, "lastUpdated", limit,
+        this::orderTransform,
         filters);
     return ppr;
   }
 
-  private static PoolPickerEntry orderTransform(SequencingOrderCompletion order) {
-    return new PoolPickerEntry(Dtos.asDto(order.getPool(), true, false, ERROR_EDIT_DISTANCE, WARNING_EDIT_DISTANCE),
-        Collections.singletonList(Dtos.asDto(order)));
+  private PoolPickerEntry orderTransform(SequencingOrderCompletion order) {
+    PoolDto poolDto = Dtos.asDto(order.getPool(), true, false, errorEditDistance, warningEditDistance);
+    SequencingOrderCompletionDto socDto = Dtos.asDto(order, errorEditDistance, warningEditDistance);
+    return new PoolPickerEntry(poolDto,
+        Collections.singletonList(socDto));
   }
 
   @GetMapping(value = "/sequencingorders/search")

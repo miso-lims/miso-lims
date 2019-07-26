@@ -44,12 +44,12 @@ WarningTarget.pool = {
           level: 'important'
         }, {
           include: pool.duplicateIndices,
-          headerMessage: Constants.warningMessages.duplicateIndices,
+          headerMessage: 'This pool contains duplicate indices!',
           tableMessage: Constants.warningMessages.duplicateIndices,
           tileMessage: Constants.warningMessages.duplicateIndices
         }, {
           include: pool.nearDuplicateIndices && !pool.duplicateIndices,
-          headerMessage: Constants.warningMessages.nearDuplicateIndices,
+          headerMessage: 'This pool contains near-duplicate indices!',
           tableMessage: '(' + Constants.warningMessages.nearDuplicateIndices + ')',
           tileMessage: Constants.warningMessages.nearDuplicateIndices
         }, {

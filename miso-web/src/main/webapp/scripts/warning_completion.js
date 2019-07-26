@@ -30,21 +30,21 @@ WarningTarget.completion = {
       level: 'important'
     }, {
       include: pool.duplicateIndices,
-      tableMessage: "(DUPLICATE INDICES)"
+      tableMessage: '(' + Constants.warningMessages.duplicateIndices + ')'
     }, {
       include: pool.nearDuplicateIndices && !pool.duplicateIndices,
-      tableMessage: "(NEAR-DUPLICATE INDICES)"
+      tableMessage: '(' + Constants.warningMessages.nearDuplicateIndices + ')'
     }, {
       include: pool.hasEmptySequence,
-      tableMessage: "(MISSING INDEX)"
+      tableMessage: '(' + Constants.warningMessages.missingIndex + ')'
     }, {
       include: pool.hasLowQualityLibraries,
-      tableMessage: "(LOW QUALITY LIBRARIES)"
+      tableMessage: '(' + Constants.warningMessages.lowQualityLibraries + ')'
     }, {
       include: pool.pooledElements && pool.pooledElements.some(function(element) {
         return element.identityConsentLevel === 'Revoked';
       }),
-      tableMessage: "(CONSENT REVOKED)"
+      tableMessage: '(' + Constants.warningMessages.consentRevoked + ')'
     }];
   }
 };
