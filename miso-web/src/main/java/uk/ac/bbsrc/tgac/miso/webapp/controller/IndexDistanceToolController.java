@@ -1,8 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -159,19 +162,20 @@ public class IndexDistanceToolController {
   }
 
   public static int getShortestIndexLength(List<String> indices) {
-    String initialValue = "REALLY_LONG_VALUE_THAT_WILL_SURELY_GET_REPLACED_BUT_HERE_ARE_SOME_MORE_CHARACTERS_JUST_IN_CASE";
-    String shortestIndex = indices.stream()
-        .reduce(initialValue, (shortest, current) -> {
-          if (current != null && current.length() > 0 && current.length() < shortest.length()) return current;
-          return shortest;
-        });
-    if (shortestIndex == null || initialValue.equals(shortestIndex)) return 0;
-    return shortestIndex.length();
+    try {
+      int shortestIndex = indices.stream().filter(Objects::nonNull)
+          .map(combinedIndex -> combinedIndex.split("-")[0])
+          .mapToInt(String::length).min().getAsInt();
+      if (shortestIndex == 0) return 0;
+      return shortestIndex;
+    } catch (NoSuchElementException e) {
+      return 0;
+    }
   }
 
   public static String flattenIndices(List<Index> indices) {
     return indices.stream()
-        .sorted((i1, i2) -> Integer.compare(i1.getPosition(), i2.getPosition()))
+        .sorted(Comparator.comparingInt(Index::getPosition))
         .map(Index::getSequence)
         .collect(Collectors.joining("-"));
   }
