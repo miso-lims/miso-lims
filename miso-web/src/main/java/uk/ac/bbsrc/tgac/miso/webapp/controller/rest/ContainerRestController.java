@@ -88,10 +88,14 @@ public class ContainerRestController extends RestController {
 
     @Override
     protected ContainerDto asDto(SequencerPartitionContainer model) {
-      model.getPartitions().forEach(p -> {
-        p.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p.getPool()));
-        p.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p.getPool()));
-      });
+      if (model.getPartitions() != null) {
+        model.getPartitions().forEach(p -> {
+          if (p.getPool() != null) {
+            p.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p.getPool()));
+            p.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p.getPool()));
+          }
+        });
+      }
       return Dtos.asDto(model);
     }
 

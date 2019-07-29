@@ -150,10 +150,14 @@ public class EditSequencerPartitionContainerController {
 
   private ModelAndView setupForm(SequencerPartitionContainer container, ModelMap model) throws IOException {
     model.put("container", container);
-    container.getPartitions().forEach(p -> {
-      p.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p.getPool()));
-      p.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p.getPool()));
-    });
+    if (container.getPartitions() != null) {
+      container.getPartitions().forEach(p -> {
+        if (p != null && p.getPool() != null) {
+          p.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p.getPool()));
+          p.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p.getPool()));
+        }
+      });
+    }
     model.put("containerPartitions",
         container.getPartitions().stream().map(partition -> Dtos.asDto(partition, false))
             .collect(Collectors.toList()));

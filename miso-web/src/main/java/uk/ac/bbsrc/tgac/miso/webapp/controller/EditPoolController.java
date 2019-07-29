@@ -151,14 +151,16 @@ public class EditPoolController {
     model.put("partitions", partitions.stream()
         .map(partition -> Dtos.asDto(partition)).collect(Collectors.toList()));
     model.put("runs", poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(runService.listByPoolId(poolId)));
-    Collection<SequencingOrder> sequencingOrders= sequencingOrderService.getByPool(pool);
+    if (poolId == PoolImpl.UNSAVED_ID) {
+      model.put("orders", Collections.emptyList());
+    } else {
+      Collection<SequencingOrder> sequencingOrders = sequencingOrderService.getByPool(pool);
     sequencingOrders.forEach(so -> {
       so.getPool().setDuplicateIndicesSequences(so.getPool().getDuplicateIndicesSequences());
       so.getPool().setNearDuplicateIndicesSequences(so.getPool().getNearDuplicateIndicesSequences());
         });
-    model.put("orders",
-        poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList()
-            : Dtos.asSequencingOrderDtos(sequencingOrders));
+      model.put("orders", Dtos.asSequencingOrderDtos(sequencingOrders));
+    }
 
     model.put("duplicateIndicesSequences", mapper.writeValueAsString(poolDto.getDuplicateIndicesSequences()));
     model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(poolDto.getNearDuplicateIndicesSequences()));
