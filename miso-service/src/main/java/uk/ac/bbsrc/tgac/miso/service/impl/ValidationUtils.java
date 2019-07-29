@@ -60,29 +60,7 @@ public class ValidationUtils {
     }
   }
 
-  private static void refreshPoolElements(Pool pool, Collection<ValidationError> errors){
-    Set<PoolElement> pes = new HashSet<>();
-    for(PoolElement oldPe : pool.getPoolContents()){
-      PoolElement newPe = new PoolElement();
-      newPe.setPool(pool);
-      newPe.setProportion(oldPe.getProportion());
-      try {
-        newPe.setPoolableElementView(poolableElementViewService.get(oldPe.getPoolableElementView().getAliquotId()));
-      } catch (IOException e) {
-        errors.add(new ValidationError("poolElements", "Failed to reconstruct PoolableElementView"));
-      }
-    }
-  }
 
-  public static void validateIndices(Pool pool, Collection<ValidationError> errors){
-    //refreshPoolElements(pool, errors);
-    Set<String> indices = pool.getDuplicateIndicesSequences();
-    indices.addAll(pool.getNearDuplicateIndicesSequences());
-
-    if(!indices.isEmpty()){
-      errors.add(new ValidationError("poolElements", "Pools may not contain Library Aliquots with indices with 2 or fewer positions of difference"));
-    }
-  }
 
   public static void validateConcentrationUnits(BigDecimal concentration, ConcentrationUnit units, String field, String label,
       Collection<ValidationError> errors) {
