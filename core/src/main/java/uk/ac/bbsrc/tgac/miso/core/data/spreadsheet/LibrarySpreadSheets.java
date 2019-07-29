@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.spreadsheet;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -46,7 +47,8 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
   }
 
   private static String listIndices(Library library) {
-    return library.getIndices().stream().map(Index::getSequence).collect(Collectors.joining(", "));
+    return library.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getSequence)
+        .collect(Collectors.joining(", "));
   }
 
   private final List<Column<Library>> columns;
