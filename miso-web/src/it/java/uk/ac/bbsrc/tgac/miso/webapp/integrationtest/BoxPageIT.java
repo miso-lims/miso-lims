@@ -254,7 +254,7 @@ public class BoxPageIT extends AbstractIT {
     BoxPage page = getBoxPage(500L);
     BoxVisualization visualization = page.getVisualization();
     assertFalse("check that position C01 is full", visualization.isEmptyPosition(position));
-    assertTrue("check that title matches LDI name", visualization.getPositionTitle(position).contains("LDI504"));
+    assertTrue("check that title matches LDI name", visualization.getPositionTitle(position).contains("TIB_0001_nn_n_PE_404_WG"));
 
     Box initial = (Box) getSession().get(BoxImpl.class, 500L);
     assertNotNull(initial.getBoxPositions().get(position));
@@ -303,7 +303,7 @@ public class BoxPageIT extends AbstractIT {
     BoxPage post = getBoxPage(500L);
     BoxVisualization postVis = post.getVisualization();
     assertFalse("check that position D01 is still full", postVis.isEmptyPosition(position));
-    assertTrue("check that D01 is now a library aliquot", postVis.getPositionTitle(position).contains("LDI"));
+    assertTrue("check that D01 is now a library aliquot", postVis.getPositionTitle(position).contains("TIB_"));
 
     Box box = (Box) getSession().get(BoxImpl.class, 500L);
     assertEquals("check that D01 now contains library aliquot", EntityType.LIBRARY_ALIQUOT,
