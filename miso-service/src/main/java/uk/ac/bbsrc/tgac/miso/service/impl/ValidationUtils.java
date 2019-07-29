@@ -43,8 +43,6 @@ public class ValidationUtils {
     }
   }
 
-
-
   public static void validateConcentrationUnits(BigDecimal concentration, ConcentrationUnit units, String field, String label,
       Collection<ValidationError> errors) {
     if (concentration != null && units == null) {
