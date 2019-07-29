@@ -321,7 +321,7 @@ public class EditLibraryAliquotController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.putPOJO("aliquotsToPool", aliquots);
+      aliquots.forEach(config.putArray("aliquotsToPool")::addPOJO);
       config.putPOJO("box", newBox);
       config.put("pageMode", "create");
     }
