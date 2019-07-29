@@ -169,6 +169,12 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
 
+  @Transient
+  private Set<String> duplicateIndicesSequences;
+
+  @Transient
+  private Set<String> nearDuplicateIndicesSequences;
+
   public PoolImpl() {
   }
 
@@ -327,6 +333,26 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public void setPendingAttachmentDeletions(List<FileAttachment> pendingAttachmentDeletions) {
     this.pendingAttachmentDeletions = pendingAttachmentDeletions;
+  }
+
+  @Override
+  public Set<String> getDuplicateIndicesSequences() {
+    return duplicateIndicesSequences;
+  }
+
+  @Override
+  public void setDuplicateIndicesSequences(Set<String> duplicateIndicesSequences) {
+    this.duplicateIndicesSequences = duplicateIndicesSequences;
+  }
+
+  @Override
+  public Set<String> getNearDuplicateIndicesSequences() {
+    return nearDuplicateIndicesSequences;
+  }
+
+  @Override
+  public void setNearDuplicateIndicesSequences(Set<String> nearDuplicateIndicesSequences) {
+    this.nearDuplicateIndicesSequences = nearDuplicateIndicesSequences;
   }
 
   @Override

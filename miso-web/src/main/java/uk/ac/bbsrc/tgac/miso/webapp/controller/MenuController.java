@@ -422,7 +422,7 @@ public class MenuController implements ServletContextAware {
     warningsNode.put("duplicateIndices", errorEditDistanceMessage);
     warningsNode.put("nearDuplicateIndices", warningEditDistanceMessage);
     warningsNode.put("lowQualityLibraries", "Low Quality Libraries");
-    warningsNode.put("missingIndex", "(MISSING INDEX)");
+    warningsNode.put("missingIndex", "MISSING INDEX");
     warningsNode.put("negativeVolume", "Negative Volume");
     node.set("warningMessages", warningsNode);
     node.put("errorEditDistance", errorEditDistance);

@@ -37,7 +37,6 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -54,7 +53,9 @@ import com.google.common.collect.Lists;
 
 import net.sf.json.JSONArray;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
@@ -72,6 +73,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
 
@@ -100,10 +102,8 @@ public class EditPoolController {
   private ContainerService containerService;
   @Autowired
   private BoxService boxService;
-  @Value("${miso.error.edit.distance:2}")
-  public int errorEditDistance;
-  @Value("${miso.warning.edit.distance:3}")
-  public int warningEditDistance;
+  @Autowired
+  private DuplicateIndicesChecker indexChecker;
 
   public void setRunService(RunService runService) {
     this.runService = runService;
@@ -133,24 +133,37 @@ public class EditPoolController {
     }
 
     if (pool == null) throw new NotFoundException("No pool found for ID " + poolId.toString());
-    PoolDto poolDto = Dtos.asDto(pool, true, false, errorEditDistance, warningEditDistance);
+    pool.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(pool));
+    pool.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(pool));
+    PoolDto poolDto = Dtos.asDto(pool, true, false);
     
     ObjectMapper mapper = new ObjectMapper();
     model.put("pool", pool);
+    pool.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(pool));
+    pool.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(pool));
     model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "{}"
         : mapper.writeValueAsString(poolDto));
-
-    model.put("partitions", containerService.listPartitionsByPoolId(poolId).stream()
-        .map(partition -> Dtos.asDto(partition, errorEditDistance, warningEditDistance)).collect(Collectors.toList()));
+    Collection<Partition> partitions = containerService.listPartitionsByPoolId(poolId);
+    partitions.forEach(partition -> {
+      partition.getPool().setDuplicateIndicesSequences(partition.getPool().getDuplicateIndicesSequences());
+      partition.getPool().setNearDuplicateIndicesSequences(partition.getPool().getNearDuplicateIndicesSequences());
+        });
+    model.put("partitions", partitions.stream()
+        .map(partition -> Dtos.asDto(partition)).collect(Collectors.toList()));
     model.put("runs", poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(runService.listByPoolId(poolId)));
+    Collection<SequencingOrder> sequencingOrders= sequencingOrderService.getByPool(pool);
+    sequencingOrders.forEach(so -> {
+      so.getPool().setDuplicateIndicesSequences(so.getPool().getDuplicateIndicesSequences());
+      so.getPool().setNearDuplicateIndicesSequences(so.getPool().getNearDuplicateIndicesSequences());
+        });
     model.put("orders",
         poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList()
-            : Dtos.asSequencingOrderDtos(sequencingOrderService.getByPool(pool), errorEditDistance, warningEditDistance));
+            : Dtos.asSequencingOrderDtos(sequencingOrders));
 
     model.put("duplicateIndicesSequences", mapper.writeValueAsString(poolDto.getDuplicateIndicesSequences()));
     model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(poolDto.getNearDuplicateIndicesSequences()));
 
-    model.put("includedLibraryAliquots", Dtos.asDto(pool, true, false, errorEditDistance, warningEditDistance).getPooledElements());
+    model.put("includedLibraryAliquots", Dtos.asDto(pool, true, false).getPooledElements());
 
     return new ModelAndView("/WEB-INF/pages/editPool.jsp", model);
   }
@@ -168,7 +181,7 @@ public class EditPoolController {
 
     @Override
     protected PoolDto asDto(Pool model) {
-      return Dtos.asDto(model, true, true, errorEditDistance, warningEditDistance);
+      return Dtos.asDto(model, true, true);
     }
 
     @Override

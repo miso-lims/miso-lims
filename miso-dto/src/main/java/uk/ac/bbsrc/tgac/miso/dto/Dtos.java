@@ -1163,10 +1163,10 @@ public class Dtos {
     return to;
   }
 
-  public static SequencingOrderDto asDto(@Nonnull SequencingOrder from, int errorEditDistance, int warningEditDistance) {
+  public static SequencingOrderDto asDto(@Nonnull SequencingOrder from) {
     SequencingOrderDto dto = new SequencingOrderDto();
     dto.setId(from.getId());
-    dto.setPool(asDto(from.getPool(), false, false, errorEditDistance, warningEditDistance));
+    dto.setPool(asDto(from.getPool(), false, false));
     dto.setParameters(asDto(from.getSequencingParameter()));
     dto.setPartitions(from.getPartitions());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
@@ -1179,9 +1179,8 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<SequencingOrderDto> asSequencingOrderDtos(@Nonnull Collection<SequencingOrder> from, int errorEditDistance,
-      int warningEditDistance) {
-    return from.stream().map(so -> asDto(so, errorEditDistance, warningEditDistance)).collect(Collectors.toSet());
+  public static Set<SequencingOrderDto> asSequencingOrderDtos(@Nonnull Collection<SequencingOrder> from) {
+    return from.stream().map(so -> asDto(so)).collect(Collectors.toSet());
   }
 
   public static SequencingOrder to(@Nonnull SequencingOrderDto from) {
@@ -1674,8 +1673,7 @@ public class Dtos {
     return to;
   }
 
-  public static PoolDto asDto(@Nonnull Pool from, boolean includeContents, boolean includeBoxPositions, int errorEditDistance,
-      int warningEditDistance) {
+  public static PoolDto asDto(@Nonnull Pool from, boolean includeContents, boolean includeBoxPositions) {
     PoolDto dto = new PoolDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1714,14 +1712,14 @@ public class Dtos {
       }
       dto.setPooledElements(pooledElements);
 
-      dto.setDuplicateIndicesSequences(getIndexSequencesWithMinimumEditDistance(indices, errorEditDistance));
-      dto.setDuplicateIndices(!dto.getDuplicateIndicesSequences().isEmpty());
-      dto.setNearDuplicateIndicesSequences(getIndexSequencesWithMinimumEditDistance(indices, warningEditDistance));
-      dto.setNearDuplicateIndices(!dto.getNearDuplicateIndicesSequences().isEmpty());
+      dto.setDuplicateIndicesSequences(from.getDuplicateIndicesSequences());
+      dto.setDuplicateIndices(dto.getDuplicateIndicesSequences() != null && !dto.getDuplicateIndicesSequences().isEmpty());
+      dto.setNearDuplicateIndicesSequences(from.getNearDuplicateIndicesSequences());
+      dto.setNearDuplicateIndices(dto.getNearDuplicateIndicesSequences() != null && !dto.getNearDuplicateIndicesSequences().isEmpty());
     } else {
       dto.setPooledElements(Collections.emptySet());
-      dto.setDuplicateIndices(!getIndexSequencesWithMinimumEditDistance(indices, errorEditDistance).isEmpty());
-      dto.setNearDuplicateIndices(!getIndexSequencesWithMinimumEditDistance(indices, warningEditDistance).isEmpty());
+      dto.setDuplicateIndices(from.getDuplicateIndicesSequences() != null && !from.getDuplicateIndicesSequences().isEmpty());
+      dto.setNearDuplicateIndices(from.getNearDuplicateIndicesSequences() != null && !from.getNearDuplicateIndicesSequences().isEmpty());
     }
     dto.setHasEmptySequence(from.hasLibrariesWithoutIndex());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
@@ -1740,46 +1738,7 @@ public class Dtos {
     return dto;
   }
 
-  private static Set<String> getIndexSequencesWithMinimumEditDistance(List<List<Index>> indices, int minAllowableEditDistance) {
-    Set<String> nearMatchSequences = new HashSet<>();
-    if (indices.stream().flatMap(List::stream).allMatch(index -> hasFakeSequence(index)))
-      return Collections.emptySet();
-    for (int i = 0; i < indices.size(); i++) {
-      String sequence1 = getCombinedIndexSequences(indices.get(i));
-      if (sequence1.length() == 0) {
-        continue;
-      }
-      for (int j = i + 1; j < indices.size(); j++) {
-        String sequence2 = getCombinedIndexSequences(indices.get(j));
-        if (sequence2.length() == 0 || !isCheckNecessary(indices.get(i), indices.get(j), minAllowableEditDistance)) {
-          continue;
-        }
-        if (Index.checkEditDistance(sequence1, sequence2) < minAllowableEditDistance) {
-          nearMatchSequences.add(sequence1);
-          nearMatchSequences.add(sequence2);
-        }
-      }
-    }
-    return nearMatchSequences;
-  }
-
-  private static boolean hasFakeSequence(Index index) {
-    return index == null ? false : index.getFamily().hasFakeSequence();
-  }
-
-  private static boolean isCheckNecessary(List<Index> indices1, List<Index> indices2, int minimumDistance) {
-    return !(indices1.stream().anyMatch(index -> hasFakeSequence(index)) || indices2.stream().anyMatch(index -> hasFakeSequence(index))
-        && (getCombinedIndexSequences(indices2).length() != getCombinedIndexSequences(indices2).length()));
-  }
-
-  private static String getCombinedIndexSequences(List<Index> indices) {
-    return indices.stream()
-        .sorted((i1, i2) -> Integer.compare(i1.getPosition(), i2.getPosition()))
-        .map(Index::getSequence)
-        .collect(Collectors.joining("-"));
-  }
-
-  public static PoolDto asDto(@Nonnull ListPoolView from, int errorEditDistance, int warningEditDistance) {
+  public static PoolDto asDto(@Nonnull ListPoolView from) {
     PoolDto to = new PoolDto();
     setLong(to::setId, from.getId(), true);
     setString(to::setName, from.getName());
@@ -1803,9 +1762,8 @@ public class Dtos {
         .ifPresent(to::setInsertSize);
     to.setLibraryAliquotCount(from.getElements().size());
     setDateTimeString(to::setLastModified, from.getLastModified());
-    List<List<Index>> indices = from.getElements().stream().map(ListPoolViewElement::getIndices).collect(Collectors.toList());
-    to.setDuplicateIndices(!getIndexSequencesWithMinimumEditDistance(indices, errorEditDistance).isEmpty());
-    to.setNearDuplicateIndices(!getIndexSequencesWithMinimumEditDistance(indices, warningEditDistance).isEmpty());
+    to.setDuplicateIndices(!from.getDuplicateIndicesSequences().isEmpty());
+    to.setNearDuplicateIndices(!from.getNearDuplicateIndicesSequences().isEmpty());
     to.setHasEmptySequence(from.getElements().stream().anyMatch(element -> element.getIndices() == null || element.getIndices().isEmpty()));
     to.setPrioritySubprojectAliases(from.getPrioritySubprojectAliases());
     to.setPooledElements(from.getElements().stream()
@@ -1968,12 +1926,11 @@ public class Dtos {
     }
   }
 
-  public static ContainerDto asDto(@Nonnull SequencerPartitionContainer from, int errorEditDistance, int warningEditDistance) {
-    return asDto(from, false, false, errorEditDistance, warningEditDistance);
+  public static ContainerDto asDto(@Nonnull SequencerPartitionContainer from) {
+    return asDto(from, false, false);
   }
 
-  public static ContainerDto asDto(@Nonnull SequencerPartitionContainer from, boolean includePartitions, boolean includePoolContents,
-      int errorEditDistance, int warningEditDistance) {
+  public static ContainerDto asDto(@Nonnull SequencerPartitionContainer from, boolean includePartitions, boolean includePoolContents) {
     ContainerDto dto = null;
     if (from instanceof OxfordNanoporeContainer) {
       OxfordNanoporeContainer ontFrom = (OxfordNanoporeContainer) from;
@@ -2009,7 +1966,7 @@ public class Dtos {
     }
 
     if (includePartitions) {
-      dto.setPartitions(asPartitionDtos(from.getPartitions(), includePoolContents, errorEditDistance, warningEditDistance));
+      dto.setPartitions(asPartitionDtos(from.getPartitions(), includePoolContents));
     }
     return dto;
   }
@@ -2066,11 +2023,10 @@ public class Dtos {
     return dto;
   }
 
-  public static List<PartitionDto> asPartitionDtos(@Nonnull Collection<Partition> partitionSubset, boolean includePoolContents,
-      int errorEditDistance, int warningEditDistance) {
+  public static List<PartitionDto> asPartitionDtos(@Nonnull Collection<Partition> partitionSubset, boolean includePoolContents) {
     List<PartitionDto> dtoList = new ArrayList<>();
     for (Partition partition : partitionSubset) {
-      dtoList.add(asDto(partition, includePoolContents, errorEditDistance, warningEditDistance));
+      dtoList.add(asDto(partition, includePoolContents));
     }
     return dtoList;
   }
@@ -2132,11 +2088,10 @@ public class Dtos {
     return qcTypeSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  public static SequencingOrderCompletionDto asDto(@Nonnull SequencingOrderCompletion from, int errorEditDistance,
-      int warningEditDistance) {
+  public static SequencingOrderCompletionDto asDto(@Nonnull SequencingOrderCompletion from) {
     SequencingOrderCompletionDto dto = new SequencingOrderCompletionDto();
     dto.setId(from.getPool().getId() + "_" + from.getSequencingParameters().getId());
-    dto.setPool(asDto(from.getPool(), false, false, errorEditDistance, warningEditDistance));
+    dto.setPool(asDto(from.getPool(), false, false));
     dto.setParameters(asDto(from.getSequencingParameters()));
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
     dto.setRemaining(from.getRemaining());
@@ -2677,17 +2632,17 @@ public class Dtos {
     return to;
   }
 
-  public static PartitionDto asDto(@Nonnull Partition from, int errorEditDistance, int warningEditDistance) {
-    return asDto(from, false, errorEditDistance, warningEditDistance);
+  public static PartitionDto asDto(@Nonnull Partition from) {
+    return asDto(from, false);
   }
 
-  public static PartitionDto asDto(@Nonnull Partition from, boolean includePoolContents, int errorEditDistance, int warningEditDistance) {
+  public static PartitionDto asDto(@Nonnull Partition from, boolean includePoolContents) {
     PartitionDto dto = new PartitionDto();
     dto.setId(from.getId());
     dto.setContainerId(from.getSequencerPartitionContainer().getId());
     dto.setContainerName(from.getSequencerPartitionContainer().getIdentificationBarcode());
     dto.setPartitionNumber(from.getPartitionNumber());
-    dto.setPool(from.getPool() == null ? null : asDto(from.getPool(), includePoolContents, false, errorEditDistance, warningEditDistance));
+    dto.setPool(from.getPool() == null ? null : asDto(from.getPool(), includePoolContents, false));
     setString(dto::setLoadingConcentration, from.getLoadingConcentration());
     dto.setLoadingConcentrationUnits(from.getLoadingConcentrationUnits());
     return dto;
@@ -2713,7 +2668,7 @@ public class Dtos {
     return to;
   }
 
-  public static ExperimentDto asDto(@Nonnull Experiment from, int errorEditDistance, int warningEditDistance) {
+  public static ExperimentDto asDto(@Nonnull Experiment from) {
     ExperimentDto dto = new ExperimentDto();
     dto.setId(from.getId());
     dto.setAccession(from.getAccession());
@@ -2724,7 +2679,7 @@ public class Dtos {
     dto.setLibrary(asDto(from.getLibrary(), false));
     dto.setPartitions(from.getRunPartitions().stream()
         .map(entry -> new ExperimentDto.RunPartitionDto(asDto(entry.getRun()),
-            asDto(entry.getPartition(), errorEditDistance, warningEditDistance)))
+            asDto(entry.getPartition())))
         .collect(Collectors.toList()));
     dto.setStudy(asDto(from.getStudy()));
     dto.setTitle(from.getTitle());
@@ -2965,8 +2920,7 @@ public class Dtos {
               .collect(Collectors.groupingBy(Pool::getId)).values().stream()//
               .map(l -> l.get(0))//
               .sorted((a, b) -> a.getAlias().compareTo(b.getAlias()))//
-              .map(p -> asDto(p, false, false, 16, 16))// "16" is fake numbers because we never want to display duplicate indices
-                                                       // warnings on the Instrument Status object
+              .map(p -> asDto(p, false, false))
               .collect(Collectors.toList()));
       ServiceRecord instrumentOutOfServiceRecord = from.getInstrument().getServiceRecords().stream()
           .filter(sr -> sr.isOutOfService() && sr.getStartTime() != null && sr.getEndTime() == null

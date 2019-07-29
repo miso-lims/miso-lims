@@ -91,6 +91,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleLCMTubeDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -108,10 +109,8 @@ public class SampleRestController extends RestController {
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
-  @Value("${miso.error.edit.distance:2}")
-  public int errorEditDistance;
-  @Value("${miso.warning.edit.distance:3}")
-  public int warningEditDistance;
+  @Autowired
+  private DuplicateIndicesChecker indexChecker;
 
   public Boolean isDetailedSampleEnabled() {
     return detailedSample;
@@ -395,7 +394,9 @@ public class SampleRestController extends RestController {
 
         @Override
         public PoolDto asDto(Pool model) {
-          return Dtos.asDto(model, false, false, errorEditDistance, warningEditDistance);
+          model.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(model));
+          model.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(model));
+          return Dtos.asDto(model, false, false);
         }
 
         @Override

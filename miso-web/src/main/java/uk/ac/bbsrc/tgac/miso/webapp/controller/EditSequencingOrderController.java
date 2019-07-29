@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
 
 @Controller
@@ -27,10 +27,8 @@ public class EditSequencingOrderController {
 
   @Autowired
   private PoolService poolService;
-  @Value("${miso.error.edit.distance:2}")
-  public int errorEditDistance;
-  @Value("${miso.warning.edit.distance:3}")
-  public int warningEditDistance;
+  @Autowired
+  private DuplicateIndicesChecker indexChecker;
 
   private final BulkPropagateTableBackend<Pool, SequencingOrderDto> orderBulkPropagateBackend = new BulkPropagateTableBackend<Pool, SequencingOrderDto>(
       "sequencingorder", SequencingOrderDto.class, "Sequencing Orders", "Pools") {
@@ -38,7 +36,9 @@ public class EditSequencingOrderController {
     @Override
     protected SequencingOrderDto createDtoFromParent(Pool item) {
       SequencingOrderDto dto = new SequencingOrderDto();
-      dto.setPool(Dtos.asDto(item, false, false, errorEditDistance, warningEditDistance));
+      item.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(item));
+      item.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(item));
+      dto.setPool(Dtos.asDto(item, false, false));
       return dto;
     }
 

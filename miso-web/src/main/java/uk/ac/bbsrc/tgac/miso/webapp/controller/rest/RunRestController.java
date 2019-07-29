@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -143,10 +142,6 @@ public class RunRestController extends RestController {
   private LibraryService libraryService;
   @Autowired
   private ExperimentService experimentService;
-  @Value("${miso.error.edit.distance:2}")
-  public int errorEditDistance;
-  @Value("${miso.warning.edit.distance:3}")
-  public int warningEditDistance;
 
   private final JQueryDataTableBackend<Run, RunDto> jQueryBackend = new JQueryDataTableBackend<Run, RunDto>() {
 
@@ -352,7 +347,7 @@ public class RunRestController extends RestController {
     Map<Library, List<Partition>> libraryGroups = getLibraryGroups(run);
 
     return libraryGroups.entrySet().stream().map(group -> new Pair<>(group.getKey(),
-        group.getValue().stream().map(partition -> Dtos.asDto(partition, errorEditDistance, warningEditDistance))
+        group.getValue().stream().map(partition -> Dtos.asDto(partition))
             .map(partitionDto -> new RunPartitionDto(runDto, partitionDto))
             .collect(Collectors.toList())))
         .map(group -> {
@@ -402,8 +397,8 @@ public class RunRestController extends RestController {
                 .filter(partition -> experiment.getRunPartitions().stream().noneMatch(rp -> rp.getPartition().equals(partition)))
                 .map(partition -> {
                   AddRequest request = new AddRequest();
-                  request.experiment = Dtos.asDto(experiment, errorEditDistance, warningEditDistance);
-                  request.partition = Dtos.asDto(partition, errorEditDistance, warningEditDistance);
+                  request.experiment = Dtos.asDto(experiment);
+                  request.partition = Dtos.asDto(partition);
                   return request;
                 }))))
         .collect(Collectors.toList());

@@ -105,6 +105,7 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
@@ -176,10 +177,8 @@ public class EditLibraryController {
   private LibraryTemplateService libraryTemplateService;
   @Autowired
   private BoxService boxService;
-  @Value("${miso.error.edit.distance:2}")
-  public int errorEditDistance;
-  @Value("${miso.warning.edit.distance:3}")
-  public int warningEditDistance;
+  @Autowired
+  private DuplicateIndicesChecker indexChecker;
 
   public NamingScheme getNamingScheme() {
     return namingScheme;
@@ -294,8 +293,12 @@ public class EditLibraryController {
     addAdjacentLibraries(library, model);
 
     Collection<Pool> pools = poolService.listByLibraryId(library.getId());
+    pools.forEach(p -> {
+      p.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p));
+      p.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p));
+    });
     model.put("libraryPools",
-        pools.stream().map(p -> Dtos.asDto(p, false, false, errorEditDistance, warningEditDistance)).collect(Collectors.toList()));
+        pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
     model.put("libraryRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
         .collect(Collectors.toList()));
     model.put("libraryAliquots", library.getLibraryAliquots().stream()
@@ -305,7 +308,7 @@ public class EditLibraryController {
     config.putPOJO("library", Dtos.asDto(library, false));
     model.put("libraryAliquotsConfig", mapper.writeValueAsString(config));
     model.put("experiments",
-        experimentService.listAllByLibraryId(library.getId()).stream().map(exp -> Dtos.asDto(exp, errorEditDistance, warningEditDistance))
+        experimentService.listAllByLibraryId(library.getId()).stream().map(exp -> Dtos.asDto(exp))
         .collect(Collectors.toList()));
     model.put("libraryDto", mapper.writeValueAsString(Dtos.asDto(library, false)));
 

@@ -33,7 +33,6 @@ import javax.ws.rs.QueryParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,10 +60,6 @@ public class EditSubmissionController {
   private SubmissionService submissionService;
   @Autowired
   private ExperimentService experimentService;
-  @Value("${miso.error.edit.distance:2}")
-  public int errorEditDistance;
-  @Value("${miso.warning.edit.distance:3}")
-  public int warningEditDistance;
 
   @GetMapping(value = "/new")
   public ModelAndView newSubmission(@QueryParam("experimentIds") String experimentIds, ModelMap model) throws IOException {
@@ -86,7 +81,7 @@ public class EditSubmissionController {
     model.put("submission", submission);
     ObjectMapper mapper = new ObjectMapper();
     model.put("submissionDto", mapper.writeValueAsString(Dtos.asDto(submission)));
-    model.put("experiments", submission.getExperiments().stream().map(expt -> Dtos.asDto(expt, errorEditDistance, warningEditDistance))
+    model.put("experiments", submission.getExperiments().stream().map(expt -> Dtos.asDto(expt))
         .collect(Collectors.toList()));
     return new ModelAndView("/WEB-INF/pages/editSubmission.jsp", model);
   }

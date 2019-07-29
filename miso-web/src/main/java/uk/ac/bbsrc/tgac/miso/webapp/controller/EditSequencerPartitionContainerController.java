@@ -32,7 +32,6 @@ import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
@@ -59,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 
 @Controller
 @RequestMapping("/container")
@@ -72,10 +72,8 @@ public class EditSequencerPartitionContainerController {
   private RunService runService;
   @Autowired
   private ContainerModelService containerModelService;
-  @Value("${miso.error.edit.distance:2}")
-  public int errorEditDistance;
-  @Value("${miso.warning.edit.distance:3}")
-  public int warningEditDistance;
+  @Autowired
+  private DuplicateIndicesChecker indexChecker;
 
   /**
    * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects
@@ -152,13 +150,17 @@ public class EditSequencerPartitionContainerController {
 
   private ModelAndView setupForm(SequencerPartitionContainer container, ModelMap model) throws IOException {
     model.put("container", container);
+    container.getPartitions().forEach(p -> {
+      p.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p.getPool()));
+      p.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p.getPool()));
+    });
     model.put("containerPartitions",
-        container.getPartitions().stream().map(partition -> Dtos.asDto(partition, false, errorEditDistance, warningEditDistance))
+        container.getPartitions().stream().map(partition -> Dtos.asDto(partition, false))
             .collect(Collectors.toList()));
     model.put("containerRuns", runService.listByContainerId(container.getId()).stream().map(Dtos::asDto).collect(Collectors.toList()));
 
     ObjectMapper mapper = new ObjectMapper();
-    model.put("containerJSON", mapper.writer().writeValueAsString(Dtos.asDto(container, errorEditDistance, warningEditDistance)));
+    model.put("containerJSON", mapper.writer().writeValueAsString(Dtos.asDto(container)));
     model.put("poreVersions", containerService.listPoreVersions());
     return new ModelAndView("/WEB-INF/pages/editSequencerPartitionContainer.jsp", model);
   }

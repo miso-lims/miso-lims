@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -45,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
 
@@ -62,10 +62,8 @@ public class SequencingOrderRestController extends RestController {
   private PoolService poolService;
   @Autowired
   private OrderPurposeService orderPurposeService;
-  @Value("${miso.error.edit.distance:2}")
-  public int errorEditDistance;
-  @Value("${miso.warning.edit.distance:3}")
-  public int warningEditDistance;
+  @Autowired
+  private DuplicateIndicesChecker indexChecker;
 
   private final JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto> jQueryBackend = new JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto>() {
 
@@ -76,7 +74,9 @@ public class SequencingOrderRestController extends RestController {
 
     @Override
     protected SequencingOrderCompletionDto asDto(SequencingOrderCompletion model) {
-      return Dtos.asDto(model, errorEditDistance, warningEditDistance);
+      model.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(model.getPool()));
+      model.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(model.getPool()));
+      return Dtos.asDto(model);
     }
   };
 
@@ -96,7 +96,7 @@ public class SequencingOrderRestController extends RestController {
     if (result == null) {
       throw new RestException("No sequencing order found with ID: " + id, Status.NOT_FOUND);
     } else {
-      return Dtos.asDto(result, errorEditDistance, warningEditDistance);
+      return Dtos.asDto(result);
     }
   }
 
@@ -108,7 +108,7 @@ public class SequencingOrderRestController extends RestController {
     SequencingOrder seqOrder = Dtos.to(orderDto);
     Long id = sequencingOrderService.create(seqOrder);
     SequencingOrder saved = sequencingOrderService.get(id);
-    return Dtos.asDto(saved, errorEditDistance, warningEditDistance);
+    return Dtos.asDto(saved);
   }
   
   @GetMapping(value = "/sequencingorders/dt/completions/all/{platform}", produces = { "application/json" })
@@ -196,8 +196,10 @@ public class SequencingOrderRestController extends RestController {
   }
 
   private PoolPickerEntry orderTransform(SequencingOrderCompletion order) {
-    PoolDto poolDto = Dtos.asDto(order.getPool(), true, false, errorEditDistance, warningEditDistance);
-    SequencingOrderCompletionDto socDto = Dtos.asDto(order, errorEditDistance, warningEditDistance);
+    order.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(order.getPool()));
+    order.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(order.getPool()));
+    PoolDto poolDto = Dtos.asDto(order.getPool(), true, false);
+    SequencingOrderCompletionDto socDto = Dtos.asDto(order);
     return new PoolPickerEntry(poolDto,
         Collections.singletonList(socDto));
   }

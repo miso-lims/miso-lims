@@ -27,6 +27,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,7 +39,6 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -69,6 +69,7 @@ import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -80,16 +81,18 @@ public class ContainerRestController extends RestController {
   private ContainerService containerService;
   @Autowired
   private ContainerModelService containerModelService;
-  @Value("${miso.error.edit.distance:2}")
-  public int errorEditDistance;
-  @Value("${miso.warning.edit.distance:3}")
-  public int warningEditDistance;
+  @Autowired
+  private DuplicateIndicesChecker indexChecker;
 
   private final JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto> jQueryBackend = new JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto>() {
 
     @Override
     protected ContainerDto asDto(SequencerPartitionContainer model) {
-      return Dtos.asDto(model, errorEditDistance, warningEditDistance);
+      model.getPartitions().forEach(p -> {
+        p.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p.getPool()));
+        p.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p.getPool()));
+      });
+      return Dtos.asDto(model);
     }
 
     @Override
@@ -101,8 +104,15 @@ public class ContainerRestController extends RestController {
 
   @GetMapping(value = "/{containerBarcode}", produces = "application/json")
   public @ResponseBody List<ContainerDto> jsonRest(@PathVariable String containerBarcode) throws IOException {
-    return containerService.listByBarcode(containerBarcode).stream()
-        .map(container -> Dtos.asDto(container, errorEditDistance, warningEditDistance)).collect(Collectors.toList());
+    Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(containerBarcode);
+    containers.forEach(c -> {
+      c.getPartitions().forEach(p -> {
+        p.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p.getPool()));
+        p.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p.getPool()));
+      });
+    });
+
+    return containers.stream().map(container -> Dtos.asDto(container)).collect(Collectors.toList());
   }
 
   @GetMapping(value = "/dt", produces = "application/json")
@@ -206,7 +216,7 @@ public class ContainerRestController extends RestController {
       container.setModel(model);
       container.setPartitionLimit(model.getPartitionCount());
       return container;
-    }, containerService, container -> Dtos.asDto(container, errorEditDistance, warningEditDistance));
+    }, containerService, container -> Dtos.asDto(container));
 
   }
 
@@ -217,8 +227,12 @@ public class ContainerRestController extends RestController {
       SequencerPartitionContainer container = Dtos.to(d);
       // reset partitions since they're not intended to be modified by this method
       container.setPartitions(original.getPartitions());
+      container.getPartitions().forEach(p -> {
+        p.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p.getPool()));
+        p.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p.getPool()));
+      });
       return container;
-    }, containerService, container -> Dtos.asDto(container, errorEditDistance, warningEditDistance));
+    }, containerService, container -> Dtos.asDto(container));
   }
 
 }

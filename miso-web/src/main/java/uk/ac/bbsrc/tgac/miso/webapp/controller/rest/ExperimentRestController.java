@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -67,10 +66,6 @@ public class ExperimentRestController extends RestController {
   private KitService kitService;
   @Autowired
   private RunService runService;
-  @Value("${miso.error.edit.distance:2}")
-  public int errorEditDistance;
-  @Value("${miso.warning.edit.distance:3}")
-  public int warningEditDistance;
 
   @PostMapping(value = "/{experimentId}/addkit", produces = "application/json")
   public @ResponseBody KitConsumableDto addKit(@PathVariable Long experimentId, @RequestBody KitConsumableDto dto) throws IOException {
@@ -130,25 +125,25 @@ public class ExperimentRestController extends RestController {
   @PostMapping(produces = "application/json")
   public @ResponseBody ExperimentDto create(@RequestBody ExperimentDto dto) throws IOException {
     return RestUtils.createObject("Experiment", dto, Dtos::to, experimentService,
-        expt -> Dtos.asDto(expt, errorEditDistance, warningEditDistance));
+        expt -> Dtos.asDto(expt));
   }
 
   @PutMapping("/{experimentId}")
   public @ResponseBody ExperimentDto update(@PathVariable long experimentId, @RequestBody ExperimentDto dto) throws IOException {
     return RestUtils.updateObject("Experiment", experimentId, dto, Dtos::to, experimentService,
-        expt -> Dtos.asDto(expt, errorEditDistance, warningEditDistance));
+        expt -> Dtos.asDto(expt));
   }
 
   @GetMapping(value = "/{experimentId}", produces = "application/json")
   public @ResponseBody ExperimentDto get(@PathVariable Long experimentId) throws IOException {
     return RestUtils.getObject("Experiment", experimentId, experimentService,
-        expt -> Dtos.asDto(expt, errorEditDistance, warningEditDistance));
+        expt -> Dtos.asDto(expt));
   }
 
   @GetMapping(produces = "application/json")
   public @ResponseBody List<ExperimentDto> list() throws IOException {
     Collection<Experiment> experiments = experimentService.list();
-    return experiments.stream().map(expt -> Dtos.asDto(expt, errorEditDistance, warningEditDistance)).collect(Collectors.toList());
+    return experiments.stream().map(expt -> Dtos.asDto(expt)).collect(Collectors.toList());
   }
 
 }

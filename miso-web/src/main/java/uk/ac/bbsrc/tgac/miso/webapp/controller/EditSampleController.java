@@ -99,6 +99,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleStockSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
@@ -169,10 +170,8 @@ public class EditSampleController {
   private String defaultLcmTubeGroupId;
   @Value("${miso.defaults.sample.lcmtube.groupdescription:}")
   private String defaultLcmTubeGroupDesc;
-  @Value("${miso.error.edit.distance:2}")
-  public int errorEditDistance;
-  @Value("${miso.warning.edit.distance:3}")
-  public int warningEditDistance;
+  @Autowired
+  private DuplicateIndicesChecker indexChecker;
 
   private Boolean isDetailedSampleEnabled() {
     return detailedSample;
@@ -260,8 +259,12 @@ public class EditSampleController {
     List<RunDto> runDtos = pools.stream().flatMap(WhineyFunction.flatRethrow(pool -> runService.listByPoolId(pool.getId())))
         .map(Dtos::asDto)
         .collect(Collectors.toList());
+    pools.forEach(p -> {
+      p.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p));
+      p.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p));
+    });
     model.put("samplePools",
-        pools.stream().map(p -> Dtos.asDto(p, false, false, errorEditDistance, warningEditDistance)).collect(Collectors.toList()));
+        pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
     model.put("sampleRuns", runDtos);
     model.put("sampleRelations", getRelations(sample));
     addArrayData(sampleId, model);

@@ -1,0 +1,107 @@
+package uk.ac.bbsrc.tgac.miso.webapp.controller.component;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+
+@Component
+public class DuplicateIndicesChecker {
+
+  @Value("${miso.error.edit.distance:2}")
+  public int errorEditDistance;
+  @Value("${miso.warning.edit.distance:3}")
+  public int warningEditDistance;
+
+  public Set<String> getDuplicateIndicesSequences(Pool pool) {
+    if (pool == null) return Collections.emptySet();
+    List<List<Index>> indices = getIndexSequences(pool);
+    return getIndexSequencesWithMinimumEditDistance(indices, errorEditDistance);
+  }
+
+  public Set<String> getNearDuplicateIndicesSequences(Pool pool) {
+    if (pool == null) return Collections.emptySet();
+    List<List<Index>> indices = getIndexSequences(pool);
+    return getIndexSequencesWithMinimumEditDistance(indices, warningEditDistance);
+  }
+
+  public Set<String> getDuplicateIndicesSequences(ListPoolView pool) {
+    if (pool == null) return Collections.emptySet();
+    List<List<Index>> indices = getIndexSequences(pool);
+    return getIndexSequencesWithMinimumEditDistance(indices, errorEditDistance);
+  }
+
+  public Set<String> getNearDuplicateIndicesSequences(ListPoolView pool) {
+    if (pool == null) return Collections.emptySet();
+    List<List<Index>> indices = getIndexSequences(pool);
+    return getIndexSequencesWithMinimumEditDistance(indices, warningEditDistance);
+  }
+
+  public static Set<String> getIndexSequencesWithMinimumEditDistance(Pool pool, int minAllowableEditDistance) {
+    if (pool == null) return Collections.emptySet();
+    List<List<Index>> indices = getIndexSequences(pool);
+    return getIndexSequencesWithMinimumEditDistance(indices, minAllowableEditDistance);
+  }
+
+  public static Set<String> getIndexSequencesWithMinimumEditDistance(List<List<Index>> indices, int minAllowableEditDistance) {
+    Set<String> nearMatchSequences = new HashSet<>();
+    if (indices.stream().flatMap(List::stream).allMatch(index -> hasFakeSequence(index)))
+      return Collections.emptySet();
+    for (int i = 0; i < indices.size(); i++) {
+      String sequence1 = getCombinedIndexSequences(indices.get(i));
+      if (sequence1.length() == 0) {
+        continue;
+      }
+      for (int j = i + 1; j < indices.size(); j++) {
+        String sequence2 = getCombinedIndexSequences(indices.get(j));
+        if (sequence2.length() == 0 || !isCheckNecessary(indices.get(i), indices.get(j), minAllowableEditDistance)) {
+          continue;
+        }
+        if (Index.checkEditDistance(sequence1, sequence2) < minAllowableEditDistance) {
+          nearMatchSequences.add(sequence1);
+          nearMatchSequences.add(sequence2);
+        }
+      }
+    }
+    return nearMatchSequences;
+  }
+
+  private static boolean hasFakeSequence(Index index) {
+    return index == null ? false : index.getFamily().hasFakeSequence();
+  }
+
+  private static boolean isCheckNecessary(List<Index> indices1, List<Index> indices2, int minimumDistance) {
+    return !(indices1.stream().anyMatch(index -> hasFakeSequence(index)) || indices2.stream().anyMatch(index -> hasFakeSequence(index))
+        && (getCombinedIndexSequences(indices2).length() != getCombinedIndexSequences(indices2).length()));
+  }
+
+  private static String getCombinedIndexSequences(List<Index> indices) {
+    return indices.stream()
+        .sorted((i1, i2) -> Integer.compare(i1.getPosition(), i2.getPosition()))
+        .map(Index::getSequence)
+        .collect(Collectors.joining("-"));
+  }
+
+  private static List<List<Index>> getIndexSequences(Pool pool) {
+    return pool.getPoolContents().stream().map(PoolElement::getPoolableElementView)
+        .map(PoolableElementView::getIndices)
+        .collect(Collectors.toList());
+  }
+
+  private static List<List<Index>> getIndexSequences(ListPoolView pool) {
+    return pool.getElements().stream()
+        .map(ListPoolViewElement::getIndices)
+        .collect(Collectors.toList());
+  }
+}

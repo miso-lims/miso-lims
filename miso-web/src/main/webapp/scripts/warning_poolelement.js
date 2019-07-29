@@ -35,7 +35,7 @@ WarningTarget.poolelement = {
 
         var combined = indices.map(function(index) {
           return index.sequence;
-        }).join('');
+        }).join('-');
 
         return [
             {

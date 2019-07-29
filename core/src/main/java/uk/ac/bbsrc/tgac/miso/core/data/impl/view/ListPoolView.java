@@ -17,6 +17,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Immutable;
 
@@ -79,6 +80,11 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
 
   @OneToMany(mappedBy = "pool")
   private List<ListPoolViewElement> elements;
+
+  @Transient
+  private Set<String> duplicateIndicesSequences;
+  @Transient
+  private Set<String> nearDuplicateIndicesSequences;
 
   @Override
   public long getId() {
@@ -258,6 +264,22 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
 
   public boolean hasLowQualityMembers() {
     return getElements().stream().anyMatch(element -> element.isLowQuality());
+  }
+
+  public Set<String> getDuplicateIndicesSequences() {
+    return duplicateIndicesSequences;
+  }
+
+  public void setDuplicateIndicesSequences(Set<String> duplicateIndicesSequences) {
+    this.duplicateIndicesSequences = duplicateIndicesSequences;
+  }
+
+  public Set<String> getNearDuplicateIndicesSequences() {
+    return nearDuplicateIndicesSequences;
+  }
+
+  public void setNearDuplicateIndicesSequences(Set<String> nearDuplicateIndicesSequences) {
+    this.nearDuplicateIndicesSequences = nearDuplicateIndicesSequences;
   }
 
   @Override

@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -53,10 +52,6 @@ public class EditStudyController {
   private ProjectService projectService;
   @Autowired
   private StudyService studyService;
-  @Value("${miso.error.edit.distance:2}")
-  public int errorEditDistance;
-  @Value("${miso.warning.edit.distance:3}")
-  public int warningEditDistance;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -97,7 +92,7 @@ public class EditStudyController {
         .collect(Collectors.toList())));
 
     model.put("experiments",
-        study.getExperiments().stream().map(expt -> Dtos.asDto(expt, errorEditDistance, warningEditDistance)).collect(Collectors.toList()));
+        study.getExperiments().stream().map(expt -> Dtos.asDto(expt)).collect(Collectors.toList()));
     return new ModelAndView("/WEB-INF/pages/editStudy.jsp", model);
   }
 }

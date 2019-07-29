@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -76,6 +75,7 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
@@ -105,10 +105,8 @@ public class LibraryRestController extends RestController {
   private LibraryService libraryService;
   @Autowired
   private SampleRestController sampleController;
-  @Value("${miso.error.edit.distance:2}")
-  public int errorEditDistance;
-  @Value("${miso.warning.edit.distance:3}")
-  public int warningEditDistance;
+  @Autowired
+  private DuplicateIndicesChecker indexChecker;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
@@ -238,7 +236,9 @@ public class LibraryRestController extends RestController {
 
         @Override
         public PoolDto asDto(Pool model) {
-          return Dtos.asDto(model, false, false, errorEditDistance, warningEditDistance);
+          model.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(model));
+          model.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(model));
+          return Dtos.asDto(model, false, false);
         }
 
         @Override
