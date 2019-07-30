@@ -58,6 +58,8 @@ weekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Display Options" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Detailed Sample Mode" %}
+{% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Strict Index Checking" %}
 
 
 {% assign section = section | plus: 1 %}

@@ -1,8 +1,14 @@
 # Unreleased
+Changes:
 
   * Show _Assignee_ column in _Issue_ tables
   * Fixed bug that broke List Freezers page
   * Fixed bug in 'Pool custom'
+  * Introduces Strict Index Checking option, which when enabled prevents library aliquots from being added to pool when that would cause near-/duplicate indices
+  
+Upgrade Notes:
+
+  * miso.pools.strictIndexChecking now present in miso.properties. Default value is false, if property is not found 'false' is assumed.  
 
 # 0.2.185:
 

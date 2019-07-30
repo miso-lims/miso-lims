@@ -51,6 +51,9 @@ import uk.ac.bbsrc.tgac.miso.persistence.PoolStore;
 @Service
 public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool> {
 
+  @Value("${miso.pools.strictIndexChecking:false}")
+  private Boolean strictPools;
+
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
@@ -266,12 +269,48 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     return savedId;
   }
 
+  private void refreshPoolElements(Pool pool) throws IOException {
+    Set<PoolElement> pes = new HashSet<>();
+    for(PoolElement oldPe : pool.getPoolContents()){
+      PoolElement newPe = new PoolElement();
+      newPe.setPool(pool);
+      newPe.setProportion(oldPe.getProportion());
+      newPe.setPoolableElementView(poolableElementViewService.get(oldPe.getPoolableElementView().getAliquotId()));
+      pes.add(newPe);
+    }
+    pool.setPoolElements(pes);
+  }
+
+  private Set<String> getAllBadIndices(Pool pool){
+    Set<String> indices = pool.getDuplicateIndicesSequences();
+    indices.addAll(pool.getNearDuplicateIndicesSequences());
+    return indices;
+  }
+
+  public void validateIndices(Pool pool, Pool beforeChange, Collection<ValidationError> errors) throws IOException {
+    refreshPoolElements(pool);
+    Set<String> indices = getAllBadIndices(pool);
+    Set<String> bcIndices = getAllBadIndices(beforeChange);
+
+    if(indices.size() > bcIndices.size()){ // If this change introduces new conflicts
+      String errorMessage = "Pools may not contain Library Aliquots with indices with 2 or fewer positions of difference, please address the following conflicts: ";
+      indices.removeAll(bcIndices);
+
+      for (String index : indices){
+        errorMessage += index + " ";
+      }
+
+      errors.add(new ValidationError("poolElements", errorMessage));
+    }
+  }
+
   private void validateChange(Pool pool, Pool beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
     validateConcentrationUnits(pool.getConcentration(), pool.getConcentrationUnits(), errors);
     validateVolumeUnits(pool.getVolume(), pool.getVolumeUnits(), errors);
     validateBarcodeUniqueness(pool, beforeChange, poolStore::getByBarcode, errors, "pool");
+    if (strictPools) validateIndices(pool, beforeChange, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);

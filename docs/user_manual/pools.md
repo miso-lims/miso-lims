@@ -114,6 +114,9 @@ and select the aliquots that you wish to add to the pool. You can search aliquot
 the table. Once you have selected the appropriate aliquots, click the "Add" button in the toolbar at the top of the
 table to add the library aliquots to the pool.
 
+If your site has [Strict Index Checking](site_configuration.html) rules enabled, library aliquots cannot be added to 
+pools when the library aliquots have indices which are duplicates or near-duplicates. 
+
 {% include userman-toplink.md %}
 
 

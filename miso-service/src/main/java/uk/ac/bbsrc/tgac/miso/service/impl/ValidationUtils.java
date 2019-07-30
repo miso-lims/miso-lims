@@ -27,7 +27,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 
 public class ValidationUtils {
-
   private ValidationUtils() {
     throw new IllegalStateException("Static util class not intended for instantiation");
   }
