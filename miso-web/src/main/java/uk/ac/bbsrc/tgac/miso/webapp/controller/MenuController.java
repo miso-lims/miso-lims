@@ -100,6 +100,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibrarySpikeInService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryStrategyService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.OrderPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.core.service.ReferenceGenomeService;
@@ -205,6 +206,8 @@ public class MenuController implements ServletContextAware {
   private ContainerModelService containerModelService;
   @Autowired
   private AttachmentCategoryService attachmentCategoryService;
+  @Autowired
+  private OrderPurposeService orderPurposeService;
 
   @Autowired
   private NamingScheme namingScheme;
@@ -327,7 +330,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, node, "stains", stainService.list(), Dtos::asDto);
     createArray(mapper, node, "targetedSequencings", targetedSequencingService.list(), Dtos::asDto);
     createArray(mapper, node, "samplePurposes", samplePurposeService.list(), Dtos::asDto);
-    createArray(mapper, node, "sequencingParameters", sequencingParametersService.getAll(), Dtos::asDto);
+    createArray(mapper, node, "sequencingParameters", sequencingParametersService.list(), Dtos::asDto);
     createArray(mapper, node, "printerBackends", Arrays.asList(Backend.values()), Dtos::asDto);
     createArray(mapper, node, "printerDrivers", Arrays.asList(Driver.values()), Dtos::asDto);
     createArray(mapper, node, "printerLayouts", Arrays.asList(Layout.values()), Dtos::asDto);
@@ -340,6 +343,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, node, "poreVersions", containerService.listPoreVersions(), Dtos::asDto);
     createArray(mapper, node, "spikeIns", librarySpikeInService.list(), Dtos::asDto);
     createArray(mapper, node, "attachmentCategories", attachmentCategoryService.list(), Dtos::asDto);
+    createArray(mapper, node, "orderPurposes", orderPurposeService.list(), Dtos::asDto);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);

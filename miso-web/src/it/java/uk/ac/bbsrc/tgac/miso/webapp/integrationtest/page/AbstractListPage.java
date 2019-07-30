@@ -28,7 +28,6 @@ public interface AbstractListPage {
     public static final String DATE_CREATED = "Date Created";
     public static final String DEFAULT_SCI_NAME = "Default Scientific Name";
     public static final String DESCRIPTION = "Description";
-    public static final String LIBRARY_ALIQUOTS = "Library Aliquots";
     public static final String DRIVER = "Driver";
     public static final String END_DATE = "End Date";
     public static final String EXTERNAL = "External";
@@ -54,6 +53,7 @@ public interface AbstractListPage {
     public static final String LAST_SEQUENCER = "Last Sequencer Used";
     public static final String LAYOUT = "Layout";
     public static final String LIBRARY_ALIAS = "Library Alias";
+    public static final String LIBRARY_ALIQUOTS = "Library Aliquots";
     public static final String LIBRARY_DESIGN_CODE = "Design Code";
     public static final String LIBRARY_NAME = "Library Name";
     public static final String LIBRARY_SELECTION = "Selection";
@@ -72,12 +72,14 @@ public interface AbstractListPage {
     public static final String ORDER_DESCRIPTION = "Order Description";
     public static final String ORDER_FULFILLED = "Order Fulfilled";
     public static final String PART_NUMBER = "Part Number";
+    public static final String PARTITIONS = "Partitions";
     public static final String PLATFORM = "Platform";
     public static final String POOL = "Pool";
     public static final String POOL_DESCRIPTION = "Pool Description";
     public static final String POSITION = "Position";
     public static final String PRINTER = "Printer";
     public static final String PROGRESS = "Progress";
+    public static final String PURPOSE = "Purpose";
     public static final String QC_NOTE = "QC Note";
     public static final String QC_PASSED = "QC Passed";
     public static final String QC_STATUS = "QC Status";
@@ -139,8 +141,10 @@ public interface AbstractListPage {
     public static final String ORDERS_ALL = "sequencingorders/all";
     public static final String ORDERS_IN_PROGRESS = "sequencingorders/in-progress";
     public static final String ORDERS_OUTSTANDING = "sequencingorders/outstanding";
+    public static final String ORDER_PURPOSES = "orderpurpose/list";
     public static final String PARTITION_QC_TYPE = "partitionqctype/list";
     public static final String POOLS = "pools";
+    public static final String POOL_ORDERS = "poolorders";
     public static final String PRINTERS = "printers";
     public static final String PROJECTS = "projects";
     public static final String REFERENCE_GENOMES = "referencegenome/list";

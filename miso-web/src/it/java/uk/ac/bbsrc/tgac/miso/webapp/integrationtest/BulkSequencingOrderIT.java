@@ -17,11 +17,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkOrderPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkOrderPage.Columns;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSequencingOrderPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSequencingOrderPage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
-public class BulkOrderIT extends AbstractIT {
+public class BulkSequencingOrderIT extends AbstractIT {
 
   @Before
   public void setup() {
@@ -30,10 +30,10 @@ public class BulkOrderIT extends AbstractIT {
 
   @Test
   public void testCreateSetup() {
-    BulkOrderPage page = BulkOrderPage.getForCreate(getDriver(), getBaseUrl(), Sets.newHashSet(120001L, 120002L, 120003L));
+    BulkSequencingOrderPage page = BulkSequencingOrderPage.getForCreate(getDriver(), getBaseUrl(), Sets.newHashSet(120001L, 120002L, 120003L));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    List<String> expectedColumns = BulkOrderPage.Columns.all();
+    List<String> expectedColumns = BulkSequencingOrderPage.Columns.all();
     assertEquals(expectedColumns.size(), headings.size());
     for (String col : expectedColumns) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
@@ -43,7 +43,7 @@ public class BulkOrderIT extends AbstractIT {
 
   @Test
   public void testCreate() {
-    BulkOrderPage page = BulkOrderPage.getForCreate(getDriver(), getBaseUrl(), Sets.newHashSet(120001L));
+    BulkSequencingOrderPage page = BulkSequencingOrderPage.getForCreate(getDriver(), getBaseUrl(), Sets.newHashSet(120001L));
     HandsOnTable table = page.getTable();
 
     // test initial values
@@ -54,6 +54,7 @@ public class BulkOrderIT extends AbstractIT {
 
     // make changes
     Map<String, String> changes = Maps.newLinkedHashMap();
+    changes.put(Columns.PURPOSE, "Production");
     changes.put(Columns.INSTRUMENT_MODEL, "Illumina HiSeq 2500");
     changes.put(Columns.PARAMETERS, "1x151");
     changes.put(Columns.PARTITIONS, "3");

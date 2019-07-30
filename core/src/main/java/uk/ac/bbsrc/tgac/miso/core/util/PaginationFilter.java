@@ -152,6 +152,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter draft(final boolean isDraft) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByDraft(item, isDraft, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter ghost(boolean isGhost) {
     return new PaginationFilter() {
 

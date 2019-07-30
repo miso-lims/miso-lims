@@ -15,30 +15,35 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.NotesSection;
 public class PoolPage extends FormPage<PoolPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
-    ID(By.id("id"), FieldType.LABEL),
-    NAME(By.id("name"), FieldType.LABEL),
-    ALIAS(By.id("alias"), FieldType.TEXT),
-    BARCODE(By.id("identificationBarcode"), FieldType.TEXT),
-    DESCRIPTION(By.id("description"), FieldType.TEXT),
-    PLATFORM(By.id("platformType"), FieldType.DROPDOWN),
-    CONCENTRATION(By.id("concentration"), FieldType.TEXT),
-    CREATE_DATE(By.id("creationDate"), FieldType.TEXT),
-    QC_PASSED(By.id("qcPassed"), FieldType.DROPDOWN),
-    VOLUME(By.id("volume"), FieldType.TEXT),
-    DISCARDED(By.id("discarded"), FieldType.CHECKBOX),
-    DISTRIBUTED(By.id("distributed"), FieldType.CHECKBOX),
-    DISTRIBUTION_DATE(By.id("distributionDate"), FieldType.TEXT), //
-    DISTRIBUTION_RECIPIENT(By.id("distributionRecipient"), FieldType.TEXT),
-    LOCATION(By.id("boxPosition"), FieldType.LABEL),
+    ID(By.id("poolForm_id")), //
+    NAME(By.id("poolForm_name")), //
+    ALIAS(By.id("poolForm_alias")), //
+    BARCODE(By.id("poolForm_identificationBarcode")), //
+    DESCRIPTION(By.id("poolForm_description")), //
+    PLATFORM(By.id("poolForm_platformType"), By.id("poolForm_platformTypeLabel")), //
+    CONCENTRATION(By.id("poolForm_concentration")), //
+    CREATE_DATE(By.id("poolForm_creationDate")), //
+    QC_PASSED(By.id("poolForm_qcPassed")), //
+    VOLUME(By.id("poolForm_volume")), //
+    DISCARDED(By.id("poolForm_discarded")), //
+    DISTRIBUTED(By.id("poolForm_distributed")), //
+    DISTRIBUTION_DATE(By.id("poolForm_distributionDate")), //
+    DISTRIBUTION_RECIPIENT(By.id("poolForm_distributionRecipient")), //
+    LOCATION(By.id("poolForm_boxPosition")), //
     
-    WARNINGS(By.className("big"), FieldType.LABEL);
+    WARNINGS(By.className("big")); //
 
     private final By selector;
-    private final FieldType type;
+    private final By labelSelector;
 
-    private Field(By selector, FieldType type) {
+    private Field(By selector) {
       this.selector = selector;
-      this.type = type;
+      this.labelSelector = null;
+    }
+
+    private Field(By selector, By labelSelector) {
+      this.selector = selector;
+      this.labelSelector = labelSelector;
     }
 
     @Override
@@ -47,8 +52,8 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     }
 
     @Override
-    public FieldType getType() {
-      return type;
+    public By getLabelSelector() {
+      return labelSelector;
     }
 
   } // end Field enum

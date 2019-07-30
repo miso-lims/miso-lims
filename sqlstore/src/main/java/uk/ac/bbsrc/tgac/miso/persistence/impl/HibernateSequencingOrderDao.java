@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -12,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingOrderDao;
 
@@ -65,6 +68,19 @@ public class HibernateSequencingOrderDao implements SequencingOrderDao {
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
+  }
+
+  @Override
+  public List<SequencingOrder> listByAttributes(Pool pool, OrderPurpose purpose, SequencingParameters parameters, Integer partitions)
+      throws IOException {
+    @SuppressWarnings("unchecked")
+    List<SequencingOrder> records = currentSession().createCriteria(SequencingOrderImpl.class)
+        .add(Restrictions.eq("pool", pool))
+        .add(Restrictions.eq("purpose", purpose))
+        .add(Restrictions.eq("parameters", parameters))
+        .add(Restrictions.eq("partitions", partitions))
+        .list();
+    return records;
   }
 
 }

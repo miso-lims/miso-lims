@@ -11,6 +11,8 @@ public class SequencingOrderDto {
   private Long updatedById;
   private String lastUpdated;
   private String description;
+  private Long purposeId;
+  private String purposeAlias;
 
 
   public Long getId() {
@@ -83,6 +85,22 @@ public class SequencingOrderDto {
 
   public void setDescription(String description){
     this.description = description;
+  }
+
+  public Long getPurposeId() {
+    return purposeId;
+  }
+
+  public void setPurposeId(Long purposeId) {
+    this.purposeId = purposeId;
+  }
+
+  public String getPurposeAlias() {
+    return purposeAlias;
+  }
+
+  public void setPurposeAlias(String purposeAlias) {
+    this.purposeAlias = purposeAlias;
   }
 
 }

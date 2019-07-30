@@ -153,15 +153,9 @@ ListTarget.poolelement = {
               return a.position - b.position;
             });
 
-            var combined = indices.map(function(index) {
-              return index.sequence;
-            }).join('');
-
-            var html = indices.map(function(index) {
+            return indices.map(function(index) {
               return index.label;
             }).join(', ');
-
-            return html;
           }
         }, {
           sTitle: 'Last Modified',

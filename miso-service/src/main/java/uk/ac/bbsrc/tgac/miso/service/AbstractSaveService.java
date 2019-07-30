@@ -27,6 +27,7 @@ public abstract class AbstractSaveService<T extends Identifiable> implements Sav
     authorizeSave(object);
     loadChildEntities(object);
     validateChange(object, null);
+    beforeSave(object);
     return getDao().create(object);
   }
 
@@ -37,6 +38,7 @@ public abstract class AbstractSaveService<T extends Identifiable> implements Sav
     loadChildEntities(object);
     validateChange(object, managed);
     applyChanges(managed, object);
+    beforeSave(managed);
     return getDao().update(managed);
   }
 
@@ -45,8 +47,19 @@ public abstract class AbstractSaveService<T extends Identifiable> implements Sav
    * Default implementation does nothing, which means the save is always authorized
    * 
    * @param object object being saved
+   * @throws IOException
    */
   protected void authorizeSave(T object) throws IOException {
+    // do nothing
+  }
+
+  /**
+   * Make any other changes necessary to the object before saving. This happens *after* validation. Default implementation does nothing
+   * 
+   * @param object object being saved
+   * @throws IOException
+   */
+  protected void beforeSave(T object) throws IOException {
     // do nothing
   }
 
@@ -77,6 +90,6 @@ public abstract class AbstractSaveService<T extends Identifiable> implements Sav
 
   protected abstract void collectValidationErrors(T object, T beforeChange, List<ValidationError> errors) throws IOException;
 
-  protected abstract void applyChanges(T to, T from);
+  protected abstract void applyChanges(T to, T from) throws IOException;
 
 }

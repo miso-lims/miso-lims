@@ -2,6 +2,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,10 +24,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.service.OrderPurposeService;
+import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
@@ -61,6 +69,10 @@ public class SequencingOrderRestController extends RestController {
   private SequencingParametersService sequencingParametersService;
   @Autowired
   private SequencingOrderCompletionService sequencingOrderCompletionService;
+  @Autowired
+  private PoolService poolService;
+  @Autowired
+  private OrderPurposeService orderPurposeService;
 
   @GetMapping(value = "/pools/{id}/dt/completions", produces = { "application/json" })
   @ResponseBody
@@ -178,4 +190,24 @@ public class SequencingOrderRestController extends RestController {
   private static PoolPickerEntry orderTransform(SequencingOrderCompletion order) {
     return new PoolPickerEntry(Dtos.asDto(order.getPool(), true, false), Collections.singletonList(Dtos.asDto(order)));
   }
+
+  @GetMapping(value = "/sequencingorders/search")
+  @ResponseBody
+  public List<SequencingOrderDto> search(@RequestParam long poolId, @RequestParam long purposeId, @RequestParam long parametersId,
+      @RequestParam int partitions) throws IOException {
+    Pool pool = getOrThrow(poolService, poolId, "Pool");
+    OrderPurpose purpose = getOrThrow(orderPurposeService, purposeId, "Order purpose");
+    SequencingParameters parameters = getOrThrow(sequencingParametersService, parametersId, "Sequencing parameters");
+    List<SequencingOrder> results = sequencingOrderService.listByAttributes(pool, purpose, parameters, partitions);
+    return results.stream().map(Dtos::asDto).collect(Collectors.toList());
+  }
+
+  private <T extends Identifiable> T getOrThrow(ProviderService<T> service, long id, String type) throws IOException {
+    T object = service.get(id);
+    if (object == null) {
+      throw new RestException(String.format("%s with id %d not found", type, id), Status.BAD_REQUEST);
+    }
+    return object;
+  }
+
 }

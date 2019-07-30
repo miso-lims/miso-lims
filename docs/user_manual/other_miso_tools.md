@@ -1,7 +1,7 @@
 ---
 layout: page
-title: "27. Other MISO Tools"
-section: 27
+title: "28. Other MISO Tools"
+section: 28
 ---
 
 The following tools can help you with planning or finding things within MISO. They can be found by clicking the

@@ -131,9 +131,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
@@ -201,6 +204,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto.OrderAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.IlluminaRunDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.IonTorrentRunDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.Ls454RunDto;
@@ -1170,6 +1174,8 @@ public class Dtos {
     setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
     setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
     dto.setDescription(from.getDescription());
+    setLong(dto::setPurposeId, maybeGetProperty(from.getPurpose(), OrderPurpose::getId), false);
+    setString(dto::setPurposeAlias, maybeGetProperty(from.getPurpose(), OrderPurpose::getAlias));
     return dto;
   }
 
@@ -1184,6 +1190,7 @@ public class Dtos {
     to.setSequencingParameters(to(from.getParameters()));
     to.setPartitions(from.getPartitions());
     to.setDescription(from.getDescription());
+    setObject(to::setPurpose, OrderPurpose::new, from.getPurposeId());
     return to;
   }
 
@@ -1502,6 +1509,23 @@ public class Dtos {
       setBoolean(dto::setLibraryLowQuality, library.isLowQuality(), false);
       setBoolean(dto::setLibraryQcPassed, library.getQcPassed(), true);
       setString(dto::setLibraryPlatformType, library.getPlatformType().getKey());
+      if (library.getIndices() != null && !library.getIndices().isEmpty()) {
+        dto.setIndexIds(library.getIndices().stream().map(Index::getId).collect(Collectors.toList()));
+      }
+      Sample sample = library.getSample();
+      if (sample != null) {
+        setLong(dto::setSampleId, sample.getId(), true);
+        setString(dto::setSampleName, sample.getName());
+        setString(dto::setSampleAlias, sample.getAlias());
+        if (isDetailedSample(sample)) {
+          DetailedSample detailed = (DetailedSample) sample;
+          dto.setIdentityConsentLevel(getIdentityConsentLevelString(detailed));
+          if (detailed.getSubproject() != null) {
+            dto.setSubprojectAlias(detailed.getSubproject().getAlias());
+            dto.setSubprojectPriority(detailed.getSubproject().getPriority());
+          }
+        }
+      }
     }
     if (from.getParentAliquot() != null) {
       setLong(dto::setParentAliquotId, from.getParentAliquot().getId(), true);
@@ -1536,15 +1560,7 @@ public class Dtos {
     dto.setDistributed(from.isDistributed());
     dto.setDistributionDate(formatDate(from.getDistributionDate()));
     dto.setDistributionRecipient(from.getDistributionRecipient());
-    Sample sample = from.getLibrary().getSample();
-    if (isDetailedSample(sample)) {
-      DetailedSample detailed = (DetailedSample) sample;
-      dto.setIdentityConsentLevel(getIdentityConsentLevelString(detailed));
-      if (detailed.getSubproject() != null) {
-        dto.setSubprojectAlias(detailed.getSubproject().getAlias());
-        dto.setSubprojectPriority(detailed.getSubproject().getPriority());
-      }
-    }
+    setDateTimeString(dto::setLastModified, from.getLastModified());
     return dto;
   }
   
@@ -1599,6 +1615,15 @@ public class Dtos {
         dto.setSubprojectPriority(detailed.getSubproject().getPriority());
       }
     }
+
+    if (from.getAliquot() != null) {
+      List<Long> parentAliquotIds = new ArrayList<>();
+      for (LibraryAliquot parent = from.getAliquot(); parent != null; parent = parent.getParentAliquot()) {
+        parentAliquotIds.add(parent.getId());
+      }
+      dto.setParentAliquotIds(parentAliquotIds);
+    }
+
     return dto;
   }
 
@@ -2075,6 +2100,7 @@ public class Dtos {
     dto.setUnknown(from.get(HealthType.Unknown));
     dto.setLoaded(from.getLoaded());
     dto.setDescription(from.getDescription());
+    setString(dto::setPurpose, from.getPurpose());
     return dto;
   }
 
@@ -2352,7 +2378,7 @@ public class Dtos {
       to.setVolume(Double.valueOf(dto.getVolume()));
     }
     to.setVolumeUnits(dto.getVolumeUnits());
-    to.setPlatformType(PlatformType.valueOf(dto.getPlatformType()));
+    setObject(to::setPlatformType, dto.getPlatformType(), pt -> PlatformType.valueOf(pt));
     if (dto.getPooledElements() != null) {
       to.setPoolElements(dto.getPooledElements().stream().map(aliquot -> {
         PoolableElementView view = new PoolableElementView();
@@ -3395,6 +3421,77 @@ public class Dtos {
     setInteger(to::setRows, from.getRows(), true);
     setInteger(to::setColumns, from.getColumns(), true);
     setBoolean(to::setScannable, from.isScannable(), false);
+    return to;
+  }
+
+  public static PoolOrderDto asDto(@Nonnull PoolOrder from) {
+    PoolOrderDto to = new PoolOrderDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setAlias, from.getAlias());
+    setString(to::setDescription, from.getDescription());
+    setLong(to::setPurposeId, maybeGetProperty(from.getPurpose(), OrderPurpose::getId), true);
+    setString(to::setPurposeAlias, maybeGetProperty(from.getPurpose(), OrderPurpose::getAlias));
+    setInteger(to::setPartitions, from.getPartitions(), true);
+    setId(to::setParametersId, from.getParameters());
+    setString(to::setParametersName, maybeGetProperty(from.getParameters(), SequencingParameters::getName));
+    setBoolean(to::setDraft, from.isDraft(), false);
+    if (from.getOrderLibraryAliquots() != null) {
+      to.setOrderAliquots(from.getOrderLibraryAliquots().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    }
+    to.setStatus(from.getStatus().getLabel());
+    setLong(to::setPoolId, maybeGetProperty(from.getPool(), Pool::getId), true);
+    setString(to::setPoolAlias, maybeGetProperty(from.getPool(), Pool::getAlias));
+    setLong(to::setSequencingOrderId, maybeGetProperty(from.getSequencingOrder(), SequencingOrder::getId), true);
+    return to;
+  }
+
+  private static OrderAliquotDto asDto(@Nonnull OrderLibraryAliquot from) {
+    OrderAliquotDto to = new OrderAliquotDto();
+    setLong(to::setId, from.getAliquot().getId(), true);
+    to.setAliquot(Dtos.asDto(from.getAliquot(), false));
+    setInteger(to::setProportion, from.getProportion(), true);
+    return to;
+  }
+
+  public static PoolOrder to(@Nonnull PoolOrderDto from) {
+    PoolOrder to = new PoolOrder();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    setString(to::setDescription, from.getDescription());
+    setObject(to::setPurpose, OrderPurpose::new, from.getPurposeId());
+    setInteger(to::setPartitions, from.getPartitions(), true);
+    setObject(to::setParameters, SequencingParameters::new, from.getParametersId());
+    setBoolean(to::setDraft, from.isDraft(), false);
+    if (from.getOrderAliquots() != null) {
+      to.setOrderLibraryAliquots(from.getOrderAliquots().stream().map(libDto -> {
+        OrderLibraryAliquot lib = Dtos.to(libDto);
+        lib.setPoolOrder(to);
+        return lib;
+      }).collect(Collectors.toSet()));
+    }
+    setObject(to::setPool, PoolImpl::new, from.getPoolId());
+    setObject(to::setSequencingOrder, SequencingOrderImpl::new, from.getSequencingOrderId());
+    return to;
+  }
+
+  private static OrderLibraryAliquot to(@Nonnull OrderAliquotDto from) {
+    OrderLibraryAliquot to = new OrderLibraryAliquot();
+    to.setAliquot(Dtos.to(from.getAliquot()));
+    setInteger(to::setProportion, from.getProportion(), false);
+    return to;
+  }
+
+  public static OrderPurposeDto asDto(@Nonnull OrderPurpose from) {
+    OrderPurposeDto to = new OrderPurposeDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
+  public static OrderPurpose to(@Nonnull OrderPurposeDto from) {
+    OrderPurpose to = new OrderPurpose();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
     return to;
   }
 

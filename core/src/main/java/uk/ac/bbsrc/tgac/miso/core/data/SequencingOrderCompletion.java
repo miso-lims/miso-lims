@@ -24,6 +24,7 @@ import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.Immutable;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrderCompletion.SequencingOrderCompletionId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -34,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
  * run information.
  */
 @Entity
+@Immutable
 @Table(name = "SequencingOrderCompletion")
 @IdClass(SequencingOrderCompletionId.class)
 public class SequencingOrderCompletion implements Serializable {
@@ -118,6 +120,7 @@ public class SequencingOrderCompletion implements Serializable {
   private int loaded;
 
   private String description;
+  private String purpose;
 
   public int get(HealthType health) {
     if (items.containsKey(health)) {
@@ -179,5 +182,13 @@ public class SequencingOrderCompletion implements Serializable {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public String getPurpose() {
+    return purpose;
+  }
+
+  public void setPurpose(String purpose) {
+    this.purpose = purpose;
   }
 }

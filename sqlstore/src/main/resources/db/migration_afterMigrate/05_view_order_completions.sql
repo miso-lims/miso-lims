@@ -1,6 +1,10 @@
 DROP VIEW IF EXISTS CompletedPartitions;
 CREATE OR REPLACE VIEW RunPartitionsByHealth AS
-  SELECT pool_poolId AS poolId, sequencingParameters_parametersId as parametersId, COUNT(*) AS num_partitions, health AS health, MAX((SELECT MAX(changeTime) FROM RunChangeLog WHERE RunChangeLog.runId = Run.runId)) as lastUpdated, NULL AS description
+  SELECT pool_poolId AS poolId,
+    sequencingParameters_parametersId as parametersId,
+    COUNT(*) AS num_partitions,
+    health AS health,
+    MAX((SELECT MAX(changeTime) FROM RunChangeLog WHERE RunChangeLog.runId = Run.runId)) as lastUpdated
     FROM Run JOIN Run_SequencerPartitionContainer ON Run.runId = Run_SequencerPartitionContainer.Run_runId
      JOIN SequencerPartitionContainer_Partition ON Run_SequencerPartitionContainer.containers_containerId = SequencerPartitionContainer_Partition.container_containerId
      JOIN _Partition ON SequencerPartitionContainer_Partition.partitions_partitionId = _Partition.partitionId
@@ -11,8 +15,13 @@ CREATE OR REPLACE VIEW RunPartitionsByHealth AS
     GROUP BY pool_poolId, sequencingParameters_parametersId, health;
 
 CREATE OR REPLACE VIEW DesiredPartitions AS 
-  SELECT poolId, parametersId, SUM(partitions) AS num_partitions, MAX(lastUpdated) as lastUpdated, GROUP_CONCAT(description SEPARATOR '; ') as description
+  SELECT poolId, parametersId,
+    SUM(partitions) AS num_partitions,
+    MAX(lastUpdated) as lastUpdated,
+    GROUP_CONCAT(description SEPARATOR '; ') as description,
+    GROUP_CONCAT(DISTINCT OrderPurpose.alias SEPARATOR '; ') as purpose
     FROM SequencingOrder
+    JOIN OrderPurpose ON OrderPurpose.purposeId = SequencingOrder.purposeId
     GROUP BY poolId, parametersId;
 
 CREATE OR REPLACE VIEW SequencingOrderCompletion_Backing AS
@@ -22,7 +31,8 @@ CREATE OR REPLACE VIEW SequencingOrderCompletion_Backing AS
     `RunPartitionsByHealth`.`num_partitions` AS `num_partitions`,
     `RunPartitionsByHealth`.`health` AS `health`,
     `RunPartitionsByHealth`.`lastUpdated` AS `lastUpdated`, 
-    `RunPartitionsByHealth`.`description` AS `description` 
+    NULL AS `description`, 
+    NULL AS `purpose` 
     from `RunPartitionsByHealth`
   ) UNION ALL (SELECT
     `DesiredPartitions`.`poolId` AS `poolId`,
@@ -30,7 +40,8 @@ CREATE OR REPLACE VIEW SequencingOrderCompletion_Backing AS
     `DesiredPartitions`.`num_partitions` AS `num_partitions`,
     'Requested' AS `health`,
     `DesiredPartitions`.`lastUpdated` AS `lastUpdated`,
-    `DesiredPartitions`.`description` AS `description` 
+    `DesiredPartitions`.`description` AS `description`,
+    `DesiredPartitions`.`purpose` AS `purposeId` 
     FROM `DesiredPartitions`);
 
 CREATE OR REPLACE VIEW SequencingOrderCompletion AS SELECT
@@ -49,7 +60,8 @@ CREATE OR REPLACE VIEW SequencingOrderCompletion AS SELECT
           AND NOT EXISTS(SELECT *
             FROM Run_SequencerPartitionContainer
             WHERE Run_SequencerPartitionContainer.containers_containerId = SequencerPartitionContainer_Partition.container_containerId)), 0) AS loaded,
-    GROUP_CONCAT(description SEPARATOR '; ') as description
+    GROUP_CONCAT(description SEPARATOR '; ') as description,
+    GROUP_CONCAT(DISTINCT purpose SEPARATOR '; ') as purpose
   FROM SequencingOrderCompletion_Backing
   GROUP BY poolId, parametersId;
 

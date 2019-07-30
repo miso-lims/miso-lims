@@ -2,7 +2,7 @@ if (typeof FormTarget === 'undefined') {
   FormTarget = {};
 }
 FormTarget.box = (function($) {
-  
+
   return {
     getSaveUrl: function(box) {
       if (box.id) {
@@ -18,98 +18,94 @@ FormTarget.box = (function($) {
       return '/miso/box/' + box.id;
     },
     getSections: function(config) {
-      return [
-        {
-          title: 'Box Information',
-          fields: [
-            {
-              title: 'Box ID',
-              data: 'id',
-              type: 'read-only',
-              getDisplayValue: function(box) {
-                return box.id || 'Unsaved';
-              }
-            }, {
-              title: 'Name',
-              data: 'name',
-              type: 'read-only',
-              getDisplayValue: function(box) {
-                return box.name || 'Unsaved';
-              }
-            }, {
-              title: 'Alias',
-              data: 'alias',
-              type: 'text',
-              required: true,
-              maxLength: 255
-            }, {
-              title: 'Description',
-              data: 'description',
-              type: 'text',
-              maxLength: 255
-            }, {
-              title: 'Matrix Barcode',
-              data: 'identificationBarcode',
-              type: 'text',
-              maxLength: 255
-            }, {
-              title: 'Box Use',
-              data: 'useId',
-              type: 'dropdown',
-              getSource: function() {
-                return Constants.boxUses;
-              },
-              getItemLabel: Utils.array.getAlias,
-              getItemValue: Utils.array.getId,
-              required: true
-            }, {
-              title: 'Box Size',
-              data: 'sizeId',
-              type: 'dropdown',
-              getSource: function() {
-                return Constants.boxSizes;
-              },
-              getItemLabel: function(boxSize) {
-                return boxSize.rowsByColumnsWithScan;
-              },
-              getItemValue: Utils.array.getId,
-              required: true,
-              include: config.isNew
-            }, {
-              title: 'Box Size',
-              data: 'sizeId',
-              getDisplayValue: function(box) {
-                return box.rows + ' × ' + box.cols + ' (can ' + (box.scannable ? '' : 'not ') + 'be scanned by your lab\'s bulk scanner)';
-              },
-              type: 'read-only',
-              include: !config.isNew
-            }, {
-              title: 'Location',
-              data: 'locationBarcode',
-              type: 'text',
-              maxLength: 255
-            }, {
-              title: 'Freezer Location',
-              data: 'storageLocationId',
-              getDisplayValue: function(box) {
-                return box.storageDisplayLocation || 'Unknown';
-              },
-              type: 'read-only'
-            }, {
-              title: 'Change Location (scan or select)',
-              type: 'special',
-              makeControls: makeLocationSelect
-            }
-          ]
-        }
-      ];
+      return [{
+        title: 'Box Information',
+        fields: [{
+          title: 'Box ID',
+          data: 'id',
+          type: 'read-only',
+          getDisplayValue: function(box) {
+            return box.id || 'Unsaved';
+          }
+        }, {
+          title: 'Name',
+          data: 'name',
+          type: 'read-only',
+          getDisplayValue: function(box) {
+            return box.name || 'Unsaved';
+          }
+        }, {
+          title: 'Alias',
+          data: 'alias',
+          type: 'text',
+          required: true,
+          maxLength: 255
+        }, {
+          title: 'Description',
+          data: 'description',
+          type: 'text',
+          maxLength: 255
+        }, {
+          title: 'Matrix Barcode',
+          data: 'identificationBarcode',
+          type: 'text',
+          maxLength: 255
+        }, {
+          title: 'Box Use',
+          data: 'useId',
+          type: 'dropdown',
+          getSource: function() {
+            return Constants.boxUses;
+          },
+          getItemLabel: Utils.array.getAlias,
+          getItemValue: Utils.array.getId,
+          required: true
+        }, {
+          title: 'Box Size',
+          data: 'sizeId',
+          type: 'dropdown',
+          getSource: function() {
+            return Constants.boxSizes;
+          },
+          getItemLabel: function(boxSize) {
+            return boxSize.rowsByColumnsWithScan;
+          },
+          getItemValue: Utils.array.getId,
+          required: true,
+          include: config.isNew
+        }, {
+          title: 'Box Size',
+          data: 'sizeId',
+          getDisplayValue: function(box) {
+            return box.rows + ' × ' + box.cols + ' (can ' + (box.scannable ? '' : 'not ') + 'be scanned by your lab\'s bulk scanner)';
+          },
+          type: 'read-only',
+          include: !config.isNew
+        }, {
+          title: 'Location',
+          data: 'locationBarcode',
+          type: 'text',
+          maxLength: 255
+        }, {
+          title: 'Freezer Location',
+          data: 'storageLocationId',
+          getDisplayValue: function(box) {
+            return box.storageDisplayLocation || 'Unknown';
+          },
+          type: 'read-only'
+        }, {
+          title: 'Change Location (scan or select)',
+          type: 'special',
+          makeControls: makeLocationSelect
+        }]
+      }];
     },
     onLoad: function() {
       resetLocationSearch();
     }
   }
-  
-  function makeLocationSelect() {
+
+  function makeLocationSelect(form) {
     var controls = [];
     controls.push($('<input>').attr('id', 'freezerLocationScan').attr('type', 'text').css('width', '120px').keyup(function(event) {
       if (event.which == "13") {
@@ -124,13 +120,15 @@ FormTarget.box = (function($) {
     controls.push($('<select>').attr('id', 'freezerLocationSelect').change(onLocationSelect).after(' '));
     controls.push($('<img>').attr('id', 'freezerLocationLoader').addClass('fg-button hidden').attr('src', '/styles/images/ajax-loader.gif')
         .css('display', 'none').after(' '));
-    controls.push($('<button>').attr('id', 'setFreezerLocation').addClass('ui-state-default').attr('type', 'button')
-        .text('Set').click(setFreezerLocation).after(' '));
-    controls.push($('<button>').attr('id', 'resetFreezerLocation').addClass('ui-state-default').attr('type', 'button')
-        .text('Reset').click(resetLocationSearch).after(' '));
+    controls.push($('<button>').attr('id', 'setFreezerLocation').addClass('ui-state-default').attr('type', 'button').text('Set').click(
+        function() {
+          setFreezerLocation(form);
+        }).after(' '));
+    controls.push($('<button>').attr('id', 'resetFreezerLocation').addClass('ui-state-default').attr('type', 'button').text('Reset').click(
+        resetLocationSearch).after(' '));
     return controls;
   }
-  
+
   function onLocationScan() {
     $('#freezerLocationLoader').show();
     Utils.ui.setDisabled('#setFreezerLocation', true);
@@ -153,8 +151,8 @@ FormTarget.box = (function($) {
           } else {
             $('#freezerLocationRoot').text('');
             $('#freezerLocationSelect').empty();
-            $('#freezerLocationSelect').append($('<option>').val(data.id)
-                .text(data.fullDisplayLocation + (data.availableStorage ? ' *' : '')));
+            $('#freezerLocationSelect').append(
+                $('<option>').val(data.id).text(data.fullDisplayLocation + (data.availableStorage ? ' *' : '')));
             freezerLocations = [data];
             parentFreezerLocation = null;
           }
@@ -166,7 +164,7 @@ FormTarget.box = (function($) {
       Utils.ui.setDisabled('#resetFreezerLocation', false);
     });
   }
-  
+
   function onLocationSelect() {
     $('#freezerLocationLoader').show();
     $('#freezerLocationScan').empty();
@@ -193,15 +191,17 @@ FormTarget.box = (function($) {
       Utils.ui.setDisabled('#setFreezerLocation', !location.availableStorage);
     });
   }
-  
-  function setFreezerLocation() {
+
+  function setFreezerLocation(form) {
     Utils.ui.setDisabled('#setFreezerLocation', true);
     var location = getSelectedLocation();
-    $('#storageLocationId').val(location.id);
-    $('#storageLocationIdLabel').text(location.fullDisplayLocation);
+    form.updateField('storageLocationId', {
+      value: location.id,
+      label: location.fullDisplayLocation
+    })
     resetLocationSearch();
   }
-  
+
   function getSelectedLocation() {
     var locationId = $('#freezerLocationSelect').val();
     if (locationId == -1) {
@@ -214,7 +214,7 @@ FormTarget.box = (function($) {
       return location.id == locationId;
     }, freezerLocations);
   }
-  
+
   function resetLocationSearch() {
     $('#freezerLocationLoader').show();
     $('#freezerLocationScan').empty();
@@ -237,10 +237,10 @@ FormTarget.box = (function($) {
       Utils.ui.setDisabled('#resetFreezerLocation', false);
     });
   }
-  
+
   var freezerLocations = [];
   var parentFreezerLocation = null;
-  
+
   function setFreezerLocationOptions(locations, parentLocation, fullDisplay) {
     freezerLocations = locations;
     parentFreezerLocation = parentLocation;
@@ -257,10 +257,10 @@ FormTarget.box = (function($) {
       return 0;
     });
     locations.forEach(function(location) {
-      $('#freezerLocationSelect').append($('<option>').val(location.id)
-          .text(location[displayProperty] + (location.availableStorage ? ' *' : '')));
+      $('#freezerLocationSelect').append(
+          $('<option>').val(location.id).text(location[displayProperty] + (location.availableStorage ? ' *' : '')));
     });
     $('#freezerLocationSelect').val('-1');
   }
-  
+
 })(jQuery);

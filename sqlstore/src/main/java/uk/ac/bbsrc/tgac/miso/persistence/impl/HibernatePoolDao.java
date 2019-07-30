@@ -83,6 +83,11 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
+  public Pool getByAlias(String alias) throws IOException {
+    return (Pool) createCriteria().add(Restrictions.eq("alias", alias)).uniqueResult();
+  }
+
+  @Override
   public List<Pool> getByBarcodeList(Collection<String> barcodeList) throws IOException {
     if (barcodeList.isEmpty()) {
       return Collections.emptyList();

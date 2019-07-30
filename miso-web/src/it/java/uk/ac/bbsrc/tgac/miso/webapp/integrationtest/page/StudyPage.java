@@ -23,17 +23,17 @@ public class StudyPage extends HeaderFooterPage {
     }
   }
 
-  @FindBy(id = "idLabel")
+  @FindBy(id = "studyForm_idLabel")
   private WebElement idLabel;
-  @FindBy(id = "projectId")
+  @FindBy(id = "studyForm_projectId")
   private WebElement projectLabel;
-  @FindBy(id = "nameLabel")
+  @FindBy(id = "studyForm_nameLabel")
   private WebElement nameLabel;
-  @FindBy(id = "alias")
+  @FindBy(id = "studyForm_alias")
   private WebElement aliasLabel;
-  @FindBy(id = "description")
+  @FindBy(id = "studyForm_description")
   private WebElement descriptionLabel;
-  @FindBy(id = "studyTypeId")
+  @FindBy(id = "studyForm_studyTypeId")
   private WebElement studyTypeLabel;
   @FindBy(id = "save")
   private WebElement saveButton;
@@ -58,7 +58,7 @@ public class StudyPage extends HeaderFooterPage {
     if ("select".equals(projectLabel.getTagName())) {
       return getSelectedDropdownText(projectLabel);
     } else {
-      return getDriver().findElement(By.id("projectIdLabel")).getText();
+      return getDriver().findElement(By.id("studyForm_projectIdLabel")).getText();
     }
   }
 

@@ -61,6 +61,10 @@ public class SequencingOrderImpl implements SequencingOrder, Serializable {
   @Column(nullable = true, length = 255, name = "description")
   private String description;
 
+  @ManyToOne
+  @JoinColumn(name = "purposeId")
+  private OrderPurpose purpose;
+
   @Override
   public long getId() {
     return sequencingOrderId;
@@ -152,6 +156,16 @@ public class SequencingOrderImpl implements SequencingOrder, Serializable {
   }
 
   @Override
+  public OrderPurpose getPurpose() {
+    return this.purpose;
+  }
+
+  @Override
+  public void setPurpose(OrderPurpose purpose) {
+    this.purpose = purpose;
+  }
+
+  @Override
   public String getDeleteType() {
     return "Sequencing Order";
   }
@@ -166,6 +180,42 @@ public class SequencingOrderImpl implements SequencingOrder, Serializable {
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((description == null) ? 0 : description.hashCode());
+    result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
+    result = prime * result + ((partitions == null) ? 0 : partitions.hashCode());
+    result = prime * result + ((pool == null) ? 0 : pool.hashCode());
+    result = prime * result + ((purpose == null) ? 0 : purpose.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    SequencingOrderImpl other = (SequencingOrderImpl) obj;
+    if (description == null) {
+      if (other.description != null) return false;
+    } else if (!description.equals(other.description)) return false;
+    if (parameters == null) {
+      if (other.parameters != null) return false;
+    } else if (!parameters.equals(other.parameters)) return false;
+    if (partitions == null) {
+      if (other.partitions != null) return false;
+    } else if (!partitions.equals(other.partitions)) return false;
+    if (pool == null) {
+      if (other.pool != null) return false;
+    } else if (!pool.equals(other.pool)) return false;
+    if (purpose == null) {
+      if (other.purpose != null) return false;
+    } else if (!purpose.equals(other.purpose)) return false;
+    return true;
   }
 
 }

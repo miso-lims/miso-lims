@@ -36,6 +36,9 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
     public static final String SOLID = "Solid";
     public static final String STORAGE = "Storage";
     public static final String TISSUE = "Tissue";
+    public static final String OUTSTANDING = "Outstanding";
+    public static final String FULFILLED = "Fulfilled";
+    public static final String DRAFT = "Draft";
   }
 
   @FindBy(className = "dataTables_wrapper")

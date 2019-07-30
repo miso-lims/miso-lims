@@ -201,6 +201,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationByDraft(Criteria criteria, boolean isDraft, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be drafted.", getFriendlyName()));
+  }
+
+  @Override
   default void restrictPaginationByGroupId(Criteria criteria, String groupId, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s has no group ID (and we are all happier for it).", getFriendlyName()));
   }

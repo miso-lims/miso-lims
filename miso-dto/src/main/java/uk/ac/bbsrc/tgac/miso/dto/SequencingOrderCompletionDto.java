@@ -15,6 +15,7 @@ public class SequencingOrderCompletionDto {
   private int stopped;
   private int unknown;
   private String description;
+  private String purpose;
 
   public int getCompleted() {
     return completed;
@@ -125,6 +126,14 @@ public class SequencingOrderCompletionDto {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public String getPurpose() {
+    return purpose;
+  }
+
+  public void setPurpose(String purpose) {
+    this.purpose = purpose;
   }
 
 }

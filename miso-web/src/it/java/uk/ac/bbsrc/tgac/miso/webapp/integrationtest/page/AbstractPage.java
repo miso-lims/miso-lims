@@ -17,120 +17,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.AbstractElement
 
 public abstract class AbstractPage extends AbstractElement {
 
-  protected enum FieldType {
-    LABEL() {
-      @Override
-      protected boolean isEditable(WebElement element) {
-        // non-input tag is expected
-        if (element.getTagName() != "input") {
-          return false;
-        }
-        return super.isEditable(element);
-      }
-    },
-    TEXT() {
-      @Override
-      protected void setValue(WebDriver driver, By selector, String value) {
-        setText(value == null ? "" : value, driver.findElement(selector));
-      }
-
-      @Override
-      protected boolean isEditable(WebElement element) {
-        // some text fields are changed to non-input tags if read-only
-        if (!isTextBox(element)) {
-          return false;
-        }
-        return super.isEditable(element);
-      }
-      
-      private boolean isTextBox(WebElement element) {
-        return "input".equals(element.getTagName());
-      }
-    },
-    TEXTAREA() {
-      @Override
-      protected void setValue(WebDriver driver, By selector, String value) {
-        setText(value == null ? "" : value, driver.findElement(selector));
-      }
-    },
-    RADIO() {
-      @Override
-      protected void setValue(WebDriver driver, By selector, String value) {
-        setRadioButton(value == null ? "" : value, driver.findElements(selector));
-      }
-
-      @Override
-      protected boolean isEditable(WebDriver driver, By selector) {
-        List<WebElement> buttons = driver.findElements(selector);
-        return !buttons.isEmpty() && buttons.stream().anyMatch((element) -> element.isDisplayed() && element.isEnabled());
-      }
-    },
-    CHECKBOX() {
-      @Override
-      protected void setValue(WebDriver driver, By selector, String value) {
-        if (!value.equalsIgnoreCase(Boolean.TRUE.toString()) && !value.equalsIgnoreCase(Boolean.FALSE.toString())) {
-          throw new IllegalArgumentException("Checkbox value must be 'true' or 'false'");
-        }
-        setCheckbox(Boolean.valueOf(value), driver.findElement(selector));
-      }
-    },
-    DROPDOWN() {
-      @Override
-      protected void setValue(WebDriver driver, By selector, String value) {
-        setDropdown(value, driver.findElement(selector));
-      }
-
-      @Override
-      protected boolean isEditable(WebElement element) {
-        if (!isDropdown(element)) {
-          return false;
-        }
-        return super.isEditable(element);
-      }
-
-      private boolean isDropdown(WebElement element) {
-        return "select".equals(element.getTagName());
-      }
-    },
-    DATEPICKER() {
-      @Override
-      protected void setValue(WebDriver driver, By selector, String value) {
-        setText(value == null ? "" : value, driver.findElement(selector));
-        ((JavascriptExecutor) driver).executeScript("jQuery('.ui-datepicker').hide();");
-      }
-
-      @Override
-      protected boolean isEditable(WebElement element) {
-        // some text fields are changed to non-input tags if read-only
-        if (!isTextBox(element)) {
-          return false;
-        }
-        return super.isEditable(element);
-      }
-
-      private boolean isTextBox(WebElement element) {
-        return "input".equals(element.getTagName());
-      }
-    };
-
-    protected void setValue(WebDriver driver, By selector, String value) {
-      throw new UnsupportedOperationException("Field is not modifiable");
-    }
-
-    protected boolean isEditable(WebDriver driver, By selector) {
-      WebElement element = findElementIfExists(driver, selector);
-      if (element == null || !element.isDisplayed() || !element.isEnabled() || element.getAttribute("readonly") != null) {
-        return false;
-      } else {
-        return isEditable(element);
-      }
-    }
-
-    protected boolean isEditable(WebElement element) {
-      return true;
-    }
-  }
-
   private static final ExpectedCondition<Boolean> pageLoaded = (driver) -> {
     return ((JavascriptExecutor) driver).executeScript("return document.readyState").equals("complete");
   };
@@ -164,7 +50,7 @@ public abstract class AbstractPage extends AbstractElement {
   protected static void setText(String input, WebElement element) {
     element.click();
     element.clear();
-    element.sendKeys(input);
+    element.sendKeys(input == null ? "" : input);
   }
 
   protected static void setCheckbox(Boolean check, WebElement element) {

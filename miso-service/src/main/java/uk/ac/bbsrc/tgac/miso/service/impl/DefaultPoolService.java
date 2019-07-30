@@ -307,6 +307,10 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   private void validateChange(Pool pool, Pool beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
+    if (ValidationUtils.isSetAndChanged(Pool::getAlias, pool, beforeChange) && poolStore.getByAlias(pool.getAlias()) != null) {
+      errors.add(new ValidationError("alias", "There is already a pool with this alias"));
+    }
+
     validateConcentrationUnits(pool.getConcentration(), pool.getConcentrationUnits(), errors);
     validateVolumeUnits(pool.getVolume(), pool.getVolumeUnits(), errors);
     validateBarcodeUniqueness(pool, beforeChange, poolStore::getByBarcode, errors, "pool");

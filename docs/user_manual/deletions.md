@@ -1,7 +1,7 @@
 ---
 layout: page
-title: "23. Deletions"
-section: 23
+title: "24. Deletions"
+section: 24
 ---
 
 

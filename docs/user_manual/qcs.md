@@ -1,7 +1,7 @@
 ---
 layout: page
-title: "20. QCs"
-section: 20
+title: "21. QCs"
+section: 21
 ---
 
 QCs in MISO are used to record the results of quality control checks. They can be added to samples, libraries, pools,

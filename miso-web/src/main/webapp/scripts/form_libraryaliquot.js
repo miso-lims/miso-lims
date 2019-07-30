@@ -83,9 +83,9 @@ FormTarget.libraryaliquot = (function($) {
           getItemValue: function(item) {
             return item.id;
           },
-          onChange: function(newValue, updateField) {
+          onChange: function(newValue, form) {
             var designCode = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), Constants.libraryDesignCodes);
-            updateField('targetedSequencingId', {
+            form.updateField('targetedSequencingId', {
               required: designCode.targetedSequencingRequired
             });
           }
@@ -99,8 +99,8 @@ FormTarget.libraryaliquot = (function($) {
           title: 'Discarded',
           data: 'discarded',
           type: 'checkbox',
-          onChange: function(newValue, updateField) {
-            updateField('volume', {
+          onChange: function(newValue, form) {
+            form.updateField('volume', {
               disabled: newValue
             });
           }
@@ -108,11 +108,11 @@ FormTarget.libraryaliquot = (function($) {
           title: 'Volume',
           data: 'volume',
           type: 'decimal'
-        }, FormUtils.makeUnitsField('volume'), {
+        }, FormUtils.makeUnitsField(object, 'volume'), {
           title: 'Concentration',
           data: 'concentration',
           type: 'decimal'
-        }, FormUtils.makeUnitsField('concentration'), FormUtils.makeBoxLocationField(), {
+        }, FormUtils.makeUnitsField(object, 'concentration'), FormUtils.makeBoxLocationField(), {
           title: 'Creation Date',
           data: 'creationDate',
           required: 'true',

@@ -1,9 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
 
@@ -29,45 +29,40 @@ public class DefaultSequencingParametersService implements SequencingParametersS
   @Autowired
   private AuthorizationManager authorizationManager;
 
+  @Autowired
+  private InstrumentModelService instrumentModelService;
+
   @Override
-  public Long create(SequencingParameters sequencingParameters) throws IOException {
+  public long create(SequencingParameters sequencingParameters) throws IOException {
     authorizationManager.throwIfNonAdmin();
     User user = authorizationManager.getCurrentUser();
     sequencingParameters.setCreatedBy(user);
     sequencingParameters.setUpdatedBy(user);
-    return sequencingParametersDao.addSequencingParameters(sequencingParameters);
+    return sequencingParametersDao.create(sequencingParameters);
   }
 
   @Override
-  public SequencingParameters get(Long sequencingParametersId) throws IOException {
-    return sequencingParametersDao.getSequencingParameters(sequencingParametersId);
+  public SequencingParameters get(long sequencingParametersId) throws IOException {
+    return sequencingParametersDao.get(sequencingParametersId);
   }
 
   @Override
-  public Collection<SequencingParameters> getAll() throws IOException {
-    return sequencingParametersDao.getSequencingParameters();
+  public List<SequencingParameters> list() throws IOException {
+    return sequencingParametersDao.list();
   }
 
   @Override
-  public void update(SequencingParameters sequencingParameters) throws IOException {
+  public long update(SequencingParameters sequencingParameters) throws IOException {
     authorizationManager.throwIfNonAdmin();
     User user = authorizationManager.getCurrentUser();
     sequencingParameters.setUpdatedBy(user);
-    sequencingParametersDao.update(sequencingParameters);
+    return sequencingParametersDao.update(sequencingParameters);
   }
 
   @Override
-  public Collection<SequencingParameters> getForInstrumentModel(Long instrumentModelId) throws IOException {
-    if (instrumentModelId == null) {
-      return Collections.emptyList();
-    }
-    Collection<SequencingParameters> results = new ArrayList<>();
-    for (SequencingParameters sp : sequencingParametersDao.getSequencingParameters()) {
-      if (sp.getInstrumentModel().getId() == instrumentModelId) {
-        results.add(sp);
-      }
-    }
-    return results;
+  public List<SequencingParameters> listByInstrumentModelId(long instrumentModelId) throws IOException {
+    InstrumentModel model = instrumentModelService.get(instrumentModelId);
+    return sequencingParametersDao.listByInstrumentModel(model);
   }
 
   public void setSequencingParametersDao(SequencingParametersDao sequencingParametersDao) {

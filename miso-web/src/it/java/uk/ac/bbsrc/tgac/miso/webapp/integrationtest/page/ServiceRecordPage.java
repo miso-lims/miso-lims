@@ -11,33 +11,26 @@ import org.openqa.selenium.support.PageFactory;
 public class ServiceRecordPage extends FormPage<ServiceRecordPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
-    ID(By.id("id"), FieldType.LABEL), //
-    INSTRUMENT(By.id("instrumentIdLabel"), FieldType.LABEL), //
-    TITLE(By.id("title"), FieldType.TEXT), //
-    DETAILS(By.id("details"), FieldType.TEXTAREA), //
-    SERVICED_BY(By.id("servicedBy"), FieldType.TEXT), //
-    REFERENCE_NUMBER(By.id("referenceNumber"), FieldType.TEXT), //
-    SERVICE_DATE(By.id("serviceDate"), FieldType.DATEPICKER), //
-    START_TIME(By.id("startTime"), FieldType.DATEPICKER), //
-    OUT_OF_SERVICE(By.id("outOfService"), FieldType.CHECKBOX), //
-    END_TIME(By.id("endTime"), FieldType.DATEPICKER);
+    ID(By.id("serviceRecordForm_id")), //
+    INSTRUMENT(By.id("serviceRecordForm_instrumentIdLabel")), //
+    TITLE(By.id("serviceRecordForm_title")), //
+    DETAILS(By.id("serviceRecordForm_details")), //
+    SERVICED_BY(By.id("serviceRecordForm_servicedBy")), //
+    REFERENCE_NUMBER(By.id("serviceRecordForm_referenceNumber")), //
+    SERVICE_DATE(By.id("serviceRecordForm_serviceDate")), //
+    START_TIME(By.id("serviceRecordForm_startTime")), //
+    OUT_OF_SERVICE(By.id("serviceRecordForm_outOfService")), //
+    END_TIME(By.id("serviceRecordForm_endTime"));
 
     private final By selector;
-    private final FieldType type;
 
-    private Field(By selector, FieldType type) {
+    private Field(By selector) {
       this.selector = selector;
-      this.type = type;
     }
 
     @Override
     public By getSelector() {
       return selector;
-    }
-
-    @Override
-    public FieldType getType() {
-      return type;
     }
   } // end Field enum
 

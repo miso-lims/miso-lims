@@ -1,7 +1,7 @@
 ---
 layout: page
-title: "24. European Nucleotide Archive Support"
-section: 24
+title: "26. European Nucleotide Archive Support"
+section: 26
 ---
 
 

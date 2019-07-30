@@ -64,28 +64,29 @@ FormTarget.freezer = (function($) {
           },
           getItemValue: Utils.array.getId,
           sortSource: Utils.sorting.standardSort('filename'),
-          onChange: function(newValue, updateField) {
+          onChange: function(newValue, form) {
             var settings = {
               disabled: !newValue
             }
             if (!newValue) {
               settings.value = null;
             }
-            updateField('mapAnchor', settings);
-            updateMapLink(updateField);
+            form.updateField('mapAnchor', settings);
+            updateMapLink(form, config.locationMaps);
           }
         }, {
           title: 'Map Anchor',
           data: 'mapAnchor',
           type: 'text',
           maxLength: 100,
-          onChange: function(newValue, updateField) {
-            updateMapLink(updateField);
+          onChange: function(newValue, form) {
+            updateMapLink(form, config.locationMaps);
           }
         }, {
           title: 'View Map',
           data: 'mapLink',
           type: 'read-only',
+          openNewTab: true,
           omit: true,
           getDisplayValue: function(freezer) {
             return 'n/a';
@@ -100,18 +101,14 @@ FormTarget.freezer = (function($) {
     }
   }
 
-  function updateMapLink(updateField) {
-    var span = $('#mapLinkLabel');
-    span.empty();
-    if ($('#mapId').val()) {
-      var url = '/freezermaps/' + $('#mapId option:selected').html();
-      if ($('#mapAnchor').val()) {
-        url += '#' + $('#mapAnchor').val();
-      }
-      span.append($('<a>').attr('href', url).attr('target', '_blank').text('Open'));
-    } else {
-      span.text('n/a');
-    }
+  function updateMapLink(form, locationMaps) {
+    var mapId = form.get('mapId');
+    var map = !mapId ? null : Utils.array.findUniqueOrThrow(Utils.array.idPredicate(mapId), locationMaps);
+    var mapAnchor = form.get('mapAnchor');
+    form.updateField('mapLink', {
+      label: mapId ? 'Open' : 'n/a',
+      link: mapId ? Urls.ui.freezerMaps.view(map.filename, mapAnchor) : null
+    });
   }
 
 })(jQuery);

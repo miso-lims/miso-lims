@@ -63,6 +63,12 @@ ListTarget.sequencingordercompletion = {
     }, 1, !config.poolId), ListUtils.labelHyperlinkColumn("Alias", Urls.ui.pools.edit, function(completion) {
       return completion.pool.id;
     }, "pool.alias", 0, !config.poolId), {
+      "sTitle": "Purpose",
+      "mData": "purpose",
+      "bSortable": true,
+      "iSortPriority": 0,
+      "include": true
+    }, {
       "sTitle": "Order Description",
       "mData": "description",
       "bSortable": false,

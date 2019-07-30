@@ -31,14 +31,15 @@
         <a href="<c:url value="/miso/samples"/>">Samples</a>
         <a href="<c:url value="/miso/libraries"/>">Libraries</a>
         <a href="<c:url value="/miso/libraryaliquots"/>">Library Aliquots</a>
-        <a href="<c:url value="/miso/worksets"/>">Worksets</a>
+        <a href="<c:url value="/miso/poolorders"/>">Pool Orders</a>
         <a href="<c:url value="/miso/pools"/>">Pools</a>
+        <a href="<c:url value="/miso/worksets"/>">Worksets</a>
         <a href="<c:url value="/miso/boxes"/>">Boxes</a>
     </div>
 
     <h2>Instrument Runs</h2>
     <div class="menu">
-        <a href="<c:url value="/miso/sequencingorders/active"/>">Sequencing Orders</a>
+        <a href="<c:url value="/miso/sequencingorders/outstanding"/>">Sequencing Orders</a>
           <a class="submenu" href="<c:url value="/miso/sequencingorders/all"/>">All</a>
           <a class="submenu" href="<c:url value="/miso/sequencingorders/outstanding"/>">Outstanding</a>
           <a class="submenu" href="<c:url value="/miso/sequencingorders/in-progress"/>">In-Progress</a>
@@ -77,6 +78,7 @@
       <a href="<c:url value="/miso/libraryselection/list"/>">Library Selection Types</a>
       <a href="<c:url value="/miso/librarystrategy/list"/>">Library Strategy Types</a>
       <a href="<c:url value="/miso/libraryspikein/list"/>">Library Spike-Ins</a>
+      <a href="<c:url value="/miso/orderpurpose/list"/>">Order Purposes</a>
       <a href="<c:url value="/miso/boxsize/list"/>">Box Sizes</a>
       <a href="<c:url value="/miso/boxuse/list"/>">Box Uses</a>
       <a href="<c:url value="/miso/arraymodel/list"/>">Array Models</a>

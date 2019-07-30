@@ -148,7 +148,7 @@ public class EditPoolController {
 
   @ModelAttribute
   public void addSequencingParameters(ModelMap model) throws IOException {
-    Collection<SequencingParametersDto> sequencingParameters = Dtos.asSequencingParametersDtos(sequencingParametersService.getAll());
+    Collection<SequencingParametersDto> sequencingParameters = Dtos.asSequencingParametersDtos(sequencingParametersService.list());
     JSONArray array = new JSONArray();
     array.addAll(sequencingParameters);
     model.put("sequencingParametersJson", array.toString());

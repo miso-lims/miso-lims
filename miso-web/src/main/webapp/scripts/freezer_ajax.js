@@ -478,7 +478,7 @@
       contentType: 'application/json; charset=utf8',
       data: JSON.stringify(component)
     }).success(Utils.page.pageReload).fail(function(response, textStatus, serverStatus) {
-      Validate.displayErrors(JSON.parse(response.responseText), '#freezerComponent-form');
+      Validate.displayErrors(JSON.parse(response.responseText), 'freezerComponent-form');
     });
   }
 

@@ -172,17 +172,17 @@ FormTarget.run = (function($) {
           getItemValue: function(item) {
             return item.label;
           },
-          onChange: function(newValue, updateField) {
+          onChange: function(newValue, form) {
             var status = getStatus(newValue);
             var updates = {
               required: status.isDone,
               // Editable if run is done and either there's no value set or user is admin
-              disabled: !status.isDone || ($('#endDate').val() && !config.isAdmin)
+              disabled: !status.isDone || (form.get('endDate') && !config.isAdmin)
             };
             if (!status.isDone) {
               updates.value = null;
             }
-            updateField('endDate', updates);
+            form.updateField('endDate', updates);
           },
           required: true,
           // Only editable by admin if run is done

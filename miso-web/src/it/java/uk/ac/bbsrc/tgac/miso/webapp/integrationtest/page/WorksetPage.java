@@ -19,27 +19,20 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 public class WorksetPage extends FormPage<WorksetPage.Field> {
   
   public static enum Field implements FormPage.FieldElement {
-    ID(By.id("id"), FieldType.LABEL), //
-    ALIAS(By.id("alias"), FieldType.TEXT), //
-    DESCRIPTION(By.id("description"), FieldType.TEXT), //
-    CREATOR(By.id("creator"), FieldType.LABEL);//
+    ID(By.id("worksetForm_id")), //
+    ALIAS(By.id("worksetForm_alias")), //
+    DESCRIPTION(By.id("worksetForm_description")), //
+    CREATOR(By.id("worksetForm_creator"));//
 
     private final By selector;
-    private final FieldType type;
 
-    private Field(By selector, FieldType type) {
+    private Field(By selector) {
       this.selector = selector;
-      this.type = type;
     }
 
     @Override
     public By getSelector() {
       return selector;
-    }
-
-    @Override
-    public FieldType getType() {
-      return type;
     }
   }
 
@@ -112,7 +105,7 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
   }
 
   public List<String> getAliasValidationErrors() {
-    return getDriver().findElements(By.cssSelector("#aliasError > ul > li")).stream()
+    return getDriver().findElements(By.cssSelector("#worksetForm_aliasError > ul > li")).stream()
         .map(WebElement::getText)
         .collect(Collectors.toList());
   }

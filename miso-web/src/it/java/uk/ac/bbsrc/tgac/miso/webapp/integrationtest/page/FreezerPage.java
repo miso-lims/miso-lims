@@ -12,28 +12,21 @@ public class FreezerPage extends FormPage<FreezerPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
 
-    ID(By.id("idLabel"), FieldType.LABEL), //
-    ROOM(By.id("parentLocationId"), FieldType.DROPDOWN), //
-    ALIAS(By.id("alias"), FieldType.TEXT), //
-    BARCODE(By.id("identificationBarcode"), FieldType.TEXT), //
-    PROBE_ID(By.id("probeId"), FieldType.TEXT); //
+    ID(By.id("freezerForm_idLabel")), //
+    ROOM(By.id("freezerForm_parentLocationId")), //
+    ALIAS(By.id("freezerForm_alias")), //
+    BARCODE(By.id("freezerForm_identificationBarcode")), //
+    PROBE_ID(By.id("freezerForm_probeId")); //
 
     private final By selector;
-    private final FieldType type;
 
-    private Field(By selector, FieldType type) {
+    private Field(By selector) {
       this.selector = selector;
-      this.type = type;
     }
 
     @Override
     public By getSelector() {
       return selector;
-    }
-
-    @Override
-    public FieldType getType() {
-      return type;
     }
 
   }

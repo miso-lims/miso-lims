@@ -11,34 +11,31 @@ import org.openqa.selenium.support.PageFactory;
 public class BoxPage extends FormPage<BoxPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
-    ID(By.id("id"), FieldType.LABEL), //
-    NAME(By.id("name"), FieldType.LABEL), //
-    ALIAS(By.id("alias"), FieldType.TEXT), //
-    BARCODE(By.id("identificationBarcode"), FieldType.TEXT), //
-    DESCRIPTION(By.id("description"), FieldType.TEXT), //
-    USE(By.id("useId"), FieldType.DROPDOWN), //
-    SIZE(By.id("sizeId"), By.id("sizeIdLabel"), FieldType.DROPDOWN) {
+    ID(By.id("boxForm_id")), //
+    NAME(By.id("boxForm_name")), //
+    ALIAS(By.id("boxForm_alias")), //
+    BARCODE(By.id("boxForm_identificationBarcode")), //
+    DESCRIPTION(By.id("boxForm_description")), //
+    USE(By.id("boxForm_useId")), //
+    SIZE(By.id("boxForm_sizeId"), By.id("boxForm_sizeIdLabel")) {
       @Override
       public String get(WebDriver driver) {
         return super.get(driver).replaceFirst(" \\(.*\\)", "");
       }
     }, //
-    LOCATION(By.id("locationBarcode"), FieldType.TEXT);
+    LOCATION(By.id("boxForm_locationBarcode"));
 
     private final By selector;
     private final By labelSelector;
-    private final FieldType type;
 
-    private Field(By selector, FieldType type) {
+    private Field(By selector) {
       this.selector = selector;
       this.labelSelector = null;
-      this.type = type;
     }
 
-    private Field(By selector, By labelSelector, FieldType type) {
+    private Field(By selector, By labelSelector) {
       this.selector = selector;
       this.labelSelector = labelSelector;
-      this.type = type;
     }
 
     @Override
@@ -49,11 +46,6 @@ public class BoxPage extends FormPage<BoxPage.Field> {
     @Override
     public By getLabelSelector() {
       return labelSelector;
-    }
-
-    @Override
-    public FieldType getType() {
-      return type;
     }
   }
 

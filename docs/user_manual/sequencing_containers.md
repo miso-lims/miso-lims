@@ -1,7 +1,7 @@
 ---
 layout: page
-title: "15. Sequencing Containers"
-section: 15
+title: "16. Sequencing Containers"
+section: 16
 ---
 
 A sequencing container holds one or more pools and is loaded onto a sequencer for a sequencing run. These actually have

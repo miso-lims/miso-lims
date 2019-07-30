@@ -39,21 +39,21 @@ public class ProjectPage extends HeaderFooterPage {
     public static final String RUNS = "project_runs_wrapper";
   }
 
-  @FindBy(id = "idLabel")
+  @FindBy(id = "projectForm_idLabel")
   private WebElement idLabel;
-  @FindBy(id = "nameLabel")
+  @FindBy(id = "projectForm_nameLabel")
   private WebElement nameLabel;
-  @FindBy(id = "creationDate")
+  @FindBy(id = "projectForm_creationDate")
   private WebElement creationDateLabel;
-  @FindBy(id = "alias")
+  @FindBy(id = "projectForm_alias")
   private WebElement aliasLabel;
-  @FindBy(id = "shortName")
+  @FindBy(id = "projectForm_shortName")
   private WebElement shortNameLabel;
-  @FindBy(id = "description")
+  @FindBy(id = "projectForm_description")
   private WebElement descriptionLabel;
-  @FindBy(id = "progress")
+  @FindBy(id = "projectForm_progress")
   private WebElement progressLabel;
-  @FindBy(id = "referenceGenomeId")
+  @FindBy(id = "projectForm_referenceGenomeId")
   private WebElement referenceGenomeLabel;
   @FindBy(id = "save")
   private WebElement saveButton;

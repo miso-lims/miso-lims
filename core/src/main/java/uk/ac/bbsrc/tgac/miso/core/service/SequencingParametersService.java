@@ -1,19 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.core.service;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.service.ListService;
+import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 
-public interface SequencingParametersService {
+public interface SequencingParametersService extends ListService<SequencingParameters>, SaveService<SequencingParameters> {
 
-  Long create(SequencingParameters sequencingParameters) throws IOException;
+  List<SequencingParameters> listByInstrumentModelId(long instrumentModelId) throws IOException;
 
-  SequencingParameters get(Long sequencingParametersId) throws IOException;
-
-  Collection<SequencingParameters> getAll() throws IOException;
-
-  Collection<SequencingParameters> getForInstrumentModel(Long instrumentModelId) throws IOException;
-
-  void update(SequencingParameters sequencingParameters) throws IOException;
 }

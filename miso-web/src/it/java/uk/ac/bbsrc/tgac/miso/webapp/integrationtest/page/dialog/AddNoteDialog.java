@@ -19,25 +19,18 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.FormPage;
 public class AddNoteDialog<T extends AbstractPage> extends FormPage<AddNoteDialog.Field> {
 
   public static enum Field implements FormPage.FieldElement {
-    INTERNAL_ONLY(By.cssSelector("#dialog input[type='checkbox']"), FieldType.CHECKBOX), //
-    TEXT(By.cssSelector("#dialog textarea"), FieldType.TEXTAREA);
+    INTERNAL_ONLY(By.cssSelector("#dialog input[type='checkbox']")), //
+    TEXT(By.cssSelector("#dialog textarea"));
 
     private final By selector;
-    private final FieldType type;
 
-    private Field(By selector, FieldType type) {
+    private Field(By selector) {
       this.selector = selector;
-      this.type = type;
     }
 
     @Override
     public By getSelector() {
       return selector;
-    }
-
-    @Override
-    public FieldType getType() {
-      return type;
     }
 
   }

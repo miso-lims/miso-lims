@@ -91,6 +91,11 @@ ListTarget.sequencingorder = {
       return pt.name == config.platformType;
     }, Constants.platformTypes);
     return [{
+      "sTitle": "Purpose",
+      "mData": "purposeAlias",
+      "include": true,
+      "iSortPriority": 0
+    }, {
       "sTitle": "Instrument Model",
       "mData": "parameters.instrumentModel.alias",
       "include": true,

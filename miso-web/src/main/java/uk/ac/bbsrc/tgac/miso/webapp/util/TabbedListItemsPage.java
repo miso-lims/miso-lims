@@ -3,8 +3,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.util;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public class TabbedListItemsPage {
   }
 
   private final String property;
-  private final SortedMap<String, String> tabs;
+  private final Map<String, String> tabs;
   private final String targetType;
 
   public <T> TabbedListItemsPage(String targetType, String property, Stream<T> tabItems, Function<T, String> getName,
@@ -58,7 +59,7 @@ public class TabbedListItemsPage {
       } catch (JsonProcessingException e) {
         throw new IllegalStateException("Failed to serialised tab value as JSON", e);
       }
-    }, (left, right) -> left, () -> new TreeMap<>(tabSorter))));
+    }, (left, right) -> left, () -> tabSorter == null ? new LinkedHashMap<>() : new TreeMap<>(tabSorter))));
   }
 
   /**
@@ -69,7 +70,7 @@ public class TabbedListItemsPage {
    * @param tabs The tabs to create. The key is a HTML-encoded string for the tab name and the value is a JavaScript-encoded value to set
    *          the configuration property to.
    */
-  public TabbedListItemsPage(String targetType, String property, SortedMap<String, String> tabs) {
+  public TabbedListItemsPage(String targetType, String property, Map<String, String> tabs) {
     this.targetType = targetType;
     this.property = property;
     this.tabs = tabs;
