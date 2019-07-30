@@ -51,7 +51,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.PoolStore;
 @Service
 public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool> {
 
-  @Value("${miso.pools.strict:false}")
+  @Value("${miso.pools.strictIndexChecking:false}")
   private Boolean strictPools;
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
