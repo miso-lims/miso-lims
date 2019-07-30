@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -121,6 +122,37 @@ public abstract class FormPage<T extends FormPage.FieldElement> extends HeaderFo
 
   public void setFields(Map<T, String> fields) {
     fields.forEach((key, val) -> setField(key, val));
+  }
+
+  public void printValidationErrors(String formId) {
+    errLog("General errors:");
+    List<WebElement> generalErrors = getDriver().findElements(By.cssSelector("#" + formId + " .generalErrors li"));
+    if (generalErrors.isEmpty()) {
+      errLog("(None)");
+    } else {
+      for (WebElement generalError : generalErrors) {
+        errLog("* " + generalError.getText());
+      }
+    }
+    errLog("Field errors:");
+    List<WebElement> errorContainers = getDriver().findElements(By.className(".errorContainer"));
+    boolean fieldErrors = false;
+    for (WebElement errorContainer : errorContainers) {
+      List<WebElement> errors = errorContainer.findElements(By.tagName("LI"));
+      if (!errors.isEmpty()) {
+        fieldErrors = true;
+        for (WebElement error : errors) {
+          errLog(String.format("* %s: %s", error.getAttribute("id"), error.getText()));
+        }
+      }
+    }
+    if (!fieldErrors) {
+      errLog("(None)");
+    }
+  }
+
+  private void errLog(String message) {
+    System.err.println(message);
   }
 
 }
