@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -9,6 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,9 +21,13 @@ import org.springframework.web.servlet.ModelAndView;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 
 @Controller
 public class IndexDistanceToolController {
+
+  @Autowired
+  private DuplicateIndicesChecker indexChecker;
 
   @ModelAttribute("title")
   public String title() {
@@ -133,6 +137,7 @@ public class IndexDistanceToolController {
 
   @RequestMapping(value = "/tools/indexdistance", method = RequestMethod.GET)
   public ModelAndView getTool(ModelMap model) {
+    model.addAttribute("defaultMinDistance", indexChecker.getWarningMismatches() + 1);
     return new ModelAndView("/WEB-INF/pages/indexDistanceTool.jsp", model);
   }
 
@@ -161,7 +166,7 @@ public class IndexDistanceToolController {
     return response;
   }
 
-  public static int getShortestIndexLength(List<String> indices) {
+  private static int getShortestIndexLength(List<String> indices) {
     try {
       int shortestIndex = indices.stream().filter(Objects::nonNull)
           .map(combinedIndex -> combinedIndex.split("-")[0])
@@ -173,14 +178,7 @@ public class IndexDistanceToolController {
     }
   }
 
-  public static String flattenIndices(List<Index> indices) {
-    return indices.stream()
-        .sorted(Comparator.comparingInt(Index::getPosition))
-        .map(Index::getSequence)
-        .collect(Collectors.joining("-"));
-  }
-
-  public static String truncate(String index, int shortestLength) {
+  private static String truncate(String index, int shortestLength) {
     return index.substring(0, shortestLength);
   }
 

@@ -247,7 +247,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListLibrariesWarnings() throws Exception {
-    testWarningNormal(ListTarget.LIBRARIES, "LIB901", "(Negative Volume)", Columns.WARNINGS);
+    testWarningNormal(ListTarget.LIBRARIES, "LIB901", "Negative Volume", Columns.WARNINGS);
   }
 
   @Test
@@ -276,10 +276,10 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListPoolsWarnings() throws Exception {
-    testWarningTabbed(ListTarget.POOLS, "no indices", "(MISSING INDEX)", Columns.DESCRIPTION);
-    testWarningTabbed(ListTarget.POOLS, "similar index", "(Near-Duplicate Indices)", Columns.DESCRIPTION);
-    testWarningTabbed(ListTarget.POOLS, "same index", "(DUPLICATE INDICES)", Columns.DESCRIPTION);
-    testWarningTabbed(ListTarget.POOLS, "low quality library", "(Low Quality Libraries)", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.POOLS, "no indices", "MISSING INDEX", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.POOLS, "similar index", "Near-Duplicate Indices", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.POOLS, "same index", "DUPLICATE INDICES", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.POOLS, "low quality library", "Low Quality Libraries", Columns.DESCRIPTION);
   }
 
   @Test
@@ -315,10 +315,10 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListOrdersWarnings() throws Exception {
-    testWarningTabbed(ListTarget.ORDERS_ALL, "no indices", "(MISSING INDEX)", Columns.POOL_DESCRIPTION);
-    testWarningTabbed(ListTarget.ORDERS_ALL, "similar index", "(Near-Duplicate Indices)", Columns.POOL_DESCRIPTION);
-    testWarningTabbed(ListTarget.ORDERS_ALL, "same index", "(DUPLICATE INDICES)", Columns.POOL_DESCRIPTION);
-    testWarningTabbed(ListTarget.ORDERS_ALL, "low quality library", "(Low Quality Libraries)", Columns.POOL_DESCRIPTION);
+    testWarningTabbed(ListTarget.ORDERS_ALL, "no indices", "MISSING INDEX", Columns.POOL_DESCRIPTION);
+    testWarningTabbed(ListTarget.ORDERS_ALL, "similar index", "Near-Duplicate Indices", Columns.POOL_DESCRIPTION);
+    testWarningTabbed(ListTarget.ORDERS_ALL, "same index", "DUPLICATE INDICES", Columns.POOL_DESCRIPTION);
+    testWarningTabbed(ListTarget.ORDERS_ALL, "low quality library", "Low Quality Libraries", Columns.POOL_DESCRIPTION);
   }
 
   @Test

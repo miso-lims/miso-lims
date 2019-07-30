@@ -19,42 +19,56 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 @Component
 public class DuplicateIndicesChecker {
 
-  @Value("${miso.error.edit.distance:2}")
-  public int errorEditDistance;
-  @Value("${miso.warning.edit.distance:3}")
-  public int warningEditDistance;
+  @Value("${miso.pools.error.index.mismatches:0}")
+  private int errorMismatches;
+  @Value("${miso.pools.error.index.mismatches.message:DUPLICATE INDICES")
+  private String errorMismatchesMessage;
+  @Value("${miso.pools.warning.index.mismatches:2}")
+  private int warningMismatches;
+  @Value("${miso.pools.warning.index.mismatches.message:Near-Duplicate Indices")
+  private String warningMismatchesMessage;
+
+  public int getErrorMismatches() {
+    return errorMismatches;
+  }
+
+  public String getErrorMismatchesMessage() {
+    return errorMismatchesMessage;
+  }
+
+  public int getWarningMismatches() {
+    return warningMismatches;
+  }
+
+  public String getWarningMismatchesMessage() {
+    return warningMismatchesMessage;
+  }
 
   public Set<String> getDuplicateIndicesSequences(Pool pool) {
     if (pool == null) return Collections.emptySet();
     List<List<Index>> indices = getIndexSequences(pool);
-    return getIndexSequencesWithMinimumEditDistance(indices, errorEditDistance);
+    return getIndexSequencesWithTooFewMismatches(indices, errorMismatches);
   }
 
   public Set<String> getNearDuplicateIndicesSequences(Pool pool) {
     if (pool == null) return Collections.emptySet();
     List<List<Index>> indices = getIndexSequences(pool);
-    return getIndexSequencesWithMinimumEditDistance(indices, warningEditDistance);
+    return getIndexSequencesWithTooFewMismatches(indices, warningMismatches);
   }
 
   public Set<String> getDuplicateIndicesSequences(ListPoolView pool) {
     if (pool == null) return Collections.emptySet();
     List<List<Index>> indices = getIndexSequences(pool);
-    return getIndexSequencesWithMinimumEditDistance(indices, errorEditDistance);
+    return getIndexSequencesWithTooFewMismatches(indices, errorMismatches);
   }
 
   public Set<String> getNearDuplicateIndicesSequences(ListPoolView pool) {
     if (pool == null) return Collections.emptySet();
     List<List<Index>> indices = getIndexSequences(pool);
-    return getIndexSequencesWithMinimumEditDistance(indices, warningEditDistance);
+    return getIndexSequencesWithTooFewMismatches(indices, warningMismatches);
   }
 
-  public static Set<String> getIndexSequencesWithMinimumEditDistance(Pool pool, int minAllowableEditDistance) {
-    if (pool == null) return Collections.emptySet();
-    List<List<Index>> indices = getIndexSequences(pool);
-    return getIndexSequencesWithMinimumEditDistance(indices, minAllowableEditDistance);
-  }
-
-  public static Set<String> getIndexSequencesWithMinimumEditDistance(List<List<Index>> indices, int minAllowableEditDistance) {
+  private static Set<String> getIndexSequencesWithTooFewMismatches(List<List<Index>> indices, int mismatchesThreshold) {
     Set<String> nearMatchSequences = new HashSet<>();
     if (indices.stream().flatMap(List::stream).allMatch(index -> hasFakeSequence(index)))
       return Collections.emptySet();
@@ -65,10 +79,10 @@ public class DuplicateIndicesChecker {
       }
       for (int j = i + 1; j < indices.size(); j++) {
         String sequence2 = getCombinedIndexSequences(indices.get(j));
-        if (sequence2.length() == 0 || !isCheckNecessary(indices.get(i), indices.get(j), minAllowableEditDistance)) {
+        if (sequence2.length() == 0 || !isCheckNecessary(indices.get(i), indices.get(j), mismatchesThreshold)) {
           continue;
         }
-        if (Index.checkEditDistance(sequence1, sequence2) < minAllowableEditDistance) {
+        if (Index.checkEditDistance(sequence1, sequence2) <= mismatchesThreshold) {
           nearMatchSequences.add(sequence1);
           nearMatchSequences.add(sequence2);
         }

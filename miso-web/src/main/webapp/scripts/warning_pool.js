@@ -50,22 +50,22 @@ WarningTarget.pool = {
         }, {
           include: pool.nearDuplicateIndices && !pool.duplicateIndices,
           headerMessage: 'This pool contains near-duplicate indices!',
-          tableMessage: '(' + Constants.warningMessages.nearDuplicateIndices + ')',
+          tableMessage: Constants.warningMessages.nearDuplicateIndices,
           tileMessage: Constants.warningMessages.nearDuplicateIndices
         }, {
           include: pool.hasEmptySequence,
           headerMessage: 'This pool contains at least one library with no index!',
-          tableMessage: '(' + Constants.warningMessages.missingIndex + ')',
+          tableMessage: Constants.warningMessages.missingIndex,
           tileMessage: Constants.warningMessages.missingIndex
         }, {
           include: pool.hasLowQualityLibraries,
           headerMessage: 'This pool contains at least one low quality library!',
-          tableMessage: '(' + Constants.warningMessages.lowQualityLibraries + ')',
+          tableMessage: Constants.warningMessages.lowQualityLibraries,
           tileMessage: Constants.warningMessages.lowQualityLibraries
         }, {
           include: revokedAliquots.length > 0,
           headerMessage: "Donor has revoked consent for " + revokedAliquots.toString(),
-          tableMessage: '(' + Constants.warningMessages.consentRevoked + ')',
+          tableMessage: Constants.warningMessages.consentRevoked,
           tileMessage: Constants.warningMessages.consentRevoked
         }];
   }

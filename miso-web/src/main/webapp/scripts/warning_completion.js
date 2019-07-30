@@ -30,21 +30,21 @@ WarningTarget.completion = {
       level: 'important'
     }, {
       include: pool.duplicateIndices,
-      tableMessage: '(' + Constants.warningMessages.duplicateIndices + ')'
+      tableMessage: Constants.warningMessages.duplicateIndices
     }, {
       include: pool.nearDuplicateIndices && !pool.duplicateIndices,
-      tableMessage: '(' + Constants.warningMessages.nearDuplicateIndices + ')'
+      tableMessage: Constants.warningMessages.nearDuplicateIndices
     }, {
       include: pool.hasEmptySequence,
-      tableMessage: '(' + Constants.warningMessages.missingIndex + ')'
+      tableMessage: Constants.warningMessages.missingIndex
     }, {
       include: pool.hasLowQualityLibraries,
-      tableMessage: '(' + Constants.warningMessages.lowQualityLibraries + ')'
+      tableMessage: Constants.warningMessages.lowQualityLibraries
     }, {
       include: pool.pooledElements && pool.pooledElements.some(function(element) {
         return element.identityConsentLevel === 'Revoked';
       }),
-      tableMessage: '(' + Constants.warningMessages.consentRevoked + ')'
+      tableMessage: Constants.warningMessages.consentRevoked
     }];
   }
 };

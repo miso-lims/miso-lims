@@ -696,7 +696,7 @@
     hyperlinkifyBoxable: function(name, id, text) {
       var path = "/miso/";
       var prefix = name.substring(0, 3);
-      if (prefix == "SAM" || prefix == "LIB" || prefix == "LDI" || prefix.substring(1, 3) == "PO") {
+      if (["SAM", "LIB", "LDI", "IPO"].includes(prefix)) {
         if (prefix == "SAM") {
           path += "sample/";
         } else if (prefix == "LIB") {
@@ -705,7 +705,7 @@
           path += "libraryaliquot/";
         } else if (prefix == "IPO") {
           path += "pool/";
-        }
+      }
         path += id;
         return Box.utils.hyperlinkify(path, text);
       } else {

@@ -13,8 +13,11 @@ Changes:
 
 Upgrade Notes:
 
+`miso.properties` changes:
   * `miso.pools.strictIndexChecking` now present in `miso.properties`. Default value is false, if
-    property is not found 'false' is assumed.  
+    property is not found 'false' is assumed.
+  * Number of mismatches to trigger duplicate & near-duplicate indices messages are now configurable
+    * Messages for duplicate & near-duplicate indices are now configurable
 
 # 0.2.185:
 

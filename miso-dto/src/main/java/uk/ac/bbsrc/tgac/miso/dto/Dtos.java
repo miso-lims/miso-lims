@@ -1180,7 +1180,7 @@ public class Dtos {
   }
 
   public static Set<SequencingOrderDto> asSequencingOrderDtos(@Nonnull Collection<SequencingOrder> from) {
-    return from.stream().map(so -> asDto(so)).collect(Collectors.toSet());
+    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static SequencingOrder to(@Nonnull SequencingOrderDto from) {

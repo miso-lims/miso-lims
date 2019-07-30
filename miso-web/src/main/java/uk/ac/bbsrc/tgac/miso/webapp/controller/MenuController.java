@@ -124,6 +124,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 
 import io.prometheus.client.Gauge;
 
@@ -208,7 +209,8 @@ public class MenuController implements ServletContextAware {
   private AttachmentCategoryService attachmentCategoryService;
   @Autowired
   private OrderPurposeService orderPurposeService;
-
+  @Autowired
+  private DuplicateIndicesChecker indexChecker;
   @Autowired
   private NamingScheme namingScheme;
 
@@ -216,14 +218,6 @@ public class MenuController implements ServletContextAware {
   private Boolean autoGenerateIdBarcodes;
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
-  @Value("${miso.error.edit.distance:2}")
-  public int errorEditDistance;
-  @Value("${miso.error.edit.distance.message:DUPLICATE INDICES}")
-  public String errorEditDistanceMessage;
-  @Value("${miso.warning.edit.distance:3}")
-  public int warningEditDistance;
-  @Value("${miso.warning.edit.distance.message:Near-Duplicate Indices}")
-  public String warningEditDistanceMessage;
 
   @Resource
   private Boolean boxScannerEnabled;
@@ -419,8 +413,8 @@ public class MenuController implements ServletContextAware {
 
     ObjectNode warningsNode = mapper.createObjectNode();
     warningsNode.put("consentRevoked", "CONSENT REVOKED");
-    warningsNode.put("duplicateIndices", errorEditDistanceMessage);
-    warningsNode.put("nearDuplicateIndices", warningEditDistanceMessage);
+    warningsNode.put("duplicateIndices", indexChecker.getErrorMismatchesMessage());
+    warningsNode.put("nearDuplicateIndices", indexChecker.getWarningMismatchesMessage());
     warningsNode.put("lowQualityLibraries", "Low Quality Libraries");
     warningsNode.put("missingIndex", "MISSING INDEX");
     warningsNode.put("negativeVolume", "Negative Volume");

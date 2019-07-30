@@ -291,8 +291,8 @@ public class PoolPageIT extends AbstractIT {
 
   @Test
   public void testLibraryAliquotTableWarnings() {
-    testLibraryAliquotTableWarningOnPoolWithError(801L, "(MISSING INDEX)");
-    testLibraryAliquotTableWarningOnPoolWithError(802L, "(NEAR-DUPLICATE INDICES)");
+    testLibraryAliquotTableWarningOnPoolWithError(801L, "MISSING INDEX");
+    testLibraryAliquotTableWarningOnPoolWithError(802L, "Near-Duplicate Indices");
     testLibraryAliquotTableWarningOnPoolWithError(803L, "DUPLICATE INDICES");
   }
 
@@ -320,9 +320,9 @@ public class PoolPageIT extends AbstractIT {
   public void testWarningsOnPoolWithNoErrors() {
     PoolPage page = PoolPage.getForEdit(getDriver(), getBaseUrl(), 120001L);
     DataTable table = page.getTable(PoolTableWrapperId.INCLUDED_LIBRARY_ALIQUOTS);
-    assertFalse(table.doesColumnContainSubstring(Columns.INDICES, "(NO INDICES)"));
-    assertFalse(table.doesColumnContainSubstring(Columns.INDICES, "(NEAR-DUPLICATE INDICES)"));
-    assertFalse(table.doesColumnContainSubstring(Columns.INDICES, "(DUPLICATE INDICES)"));
+    assertFalse(table.doesColumnContainSubstring(Columns.INDICES, "MISSING INDEX"));
+    assertFalse(table.doesColumnContainSubstring(Columns.INDICES, "Near-Duplicate Indices"));
+    assertFalse(table.doesColumnContainSubstring(Columns.INDICES, "DUPLICATE INDICES"));
   }
 
   private void assertPoolAttributes(Map<PoolPage.Field, String> expectedValues, Pool pool) {

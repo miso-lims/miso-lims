@@ -31,15 +31,15 @@ WarningTarget.library = {
     }, {
       include: parseFloat(library.volume) < 0,
       headerMessage: 'This library has a negative volume!',
-      tableMessage: '(' + Constants.warningMessages.negativeVolume + ')'
+      tableMessage: Constants.warningMessages.negativeVolume
     }, {
       include: library.identityConsentLevel === 'Revoked',
       headerMessage: 'Donor has revoked consent',
-      tableMessage: '(' + Constants.warningMessages.consentRevoked + ')'
+      tableMessage: Constants.warningMessages.consentRevoked
     }, {
       include: library.lowQuality,
       headerMessage: 'Low Quality Library',
-      tableMessage: '(' + Constants.warningMessages.lowQualityLibraries + ')'
+      tableMessage: Constants.warningMessages.lowQualityLibraries
     }];
   }
 

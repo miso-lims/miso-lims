@@ -469,9 +469,9 @@ public class RunPageIT extends AbstractIT {
   @Test
   public void testPoolTileWarnings() throws Exception {
     testPoolTileWarning("IPO801", "MISSING INDEX");
-    testPoolTileWarning("IPO802", "NEAR-DUPLICATE INDICES");
+    testPoolTileWarning("IPO802", "Near-Duplicate Indices");
     testPoolTileWarning("IPO803", "DUPLICATE INDICES");
-    testPoolTileWarning("IPO804", "LOW QUALITY LIBRARIES");
+    testPoolTileWarning("IPO804", "Low Quality Libraries");
   }
 
   public void testPoolTileWarning(String search, String warning) throws Exception {
