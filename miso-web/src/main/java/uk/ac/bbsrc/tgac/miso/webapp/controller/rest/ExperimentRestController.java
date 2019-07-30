@@ -124,26 +124,23 @@ public class ExperimentRestController extends RestController {
 
   @PostMapping(produces = "application/json")
   public @ResponseBody ExperimentDto create(@RequestBody ExperimentDto dto) throws IOException {
-    return RestUtils.createObject("Experiment", dto, Dtos::to, experimentService,
-        expt -> Dtos.asDto(expt));
+    return RestUtils.createObject("Experiment", dto, Dtos::to, experimentService, Dtos::asDto);
   }
 
   @PutMapping("/{experimentId}")
   public @ResponseBody ExperimentDto update(@PathVariable long experimentId, @RequestBody ExperimentDto dto) throws IOException {
-    return RestUtils.updateObject("Experiment", experimentId, dto, Dtos::to, experimentService,
-        expt -> Dtos.asDto(expt));
+    return RestUtils.updateObject("Experiment", experimentId, dto, Dtos::to, experimentService, Dtos::asDto);
   }
 
   @GetMapping(value = "/{experimentId}", produces = "application/json")
   public @ResponseBody ExperimentDto get(@PathVariable Long experimentId) throws IOException {
-    return RestUtils.getObject("Experiment", experimentId, experimentService,
-        expt -> Dtos.asDto(expt));
+    return RestUtils.getObject("Experiment", experimentId, experimentService, Dtos::asDto);
   }
 
   @GetMapping(produces = "application/json")
   public @ResponseBody List<ExperimentDto> list() throws IOException {
     Collection<Experiment> experiments = experimentService.list();
-    return experiments.stream().map(expt -> Dtos.asDto(expt)).collect(Collectors.toList());
+    return experiments.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
 }

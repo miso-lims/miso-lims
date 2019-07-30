@@ -49,6 +49,6 @@ public class ListExperimentsController {
   @RequestMapping("/experiments")
   public ModelAndView listExperiments(ModelMap model) throws IOException {
     return new ListItemsPage("experiment").list(model,
-        experimentService.list().stream().map(expt -> Dtos.asDto(expt)));
+        experimentService.list().stream().map(Dtos::asDto));
   }
 }
