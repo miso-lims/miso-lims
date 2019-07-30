@@ -288,7 +288,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   public void validateIndices(Pool pool, Pool beforeChange, Collection<ValidationError> errors) throws IOException {
-    refreshPoolElements(pool, errors);
+    refreshPoolElements(pool);
     Set<String> indices = getAllBadIndices(pool);
     Set<String> bcIndices = getAllBadIndices(beforeChange);
 
