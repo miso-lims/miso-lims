@@ -336,26 +336,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public Set<String> getDuplicateIndicesSequences() {
-    return duplicateIndicesSequences;
-  }
-
-  @Override
-  public void setDuplicateIndicesSequences(Set<String> duplicateIndicesSequences) {
-    this.duplicateIndicesSequences = duplicateIndicesSequences;
-  }
-
-  @Override
-  public Set<String> getNearDuplicateIndicesSequences() {
-    return nearDuplicateIndicesSequences;
-  }
-
-  @Override
-  public void setNearDuplicateIndicesSequences(Set<String> nearDuplicateIndicesSequences) {
-    this.nearDuplicateIndicesSequences = nearDuplicateIndicesSequences;
-  }
-
-  @Override
   public boolean hasLibrariesWithoutIndex() {
     return getPoolContents().stream().map(PoolElement::getPoolableElementView).anyMatch(v -> v.getIndices().isEmpty());
   }

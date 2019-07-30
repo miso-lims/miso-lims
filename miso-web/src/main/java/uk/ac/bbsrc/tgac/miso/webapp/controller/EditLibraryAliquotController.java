@@ -81,12 +81,8 @@ public class EditLibraryAliquotController {
     model.put("aliquot", aliquot);
     model.put("aliquotDto", mapper.writeValueAsString(Dtos.asDto(aliquot, false)));
     List<Pool> pools = poolService.listByLibraryAliquotId(aliquotId);
-    pools.forEach(p -> {
-      p.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p));
-      p.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p));
-    });
     model.put("aliquotPools",
-        pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
+        pools.stream().map(p -> Dtos.asDto(p, false, false, indexChecker)).collect(Collectors.toList()));
     model.put("aliquotRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
         .collect(Collectors.toList()));
 

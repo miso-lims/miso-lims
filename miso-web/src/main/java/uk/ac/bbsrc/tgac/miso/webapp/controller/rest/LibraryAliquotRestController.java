@@ -200,9 +200,7 @@ public class LibraryAliquotRestController extends RestController {
 
         @Override
         public PoolDto asDto(Pool model) {
-          model.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(model));
-          model.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(model));
-          return Dtos.asDto(model, false, false);
+          return Dtos.asDto(model, false, false, indexChecker);
         }
 
         @Override

@@ -15,17 +15,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.dto.IndexChecker;
 
 @Component
-public class DuplicateIndicesChecker {
+public class DuplicateIndicesChecker implements IndexChecker {
 
   @Value("${miso.pools.error.index.mismatches:0}")
   private int errorMismatches;
-  @Value("${miso.pools.error.index.mismatches.message:DUPLICATE INDICES")
+  @Value("${miso.pools.error.index.mismatches.message:DUPLICATE INDICES}")
   private String errorMismatchesMessage;
   @Value("${miso.pools.warning.index.mismatches:2}")
   private int warningMismatches;
-  @Value("${miso.pools.warning.index.mismatches.message:Near-Duplicate Indices")
+  @Value("${miso.pools.warning.index.mismatches.message:Near-Duplicate Indices}")
   private String warningMismatchesMessage;
 
   public int getErrorMismatches() {
@@ -44,24 +45,28 @@ public class DuplicateIndicesChecker {
     return warningMismatchesMessage;
   }
 
+  @Override
   public Set<String> getDuplicateIndicesSequences(Pool pool) {
     if (pool == null) return Collections.emptySet();
     List<List<Index>> indices = getIndexSequences(pool);
     return getIndexSequencesWithTooFewMismatches(indices, errorMismatches);
   }
 
+  @Override
   public Set<String> getNearDuplicateIndicesSequences(Pool pool) {
     if (pool == null) return Collections.emptySet();
     List<List<Index>> indices = getIndexSequences(pool);
     return getIndexSequencesWithTooFewMismatches(indices, warningMismatches);
   }
 
+  @Override
   public Set<String> getDuplicateIndicesSequences(ListPoolView pool) {
     if (pool == null) return Collections.emptySet();
     List<List<Index>> indices = getIndexSequences(pool);
     return getIndexSequencesWithTooFewMismatches(indices, errorMismatches);
   }
 
+  @Override
   public Set<String> getNearDuplicateIndicesSequences(ListPoolView pool) {
     if (pool == null) return Collections.emptySet();
     List<List<Index>> indices = getIndexSequences(pool);

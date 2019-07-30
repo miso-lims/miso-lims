@@ -46,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 
 @Controller
 @RequestMapping("/experiment")
@@ -53,6 +54,8 @@ public class EditExperimentController {
 
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private DuplicateIndicesChecker indexChecker;
 
   @GetMapping(value = "/{experimentId}")
   public ModelAndView setupForm(@PathVariable Long experimentId, ModelMap model) throws IOException {
@@ -81,7 +84,7 @@ public class EditExperimentController {
     model.put("runPartitions",
         experiment.getRunPartitions().stream()
             .map(entry -> new ExperimentDto.RunPartitionDto(Dtos.asDto(entry.getRun()),
-                Dtos.asDto(entry.getPartition())))
+                Dtos.asDto(entry.getPartition(), indexChecker)))
             .collect(Collectors.toList()));
     model.put("title", "Edit Experiment");
     return new ModelAndView("/WEB-INF/pages/editExperiment.jsp", model);

@@ -259,12 +259,8 @@ public class EditSampleController {
     List<RunDto> runDtos = pools.stream().flatMap(WhineyFunction.flatRethrow(pool -> runService.listByPoolId(pool.getId())))
         .map(Dtos::asDto)
         .collect(Collectors.toList());
-    pools.forEach(p -> {
-      p.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p));
-      p.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p));
-    });
     model.put("samplePools",
-        pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
+        pools.stream().map(p -> Dtos.asDto(p, false, false, indexChecker)).collect(Collectors.toList()));
     model.put("sampleRuns", runDtos);
     model.put("sampleRelations", getRelations(sample));
     addArrayData(sampleId, model);

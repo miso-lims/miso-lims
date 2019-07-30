@@ -74,9 +74,7 @@ public class SequencingOrderRestController extends RestController {
 
     @Override
     protected SequencingOrderCompletionDto asDto(SequencingOrderCompletion model) {
-      model.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(model.getPool()));
-      model.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(model.getPool()));
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, indexChecker);
     }
   };
 
@@ -96,7 +94,7 @@ public class SequencingOrderRestController extends RestController {
     if (result == null) {
       throw new RestException("No sequencing order found with ID: " + id, Status.NOT_FOUND);
     } else {
-      return Dtos.asDto(result);
+      return Dtos.asDto(result, indexChecker);
     }
   }
 
@@ -108,7 +106,7 @@ public class SequencingOrderRestController extends RestController {
     SequencingOrder seqOrder = Dtos.to(orderDto);
     Long id = sequencingOrderService.create(seqOrder);
     SequencingOrder saved = sequencingOrderService.get(id);
-    return Dtos.asDto(saved);
+    return Dtos.asDto(saved, indexChecker);
   }
   
   @GetMapping(value = "/sequencingorders/dt/completions/all/{platform}", produces = { "application/json" })
@@ -196,10 +194,8 @@ public class SequencingOrderRestController extends RestController {
   }
 
   private PoolPickerEntry orderTransform(SequencingOrderCompletion order) {
-    order.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(order.getPool()));
-    order.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(order.getPool()));
-    PoolDto poolDto = Dtos.asDto(order.getPool(), true, false);
-    SequencingOrderCompletionDto socDto = Dtos.asDto(order);
+    PoolDto poolDto = Dtos.asDto(order.getPool(), true, false, indexChecker);
+    SequencingOrderCompletionDto socDto = Dtos.asDto(order, indexChecker);
     return new PoolPickerEntry(poolDto,
         Collections.singletonList(socDto));
   }

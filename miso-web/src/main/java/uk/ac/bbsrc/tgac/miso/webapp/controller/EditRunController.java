@@ -157,11 +157,7 @@ public class EditRunController {
     model.put("runPositions", run.getRunPositions().stream().map(Dtos::asDto).collect(Collectors.toList()));
     model.put("runPartitions", run.getSequencerPartitionContainers().stream().flatMap(container -> container.getPartitions().stream())
         .map(WhineyFunction.rethrow(partition -> {
-          if (partition.getPool() != null) {
-            partition.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(partition.getPool()));
-            partition.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(partition.getPool()));
-          }
-          PartitionDto dto = Dtos.asDto(partition, false);
+          PartitionDto dto = Dtos.asDto(partition, false, indexChecker);
           PartitionQC qc = partitionQCService.get(run, partition);
           if (qc != null) {
             dto.setQcType(qc.getType().getId());

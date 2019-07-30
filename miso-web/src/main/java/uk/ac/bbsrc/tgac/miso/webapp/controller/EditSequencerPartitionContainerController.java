@@ -150,21 +150,13 @@ public class EditSequencerPartitionContainerController {
 
   private ModelAndView setupForm(SequencerPartitionContainer container, ModelMap model) throws IOException {
     model.put("container", container);
-    if (container.getPartitions() != null) {
-      container.getPartitions().forEach(p -> {
-        if (p != null && p.getPool() != null) {
-          p.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p.getPool()));
-          p.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p.getPool()));
-        }
-      });
-    }
     model.put("containerPartitions",
-        container.getPartitions().stream().map(partition -> Dtos.asDto(partition, false))
+        container.getPartitions().stream().map(partition -> Dtos.asDto(partition, false, indexChecker))
             .collect(Collectors.toList()));
     model.put("containerRuns", runService.listByContainerId(container.getId()).stream().map(Dtos::asDto).collect(Collectors.toList()));
 
     ObjectMapper mapper = new ObjectMapper();
-    model.put("containerJSON", mapper.writer().writeValueAsString(Dtos.asDto(container)));
+    model.put("containerJSON", mapper.writer().writeValueAsString(Dtos.asDto(container, indexChecker)));
     model.put("poreVersions", containerService.listPoreVersions());
     return new ModelAndView("/WEB-INF/pages/editSequencerPartitionContainer.jsp", model);
   }

@@ -177,14 +177,6 @@ public interface Pool
    */
   void setDescription(String description);
 
-  Set<String> getDuplicateIndicesSequences();
-
-  Set<String> getNearDuplicateIndicesSequences();
-
-  void setDuplicateIndicesSequences(Set<String> duplicateIndicesSequences);
-
-  void setNearDuplicateIndicesSequences(Set<String> nearDuplicateIndicesSequences);
-
   public void setBoxPosition(PoolBoxPosition boxPosition);
 
   /**

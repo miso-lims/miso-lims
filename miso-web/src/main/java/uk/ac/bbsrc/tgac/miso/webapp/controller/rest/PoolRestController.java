@@ -138,9 +138,7 @@ public class PoolRestController extends RestController {
 
     @Override
     protected PoolDto asDto(ListPoolView model) {
-      model.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(model));
-      model.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(model));
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, indexChecker);
     }
 
     @Override
@@ -175,15 +173,11 @@ public class PoolRestController extends RestController {
   }
 
   private PoolDto makePoolDto(Pool pool) {
-    pool.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(pool));
-    pool.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(pool));
-    return Dtos.asDto(pool, true, false);
+    return Dtos.asDto(pool, true, false, indexChecker);
   }
   
   private PoolDto makeEmptyPoolDto(Pool pool) {
-    pool.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(pool));
-    pool.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(pool));
-    return Dtos.asDto(pool, false, false);
+    return Dtos.asDto(pool, false, false, indexChecker);
   }
 
   @GetMapping(value = "{poolId}/runs", produces = "application/json")
@@ -397,7 +391,7 @@ public class PoolRestController extends RestController {
 
   private PoolPickerEntry poolTransform(Pool pool) throws IOException {
     List<SequencingOrderCompletionDto> completions = sequencingOrderCompletionService.listByPoolId(pool.getId()).stream()
-        .map(oc -> Dtos.asDto(oc)).collect(Collectors.toList());
+        .map(oc -> Dtos.asDto(oc, indexChecker)).collect(Collectors.toList());
     return new PoolPickerEntry(makePoolDto(pool), completions);
   }
 

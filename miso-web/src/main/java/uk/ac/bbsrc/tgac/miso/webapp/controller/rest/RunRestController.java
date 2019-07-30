@@ -87,6 +87,7 @@ import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
 import uk.ac.bbsrc.tgac.miso.dto.StudyDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 
 /**
  * A controller to handle all REST requests for Runs
@@ -142,6 +143,8 @@ public class RunRestController extends RestController {
   private LibraryService libraryService;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private DuplicateIndicesChecker indexChecker;
 
   private final JQueryDataTableBackend<Run, RunDto> jQueryBackend = new JQueryDataTableBackend<Run, RunDto>() {
 
@@ -347,7 +350,7 @@ public class RunRestController extends RestController {
     Map<Library, List<Partition>> libraryGroups = getLibraryGroups(run);
 
     return libraryGroups.entrySet().stream().map(group -> new Pair<>(group.getKey(),
-        group.getValue().stream().map(partition -> Dtos.asDto(partition))
+        group.getValue().stream().map(partition -> Dtos.asDto(partition, indexChecker))
             .map(partitionDto -> new RunPartitionDto(runDto, partitionDto))
             .collect(Collectors.toList())))
         .map(group -> {
@@ -398,7 +401,7 @@ public class RunRestController extends RestController {
                 .map(partition -> {
                   AddRequest request = new AddRequest();
                   request.experiment = Dtos.asDto(experiment);
-                  request.partition = Dtos.asDto(partition);
+                  request.partition = Dtos.asDto(partition, indexChecker);
                   return request;
                 }))))
         .collect(Collectors.toList());

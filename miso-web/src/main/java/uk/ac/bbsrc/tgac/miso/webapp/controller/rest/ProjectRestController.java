@@ -150,11 +150,7 @@ public class ProjectRestController extends RestController {
   @GetMapping(value = "/{projectId}/pools", produces = "application/json")
   public @ResponseBody List<PoolDto> getProjectPools(@PathVariable Long projectId) throws IOException {
     Collection<Pool> pp = poolService.listByProjectId(projectId);
-    pp.forEach(p -> {
-      p.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p));
-      p.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p));
-    });
-    return pp.stream().map(pool -> Dtos.asDto(pool, true, false)).collect(Collectors.toList());
+    return pp.stream().map(pool -> Dtos.asDto(pool, true, false, indexChecker)).collect(Collectors.toList());
   }
 
   @GetMapping(value = "/{projectId}/runs", produces = "application/json")

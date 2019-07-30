@@ -293,12 +293,8 @@ public class EditLibraryController {
     addAdjacentLibraries(library, model);
 
     Collection<Pool> pools = poolService.listByLibraryId(library.getId());
-    pools.forEach(p -> {
-      p.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p));
-      p.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p));
-    });
     model.put("libraryPools",
-        pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
+        pools.stream().map(p -> Dtos.asDto(p, false, false, indexChecker)).collect(Collectors.toList()));
     model.put("libraryRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
         .collect(Collectors.toList()));
     model.put("libraryAliquots", library.getLibraryAliquots().stream()

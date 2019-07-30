@@ -36,9 +36,7 @@ public class EditSequencingOrderController {
     @Override
     protected SequencingOrderDto createDtoFromParent(Pool item) {
       SequencingOrderDto dto = new SequencingOrderDto();
-      item.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(item));
-      item.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(item));
-      dto.setPool(Dtos.asDto(item, false, false));
+      dto.setPool(Dtos.asDto(item, false, false, indexChecker));
       return dto;
     }
 

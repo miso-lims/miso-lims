@@ -88,15 +88,7 @@ public class ContainerRestController extends RestController {
 
     @Override
     protected ContainerDto asDto(SequencerPartitionContainer model) {
-      if (model.getPartitions() != null) {
-        model.getPartitions().forEach(p -> {
-          if (p.getPool() != null) {
-            p.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p.getPool()));
-            p.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p.getPool()));
-          }
-        });
-      }
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, indexChecker);
     }
 
     @Override
@@ -109,14 +101,7 @@ public class ContainerRestController extends RestController {
   @GetMapping(value = "/{containerBarcode}", produces = "application/json")
   public @ResponseBody List<ContainerDto> jsonRest(@PathVariable String containerBarcode) throws IOException {
     Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(containerBarcode);
-    containers.forEach(c -> {
-      c.getPartitions().forEach(p -> {
-        p.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p.getPool()));
-        p.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p.getPool()));
-      });
-    });
-
-    return containers.stream().map(container -> Dtos.asDto(container)).collect(Collectors.toList());
+    return containers.stream().map(container -> Dtos.asDto(container, indexChecker)).collect(Collectors.toList());
   }
 
   @GetMapping(value = "/dt", produces = "application/json")
@@ -220,7 +205,7 @@ public class ContainerRestController extends RestController {
       container.setModel(model);
       container.setPartitionLimit(model.getPartitionCount());
       return container;
-    }, containerService, container -> Dtos.asDto(container));
+    }, containerService, container -> Dtos.asDto(container, indexChecker));
 
   }
 
@@ -231,12 +216,8 @@ public class ContainerRestController extends RestController {
       SequencerPartitionContainer container = Dtos.to(d);
       // reset partitions since they're not intended to be modified by this method
       container.setPartitions(original.getPartitions());
-      container.getPartitions().forEach(p -> {
-        p.getPool().setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(p.getPool()));
-        p.getPool().setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(p.getPool()));
-      });
       return container;
-    }, containerService, container -> Dtos.asDto(container));
+    }, containerService, container -> Dtos.asDto(container, indexChecker));
   }
 
 }

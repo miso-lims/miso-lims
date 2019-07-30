@@ -133,39 +133,27 @@ public class EditPoolController {
     }
 
     if (pool == null) throw new NotFoundException("No pool found for ID " + poolId.toString());
-    pool.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(pool));
-    pool.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(pool));
-    PoolDto poolDto = Dtos.asDto(pool, true, false);
+    PoolDto poolDto = Dtos.asDto(pool, true, false, indexChecker);
     
     ObjectMapper mapper = new ObjectMapper();
     model.put("pool", pool);
-    pool.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(pool));
-    pool.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(pool));
     model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "{}"
         : mapper.writeValueAsString(poolDto));
     Collection<Partition> partitions = containerService.listPartitionsByPoolId(poolId);
-    partitions.forEach(partition -> {
-      partition.getPool().setDuplicateIndicesSequences(partition.getPool().getDuplicateIndicesSequences());
-      partition.getPool().setNearDuplicateIndicesSequences(partition.getPool().getNearDuplicateIndicesSequences());
-        });
     model.put("partitions", partitions.stream()
-        .map(partition -> Dtos.asDto(partition)).collect(Collectors.toList()));
+        .map(partition -> Dtos.asDto(partition, indexChecker)).collect(Collectors.toList()));
     model.put("runs", poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(runService.listByPoolId(poolId)));
     if (poolId == PoolImpl.UNSAVED_ID) {
       model.put("orders", Collections.emptyList());
     } else {
       Collection<SequencingOrder> sequencingOrders = sequencingOrderService.getByPool(pool);
-    sequencingOrders.forEach(so -> {
-      so.getPool().setDuplicateIndicesSequences(so.getPool().getDuplicateIndicesSequences());
-      so.getPool().setNearDuplicateIndicesSequences(so.getPool().getNearDuplicateIndicesSequences());
-        });
-      model.put("orders", Dtos.asSequencingOrderDtos(sequencingOrders));
+      model.put("orders", Dtos.asSequencingOrderDtos(sequencingOrders, indexChecker));
     }
 
     model.put("duplicateIndicesSequences", mapper.writeValueAsString(poolDto.getDuplicateIndicesSequences()));
     model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(poolDto.getNearDuplicateIndicesSequences()));
 
-    model.put("includedLibraryAliquots", Dtos.asDto(pool, true, false).getPooledElements());
+    model.put("includedLibraryAliquots", Dtos.asDto(pool, true, false, indexChecker).getPooledElements());
 
     return new ModelAndView("/WEB-INF/pages/editPool.jsp", model);
   }
@@ -183,7 +171,7 @@ public class EditPoolController {
 
     @Override
     protected PoolDto asDto(Pool model) {
-      return Dtos.asDto(model, true, true);
+      return Dtos.asDto(model, true, true, indexChecker);
     }
 
     @Override
