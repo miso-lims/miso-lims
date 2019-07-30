@@ -269,7 +269,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     return savedId;
   }
 
-  private void refreshPoolElements(Pool pool, Collection<ValidationError> errors) throws IOException {
+  private void refreshPoolElements(Pool pool) throws IOException {
     Set<PoolElement> pes = new HashSet<>();
     for(PoolElement oldPe : pool.getPoolContents()){
       PoolElement newPe = new PoolElement();
