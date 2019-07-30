@@ -269,17 +269,13 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     return savedId;
   }
 
-  private void refreshPoolElements(Pool pool, Collection<ValidationError> errors){
+  private void refreshPoolElements(Pool pool, Collection<ValidationError> errors) throws IOException {
     Set<PoolElement> pes = new HashSet<>();
     for(PoolElement oldPe : pool.getPoolContents()){
       PoolElement newPe = new PoolElement();
       newPe.setPool(pool);
       newPe.setProportion(oldPe.getProportion());
-      try {
-        newPe.setPoolableElementView(poolableElementViewService.get(oldPe.getPoolableElementView().getAliquotId()));
-      } catch (IOException e) {
-        errors.add(new ValidationError("poolElements", "Failed to reconstruct PoolableElementView"));
-      }
+      newPe.setPoolableElementView(poolableElementViewService.get(oldPe.getPoolableElementView().getAliquotId()));
       pes.add(newPe);
     }
     pool.setPoolElements(pes);
@@ -291,7 +287,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     return indices;
   }
 
-  public void validateIndices(Pool pool, Pool beforeChange, Collection<ValidationError> errors){
+  public void validateIndices(Pool pool, Pool beforeChange, Collection<ValidationError> errors) throws IOException {
     refreshPoolElements(pool, errors);
     Set<String> indices = getAllBadIndices(pool);
     Set<String> bcIndices = getAllBadIndices(beforeChange);
