@@ -785,10 +785,6 @@ INSERT INTO DetailedLibraryAliquot (aliquotId, libraryDesignCodeId) VALUES
 (1003, 7),
 (1004, 7);
 
-INSERT INTO PoolOrder (poolOrderId, alias, description, purposeId, parametersId, partitions, draft, poolId, sequencingOrderId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 'Pool Order One', 'first pool order', 1, 3, 2, FALSE, NULL, NULL, 1, '2019-07-24 16:15:00', 1, '2019-07-24 16:15:00'),
-(2, 'Pool Order Two', 'second pool order', 2, 2, 1, FALSE, NULL, NULL, 1, '2019-07-24 16:15:00', 1, '2019-07-24 16:15:00');
-
 INSERT INTO Pool (poolId, concentration, concentrationUnits, volume, volumeUnits, name, alias, identificationBarcode, description, creationDate, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
 (1, 8.25, 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL),
 (501, 2.2, 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, 'IPO501', 'TIB_Pool', 'TIB_Pool', NULL, '2017-08-15', 'ILLUMINA', 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00', 1),
@@ -857,6 +853,18 @@ INSERT INTO SequencingOrder (sequencingOrderId, poolId, partitions, parametersId
 (6, 802, 2, 2, 1, 1, '2018-06-26 10:10:00', '2018-06-26 10:10:00', 1),
 (7, 803, 2, 2, 1, 1, '2018-06-26 10:10:00', '2018-06-26 10:10:00', 1),
 (8, 804, 2, 2, 1, 1, '2018-06-26 10:10:00', '2018-06-26 10:10:00', 1);
+
+INSERT INTO PoolOrder (poolOrderId, alias, description, purposeId, parametersId, partitions, draft, poolId, sequencingOrderId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 'Pool Order One', 'first pool order', 2, 3, 1, FALSE, NULL, NULL, 1, '2019-07-24 16:15:00', 1, '2019-07-24 16:15:00'),
+(2, 'Pool Order Two', 'second pool order', 1, 2, 2, FALSE, 802, 6, 1, '2019-07-24 16:15:00', 1, '2019-07-24 16:15:00'),
+(3, 'Pool Order Three', NULL, 1, NULL, NULL, FALSE, NULL, NULL, 1, '2019-07-24 16:15:00', 1, '2019-07-24 16:15:00');
+
+INSERT INTO PoolOrder_LibraryAliquot (poolOrderId, aliquotId, proportion) VALUES
+(1, 1001, 1),
+(1, 1002, 1),
+(2, 801, 1),
+(2, 802, 1),
+(3, 1001, 1);
 
 INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, lastModifier, creator, created, lastModified) VALUES
 (1, 1, 1, 'BOX1', 'First Box', 1, 1, '2017-07-20 13:01:01', '2017-07-20 13:01:01'),
