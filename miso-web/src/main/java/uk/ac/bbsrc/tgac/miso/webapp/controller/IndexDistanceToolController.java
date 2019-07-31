@@ -21,13 +21,13 @@ import org.springframework.web.servlet.ModelAndView;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 
 @Controller
 public class IndexDistanceToolController {
 
   @Autowired
-  private DuplicateIndicesChecker indexChecker;
+  private IndexChecker indexChecker;
 
   @ModelAttribute("title")
   public String title() {

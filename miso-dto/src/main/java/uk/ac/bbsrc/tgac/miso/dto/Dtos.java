@@ -203,6 +203,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto.OrderAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.IlluminaRunDto;
@@ -1709,11 +1710,12 @@ public class Dtos {
         pooledElements.add(ldi);
       }
       dto.setPooledElements(pooledElements);
-
-      dto.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(from));
-      dto.setDuplicateIndices(dto.getDuplicateIndicesSequences() != null && !dto.getDuplicateIndicesSequences().isEmpty());
-      dto.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(from));
-      dto.setNearDuplicateIndices(dto.getNearDuplicateIndicesSequences() != null && !dto.getNearDuplicateIndicesSequences().isEmpty());
+      if (indexChecker != null) {
+        dto.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(from));
+        dto.setDuplicateIndices(dto.getDuplicateIndicesSequences() != null && !dto.getDuplicateIndicesSequences().isEmpty());
+        dto.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(from));
+        dto.setNearDuplicateIndices(dto.getNearDuplicateIndicesSequences() != null && !dto.getNearDuplicateIndicesSequences().isEmpty());
+      }
     } else {
       dto.setPooledElements(Collections.emptySet());
       if (indexChecker != null) {

@@ -41,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolableElementViewService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -50,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -76,7 +76,7 @@ public class LibraryAliquotRestController extends RestController {
   @Autowired
   private PoolService poolService;
   @Autowired
-  private DuplicateIndicesChecker indexChecker;
+  private IndexChecker indexChecker;
 
   public void setLibraryAliquotService(LibraryAliquotService libraryAliquotService) {
     this.libraryAliquotService = libraryAliquotService;

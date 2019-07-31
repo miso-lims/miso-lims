@@ -56,9 +56,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 
 @Controller
 @RequestMapping("/container")
@@ -73,7 +73,7 @@ public class EditSequencerPartitionContainerController {
   @Autowired
   private ContainerModelService containerModelService;
   @Autowired
-  private DuplicateIndicesChecker indexChecker;
+  private IndexChecker indexChecker;
 
   /**
    * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects

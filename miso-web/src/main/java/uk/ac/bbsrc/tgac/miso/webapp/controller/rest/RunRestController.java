@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -87,7 +88,6 @@ import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
 import uk.ac.bbsrc.tgac.miso.dto.StudyDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 
 /**
  * A controller to handle all REST requests for Runs
@@ -144,7 +144,7 @@ public class RunRestController extends RestController {
   @Autowired
   private ExperimentService experimentService;
   @Autowired
-  private DuplicateIndicesChecker indexChecker;
+  private IndexChecker indexChecker;
 
   private final JQueryDataTableBackend<Run, RunDto> jQueryBackend = new JQueryDataTableBackend<Run, RunDto>() {
 

@@ -95,6 +95,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.AlphanumericComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
@@ -105,7 +106,6 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
@@ -178,7 +178,7 @@ public class EditLibraryController {
   @Autowired
   private BoxService boxService;
   @Autowired
-  private DuplicateIndicesChecker indexChecker;
+  private IndexChecker indexChecker;
 
   public NamingScheme getNamingScheme() {
     return namingScheme;

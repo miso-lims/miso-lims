@@ -61,7 +61,7 @@
       </label>
     </div>
     <div style="display: table-cell; width: 100px; vertical-align: bottom; padding-left: 12px; padding-right: 12px;">
-      <label>Min. Distance:<br>
+      <label>Min. Mismatches:<br>
         <input id="minDistance" type="text" value="${defaultMinDistance}"
             style="width: 100%; box-sizing: border-box; border-left: 1px solid #666699; border-top: 1px solid #666666;"><br>
       </label>

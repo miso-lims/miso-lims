@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -75,6 +76,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   private SequencingOrderService sequencingOrderService;
   @Autowired
   private FileAttachmentService fileAttachmentService;
+  @Autowired
+  private IndexChecker indexChecker;
 
   public void setAutoGenerateIdBarcodes(boolean autoGenerateIdBarcodes) {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
@@ -281,14 +284,15 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     pool.setPoolElements(pes);
   }
 
-  private Set<String> getAllBadIndices(Pool pool){
+  private Set<String> getAllBadIndices(Pool pool) {
     if(pool == null) return new HashSet<>();
-    Set<String> indices = pool.getDuplicateIndicesSequences();
-    indices.addAll(pool.getNearDuplicateIndicesSequences());
+    Set<String> indices = indexChecker.getDuplicateIndicesSequences(pool);
+    indices.addAll(indexChecker.getNearDuplicateIndicesSequences(pool));
     return indices;
   }
 
-  public void validateIndices(Pool pool, Pool beforeChange, Collection<ValidationError> errors) throws IOException {
+  public void validateIndices(Pool pool, Pool beforeChange, Collection<ValidationError> errors)
+      throws IOException {
     refreshPoolElements(pool);
     Set<String> indices = getAllBadIndices(pool);
     Set<String> bcIndices = getAllBadIndices(beforeChange);
@@ -436,5 +440,4 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
       throws IOException {
     return poolStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
-
 }

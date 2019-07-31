@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.webapp.controller.component;
+package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -15,12 +15,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
-import uk.ac.bbsrc.tgac.miso.dto.IndexChecker;
 
 @Component
-public class DuplicateIndicesChecker implements IndexChecker {
+public class IndexChecker {
 
-  @Value("${miso.pools.error.index.mismatches:0}")
+  @Value("${miso.pools.error.index.mismatches:1}")
   private int errorMismatches;
   @Value("${miso.pools.error.index.mismatches.message:DUPLICATE INDICES}")
   private String errorMismatchesMessage;
@@ -45,28 +44,24 @@ public class DuplicateIndicesChecker implements IndexChecker {
     return warningMismatchesMessage;
   }
 
-  @Override
   public Set<String> getDuplicateIndicesSequences(Pool pool) {
     if (pool == null) return Collections.emptySet();
     List<List<Index>> indices = getIndexSequences(pool);
     return getIndexSequencesWithTooFewMismatches(indices, errorMismatches);
   }
 
-  @Override
   public Set<String> getNearDuplicateIndicesSequences(Pool pool) {
     if (pool == null) return Collections.emptySet();
     List<List<Index>> indices = getIndexSequences(pool);
     return getIndexSequencesWithTooFewMismatches(indices, warningMismatches);
   }
 
-  @Override
   public Set<String> getDuplicateIndicesSequences(ListPoolView pool) {
     if (pool == null) return Collections.emptySet();
     List<List<Index>> indices = getIndexSequences(pool);
     return getIndexSequencesWithTooFewMismatches(indices, errorMismatches);
   }
 
-  @Override
   public Set<String> getNearDuplicateIndicesSequences(ListPoolView pool) {
     if (pool == null) return Collections.emptySet();
     List<List<Index>> indices = getIndexSequences(pool);

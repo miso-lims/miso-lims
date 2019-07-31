@@ -59,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.dto.AttachmentDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
@@ -66,7 +67,6 @@ import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 
 /**
  * A controller to handle all REST requests for Projects
@@ -93,7 +93,7 @@ public class ProjectRestController extends RestController {
   @Autowired
   private SampleGroupService sampleGroupService;
   @Autowired
-  private DuplicateIndicesChecker indexChecker;
+  private IndexChecker indexChecker;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;

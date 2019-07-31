@@ -62,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PartitionSpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -69,7 +70,6 @@ import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -82,7 +82,7 @@ public class ContainerRestController extends RestController {
   @Autowired
   private ContainerModelService containerModelService;
   @Autowired
-  private DuplicateIndicesChecker indexChecker;
+  private IndexChecker indexChecker;
 
   private final JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto> jQueryBackend = new JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto>() {
 

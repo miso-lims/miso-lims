@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.AlphanumericComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
@@ -42,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.dto.DetailedLibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkMergeTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
@@ -68,7 +68,7 @@ public class EditLibraryAliquotController {
   @Autowired
   private BoxService boxService;
   @Autowired
-  private DuplicateIndicesChecker indexChecker;
+  private IndexChecker indexChecker;
 
   @GetMapping("/{aliquotId}")
   public ModelAndView edit(ModelMap model, @PathVariable long aliquotId) throws IOException {

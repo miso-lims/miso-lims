@@ -76,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -91,7 +92,6 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleLCMTubeDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -110,7 +110,7 @@ public class SampleRestController extends RestController {
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
   @Autowired
-  private DuplicateIndicesChecker indexChecker;
+  private IndexChecker indexChecker;
 
   public Boolean isDetailedSampleEnabled() {
     return detailedSample;

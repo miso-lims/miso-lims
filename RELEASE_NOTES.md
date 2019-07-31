@@ -13,11 +13,18 @@ Changes:
 
 Upgrade Notes:
 
-`miso.properties` changes:
-  * `miso.pools.strictIndexChecking` now present in `miso.properties`. Default value is false, if
-    property is not found 'false' is assumed.
-  * Number of mismatches to trigger duplicate & near-duplicate indices messages are now configurable
-    * Messages for duplicate & near-duplicate indices are now configurable
+  * There have been changes to the settings in `security.properties`. You may need to make
+    corresponding updates to your configuration:
+    * `miso.pools.strictIndexChecking`: if `true`, library aliquots with conflicting indices will be
+      impossible to pool together. Default is `false`.
+    * `miso.pools.error.index.mismatches`: this or fewer mismatches will trigger the duplicate
+      indices warning. Default is `0`.
+    * `miso.pools.error.index.mismatches.message`: the custom error message shown when duplicate
+      indices are detected. Default is `DUPLICATE INDICES`.
+    * `miso.pools.warning.index.mismatches`: this or fewer mismatches will trigger the near-duplicate
+      indices warning. Default is `2`.
+    * `miso.pools.warning.index.mismatches.message`: the custom error message shown when near-duplicate
+      indices are detected. Default is `Near-Duplicate Indices`.
 
 # 0.2.185:
 

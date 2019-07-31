@@ -58,12 +58,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ExternalUriBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.JsonArrayCollector;
 import uk.ac.bbsrc.tgac.miso.webapp.util.RunMetricsSource;
 
@@ -97,7 +97,7 @@ public class EditRunController {
   @Autowired
   private ExternalUriBuilder externalUriBuilder;
   @Autowired
-  private DuplicateIndicesChecker indexChecker;
+  private IndexChecker indexChecker;
 
   public void setRunService(RunService runService) {
     this.runService = runService;

@@ -84,6 +84,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderCompletionService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
@@ -97,7 +98,6 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
@@ -111,7 +111,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
 @RequestMapping("/rest/pools")
 public class PoolRestController extends RestController {
   @Autowired
-  private DuplicateIndicesChecker indexChecker;
+  private IndexChecker indexChecker;
 
   public static class PoolChangeRequest {
     private List<Long> add;
@@ -405,7 +405,7 @@ public class PoolRestController extends RestController {
 
   @GetMapping(value = "/search")
   public @ResponseBody List<PoolDto> search(@RequestParam("q") String search) throws IOException {
-    return poolService.listBySearch(search).stream().map(pool -> Dtos.asDto(pool, true, false)).collect(Collectors.toList());
+    return poolService.listBySearch(search).stream().map(pool -> Dtos.asDto(pool, true, false, indexChecker)).collect(Collectors.toList());
   }
 
   @PostMapping(value = "/spreadsheet")

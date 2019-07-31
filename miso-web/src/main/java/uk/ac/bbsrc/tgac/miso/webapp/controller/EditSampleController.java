@@ -82,6 +82,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.core.service.StainService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
@@ -99,7 +100,6 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleStockSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
@@ -171,7 +171,7 @@ public class EditSampleController {
   @Value("${miso.defaults.sample.lcmtube.groupdescription:}")
   private String defaultLcmTubeGroupDesc;
   @Autowired
-  private DuplicateIndicesChecker indexChecker;
+  private IndexChecker indexChecker;
 
   private Boolean isDetailedSampleEnabled() {
     return detailedSample;

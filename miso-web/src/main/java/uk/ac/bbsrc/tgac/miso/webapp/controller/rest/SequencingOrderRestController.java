@@ -37,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -44,7 +45,6 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
 
@@ -63,7 +63,7 @@ public class SequencingOrderRestController extends RestController {
   @Autowired
   private OrderPurposeService orderPurposeService;
   @Autowired
-  private DuplicateIndicesChecker indexChecker;
+  private IndexChecker indexChecker;
 
   private final JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto> jQueryBackend = new JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto>() {
 
@@ -208,7 +208,7 @@ public class SequencingOrderRestController extends RestController {
     OrderPurpose purpose = getOrThrow(orderPurposeService, purposeId, "Order purpose");
     SequencingParameters parameters = getOrThrow(sequencingParametersService, parametersId, "Sequencing parameters");
     List<SequencingOrder> results = sequencingOrderService.listByAttributes(pool, purpose, parameters, partitions);
-    return results.stream().map(Dtos::asDto).collect(Collectors.toList());
+    return results.stream().map(so -> Dtos.asDto(so, indexChecker)).collect(Collectors.toList());
   }
 
   private <T extends Identifiable> T getOrThrow(ProviderService<T> service, long id, String type) throws IOException {

@@ -67,13 +67,13 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
 
@@ -103,7 +103,7 @@ public class EditPoolController {
   @Autowired
   private BoxService boxService;
   @Autowired
-  private DuplicateIndicesChecker indexChecker;
+  private IndexChecker indexChecker;
 
   public void setRunService(RunService runService) {
     this.runService = runService;

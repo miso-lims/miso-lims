@@ -121,10 +121,10 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.DuplicateIndicesChecker;
 
 import io.prometheus.client.Gauge;
 
@@ -210,7 +210,7 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private OrderPurposeService orderPurposeService;
   @Autowired
-  private DuplicateIndicesChecker indexChecker;
+  private IndexChecker indexChecker;
   @Autowired
   private NamingScheme namingScheme;
 
@@ -419,8 +419,8 @@ public class MenuController implements ServletContextAware {
     warningsNode.put("missingIndex", "MISSING INDEX");
     warningsNode.put("negativeVolume", "Negative Volume");
     node.set("warningMessages", warningsNode);
-    node.put("errorEditDistance", errorEditDistance);
-    node.put("warningEditDistance", warningEditDistance);
+    node.put("errorEditDistance", indexChecker.getErrorMismatches());
+    node.put("warningEditDistance", indexChecker.getWarningMismatches());
 
     // Save the regenerated file in cache. This has a race condition where multiple concurrent requests could results in regenerating this
     // file and updating the cache. Since the cache is two variables (data and time), they can also be torn. Given the nature of the cached
