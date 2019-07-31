@@ -89,7 +89,9 @@ ListTarget.run = {
           "iSortPriority": 0
         }, {
           "sTitle": "Start Date",
-          "mData": "startDate",
+          "mData": function(full) {
+            return full.startDate || null;
+          },
           "mRender": function(data, type, full) {
             return data || "";
           },

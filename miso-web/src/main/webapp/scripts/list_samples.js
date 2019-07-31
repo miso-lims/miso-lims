@@ -134,7 +134,9 @@ ListTarget.sample = {
           "iSortPriority": 0
         }, {
           "sTitle": "Creation Date",
-          "mData": "creationDate",
+          "mData": function(full) {
+            return full.creationDate || null;
+          },
           "include": Constants.isDetailedSample,
           "iSortPriority": 0,
           "bVisible": "true"
