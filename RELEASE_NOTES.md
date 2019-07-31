@@ -13,7 +13,7 @@ Changes:
 
 Upgrade Notes:
 
-  * There have been changes to the settings in `security.properties`. You may need to make
+  * There have been changes to the settings in `miso.properties`. You may need to make
     corresponding updates to your configuration:
     * `miso.pools.strictIndexChecking`: if `true`, library aliquots with conflicting indices will be
       impossible to pool together. Default is `false`.
