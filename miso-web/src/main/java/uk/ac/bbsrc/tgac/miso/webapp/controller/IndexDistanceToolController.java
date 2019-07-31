@@ -145,16 +145,14 @@ public class IndexDistanceToolController {
   public @ResponseBody IndexDistanceResponseDto checkIndices(@RequestBody IndexDistanceRequestDto requestObject) {
     List<String> indices = requestObject.getIndices().stream()
         .map(String::trim)
-        .map(line -> line.replaceAll("\\W+", "-")) // remove any spaces, commas, dashes, etc. used to separate dual index sequences
+        .map(line -> line.replaceAll("\\W+", "")) // remove any spaces, commas, dashes, etc. used to separate dual index sequences
         .collect(Collectors.toList());
-    int shortestIndexLength = getShortestIndexLength(
-        indices.stream().map(index -> index.contains("-") ? index.split("-")[0] : index).collect(Collectors.toList())); // compare against
-                                                                                                                        // first index
+    int shortestIndexLength = getShortestIndexLength(indices); // compare against first index
     Set<IndexDistanceWarningDto> results = new HashSet<>();
 
     for (int i = 0; i < indices.size(); i++) {
       for (int j = i+1; j < indices.size(); j++) {
-        int editDistance = Index.checkEditDistance(truncate(indices.get(i), shortestIndexLength),
+        int editDistance = Index.checkMismatches(truncate(indices.get(i), shortestIndexLength),
             truncate(indices.get(j), shortestIndexLength));
         if (editDistance < requestObject.getMinimumDistance()) {
           results.add(new IndexDistanceWarningDto(indices.get(i), indices.get(j), editDistance));
@@ -169,7 +167,6 @@ public class IndexDistanceToolController {
   private static int getShortestIndexLength(List<String> indices) {
     try {
       int shortestIndex = indices.stream().filter(Objects::nonNull)
-          .map(combinedIndex -> combinedIndex.split("-")[0])
           .mapToInt(String::length).min().getAsInt();
       if (shortestIndex == 0) return 0;
       return shortestIndex;

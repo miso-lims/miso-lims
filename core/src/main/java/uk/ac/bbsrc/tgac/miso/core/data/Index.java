@@ -64,17 +64,17 @@ public class Index implements Nameable, Serializable {
    * 
    * @param sequence1
    * @param sequence2
-   * @return edit distance between the two sequences with 0 meaning they are duplicates, 1 meaning they differ by one character, etc.
+   * @return mismatches between the two sequences with 0 meaning they are duplicates, 1 meaning they differ by one character, etc.
    */
-  public static int checkEditDistance(String sequence1, String sequence2) {
+  public static int checkMismatches(String sequence1, String sequence2) {
     int minLength = Math.min(sequence1.length(), sequence2.length());
-    int editDistance = minLength;
+    int mismatches = minLength;
     for (int i = 0; i < minLength; i++) {
       if (sequence1.charAt(i) == sequence2.charAt(i)) {
-        editDistance--;
+        mismatches--;
       }
     }
-    return editDistance;
+    return mismatches;
   }
 
   @ManyToOne

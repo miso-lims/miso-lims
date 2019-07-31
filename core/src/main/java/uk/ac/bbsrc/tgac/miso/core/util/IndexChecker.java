@@ -82,7 +82,7 @@ public class IndexChecker {
         if (sequence2.length() == 0 || !isCheckNecessary(indices.get(i), indices.get(j), mismatchesThreshold)) {
           continue;
         }
-        if (Index.checkEditDistance(sequence1, sequence2) <= mismatchesThreshold) {
+        if (Index.checkMismatches(sequence1, sequence2) <= mismatchesThreshold) {
           nearMatchSequences.add(sequence1);
           nearMatchSequences.add(sequence2);
         }
