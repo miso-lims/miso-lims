@@ -282,6 +282,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   private Set<String> getAllBadIndices(Pool pool){
+    if(pool == null) return new HashSet<>();
     Set<String> indices = pool.getDuplicateIndicesSequences();
     indices.addAll(pool.getNearDuplicateIndicesSequences());
     return indices;
