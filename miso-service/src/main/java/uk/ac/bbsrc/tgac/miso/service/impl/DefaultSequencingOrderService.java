@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,12 +22,16 @@ import uk.ac.bbsrc.tgac.miso.core.service.OrderPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingOrderDao;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultSequencingOrderService implements SequencingOrderService {
+
+  @Value("${miso.pools.strictIndexChecking:false}")
+  private Boolean strictPools;
 
   @Autowired
   private SequencingOrderDao sequencingOrderDao;
@@ -52,10 +57,16 @@ public class DefaultSequencingOrderService implements SequencingOrderService {
   }
 
   @Override
-  public long create(SequencingOrder seqOrder) throws IOException {
+  public long create(SequencingOrder seqOrder) throws ValidationException, IOException {
     Pool pool = poolService.get(seqOrder.getPool().getId());
     if (pool == null) {
       throw new IOException("No such pool: " + seqOrder.getPool().getId());
+    }
+
+    if(strictPools &&
+            (pool.getDuplicateIndicesSequences().size() > 0 || pool.getNearDuplicateIndicesSequences().size() > 0)){
+      throw new ValidationException("Cannot create a sequencing order for a pool which contains duplicate or " +
+              "near-duplicate indices. Please resolve index problems in pool " + pool.getAlias());
     }
 
     User user = authorizationManager.getCurrentUser();
