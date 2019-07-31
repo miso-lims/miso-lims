@@ -6,6 +6,8 @@ Changes:
   * Added Assignee column to Issue tables
   * Added Strict Index Checking option, which when enabled prevents library aliquots from being
     added to pool when that would cause near-/duplicate indices
+  * Added buttons on the Edit Workset page to move samples/libraries/aliquots from one workset to a
+    different workset
   * Changed single item create/edit pages to warn you when leaving with unsaved changes
   * Fixed bug that broke List Freezers page
   * Fixed bug in 'Pool custom'

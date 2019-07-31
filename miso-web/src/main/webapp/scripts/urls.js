@@ -6,6 +6,12 @@ Urls = (function() {
     }
   }
 
+  function middleIdUrlFunction(prefix, suffix) {
+    return function(id) {
+      return prefix + '/' + id + suffix;
+    }
+  }
+
   var baseUrl = '/miso';
   var restBase = baseUrl + '/rest';
 
@@ -416,24 +422,15 @@ Urls = (function() {
 
   var worksetRestBase = restBase + '/worksets';
   rest.worksets = {
-    addSamples: function(worksetId) {
-      return worksetRestBase + '/' + worksetId + '/samples';
-    },
-    addLibraries: function(worksetId) {
-      return worksetRestBase + '/' + worksetId + '/libraries';
-    },
-    addLibraryAliquots: function(worksetId) {
-      return worksetRestBase + '/' + worksetId + '/libraryaliquots';
-    },
-    removeSamples: function(worksetId) {
-      return worksetRestBase + '/' + worksetId + '/samples';
-    },
-    removeLibraries: function(worksetId) {
-      return worksetRestBase + '/' + worksetId + '/libraries';
-    },
-    removeLibraryAliquots: function(worksetId) {
-      return worksetRestBase + '/' + worksetId + '/libraryaliquots';
-    }
+    addSamples: middleIdUrlFunction(worksetRestBase, '/samples'),
+    addLibraries: middleIdUrlFunction(worksetRestBase, '/libraries'),
+    addLibraryAliquots: middleIdUrlFunction(worksetRestBase, '/libraryaliquots'),
+    removeSamples: middleIdUrlFunction(worksetRestBase, '/samples'),
+    removeLibraries: middleIdUrlFunction(worksetRestBase, '/libraries'),
+    removeLibraryAliquots: middleIdUrlFunction(worksetRestBase, '/libraryaliquots'),
+    moveSamples: middleIdUrlFunction(worksetRestBase, '/samples/move'),
+    moveLibraries: middleIdUrlFunction(worksetRestBase, '/libraries/move'),
+    moveLibraryAliquots: middleIdUrlFunction(worksetRestBase, '/libraryaliquots/move')
   };
 
   return {

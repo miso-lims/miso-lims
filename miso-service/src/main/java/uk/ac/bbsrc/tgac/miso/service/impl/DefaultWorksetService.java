@@ -15,7 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
@@ -195,6 +198,38 @@ public class DefaultWorksetService implements WorksetService {
   @Override
   public void authorizeDeletion(Workset workset) throws IOException {
     authorizationManager.throwIfNonAdminOrMatchingOwner(workset.getCreator());
+  }
+
+  @Override
+  public void moveSamples(Workset from, Workset to, Collection<Sample> items) {
+    moveItems(from, to, items, Workset::getSamples, "samples");
+  }
+
+  @Override
+  public void moveLibraries(Workset from, Workset to, Collection<Library> items) {
+    moveItems(from, to, items, Workset::getLibraries, "libraries");
+  }
+
+  @Override
+  public void moveLibraryAliquots(Workset from, Workset to, Collection<LibraryAliquot> items) {
+    moveItems(from, to, items, Workset::getLibraryAliquots, "library aliquots");
+  }
+
+  public <T extends Identifiable> void moveItems(Workset from, Workset to, Collection<T> items, Function<Workset, Set<T>> getter,
+      String pluralTypeLabel) {
+    if (from.getId() == to.getId()) {
+      throw new ValidationException(String.format("Trying to move %s from the same workset", pluralTypeLabel));
+    }
+    Set<T> sourceItems = getter.apply(from);
+    int initialSize = sourceItems.size();
+    Set<Long> itemIds = items.stream().map(Identifiable::getId).collect(Collectors.toSet());
+    sourceItems.removeIf(item -> itemIds.contains(item.getId()));
+    if (initialSize - sourceItems.size() != items.size()) {
+      throw new ValidationException(String.format("Not all %s were found in source workset", pluralTypeLabel));
+    }
+    getter.apply(to).addAll(items);
+    worksetStore.save(to);
+    worksetStore.save(from);
   }
 
 }

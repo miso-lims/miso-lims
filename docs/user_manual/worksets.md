@@ -83,6 +83,19 @@ table. In the dialog that appears, click the "Remove" button to confirm the remo
 
 
 {% assign sub = sub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Moving Items Between Worksets" %}
+
+You may wish to remove items from one workset while adding the same items to another workset. This may be useful when
+transfering items to another person or team, for example. On the Edit Workset page, select the items you would like to
+move and then click the "Move to Workset" button in the toolbar at the top of the table. In the dialog that appears,
+type in the alias of the Workset that you want to move the items to and click "Search." Click on the alias of the
+workset to confirm and the items will be moved. 
+
+{% include userman-toplink.md %}
+
+
+
+{% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Merging Worksets" %}
 
 You can merge multiple worksets to create a new workset that contains all of the items in each of the selected

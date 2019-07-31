@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,15 +32,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.TriConsumer;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.WorksetDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 
 @Controller
 @RequestMapping("/rest/worksets")
@@ -238,6 +242,71 @@ public class WorksetRestController extends RestController {
     }
     worksetService.create(workset);
     return Dtos.asDto(workset);
+  }
+
+  public static class MoveItemsDto {
+
+    private Long targetWorksetId;
+    private List<Long> itemIds;
+
+    public Long getTargetWorksetId() {
+      return targetWorksetId;
+    }
+
+    public void setTargetWorksetId(Long targetWorksetId) {
+      this.targetWorksetId = targetWorksetId;
+    }
+
+    public List<Long> getItemIds() {
+      return itemIds;
+    }
+
+    public void setItemIds(List<Long> itemIds) {
+      this.itemIds = itemIds;
+    }
+
+  }
+
+  @PostMapping("/{worksetId}/samples/move")
+  public @ResponseBody void moveSamples(@PathVariable long worksetId, @RequestBody MoveItemsDto dto) throws IOException {
+    moveItems(worksetId, dto, "Sample", sampleService, worksetService::moveSamples);
+  }
+
+  @PostMapping("/{worksetId}/libraries/move")
+  public @ResponseBody void moveLibraries(@PathVariable long worksetId, @RequestBody MoveItemsDto dto) throws IOException {
+    moveItems(worksetId, dto, "Library", libraryService, worksetService::moveLibraries);
+  }
+
+  @PostMapping("/{worksetId}/libraryaliquots/move")
+  public @ResponseBody void moveLibraryAliquots(@PathVariable long worksetId, @RequestBody MoveItemsDto dto) throws IOException {
+    moveItems(worksetId, dto, "Library aliquot", libraryAliquotService, worksetService::moveLibraryAliquots);
+  }
+
+  private <T extends Identifiable> void moveItems(long sourceWorksetId, MoveItemsDto dto, String itemTypeName, ProviderService<T> service,
+      TriConsumer<Workset, Workset, Collection<T>> moveFunction)
+      throws IOException {
+    Workset sourceWorkset = worksetService.get(sourceWorksetId);
+    if (sourceWorkset == null) {
+      throw new NotFoundException(String.format("Source workset %d not found", sourceWorksetId));
+    }
+    if (dto.getTargetWorksetId() == null) {
+      throw new ClientErrorException("Target workset ID missing");
+    } else if (dto.getItemIds() == null || dto.getItemIds().isEmpty()) {
+      throw new ClientErrorException("Item IDs missing");
+    }
+    Workset targetWorkset = worksetService.get(dto.getTargetWorksetId());
+    if (targetWorkset == null) {
+      throw new ClientErrorException(String.format("Target workset %d not found", dto.getTargetWorksetId()));
+    }
+    List<T> items = new ArrayList<>();
+    for (Long id : dto.getItemIds()) {
+      T item = service.get(id);
+      if (item == null) {
+        throw new ClientErrorException(String.format("%s %d not found", itemTypeName, id));
+      }
+      items.add(item);
+    }
+    moveFunction.accept(sourceWorkset, targetWorkset, items);
   }
 
 }
