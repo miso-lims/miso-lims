@@ -39,6 +39,10 @@ ListTarget.sample = {
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.sample.getBulkActions(config);
 
+    if (config.worksetId) {
+      actions.push(HotUtils.makeMoveFromWorkset('samples', Urls.rest.worksets.moveSamples(config.worksetId)));
+    }
+
     actions.push({
       name: "Delete",
       action: function(items) {

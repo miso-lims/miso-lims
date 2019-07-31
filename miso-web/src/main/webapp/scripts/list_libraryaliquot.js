@@ -34,6 +34,10 @@ ListTarget.libraryaliquot = {
       return action.allowOnLibraryPage;
     }) : HotTarget.libraryaliquot.getBulkActions(config);
 
+    if (config.worksetId) {
+      actions.push(HotUtils.makeMoveFromWorkset('library aliquots', Urls.rest.worksets.moveLibraryAliquots(config.worksetId)));
+    }
+
     actions.push({
       name: "Delete",
       action: function(items) {
