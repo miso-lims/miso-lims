@@ -44,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
 
@@ -53,6 +54,8 @@ public class EditExperimentController {
 
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private IndexChecker indexChecker;
 
   @GetMapping(value = "/{experimentId}")
   public ModelAndView setupForm(@PathVariable Long experimentId, ModelMap model) throws IOException {
@@ -80,7 +83,8 @@ public class EditExperimentController {
     model.put("consumableConfig", mapper.writeValueAsString(consumableConfig));
     model.put("runPartitions",
         experiment.getRunPartitions().stream()
-            .map(entry -> new ExperimentDto.RunPartitionDto(Dtos.asDto(entry.getRun()), Dtos.asDto(entry.getPartition())))
+            .map(entry -> new ExperimentDto.RunPartitionDto(Dtos.asDto(entry.getRun()),
+                Dtos.asDto(entry.getPartition(), indexChecker)))
             .collect(Collectors.toList()));
     model.put("title", "Edit Experiment");
     return new ModelAndView("/WEB-INF/pages/editExperiment.jsp", model);

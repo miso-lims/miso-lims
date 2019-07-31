@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 public class ListExperimentsController {
   @Autowired
   private ExperimentService experimentService;
+
   @ModelAttribute("title")
   public String title() {
     return "Experiments";
@@ -47,6 +48,7 @@ public class ListExperimentsController {
 
   @RequestMapping("/experiments")
   public ModelAndView listExperiments(ModelMap model) throws IOException {
-    return new ListItemsPage("experiment").list(model, experimentService.list().stream().map(Dtos::asDto));
+    return new ListItemsPage("experiment").list(model,
+        experimentService.list().stream().map(Dtos::asDto));
   }
 }

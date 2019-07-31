@@ -35,7 +35,7 @@ WarningTarget.poolelement = {
 
         var combined = indices.map(function(index) {
           return index.sequence;
-        }).join('');
+        }).join('-');
 
         return [
             {
@@ -45,22 +45,22 @@ WarningTarget.poolelement = {
             },
             {
               include: element.libraryLowQuality,
-              tableMessage: '(LOW QUALITY LIBRARY)'
+              tableMessage: Constants.warningMessages.lowQualityLibraries + ')'
             },
             {
               include: duplicateSequences && duplicateSequences.indexOf(combined) != -1,
-              tableMessage: "(DUPLICATE INDEX)"
+              tableMessage: Constants.warningMessages.duplicateIndices
             },
             {
               include: nearDuplicateSequences && nearDuplicateSequences.indexOf(combined) != -1
                   && !(duplicateSequences && duplicateSequences.indexOf(combined) != -1),
-              tableMessage: "(NEAR-DUPLICATE INDEX)"
+              tableMessage: Constants.warningMessages.nearDuplicateIndices
             }, {
               include: Utils.validation.isEmpty(combined),
-              tableMessage: "(NO INDEX)"
+              tableMessage: Constants.warningMessages.missingIndex
             }, {
               include: element.identityConsentLevel === 'Revoked',
-              tableMessage: '(CONSENT REVOKED)'
+              tableMessage: Constants.warningMessages.consentRevoked
             }];
       }
     }

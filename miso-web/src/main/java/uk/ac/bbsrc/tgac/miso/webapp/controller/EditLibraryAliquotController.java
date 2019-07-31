@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.AlphanumericComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
@@ -66,6 +67,8 @@ public class EditLibraryAliquotController {
   private LibraryService libraryService;
   @Autowired
   private BoxService boxService;
+  @Autowired
+  private IndexChecker indexChecker;
 
   @GetMapping("/{aliquotId}")
   public ModelAndView edit(ModelMap model, @PathVariable long aliquotId) throws IOException {
@@ -79,7 +82,7 @@ public class EditLibraryAliquotController {
     model.put("aliquotDto", mapper.writeValueAsString(Dtos.asDto(aliquot, false)));
     List<Pool> pools = poolService.listByLibraryAliquotId(aliquotId);
     model.put("aliquotPools",
-        pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
+        pools.stream().map(p -> Dtos.asDto(p, false, false, indexChecker)).collect(Collectors.toList()));
     model.put("aliquotRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
         .collect(Collectors.toList()));
 

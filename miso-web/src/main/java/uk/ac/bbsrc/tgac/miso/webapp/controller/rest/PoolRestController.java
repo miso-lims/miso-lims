@@ -84,6 +84,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderCompletionService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
@@ -109,6 +110,9 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
 @Controller
 @RequestMapping("/rest/pools")
 public class PoolRestController extends RestController {
+  @Autowired
+  private IndexChecker indexChecker;
+
   public static class PoolChangeRequest {
     private List<Long> add;
     private List<Long> remove;
@@ -134,7 +138,7 @@ public class PoolRestController extends RestController {
 
     @Override
     protected PoolDto asDto(ListPoolView model) {
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, indexChecker);
     }
 
     @Override
@@ -165,7 +169,15 @@ public class PoolRestController extends RestController {
 
   @GetMapping(value = "{poolId}", produces = "application/json")
   public @ResponseBody PoolDto getPoolById(@PathVariable long poolId) throws IOException {
-    return RestUtils.getObject("Pool", poolId, poolService, pool -> Dtos.asDto(pool, true, false));
+    return RestUtils.getObject("Pool", poolId, poolService, this::makePoolDto);
+  }
+
+  private PoolDto makePoolDto(Pool pool) {
+    return Dtos.asDto(pool, true, false, indexChecker);
+  }
+  
+  private PoolDto makeEmptyPoolDto(Pool pool) {
+    return Dtos.asDto(pool, false, false, indexChecker);
   }
 
   @GetMapping(value = "{poolId}/runs", produces = "application/json")
@@ -188,13 +200,13 @@ public class PoolRestController extends RestController {
             .mapToDouble(PoolableElementView::getAliquotVolumeUsed).sum());
       }
       return pool;
-    }, poolService, p -> Dtos.asDto(p, true, false));
+    }, poolService, this::makePoolDto);
   }
 
   @PutMapping(value = "{poolId}", produces = "application/json")
   @ResponseBody
   public PoolDto updatePool(@PathVariable long poolId, @RequestBody PoolDto dto) throws IOException {
-    return RestUtils.updateObject("Pool", poolId, dto, Dtos::to, poolService, pool -> Dtos.asDto(pool, true, false));
+    return RestUtils.updateObject("Pool", poolId, dto, Dtos::to, poolService, this::makePoolDto);
   }
 
   @PutMapping(value = "/{poolId}/contents", produces = "application/json")
@@ -206,7 +218,7 @@ public class PoolRestController extends RestController {
         .map(view -> new PoolElement(pool, view));
     pool.setPoolElements(Stream.concat(originalMinusRemoved, added).collect(Collectors.toSet()));
     poolService.update(pool);
-    return Dtos.asDto(poolService.get(poolId), true, false);
+    return makePoolDto(poolService.get(poolId));
   }
 
   @PutMapping(value = "/{poolId}/proportions")
@@ -230,7 +242,7 @@ public class PoolRestController extends RestController {
       poolElement.setProportion(entry.getValue());
     }
     poolService.update(pool);
-    return Dtos.asDto(poolService.get(poolId), true, false);
+    return makePoolDto(poolService.get(poolId));
   }
 
   public static class AssignPoolDto {
@@ -349,7 +361,8 @@ public class PoolRestController extends RestController {
 
   public List<PoolDto> serializePools(Collection<Pool> pools, UriComponentsBuilder uriBuilder)
       throws IOException {
-    List<PoolDto> poolDtos = pools.stream().map(pool -> Dtos.asDto(pool, false, false)).collect(Collectors.toList());
+    List<PoolDto> poolDtos = pools.stream().map(this::makeEmptyPoolDto)
+        .collect(Collectors.toList());
     return poolDtos;
   }
 
@@ -378,21 +391,21 @@ public class PoolRestController extends RestController {
 
   private PoolPickerEntry poolTransform(Pool pool) throws IOException {
     List<SequencingOrderCompletionDto> completions = sequencingOrderCompletionService.listByPoolId(pool.getId()).stream()
-        .map(Dtos::asDto).collect(Collectors.toList());
-    return new PoolPickerEntry(Dtos.asDto(pool, true, false), completions);
+        .map(oc -> Dtos.asDto(oc, indexChecker)).collect(Collectors.toList());
+    return new PoolPickerEntry(makePoolDto(pool), completions);
   }
 
   @PostMapping(value = "/query", produces = { "application/json" })
   @ResponseBody
   public List<PoolDto> getPoolsInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
-    return PaginationFilter.bulkSearch(names, poolService, p -> Dtos.asDto(p, false, false),
+    return PaginationFilter.bulkSearch(names, poolService, this::makeEmptyPoolDto,
         message -> new RestException(message, Status.BAD_REQUEST));
   }
 
   @GetMapping(value = "/search")
   public @ResponseBody List<PoolDto> search(@RequestParam("q") String search) throws IOException {
-    return poolService.listBySearch(search).stream().map(pool -> Dtos.asDto(pool, true, false)).collect(Collectors.toList());
+    return poolService.listBySearch(search).stream().map(pool -> Dtos.asDto(pool, true, false, indexChecker)).collect(Collectors.toList());
   }
 
   @PostMapping(value = "/spreadsheet")

@@ -203,6 +203,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto.OrderAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.IlluminaRunDto;
@@ -1163,10 +1164,10 @@ public class Dtos {
     return to;
   }
 
-  public static SequencingOrderDto asDto(@Nonnull SequencingOrder from) {
+  public static SequencingOrderDto asDto(@Nonnull SequencingOrder from, IndexChecker indexChecker) {
     SequencingOrderDto dto = new SequencingOrderDto();
     dto.setId(from.getId());
-    dto.setPool(asDto(from.getPool(), false, false));
+    dto.setPool(asDto(from.getPool(), false, false, indexChecker));
     dto.setParameters(asDto(from.getSequencingParameter()));
     dto.setPartitions(from.getPartitions());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
@@ -1179,8 +1180,8 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<SequencingOrderDto> asSequencingOrderDtos(@Nonnull Collection<SequencingOrder> from) {
-    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
+  public static Set<SequencingOrderDto> asSequencingOrderDtos(@Nonnull Collection<SequencingOrder> from, IndexChecker indexChecker) {
+    return from.stream().map(so -> Dtos.asDto(so, indexChecker)).collect(Collectors.toSet());
   }
 
   public static SequencingOrder to(@Nonnull SequencingOrderDto from) {
@@ -1673,7 +1674,7 @@ public class Dtos {
     return to;
   }
 
-  public static PoolDto asDto(@Nonnull Pool from, boolean includeContents, boolean includeBoxPositions) {
+  public static PoolDto asDto(@Nonnull Pool from, boolean includeContents, boolean includeBoxPositions, IndexChecker indexChecker) {
     PoolDto dto = new PoolDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1700,6 +1701,7 @@ public class Dtos {
         .mapToDouble(Long::doubleValue)//
         .average()//
         .ifPresent(dto::setInsertSize);
+
     if (includeContents) {
       Set<LibraryAliquotDto> pooledElements = new HashSet<>();
       for (PoolElement element : from.getPoolContents()) {
@@ -1708,14 +1710,20 @@ public class Dtos {
         pooledElements.add(ldi);
       }
       dto.setPooledElements(pooledElements);
-      dto.setDuplicateIndicesSequences(from.getDuplicateIndicesSequences());
-      dto.setDuplicateIndices(!dto.getDuplicateIndicesSequences().isEmpty());
-      dto.setNearDuplicateIndicesSequences(from.getNearDuplicateIndicesSequences());
-      dto.setNearDuplicateIndices(!dto.getNearDuplicateIndicesSequences().isEmpty());
+      if (indexChecker != null) {
+        dto.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(from));
+        dto.setDuplicateIndices(dto.getDuplicateIndicesSequences() != null && !dto.getDuplicateIndicesSequences().isEmpty());
+        dto.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(from));
+        dto.setNearDuplicateIndices(dto.getNearDuplicateIndicesSequences() != null && !dto.getNearDuplicateIndicesSequences().isEmpty());
+      }
     } else {
       dto.setPooledElements(Collections.emptySet());
-      dto.setDuplicateIndices(!from.getDuplicateIndicesSequences().isEmpty());
-      dto.setNearDuplicateIndices(!from.getNearDuplicateIndicesSequences().isEmpty());
+      if (indexChecker != null) {
+        dto.setDuplicateIndices(
+          indexChecker.getDuplicateIndicesSequences(from) != null && !indexChecker.getDuplicateIndicesSequences(from).isEmpty());
+        dto.setNearDuplicateIndices(
+          indexChecker.getNearDuplicateIndicesSequences(from) != null && !indexChecker.getNearDuplicateIndicesSequences(from).isEmpty());
+      }
     }
     dto.setHasEmptySequence(from.hasLibrariesWithoutIndex());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
@@ -1734,7 +1742,7 @@ public class Dtos {
     return dto;
   }
 
-  public static PoolDto asDto(@Nonnull ListPoolView from) {
+  public static PoolDto asDto(@Nonnull ListPoolView from, IndexChecker indexChecker) {
     PoolDto to = new PoolDto();
     setLong(to::setId, from.getId(), true);
     setString(to::setName, from.getName());
@@ -1758,8 +1766,10 @@ public class Dtos {
         .ifPresent(to::setInsertSize);
     to.setLibraryAliquotCount(from.getElements().size());
     setDateTimeString(to::setLastModified, from.getLastModified());
-    to.setDuplicateIndices(!from.getDuplicateIndicesSequences().isEmpty());
-    to.setNearDuplicateIndices(!from.getNearDuplicateIndicesSequences().isEmpty());
+    to.setDuplicateIndices(
+        indexChecker.getDuplicateIndicesSequences(from) != null && !indexChecker.getDuplicateIndicesSequences(from).isEmpty());
+    to.setNearDuplicateIndices(
+        indexChecker.getNearDuplicateIndicesSequences(from) != null && !indexChecker.getNearDuplicateIndicesSequences(from).isEmpty());
     to.setHasEmptySequence(from.getElements().stream().anyMatch(element -> element.getIndices() == null || element.getIndices().isEmpty()));
     to.setPrioritySubprojectAliases(from.getPrioritySubprojectAliases());
     to.setPooledElements(from.getElements().stream()
@@ -1922,11 +1932,12 @@ public class Dtos {
     }
   }
 
-  public static ContainerDto asDto(@Nonnull SequencerPartitionContainer from) {
-    return asDto(from, false, false);
+  public static ContainerDto asDto(@Nonnull SequencerPartitionContainer from, IndexChecker indexChecker) {
+    return asDto(from, false, false, indexChecker);
   }
 
-  public static ContainerDto asDto(@Nonnull SequencerPartitionContainer from, boolean includePartitions, boolean includePoolContents) {
+  public static ContainerDto asDto(@Nonnull SequencerPartitionContainer from, boolean includePartitions, boolean includePoolContents,
+      IndexChecker indexChecker) {
     ContainerDto dto = null;
     if (from instanceof OxfordNanoporeContainer) {
       OxfordNanoporeContainer ontFrom = (OxfordNanoporeContainer) from;
@@ -1962,7 +1973,7 @@ public class Dtos {
     }
 
     if (includePartitions) {
-      dto.setPartitions(asPartitionDtos(from.getPartitions(), includePoolContents));
+      dto.setPartitions(asPartitionDtos(from.getPartitions(), includePoolContents, indexChecker));
     }
     return dto;
   }
@@ -2019,10 +2030,11 @@ public class Dtos {
     return dto;
   }
 
-  public static List<PartitionDto> asPartitionDtos(@Nonnull Collection<Partition> partitionSubset, boolean includePoolContents) {
+  public static List<PartitionDto> asPartitionDtos(@Nonnull Collection<Partition> partitionSubset, boolean includePoolContents,
+      IndexChecker indexChecker) {
     List<PartitionDto> dtoList = new ArrayList<>();
     for (Partition partition : partitionSubset) {
-      dtoList.add(asDto(partition, includePoolContents));
+      dtoList.add(asDto(partition, includePoolContents, indexChecker));
     }
     return dtoList;
   }
@@ -2084,10 +2096,10 @@ public class Dtos {
     return qcTypeSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  public static SequencingOrderCompletionDto asDto(@Nonnull SequencingOrderCompletion from) {
+  public static SequencingOrderCompletionDto asDto(@Nonnull SequencingOrderCompletion from, IndexChecker indexChecker) {
     SequencingOrderCompletionDto dto = new SequencingOrderCompletionDto();
     dto.setId(from.getPool().getId() + "_" + from.getSequencingParameters().getId());
-    dto.setPool(asDto(from.getPool(), false, false));
+    dto.setPool(asDto(from.getPool(), false, false, indexChecker));
     dto.setParameters(asDto(from.getSequencingParameters()));
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
     dto.setRemaining(from.getRemaining());
@@ -2628,17 +2640,17 @@ public class Dtos {
     return to;
   }
 
-  public static PartitionDto asDto(@Nonnull Partition from) {
-    return asDto(from, false);
+  public static PartitionDto asDto(@Nonnull Partition from, IndexChecker indexChecker) {
+    return asDto(from, false, indexChecker);
   }
 
-  public static PartitionDto asDto(@Nonnull Partition from, boolean includePoolContents) {
+  public static PartitionDto asDto(@Nonnull Partition from, boolean includePoolContents, IndexChecker indexChecker) {
     PartitionDto dto = new PartitionDto();
     dto.setId(from.getId());
     dto.setContainerId(from.getSequencerPartitionContainer().getId());
     dto.setContainerName(from.getSequencerPartitionContainer().getIdentificationBarcode());
     dto.setPartitionNumber(from.getPartitionNumber());
-    dto.setPool(from.getPool() == null ? null : asDto(from.getPool(), includePoolContents, false));
+    dto.setPool(from.getPool() == null ? null : asDto(from.getPool(), includePoolContents, false, indexChecker));
     setString(dto::setLoadingConcentration, from.getLoadingConcentration());
     dto.setLoadingConcentrationUnits(from.getLoadingConcentrationUnits());
     return dto;
@@ -2674,7 +2686,9 @@ public class Dtos {
     dto.setInstrumentModel(asDto(from.getInstrumentModel()));
     dto.setLibrary(asDto(from.getLibrary(), false));
     dto.setPartitions(from.getRunPartitions().stream()
-        .map(entry -> new ExperimentDto.RunPartitionDto(asDto(entry.getRun()), asDto(entry.getPartition()))).collect(Collectors.toList()));
+        .map(entry -> new ExperimentDto.RunPartitionDto(asDto(entry.getRun()),
+            asDto(entry.getPartition(), null)))
+        .collect(Collectors.toList()));
     dto.setStudy(asDto(from.getStudy()));
     dto.setTitle(from.getTitle());
     return dto;
@@ -2914,7 +2928,7 @@ public class Dtos {
               .collect(Collectors.groupingBy(Pool::getId)).values().stream()//
               .map(l -> l.get(0))//
               .sorted((a, b) -> a.getAlias().compareTo(b.getAlias()))//
-              .map(p -> asDto(p, false, false))//
+              .map(p -> asDto(p, false, false, null))
               .collect(Collectors.toList()));
       ServiceRecord instrumentOutOfServiceRecord = from.getInstrument().getServiceRecords().stream()
           .filter(sr -> sr.isOutOfService() && sr.getStartTime() != null && sr.getEndTime() == null

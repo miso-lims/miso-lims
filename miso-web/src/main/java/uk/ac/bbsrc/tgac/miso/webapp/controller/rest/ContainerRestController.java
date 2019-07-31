@@ -27,6 +27,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -61,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PartitionSpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -79,12 +81,14 @@ public class ContainerRestController extends RestController {
   private ContainerService containerService;
   @Autowired
   private ContainerModelService containerModelService;
+  @Autowired
+  private IndexChecker indexChecker;
 
   private final JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto> jQueryBackend = new JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto>() {
 
     @Override
     protected ContainerDto asDto(SequencerPartitionContainer model) {
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, indexChecker);
     }
 
     @Override
@@ -96,7 +100,8 @@ public class ContainerRestController extends RestController {
 
   @GetMapping(value = "/{containerBarcode}", produces = "application/json")
   public @ResponseBody List<ContainerDto> jsonRest(@PathVariable String containerBarcode) throws IOException {
-    return containerService.listByBarcode(containerBarcode).stream().map(Dtos::asDto).collect(Collectors.toList());
+    Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(containerBarcode);
+    return containers.stream().map(container -> Dtos.asDto(container, indexChecker)).collect(Collectors.toList());
   }
 
   @GetMapping(value = "/dt", produces = "application/json")
@@ -200,7 +205,7 @@ public class ContainerRestController extends RestController {
       container.setModel(model);
       container.setPartitionLimit(model.getPartitionCount());
       return container;
-    }, containerService, Dtos::asDto);
+    }, containerService, container -> Dtos.asDto(container, indexChecker));
 
   }
 
@@ -212,7 +217,7 @@ public class ContainerRestController extends RestController {
       // reset partitions since they're not intended to be modified by this method
       container.setPartitions(original.getPartitions());
       return container;
-    }, containerService, Dtos::asDto);
+    }, containerService, container -> Dtos.asDto(container, indexChecker));
   }
 
 }

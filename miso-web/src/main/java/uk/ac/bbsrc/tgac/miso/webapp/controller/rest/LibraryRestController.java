@@ -64,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -104,6 +105,8 @@ public class LibraryRestController extends RestController {
   private LibraryService libraryService;
   @Autowired
   private SampleRestController sampleController;
+  @Autowired
+  private IndexChecker indexChecker;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
@@ -233,7 +236,7 @@ public class LibraryRestController extends RestController {
 
         @Override
         public PoolDto asDto(Pool model) {
-          return Dtos.asDto(model, false, false);
+          return Dtos.asDto(model, false, false, indexChecker);
         }
 
         @Override

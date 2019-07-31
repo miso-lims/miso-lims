@@ -58,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
@@ -87,17 +88,16 @@ public class EditRunController {
   private RunService runService;
   @Autowired
   private PartitionQCService partitionQCService;
-
   @Autowired
   private InstrumentService instrumentService;
   @Autowired
   private ExperimentService experimentService;
-
   @Autowired
   private IssueTrackerManager issueTrackerManager;
-
   @Autowired
   private ExternalUriBuilder externalUriBuilder;
+  @Autowired
+  private IndexChecker indexChecker;
 
   public void setRunService(RunService runService) {
     this.runService = runService;
@@ -157,7 +157,7 @@ public class EditRunController {
     model.put("runPositions", run.getRunPositions().stream().map(Dtos::asDto).collect(Collectors.toList()));
     model.put("runPartitions", run.getSequencerPartitionContainers().stream().flatMap(container -> container.getPartitions().stream())
         .map(WhineyFunction.rethrow(partition -> {
-          PartitionDto dto = Dtos.asDto(partition, false);
+          PartitionDto dto = Dtos.asDto(partition, false, indexChecker);
           PartitionQC qc = partitionQCService.get(run, partition);
           if (qc != null) {
             dto.setQcType(qc.getType().getId());
@@ -186,7 +186,7 @@ public class EditRunController {
     partitionConfig.put("showPool", true);
     model.put("partitionConfig", mapper.writeValueAsString(partitionConfig));
     model.put("experiments",
-        experimentService.listAllByRunId(run.getId()).stream().map(Dtos::asDto)
+        experimentService.listAllByRunId(run.getId()).stream().map(expt -> Dtos.asDto(expt))
             .collect(Collectors.toList()));
     ObjectNode experimentConfig = mapper.createObjectNode();
     experimentConfig.put("runId", run.getId());

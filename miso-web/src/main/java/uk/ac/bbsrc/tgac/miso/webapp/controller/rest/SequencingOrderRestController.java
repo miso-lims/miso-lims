@@ -37,10 +37,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderDto;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
@@ -49,19 +51,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
 @Controller
 @RequestMapping("/rest")
 public class SequencingOrderRestController extends RestController {
-
-  private final JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto> jQueryBackend = new JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto>() {
-
-    @Override
-    protected PaginatedDataSource<SequencingOrderCompletion> getSource() throws IOException {
-      return sequencingOrderCompletionService;
-    }
-
-    @Override
-    protected SequencingOrderCompletionDto asDto(SequencingOrderCompletion model) {
-      return Dtos.asDto(model);
-    }
-  };
 
   @Autowired
   private SequencingOrderService sequencingOrderService;
@@ -73,6 +62,21 @@ public class SequencingOrderRestController extends RestController {
   private PoolService poolService;
   @Autowired
   private OrderPurposeService orderPurposeService;
+  @Autowired
+  private IndexChecker indexChecker;
+
+  private final JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto> jQueryBackend = new JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto>() {
+
+    @Override
+    protected PaginatedDataSource<SequencingOrderCompletion> getSource() throws IOException {
+      return sequencingOrderCompletionService;
+    }
+
+    @Override
+    protected SequencingOrderCompletionDto asDto(SequencingOrderCompletion model) {
+      return Dtos.asDto(model, indexChecker);
+    }
+  };
 
   @GetMapping(value = "/pools/{id}/dt/completions", produces = { "application/json" })
   @ResponseBody
@@ -90,7 +94,7 @@ public class SequencingOrderRestController extends RestController {
     if (result == null) {
       throw new RestException("No sequencing order found with ID: " + id, Status.NOT_FOUND);
     } else {
-      return Dtos.asDto(result);
+      return Dtos.asDto(result, indexChecker);
     }
   }
 
@@ -102,7 +106,7 @@ public class SequencingOrderRestController extends RestController {
     SequencingOrder seqOrder = Dtos.to(orderDto);
     Long id = sequencingOrderService.create(seqOrder);
     SequencingOrder saved = sequencingOrderService.get(id);
-    return Dtos.asDto(saved);
+    return Dtos.asDto(saved, indexChecker);
   }
   
   @GetMapping(value = "/sequencingorders/dt/completions/all/{platform}", produces = { "application/json" })
@@ -183,12 +187,17 @@ public class SequencingOrderRestController extends RestController {
 
   private PoolPickerResponse getPoolPickerWithFilters(Integer limit, PaginationFilter... filters) throws IOException {
     PoolPickerResponse ppr = new PoolPickerResponse();
-    ppr.populate(sequencingOrderCompletionService, true, "lastUpdated", limit, SequencingOrderRestController::orderTransform, filters);
+    ppr.populate(sequencingOrderCompletionService, true, "lastUpdated", limit,
+        this::orderTransform,
+        filters);
     return ppr;
   }
 
-  private static PoolPickerEntry orderTransform(SequencingOrderCompletion order) {
-    return new PoolPickerEntry(Dtos.asDto(order.getPool(), true, false), Collections.singletonList(Dtos.asDto(order)));
+  private PoolPickerEntry orderTransform(SequencingOrderCompletion order) {
+    PoolDto poolDto = Dtos.asDto(order.getPool(), true, false, indexChecker);
+    SequencingOrderCompletionDto socDto = Dtos.asDto(order, indexChecker);
+    return new PoolPickerEntry(poolDto,
+        Collections.singletonList(socDto));
   }
 
   @GetMapping(value = "/sequencingorders/search")
@@ -199,7 +208,7 @@ public class SequencingOrderRestController extends RestController {
     OrderPurpose purpose = getOrThrow(orderPurposeService, purposeId, "Order purpose");
     SequencingParameters parameters = getOrThrow(sequencingParametersService, parametersId, "Sequencing parameters");
     List<SequencingOrder> results = sequencingOrderService.listByAttributes(pool, purpose, parameters, partitions);
-    return results.stream().map(Dtos::asDto).collect(Collectors.toList());
+    return results.stream().map(so -> Dtos.asDto(so, indexChecker)).collect(Collectors.toList());
   }
 
   private <T extends Identifiable> T getOrThrow(ProviderService<T> service, long id, String type) throws IOException {

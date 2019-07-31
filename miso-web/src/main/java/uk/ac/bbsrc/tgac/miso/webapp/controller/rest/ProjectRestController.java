@@ -59,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.dto.AttachmentDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
@@ -91,6 +92,8 @@ public class ProjectRestController extends RestController {
   private RunService runService;
   @Autowired
   private SampleGroupService sampleGroupService;
+  @Autowired
+  private IndexChecker indexChecker;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -147,7 +150,7 @@ public class ProjectRestController extends RestController {
   @GetMapping(value = "/{projectId}/pools", produces = "application/json")
   public @ResponseBody List<PoolDto> getProjectPools(@PathVariable Long projectId) throws IOException {
     Collection<Pool> pp = poolService.listByProjectId(projectId);
-    return pp.stream().map(pool -> Dtos.asDto(pool, true, false)).collect(Collectors.toList());
+    return pp.stream().map(pool -> Dtos.asDto(pool, true, false, indexChecker)).collect(Collectors.toList());
   }
 
   @GetMapping(value = "/{projectId}/runs", produces = "application/json")

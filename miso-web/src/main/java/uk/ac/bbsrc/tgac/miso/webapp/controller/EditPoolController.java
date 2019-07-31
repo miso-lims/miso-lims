@@ -53,7 +53,9 @@ import com.google.common.collect.Lists;
 
 import net.sf.json.JSONArray;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
@@ -65,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -99,6 +102,8 @@ public class EditPoolController {
   private ContainerService containerService;
   @Autowired
   private BoxService boxService;
+  @Autowired
+  private IndexChecker indexChecker;
 
   public void setRunService(RunService runService) {
     this.runService = runService;
@@ -128,20 +133,27 @@ public class EditPoolController {
     }
 
     if (pool == null) throw new NotFoundException("No pool found for ID " + poolId.toString());
-
+    PoolDto poolDto = Dtos.asDto(pool, true, false, indexChecker);
+    
     ObjectMapper mapper = new ObjectMapper();
     model.put("pool", pool);
-    model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "{}" : mapper.writeValueAsString(Dtos.asDto(pool, true, false)));
-
-    model.put("partitions", containerService.listPartitionsByPoolId(poolId).stream().map(Dtos::asDto).collect(Collectors.toList()));
+    model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "{}"
+        : mapper.writeValueAsString(poolDto));
+    Collection<Partition> partitions = containerService.listPartitionsByPoolId(poolId);
+    model.put("partitions", partitions.stream()
+        .map(partition -> Dtos.asDto(partition, indexChecker)).collect(Collectors.toList()));
     model.put("runs", poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(runService.listByPoolId(poolId)));
-    model.put("orders",
-        poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asSequencingOrderDtos(sequencingOrderService.getByPool(pool)));
+    if (poolId == PoolImpl.UNSAVED_ID) {
+      model.put("orders", Collections.emptyList());
+    } else {
+      Collection<SequencingOrder> sequencingOrders = sequencingOrderService.getByPool(pool);
+      model.put("orders", Dtos.asSequencingOrderDtos(sequencingOrders, indexChecker));
+    }
 
-    model.put("duplicateIndicesSequences", mapper.writeValueAsString(pool.getDuplicateIndicesSequences()));
-    model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(pool.getNearDuplicateIndicesSequences()));
+    model.put("duplicateIndicesSequences", mapper.writeValueAsString(poolDto.getDuplicateIndicesSequences()));
+    model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(poolDto.getNearDuplicateIndicesSequences()));
 
-    model.put("includedLibraryAliquots", Dtos.asDto(pool, true, false).getPooledElements());
+    model.put("includedLibraryAliquots", Dtos.asDto(pool, true, false, indexChecker).getPooledElements());
 
     return new ModelAndView("/WEB-INF/pages/editPool.jsp", model);
   }
@@ -159,7 +171,7 @@ public class EditPoolController {
 
     @Override
     protected PoolDto asDto(Pool model) {
-      return Dtos.asDto(model, true, true);
+      return Dtos.asDto(model, true, true, indexChecker);
     }
 
     @Override

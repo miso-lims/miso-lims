@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderDto;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
@@ -26,6 +27,8 @@ public class EditSequencingOrderController {
 
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private IndexChecker indexChecker;
 
   private final BulkPropagateTableBackend<Pool, SequencingOrderDto> orderBulkPropagateBackend = new BulkPropagateTableBackend<Pool, SequencingOrderDto>(
       "sequencingorder", SequencingOrderDto.class, "Sequencing Orders", "Pools") {
@@ -33,7 +36,7 @@ public class EditSequencingOrderController {
     @Override
     protected SequencingOrderDto createDtoFromParent(Pool item) {
       SequencingOrderDto dto = new SequencingOrderDto();
-      dto.setPool(Dtos.asDto(item, false, false));
+      dto.setPool(Dtos.asDto(item, false, false, indexChecker));
       return dto;
     }
 

@@ -91,7 +91,8 @@ public class EditStudyController {
         .map(Dtos::asDto)
         .collect(Collectors.toList())));
 
-    model.put("experiments", study.getExperiments().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    model.put("experiments",
+        study.getExperiments().stream().map(expt -> Dtos.asDto(expt)).collect(Collectors.toList()));
     return new ModelAndView("/WEB-INF/pages/editStudy.jsp", model);
   }
 }

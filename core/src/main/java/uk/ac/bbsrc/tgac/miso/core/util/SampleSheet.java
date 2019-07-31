@@ -159,7 +159,7 @@ public enum SampleSheet {
     case 'T':
     case 'U':
       return 'A';
-    // Below are all the degenerate nucleotides. I hope we never need these and if we had one, the edit distance calculations would have
+    // Below are all the degenerate nucleotides. I hope we never need these and if we had one, the index mismatches calculations would have
     // to be the changed.
     case 'R': // AG
       return 'Y';

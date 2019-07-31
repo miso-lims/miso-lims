@@ -82,6 +82,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.core.service.StainService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
@@ -169,6 +170,8 @@ public class EditSampleController {
   private String defaultLcmTubeGroupId;
   @Value("${miso.defaults.sample.lcmtube.groupdescription:}")
   private String defaultLcmTubeGroupDesc;
+  @Autowired
+  private IndexChecker indexChecker;
 
   private Boolean isDetailedSampleEnabled() {
     return detailedSample;
@@ -256,7 +259,8 @@ public class EditSampleController {
     List<RunDto> runDtos = pools.stream().flatMap(WhineyFunction.flatRethrow(pool -> runService.listByPoolId(pool.getId())))
         .map(Dtos::asDto)
         .collect(Collectors.toList());
-    model.put("samplePools", pools.stream().map(p -> Dtos.asDto(p, false, false)).collect(Collectors.toList()));
+    model.put("samplePools",
+        pools.stream().map(p -> Dtos.asDto(p, false, false, indexChecker)).collect(Collectors.toList()));
     model.put("sampleRuns", runDtos);
     model.put("sampleRelations", getRelations(sample));
     addArrayData(sampleId, model);

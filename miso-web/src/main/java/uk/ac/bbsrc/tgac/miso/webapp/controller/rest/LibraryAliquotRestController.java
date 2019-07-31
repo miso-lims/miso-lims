@@ -41,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolableElementViewService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -70,12 +71,12 @@ public class LibraryAliquotRestController extends RestController {
 
   @Autowired
   private LibraryAliquotService libraryAliquotService;
-
   @Autowired
   private PoolableElementViewService poolableElementViewService;
-
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private IndexChecker indexChecker;
 
   public void setLibraryAliquotService(LibraryAliquotService libraryAliquotService) {
     this.libraryAliquotService = libraryAliquotService;
@@ -199,7 +200,7 @@ public class LibraryAliquotRestController extends RestController {
 
         @Override
         public PoolDto asDto(Pool model) {
-          return Dtos.asDto(model, false, false);
+          return Dtos.asDto(model, false, false, indexChecker);
         }
 
         @Override

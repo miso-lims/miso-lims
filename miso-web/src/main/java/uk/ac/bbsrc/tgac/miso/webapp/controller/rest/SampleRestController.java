@@ -76,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -108,6 +109,8 @@ public class SampleRestController extends RestController {
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
+  @Autowired
+  private IndexChecker indexChecker;
 
   public Boolean isDetailedSampleEnabled() {
     return detailedSample;
@@ -391,7 +394,7 @@ public class SampleRestController extends RestController {
 
         @Override
         public PoolDto asDto(Pool model) {
-          return Dtos.asDto(model, false, false);
+          return Dtos.asDto(model, false, false, indexChecker);
         }
 
         @Override

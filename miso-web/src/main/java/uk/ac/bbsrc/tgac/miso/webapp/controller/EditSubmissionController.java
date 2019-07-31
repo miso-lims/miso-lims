@@ -58,7 +58,6 @@ public class EditSubmissionController {
 
   @Autowired
   private SubmissionService submissionService;
-
   @Autowired
   private ExperimentService experimentService;
 
@@ -82,7 +81,8 @@ public class EditSubmissionController {
     model.put("submission", submission);
     ObjectMapper mapper = new ObjectMapper();
     model.put("submissionDto", mapper.writeValueAsString(Dtos.asDto(submission)));
-    model.put("experiments", submission.getExperiments().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    model.put("experiments", submission.getExperiments().stream().map(expt -> Dtos.asDto(expt))
+        .collect(Collectors.toList()));
     return new ModelAndView("/WEB-INF/pages/editSubmission.jsp", model);
   }
 }

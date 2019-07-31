@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -142,6 +143,8 @@ public class RunRestController extends RestController {
   private LibraryService libraryService;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private IndexChecker indexChecker;
 
   private final JQueryDataTableBackend<Run, RunDto> jQueryBackend = new JQueryDataTableBackend<Run, RunDto>() {
 
@@ -347,7 +350,8 @@ public class RunRestController extends RestController {
     Map<Library, List<Partition>> libraryGroups = getLibraryGroups(run);
 
     return libraryGroups.entrySet().stream().map(group -> new Pair<>(group.getKey(),
-        group.getValue().stream().map(Dtos::asDto).map(partitionDto -> new RunPartitionDto(runDto, partitionDto))
+        group.getValue().stream().map(partition -> Dtos.asDto(partition, indexChecker))
+            .map(partitionDto -> new RunPartitionDto(runDto, partitionDto))
             .collect(Collectors.toList())))
         .map(group -> {
           StudiesForExperiment result = new StudiesForExperiment();
@@ -397,7 +401,7 @@ public class RunRestController extends RestController {
                 .map(partition -> {
                   AddRequest request = new AddRequest();
                   request.experiment = Dtos.asDto(experiment);
-                  request.partition = Dtos.asDto(partition);
+                  request.partition = Dtos.asDto(partition, indexChecker);
                   return request;
                 }))))
         .collect(Collectors.toList());

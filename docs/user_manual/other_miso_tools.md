@@ -23,11 +23,11 @@ to search for indices and then select and add them, or you can type the index se
 For dual barcodes, enter both indices together as if they were one. e.g. 'AAAAAA' index 1 and 'CCCCCC' index 2 should
 be entered as 'AAAAAACCCCCC'.
 
-In the Min. Distance box, you can choose the minimum edit distance that the sequences must have. Edit distance is the
-number of bases that differ between two indices. For example, 'AAAAAA' and 'AAAACC' have an edit distance of 2. You
-will be warned of any sequences which have a lower edit distance than that entered here. If indices are of different
-lengths, only the length of the shorter one will be considered, and the extra bases on the longer index will be
-ignored. For example, 'AAAAAA' and 'AAAAAACC' will be considered duplicates.
+In the Min. Mismatches box, you can choose the minimum number of base mismatches that the sequences must have. For
+example, 'AAAAAA' and 'AAAACC' have 2 mismatches. You will be warned of any sequences which have a lower number of
+mismatches than that entered here. If indices are of different lengths, only the length of the shortest one will be
+considered, and the extra bases on the longer index will be ignored. For example, 'AAAAAA' and 'AAAAAACC' will be
+considered duplicates.
 
 When you have made your selections, click the Calculate button and the Results box will be updated to show any
 duplicates and near duplicates.

@@ -2,9 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,7 +24,6 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -250,55 +247,6 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
-  }
-
-  public Set<String> getDuplicateIndicesSequences() {
-    return getIndexSequencesWithMinimumEditDistance(1);
-  }
-
-  public Set<String> getNearDuplicateIndicesSequences() {
-    return getIndexSequencesWithMinimumEditDistance(3);
-  }
-
-  private Set<String> getIndexSequencesWithMinimumEditDistance(int minimumDistance) {
-    Set<String> sequences = new HashSet<>();
-    List<ListPoolViewElement> elements = getElements();
-    if (minimumDistance > 1 && elements.stream().allMatch(ListPoolView::hasFakeSequence)) return Collections.emptySet();
-    for (int i = 0; i < elements.size(); i++) {
-      String sequence1 = getCombinedIndexSequences(elements.get(i));
-      if (sequence1.length() == 0) {
-        continue;
-      }
-      for (int j = i + 1; j < elements.size(); j++) {
-        String sequence2 = getCombinedIndexSequences(elements.get(j));
-        if (sequence2.length() == 0 || !isCheckNecessary(elements.get(i), elements.get(j), minimumDistance)) {
-          continue;
-        }
-        if (Index.checkEditDistance(sequence1, sequence2) < minimumDistance) {
-          sequences.add(sequence1);
-          sequences.add(sequence2);
-        }
-      }
-    }
-    return sequences;
-  }
-
-  private static boolean hasFakeSequence(ListPoolViewElement element) {
-    return element.getIndices().stream()
-        .map(Index::getFamily)
-        .anyMatch(f -> f.hasFakeSequence());
-  }
-
-  private static boolean isCheckNecessary(ListPoolViewElement element1, ListPoolViewElement element2, int minimumDistance) {
-    return !((hasFakeSequence(element1) || hasFakeSequence(element2))
-        && (minimumDistance > 1 || getCombinedIndexSequences(element1).length() != getCombinedIndexSequences(element2).length()));
-  }
-
-  private static String getCombinedIndexSequences(ListPoolViewElement element) {
-    return element.getIndices().stream()
-        .sorted((i1, i2) -> Integer.compare(i1.getPosition(), i2.getPosition()))
-        .map(Index::getSequence)
-        .collect(Collectors.joining());
   }
 
   public Set<String> getPrioritySubprojectAliases() {

@@ -56,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
@@ -71,6 +72,8 @@ public class EditSequencerPartitionContainerController {
   private RunService runService;
   @Autowired
   private ContainerModelService containerModelService;
+  @Autowired
+  private IndexChecker indexChecker;
 
   /**
    * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects
@@ -148,11 +151,12 @@ public class EditSequencerPartitionContainerController {
   private ModelAndView setupForm(SequencerPartitionContainer container, ModelMap model) throws IOException {
     model.put("container", container);
     model.put("containerPartitions",
-        container.getPartitions().stream().map(partition -> Dtos.asDto(partition, false)).collect(Collectors.toList()));
+        container.getPartitions().stream().map(partition -> Dtos.asDto(partition, false, indexChecker))
+            .collect(Collectors.toList()));
     model.put("containerRuns", runService.listByContainerId(container.getId()).stream().map(Dtos::asDto).collect(Collectors.toList()));
 
     ObjectMapper mapper = new ObjectMapper();
-    model.put("containerJSON", mapper.writer().writeValueAsString(Dtos.asDto(container)));
+    model.put("containerJSON", mapper.writer().writeValueAsString(Dtos.asDto(container, indexChecker)));
     model.put("poreVersions", containerService.listPoreVersions());
     return new ModelAndView("/WEB-INF/pages/editSequencerPartitionContainer.jsp", model);
   }
