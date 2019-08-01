@@ -45,7 +45,7 @@ CREATE OR REPLACE VIEW LibraryBoxableView AS
   LEFT JOIN Box b ON b.boxId = bp.boxId;
 
 CREATE OR REPLACE VIEW LibraryAliquotBoxableView AS
-  SELECT aliquotId AS targetId, 'LIBRARY_ALIQUOT' AS targetType, LibraryAliquot.name, LibraryAliquot.name AS alias,
+  SELECT aliquotId AS targetId, 'LIBRARY_ALIQUOT' AS targetType, LibraryAliquot.name, LibraryAliquot.alias,
     LibraryAliquot.identificationBarcode, NULL AS locationBarcode, volume, discarded, distributed, preMigrationId,
     NULL AS sampleClassId, bp.boxId, bp.position AS boxPosition, b.name AS boxName, b.alias AS boxAlias,
     b.locationBarcode AS boxLocationBarcode

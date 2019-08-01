@@ -9,6 +9,7 @@ Changes:
   * Added buttons on the Edit Workset page to move samples/libraries/aliquots from one workset to a
     different workset
   * Changed single item create/edit pages to warn you when leaving with unsaved changes
+  * Box contents table now displays library aliquot alias
   * Fixed bug that broke List Freezers page
   * Fixed bug in 'Pool custom'
   * Fixed broken menu link to Sequencing Orders list page
