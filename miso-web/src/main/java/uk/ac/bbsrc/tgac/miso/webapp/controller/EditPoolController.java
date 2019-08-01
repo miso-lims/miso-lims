@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -90,6 +91,9 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
 public class EditPoolController {
   protected static final Logger log = LoggerFactory.getLogger(EditPoolController.class);
 
+  @Value("${miso.pools.strictIndexChecking:false}")
+  private Boolean strictIndexChecking;
+
   @Autowired
   private SequencingParametersService sequencingParametersService;
   @Autowired
@@ -103,7 +107,7 @@ public class EditPoolController {
   @Autowired
   private BoxService boxService;
   @Autowired
-  private IndexChecker indexChecker;
+  protected IndexChecker indexChecker;
 
   public void setRunService(RunService runService) {
     this.runService = runService;
@@ -193,11 +197,13 @@ public class EditPoolController {
   private static class BulkMergePoolsBackend extends BulkTableBackend<PoolDto> {
 
     private final PoolService poolService;
+    private final IndexChecker indexChecker;
     private final BoxDto newBox;
 
-    public BulkMergePoolsBackend(BoxDto newBox, PoolService poolService) {
+    public BulkMergePoolsBackend(BoxDto newBox, PoolService poolService, IndexChecker indexChecker) {
       super("pool", PoolDto.class);
       this.poolService = poolService;
+      this.indexChecker = indexChecker;
       this.newBox = newBox;
     }
 
@@ -262,12 +268,27 @@ public class EditPoolController {
       config.put(Config.PAGE_MODE, Config.CREATE);
     }
 
-    public ModelAndView merge(String parentIdsString, String proportionsString, ModelMap model) throws IOException {
+    public ModelAndView merge(String parentIdsString, String proportionsString, ModelMap model, Boolean strictIndices)
+            throws IOException {
       List<Long> parentIds = LimsUtils.parseIds(parentIdsString);
       List<Integer> proportions = parseProportions(proportionsString);
       List<PoolDto> dtos = Lists.newArrayList(createDtoFromParents(parentIds, proportions));
+
       return prepare(model, true, "Merge Pools", dtos);
     }
+
+//    private boolean checkPoolsForNewIndexCollisions(List<PoolDto> dtos){
+//      Pool hypotheticalNewPool = Dtos.to(new PoolDto());
+//      Set<PoolElement> allPoolElements = new HashSet<>();
+//      for(PoolDto dtoToMerge: dtos){
+//        Pool poolToMerge = Dtos.to(dtoToMerge);
+//        allPoolElements.addAll(poolToMerge.getPoolContents());
+//      }
+//      hypotheticalNewPool.setPoolElements(allPoolElements);
+//
+//      return (indexChecker.getDuplicateIndicesSequences(hypotheticalNewPool).size() > 0
+//              || indexChecker.getNearDuplicateIndicesSequences(hypotheticalNewPool).size() > 0);
+//    }
 
     private static List<Integer> parseProportions(String proportionsString) {
       String[] split = proportionsString.split(",");
@@ -285,9 +306,12 @@ public class EditPoolController {
   }
 
   @GetMapping(value = "/bulk/merge")
-  public ModelAndView propagatePoolsMerged(@RequestParam("ids") String poolIds, @RequestParam(value = "boxId", required = false) Long boxId, @RequestParam String proportions, ModelMap model)
+  public ModelAndView propagatePoolsMerged(@RequestParam("ids") String poolIds,
+                                           @RequestParam(value = "boxId", required = false) Long boxId,
+                                           @RequestParam String proportions, ModelMap model)
       throws IOException {
-    return new BulkMergePoolsBackend((boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null), poolService).merge(poolIds, proportions, model);
+    return new BulkMergePoolsBackend((boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null),
+            poolService, indexChecker).merge(poolIds, proportions, model, strictIndexChecking);
   }
 
 }
