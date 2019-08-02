@@ -6,7 +6,7 @@ import java.util.Map;
 
 public enum IlluminaWorkflowType {
 
-  NOVASEQ_STANDARD("NovaSeqStandard", "NovaSeq Standard"), NOVASEQ_XP("NovaSeqXp", "NovaSeq XP");
+  NOVASEQ_STANDARD("NovaSeqStandard", "NovaSeq Standard"), NOVASEQ_XP("NovaSeqXp", "NovaSeq XP"), HISEQ_ONBOARD("OnBoardClustering", "HiSeq On-instrument"), HISEQ_CBOT("CBotTemplateHybridization", "HiSeq using cBot");
 
   private static final Map<String, IlluminaWorkflowType> lookup = new HashMap<>();
 
