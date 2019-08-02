@@ -298,8 +298,9 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     Set<String> bcIndices = getAllBadIndices(beforeChange);
 
     if(indices.size() > bcIndices.size()){ // If this change introduces new conflicts
-      String errorMessage = "Pools may not contain Library Aliquots with indices with 2 or fewer positions of " +
-              "difference, please address the following conflicts: ";
+      String errorMessage = String.format("Pools may not contain Library Aliquots with indices with %d or " +
+              "fewer positions of difference, please address the following conflicts: ",
+              indexChecker.getWarningMismatches());
       indices.removeAll(bcIndices);
 
       for (String index : indices){
