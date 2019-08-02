@@ -272,8 +272,11 @@ public class EditPoolController {
             throws IOException {
       List<Long> parentIds = LimsUtils.parseIds(parentIdsString);
       List<Integer> proportions = parseProportions(proportionsString);
+
+      //This is packaged in a List only because prepare() wants a List. There's only ever 1 PoolDto in here.
       List<PoolDto> dtos = Lists.newArrayList(createDtoFromParents(parentIds, proportions));
-      //model.addAttribute("badIndices", poolService.validateIndices())
+      model.addAttribute("badIndices", poolService.validateIndices(Dtos.to(dtos.get(0)),
+              null, new HashSet<>()));
 
       return prepare(model, true, "Merge Pools", dtos);
     }
