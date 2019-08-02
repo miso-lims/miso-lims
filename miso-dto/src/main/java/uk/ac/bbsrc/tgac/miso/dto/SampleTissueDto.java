@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeName(value = SampleTissue.CATEGORY_NAME)
 public class SampleTissueDto extends SampleIdentityDto {
   private String secondaryIdentifier;

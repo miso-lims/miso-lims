@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DetailedSampleDto extends SampleDto {
 
   private Long parentId;
