@@ -24,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingOrderDao;
 
 @Transactional(rollbackFor = Exception.class)
@@ -51,6 +52,9 @@ public class DefaultSequencingOrderService implements SequencingOrderService {
   @Autowired
   private AuthorizationManager authorizationManager;
 
+  @Autowired
+  private IndexChecker indexChecker;
+
   @Override
   public SequencingOrder get(long id) throws IOException {
     return sequencingOrderDao.get(id);
@@ -64,7 +68,8 @@ public class DefaultSequencingOrderService implements SequencingOrderService {
     }
 
     if(strictPools &&
-            (pool.getDuplicateIndicesSequences().size() > 0 || pool.getNearDuplicateIndicesSequences().size() > 0)){
+            (indexChecker.getDuplicateIndicesSequences(pool).size() > 0
+                    || indexChecker.getNearDuplicateIndicesSequences(pool).size() > 0)){
       throw new ValidationException("Cannot create a sequencing order for a pool which contains duplicate or " +
               "near-duplicate indices. Please resolve index problems in pool " + pool.getAlias());
     }
