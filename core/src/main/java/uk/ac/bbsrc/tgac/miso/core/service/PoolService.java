@@ -1,11 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.core.service;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface PoolService
@@ -36,4 +38,5 @@ public interface PoolService
 
   public Pool getByBarcode(String barcode) throws IOException;
 
+  public boolean validateIndices(Pool pool, Pool beforeChange, Collection<ValidationError> errors) throws IOException;
 }

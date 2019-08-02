@@ -291,8 +291,10 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     return indices;
   }
 
-  public void validateIndices(Pool pool, Pool beforeChange, Collection<ValidationError> errors)
+  @Override
+  public boolean validateIndices(Pool pool, Pool beforeChange, Collection<ValidationError> errors)
       throws IOException {
+    int initErrorsSize = errors.size();
     refreshPoolElements(pool);
     Set<String> indices = getAllBadIndices(pool);
     Set<String> bcIndices = getAllBadIndices(beforeChange);
@@ -307,6 +309,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
 
       errors.add(new ValidationError("poolElements", errorMessage));
     }
+    return errors.size() > initErrorsSize;
   }
 
   private void validateChange(Pool pool, Pool beforeChange) throws IOException {

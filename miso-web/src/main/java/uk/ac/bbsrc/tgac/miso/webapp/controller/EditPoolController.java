@@ -273,22 +273,10 @@ public class EditPoolController {
       List<Long> parentIds = LimsUtils.parseIds(parentIdsString);
       List<Integer> proportions = parseProportions(proportionsString);
       List<PoolDto> dtos = Lists.newArrayList(createDtoFromParents(parentIds, proportions));
+      //model.addAttribute("badIndices", poolService.validateIndices())
 
       return prepare(model, true, "Merge Pools", dtos);
     }
-
-//    private boolean checkPoolsForNewIndexCollisions(List<PoolDto> dtos){
-//      Pool hypotheticalNewPool = Dtos.to(new PoolDto());
-//      Set<PoolElement> allPoolElements = new HashSet<>();
-//      for(PoolDto dtoToMerge: dtos){
-//        Pool poolToMerge = Dtos.to(dtoToMerge);
-//        allPoolElements.addAll(poolToMerge.getPoolContents());
-//      }
-//      hypotheticalNewPool.setPoolElements(allPoolElements);
-//
-//      return (indexChecker.getDuplicateIndicesSequences(hypotheticalNewPool).size() > 0
-//              || indexChecker.getNearDuplicateIndicesSequences(hypotheticalNewPool).size() > 0);
-//    }
 
     private static List<Integer> parseProportions(String proportionsString) {
       String[] split = proportionsString.split(",");
