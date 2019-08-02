@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 0.2.186
+
+Changes:
+
   * Added Pool Orders - see user manual for more details
   * Added Assignee column to Issue tables
   * Added Strict Index Checking option, which when enabled prevents library aliquots from being
@@ -14,6 +20,8 @@ Changes:
   * Fixed bug that broke List Freezers page
   * Fixed bug in 'Pool custom'
   * Fixed broken menu link to Sequencing Orders list page
+  * Fixed bug where no scientific name didn't validate when receiving libraries
+  * Fixed index order in library and library aliquot spreadsheet download
 
 Upgrade Notes:
 
