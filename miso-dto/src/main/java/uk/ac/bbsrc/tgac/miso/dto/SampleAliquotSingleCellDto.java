@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeName(value = SampleAliquotSingleCell.SAMPLE_CLASS_NAME)
 public class SampleAliquotSingleCellDto extends SampleAliquotDto implements SampleStockSingleCellRelative {
 

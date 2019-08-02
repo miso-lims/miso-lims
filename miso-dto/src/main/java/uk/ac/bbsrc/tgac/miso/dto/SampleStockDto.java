@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeName(value = SampleStock.CATEGORY_NAME)
 public class SampleStockDto extends SampleTissueDto {
 

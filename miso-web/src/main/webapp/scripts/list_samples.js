@@ -141,7 +141,10 @@ ListTarget.sample = {
           "mData": "creationDate",
           "include": Constants.isDetailedSample,
           "iSortPriority": 0,
-          "bVisible": "true"
+          "bVisible": "true",
+          "mRender": function(data, type, full) {
+                      return data || "";
+                    }
         }, {
           "sTitle": "Last Modified",
           "mData": "lastModified",

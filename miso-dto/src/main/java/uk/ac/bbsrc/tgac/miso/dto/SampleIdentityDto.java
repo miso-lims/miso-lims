@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeName(value = SampleIdentity.CATEGORY_NAME)
 public class SampleIdentityDto extends DetailedSampleDto {
 

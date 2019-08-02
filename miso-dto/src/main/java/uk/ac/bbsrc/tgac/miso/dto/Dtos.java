@@ -364,7 +364,7 @@ public class Dtos {
     if (isDetailedSample(from)) {
       DetailedSample detailed = (DetailedSample) from;
       dto.setSampleClassId(detailed.getSampleClass().getId());
-      dto.setCreationDate(detailed.getCreationDate() == null ? "" : formatDate(detailed.getCreationDate()));
+      setDateString(dto::setCreationDate, detailed.getCreationDate());
       dto.setIdentityConsentLevel(getIdentityConsentLevelString(detailed));
       if (detailed.getSubproject() != null) {
         dto.setSubprojectAlias(detailed.getSubproject().getAlias());
@@ -489,7 +489,7 @@ public class Dtos {
     if (from.isSynthetic() != null) {
       dto.setSynthetic(from.isSynthetic());
     }
-    dto.setCreationDate(from.getCreationDate() == null ? "" : formatDate(from.getCreationDate()));
+    setDateString(dto::setCreationDate, from.getCreationDate());
     dto.setNonStandardAlias(from.hasNonStandardAlias());
     if (from.getDetailedQcStatus() != null) {
       dto.setDetailedQcStatusId(from.getDetailedQcStatus().getId());
@@ -1468,9 +1468,9 @@ public class Dtos {
     Box to = new BoxImpl();
     if (from.getId() != null) to.setId(from.getId());
     to.setAlias(from.getAlias());
-    to.setDescription(from.getDescription());
+    setString(to::setDescription, from.getDescription());
     to.setIdentificationBarcode(from.getIdentificationBarcode());
-    to.setLocationBarcode(from.getLocationBarcode() == null ? "" : from.getLocationBarcode());
+    setString(to::setLocationBarcode, from.getLocationBarcode());
     if (from.getUseId() != null) {
       BoxUse use = new BoxUse();
       use.setId(from.getUseId());
@@ -1798,8 +1798,6 @@ public class Dtos {
     setString(dto::setDescription, from.getDescription());
     if (from.getHealth() != null) {
       dto.setStatus(from.getHealth().getKey());
-    } else {
-      dto.setStatus("");
     }
     dto.setLastModified(formatDateTime(from.getLastModified()));
     setString(dto::setAccession, from.getAccession());
@@ -1811,13 +1809,9 @@ public class Dtos {
         dto.setInstrumentModelId(from.getSequencer().getInstrumentModel().getId());
         dto.setInstrumentModelAlias(from.getSequencer().getInstrumentModel().getAlias());
       }
-    } else {
-      dto.setPlatformType("");
     }
     if (from.getStartDate() != null) {
       dto.setStartDate(formatDate(from.getStartDate()));
-    } else {
-      dto.setStartDate("");
     }
     if (from.getCompletionDate() != null) {
       dto.setEndDate(formatDate(from.getCompletionDate()));
