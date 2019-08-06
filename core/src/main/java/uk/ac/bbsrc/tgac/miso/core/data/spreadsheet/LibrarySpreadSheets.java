@@ -21,6 +21,8 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forString("Barcode", Library::getIdentificationBarcode), //
       Column.forString("Library Type", library -> library.getLibraryType().getDescription()), //
       Column.forString("Index(es)", LibrarySpreadSheets::listIndices), //
+      Column.forString("i7 Index", listIndex(1)), //
+      Column.forString("i5 Index", listIndex(2)), //
       Column.forString("Sample Name", library -> library.getSample().getName()), //
       Column.forString("Sample Alias", library -> library.getSample().getAlias()), //
       Column.forString("Sample Barcode", library -> library.getSample().getIdentificationBarcode()), //
@@ -49,6 +51,12 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
   private static String listIndices(Library library) {
     return library.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getSequence)
         .collect(Collectors.joining(", "));
+  }
+
+  private static Function<Library, String> listIndex(int position) {
+    return library -> library.getIndices().stream().filter(i -> i.getPosition() == position)
+        .map(Index::getSequence)
+        .findFirst().orElse("");
   }
 
   private final List<Column<Library>> columns;

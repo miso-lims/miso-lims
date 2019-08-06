@@ -24,6 +24,8 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
       Column.forString("Library Barcode", libraryAliquot -> libraryAliquot.getLibrary().getIdentificationBarcode()), //
       Column.forString("Library Type", libraryAliquot -> libraryAliquot.getLibrary().getLibraryType().getDescription()), //
       Column.forString("Index(es)", LibraryAliquotSpreadSheets::listIndices), //
+      Column.forString("i7 Index", listIndex(1)), //
+      Column.forString("i5 Index", listIndex(2)), //
       Column.forString("Targeted Sequencing",
           libraryAliquot -> libraryAliquot.getTargetedSequencing() != null ? libraryAliquot.getTargetedSequencing().getAlias() : ""), //
       Column.forString("Sample Name", libraryAliquot -> libraryAliquot.getLibrary().getSample().getName()), //
@@ -57,6 +59,11 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
         .collect(Collectors.joining(", "));
   }
 
+  private static Function<LibraryAliquot, String> listIndex(int position) {
+    return libraryAliquot -> libraryAliquot.getLibrary().getIndices().stream().filter(i -> i.getPosition() == position)
+        .map(Index::getSequence)
+        .findFirst().orElse("");
+  }
   private final List<Column<LibraryAliquot>> columns;
   private final String description;
 
