@@ -275,6 +275,10 @@ HotTarget.pool = (function() {
             var errors = [];
             return errors;
           }),
+          HotUtils.spreadsheetAction('/miso/rest/pools/contents/spreadsheet', Constants.libraryAliquotSpreadsheets, function(aliquots, spreadsheet) {
+            var errors = [];
+            return errors;
+          }, 'Download Contents'),
 
           HotUtils.makeParents(Urls.rest.pools.parents, HotUtils.relationCategoriesForDetailed().concat(
               [HotUtils.relations.library(), HotUtils.relations.libraryAliquot()]))
