@@ -73,6 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
@@ -175,7 +176,7 @@ public class PoolRestController extends RestController {
   private PoolDto makePoolDto(Pool pool) {
     return Dtos.asDto(pool, true, false, indexChecker);
   }
-  
+
   private PoolDto makeEmptyPoolDto(Pool pool) {
     return Dtos.asDto(pool, false, false, indexChecker);
   }
@@ -415,6 +416,17 @@ public class PoolRestController extends RestController {
     return MisoWebUtils.generateSpreadsheet(request, poolService::get, PoolSpreadSheets::valueOf, response);
   }
 
+  @PostMapping(value = "/contents/spreadsheet")
+  @ResponseBody
+  public HttpEntity<byte[]> getContentsSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) {
+    return MisoWebUtils.generateSpreadsheet(request, request.getIds().stream()//
+        .flatMap(
+            WhineyFunction.rethrow(id -> poolService.get(id).getPoolContents().stream()))//
+        .map(pe -> pe.getPoolableElementView().getAliquot()),
+        LibraryAliquotSpreadSheets::valueOf, response);
+  }
+
   @PostMapping(value = "/bulk-delete")
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -489,7 +501,6 @@ public class PoolRestController extends RestController {
               .map(WhineyFunction.rethrow(pd -> libraryAliquotService.get(pd.getPoolableElementView().getAliquotId())));
         }
       });
-
 
   @PostMapping(value = "/parents/{category}")
   @ResponseBody

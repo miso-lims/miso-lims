@@ -1105,9 +1105,9 @@ var HotUtils = {
     };
   },
 
-  spreadsheetAction: function(url, sheets, generateErrors) {
+  spreadsheetAction: function(url, sheets, generateErrors, name) {
     return {
-      name: 'Download',
+      name: name || 'Download',
       action: function(items) {
         Utils.showDialog('Download Spreadsheet', 'Download', [{
           property: 'sheet',
