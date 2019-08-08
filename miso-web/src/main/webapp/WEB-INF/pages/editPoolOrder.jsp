@@ -48,7 +48,7 @@
     var order = ${orderDto};
     var form = FormUtils.createForm('orderForm', 'save', order, 'poolorder', {});
     PoolOrder.setForm(form);
-    PoolOrder.setAliquots(order.orderAliquots);
+    PoolOrder.setAliquots(order.orderAliquots, order.duplicateIndicesSequences, order.nearDuplicateIndicesSequences);
   });
 </script>
 

@@ -19,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto;
@@ -34,6 +35,9 @@ public class EditPoolOrderController {
 
   @Autowired
   private LibraryAliquotService libraryAliquotService;
+
+  @Autowired
+  private IndexChecker indexChecker;
 
   @GetMapping("/new")
   public ModelAndView create(@RequestParam(name = "aliquotIds", required = false) String aliquotIds, ModelMap model) throws IOException {
@@ -67,7 +71,7 @@ public class EditPoolOrderController {
 
   private ModelAndView orderPage(PoolOrder order, ModelMap model) throws JsonProcessingException {
     ObjectMapper mapper = new ObjectMapper();
-    PoolOrderDto dto = Dtos.asDto(order);
+    PoolOrderDto dto = Dtos.asDto(order, indexChecker);
     model.put("orderDto", mapper.writeValueAsString(dto));
     model.put("libraryDtos", dto.getOrderAliquots());
     return new ModelAndView("/WEB-INF/pages/editPoolOrder.jsp", model);

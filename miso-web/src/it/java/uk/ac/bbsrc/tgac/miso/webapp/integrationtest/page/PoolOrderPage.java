@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.titleContains;
 
+import java.util.concurrent.TimeUnit;
 import java.util.Collection;
 
 import org.openqa.selenium.By;
@@ -105,6 +106,8 @@ public class PoolOrderPage extends FormPage<PoolOrderPage.Field> {
     WebElement dialog = getDriver().findElement(dialogSelector);
     okButton.click();
     waitUntil(ExpectedConditions.invisibilityOf(dialog));
+    // The AJAX dialog is fast enough that finding it be visibility seems to be hard
+    getDriver().manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
   }
 
 }

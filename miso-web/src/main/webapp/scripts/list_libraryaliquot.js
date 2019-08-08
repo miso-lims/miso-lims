@@ -123,6 +123,18 @@ ListTarget.libraryaliquot = {
       "iSortPriority": 0,
       "bSortable": false
     }, {
+      "sTitle": "Index(es)",
+      "mData": "indexLabels",
+      "mRender": function(data, type, full) {
+        if (!data) {
+            return "None";
+        }
+        return data.join(", ");
+      },
+      "include": true,
+      "iSortPriority": 0,
+      "bSortable": false
+    }, {
       "sTitle": "Volume",
       "mData": "volume",
       "include": true,

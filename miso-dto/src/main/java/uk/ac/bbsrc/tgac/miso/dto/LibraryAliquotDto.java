@@ -51,6 +51,7 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
   private String parentVolume;
   private String lastModified;
   private List<Long> indexIds;
+  private List<String> indexLabels;
   private String identityConsentLevel;
   private String ngUsed;
   private String volumeUsed;
@@ -376,6 +377,14 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
 
   public void setDistributionRecipient(String distributionRecipient) {
     this.distributionRecipient = distributionRecipient;
+  }
+
+  public List<String> getIndexLabels() {
+    return indexLabels;
+  }
+
+  public void setIndexLabels(List<String> indexLabels) {
+    this.indexLabels = indexLabels;
   }
 
 }

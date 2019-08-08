@@ -30,8 +30,9 @@ public class PoolOrderPageIT extends AbstractIT {
     fields.put(Field.PURPOSE, "Production");
     page.setFields(fields);
 
-    String aliquotName = "LDI1001";
-    page.addAliquots(Lists.newArrayList(aliquotName));
+    String aliquotName1 = "LDI902";
+    String aliquotName2 = "LDI1001";
+    page.addAliquots(Lists.newArrayList(aliquotName1, aliquotName2));
 
     assertEquals("", page.getField(Field.ID));
     assertFieldValues("changes pre-save", fields, page);
@@ -42,8 +43,8 @@ public class PoolOrderPageIT extends AbstractIT {
     PoolOrder order = (PoolOrder) getSession().get(PoolOrder.class, Long.valueOf(savedPage.getField(Field.ID)));
     assertEquals(fields.get(Field.ALIAS), order.getAlias());
     assertEquals(fields.get(Field.PURPOSE), order.getPurpose().getAlias());
-    assertEquals(1, order.getOrderLibraryAliquots().size());
-    assertEquals(aliquotName, order.getOrderLibraryAliquots().iterator().next().getAliquot().getName());
+    assertEquals(2, order.getOrderLibraryAliquots().size());
+    assertEquals(aliquotName1, order.getOrderLibraryAliquots().iterator().next().getAliquot().getName());
   }
 
   @Test

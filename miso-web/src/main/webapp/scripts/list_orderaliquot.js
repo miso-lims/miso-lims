@@ -136,6 +136,12 @@ ListTarget.orderaliquot = {
         }).join(', ');
       }
     }, {
+      "sTitle": "Description",
+      "mData": null,
+      "mRender": Warning.tableWarningRenderer(WarningTarget.orderaliquot.makeTarget(config.duplicateSequences, config.nearDuplicateIndices)),
+      "include": true,
+      "iSortPriority": 0
+    }, {
       'sTitle': 'Last Modified',
       'mData': 'aliquot.lastModified',
       'include': true,

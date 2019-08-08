@@ -7,6 +7,13 @@ var PoolOrder = (function($) {
   var aliquotListInitialized = false;
   var form = null;
 
+  function computeDuplicates(aliquots) {
+    Utils.ajaxWithDialog('Checking duplicates', 'POST', '/miso/rest/poolorders/indexchecker', aliquots.map(Utils.array.getId), function(
+        response) {
+      PoolOrder.setAliquots(aliquots, response.duplicateIndices, response.nearDuplicateIndices)
+    });
+  }
+
   return {
 
     setForm: function(formApi) {
@@ -17,7 +24,7 @@ var PoolOrder = (function($) {
       return $(listSelector).dataTable().fnGetData();
     },
 
-    setAliquots: function(orderAliquots) {
+    setAliquots: function(orderAliquots, duplicateSequences, nearDuplicateIndices) {
       if (aliquotListInitialized) {
         form.markOtherChanges();
         $(listSelector).dataTable().fnDestroy();
@@ -25,20 +32,23 @@ var PoolOrder = (function($) {
         ListState[listId] = null;
       }
       $(containerSelector).append($('<table>').attr('id', listId).addClass('display no-border ui-widget-content'));
-      ListUtils.createStaticTable(listId, ListTarget.orderaliquot, {}, orderAliquots);
+      ListUtils.createStaticTable(listId, ListTarget.orderaliquot, {
+        duplicateSequences: duplicateSequences,
+        nearDuplicateIndices: nearDuplicateIndices
+      }, orderAliquots);
       aliquotListInitialized = true;
     },
 
     addAliquots: function(orderAliquots) {
       var aliquots = PoolOrder.getAliquots().concat(orderAliquots);
-      PoolOrder.setAliquots(aliquots);
+      computeDuplicates(aliquots);
     },
 
     removeAliquots: function(aliquotIds) {
       var aliquots = PoolOrder.getAliquots().filter(function(orderAli) {
         return aliquotIds.indexOf(orderAli.aliquot.id) === -1;
       });
-      PoolOrder.setAliquots(aliquots);
+      computeDuplicates(aliquots);
     }
 
   };
