@@ -28,6 +28,7 @@ ListTarget.poolorder = {
         {
           sTitle: 'Description',
           mData: 'description',
+          mRender: Warning.tableWarningRenderer(WarningTarget.poolorder),
           include: true,
           iSortPriority: 0
         },

@@ -1511,7 +1511,10 @@ public class Dtos {
       setBoolean(dto::setLibraryQcPassed, library.getQcPassed(), true);
       setString(dto::setLibraryPlatformType, library.getPlatformType().getKey());
       if (library.getIndices() != null && !library.getIndices().isEmpty()) {
-        dto.setIndexIds(library.getIndices().stream().map(Index::getId).collect(Collectors.toList()));
+        dto.setIndexIds(library.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getId)
+            .collect(Collectors.toList()));
+        dto.setIndexLabels(library.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getLabel)
+            .collect(Collectors.toList()));
       }
       Sample sample = library.getSample();
       if (sample != null) {
@@ -1590,7 +1593,10 @@ public class Dtos {
     dto.setLastModified(formatDateTime(from.getLastModified()));
     dto.setCreationDate(formatDate(from.getCreated()));
     dto.setIdentificationBarcode(from.getAliquotBarcode());
-    dto.setIndexIds(from.getIndices().stream().map(Index::getId).collect(Collectors.toList()));
+    dto.setIndexIds(
+        from.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getId).collect(Collectors.toList()));
+    dto.setIndexLabels(from.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getLabel)
+        .collect(Collectors.toList()));
     dto.setTargetedSequencingId(from.getTargetedSequencingId());
     dto.setVolume(from.getAliquotVolume() == null ? null : from.getAliquotVolume().toString());
     dto.setVolumeUnits(from.getAliquotVolumeUnits());
@@ -3451,6 +3457,17 @@ public class Dtos {
     setString(to::setPoolAlias, maybeGetProperty(from.getPool(), Pool::getAlias));
     setLong(to::setSequencingOrderId, maybeGetProperty(from.getSequencingOrder(), SequencingOrder::getId), true);
     return to;
+  }
+
+  public static PoolOrderDto asDto(@Nonnull PoolOrder from, IndexChecker indexChecker) {
+    PoolOrderDto dto = asDto(from);
+    if (indexChecker != null) {
+      dto.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(from));
+      dto.setDuplicateIndices(dto.getDuplicateIndicesSequences() != null && !dto.getDuplicateIndicesSequences().isEmpty());
+      dto.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(from));
+      dto.setNearDuplicateIndices(dto.getNearDuplicateIndicesSequences() != null && !dto.getNearDuplicateIndicesSequences().isEmpty());
+    }
+    return dto;
   }
 
   private static OrderAliquotDto asDto(@Nonnull OrderLibraryAliquot from) {

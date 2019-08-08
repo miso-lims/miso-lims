@@ -2,6 +2,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,9 +22,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto;
@@ -31,6 +37,26 @@ import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 @Controller
 @RequestMapping("/rest/poolorders")
 public class PoolOrderRestController extends RestController {
+  public static class IndexResponseDto {
+    private Set<String> duplicateIndices;
+    private Set<String> nearDuplicateIndices;
+
+    public Set<String> getDuplicateIndices() {
+      return duplicateIndices;
+    }
+
+    public void setDuplicateIndices(Set<String> duplicateIndices) {
+      this.duplicateIndices = duplicateIndices;
+    }
+
+    public Set<String> getNearDuplicateIndices() {
+      return nearDuplicateIndices;
+    }
+
+    public void setNearDuplicateIndices(Set<String> nearDuplicateIndices) {
+      this.nearDuplicateIndices = nearDuplicateIndices;
+    }
+  }
 
   private final JQueryDataTableBackend<PoolOrder, PoolOrderDto> jQueryBackend = new JQueryDataTableBackend<PoolOrder, PoolOrderDto>() {
 
@@ -41,12 +67,17 @@ public class PoolOrderRestController extends RestController {
 
     @Override
     protected PoolOrderDto asDto(PoolOrder model) {
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, indexChecker);
     }
   };
+  @Autowired
+  private IndexChecker indexChecker;
 
   @Autowired
   private PoolOrderService poolOrderService;
+
+  @Autowired
+  private LibraryAliquotService libraryAliquotService;
 
   @PostMapping
   public @ResponseBody PoolOrderDto create(@RequestBody PoolOrderDto dto) throws IOException {
@@ -63,6 +94,16 @@ public class PoolOrderRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Pool Order", ids, poolOrderService);
+  }
+
+  @PostMapping(value = "/indexchecker")
+  @ResponseBody
+  public IndexResponseDto indexChecker(@RequestBody(required = true) List<Long> ids) throws IOException {
+    List<LibraryAliquot> aliquots = ids.stream().map(WhineyFunction.rethrow(libraryAliquotService::get)).collect(Collectors.toList());
+    IndexResponseDto response = new IndexResponseDto();
+    response.setDuplicateIndices(indexChecker.getDuplicateIndicesSequences(aliquots));
+    response.setNearDuplicateIndices(indexChecker.getNearDuplicateIndicesSequences(aliquots));
+    return response;
   }
 
   @GetMapping("/dt/{status}")

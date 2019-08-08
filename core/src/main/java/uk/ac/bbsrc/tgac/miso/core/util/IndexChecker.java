@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
@@ -68,6 +70,29 @@ public class IndexChecker {
     return getIndexSequencesWithTooFewMismatches(indices, warningMismatches);
   }
 
+  public Set<String> getDuplicateIndicesSequences(PoolOrder order) {
+    if (order == null) return Collections.emptySet();
+    List<List<Index>> indices = getIndexSequences(order);
+    return getIndexSequencesWithTooFewMismatches(indices, errorMismatches);
+  }
+
+  public Set<String> getNearDuplicateIndicesSequences(PoolOrder order) {
+    if (order == null) return Collections.emptySet();
+    List<List<Index>> indices = getIndexSequences(order);
+    return getIndexSequencesWithTooFewMismatches(indices, warningMismatches);
+  }
+
+  public Set<String> getDuplicateIndicesSequences(List<LibraryAliquot> aliquots) {
+    if (aliquots == null) return Collections.emptySet();
+    List<List<Index>> indices = getIndexSequences(aliquots);
+    return getIndexSequencesWithTooFewMismatches(indices, errorMismatches);
+  }
+
+  public Set<String> getNearDuplicateIndicesSequences(List<LibraryAliquot> aliquots) {
+    if (aliquots == null) return Collections.emptySet();
+    List<List<Index>> indices = getIndexSequences(aliquots);
+    return getIndexSequencesWithTooFewMismatches(indices, warningMismatches);
+  }
   private static Set<String> getIndexSequencesWithTooFewMismatches(List<List<Index>> indices, int mismatchesThreshold) {
     Set<String> nearMatchSequences = new HashSet<>();
     if (indices.stream().flatMap(List::stream).allMatch(index -> hasFakeSequence(index)))
@@ -116,6 +141,16 @@ public class IndexChecker {
   private static List<List<Index>> getIndexSequences(ListPoolView pool) {
     return pool.getElements().stream()
         .map(ListPoolViewElement::getIndices)
+        .collect(Collectors.toList());
+  }
+
+  private static List<List<Index>> getIndexSequences(PoolOrder pool) {
+    return pool.getOrderLibraryAliquots().stream().map(ola -> ola.getAliquot().getLibrary().getIndices())
+        .collect(Collectors.toList());
+  }
+
+  private static List<List<Index>> getIndexSequences(List<LibraryAliquot> aliquots) {
+    return aliquots.stream().map(la -> la.getLibrary().getIndices())
         .collect(Collectors.toList());
   }
 }

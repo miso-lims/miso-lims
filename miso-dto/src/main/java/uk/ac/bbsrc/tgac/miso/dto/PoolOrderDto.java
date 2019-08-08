@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
+import java.util.Set;
 
 public class PoolOrderDto {
 
@@ -46,6 +47,10 @@ public class PoolOrderDto {
   private Integer partitions;
   private boolean draft;
   private List<OrderAliquotDto> orderAliquots;
+  private boolean duplicateIndices;
+  private Set<String> duplicateIndicesSequences;
+  private boolean nearDuplicateIndices;
+  private Set<String> nearDuplicateIndicesSequences;
   private String status;
   private Long poolId;
   private String poolAlias;
@@ -161,6 +166,38 @@ public class PoolOrderDto {
 
   public void setSequencingOrderId(Long sequencingOrderId) {
     this.sequencingOrderId = sequencingOrderId;
+  }
+
+  public boolean isDuplicateIndices() {
+    return duplicateIndices;
+  }
+
+  public void setDuplicateIndices(boolean duplicateIndices) {
+    this.duplicateIndices = duplicateIndices;
+  }
+
+  public Set<String> getDuplicateIndicesSequences() {
+    return duplicateIndicesSequences;
+  }
+
+  public void setDuplicateIndicesSequences(Set<String> duplicateIndicesSequences) {
+    this.duplicateIndicesSequences = duplicateIndicesSequences;
+  }
+
+  public boolean isNearDuplicateIndices() {
+    return nearDuplicateIndices;
+  }
+
+  public void setNearDuplicateIndices(boolean nearDuplicateIndices) {
+    this.nearDuplicateIndices = nearDuplicateIndices;
+  }
+
+  public Set<String> getNearDuplicateIndicesSequences() {
+    return nearDuplicateIndicesSequences;
+  }
+
+  public void setNearDuplicateIndicesSequences(Set<String> nearDuplicateIndicesSequences) {
+    this.nearDuplicateIndicesSequences = nearDuplicateIndicesSequences;
   }
 
 }
