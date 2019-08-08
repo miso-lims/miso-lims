@@ -1,6 +1,7 @@
 # Unreleased
 
 Changes:
+  * Fix clear button index distance page
 
 
 

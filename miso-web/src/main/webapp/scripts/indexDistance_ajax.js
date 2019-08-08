@@ -66,7 +66,7 @@
 
   IndexDistance.clearForm = function() {
     $('#indices').val('');
-    $('#minDistance').val('2');
+    $('#minDistance').val(Math.max(Constants.errorEditDistance, Constants.warningEditDistance) + 1);
     clearResults();
   };
 
