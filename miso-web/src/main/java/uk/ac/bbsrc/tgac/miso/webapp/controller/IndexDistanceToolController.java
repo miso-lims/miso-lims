@@ -137,7 +137,6 @@ public class IndexDistanceToolController {
 
   @RequestMapping(value = "/tools/indexdistance", method = RequestMethod.GET)
   public ModelAndView getTool(ModelMap model) {
-    model.addAttribute("defaultMinDistance", indexChecker.getWarningMismatches() + 1);
     return new ModelAndView("/WEB-INF/pages/indexDistanceTool.jsp", model);
   }
 
