@@ -1,8 +1,14 @@
 # Unreleased
 
 Changes:
-  * Fix clear button index distance page
 
+
+
+# 0.2.187
+
+Changes:
+  * Fix clear button index distance page
+  * Display index collisions in pool orders
 
 
 # 0.2.186
