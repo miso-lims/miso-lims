@@ -1,8 +1,4 @@
----
-layout: page
-title: "13. Sequencing Orders"
-section: 13
----
+# Sequencing Orders
 
 Sequencing orders are used to track which pools are ready to be sequenced, how much
 sequencing needs to be done for a given pool, and whether that required
@@ -16,8 +12,7 @@ Since sequencing orders are tied to a particular sequencing platform, the
 technology-specific terminology (lanes, chips, flow cells) may be used instead
 of the generic term "partitions".
 
-{% assign sub = 1 %}
-{% include userman-heading.md section=page.section sub=sub section-title=section-title title="Outstanding Sequencing Orders List" %}
+## Outstanding Sequencing Orders List
 
 The Outstanding Sequencing Orders page shows the orders that still require sequencing to be
 performed. From the "Instrument Runs" list, click "Sequencing Orders - Outstanding". There are tabs for
@@ -32,19 +27,13 @@ have been subtracted from this number. See the _In-Progress Sequencing Orders Li
 Sequencing orders are only shown on this page if the "Remaining" column is greater than
 zero.
 
-{% include userman-toplink.md %}
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub section-title=section-title title="All Sequencing Orders List" %}
+## All Sequencing Orders List
 
 This page shows all sequencing orders, including ones that are complete. The format is
 similar to the "Outstanding Sequencing Orders" list. From the "Instrument Runs" list, click
 "Sequencing Orders - All".
 
-{% include userman-toplink.md %}
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub section-title=section-title title="In-Progress Sequencing Orders List" %}
+## In-Progress Sequencing Orders List
 
 The In-Progress Sequencing Orders page is similar to the "Outstanding Sequencing Orders" list. From the
 "Instrument Runs" list, click "Sequencing Orders - In-Progress". If a pool has been added to a
@@ -53,50 +42,36 @@ between being sequenced and not. This state is called _in-progress_ since the po
 has been loaded on a flow cell but not yet associated with the status of a
 sequencing run. This page shows all of the sequencing orders in this intermediate state.
 
-{% include userman-toplink.md %}
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub section-title=section-title title="Creating Sequencing Orders" %}
+## Creating Sequencing Orders
 
 Sequencing orders can be created on pools either for a single pool or for multiple pools at once.
 
 {% assign subsub = 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub section-title=section-title title="Single" %}
+{% include userman-heading.md section=page.section sub=sub subsub=subsub section-title=section-title title="Single
 
-To create a sequencing order for a single pool, first navigate to the [Edit Pool
-Page](pools.html#editing_a_single_pool).
+To create a sequencing order for a single pool, first navigate to the 
+[Edit Pool Page](../pools/#editing-a-single-pool).
 
 On the Edit Pool Page, scroll down to the "Requested Sequencing Orders" table and click
 "Create" from the toolbar at the top of the table.
 
 Select the platform, sequencing parameters, and partitions and click "Save".
 
-{% include userman-toplink.md %}
+### Bulk
 
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub section-title=section-title title="Bulk" %}
-
-On the [List Pools Page](pools.html#pool_list), check the boxes
+On the [List Pools Page](../pools/#pool-list), check the boxes
 beside the pools needing orders and click "Create Orders".
 
 Select the platform, sequencing parameters, and partitions and click "Save".
 
-{% include userman-toplink.md %}
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub section-title=section-title title="Extending a Sequencing Order" %}
+## Extending a Sequencing Order
 
 From the Edit Pool Page, scroll down to the "Requested Sequencing Orders" table. Check the
 orders to be extended. From the toolbar at the top of the table, click "Order
 More". In the dialog, add the number of additional partitions to be sequenced.
 Click "Save".
 
-{% include userman-toplink.md %}
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub section-title=section-title title="Deleting Sequencing Orders" %}
+## Deleting Sequencing Orders
 
 From the Edit Pool Page, scroll down to the "Requested Sequencing Orders" table. Check the
 orders to be deleted. From the toolbar at the top of the table, click "Delete".
-
-{% include userman-toplink.md %}

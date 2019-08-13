@@ -1,15 +1,10 @@
----
-layout: page
-title: "16. Sequencing Containers"
-section: 16
----
+# Sequencing Containers
 
 A sequencing container holds one or more pools and is loaded onto a sequencer for a sequencing run. These actually have
 different names depending on the platform. Illumina and Oxford Nanopore containers are called flow cells, PacBio
 containers are called 8Pacs, etc. "Sequencing container" is a platform-agnostic term that we use for all of these.
 
-{% assign sub = 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Sequencing Container List" %}
+## Sequencing Container List
 
 To get to the Sequencing Containers list page, click "Containers" under Sequencing in the Instrument Runs list in the
 menu on the left side of the screen. This list includes all containers that have been created in MISO. The list is
@@ -21,12 +16,9 @@ There is also a Sequencing Containers list on the Edit Run page which allows you
 containers list has most of the same controls as on the Sequencing Containers list page, plus extra controls for adding
 and removing containers from the run.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Creating a Container" %}
+## Creating a Container
 
 Containers can be created from the Sequencing Containers list page. Select the tab of the platform for which you would
 like to create a container. From the toolbar at the top of the table, click the "Add Container" button. This button
@@ -41,12 +33,9 @@ you can add pools and further modify the container.
 If you are using Run Scanner, MISO will automatically create any non-existant containers for runs that it reports. If a
 container with a serial number matching the one reported for the run already exists, it will be used instead.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Editing a Container" %}
+## Editing a Container
 
 To get to the Edit Container page, click on its ID or Serial Number on the Sequencing Containers list. There are also
 links to the Edit Container page in the Partitions lists found on the Edit Run and Edit Pool pages. Note that
@@ -58,12 +47,9 @@ changes you would like and then click the "Save" button at the top right to conf
 Below, there are sections for QC's and Partitions, which are discussed in other parts of this section of the user
 manual. Other sections list the runs that the container has been loading onto, and the container's change log.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Assigning Pools to a Container" %}
+## Assigning Pools to a Container
 
 You can assign pools to a container using the Partitions list that is found on both the Edit Container and Edit Run
 pages. The Partitions list will be labelled differently depending on the platform. For Illumina, it will be called the
@@ -81,38 +67,27 @@ You will be given several options for selecting a pool.
 
 After choosing a pool, you can set the loading concentration, or leave it blank. Click the OK button to finish.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Container QCs" %}
+## Container QCs
 
 Any number of quality control measures may be recorded for a container. For more information on this feature, see the
-[QCs section](qcs.html).
-
-{% include userman-toplink.md %}
+[QCs section](../qcs/).
 
 
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Printing Barcodes" %}
+## Printing Barcodes
 
 Barcode labels can be printed for a series of containers from the Containers list. See the
-[Barcode Label Printers section - Printing Barcodes](barcode_label_printers.html#printing_barcodes) for details on how
+[Barcode Label Printers section - Printing Barcodes](../barcode_label_printers/#printing-barcodes) for details on how
 to do this.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Deleting Containers" %}
+## Deleting Containers
 
 To delete containers, go to the Containers list, check the checkboxes next to the containers that you wish to delete, and
 click the "Delete" button in the toolbar at the top of the table. A container can only be deleted if it has not been added
 to any runs. The container must be removed from any runs before it can be deleted. A container can only be deleted by its
 creator or a MISO administrator.
-
-{% include userman-toplink.md %}
 

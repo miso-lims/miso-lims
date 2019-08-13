@@ -1,17 +1,9 @@
----
-layout: page
-title: Installing MISO on baremetal
-category: adm
-date: 2016-01-11 13:51:46
-order: 2
----
+# Installing MISO on baremetal
 
 This installation guide is intended to be used if you cannot use Docker and
 Docker compose, and is not trivial to set up. We recommend using Docker compose
 if possible by following the
 [Docker compose installation guide](compose-installation-guide).
-
-<a name="prerequisites"/>
 
 ## Prerequisites
 For each service, which may be put on the same machine, the following tools are
@@ -33,8 +25,6 @@ Development Machine(s):
 * git
 * Eclipse
 * A merge tool such as Meld
-
-<a id="latest-release">
 
 ## Downloading the latest release
 Use the GitHub interface to download the [latest release](https://github.com/miso-lims/miso-lims/releases/latest).
@@ -81,8 +71,6 @@ need to add a grant privilege to the MISO database from your remote machine:
     GRANT ALL ON `lims`.* TO 'tgaclims'@'your.tomcat.install.server';
     GRANT ALL ON `lims`.* TO 'tgaclims'@'your.tomcat.install.server' IDENTIFIED BY 'tgaclims';
 
-
-<a id="root">
 
 # Setting Up the Application Server
 
@@ -208,9 +196,9 @@ prefix.
 If using JDBC, once running, you should change the passwords of the `admin` and
 `notification` accounts.
 
-<a name="naming-schemes">
+## Naming Schemes 
 
-## Naming Schemes (updating `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`)
+(updating `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`)
 MISO Naming Schemes are used to validate and generate entity String fields. They are
 used for all `name` fields, and some `alias` fields. You may configure a base naming
 scheme, and customize it by switching validators and generators in `miso.properties` in
@@ -294,7 +282,7 @@ to allow duplicate library aliases. A custom validator must be specified for thi
 property to be enabled - the naming scheme’s default validator will not be altered.
 
 # Setting Up the Run Scanner
-[Run Scanner](https://github.com/oicr-gsi/runscanner) is a webservice that scans the paths containing
+[Run Scanner](https://github.com/miso-lims/runscanner) is a webservice that scans the paths containing
 sequencer output. It is not required for a functioning MISO install, but
 without it, sequencer runs must be added manually.
 
@@ -312,12 +300,10 @@ Build the application using:
 
 There will be an important build artefact: `miso-web/target/ROOT.war`
 
-<a name="upgrading"/>
-
 # Releasing and Upgrading
 
 Prior to release, ensure that you have followed the instructions in the
-above and have WAR files for both MISO (`ROOT.war`) and, if desired, [Run Scanner](https://github.com/oicr-gsi/runscanner)(`runscanner-*.war`).
+above and have WAR files for both MISO (`ROOT.war`) and, if desired, [Run Scanner](https://github.com/miso-lims/runscanner)(`runscanner-*.war`).
 
 To install or upgrade, perform the following steps:
 

@@ -1,0 +1,51 @@
+site_name: MISO LIMS
+site_url: http://miso-lims.github.io
+site_description: MISO LIMS Documentation
+site_author: Genome Sequence Informatics, Ontario Institute for Cancer Research
+
+repo_url: https://github.com/miso-lims/miso-lims
+
+theme: readthedocs
+
+nav:
+  - Getting Started:
+    - Building and Deploying: admin/installation-guide.md
+    - Docker Compose Installation: admin/compose-installation-guide.md
+    - Baremetal Installation: admin/baremetal-installation-guide.md
+    - Administering MISO: admin/admin-guide.md
+  - User Manual:
+    - Introduction: user-manual.md
+    - 1. Site Configuration: user_manual/site_configuration.md
+    - 2. General Navigation: user_manual/general_navigation.md
+    - 3. Barcode Label Printers: user_manual/barcode_label_printers.md
+    - 4. Users and Groups: user_manual/users_and_groups.md
+    - 5. Type Data: user_manual/type_data.md
+    - 6. Projects: user_manual/projects.md
+    - 7. Samples: user_manual/samples.md
+    - 8. Libraries: user_manual/libraries.md
+    - 9. Library Aliquots: user_manual/library_aliquots.md
+    - 10. Worksets: user_manual/worksets.md
+    - 11. Pool Orders: user_manual/pool_orders.md
+    - 12. Pools: user_manual/pools.md
+    - 13. Sequencing Orders: user_manual/sequencing_orders.md
+    - 14. Freezers and Rooms: user_manual/freezers_and_rooms.md
+    - 15. Boxes: user_manual/boxes.md
+    - 16. Sequencing Containers: user_manual/sequencing_containers.md
+    - 17. Instruments: user_manual/instruments.md
+    - 18. Sequencer Runs: user_manual/sequencer_runs.md
+    - 19. Arrays : user_manual/arrays.md
+    - 20. Array Runs: user_manual/array_runs.md
+    - 21. QCs: user_manual/qcs.md
+    - 22. Notes: user_manual/notes.md
+    - 23. Attachments: user_manual/attachments.md
+    - 24. Deletions: user_manual/deletions.md
+    - 25. Workflows: user_manual/workflows.md
+    - 26. European Nucleotide Archive Support: user_manual/european_nucleotide_archive_support.md
+    - 27. Home Screen Widgets: user_manual/home_screen_widgets.md
+    - 28. Other MISO Tools: user_manual/other_miso_tools.md
+    - 29. Related Software: user_manual/related_software.md
+  - Developer Guide: developers-manual.md
+    
+extra_css:
+    - css/numbering.css
+    - css/extra.css

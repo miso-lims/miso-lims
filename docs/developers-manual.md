@@ -1,15 +1,9 @@
----
-layout: page
-title: "Developer's Manual"
-category: dev
-date: 2016-01-12 13:38:53
-order: 1
----
+# Developer's Manual
 
 This manual is intended to be an overview of all MISO's major development areas. If you feel that anything is missing, please
 [let us know](https://github.com/miso-lims/miso-lims/issues).
 
-# Module Overview
+## Module Overview
 
 MISO is divided into several modules, some of which are separate applications or libraries which may also be used in external
 applications.
@@ -25,11 +19,11 @@ applications.
 |pinery-miso|pinery-miso|Implementation of [Pinery](https://github.com/oicr-gsi/pinery) REST API for serving MISO LIMS data to other applications|
 |migration|migration|a separate application which can be extended to facilitate migration of data from a different LIMS|
 
-# Core
+## Core
 
-## Domain Model
+### Domain Model
 
-### Core Behavioral Interfaces
+#### Core Behavioral Interfaces
 
 |Interface|Description|
 |-------|-----------|
@@ -42,7 +36,7 @@ applications.
 |[Locatable](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Locatable.java)|Defines whether an implementing object is able to be located by a barcode string, e.g. a freezer shelf barcode.|
 |[Nameable](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java)|Defines whether an implementing object is able to be identified by a unique long and named by a string. This name may or may not be unique depending on the given [NamingScheme](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/NamingScheme.java) applied (see [Naming Schemes](#naming-schemes)). This interface is heavily used in MISO for all persistable objects.|
 
-### Core Model Interfaces
+#### Core Model Interfaces
 
 These interfaces represent the objects that store state inherent to the MISO model, and are a superset of the
 [EBI SRA domain model schema](http://www.ebi.ac.uk/ena/about/sra_format). This means that as object fields are inputted by
@@ -63,11 +57,11 @@ to wrap up the synonymous objects so that SRA XMLs can be generated.
 |SequencerReference|a hardware sequencer|
 |Box|storage box which holds barcoded sample/library/library aliquot/pool tubes|
 
-## Enumerated Types
+### Enumerated Types
 
 MISO has two categories of enumerated types: those that are actual Java enums, and those that are database-defined.
 
-### Enums
+#### Enums
 
 These concrete enums are intended to provide collections of relatively static instances of descriptive definitions.
 
@@ -80,7 +74,7 @@ These concrete enums are intended to provide collections of relatively static in
 * StrStatus
 * SubmissionActionType
 
-### Database definition types
+#### Database definition types
 
 Unlike their enum conterparts, these type definitions are instances of database entities. The primary reason for this is to simplify
 management of types that may be institute-specific. Another is that some of these types follow the enumerations specified in the
@@ -93,14 +87,14 @@ management of types that may be institute-specific. Another is that some of thes
 
 
 <a name="naming-schemes"/>
-## Naming Schemes
+### Naming Schemes
 
 All [Nameable](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java) entities
 in MISO should conform to a Naming Scheme. This ensures consistency of human-readable names across entity space, and allows centralised
 validation with no requirement of extra code (backend or frontend) on an external developer's part. The alias attribute on Sample and
 Library can also be generated and/or validated by the naming scheme.
 
-### Interfaces
+#### Interfaces
 
 |Interface|Description|
 |---------|-----------|
@@ -109,9 +103,9 @@ Library can also be generated and/or validated by the naming scheme.
 |NamingScheme|coordinates usage of a collection of generators and validators|
 |NamingSchemeResolverService|resolves naming schemes, generators, and validators given a configured property value. The default implementation simply uses static String mappings|
 
-## Managers
+### Managers
 
-### Files
+#### Files
 
 API access to the underlying filesystem is made available through implementors of the
 [FilesManager](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/FilesManager.java)
@@ -149,7 +143,7 @@ A project with ID 1 and stored in the default file storage directory on the 31st
 
 MISO also obfuscates the actual filename and path within the web application user interfaces by using the file object's hashcode.
 
-### IssueTrackers
+#### IssueTrackers
 
 API access to any registered Issue trackers, e.g. JIRA, RT, Redmine, Mantis, is made available through implementors of the
 [IssueTrackerManager](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/IssueTrackerManager.java)
@@ -165,11 +159,11 @@ details from the tracker's API. Currently the only default supported implementat
 [JiraIssueManager](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/java/uk/ac/bbsrc/tgac/miso/webapp/service/integration/jira/JiraIssueManager.java)
 class.
 
-# Database and Schema
+## Database and Schema
 
 The MISO database is created and updated using [Flyway](https://flywaydb.org/) migrations.
 
-## Creating a New Database
+### Creating a New Database
 
 1. First, check out the branch you'd like to build the DB for via Github
     * If you want the OICR base data to be included, this should be oicr/oicr, or another branch derived from it
@@ -201,7 +195,7 @@ The MISO database is created and updated using [Flyway](https://flywaydb.org/) m
         cd sqlstore
         mvn flyway:migrate
 
-## Updating an Existing Database
+### Updating an Existing Database
 
 1. Check out and build MISO as described in steps 1-2 of Creating a New Database (above)
 2. Run Flyway Migrate. Only new migrations will be run
@@ -209,7 +203,7 @@ The MISO database is created and updated using [Flyway](https://flywaydb.org/) m
         cd sqlstore
         mvn flyway:migrate
 
-## Adding New Database Migrations
+### Adding New Database Migrations
 
 There are a few things to keep in mind when adding Flyway migrations
 
@@ -229,13 +223,13 @@ There are a few things to keep in mind when adding Flyway migrations
   statements must be preceded by `DROP` statements, or something similar
 * **Data** additions (Tissue Origins, Kits, etc.) should usually be in an afterMigrate script
 
-# Persistence Layer
+## Persistence Layer
 
 Hibernate is used for Object-Relational Mapping (ORM). JPA/Hibernate annotations are used in the model classes to define columns, joins,
 constraints, and other database info. The Data Access Objects (DAOs) found in the sqlstore module are then only responsible for doing
 simple reads and writes as (usually) dictated by the Service layer. DAOs should only be consumed by the Service layer.
 
-# Service Layer
+## Service Layer
 
 The Service layer, found in the miso-service layer, contains all the business logic involved in correctly storing and retrieving things
 from the database. To ensure data consistency, all database access in MISO should be done through a Service class rather than using the
@@ -248,14 +242,14 @@ DAOs directly. Beyond data storage and retrieval via the DAO's, the Service laye
 * Ensuring that only fields which should be modifiable can be modified
 
 <a name="configuration"/>
-# Web Application
+## Web Application
 
 The main MISO web application is powered by the [Spring framework](http://www.springsource.org/), notably
 [Spring MVC](http://static.springsource.org/spring/docs/4.3.x/spring-framework-reference/html/mvc.html). This allows powerful webapp
 configuration and tailoring via Spring XML and annotations, making functionality like the REST API a breeze. Here, we will go through the
 MISO elements that comprise the web application layer.
 
-## Configuration
+### Configuration
 
 A great deal of MISO can be configured at the Spring XML level, making it easy for developers to swap out existing MISO implementations for their own, via [Dependency Injection](http://static.springsource.org/spring/docs/3.2.x/spring-framework-reference/html/overview.html#overview-dependency-injection). MISO uses the usual web.xml to define properties relevant to the webapp container, and a number of Spring configuration XML files for the core application itself:
 
@@ -269,12 +263,12 @@ A great deal of MISO can be configured at the Spring XML level, making it easy f
 |[jdbc-security-config.xml](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/jdbc-security-config.xml) / [ldap-security-config.xml](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/ldap-security-config.xml)|Database and LDAP specific configuration, respectively. JDBC configuration is the initial default, and is the simplest mechanism to get started. If you would like more fine-grained access to a directory-style authentication and role assignment mechanism, then LDAP support is also available|
 |[integration-config.xml](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/integration-config.xml)|Configures elements in the integration layer, e.g. analysis server|
 
-## REST API
+### REST API
 
 The REST API is used primarily to support AJAX on the front-end. Because the model classes may be very complex and sometimes contain a
 deep graph of nested objects, they are converted to simpler Data Transfer Objects (DTO) before serializion to JSON.
 
-### Request Signing
+#### Request Signing
 
 Signing requests requires 3 elements:
 
@@ -308,20 +302,20 @@ SIGNATURE=`echo -n "/miso/rest/projects/$PROJECTID/libraries?x-url=/miso/rest/pr
 curl --request GET "http://your.miso.url/miso/rest/projects/$PROJECTID/libraries" --header "x-user:$USER" --header "x-signature:$SIGNATURE" --header "x-url:/miso/rest/projects/$PROJECTID/libraries"
 ```
 
-# Run Scanner
+## Run Scanner
 (TODO)
 
-# Testing
+## Testing
 
-## Unit Tests
+### Unit Tests
 
 Tests are run through jUnit 4 via Maven. It is configured to run any classes with names ending in "Test" in the test sources. Generally,
 all new code should be unit tested. The Maven Cobertura plugin can be used to generate a coverage report. SonarQube also analyses test
 coverage.
 
-## DAO Testing
+### DAO Testing
 
-### Test Database
+#### Test Database
 
 A test database is created in memory for DAO testing. It is an H2 database running in MySQL mode. The database understands most MySQL
 syntax, but is not perfect. A Groovy script is used to copy the production schemas and make a few changes to them so that H2 will be happy.
@@ -331,7 +325,7 @@ Flyway is used to migrate the test schemas into the test database.
 m2e (Maven) plugin. The tests can still be run in Eclipse, but you must first do a `mvn clean install` outside of Eclipse, so that Maven
 will run the schema translator.
 
-### Test Data
+#### Test Data
 
 Test data is populated via Flyway from the script
 [test_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/sqlstore/src/test/resources/db/test_migration/test_data.sql)
@@ -339,7 +333,7 @@ Test data is populated via Flyway from the script
 Flyway is configured to look for any files in the migration directory ending with .test.sql. They must include version numbers higher than
 the production schema versions so that they are run after the tables are created.
 
-### Tests
+#### Tests
 
 DAO test classes should all extend `AbstractDAOTest`. The abstract class includes the annotations necessary to make the test database
 available. It also makes your tests transactional, so any database changes made in a test case are rolled back before the next test case
@@ -365,7 +359,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
 }
 ```
 
-## UI Integration Testing
+### UI Integration Testing
 UI integration tests should all extend `AbstractIT` for similar reasons as the DAO tests listed above.
 The UI tests run Selenium against a Tomcat instance using MySQL in Docker.
 UI integration tests can be run using:
@@ -385,7 +379,7 @@ This will cause Tomcat to start but will not run any tests. You can access this 
 output once the Tomcat has finished starting up. As Tomcat is not running tests, it will have to be killed
 with `Ctrl-C` and the MySQL Docker container will have to be manually cleaned up.
 
-## Building the Docker images (after building a release)
+### Building the Docker images (after building a release)
 
 If you are a MISO maintainer and you have created the latest release, you will need to create a
 Docker image for it and send it to DockerHub.

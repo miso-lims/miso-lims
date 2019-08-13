@@ -1,37 +1,25 @@
----
-layout: page
-title: "2. General Navigation"
-section: 2
----
+# General Navigation
 
-
-{% assign sub = 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Home Screen" %}
+## Home Screen
 The Home Screen or Home Page is the main page of MISO, and contains [widgets](#home-screen-widgets) and links
 to other areas of MISO. To get to the Home Screen, click on either the MISO logo in the top left corner of all MISO
 pages.
 
-{% include userman-toplink.md %}
+## Home Screen Widgets
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Home Screen Widgets" %}
 
-{% assign figure = 1 %}
 You'll find a number of widgets on the home screen (see figure {{figure}}). How you interact with these varies
 depending on the individual widget. Some have a search box that can be used to filter what is displayed. Clicking
 on a tile within a widget will either take you to the single-item edit page for the item, open a menu with options
 depending on the item you clicked, or perform some other action.
 
-{% include userman-figure.md num=figure cap="Home screen widgets" img="general-nav-widgets.png" %}
+{% include userman-figure.md num=figure cap="Home screen widgets" img="general-nav-widgets.png
 
-Individual widgets are described in more detail in the [Home Screen Widgets section](home_screen_widgets.html)
-
-{% include userman-toplink.md %}
+Individual widgets are described in more detail in the [Home Screen Widgets section](../home_screen_widgets/)
 
 
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="List Pages" %}
+## List Pages
 
 You can access the list pages by clicking links in the menu on the left side of the screen. For example, to access the
 Samples list, click "Samples" in the Preparation list. These list pages all have similar features and behaviours, as
@@ -41,9 +29,7 @@ A dropdown at the top of the table allows you to choose how many entries are sho
 bottom of the page can be used to move to other pages.
 
 
-
-{% assign subsub = 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Selecting Items" %}
+### Selecting Items
 
 Tables which allow you to select items will have a column of checkboxes on the left-hand side. To select an item,
 check the checkbox in the row of the item you wish to select. To deselect an item, uncheck the checkbox. Multiple items
@@ -57,12 +43,8 @@ The toolbar at the top of the table also contains controls to select (☑) and d
 button will only select the items on the current page, whereas the deselect all button will deselect all items on all
 pages.
 
-{% include userman-toplink.md %}
 
-
-
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Selecting by Search" %}
+### Selecting by Search
 
 Several of the list pages have a "Select by names" feature which is represented by a button in the toolbar that looks
 like a clipboard (📋). Clicking this button will open a dialog which prompts you to enter names, aliases, or barcodes.
@@ -77,12 +59,8 @@ items. These will be the same options as are available in the list page's toolba
 This feature is useful if you have a list of names, aliases, or barcodes that you can copy from a spreadsheet, or if
 you have several barcoded items that you can scan into the dialog.
 
-{% include userman-toplink.md %}
 
-
-
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Searching" %}
+### Searching
 
 Each of the list pages has a search box at the top right of the table. You can enter your search terms and press Enter
 to filter the data that is shown in the table.
@@ -94,7 +72,7 @@ tell which tables have Advanced Search because they will have a black help bubbl
 the Samples list page, you can search for samples by the box that they're stored in (`box:boxname`) or the date they
 were created (`created:today`).
 
-{% include userman-figure.md num=figure cap="Advanced search" img="general-nav-search.png" %}
+{% include userman-figure.md num=figure cap="Advanced search" img="general-nav-search.png
 
 On pages that don't have Advanced Search, the search is only looking at the text you can see in the table, and
 sometimes some additional hidden fields. There is no way to specify which columns to search.
@@ -102,23 +80,15 @@ sometimes some additional hidden fields. There is no way to specify which column
 MISO remembers your recent searches, and will maintain the search results on a list page for some time. Clear the
 search box and press Enter to reset the page and show all items again.
 
-{% include userman-toplink.md %}
 
-
-
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Sorting" %}
+### Sorting
 
 Some list pages allow you to change the sorting order. You can tell which columns are sortable because they have up
 and/or down arrows in the column heading. Click on the column heading to sort the table by that column. Click the same
 column heading again to reverse the sorting order.
 
-{% include userman-toplink.md %}
 
-
-
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Finding Related Items" %}
+### Finding Related Items
 
 Several tables (Samples, Libraries, Library Aliquots, and Pools) have toolbar buttons labelled "Parents" and
 "Children." These allow you to find items related to the ones you have selected. For instance, you can select a number
@@ -144,12 +114,9 @@ If your site uses detailed sample mode, samples are broken into several addition
 1. Stock Samples
 1. Aliquot Samples
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Single Item Create/Edit Pages" %}
+## Single Item Create/Edit Pages
 
 Many types of items within MISO have an edit page that allows you to modify a single item. In some cases, the same page
 is also used to create new items.
@@ -160,33 +127,25 @@ with an asterisk (\*) are required and must be filled in before the item can be 
 fields that are invalid will be marked in red, and an error message will appear to explain the problem (see figure
 {{figure}}).
 
-{% include userman-figure.md num=figure cap="Single item create/edit page" img="general-nav-edit-page.png" %}
+{% include userman-figure.md num=figure cap="Single item create/edit page" img="general-nav-edit-page.png
 
 Depending on the item type, there will usually be a number of tables below the item's attributes. These tables will
 detail items related to the one you're working with. These tables function similarly to the list pages, allowing you to
 work with the related items. 
 
-{% include userman-toplink.md %}
+
+## Collapsible Sections
 
 
-
-{% assign subsub = 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Collapsible Sections" %}
-
-{% assign figure = 1 %}
 Some of the single item edit pages can get quite long if there is a lot of related information. To help shorten the
 pages, some sections may be collapsed. To expand these, click anywhere within the heading line of the collapsed
 section. Click on the heading line again to collapse the section once more. Figure {{figure}} shows some collapsed
 sections.
 
-{% include userman-figure.md num=figure cap="Collapsed page sections" img="general-nav-collapsed-sections.png" %}
-
-{% include userman-toplink.md %}
+{% include userman-figure.md num=figure cap="Collapsed page sections" img="general-nav-collapsed-sections.png
 
 
-
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Change Logs" %}
+## Change Logs
 
 Many of the single item edit pages include a Changes table at the very bottom. This is a log of changes that have been
 made to an item and serves as a record of the item's history. It shows when each change was made, who made the change,
@@ -195,29 +154,22 @@ changed and includes the value both before and after the change. Sometimes a cha
 attributes, but is still important to the item's history. These actions are also logged, and include thing such as
 adding a sequencing container to a run, and removing an item from a box.
 
-{% include userman-toplink.md %}
 
-
-
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Notes" %}
+## Notes
 
 Most items in MISO have a description field, which allows you to enter any text that you would like. For cases where
 you'd like to provide more detail, a Notes section appears on several of the single item edit pages. This allows you to
 record any number of details about the item. For more information on working with Notes, see the
-[Notes section](notes.html).
-
-{% include userman-toplink.md %}
+[Notes section](../notes/).
 
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Bulk Create/Edit Pages" %}
+## Bulk Create/Edit Pages
 
 {% assign figure = figure | plus: 1 %}
 In addition to creating and editing single items, it is often useful to work with many items at once. MISO provides
 many bulk create/edit pages to facilitate this (see figure {{figure}}). These bulk pages feature a spreadsheet-like
 interface with features similar to popular spreadsheet software.
-{% include userman-figure.md num=figure cap="Bulk propagate library aliquots page" img="general-nav-bulk-page.png" %}
+{% include userman-figure.md num=figure cap="Bulk propagate library aliquots page" img="general-nav-bulk-page.png
 
 Any cells that are invalid will be highlighted in red. This includes any required cells which are left blank. Upon
 saving the table, it is possible that some items save successfully while others fail for various reasons. Any row
@@ -230,12 +182,8 @@ options as the tool bar of the appropriate list page. This allows continuing
 work with the same items by moving through propagation steps for the same
 items.
 
-{% include userman-toplink.md %}
 
-
-
-{% assign subsub = 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Autofill" %}
+### Autofill
 
 In any of the bulk tables, you can autofill a column by setting a value in the top row, selecting that cell, and then
 either dragging the fill handle to include all of the cells that you would like to copy the value to, or simply
@@ -247,67 +195,49 @@ both of those cells, and then using the fill handle in the same manner. For exam
 similar to those in figure {{figure}}, you could enter "POOL_01" into the first row, "POOL_02" into the second row,
 select both of these cells, then double-click the fill handle to continue the pattern to the bottom of the table.
 
-{% include userman-toplink.md %}
 
-
-
-{% assign subsub = 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Exporting to Spreadsheet" %}
+## Exporting to Spreadsheet
 
 All of the bulk pages include an Export button in the toolbar. This allows you to download a spreadsheet containing all
 of the data in the table. A dialog will give you the option of which format to output the spreadsheet in. Microsoft
 Excel (\*.xlsx), Open Document Format (\*.odt), and comma-delimited data (\*.csv) formats are supported.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Tools" %}
+## Tools
 
 The Tools list in the menu on the left-hand side of the page contains links to tools that are helpful for finding and
 working with items in MISO and the lab. Individual tools are documented in more detail in the
-[Other MISO Tools section](other_miso_tools.html).
-
-{% include userman-toplink.md %}
+[Other MISO Tools section](../other_miso_tools/).
 
 
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="My Account" %}
+## My Account
 
 Clicking on your username near the top right of the screen will take you to a page showing your name and the groups
 that you belong to. There is an Edit link that will open a page showing more of your user details. Depending on your
 site configuration, you may be able to edit some of these details and reset your password from this page. See
-[Authentication](site_configuration.html#logging_in) for more details.
+[Authentication](../site_configuration/#logging_in) for more details.
 
 If you are a MISO administrator, an Administration section will also appear on the My Account page. The Clear Cache
 action should not be necessary, but can be used to help troubleshoot bugs. The Refresh Constants action can be used to
 make new type data values show up immediately in cases where they do not. For more information, see the
-[Type Data section](type_data.html).
-
-{% include userman-toplink.md %}
+[Type Data section](../type_data/).
 
 
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Help" %}
+## Help
 
 The "Help" link near the top right of the screen will link you to this user manual.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Quick Help" %}
+## Quick Help
 
 {% assign figure = figure | plus: 1 %}
 Many pages in MISO include a Quick Help section. This section is hidden by default, but can be show by clicking the
 "Quick Help" heading near the top of the screen (see figure {{figure}}). The Quick Help section displays tips and
 details to help you work with the page.
 
-{% include userman-figure.md num=figure cap="Quick Help" img="general-nav-quick-help.png" %}
-
-{% include userman-toplink.md %}
+{% include userman-figure.md num=figure cap="Quick Help" img="general-nav-quick-help.png
 

@@ -1,17 +1,11 @@
----
-layout: page
-title: "1. Site Configuration"
-section: 1
----
+# Site Configuration
 
 This section is intended not as a guide to configuring MISO, but to explain the configuration options that are
 available. If you are interested in using one of these features and it is not available in your installation, talk to
 your MISO administrators about setting it up.
 
 
-
-{% assign sub = 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Logging In" %}
+## Logging In
 
 You log in to MISO using a username and password. These credentials may come from different places, depending on your
 site configuration.
@@ -30,30 +24,22 @@ groups, but they should be able to help you get set up.
 If you require a new account, password reset, or are otherwise unable to log in to MISO, you should talk to your MISO
 administrators.
 
-{% include userman-toplink.md %}
 
-
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Issue Trackers" %}
+## Issue Trackers
 
 MISO integrates with issue trackers in order to display and link to issues from within MISO. The only
 currently-supported issue tracker is JIRA. If JIRA integration is configured for your site, you will see a list of
 related issues on the Project page and the Run page. These lists are described in more detail in the
-[Projects](projects.html) and [Sequencer Runs](sequencer_runs.html) sections.
+[Projects](../projects/) and [Sequencer Runs](../sequencer_runs/) sections.
 
-{% assign figure = 1 %}
+
 MISO may also be configured to take bug reports. If it is, a "Report a problem" link will appear near the top right of
 the screen (see figure {{figure}}). Click this link to report a bug in your issue tracker.
 
-{% include userman-figure.md num=figure cap="Bug report link" img="site-config-bug-report.png" %}
-
-{% include userman-toplink.md %}
+{% include userman-figure.md num=figure cap="Bug report link" img="site-config-bug-report.png
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Naming Schemes" %}
+## Naming Schemes
 
 Some institutes will have a specific and uniform way of naming things. MISO allows you to customize the validation of
 some fields in order to enforce these naming schemes:
@@ -67,35 +53,23 @@ It may also be possible to auto-generate aliases for your samples and/or librari
 
 Both validation and alias generation must be configured by your MISO administrators.
 
-{% include userman-toplink.md %}
 
-
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Taxon Lookup" %}
+## Taxon Lookup
 
 A [NCBI](https://www.ncbi.nlm.nih.gov/) service may be used to validate the scientific name entered for samples to
 ensure that the name is entered correctly. If this is enabled, you will not be able to save a sample until a valid
 scientific name is entered. You can browse the taxonomy database using NCBI's
 [Taxonomy Browser](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi).
 
-{% include userman-toplink.md %}
 
-
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Automatic Barcode Generation" %}
+## Automatic Barcode Generation
 
 If automatic barcode generation is enabled for your site, MISO will automatically generate a unique barcode any time
 you leave the barcode field blank for an item. These barcodes, whether auto-generated or not, may be printed from MISO
-to a label printer. See the [Barcode Label Printers section](barcode_label_printers.html) for more information.
-
-{% include userman-toplink.md %}
+to a label printer. See the [Barcode Label Printers section](../barcode_label_printers/) for more information.
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Barcode Scanners" %}
+## Barcode Scanners
 
 Barcode scanners may be used to enter barcodes into any text-entry area in MISO. Most barcode scanners allow you to
 configure a key to send after scanning. If you configure your barcode scanners to send the Enter key after a scan, that
@@ -107,12 +81,8 @@ It is also possible to use
 [Thermo Fisher VisionMate™ High Speed Barcode Readers](https://www.thermofisher.com/order/catalog/product/312800) to
 scan entire boxes of tubes at once. These bulk scanners must be configured by your MISO administrators to work in MISO.
 
-{% include userman-toplink.md %}
 
-
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Report Links" %}
+## Report Links
 
 {% assign figure = figure | plus: 1 %}
 If you are generating reports for projects or runs outside of MISO, it may be possible to automatically link to them
@@ -122,14 +92,10 @@ alias. For example, you could create links to http://www.example.com/projects/{p
 http://www.example.com/runreports/{run-alias}.html. The report links will appear in the External Links section of the
 Run or Project page (see figure {{figure}}).
 
-{% include userman-figure.md num=figure cap="Report links" img="site-config-external-links.png" %}
-
-{% include userman-toplink.md %}
+{% include userman-figure.md num=figure cap="Report links" img="site-config-external-links.png
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Default Values" %}
+## Default Values
 
 It is possible to set a default value for some fields to save users from repetitive entry. If a default value is
 configured, it will be filled in automatically when creating new items. The user is still free to change the value if
@@ -137,12 +103,8 @@ they would like.
 
 The only field that can currently be configured with a default value is sample scientific name.
 
-{% include userman-toplink.md %}
 
-
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Display Options" %}
+## Display Options
 
 In some organizations, it may be desirable to hide certain fields in order to simplify the forms. The following fields
 can be configured to be hidden on bulk create/edit pages.
@@ -154,12 +116,8 @@ can be configured to be hidden on bulk create/edit pages.
 These fields will always be displayed on the single item create/edit pages, even if they are hidden on the bulk
 create/edit pages.
 
-{% include userman-toplink.md %}
 
-
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Detailed Sample Mode" %}
+## Detailed Sample Mode
 
 By default, MISO uses plain sample mode. In plain sample mode, you create samples and propagate libraries from them.
 
@@ -187,11 +145,7 @@ You may know what the tissue origin was and want to record it even if you never 
 The other advantage to having these ghost samples is that if you receive other related samples, they can be connected
 to the existing hierarchy. For example, if you receive two different aliquots from the same tissue sample, it will be
 easier to find that they are related because they are connected to the same ghost tissue.
-
-{% include userman-toplink.md %}
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Strict Index Checking" %}
+## Strict Index Checking
 
 By default, any library aliquot can be added to a pool. When strict index checking is enabled, library aliquots
 cannot be added to a pool when their addition would cause duplicate or near-duplicate indices to exist within the 
