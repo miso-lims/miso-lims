@@ -6,7 +6,7 @@ site_favicon: images/favicon.ico
 repo_url: https://github.com/miso-lims/miso-lims
 
 theme: 
-  name: readthedocs
+  name: mkdocs
   highlightjs: true
   hljs_languages:
     - yaml
