@@ -2,10 +2,11 @@ site_name: MISO LIMS
 site_url: http://miso-lims.github.io
 site_description: MISO LIMS Documentation
 site_author: Genome Sequence Informatics, Ontario Institute for Cancer Research
-
+site_favicon: images/favicon.ico
 repo_url: https://github.com/miso-lims/miso-lims
 
 theme: readthedocs
+theme_dir: 'custom_theme'
 
 nav:
   - Getting Started:

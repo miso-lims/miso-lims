@@ -385,12 +385,12 @@ warning.
 Here is what your browser will look like, with Chrome on the left and Firefox on
 the right. To ignore the errors, click the _Advanced_ button on either page.
 
-![Security Warnings in Chrome and Firefox]({{ site.baseurl }}/images/security-warning.png)
+![Security Warnings in Chrome and Firefox](/images/security-warning.png)
 
 Then click either "Proceed to localhost (unsafe)" or "Accept the Risk and
 Continue".
 
-![Accept Security Warnings in Chrome and Firefox]({{ site.baseurl }}/images/security-warning-accept.png)
+![Accept Security Warnings in Chrome and Firefox](../images/security-warning-accept.png)
 
 The process for [handling self-signed certificates on Internet Explorer or Edge](https://medium.com/@ali.dev/how-to-trust-any-self-signed-ssl-certificate-in-ie11-and-edge-fa7b416cac68)
 is very similar. Follow the accepted process for trusting self-signed

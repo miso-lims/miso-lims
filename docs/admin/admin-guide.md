@@ -1,5 +1,5 @@
 # Administrator's Manual
-This guide contains instructions to facilitate day-to-day running MISO at your institution. See [Building and Deploying](../installation-guide.md) if you need to set up your instance.
+This guide contains instructions to facilitate day-to-day running MISO at your institution. See [Building and Deploying](../installation-guide) if you need to set up your instance.
 
 
 ## Adding Value-Type Data
@@ -234,7 +234,7 @@ CALL deleteSample(sampleId, sampleAlias);
 
 ## Upgrading to the latest version
 
-To upgrade MISO to the latest version, follow the upgrading instructions in [Building and Deploying](../installation-guide#upgrading).
+To upgrade MISO to the latest version, follow the upgrading instructions in [Building and Deploying](../installation-guide).
 
 ### List of container models
 
