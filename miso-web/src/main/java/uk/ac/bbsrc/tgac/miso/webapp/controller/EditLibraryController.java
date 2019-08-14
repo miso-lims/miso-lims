@@ -91,6 +91,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.AlphanumericComparator;
@@ -408,7 +409,7 @@ public class EditLibraryController {
           if (sampleClass == null) {
             sampleClass = detailed.getSampleClass();
           } else if (sampleClass.getId() != detailed.getSampleClass().getId()) {
-            throw new IOException("Can only create libraries when samples all have the same class.");
+            throw new ValidationException("Can only create libraries when samples all have the same class.");
           }
         } else {
           hasPlain = true;
