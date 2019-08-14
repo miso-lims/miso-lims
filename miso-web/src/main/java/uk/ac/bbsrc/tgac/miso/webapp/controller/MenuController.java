@@ -122,6 +122,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
+import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
@@ -346,6 +347,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, node, "spikeIns", librarySpikeInService.list(), Dtos::asDto);
     createArray(mapper, node, "attachmentCategories", attachmentCategoryService.list(), Dtos::asDto);
     createArray(mapper, node, "orderPurposes", orderPurposeService.list(), Dtos::asDto);
+    createArray(mapper, node, "sampleSheetFormats", Arrays.asList(SampleSheet.values()), SampleSheet::name);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);

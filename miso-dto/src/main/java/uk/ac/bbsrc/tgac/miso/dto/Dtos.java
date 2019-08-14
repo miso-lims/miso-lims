@@ -1758,6 +1758,7 @@ public class Dtos {
     setDateString(to::setCreationDate, from.getCreationTime());
     setString(to::setConcentration, from.getConcentration());
     to.setConcentrationUnits(from.getConcentrationUnits());
+      to.setPlatformType(from.getPlatformType().name());
     if (from.getBoxId() != null) {
       to.setBox(new BoxDto());
       to.getBox().setId(from.getBoxId());

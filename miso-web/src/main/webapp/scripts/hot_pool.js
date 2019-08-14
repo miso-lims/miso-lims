@@ -279,10 +279,69 @@ HotTarget.pool = (function() {
             var errors = [];
             return errors;
           }, 'Download Contents'),
-
+          {
+           name: "Create Samplesheet",
+           action: function(pools) {
+             var platformTypes = Utils.array.deduplicateString(
+               pools.map(function(pool) {
+                 return pool.platformType;
+               })
+             );
+             if (platformTypes.length > 1) {
+               Utils.showOkDialog("Error", [
+                 "Cannot create a sample sheet from pools for different platforms."
+               ]);
+               return;
+             }
+             var instrumentModels = Constants.instrumentModels.filter(function(model) {
+               return (
+                 model.instrumentType == "SEQUENCER" &&
+                 model.platformType == platformTypes[0] &&
+                 model.active
+               );
+             });
+             if (instrumentModels.length == 0) {
+               Utils.showOkDialog("Error", [
+                 "No instruments are available for these pools.",
+                 "Please add a sequencer first."
+               ]);
+               return;
+             }
+             Utils.showDialog(
+               "Create Samplesheet",
+               "Download",
+               [
+                 {
+                   property: "format",
+                   label: "Format",
+                   required: true,
+                   type: "select",
+                   values: Constants.sampleSheetFormats
+                 },
+                 {
+                   property: "instrumentModel",
+                   label: "Instrument Model",
+                   required: true,
+                   type: "select",
+                   getLabel: Utils.array.getAlias,
+                   values: instrumentModels
+                 }
+               ],
+               function(result) {
+                 Utils.ajaxDownloadWithDialog(
+                   "/miso/rest/pools/samplesheet/" + result.format,
+                   {
+                     instrumentModelId: result.instrumentModel.id,
+                     poolIds: pools.map(Utils.array.getId)
+                   }
+                 );
+               },
+               null
+             );
+           }
+          },
           HotUtils.makeParents(Urls.rest.pools.parents, HotUtils.relationCategoriesForDetailed().concat(
               [HotUtils.relations.library(), HotUtils.relations.libraryAliquot()]))
-
       ].concat(HotUtils.makeQcActions("Pool"));
     },
 
