@@ -3,7 +3,7 @@ layout: default
 title: "MISO Documentation Home"
 ---
 
-![MISO](../images/MISO.png)
+![MISO](images/MISO.png)
 
 MISO (_Managing Information for Sequencing Operations_) is an open-source Lab Information Management System (LIMS) started at the [Earlham Institute](http://www.earlham.ac.uk/), specifically designed for tracking next-generation sequencing experiments.
 

@@ -172,6 +172,7 @@ many bulk create/edit pages to facilitate this (see figure {{figure}}). These bu
 interface with features similar to popular spreadsheet software.
 
 ![Bulk propagate library aliquots page](../images/general-nav-bulk-page.png)
+*Bulk propagate library aliquots page*
 
 Any cells that are invalid will be highlighted in red. This includes any required cells which are left blank. Upon
 saving the table, it is possible that some items save successfully while others fail for various reasons. Any row
