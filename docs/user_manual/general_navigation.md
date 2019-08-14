@@ -6,14 +6,15 @@ to other areas of MISO. To get to the Home Screen, click on either the MISO logo
 pages.
 
 ## Home Screen Widgets
+![Home screen widgets](../images/general-nav-widgets.png)
+*Home screen widgets*
 
-
-You'll find a number of widgets on the home screen (see figure {{figure}}). How you interact with these varies
+You'll find a number of widgets on the home screen. How you interact with these varies
 depending on the individual widget. Some have a search box that can be used to filter what is displayed. Clicking
 on a tile within a widget will either take you to the single-item edit page for the item, open a menu with options
 depending on the item you clicked, or perform some other action.
 
-{% include userman-figure.md num=figure cap="Home screen widgets" img="general-nav-widgets.png
+
 
 Individual widgets are described in more detail in the [Home Screen Widgets section](../home_screen_widgets/)
 
@@ -65,14 +66,16 @@ you have several barcoded items that you can scan into the dialog.
 Each of the list pages has a search box at the top right of the table. You can enter your search terms and press Enter
 to filter the data that is shown in the table.
 
-{% assign figure = figure | plus: 1 %}
+![Advanced search](../images/general-nav-search.png)
+*Advanced search*
+
 Some tables have "Advanced Search," which allows you to better describe what it is that you're looking for. You can
-tell which tables have Advanced Search because they will have a black help bubble (?) beside them (see figure
-{{figure}}). You can click this bubble to see a full list of the applicable search terms for this page. For example, on
+tell which tables have Advanced Search because they will have a black help bubble (?) beside them. 
+You can click this bubble to see a full list of the applicable search terms for this page. For example, on
 the Samples list page, you can search for samples by the box that they're stored in (`box:boxname`) or the date they
 were created (`created:today`).
 
-{% include userman-figure.md num=figure cap="Advanced search" img="general-nav-search.png
+
 
 On pages that don't have Advanced Search, the search is only looking at the text you can see in the table, and
 sometimes some additional hidden fields. There is no way to specify which columns to search.
@@ -121,13 +124,12 @@ If your site uses detailed sample mode, samples are broken into several addition
 Many types of items within MISO have an edit page that allows you to modify a single item. In some cases, the same page
 is also used to create new items.
 
-{% assign figure = figure | plus: 1 %}
 These single-item create/edit pages mainly consist of a form listing all of the item's attributes. Attributes marked
 with an asterisk (\*) are required and must be filled in before the item can be saved. Upon attempting to save, any
-fields that are invalid will be marked in red, and an error message will appear to explain the problem (see figure
-{{figure}}).
+fields that are invalid will be marked in red, and an error message will appear to explain the problem.
 
-{% include userman-figure.md num=figure cap="Single item create/edit page" img="general-nav-edit-page.png
+![Single item create/edit page](../images/general-nav-edit-page.png)
+*Single item create/edit page*
 
 Depending on the item type, there will usually be a number of tables below the item's attributes. These tables will
 detail items related to the one you're working with. These tables function similarly to the list pages, allowing you to
@@ -139,11 +141,11 @@ work with the related items.
 
 Some of the single item edit pages can get quite long if there is a lot of related information. To help shorten the
 pages, some sections may be collapsed. To expand these, click anywhere within the heading line of the collapsed
-section. Click on the heading line again to collapse the section once more. Figure {{figure}} shows some collapsed
+section. Click on the heading line again to collapse the section once more. The figure below shows some collapsed
 sections.
 
-{% include userman-figure.md num=figure cap="Collapsed page sections" img="general-nav-collapsed-sections.png
-
+![Collapsed page sections](../images/general-nav-collapsed-sections.png)
+*Collapsed page sections*
 
 ## Change Logs
 
@@ -165,11 +167,11 @@ record any number of details about the item. For more information on working wit
 
 ## Bulk Create/Edit Pages
 
-{% assign figure = figure | plus: 1 %}
 In addition to creating and editing single items, it is often useful to work with many items at once. MISO provides
 many bulk create/edit pages to facilitate this (see figure {{figure}}). These bulk pages feature a spreadsheet-like
 interface with features similar to popular spreadsheet software.
-{% include userman-figure.md num=figure cap="Bulk propagate library aliquots page" img="general-nav-bulk-page.png
+
+![Bulk propagate library aliquots page](../images/general-nav-bulk-page.png)
 
 Any cells that are invalid will be highlighted in red. This includes any required cells which are left blank. Upon
 saving the table, it is possible that some items save successfully while others fail for various reasons. Any row
@@ -234,10 +236,11 @@ The "Help" link near the top right of the screen will link you to this user manu
 
 ## Quick Help
 
-{% assign figure = figure | plus: 1 %}
-Many pages in MISO include a Quick Help section. This section is hidden by default, but can be show by clicking the
-"Quick Help" heading near the top of the screen (see figure {{figure}}). The Quick Help section displays tips and
+![Quick Help](../images/general-nav-quick-help.png)
+*Quick Help*
+
+Many pages in MISO include a Quick Help section. This section is hidden by default, but can be shown by clicking the
+"Quick Help" heading near the top of the screen. The Quick Help section displays tips and
 details to help you work with the page.
 
-{% include userman-figure.md num=figure cap="Quick Help" img="general-nav-quick-help.png
 

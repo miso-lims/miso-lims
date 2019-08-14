@@ -36,8 +36,8 @@ related issues on the Project page and the Run page. These lists are described i
 MISO may also be configured to take bug reports. If it is, a "Report a problem" link will appear near the top right of
 the screen (see figure {{figure}}). Click this link to report a bug in your issue tracker.
 
-{% include userman-figure.md num=figure cap="Bug report link" img="site-config-bug-report.png
-
+![Bug report link](../images/site-config-bug-report.png)
+*Bug report link*
 
 ## Naming Schemes
 
@@ -84,7 +84,6 @@ scan entire boxes of tubes at once. These bulk scanners must be configured by yo
 
 ## Report Links
 
-{% assign figure = figure | plus: 1 %}
 If you are generating reports for projects or runs outside of MISO, it may be possible to automatically link to them
 from the MISO Project and Run pages. For projects, it must be possible to generate the report URL using the project's
 ID, name, and/or short name. For runs, it must be possible to generate the report URL using the run's ID, name, and/or
@@ -92,8 +91,8 @@ alias. For example, you could create links to http://www.example.com/projects/{p
 http://www.example.com/runreports/{run-alias}.html. The report links will appear in the External Links section of the
 Run or Project page (see figure {{figure}}).
 
-{% include userman-figure.md num=figure cap="Report links" img="site-config-external-links.png
-
+![Report links](../images/site-config-external-links.png)
+*Report links*
 
 ## Default Values
 
@@ -145,6 +144,7 @@ You may know what the tissue origin was and want to record it even if you never 
 The other advantage to having these ghost samples is that if you receive other related samples, they can be connected
 to the existing hierarchy. For example, if you receive two different aliquots from the same tissue sample, it will be
 easier to find that they are related because they are connected to the same ghost tissue.
+
 ## Strict Index Checking
 
 By default, any library aliquot can be added to a pool. When strict index checking is enabled, library aliquots

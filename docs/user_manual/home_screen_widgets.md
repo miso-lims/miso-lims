@@ -13,7 +13,8 @@ click on a result tile to go to the Edit page for that item.
 ## Instrument Status
 
 
-{% include userman-figure.md num=figure cap="Instrument Status Widget" img="widgets-instrument-status.png
+![Instrument Status Widget](../images/widgets-instrument-status.png)
+*Instrument Status Widget*
 
 The Instrument Status widget provides a view of what your sequencers are doing. All sequencers are listed along with
 their current status and their most recent runs. The most recent status changes appear at the top of the list.

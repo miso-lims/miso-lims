@@ -62,12 +62,12 @@ and ghost samples.
 
 
 Sample classes, and the relationships between them define the sample hierarchy. Both the classes and relationships can
-be customized to suit your requirements. Figure {{figure}} shows the sample hierarchy used at OICR. Sample
+be customized to suit your requirements. The figure below shows the sample hierarchy used at OICR. Sample
 relationships have a parent and child class. This means that if you have a sample of the parent class, you can
-propagate a sample of the child class. In figure {{figure}}, the relationships are illustrated using arrows that point
-from the parent class to the child class.
+propagate a sample of the child class.
 
-{% include userman-figure.md num=figure cap="OICR sample hierarchy" img="type-data-sample-hierarchy.png
+![OICR sample hierarchy](../images/type-data-sample-hierarchy.png)
+*OICR sample hierarchy. The relationships are illustrated using arrows that point from the parent class to the child class.*
 
 Sample classes and valid relationships can only be modified via direct access to the MISO database, and so must be done
 by a MISO administrator. A custom hierarchy must follow these rules:
@@ -81,7 +81,7 @@ by a MISO administrator. A custom hierarchy must follow these rules:
 
 Sample classes may be archived, which means that they will no longer available when creating new samples. Similarly,
 relationships between classes may also be archived. This means that you will no longer be able to propagate samples
-to create that type of relationship. Using the OICR sample hierarchy in figure {{figure}} as an example, we could
+to create that type of relationship. Using the OICR sample hierarchy in figure 1 as an example, we could
 archive the relationship between Slide and LCM Tube to prevent users from propagating LCM Tubes from Slide samples.
 
 Another option is to prevent direct creation of a sample class. This means that the sample class will be available as

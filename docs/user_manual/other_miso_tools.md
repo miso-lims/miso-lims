@@ -11,7 +11,8 @@ have identical or near-identical indices, demultiplexing may be more difficult o
 tool can help you identify indices which may be inadvisable to multiplex together.
 
 
-{% include userman-figure.md num=figure cap="Index Distance tool" img="tools-index-distance.png
+![Index Distance tool](../images/tools-index-distance.png)
+*Index Distance tool*
 
 To use the tool, enter all of the indices you wish to compare into the Indices box. You can use the Indices list below
 to search for indices and then select and add them, or you can type the index sequences directly into the Indices box.
@@ -33,8 +34,8 @@ duplicates and near duplicates.
 If you have a list of index sequences, but do not know either the name of the index family containing them, or whether
 they exist in MISO at all, you can use the Index Search tool to check.
 
-{% assign figure = figure | plus: 1 %}
-{% include userman-figure.md num=figure cap="Index Search tool" img="tools-index-search.png
+![Index Search tool](../images/tools-index-search.png)
+*Index Search tool*
 
 To use the tool, enter the index sequences you are looking for into the Index 1 Sequences and Index 2 Sequences boxes.
 The Index 2 Sequences box should be left empty if you are not looking for dual indices. Click the Search button and the
@@ -50,8 +51,8 @@ The Identity Search tool can be used to find identity (donor/organism) samples w
 see all of the samples descended from the resulting identities. This is useful if you're not sure whether you've
 received samples from this donor or organism before, or if you want to see all of the samples related to it.
 
-{% assign figure = figure | plus: 1 %}
-{% include userman-figure.md num=figure cap="Identity Search tool" img="tools-identity-search.png
+![Identity Search tool](../images/tools-identity-search.png)
+*Identity Search tool*
 
 To use the Identity Search, enter the external names you're looking for in the External Names box. Optionally, you can
 enter the short name of the project you wish to search in. If no results are found within that project, identities from

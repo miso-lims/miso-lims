@@ -23,10 +23,11 @@ the array runs that the array has been used in, and the array's change log.
 ## Adding a Sample to an Array
 
 Samples can be added to an array using the Edit Array page. In the Samples section, there is a diagram of the array
-contents (see figure {{figure}}). Blue circles in the diagram represent positions where samples have already been
+contents (see figure below). Blue circles in the diagram represent positions where samples have already been
 added. Grey circles are empty positions. Select a position by clicking on its circle in the diagram.
 
-{% include userman-figure.md num=figure cap="Array contents diagram" img="arrays-diagram.png
+![Array contents diagram](../images/arrays-diagram.png)
+*Array contents diagram*
 
 Once a position is selected, the search controls become available. Enter the name, alias, or barcode of a sample into
 the search box and click the Lookup button to perform the search. If your site uses

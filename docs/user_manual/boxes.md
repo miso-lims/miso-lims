@@ -75,13 +75,16 @@ selecting the desired freezer location from the dropdown menu, and clicking "Set
 changed on the bulk edit boxes page by scanning the freezer location barcode into the Freezer Location Barcode
 cell; the Freezer Location cell will update automatically with the appropriate freezer location details.
 
-On the Edit Box page, if no positions are selected in the Contents diagram (figure {{figure}}), the table will
+![Contents diagram and table](../images/contents-diagram-and-table.png)
+*Contents diagram and table*
+
+On the Edit Box page, if no positions are selected in the Contents diagram, the table will
 contain all box contents items. If one or more positions in the Contents diagram are selected, the table will
 be filtered to display only those items, and available actions for those items will be displayed at the top of
 the table.
 
-{% include userman-figure.md num=figure cap="Contents diagram and table" img="contents-diagram-and-table.png"
-%}
+
+
 ## Selecting Positions within a Box
 
 Positions with items in them are represented by blue circles in the Contents diagram, while empty positions
@@ -114,11 +117,11 @@ near the Search field.
 ## Adding a Single Item to a Box
 
 On the Edit Box page, select the target position in the Contents diagram. In the information section that
-appears adjacent to the Contents diagram (see figure {{figure}}), scan the item's barcode, or type its name,
+appears adjacent to the Contents diagram, scan the item's barcode, or type its name,
 alias, or barcode into the "Search" field and press the Enter key or click "Lookup".
 
-{% include userman-figure.md num=figure cap="Additional information when one position is selected"
-img="one-position-selected.png
+![Additional information when one position is selected](../images/one-position-selected.png)
+*Additional information when one position is selected*
 
 Once the search completes, any matching items found will be in the "Results" dropdown. Select the target item
 from the dropdown and click "Update Position". After the update completes, the information about the item in
@@ -131,11 +134,11 @@ new box before or after saving the new item to the target position.
 ## Adding Multiple Items to a Box
 
 On the Edit Box page, select the target positions in the Contents diagram. Find the Position and Search rows
-adjacent to the Contents diagram (see figure {{figure}}), and scan each target item's barcode or type its
+adjacent to the Contents diagram, and scan each target item's barcode or type its
 name, alias, or barcode into the Search field for its target position.
 
-{% include userman-figure.md num=figure cap="Additional information when multiple positions are selected"
-img="multiple-positions-selected.png
+![Additional information when multiple positions are selected](../images/multiple-positions-selected.png)
+*Additional information when multiple positions are selected*
 
 Once all Search fields are filled out, click "Update" below the last search field. If any of the target
 positions already contains an item, a dialog box will name the items that already occupy those positions and
@@ -195,9 +198,10 @@ in the list, your box may not be scannable or MISO may not be configured to use 
 Wait until the Scan dialog box prompts you to place the box on the scanner. It will automatically scan the box.
 Once the scan is complete, the diagram will display the tubes which the scanner found.
 
-Once a successful scan is made, review the changes that would be made (see figure {{figure}}) and click "Save".
+Once a successful scan is made, review the changes that would be made and click "Save".
 
-{% include userman-figure.md num=figure cap="Successful box scan" img="box-scan-success.png
+![Successful box scan](../images/box-scan-success.png)
+*Successful box scan*
 
 If there are any errors with the scan, the scan will need to be retried until there are no errors. Possible
 sources of error are:

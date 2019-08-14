@@ -3,6 +3,8 @@ layout: default
 title: "MISO Documentation Home"
 ---
 
+![MISO](../images/MISO.png)
+
 MISO (_Managing Information for Sequencing Operations_) is an open-source Lab Information Management System (LIMS) started at the [Earlham Institute](http://www.earlham.ac.uk/), specifically designed for tracking next-generation sequencing experiments.
 
 Sequencing centres differ not only in terms of their scale and output, but also their requirements for information management. Sequencing platforms are becoming more accessible, and the efficient storage of genomic metadata is vital for large and small sequencing centres alike. Off-the-shelf solutions are often very expensive and not cost-effective for the smaller centre. Furthermore, support contracts are often required, and the extensibility of these systems is not in the hands of the metadata generators. In terms of implementation, as well as the desire to tailor an information system in-house, data formats can change and platforms can evolve rapidly. These are valid concerns for both large centres characterised by high-throughout data production and smaller scale laboratories with constrained expenditure for IT solutions, and potentially project specific metadata requirements.

@@ -5,15 +5,21 @@ site_author: Genome Sequence Informatics, Ontario Institute for Cancer Research
 site_favicon: images/favicon.ico
 repo_url: https://github.com/miso-lims/miso-lims
 
-theme: readthedocs
-theme_dir: 'custom_theme'
+theme: 
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+    - yaml
+    - bash
 
 nav:
+  - About: index.md
   - Getting Started:
     - Building and Deploying: admin/installation-guide.md
     - Docker Compose Installation: admin/compose-installation-guide.md
     - Baremetal Installation: admin/baremetal-installation-guide.md
     - Administering MISO: admin/admin-guide.md
+  - Walkthroughs: /projects/walkthroughs
   - User Manual:
     - Introduction: user-manual.md
     - 1. Site Configuration: user_manual/site_configuration.md
@@ -50,3 +56,5 @@ nav:
 extra_css:
     - css/numbering.css
     - css/extra.css
+    
+copyright: Copyright &copy; 2019 <a href="https://oicr-gsi.github.io/">Genome Sequence Informatics</a>, <a href="http://oicr.on.ca">Ontario Institute for Cancer Research</a>

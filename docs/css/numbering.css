@@ -1,4 +1,7 @@
-body {counter-reset: h2}
+/* Initialize counters for headers and figures */
+body {counter-reset: h2 imgem; }
+
+/* Automatic Header Numbering */
 h2 {counter-reset: h3}
 h3 {counter-reset: h4}
 h4 {counter-reset: h5}
@@ -11,3 +14,20 @@ h5:before {counter-increment: h5; content: counter(h2) "." counter(h3) "." count
 h6:before {counter-increment: h6; content: counter(h2) "." counter(h3) "." counter(h4) "." counter(h5) "." counter(h6) ". "}
 
 h2.nocount:before, h3.nocount:before, h4.nocount:before, h5.nocount:before, h6.nocount:before { content: ""; counter-increment: none } 
+
+/* Automatic Figure Numbering!!
+  Put emphasized text on the line after an image to have this kick in.
+  Credit: https://stackoverflow.com/questions/19331362/using-an-image-caption-in-markdown-jekyll
+*/
+img + em { 
+  font-style: normal;
+  font-size: 0.9em;
+  font-style: oblique;
+}
+img + em::before {
+  counter-increment: imgem;
+  content: "\A Figure " counter(imgem) ". ";
+  /*pre + \A = Ensure figure caption is on newline. https://stackoverflow.com/questions/17047694/add-line-break-to-after-or-before-pseudo-element-content*/
+  white-space: pre;
+}
+

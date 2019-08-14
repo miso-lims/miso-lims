@@ -6,13 +6,14 @@ amount of work. They are designed to simplify input by allowing for barcode scan
 
 ## Workflows Widget
 
-The Workflows widget is accessible on the MISO Home Screen. The Workflows (figure {{figure}}) widget displays
+![Workflows widget](../images/workflows-widget.png)
+*Workflows widget*
+
+The Workflows widget is accessible on the MISO Home Screen. The Workflows widget displays
 your incomplete workflows, favourite workflows, an option to begin a new workflow, and an option to manage
 favourite workflows. Once a workflow is complete, it no longer appears in the Workflows widget.
 
-{% include userman-figure.md num=figure cap="Workflows widget" img="workflows-widget.png
-{% assign sub = sub | plus: 1 %}
-{% assign figure = figure | plus: 1 %}
+
 ## Managing Favourite Workflows
 
 If you perform a workflow frequently, you may wish to add it to your favourite workflows. This will allow you
@@ -21,10 +22,10 @@ to begin a new workflow of this type by clicking a single item in the Workflows 
 To add a new workflow to your favourites, go to the Workflows widget and click the "Edit Favourite Workflows"
 item at the bottom of the widget. In the dialog box which opens, click the "Add ... to Favourites" link, where
 "..." is the name of the workflow you wish to add. The Home page will reload, and a "Begin New ... Workflow"
-item will be added to the Workflows widget (figure {{figure}}).
+item will be added to the Workflows widget.
 
-{% include userman-figure.md num=figure cap="Workflows widget with favourite workflow added"
-img="new-favourite-workflow.png
+![Workflows widget with favourite workflow added](../images/new-favourite-workflow.png)
+*Workflows widget with favourite workflow added*
 
 To remove a workflow from your favourites, go to the Workflows widget and click the "Edit Favourite Workflows"
 item at the bottom of the widget. In the dialog box which opens, click the "Remove ... from Favourites" link,
@@ -39,22 +40,20 @@ workflows, click on the "Begin New ... Workflow" item in the widget, where "..."
 If the workflow you wish to begin is not one of your favourite workflows, click on the "Begin New Workflow"
 item in the Workflows widget. In the dialog box which opens, click the name of the workflow you wish to begin.
 
-{% assign sub = sub | plus: 1 %}
-{% assign figure = figure | plus: 1 %}
 ## Entering Workflow Data
 
 Workflow data can be entered by scanning (using a hand-held scanner) or typing in the information for each
-step (see figure {{figure}}).
+step.
 
-{% include userman-figure.md num=figure cap="Entering data for a workflow" img="workflow-steps.png
+![Entering data for a workflow](../images/workflow-steps.png)
+*Entering data for a workflow. The user can click the Undo icon in the "Selected Flow Cell Model 'PRO-001'" step on the right side of the screen to re-enter information from that step, or the icon beside "Selected new Sequencing Container 'CONTAINER'" step to change data from an earlier step.*
 
-Workflows are designed to have data entered in a given order. If data from the previous step must be
-re-entered, click the "Undo" button (near-circle with arrow end, or the icon in the "Selected Flow Cell Model
-'PRO-001'" step in figure {{figure}}) on the right side of the screen to re-enter information from that step.
+Workflows are designed to have data entered in a given order.
+
+If data from the previous step must be
+re-entered, click the "Undo" button (near-circle with arrow end) to re-enter information from that step.
 If data from an earlier step in the workflow must be changed, click the "Go Back" button (arrow pointing to
-the left, or the icon in the "Selected new Sequencing Container 'CONTAINER'" step in figure {{figure}}) on the
-right side of the screen at the target step. If any of these buttons are clicked, you will be brought back to
-the target step and will be able to re-enter your data. If you selected "Go Back", you must re-enter all data
+the left) at the target step. If you select "Go Back", you must re-enter all data
 from that point in the workflow onwards.
 
 If you exit the workflow at any time before completing it, you will be able to 

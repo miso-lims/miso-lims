@@ -79,7 +79,8 @@ hold a box. Slots within a stack are numbered from the bottom up. Stacks can be 
 freezers.
 
 
-{% include userman-figure.md num=figure cap="A stack" img="storage-stack.png
+![A stack](../images/storage-stack.png)
+*A stack*
 
 To add a stack, click the "Add Storage" button either beside the "Freezer" label to add it directly to the freezer, or
 beside a shelf label to add it to a shelf. In the dialog that appears, choose "Stack." In the next dialog, choose
@@ -99,8 +100,8 @@ A rack is a shelving unit that holds several stacks of boxes. It can have any nu
 (slots). Each slot in each stack can hold a box. Stacks within a rack are numbered from front to back, and slots within
 a stack are numbered from bottom to top. Racks can only be added to shelves.
 
-{% assign figure = figure | plus: 1 %}
-{% include userman-figure.md num=figure cap="A rack" img="storage-rack.png
+![A rack](../images/storage-rack.png)
+*A rack*
 
 To add a rack, click the "Add Storage" button beside the shelf label of the shelf to which you wish to add it. In the
 Add Shelf Storage dialog, choose "Rack." In the next dialog, choose the number of stacks and rows and optionally a

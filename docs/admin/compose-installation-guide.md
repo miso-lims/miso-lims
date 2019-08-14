@@ -99,9 +99,9 @@ We suggest the following:
 
 1. Mount the MySQL database and MISO files storage location to permanent, backed-up locations (see [Adding Persistent Storage](#adding-persistent-storage)).
 3. Pre-load desired data (if any) by binding SQL files to the flyway container (see [Pre-loading data with Flyway](#pre-loading-data-with-flyway).
-4. Modify and mount the miso.properties file to have your desired configuration (see [Modifying the miso.properties file](#modifying-the-miso-properties-file).
+4. Modify and mount the miso.properties file to have your desired configuration (see [Modifying the miso.properties file](#modifying-the-misoproperties-file).
 5. Change the username and password for the database using the environmental variables
-6. Enable HTTPS (see [Configuring HTTPS](#configuring-https).
+6. Enable HTTPS (see [Configuring HTTPS](#configuring-https)).
 
 ## Recipes
 
@@ -211,7 +211,7 @@ options include:
 * `miso.naming.scheme` : turns on/off various validation options for
   naming samples.
   The most rigorous naming validation scheme is `oicr`. See
-  [Naming schemes](https://miso-lims.github.io/miso-lims/adm/installation-guide.html#naming-schemes-updating-catalina_homeconfcatalinalocalhostmisoproperties)
+  [Naming schemes](../baremetal-installation-guide/#naming-schemes)
   for more information.
 
 This file should be mounted in the webapp container at
@@ -385,7 +385,7 @@ warning.
 Here is what your browser will look like, with Chrome on the left and Firefox on
 the right. To ignore the errors, click the _Advanced_ button on either page.
 
-![Security Warnings in Chrome and Firefox](/images/security-warning.png)
+![Security Warnings in Chrome and Firefox](../images/security-warning.png)
 
 Then click either "Proceed to localhost (unsafe)" or "Accept the Risk and
 Continue".
@@ -611,12 +611,11 @@ starting.
     volume in the docker-compose file. Note that this will remove _all_  
     detached volumes, not just the MISO ones, and this data will be permanently
     lost.
+ 
+        # compose.yml is the location of your compose file
+        docker-compose -f compose.yml down
+        docker volume prune
 
-    ```
-    # compose.yml is the location of your compose file
-    docker-compose -f compose.yml down
-    docker volume prune
-    ```
 
 1. **Problem on docker-compose up:
   "ERROR: Unable to obtain Jdbc connection from DataSource ... for user
@@ -650,10 +649,8 @@ starting.
     `webapp` container. While docker-compose is still up, run the following in
     another terminal:
 
-    ```
-    # compose.yml is the location of your compose file
-    docker-compose -f compose.yml restart webapp
-    ```
+        # compose.yml is the location of your compose file
+        docker-compose -f compose.yml restart webapp
 
     The `webapp` container will restart in the original docker-compose window.
 
@@ -666,10 +663,9 @@ starting.
     permissions to 440 (user and group read only) and changing the file's group
     to `docker`.
 
-    ```
-    $ ls -la .miso_db_password
-      -r--r----- 1 miso-user docker 12 May  3 10:37 .miso_db_password
-    ```
+
+        $ ls -la .miso_db_password
+          -r--r----- 1 miso-user docker 12 May  3 10:37 .miso_db_password
 
 1. **Problem on docker-compose up:
   "ERROR: for miso-lims_webapp_1  Cannot start service webapp: OCI runtime
@@ -703,21 +699,20 @@ starting.
     To use another port, 3000 for example, two files need to be changed: the
     docker compose file and the nginx configuration. First, the compose file:
 
-    ``` yaml
-    services:
-      nginx:
-        ports:
-          - "3000:3000"
-    ```
+
+        services:
+          nginx:
+            ports:
+              - "3000:3000"
 
     And then in [nginx/http.conf](https://github.com/miso-lims/miso-lims/tree/develop/.docker/nginx/http.conf):
 
-    ```
-    server {
-      listen 3000;
-    ...
-    }
-    ```
+
+        server {
+          listen 3000;
+        ...
+        }
+
     Nginx in MISO really doesn't like it when you use a port different from the
     one that you've specified. You cannot simply map port 80 in the nginx
     container to a port on your host machine. It will not work.
@@ -744,19 +739,18 @@ starting.
     This is normal startup behaviour. True errors in Flyway will have an error
     that looks like this:
 
-    ```
-    ERROR: Migration of schema `lims` to version 0794 - site-specific-migration failed! Please restore backups and roll back database and code!
-    ERROR:
-    Migration V0794__site-specific-migration.sql failed
-    --------------------------------------------------
-    SQL State  : 42000
-    Error Code : 1064
-    Message    : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'DELETE FROM SampleClass WHERE alias='Slide'' at line 2
-    Location   : /flyway/sql/V0794__site-specific-migration.sql (/flyway/sql/V0794__site-specific-migration.sql)
-    Line       : 4
-    Statement  : DELETE FROM BoxUse WHERE alias='Libraries'
-    DELETE FROM SampleClass WHERE alias='Slide'
-    ```
+
+        ERROR: Migration of schema `lims` to version 0794 - site-specific-migration failed! Please restore backups and roll back database and code!
+        ERROR:
+        Migration V0794__site-specific-migration.sql failed
+        --------------------------------------------------
+        SQL State  : 42000
+        Error Code : 1064
+        Message    : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'DELETE FROM SampleClass WHERE alias='Slide'' at line 2
+        Location   : /flyway/sql/V0794__site-specific-migration.sql (/flyway/sql/V0794__site-specific-migration.sql)
+        Line       : 4
+        Statement  : DELETE FROM BoxUse WHERE alias='Libraries'
+        DELETE FROM SampleClass WHERE alias='Slide'
 
 1. **MISO started with no errors but the page at http://localhost/miso says
   "Server not found" or "Proxy error".**
@@ -764,12 +758,12 @@ starting.
     First, to check if the problem with with MISO or nginx, temporarily expose
     MISO's port by adding the following section to `webapp`:
 
-    ```
-    services:
-      webapp:
-          ports:
-            - "8080:8080"
-    ```
+
+        services:
+          webapp:
+              ports:
+                - "8080:8080"
+
     Navigate to http://localhost:8080 to check if MISO is running. If it is,
     the problem is with nginx. Ensure that all three ports in the compose file
       and `http.conf` file match each other.
