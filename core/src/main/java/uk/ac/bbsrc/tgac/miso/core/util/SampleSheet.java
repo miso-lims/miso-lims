@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.eaglegenomics.simlims.core.User;
@@ -14,7 +15,9 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -45,7 +48,13 @@ public enum SampleSheet {
     }
 
     @Override
-    protected void makeColumns(Run run, Partition partition, PoolableElementView aliquot, String userName, String[] output) {
+    protected String header(InstrumentModel model) {
+      return String.format("[Header]\nDate,%s\n\n[Reads]\nXREADLENGTHX\nXPAIREDX\n\n[Data]\n",
+          DateTimeFormatter.ISO_DATE.format(ZonedDateTime.now()));
+    }
+    @Override
+    protected void makeColumns(InstrumentModel model, int partitionNumber, String partitionBarcode, PoolableElementView aliquot,
+        String userName, String[] output) {
       output[0] = aliquot.getLibraryName();
       output[1] = aliquot.getLibraryAlias();
       final Optional<Index> firstIndex = aliquot.getIndices().stream().filter(i -> i.getPosition() == 1).findFirst();
@@ -54,7 +63,7 @@ public enum SampleSheet {
       final Optional<Index> secondIndex = aliquot.getIndices().stream().filter(i -> i.getPosition() == 2).findFirst();
       output[4] = secondIndex.map(Index::getName).orElse("");
       output[5] = secondIndex.map(Index::getSequence)
-          .map(run.getSequencer().getInstrumentModel().getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
+          .map(model.getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
               ? SampleSheet::reverseComplement
               : Function.identity())
           .orElse("");
@@ -76,18 +85,23 @@ public enum SampleSheet {
     protected String header(Run run) {
       return "";
     }
+    @Override
+    protected String header(InstrumentModel model) {
+      return "";
+    }
 
     @Override
-    protected void makeColumns(Run run, Partition p, PoolableElementView aliquot, String userName, String[] output) {
-      output[0] = p.getSequencerPartitionContainer().getIdentificationBarcode();
-      output[1] = p.getPartitionNumber().toString();
-      output[2] = String.format("%d_%s_%s", p.getSequencerPartitionContainer().getId(), aliquot.getLibraryName(),
+    protected void makeColumns(InstrumentModel model, int partitionNumber, String partitionBarcode, PoolableElementView aliquot,
+        String userName, String[] output) {
+      output[0] = partitionBarcode;
+      output[1] = Integer.toString(partitionNumber);
+      output[2] = String.format("%s_%s", aliquot.getLibraryName(),
           aliquot.getAliquotName());
       output[3] = aliquot.getSampleAlias().replaceAll("\\s", "");
       output[4] = aliquot.getIndices().stream()//
           .sorted(Comparator.comparingInt(Index::getPosition))//
           .map(i -> {
-            if (run.getSequencer().getInstrumentModel().getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
+            if (model.getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
                 && i.getPosition() == 2) {
               return reverseComplement(i.getSequence());
             }
@@ -116,10 +130,15 @@ public enum SampleSheet {
     protected String header(Run run) {
       return "";
     }
+    @Override
+    protected String header(InstrumentModel model) {
+      return "";
+    }
 
     @Override
-    protected void makeColumns(Run run, Partition partition, PoolableElementView aliquot, String userName, String[] output) {
-      SampleSheet.CASAVA_1_7.makeColumns(run, partition, aliquot, userName, output);
+    protected void makeColumns(InstrumentModel model, int partitionNumber, String partitionBarcode, PoolableElementView aliquot,
+        String userName, String[] output) {
+      SampleSheet.CASAVA_1_7.makeColumns(model, partitionNumber, partitionBarcode, aliquot, userName, output);
       output[9] = aliquot.getProjectAlias().replaceAll("\\s", "");
     }
   },
@@ -140,8 +159,14 @@ public enum SampleSheet {
     }
 
     @Override
-    protected void makeColumns(Run run, Partition partition, PoolableElementView aliquot, String userName, String[] output) {
-      output[0] = Integer.toString(partition.getPartitionNumber());
+    protected String header(InstrumentModel model) {
+      return "[Data]\n";
+    }
+
+    @Override
+    protected void makeColumns(InstrumentModel model, int partitionNumber, String partitionBarcode, PoolableElementView aliquot,
+        String userName, String[] output) {
+      output[0] = Integer.toString(partitionNumber);
       output[1] = aliquot.getAliquotName();
       output[2] = aliquot.getLibraryAlias();
       output[3] = aliquot.getIndices().stream().findFirst().map(Index::getSequence).orElse("");
@@ -216,11 +241,21 @@ public enum SampleSheet {
         .map(PoolElement::getPoolableElementView)
         .map(aliquot -> {
           final String[] output = new String[columns.size()];
-          makeColumns(run, partition, aliquot, user.getLoginName(), output);
+          makeColumns(run.getSequencer().getInstrumentModel(), partition.getPartitionNumber(),
+              partition.getSequencerPartitionContainer().getIdentificationBarcode(), aliquot, user.getLoginName(), output);
           return String.join(",", output);
         });
   }
 
+  private Stream<String> createRowsForPool(InstrumentModel model, User user, List<String> columns, int partitionNumber, Pool pool) {
+    return pool.getPoolContents().stream()//
+        .map(PoolElement::getPoolableElementView)
+        .map(aliquot -> {
+          final String[] output = new String[columns.size()];
+          makeColumns(model, partitionNumber, "", aliquot, user.getLoginName(), output);
+          return String.join(",", output);
+        });
+  }
   public String createSampleSheet(Run run, User user) {
     final List<String> columns = getColumns().collect(Collectors.toList());
     return header(run) + Stream.concat(//
@@ -232,9 +267,20 @@ public enum SampleSheet {
         .collect(Collectors.joining("\n"));
   }
 
+  public String createSampleSheet(InstrumentModel model, List<Pool> pools, User user) {
+    final List<String> columns = getColumns().collect(Collectors.toList());
+    return header(model) + Stream.concat(//
+        Stream.of(String.join(",", columns)), //
+        IntStream.range(0, pools.size()).boxed().flatMap(i -> createRowsForPool(model, user, columns, i, pools.get(i))))
+        .collect(Collectors.joining("\n"));
+  }
+
   protected abstract Stream<String> getColumns();
 
   protected abstract String header(Run run);
 
-  protected abstract void makeColumns(Run run, Partition partition, PoolableElementView aliquot, String userName, String[] output);
+  protected abstract String header(InstrumentModel model);
+
+  protected abstract void makeColumns(InstrumentModel model, int partitionNumber, String partitionBarcode, PoolableElementView aliquot,
+      String userName, String[] output);
 }

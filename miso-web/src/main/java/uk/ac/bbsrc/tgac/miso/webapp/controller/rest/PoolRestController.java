@@ -25,6 +25,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -59,6 +61,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -76,8 +79,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.ListPoolViewService;
@@ -88,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -135,6 +141,27 @@ public class PoolRestController extends RestController {
     }
   }
 
+  public static class SampleSheetRequest {
+    private List<Long> poolIds;
+    private long instrumentModelId;
+
+    public long getInstrumentModelId() {
+      return instrumentModelId;
+    }
+
+    public void setInstrumentModelId(long instrumentModelId) {
+      this.instrumentModelId = instrumentModelId;
+    }
+
+    public List<Long> getPoolIds() {
+      return poolIds;
+    }
+
+    public void setPoolIds(List<Long> poolIds) {
+      this.poolIds = poolIds;
+    }
+  }
+
   private final JQueryDataTableBackend<ListPoolView, PoolDto> jQueryBackend = new JQueryDataTableBackend<ListPoolView, PoolDto>() {
 
     @Override
@@ -150,6 +177,8 @@ public class PoolRestController extends RestController {
   };
 
   @Autowired
+  private AuthorizationManager authorizationManager;
+  @Autowired
   private ExperimentService experimentService;
   @Autowired
   private PoolService poolService;
@@ -157,6 +186,8 @@ public class PoolRestController extends RestController {
   private ListPoolViewService listPoolViewService;
   @Autowired
   private RunService runService;
+  @Autowired
+  private InstrumentModelService instrumentModelService;
   @Autowired
   private ContainerService containerService;
   @Autowired
@@ -509,4 +540,16 @@ public class PoolRestController extends RestController {
     return parentFinder.list(ids, category);
   }
 
+  @PostMapping(value = "/samplesheet/{format}")
+  @ResponseBody
+  public HttpEntity<byte[]> samplesheet(@PathVariable("format") String format, @RequestBody SampleSheetRequest request,
+      HttpServletRequest httpRequest,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
+    SampleSheet samplesheet = SampleSheet.valueOf(format);
+    InstrumentModel instrumentModel = instrumentModelService.get(request.getInstrumentModelId());
+    response.setHeader("Content-Disposition", String.format("attachment; filename=SAMPLE_SHEET_%s.txt", Instant.now()));
+    return new HttpEntity<>(samplesheet.createSampleSheet(instrumentModel,
+        request.getPoolIds().stream().map(WhineyFunction.rethrow(poolService::get)).collect(Collectors.toList()),
+        authorizationManager.getCurrentUser()).getBytes(StandardCharsets.UTF_8));
+  }
 }
