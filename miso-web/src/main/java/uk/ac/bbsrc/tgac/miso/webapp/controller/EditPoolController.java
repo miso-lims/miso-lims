@@ -265,7 +265,11 @@ public class EditPoolController {
     public ModelAndView merge(String parentIdsString, String proportionsString, ModelMap model) throws IOException {
       List<Long> parentIds = LimsUtils.parseIds(parentIdsString);
       List<Integer> proportions = parseProportions(proportionsString);
+
+      //This is packaged in a List only because prepare() wants a List. There's only ever 1 PoolDto in here.
       List<PoolDto> dtos = Lists.newArrayList(createDtoFromParents(parentIds, proportions));
+      dtos.get(0).setMergeChild(true);
+      
       return prepare(model, true, "Merge Pools", dtos);
     }
 

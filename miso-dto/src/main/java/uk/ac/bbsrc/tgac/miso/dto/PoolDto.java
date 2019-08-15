@@ -43,6 +43,7 @@ public class PoolDto extends AbstractBoxableDto {
   private boolean distributed;
   private String distributionDate;
   private String distributionRecipient;
+  private boolean mergeChild;
 
   public String getAlias() {
     return alias;
@@ -270,4 +271,11 @@ public class PoolDto extends AbstractBoxableDto {
     this.distributionRecipient = distributionRecipient;
   }
 
+  public boolean isMergeChild() {
+    return mergeChild;
+  }
+
+  public void setMergeChild(boolean mergeChild) {
+    this.mergeChild = mergeChild;
+  }
 }
