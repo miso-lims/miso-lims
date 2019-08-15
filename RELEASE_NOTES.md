@@ -1,7 +1,7 @@
 # Unreleased
 
 Changes:
-
+  * Show all unmatched names on bulk search failure, rather than the first one
 
 
 # 0.2.187
