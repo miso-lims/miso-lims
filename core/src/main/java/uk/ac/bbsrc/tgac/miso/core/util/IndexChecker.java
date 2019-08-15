@@ -1,10 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -95,41 +100,47 @@ public class IndexChecker {
   }
   private static Set<String> getIndexSequencesWithTooFewMismatches(List<List<Index>> indices, int mismatchesThreshold) {
     Set<String> nearMatchSequences = new HashSet<>();
-    if (indices.stream().flatMap(List::stream).allMatch(index -> hasFakeSequence(index)))
-      return Collections.emptySet();
-    for (int i = 0; i < indices.size(); i++) {
-      String sequence1 = getCombinedIndexSequences(indices.get(i));
-      if (sequence1.length() == 0) {
-        continue;
-      }
-      for (int j = i + 1; j < indices.size(); j++) {
-        String sequence2 = getCombinedIndexSequences(indices.get(j));
-        if (sequence2.length() == 0 || !isCheckNecessary(indices.get(i), indices.get(j), mismatchesThreshold)) {
-          continue;
+    // Real sequence → name the front end expects
+    Map<String, String> knownSequences = new HashMap<>();
+    for (List<Index> indexGroup : indices) {
+      String name = indexGroup.stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getSequence)
+          .collect(Collectors.joining("-"));
+      for (String sequence : getCombinedIndexSequences(indexGroup)) {
+        if (knownSequences.containsKey(sequence)) {
+          nearMatchSequences.add(name);
+          nearMatchSequences.add(knownSequences.get(sequence));
+        } else {
+          for (Map.Entry<String, String> otherSequence : knownSequences.entrySet()) {
+            if (Index.checkMismatches(sequence, otherSequence.getKey()) <= mismatchesThreshold) {
+              nearMatchSequences.add(name);
+              nearMatchSequences.add(otherSequence.getValue());
+            }
+          }
         }
-        if (Index.checkMismatches(sequence1, sequence2) <= mismatchesThreshold) {
-          nearMatchSequences.add(sequence1);
-          nearMatchSequences.add(sequence2);
-        }
+        knownSequences.put(sequence, name);
       }
     }
     return nearMatchSequences;
   }
 
-  private static boolean hasFakeSequence(Index index) {
-    return index == null ? false : index.getFamily().hasFakeSequence();
-  }
-
-  private static boolean isCheckNecessary(List<Index> indices1, List<Index> indices2, int minimumDistance) {
-    return !(indices1.stream().anyMatch(index -> hasFakeSequence(index)) || indices2.stream().anyMatch(index -> hasFakeSequence(index))
-        && (getCombinedIndexSequences(indices2).length() != getCombinedIndexSequences(indices2).length()));
-  }
-
-  private static String getCombinedIndexSequences(List<Index> indices) {
-    return indices.stream()
-        .sorted((i1, i2) -> Integer.compare(i1.getPosition(), i2.getPosition()))
-        .map(Index::getSequence)
-        .collect(Collectors.joining("-"));
+  private static List<String> getCombinedIndexSequences(List<Index> indices) {
+    if (indices.isEmpty()) {
+      return Collections.singletonList("");
+    }
+    List<String> currentSequences = null;
+    Set<Integer> positions = indices.stream().map(Index::getPosition).collect(Collectors.toCollection(TreeSet::new));
+    for (int position : positions) {
+      List<String> suffixes = indices.stream().filter(i -> i.getPosition() == position)
+          .flatMap(i -> i.getFamily().hasFakeSequence() ? i.getRealSequences().stream() : Stream.of(i.getSequence()))
+          .collect(Collectors.toList());
+      if (currentSequences == null) {
+        currentSequences = suffixes;
+      } else {
+        currentSequences = currentSequences.stream().flatMap(prefix -> suffixes.stream().map(suffix -> prefix + "-" + suffix))
+            .collect(Collectors.toList());
+      }
+    }
+    return currentSequences;
   }
 
   private static List<List<Index>> getIndexSequences(Pool pool) {
