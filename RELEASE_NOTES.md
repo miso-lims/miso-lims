@@ -1,7 +1,7 @@
 # Unreleased
 
 Changes:
-
+  * Show detailed messages rather than generic Server Errors in validation failure cases
 
 
 # 0.2.187
