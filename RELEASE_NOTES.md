@@ -1,6 +1,7 @@
 # Unreleased
 
 Changes:
+  * Show all unmatched names on bulk search failure, rather than the first one
   * Show detailed messages rather than generic Server Errors in validation failure cases
 
 

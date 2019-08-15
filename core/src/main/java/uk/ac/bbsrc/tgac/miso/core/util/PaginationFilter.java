@@ -2,12 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -15,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 
+import sun.awt.image.ImageWatched;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -73,12 +69,13 @@ public abstract interface PaginationFilter {
   public static <M extends Identifiable, D, X extends RuntimeException> List<D> bulkSearch(Collection<String> names,
       PaginatedDataSource<M> service,
       Function<M, D> dto, Function<String, X> makeException) {
-    return names.stream()//
+    List<String> namesNotFound = new LinkedList<>();
+    List<D> dtos = names.stream()//
         .filter(name -> !LimsUtils.isStringBlankOrNull(name))//
         .flatMap(WhineyFunction.flatRethrow(name -> {
           Collection<M> matches = service.list(0, 0, true, "id", exactQuery(name));
           if (matches.isEmpty()) {
-            throw makeException.apply(String.format("Cannot find \"%s\".", name));
+            namesNotFound.add(name);
           }
           return matches;
         }))//
@@ -87,6 +84,14 @@ public abstract interface PaginationFilter {
         .stream()//
         .map(list -> list.get(0))//
         .map(dto).collect(Collectors.toList());
+    if(!namesNotFound.isEmpty()){
+      StringBuilder exceptionMessage = new StringBuilder().append("Cannot find: \n");
+      for(String name : namesNotFound){
+        exceptionMessage.append(name).append("\n");
+      }
+      throw makeException.apply(exceptionMessage.toString());
+    }
+    return dtos;
   }
 
   public static PaginationFilter date(Date start, Date end, DateType type) {
