@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.List;
+
 public class IndexDto {
   private IndexFamilyDto family;
   private long id;
@@ -7,6 +9,7 @@ public class IndexDto {
   private String name;
   private int position;
   private String sequence;
+  private List<String> realSequences;
 
   public IndexFamilyDto getFamily() {
     return family;
@@ -54,5 +57,13 @@ public class IndexDto {
 
   public void setSequence(String sequence) {
     this.sequence = sequence;
+  }
+
+  public List<String> getRealSequences() {
+    return realSequences;
+  }
+
+  public void setRealSequences(List<String> realSequences) {
+    this.realSequences = realSequences;
   }
 }

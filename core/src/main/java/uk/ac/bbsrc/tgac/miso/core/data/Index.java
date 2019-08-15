@@ -27,7 +27,9 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -86,6 +88,11 @@ public class Index implements Nameable, Serializable {
   private int position;
   @Column(nullable = false)
   private String sequence;
+
+  @ElementCollection
+  @CollectionTable(name = "Index_RealSequences", joinColumns = @JoinColumn(name = "indexId"))
+  @Column(name = "sequence")
+  private List<String> realSequences;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -166,6 +173,14 @@ public class Index implements Nameable, Serializable {
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  public List<String> getRealSequences() {
+    return realSequences;
+  }
+
+  public void setRealSequences(List<String> realSequences) {
+    this.realSequences = realSequences;
   }
 
 }
