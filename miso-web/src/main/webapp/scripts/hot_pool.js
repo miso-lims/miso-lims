@@ -325,6 +325,14 @@ HotTarget.pool = (function() {
                    type: "select",
                    getLabel: Utils.array.getAlias,
                    values: instrumentModels
+                 },
+                 {
+                   property: "pools",
+                   label: "Lanes Configuration",
+                   required: true,
+                   type: "order",
+                   getLabel: Utils.array.getAlias,
+                   values: pools
                  }
                ],
                function(result) {
@@ -332,7 +340,7 @@ HotTarget.pool = (function() {
                    "/miso/rest/pools/samplesheet/" + result.format,
                    {
                      instrumentModelId: result.instrumentModel.id,
-                     poolIds: pools.map(Utils.array.getId)
+                     poolIds: result.pools.map(Utils.array.getId)
                    }
                  );
                },
