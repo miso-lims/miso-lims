@@ -51,6 +51,16 @@ public class IndexChecker {
     return warningMismatchesMessage;
   }
 
+  public Set<String> getDuplicateIndicesSequencesFromList(List<List<Index>> indices){
+    if(indices == null) return Collections.emptySet();
+    return getIndexSequencesWithTooFewMismatches(indices, errorMismatches);
+  }
+
+  public Set<String> getNearDuplicateIndicesSequencesFromList(List<List<Index>> indices){
+    if(indices == null) return Collections.emptySet();
+    return getIndexSequencesWithTooFewMismatches(indices, warningMismatches);
+  }
+
   public Set<String> getDuplicateIndicesSequences(Pool pool) {
     if (pool == null) return Collections.emptySet();
     List<List<Index>> indices = getIndexSequences(pool);

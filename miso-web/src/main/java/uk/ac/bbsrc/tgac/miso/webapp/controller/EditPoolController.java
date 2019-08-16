@@ -24,13 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -53,10 +47,7 @@ import com.google.common.collect.Lists;
 
 import net.sf.json.JSONArray;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
-import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -194,11 +185,13 @@ public class EditPoolController {
 
     private final PoolService poolService;
     private final BoxDto newBox;
+    private final IndexChecker indexChecker;
 
-    public BulkMergePoolsBackend(BoxDto newBox, PoolService poolService) {
+    public BulkMergePoolsBackend(BoxDto newBox, PoolService poolService, IndexChecker indexChecker) {
       super("pool", PoolDto.class);
       this.poolService = poolService;
       this.newBox = newBox;
+      this.indexChecker = indexChecker;
     }
 
     protected PoolDto createDtoFromParents(List<Long> parentIds, List<Integer> proportions) throws IOException {
@@ -225,10 +218,12 @@ public class EditPoolController {
       }
 
       Set<LibraryAliquotDto> aliquotDtos = new HashSet<>();
+      List<List<Index>> masterIndexList = new LinkedList<>();
       for (Pool parent : parents) {
         for (int i = 0; i < parentIds.size(); i++) {
           if (parentIds.get(i).equals(Long.valueOf(parent.getId()))) {
             for (PoolElement element : parent.getPoolContents()) {
+              masterIndexList.add(element.getPoolableElementView().getIndices());
               LibraryAliquotDto existing = aliquotDtos.stream().filter(d -> d.getId().equals(element.getPoolableElementView().getAliquotId()))
                   .findFirst().orElse(null);
               if (existing == null) {
@@ -245,11 +240,18 @@ public class EditPoolController {
       }
       dto.setPooledElements(aliquotDtos);
 
+      dto.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequencesFromList(masterIndexList));
+      dto.setNearDuplicateIndices(!dto.getNearDuplicateIndicesSequences().isEmpty());
+      dto.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequencesFromList(masterIndexList));
+      dto.setDuplicateIndices(!dto.getDuplicateIndicesSequences().isEmpty());
+
       List<VolumeUnit> volumeUnits = parents.stream().map(Pool::getVolumeUnits).filter(Objects::nonNull).distinct()
           .collect(Collectors.toList());
       if (parents.stream().map(Pool::getVolume).allMatch(Objects::nonNull) && volumeUnits.size() == 1) {
         dto.setVolume(Double.toString(parents.stream().mapToDouble(Pool::getVolume).sum()));
       }
+
+
 
       dto.setBox(newBox);
 
@@ -265,7 +267,14 @@ public class EditPoolController {
     public ModelAndView merge(String parentIdsString, String proportionsString, ModelMap model) throws IOException {
       List<Long> parentIds = LimsUtils.parseIds(parentIdsString);
       List<Integer> proportions = parseProportions(proportionsString);
+
+      //This is packaged in a List only because prepare() wants a List. There's only ever 1 PoolDto in here.
       List<PoolDto> dtos = Lists.newArrayList(createDtoFromParents(parentIds, proportions));
+      PoolDto newDto = dtos.get(0);
+      newDto.setMergeChild(true);
+
+      dtos.set(0, newDto);
+
       return prepare(model, true, "Merge Pools", dtos);
     }
 
@@ -287,7 +296,8 @@ public class EditPoolController {
   @GetMapping(value = "/bulk/merge")
   public ModelAndView propagatePoolsMerged(@RequestParam("ids") String poolIds, @RequestParam(value = "boxId", required = false) Long boxId, @RequestParam String proportions, ModelMap model)
       throws IOException {
-    return new BulkMergePoolsBackend((boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null), poolService).merge(poolIds, proportions, model);
+    return new BulkMergePoolsBackend((boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null),
+            poolService, indexChecker).merge(poolIds, proportions, model);
   }
 
 }

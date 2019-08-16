@@ -236,4 +236,7 @@ public interface Pool
   @Override
   public boolean equals(Object obj);
 
+  public boolean isMergeChild();
+
+  public void makeMergeChild();
 }

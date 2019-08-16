@@ -426,6 +426,15 @@ HotTarget.pool = (function() {
         });
       }
       return deferred.promise();
+    },
+
+    headerWarnings: function(config, data) {
+        if(data.length == 1 && data[0].mergeChild){
+            var mergeChildDto = data[0];
+            if(mergeChildDto.duplicateIndices || mergeChildDto.nearDuplicateIndices){
+                return "Merged pool will contain duplicate or near duplicate indices. Functionality will be limited on save."
+            }
+        }
     }
 
   }

@@ -175,6 +175,9 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Transient
   private Set<String> nearDuplicateIndicesSequences;
 
+  @Transient
+  private boolean mergeChild = false;
+
   public PoolImpl() {
   }
 
@@ -213,6 +216,16 @@ public class PoolImpl extends AbstractBoxable implements Pool {
         .append(identificationBarcode, other.getIdentificationBarcode())
         .append(qcPassed, other.getQcPassed())
         .isEquals();
+  }
+
+  @Override
+  public boolean isMergeChild() {
+    return mergeChild;
+  }
+
+  @Override
+  public void makeMergeChild() {
+    mergeChild = true;
   }
 
   @Override
