@@ -60,6 +60,10 @@
     </div>
 
    <div id="successesAndErrors">
+     <div id="warnings" class="bs-callout bs-callout-warning hidden">
+        <h2>Warning</h2>
+        <div id="creationErrors"></div>
+     </div>
      <div id="saveSuccesses"  class="parsley-success hidden">
        <p id="successMessages"></p>
      </div>

@@ -119,6 +119,24 @@ var HotUtils = {
    * these are being created or modified and a list of data items.
    */
   makeTable: function(target, create, data, config) {
+    function drawHeaderWarning() {
+      var warnings = [];
+        if (target.hasOwnProperty("headerWarnings")){
+            var potentialWarnings = target.headerWarnings(config, data);
+            if(potentialWarnings) warnings = warnings.concat(potentialWarnings);
+        }
+        if (warnings.length) {
+            var headerWarningsDiv = document.getElementById('creationErrors');
+            headerWarningsHTML = '<ul>';
+            for (var i = 0; i < warnings.length; ++i) {
+                headerWarningsHTML += '<li>' + warnings[i] + '</li>';
+            }
+            headerWarningsHTML += '</ul>';
+            headerWarningsDiv.innerHTML = headerWarningsHTML;
+            document.getElementById('warnings').classList.remove('hidden');
+        }
+      }
+
     jQuery('#additionalHotNotes').hide();
     jQuery('#additionalHotNotes').empty();
     if (typeof target.getNotes === 'function') {
@@ -329,6 +347,8 @@ var HotUtils = {
       }
       return data;
     };
+
+    drawHeaderWarning(config, target);
 
     hotContainer.style.display = '';
 
