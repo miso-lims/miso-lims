@@ -1,8 +1,18 @@
 # Unreleased
 
 Changes:
+
+
+
+# 0.2.188
+
+Changes:
   * Show all unmatched names on bulk search failure, rather than the first one
   * Show detailed messages rather than generic Server Errors in validation failure cases
+  * Warn on bad pool merge but allow creation
+  * Allow creating sample sheets for pools
+  * Check duplicate indices for fake (10X) families
+  * Allow toolbar buttons to wrap when full
 
 
 # 0.2.187
