@@ -2407,6 +2407,7 @@ public class Dtos {
     }
     to.setQcPassed(dto.getQcPassed());
     to.setBoxPosition((PoolBoxPosition) makeBoxablePosition(dto, to));
+    if(dto.isMergeChild()) to.makeMergeChild();
     return to;
   }
 
