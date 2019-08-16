@@ -2,9 +2,11 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -41,8 +43,7 @@ public enum SampleSheet {
       String reads = "";
       if (r.getSequencingParameters() != null) {
         final String readLength = Integer.toString(r.getSequencingParameters().getReadLength());
-        reads = String.format("[Reads]\n%s\n%s\n\n", readLength,
-            r.getSequencingParameters().isPaired() ? readLength : "");
+        reads = String.format("[Reads]\n%s\n%s\n\n", readLength, r.getSequencingParameters().isPaired() ? readLength : "");
       }
       return String.format("[Header]\nDate,%s\n\n%s[Data]\n", DateTimeFormatter.ISO_DATE.format(ZonedDateTime.now()), reads);
     }
@@ -52,21 +53,21 @@ public enum SampleSheet {
       return String.format("[Header]\nDate,%s\n\n[Reads]\nXREADLENGTHX\nXPAIREDX\n\n[Data]\n",
           DateTimeFormatter.ISO_DATE.format(ZonedDateTime.now()));
     }
+
     @Override
-    protected void makeColumns(InstrumentModel model, int partitionNumber, String partitionBarcode, PoolableElementView aliquot,
-        String userName, String[] output) {
-      output[0] = aliquot.getLibraryName();
-      output[1] = aliquot.getLibraryAlias();
+    protected Stream<String> makeColumns(boolean needsSuffix, InstrumentModel model, int partitionNumber, String partitionBarcode,
+        PoolableElementView aliquot,
+        List<String> index,
+        String userName) {
       final Optional<Index> firstIndex = aliquot.getIndices().stream().filter(i -> i.getPosition() == 1).findFirst();
-      output[2] = firstIndex.map(Index::getName).orElse("");
-      output[3] = firstIndex.map(Index::getSequence).orElse("");
       final Optional<Index> secondIndex = aliquot.getIndices().stream().filter(i -> i.getPosition() == 2).findFirst();
-      output[4] = secondIndex.map(Index::getName).orElse("");
-      output[5] = secondIndex.map(Index::getSequence)
-          .map(model.getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
-              ? SampleSheet::reverseComplement
-              : Function.identity())
-          .orElse("");
+      return Stream.of(
+          aliquot.getLibraryAlias() + (needsSuffix ? ("_" + String.join("_", index)) : ""), //
+          aliquot.getLibraryName(), //
+          firstIndex.map(Index::getName).orElse(""), //
+          index.size() > 0 ? index.get(0) : "", //
+          secondIndex.map(Index::getName).orElse(""), //
+          index.size() > 1 ? index.get(1) : "");
     }
 
   },
@@ -85,33 +86,28 @@ public enum SampleSheet {
     protected String header(Run run) {
       return "";
     }
+
     @Override
     protected String header(InstrumentModel model) {
       return "";
     }
 
     @Override
-    protected void makeColumns(InstrumentModel model, int partitionNumber, String partitionBarcode, PoolableElementView aliquot,
-        String userName, String[] output) {
-      output[0] = partitionBarcode;
-      output[1] = Integer.toString(partitionNumber);
-      output[2] = String.format("%s_%s", aliquot.getLibraryName(),
-          aliquot.getAliquotName());
-      output[3] = aliquot.getSampleAlias().replaceAll("\\s", "");
-      output[4] = aliquot.getIndices().stream()//
-          .sorted(Comparator.comparingInt(Index::getPosition))//
-          .map(i -> {
-            if (model.getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
-                && i.getPosition() == 2) {
-              return reverseComplement(i.getSequence());
-            }
-            return i.getSequence();
-          })//
-          .collect(Collectors.joining("-"));
-      output[5] = aliquot.getLibraryDescription();
-      output[6] = "N";
-      output[7] = "NA";
-      output[8] = userName;
+    protected Stream<String> makeColumns(boolean suffixNeeded, InstrumentModel model, int partitionNumber, String partitionBarcode,
+        PoolableElementView aliquot,
+        List<String> index,
+        String userName) {
+      return Stream.of(partitionBarcode, //
+          Integer.toString(partitionNumber), //
+          String.format("%s_%s%s", aliquot.getLibraryName(), //
+              aliquot.getAliquotName(), suffixNeeded ? ("_" + String.join("_", index)) : ""), //
+
+          aliquot.getSampleAlias().replaceAll("\\s", ""), //
+          String.join("-", index), //
+          aliquot.getLibraryDescription(), //
+          "N", //
+          "NA", //
+          userName);
     }
 
   },
@@ -130,16 +126,20 @@ public enum SampleSheet {
     protected String header(Run run) {
       return "";
     }
+
     @Override
     protected String header(InstrumentModel model) {
       return "";
     }
 
     @Override
-    protected void makeColumns(InstrumentModel model, int partitionNumber, String partitionBarcode, PoolableElementView aliquot,
-        String userName, String[] output) {
-      SampleSheet.CASAVA_1_7.makeColumns(model, partitionNumber, partitionBarcode, aliquot, userName, output);
-      output[9] = aliquot.getProjectAlias().replaceAll("\\s", "");
+    protected Stream<String> makeColumns(boolean suffixNeeded, InstrumentModel model, int partitionNumber, String partitionBarcode,
+        PoolableElementView aliquot,
+        List<String> index,
+        String userName) {
+      return Stream.concat(
+          SampleSheet.CASAVA_1_7.makeColumns(suffixNeeded, model, partitionNumber, partitionBarcode, aliquot, index, userName),
+          Stream.of(aliquot.getProjectAlias().replaceAll("\\s", "")));
     }
   },
   CELL_RANGER("CellRanger") {
@@ -164,13 +164,22 @@ public enum SampleSheet {
     }
 
     @Override
-    protected void makeColumns(InstrumentModel model, int partitionNumber, String partitionBarcode, PoolableElementView aliquot,
-        String userName, String[] output) {
-      output[0] = Integer.toString(partitionNumber);
-      output[1] = aliquot.getAliquotName();
-      output[2] = aliquot.getLibraryAlias();
-      output[3] = aliquot.getIndices().stream().findFirst().map(Index::getSequence).orElse("");
-      output[4] = aliquot.getProjectShortName();
+    protected Stream<String> makeColumns(boolean suffixNeeded, InstrumentModel model, int partitionNumber, String partitionBarcode,
+        PoolableElementView aliquot, List<String> index,
+        String userName) {
+      return Stream.of(Integer.toString(partitionNumber), //
+          aliquot.getAliquotName(), //
+          aliquot.getLibraryAlias(), //
+          String.join(",", index), //
+          aliquot.getProjectShortName());
+    }
+
+    @Override
+    protected Stream<String> flattenRows(InstrumentModel model, int partitionNumber, String partitionBarcode,
+        PoolableElementView aliquot,
+        String userName) {
+      return Stream.of(makeColumns(false, model, partitionNumber, partitionBarcode, aliquot,
+          aliquot.getIndices().stream().map(Index::getSequence).collect(Collectors.toList()), userName).collect(Collectors.joining(",")));
     }
   };
   private static char complement(char nt) {
@@ -239,23 +248,16 @@ public enum SampleSheet {
   private Stream<String> createRowsForPartition(Run run, User user, List<String> columns, Partition partition) {
     return partition.getPool().getPoolContents().stream()//
         .map(PoolElement::getPoolableElementView)
-        .map(aliquot -> {
-          final String[] output = new String[columns.size()];
-          makeColumns(run.getSequencer().getInstrumentModel(), partition.getPartitionNumber(),
-              partition.getSequencerPartitionContainer().getIdentificationBarcode(), aliquot, user.getLoginName(), output);
-          return String.join(",", output);
-        });
+        .flatMap(aliquot -> flattenRows(run.getSequencer().getInstrumentModel(), partition.getPartitionNumber(),
+            partition.getSequencerPartitionContainer().getIdentificationBarcode(), aliquot, user.getLoginName()));
   }
 
   private Stream<String> createRowsForPool(InstrumentModel model, User user, List<String> columns, int partitionNumber, Pool pool) {
     return pool.getPoolContents().stream()//
         .map(PoolElement::getPoolableElementView)
-        .map(aliquot -> {
-          final String[] output = new String[columns.size()];
-          makeColumns(model, partitionNumber, "", aliquot, user.getLoginName(), output);
-          return String.join(",", output);
-        });
+        .flatMap(aliquot -> flattenRows(model, partitionNumber, "", aliquot, user.getLoginName()));
   }
+
   public String createSampleSheet(Run run, User user) {
     final List<String> columns = getColumns().collect(Collectors.toList());
     return header(run) + Stream.concat(//
@@ -275,12 +277,47 @@ public enum SampleSheet {
         .collect(Collectors.joining("\n"));
   }
 
+  protected Stream<String> flattenRows(InstrumentModel model, int partitionNumber, String partitionBarcode,
+      PoolableElementView aliquot,
+      String userName) {
+    Set<Integer> positions = aliquot.getIndices().stream().map(Index::getPosition).collect(Collectors.toCollection(TreeSet::new));
+    if (positions.isEmpty()) {
+      return Stream.of(makeColumns(false, model, partitionNumber, partitionBarcode, aliquot, Collections.emptyList(), userName)
+          .collect(Collectors.joining(",")));
+    }
+    List<List<String>> indices = null;
+    for (int position : positions) {
+      List<String> suffixes = aliquot.getIndices().stream().filter(i -> i.getPosition() == position)
+          .flatMap(i -> i.getFamily().hasFakeSequence() ? i.getRealSequences().stream() : Stream.of(i.getSequence()))
+          .map(
+              model.getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
+                  && position == 2 ? SampleSheet::reverseComplement : Function.identity())
+          .collect(Collectors.toList());
+      if (indices == null) {
+        indices = suffixes.stream().map(Collections::singletonList).collect(Collectors.toList());
+      } else {
+        indices = indices.stream()//
+            .flatMap(prefix -> suffixes.stream()//
+                .map(suffix -> Stream.concat(prefix.stream(), //
+                    Stream.of(suffix))//
+                    .collect(Collectors.toList())))//
+            .collect(Collectors.toList());
+      }
+    }
+    final boolean needsSuffix = indices.size() > 1;
+    return indices.stream()
+        .map(index -> makeColumns(needsSuffix, model, partitionNumber, partitionBarcode, aliquot, index, userName)
+            .collect(Collectors.joining(",")));
+
+  }
+
   protected abstract Stream<String> getColumns();
 
   protected abstract String header(Run run);
 
   protected abstract String header(InstrumentModel model);
 
-  protected abstract void makeColumns(InstrumentModel model, int partitionNumber, String partitionBarcode, PoolableElementView aliquot,
-      String userName, String[] output);
+  protected abstract Stream<String> makeColumns(boolean suffixNeeded, InstrumentModel model, int partitionNumber, String partitionBarcode,
+      PoolableElementView aliquot, List<String> index,
+      String userName);
 }
