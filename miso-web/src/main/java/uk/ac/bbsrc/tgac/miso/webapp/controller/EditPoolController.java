@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -80,6 +81,9 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
 @RequestMapping("/pool")
 public class EditPoolController {
   protected static final Logger log = LoggerFactory.getLogger(EditPoolController.class);
+
+  @Value("${miso.pools.strictIndexChecking:false}")
+  private Boolean strictPools;
 
   @Autowired
   private SequencingParametersService sequencingParametersService;
@@ -186,12 +190,14 @@ public class EditPoolController {
     private final PoolService poolService;
     private final BoxDto newBox;
     private final IndexChecker indexChecker;
+    private final Boolean strictPools;
 
-    public BulkMergePoolsBackend(BoxDto newBox, PoolService poolService, IndexChecker indexChecker) {
+    public BulkMergePoolsBackend(BoxDto newBox, PoolService poolService, IndexChecker indexChecker, Boolean strictPools) {
       super("pool", PoolDto.class);
       this.poolService = poolService;
       this.newBox = newBox;
       this.indexChecker = indexChecker;
+      this.strictPools = strictPools;
     }
 
     protected PoolDto createDtoFromParents(List<Long> parentIds, List<Integer> proportions) throws IOException {
@@ -271,7 +277,7 @@ public class EditPoolController {
       //This is packaged in a List only because prepare() wants a List. There's only ever 1 PoolDto in here.
       List<PoolDto> dtos = Lists.newArrayList(createDtoFromParents(parentIds, proportions));
       PoolDto newDto = dtos.get(0);
-      newDto.setMergeChild(true);
+      if(strictPools) newDto.setMergeChild(true);
 
       dtos.set(0, newDto);
 
@@ -297,7 +303,7 @@ public class EditPoolController {
   public ModelAndView propagatePoolsMerged(@RequestParam("ids") String poolIds, @RequestParam(value = "boxId", required = false) Long boxId, @RequestParam String proportions, ModelMap model)
       throws IOException {
     return new BulkMergePoolsBackend((boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null),
-            poolService, indexChecker).merge(poolIds, proportions, model);
+            poolService, indexChecker, strictPools).merge(poolIds, proportions, model);
   }
 
 }
