@@ -51,8 +51,8 @@ public class OicrLibraryAliasValidator extends RegexValidator {
     lookupsSuccessful = true;
     final String identityRegex = "(" + OicrProjectShortNameValidator.REGEX + ")_(\\d{3,}|\\d[CR]\\d{1,2})_"; // PROJ_0001_...
 
-    String origins = makeOptionRegex("Tissue origins", tissueOriginService, null, TissueOrigin::getAlias, "[A-Z][a-z]");
-    String tissueTypes = makeOptionRegex("Tissue types", tissueTypeService, null, TissueType::getAlias, "[A-Z]");
+    String origins = makeOptionRegex("Tissue origins", tissueOriginService, null, TissueOrigin::getAlias, OicrSampleAliasValidator.TISSUE_NAME_REGEX);
+    String tissueTypes = makeOptionRegex("Tissue types", tissueTypeService, null, TissueType::getAlias, OicrSampleAliasValidator.TISSUE_NAME_REGEX);
 
     final String tissueRegex = "(" + origins + ")_(" + tissueTypes + ")_"; // ...Pa_P_...
 
