@@ -186,7 +186,7 @@ var HotUtils = {
     });
     var anyInvalidCells = false;
     var table = new Handsontable(hotContainer, {
-      debug: true,
+      licenseKey: 'non-commercial-and-evaluation',
       fixedColumnsLeft: target.hasOwnProperty('getFixedColumns') ? target.getFixedColumns(config) : 1,
       manualColumnResize: true,
       rowHeaders: false,
