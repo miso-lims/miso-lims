@@ -9,6 +9,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,10 @@ import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> implements PoolOrderService {
+
+  @Value("${miso.pools.strictIndexChecking:false}")
+  private Boolean strictPools;
+
 
   @Autowired
   private PoolOrderDao poolOrderDao;
@@ -146,11 +151,15 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
       errors.add(new ValidationError("Non-draft order must include at least one library aliquot"));
     }
 
+    if(strictPools) validateIndices(object, beforeChange, errors);
+  }
+
+  private void validateIndices(PoolOrder object, PoolOrder beforeChange, List<ValidationError> errors){
     // Work based on whether bad index count increases, rather than >0, in case Pool Orders already exist w >1
     if(indexChecker.getDuplicateIndicesSequences(beforeChange).size()
             < indexChecker.getDuplicateIndicesSequences(object).size()
-      || indexChecker.getNearDuplicateIndicesSequences(beforeChange).size()
-            < indexChecker.getNearDuplicateIndicesSequences(object).size()){
+            || indexChecker.getNearDuplicateIndicesSequences(beforeChange).size()
+            < indexChecker.getNearDuplicateIndicesSequences(object).size()) {
       Set<String> indices = indexChecker.getDuplicateIndicesSequences(object);
       indices.addAll(indexChecker.getNearDuplicateIndicesSequences(object));
       Set<String> bcIndices = indexChecker.getDuplicateIndicesSequences(beforeChange);
@@ -160,7 +169,7 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
               indexChecker.getWarningMismatches());
       indices.removeAll(bcIndices);
 
-      for (String index : indices){
+      for (String index : indices) {
         errorMessage += index + " ";
       }
 
