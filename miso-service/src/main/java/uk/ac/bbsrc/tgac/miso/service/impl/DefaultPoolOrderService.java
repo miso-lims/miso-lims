@@ -151,10 +151,10 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
       errors.add(new ValidationError("Non-draft order must include at least one library aliquot"));
     }
 
-    if(strictPools) validateIndices(object, beforeChange, errors);
+    if(strictPools) validateNoNewDuplicateIndices(object, beforeChange, errors);
   }
 
-  private void validateIndices(PoolOrder object, PoolOrder beforeChange, List<ValidationError> errors){
+  private void validateNoNewDuplicateIndices(PoolOrder object, PoolOrder beforeChange, List<ValidationError> errors){
     // Work based on whether bad index count increases, rather than >0, in case Pool Orders already exist w >1
     if(indexChecker.getDuplicateIndicesSequences(beforeChange).size()
             < indexChecker.getDuplicateIndicesSequences(object).size()
