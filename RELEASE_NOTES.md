@@ -1,7 +1,8 @@
 # Unreleased
 
 Changes:
-
+  * Prevent creation of Pool Orders with duplicate indices
+  * Prevent linking of Pools with duplicate indices to Pool Orders
 
 
 # 0.2.188
