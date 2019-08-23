@@ -3,11 +3,13 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
@@ -33,6 +36,10 @@ import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> implements PoolOrderService {
+
+  @Value("${miso.pools.strictIndexChecking:false}")
+  private Boolean strictPools;
+
 
   @Autowired
   private PoolOrderDao poolOrderDao;
@@ -57,6 +64,9 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
 
   @Autowired
   private SequencingOrderService sequencingOrderService;
+
+  @Autowired
+  private IndexChecker indexChecker;
 
   @Override
   public DeletionStore getDeletionStore() {
@@ -139,6 +149,31 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
 
     if (!object.isDraft() && object.getOrderLibraryAliquots().isEmpty()) {
       errors.add(new ValidationError("Non-draft order must include at least one library aliquot"));
+    }
+
+    if(strictPools) validateNoNewDuplicateIndices(object, beforeChange, errors);
+  }
+
+  private void validateNoNewDuplicateIndices(PoolOrder object, PoolOrder beforeChange, List<ValidationError> errors){
+    // Work based on whether bad index count increases, rather than >0, in case Pool Orders already exist w >1
+    if(indexChecker.getDuplicateIndicesSequences(beforeChange).size()
+            < indexChecker.getDuplicateIndicesSequences(object).size()
+            || indexChecker.getNearDuplicateIndicesSequences(beforeChange).size()
+            < indexChecker.getNearDuplicateIndicesSequences(object).size()) {
+      Set<String> indices = indexChecker.getDuplicateIndicesSequences(object);
+      indices.addAll(indexChecker.getNearDuplicateIndicesSequences(object));
+      Set<String> bcIndices = indexChecker.getDuplicateIndicesSequences(beforeChange);
+      bcIndices.addAll(indexChecker.getNearDuplicateIndicesSequences(beforeChange));
+      String errorMessage = String.format("Pools may not contain Library Aliquots with indices with %d or " +
+                      "fewer positions of difference, please address the following conflicts: ",
+              indexChecker.getWarningMismatches());
+      indices.removeAll(bcIndices);
+
+      for (String index : indices) {
+        errorMessage += index + " ";
+      }
+
+      errors.add(new ValidationError(errorMessage));
     }
   }
 

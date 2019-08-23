@@ -326,12 +326,16 @@ FormTarget.poolorder = (function($) {
   }
 
   function doSetPool(form, pool) {
+  if(pool && (pool.duplicateIndices || pool.nearDuplicateIndices)){
+    Utils.showOkDialog('Error', ['Selected pool contains duplicate or near duplicate indices.']);
+  } else {
     form.updateField('poolId', {
       value: pool ? pool.id : null,
       label: pool ? pool.alias : 'not linked',
       link: pool ? Urls.ui.pools.edit(pool.id) : null
     });
     form.save();
+    }
   }
 
   function unlinkPool(form) {
