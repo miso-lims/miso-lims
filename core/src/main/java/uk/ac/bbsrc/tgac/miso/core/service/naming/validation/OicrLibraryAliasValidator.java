@@ -48,50 +48,15 @@ public class OicrLibraryAliasValidator extends RegexValidator {
   }
 
   private synchronized Pattern initializePattern() {
-    lookupsSuccessful = true;
     final String identityRegex = "(" + OicrProjectShortNameValidator.REGEX + ")_(\\d{3,}|\\d[CR]\\d{1,2})_"; // PROJ_0001_...
-
-    String origins = makeOptionRegex("Tissue origins", tissueOriginService, null, TissueOrigin::getAlias, OicrSampleAliasValidator.TISSUE_NAME_REGEX);
-    String tissueTypes = makeOptionRegex("Tissue types", tissueTypeService, null, TissueType::getAlias, OicrSampleAliasValidator.TISSUE_NAME_REGEX);
-
-    final String tissueRegex = "(" + origins + ")_(" + tissueTypes + ")_"; // ...Pa_P_...
-
-    String designCodes = makeOptionRegex("Library design codes", libraryDesignCodeService, null, LibraryDesignCode::getCode, "[A-Z]{2}");
-    final String designCodeRegex = "(" + designCodes + "|\\?\\?)";
-
-    String illuminaLibTypes = makeOptionRegex("Library types", libraryTypeService, lt -> lt.getPlatformType() == PlatformType.ILLUMINA,
-        LibraryType::getAbbreviation, "[A-Z]{2}");
-    final String illuminaRegex = "(" + illuminaLibTypes + "|\\?\\?)_(nn|\\d{2,6}|\\dK)_" + designCodeRegex; // ...PE_700_WG
-
-    String ontLibTypes = makeOptionRegex("Library types", libraryTypeService, lt -> lt.getPlatformType() == PlatformType.OXFORDNANOPORE,
-        LibraryType::getAbbreviation, "[A-Z\\d]{3,4}");
-    final String ontRegex = "(" + ontLibTypes + ")_" + designCodeRegex + "_\\d+"; // ...1D2_WG_1
-
+    final String tissueRegex = "(" + OicrSampleAliasValidator.TISSUE_NAME_REGEX + ")_(" + OicrSampleAliasValidator.TISSUE_NAME_REGEX + ")_"; // ...Pa_P_...
+    final String designCodeRegex = "(" + "[A-Z]{2}" + "|\\?\\?)";
+    final String illuminaRegex = "(" + "[A-Z]{2}" + "|\\?\\?)_(nn|\\d{2,6}|\\dK)_" + designCodeRegex;
+    final String ontRegex = "(" + "[A-Z\\d]{3,4}" + ")_" + designCodeRegex + "_\\d+";
     final String pacbioRegex = "\\d{8}_\\d+"; // ...20170913_1
-
-    // PROJ_0001_Pa_P_PE_700_WG (Illumina) or PROJ_0001_20170913_1 (PacBio) or PROJ_0001_Pa_P_1D2_WG_1 (Oxford Nanopore)
     String finalRegex = String.format("^%s(%s|%s(%s|%s))$", identityRegex, pacbioRegex, tissueRegex, illuminaRegex, ontRegex);
 
-    if (lookupsSuccessful) {
-      // Save if everything initialized properly. This means the lookups aren't required every time,
-      // but also that MISO must be restarted to update values for validation
-      pattern = Pattern.compile(finalRegex);
-    }
-    return pattern;
-  }
-
-  private <T extends Identifiable> String makeOptionRegex(String type, ListService<T> service, Predicate<T> filter,
-      Function<T, String> mapFunction, String simpleRegex) {
-    try {
-      return service.list().stream()
-          .filter(filter == null ? (i -> true) : filter)
-          .map(mapFunction)
-          .collect(Collectors.joining("|"));
-    } catch (IOException e) {
-      lookupsSuccessful = false;
-      log.error("{} lookup failed. Falling back to simple validation pattern", type);
-      return simpleRegex;
-    }
+    return Pattern.compile(finalRegex);
   }
 
   @Override
