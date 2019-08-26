@@ -3459,6 +3459,7 @@ public class Dtos {
     setLong(to::setPoolId, maybeGetProperty(from.getPool(), Pool::getId), true);
     setString(to::setPoolAlias, maybeGetProperty(from.getPool(), Pool::getAlias));
     setLong(to::setSequencingOrderId, maybeGetProperty(from.getSequencingOrder(), SequencingOrder::getId), true);
+    setString(to::setLongestIndex, from.getLongestIndex());
     return to;
   }
 
