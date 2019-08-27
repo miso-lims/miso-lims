@@ -23,7 +23,13 @@ public class OicrLibraryAliasGenerator implements NameGenerator<Library> {
 
   private static final String SEPARATOR = "_";
 
-  private static final @RegEx String sampleRegex = "^" + OicrSampleAliasValidator.IDENTITY_REGEX_PART + "(_(?:[A-Z][a-z]|nn)_[A-Zn])_.*";
+  private static final @RegEx String sampleRegex = "^"
+          + OicrSampleAliasValidator.IDENTITY_REGEX_PART
+          + "(_(?:"
+          + OicrSampleAliasValidator.TISSUE_NAME_REGEX
+          + ")_"
+          + OicrSampleAliasValidator.TISSUE_NAME_REGEX
+          + ")_.*";
   private static final Pattern samplePattern = Pattern.compile(sampleRegex);
 
   @Autowired
