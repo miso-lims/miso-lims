@@ -55,6 +55,7 @@ public class PoolOrderDto {
   private Long poolId;
   private String poolAlias;
   private Long sequencingOrderId;
+  private String longestIndex;
 
   public Long getId() {
     return id;
@@ -198,6 +199,14 @@ public class PoolOrderDto {
 
   public void setNearDuplicateIndicesSequences(Set<String> nearDuplicateIndicesSequences) {
     this.nearDuplicateIndicesSequences = nearDuplicateIndicesSequences;
+  }
+
+  public String getLongestIndex(){
+    return longestIndex;
+  }
+
+  public void setLongestIndex(String longestIndex){
+    this.longestIndex = longestIndex;
   }
 
 }

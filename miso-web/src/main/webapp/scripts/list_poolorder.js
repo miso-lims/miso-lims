@@ -42,6 +42,13 @@ ListTarget.poolorder = {
           }
         },
         {
+          sTitle: "Longest Index",
+          mData: "longestIndex",
+          bSortable: false,
+          iSortPriority: 0,
+          include: !config.poolId
+        },
+        {
           sTitle: 'Instrument Model',
           mData: 'parametersName',
           include: true,

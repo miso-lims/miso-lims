@@ -3,7 +3,9 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,12 +22,7 @@ import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
-import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
-import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 
 @Entity
 public class PoolOrder implements Deletable, Identifiable, Serializable, Timestamped {
@@ -309,4 +306,17 @@ public class PoolOrder implements Deletable, Identifiable, Serializable, Timesta
     return true;
   }
 
+  public String getLongestIndex() {
+    Map<Integer, Integer> lengths = orderLibraryAliquots.stream()
+            .flatMap(element -> element.getAliquot().getLibrary().getIndices().stream())
+            .collect(Collectors.toMap(Index::getPosition, index -> index.getSequence().length(), Integer::max));
+    if (lengths.isEmpty()) {
+      return "0";
+    }
+    return lengths.entrySet().stream()
+            .sorted((a, b) -> a.getKey().compareTo(b.getKey()))
+            .map(Map.Entry<Integer, Integer>::getValue)
+            .map(length -> length.toString())
+            .collect(Collectors.joining(","));
+  }
 }
