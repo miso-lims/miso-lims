@@ -160,7 +160,7 @@ public class AdminRestController extends DefaultRestController {
   @PostMapping(value = "/constants/refresh")
   @ResponseBody
   @ResponseStatus(HttpStatus.OK)
-  public int refreshConstants() {
+  public int refreshConstants() throws IOException {
     menuController.refreshConstants();
     return 0;
   }

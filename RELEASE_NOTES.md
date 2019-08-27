@@ -4,6 +4,7 @@ Changes:
   * Prevent creation of Pool Orders with duplicate indices
   * Prevent linking of Pools with duplicate indices to Pool Orders
   * List Longest Index on Pool Orders page
+  * Improve performance of downloading `/miso/constants.js`; this will make saving institute defaults much slower.
 
 
 # 0.2.188
