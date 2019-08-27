@@ -126,6 +126,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 
 import io.prometheus.client.Gauge;
 
@@ -137,7 +138,6 @@ public class MenuController implements ServletContextAware {
       .build("miso_constants_timestamp", "The epoch time of the last build of the constants.js file.").register();
 
   private String constantsJs;
-  private long constantsJsTime;
 
   ServletContext servletContext;
   @Autowired
@@ -294,9 +294,14 @@ public class MenuController implements ServletContextAware {
   public ResponseEntity<String> constantsScript(HttpServletResponse response, final UriComponentsBuilder uriBuilder) throws IOException {
     response.setContentType("application/javascript");
     // Use a cached copy and only update every
-    if (constantsJs != null && (System.currentTimeMillis() - constantsJsTime) < 15 * 60 * 1000) {
-      return ResponseEntity.ok().cacheControl(CacheControl.maxAge(15, TimeUnit.MINUTES)).body(constantsJs);
+    if (constantsJs == null) {
+      refreshConstants();
     }
+    return ResponseEntity.ok().cacheControl(CacheControl.maxAge(15, TimeUnit.MINUTES)).body(constantsJs);
+  }
+
+  public void refreshConstants() {
+    try {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode node = mapper.createObjectNode();
     node.put("isDetailedSample", detailedSample);
@@ -428,13 +433,10 @@ public class MenuController implements ServletContextAware {
     // file and updating the cache. Since the cache is two variables (data and time), they can also be torn. Given the nature of the cached
     // data, we don't really care since the results are probably the same and jitter of a few seconds is a small error in cache time.
     constantsJs = "Constants = " + mapper.writeValueAsString(node) + ";";
-    constantsJsTime = System.currentTimeMillis();
-    constantsTimestamp.set(constantsJsTime / 1000.0);
-    return ResponseEntity.ok().cacheControl(CacheControl.maxAge(15, TimeUnit.MINUTES)).body(constantsJs);
-  }
-
-  public void refreshConstants() {
-    constantsJsTime = 0;
+    constantsTimestamp.set(System.currentTimeMillis() / 1000.0);
+    } catch (IOException e) {
+      throw new RestException(e);
+    }
   }
 
   @GetMapping("/accessDenied")
