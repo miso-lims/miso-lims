@@ -652,7 +652,8 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListPoolOrdersSetup() throws Exception {
     testTabbedPageSetup(ListTarget.POOL_ORDERS, Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.PURPOSE,
-        Columns.DESCRIPTION, Columns.LIBRARY_ALIQUOTS, Columns.INSTRUMENT_MODEL, Columns.SEQUENCING_PARAMETERS, Columns.PARTITIONS));
+        Columns.DESCRIPTION, Columns.LIBRARY_ALIQUOTS, Columns.LONGEST_INDEX, Columns.INSTRUMENT_MODEL,
+            Columns.SEQUENCING_PARAMETERS, Columns.PARTITIONS));
   }
 
   @Test
