@@ -62,7 +62,6 @@ public class DefaultSamplePurposeService implements SamplePurposeService {
 
   @Override
   public List<SamplePurpose> list() throws IOException {
-    authorizationManager.throwIfUnauthenticated();
     return samplePurposeDao.getSamplePurpose();
   }
 

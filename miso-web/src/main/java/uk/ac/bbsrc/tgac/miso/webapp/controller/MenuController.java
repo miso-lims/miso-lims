@@ -28,6 +28,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -291,152 +294,169 @@ public class MenuController implements ServletContextAware {
 
   @GetMapping(path = "/constants.js")
   @ResponseBody
-  public ResponseEntity<String> constantsScript(HttpServletResponse response, final UriComponentsBuilder uriBuilder) throws IOException {
+  public synchronized ResponseEntity<String> constantsScript(HttpServletResponse response, final UriComponentsBuilder uriBuilder)
+      throws IOException {
     response.setContentType("application/javascript");
     // Use a cached copy and only update every
     if (constantsJs == null) {
-      refreshConstants();
+      final ScheduledFuture<?> current = future;
+      if (current != null && !current.isDone()) {
+        current.cancel(false);
+        future = null;
+      }
+      rebuildConstants();
     }
     return ResponseEntity.ok().cacheControl(CacheControl.maxAge(15, TimeUnit.MINUTES)).body(constantsJs);
   }
 
-  public void refreshConstants() {
+  private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+  private ScheduledFuture<?> future;
+
+  private void rebuildConstants() {
     try {
-    ObjectMapper mapper = new ObjectMapper();
-    ObjectNode node = mapper.createObjectNode();
-    node.put("isDetailedSample", detailedSample);
-    node.put("automaticBarcodes", autoGenerateIdentificationBarcodes());
-    node.put("automaticSampleAlias", namingScheme.hasSampleAliasGenerator());
-    node.put("automaticLibraryAlias", namingScheme.hasLibraryAliasGenerator());
-    node.put("boxScannerEnabled", boxScannerEnabled);
+      ObjectMapper mapper = new ObjectMapper();
+      ObjectNode node = mapper.createObjectNode();
+      node.put("isDetailedSample", detailedSample);
+      node.put("automaticBarcodes", autoGenerateIdentificationBarcodes());
+      node.put("automaticSampleAlias", namingScheme.hasSampleAliasGenerator());
+      node.put("automaticLibraryAlias", namingScheme.hasLibraryAliasGenerator());
+      node.put("boxScannerEnabled", boxScannerEnabled);
 
-    final Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
+      final Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
 
-    createArray(mapper, node, "libraryDesigns", libraryDesignService.list(), Dtos::asDto);
-    createArray(mapper, node, "libraryTypes", libraryTypeService.list(), Dtos::asDto);
-    createArray(mapper, node, "librarySelections", librarySelectionService.list(), Dtos::asDto);
-    createArray(mapper, node, "libraryStrategies", libraryStrategyService.list(), Dtos::asDto);
-    createArray(mapper, node, "libraryDesignCodes", libraryDesignCodeService.list(), Dtos::asDto);
-    Set<Long> activePlatforms = sequencerService.list().stream().filter(Instrument::isActive)
-        .map(sequencer -> sequencer.getInstrumentModel().getId())
-        .collect(Collectors.toSet());
-    createArray(mapper, node, "instrumentModels", instrumentModelService.list(), platform -> {
-      InstrumentModelDto dto = Dtos.asDto(platform);
-      dto.setActive(activePlatforms.contains(platform.getId()));
-      return dto;
-    });
-    createArray(mapper, node, "kitDescriptors", kitService.list(), Dtos::asDto);
-    createArray(mapper, node, "sampleClasses", sampleClassService.getAll(), Dtos::asDto);
-    createArray(mapper, node, "sampleValidRelationships", relationships, Dtos::asDto);
-    createArray(mapper, node, "detailedQcStatuses", detailedQcStatusService.getAll(), Dtos::asDto);
-    createArray(mapper, node, "sampleGroups", sampleGroupService.getAll(), Dtos::asDto);
-    createArray(mapper, node, "subprojects", subprojectService.list(), Dtos::asDto);
-    createArray(mapper, node, "labs", labService.list(), Dtos::asDto);
-    createArray(mapper, node, "tissueOrigins", tissueOriginService.list(), Dtos::asDto);
-    createArray(mapper, node, "tissueTypes", tissueTypeService.list(), Dtos::asDto);
-    createArray(mapper, node, "tissueMaterials", tissueMaterialService.list(), Dtos::asDto);
-    createArray(mapper, node, "stains", stainService.list(), Dtos::asDto);
-    createArray(mapper, node, "targetedSequencings", targetedSequencingService.list(), Dtos::asDto);
-    createArray(mapper, node, "samplePurposes", samplePurposeService.list(), Dtos::asDto);
-    createArray(mapper, node, "sequencingParameters", sequencingParametersService.list(), Dtos::asDto);
-    createArray(mapper, node, "printerBackends", Arrays.asList(Backend.values()), Dtos::asDto);
-    createArray(mapper, node, "printerDrivers", Arrays.asList(Driver.values()), Dtos::asDto);
-    createArray(mapper, node, "printerLayouts", Arrays.asList(Layout.values()), Dtos::asDto);
-    createArray(mapper, node, "boxSizes", boxSizeService.list(), Dtos::asDto);
-    createArray(mapper, node, "boxUses", boxUseService.list(), Dtos::asDto);
-    createArray(mapper, node, "studyTypes", studyTypeService.list(), Dtos::asDto);
-    createArray(mapper, node, "sampleCategories", SampleClass.CATEGORIES, Function.identity());
-    createArray(mapper, node, "submissionAction", Arrays.asList(SubmissionActionType.values()), SubmissionActionType::name);
-    createArray(mapper, node, "containerModels", containerModelService.list(), Dtos::asDto);
-    createArray(mapper, node, "poreVersions", containerService.listPoreVersions(), Dtos::asDto);
-    createArray(mapper, node, "spikeIns", librarySpikeInService.list(), Dtos::asDto);
-    createArray(mapper, node, "attachmentCategories", attachmentCategoryService.list(), Dtos::asDto);
-    createArray(mapper, node, "orderPurposes", orderPurposeService.list(), Dtos::asDto);
-    createArray(mapper, node, "sampleSheetFormats", Arrays.asList(SampleSheet.values()), SampleSheet::name);
+      createArray(mapper, node, "libraryDesigns", libraryDesignService.list(), Dtos::asDto);
+      createArray(mapper, node, "libraryTypes", libraryTypeService.list(), Dtos::asDto);
+      createArray(mapper, node, "librarySelections", librarySelectionService.list(), Dtos::asDto);
+      createArray(mapper, node, "libraryStrategies", libraryStrategyService.list(), Dtos::asDto);
+      createArray(mapper, node, "libraryDesignCodes", libraryDesignCodeService.list(), Dtos::asDto);
+      Set<Long> activePlatforms = sequencerService.list().stream().filter(Instrument::isActive)
+          .map(sequencer -> sequencer.getInstrumentModel().getId())
+          .collect(Collectors.toSet());
+      createArray(mapper, node, "instrumentModels", instrumentModelService.list(), platform -> {
+        InstrumentModelDto dto = Dtos.asDto(platform);
+        dto.setActive(activePlatforms.contains(platform.getId()));
+        return dto;
+      });
+      createArray(mapper, node, "kitDescriptors", kitService.list(), Dtos::asDto);
+      createArray(mapper, node, "sampleClasses", sampleClassService.getAll(), Dtos::asDto);
+      createArray(mapper, node, "sampleValidRelationships", relationships, Dtos::asDto);
+      createArray(mapper, node, "detailedQcStatuses", detailedQcStatusService.getAll(), Dtos::asDto);
+      createArray(mapper, node, "sampleGroups", sampleGroupService.getAll(), Dtos::asDto);
+      createArray(mapper, node, "subprojects", subprojectService.list(), Dtos::asDto);
+      createArray(mapper, node, "labs", labService.list(), Dtos::asDto);
+      createArray(mapper, node, "tissueOrigins", tissueOriginService.list(), Dtos::asDto);
+      createArray(mapper, node, "tissueTypes", tissueTypeService.list(), Dtos::asDto);
+      createArray(mapper, node, "tissueMaterials", tissueMaterialService.list(), Dtos::asDto);
+      createArray(mapper, node, "stains", stainService.list(), Dtos::asDto);
+      createArray(mapper, node, "targetedSequencings", targetedSequencingService.list(), Dtos::asDto);
+      createArray(mapper, node, "samplePurposes", samplePurposeService.list(), Dtos::asDto);
+      createArray(mapper, node, "sequencingParameters", sequencingParametersService.list(), Dtos::asDto);
+      createArray(mapper, node, "printerBackends", Arrays.asList(Backend.values()), Dtos::asDto);
+      createArray(mapper, node, "printerDrivers", Arrays.asList(Driver.values()), Dtos::asDto);
+      createArray(mapper, node, "printerLayouts", Arrays.asList(Layout.values()), Dtos::asDto);
+      createArray(mapper, node, "boxSizes", boxSizeService.list(), Dtos::asDto);
+      createArray(mapper, node, "boxUses", boxUseService.list(), Dtos::asDto);
+      createArray(mapper, node, "studyTypes", studyTypeService.list(), Dtos::asDto);
+      createArray(mapper, node, "sampleCategories", SampleClass.CATEGORIES, Function.identity());
+      createArray(mapper, node, "submissionAction", Arrays.asList(SubmissionActionType.values()), SubmissionActionType::name);
+      createArray(mapper, node, "containerModels", containerModelService.list(), Dtos::asDto);
+      createArray(mapper, node, "poreVersions", containerService.listPoreVersions(), Dtos::asDto);
+      createArray(mapper, node, "spikeIns", librarySpikeInService.list(), Dtos::asDto);
+      createArray(mapper, node, "attachmentCategories", attachmentCategoryService.list(), Dtos::asDto);
+      createArray(mapper, node, "orderPurposes", orderPurposeService.list(), Dtos::asDto);
+      createArray(mapper, node, "sampleSheetFormats", Arrays.asList(SampleSheet.values()), SampleSheet::name);
 
-    Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
-    indexFamilies.add(IndexFamily.NULL);
-    createArray(mapper, node, "indexFamilies", indexFamilies, Dtos::asDto);
-    createArray(mapper, node, "qcTypes", qcService.listQcTypes(), Dtos::asDto);
-    createArray(mapper, node, "qcTargets", Arrays.asList(QcTarget.values()), Dtos::asDto);
-    createArray(mapper, node, "concentrationUnits", Arrays.asList(ConcentrationUnit.values()), Dtos::asDto);
-    createArray(mapper, node, "volumeUnits", Arrays.asList(VolumeUnit.values()), Dtos::asDto);
-    createArray(mapper, node, "partitionQcTypes", partitionQcTypeService.list(), Dtos::asDto);
-    createArray(mapper, node, "referenceGenomes", referenceGenomeService.list(), Dtos::asDto);
-    createArray(mapper, node, "spreadsheetFormats", Arrays.asList(SpreadSheetFormat.values()), Dtos::asDto);
-    createArray(mapper, node, "sampleSpreadsheets", Arrays.asList(SampleSpreadSheets.values()), Dtos::asDto);
-    createArray(mapper, node, "librarySpreadsheets", Arrays.asList(LibrarySpreadSheets.values()), Dtos::asDto);
-    createArray(mapper, node, "libraryAliquotSpreadsheets", Arrays.asList(LibraryAliquotSpreadSheets.values()), Dtos::asDto);
-    createArray(mapper, node, "poolSpreadsheets", Arrays.asList(PoolSpreadSheets.values()), Dtos::asDto);
-    createArray(mapper, node, "partitionSpreadsheets", Arrays.asList(PartitionSpreadsheets.values()), Dtos::asDto);
-    createArray(mapper, node, "workflows", Arrays.asList(WorkflowName.values()), Dtos::asDto);
+      Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
+      indexFamilies.add(IndexFamily.NULL);
+      createArray(mapper, node, "indexFamilies", indexFamilies, Dtos::asDto);
+      createArray(mapper, node, "qcTypes", qcService.listQcTypes(), Dtos::asDto);
+      createArray(mapper, node, "qcTargets", Arrays.asList(QcTarget.values()), Dtos::asDto);
+      createArray(mapper, node, "concentrationUnits", Arrays.asList(ConcentrationUnit.values()), Dtos::asDto);
+      createArray(mapper, node, "volumeUnits", Arrays.asList(VolumeUnit.values()), Dtos::asDto);
+      createArray(mapper, node, "partitionQcTypes", partitionQcTypeService.list(), Dtos::asDto);
+      createArray(mapper, node, "referenceGenomes", referenceGenomeService.list(), Dtos::asDto);
+      createArray(mapper, node, "spreadsheetFormats", Arrays.asList(SpreadSheetFormat.values()), Dtos::asDto);
+      createArray(mapper, node, "sampleSpreadsheets", Arrays.asList(SampleSpreadSheets.values()), Dtos::asDto);
+      createArray(mapper, node, "librarySpreadsheets", Arrays.asList(LibrarySpreadSheets.values()), Dtos::asDto);
+      createArray(mapper, node, "libraryAliquotSpreadsheets", Arrays.asList(LibraryAliquotSpreadSheets.values()), Dtos::asDto);
+      createArray(mapper, node, "poolSpreadsheets", Arrays.asList(PoolSpreadSheets.values()), Dtos::asDto);
+      createArray(mapper, node, "partitionSpreadsheets", Arrays.asList(PartitionSpreadsheets.values()), Dtos::asDto);
+      createArray(mapper, node, "workflows", Arrays.asList(WorkflowName.values()), Dtos::asDto);
 
-    ArrayNode platformTypes = node.putArray("platformTypes");
-    Collection<PlatformType> activePlatformTypes = instrumentModelService.listActivePlatformTypes();
-    for (PlatformType platformType : PlatformType.values()) {
-      ObjectNode dto = platformTypes.addObject();
-      dto.put("name", platformType.name());
-      dto.put("key", platformType.getKey());
-      dto.put("containerName", platformType.getContainerName());
-      dto.put("active", activePlatformTypes.contains(platformType));
-      dto.put("partitionName", platformType.getPartitionName());
-      dto.put("pluralPartitionName", platformType.getPluralPartitionName());
-    }
-    ArrayNode sampleTypes = node.putArray("sampleTypes");
-    for (SampleType sampleType : sampleTypeService.list()) {
-      if (!sampleType.isArchived()) {
-        sampleTypes.add(sampleType.getName());
+      ArrayNode platformTypes = node.putArray("platformTypes");
+      Collection<PlatformType> activePlatformTypes = instrumentModelService.listActivePlatformTypes();
+      for (PlatformType platformType : PlatformType.values()) {
+        ObjectNode dto = platformTypes.addObject();
+        dto.put("name", platformType.name());
+        dto.put("key", platformType.getKey());
+        dto.put("containerName", platformType.getContainerName());
+        dto.put("active", activePlatformTypes.contains(platformType));
+        dto.put("partitionName", platformType.getPartitionName());
+        dto.put("pluralPartitionName", platformType.getPluralPartitionName());
       }
-    }
-    ArrayNode donorSexes = node.putArray("donorSexes");
-    for (String label : DonorSex.getLabels()) {
-      donorSexes.add(label);
-    }
-    ArrayNode consentLevels = node.putArray("consentLevels");
-    for (ConsentLevel level : ConsentLevel.values()) {
-      consentLevels.add(level.getLabel());
-    }
-    ArrayNode strStatuses = node.putArray("strStatuses");
-    for (String label : StrStatus.getLabels()) {
-      strStatuses.add(label);
-    }
-    ArrayNode dilutionFactors = node.putArray("dilutionFactors");
-    for (String label : DilutionFactor.getLabels()) {
-      dilutionFactors.add(label);
-    }
-    ArrayNode healthTypes = node.putArray("healthTypes");
-    for (HealthType status : HealthType.values()) {
-      ObjectNode dto = healthTypes.addObject();
-      dto.put("label", status.getKey());
-      dto.put("allowedFromSequencer", status.isAllowedFromSequencer());
-      dto.put("isDone", status.isDone());
-    }
-    ArrayNode illuminaWorkflowTypes = node.putArray("illuminaWorkflowTypes");
-    for (IlluminaWorkflowType wf : IlluminaWorkflowType.values()) {
-      ObjectNode dto = illuminaWorkflowTypes.addObject();
-      dto.put("label", wf.getLabel());
-      dto.put("value", wf.getRawValue());
-    }
+      ArrayNode sampleTypes = node.putArray("sampleTypes");
+      for (SampleType sampleType : sampleTypeService.list()) {
+        if (!sampleType.isArchived()) {
+          sampleTypes.add(sampleType.getName());
+        }
+      }
+      ArrayNode donorSexes = node.putArray("donorSexes");
+      for (String label : DonorSex.getLabels()) {
+        donorSexes.add(label);
+      }
+      ArrayNode consentLevels = node.putArray("consentLevels");
+      for (ConsentLevel level : ConsentLevel.values()) {
+        consentLevels.add(level.getLabel());
+      }
+      ArrayNode strStatuses = node.putArray("strStatuses");
+      for (String label : StrStatus.getLabels()) {
+        strStatuses.add(label);
+      }
+      ArrayNode dilutionFactors = node.putArray("dilutionFactors");
+      for (String label : DilutionFactor.getLabels()) {
+        dilutionFactors.add(label);
+      }
+      ArrayNode healthTypes = node.putArray("healthTypes");
+      for (HealthType status : HealthType.values()) {
+        ObjectNode dto = healthTypes.addObject();
+        dto.put("label", status.getKey());
+        dto.put("allowedFromSequencer", status.isAllowedFromSequencer());
+        dto.put("isDone", status.isDone());
+      }
+      ArrayNode illuminaWorkflowTypes = node.putArray("illuminaWorkflowTypes");
+      for (IlluminaWorkflowType wf : IlluminaWorkflowType.values()) {
+        ObjectNode dto = illuminaWorkflowTypes.addObject();
+        dto.put("label", wf.getLabel());
+        dto.put("value", wf.getRawValue());
+      }
 
-    ObjectNode warningsNode = mapper.createObjectNode();
-    warningsNode.put("consentRevoked", "CONSENT REVOKED");
-    warningsNode.put("duplicateIndices", indexChecker.getErrorMismatchesMessage());
-    warningsNode.put("nearDuplicateIndices", indexChecker.getWarningMismatchesMessage());
-    warningsNode.put("lowQualityLibraries", "Low Quality Libraries");
-    warningsNode.put("missingIndex", "MISSING INDEX");
-    warningsNode.put("negativeVolume", "Negative Volume");
-    node.set("warningMessages", warningsNode);
-    node.put("errorEditDistance", indexChecker.getErrorMismatches());
-    node.put("warningEditDistance", indexChecker.getWarningMismatches());
+      ObjectNode warningsNode = mapper.createObjectNode();
+      warningsNode.put("consentRevoked", "CONSENT REVOKED");
+      warningsNode.put("duplicateIndices", indexChecker.getErrorMismatchesMessage());
+      warningsNode.put("nearDuplicateIndices", indexChecker.getWarningMismatchesMessage());
+      warningsNode.put("lowQualityLibraries", "Low Quality Libraries");
+      warningsNode.put("missingIndex", "MISSING INDEX");
+      warningsNode.put("negativeVolume", "Negative Volume");
+      node.set("warningMessages", warningsNode);
+      node.put("errorEditDistance", indexChecker.getErrorMismatches());
+      node.put("warningEditDistance", indexChecker.getWarningMismatches());
 
-    // Save the regenerated file in cache. This has a race condition where multiple concurrent requests could results in regenerating this
-    // file and updating the cache. Since the cache is two variables (data and time), they can also be torn. Given the nature of the cached
-    // data, we don't really care since the results are probably the same and jitter of a few seconds is a small error in cache time.
-    constantsJs = "Constants = " + mapper.writeValueAsString(node) + ";";
-    constantsTimestamp.set(System.currentTimeMillis() / 1000.0);
+      // Save the regenerated file in cache.
+      constantsJs = "Constants = " + mapper.writeValueAsString(node) + ";";
+      constantsTimestamp.set(System.currentTimeMillis() / 1000.0);
     } catch (IOException e) {
       throw new RestException(e);
     }
+  }
+
+  public synchronized void refreshConstants() {
+    final ScheduledFuture<?> current = future;
+    if (current != null && !current.isDone()) {
+      current.cancel(false);
+    }
+    // This will wait a few seconds after a save of an institute default; if another save comes along, it will cancel and wait again. If
+    // nothing saves again, it will rebuild the constants string.
+    future = executor.schedule(this::rebuildConstants, 15, TimeUnit.SECONDS);
   }
 
   @GetMapping("/accessDenied")

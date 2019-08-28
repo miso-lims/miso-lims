@@ -86,7 +86,6 @@ public class DefaultDetailedQcStatusService implements DetailedQcStatusService {
 
   @Override
   public Set<DetailedQcStatus> getAll() throws IOException {
-    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(detailedQcStatusDao.list());
   }
 

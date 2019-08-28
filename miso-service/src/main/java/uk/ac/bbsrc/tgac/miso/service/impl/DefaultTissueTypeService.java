@@ -79,7 +79,6 @@ public class DefaultTissueTypeService implements TissueTypeService {
 
   @Override
   public List<TissueType> list() throws IOException {
-    authorizationManager.throwIfUnauthenticated();
     return tissueTypeDao.list();
   }
 

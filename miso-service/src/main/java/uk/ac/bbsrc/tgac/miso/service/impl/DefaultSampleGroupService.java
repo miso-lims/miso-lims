@@ -75,7 +75,6 @@ public class DefaultSampleGroupService implements SampleGroupService {
 
   @Override
   public Set<SampleGroupId> getAll() throws IOException {
-    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(sampleGroupDao.getSampleGroups());
   }
 

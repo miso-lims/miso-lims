@@ -76,7 +76,6 @@ public class DefaultLabService implements LabService {
 
   @Override
   public List<Lab> list() throws IOException {
-    authorizationManager.throwIfUnauthenticated();
     return labDao.getLabs();
   }
 

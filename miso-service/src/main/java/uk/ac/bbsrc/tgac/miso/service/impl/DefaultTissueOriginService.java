@@ -113,7 +113,6 @@ public class DefaultTissueOriginService implements TissueOriginService {
 
   @Override
   public List<TissueOrigin> list() throws IOException {
-    authorizationManager.throwIfUnauthenticated();
     return tissueOriginDao.getTissueOrigin();
   }
 
