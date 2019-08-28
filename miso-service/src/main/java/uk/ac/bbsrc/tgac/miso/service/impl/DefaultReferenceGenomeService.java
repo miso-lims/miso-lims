@@ -51,7 +51,6 @@ public class DefaultReferenceGenomeService implements ReferenceGenomeService {
 
   @Override
   public List<ReferenceGenome> list() throws IOException {
-    authorizationManager.throwIfUnauthenticated();
     return referenceGenomeDao.list();
   }
 

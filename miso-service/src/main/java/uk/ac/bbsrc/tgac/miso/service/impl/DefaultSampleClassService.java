@@ -77,7 +77,6 @@ public class DefaultSampleClassService implements SampleClassService {
 
   @Override
   public Set<SampleClass> getAll() throws IOException {
-    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(sampleClassDao.getSampleClass());
   }
 

@@ -48,7 +48,6 @@ public class DefaultSampleValidRelationshipService implements SampleValidRelatio
 
   @Override
   public SampleValidRelationship get(Long sampleValidRelationshipId) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
     return sampleValidRelationshipDao.getSampleValidRelationship(sampleValidRelationshipId);
   }
 
@@ -82,7 +81,6 @@ public class DefaultSampleValidRelationshipService implements SampleValidRelatio
 
   @Override
   public Set<SampleValidRelationship> getAll() throws IOException {
-    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(sampleValidRelationshipDao.getSampleValidRelationship());
   }
 

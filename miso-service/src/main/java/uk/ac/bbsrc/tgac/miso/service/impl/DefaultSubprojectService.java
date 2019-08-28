@@ -72,7 +72,6 @@ public class DefaultSubprojectService implements SubprojectService {
 
   @Override
   public List<Subproject> list() throws IOException {
-    authorizationManager.throwIfUnauthenticated();
     return subprojectDao.getSubproject();
   }
 

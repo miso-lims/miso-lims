@@ -61,7 +61,6 @@ public class DefaultQcTypeService implements QcTypeService {
 
   @Override
   public Collection<QcType> getAll() throws IOException {
-    authorizationManager.throwIfUnauthenticated();
     return qcTypeStore.list();
   }
 
