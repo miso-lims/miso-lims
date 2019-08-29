@@ -411,6 +411,7 @@ FormTarget.library = (function($) {
     if (position === 1) {
       field.onChange = function(newValue, form) {
         var indexFamilyId = form.get('indexFamilyId');
+        if (!indexFamilyId) return;
         var indexFamily = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(indexFamilyId), Constants.indexFamilies);
         if (indexFamily.uniqueDualIndex) {
           var index1 = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), indexFamily.indices);

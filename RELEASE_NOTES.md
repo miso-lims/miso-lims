@@ -5,6 +5,7 @@ Changes:
   * Prevent linking of Pools with duplicate indices to Pool Orders
   * List Longest Index on Pool Orders page
   * Improve performance of downloading `/miso/constants.js`
+  * Fix error on Edit Library page when 'No indices' is selected
 
 
 # 0.2.188
