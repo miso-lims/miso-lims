@@ -1,10 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
@@ -23,9 +20,29 @@ import javax.persistence.TemporalType;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolOrderChangeLog;
 
 @Entity
-public class PoolOrder implements Deletable, Identifiable, Serializable, Timestamped {
+public class PoolOrder implements Deletable, Identifiable, Serializable, Timestamped, ChangeLoggable {
+
+  @OneToMany(targetEntity = PoolOrderChangeLog.class, mappedBy = "poolOrder", cascade = CascadeType.REMOVE)
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    PoolOrderChangeLog changeLog = new PoolOrderChangeLog();
+    changeLog.setPoolOrder(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
+  }
 
   public enum Status {
     OUTSTANDING("Outstanding"), DRAFT("Draft"), FULFILLED("Fulfilled");

@@ -19,11 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
-import uk.ac.bbsrc.tgac.miso.core.service.OrderPurposeService;
-import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
-import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.core.service.*;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -39,7 +35,6 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
 
   @Value("${miso.pools.strictIndexChecking:false}")
   private Boolean strictPools;
-
 
   @Autowired
   private PoolOrderDao poolOrderDao;
@@ -68,6 +63,9 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
   @Autowired
   private IndexChecker indexChecker;
 
+  @Autowired
+  private ChangeLogService changeLogService;
+
   @Override
   public DeletionStore getDeletionStore() {
     return deletionStore;
@@ -81,6 +79,10 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
   @Override
   public SaveDao<PoolOrder> getDao() {
     return poolOrderDao;
+  }
+
+  public void setChangeLogService(ChangeLogService changeLogService) {
+    this.changeLogService = changeLogService;
   }
 
   @Override
