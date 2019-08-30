@@ -227,6 +227,11 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
       }
     }
 
+    if(to.getPool() != from.getPool()) changeLogService.create(
+            to.createChangeLog(from.getPool() == null? "Pool unlinked."
+                            : "Associated pool: " + from.getPool().getAlias(),
+                    "poolId",
+                    authorizationManager.getCurrentUser()));
     to.setPool(from.getPool());
     to.setSequencingOrder(from.getSequencingOrder());
   }
