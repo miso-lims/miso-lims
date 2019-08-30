@@ -234,7 +234,7 @@ ListUtils = (function($) {
         $('<p>').attr('id', 'headerMessage').addClass('big big-' + (level || 'info')).css('margin-top', '.25em').text(text));
   };
 
-  var initTable = function(elementId, target, projectId, config, optionModifier) {
+  var initTable = function(elementId, target, projectId, config, optionModifier, selectAll) {
     var staticActions = target.createStaticActions(config, projectId);
     var bulkActions = target.createBulkActions(config, projectId);
     var columns = target.createColumns(config, projectId).filter(function(x) {
@@ -296,6 +296,29 @@ ListUtils = (function($) {
             }
           });
           updateSelectedLabel(state);
+        }
+      });
+      staticActions.push({
+        "name": "☑ All",
+        "title": "Select all on all pages",
+        "handler": function() {
+          if (jqTable.fnSettings().fnRecordsDisplay() > 10000) {
+            Utils.showOkDialog('Select all', [ 'Too many items selected.', 'Please use stricter filtering to limit to 10­000.' ]);
+            return;
+          }
+          var filterbox = $('#' + elementId + '_filter :input');
+          selectAll(errorMessage, filterbox.val(), function(data) {
+            var state = ListState[elementId];
+            state.lastId = -1;
+            state.selected = data;
+            state.data.forEach(function(item) {
+              var element = document.getElementById(elementId + "_toggle" + item.id);
+              if (element) {
+                element.checked = data.length > 0;
+              }
+            });
+            updateSelectedLabel(state);
+          });
         }
       });
       if (!projectId && target.getQueryUrl) {
@@ -508,12 +531,30 @@ ListUtils = (function($) {
             }
           });
         };
+      }, function(errorMessage, searchString, callback) {
+          Utils.ajaxWithDialog('Selecting', 'GET', target.createUrl(config, projectId) + "?" + jQuery.param({
+              iDisplayStart: 0,
+              iDisplayLength: 10000,
+              sSearch: searchString,
+              sSortDir_0: "asc",
+              iSortCol_0: 0,
+              mDataProp_0: "id",
+              sEcho: 0
+            }), null, function(data) {
+              errorMessage.innerText = data.sError;
+              errorMessage.style.visibility = data.sError ? "visible" : "hidden";
+              callback(data.aaData);
+            }, function() {
+              callback([]);
+            });
       });
     },
     createStaticTable: function(elementId, target, config, data) {
       initTable(elementId, target, null, config, function(options, jqTable, errorMessage, columns) {
         options.aaData = data;
         errorMessage.style.visibility = "hidden";
+      }, function(errorMessage, searchString, callback) {
+        callback(data);
       });
     },
     _checkEventHandler: function(isChecked, ev, data, elementId) {
