@@ -8,3 +8,4 @@ CREATE TABLE PoolOrderChangeLog (
   CONSTRAINT fk_poolOrderChangeLog_pool FOREIGN KEY (poolOrderId) REFERENCES PoolOrder(poolOrderId),
   CONSTRAINT fk_poolOrderChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
 ) Engine=InnoDB DEFAULT CHARSET=utf8;
+

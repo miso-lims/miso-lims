@@ -66,13 +66,13 @@ public class EditPoolOrderController {
     }
     model.put("title", "Pool Order " + orderId);
     model.put("pageMode", "edit");
-    model.put("poolOrder", order);
     return orderPage(order, model);
   }
 
   private ModelAndView orderPage(PoolOrder order, ModelMap model) throws JsonProcessingException {
     ObjectMapper mapper = new ObjectMapper();
     PoolOrderDto dto = Dtos.asDto(order, indexChecker);
+    model.put("poolOrder", order);
     model.put("orderDto", mapper.writeValueAsString(dto));
     model.put("libraryDtos", dto.getOrderAliquots());
     return new ModelAndView("/WEB-INF/pages/editPoolOrder.jsp", model);
