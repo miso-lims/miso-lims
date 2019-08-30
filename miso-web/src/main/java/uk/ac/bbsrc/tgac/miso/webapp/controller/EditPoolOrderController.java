@@ -66,6 +66,7 @@ public class EditPoolOrderController {
     }
     model.put("title", "Pool Order " + orderId);
     model.put("pageMode", "edit");
+    model.put("poolOrder", order);
     return orderPage(order, model);
   }
 
