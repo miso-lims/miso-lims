@@ -204,9 +204,45 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
 
   @Override
   protected void applyChanges(PoolOrder to, PoolOrder from) throws IOException {
+    // Properties not changelogged here are caught by SQL triggers
     to.setPartitions(from.getPartitions());
+
+    if (from.getParameters() == null && to.getParameters() != null) {
+      changeLogService.create(
+              to.createChangeLog("Sequencing Parameters deleted.",
+                      "parametersId",
+                      authorizationManager.getCurrentUser())
+      );
+    } else if(to.getParameters() == null && from.getParameters() != null){
+      changeLogService.create(
+              to.createChangeLog("New Sequencing Parameters:"
+                      + from.getParameters().getInstrumentModel().getAlias()
+                      + ", " + from.getParameters().getName(),
+                      "parametersId",
+                      authorizationManager.getCurrentUser())
+      );
+    } else if(to.getParameters() != null && from.getParameters() != null
+            && !to.getParameters().equals(from.getParameters())) {
+      changeLogService.create(
+              to.createChangeLog("Changed Sequencing Parameters: "
+                              + to.getParameters().getInstrumentModel().getAlias()
+                              + ", " + to.getParameters().getName()+ " to "
+                              + from.getParameters().getInstrumentModel().getAlias()
+                              + ", " + from.getParameters().getName(),
+                      "parametersId",
+                      authorizationManager.getCurrentUser())
+      );
+    }
     to.setParameters(from.getParameters());
     to.setAlias(from.getAlias());
+
+    if(!to.getPurpose().getAlias().equals(from.getPurpose().getAlias())) changeLogService.create(
+            to.createChangeLog("Changed Purpose: "
+                            + to.getPurpose().getAlias()
+                            + " to " + from.getPurpose().getAlias(),
+                    "purposeId",
+                    authorizationManager.getCurrentUser())
+    );
     to.setPurpose(from.getPurpose());
     to.setDescription(from.getDescription());
     to.setDraft(from.isDraft());
