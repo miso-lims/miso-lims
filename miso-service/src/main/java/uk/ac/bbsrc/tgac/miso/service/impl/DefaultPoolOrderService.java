@@ -290,12 +290,28 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
       }
     }
 
-    if(to.getPool() != from.getPool()) changeLogService.create(
-            to.createChangeLog(from.getPool() == null? "Pool unlinked."
-                            : "Associated pool: " + from.getPool().getAlias(),
-                    "poolId",
-                    authorizationManager.getCurrentUser()));
+    if(from.getPool() == null && to.getPool() != null){
+      changeLogService.create(to.createChangeLog("Pool unlinked.",
+              "poolId",
+              authorizationManager.getCurrentUser()));
+    }else if(to.getPool() == null && from.getPool() != null){
+      changeLogService.create(
+              to.createChangeLog("Associated pool: " + from.getPool().getAlias(),
+                      "poolId",
+                      authorizationManager.getCurrentUser()));
+    }
     to.setPool(from.getPool());
+
+    if(from.getSequencingOrder() == null && to.getSequencingOrder() != null){
+      changeLogService.create(to.createChangeLog("Sequencing order unlinked.",
+              "sequencingOrderId",
+              authorizationManager.getCurrentUser()));
+    }else if(to.getSequencingOrder() == null && from.getSequencingOrder() != null){
+      changeLogService.create(
+              to.createChangeLog("Associated sequencing order.",
+                      "sequencingOrderId",
+                      authorizationManager.getCurrentUser()));
+    }
     to.setSequencingOrder(from.getSequencingOrder());
   }
 
