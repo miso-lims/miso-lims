@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -19,11 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
-import uk.ac.bbsrc.tgac.miso.core.service.OrderPurposeService;
-import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
-import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.core.service.*;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -39,7 +36,6 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
 
   @Value("${miso.pools.strictIndexChecking:false}")
   private Boolean strictPools;
-
 
   @Autowired
   private PoolOrderDao poolOrderDao;
@@ -68,6 +64,9 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
   @Autowired
   private IndexChecker indexChecker;
 
+  @Autowired
+  private ChangeLogService changeLogService;
+
   @Override
   public DeletionStore getDeletionStore() {
     return deletionStore;
@@ -81,6 +80,10 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
   @Override
   public SaveDao<PoolOrder> getDao() {
     return poolOrderDao;
+  }
+
+  public void setChangeLogService(ChangeLogService changeLogService) {
+    this.changeLogService = changeLogService;
   }
 
   @Override
@@ -202,9 +205,45 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
 
   @Override
   protected void applyChanges(PoolOrder to, PoolOrder from) throws IOException {
+    // Properties not changelogged here are caught by SQL triggers
     to.setPartitions(from.getPartitions());
+
+    if (from.getParameters() == null && to.getParameters() != null) {
+      changeLogService.create(
+              to.createChangeLog("Sequencing Parameters deleted.",
+                      "parametersId",
+                      authorizationManager.getCurrentUser())
+      );
+    } else if(to.getParameters() == null && from.getParameters() != null){
+      changeLogService.create(
+              to.createChangeLog("New Sequencing Parameters:"
+                      + from.getParameters().getInstrumentModel().getAlias()
+                      + ", " + from.getParameters().getName(),
+                      "parametersId",
+                      authorizationManager.getCurrentUser())
+      );
+    } else if(to.getParameters() != null && from.getParameters() != null
+            && !to.getParameters().equals(from.getParameters())) {
+      changeLogService.create(
+              to.createChangeLog("Changed Sequencing Parameters: "
+                              + to.getParameters().getInstrumentModel().getAlias()
+                              + ", " + to.getParameters().getName()+ " to "
+                              + from.getParameters().getInstrumentModel().getAlias()
+                              + ", " + from.getParameters().getName(),
+                      "parametersId",
+                      authorizationManager.getCurrentUser())
+      );
+    }
     to.setParameters(from.getParameters());
     to.setAlias(from.getAlias());
+
+    if(!to.getPurpose().getAlias().equals(from.getPurpose().getAlias())) changeLogService.create(
+            to.createChangeLog("Changed Purpose: "
+                            + to.getPurpose().getAlias()
+                            + " to " + from.getPurpose().getAlias(),
+                    "purposeId",
+                    authorizationManager.getCurrentUser())
+    );
     to.setPurpose(from.getPurpose());
     to.setDescription(from.getDescription());
     to.setDraft(from.isDraft());
@@ -212,20 +251,67 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
     // remove from TO if library isn't in FROM
     // add to TO if library isn't in TO
     // update proportion in TO if different in FROM
-    to.getOrderLibraryAliquots().removeIf(toOrderAli -> from.getOrderLibraryAliquots().stream()
-        .noneMatch(fromOrderAli -> toOrderAli.getAliquot().getId() == fromOrderAli.getAliquot().getId()));
+    Set<Long> fromIds = new HashSet<>();
+    for (OrderLibraryAliquot fromOrderAli : from.getOrderLibraryAliquots()){
+      fromIds.add(fromOrderAli.getAliquot().getId());
+    }
+    Set<OrderLibraryAliquot> removed = new HashSet<>();
+    for (OrderLibraryAliquot toOrderAli : to.getOrderLibraryAliquots()){
+      if(!fromIds.contains(toOrderAli.getAliquot().getId())){
+        changeLogService.create(
+                to.createChangeLog("Removed Library Aliquot: " + toOrderAli.getAliquot().getAlias(),
+                        "aliquotId",
+                        authorizationManager.getCurrentUser())
+        );
+        removed.add(toOrderAli);
+      }
+    }
+    to.getOrderLibraryAliquots().removeAll(removed);
+
     for (OrderLibraryAliquot fromOrderAli : from.getOrderLibraryAliquots()) {
       OrderLibraryAliquot toOrderAli = to.getOrderLibraryAliquots().stream()
           .filter(lib -> lib.getAliquot().getId() == fromOrderAli.getAliquot().getId())
           .findFirst().orElse(null);
       if (toOrderAli == null) {
+        changeLogService.create(
+                to.createChangeLog("Added Library Aliquot: " + fromOrderAli.getAliquot().getAlias(),
+                        "aliquotId",
+                        authorizationManager.getCurrentUser())
+        );
         to.getOrderLibraryAliquots().add(fromOrderAli);
       } else {
+        if(toOrderAli.getProportion() != fromOrderAli.getProportion()) changeLogService.create(
+                to.createChangeLog(fromOrderAli.getAliquot().getAlias() + " proportion changed: "
+                                + toOrderAli.getProportion() + " to " + fromOrderAli.getProportion(),
+                        "aliquotId",
+                        authorizationManager.getCurrentUser())
+        );
         toOrderAli.setProportion(fromOrderAli.getProportion());
       }
     }
 
+    if(from.getPool() == null && to.getPool() != null){
+      changeLogService.create(to.createChangeLog("Pool unlinked.",
+              "poolId",
+              authorizationManager.getCurrentUser()));
+    }else if(to.getPool() == null && from.getPool() != null){
+      changeLogService.create(
+              to.createChangeLog("Associated pool: " + from.getPool().getAlias(),
+                      "poolId",
+                      authorizationManager.getCurrentUser()));
+    }
     to.setPool(from.getPool());
+
+    if(from.getSequencingOrder() == null && to.getSequencingOrder() != null){
+      changeLogService.create(to.createChangeLog("Sequencing order unlinked.",
+              "sequencingOrderId",
+              authorizationManager.getCurrentUser()));
+    }else if(to.getSequencingOrder() == null && from.getSequencingOrder() != null){
+      changeLogService.create(
+              to.createChangeLog("Associated sequencing order.",
+                      "sequencingOrderId",
+                      authorizationManager.getCurrentUser()));
+    }
     to.setSequencingOrder(from.getSequencingOrder());
   }
 

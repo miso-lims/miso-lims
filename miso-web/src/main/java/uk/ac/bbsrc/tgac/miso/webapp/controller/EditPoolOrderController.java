@@ -72,6 +72,7 @@ public class EditPoolOrderController {
   private ModelAndView orderPage(PoolOrder order, ModelMap model) throws JsonProcessingException {
     ObjectMapper mapper = new ObjectMapper();
     PoolOrderDto dto = Dtos.asDto(order, indexChecker);
+    model.put("poolOrder", order);
     model.put("orderDto", mapper.writeValueAsString(dto));
     model.put("libraryDtos", dto.getOrderAliquots());
     return new ModelAndView("/WEB-INF/pages/editPoolOrder.jsp", model);

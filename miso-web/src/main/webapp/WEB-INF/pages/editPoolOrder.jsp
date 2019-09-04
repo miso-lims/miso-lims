@@ -52,6 +52,10 @@
   });
 </script>
 
+<div class="noPrint">
+  <miso:changelog item="${poolOrder}"/>
+</div>
+
 </div>
 </div>
 
