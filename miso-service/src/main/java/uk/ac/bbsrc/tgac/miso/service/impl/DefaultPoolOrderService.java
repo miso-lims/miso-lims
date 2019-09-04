@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -250,15 +251,41 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
     // remove from TO if library isn't in FROM
     // add to TO if library isn't in TO
     // update proportion in TO if different in FROM
-    to.getOrderLibraryAliquots().removeIf(toOrderAli -> from.getOrderLibraryAliquots().stream()
-        .noneMatch(fromOrderAli -> toOrderAli.getAliquot().getId() == fromOrderAli.getAliquot().getId()));
+    Set<Long> fromIds = new HashSet<>();
+    for (OrderLibraryAliquot fromOrderAli : from.getOrderLibraryAliquots()){
+      fromIds.add(fromOrderAli.getAliquot().getId());
+    }
+    Set<OrderLibraryAliquot> removed = new HashSet<>();
+    for (OrderLibraryAliquot toOrderAli : to.getOrderLibraryAliquots()){
+      if(!fromIds.contains(toOrderAli.getAliquot().getId())){
+        changeLogService.create(
+                to.createChangeLog("Removed Library Aliquot: " + toOrderAli.getAliquot().getAlias(),
+                        "aliquotId",
+                        authorizationManager.getCurrentUser())
+        );
+        removed.add(toOrderAli);
+      }
+    }
+    to.getOrderLibraryAliquots().removeAll(removed);
+
     for (OrderLibraryAliquot fromOrderAli : from.getOrderLibraryAliquots()) {
       OrderLibraryAliquot toOrderAli = to.getOrderLibraryAliquots().stream()
           .filter(lib -> lib.getAliquot().getId() == fromOrderAli.getAliquot().getId())
           .findFirst().orElse(null);
       if (toOrderAli == null) {
+        changeLogService.create(
+                to.createChangeLog("Added Library Aliquot: " + fromOrderAli.getAliquot().getAlias(),
+                        "aliquotId",
+                        authorizationManager.getCurrentUser())
+        );
         to.getOrderLibraryAliquots().add(fromOrderAli);
       } else {
+        if(toOrderAli.getProportion() != fromOrderAli.getProportion()) changeLogService.create(
+                to.createChangeLog(fromOrderAli.getAliquot().getAlias() + " proportion changed: "
+                                + toOrderAli.getProportion() + " to " + fromOrderAli.getProportion(),
+                        "aliquotId",
+                        authorizationManager.getCurrentUser())
+        );
         toOrderAli.setProportion(fromOrderAli.getProportion());
       }
     }
