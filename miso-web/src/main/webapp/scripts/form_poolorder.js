@@ -216,7 +216,7 @@ FormTarget.poolorder = (function($) {
           controls.push(makeButton('Unlink Sequencing Order', unlinkSequencingOrder, form));
         } else {
           controls.push(makeButton('Unlink Pool', unlinkPool, form));
-          controls.push(makeButton('Create Sequencing Order', createSequencingOrder, form), makeButton('Link Sequencing Order',
+          if (object.status !== "Fulfilled") controls.push(makeButton('Create Sequencing Order', createSequencingOrder, form), makeButton('Link Sequencing Order',
               linkSequencingOrder, form));
         }
       } else {
