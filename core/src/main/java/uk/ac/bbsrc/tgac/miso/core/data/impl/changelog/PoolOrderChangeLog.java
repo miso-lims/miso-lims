@@ -12,8 +12,6 @@ import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 
 @Entity
