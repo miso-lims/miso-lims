@@ -9,21 +9,22 @@ FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
-        CASE WHEN (NEW.alias IS NULL) <> (OLD.alias IS NULL) OR NEW.alias <> OLD.alias THEN CONCAT('alias: ', COALESCE(OLD.alias, 'n/a'), ' → ', COALESCE(NEW.alias, 'n/a')) END,
+        CASE WHEN NEW.alias <> OLD.alias THEN CONCAT('alias: ', COALESCE(OLD.alias, 'n/a'), ' → ', COALESCE(NEW.alias, 'n/a')) END,
         CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN CONCAT('description: ', COALESCE(OLD.description, 'n/a'), ' → ', COALESCE(NEW.description, 'n/a')) END,
-        CASE WHEN (NEW.partitions IS NULL) <> (OLD.partitions IS NULL) OR NEW.partitions <> OLD.partitions THEN CONCAT('partitions: ', COALESCE(OLD.partitions, 'n/a'), ' → ', COALESCE(NEW.partitions, 'n/a')) END,         CASE WHEN (NEW.draft IS NULL) <> (OLD.draft IS NULL) OR NEW.draft <> OLD.draft THEN CONCAT('draft: ', IF(OLD.draft = 0, 'No', 'Yes'), ' → ', IF(NEW.draft = 0, 'No', 'Yes')) END,
-        CASE WHEN (NEW.createdBy IS NULL) <> (OLD.createdBy IS NULL) OR NEW.createdBy <> OLD.createdBy THEN CONCAT('created by: ', COALESCE(OLD.createdBy, 'n/a'), ' → ', COALESCE(NEW.createdBy, 'n/a')) END,
-        CASE WHEN (NEW.creationDate IS NULL) <> (OLD.creationDate IS NULL) OR NEW.creationDate <> OLD.creationDate THEN CONCAT('creation date: ', COALESCE(OLD.creationDate, 'n/a'), ' → ', COALESCE(NEW.creationDate, 'n/a')) END);
+        CASE WHEN (NEW.partitions IS NULL) <> (OLD.partitions IS NULL) OR NEW.partitions <> OLD.partitions THEN CONCAT('partitions: ', COALESCE(OLD.partitions, 'n/a'), ' → ', COALESCE(NEW.partitions, 'n/a')) END,
+        CASE WHEN NEW.draft <> OLD.draft THEN CONCAT('draft: ', IF(OLD.draft = 0, 'No', 'Yes'), ' → ', IF(NEW.draft = 0, 'No', 'Yes')) END,
+        CASE WHEN NEW.createdBy <> OLD.createdBy THEN CONCAT('created by: ', COALESCE(OLD.createdBy, 'n/a'), ' → ', COALESCE(NEW.createdBy, 'n/a')) END,
+        CASE WHEN NEW.creationDate <> OLD.creationDate THEN CONCAT('creation date: ', COALESCE(OLD.creationDate, 'n/a'), ' → ', COALESCE(NEW.creationDate, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO PoolOrderChangeLog(poolOrderId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.poolOrderId,
       COALESCE(CONCAT_WS(',',
-        CASE WHEN (NEW.alias IS NULL) <> (OLD.alias IS NULL) OR NEW.alias <> OLD.alias THEN 'alias' END,
+        CASE WHEN NEW.alias <> OLD.alias THEN 'alias' END,
         CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN 'description' END,
         CASE WHEN (NEW.partitions IS NULL) <> (OLD.partitions IS NULL) OR NEW.partitions <> OLD.partitions THEN 'partitions' END,
-        CASE WHEN (NEW.draft IS NULL) <> (OLD.draft IS NULL) OR NEW.draft <> OLD.draft THEN 'draft' END,
-        CASE WHEN (NEW.createdBy IS NULL) <> (OLD.createdBy IS NULL) OR NEW.createdBy <> OLD.createdBy THEN 'createdBy' END,
-        CASE WHEN (NEW.creationDate IS NULL) <> (OLD.creationDate IS NULL) OR NEW.creationDate <> OLD.creationDate THEN 'creationDate' END), ''),
+        CASE WHEN NEW.draft <> OLD.draft THEN 'draft' END,
+        CASE WHEN NEW.createdBy <> OLD.createdBy THEN 'createdBy' END,
+        CASE WHEN NEW.creationDate <> OLD.creationDate THEN 'creationDate' END), ''),
       NEW.updatedBy,
       log_message,
       NEW.lastUpdated);
