@@ -516,7 +516,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(lcmTubeColumns);
 
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("LCM Tube")));
-    HandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();// TODO: right here, everything goes to hell right here
     List<String> headings = table.getColumnHeadings();
     assertEquals(expectedHeadings.size(), headings.size());
     for (String col : expectedHeadings) {

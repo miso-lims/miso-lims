@@ -34,7 +34,7 @@ public class HandsOnTable extends AbstractElement {
   private static final By activeDropdownSelector = By.cssSelector("div.handsontableInputHolder[style*='block']");
   private static final By activeCellEditorSelector = By.cssSelector("div.handsontableInputHolder[style*='block'] > textarea");
   private static final By dropdownOptionRowsSelector = By.cssSelector("div.ht_master table.htCore > tbody > tr");
-  private final List<String> columnHeadings;
+  private List<String> columnHeadings;
   private final List<WebElement> inputRows;
   private final List<WebElement> lockedRows;
 
@@ -51,11 +51,21 @@ public class HandsOnTable extends AbstractElement {
   public HandsOnTable(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
-    this.columnHeadings = hotContainer.findElements(columnHeadingsSelector).stream()
-        .map(element -> element.getText().trim())
-        .collect(Collectors.toList());
+    setColumnHeadings();
+    activateColumns();
+    setColumnHeadings();
     this.inputRows = hotContainer.findElements(inputRowsSelector);
     this.lockedRows = hotContainer.findElements(lockedRowsSelector);
+  }
+
+  private void setColumnHeadings(){
+    this.columnHeadings = hotContainer.findElements(columnHeadingsSelector).stream()
+            .map(element -> element.getText().trim())
+            .collect(Collectors.toList());
+  }
+
+  private void activateColumns(){
+    hotContainer.findElements(inputCellSelector).stream().forEach(WebElement::click);
   }
 
   public List<String> getColumnHeadings() {
