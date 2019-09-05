@@ -10,7 +10,7 @@ SELECT DISTINCT r.alias
   ,createLog.changeTime
   ,updateLog.userId
   ,updateLog.changeTime
-  ,sp.paired AS paired
+  ,sp.readLength = sp.readLength2 AS paired
   ,sp.readLength AS read_length
   ,sp.name AS sequencingParameters
   ,ri.runBasesMask AS runBasesMask

@@ -110,16 +110,48 @@ public class RunScannerClient {
           Predicate<SequencingParameters> isMatchingSequencingParameters;
           switch (dto.getPlatformType()) {
           case ILLUMINA:
-            isMatchingSequencingParameters = params -> params.getInstrumentModel().getPlatformType() == PlatformType.ILLUMINA &&
-                Math.abs(params.getReadLength() - ((IlluminaNotificationDto) dto).getReadLength()) < 2
-                && params.isPaired() == ((IlluminaNotificationDto) dto).isPairedEndRun()
-                && params.getChemistry() == Dtos.getMisoIlluminaChemistryFromRunscanner(((IlluminaNotificationDto) dto).getChemistry());
+            isMatchingSequencingParameters = params -> {
+              IlluminaNotificationDto illuminaDto = (IlluminaNotificationDto) dto;
+              if (params.getInstrumentModel().getPlatformType() != PlatformType.ILLUMINA) {
+                return false;
+              }
+              if (params.getChemistry() != Dtos.getMisoIlluminaChemistryFromRunscanner(illuminaDto.getChemistry())) {
+                return false;
+              }
+              // If we are talking to an old Run Scanner that doens't provide read lengths, use the old logic
+              if (illuminaDto.getReadLengths() == null) {
+                // The read length must match the first read length
+                if (Math.abs(params.getReadLength() - illuminaDto.getReadLength()) < 2) {
+                  // if there is no second read length, then this must be single ended
+                  if (params.getReadLength2() == 0) {
+                    return !illuminaDto.isPairedEndRun();
+                  } else {
+                    // If there is, it must be paired and symmetric
+                    return illuminaDto.isPairedEndRun() && params.getReadLength() == params.getReadLength2();
+                  }
+                } else {
+                  return false;
+                }
+              }
+              // If we have real read lengths, check they match what we see from Run Scanner
+              if (illuminaDto.getReadLengths().size() == 0) {
+                return false;
+              }
+              if (Math.abs(params.getReadLength() - illuminaDto.getReadLengths().get(0)) > 1) {
+                return false;
+              }
+              // If no second read is provided, make sure none is required
+              if (illuminaDto.getReadLengths().size() == 1) {
+                return params.getReadLength2() == 0;
+              }
+              // Otherwise, check the second read matches the right length
+              return Math.abs(params.getReadLength2() - illuminaDto.getReadLengths().get(1)) < 2;
+            };
             break;
-            case OXFORDNANOPORE:
-              isMatchingSequencingParameters =
-                      params -> params.getInstrumentModel().getPlatformType() == PlatformType.OXFORDNANOPORE &&
-                      params.getRunType().equals(((OxfordNanoporeNotificationDto) dto).getRunType());
-              break;
+          case OXFORDNANOPORE:
+            isMatchingSequencingParameters = params -> params.getInstrumentModel().getPlatformType() == PlatformType.OXFORDNANOPORE &&
+                params.getRunType().equals(((OxfordNanoporeNotificationDto) dto).getRunType());
+            break;
           default:
             isMatchingSequencingParameters = params -> params.getInstrumentModel()
                 .getPlatformType() == Dtos.getMisoPlatformTypeFromRunscanner(dto.getPlatformType());
@@ -138,7 +170,8 @@ public class RunScannerClient {
           };
 
           Run notificationRun = Dtos.to(dto);
-          boolean isNew = runService.processNotification(notificationRun, dto.getLaneCount(), dto.getContainerModel(), dto.getContainerSerialNumber(),
+          boolean isNew = runService.processNotification(notificationRun, dto.getLaneCount(), dto.getContainerModel(),
+              dto.getContainerSerialNumber(),
               dto.getSequencerName(), isMatchingSequencingParameters, laneContents, dto.getSequencerPosition());
           (isNew ? saveNew : saveUpdate).inc();
           saveCount.inc();

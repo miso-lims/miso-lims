@@ -2,12 +2,18 @@
 
 Changes:
   * Add support to generate sample sheets for Illumina sequencers
+  * Allow first and second read lengths to be different for Illumina runs
 
 
 Upgrade notes:
 
 	* When generating sample sheets, the genome folder must be specified. In
 	  `miso.properties`, you may specify a default using `miso.genomeFolder`.
+	* Illumina runs can now have different first and second read lengths. The
+	  sequencing parameters should be updated if you have these asymmetric runs.
+	  Update `readLength` and `readLength2` in the `SequencingParameters` table
+	  as necessary. Single-ended and symmetric paired-end parameters will be
+	  upgraded automatically. These are often used for 10X runs.
 
 # 0.2.189
 

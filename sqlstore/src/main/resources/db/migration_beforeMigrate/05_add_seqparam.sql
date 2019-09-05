@@ -8,7 +8,7 @@ CREATE PROCEDURE addSequencingParameters(
   iPlatformName varchar(50),
   iInstrumentModel varchar(100),
   iReadLength int(11),
-  iPaired tinyint(1),
+  iReadLength2 int(11),
   iChemistry varchar(255)
 ) BEGIN
   DECLARE errorMessage varchar(300);
@@ -23,8 +23,8 @@ CREATE PROCEDURE addSequencingParameters(
   
   IF NOT EXISTS (SELECT 1 FROM SequencingParameters WHERE name = iName AND instrumentModelId = instModelId) THEN
     SET createUser = getAdminUserId();
-    INSERT INTO SequencingParameters(name, instrumentModelId, readLength, paired, createdBy, creationDate, updatedBy, lastUpdated, chemistry)
-    VALUES (iName, instModelId, iReadLength, iPaired, createUser, createTime, createUser, createTime, iChemistry);
+    INSERT INTO SequencingParameters(name, instrumentModelId, readLength, readLength2, createdBy, creationDate, updatedBy, lastUpdated, chemistry)
+    VALUES (iName, instModelId, iReadLength, iReadLength2, createUser, createTime, createUser, createTime, iChemistry);
   END IF;
 END//
 

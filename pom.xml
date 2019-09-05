@@ -646,7 +646,7 @@
       <dependency>
         <groupId>ca.on.oicr.gsi.runscanner</groupId>
         <artifactId>runscanner-dto</artifactId>
-        <version>1.6.2</version>
+        <version>1.8.0</version>
       </dependency>
       <dependency>
         <groupId>uk.ac.bbsrc.tgac.miso</groupId>
