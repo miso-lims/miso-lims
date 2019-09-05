@@ -44,6 +44,8 @@ public class PoolDto extends AbstractBoxableDto {
   private String distributionDate;
   private String distributionRecipient;
   private boolean mergeChild;
+  private boolean poolOrderMismatch;
+  private Long poolOrderId;
 
   public String getAlias() {
     return alias;
@@ -278,4 +280,8 @@ public class PoolDto extends AbstractBoxableDto {
   public void setMergeChild(boolean mergeChild) {
     this.mergeChild = mergeChild;
   }
+
+  public boolean isPoolOrderMismatch() { return poolOrderMismatch; }
+
+  public void setPoolOrderMismatch(boolean poolOrderMismatch) { this.poolOrderMismatch = poolOrderMismatch; }
 }

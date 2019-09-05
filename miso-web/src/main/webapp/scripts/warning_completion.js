@@ -45,6 +45,9 @@ WarningTarget.completion = {
         return element.identityConsentLevel === 'Revoked';
       }),
       tableMessage: Constants.warningMessages.consentRevoked
+    }, {
+      include: pool.poolOrderMismatch,
+      tableMessage: Constants.warningMessages.poolOrderMismatch
     }];
   }
 };

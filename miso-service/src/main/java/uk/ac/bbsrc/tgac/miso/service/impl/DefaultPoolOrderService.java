@@ -155,6 +155,8 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
     }
 
     if(strictPools) validateNoNewDuplicateIndices(object, beforeChange, errors);
+
+    //TODO: check if there's an associated Pool and if it still matches the Order, flip poolOrderMismatch on the Pool if it doesn't
   }
 
   private void validateNoNewDuplicateIndices(PoolOrder object, PoolOrder beforeChange, List<ValidationError> errors){
