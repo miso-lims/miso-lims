@@ -2,7 +2,7 @@ SELECT o.sequencingOrderId orderId
         ,lib.NAME libraryId 
         ,bc1.sequence barcode 
         ,bc2.sequence barcode_two 
-        ,sp.paired paired 
+        ,sp.readLength2 != 0 paired 
         ,sp.readLength read_length 
         ,tr.alias targeted_sequencing 
 FROM SequencingOrder o 

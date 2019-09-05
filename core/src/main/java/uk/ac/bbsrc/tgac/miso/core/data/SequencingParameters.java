@@ -50,8 +50,6 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
   private Date lastUpdated;
   @Column(nullable = false)
   private String name;
-  @Column(nullable = false)
-  private boolean paired;
   @Column
   private String runType;
 
@@ -64,6 +62,8 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
   private InstrumentModel instrumentModel;
   @Column(nullable = false)
   private int readLength;
+  @Column(nullable = false)
+  private int readLength2;
 
   @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "updatedBy", nullable = false)
@@ -107,10 +107,6 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
     return updatedBy;
   }
 
-  public boolean isPaired() {
-    return paired;
-  }
-
   public void setChemistry(IlluminaChemistry chemistry) {
     this.chemistry = chemistry;
   }
@@ -134,10 +130,6 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public void setPaired(boolean paired) {
-    this.paired = paired;
   }
 
   public void setInstrumentModel(InstrumentModel instrumentModel) {
@@ -219,8 +211,8 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
     result = prime * result + ((chemistry == null) ? 0 : chemistry.hashCode());
     result = prime * result + ((instrumentModel == null) ? 0 : instrumentModel.hashCode());
     result = prime * result + ((name == null) ? 0 : name.hashCode());
-    result = prime * result + (paired ? 1231 : 1237);
     result = prime * result + readLength;
+    result = prime * result + readLength2;
     result = prime * result + ((runType == null) ? 0 : runType.hashCode());
     return result;
   }
@@ -238,12 +230,20 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
     if (name == null) {
       if (other.name != null) return false;
     } else if (!name.equals(other.name)) return false;
-    if (paired != other.paired) return false;
     if (readLength != other.readLength) return false;
+    if (readLength2 != other.readLength2) return false;
     if (runType == null) {
       if (other.runType != null) return false;
     } else if (!runType.equals(other.runType)) return false;
     return true;
+  }
+
+  public int getReadLength2() {
+    return readLength2;
+  }
+
+  public void setReadLength2(int readLength2) {
+    this.readLength2 = readLength2;
   }
 
 }

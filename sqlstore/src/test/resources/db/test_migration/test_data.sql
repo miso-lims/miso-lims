@@ -452,8 +452,8 @@ INSERT INTO InstrumentModel(instrumentModelId, platform, alias, description, num
 (16, 'ILLUMINA', 'Illumina HiSeq 2000', '4-channel flowgram', 1, 'SEQUENCER'),
 (30, 'ILLUMINA', 'Illumina iScan', NULL, 1, 'ARRAY_SCANNER');
 
-INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, paired, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
-(2, 'Rapid Run 2x151', 16, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN');
+INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, readLength2, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
+(2, 'Rapid Run 2x151', 16, 151, 151, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN');
 
 DELETE FROM `Instrument`;
 INSERT INTO `Instrument`(`instrumentId`, `name`, `instrumentModelId`) VALUES

@@ -126,8 +126,8 @@ public enum IlluminaExperiment {
     output.append("[Header]\n");
     writeMap(header, output);
     output.append("\n[Reads]\n").append(parameters.getReadLength()).append("\n");
-    if (parameters.isPaired()) {
-      output.append(parameters.getReadLength()).append("\n");
+    if (parameters.getReadLength2() != 0) {
+      output.append(parameters.getReadLength2()).append("\n");
     }
 
     output.append("\n[Settings]\n");

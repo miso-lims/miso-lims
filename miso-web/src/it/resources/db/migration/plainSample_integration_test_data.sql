@@ -114,11 +114,11 @@ INSERT INTO InstrumentModel (instrumentModelId, platform, alias, numContainers, 
   (2, 'ILLUMINA', 'Illumina MiSeq', 1, 'SEQUENCER'),
   (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER');
   
-INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, paired, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
+INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, readLength2, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
   (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),
-  (2, 'Rapid Run 2x151', 1, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN'),
+  (2, 'Rapid Run 2x151', 1, 151, 151, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN'),
   (3, '1x151', 1, 151, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V4'),
-  (4, 'Micro 2x151', 2, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V3');
+  (4, 'Micro 2x151', 2, 151, 151, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V3');
 
 INSERT INTO Instrument (instrumentId, name, instrumentModelId) VALUES
   (1, 'T2500', 1);

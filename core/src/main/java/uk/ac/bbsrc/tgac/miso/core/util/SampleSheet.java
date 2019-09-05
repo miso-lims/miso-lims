@@ -40,8 +40,8 @@ public enum SampleSheet {
       final IlluminaRun r = (IlluminaRun) run;
       String reads = "";
       if (r.getSequencingParameters() != null) {
-        final String readLength = Integer.toString(r.getSequencingParameters().getReadLength());
-        reads = String.format("[Reads]\n%s\n%s\n\n", readLength, r.getSequencingParameters().isPaired() ? readLength : "");
+        reads = String.format("[Reads]\n%d\n%d\n\n", r.getSequencingParameters().getReadLength(),
+            r.getSequencingParameters().getReadLength2());
       }
       return String.format("[Header]\nDate,%s\n\n%s[Data]\n", DateTimeFormatter.ISO_DATE.format(ZonedDateTime.now()), reads);
     }
