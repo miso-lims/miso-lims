@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.eaglegenomics.simlims.core.User;
@@ -19,7 +18,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -252,12 +250,6 @@ public enum SampleSheet {
             partition.getSequencerPartitionContainer().getIdentificationBarcode(), aliquot, user.getLoginName()));
   }
 
-  private Stream<String> createRowsForPool(InstrumentModel model, User user, List<String> columns, int partitionNumber, Pool pool) {
-    return pool.getPoolContents().stream()//
-        .map(PoolElement::getPoolableElementView)
-        .flatMap(aliquot -> flattenRows(model, partitionNumber, "", aliquot, user.getLoginName()));
-  }
-
   public String createSampleSheet(Run run, User user) {
     final List<String> columns = getColumns().collect(Collectors.toList());
     return header(run) + Stream.concat(//
@@ -266,14 +258,6 @@ public enum SampleSheet {
             .flatMap(container -> container.getPartitions().stream())//
             .filter(partition -> partition.getPool() != null)//
             .flatMap(partition -> createRowsForPartition(run, user, columns, partition)))
-        .collect(Collectors.joining("\n"));
-  }
-
-  public String createSampleSheet(InstrumentModel model, List<Pool> pools, User user) {
-    final List<String> columns = getColumns().collect(Collectors.toList());
-    return header(model) + Stream.concat(//
-        Stream.of(String.join(",", columns)), //
-        IntStream.range(0, pools.size()).boxed().flatMap(i -> createRowsForPool(model, user, columns, i, pools.get(i))))
         .collect(Collectors.joining("\n"));
   }
 

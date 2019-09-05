@@ -124,6 +124,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
+import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -222,6 +223,8 @@ public class MenuController implements ServletContextAware {
   private Boolean autoGenerateIdBarcodes;
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
+  @Value("${miso.genomeFolder:}")
+  private String genomeFolder;
 
   @Resource
   private Boolean boxScannerEnabled;
@@ -394,6 +397,12 @@ public class MenuController implements ServletContextAware {
         dto.put("partitionName", platformType.getPartitionName());
         dto.put("pluralPartitionName", platformType.getPluralPartitionName());
       }
+      ArrayNode illuminaExperimentTypes = node.putArray("illuminaExperimentTypes");
+      for (IlluminaExperiment experiment : IlluminaExperiment.values()) {
+        ObjectNode dto = illuminaExperimentTypes.addObject();
+        dto.put("name", experiment.name());
+        dto.put("description", experiment.getDescription());
+      }
       ArrayNode sampleTypes = node.putArray("sampleTypes");
       for (SampleType sampleType : sampleTypeService.list()) {
         if (!sampleType.isArchived()) {
@@ -440,6 +449,7 @@ public class MenuController implements ServletContextAware {
       node.set("warningMessages", warningsNode);
       node.put("errorEditDistance", indexChecker.getErrorMismatches());
       node.put("warningEditDistance", indexChecker.getWarningMismatches());
+      node.put("genomeFolder", genomeFolder);
 
       // Save the regenerated file in cache.
       constantsJs = "Constants = " + mapper.writeValueAsString(node) + ";";

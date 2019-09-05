@@ -293,6 +293,12 @@ HotTarget.pool = (function() {
                ]);
                return;
              }
+             if (platformTypes[0] != "ILLUMINA") {
+               Utils.showOkDialog("Error", [
+                 "Can only create sample sheets for Illumina sequencers."
+               ]);
+               return;
+             }
              var instrumentModels = Constants.instrumentModels.filter(function(model) {
                return (
                  model.instrumentType == "SEQUENCER" &&
@@ -307,45 +313,70 @@ HotTarget.pool = (function() {
                ]);
                return;
              }
-             Utils.showDialog(
-               "Create Samplesheet",
-               "Download",
-               [
-                 {
-                   property: "format",
-                   label: "Format",
-                   required: true,
-                   type: "select",
-                   values: Constants.sampleSheetFormats
-                 },
-                 {
-                   property: "instrumentModel",
-                   label: "Instrument Model",
-                   required: true,
-                   type: "select",
-                   getLabel: Utils.array.getAlias,
-                   values: instrumentModels
-                 },
-                 {
-                   property: "pools",
-                   label: "Lanes Configuration",
-                   required: true,
-                   type: "order",
-                   getLabel: Utils.array.getAlias,
-                   values: pools
-                 }
-               ],
-               function(result) {
-                 Utils.ajaxDownloadWithDialog(
-                   "/miso/rest/pools/samplesheet/" + result.format,
+             function showCreateDialog(modelId) {
+               Utils.showDialog(
+                 "Create Samplesheet",
+                 "Download",
+                 [
                    {
-                     instrumentModelId: result.instrumentModel.id,
-                     poolIds: result.pools.map(Utils.array.getId)
+                     property: "experimentType",
+                     label: "Type",
+                     required: true,
+                     type: "select",
+                     getLabel: function(type) {
+                       return type.description;
+                     },
+                     values: Constants.illuminaExperimentTypes
+                   },
+                   {
+                     property: "sequencingParameters",
+                     label: "Sequencing Parameters",
+                     required: true,
+                     type: "select",
+                     getLabel: Utils.array.getName,
+                     values: Constants.sequencingParameters.filter(function(param) {
+                         return param.instrumentModel.id == modelId;
+                       })
+                   },
+                   {
+                     property: 'genomeFolder',
+                     type: 'text',
+                     label: 'Genome Folder',
+                     value: Constants.genomeFolder,
+                     required: true
+                   }, {
+                     property: "pools",
+                     label: "Lanes Configuration",
+                     required: true,
+                     type: "order",
+                     getLabel: Utils.array.getAlias,
+                     values: pools
                    }
-                 );
-               },
-               null
-             );
+                 ],
+                 function(result) {
+                   Utils.ajaxDownloadWithDialog(
+                     "/miso/rest/pools/samplesheet",
+                     {
+                       experimentType: result.experimentType.name,
+                       genomeFolder: result.genomeFolder,
+                       sequencingParametersId: result.sequencingParameters.id,
+                       poolIds: result.pools.map(Utils.array.getId)
+                     }
+                   );
+                 },
+                 null
+               );
+             }
+             Utils.showWizardDialog("Create Samplesheet", Constants.instrumentModels.filter(function(p) {
+               return p.platformType === platformTypes[0] && p.instrumentType === 'SEQUENCER' && p.active;
+             }).sort(Utils.sorting.standardSort('alias')).map(function(instrumentModel) {
+               return {
+                 name: instrumentModel.alias,
+                 handler: function() {
+                   showCreateDialog(instrumentModel.id);
+                 }
+               }
+             }));
            }
           },
           HotUtils.makeParents(Urls.rest.pools.parents, HotUtils.relationCategoriesForDetailed().concat(

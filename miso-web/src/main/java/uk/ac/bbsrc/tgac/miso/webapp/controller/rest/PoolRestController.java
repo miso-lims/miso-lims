@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -61,7 +60,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
-import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -71,6 +69,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
@@ -79,10 +78,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
-import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.ListPoolViewService;
@@ -90,10 +87,11 @@ import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderCompletionService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -142,23 +140,41 @@ public class PoolRestController extends RestController {
   }
 
   public static class SampleSheetRequest {
+    private String experimentType;
+    private String genomeFolder;
     private List<Long> poolIds;
-    private long instrumentModelId;
+    private long sequencingParametersId;
 
-    public long getInstrumentModelId() {
-      return instrumentModelId;
+    public String getExperimentType() {
+      return experimentType;
     }
 
-    public void setInstrumentModelId(long instrumentModelId) {
-      this.instrumentModelId = instrumentModelId;
+    public String getGenomeFolder() {
+      return genomeFolder;
     }
 
     public List<Long> getPoolIds() {
       return poolIds;
     }
 
+    public long getSequencingParametersId() {
+      return sequencingParametersId;
+    }
+
+    public void setExperimentType(String experimentType) {
+      this.experimentType = experimentType;
+    }
+
+    public void setGenomeFolder(String genomeFolder) {
+      this.genomeFolder = genomeFolder;
+    }
+
     public void setPoolIds(List<Long> poolIds) {
       this.poolIds = poolIds;
+    }
+
+    public void setSequencingParametersId(long sequencingParametersId) {
+      this.sequencingParametersId = sequencingParametersId;
     }
   }
 
@@ -177,8 +193,6 @@ public class PoolRestController extends RestController {
   };
 
   @Autowired
-  private AuthorizationManager authorizationManager;
-  @Autowired
   private ExperimentService experimentService;
   @Autowired
   private PoolService poolService;
@@ -187,13 +201,13 @@ public class PoolRestController extends RestController {
   @Autowired
   private RunService runService;
   @Autowired
-  private InstrumentModelService instrumentModelService;
-  @Autowired
   private ContainerService containerService;
   @Autowired
   private PoolableElementViewService poolableElementViewService;
   @Autowired
   private SequencingOrderCompletionService sequencingOrderCompletionService;
+  @Autowired
+  private SequencingParametersService sequencingParametersService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
@@ -540,16 +554,18 @@ public class PoolRestController extends RestController {
     return parentFinder.list(ids, category);
   }
 
-  @PostMapping(value = "/samplesheet/{format}")
+  @PostMapping(value = "/samplesheet")
   @ResponseBody
-  public HttpEntity<byte[]> samplesheet(@PathVariable("format") String format, @RequestBody SampleSheetRequest request,
+  public HttpEntity<byte[]> samplesheet(@RequestBody SampleSheetRequest request,
       HttpServletRequest httpRequest,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    SampleSheet samplesheet = SampleSheet.valueOf(format);
-    InstrumentModel instrumentModel = instrumentModelService.get(request.getInstrumentModelId());
-    response.setHeader("Content-Disposition", String.format("attachment; filename=SAMPLE_SHEET_%s.txt", Instant.now()));
-    return new HttpEntity<>(samplesheet.createSampleSheet(instrumentModel,
-        request.getPoolIds().stream().map(WhineyFunction.rethrow(poolService::get)).collect(Collectors.toList()),
-        authorizationManager.getCurrentUser()).getBytes(StandardCharsets.UTF_8));
+    IlluminaExperiment experiment = IlluminaExperiment.valueOf(request.getExperimentType());
+    SequencingParameters parameters = sequencingParametersService.get(request.getSequencingParametersId());
+    List<Pool> pools = request.getPoolIds().stream().map(WhineyFunction.rethrow(poolService::get)).collect(Collectors.toList());
+    response.setHeader("Content-Disposition", String.format("attachment; filename=%s-%s.csv", experiment.name(),
+        pools.stream().map(Pool::getAlias).collect(Collectors.joining("-"))));
+    return new HttpEntity<>(experiment.makeSampleSheet(request.getGenomeFolder(), parameters,
+        pools)
+        .getBytes(StandardCharsets.UTF_8));
   }
 }

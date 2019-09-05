@@ -1,8 +1,13 @@
 # Unreleased
 
 Changes:
+  * Add support to generate sample sheets for Illumina sequencers
 
 
+Upgrade notes:
+
+	* When generating sample sheets, the genome folder must be specified. In
+	  `miso.properties`, you may specify a default using `miso.genomeFolder`.
 
 # 0.2.189
 
