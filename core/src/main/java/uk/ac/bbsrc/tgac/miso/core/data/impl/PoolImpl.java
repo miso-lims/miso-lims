@@ -154,7 +154,10 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @PrimaryKeyJoinColumn
   private PoolBoxPosition boxPosition;
 
-  private Boolean qcPassed, poolOrderMismatch;
+  private Boolean qcPassed;
+
+  @Column(nullable = false)
+  private Boolean poolOrderMismatch;
 
   @Enumerated(EnumType.STRING)
   private ConcentrationUnit concentrationUnits;
@@ -165,9 +168,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @JoinTable(name = "Pool_Attachment", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
   private List<FileAttachment> attachments;
-
-  @OneToOne(targetEntity = PoolOrder.class, mappedBy = "poolOrderId")
-  private PoolOrder poolOrder;
 
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
@@ -235,28 +235,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   public boolean isMismatchedWithOrder() { return poolOrderMismatch; }
 
   @Override
-  public void checkMismatchedWithOrder() {
-    // Check that aliquot counts are same. Any mismatch fails check.
-    Set<OrderLibraryAliquot> poolOrderAliquots = poolOrder.getOrderLibraryAliquots();
-    if (poolOrderAliquots.size() != poolElements.size()) {
-      poolOrderMismatch = false;
-      return;
-    }
-
-    // Check all library aliquots and platform type. Only one mismatch is necessary for failure.
-    for(OrderLibraryAliquot ola : poolOrderAliquots){
-      LibraryAliquot orderInnerAliquot = ola.getAliquot();
-      for(PoolElement pe : poolElements){
-        LibraryAliquot poolInnerAliquot = pe.getPoolableElementView().getAliquot();
-        if(!(orderInnerAliquot.getLibrary().getPlatformType() == platformType
-                && orderInnerAliquot.equals(poolInnerAliquot))) {
-          poolOrderMismatch = true;
-          return;
-        }
-      }
-    }
-
-    poolOrderMismatch = false;
+  public void setMismatchedWithOrder(boolean b) {
+    poolOrderMismatch = b;
   }
 
   @Override
@@ -596,11 +576,4 @@ public class PoolImpl extends AbstractBoxable implements Pool {
         .map(view -> view.getSubprojectAlias()).collect(Collectors.toSet());
   }
 
-  public PoolOrder getPoolOrder() {
-    return poolOrder;
-  }
-
-  public void setPoolOrder(PoolOrder poolOrder) {
-    this.poolOrder = poolOrder;
-  }
 }

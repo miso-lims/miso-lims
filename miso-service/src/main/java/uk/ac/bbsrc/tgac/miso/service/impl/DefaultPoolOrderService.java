@@ -155,8 +155,6 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
     }
 
     if(strictPools) validateNoNewDuplicateIndices(object, beforeChange, errors);
-
-    //TODO: check if there's an associated Pool and if it still matches the Order, flip poolOrderMismatch on the Pool if it doesn't
   }
 
   private void validateNoNewDuplicateIndices(PoolOrder object, PoolOrder beforeChange, List<ValidationError> errors){
@@ -315,6 +313,9 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
                       authorizationManager.getCurrentUser()));
     }
     to.setSequencingOrder(from.getSequencingOrder());
+
+    //check if there's an associated Pool and if it still matches the Order
+    if(to.getPool() != null) poolService.checkMismatchedWithOrder(to.getPool());
   }
 
   @Override

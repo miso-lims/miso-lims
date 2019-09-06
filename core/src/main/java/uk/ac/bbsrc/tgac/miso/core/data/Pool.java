@@ -31,6 +31,7 @@ import java.util.Set;
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -242,5 +243,5 @@ public interface Pool
 
   public boolean isMismatchedWithOrder();
 
-  public void checkMismatchedWithOrder();
+  public void setMismatchedWithOrder(boolean b);
 }

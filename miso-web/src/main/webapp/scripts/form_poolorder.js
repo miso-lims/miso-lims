@@ -330,6 +330,7 @@ FormTarget.poolorder = (function($) {
   if(pool && (pool.duplicateIndices || pool.nearDuplicateIndices)){
     Utils.showOkDialog('Error', ['Selected pool contains duplicate or near duplicate indices.']);
   } else {
+
     form.updateField('poolId', {
       value: pool ? pool.id : null,
       label: pool ? pool.alias : 'not linked',

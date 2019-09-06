@@ -25,6 +25,9 @@ import com.eaglegenomics.simlims.core.Note;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -47,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolStore;
+import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -78,6 +82,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   private FileAttachmentService fileAttachmentService;
   @Autowired
   private IndexChecker indexChecker;
+  @Autowired
+  private PoolOrderService poolOrderService;
 
   public void setAutoGenerateIdBarcodes(boolean autoGenerateIdBarcodes) {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
@@ -443,5 +449,19 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     return poolStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
-
+  @Override
+  public void checkMismatchedWithOrder(Pool pool) throws IOException {
+    // Check equivalence for all library aliquots. Platform type /should/ logically follow so no explicit check
+    // Muffy, sis, the time complexity
+    PoolOrder poolOrder = poolOrderService.get(pool.getPoolOrderId());
+    Set<LibraryAliquot> poolOrderAliquots = poolOrder.getOrderLibraryAliquots().stream()
+            .map(OrderLibraryAliquot::getAliquot)
+            .collect(Collectors.toSet()),
+            poolAliquots = pool.getPoolContents().stream()
+                    .map(PoolElement::getPoolableElementView)
+                    .map(PoolableElementView::getAliquot)
+                    .collect(Collectors.toSet());
+    // Set.equals checks set size and equivalence of every set member
+    pool.setMismatchedWithOrder(!poolOrderAliquots.equals(poolAliquots));
+  }
 }
