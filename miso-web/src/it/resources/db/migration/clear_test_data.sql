@@ -56,7 +56,7 @@ DELETE FROM SampleAliquot;
 DELETE FROM SampleStockSingleCell;
 DELETE FROM SampleStock;
 DELETE FROM SampleSlide;
-DELETE FROM SampleLCMTube;
+DELETE FROM SampleTissuePiece;
 DELETE FROM SampleSingleCell;
 DELETE FROM SampleTissueProcessing;
 DELETE FROM SampleTissue;

@@ -15,7 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
@@ -25,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissuePieceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
@@ -192,8 +192,8 @@ public class OicrSampleAliasGeneratorTest {
     return child;
   }
 
-  private SampleLCMTube makeLcmTube() {
-    SampleLCMTube lcmTube = new SampleLCMTubeImpl();
+  private SampleTissuePiece makeLcmTube() {
+    SampleTissuePiece lcmTube = new SampleTissuePieceImpl();
     SampleTissue tissue = makeMinimalTissue();
     tissue.setAlias("PROJ_0001_nn_n_nn_1-1");
     lcmTube.setParent(tissue);

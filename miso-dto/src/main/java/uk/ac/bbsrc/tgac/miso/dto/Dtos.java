@@ -87,7 +87,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
@@ -96,6 +95,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
@@ -148,7 +148,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSingleCellImpl;
@@ -156,6 +155,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissuePieceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -197,6 +197,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.TissuePieceType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
@@ -592,12 +593,12 @@ public class Dtos {
         tissue.setParent(parent);
         parent = tissue;
 
-        if (childDto instanceof SampleLCMTubeDto) {
-          SampleLCMTubeDto lcm = (SampleLCMTubeDto) childDto;
-          if (lcm.getParentSlideClassId() != null) {
+        if (childDto instanceof SampleTissuePieceDto) {
+          SampleTissuePieceDto tissuePieceDto = (SampleTissuePieceDto) childDto;
+          if (tissuePieceDto.getParentSlideClassId() != null) {
             SampleSlide slide = new SampleSlideImpl();
             slide.setSampleClass(new SampleClassImpl());
-            slide.getSampleClass().setId(lcm.getParentSlideClassId());
+            slide.getSampleClass().setId(tissuePieceDto.getParentSlideClassId());
             slide.setSlides(0);
             slide.setParent(parent);
             parent = slide;
@@ -991,8 +992,8 @@ public class Dtos {
 
     if (isSampleSlide(from)) {
       return asSlideSampleDto((SampleSlide) from);
-    } else if (isLcmTubeSample(from)) {
-      return asLCMTubeSampleDto((SampleLCMTube) from);
+    } else if (isTissuePieceSample(from)) {
+      return asTissuePieceSampleDto((SampleTissuePiece) from);
     } else if (isProcessingSingleCellSample(from)) {
       return asSingleCellSampleDto((SampleSingleCell) from);
     } else {
@@ -1004,8 +1005,8 @@ public class Dtos {
     SampleTissueProcessing to = null;
     if (from.getClass() == SampleSlideDto.class) {
       to = toSlideSample((SampleSlideDto) from);
-    } else if (from.getClass() == SampleLCMTubeDto.class) {
-      to = toLCMTubeSample((SampleLCMTubeDto) from);
+    } else if (from.getClass() == SampleTissuePieceDto.class) {
+      to = toTissuePieceSample((SampleTissuePieceDto) from);
     } else if (from instanceof SampleSingleCellRelative) {
       to = toSingleCellSample((SampleSingleCellRelative) from);
     } else {
@@ -1046,9 +1047,10 @@ public class Dtos {
     return dto;
   }
 
-  private static SampleLCMTubeDto asLCMTubeSampleDto(@Nonnull SampleLCMTube from) {
-    SampleLCMTubeDto dto = new SampleLCMTubeDto();
+  private static SampleTissuePieceDto asTissuePieceSampleDto(@Nonnull SampleTissuePiece from) {
+    SampleTissuePieceDto dto = new SampleTissuePieceDto();
     dto.setSlidesConsumed(from.getSlidesConsumed());
+    dto.setTissuePieceTypeId(from.getTissuePieceType().getId());
     return dto;
   }
 
@@ -1059,8 +1061,11 @@ public class Dtos {
     return to;
   }
 
-  private static SampleLCMTube toLCMTubeSample(@Nonnull SampleLCMTubeDto from) {
-    SampleLCMTube to = new SampleLCMTubeImpl();
+  private static SampleTissuePiece toTissuePieceSample(@Nonnull SampleTissuePieceDto from) {
+    SampleTissuePiece to = new SampleTissuePieceImpl();
+    TissuePieceType tissuePieceType = new TissuePieceType();
+    tissuePieceType.setId(from.getTissuePieceTypeId());
+    to.setTissuePieceType(tissuePieceType);
     to.setSlidesConsumed(from.getSlidesConsumed());
     return to;
   }
@@ -1578,7 +1583,7 @@ public class Dtos {
     setDateTimeString(dto::setLastModified, from.getLastModified());
     return dto;
   }
-  
+
   private static DetailedLibraryAliquotDto asDetailedDto(DetailedLibraryAliquot from) {
     DetailedLibraryAliquotDto dto = new DetailedLibraryAliquotDto();
     setId(dto::setLibraryDesignCodeId, from.getLibraryDesignCode());
@@ -1737,9 +1742,9 @@ public class Dtos {
       dto.setPooledElements(Collections.emptySet());
       if (indexChecker != null) {
         dto.setDuplicateIndices(
-          indexChecker.getDuplicateIndicesSequences(from) != null && !indexChecker.getDuplicateIndicesSequences(from).isEmpty());
+            indexChecker.getDuplicateIndicesSequences(from) != null && !indexChecker.getDuplicateIndicesSequences(from).isEmpty());
         dto.setNearDuplicateIndices(
-          indexChecker.getNearDuplicateIndicesSequences(from) != null && !indexChecker.getNearDuplicateIndicesSequences(from).isEmpty());
+            indexChecker.getNearDuplicateIndicesSequences(from) != null && !indexChecker.getNearDuplicateIndicesSequences(from).isEmpty());
       }
     }
     dto.setHasEmptySequence(from.hasLibrariesWithoutIndex());
@@ -1769,7 +1774,7 @@ public class Dtos {
     setDateString(to::setCreationDate, from.getCreationTime());
     setString(to::setConcentration, from.getConcentration());
     to.setConcentrationUnits(from.getConcentrationUnits());
-      to.setPlatformType(from.getPlatformType().name());
+    to.setPlatformType(from.getPlatformType().name());
     if (from.getBoxId() != null) {
       to.setBox(new BoxDto());
       to.getBox().setId(from.getBoxId());
@@ -2377,7 +2382,7 @@ public class Dtos {
     case PACBIO:
       break;
     case OXFORDNANOPORE:
-      setOxfordNanoporeRunValues((OxfordNanoporeNotificationDto)from, (OxfordNanoporeRun)to);
+      setOxfordNanoporeRunValues((OxfordNanoporeNotificationDto) from, (OxfordNanoporeRun) to);
       break;
     case ILLUMINA:
       setIlluminaRunValues((IlluminaNotificationDto) from, (IlluminaRun) to);
@@ -2389,7 +2394,7 @@ public class Dtos {
   }
 
   private static void setOxfordNanoporeRunValues(@Nonnull OxfordNanoporeNotificationDto from,
-                                                 @Nonnull OxfordNanoporeRun to){
+      @Nonnull OxfordNanoporeRun to) {
     to.setMinKnowVersion(from.getSoftware());
     to.setProtocolVersion(from.getProtocolVersion());
   }
@@ -2469,7 +2474,7 @@ public class Dtos {
         view.setAliquotId(aliquot.getId());
         view.setAliquotName(aliquot.getName());
         view.setAliquotVolumeUsed(aliquot.getVolumeUsed() == null ? null : Double.valueOf(aliquot.getVolumeUsed()));
-  
+
         PoolElement link = new PoolElement(to, view);
         if (aliquot.getProportion() != null) {
           link.setProportion(aliquot.getProportion());
@@ -2479,7 +2484,7 @@ public class Dtos {
     }
     to.setQcPassed(dto.getQcPassed());
     to.setBoxPosition((PoolBoxPosition) makeBoxablePosition(dto, to));
-    if(dto.isMergeChild()) to.makeMergeChild();
+    if (dto.isMergeChild()) to.makeMergeChild();
     return to;
   }
 
@@ -3591,6 +3596,24 @@ public class Dtos {
     OrderPurpose to = new OrderPurpose();
     setLong(to::setId, from.getId(), false);
     setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
+  public static TissuePieceTypeDto asDto(@Nonnull TissuePieceType from) {
+    TissuePieceTypeDto to = new TissuePieceTypeDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setName, from.getName());
+    setString(to::setAbbreviation, from.getAbbreviation());
+    setBoolean(to::setArchived, from.getArchived(), true);
+    return to;
+  }
+
+  public static TissuePieceType to(@Nonnull TissuePieceTypeDto from) {
+    TissuePieceType to = new TissuePieceType();
+    if (from.getId() != null) to.setId(from.getId());
+    setString(to::setName, from.getName());
+    setString(to::setAbbreviation, from.getAbbreviation());
+    setBoolean(to::setArchived, from.isArchived(), false);
     return to;
   }
 

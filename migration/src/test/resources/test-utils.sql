@@ -13,7 +13,7 @@ BEGIN
     UNION SELECT 'SampleTissues',COUNT(*) FROM SampleTissue 
     UNION SELECT 'SampleTissueProcessings',COUNT(*) FROM SampleTissueProcessing 
     UNION SELECT 'SampleCVSlides',COUNT(*) FROM SampleCVSlide 
-    UNION SELECT 'SampleLCMTubes',COUNT(*) FROM SampleLCMTube 
+    UNION SELECT 'SampleTissuePieces',COUNT(*) FROM SampleTissuePiece 
     UNION SELECT 'SampleTissues',COUNT(*) FROM SampleTissue
     UNION SELECT 'SampleChangeLogs',COUNT(*) FROM SampleChangeLog
     UNION SELECT 'SampleQCs',COUNT(*) FROM SampleQC
@@ -65,7 +65,7 @@ BEGIN
     DELETE FROM Identity;
     DELETE FROM SampleTissue;
     DELETE FROM SampleCVSlide;
-    DELETE FROM SampleLCMTube;
+    DELETE FROM SampleTissuePiece;
     DELETE FROM SampleTissueProcessing;
     DELETE FROM SampleStock;
     DELETE FROM SampleAliquot;

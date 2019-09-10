@@ -36,7 +36,7 @@ DELETE FROM LibraryDesignCode;
 DELETE FROM SampleAliquot;
 DELETE FROM SampleStock;
 DELETE FROM SampleSlide;
-DELETE FROM SampleLCMTube;
+DELETE FROM SampleTissuePiece;
 DELETE FROM SampleTissueProcessing;
 DELETE FROM SampleTissue;
 DELETE FROM Identity;

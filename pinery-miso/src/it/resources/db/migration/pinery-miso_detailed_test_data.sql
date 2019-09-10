@@ -187,8 +187,8 @@ INSERT INTO SampleTissueProcessing(sampleId) VALUES
 INSERT INTO `SampleSlide` (sampleId, slides) VALUES
 (3, 15);
 
-INSERT INTO `SampleLCMTube` (sampleId, slidesConsumed) VALUES
-(5, 10);
+INSERT INTO `SampleTissuePiece` (sampleId, tissuePieceType, slidesConsumed) VALUES
+(5, 1, 10);
 
 INSERT INTO `SampleStock` (sampleId, strStatus, dnaseTreated) VALUES
 (6, 'SUBMITTED', 0),

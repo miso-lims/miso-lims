@@ -8,7 +8,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 
@@ -47,8 +47,8 @@ public class SampleSlideImpl extends SampleTissueProcessingImpl implements Sampl
     for (Sample child : getChildren()) {
       if (child == null) continue;
       child = deproxify(child);
-      if (child instanceof SampleLCMTube) {
-        Integer consumed = ((SampleLCMTube) child).getSlidesConsumed();
+      if (child instanceof SampleTissuePiece) {
+        Integer consumed = ((SampleTissuePiece) child).getSlidesConsumed();
         if (consumed != null) slidesConsumed += consumed;
       } else if (child instanceof SampleSlideImpl) {
         Integer consumed = ((SampleSlideImpl) child).getSlides();

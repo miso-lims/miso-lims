@@ -8,6 +8,7 @@ Changes:
   * Order configuration in Illumina sample sheets (some instruments are picky)
   * Fixed migration error in detailed sample Docker Compose demo
   * Improved performance of bulk entry forms
+  * Changed LCM tube to be a more generic _Tissue Piece_ that can have a type; by default, _LCM Tube_.
 
 # 0.2.191
 

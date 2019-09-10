@@ -39,7 +39,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
   private static final Set<String> curlsColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE);
 
-  private static final Set<String> lcmTubeColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.SLIDES_CONSUMED);
+  private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED);
 
   @Before
   public void setup() {
@@ -508,14 +508,14 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
   }
 
   @Test
-  public void testEditLcmTubeSetup() throws Exception {
+  public void testEditTissuePieceSetup() throws Exception {
     // Goal: ensure all expected fields are present, and no extra
     Set<String> expectedHeadings = Sets.newHashSet();
     expectedHeadings.addAll(commonColumns);
     expectedHeadings.addAll(boxableColumns);
-    expectedHeadings.addAll(lcmTubeColumns);
+    expectedHeadings.addAll(tissuePieceColumns);
 
-    BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("LCM Tube")));
+    BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Tissue Piece")));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     assertEquals(expectedHeadings.size(), headings.size());
@@ -531,7 +531,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     sampleIds.put("Tissue", 2L);
     sampleIds.put("Slide", 3L);
     sampleIds.put("Curls", 4L);
-    sampleIds.put("LCM Tube", 5L);
+    sampleIds.put("Tissue Piece", 5L);
     sampleIds.put("gDNA (stock)", 6L);
     sampleIds.put("whole RNA (stock)", 7L);
     sampleIds.put("gDNA (aliquot)", 8L);

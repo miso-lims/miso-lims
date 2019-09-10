@@ -227,6 +227,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.GROUP_ID, "1");
     attrs.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     attrs.put(SamColumns.SLIDES_CONSUMED, "1");
+    attrs.put(SamColumns.PIECE_TYPE, "LCM Tube");
     attrs.put(SamColumns.QC_STATUS, "Ready");
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
@@ -234,7 +235,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     // add in fields that are read-only
     attrs.put(SamColumns.PARENT_ALIAS, "PROP_0001_nn_n_1-1_SL01");
     attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "Slide");
-    attrs.put(SamColumns.SAMPLE_CLASS, "LCM Tube");
+    attrs.put(SamColumns.SAMPLE_CLASS, "Tissue Piece");
 
     attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
     saveSingleAndAssertSuccess(table);
@@ -268,7 +269,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
 
     // add in fields that are read-only
     attrs.put(SamColumns.PARENT_ALIAS, "PROP_0001_nn_n_1-1_LCM01");
-    attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "LCM Tube");
+    attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "Tissue Piece");
     attrs.put(SamColumns.SAMPLE_CLASS, "gDNA (stock)");
 
     attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));

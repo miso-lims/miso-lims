@@ -32,12 +32,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
@@ -73,6 +73,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
+import uk.ac.bbsrc.tgac.miso.persistence.TissuePieceTypeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
 
 @Transactional(rollbackFor = Exception.class)
@@ -127,6 +128,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   private SamplePurposeDao samplePurposeDao;
   @Autowired
   private TissueMaterialDao tissueMaterialDao;
+  @Autowired
+  private TissuePieceTypeDao tissuePieceTypeDao;
   @Autowired
   private DeletionStore deletionStore;
   @Autowired
@@ -503,10 +506,10 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     parent.setVolumeUnits(VolumeUnit.MICROLITRES);
     parent.setSynthetic(true);
     if (child.getIdentityId() != null) parent.setIdentityId(child.getIdentityId());
-    if (isLcmTubeSample(child)) {
+    if (isTissuePieceSample(child)) {
       SampleSlide parentSlides = (SampleSlide) parent;
       Integer slides = parentSlides.getSlides() == null ? 0 : parentSlides.getSlides();
-      slides += ((SampleLCMTube) child).getSlidesConsumed();
+      slides += ((SampleTissuePiece) child).getSlidesConsumed();
       parentSlides.setSlides(slides);
       parentSlides.setDiscards(0);
       if (parentSlides.getId() != SampleImpl.UNSAVED_ID) {
@@ -626,7 +629,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       if (sai.getSubproject() != null && sai.getSubproject().isSaved()) {
         sai.setSubproject(subProjectDao.getSubproject(sai.getSubproject().getId()));
       }
-      if (isTissueProcessingSample(sai) && sai instanceof SampleSlide) {
+      if (isTissueProcessingSample(sai)) {
+        if (sai instanceof SampleSlide) {
         Stain originalStain = ((SampleSlide) sai).getStain();
         Stain stain;
         if (originalStain == null) {
@@ -635,6 +639,10 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
           stain = stainService.get(originalStain.getId());
         }
         ((SampleSlide) sai).setStain(stain);
+      }
+        else if (sai instanceof SampleTissuePiece) {
+          ((SampleTissuePiece) sai).setTissuePieceType(tissuePieceTypeDao.get(((SampleTissuePiece) sai).getTissuePieceType().getId()));
+        }
       }
       if (isAliquotSample(sai)) {
         SampleAliquot sa = (SampleAliquot) sai;
@@ -837,8 +845,9 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       ((SampleSlide) target).setDiscards(((SampleSlide) source).getDiscards());
       ((SampleSlide) target).setThickness(((SampleSlide) source).getThickness());
       ((SampleSlide) target).setStain(((SampleSlide) source).getStain());
-    } else if (source instanceof SampleLCMTube) {
-      ((SampleLCMTube) target).setSlidesConsumed(((SampleLCMTube) source).getSlidesConsumed());
+    } else if (source instanceof SampleTissuePiece) {
+      ((SampleTissuePiece) target).setSlidesConsumed(((SampleTissuePiece) source).getSlidesConsumed());
+      ((SampleTissuePiece) target).setTissuePieceType(((SampleTissuePiece) source).getTissuePieceType());
     } else if (source instanceof SampleSingleCell) {
       ((SampleSingleCell) target).setInitialCellConcentration(((SampleSingleCell) source).getInitialCellConcentration());
       ((SampleSingleCell) target).setDigestion(((SampleSingleCell) source).getDigestion());

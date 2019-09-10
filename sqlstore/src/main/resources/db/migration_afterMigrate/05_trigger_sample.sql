@@ -144,13 +144,14 @@ FOR EACH ROW
   END IF;
   END//
 
-DROP TRIGGER IF EXISTS SampleLCMTubeChange//
-CREATE TRIGGER SampleLCMTubeChange BEFORE UPDATE ON SampleLCMTube
+DROP TRIGGER IF EXISTS SampleTissuePieceChange//
+CREATE TRIGGER SampleTissuePieceChange BEFORE UPDATE ON SampleTissuePiece
 FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
-     CASE WHEN NEW.slidesConsumed <> OLD.slidesConsumed THEN CONCAT('slides: ', OLD.slidesConsumed, ' → ', NEW.slidesConsumed) END);
+     CASE WHEN NEW.slidesConsumed <> OLD.slidesConsumed THEN CONCAT('slides: ', OLD.slidesConsumed, ' → ', NEW.slidesConsumed) END,
+     CASE WHEN NEW.tissuePieceType <> OLD.tissuePieceType THEN CONCAT('type: ', (SELECT name FROM TissuePieceType WHERE tissuePieceTypeId = OLD.tissuePieceType), ' → ', (SELECT name FROM TissuePieceType WHERE tissuePieceTypeId = NEW.tissuePieceType)) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
     SELECT
