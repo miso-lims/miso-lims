@@ -122,6 +122,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.core.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueOriginService;
+import uk.ac.bbsrc.tgac.miso.core.service.TissuePieceTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
@@ -167,6 +168,8 @@ public class MenuController implements ServletContextAware {
   private TissueOriginService tissueOriginService;
   @Autowired
   private TissueTypeService tissueTypeService;
+  @Autowired
+  private TissuePieceTypeService tissuePieceTypeService;
   @Autowired
   private LibraryTypeService libraryTypeService;
   @Autowired
@@ -353,6 +356,7 @@ public class MenuController implements ServletContextAware {
       createArray(mapper, node, "tissueOrigins", tissueOriginService.list(), Dtos::asDto);
       createArray(mapper, node, "tissueTypes", tissueTypeService.list(), Dtos::asDto);
       createArray(mapper, node, "tissueMaterials", tissueMaterialService.list(), Dtos::asDto);
+      createArray(mapper, node, "tissuePieceTypes", tissuePieceTypeService.list(), Dtos::asDto);
       createArray(mapper, node, "stains", stainService.list(), Dtos::asDto);
       createArray(mapper, node, "targetedSequencings", targetedSequencingService.list(), Dtos::asDto);
       createArray(mapper, node, "samplePurposes", samplePurposeService.list(), Dtos::asDto);

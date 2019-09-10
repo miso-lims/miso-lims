@@ -14,7 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -24,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissuePieceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
@@ -143,7 +143,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertEntityAttribute(SamColumns.STAIN, attributes, sample, s -> s.getStain() == null ? "(None)" : s.getStain().getName());
   }
 
-  protected void assertLcmTubeAttributes(Map<String, String> attributes, SampleLCMTube sample) {
+  protected void assertLcmTubeAttributes(Map<String, String> attributes, SampleTissuePiece sample) {
     assertEntityAttribute(SamColumns.SLIDES_CONSUMED, attributes, sample, s -> s.getSlidesConsumed().toString());
   }
 
@@ -210,7 +210,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertAllForLcmTube(Map<String, String> lcmTube, Long sampleId, boolean newlyCreated) {
-    SampleLCMTube target = (SampleLCMTube) getSession().get(SampleLCMTubeImpl.class, sampleId);
+    SampleTissuePiece target = (SampleTissuePiece) getSession().get(SampleTissuePieceImpl.class, sampleId);
 
     assertPlainSampleAttributes(lcmTube, target, newlyCreated);
     assertDetailedSampleAttributes(lcmTube, target);

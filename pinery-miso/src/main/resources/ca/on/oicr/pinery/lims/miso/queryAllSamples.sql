@@ -54,7 +54,7 @@ SELECT s.alias NAME
         ,slide.slides slides
         ,slide.discards discards
         ,stain.name stain
-        ,lcm.slidesConsumed slides_consumed
+        ,piece.slidesConsumed slides_consumed
         ,NULL pdac
         ,sai.isSynthetic isSynthetic
         ,s.distributed distributed
@@ -78,7 +78,7 @@ LEFT JOIN Institute it ON la.instituteId = it.instituteId
 LEFT JOIN SampleStock ss ON sai.sampleId = ss.sampleId
 LEFT JOIN SampleSlide slide ON slide.sampleId = s.sampleId
 LEFT JOIN Stain stain ON stain.stainId = slide.stain
-LEFT JOIN SampleLCMTube lcm ON lcm.sampleId = s.sampleId
+LEFT JOIN SampleTissuePiece piece ON piece.sampleId = s.sampleId
 LEFT JOIN (
 	    SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
 	    FROM (

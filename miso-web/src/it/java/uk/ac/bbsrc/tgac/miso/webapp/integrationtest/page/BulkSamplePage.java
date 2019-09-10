@@ -52,6 +52,7 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String DISCARDS = "Discards";
     public static final String THICKNESS = "Thickness";
     public static final String STAIN = "Stain";
+    public static final String PIECE_TYPE = "Piece Type";
     public static final String SLIDES_CONSUMED = "Slides Consumed";
     public static final String STR_STATUS = "STR Status";
     public static final String VOLUME = "Volume";

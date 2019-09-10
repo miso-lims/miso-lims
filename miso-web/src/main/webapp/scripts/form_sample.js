@@ -396,8 +396,8 @@ FormTarget.sample = (function($) {
               }
             }]
           }, {
-            title: 'LCM Tube',
-            include: config.detailedSample && object.sampleSubcategory === 'LCM Tube',
+            title: 'Tissue Pieces',
+            include: config.detailedSample && object.sampleSubcategory === 'Tissue Piece',
             fields: [{
               title: 'Slides Consumed',
               data: 'slidesConsumed',

@@ -62,12 +62,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -92,12 +92,12 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleIdentityDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleLCMTubeDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleSlideDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleTissuePieceDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
@@ -381,8 +381,8 @@ public class EditSampleController {
     case SampleTissueProcessing.CATEGORY_NAME:
       if (SampleSlide.SUBCATEGORY_NAME.equals(target.getSampleSubcategory())) {
         detailedTemplate = new SampleSlideDto();
-      } else if (SampleLCMTube.SUBCATEGORY_NAME.equals(target.getSampleSubcategory())) {
-        detailedTemplate = new SampleLCMTubeDto();
+      } else if (SampleTissuePiece.SUBCATEGORY_NAME.equals(target.getSampleSubcategory())) {
+        detailedTemplate = new SampleTissuePieceDto();
       } else if (SampleSingleCell.SUBCATEGORY_NAME.equals(target.getSampleSubcategory())) {
         detailedTemplate = new SampleSingleCellDto();
       } else {

@@ -88,7 +88,7 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleLCMTubeDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleTissuePieceDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
@@ -229,8 +229,8 @@ public class SampleRestController extends RestController {
     } else if (sampleDto instanceof SampleTissueProcessingDto) {
       DetailedSampleDto dto = (DetailedSampleDto) sampleDto;
       Long topProcessingClassId = dto.getSampleClassId();
-      if (sampleDto instanceof SampleLCMTubeDto) {
-        SampleLCMTubeDto lcmDto = (SampleLCMTubeDto) dto;
+      if (sampleDto instanceof SampleTissuePieceDto) {
+        SampleTissuePieceDto lcmDto = (SampleTissuePieceDto) dto;
         // Some hierarchies have two Tissue Processing levels
         lcmDto.setParentSlideClassId(inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleTissueProcessing.CATEGORY_NAME,
             SampleTissueProcessing.CATEGORY_NAME, true));

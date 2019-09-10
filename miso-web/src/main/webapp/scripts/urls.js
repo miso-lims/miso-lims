@@ -458,6 +458,17 @@ Urls = (function() {
     update: idUrlFunction(tissueOriginRestBase)
   };
 
+  // Tissue Piece Types
+  var tissuePieceTypesRestBase = restBase + '/tissuepiecetypes';
+  rest.tissuePieceTypes = {
+    create: tissuePieceTypesRestBase,
+    update: idUrlFunction(tissuePieceTypesRestBase)
+  };
+  var tissuePieceTypesUiBase = baseUrl + '/tissuepiecetype';
+  ui.tissuePieceTypes = {
+    bulkEdit: tissuePieceTypesUiBase + '/bulk/edit',
+  };
+
   // Tissue Types
   var tissueTypeRestBase = restBase + '/tissuetypes';
   rest.tissueTypes = {

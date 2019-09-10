@@ -86,4 +86,8 @@ public class Pluralizer {
     return count == 1 ? singular : plural;
   }
 
+  public static String tissuePiece(long count) {
+    return pluralize(count, "tissue piece", "tissue pieces");
+  }
+
 }

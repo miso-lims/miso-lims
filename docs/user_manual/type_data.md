@@ -112,7 +112,7 @@ Note: This item only applies if your site uses [detailed sample mode](site_confi
 Tissue materials describe how the tissue was prepared and may include options such as 'Fresh Frozen,' 'FFPE,' and 'Blood.'
 Tissue material is an optional field for tissue samples.
 
-Any user can add tissue materials using the standard inerface. MISO administrators can also edit and delete tissue
+Any user can add tissue materials using the standard interface. MISO administrators can also edit and delete tissue
 materials. A tissue material can only be deleted if the option has not been used by any existing samples.
 
 {% include userman-toplink.md %}
@@ -129,6 +129,25 @@ include 'Brain,' 'Lung,' and 'Pancreas.'
 
 MISO administrators can add, edit, and delete tissue origins using the standard interface. A tissue origin can only be
 deleted if the option has not been used by any existing samples.
+
+{% include userman-toplink.md %}
+
+
+{% assign sub = sub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Tissue Piece Types" %}
+
+Note: This item only applies if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
+
+For tissue processing, slides can be made and then used for various other
+preparations (e.g., LCM). A tissue piece is a sample class that consumes slides
+to produce some new thing. The tissue piece type is the type of these new
+things. By default, _LCM Tube_ is created for laser-captured microdissection,
+but curls, macrodissections, and extracted nuceli are other procedures in this
+category.
+
+MISO administrators can add, edit, and delete tissue piece types using the
+standard interface. A tissue piece type can only be deleted if the option has
+not been used by any existing samples.
 
 {% include userman-toplink.md %}
 

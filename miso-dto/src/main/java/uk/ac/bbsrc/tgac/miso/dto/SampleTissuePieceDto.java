@@ -1,15 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 
-@JsonTypeName(value = SampleLCMTube.SUBCATEGORY_NAME)
-public class SampleLCMTubeDto extends SampleTissueProcessingDto {
+@JsonTypeName(value = SampleTissuePiece.SUBCATEGORY_NAME)
+public class SampleTissuePieceDto extends SampleTissueProcessingDto {
 
   private Integer slidesConsumed;
   private Long parentSlideClassId;
+  private Long tissuePieceTypeId;
 
   public Integer getSlidesConsumed() {
     return slidesConsumed;
@@ -25,6 +25,14 @@ public class SampleLCMTubeDto extends SampleTissueProcessingDto {
 
   public void setParentSlideClassId(Long parentSlideClassId) {
     this.parentSlideClassId = parentSlideClassId;
+  }
+
+  public Long getTissuePieceTypeId() {
+    return tissuePieceTypeId;
+  }
+
+  public void setTissuePieceTypeId(Long tissuePieceTypeId) {
+    this.tissuePieceTypeId = tissuePieceTypeId;
   }
 
 }

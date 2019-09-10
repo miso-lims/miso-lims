@@ -503,10 +503,10 @@ HotTarget.sample = (function() {
           },
           HotUtils.makeColumnForText('Group ID', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupId', {
             validator: HotUtils.validator.optionalTextAlphanumeric
-          }, config.targetSampleClass && config.targetSampleClass.sampleSubcategory === 'LCM Tube' && config.pageMode != 'edit'
+          }, config.targetSampleClass && config.targetSampleClass.sampleSubcategory === 'Tissue Piece' && config.pageMode != 'edit'
               ? config.defaultLcmTubeGroupId : null),
           HotUtils.makeColumnForText('Group Desc.', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupDescription', {},
-              config.targetSampleClass && config.targetSampleClass.sampleSubcategory === 'LCM Tube' && config.pageMode != 'edit'
+              config.targetSampleClass && config.targetSampleClass.sampleSubcategory === 'Tissue Piece' && config.pageMode != 'edit'
                   ? config.defaultLcmTubeGroupDescription : null),
           {
             header: 'Date of Creation',
@@ -596,18 +596,22 @@ HotTarget.sample = (function() {
             include: show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Slide'
           },
 
-          // Tissue Processing: LCM Tube columns
-          HotUtils.makeColumnForInt('Slides Consumed',
-              (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'LCM Tube'), 'slidesConsumed', HotUtils.validator
-                  .integer(true, 0)),
+          // Tissue Processing: Tissue Piece columns
+          HotUtils.makeAutocompleteColumnForConstantsList('Piece Type', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Tissue Piece'), 'tissuePieceTypeName', 'tissuePieceTypeId', 'id', 'name',
+              Constants.tissuePieceTypes, true, function(item, value) {
+                return item.name.toLowerCase() == value.toLowerCase() || item.abbreviation.toLowerCase() == value.toLowerCase();
+              }, function(item) {
+                return item.name;
+              }),
+          HotUtils.makeColumnForInt('Slides Consumed', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Tissue Piece'),
+              'slidesConsumed', HotUtils.validator.integer(true, 0)),
 
           // Tissue Processing: Single Cell columns
-          HotUtils.makeColumnForDecimal('Initial Cell Conc.',
-              (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory
-                  .startsWith('Single Cell')), 'initialCellConcentration', 14, 10, false, false),
+          HotUtils.makeColumnForDecimal('Initial Cell Conc.', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory
+              && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell')), 'initialCellConcentration', 14, 10, false, false),
           HotUtils.makeColumnForText('Digestion',
-              (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory
-                  .startsWith('Single Cell')), 'digestion', {
+              (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell')),
+              'digestion', {
                 validator: HotUtils.validator.requiredTextNoSpecialChars
               }),
 

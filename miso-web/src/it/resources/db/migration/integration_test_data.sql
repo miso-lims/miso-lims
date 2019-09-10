@@ -14,7 +14,7 @@ INSERT INTO SampleClass (sampleClassId, alias, sampleCategory, sampleSubcategory
 (1, 'Identity',             'Identity',          NULL,                    NULL,  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (23, 'Tissue',              'Tissue',            NULL,                    NULL,  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (24, 'Slide',               'Tissue Processing', 'Slide',                 'SL',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(10, 'LCM Tube',            'Tissue Processing', 'LCM Tube',              'LCM', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(10, 'Tissue Piece',        'Tissue Processing', 'Tissue Piece',          'LCM', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (8, 'Curls',                'Tissue Processing', 'Curls',                 'C',   0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (11, 'gDNA (stock)',        'Stock',             NULL,                    'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (12, 'gDNA_wga (stock)',    'Stock',             NULL,                    'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
@@ -530,9 +530,9 @@ INSERT INTO `SampleSlide` (sampleId, slides) VALUES
 (3, 15),
 (4443, 3);
 
-INSERT INTO `SampleLCMTube` (sampleId, slidesConsumed) VALUES
-(5, 10),
-(4444, 1);
+INSERT INTO `SampleTissuePiece` (sampleId, tissuePieceType, slidesConsumed) VALUES
+(5, 1, 10),
+(4444, 1, 1);
 
 INSERT INTO `SampleStock` (sampleId, strStatus, dnaseTreated) VALUES
 (6, 'SUBMITTED', 0),
