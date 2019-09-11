@@ -1,9 +1,16 @@
 # Unreleased
 
 Changes:
+
+
+
+# 0.2.190
+
+Changes:
   * Add support to generate sample sheets for Illumina sequencers
   * Allow first and second read lengths to be different for Illumina runs
-
+  * Don't permit Create/Link Seq Orders when Fulfilled
+  * Allow selecting all things from all pages in a table
 
 Upgrade notes:
 
