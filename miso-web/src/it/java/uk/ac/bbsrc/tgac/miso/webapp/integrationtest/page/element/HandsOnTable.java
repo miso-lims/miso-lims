@@ -69,10 +69,10 @@ public class HandsOnTable extends AbstractElement {
   }
 
   private void activateColumns(WebDriver driver){
-    JavascriptExecutor executor = (JavascriptExecutor)driver;
-    List<WebElement> cells = hotContainer.findElements(inputCellSelector);
-    for(WebElement cell: cells){
-        executor.executeScript("arguments[0].click()", cell);
+    WebDriverWait wait = new WebDriverWait(driver, 3000);
+    for(WebElement cell : hotContainer.findElements(inputCellSelector)){
+      wait.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(cell, "")));
+      cell.sendKeys(String.valueOf(' '));
     }
   }
 

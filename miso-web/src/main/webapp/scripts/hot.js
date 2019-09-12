@@ -193,6 +193,7 @@ var HotUtils = {
       colHeaders: columns.map(function(c) {
         return c.header;
       }),
+      viewportColumnRenderingOffset: 700,
       preventOverflow: 'horizontal',
       contextMenu: false,
       columns: columns,
