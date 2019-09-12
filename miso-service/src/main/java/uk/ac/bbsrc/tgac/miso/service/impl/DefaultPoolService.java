@@ -450,10 +450,9 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   @Override
-  public void checkMismatchedWithOrder(Pool pool) throws IOException {
+  public void checkMismatchedWithOrder(Pool pool, PoolOrder poolOrder) throws IOException {
     // Check equivalence for all library aliquots. Platform type /should/ logically follow so no explicit check
     // Muffy, sis, the time complexity
-    PoolOrder poolOrder = poolOrderService.get(pool.getPoolOrderId());
     Set<LibraryAliquot> poolOrderAliquots = poolOrder.getOrderLibraryAliquots().stream()
             .map(OrderLibraryAliquot::getAliquot)
             .collect(Collectors.toSet()),

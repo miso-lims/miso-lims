@@ -315,7 +315,7 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
     to.setSequencingOrder(from.getSequencingOrder());
 
     //check if there's an associated Pool and if it still matches the Order
-    if(to.getPool() != null) poolService.checkMismatchedWithOrder(to.getPool());
+    if(to.getPool() != null) poolService.checkMismatchedWithOrder(to.getPool(), to);
   }
 
   @Override

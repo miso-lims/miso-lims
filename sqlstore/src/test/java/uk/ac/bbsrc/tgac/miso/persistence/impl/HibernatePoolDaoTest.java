@@ -77,6 +77,7 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     rtn.setVolume(discarded ? 0.0 : counter);
     rtn.setQcPassed(false);
     rtn.setDescription("Description " + counter);
+    rtn.setMismatchedWithOrder(false);
     for (int i = 0; i < notes; i++) {
       Note note = new Note();
       note.setCreationDate(new Date());
