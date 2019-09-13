@@ -54,7 +54,7 @@ public abstract class AbstractIT {
   @Before
   public final void setupAbstractTest() {
     ChromeOptions opts = new ChromeOptions();
-    opts.setHeadless(true);
+    opts.setHeadless(false);
     // large width is important so that all columns of handsontables get rendered
     opts.addArguments("--disable-gpu", "--window-size=4000x1440");
     driver = new ChromeDriver(opts);

@@ -29,10 +29,10 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class HandsOnTable extends AbstractElement {
 
-  private static final By columnHeadingsSelector = By.cssSelector("div.ht_master table.htCore span.colHeader");
+  private static final By columnHeadingsSelector = By.tagName("tr");
   private static final By inputRowsSelector = By.cssSelector("div.ht_master table.htCore tbody tr");
   private static final By lockedRowsSelector = By.cssSelector("div.ht_clone_left table.htCore tbody tr");
-  private static final By inputCellSelector = By.tagName("td");
+  private static final By inputCellSelector = By.cssSelector("td.htDimmed");
   private static final By dropdownArrowSelector = By.className("htAutocompleteArrow");
   private static final By activeDropdownSelector = By.cssSelector("div.handsontableInputHolder[style*='block']");
   private static final By activeCellEditorSelector = By.cssSelector("div.handsontableInputHolder[style*='block'] > textarea");
@@ -54,7 +54,7 @@ public class HandsOnTable extends AbstractElement {
   public HandsOnTable(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
-    driver.manage().window().maximize();
+    //driver.manage().window().maximize();
     setColumnHeadings();
     activateColumns(driver);
     setColumnHeadings();
@@ -70,9 +70,14 @@ public class HandsOnTable extends AbstractElement {
 
   private void activateColumns(WebDriver driver){
     WebDriverWait wait = new WebDriverWait(driver, 3000);
+    boolean skipFirstCell = true;
     for(WebElement cell : hotContainer.findElements(inputCellSelector)){
-      wait.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(cell, "")));
-      cell.sendKeys(String.valueOf(' '));
+      if (skipFirstCell){
+        skipFirstCell = false;
+        continue;
+      }
+      //wait.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(cell, "")));
+      cell.click();
     }
   }
 
