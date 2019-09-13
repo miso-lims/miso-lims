@@ -155,9 +155,10 @@ Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if you installed
 
 (Update the security method if you are using LDAP or Active Directory LDAP.)
 
-Create the directory `/storage/miso` and subdirectory `/storage/miso/log`.
+Create the directory `/storage/miso` and subdirectories `/storage/miso/log` and `/storage/miso/files`.
 
-  	mkdir -p /storage/miso/log
+    mkdir -p /storage/miso/log
+    mkdir -p /storage/miso/files
 
 Ensure that the user that Tomcat runs as has write permission to the storage directory. For example, if the user is in the 'tomcat' group:
 
@@ -351,7 +352,7 @@ jdbc:mysql://localhost:3306/lims?autoReconnect=true&zeroDateTimeBehavior=CONVERT
 ```
 
 <details>
-<summary>Click here if you have run into an issue with migration `V0320__auto_main.sql` with MariaDB:</summary>
+<summary>Click here if you have run into an issue with migration `V0320` with MariaDB:</summary>
 
 This migration contains some syntax which is not compatible with MariaDB. You can skip over the `Printer` code at issue, and manually copy the remainder of the migration into the MySQL console (as seen below). The last command changes the Flyway state from failed to succeeded. You can then run Flyway again from the terminal and it will resume with the next migration.
 
@@ -438,8 +439,17 @@ DROP TABLE RunQC;
 DELETE FROM QCType WHERE qcTarget = 'Run';
 
 
-UPDATE flyway_schema_history SET success = 1 WHERE checksum =-484724217;
+UPDATE flyway_schema_history SET success = 1 WHERE version = '0320';
 ```
+</details>
+
+<details>
+<summary>Click here if you have run into an issue with migration `V0611`:</summary>
+
+Ths command changes the Flyway state from failed to succeeded. You can then run Flyway again from the terminal and it will resume with the next migration.
+
+    UPDATE flyway_schema_history SET success = 1 WHERE version = '0611';
+
 
 </details>
 
