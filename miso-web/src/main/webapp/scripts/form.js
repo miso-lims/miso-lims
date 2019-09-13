@@ -557,7 +557,7 @@ FormUtils = (function($) {
       control.attr('data-parsley-error-message', 'Must be a number between ' + min + ' and ' + max);
     }
     if (field.match) {
-      control.attr('data-parsley-equalto', '#' + field.match);
+      control.attr('data-parsley-equalto', '#' + makeInputId(containerId, field.match));
     }
   }
 
