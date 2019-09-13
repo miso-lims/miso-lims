@@ -1,7 +1,7 @@
 # Unreleased
 
 Changes:
-
+  * Add information for how to fix migration errors in a baremetal install on MariaDB
 
 
 # 0.2.190
