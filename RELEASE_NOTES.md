@@ -2,6 +2,7 @@
 
 Changes:
   * Add information for how to fix migration errors in a baremetal install on MariaDB
+  * Allow setting the Active Directory domain DN via `security.ad.domainDn` in `security.properties`. This should only be necessary if you have an unusual ActiveDirectory configuration.
 
 
 # 0.2.190
