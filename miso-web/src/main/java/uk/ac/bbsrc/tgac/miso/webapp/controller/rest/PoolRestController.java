@@ -140,10 +140,25 @@ public class PoolRestController extends RestController {
   }
 
   public static class SampleSheetRequest {
+    private String customIndexPrimer;
+    private String customRead1Primer;
+    private String customRead2Primer;
     private String experimentType;
     private String genomeFolder;
     private List<Long> poolIds;
     private long sequencingParametersId;
+
+    public String getCustomIndexPrimer() {
+      return customIndexPrimer;
+    }
+
+    public void setCustomRead1Primer(String customRead1Primer) {
+      this.customRead1Primer = customRead1Primer;
+    }
+
+    public String getCustomRead2Primer() {
+      return customRead2Primer;
+    }
 
     public String getExperimentType() {
       return experimentType;
@@ -161,6 +176,18 @@ public class PoolRestController extends RestController {
       return sequencingParametersId;
     }
 
+    public void setCustomIndexPrimer(String customIndexPrimer) {
+      this.customIndexPrimer = customIndexPrimer;
+    }
+
+    public String getCustomRead1Primer() {
+      return customRead1Primer;
+    }
+
+    public void setCustomRead2Primer(String customRead2Primer) {
+      this.customRead2Primer = customRead2Primer;
+    }
+
     public void setExperimentType(String experimentType) {
       this.experimentType = experimentType;
     }
@@ -176,6 +203,7 @@ public class PoolRestController extends RestController {
     public void setSequencingParametersId(long sequencingParametersId) {
       this.sequencingParametersId = sequencingParametersId;
     }
+
   }
 
   private final JQueryDataTableBackend<ListPoolView, PoolDto> jQueryBackend = new JQueryDataTableBackend<ListPoolView, PoolDto>() {
@@ -564,8 +592,10 @@ public class PoolRestController extends RestController {
     List<Pool> pools = request.getPoolIds().stream().map(WhineyFunction.rethrow(poolService::get)).collect(Collectors.toList());
     response.setHeader("Content-Disposition", String.format("attachment; filename=%s-%s.csv", experiment.name(),
         pools.stream().map(Pool::getAlias).collect(Collectors.joining("-"))));
-    return new HttpEntity<>(experiment.makeSampleSheet(request.getGenomeFolder(), parameters,
-        pools)
+    return new HttpEntity<>(experiment
+        .makeSampleSheet(request.getGenomeFolder(), parameters, request.getCustomRead1Primer(), request.getCustomIndexPrimer(),
+            request.getCustomRead2Primer(),
+            pools)
         .getBytes(StandardCharsets.UTF_8));
   }
 }
