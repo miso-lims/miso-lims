@@ -344,7 +344,26 @@ HotTarget.pool = (function() {
                      label: 'Genome Folder',
                      value: Constants.genomeFolder,
                      required: true
-                   }, {
+                   },
+                   {
+                     property: 'customRead1Primer',
+                     type: 'text',
+                     label: 'Custom Read 1 Primer Well',
+                     required: false
+                   },
+                   {
+                     property: 'customIndexPrimer',
+                     type: 'text',
+                     label: 'Custom Index Primer Well',
+                     required: false
+                   },
+                   {
+                     property: 'customRead2Primer',
+                     type: 'text',
+                     label: 'Custom Read 2 Primer Well',
+                     required: false
+                   },
+                   {
                      property: "pools",
                      label: "Lanes Configuration",
                      required: true,
@@ -357,6 +376,9 @@ HotTarget.pool = (function() {
                    Utils.ajaxDownloadWithDialog(
                      "/miso/rest/pools/samplesheet",
                      {
+                       customRead1Primer: result.customRead1Primer,
+                       customIndexPrimer: result.customIndexPrimer,
+                       customRead2Primer: result.customRead2Primer,
                        experimentType: result.experimentType.name,
                        genomeFolder: result.genomeFolder,
                        sequencingParametersId: result.sequencingParameters.id,

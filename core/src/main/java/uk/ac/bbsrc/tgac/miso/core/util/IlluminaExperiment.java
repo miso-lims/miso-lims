@@ -106,7 +106,8 @@ public enum IlluminaExperiment {
         .max().orElse(0);
   }
 
-  public final String makeSampleSheet(String genomeFolder, SequencingParameters parameters, List<Pool> pools) {
+  public final String makeSampleSheet(String genomeFolder, SequencingParameters parameters, String read1Primer, String indexPrimer,
+      String read2Primer, List<Pool> pools) {
     final Map<String, String> header = new HashMap<>();
     final Map<String, String> settings = new HashMap<>();
     applyAttribute(header, settings);
@@ -121,6 +122,16 @@ public enum IlluminaExperiment {
         .distinct()//
         .sorted()//
         .collect(Collectors.joining("/")));
+
+    if (!LimsUtils.isStringBlankOrNull(read1Primer)) {
+      settings.put("CustomRead1PrimerMix", read1Primer);
+    }
+    if (!LimsUtils.isStringBlankOrNull(indexPrimer)) {
+      settings.put("CustomIndexPrimerMix", indexPrimer);
+    }
+    if (!LimsUtils.isStringBlankOrNull(read2Primer) && parameters.getReadLength2() != 0) {
+      settings.put("CustomRead2PrimerMix", read2Primer);
+    }
 
     final StringBuilder output = new StringBuilder();
     output.append("[Header]\n");
