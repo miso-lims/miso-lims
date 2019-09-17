@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -10,6 +11,8 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
@@ -18,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
 @Repository
 public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder> implements PoolOrderDao, HibernatePaginatedDataSource<PoolOrder> {
 
+  private static final String FIELD_POOL = "poolId";
   private static final String[] SEARCH_PROPERTIES = new String[] { "alias", "description" };
   private static final List<String> STANDARD_ALIASES = Arrays.asList("purpose");
 
@@ -101,6 +105,13 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder> implement
   @Override
   public void restrictPaginationByDraft(Criteria criteria, boolean isDraft, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("draft", isDraft));
+  }
+
+  @Override
+  public PoolOrder getByPoolId(long poolId) {
+    Criteria criteria = currentSession().createCriteria(PoolOrder.class);
+    criteria.add(Restrictions.eq(FIELD_POOL, poolId));
+    return (PoolOrder) criteria.uniqueResult();
   }
 
 }

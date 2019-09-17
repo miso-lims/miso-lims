@@ -348,4 +348,9 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
     return poolOrderDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
+  @Override
+  public PoolOrder getByPoolId(long poolId){
+    return poolOrderDao.getByPoolId(poolId);
+  }
+
 }

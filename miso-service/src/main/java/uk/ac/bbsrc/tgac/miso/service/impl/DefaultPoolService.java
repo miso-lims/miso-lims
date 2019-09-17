@@ -328,6 +328,10 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     validateVolumeUnits(pool.getVolume(), pool.getVolumeUnits(), errors);
     validateBarcodeUniqueness(pool, beforeChange, poolStore::getByBarcode, errors, "pool");
     if (strictPools && !pool.isMergeChild()) validateIndices(pool, beforeChange, errors);
+    PoolOrder potentialPoolOrder = poolOrderService.getByPoolId(pool.getId());
+    if (potentialPoolOrder != null) {
+      checkMismatchedWithOrder(pool, potentialPoolOrder);
+    }
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);

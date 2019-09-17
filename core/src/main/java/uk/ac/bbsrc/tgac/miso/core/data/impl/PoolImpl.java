@@ -157,7 +157,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private Boolean qcPassed;
 
   @Column(nullable = false)
-  private Boolean poolOrderMismatch;
+  private Boolean poolOrderMismatch = false;
 
   @Enumerated(EnumType.STRING)
   private ConcentrationUnit concentrationUnits;
