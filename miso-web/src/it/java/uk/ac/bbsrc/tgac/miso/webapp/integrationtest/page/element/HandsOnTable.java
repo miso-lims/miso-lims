@@ -4,9 +4,11 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.MoreExpectedConditions.textDoesNotContain;
 
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.Arrays;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -29,7 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class HandsOnTable extends AbstractElement {
 
-  private static final By columnHeadingsSelector = By.tagName("tr");
+  private static final By columnHeadingsSelector = By.cssSelector("thead");
   private static final By inputRowsSelector = By.cssSelector("div.ht_master table.htCore tbody tr");
   private static final By lockedRowsSelector = By.cssSelector("div.ht_clone_left table.htCore tbody tr");
   private static final By inputCellSelector = By.cssSelector("td.htDimmed");
@@ -37,7 +39,7 @@ public class HandsOnTable extends AbstractElement {
   private static final By activeDropdownSelector = By.cssSelector("div.handsontableInputHolder[style*='block']");
   private static final By activeCellEditorSelector = By.cssSelector("div.handsontableInputHolder[style*='block'] > textarea");
   private static final By dropdownOptionRowsSelector = By.cssSelector("div.ht_master table.htCore > tbody > tr");
-  private List<String> columnHeadings;
+  private List<String> columnHeadings = new LinkedList<>();
   private final List<WebElement> inputRows;
   private final List<WebElement> lockedRows;
 
@@ -54,29 +56,40 @@ public class HandsOnTable extends AbstractElement {
   public HandsOnTable(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
-    //driver.manage().window().maximize();
-    setColumnHeadings();
-    activateColumns(driver);
+    driver.manage().window().maximize();
     setColumnHeadings();
     this.inputRows = hotContainer.findElements(inputRowsSelector);
     this.lockedRows = hotContainer.findElements(lockedRowsSelector);
   }
 
   private void setColumnHeadings(){
-    this.columnHeadings = hotContainer.findElements(columnHeadingsSelector).stream()
-            .map(element -> element.getText().trim())
-            .collect(Collectors.toList());
+    boolean firstCell = true;
+    for(WebElement cell : hotContainer.findElements(inputCellSelector)) {
+      if(firstCell){
+        firstCell = false;
+        continue;
+      }
+      cell.click();
+      List<String> tempColumnHeadings = hotContainer.findElements(columnHeadingsSelector).stream()
+              .map(element -> element.getText().trim())
+              .collect(Collectors.toList());
+      for (String heading : tempColumnHeadings) {
+        if (heading.equals("")) continue;
+        for(String s : heading.split("\n")){
+          if(s.equals("") || this.columnHeadings.contains(s)) continue;
+          this.columnHeadings.add(s);
+        }
+      }
+    }
   }
 
-  private void activateColumns(WebDriver driver){
-    WebDriverWait wait = new WebDriverWait(driver, 3000);
+  private void activateColumns(){
     boolean skipFirstCell = true;
     for(WebElement cell : hotContainer.findElements(inputCellSelector)){
       if (skipFirstCell){
         skipFirstCell = false;
         continue;
       }
-      //wait.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(cell, "")));
       cell.click();
     }
   }
