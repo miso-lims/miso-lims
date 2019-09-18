@@ -1917,6 +1917,14 @@ button.disabled {
   border: 0;
 }
 
+/* banded rows */
+#hotContainer > div.ht_master table.htCore > tbody > tr:nth-child(2n) > td {
+  background-color: #E2E4FF;
+}
+#hotContainer > div.ht_clone_left table.htCore > tbody > tr:nth-child(2n) > td {
+  background-color: #E2E4FF;
+}
+
 .handsontable td.htInvalid {
   background-color: #f2dede !important; /*gives priority over td.area selection background*/
 }
@@ -1930,7 +1938,7 @@ button.disabled {
 }
 
 .handsontable td.nonStandardAlias {
-  background-color: #FEFEE3;
+  background-color: #FEFEE3 !important;
 }
 
 .handsontable td.nonStandardAlias.htInvalid {
@@ -1938,11 +1946,11 @@ button.disabled {
 }
 
 .handsontable td.multipleOptions {
-  background-color: #F0F0FF;
+  background-color: #F0F0FF !important;
 }
 
 .handsontable td.notification {
-  background-color: #FDEABC;
+  background-color: #FDEABC !important;
 }
 
 /* fix for autocomplete menus being hidden when they extend beyond the table */
