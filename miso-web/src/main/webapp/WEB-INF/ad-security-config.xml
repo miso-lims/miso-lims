@@ -18,7 +18,7 @@
   <bean id="ldapActiveDirectoryAuthProvider" class="org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider">
     <constructor-arg value="${security.ad.emailDomain}" /> <!-- Domain name added to username during directory search for user -->
     <constructor-arg value="${security.ad.url}" /> <!-- Directory url -->
-    <constructor-arg value="${security.ad.domainDn}" /> <!-- Root DN if not inferrrable from the domain -->
+    <constructor-arg value="${security.ad.domainDn:}" /> <!-- Root DN if not inferrrable from the domain -->
     <property name="authoritiesMapper" ref="grantedAuthoritiesMapper" />
     <property name="convertSubErrorCodesToExceptions" value="true" />
     <property name="userDetailsContextMapper">
