@@ -21,7 +21,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
 @Repository
 public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder> implements PoolOrderDao, HibernatePaginatedDataSource<PoolOrder> {
 
-  private static final String FIELD_POOL = "poolId";
+  private static final String FIELD_POOL = "pool.id";
   private static final String[] SEARCH_PROPERTIES = new String[] { "alias", "description" };
   private static final List<String> STANDARD_ALIASES = Arrays.asList("purpose");
 

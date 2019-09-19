@@ -239,6 +239,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     managed.setQcPassed(pool.getQcPassed());
     managed.setDiscarded(pool.isDiscarded());
     managed.setCreationDate(pool.getCreationDate());
+    managed.setMismatchedWithOrder(pool.isMismatchedWithOrder());
     if (pool.isDiscarded() || pool.isDistributed()) {
       managed.setVolume(0.0);
     } else {
