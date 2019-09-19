@@ -27,12 +27,16 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.IndexDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping(value = "/rest/indices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class IndexRestController extends RestController {
   @Autowired
   private IndexService indexService;
+
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
 
   private final JQueryDataTableBackend<Index, IndexDto> jQueryBackend = new JQueryDataTableBackend<Index, IndexDto>() {
 
@@ -52,7 +56,7 @@ public class IndexRestController extends RestController {
   public DataTablesResponseDto<IndexDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder)
       throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
   }
 
   @GetMapping("/dt/platform/{platform}")
@@ -64,7 +68,8 @@ public class IndexRestController extends RestController {
     if (platformType == null) {
       throw new RestException("Invalid platform type.", Status.BAD_REQUEST);
     }
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(platformType), PaginationFilter.archived(false));
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.platformType(platformType),
+        PaginationFilter.archived(false));
   }
 
   public static class IndexSearchRequest {

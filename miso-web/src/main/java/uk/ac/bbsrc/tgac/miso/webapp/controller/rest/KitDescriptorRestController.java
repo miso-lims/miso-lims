@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.KitDescriptorDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/kitdescriptors")
@@ -44,6 +45,9 @@ public class KitDescriptorRestController extends RestController {
 
   @Autowired
   private MenuController menuController;
+
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
 
   private final JQueryDataTableBackend<KitDescriptor, KitDescriptorDto> jQueryBackend = new JQueryDataTableBackend<KitDescriptor, KitDescriptorDto>() {
 
@@ -120,7 +124,7 @@ public class KitDescriptorRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<KitDescriptorDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/type/{type}", produces = "application/json")
@@ -132,7 +136,7 @@ public class KitDescriptorRestController extends RestController {
     if (kitType == null) {
       throw new RestException("Invalid kit type.");
     }
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.kitType(kitType));
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.kitType(kitType));
   }
 
   @PutMapping(value = "/{id}/targetedsequencing", produces = "application/json")

@@ -36,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.dto.ChangeLogDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/arrays")
@@ -48,6 +49,9 @@ public class ArrayRestController extends RestController {
 
   @Autowired
   private SampleService sampleService;
+
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
 
   private final JQueryDataTableBackend<Array, ArrayDto> jQueryBackend = new JQueryDataTableBackend<Array, ArrayDto>() {
 
@@ -67,7 +71,7 @@ public class ArrayRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<ArrayDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
   }
 
   @PostMapping()

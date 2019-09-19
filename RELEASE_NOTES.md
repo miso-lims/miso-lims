@@ -1,14 +1,26 @@
 # Unreleased
 
 Changes:
+
   * Add information for how to fix migration errors in a baremetal install on MariaDB
-  * Allow setting the Active Directory domain DN via `security.ad.domainDn` in `security.properties`. This should only be necessary if you have an unusual ActiveDirectory configuration.
   * Display even/odd rows of bulk edit tables in different colours
+  * Allow setting the Active Directory domain DN via `security.ad.domainDn` in
+    `security.properties`. This should only be necessary if you have an unusual
+    ActiveDirectory configuration.
+  * New options for searching by date: year, month, fiscal year, fiscal quarter,
+    before/after specified range
+
+Upgrade notes:
+
+  * To enable searching by fiscal year and quarter, you must add the property
+    `miso.fiscalYearStartMonth` to your `miso.properties` file, and set the value to
+    the month number (1-12) of the start of your fiscal year.
 
 
 # 0.2.190
 
 Changes:
+
   * Add support to generate sample sheets for Illumina sequencers
   * Allow first and second read lengths to be different for Illumina runs
   * Don't permit Create/Link Seq Orders when Fulfilled
@@ -27,6 +39,7 @@ Upgrade notes:
 # 0.2.189
 
 Changes:
+
   * Prevent creation of Pool Orders with duplicate indices
   * Prevent linking of Pools with duplicate indices to Pool Orders
   * List Longest Index on Pool Orders page
@@ -37,6 +50,7 @@ Changes:
 # 0.2.188
 
 Changes:
+
   * Show all unmatched names on bulk search failure, rather than the first one
   * Show detailed messages rather than generic Server Errors in validation failure cases
   * Warn on bad pool merge but allow creation
@@ -48,6 +62,7 @@ Changes:
 # 0.2.187
 
 Changes:
+
   * Fix clear button index distance page
   * Display index collisions in pool orders
 

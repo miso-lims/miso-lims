@@ -70,6 +70,7 @@ import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -83,6 +84,9 @@ public class ContainerRestController extends RestController {
   private ContainerModelService containerModelService;
   @Autowired
   private IndexChecker indexChecker;
+
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
 
   private final JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto> jQueryBackend = new JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto>() {
 
@@ -108,7 +112,7 @@ public class ContainerRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<ContainerDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/platform/{platform}", produces = "application/json")
@@ -120,7 +124,7 @@ public class ContainerRestController extends RestController {
     if (platformType == null) {
       throw new RestException("Invalid platform.", Status.BAD_REQUEST);
     }
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(platformType));
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.platformType(platformType));
   }
 
   @PostMapping(value = "/bulk-delete")

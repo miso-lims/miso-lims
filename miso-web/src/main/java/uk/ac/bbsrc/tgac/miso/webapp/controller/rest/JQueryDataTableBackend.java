@@ -22,6 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 public abstract class JQueryDataTableBackend<Model, Dto> {
 
@@ -30,7 +31,7 @@ public abstract class JQueryDataTableBackend<Model, Dto> {
   protected abstract Dto asDto(Model model);
 
   public DataTablesResponseDto<Dto> get(HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder, PaginationFilter... filters) throws IOException {
+      UriComponentsBuilder uriBuilder, AdvancedSearchParser advancedSearchParser, PaginationFilter... filters) throws IOException {
     if (request.getParameterMap().size() > 0) {
       long numItems = getSource().count(filters);
       // get request params from DataTables
@@ -60,7 +61,7 @@ public abstract class JQueryDataTableBackend<Model, Dto> {
       if (!isStringEmptyOrNull(sSearch)) {
         additionalFilters
             .addAll(Arrays.asList(
-                PaginationFilter.parse(sSearch, SecurityContextHolder.getContext().getAuthentication().getName(), errorHandler)));
+                advancedSearchParser.parseQuery(sSearch, SecurityContextHolder.getContext().getAuthentication().getName(), errorHandler)));
         numMatches = getSource().count(additionalFilters.toArray(filters));
       } else {
         numMatches = numItems;

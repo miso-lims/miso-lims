@@ -76,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
@@ -88,6 +89,9 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 @Controller
 @RequestMapping("/rest/libraries")
 public class LibraryRestController extends RestController {
+
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
 
   private final JQueryDataTableBackend<Library, LibraryDto> jQueryBackend = new JQueryDataTableBackend<Library, LibraryDto>() {
     @Override
@@ -147,7 +151,7 @@ public class LibraryRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<LibraryDto> getLibraries(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/project/{id}", produces = "application/json")
@@ -155,7 +159,7 @@ public class LibraryRestController extends RestController {
   public DataTablesResponseDto<LibraryDto> getLibrariesForProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.project(id));
   }
 
   @PostMapping(value = "/query", produces = { "application/json" })

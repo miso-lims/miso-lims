@@ -163,8 +163,11 @@ ListUtils = (function($) {
         + '    <tr><th>Syntax</th><th>Meaning</th></tr>' + '  </thead>' + makePopupTableBody(target) + '</table>';
   };
 
-  var dateGrammar = '<table class="searchHelpTable">' + '  <caption><h2>DATE Format</h2></caption>' + '  <thead>'
-      + '    <tr><th>Format</th><th>Behaviour</th></tr>' + '  </thead>'
+  var dateGrammar = '<table class="searchHelpTable">'
+      + '  <caption><h2>DATE Format</h2></caption>'
+      + '  <thead>'
+      + '    <tr><th>Format</th><th>Behaviour</th></tr>'
+      + '  </thead>'
       + '  <tr><td>lasthour</td><td>Filter from 1 hour ago to the current time.</td></tr>'
       + '  <tr><td>today</td><td>Anything that happened on the current calendar day.</td></tr>'
       + '  <tr><td>yesterday</td><td>Filter for anything on the last calendar day.</td></tr>'
@@ -172,7 +175,15 @@ ListUtils = (function($) {
       + '  <tr><td>lastweek</td><td>Filter from Monday 00:00:00 of the previous week to Sunday 23:59:59 of the previous week.</td></tr>'
       + '  <tr><td><i>N</i>hours</td><td>Filter for anything from the current time to <i>N</i> hours ago.</td></tr>'
       + '  <tr><td><i>N</i>days</td><td>Filter for anything from the current time to <i>N</i>*24 hours ago.</td></tr>'
-      + '  <tr><td>YYYY-MM-DD</td><td>Search from YYYY-MM-DD 00:00:00 to YYYY-MM-DD 23:59:59</td></tr>' + '</table>';
+      + '  <tr><td><i>YYYY</i>-<i>MM</i>-<i>DD</i></td><td>Search from YYYY-MM-DD 00:00:00 to YYYY-MM-DD 23:59:59</td></tr>'
+      + '  <tr><td><i>YYYY</i>-<i>MM</i></td><td>Filter for anything within the specified year and month</td></tr>'
+      + '  <tr><td><i>YYYY</i></td><td>Filter for anything within the specified year</td></tr>'
+      + '  <tr><td>FY<i>YYYY</i></td><td>Filter for anything within the specified fiscal year. e.g. "FY2019"</td></tr>'
+      + '  <tr><td>Q<i>#</i></td><td>Filter for anything within the specified fiscal quarter of this year. e.g. "Q3"</td></tr>'
+      + '  <tr><td>FY<i>YYYY</i> Q<i>#</i></td><td>Filter for anything within the specified fiscal year and quarter. e.g. "FY2019 Q3"</td></tr>'
+      + '  <tr><td>before <i>RANGE</i></td><td>Filter for anything before the specified range, where the range is one of the above options. e.g. "before lastweek" </td></tr>'
+      + '  <tr><td>after <i>RANGE</i></td><td>Filter for anything after the specified range, where the range is one of the above options. e.g. "after 2019-02"</td></tr>'
+      + '</table>';
 
   var userGrammar = '<table class="searchHelpTable">' + '  <caption><h2>USER Format</h2></caption>' + '  <thead>'
       + '    <tr><th>Format</th><th>Behaviour</th></tr>' + '  </thead>' + '  <tr><td>me</td><td>Searches for the current user.</td></tr>'
@@ -303,7 +314,7 @@ ListUtils = (function($) {
         "title": "Select all on all pages",
         "handler": function() {
           if (jqTable.fnSettings().fnRecordsDisplay() > 10000) {
-            Utils.showOkDialog('Select all', [ 'Too many items selected.', 'Please use stricter filtering to limit to 10­000.' ]);
+            Utils.showOkDialog('Select all', ['Too many items selected.', 'Please use stricter filtering to limit to 10­000.']);
             return;
           }
           var filterbox = $('#' + elementId + '_filter :input');
@@ -532,21 +543,21 @@ ListUtils = (function($) {
           });
         };
       }, function(errorMessage, searchString, callback) {
-          Utils.ajaxWithDialog('Selecting', 'GET', target.createUrl(config, projectId) + "?" + jQuery.param({
-              iDisplayStart: 0,
-              iDisplayLength: 10000,
-              sSearch: searchString,
-              sSortDir_0: "asc",
-              iSortCol_0: 0,
-              mDataProp_0: "id",
-              sEcho: 0
-            }), null, function(data) {
-              errorMessage.innerText = data.sError;
-              errorMessage.style.visibility = data.sError ? "visible" : "hidden";
-              callback(data.aaData);
-            }, function() {
-              callback([]);
-            });
+        Utils.ajaxWithDialog('Selecting', 'GET', target.createUrl(config, projectId) + "?" + jQuery.param({
+          iDisplayStart: 0,
+          iDisplayLength: 10000,
+          sSearch: searchString,
+          sSortDir_0: "asc",
+          iSortCol_0: 0,
+          mDataProp_0: "id",
+          sEcho: 0
+        }), null, function(data) {
+          errorMessage.innerText = data.sError;
+          errorMessage.style.visibility = data.sError ? "visible" : "hidden";
+          callback(data.aaData);
+        }, function() {
+          callback([]);
+        });
       });
     },
     createStaticTable: function(elementId, target, config, data) {

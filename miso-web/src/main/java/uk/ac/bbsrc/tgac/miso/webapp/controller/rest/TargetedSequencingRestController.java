@@ -22,6 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.TargetedSequencingDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/targetedsequencings")
@@ -29,6 +30,9 @@ public class TargetedSequencingRestController extends RestController {
 
   @Autowired
   private TargetedSequencingService targetedSequencingService;
+
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
 
   private final JQueryDataTableBackend<TargetedSequencing, TargetedSequencingDto> jQueryBackend = new JQueryDataTableBackend<TargetedSequencing, TargetedSequencingDto>() {
     @Override
@@ -63,6 +67,6 @@ public class TargetedSequencingRestController extends RestController {
   @GetMapping(value = "/dt/kit/{id}/available", produces = "application/json")
   public @ResponseBody DataTablesResponseDto<TargetedSequencingDto> availableTargetedSequencings(@PathVariable("id") Long kitDescriptorId,
       HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder builder) throws IOException {
-    return jQueryBackend.get(request, response, builder, new PaginationFilter[0]);
+    return jQueryBackend.get(request, response, builder, advancedSearchParser, new PaginationFilter[0]);
   }
 }

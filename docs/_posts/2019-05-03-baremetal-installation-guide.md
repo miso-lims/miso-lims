@@ -127,7 +127,7 @@ manually deploy your webapp, or make the `ROOT.xml` file undeletable by using
 `chattr +i` (`chattr -i` will undo this operation). [Upstream
 bug](https://issues.apache.org/bugzilla/show_bug.cgi?id=40050)
 
-Copy `$MISO_SRC/miso-web/src/main/resources/external/miso.properties` to
+Copy `$MISO_SRC/miso-web/src/main/resources/miso.properties` to
 `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`. Review and edit
 this file as appropriate (see [Naming Schemes](#naming-schemes) below).
 

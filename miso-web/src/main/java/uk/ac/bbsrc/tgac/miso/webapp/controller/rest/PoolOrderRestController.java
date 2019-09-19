@@ -33,10 +33,15 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/poolorders")
 public class PoolOrderRestController extends RestController {
+
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
+
   public static class IndexResponseDto {
     private Set<String> duplicateIndices;
     private Set<String> nearDuplicateIndices;
@@ -111,11 +116,13 @@ public class PoolOrderRestController extends RestController {
       HttpServletRequest request, HttpServletResponse response) throws IOException {
     switch (PoolOrder.Status.get(status)) {
     case OUTSTANDING:
-      return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.draft(false), PaginationFilter.fulfilled(false));
+      return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.draft(false),
+          PaginationFilter.fulfilled(false));
     case FULFILLED:
-      return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.fulfilled(true));
+      return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.fulfilled(true));
     case DRAFT:
-      return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.draft(true), PaginationFilter.fulfilled(false));
+      return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.draft(true),
+          PaginationFilter.fulfilled(false));
     default:
       throw new RestException("Unknown pool order status: " + status, Status.BAD_REQUEST);
     }

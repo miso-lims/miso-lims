@@ -46,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PrinterDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/printers")
@@ -155,6 +156,9 @@ public class PrinterRestController extends RestController {
   @Autowired
   private LibraryAliquotService libraryAliquotService;
 
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
+
   private final JQueryDataTableBackend<Printer, PrinterDto> jQueryBackend = new JQueryDataTableBackend<Printer, PrinterDto>() {
 
     @Override
@@ -228,7 +232,7 @@ public class PrinterRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<PrinterDto> dataTable(HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
   }
 
   @DeleteMapping(headers = { "Content-type=application/json" })

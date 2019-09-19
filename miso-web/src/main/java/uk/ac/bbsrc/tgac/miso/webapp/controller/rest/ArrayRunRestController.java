@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.dto.ArrayDto;
 import uk.ac.bbsrc.tgac.miso.dto.ArrayRunDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/arrayruns")
@@ -42,6 +43,9 @@ public class ArrayRunRestController extends RestController {
 
   @Autowired
   private ArrayService arrayService;
+
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
 
   private final JQueryDataTableBackend<ArrayRun, ArrayRunDto> jQueryBackend = new JQueryDataTableBackend<ArrayRun, ArrayRunDto>() {
 
@@ -61,7 +65,7 @@ public class ArrayRunRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<ArrayRunDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/project/{id}", produces = "application/json")
@@ -69,7 +73,7 @@ public class ArrayRunRestController extends RestController {
   public DataTablesResponseDto<ArrayRunDto> dataTableByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder)
       throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.project(id));
   }
 
   @PostMapping(produces = "application/json")
