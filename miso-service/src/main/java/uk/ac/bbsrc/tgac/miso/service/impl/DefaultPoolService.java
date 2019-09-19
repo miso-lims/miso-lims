@@ -200,7 +200,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     pool.setChangeDetails(authorizationManager.getCurrentUser());
     boxService.throwIfBoxPositionIsFilled(pool);
     validateChange(pool, null);
-    poolStore.save(pool); //fails here
+    poolStore.save(pool);
 
     if (autoGenerateIdBarcodes) {
       LimsUtils.generateAndSetIdBarcode(pool);
