@@ -67,7 +67,7 @@ COPY ./.docker/tomcat/logging.properties ${CATALINA_HOME}/conf/
 COPY ./.docker/tomcat/ROOT.xml ${CATALINA_HOME}/conf/Catalina/localhost/
 
 RUN mkdir -p /storage/miso/log && rm -r ${CATALINA_HOME}/webapps/ROOT*
-COPY --from=builder /miso-lims/miso-web/src/main/resources/external/miso.properties  ${CATALINA_HOME}/conf/Catalina/localhost
+COPY --from=builder /miso-lims/miso-web/src/main/resources/miso.properties  ${CATALINA_HOME}/conf/Catalina/localhost
 COPY --from=builder /miso-lims/miso-web/src/main/resources/security.properties /storage/miso/
 COPY --from=builder /miso-lims/miso-web/src/main/resources/submission.properties /storage/miso/
 

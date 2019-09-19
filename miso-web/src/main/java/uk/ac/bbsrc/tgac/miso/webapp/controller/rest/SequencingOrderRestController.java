@@ -45,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
 
@@ -64,6 +65,8 @@ public class SequencingOrderRestController extends RestController {
   private OrderPurposeService orderPurposeService;
   @Autowired
   private IndexChecker indexChecker;
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
 
   private final JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto> jQueryBackend = new JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto>() {
 
@@ -83,7 +86,7 @@ public class SequencingOrderRestController extends RestController {
   public DataTablesResponseDto<SequencingOrderCompletionDto> getCompletionsByPool(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletRequest request, HttpServletResponse response)
       throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.pool(id));
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.pool(id));
   }
 
   @GetMapping(value = "/sequencingorders/{id}", produces = { "application/json" })
@@ -114,7 +117,8 @@ public class SequencingOrderRestController extends RestController {
   public DataTablesResponseDto<SequencingOrderCompletionDto> getDtCompletions(@PathVariable String platform, UriComponentsBuilder uriBuilder,
       HttpServletRequest request, HttpServletResponse response)
       throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(PlatformType.valueOf(platform)));
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser,
+        PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 
   @GetMapping(value = "/sequencingorders/dt/completions/outstanding/{platform}", produces = { "application/json" })
@@ -123,7 +127,7 @@ public class SequencingOrderRestController extends RestController {
       UriComponentsBuilder uriBuilder, HttpServletRequest request,
       HttpServletResponse response)
       throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.fulfilled(false),
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.fulfilled(false),
         PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 
@@ -133,7 +137,7 @@ public class SequencingOrderRestController extends RestController {
       UriComponentsBuilder uriBuilder, HttpServletRequest request,
       HttpServletResponse response)
       throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.pending(),
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.pending(),
         PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 

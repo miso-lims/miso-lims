@@ -370,17 +370,12 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
 
   @Test
   public void testSearchByDistributed() throws IOException {
-    testSearch(PaginationFilter.distributed(""));
+    testSearch(PaginationFilter.distributed());
   }
 
   @Test
-  public void testSearchByDistributedWithString() throws IOException {
-    testSearch(PaginationFilter.distributed("lastweek"));
-  }
-
-  @Test
-  public void testSearchByDistributedWithDate() throws IOException {
-    testSearch(PaginationFilter.distributed("2017-01-01"));
+  public void testSearchByDistributedDate() throws IOException {
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2017-01-02"), DateType.DISTRIBUTED));
   }
 
   @Test

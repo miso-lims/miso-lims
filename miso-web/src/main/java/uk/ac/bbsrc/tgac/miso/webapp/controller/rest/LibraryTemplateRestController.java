@@ -58,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/librarytemplates")
@@ -68,6 +69,9 @@ public class LibraryTemplateRestController extends RestController {
 
   @Autowired
   private ProjectService projectService;
+
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
 
   private final JQueryDataTableBackend<LibraryTemplate, LibraryTemplateDto> jQueryBackend = new JQueryDataTableBackend<LibraryTemplate, LibraryTemplateDto>() {
 
@@ -115,14 +119,14 @@ public class LibraryTemplateRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<LibraryTemplateDto> getLibraryTemplates(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<LibraryTemplateDto> getDTLibraryTemplatesByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.project(id));
   }
 
   @PostMapping(value = "/bulk-delete")

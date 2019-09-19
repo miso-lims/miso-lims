@@ -103,6 +103,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
@@ -117,6 +118,9 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
 public class PoolRestController extends RestController {
   @Autowired
   private IndexChecker indexChecker;
+
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
 
   public static class PoolChangeRequest {
     private List<Long> add;
@@ -423,14 +427,14 @@ public class PoolRestController extends RestController {
     if (platformType == null) {
       throw new RestException("Invalid platform type.", Status.BAD_REQUEST);
     }
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(platformType));
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.platformType(platformType));
   }
 
   @GetMapping(value = "dt/project/{id}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<PoolDto> getDTPoolsByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.project(id));
   }
 
   public List<PoolDto> serializePools(Collection<Pool> pools, UriComponentsBuilder uriBuilder)

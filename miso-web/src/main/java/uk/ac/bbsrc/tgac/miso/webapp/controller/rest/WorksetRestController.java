@@ -43,6 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.WorksetDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 
 @Controller
@@ -59,6 +60,8 @@ public class WorksetRestController extends RestController {
   private LibraryAliquotService libraryAliquotService;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
 
   private final JQueryDataTableBackend<Workset, WorksetDto> jQueryBackend = new JQueryDataTableBackend<Workset, WorksetDto>() {
 
@@ -77,14 +80,14 @@ public class WorksetRestController extends RestController {
   @GetMapping(value = "/dt/all", produces = "application/json")
   public @ResponseBody DataTablesResponseDto<WorksetDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/mine", produces = "application/json")
   public @ResponseBody DataTablesResponseDto<WorksetDto> dataTableForUser(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     String username = authorizationManager.getCurrentUser().getLoginName();
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.user(username, true));
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.user(username, true));
   }
 
   @GetMapping

@@ -18,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DeletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/deletions")
@@ -25,6 +26,9 @@ public class DeletionRestController extends RestController {
 
   @Autowired
   private DeletionService deletionService;
+
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
 
   private final JQueryDataTableBackend<Deletion, DeletionDto> jQueryBackend = new JQueryDataTableBackend<Deletion, DeletionDto>() {
 
@@ -44,7 +48,7 @@ public class DeletionRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<DeletionDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
   }
 
 }

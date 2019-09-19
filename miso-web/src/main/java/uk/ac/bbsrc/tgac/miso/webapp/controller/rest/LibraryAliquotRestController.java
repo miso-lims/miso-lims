@@ -51,11 +51,15 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
 @RequestMapping("/rest/libraryaliquots")
 public class LibraryAliquotRestController extends RestController {
+
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
 
   private final JQueryDataTableBackend<PoolableElementView, LibraryAliquotDto> jQueryBackend = new JQueryDataTableBackend<PoolableElementView, LibraryAliquotDto>() {
     @Override
@@ -106,14 +110,14 @@ public class LibraryAliquotRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<LibraryAliquotDto> getLibraryAliquots(HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<LibraryAliquotDto> getByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.project(id));
   }
 
   @GetMapping(value = "/dt/pool/{id}/available", produces = "application/json")
@@ -122,7 +126,7 @@ public class LibraryAliquotRestController extends RestController {
       UriComponentsBuilder uriBuilder) throws IOException {
 
     final Pool pool = poolService.get(poolId);
-    return jQueryBackend.get(request, response, null, PaginationFilter.platformType(pool.getPlatformType()));
+    return jQueryBackend.get(request, response, null, advancedSearchParser, PaginationFilter.platformType(pool.getPlatformType()));
   }
 
   @PostMapping(value = "query", produces = { "application/json" })

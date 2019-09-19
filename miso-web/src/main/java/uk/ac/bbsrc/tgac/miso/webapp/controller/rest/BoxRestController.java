@@ -82,6 +82,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/boxes")
@@ -117,6 +118,9 @@ public class BoxRestController extends RestController {
   @Resource
   private Map<String, BoxScanner> boxScanners;
 
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
+
   private final JQueryDataTableBackend<Box, BoxDto> jQueryBackend = new JQueryDataTableBackend<Box, BoxDto>() {
     @Override
     protected BoxDto asDto(Box model) {
@@ -141,7 +145,7 @@ public class BoxRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<BoxDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/use/{id}", produces = "application/json")
@@ -149,7 +153,7 @@ public class BoxRestController extends RestController {
   public DataTablesResponseDto<BoxDto> dataTableByUse(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.boxUse(id));
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.boxUse(id));
   }
 
   @PutMapping(value = "/{boxId}/position/{position}", consumes = { "application/json" }, produces = { "application/json" })

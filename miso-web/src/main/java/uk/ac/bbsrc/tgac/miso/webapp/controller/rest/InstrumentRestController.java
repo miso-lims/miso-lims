@@ -30,10 +30,15 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/instruments")
 public class InstrumentRestController extends RestController {
+
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
+
   private final JQueryDataTableBackend<Instrument, InstrumentDto> jQueryBackend = new JQueryDataTableBackend<Instrument, InstrumentDto>() {
     @Override
     protected InstrumentDto asDto(Instrument model) {
@@ -90,7 +95,7 @@ public class InstrumentRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<InstrumentDto> datatable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/instrument-type/{type}", produces = "application/json")
@@ -101,7 +106,7 @@ public class InstrumentRestController extends RestController {
     if (instrumentType == null) {
       throw new RestException("Invalid instrument type.", Status.BAD_REQUEST);
     }
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.instrumentType(instrumentType));
+    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.instrumentType(instrumentType));
   }
 
 }
