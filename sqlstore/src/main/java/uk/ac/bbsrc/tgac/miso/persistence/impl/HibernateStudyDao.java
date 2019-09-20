@@ -57,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 @Repository
 public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSource<Study> {
   private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "description" };
-  private static final Iterable<String> STANDARD_ALIASES = Arrays.asList("project", "lastModifier");
+  private static final Iterable<String> STANDARD_ALIASES = Arrays.asList("project");
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateStudyDao.class);
 
@@ -185,8 +185,8 @@ public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSour
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
-    return creator ? null : "lastModifier.loginName";
+  public String propertyForUser(boolean creator) {
+    return creator ? "creator" : "lastModifier";
   }
 
 }

@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -21,7 +21,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.WorksetStore;
 public class HibernateWorksetDao implements WorksetStore, HibernatePaginatedDataSource<Workset> {
 
   private static final String[] SEARCH_PROPERTIES = new String[] { "alias", "description" };
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("creator", "lastModifier");
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -121,7 +120,7 @@ public class HibernateWorksetDao implements WorksetStore, HibernatePaginatedData
 
   @Override
   public Iterable<String> listAliases() {
-    return STANDARD_ALIASES;
+    return Collections.emptyList();
   }
 
   @Override
@@ -147,8 +146,8 @@ public class HibernateWorksetDao implements WorksetStore, HibernatePaginatedData
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
-    return creator ? "creator.loginName" : "lastModifier.loginName";
+  public String propertyForUser(boolean creator) {
+    return creator ? "creator" : "lastModifier";
   }
 
 }

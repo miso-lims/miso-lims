@@ -231,7 +231,7 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     return records;
   }
 
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("sample", "lastModifier", "creator");
+  private final static List<String> STANDARD_ALIASES = Arrays.asList("sample");
 
   @Override
   public long countLibrariesBySearch(String querystr) throws IOException {
@@ -373,8 +373,8 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
-    return creator ? "creator.loginName" : "lastModifier.loginName";
+  public String propertyForUser(boolean creator) {
+    return creator ? "creator" : "lastModifier";
   }
 
   @Override

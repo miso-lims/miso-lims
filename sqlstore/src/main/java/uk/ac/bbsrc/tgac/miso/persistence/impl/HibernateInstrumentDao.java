@@ -160,7 +160,7 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
+  public String propertyForUser(boolean creator) {
     return null;
   }
 

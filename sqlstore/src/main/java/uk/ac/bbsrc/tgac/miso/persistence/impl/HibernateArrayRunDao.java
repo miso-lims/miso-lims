@@ -154,8 +154,8 @@ public class HibernateArrayRunDao implements ArrayRunStore, HibernatePaginatedDa
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
-    return creator ? "creator.loginName" : "lastModifier.loginName";
+  public String propertyForUser(boolean creator) {
+    return creator ? "creator" : "lastModifier";
   }
 
   @Override

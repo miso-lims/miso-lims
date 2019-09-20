@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
@@ -23,7 +22,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.ListPoolViewDao;
 public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePaginatedDataSource<ListPoolView> {
 
   private final static String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode", "description" };
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator");
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -69,7 +67,7 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
 
   @Override
   public Iterable<String> listAliases() {
-    return STANDARD_ALIASES;
+    return Collections.emptyList();
   }
 
   @Override
@@ -98,7 +96,7 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
+  public String propertyForUser(boolean creator) {
     return creator ? "creator" : "lastModifier";
   }
 

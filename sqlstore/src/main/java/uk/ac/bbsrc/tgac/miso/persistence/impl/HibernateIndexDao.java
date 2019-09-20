@@ -115,7 +115,7 @@ public class HibernateIndexDao implements IndexStore, HibernatePaginatedDataSour
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
+  public String propertyForUser(boolean creator) {
     return null;
   }
 

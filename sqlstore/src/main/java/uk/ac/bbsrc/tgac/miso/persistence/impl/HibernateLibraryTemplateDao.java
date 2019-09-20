@@ -102,7 +102,7 @@ public class HibernateLibraryTemplateDao implements LibraryTemplateStore, Hibern
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
+  public String propertyForUser(boolean creator) {
     return null;
   }
 

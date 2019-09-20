@@ -111,6 +111,8 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
       return "sampleAlias";
     case "libraryPlatformType":
       return "platformType";
+    case "creatorName":
+      return "creator.fullName";
     case "creationDate":
       return "created";
     case "library.platformType":
@@ -163,8 +165,8 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
-  public String propertyForUserName(Criteria item, boolean creator) {
-    return creator ? "creatorName" : "lastModifierName";
+  public String propertyForUser(boolean creator) {
+    return creator ? "creator" : "lastModifier";
   }
 
   @Override

@@ -29,7 +29,7 @@ public class HibernateArrayDao implements ArrayStore, HibernatePaginatedDataSour
   private static final String FIELD_SERIALNUM = "serialNumber";
 
   private static final String[] SEARCH_PROPERTIES = new String[] { FIELD_ALIAS, FIELD_SERIALNUM, "description" };
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator", "arrayModel");
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("arrayModel");
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -192,8 +192,8 @@ public class HibernateArrayDao implements ArrayStore, HibernatePaginatedDataSour
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
-    return creator ? "creator.loginName" : "lastModifier.loginName";
+  public String propertyForUser(boolean creator) {
+    return creator ? "creator" : "lastModifier";
   }
 
 }

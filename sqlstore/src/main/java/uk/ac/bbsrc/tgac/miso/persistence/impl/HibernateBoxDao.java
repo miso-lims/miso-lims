@@ -43,7 +43,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
 
   protected static final String[] SEARCH_PROPERTIES = new String[] { "name", FIELD_ALIAS, FIELD_BARCODE, "locationBarcode" };
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator", "size", "use");
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("size", "use");
 
   private static final List<Class<? extends BoxableView>> VIEW_CLASSES = Lists.newArrayList(SampleBoxableView.class,
       LibraryBoxableView.class, LibraryAliquotBoxableView.class, PoolBoxableView.class);
@@ -331,8 +331,8 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
-    return creator ? null : "lastModifier.loginName";
+  public String propertyForUser(boolean creator) {
+    return creator ? "creator" : "lastModifier";
   }
 
   @Override

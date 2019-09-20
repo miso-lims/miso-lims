@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -307,8 +306,6 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     return (Sample) criteria.uniqueResult();
   }
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator");
-
   @Override
   public String getProjectColumn() {
     return "project.id";
@@ -316,7 +313,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
 
   @Override
   public Iterable<String> listAliases() {
-    return STANDARD_ALIASES;
+    return Collections.emptyList();
   }
 
   @Override
@@ -351,8 +348,8 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
-    return creator ? "creator.loginName" : "lastModifier.loginName";
+  public String propertyForUser(boolean creator) {
+    return creator ? "creator" : "lastModifier";
   }
 
   @Override

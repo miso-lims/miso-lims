@@ -13,10 +13,9 @@ AS SELECT
     d.identificationBarcode AS aliquotBarcode,
     d.lastUpdated AS lastModified,
     d.creationDate AS created,
-    createUser.loginName AS creatorName,
-    createUser.fullName AS creatorFullName,
+    d.creator AS creator,
     d.targetedSequencingId AS targetedSequencingId,
-    modUser.loginName AS lastModifierName,
+    d.lastModifier AS lastModifier,
     d.preMigrationId AS preMigrationId,
     l.libraryId AS libraryId,
     l.name AS libraryName,
@@ -47,8 +46,6 @@ AS SELECT
     box.identificationBarcode AS boxIdentificationBarcode,
     box.locationBarcode AS boxLocationBarcode
   FROM LibraryAliquot d
-    LEFT JOIN User modUser ON modUser.userId = d.lastModifier
-    JOIN User createUser ON createUser.userId = d.creator
     JOIN Library l ON l.libraryId = d.libraryId
     JOIN Sample s ON s.sampleId = l.sample_sampleId
     JOIN Project p ON p.projectId = s.project_projectId

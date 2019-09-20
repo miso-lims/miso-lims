@@ -1587,7 +1587,7 @@ public class Dtos {
     dto.setId(from.getAliquotId());
     dto.setName(from.getAliquotName());
     setString(dto::setAlias, from.getAliquotAlias());
-    dto.setCreatorName(from.getCreatorFullName());
+    setString(dto::setCreatorName, maybeGetProperty(from.getCreator(), User::getFullName));
     dto.setConcentration(from.getAliquotConcentration() == null ? null : from.getAliquotConcentration().toString());
     dto.setConcentrationUnits(from.getAliquotConcentrationUnits());
     dto.setLastModified(formatDateTime(from.getLastModified()));

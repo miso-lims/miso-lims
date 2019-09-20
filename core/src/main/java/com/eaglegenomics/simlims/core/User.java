@@ -30,7 +30,7 @@ public interface User extends Serializable, Comparable<User>, Identifiable {
 
   String getPassword();
 
-  Collection<Group> getGroups();
+  Set<Group> getGroups();
 
   String getLoginName();
 
@@ -52,7 +52,7 @@ public interface User extends Serializable, Comparable<User>, Identifiable {
 
   void setPassword(String password);
 
-  void setGroups(Collection<Group> groups);
+  void setGroups(Set<Group> groups);
 
   void setInternal(boolean internal);
 

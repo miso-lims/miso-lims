@@ -19,6 +19,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -63,6 +64,17 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
       String[] parts = alias.split("\\.");
       criteria.createAlias(alias, parts[parts.length - 1]);
     }
+    String creator = propertyForUser(true);
+    String modifier = propertyForUser(false);
+    if (creator != null) {
+      criteria.createAlias(creator, creator);
+      criteria.createAlias(creator + ".groups", "creatorGroup", JoinType.LEFT_OUTER_JOIN);
+    }
+    if (modifier != null) {
+      criteria.createAlias(modifier, modifier);
+      criteria.createAlias(modifier + ".groups", "modifierGroup", JoinType.LEFT_OUTER_JOIN);
+    }
+    criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
     return criteria;
   }
 
@@ -145,12 +157,12 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   String propertyForSortColumn(String original);
 
   /**
-   * The property name for the login name of a user.
+   * The property name for the user
    * 
-   * @param creator if the true, the user that created this object; otherwise the last modifier
-   * @return the name of the property or null if the search criterion should be ignored.
+   * @param creator if true, the user that created this object; otherwise the last modifier
+   * @return the name of the property or null if the search criterion should be ignored
    */
-  public abstract String propertyForUserName(Criteria criteria, boolean creator);
+  public abstract String propertyForUser(boolean creator);
 
   @Override
   default void restrictPaginationByArchived(Criteria criteria, boolean isArchived, Consumer<String> errorHandler) {
@@ -316,9 +328,22 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
 
   @Override
   public default void restrictPaginationByUser(Criteria criteria, String userName, boolean creator, Consumer<String> errorHandler) {
-    String property = propertyForUserName(criteria, creator);
+    String property = propertyForUser(creator);
     if (property != null) {
-      criteria.add(Restrictions.ilike(property, userName, MatchMode.START));
+      criteria.add(Restrictions.ilike(property + ".loginName", userName, MatchMode.START));
+    } else {
+      errorHandler.accept(String.format("%s has no %s.", getFriendlyName(), (creator ? "creator" : "modifier")));
+    }
+  }
+
+  @Override
+  public default void restrictPaginationByUserOrGroup(Criteria criteria, String name, boolean creator, Consumer<String> errorHandler) {
+    String propertyForUser = propertyForUser(creator);
+    if (propertyForUser != null) {
+      propertyForUser += ".loginName";
+      String propertyForGroup = creator ? "creatorGroup.name" : "modifierGroup.name";
+      criteria.add(Restrictions.or(Restrictions.ilike(propertyForUser, name, MatchMode.START),
+          Restrictions.ilike(propertyForGroup, name, MatchMode.START)));
     } else {
       errorHandler.accept(String.format("%s has no %s.", getFriendlyName(), (creator ? "creator" : "modifier")));
     }

@@ -1,8 +1,8 @@
 package com.eaglegenomics.simlims.core;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -41,7 +41,7 @@ public class Group implements Serializable, Comparable<Group>, Identifiable {
   @JoinTable(name = "User_Group", joinColumns = { @JoinColumn(name = "groups_groupId") }, inverseJoinColumns = {
       @JoinColumn(name = "users_userId")
   })
-  private Collection<User> users = new HashSet<>();
+  private Set<User> users = new HashSet<>();
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -65,7 +65,7 @@ public class Group implements Serializable, Comparable<Group>, Identifiable {
     return name;
   }
 
-  public Collection<User> getUsers() {
+  public Set<User> getUsers() {
     return users;
   }
 
@@ -77,7 +77,7 @@ public class Group implements Serializable, Comparable<Group>, Identifiable {
     this.name = name;
   }
 
-  public void setUsers(Collection<User> users) {
+  public void setUsers(Set<User> users) {
     this.users = users;
   }
 
