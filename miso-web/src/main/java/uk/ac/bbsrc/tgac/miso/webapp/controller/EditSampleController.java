@@ -379,25 +379,25 @@ public class EditSampleController {
       detailedTemplate = new SampleTissueDto();
       break;
     case SampleTissueProcessing.CATEGORY_NAME:
-      if (SampleSlide.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
+      if (SampleSlide.SUBCATEGORY_NAME.equals(target.getSampleSubcategory())) {
         detailedTemplate = new SampleSlideDto();
-      } else if (SampleLCMTube.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
+      } else if (SampleLCMTube.SUBCATEGORY_NAME.equals(target.getSampleSubcategory())) {
         detailedTemplate = new SampleLCMTubeDto();
-      } else if (SampleSingleCell.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
+      } else if (SampleSingleCell.SUBCATEGORY_NAME.equals(target.getSampleSubcategory())) {
         detailedTemplate = new SampleSingleCellDto();
       } else {
         detailedTemplate = new SampleTissueProcessingDto();
       }
       break;
     case SampleStock.CATEGORY_NAME:
-      if (SampleStockSingleCell.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
+      if (SampleStockSingleCell.SUBCATEGORY_NAME.equals(target.getSampleSubcategory())) {
         detailedTemplate = new SampleStockSingleCellDto();
       } else {
         detailedTemplate = new SampleStockDto();
       }
       break;
     case SampleAliquot.CATEGORY_NAME:
-      if (SampleAliquotSingleCell.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
+      if (SampleAliquotSingleCell.SUBCATEGORY_NAME.equals(target.getSampleSubcategory())) {
         detailedTemplate = new SampleAliquotSingleCellDto();
       } else {
         detailedTemplate = new SampleAliquotDto();

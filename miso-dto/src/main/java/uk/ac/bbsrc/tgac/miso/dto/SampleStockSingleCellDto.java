@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 
-@JsonTypeName(value = SampleStockSingleCell.SAMPLE_CLASS_NAME)
+@JsonTypeName(value = SampleStockSingleCell.SUBCATEGORY_NAME)
 public class SampleStockSingleCellDto extends SampleStockDto implements SampleStockSingleCellRelative {
 
   private Long tissueProcessingClassId;

@@ -305,6 +305,7 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setSampleCategory(from.getSampleCategory());
+    dto.setSampleSubcategory(from.getSampleSubcategory());
     dto.setSuffix(from.getSuffix());
     dto.setArchived(from.isArchived());
     dto.setDirectCreationAllowed(from.isDirectCreationAllowed());
@@ -324,6 +325,7 @@ public class Dtos {
     SampleClass to = new SampleClassImpl();
     to.setAlias(from.getAlias());
     to.setSampleCategory(from.getSampleCategory());
+    to.setSampleSubcategory(from.getSampleSubcategory());
     to.setSuffix(from.getSuffix());
     to.setArchived(from.isArchived());
     to.setDirectCreationAllowed(from.isDirectCreationAllowed());
@@ -458,6 +460,7 @@ public class Dtos {
     dto.setSampleClassId(from.getSampleClass().getId());
     dto.setSampleClassAlias(from.getSampleClass().getAlias());
     dto.setSampleCategory(from.getSampleClass().getSampleCategory());
+    dto.setSampleSubcategory(from.getSampleClass().getSampleSubcategory());
     if (from.getDetailedQcStatus() != null) {
       dto.setDetailedQcStatusId(from.getDetailedQcStatus().getId());
     }

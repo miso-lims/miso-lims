@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 public interface SampleSlide extends SampleTissueProcessing {
 
-  public static final String SAMPLE_CLASS_NAME = "Slide";
+  public static final String SUBCATEGORY_NAME = "Slide";
 
   Integer getSlides();
 

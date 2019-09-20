@@ -10,26 +10,26 @@ INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Human h
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (2, 'Human hg19');
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (3, 'Human hg18 random');
 
-INSERT INTO SampleClass (sampleClassId, alias, sampleCategory, suffix, dnaseTreatable, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 'Identity',             'Identity',          NULL,  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(23, 'Tissue',              'Tissue',            NULL,  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(24, 'Slide',               'Tissue Processing', 'SL',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(10, 'LCM Tube',            'Tissue Processing', 'LCM', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(8, 'Curls',                'Tissue Processing', 'C',   0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(11, 'gDNA (stock)',        'Stock',             'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(12, 'gDNA_wga (stock)',    'Stock',             'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(13, 'whole RNA (stock)',   'Stock',             'R_S', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(14, 'cDNA (stock)',        'Stock',             'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(15, 'gDNA (aliquot)',      'Aliquot',           'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(16, 'gDNA_wga (aliquot)',  'Aliquot',           'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(17, 'whole RNA (aliquot)', 'Aliquot',           'R_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(18, 'smRNA',               'Aliquot',           'SM_', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(19, 'mRNA',                'Aliquot',           'MR_', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(20, 'rRNA_depleted',       'Aliquot',           'WT_', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(21, 'cDNA (aliquot)',      'Aliquot',           'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(25, 'Single Cell',         'Tissue Processing', 'SC',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(26, 'Single Cell DNA (stock)',   'Stock',       'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(27, 'Single Cell DNA (aliquot)', 'Aliquot',     'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
+INSERT INTO SampleClass (sampleClassId, alias, sampleCategory, sampleSubcategory, suffix, dnaseTreatable, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 'Identity',             'Identity',          NULL,                    NULL,  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(23, 'Tissue',              'Tissue',            NULL,                    NULL,  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(24, 'Slide',               'Tissue Processing', 'Slide',                 'SL',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(10, 'LCM Tube',            'Tissue Processing', 'LCM Tube',              'LCM', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(8, 'Curls',                'Tissue Processing', 'Curls',                 'C',   0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(11, 'gDNA (stock)',        'Stock',             NULL,                    'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(12, 'gDNA_wga (stock)',    'Stock',             NULL,                    'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(13, 'whole RNA (stock)',   'Stock',             NULL,                    'R_S', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(14, 'cDNA (stock)',        'Stock',             NULL,                    'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(15, 'gDNA (aliquot)',      'Aliquot',           NULL,                    'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(16, 'gDNA_wga (aliquot)',  'Aliquot',           NULL,                    'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(17, 'whole RNA (aliquot)', 'Aliquot',           NULL,                    'R_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(18, 'smRNA',               'Aliquot',           NULL,                    'SM_', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(19, 'mRNA',                'Aliquot',           NULL,                    'MR_', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(20, 'rRNA_depleted',       'Aliquot',           NULL,                    'WT_', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(21, 'cDNA (aliquot)',      'Aliquot',           NULL,                    'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(25, 'Single Cell',         'Tissue Processing', 'Single Cell',           'SC',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(26, 'Single Cell DNA (stock)',   'Stock',       'Single Cell (stock)',   'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(27, 'Single Cell DNA (aliquot)', 'Aliquot',     'Single Cell (aliquot)', 'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
 
 INSERT INTO SampleValidRelationship (parentId, childId, createdBy, creationDate, updatedBy, lastUpdated, archived) VALUES
 ( 8, 11, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),

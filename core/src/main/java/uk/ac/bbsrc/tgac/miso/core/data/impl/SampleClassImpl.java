@@ -45,6 +45,8 @@ public class SampleClassImpl implements SampleClass {
   @Column(nullable = false)
   private String sampleCategory;
 
+  private String sampleSubcategory;
+
   @Column(nullable = true)
   private String suffix;
 
@@ -180,6 +182,16 @@ public class SampleClassImpl implements SampleClass {
   }
 
   @Override
+  public String getSampleSubcategory() {
+    return sampleSubcategory;
+  }
+
+  @Override
+  public void setSampleSubcategory(String sampleSubcategory) {
+    this.sampleSubcategory = sampleSubcategory;
+  }
+
+  @Override
   public boolean hasPathToDnaseTreatable(Collection<SampleValidRelationship> relationships) {
     return hasPathToDnaseTreatable(this, new HashSet<>(), relationships);
   }
@@ -206,6 +218,7 @@ public class SampleClassImpl implements SampleClass {
         .append(alias)
         .append(dnaseTreatable)
         .append(sampleCategory)
+        .append(sampleSubcategory)
         .append(suffix)
         .toHashCode();
   }
@@ -220,6 +233,7 @@ public class SampleClassImpl implements SampleClass {
         .append(alias, other.alias)
         .append(dnaseTreatable, other.dnaseTreatable)
         .append(sampleCategory, other.sampleCategory)
+        .append(sampleSubcategory, other.sampleSubcategory)
         .append(suffix, other.suffix)
         .isEquals();
   }

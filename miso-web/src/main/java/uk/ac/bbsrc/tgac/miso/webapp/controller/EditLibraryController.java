@@ -483,7 +483,7 @@ public class EditLibraryController {
       if (aliquotClass == null) throw new InvalidParameterException("Requested sample class not found");
       DetailedLibraryDto detailedDto = new DetailedLibraryDto();
       libDto = detailedDto;
-      SampleAliquotDto samDto = SampleAliquotSingleCell.SAMPLE_CLASS_NAME.equals(aliquotClass.getAlias()) ? new SampleAliquotSingleCellDto()
+      SampleAliquotDto samDto = SampleAliquotSingleCell.SUBCATEGORY_NAME.equals(aliquotClass.getAlias()) ? new SampleAliquotSingleCellDto()
           : new SampleAliquotDto();
       detailedDto.setSample(samDto);
       samDto.setSampleClassId(aliquotClassId);

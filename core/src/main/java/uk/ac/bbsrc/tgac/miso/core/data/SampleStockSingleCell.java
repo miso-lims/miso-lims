@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public interface SampleStockSingleCell extends SampleStock {
 
-  public static final String SAMPLE_CLASS_NAME = "Single Cell DNA (stock)";
+  public static final String SUBCATEGORY_NAME = "Single Cell (stock)";
 
   public BigDecimal getTargetCellRecovery();
 
