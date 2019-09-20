@@ -105,6 +105,11 @@ public class HibernateIndexDao implements IndexStore, HibernatePaginatedDataSour
   }
 
   @Override
+  public String propertyForId() {
+    return "indexId";
+  }
+
+  @Override
   public String propertyForSortColumn(String original) {
     return original;
   }

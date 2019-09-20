@@ -66,6 +66,11 @@ public class HibernateDeletionDao implements DeletionStore, HibernatePaginatedDa
   }
 
   @Override
+  public String propertyForId() {
+    return "id";
+  }
+
+  @Override
   public String[] getSearchProperties() {
     return SEARCH_PROPERTIES;
   }

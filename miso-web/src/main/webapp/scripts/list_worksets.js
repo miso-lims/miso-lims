@@ -111,5 +111,8 @@ ListTarget.workset = {
           include: true,
           iSortPriority: 1
         }];
+  },
+  searchTermSelector: function(searchTerms) {
+    return [searchTerms['id'], searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby']];
   }
 };

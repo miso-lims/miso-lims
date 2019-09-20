@@ -35,6 +35,10 @@ ListUtils = (function($) {
   };
 
   var searchTerms = {
+    "id": {
+      term: "id:#",
+      help: "Checks for an item with the specified ID."
+    },
     "fulfilled": {
       term: "is:fulfilled",
       help: "Check if there are no outstanding orders (remaining = 0)."

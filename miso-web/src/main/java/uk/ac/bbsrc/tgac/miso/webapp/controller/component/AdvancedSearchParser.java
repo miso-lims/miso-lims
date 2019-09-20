@@ -117,6 +117,13 @@ public class AdvancedSearchParser {
             errorHandler.accept("Invalid platform: " + parts[1]);
             return null;
           }
+        case "id":
+          try {
+            return PaginationFilter.id(Long.parseLong(parts[1]));
+          } catch (NumberFormatException ex) {
+            errorHandler.accept("Invalid ID: " + parts[1]);
+            return null;
+          }
         case "index":
           return PaginationFilter.index(parts[1]);
         case "class":

@@ -161,8 +161,8 @@ ListTarget.sample = {
         }];
   },
   searchTermSelector: function(searchTerms) {
-    const plainSampleTerms = [searchTerms['created'], searchTerms['changed'], searchTerms['received'], searchTerms['creator'],
-        searchTerms['changedby'], searchTerms['box'], searchTerms['distributed'], searchTerms['distributedto']];
+    const plainSampleTerms = [searchTerms['id'], searchTerms['created'], searchTerms['changed'], searchTerms['received'],
+        searchTerms['creator'], searchTerms['changedby'], searchTerms['box'], searchTerms['distributed'], searchTerms['distributedto']];
     const detailedSampleTerms = [searchTerms['class'], searchTerms['institute'], searchTerms['external'], searchTerms['subproject'],
         searchTerms['groupid'], searchTerms['ghost']];
     if (Constants.isDetailedSample) {

@@ -158,6 +158,11 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
+  public String propertyForId() {
+    return "aliquotId";
+  }
+
+  @Override
   public String propertyForUserName(Criteria item, boolean creator) {
     return creator ? "creatorName" : "lastModifierName";
   }

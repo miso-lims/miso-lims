@@ -368,6 +368,11 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
+  public String propertyForId() {
+    return "libraryId";
+  }
+
+  @Override
   public String propertyForUserName(Criteria criteria, boolean creator) {
     return creator ? "creator.loginName" : "lastModifier.loginName";
   }

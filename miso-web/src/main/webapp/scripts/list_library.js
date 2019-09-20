@@ -148,9 +148,9 @@ ListTarget.library = {
         }];
   },
   searchTermSelector: function(searchTerms) {
-    const plainSampleTerms = [searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'],
-        searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box'], searchTerms['kitname'],
-        searchTerms['distributed'], searchTerms['distributedto']];
+    const plainSampleTerms = [searchTerms['id'], searchTerms['created'], searchTerms['changed'], searchTerms['creator'],
+        searchTerms['changedby'], searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box'],
+        searchTerms['kitname'], searchTerms['distributed'], searchTerms['distributedto']];
     const detailedSampleTerms = [searchTerms['groupid']];
     if (Constants.isDetailedSample) {
       return plainSampleTerms.concat(detailedSampleTerms);

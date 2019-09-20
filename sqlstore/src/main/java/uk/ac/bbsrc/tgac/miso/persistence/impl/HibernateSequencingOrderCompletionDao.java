@@ -96,6 +96,11 @@ public class HibernateSequencingOrderCompletionDao implements SequencingOrderCom
   }
 
   @Override
+  public String propertyForId() {
+    return null;
+  }
+
+  @Override
   public String propertyForUserName(Criteria criteria, boolean creator) {
     return null;
   }
