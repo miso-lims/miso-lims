@@ -83,7 +83,7 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder> implement
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
+  public String propertyForUser(boolean creator) {
     return creator ? "createdBy" : "updatedBy";
   }
 

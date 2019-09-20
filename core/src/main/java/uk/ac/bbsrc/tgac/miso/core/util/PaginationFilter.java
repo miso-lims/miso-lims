@@ -369,6 +369,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter userOrGroup(String name, boolean creator) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByUserOrGroup(item, name, creator, errorHandler);
+      }
+    };
+  }
+
   public abstract <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler);
 
 }

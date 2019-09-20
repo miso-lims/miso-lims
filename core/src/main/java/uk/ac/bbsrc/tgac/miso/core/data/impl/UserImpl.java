@@ -95,7 +95,7 @@ public class UserImpl implements User, Serializable {
   @Fetch(FetchMode.SUBSELECT)
   @JoinTable(name = "User_Group", inverseJoinColumns = { @JoinColumn(name = "groups_groupId") }, joinColumns = {
       @JoinColumn(name = "users_userId") })
-  private Collection<Group> groups = new HashSet<>();
+  private Set<Group> groups = new HashSet<>();
 
   @Lob
   private String roles = new String();
@@ -141,7 +141,7 @@ public class UserImpl implements User, Serializable {
   }
 
   @Override
-  public Collection<Group> getGroups() {
+  public Set<Group> getGroups() {
     return groups;
   }
 
@@ -204,7 +204,7 @@ public class UserImpl implements User, Serializable {
   }
 
   @Override
-  public void setGroups(Collection<Group> groups) {
+  public void setGroups(Set<Group> groups) {
     this.groups = groups;
   }
 

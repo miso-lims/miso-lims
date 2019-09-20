@@ -1,8 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -21,8 +20,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernateDeletionDao implements DeletionStore, HibernatePaginatedDataSource<Deletion> {
-
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("user");
 
   private static final String[] SEARCH_PROPERTIES = new String[] { "description" };
 
@@ -56,8 +53,8 @@ public class HibernateDeletionDao implements DeletionStore, HibernatePaginatedDa
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
-    return null;
+  public String propertyForUser(boolean creator) {
+    return creator ? "user" : null;
   }
 
   @Override
@@ -87,7 +84,7 @@ public class HibernateDeletionDao implements DeletionStore, HibernatePaginatedDa
 
   @Override
   public Iterable<String> listAliases() {
-    return STANDARD_ALIASES;
+    return Collections.emptyList();
   }
 
   @Override

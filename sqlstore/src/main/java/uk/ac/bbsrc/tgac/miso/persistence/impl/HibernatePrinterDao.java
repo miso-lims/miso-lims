@@ -123,7 +123,7 @@ public class HibernatePrinterDao implements PrinterStore, HibernatePaginatedData
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
+  public String propertyForUser(boolean creator) {
     return null;
   }
 

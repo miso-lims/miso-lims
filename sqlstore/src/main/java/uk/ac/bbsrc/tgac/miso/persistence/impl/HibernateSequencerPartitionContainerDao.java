@@ -36,7 +36,7 @@ public class HibernateSequencerPartitionContainerDao
   protected static final Logger log = LoggerFactory.getLogger(HibernateSequencerPartitionContainerDao.class);
 
   private static final String[] SEARCH_PROPERTIES = new String[] { "identificationBarcode" };
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator", "model");
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("model");
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -192,8 +192,8 @@ public class HibernateSequencerPartitionContainerDao
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
-    return creator ? "creator.loginName" : "lastModifier.loginName";
+  public String propertyForUser(boolean creator) {
+    return creator ? "creator" : "lastModifier";
   }
 
   @Override

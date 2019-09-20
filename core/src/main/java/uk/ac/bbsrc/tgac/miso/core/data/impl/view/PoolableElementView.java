@@ -23,6 +23,8 @@ import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.LazyToOne;
 import org.hibernate.annotations.LazyToOneOption;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -31,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
@@ -129,11 +132,13 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private Boolean subprojectPriority;
 
-  private String lastModifierName;
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
 
-  private String creatorName;
-
-  private String creatorFullName;
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier", nullable = false)
+  private User lastModifier;
 
   private Long targetedSequencingId;
 
@@ -511,28 +516,20 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     this.created = created;
   }
 
-  public String getLastModifierName() {
-    return lastModifierName;
+  public User getCreator() {
+    return creator;
   }
 
-  public void setLastModifierName(String lastModifierName) {
-    this.lastModifierName = lastModifierName;
+  public void setCreator(User creator) {
+    this.creator = creator;
   }
 
-  public String getCreatorName() {
-    return creatorName;
+  public User getLastModifier() {
+    return lastModifier;
   }
 
-  public void setCreatorName(String creatorName) {
-    this.creatorName = creatorName;
-  }
-
-  public String getCreatorFullName() {
-    return creatorFullName;
-  }
-
-  public void setCreatorFullName(String creatorFullName) {
-    this.creatorFullName = creatorFullName;
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
   }
 
   @Override
@@ -629,8 +626,7 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     result = prime * result + ((boxLocationBarcode == null) ? 0 : boxLocationBarcode.hashCode());
     result = prime * result + ((boxName == null) ? 0 : boxName.hashCode());
     result = prime * result + ((created == null) ? 0 : created.hashCode());
-    result = prime * result + ((creatorName == null) ? 0 : creatorName.hashCode());
-    result = prime * result + ((creatorFullName == null) ? 0 : creatorFullName.hashCode());
+    result = prime * result + ((creator == null) ? 0 : creator.hashCode());
     result = prime * result + ((aliquotBarcode == null) ? 0 : aliquotBarcode.hashCode());
     result = prime * result + ((aliquotDnaSize == null) ? 0 : aliquotDnaSize.hashCode());
     result = prime * result + ((aliquotConcentration == null) ? 0 : aliquotConcentration.hashCode());
@@ -642,7 +638,7 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     result = prime * result + ((aliquotVolumeUsed == null) ? 0 : aliquotVolumeUsed.hashCode());
     result = prime * result + ((indices == null) ? 0 : indices.hashCode());
     result = prime * result + ((lastModified == null) ? 0 : lastModified.hashCode());
-    result = prime * result + ((lastModifierName == null) ? 0 : lastModifierName.hashCode());
+    result = prime * result + ((lastModifier == null) ? 0 : lastModifier.hashCode());
     result = prime * result + ((libraryAlias == null) ? 0 : libraryAlias.hashCode());
     result = prime * result + ((libraryBarcode == null) ? 0 : libraryBarcode.hashCode());
     result = prime * result + ((libraryDescription == null) ? 0 : libraryDescription.hashCode());
@@ -689,12 +685,9 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     if (created == null) {
       if (other.created != null) return false;
     } else if (!created.equals(other.created)) return false;
-    if (creatorName == null) {
-      if (other.creatorName != null) return false;
-    } else if (!creatorName.equals(other.creatorName)) return false;
-    if (creatorFullName == null) {
-      if (other.creatorFullName != null) return false;
-    } else if (!creatorFullName.equals(other.creatorFullName)) return false;
+    if (creator == null) {
+      if (other.creator != null) return false;
+    } else if (!creator.equals(other.creator)) return false;
     if (aliquotBarcode == null) {
       if (other.aliquotBarcode != null) return false;
     } else if (!aliquotBarcode.equals(other.aliquotBarcode)) return false;
@@ -726,9 +719,9 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     if (lastModified == null) {
       if (other.lastModified != null) return false;
     } else if (!lastModified.equals(other.lastModified)) return false;
-    if (lastModifierName == null) {
-      if (other.lastModifierName != null) return false;
-    } else if (!lastModifierName.equals(other.lastModifierName)) return false;
+    if (lastModifier == null) {
+      if (other.lastModifier != null) return false;
+    } else if (!lastModifier.equals(other.lastModifier)) return false;
     if (libraryAlias == null) {
       if (other.libraryAlias != null) return false;
     } else if (!libraryAlias.equals(other.libraryAlias)) return false;

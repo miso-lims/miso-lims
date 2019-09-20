@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -224,8 +223,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
     this.sessionFactory = sessionFactory;
   }
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator");
-
   @Override
   public String[] getSearchProperties() {
     return SEARCH_PROPERTIES;
@@ -238,7 +235,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   @Override
   public Iterable<String> listAliases() {
-    return STANDARD_ALIASES;
+    return Collections.emptyList();
   }
 
   @Override
@@ -278,8 +275,8 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
-    return creator ? "creator.loginName" : "lastModifier.loginName";
+  public String propertyForUser(boolean creator) {
+    return creator ? "creator" : "lastModifier";
   }
 
   @Override

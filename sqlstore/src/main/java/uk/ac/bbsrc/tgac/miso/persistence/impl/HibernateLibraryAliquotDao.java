@@ -30,7 +30,7 @@ public class HibernateLibraryAliquotDao
   // Make sure these match the HiberatePoolableElementViewDao
   private final static String[] SEARCH_PROPERTIES = new String[] { "name", "identificationBarcode", "library.name", "library.alias",
       "library.description" };
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("library", "creator", "lastModifier");
+  private final static List<String> STANDARD_ALIASES = Arrays.asList("library");
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -179,8 +179,8 @@ public class HibernateLibraryAliquotDao
   }
 
   @Override
-  public String propertyForUserName(Criteria item, boolean creator) {
-    return creator ? "creator.loginName" : "lastModifier.loginName";
+  public String propertyForUser(boolean creator) {
+    return creator ? "creator" : "lastModifier";
   }
 
   @Override

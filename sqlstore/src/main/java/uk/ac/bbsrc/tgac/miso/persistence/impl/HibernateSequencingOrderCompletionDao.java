@@ -101,7 +101,7 @@ public class HibernateSequencingOrderCompletionDao implements SequencingOrderCom
   }
 
   @Override
-  public String propertyForUserName(Criteria criteria, boolean creator) {
+  public String propertyForUser(boolean creator) {
     return null;
   }
 

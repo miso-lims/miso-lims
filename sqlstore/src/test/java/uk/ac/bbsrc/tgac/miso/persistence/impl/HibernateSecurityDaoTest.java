@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -184,7 +185,7 @@ public class HibernateSecurityDaoTest extends AbstractDAOTest {
     Group group = new Group();
     group.setName("testgroup");
     group.setDescription("test group");
-    Collection<User> users = new HashSet<>();
+    Set<User> users = new HashSet<>();
     users.add(dao.getUserById(3L));
     group.setUsers(users);
     

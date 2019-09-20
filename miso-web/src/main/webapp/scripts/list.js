@@ -191,7 +191,7 @@ ListUtils = (function($) {
 
   var userGrammar = '<table class="searchHelpTable">' + '  <caption><h2>USER Format</h2></caption>' + '  <thead>'
       + '    <tr><th>Format</th><th>Behaviour</th></tr>' + '  </thead>' + '  <tr><td>me</td><td>Searches for the current user.</td></tr>'
-      + '  <tr><td>Anything else</td><td>Assumed to be the user\'s login name (not their human name).'
+      + '  <tr><td>Anything else</td><td>Assumed to be the user\'s login name (not their human name), or the name of a group.'
       + '    This starts searching from the beginning, so “jrh” will match “jrhacker”, but “hacker” will not match “jrhacker”.</td></tr>'
       + '</table>';
 

@@ -230,7 +230,7 @@ public class AdvancedSearchParser {
     if (username.equalsIgnoreCase("me")) {
       return PaginationFilter.user(currentUser, creator);
     }
-    return PaginationFilter.user(username, creator);
+    return PaginationFilter.userOrGroup(username, creator);
   }
 
 }
