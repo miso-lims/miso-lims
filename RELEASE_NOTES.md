@@ -13,6 +13,7 @@ Changes:
   * Search worksets by user, date, and ID
   * Search by user group in any way that you could previously search by user
   * Fix bug where unassigned JIRA tickets will cause tables to not display correctly
+  * Added interface for administrators to add, edit, and delete targeted sequencings
 
 Upgrade notes:
 

@@ -156,6 +156,7 @@ public interface AbstractListPage {
     public static final String STORAGE_LOCATIONS = "storagelocations";
     public static final String STUDIES = "studies";
     public static final String STUDY_TYPES = "studytype/list";
+    public static final String TARGETED_SEQUENCINGS = "targetedsequencing/list";
     public static final String TISSUE_TYPES = "tissuetype/list";
     public static final String WORKSETS = "worksets";
   }

@@ -20,13 +20,14 @@ import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 @Entity
 @Table(name = "TargetedSequencing")
-public class TargetedSequencing implements Identifiable, Serializable, Timestamped {
+public class TargetedSequencing implements Deletable, Identifiable, Serializable, Timestamped {
 
   private static final long serialVersionUID = 1L;
   public static final long UNSAVED_ID = 0L;
@@ -38,7 +39,6 @@ public class TargetedSequencing implements Identifiable, Serializable, Timestamp
   @Column(nullable = false)
   private String alias;
 
-  @Column(nullable = false)
   private String description;
 
   @ManyToMany(targetEntity = KitDescriptor.class, mappedBy = "targetedSequencing")
@@ -197,6 +197,16 @@ public class TargetedSequencing implements Identifiable, Serializable, Timestamp
     } else if (!description.equals(other.description)) return false;
     if (targetedSequencingId != other.targetedSequencingId) return false;
     return true;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Targeted Sequencing";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias();
   }
 
 }

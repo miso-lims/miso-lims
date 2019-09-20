@@ -375,8 +375,12 @@ analysis and QC, though this file is not tracked within MISO.
 Targeted sequencing values may be archived if they are no longer needed. This will prevent them from showing up in the
 options when creating new library aliquots.
 
-Modifications to targeted sequencing values can only be made via direct access to the MISO database. As such, they must
-be performed by a MISO adminstrator.
+MISO administrators can add, edit, and delete targeted sequencings using the standard interface. A targeted sequencing
+can only be deleted if it has not been used by any existing library aliquots.
+
+Targeted sequencings are associated with kits, and a targeted sequencing may only be set on a library aliquot if its
+parent library uses an associated kit. Targeted sequencings can be associated with a kit from the Edit Kit Descriptor
+page.
 
 {% include userman-toplink.md %}
 
