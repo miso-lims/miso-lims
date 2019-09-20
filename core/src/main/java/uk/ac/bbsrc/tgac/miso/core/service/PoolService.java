@@ -37,5 +37,5 @@ public interface PoolService
 
   public Pool getByBarcode(String barcode) throws IOException;
 
-  public void checkMismatchedWithOrder(Pool pool, PoolOrder poolOrder) throws IOException;
+  public void checkMismatchedWithOrders(Pool pool, List<PoolOrder> poolOrders) throws IOException;
 }

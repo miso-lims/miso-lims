@@ -1,18 +1,19 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.hibernate.Criteria;
+import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
@@ -108,10 +109,11 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder> implement
   }
 
   @Override
-  public PoolOrder getByPoolId(long poolId) {
+  public List<PoolOrder> getAllByPoolId(long poolId) {
     Criteria criteria = currentSession().createCriteria(PoolOrder.class);
     criteria.add(Restrictions.eq(FIELD_POOL, poolId));
-    return (PoolOrder) criteria.uniqueResult();
+    List<PoolOrder> list = criteria.list();
+    return list;
   }
 
 }

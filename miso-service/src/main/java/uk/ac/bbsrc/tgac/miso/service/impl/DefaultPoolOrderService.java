@@ -1,10 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -315,7 +312,8 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
     to.setSequencingOrder(from.getSequencingOrder());
 
     //check if there's an associated Pool and if it still matches the Order
-    if(to.getPool() != null) poolService.checkMismatchedWithOrder(to.getPool(), to);
+    List<PoolOrder> poolOrderList = new LinkedList<>(); poolOrderList.add(to);
+    if(to.getPool() != null) poolService.checkMismatchedWithOrders(to.getPool(), poolOrderList);
   }
 
   @Override
@@ -349,8 +347,8 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
   }
 
   @Override
-  public PoolOrder getByPoolId(long poolId){
-    return poolOrderDao.getByPoolId(poolId);
+  public List<PoolOrder> getAllByPoolId(long poolId){
+    return poolOrderDao.getAllByPoolId(poolId);
   }
 
 }

@@ -329,9 +329,9 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     validateVolumeUnits(pool.getVolume(), pool.getVolumeUnits(), errors);
     validateBarcodeUniqueness(pool, beforeChange, poolStore::getByBarcode, errors, "pool");
     if (strictPools && !pool.isMergeChild()) validateIndices(pool, beforeChange, errors);
-    PoolOrder potentialPoolOrder = poolOrderService.getByPoolId(pool.getId());
-    if (potentialPoolOrder != null) {
-      checkMismatchedWithOrder(pool, potentialPoolOrder);
+    List<PoolOrder> potentialPoolOrders = poolOrderService.getAllByPoolId(pool.getId());
+    if (potentialPoolOrders != null) {
+      checkMismatchedWithOrders(pool, potentialPoolOrders);
     }
 
     if (!errors.isEmpty()) {
@@ -455,10 +455,10 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   @Override
-  public void checkMismatchedWithOrder(Pool pool, PoolOrder poolOrder) throws IOException {
+  public void checkMismatchedWithOrders(Pool pool, List<PoolOrder> poolOrders) throws IOException {
     // Check equivalence for all library aliquots. Platform type /should/ logically follow so no explicit check
     // Muffy, sis, the time complexity
-    Set<LibraryAliquot> poolOrderAliquots = poolOrder.getOrderLibraryAliquots().stream()
+    Set<LibraryAliquot> poolOrderAliquots = poolOrders.stream().flatMap(element -> element.getOrderLibraryAliquots().stream())
             .map(OrderLibraryAliquot::getAliquot)
             .collect(Collectors.toSet()),
             poolAliquots = pool.getPoolContents().stream()
