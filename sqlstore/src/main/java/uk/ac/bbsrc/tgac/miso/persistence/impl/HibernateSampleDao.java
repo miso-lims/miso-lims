@@ -346,6 +346,11 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
+  public String propertyForId() {
+    return "sampleId";
+  }
+
+  @Override
   public String propertyForUserName(Criteria criteria, boolean creator) {
     return creator ? "creator.loginName" : "lastModifier.loginName";
   }

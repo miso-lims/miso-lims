@@ -133,6 +133,13 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   public abstract String propertyForDate(Criteria criteria, DateType type);
 
   /**
+   * The property name for the ID field
+   * 
+   * @return the name of the property, or null if search by ID shouldn't be allowed
+   */
+  public abstract String propertyForId();
+
+  /**
    * Determine the correct Hibernate property given the user-supplied sort column.
    */
   String propertyForSortColumn(String original);
@@ -218,6 +225,16 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   @Override
   public default void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s has no health information.", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationById(Criteria criteria, long id, Consumer<String> errorHandler) {
+    String property = propertyForId();
+    if (property == null) {
+      errorHandler.accept(String.format("%s cannot be filtered by ID", getFriendlyName()));
+    } else {
+      criteria.add(Restrictions.eq(property, id));
+    }
   }
 
   @Override

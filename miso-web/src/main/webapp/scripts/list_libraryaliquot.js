@@ -194,7 +194,7 @@ ListTarget.libraryaliquot = {
     }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'],
-        searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box']]
+    return [searchTerms['id'], searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'],
+        searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box']]
   }
 };

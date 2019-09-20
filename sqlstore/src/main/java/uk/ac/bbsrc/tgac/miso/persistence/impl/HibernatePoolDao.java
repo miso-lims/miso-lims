@@ -273,6 +273,11 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
+  public String propertyForId() {
+    return "poolId";
+  }
+
+  @Override
   public String propertyForUserName(Criteria criteria, boolean creator) {
     return creator ? "creator.loginName" : "lastModifier.loginName";
   }

@@ -187,6 +187,11 @@ public class HibernateSequencerPartitionContainerDao
   }
 
   @Override
+  public String propertyForId() {
+    return "containerId";
+  }
+
+  @Override
   public String propertyForUserName(Criteria criteria, boolean creator) {
     return creator ? "creator.loginName" : "lastModifier.loginName";
   }

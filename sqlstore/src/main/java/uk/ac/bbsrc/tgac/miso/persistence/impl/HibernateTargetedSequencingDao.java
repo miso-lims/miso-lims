@@ -116,6 +116,11 @@ public class HibernateTargetedSequencingDao implements TargetedSequencingStore, 
   }
 
   @Override
+  public String propertyForId() {
+    return "targetedSequencingId";
+  }
+
+  @Override
   public String propertyForSortColumn(String original) {
     return original;
   }

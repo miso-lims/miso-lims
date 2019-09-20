@@ -9,6 +9,8 @@ Changes:
     ActiveDirectory configuration.
   * New options for searching by date: year, month, fiscal year, fiscal quarter,
     before/after specified range
+  * Search for items by ID
+  * Search worksets by user, date, and ID
 
 Upgrade notes:
 

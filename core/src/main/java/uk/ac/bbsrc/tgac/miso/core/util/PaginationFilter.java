@@ -192,6 +192,16 @@ public abstract interface PaginationFilter {
     return health(EnumSet.of(health));
   }
 
+  public static PaginationFilter id(long id) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationById(item, id, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter index(String index) {
     return new PaginationFilter() {
 

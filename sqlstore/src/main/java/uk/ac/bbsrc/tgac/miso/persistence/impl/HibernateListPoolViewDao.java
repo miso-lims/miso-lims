@@ -85,6 +85,11 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
   }
 
   @Override
+  public String propertyForId() {
+    return "poolId";
+  }
+
+  @Override
   public String propertyForSortColumn(String original) {
     if ("creationDate".equals(original)) {
       return "creationTime";

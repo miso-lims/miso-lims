@@ -68,6 +68,11 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder> implement
   }
 
   @Override
+  public String propertyForId() {
+    return "poolOrderId";
+  }
+
+  @Override
   public String propertyForSortColumn(String original) {
     switch (original) {
     case "purposeAlias":

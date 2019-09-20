@@ -170,6 +170,11 @@ public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSour
   }
 
   @Override
+  public String propertyForId() {
+    return "studyId";
+  }
+
+  @Override
   public String propertyForSortColumn(String original) {
     switch (original) {
     case "studyTypeId":

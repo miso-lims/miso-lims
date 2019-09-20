@@ -126,7 +126,19 @@ public class HibernateWorksetDao implements WorksetStore, HibernatePaginatedData
 
   @Override
   public String propertyForDate(Criteria criteria, DateType type) {
-    return null;
+    switch (type) {
+    case CREATE:
+      return "created";
+    case UPDATE:
+      return "lastModified";
+    default:
+      return null;
+    }
+  }
+
+  @Override
+  public String propertyForId() {
+    return "id";
   }
 
   @Override
