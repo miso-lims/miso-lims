@@ -393,6 +393,18 @@ Urls = (function() {
     update: idUrlFunction(subprojectRestBase)
   };
 
+  // Targeted Sequencings
+  var targetedSequencingUiBase = baseUrl + '/targetedsequencing';
+  ui.targetedSequencings = {
+    bulkEdit: targetedSequencingUiBase + '/bulk/edit'
+  };
+
+  var targetedSequencingRestBase = restBase + '/targetedsequencings';
+  rest.targetedSequencings = {
+    create: targetedSequencingRestBase,
+    update: idUrlFunction(targetedSequencingRestBase)
+  };
+
   // Tissue Materials
   var tissueMaterialRestBase = restBase + '/tissuematerials';
   rest.tissueMaterials = {

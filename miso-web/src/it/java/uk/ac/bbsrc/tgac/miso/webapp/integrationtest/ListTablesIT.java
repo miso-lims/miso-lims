@@ -661,6 +661,17 @@ public class ListTablesIT extends AbstractIT {
     testTabbedColumnsSort(ListTarget.POOL_ORDERS);
   }
 
+  @Test
+  public void testListTargetedSequencingsSetup() throws Exception {
+    testPageSetup(ListTarget.TARGETED_SEQUENCINGS,
+        Sets.newHashSet(Columns.SORT, Columns.ALIAS, Columns.DESCRIPTION, Columns.ARCHIVED));
+  }
+
+  @Test
+  public void testListTargetedSequencingsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.TARGETED_SEQUENCINGS);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     // Goal: confirm that all expected columns are present
     ListPage page = getList(listTarget);

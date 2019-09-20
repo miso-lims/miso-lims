@@ -28,38 +28,50 @@ ListTarget.targetedsequencing = {
   },
   getQueryUrl: null,
   createBulkActions: function(config) {
-    var actions = [{
-      'name': config.add ? 'Add' : 'Remove',
-      'action': function(tarseqs) {
-        var doAction = function() {
-          var data = {};
-          data[(config.add ? 'add' : 'remove')] = tarseqs.map(Utils.array.getId);
-          data[(config.add ? 'remove' : 'add')] = [];
-          Utils.ajaxWithDialog('Changing associated Targeted Sequencing panels', 'PUT', '/miso/rest/kitdescriptors/'
-              + config.kitDescriptorId + '/targetedsequencing', data, Utils.page.pageReload);
-        };
-        doAction();
+    if (config.kitDescriptorId) {
+      return [{
+        'name': config.add ? 'Add' : 'Remove',
+        'action': function(tarseqs) {
+          var doAction = function() {
+            var data = {};
+            data[(config.add ? 'add' : 'remove')] = tarseqs.map(Utils.array.getId);
+            data[(config.add ? 'remove' : 'add')] = [];
+            Utils.ajaxWithDialog('Changing associated Targeted Sequencing panels', 'PUT', '/miso/rest/kitdescriptors/'
+                + config.kitDescriptorId + '/targetedsequencing', data, Utils.page.pageReload);
+          };
+          doAction();
+        }
+      }];
+    } else {
+      var actions = HotTarget.targetedsequencing.getBulkActions(config);
+      if (config.isAdmin) {
+        actions.push(ListUtils.createBulkDeleteAction('Targeted Sequencings', 'targetedsequencings', Utils.array.getAlias));
       }
-    }];
-    return actions;
+      return actions;
+    }
   },
   createStaticActions: function(config) {
-    return [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Targeted Sequencings', 'targetedsequencing')] : [];
   },
   createColumns: function(config) {
     return [{
-      'sTitle': 'Alias',
-      'mData': 'alias',
-      'include': true,
-      'iSortPriority': 1
+      sTitle: 'Alias',
+      mData: 'alias',
+      include: true,
+      iSortPriority: 1
     }, {
-      'sTitle': 'Archived',
-      'mData': 'archived',
-      'mRender': function(data, type, full) {
+      sTitle: 'Description',
+      mData: 'description',
+      include: true,
+      iSortPriority: 0
+    }, {
+      sTitle: 'Archived',
+      mData: 'archived',
+      mRender: function(data, type, full) {
         return !!data ? 'Yes' : 'No';
       },
-      'include': true,
-      'iSortPriority': 0
+      include: true,
+      iSortPriority: 0
     }];
   }
 }

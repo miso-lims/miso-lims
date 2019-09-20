@@ -2359,19 +2359,29 @@ public class Dtos {
     TargetedSequencingDto dto = new TargetedSequencingDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
+    setString(dto::setDescription, from.getDescription());
     dto.setArchived(from.isArchived());
     dto.setKitDescriptorIds(from.getKitDescriptors().stream().map(KitDescriptor::getId).collect(Collectors.toList()));
     return dto;
   }
 
-  public static Set<TargetedSequencingDto> asTargetedSequencingDtos(Set<TargetedSequencing> from) {
+  public static Set<TargetedSequencingDto> asTargetedSequencingDtos(Collection<TargetedSequencing> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static TargetedSequencing to(@Nonnull TargetedSequencingDto dto) {
     TargetedSequencing to = new TargetedSequencing();
-    to.setId(dto.getId());
-    to.setAlias(dto.getAlias());
+    setLong(to::setId, dto.getId(), false);
+    setString(to::setAlias, dto.getAlias());
+    setString(to::setDescription, dto.getDescription());
+    setBoolean(to::setArchived, dto.getArchived(), false);
+    if (dto.getKitDescriptorIds() != null) {
+      dto.getKitDescriptorIds().forEach(kitId -> {
+        KitDescriptor kit = new KitDescriptor();
+        kit.setId(kitId);
+        to.getKitDescriptors().add(kit);
+      });
+    }
     return to;
   }
 

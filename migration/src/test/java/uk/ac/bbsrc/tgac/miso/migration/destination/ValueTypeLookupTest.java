@@ -205,7 +205,7 @@ public class ValueTypeLookupTest {
     HibernateTargetedSequencingDao tarSeqDao = Mockito.mock(HibernateTargetedSequencingDao.class);
     List<TargetedSequencing> tarSeqs = Lists.newArrayList();
     tarSeqs.add(makeTargetedSequencing(VALID_LONG, VALID_STRING));
-    Mockito.when(tarSeqDao.listAll()).thenReturn(tarSeqs);
+    Mockito.when(tarSeqDao.list()).thenReturn(tarSeqs);
     Mockito.when(mgr.getTargetedSequencingDao()).thenReturn(tarSeqDao);
 
     DefaultBoxUseService boxUseService = Mockito.mock(DefaultBoxUseService.class);
