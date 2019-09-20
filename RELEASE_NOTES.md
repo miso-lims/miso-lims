@@ -31,6 +31,14 @@ Upgrade notes:
     the month number (1-12) of the start of your fiscal year.
 
 
+Upgrade notes:
+
+ * Some sample classes had special names that gave them different behaviour
+   (LCM Tube, Slide, Single Cell, Single Cell DNA (stock), Single Cell DNA
+   (aliquot). This information has been moved to the `sampleSubcategory` column
+   allow them to be renamed.
+
+
 # 0.2.190
 
 Changes:

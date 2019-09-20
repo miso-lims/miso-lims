@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public interface SampleAliquotSingleCell extends SampleAliquot {
 
-  public static final String SAMPLE_CLASS_NAME = "Single Cell DNA (aliquot)";
+  public static final String SUBCATEGORY_NAME = "Single Cell (aliquot)";
 
   public BigDecimal getInputIntoLibrary();
 

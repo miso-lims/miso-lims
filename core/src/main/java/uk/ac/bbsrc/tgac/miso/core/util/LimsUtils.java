@@ -263,7 +263,7 @@ public class LimsUtils {
   }
 
   public static boolean isSampleSlide(DetailedSample sample) {
-    return sample instanceof SampleSlide || sample.getSampleClass().getAlias().equals(SampleSlide.SAMPLE_CLASS_NAME);
+    return sample instanceof SampleSlide || SampleSlide.SUBCATEGORY_NAME.equals(sample.getSampleClass().getSampleSubcategory());
   }
 
   public static boolean isDetailedLibrary(Library library) {

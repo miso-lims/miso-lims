@@ -359,7 +359,7 @@ FormTarget.sample = (function($) {
             }]
           }, {
             title: 'Slide',
-            include: config.detailedSample && object.sampleClassAlias === 'Slide',
+            include: config.detailedSample && object.sampleSubcategory === 'Slide',
             fields: [{
               title: 'Slides Remaining',
               data: 'slidesRemaining',
@@ -397,7 +397,7 @@ FormTarget.sample = (function($) {
             }]
           }, {
             title: 'LCM Tube',
-            include: config.detailedSample && object.sampleClassAlias === 'LCM Tube',
+            include: config.detailedSample && object.sampleSubcategory === 'LCM Tube',
             fields: [{
               title: 'Slides Consumed',
               data: 'slidesConsumed',
@@ -407,7 +407,7 @@ FormTarget.sample = (function($) {
             }]
           }, {
             title: 'Single Cell',
-            include: config.detailedSample && object.sampleClassAlias === 'Single Cell',
+            include: config.detailedSample && object.sampleSubcategory === 'Single Cell',
             fields: [{
               title: 'Initial Cell Concentration',
               data: 'initialCellConcentration',
@@ -443,21 +443,21 @@ FormTarget.sample = (function($) {
               type: 'decimal',
               precision: 14,
               scale: 10,
-              include: object.sampleClassAlias === 'Single Cell DNA (stock)'
+              include: object.sampleSubcategory === 'Single Cell (stock)'
             }, {
               title: 'Cell Viability',
               data: 'cellViability',
               type: 'decimal',
               precision: 14,
               scale: 10,
-              include: object.sampleClassAlias === 'Single Cell DNA (stock)'
+              include: object.sampleSubcategory === 'Single Cell (stock)'
             }, {
               title: 'Loading Cell Concentration',
               data: 'loadingCellConcentration',
               type: 'decimal',
               precision: 14,
               scale: 10,
-              include: object.sampleClassAlias === 'Single Cell DNA (stock)'
+              include: object.sampleSubcategory === 'Single Cell (stock)'
             }]
           }, {
             title: 'Aliquot',
@@ -482,7 +482,7 @@ FormTarget.sample = (function($) {
               type: 'decimal',
               precision: 14,
               scale: 10,
-              include: object.sampleClassAlias === 'Single Cell DNA (aliquot)'
+              include: object.sampleSubcategory === 'Single Cell (aliquot)'
             }]
           }];
     }

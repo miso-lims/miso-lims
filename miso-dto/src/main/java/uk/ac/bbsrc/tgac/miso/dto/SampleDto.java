@@ -25,15 +25,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ @JsonSubTypes.Type(value = SampleAliquotDto.class, name = SampleAliquot.CATEGORY_NAME),
-    @JsonSubTypes.Type(value = SampleAliquotSingleCellDto.class, name = SampleAliquotSingleCell.SAMPLE_CLASS_NAME),
+    @JsonSubTypes.Type(value = SampleAliquotSingleCellDto.class, name = SampleAliquotSingleCell.SUBCATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleIdentityDto.class, name = SampleIdentity.CATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleStockDto.class, name = SampleStock.CATEGORY_NAME),
-    @JsonSubTypes.Type(value = SampleStockSingleCellDto.class, name = SampleStockSingleCell.SAMPLE_CLASS_NAME),
+    @JsonSubTypes.Type(value = SampleStockSingleCellDto.class, name = SampleStockSingleCell.SUBCATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleTissueDto.class, name = SampleTissue.CATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleTissueProcessingDto.class, name = SampleTissueProcessing.CATEGORY_NAME),
-    @JsonSubTypes.Type(value = SampleSlideDto.class, name = SampleSlide.SAMPLE_CLASS_NAME),
-    @JsonSubTypes.Type(value = SampleLCMTubeDto.class, name = SampleLCMTube.SAMPLE_CLASS_NAME),
-    @JsonSubTypes.Type(value = SampleSingleCellDto.class, name = SampleSingleCell.SAMPLE_CLASS_NAME),
+    @JsonSubTypes.Type(value = SampleSlideDto.class, name = SampleSlide.SUBCATEGORY_NAME),
+    @JsonSubTypes.Type(value = SampleLCMTubeDto.class, name = SampleLCMTube.SUBCATEGORY_NAME),
+    @JsonSubTypes.Type(value = SampleSingleCellDto.class, name = SampleSingleCell.SUBCATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleDto.class, name = "Plain") })
 @JsonTypeName(value = "Plain")
 public class SampleDto extends AbstractBoxableDto {

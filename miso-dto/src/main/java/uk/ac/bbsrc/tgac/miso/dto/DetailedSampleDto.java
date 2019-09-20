@@ -10,6 +10,7 @@ public class DetailedSampleDto extends SampleDto {
   private Long sampleClassId;
   private String sampleClassAlias;
   private String sampleCategory;
+  private String sampleSubcategory;
   private Long detailedQcStatusId;
   private String detailedQcStatusNote;
   private Long subprojectId;
@@ -202,6 +203,14 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setEffectiveExternalNames(String effectiveExternalNames) {
     this.effectiveExternalNames = effectiveExternalNames;
+  }
+
+  public String getSampleSubcategory() {
+    return sampleSubcategory;
+  }
+
+  public void setSampleSubcategory(String sampleSubcategory) {
+    this.sampleSubcategory = sampleSubcategory;
   }
 
 }

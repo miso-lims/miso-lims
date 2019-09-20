@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 public interface SampleLCMTube extends SampleTissueProcessing {
 
-  public static final String SAMPLE_CLASS_NAME = "LCM Tube";
+  public static final String SUBCATEGORY_NAME = "LCM Tube";
 
   Integer getSlidesConsumed();
 

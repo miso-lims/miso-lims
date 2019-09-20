@@ -8,6 +8,7 @@ public class SampleClassDto {
   private Long id;
   private String alias;
   private String sampleCategory;
+  private String sampleSubcategory;
   private String suffix;
   private boolean archived;
   private boolean directCreationAllowed;
@@ -105,10 +106,20 @@ public class SampleClassDto {
     this.dnaseTreatable = dnaseTreatable;
   }
 
+  public String getSampleSubcategory() {
+    return sampleSubcategory;
+  }
+
+  public void setSampleSubcategory(String sampleSubcategory) {
+    this.sampleSubcategory = sampleSubcategory;
+  }
+
   @Override
   public String toString() {
-    return "SampleClassDto [id=" + id + ", alias=" + alias + ", sampleCategory=" + sampleCategory + ", suffix=" + suffix
+    return "SampleClassDto [id=" + id + ", alias=" + alias + ", sampleCategory=" + sampleCategory + ", sampleSubcategory="
+        + sampleSubcategory + ", suffix=" + suffix
         + ", createdById=" + createdById + ", creationDate=" + creationDate + ", updatedById=" + updatedById + ", lastUpdated="
         + lastUpdated + ", dnaseTreatable=" + dnaseTreatable + "]";
   }
+
 }

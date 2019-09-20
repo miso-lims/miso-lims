@@ -38,6 +38,10 @@ public interface SampleClass extends Identifiable, Serializable {
 
   void setSampleCategory(String sampleCategory);
 
+  String getSampleSubcategory();
+
+  void setSampleSubcategory(String sampleCategory);
+
   /**
    * @return the class identifier used in Sample alias generation
    */

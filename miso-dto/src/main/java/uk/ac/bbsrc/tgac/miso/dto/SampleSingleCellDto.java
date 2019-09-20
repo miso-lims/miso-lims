@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 
-@JsonTypeName(value = SampleSingleCell.SAMPLE_CLASS_NAME)
+@JsonTypeName(value = SampleSingleCell.SUBCATEGORY_NAME)
 public class SampleSingleCellDto extends SampleTissueProcessingDto implements SampleSingleCellRelative {
 
   private String initialCellConcentration;

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 
-@JsonTypeName(value = SampleLCMTube.SAMPLE_CLASS_NAME)
+@JsonTypeName(value = SampleLCMTube.SUBCATEGORY_NAME)
 public class SampleLCMTubeDto extends SampleTissueProcessingDto {
 
   private Integer slidesConsumed;

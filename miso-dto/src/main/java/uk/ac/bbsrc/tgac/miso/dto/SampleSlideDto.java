@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 
-@JsonTypeName(value = SampleSlide.SAMPLE_CLASS_NAME)
+@JsonTypeName(value = SampleSlide.SUBCATEGORY_NAME)
 public class SampleSlideDto extends SampleTissueProcessingDto {
 
   private Integer slides;
