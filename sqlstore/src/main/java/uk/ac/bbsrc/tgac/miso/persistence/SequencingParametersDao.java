@@ -5,18 +5,17 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
-import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersCollection;
 
-public interface SequencingParametersDao extends SequencingParametersCollection {
+public interface SequencingParametersDao extends SaveDao<SequencingParameters> {
 
-  List<SequencingParameters> list() throws IOException;
+  public SequencingParameters getByNameAndInstrumentModel(String name, InstrumentModel instrumentModel) throws IOException;
 
-  List<SequencingParameters> listByInstrumentModel(InstrumentModel instrumentModel) throws IOException;
+  public List<SequencingParameters> listByInstrumentModel(InstrumentModel instrumentModel) throws IOException;
 
-  SequencingParameters get(long id) throws IOException;
+  public long getUsageByRuns(SequencingParameters sequencingParameters) throws IOException;
 
-  long create(SequencingParameters sequencingParameters);
+  public long getUsageByPoolOrders(SequencingParameters sequencingParameters) throws IOException;
 
-  long update(SequencingParameters sequencingParameters);
+  public long getUsageBySequencingOrders(SequencingParameters sequencingParameters) throws IOException;
 
 }

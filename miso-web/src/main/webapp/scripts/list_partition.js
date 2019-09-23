@@ -63,7 +63,7 @@ ListTarget.partition = {
           return order.remaining > 0;
         }).map(
             function(order) {
-              return order.parameters.instrumentModel.alias + " " + order.parameters.name + ": " + order.remaining + " "
+              return order.parameters.instrumentModelAlias + " " + order.parameters.name + ": " + order.remaining + " "
                   + (order.remaining == 1 ? platformType.partitionName : platformType.pluralPartitionName) + " remaining";
             });
 

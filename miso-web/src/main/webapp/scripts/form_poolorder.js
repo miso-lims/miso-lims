@@ -18,7 +18,7 @@ FormTarget.poolorder = (function($) {
       var instrumentModel = null;
       if (object.parametersId) {
         var params = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(object.parametersId), Constants.sequencingParameters);
-        instrumentModel = params.instrumentModel;
+        instrumentModel = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(params.instrumentModelId), Constants.instrumentModels);
       }
 
       return [{
@@ -114,7 +114,7 @@ FormTarget.poolorder = (function($) {
           nullLabel: 'Unspecified',
           onChange: function(newValue, form) {
             var source = !newValue ? [] : Constants.sequencingParameters.filter(function(params) {
-              return params.instrumentModel.id == newValue;
+              return params.instrumentModelId == newValue;
             });
             var options = {
               source: source
@@ -189,7 +189,8 @@ FormTarget.poolorder = (function($) {
     var platformName = null;
     if (order.parametersId) {
       var params = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(order.parametersId), Constants.sequencingParameters);
-      platformName = params.instrumentModel.platformType;
+      var instrumentModel = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(params.instrumentModelId), Constants.instrumentModels);
+      platformName = instrumentModel.platformType;
     } else if (order.libraries && order.libraries.length) {
       platformName = order.libraries[0].library.platformType;
     }

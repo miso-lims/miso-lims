@@ -151,6 +151,7 @@ public interface AbstractListPage {
     public static final String RUNS = "runs";
     public static final String SAMPLES = "samples";
     public static final String SAMPLE_TYPES = "sampletype/list";
+    public static final String SEQUENCING_PARAMETERS = "sequencingparameters/list";
     public static final String STAINS = "stain/list";
     public static final String STAIN_CATEGORIES = "staincategory/list";
     public static final String STORAGE_LOCATIONS = "storagelocations";

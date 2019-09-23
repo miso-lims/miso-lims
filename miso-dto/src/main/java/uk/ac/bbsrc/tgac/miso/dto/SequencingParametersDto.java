@@ -1,16 +1,19 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 public class SequencingParametersDto {
+
   private Long id;
   private String name;
-  private InstrumentModelDto instrumentModel;
+  private Long instrumentModelId;
+  private String instrumentModelAlias;
+  private int read1Length = 0;
+  private int read2Length = 0;
+  private String chemistry;
+  private String runType;
   private Long createdById;
-  private String createdByUrl;
   private String creationDate;
   private Long updatedById;
-  private String updatedByUrl;
   private String lastUpdated;
-  private String url;
 
   public Long getId() {
     return id;
@@ -28,12 +31,53 @@ public class SequencingParametersDto {
     this.name = name;
   }
 
-  public InstrumentModelDto getInstrumentModel() {
-    return instrumentModel;
+
+  public Long getInstrumentModelId() {
+    return instrumentModelId;
   }
 
-  public void setInstrumentModel(InstrumentModelDto instrumentModel) {
-    this.instrumentModel = instrumentModel;
+  public void setInstrumentModelId(Long instrumentModelId) {
+    this.instrumentModelId = instrumentModelId;
+  }
+
+  public String getInstrumentModelAlias() {
+    return instrumentModelAlias;
+  }
+
+  public void setInstrumentModelAlias(String instrumentModelAlias) {
+    this.instrumentModelAlias = instrumentModelAlias;
+  }
+
+  public Integer getRead1Length() {
+    return read1Length;
+  }
+
+  public void setRead1Length(Integer read1Length) {
+    this.read1Length = read1Length;
+  }
+
+  public Integer getRead2Length() {
+    return read2Length;
+  }
+
+  public void setRead2Length(Integer read2Length) {
+    this.read2Length = read2Length;
+  }
+
+  public String getChemistry() {
+    return chemistry;
+  }
+
+  public void setChemistry(String chemistry) {
+    this.chemistry = chemistry;
+  }
+
+  public String getRunType() {
+    return runType;
+  }
+
+  public void setRunType(String runType) {
+    this.runType = runType;
   }
 
   public Long getCreatedById() {
@@ -42,14 +86,6 @@ public class SequencingParametersDto {
 
   public void setCreatedById(Long createdById) {
     this.createdById = createdById;
-  }
-
-  public String getCreatedByUrl() {
-    return createdByUrl;
-  }
-
-  public void setCreatedByUrl(String createdByUrl) {
-    this.createdByUrl = createdByUrl;
   }
 
   public String getCreationDate() {
@@ -68,27 +104,11 @@ public class SequencingParametersDto {
     this.updatedById = updatedById;
   }
 
-  public String getUpdatedByUrl() {
-    return updatedByUrl;
-  }
-
-  public void setUpdatedByUrl(String updatedByUrl) {
-    this.updatedByUrl = updatedByUrl;
-  }
-
   public String getLastUpdated() {
     return lastUpdated;
   }
 
   public void setLastUpdated(String lastUpdated) {
     this.lastUpdated = lastUpdated;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
   }
 }

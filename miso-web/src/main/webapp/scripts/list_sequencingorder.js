@@ -97,7 +97,7 @@ ListTarget.sequencingorder = {
       "iSortPriority": 0
     }, {
       "sTitle": "Instrument Model",
-      "mData": "parameters.instrumentModel.alias",
+      "mData": "parameters.instrumentModelAlias",
       "include": true,
       "iSortPriority": 1
     }, {

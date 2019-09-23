@@ -86,7 +86,7 @@ HotTarget.sequencingorder = (function() {
             },
             pack: function(order, flat, errorHandler) {
               order.parameters = Utils.array.findFirstOrNull(function(param) {
-                return param.name == flat.sequencingParameters && param.instrumentModel.alias == flat.instrumentModel;
+                return param.name == flat.sequencingParameters && param.instrumentModelAlias == flat.instrumentModel;
               }, Constants.sequencingParameters);
             },
             depends: 'instrumentModel',
@@ -97,7 +97,7 @@ HotTarget.sequencingorder = (function() {
                   return instrumentModel.alias == value;
                 }, Constants.instrumentModels);
                 params = Constants.sequencingParameters.filter(function(parameters) {
-                  return parameters.instrumentModel.id == instrumentModel.id;
+                  return parameters.instrumentModelId == instrumentModel.id;
                 }).map(function(parameters) {
                   return parameters.name;
                 }).sort();
