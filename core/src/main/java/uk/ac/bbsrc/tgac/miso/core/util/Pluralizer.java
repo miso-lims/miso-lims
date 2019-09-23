@@ -54,6 +54,10 @@ public class Pluralizer {
     return pluralize(count, "project", "projects");
   }
 
+  public static String runs(long count) {
+    return pluralize(count, "run", "runs");
+  }
+
   public static String samples(long count) {
     return pluralize(count, "sample", "samples");
   }

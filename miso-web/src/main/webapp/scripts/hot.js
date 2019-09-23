@@ -121,21 +121,22 @@ var HotUtils = {
   makeTable: function(target, create, data, config) {
     function drawHeaderWarning() {
       var warnings = [];
-        if (target.hasOwnProperty("headerWarnings")){
-            var potentialWarnings = target.headerWarnings(config, data);
-            if(potentialWarnings) warnings = warnings.concat(potentialWarnings);
-        }
-        if (warnings.length) {
-            var headerWarningsDiv = document.getElementById('creationErrors');
-            headerWarningsHTML = '<ul>';
-            for (var i = 0; i < warnings.length; ++i) {
-                headerWarningsHTML += '<li>' + warnings[i] + '</li>';
-            }
-            headerWarningsHTML += '</ul>';
-            headerWarningsDiv.innerHTML = headerWarningsHTML;
-            document.getElementById('warnings').classList.remove('hidden');
-        }
+      if (target.hasOwnProperty("headerWarnings")) {
+        var potentialWarnings = target.headerWarnings(config, data);
+        if (potentialWarnings)
+          warnings = warnings.concat(potentialWarnings);
       }
+      if (warnings.length) {
+        var headerWarningsDiv = document.getElementById('creationErrors');
+        headerWarningsHTML = '<ul>';
+        for (var i = 0; i < warnings.length; ++i) {
+          headerWarningsHTML += '<li>' + warnings[i] + '</li>';
+        }
+        headerWarningsHTML += '</ul>';
+        headerWarningsDiv.innerHTML = headerWarningsHTML;
+        document.getElementById('warnings').classList.remove('hidden');
+      }
+    }
 
     jQuery('#additionalHotNotes').hide();
     jQuery('#additionalHotNotes').empty();
@@ -1046,24 +1047,24 @@ var HotUtils = {
     };
   },
 
-  makeColumnForInt: function(headerName, include, property, validator) {
-    return {
-      'header': headerName,
-      'data': property,
-      'type': 'numeric',
-      'include': include,
-      'validator': validator,
-      'unpack': function(obj, flat, setCellMeta) {
-        flat[property] = Utils.valOrNull(obj[property]);
-      },
-      'pack': function(obj, flat, errorHandler) {
-        if (!Utils.validation.isEmpty(flat[property])) {
-          obj[property] = flat[property];
-        } else {
-          obj[property] = null;
-        }
+  makeColumnForInt: function(headerName, include, property, validator, baseObj) {
+    var column = baseObj || {};
+    column.header = headerName;
+    column.data = property;
+    column.type = 'numeric';
+    column.include = include;
+    column.validator = validator;
+    column.unpack = function(obj, flat, setCellMeta) {
+      flat[property] = Utils.valOrNull(obj[property]);
+    };
+    column.pack = function(obj, flat, errorHandler) {
+      if (!Utils.validation.isEmpty(flat[property])) {
+        obj[property] = flat[property];
+      } else {
+        obj[property] = null;
       }
-    }
+    };
+    return column;
   },
 
   makeColumnForText: function(headerName, include, property, baseobj, defaultValue) {
@@ -1089,7 +1090,7 @@ var HotUtils = {
     return baseobj;
   },
 
-  makeColumnForEnum: function(headerName, include, required, property, source, defaultValue, nullValue) {
+  makeColumnForEnum: function(headerName, include, required, property, source, defaultValue, nullValue, baseObj) {
     var validator = Handsontable.validators.AutocompleteValidator;
     if (required) {
       if (nullValue) {
@@ -1098,21 +1099,21 @@ var HotUtils = {
         validator = HotUtils.validator.requiredAutocomplete;
       }
     }
-    return {
-      'header': headerName,
-      'data': property,
-      'type': 'dropdown',
-      'trimDropdown': false,
-      'source': nullValue ? [nullValue].concat(source) : source,
-      'include': include,
-      'validator': validator,
-      'unpack': function(obj, flat, setCellMeta) {
-        flat[property] = obj[property] || defaultValue;
-      },
-      'pack': function(obj, flat, errorHandler) {
-        obj[property] = flat[property];
-      }
-    }
+    var column = baseObj || {};
+    column.header = headerName;
+    column.data = property;
+    column.type = 'dropdown';
+    column.trimDropdown = false;
+    column.source = nullValue ? [nullValue].concat(source) : source;
+    column.include = include;
+    column.validator = validator;
+    column.unpack = function(obj, flat, setCellMeta) {
+      flat[property] = obj[property] || defaultValue;
+    };
+    column.pack = function(obj, flat, errorHandler) {
+      obj[property] = flat[property];
+    };
+    return column;
   },
 
   printAction: function(type) {

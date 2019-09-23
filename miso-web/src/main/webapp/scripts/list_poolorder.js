@@ -55,7 +55,7 @@ ListTarget.poolorder = {
           bSortable: false,
           mRender: function(data, type, full) {
             return !data ? 'n/a' : Utils.array
-                .findUniqueOrThrow(Utils.array.idPredicate(full.parametersId), Constants.sequencingParameters).instrumentModel.alias;
+                .findUniqueOrThrow(Utils.array.idPredicate(full.parametersId), Constants.sequencingParameters).instrumentModelAlias;
           }
         }, {
           sTitle: 'Sequencing Parameters',

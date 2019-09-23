@@ -347,6 +347,18 @@ Urls = (function() {
     search: sequencingOrderRestBase + '/search'
   };
 
+  // Sequencing Parameters
+  var sequencingParametersUiBase = baseUrl + '/sequencingparameters';
+  ui.sequencingParameters = {
+    bulkEdit: sequencingParametersUiBase + '/bulk/edit'
+  };
+
+  var sequencingParametersRestBase = restBase + '/sequencingparameters';
+  rest.sequencingParameters = {
+    create: sequencingParametersRestBase,
+    update: idUrlFunction(sequencingParametersRestBase)
+  };
+
   // Service Records
   var serviceRecordUiBase = baseUrl + '/instrument/servicerecord';
   ui.serviceRecords = {

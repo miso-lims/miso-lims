@@ -488,12 +488,12 @@ access to the MISO database. As such, they must be performed by a MISO adminstra
 {% include userman-heading.md section=page.section sub=sub title="Sequencing Parameters" %}
 
 Sequencing parameters describe the settings that a sequencer run was configured with for a run. They include details
-such as the chemistry version, read length, and whether the run was paired end. When making orders, you can choose the
-parameters that are required. Later, MISO will look at the sequencing parameters used by a sequencing run in order to
-determine whether the order has been completed.
+such as the chemistry version and read lengths. When making orders, you can choose the parameters that are required.
+Later, MISO will look at the sequencing parameters used by a sequencing run in order to determine whether the order has
+been completed.
 
-Modifications to sequencing parameter options can only be made via direct access to the MISO database. As such, they
-must be performed by a MISO adminstrator.
+MISO administrators can add, edit, and delete sequencing parameters using the standard interface. A sequencing
+parameters option can only be deleted if it has not been used by any existing runs or orders.
 
 {% include userman-toplink.md %}
 

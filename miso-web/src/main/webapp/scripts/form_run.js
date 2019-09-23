@@ -75,7 +75,7 @@ FormTarget.run = (function($) {
           nullLabel: 'SELECT',
           getSource: function() {
             return Constants.sequencingParameters.filter(function(param) {
-              return param.instrumentModel.id === object.instrumentModelId;
+              return param.instrumentModelId === object.instrumentModelId;
             });
           },
           getItemLabel: function(item) {

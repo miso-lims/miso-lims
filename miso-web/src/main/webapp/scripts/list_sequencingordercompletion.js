@@ -83,7 +83,7 @@ ListTarget.sequencingordercompletion = {
       "include": !config.poolId
     }, {
       "sTitle": "Instrument Model",
-      "mData": "parameters.instrumentModel.alias",
+      "mData": "parameters.instrumentModelAlias",
       "bSortable": false,
       "iSortPriority": 0,
       "include": true

@@ -46,6 +46,7 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
       throw new RestException("Must specify quantity to create", Status.BAD_REQUEST);
     }
     ObjectNode config = makeBaseConfig();
+    config.put("pageMode", "create");
     addHotConfig(config, mapper);
     addHotAttributes("Create " + pluralType, config, true, model);
 
@@ -55,6 +56,7 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
 
   protected final ModelAndView bulkEdit(String idString, ModelMap model) throws IOException {
     ObjectNode config = makeBaseConfig();
+    config.put("pageMode", "edit");
     addHotConfig(config, mapper);
     addHotAttributes("Edit " + pluralType, config, false, model);
 

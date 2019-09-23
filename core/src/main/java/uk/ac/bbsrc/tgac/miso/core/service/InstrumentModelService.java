@@ -8,9 +8,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
-public interface InstrumentModelService {
-
-  InstrumentModel get(long instrumentModelId) throws IOException;
+public interface InstrumentModelService extends ProviderService<InstrumentModel> {
 
   Collection<InstrumentModel> list() throws IOException;
 

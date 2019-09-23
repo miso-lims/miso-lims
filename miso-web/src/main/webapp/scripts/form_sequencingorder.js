@@ -34,7 +34,7 @@ FormTarget.sequencingorder = (function($) {
           omit: true,
           type: 'read-only',
           getDisplayValue: function(order) {
-            return order.parameters.name + ' (' + order.parameters.instrumentModel.alias + ')';
+            return order.parameters.name + ' (' + order.parameters.instrumentModelAlias + ')';
           }
         }, {
           title: 'Partitions Required',

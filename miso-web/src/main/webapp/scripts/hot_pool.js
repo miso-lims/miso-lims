@@ -335,7 +335,7 @@ HotTarget.pool = (function() {
                      type: "select",
                      getLabel: Utils.array.getName,
                      values: Constants.sequencingParameters.filter(function(param) {
-                         return param.instrumentModel.id == modelId;
+                         return param.instrumentModelId == modelId;
                        })
                    },
                    {

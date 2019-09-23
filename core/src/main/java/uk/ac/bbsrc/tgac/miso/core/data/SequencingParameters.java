@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 @Entity
 @Table(name = "SequencingParameters")
 
-public class SequencingParameters implements Serializable, Identifiable, Comparable<SequencingParameters>
+public class SequencingParameters implements Deletable, Serializable, Identifiable, Comparable<SequencingParameters>, Timestamped
 {
 
   private static final long serialVersionUID = 1L;
@@ -73,11 +73,13 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
     return chemistry;
   }
 
-  public User getCreatedBy() {
+  @Override
+  public User getCreator() {
     return createdBy;
   }
 
-  public Date getCreationDate() {
+  @Override
+  public Date getCreationTime() {
     return creationDate;
   }
 
@@ -86,7 +88,8 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
     return parametersId;
   }
 
-  public Date getLastUpdated() {
+  @Override
+  public Date getLastModified() {
     return lastUpdated;
   }
 
@@ -103,7 +106,8 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
     return readLength;
   }
 
-  public User getUpdatedBy() {
+  @Override
+  public User getLastModifier() {
     return updatedBy;
   }
 
@@ -111,11 +115,13 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
     this.chemistry = chemistry;
   }
 
-  public void setCreatedBy(User createdBy) {
+  @Override
+  public void setCreator(User createdBy) {
     this.createdBy = createdBy;
   }
 
-  public void setCreationDate(Date creation) {
+  @Override
+  public void setCreationTime(Date creation) {
     this.creationDate = creation;
   }
 
@@ -124,7 +130,8 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
     this.parametersId = id;
   }
 
-  public void setLastUpdated(Date lastUpdated) {
+  @Override
+  public void setLastModified(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
 
@@ -140,7 +147,8 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
     this.readLength = readLength;
   }
 
-  public void setUpdatedBy(User updatedBy) {
+  @Override
+  public void setLastModifier(User updatedBy) {
     this.updatedBy = updatedBy;
   }
 
@@ -244,6 +252,16 @@ public class SequencingParameters implements Serializable, Identifiable, Compara
 
   public void setReadLength2(int readLength2) {
     this.readLength2 = readLength2;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Sequencing Parameters";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName() + " (" + getInstrumentModel().getAlias() + ")";
   }
 
 }

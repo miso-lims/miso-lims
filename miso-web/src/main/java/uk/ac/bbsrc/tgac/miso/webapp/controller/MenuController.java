@@ -63,6 +63,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
@@ -437,6 +438,10 @@ public class MenuController implements ServletContextAware {
         ObjectNode dto = illuminaWorkflowTypes.addObject();
         dto.put("label", wf.getLabel());
         dto.put("value", wf.getRawValue());
+      }
+      ArrayNode illuminaChemistry = node.putArray("illuminaChemistry");
+      for (IlluminaChemistry chemistry : IlluminaChemistry.values()) {
+        illuminaChemistry.add(chemistry.name());
       }
 
       ObjectNode warningsNode = mapper.createObjectNode();

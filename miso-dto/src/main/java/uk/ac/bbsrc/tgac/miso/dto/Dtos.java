@@ -1197,19 +1197,26 @@ public class Dtos {
 
   public static SequencingParametersDto asDto(@Nonnull SequencingParameters from) {
     SequencingParametersDto dto = new SequencingParametersDto();
-    dto.setId(from.getId());
-    dto.setName(from.getName());
-    dto.setInstrumentModel(asDto(from.getInstrumentModel()));
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setName, from.getName());
+    setId(dto::setInstrumentModelId, from.getInstrumentModel());
+    setString(dto::setInstrumentModelAlias, maybeGetProperty(from.getInstrumentModel(), InstrumentModel::getAlias));
+    setInteger(dto::setRead1Length, from.getReadLength(), false);
+    setInteger(dto::setRead2Length, from.getReadLength2(), false);
+    setString(dto::setChemistry, maybeGetProperty(from.getChemistry(), IlluminaChemistry::name));
+    setString(dto::setRunType, from.getRunType());
     return dto;
   }
 
   public static SequencingParameters to(@Nonnull SequencingParametersDto from) {
     SequencingParameters to = new SequencingParameters();
-    to.setId(from.getId());
-    to.setName(from.getName());
-    if (from.getInstrumentModel() != null) {
-      to.setInstrumentModel(to(from.getInstrumentModel()));
-    }
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
+    setObject(to::setInstrumentModel, InstrumentModel::new, from.getInstrumentModelId());
+    setInteger(to::setReadLength, from.getRead1Length(), false);
+    setInteger(to::setReadLength2, from.getRead2Length(), false);
+    setObject(to::setChemistry, from.getChemistry(), str -> IlluminaChemistry.valueOf(str));
+    setString(to::setRunType, from.getRunType());
     return to;
   }
 
