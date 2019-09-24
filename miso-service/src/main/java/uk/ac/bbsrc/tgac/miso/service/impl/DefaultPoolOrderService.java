@@ -313,7 +313,7 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
 
     //check if there's an associated Pool and if it still matches the Order
     List<PoolOrder> poolOrderList = new LinkedList<>(); poolOrderList.add(to);
-    if(to.getPool() != null) poolService.checkMismatchedWithOrders(to.getPool(), poolOrderList);
+    if(to.getPool() != null) to.getPool().setMismatchedWithOrder(poolService.checkMismatchedWithOrders(to.getPool(), poolOrderList));
   }
 
   @Override

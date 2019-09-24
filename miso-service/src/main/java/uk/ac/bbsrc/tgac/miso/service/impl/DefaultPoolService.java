@@ -318,6 +318,21 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     }
   }
 
+  @Override
+  public boolean checkMismatchedWithOrders(Pool pool, List<PoolOrder> poolOrders) throws IOException {
+    // Check equivalence for all library aliquots. Platform type /should/ logically follow so no explicit check
+    // Muffy, sis, the time complexity
+    Set<LibraryAliquot> poolOrderAliquots = poolOrders.stream().flatMap(element -> element.getOrderLibraryAliquots().stream())
+            .map(OrderLibraryAliquot::getAliquot)
+            .collect(Collectors.toSet()),
+            poolAliquots = pool.getPoolContents().stream()
+                    .map(PoolElement::getPoolableElementView)
+                    .map(PoolableElementView::getAliquot)
+                    .collect(Collectors.toSet());
+    // Set.equals checks set size and equivalence of every set member
+    return !poolOrderAliquots.equals(poolAliquots);
+  }
+
   private void validateChange(Pool pool, Pool beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
@@ -330,8 +345,10 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     validateBarcodeUniqueness(pool, beforeChange, poolStore::getByBarcode, errors, "pool");
     if (strictPools && !pool.isMergeChild()) validateIndices(pool, beforeChange, errors);
     List<PoolOrder> potentialPoolOrders = poolOrderService.getAllByPoolId(pool.getId());
-    if (potentialPoolOrders != null) {
-      checkMismatchedWithOrders(pool, potentialPoolOrders);
+    if (potentialPoolOrders != null && potentialPoolOrders.size() != 0) {
+      if(checkMismatchedWithOrders(pool, potentialPoolOrders))
+        errors.add(new ValidationError("poolElements", "Pool deviates from pool order."));
+
     }
 
     if (!errors.isEmpty()) {
@@ -452,20 +469,5 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   public List<Pool> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
       throws IOException {
     return poolStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
-  }
-
-  @Override
-  public void checkMismatchedWithOrders(Pool pool, List<PoolOrder> poolOrders) throws IOException {
-    // Check equivalence for all library aliquots. Platform type /should/ logically follow so no explicit check
-    // Muffy, sis, the time complexity
-    Set<LibraryAliquot> poolOrderAliquots = poolOrders.stream().flatMap(element -> element.getOrderLibraryAliquots().stream())
-            .map(OrderLibraryAliquot::getAliquot)
-            .collect(Collectors.toSet()),
-            poolAliquots = pool.getPoolContents().stream()
-                    .map(PoolElement::getPoolableElementView)
-                    .map(PoolableElementView::getAliquot)
-                    .collect(Collectors.toSet());
-    // Set.equals checks set size and equivalence of every set member
-    pool.setMismatchedWithOrder(!poolOrderAliquots.equals(poolAliquots));
   }
 }
