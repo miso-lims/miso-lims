@@ -347,9 +347,14 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     //If this is a new pool, we don't have to worry about syncing to pool orders - either it's irrelevant, or a guarantee
     List<PoolOrder> potentialPoolOrders = beforeChange == null? null: poolOrderService.getAllByPoolId(pool.getId());
     if (potentialPoolOrders != null && potentialPoolOrders.size() != 0) {
-      if(checkMismatchedWithOrders(pool, potentialPoolOrders))
-        errors.add(new ValidationError("poolElements", "Pool deviates from pool order."));
-
+      if(checkMismatchedWithOrders(pool, potentialPoolOrders)) {
+        String errorMessage = "Pool deviates from pool order(s): ";
+        for(PoolOrder po: potentialPoolOrders){
+          errorMessage += po.getAlias();
+          errorMessage += " ";
+        }
+        errors.add(new ValidationError("poolElements", errorMessage));
+      }
     }
 
     if (!errors.isEmpty()) {
