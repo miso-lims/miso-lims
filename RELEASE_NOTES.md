@@ -11,6 +11,7 @@ Changes:
     before/after specified range
   * Search for items by ID
   * Search worksets by user, date, and ID
+  * Fix bug where unassigned JIRA tickets will cause tables to not display correctly
 
 Upgrade notes:
 
