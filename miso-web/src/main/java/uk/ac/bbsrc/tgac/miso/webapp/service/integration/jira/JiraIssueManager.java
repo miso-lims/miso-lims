@@ -107,7 +107,7 @@ public class JiraIssueManager implements IssueTrackerManager {
     WebResource webResource = prepareWebResource(getRestUri("/search", params));
     return retrieveList(webResource);
   }
-  
+
   @Override
   public List<Issue> searchIssues(String query) throws IOException {
     if (LimsUtils.isStringEmptyOrNull(query)) {
@@ -176,8 +176,13 @@ public class JiraIssueManager implements IssueTrackerManager {
     issue.setUrl(baseTrackerUrl + "/browse/" + key);
     JSONObject status = fields.getJSONObject("status");
     issue.setStatus(status.getString("name"));
-    JSONObject assignee = fields.getJSONObject("assignee");
-    issue.setAssignee(assignee.has("displayName") ? assignee.getString("displayName") : "(Unassigned)");
+    issue.setAssignee("(Unassigned)");
+    if (fields.has("assignee")) {
+      JSONObject assignee = fields.getJSONObject("assignee");
+      if (assignee.has("displayName")) {
+        issue.setAssignee(assignee.getString("displayName"));
+      }
+    }
     try {
       issue.setLastUpdated(iso8601Format.parse(fields.getString("updated")));
     } catch (ParseException e) {
