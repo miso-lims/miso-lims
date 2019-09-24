@@ -344,7 +344,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     validateVolumeUnits(pool.getVolume(), pool.getVolumeUnits(), errors);
     validateBarcodeUniqueness(pool, beforeChange, poolStore::getByBarcode, errors, "pool");
     if (strictPools && !pool.isMergeChild()) validateIndices(pool, beforeChange, errors);
-    List<PoolOrder> potentialPoolOrders = poolOrderService.getAllByPoolId(pool.getId());
+    //If this is a new pool, we don't have to worry about syncing to pool orders - either it's irrelevant, or a guarantee
+    List<PoolOrder> potentialPoolOrders = beforeChange == null? null: poolOrderService.getAllByPoolId(pool.getId());
     if (potentialPoolOrders != null && potentialPoolOrders.size() != 0) {
       if(checkMismatchedWithOrders(pool, potentialPoolOrders))
         errors.add(new ValidationError("poolElements", "Pool deviates from pool order."));
