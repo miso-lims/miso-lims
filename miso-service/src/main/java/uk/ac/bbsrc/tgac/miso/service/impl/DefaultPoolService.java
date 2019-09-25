@@ -239,7 +239,6 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     managed.setQcPassed(pool.getQcPassed());
     managed.setDiscarded(pool.isDiscarded());
     managed.setCreationDate(pool.getCreationDate());
-    managed.setMismatchedWithOrder(pool.isMismatchedWithOrder());
     if (pool.isDiscarded() || pool.isDistributed()) {
       managed.setVolume(0.0);
     } else {
@@ -344,7 +343,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     validateVolumeUnits(pool.getVolume(), pool.getVolumeUnits(), errors);
     validateBarcodeUniqueness(pool, beforeChange, poolStore::getByBarcode, errors, "pool");
     if (strictPools && !pool.isMergeChild()) validateIndices(pool, beforeChange, errors);
-    //If this is a new pool, we don't have to worry about syncing to pool orders - either it's irrelevant, or a guarantee
+    //If this is a new pool, we don't have to worry about syncing to pool orders: either it's irrelevant, or a guarantee
     List<PoolOrder> potentialPoolOrders = beforeChange == null? null: poolOrderService.getAllByPoolId(pool.getId());
     if (potentialPoolOrders != null && potentialPoolOrders.size() != 0) {
       if(checkMismatchedWithOrders(pool, potentialPoolOrders)) {

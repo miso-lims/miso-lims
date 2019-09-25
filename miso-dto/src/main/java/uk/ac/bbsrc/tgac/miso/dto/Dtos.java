@@ -1754,7 +1754,6 @@ public class Dtos {
     dto.setDistributionRecipient(from.getDistributionRecipient());
     dto.setHasLowQualityLibraries(from.getHasLowQualityMembers());
     dto.setPrioritySubprojectAliases(from.getPrioritySubprojectAliases());
-    dto.setPoolOrderMismatch(from.isMismatchedWithOrder());
 
     return dto;
   }

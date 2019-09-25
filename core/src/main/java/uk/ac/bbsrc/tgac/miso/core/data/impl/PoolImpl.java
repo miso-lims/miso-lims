@@ -156,9 +156,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   private Boolean qcPassed;
 
-  @Column(nullable = false)
-  private Boolean poolOrderMismatch = false;
-
   @Enumerated(EnumType.STRING)
   private ConcentrationUnit concentrationUnits;
   @Enumerated(EnumType.STRING)
@@ -229,14 +226,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public void makeMergeChild() {
     mergeChild = true;
-  }
-
-  @Override
-  public boolean isMismatchedWithOrder() { return poolOrderMismatch; }
-
-  @Override
-  public void setMismatchedWithOrder(boolean b) {
-    poolOrderMismatch = b;
   }
 
   @Override

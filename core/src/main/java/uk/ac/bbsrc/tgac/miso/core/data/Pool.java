@@ -240,8 +240,4 @@ public interface Pool
   public boolean isMergeChild();
 
   public void makeMergeChild();
-
-  public boolean isMismatchedWithOrder();
-
-  public void setMismatchedWithOrder(boolean b);
 }
