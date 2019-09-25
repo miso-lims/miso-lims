@@ -18,6 +18,10 @@ public class Pluralizer {
     return pluralize(count, "box", "boxes");
   }
 
+  public static final String containers(long count) {
+    return pluralize(count, "container", "containers");
+  }
+
   public static final String freezers(long count) {
     return pluralize(count, "freezer", "freezers");
   }

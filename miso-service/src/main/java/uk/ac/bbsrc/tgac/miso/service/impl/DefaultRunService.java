@@ -57,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
-import uk.ac.bbsrc.tgac.miso.core.service.ContainerModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
@@ -117,7 +117,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   @Autowired
   private PoolService poolService;
   @Autowired
-  private ContainerModelService containerModelService;
+  private SequencingContainerModelService containerModelService;
 
   @Override
   public List<Run> list() throws IOException {

@@ -1,8 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public class HibernateSequencingContainerModelDaoTest extends AbstractDAOTest {
 
@@ -75,4 +74,74 @@ public class HibernateSequencingContainerModelDaoTest extends AbstractDAOTest {
     List<SequencingContainerModel> models = dao.list();
     assertEquals(3, models.size());
   }
+
+  @Test
+  public void testGet() throws Exception {
+    long id = 3L;
+    SequencingContainerModel model = dao.get(id);
+    assertNotNull(model);
+    assertEquals(id, model.getId());
+  }
+
+  @Test
+  public void testCreate() throws Exception {
+    SequencingContainerModel model = new SequencingContainerModel();
+    model.setAlias("New Model");
+    model.setIdentificationBarcode("barbarbarbar");
+    model.setPartitionCount(3);
+    model.setPlatformType(PlatformType.ILLUMINA);
+    long savedId = dao.create(model);
+
+    clearSession();
+
+    SequencingContainerModel saved = (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, savedId);
+    assertNotNull(saved);
+    assertEquals(model.getAlias(), saved.getAlias());
+    assertEquals(model.getIdentificationBarcode(), saved.getIdentificationBarcode());
+    assertEquals(model.getPartitionCount(), saved.getPartitionCount());
+    assertEquals(model.getPlatformType(), saved.getPlatformType());
+  }
+
+  @Test
+  public void testUpdate() throws Exception {
+    long id = 1L;
+    String alias = "Changed Alias";
+    SequencingContainerModel model = (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, id);
+    assertNotEquals(alias, model.getAlias());
+    model.setAlias(alias);
+    dao.update(model);
+
+    clearSession();
+
+    SequencingContainerModel saved = (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, id);
+    assertEquals(alias, saved.getAlias());
+  }
+
+  @Test
+  public void testGetByPlatformAndAlias() throws Exception {
+    PlatformType platform = PlatformType.ILLUMINA;
+    String alias = "Generic 2-Lane Illumina Flow Cell";
+    SequencingContainerModel model = dao.getByPlatformAndAlias(platform, alias);
+    assertNotNull(model);
+    assertEquals(platform, model.getPlatformType());
+    assertEquals(alias, model.getAlias());
+  }
+
+  @Test
+  public void testGetByPlatformAndBarcode() throws Exception {
+    PlatformType platform = PlatformType.ILLUMINA;
+    String barcode = "12345678";
+    SequencingContainerModel model = dao.getByPlatformAndBarcode(platform, barcode);
+    assertNotNull(model);
+    assertEquals(platform, model.getPlatformType());
+    assertEquals(barcode, model.getIdentificationBarcode());
+  }
+
+  @Test
+  public void testGetUsage() throws Exception {
+    SequencingContainerModel model = (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, 1L);
+    assertNotNull(model);
+    assertEquals(4, dao.getUsage(model));
+  }
+
 }

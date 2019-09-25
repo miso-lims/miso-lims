@@ -477,8 +477,12 @@ performed by a MISO adminstrator.
 
 Most instrument models may be run with different sequencing container models. Some sequencing container models may also
 be used by multiple instrument models. A sequencing container must specify its model, and this is used to determine
-which runs the container can be attached to. Modifications to sequencing container models can only be made via direct
-access to the MISO database. As such, they must be performed by a MISO adminstrator.
+which runs the container can be attached to.
+
+MISO administrators can add, edit, and delete sequencing container models using the standard interface. After creating
+a new container model, it can be linked to instrument models from the Edit Instrument Model page. A container model can
+only be deleted if it has not been used by any existing sequencing containers. Alternately, container models no longer
+in use can be archived.
 
 {% include userman-toplink.md %}
 

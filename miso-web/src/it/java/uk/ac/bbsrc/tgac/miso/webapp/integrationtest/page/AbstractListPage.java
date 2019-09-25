@@ -32,6 +32,7 @@ public interface AbstractListPage {
     public static final String END_DATE = "End Date";
     public static final String EXTERNAL = "External";
     public static final String FAILED = "Failed";
+    public static final String FALLBACK = "Fallback";
     public static final String FAMILY = "Family";
     public static final String FILENAME = "Filename";
     public static final String FREEZER_NAME = "Freezer Name";
@@ -125,6 +126,7 @@ public interface AbstractListPage {
     public static final String BOX_USES = "boxuse/list";
     public static final String BOXES = "boxes";
     public static final String CONTAINERS = "containers";
+    public static final String CONTAINER_MODELS = "containermodel/list";
     public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";
     public static final String INDICES = "indices";
     public static final String INSTRUMENTS = "instruments";

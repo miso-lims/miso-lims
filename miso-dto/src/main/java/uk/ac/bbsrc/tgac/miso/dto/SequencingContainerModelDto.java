@@ -2,13 +2,14 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
 
-public class ContainerModelDto {
+public class SequencingContainerModelDto {
 
   private Long id;
   private String alias;
   private String identificationBarcode;
   private String platformType;
   private Integer partitionCount;
+  private Boolean fallback;
   private Boolean archived;
   private List<Long> instrumentModelIds;
 
@@ -50,6 +51,14 @@ public class ContainerModelDto {
 
   public void setPartitionCount(Integer partitionCount) {
     this.partitionCount = partitionCount;
+  }
+
+  public Boolean getFallback() {
+    return fallback;
+  }
+
+  public void setFallback(Boolean fallback) {
+    this.fallback = fallback;
   }
 
   public Boolean getArchived() {

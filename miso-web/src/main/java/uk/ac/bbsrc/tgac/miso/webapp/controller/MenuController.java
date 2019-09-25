@@ -90,7 +90,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AttachmentCategoryService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxSizeService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxUseService;
-import uk.ac.bbsrc.tgac.miso.core.service.ContainerModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
@@ -210,7 +210,7 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private ContainerService containerService;
   @Autowired
-  private ContainerModelService containerModelService;
+  private SequencingContainerModelService containerModelService;
   @Autowired
   private AttachmentCategoryService attachmentCategoryService;
   @Autowired

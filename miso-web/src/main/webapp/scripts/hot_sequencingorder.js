@@ -108,7 +108,7 @@ HotTarget.sequencingorder = (function() {
                 source: params
               });
             }
-          }, HotUtils.makeColumnForInt('Partitions', true, 'partitions', HotUtils.validator.requiredPositiveInt)];
+          }, HotUtils.makeColumnForInt('Partitions', true, 'partitions', HotUtils.validator.integer(true, 1))];
     },
     getCustomActions: function(table) {
       return [];

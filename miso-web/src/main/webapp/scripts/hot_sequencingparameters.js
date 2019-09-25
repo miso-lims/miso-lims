@@ -25,7 +25,7 @@ HotTarget.sequencingparameters = {
                 'Read 1 Length',
                 true,
                 'read1Length',
-                HotUtils.validator.requiredPositiveInt,
+                HotUtils.validator.integer(true, 0),
                 {
                   description: 'For Illumina instruments, read 1 length must be greater than zero. For other platforms, read lengths should be set to zero.'
                 }),
@@ -34,7 +34,7 @@ HotTarget.sequencingparameters = {
                 'Read 2 Length',
                 true,
                 'read2Length',
-                HotUtils.validator.requiredPositiveInt,
+                HotUtils.validator.integer(true, 0),
                 {
                   description: 'For Illumina instruments, read 2 should be set to zero for single end, or greater than zero for paired end. For other platforms, read lengths should be set to zero.'
                 }),

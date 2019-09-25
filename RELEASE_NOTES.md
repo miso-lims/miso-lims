@@ -2,7 +2,8 @@
 
 Changes:
 
-
+  * Added interface for administrators to add, edit, and delete dropdown options
+    * sequencing container models
 
 # 0.2.191
 

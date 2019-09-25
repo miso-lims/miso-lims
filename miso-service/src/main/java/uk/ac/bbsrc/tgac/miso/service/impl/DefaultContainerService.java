@@ -20,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.ContainerModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
@@ -48,7 +48,7 @@ public class DefaultContainerService
   @Autowired
   private KitDescriptorService kitService;
   @Autowired
-  private ContainerModelService containerModelService;
+  private SequencingContainerModelService containerModelService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
