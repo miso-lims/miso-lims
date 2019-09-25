@@ -91,11 +91,11 @@ ListTarget.poolelement = {
           include: true,
           iSortPriority: 0,
           mRender: function(data, type, full) {
-                      if (type === 'display') {
-                        return '<a href="' + Urls.ui.libraryAliquots.edit(full.id) + '">' + full.alias + '</a>';
-                      }
-                      return data;
-                    }
+            if (type === 'display') {
+              return '<a href="' + Urls.ui.libraryAliquots.edit(full.id) + '">' + full.alias + '</a>';
+            }
+            return data;
+          }
         },
         {
           sTitle: "Warnings",
