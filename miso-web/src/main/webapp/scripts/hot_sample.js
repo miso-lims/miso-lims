@@ -546,8 +546,8 @@ HotTarget.sample = (function() {
                 return item.label;
               }),
           HotUtils.makeColumnForInt('Passage #', show['Tissue'], 'passageNumber', null),
-          HotUtils.makeColumnForInt('Times Received', show['Tissue'], 'timesReceived', HotUtils.validator.requiredPositiveInt),
-          HotUtils.makeColumnForInt('Tube Number', show['Tissue'], 'tubeNumber', HotUtils.validator.requiredPositiveInt),
+          HotUtils.makeColumnForInt('Times Received', show['Tissue'], 'timesReceived', HotUtils.validator.integer(true, 1)),
+          HotUtils.makeColumnForInt('Tube Number', show['Tissue'], 'tubeNumber', HotUtils.validator.integer(true, 1)),
           HotUtils.makeColumnForConstantsList('Lab', show['Tissue'] && !config.isLibraryReceipt, 'labComposite', 'labId', 'id', 'label',
               Constants.labs, false),
           HotUtils.makeColumnForText('Secondary ID', show['Tissue'] && !config.isLibraryReceipt, 'secondaryIdentifier', {
@@ -560,12 +560,12 @@ HotTarget.sample = (function() {
           }),
 
           // Tissue Processing: Slides columns
-          HotUtils.makeColumnForInt('Slides', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Slide'), 'slides',
-              HotUtils.validator.requiredPositiveInt),
-          HotUtils.makeColumnForInt('Discards', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Slide'), 'discards',
-              HotUtils.validator.requiredPositiveInt),
-          HotUtils.makeColumnForInt('Thickness', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Slide'), 'thickness',
-              null),
+          HotUtils.makeColumnForInt('Slides', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Slide'),
+              'slides', HotUtils.validator.integer(true, 0)),
+          HotUtils.makeColumnForInt('Discards', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Slide'),
+              'discards', HotUtils.validator.integer(true, 0)),
+          HotUtils.makeColumnForInt('Thickness', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Slide'),
+              'thickness', HotUtils.validator.integer(false, 0)),
           {
             header: 'Stain',
             data: 'stainName',
@@ -597,15 +597,17 @@ HotTarget.sample = (function() {
           },
 
           // Tissue Processing: LCM Tube columns
-          HotUtils.makeColumnForInt('Slides Consumed', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'LCM Tube'),
-              'slidesConsumed', HotUtils.validator.requiredPositiveInt),
+          HotUtils.makeColumnForInt('Slides Consumed',
+              (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'LCM Tube'), 'slidesConsumed', HotUtils.validator
+                  .integer(true, 0)),
 
           // Tissue Processing: Single Cell columns
-          HotUtils.makeColumnForDecimal('Initial Cell Conc.', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory
-              && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell')), 'initialCellConcentration', 14, 10, false, false),
+          HotUtils.makeColumnForDecimal('Initial Cell Conc.',
+              (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory
+                  .startsWith('Single Cell')), 'initialCellConcentration', 14, 10, false, false),
           HotUtils.makeColumnForText('Digestion',
-              (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell')),
-              'digestion', {
+              (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory
+                  .startsWith('Single Cell')), 'digestion', {
                 validator: HotUtils.validator.requiredTextNoSpecialChars
               }),
 
@@ -679,13 +681,14 @@ HotTarget.sample = (function() {
           },
           // Stock: Single Cell columns
           HotUtils.makeColumnForDecimal('Target Cell Recovery',
-              (show['Stock'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell')),
-              'targetCellRecovery', 14, 10, false, false),
-          HotUtils.makeColumnForDecimal('Cell Viability', (show['Stock'] && config.targetSampleClass.sampleSubcategory
-              && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell')), 'cellViability', 14, 10, false, false),
+              (show['Stock'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory
+                  .startsWith('Single Cell')), 'targetCellRecovery', 14, 10, false, false),
+          HotUtils.makeColumnForDecimal('Cell Viability',
+              (show['Stock'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory
+                  .startsWith('Single Cell')), 'cellViability', 14, 10, false, false),
           HotUtils.makeColumnForDecimal('Loading Cell Conc.',
-              (show['Stock'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell')),
-              'loadingCellConcentration', 14, 10, false, false),
+              (show['Stock'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory
+                  .startsWith('Single Cell')), 'loadingCellConcentration', 14, 10, false, false),
 
           // QC status columns for detailed and non-detailed samples
           {
@@ -791,8 +794,8 @@ HotTarget.sample = (function() {
               }),
           // Aliquot: Single Cell columns
           HotUtils.makeColumnForDecimal('Input into Library',
-              (show['Aliquot'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell')),
-              'inputIntoLibrary', 14, 10, false, false)];
+              (show['Aliquot'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory
+                  .startsWith('Single Cell')), 'inputIntoLibrary', 14, 10, false, false)];
 
       if (!config.isLibraryReceipt) {
         var spliceIndex = columns.indexOf(columns.filter(function(column) {

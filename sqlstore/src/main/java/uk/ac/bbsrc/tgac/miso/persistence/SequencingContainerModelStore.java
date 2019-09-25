@@ -23,13 +23,13 @@
 
 package uk.ac.bbsrc.tgac.miso.persistence;
 
-import java.util.List;
+import java.io.IOException;
 
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
-public interface SequencingContainerModelStore {
-  SequencingContainerModel get(long id);
+public interface SequencingContainerModelStore extends SaveDao<SequencingContainerModel> {
 
   /**
    * Attempt to find a SequencingContainerModel matching the supplied parameters
@@ -42,8 +42,12 @@ public interface SequencingContainerModelStore {
    *          the number of partitions that the model must have (required)
    * @return an appropriate model if one is found; null otherwise
    */
-  SequencingContainerModel find(InstrumentModel platform, String search, int partitionCount);
+  public SequencingContainerModel find(InstrumentModel platform, String search, int partitionCount);
 
-  List<SequencingContainerModel> list();
+  public SequencingContainerModel getByPlatformAndAlias(PlatformType platform, String alias) throws IOException;
+
+  public SequencingContainerModel getByPlatformAndBarcode(PlatformType platform, String identificationBarcode) throws IOException;
+
+  public long getUsage(SequencingContainerModel model) throws IOException;
 
 }

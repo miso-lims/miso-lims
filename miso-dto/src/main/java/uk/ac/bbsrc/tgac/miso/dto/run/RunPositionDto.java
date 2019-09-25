@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto.run;
 
-import uk.ac.bbsrc.tgac.miso.dto.ContainerModelDto;
+import uk.ac.bbsrc.tgac.miso.dto.SequencingContainerModelDto;
 
 public class RunPositionDto {
 
@@ -12,7 +12,7 @@ public class RunPositionDto {
 
   private String identificationBarcode;
 
-  private ContainerModelDto containerModel;
+  private SequencingContainerModelDto containerModel;
 
   private String lastModified;
 
@@ -48,11 +48,11 @@ public class RunPositionDto {
     this.identificationBarcode = identificationBarcode;
   }
 
-  public ContainerModelDto getContainerModel() {
+  public SequencingContainerModelDto getContainerModel() {
     return containerModel;
   }
 
-  public void setContainerModel(ContainerModelDto containerModel) {
+  public void setContainerModel(SequencingContainerModelDto containerModel) {
     this.containerModel = containerModel;
   }
 

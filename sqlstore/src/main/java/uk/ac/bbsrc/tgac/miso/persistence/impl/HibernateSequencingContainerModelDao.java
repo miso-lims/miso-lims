@@ -1,45 +1,26 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import java.util.List;
+import java.io.IOException;
 
 import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingContainerModelStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSequencingContainerModelDao implements SequencingContainerModelStore {
-  protected static final Logger log = LoggerFactory.getLogger(HibernateSequencingContainerModelDao.class);
+public class HibernateSequencingContainerModelDao extends HibernateSaveDao<SequencingContainerModel>
+    implements SequencingContainerModelStore {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
-  }
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
-
-  @Override
-  public SequencingContainerModel get(long id) {
-    return (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, id);
+  public HibernateSequencingContainerModelDao() {
+    super(SequencingContainerModel.class);
   }
 
   @Override
@@ -69,11 +50,24 @@ public class HibernateSequencingContainerModelDao implements SequencingContainer
   }
 
   @Override
-  public List<SequencingContainerModel> list() {
-    Criteria criteria = currentSession().createCriteria(SequencingContainerModel.class);
-    @SuppressWarnings("unchecked")
-    List<SequencingContainerModel> results = criteria.list();
-    return results;
+  public SequencingContainerModel getByPlatformAndAlias(PlatformType platform, String alias) throws IOException {
+    return (SequencingContainerModel) currentSession().createCriteria(SequencingContainerModel.class)
+        .add(Restrictions.eq("platformType", platform))
+        .add(Restrictions.eq("alias", alias))
+        .uniqueResult();
+  }
+
+  @Override
+  public SequencingContainerModel getByPlatformAndBarcode(PlatformType platform, String identificationBarcode) throws IOException {
+    return (SequencingContainerModel) currentSession().createCriteria(SequencingContainerModel.class)
+        .add(Restrictions.eq("platformType", platform))
+        .add(Restrictions.eq("identificationBarcode", identificationBarcode))
+        .uniqueResult();
+  }
+
+  @Override
+  public long getUsage(SequencingContainerModel model) throws IOException {
+    return getUsageBy(SequencerPartitionContainerImpl.class, "model", model);
   }
 
 }

@@ -45,7 +45,7 @@ HotTarget.qctype = {
         data: 'precisionNumber',
         type: 'numeric',
         include: true,
-        validator: HotUtils.validator.requiredPositiveInt,
+        validator: HotUtils.validator.integer(true, 0),
         unpack: function(obj, flat, setCellMeta) {
           flat['precisionNumber'] = obj['precisionAfterDecimal'] === -1 ? null : Utils.valOrNull(obj['precisionAfterDecimal']);
         },
@@ -64,7 +64,7 @@ HotTarget.qctype = {
             setReadOnly(true);
           } else {
             setOptions({
-              'validator': HotUtils.validator.requiredPositiveInt
+              'validator': HotUtils.validator.integer(true, 0)
             })
             setReadOnly(false);
           }

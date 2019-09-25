@@ -13,8 +13,8 @@ HotTarget.arraymodel = {
   createColumns: function(config, create, data) {
     return [HotUtils.makeColumnForText('Alias', true, 'alias', {
       validator: HotUtils.validator.requiredText
-    }), HotUtils.makeColumnForInt('Rows', true, 'rows', HotUtils.validator.requiredPositiveInt),
-        HotUtils.makeColumnForInt('Columns', true, 'columns', HotUtils.validator.requiredPositiveInt)];
+    }), HotUtils.makeColumnForInt('Rows', true, 'rows', HotUtils.validator.integer(true, 1)),
+        HotUtils.makeColumnForInt('Columns', true, 'columns', HotUtils.validator.integer(true, 1))];
   },
 
   getBulkActions: function(config) {

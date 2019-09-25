@@ -682,6 +682,17 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.SEQUENCING_PARAMETERS);
   }
 
+  @Test
+  public void testListContainerModelsSetup() throws Exception {
+    testPageSetup(ListTarget.CONTAINER_MODELS,
+        Sets.newHashSet(Columns.SORT, Columns.ALIAS, Columns.PLATFORM, Columns.FALLBACK, Columns.ARCHIVED));
+  }
+
+  @Test
+  public void testListContainerModelsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.CONTAINER_MODELS);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     // Goal: confirm that all expected columns are present
     ListPage page = getList(listTarget);

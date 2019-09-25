@@ -76,6 +76,18 @@ Urls = (function() {
     edit: idUrlFunction(containerUiBase)
   };
 
+  // Container Models
+  var containerModelUiBase = baseUrl + '/containermodel';
+  ui.containerModels = {
+    bulkEdit: containerModelUiBase + '/bulk/edit'
+  };
+
+  var containerModelRestBase = restBase + '/containermodels';
+  rest.containerModels = {
+    create: containerModelRestBase,
+    update: idUrlFunction(containerModelRestBase)
+  };
+
   // Detailed QC Statuses
   var detailedQcStatusRestBase = restBase + '/detailedqcstatuses';
   rest.detailedQcStatuses = {

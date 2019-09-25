@@ -11,8 +11,8 @@ HotTarget.boxsize = {
   fixUp: function(boxsize, errorHandler) {
   },
   createColumns: function(config, create, data) {
-    return [HotUtils.makeColumnForInt('Rows', true, 'rows', HotUtils.validator.requiredPositiveInt),
-        HotUtils.makeColumnForInt('Columns', true, 'columns', HotUtils.validator.requiredPositiveInt),
+    return [HotUtils.makeColumnForInt('Rows', true, 'rows', HotUtils.validator.integer(true, 1)),
+        HotUtils.makeColumnForInt('Columns', true, 'columns', HotUtils.validator.integer(true, 1)),
         HotUtils.makeColumnForBoolean('Scannable', true, 'scannable', true)];
   },
 

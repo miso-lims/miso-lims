@@ -31,10 +31,24 @@ var HotUtils = {
     },
 
     /**
-     * Custom validator for required positive integers
+     * Custom validator for integers
      */
-    requiredPositiveInt: function(value, callback) {
-      return callback(/^[0-9]+$/g.test(value));
+    integer: function(required, min, max) {
+      return function(value, callback) {
+        if (value === '') {
+          return callback(!required);
+        }
+        if (!/^-?[0-9]*$/g.test(value)) {
+          return callback(false);
+        }
+        if (min !== undefined && min !== null && parseInt(value) < min) {
+          return callback(false);
+        }
+        if (max !== undefined && max !== null && parseInt(value) > max) {
+          return callback(false);
+        }
+        return callback(true);
+      };
     },
 
     /**
@@ -951,40 +965,40 @@ var HotUtils = {
     return baseobj;
   },
 
-  makeColumnForBoolean: function(headerName, include, property, required) {
-    return {
-      header: headerName,
-      data: property,
-      type: 'dropdown',
-      trimDropdown: false,
-      source: required ? ['True', 'False'] : ['Unknown', 'True', 'False'],
-      include: include,
-      unpack: function(obj, flat, setCellMeta) {
-        var result;
-        if (obj[property] === true) {
-          result = 'True';
-        } else if (obj[property] === false) {
-          result = 'False';
-        } else if (required) {
-          result = 'False';
-        } else {
-          result = 'Unknown';
-        }
-        flat[property] = result;
-      },
-      pack: function(obj, flat, errorHandler) {
-        if (flat[property] === 'True') {
-          obj[property] = true;
-        } else if (flat[property] === 'False') {
-          obj[property] = false;
-        } else if (required) {
-          errorHandler(headerName + ' is missing');
-          return;
-        } else {
-          obj[property] = null;
-        }
+  makeColumnForBoolean: function(headerName, include, property, required, baseObj) {
+    var column = baseObj || {};
+    column.header = headerName;
+    column.data = property;
+    column.type = 'dropdown';
+    column.trimDropdown = false;
+    column.source = required ? ['True', 'False'] : ['Unknown', 'True', 'False'];
+    column.include = include;
+    column.unpack = function(obj, flat, setCellMeta) {
+      var result;
+      if (obj[property] === true) {
+        result = 'True';
+      } else if (obj[property] === false) {
+        result = 'False';
+      } else if (required) {
+        result = 'False';
+      } else {
+        result = 'Unknown';
+      }
+      flat[property] = result;
+    };
+    column.pack = function(obj, flat, errorHandler) {
+      if (flat[property] === 'True') {
+        obj[property] = true;
+      } else if (flat[property] === 'False') {
+        obj[property] = false;
+      } else if (required) {
+        errorHandler(headerName + ' is missing');
+        return;
+      } else {
+        obj[property] = null;
       }
     };
+    return column;
   },
 
   makeColumnForFloat: function(headerName, include, property, required) {

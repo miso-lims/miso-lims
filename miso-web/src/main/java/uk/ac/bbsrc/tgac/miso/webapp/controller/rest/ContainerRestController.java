@@ -60,7 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PartitionSpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.service.ContainerModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -81,7 +81,7 @@ public class ContainerRestController extends RestController {
   @Autowired
   private ContainerService containerService;
   @Autowired
-  private ContainerModelService containerModelService;
+  private SequencingContainerModelService containerModelService;
   @Autowired
   private IndexChecker indexChecker;
 

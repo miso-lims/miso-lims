@@ -14,7 +14,7 @@ public class ContainerDto {
   private Long id;
   // identificationBarcode is displayed as "serial number" to the user
   private String identificationBarcode;
-  private ContainerModelDto model;
+  private SequencingContainerModelDto model;
   private String description;
   private String lastRunAlias;
   private Long lastRunId;
@@ -41,11 +41,11 @@ public class ContainerDto {
     this.identificationBarcode = identificationBarcode;
   }
 
-  public ContainerModelDto getModel() {
+  public SequencingContainerModelDto getModel() {
     return model;
   }
 
-  public void setModel(ContainerModelDto model) {
+  public void setModel(SequencingContainerModelDto model) {
     this.model = model;
   }
 

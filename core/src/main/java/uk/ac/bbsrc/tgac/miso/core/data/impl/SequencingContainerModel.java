@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -15,19 +16,20 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
-public class SequencingContainerModel implements Serializable, Barcodable {
+public class SequencingContainerModel implements Deletable, Serializable, Barcodable {
 
   private static final long serialVersionUID = 1L;
 
-  private static final long UNSAVD_ID = 0;
+  private static final long UNSAVED_ID = 0;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long sequencingContainerModelId = UNSAVD_ID;
+  private long sequencingContainerModelId = UNSAVED_ID;
 
   private String alias;
 
@@ -106,6 +108,9 @@ public class SequencingContainerModel implements Serializable, Barcodable {
   }
 
   public List<InstrumentModel> getInstrumentModels() {
+    if (instrumentModels == null) {
+      instrumentModels = new ArrayList<>();
+    }
     return instrumentModels;
   }
 
@@ -150,6 +155,16 @@ public class SequencingContainerModel implements Serializable, Barcodable {
 
   @Override
   public boolean isSaved() {
-    return getId() != UNSAVD_ID;
+    return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Sequencing Container Model";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias() + " (" + getPlatformType().getKey() + ")";
   }
 }

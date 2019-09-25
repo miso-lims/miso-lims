@@ -81,6 +81,7 @@
       <a href="<c:url value="/miso/targetedsequencing/list"/>">Targeted Sequencings</a>
       <a href="<c:url value="/miso/orderpurpose/list"/>">Order Purposes</a>
       <a href="<c:url value="/miso/sequencingparameters/list"/>">Sequencing Parameters</a>
+      <a href="<c:url value="/miso/containermodel/list"/>">Sequencing Container Models</a>
       <a href="<c:url value="/miso/boxsize/list"/>">Box Sizes</a>
       <a href="<c:url value="/miso/boxuse/list"/>">Box Uses</a>
       <a href="<c:url value="/miso/arraymodel/list"/>">Array Models</a>

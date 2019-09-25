@@ -2008,7 +2008,7 @@ public class Dtos {
     }
     setLong(to::setId, from.getId(), false);
     setString(to::setIdentificationBarcode, from.getIdentificationBarcode());
-    setObject(to::setModel, SequencingContainerModel::new, maybeGetProperty(from.getModel(), ContainerModelDto::getId));
+    setObject(to::setModel, SequencingContainerModel::new, maybeGetProperty(from.getModel(), SequencingContainerModelDto::getId));
     setString(to::setDescription, from.getDescription());
     setObject(to::setClusteringKit, KitDescriptor::new, from.getClusteringKitId());
     setObject(to::setMultiplexingKit, KitDescriptor::new, from.getMultiplexingKitId());
@@ -2029,16 +2029,36 @@ public class Dtos {
     return dto;
   }
 
-  public static ContainerModelDto asDto(@Nonnull SequencingContainerModel from) {
-    ContainerModelDto dto = new ContainerModelDto();
+  public static SequencingContainerModelDto asDto(@Nonnull SequencingContainerModel from) {
+    SequencingContainerModelDto dto = new SequencingContainerModelDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setPlatformType(from.getPlatformType().name());
     dto.setInstrumentModelIds(from.getInstrumentModels().stream().map(InstrumentModel::getId).collect(Collectors.toList()));
     dto.setPartitionCount(from.getPartitionCount());
+    dto.setFallback(from.isFallback());
     dto.setArchived(from.isArchived());
     return dto;
+  }
+
+  public static SequencingContainerModel to(@Nonnull SequencingContainerModelDto from) {
+    SequencingContainerModel to = new SequencingContainerModel();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    setString(to::setIdentificationBarcode, from.getIdentificationBarcode());
+    setObject(to::setPlatformType, from.getPlatformType(), str -> PlatformType.valueOf(str));
+    setObject(to::setInstrumentModels, from.getInstrumentModelIds(), ids -> ids.stream()
+        .map(id -> {
+          InstrumentModel model = new InstrumentModel();
+          model.setId(id);
+          return model;
+        })
+        .collect(Collectors.toList()));
+    setInteger(to::setPartitionCount, from.getPartitionCount(), false);
+    setBoolean(to::setFallback, from.getFallback(), false);
+    setBoolean(to::setArchived, from.getArchived(), false);
+    return to;
   }
 
   public static List<PartitionDto> asPartitionDtos(@Nonnull Collection<Partition> partitionSubset, boolean includePoolContents,
@@ -2050,7 +2070,7 @@ public class Dtos {
     return dtoList;
   }
 
-  public static List<ContainerModelDto> asDtos(@Nonnull Collection<SequencingContainerModel> models) {
+  public static List<SequencingContainerModelDto> asDtos(@Nonnull Collection<SequencingContainerModel> models) {
     return models.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 

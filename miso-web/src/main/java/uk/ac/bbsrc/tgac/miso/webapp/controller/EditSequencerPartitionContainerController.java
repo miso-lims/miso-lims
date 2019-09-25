@@ -53,7 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
-import uk.ac.bbsrc.tgac.miso.core.service.ContainerModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
@@ -71,7 +71,7 @@ public class EditSequencerPartitionContainerController {
   @Autowired
   private RunService runService;
   @Autowired
-  private ContainerModelService containerModelService;
+  private SequencingContainerModelService containerModelService;
   @Autowired
   private IndexChecker indexChecker;
 
