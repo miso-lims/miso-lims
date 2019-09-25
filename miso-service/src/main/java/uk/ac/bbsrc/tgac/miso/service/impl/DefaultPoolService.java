@@ -319,17 +319,15 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
 
   @Override
   public boolean checkMismatchedWithOrders(Pool pool, List<PoolOrder> poolOrders) throws IOException {
-    // Check equivalence for all library aliquots. Platform type /should/ logically follow so no explicit check
-    // Muffy, sis, the time complexity
-    Set<LibraryAliquot> poolOrderAliquots = poolOrders.stream().flatMap(element -> element.getOrderLibraryAliquots().stream())
-            .map(OrderLibraryAliquot::getAliquot)
-            .collect(Collectors.toSet()),
-            poolAliquots = pool.getPoolContents().stream()
-                    .map(PoolElement::getPoolableElementView)
-                    .map(PoolableElementView::getAliquot)
-                    .collect(Collectors.toSet());
-    // Set.equals checks set size and equivalence of every set member
-    return !poolOrderAliquots.equals(poolAliquots);
+      //TODO convert everything to Pair<LibraryAliquot, int> maybe?? 
+    Set<OrderLibraryAliquot> poolOrderAliquots = poolOrders.stream().flatMap(element -> element.getOrderLibraryAliquots().stream())
+            .collect(Collectors.toSet());
+    Set<PoolElement> poolAliquots = pool.getPoolContents();
+
+    boolean mismatch = false;
+    for(OrderLibraryAliquot ola: poolOrderAliquots){
+        if (!p)
+    }
   }
 
   private void validateChange(Pool pool, Pool beforeChange) throws IOException {
