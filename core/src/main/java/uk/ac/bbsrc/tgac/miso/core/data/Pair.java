@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.Function;
 
 public class Pair<K, V> implements Entry<K, V> {
@@ -38,5 +39,19 @@ public class Pair<K, V> implements Entry<K, V> {
   @Override
   public V setValue(V arg0) {
     throw new UnsupportedOperationException("Pairs are immutable.");
+  }
+
+  @Override
+  public boolean equals(Object o){
+    if(o == this) return true;
+    if(!(o instanceof Pair)) return false;
+    Pair<K, V> po = (Pair<K, V>)o;
+    return Objects.equals(this.key, po.key)
+            && Objects.equals(this.value, po.value);
+  }
+
+  @Override
+  public int hashCode(){
+    return Objects.hash(this.key, this.value);
   }
 }
