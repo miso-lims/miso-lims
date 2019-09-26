@@ -317,7 +317,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
 
   @Override
   public boolean checkMismatchedWithOrders(Pool pool, List<PoolOrder> poolOrders) throws IOException {
-    Set<Pair<LibraryAliquot, Integer>> poolAliquots = new HashSet<>(), poolOrderAliquots = new HashSet<>();
+    Set<Pair<LibraryAliquot, Integer>> poolAliquots = new HashSet<>();
+    Set<Pair<LibraryAliquot, Integer>> poolOrderAliquots = new HashSet<>();
 
     for(PoolElement pe: pool.getPoolContents()){
       poolAliquots.add(new Pair<>(pe.getPoolableElementView().getAliquot(), pe.getProportion()));
