@@ -465,8 +465,16 @@ categories:
 * Array scanners: Used for array runs
 * Others: Not used within MISO; however, they may be registered in order to track service records or for other purposes
 
-Modifications to instrument models can only be made via direct access to the MISO database. As such, they must be
-performed by a MISO adminstrator.
+MISO administrators can add, edit, and delete instrument models from the List Instrument Models page. To create a new
+instrument model, click the "Add" button at the top of the table. To edit an existing instrument model, click on its
+alias in the Instrument Models list.
+
+If a model has multiple run positions, these may be added on the Create or Edit Instrument Model page. Container models
+may be linked to an instrument model using the Edit Instrument Model page after the instrument model is saved. The
+container models must already exist, and can be looked up by alias or barcode.
+
+MISO administrators can delete instrument models using the standard interface. An instrument model can only be deleted
+if there are no exiting instruments of that model.
 
 {% include userman-toplink.md %}
 

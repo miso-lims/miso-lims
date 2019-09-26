@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -33,9 +34,13 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -47,7 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  */
 @Entity
 @Table(name = "InstrumentModel")
-public class InstrumentModel implements Comparable<InstrumentModel>, Identifiable, Serializable {
+public class InstrumentModel implements Comparable<InstrumentModel>, Deletable, Identifiable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -72,11 +77,17 @@ public class InstrumentModel implements Comparable<InstrumentModel>, Identifiabl
   private InstrumentDataManglingPolicy dataManglingPolicy;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long instrumentModelId = InstrumentModel.UNSAVED_ID;
 
   @OneToMany(mappedBy = "instrumentModel")
   private Set<InstrumentPosition> positions;
+
+  @ManyToMany
+  @JoinTable(name = "SequencingContainerModel_InstrumentModel", joinColumns = {
+      @JoinColumn(name = "instrumentModelId", nullable = false) }, inverseJoinColumns = {
+          @JoinColumn(name = "sequencingContainerModelId", nullable = false) })
+  private Set<SequencingContainerModel> containerModels;
 
   @Override
   public long getId() {
@@ -133,7 +144,17 @@ public class InstrumentModel implements Comparable<InstrumentModel>, Identifiabl
   }
 
   public Set<InstrumentPosition> getPositions() {
+    if (positions == null) {
+      positions = new HashSet<>();
+    }
     return positions;
+  }
+
+  public Set<SequencingContainerModel> getContainerModels() {
+    if (containerModels == null) {
+      containerModels = new HashSet<>();
+    }
+    return containerModels;
   }
 
   /**
@@ -186,6 +207,16 @@ public class InstrumentModel implements Comparable<InstrumentModel>, Identifiabl
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Instrument Model";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getPlatformAndAlias();
   }
 
 }

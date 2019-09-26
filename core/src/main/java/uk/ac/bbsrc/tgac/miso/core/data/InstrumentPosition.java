@@ -18,7 +18,7 @@ public class InstrumentPosition implements Serializable, Aliasable {
   private static final long UNSAVED_ID = 0;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long positionId = UNSAVED_ID;
 
   @ManyToOne
@@ -98,7 +98,7 @@ public class InstrumentPosition implements Serializable, Aliasable {
 
   @Override
   public boolean isSaved() {
-    return getId() == UNSAVED_ID;
+    return getId() != UNSAVED_ID;
   }
 
 }

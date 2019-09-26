@@ -54,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
@@ -2150,25 +2151,54 @@ public class Dtos {
   public static InstrumentModelDto asDto(@Nonnull InstrumentModel from) {
     InstrumentModelDto dto = new InstrumentModelDto();
     dto.setId(from.getId());
-    dto.setPlatformType(from.getPlatformType().name());
-    dto.setDescription(from.getDescription());
     dto.setAlias(from.getAlias());
-    dto.setNumContainers(from.getNumContainers());
-    dto.setInstrumentType(from.getInstrumentType().name());
-    if (from.getPositions() != null) {
-      dto.setPositions(from.getPositions().stream().map(InstrumentPosition::getAlias).collect(Collectors.toList()));
-    }
+    dto.setDescription(from.getDescription());
+    setInteger(dto::setNumContainers, from.getNumContainers(), true);
+    setString(dto::setPlatformType, maybeGetProperty(from.getPlatformType(), PlatformType::name));
+    setString(dto::setInstrumentType, maybeGetProperty(from.getInstrumentType(), InstrumentType::name));
+    setObject(dto::setPositions, from.getPositions(), positions -> positions.stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList()));
+    setObject(dto::setContainerModels, from.getContainerModels(), containerModels -> containerModels.stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList()));
+    setString(dto::setDataManglingPolicy, maybeGetProperty(from.getDataManglingPolicy(), InstrumentDataManglingPolicy::name));
     return dto;
   }
 
   public static InstrumentModel to(@Nonnull InstrumentModelDto from) {
     InstrumentModel to = new InstrumentModel();
     to.setId(from.getId());
-    to.setPlatformType(PlatformType.get(from.getPlatformType()));
-    to.setDescription(from.getDescription());
     to.setAlias(from.getAlias());
-    to.setNumContainers(from.getNumContainers());
-    to.setInstrumentType(InstrumentType.valueOf(from.getInstrumentType()));
+    to.setDescription(from.getDescription());
+    setInteger(to::setNumContainers, from.getNumContainers(), false);
+    setObject(to::setPlatformType, from.getPlatformType(), str -> PlatformType.valueOf(str));
+    setObject(to::setInstrumentType, from.getInstrumentType(), str -> InstrumentType.valueOf(str));
+    if (from.getPositions() != null) {
+      to.getPositions().addAll(from.getPositions().stream()
+          .map(Dtos::to)
+          .collect(Collectors.toList()));
+    }
+    if (from.getContainerModels() != null) {
+      to.getContainerModels().addAll(from.getContainerModels().stream()
+          .map(Dtos::to)
+          .collect(Collectors.toSet()));
+    }
+    setObject(to::setDataManglingPolicy, from.getDataManglingPolicy(), str -> InstrumentDataManglingPolicy.valueOf(str));
+    return to;
+  }
+
+  public static InstrumentPositionDto asDto(@Nonnull InstrumentPosition from) {
+    InstrumentPositionDto to = new InstrumentPositionDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
+  public static InstrumentPosition to(@Nonnull InstrumentPositionDto from) {
+    InstrumentPosition to = new InstrumentPosition();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
     return to;
   }
 

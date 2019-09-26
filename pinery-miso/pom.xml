@@ -10,6 +10,7 @@
   <packaging>war</packaging>
   
   <properties>
+    <failOnMissingWebXml>false</failOnMissingWebXml>
     <skipITs>true</skipITs>
     <mysql.db>lims</mysql.db>
     <mysql.user>tgaclims</mysql.user>

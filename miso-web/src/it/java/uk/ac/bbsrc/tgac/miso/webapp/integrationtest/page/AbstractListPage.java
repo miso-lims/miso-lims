@@ -43,6 +43,7 @@ public interface AbstractListPage {
     public static final String INDICES = "Indices";
     public static final String INSTRUMENT_MODEL = "Instrument Model";
     public static final String INSTRUMENT_NAME = "Instrument Name";
+    public static final String INSTRUMENT_TYPE = "Instrument Type";
     public static final String INTERNAL = "Internal";
     public static final String ID = "ID";
     public static final String ITEMS = "Items";
@@ -130,6 +131,7 @@ public interface AbstractListPage {
     public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";
     public static final String INDICES = "indices";
     public static final String INSTRUMENTS = "instruments";
+    public static final String INSTRUMENT_MODELS = "instrumentmodel/list";
     public static final String KITS = "kitdescriptors";
     public static final String LIBRARIES = "libraries";
     public static final String LIBRARY_ALIQUOTS = "libraryaliquots";

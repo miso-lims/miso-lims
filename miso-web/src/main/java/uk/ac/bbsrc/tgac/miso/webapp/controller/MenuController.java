@@ -66,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
@@ -82,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.IlluminaWorkflowType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
@@ -90,7 +92,6 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AttachmentCategoryService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxSizeService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxUseService;
-import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
@@ -113,6 +114,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.StainService;
 import uk.ac.bbsrc.tgac.miso.core.service.StudyTypeService;
@@ -442,6 +444,18 @@ public class MenuController implements ServletContextAware {
       ArrayNode illuminaChemistry = node.putArray("illuminaChemistry");
       for (IlluminaChemistry chemistry : IlluminaChemistry.values()) {
         illuminaChemistry.add(chemistry.name());
+      }
+      ArrayNode instrumentTypes = node.putArray("instrumentTypes");
+      for (InstrumentType type : InstrumentType.values()) {
+        ObjectNode dto = instrumentTypes.addObject();
+        dto.put("label", type.getLabel());
+        dto.put("value", type.name());
+      }
+      ArrayNode dataManglingPolicies = node.putArray("dataManglingPolicies");
+      for (InstrumentDataManglingPolicy policy : InstrumentDataManglingPolicy.values()) {
+        ObjectNode dto = dataManglingPolicies.addObject();
+        dto.put("label", policy.getLabel());
+        dto.put("value", policy.name());
       }
 
       ObjectNode warningsNode = mapper.createObjectNode();

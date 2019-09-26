@@ -24,12 +24,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
  * Defines a DAO interface for storing Platforms
@@ -37,7 +37,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface InstrumentModelStore extends Store<InstrumentModel> {
+public interface InstrumentModelStore extends PaginatedDataSource<InstrumentModel>, SaveDao<InstrumentModel> {
+
   /**
    * Get an Instrument Model given a model alias
    * 
@@ -45,28 +46,25 @@ public interface InstrumentModelStore extends Store<InstrumentModel> {
    * @return Platform
    * @throws IOException
    */
-  InstrumentModel getByAlias(String alias) throws IOException;
+  public InstrumentModel getByAlias(String alias) throws IOException;
+
+  public Set<PlatformType> listActivePlatformTypes() throws IOException;
+
+  public long getUsage(InstrumentModel model) throws IOException;
 
   /**
-   * List all Instrument Models given a PlatformType
-   * 
-   * @param platformType
-   * @return List<Platform>
+   * @param model
+   * @return the max number of containers attached to a run on an instrument of the specified model
    * @throws IOException
    */
-  List<InstrumentModel> listByPlatformType(String platformType) throws IOException;
+  public int getMaxContainersUsed(InstrumentModel model) throws IOException;
 
-  /**
-   * List all distinct Platform names
-   * 
-   * @return List<String>
-   * @throws IOException
-   *           when
-   */
-  List<PlatformType> listDistinctPlatformNames() throws IOException;
+  public InstrumentPosition getPosition(long id) throws IOException;
 
-  InstrumentPosition getInstrumentPosition(long positionId) throws IOException;
+  public long createPosition(InstrumentPosition position) throws IOException;
 
-  Set<PlatformType> listActivePlatformTypes() throws IOException;
+  public void deletePosition(InstrumentPosition position) throws IOException;
+
+  public long getPositionUsage(InstrumentPosition position) throws IOException;
 
 }

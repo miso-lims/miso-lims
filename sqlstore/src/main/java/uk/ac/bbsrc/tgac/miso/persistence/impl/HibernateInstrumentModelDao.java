@@ -24,16 +24,14 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -42,9 +40,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.InstrumentModelStore;
 
 /**
@@ -56,42 +58,29 @@ import uk.ac.bbsrc.tgac.miso.persistence.InstrumentModelStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateInstrumentModelDao implements InstrumentModelStore {
+public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentModel>
+    implements HibernatePaginatedDataSource<InstrumentModel>, InstrumentModelStore {
 
-  protected static final Logger log = LoggerFactory.getLogger(HibernateInstrumentModelDao.class);
+  private static final String[] SEARCH_PROPERTIES = new String[] { "alias", "platformType" };
 
   @Autowired
   private JdbcTemplate template;
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  public HibernateInstrumentModelDao() {
+    super(InstrumentModel.class);
+  }
 
-  private Session currentSession() {
-    return getSessionFactory().getCurrentSession();
+  public JdbcTemplate getJdbcTemplate() {
+    return template;
+  }
+
+  public void setJdbcTemplate(JdbcTemplate template) {
+    this.template = template;
   }
 
   @Override
-  public long save(InstrumentModel platform) throws IOException {
-    return (long) currentSession().save(platform);
-  }
-
-  @Override
-  public InstrumentModel get(long id) throws IOException {
-    return (InstrumentModel) currentSession().get(InstrumentModel.class, id);
-  }
-
-  @Override
-  public List<InstrumentModel> listAll() throws IOException {
-    Criteria criteria = currentSession().createCriteria(InstrumentModel.class);
-    @SuppressWarnings("unchecked")
-    List<InstrumentModel> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public int count() throws IOException {
-    Criteria criteria = currentSession().createCriteria(InstrumentModel.class);
-    return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
+  public Session currentSession() {
+    return super.currentSession();
   }
 
   @Override
@@ -99,29 +88,6 @@ public class HibernateInstrumentModelDao implements InstrumentModelStore {
     Criteria criteria = currentSession().createCriteria(InstrumentModel.class);
     criteria.add(Restrictions.eq("alias", alias));
     return (InstrumentModel) criteria.uniqueResult();
-  }
-
-  @Override
-  public List<InstrumentModel> listByPlatformType(String platformType) throws IOException {
-    Criteria criteria = currentSession().createCriteria(InstrumentModel.class);
-    criteria.add(Restrictions.eq("platformType", PlatformType.get(platformType)));
-    @SuppressWarnings("unchecked")
-    List<InstrumentModel> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public List<PlatformType> listDistinctPlatformNames() throws IOException {
-    Criteria criteria = currentSession().createCriteria(InstrumentModel.class);
-    criteria.setProjection(Projections.distinct(Projections.property("platformType")));
-    @SuppressWarnings("unchecked")
-    List<PlatformType> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public InstrumentPosition getInstrumentPosition(long positionId) throws IOException {
-    return (InstrumentPosition) currentSession().get(InstrumentPosition.class, positionId);
   }
 
   private static final RowMapper<PlatformType> platformTypeMapper = (rs, rowNum) -> {
@@ -134,19 +100,93 @@ public class HibernateInstrumentModelDao implements InstrumentModelStore {
     return Sets.newHashSet(getJdbcTemplate().query("SELECT platform FROM ActivePlatformTypes", platformTypeMapper));
   }
 
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
+  @Override
+  public long getUsage(InstrumentModel model) throws IOException {
+    return getUsageBy(InstrumentImpl.class, "instrumentModel", model);
   }
 
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
+  @Override
+  public int getMaxContainersUsed(InstrumentModel model) throws IOException {
+    @SuppressWarnings("unchecked")
+    List<Instrument> instruments = currentSession().createCriteria(InstrumentImpl.class)
+        .add(Restrictions.eq("instrumentModel", model))
+        .list();
+
+    @SuppressWarnings("unchecked")
+    List<Run> runs = currentSession().createCriteria(Run.class)
+        .add(Restrictions.in("sequencer", instruments))
+        .list();
+
+    return runs.stream().mapToInt(run -> run.getRunPositions().size()).max().orElse(0);
   }
 
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
+  @Override
+  public InstrumentPosition getPosition(long id) {
+    return (InstrumentPosition) currentSession().createCriteria(InstrumentPosition.class)
+        .add(Restrictions.eq("positionId", id))
+        .uniqueResult();
   }
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  @Override
+  public String getFriendlyName() {
+    return "Instrument Model";
+  }
+
+  @Override
+  public String getProjectColumn() {
+    return null;
+  }
+
+  @Override
+  public Class<? extends InstrumentModel> getRealClass() {
+    return InstrumentModel.class;
+  }
+
+  @Override
+  public String[] getSearchProperties() {
+    return SEARCH_PROPERTIES;
+  }
+
+  @Override
+  public Iterable<String> listAliases() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public String propertyForDate(Criteria criteria, DateType type) {
+    return null;
+  }
+
+  @Override
+  public String propertyForId() {
+    return "instrumentModelId";
+  }
+
+  @Override
+  public String propertyForSortColumn(String original) {
+    return original;
+  }
+
+  @Override
+  public String propertyForUser(boolean creator) {
+    return null;
+  }
+
+  @Override
+  public long createPosition(InstrumentPosition position) throws IOException {
+    return (long) currentSession().save(position);
+  }
+
+  @Override
+  public void deletePosition(InstrumentPosition position) throws IOException {
+    currentSession().delete(position);
+  }
+
+  @Override
+  public long getPositionUsage(InstrumentPosition position) throws IOException {
+    return (long) currentSession().createCriteria(Run.class)
+        .createAlias("runPositions", "runPosition")
+        .add(Restrictions.eq("runPosition.position", position))
+        .setProjection(Projections.rowCount()).uniqueResult();
   }
 }

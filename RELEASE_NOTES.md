@@ -3,7 +3,8 @@
 Changes:
 
   * Added interface for administrators to add, edit, and delete dropdown options
-    sequencing container models
+    * sequencing container models
+    * instrument models
   * Order configuration in Illumina sample sheets (some instruments are picky)
 
 # 0.2.191

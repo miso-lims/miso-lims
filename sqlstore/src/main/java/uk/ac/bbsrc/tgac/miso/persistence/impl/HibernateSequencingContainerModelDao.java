@@ -1,8 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +53,16 @@ public class HibernateSequencingContainerModelDao extends HibernateSaveDao<Seque
   }
 
   @Override
+  public List<SequencingContainerModel> find(PlatformType platform, String search) throws IOException {
+    @SuppressWarnings("unchecked")
+    List<SequencingContainerModel> results = currentSession().createCriteria(SequencingContainerModel.class)
+        .add(Restrictions.eq("platformType", platform))
+        .add(Restrictions.or(Restrictions.ilike("alias", search, MatchMode.START), Restrictions.eq("identificationBarcode", search)))
+        .list();
+    return results;
+  }
+
+  @Override
   public SequencingContainerModel getByPlatformAndAlias(PlatformType platform, String alias) throws IOException {
     return (SequencingContainerModel) currentSession().createCriteria(SequencingContainerModel.class)
         .add(Restrictions.eq("platformType", platform))
@@ -68,6 +81,17 @@ public class HibernateSequencingContainerModelDao extends HibernateSaveDao<Seque
   @Override
   public long getUsage(SequencingContainerModel model) throws IOException {
     return getUsageBy(SequencerPartitionContainerImpl.class, "model", model);
+  }
+
+  @Override
+  public long getUsage(SequencingContainerModel containerModel, InstrumentModel instrumentModel) throws IOException {
+    return (long) currentSession().createCriteria(SequencerPartitionContainerImpl.class)
+        .add(Restrictions.eq("model", containerModel))
+        .createAlias("runPositions", "runPosition")
+        .createAlias("runPosition.position", "position")
+        .add(Restrictions.eq("position.instrumentModel", instrumentModel))
+        .setProjection(Projections.rowCount())
+        .uniqueResult();
   }
 
 }

@@ -46,7 +46,7 @@ ListTarget.run_position = {
     }, Constants.platformTypes);
     var getPlatformPositions = function() {
       var instrumentModel = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(config.instrumentModelId), Constants.instrumentModels);
-      return (instrumentModel.positions && instrumentModel.positions.length) ? instrumentModel.positions.sort() : [null];
+      return (instrumentModel.positions && instrumentModel.positions.length) ? instrumentModel.positions.map(Utils.array.getAlias).sort() : [null];
     }
     return [{
       "name": "Add " + platformType.containerName,
