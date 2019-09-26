@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 0.2.191
+
+Changes:
+
   * Add information for how to fix migration errors in a baremetal install on MariaDB
   * Display even/odd rows of bulk edit tables in different colours
   * Allow setting the Active Directory domain DN via `security.ad.domainDn` in
@@ -16,6 +22,7 @@ Changes:
   * Added interface for administrators to add, edit, and delete dropdown options
     * targeted sequencings
     * sequencing parameters
+  * Add link in library aliquot alias in lists
 
 Upgrade notes:
 
