@@ -27,7 +27,6 @@ public enum IlluminaExperiment {
       header.put("Workflow", "GenerateFASTQ");
       header.put("Application", "Clone Checking");
       header.put("Assay", "Nextera XT");
-      header.put("Chemistry", "Amplicon");
       settings.put("Adapter", "CTGTCTCTTATACACATCT");
 
     }
@@ -40,7 +39,6 @@ public enum IlluminaExperiment {
       header.put("Workflow", "LibraryQC");
       header.put("Application", "Library QC");
       header.put("Assay", "Nextera DNA");
-      header.put("Chemistry", "Default");
 
       settings.put("FlagPCRDuplicates", "1");
       settings.put("ReverseComplement", "0");
@@ -57,7 +55,6 @@ public enum IlluminaExperiment {
       header.put("Workflow", "Metagenomics");
       header.put("Application", "Metagenomics 16S rRNA");
       header.put("Assay", "TruSeq DNA PCR-Free");
-      header.put("Chemistry", "Default");
 
       settings.put("Adapter", "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA");
       settings.put("AdapterRead2", "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT");
@@ -122,6 +119,14 @@ public enum IlluminaExperiment {
         .distinct()//
         .sorted()//
         .collect(Collectors.joining("/")));
+    if (pools.stream()//
+        .flatMap(pool -> pool.getPoolContents().stream())
+        .flatMap(element -> element.getPoolableElementView().getIndices().stream())//
+        .anyMatch(index -> index.getPosition() == 2)) {
+      header.put("Chemistry", "Amplicon");
+    } else {
+      header.put("Chemistry", "Default");
+    }
 
     if (!LimsUtils.isStringBlankOrNull(read1Primer)) {
       settings.put("CustomRead1PrimerMix", read1Primer);
