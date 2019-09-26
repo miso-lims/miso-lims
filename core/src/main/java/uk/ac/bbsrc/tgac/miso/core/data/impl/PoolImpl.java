@@ -564,5 +564,4 @@ public class PoolImpl extends AbstractBoxable implements Pool {
         .map(PoolElement::getPoolableElementView).filter(view -> view.getSubprojectPriority() != null && view.getSubprojectPriority())
         .map(view -> view.getSubprojectAlias()).collect(Collectors.toSet());
   }
-
 }

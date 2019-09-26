@@ -278,5 +278,4 @@ public class PoolDto extends AbstractBoxableDto {
   public void setMergeChild(boolean mergeChild) {
     this.mergeChild = mergeChild;
   }
-
 }

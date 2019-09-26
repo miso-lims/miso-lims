@@ -67,11 +67,6 @@ WarningTarget.pool = {
           headerMessage: "Donor has revoked consent for " + revokedAliquots.toString(),
           tableMessage: Constants.warningMessages.consentRevoked,
           tileMessage: Constants.warningMessages.consentRevoked
-        }, {
-          include: pool.poolOrderMismatch,
-          headerMessage: "Pool no longer matches Pool Order!",
-          tableMessage: Constants.warningMessages.poolOrderMismatch,
-          tileMessage: Constants.warningMessages.poolOrderMismatch
         }];
   }
 

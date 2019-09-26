@@ -451,7 +451,6 @@ public class MenuController implements ServletContextAware {
       warningsNode.put("lowQualityLibraries", "Low Quality Libraries");
       warningsNode.put("missingIndex", "MISSING INDEX");
       warningsNode.put("negativeVolume", "Negative Volume");
-      warningsNode.put("poolOrderMismatch", "No Longer Matches Pool Order");
       node.set("warningMessages", warningsNode);
       node.put("errorEditDistance", indexChecker.getErrorMismatches());
       node.put("warningEditDistance", indexChecker.getWarningMismatches());
