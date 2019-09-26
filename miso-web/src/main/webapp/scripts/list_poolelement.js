@@ -89,7 +89,13 @@ ListTarget.poolelement = {
           sTitle: 'Library Aliquot Alias',
           mData: 'alias',
           include: true,
-          iSortPriority: 0
+          iSortPriority: 0,
+          mRender: function(data, type, full) {
+            if (type === 'display') {
+              return '<a href="' + Urls.ui.libraryAliquots.edit(full.id) + '">' + full.alias + '</a>';
+            }
+            return data;
+          }
         },
         {
           sTitle: "Warnings",
