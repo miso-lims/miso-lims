@@ -22,9 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
@@ -319,15 +317,17 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
 
   @Override
   public boolean checkMismatchedWithOrders(Pool pool, List<PoolOrder> poolOrders) throws IOException {
-      //TODO convert everything to Pair<LibraryAliquot, int> maybe?? 
-    Set<OrderLibraryAliquot> poolOrderAliquots = poolOrders.stream().flatMap(element -> element.getOrderLibraryAliquots().stream())
-            .collect(Collectors.toSet());
-    Set<PoolElement> poolAliquots = pool.getPoolContents();
+    Set<Pair<LibraryAliquot, Integer>> poolAliquots = new HashSet<>(), poolOrderAliquots = new HashSet<>();
 
-    boolean mismatch = false;
-    for(OrderLibraryAliquot ola: poolOrderAliquots){
-        if (!p)
+    for(PoolElement pe: pool.getPoolContents()){
+      poolAliquots.add(new Pair<>(pe.getPoolableElementView().getAliquot(), pe.getProportion()));
     }
+
+    for(OrderLibraryAliquot ola: poolOrders.stream().flatMap(poolOrder -> poolOrder.getOrderLibraryAliquots().stream()).collect(Collectors.toSet())){
+      poolOrderAliquots.add(new Pair<>(ola.getAliquot(), ola.getProportion()));
+    }
+
+    return (!poolAliquots.equals(poolOrderAliquots));
   }
 
   private void validateChange(Pool pool, Pool beforeChange) throws IOException {
