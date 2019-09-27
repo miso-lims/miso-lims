@@ -4,13 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -316,9 +310,12 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   @Override
-  public boolean checkMismatchedWithOrders(Pool pool, List<PoolOrder> poolOrders) throws IOException {
+  public List<ValidationError> getMismatchesWithOrders(Pool pool, List<PoolOrder> poolOrders) throws IOException {
     Set<Pair<LibraryAliquot, Integer>> poolAliquots = new HashSet<>();
     Set<Pair<LibraryAliquot, Integer>> poolOrderAliquots = new HashSet<>();
+    Set<Pair<LibraryAliquot, Integer>> inPoolNotPoolOrder;
+    Set<Pair<LibraryAliquot, Integer>> inPoolOrderNotPool;
+    List<ValidationError> errors = new LinkedList<>();
 
     for(PoolElement pe: pool.getPoolContents()){
       poolAliquots.add(new Pair<>(pe.getPoolableElementView().getAliquot(), pe.getProportion()));
@@ -328,7 +325,27 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
       poolOrderAliquots.add(new Pair<>(ola.getAliquot(), ola.getProportion()));
     }
 
-    return (!poolAliquots.equals(poolOrderAliquots));
+    inPoolNotPoolOrder = new HashSet<>(poolAliquots);
+    inPoolNotPoolOrder.removeAll(poolOrderAliquots);
+    for(Pair<LibraryAliquot, Integer> p: inPoolNotPoolOrder){
+      String errorMessage = "Pool should not contain library aliquot ";
+      errorMessage += p.getKey().getAlias();
+      errorMessage += " of proportion ";
+      errorMessage += p.getValue();
+      errors.add(new ValidationError("poolElements", errorMessage));
+    }
+
+    inPoolOrderNotPool = new HashSet<>(poolOrderAliquots);
+    inPoolOrderNotPool.removeAll(poolAliquots);
+    for(Pair<LibraryAliquot, Integer> p: inPoolOrderNotPool){
+      String errorMessage = "Pool needs to contain library aliquot ";
+      errorMessage += p.getKey().getAlias();
+      errorMessage += " of proportion ";
+      errorMessage += p.getValue();
+      errorMessage += " but does not.";
+      errors.add(new ValidationError("poolElements", errorMessage));
+    }
+    return errors;
   }
 
   private void validateChange(Pool pool, Pool beforeChange) throws IOException {
@@ -345,14 +362,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     //If this is a new pool, we don't have to worry about syncing to pool orders: either it's irrelevant, or a guarantee
     List<PoolOrder> potentialPoolOrders = beforeChange == null? null: poolOrderService.getAllByPoolId(pool.getId());
     if (potentialPoolOrders != null && potentialPoolOrders.size() != 0) {
-      if(checkMismatchedWithOrders(pool, potentialPoolOrders)) {
-        String errorMessage = "Pool deviates from pool order(s): ";
-        for(PoolOrder po: potentialPoolOrders){
-          errorMessage += po.getAlias();
-          errorMessage += " ";
-        }
-        errors.add(new ValidationError("poolElements", errorMessage));
-      }
+      errors.addAll(getMismatchesWithOrders(pool, potentialPoolOrders));
     }
 
     if (!errors.isEmpty()) {
