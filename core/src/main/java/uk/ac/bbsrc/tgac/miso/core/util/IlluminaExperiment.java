@@ -4,7 +4,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -105,9 +105,8 @@ public enum IlluminaExperiment {
 
   public final String makeSampleSheet(String genomeFolder, SequencingParameters parameters, String read1Primer, String indexPrimer,
       String read2Primer, List<Pool> pools) {
-    final Map<String, String> header = new HashMap<>();
-    final Map<String, String> settings = new HashMap<>();
-    applyAttribute(header, settings);
+    final Map<String, String> header = new LinkedHashMap<>();
+    final Map<String, String> settings = new LinkedHashMap<>();
     header.put("IEMFileVersion", "5");
     header.put("Experiment Name", pools.stream().map(Pool::getAlias).collect(Collectors.joining("/")));
     header.put("Date", ZonedDateTime.now().format(MDY));
@@ -137,6 +136,8 @@ public enum IlluminaExperiment {
     if (!LimsUtils.isStringBlankOrNull(read2Primer) && parameters.getReadLength2() != 0) {
       settings.put("CustomRead2PrimerMix", read2Primer);
     }
+
+    applyAttribute(header, settings);
 
     final StringBuilder output = new StringBuilder();
     output.append("[Header]\n");
