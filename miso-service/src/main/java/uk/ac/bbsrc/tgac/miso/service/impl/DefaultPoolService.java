@@ -311,39 +311,26 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
 
   @Override
   public List<ValidationError> getMismatchesWithOrders(Pool pool, List<PoolOrder> poolOrders) throws IOException {
-    Set<Pair<LibraryAliquot, Integer>> poolAliquots = new HashSet<>();
-    Set<Pair<LibraryAliquot, Integer>> poolOrderAliquots = new HashSet<>();
-    Set<Pair<LibraryAliquot, Integer>> inPoolNotPoolOrder;
-    Set<Pair<LibraryAliquot, Integer>> inPoolOrderNotPool;
+    Set<LibraryAliquot> poolAliquots = new HashSet<>();
+    Map<LibraryAliquot, String> poolOrderAliquots = new HashMap<>();
     List<ValidationError> errors = new LinkedList<>();
 
     for(PoolElement pe: pool.getPoolContents()){
-      poolAliquots.add(new Pair<>(pe.getPoolableElementView().getAliquot(), pe.getProportion()));
+      poolAliquots.add(pe.getPoolableElementView().getAliquot());
     }
 
     for(OrderLibraryAliquot ola: poolOrders.stream().flatMap(poolOrder -> poolOrder.getOrderLibraryAliquots().stream()).collect(Collectors.toSet())){
-      poolOrderAliquots.add(new Pair<>(ola.getAliquot(), ola.getProportion()));
+      poolOrderAliquots.put(ola.getAliquot(), ola.getPoolOrder().getAlias());
     }
 
-    inPoolNotPoolOrder = new HashSet<>(poolAliquots);
-    inPoolNotPoolOrder.removeAll(poolOrderAliquots);
-    for(Pair<LibraryAliquot, Integer> p: inPoolNotPoolOrder){
-      String errorMessage = "Pool should not contain library aliquot ";
-      errorMessage += p.getKey().getAlias();
-      errorMessage += " of proportion ";
-      errorMessage += p.getValue();
-      errors.add(new ValidationError("poolElements", errorMessage));
-    }
-
-    inPoolOrderNotPool = new HashSet<>(poolOrderAliquots);
-    inPoolOrderNotPool.removeAll(poolAliquots);
-    for(Pair<LibraryAliquot, Integer> p: inPoolOrderNotPool){
-      String errorMessage = "Pool needs to contain library aliquot ";
-      errorMessage += p.getKey().getAlias();
-      errorMessage += " of proportion ";
-      errorMessage += p.getValue();
-      errorMessage += " but does not.";
-      errors.add(new ValidationError("poolElements", errorMessage));
+    for(Map.Entry<LibraryAliquot, String> e: poolOrderAliquots.entrySet()){
+      if(!poolAliquots.contains(e.getKey())) {
+        String errorMessage = "Pool needs to contain library aliquot ";
+        errorMessage += e.getKey().getAlias();
+        errorMessage += " as specified by pool order ";
+        errorMessage += e.getValue();
+        errors.add(new ValidationError("poolElements", errorMessage));
+      }
     }
     return errors;
   }
