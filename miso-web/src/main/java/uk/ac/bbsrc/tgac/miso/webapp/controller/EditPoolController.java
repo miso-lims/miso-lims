@@ -66,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
+import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
 
@@ -99,6 +100,8 @@ public class EditPoolController {
   private BoxService boxService;
   @Autowired
   private IndexChecker indexChecker;
+  @Autowired
+  private PoolOrderService poolOrderService;
 
   public void setRunService(RunService runService) {
     this.runService = runService;
@@ -144,6 +147,8 @@ public class EditPoolController {
       Collection<SequencingOrder> sequencingOrders = sequencingOrderService.getByPool(pool);
       model.put("orders", Dtos.asSequencingOrderDtos(sequencingOrders, indexChecker));
     }
+
+    model.put("poolorders", poolOrderService.getAllByPoolId(pool.getId()).stream().map(order -> Dtos.asDto(order)).collect(Collectors.toList()));
 
     model.put("duplicateIndicesSequences", mapper.writeValueAsString(poolDto.getDuplicateIndicesSequences()));
     model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(poolDto.getNearDuplicateIndicesSequences()));
