@@ -31,8 +31,8 @@ public class HandsOnTable extends AbstractElement {
   private static final By lockedRowsSelector = By.cssSelector("div.ht_clone_left table.htCore tbody tr");
   private static final By inputCellSelector = By.tagName("td");
   private static final By dropdownArrowSelector = By.className("htAutocompleteArrow");
-  private static final By activeDropdownSelector = By.cssSelector("div.handsontableInputHolder[style*='block']");
-  private static final By activeCellEditorSelector = By.cssSelector("div.handsontableInputHolder[style*='block'] > textarea");
+  private static final By activeDropdownSelector = By.cssSelector("div.handsontableInputHolder:not([style*='z-index: -1'])");
+  private static final By activeCellEditorSelector = By.cssSelector("div.handsontableInputHolder:not([style*='z-index: -1']) > textarea");
   private static final By dropdownOptionRowsSelector = By.cssSelector("div.ht_master table.htCore > tbody > tr");
   private final List<String> columnHeadings;
   private final List<WebElement> inputRows;
@@ -52,7 +52,7 @@ public class HandsOnTable extends AbstractElement {
     super(driver);
     PageFactory.initElements(driver, this);
     this.columnHeadings = hotContainer.findElements(columnHeadingsSelector).stream()
-        .map(element -> element.getText().trim())
+        .map(element -> element.getAttribute("textContent").trim())
         .collect(Collectors.toList());
     this.inputRows = hotContainer.findElements(inputRowsSelector);
     this.lockedRows = hotContainer.findElements(lockedRowsSelector);

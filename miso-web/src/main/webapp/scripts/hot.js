@@ -208,6 +208,7 @@ var HotUtils = {
       colHeaders: columns.map(function(c) {
         return c.header;
       }),
+      viewportColumnRenderingOffset: 700,
       preventOverflow: 'horizontal',
       contextMenu: false,
       columns: columns,
@@ -845,21 +846,15 @@ var HotUtils = {
 
   sorting: {
     /** Sorts by box row: A01, A02, B01, B03, H02 */
-    rowSort: function(sortOrder) {
-      return function(a, b) {
-        // a & b are each an array: [row_index, element_value]
-        return Utils.sorting.sortBoxPositions(a[1], b[1], true);
-      }
+    rowSort: function(a, b) {
+      return Utils.sorting.sortBoxPositions(a, b, true);
     },
 
     /**
      * Sorts by box column: A01, B01, A02, H02, B03. Useful for applying indices to libraries using the Sciclone machine.
      */
-    colSort: function(sortOrder) {
-      return function(a, b) {
-        // a & b are each an array: [row_index, element_value]
-        return Utils.sorting.sortBoxPositions(a[1], b[1], false);
-      }
+    colSort: function(a, b) {
+      return Utils.sorting.sortBoxPositions(a, b, false);
     }
   },
 
@@ -1510,11 +1505,18 @@ var HotUtils = {
   },
 
   sortTable: function(table, sortColIndex, sortFunction) {
-    var rowCount = table.countRows();
-    for (var i = 0; i < rowCount; i++) {
-      table.setCellMeta(i, sortColIndex, 'sortFunction', sortFunction);
-    }
-    table.sort(sortColIndex);
+    var settings = table.getSettings();
+    settings.columns[sortColIndex].columnSorting = {
+      compareFunctionFactory: function(sortOrder, columnMeta) {
+        return sortFunction;
+      }
+    };
+    table.updateSettings(settings);
+
+    table.getPlugin('columnSorting').sort({
+      column: sortColIndex,
+      sortOrder: 'asc'
+    });
   },
 
   getPlatformType: function(value) {

@@ -323,8 +323,7 @@ HotTarget.library = (function() {
               buttonText: 'Sort by Sample Location (columns)',
               sortTarget: 'columns',
               sortFunc: HotUtils.sorting.colSort
-            }],
-            sortIndicator: true
+            }]
           },
           HotUtils.makeColumnForText('Matrix Barcode', !Constants.automaticBarcodes, 'identificationBarcode', {
             validator: HotUtils.validator.optionalTextNoSpecialChars
