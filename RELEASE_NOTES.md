@@ -7,6 +7,7 @@ Changes:
     * instrument models
   * Order configuration in Illumina sample sheets (some instruments are picky)
   * Fixed migration error in detailed sample Docker Compose demo
+  * Improved performance of bulk entry forms
 
 # 0.2.191
 
