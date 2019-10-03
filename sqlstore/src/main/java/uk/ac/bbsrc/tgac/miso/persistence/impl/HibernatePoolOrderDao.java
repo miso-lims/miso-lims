@@ -18,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
 @Repository
 public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder> implements PoolOrderDao, HibernatePaginatedDataSource<PoolOrder> {
 
+  private static final String FIELD_POOL = "pool.id";
   private static final String[] SEARCH_PROPERTIES = new String[] { "alias", "description" };
   private static final List<String> STANDARD_ALIASES = Arrays.asList("purpose");
 
@@ -101,6 +102,14 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder> implement
   @Override
   public void restrictPaginationByDraft(Criteria criteria, boolean isDraft, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("draft", isDraft));
+  }
+
+  @Override
+  public List<PoolOrder> getAllByPoolId(long poolId) {
+    Criteria criteria = currentSession().createCriteria(PoolOrder.class);
+    criteria.add(Restrictions.eq(FIELD_POOL, poolId));
+    List<PoolOrder> list = criteria.list();
+    return list;
   }
 
 }

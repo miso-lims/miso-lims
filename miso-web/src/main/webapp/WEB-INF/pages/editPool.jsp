@@ -98,6 +98,7 @@
 
   <miso:attachments item="${pool}"/>
   <miso:qcs id="list_qcs" item="${pool}"/>
+  <miso:list-section id="list_pool_order" name="Linked Pool Orders" target="linkedpoolorder" alwaysShow="false" items="${poolorders}" config="{}" />
   <miso:list-section id="list_order" name="Requested Sequencing Orders" target="sequencingorder" alwaysShow="true" items="${orders}" config="{ pool: ${poolDto}, platformType: '${pool.platformType.name()}' }"/>
   <miso:list-section-ajax id="list_completion" name="Sequencing Order Status" target="sequencingordercompletion" config="{ poolId: ${pool.id} }"/>
   <miso:list-section id="list_run" name="Runs" target="run" items="${runs}" config="{ poolId: ${pool.id} }"/>

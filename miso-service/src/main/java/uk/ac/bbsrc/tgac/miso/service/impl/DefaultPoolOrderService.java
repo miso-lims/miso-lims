@@ -1,10 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -343,6 +340,11 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
   public List<PoolOrder> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
       PaginationFilter... filter) throws IOException {
     return poolOrderDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+  }
+
+  @Override
+  public List<PoolOrder> getAllByPoolId(long poolId){
+    return poolOrderDao.getAllByPoolId(poolId);
   }
 
 }

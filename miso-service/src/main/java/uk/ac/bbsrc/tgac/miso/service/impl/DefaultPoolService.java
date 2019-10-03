@@ -4,13 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -22,9 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -47,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolStore;
+import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -78,6 +74,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   private FileAttachmentService fileAttachmentService;
   @Autowired
   private IndexChecker indexChecker;
+  @Autowired
+  private PoolOrderService poolOrderService;
 
   public void setAutoGenerateIdBarcodes(boolean autoGenerateIdBarcodes) {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
@@ -311,6 +309,32 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     }
   }
 
+  @Override
+  public List<ValidationError> getMismatchesWithOrders(Pool pool, List<PoolOrder> poolOrders) throws IOException {
+    Set<LibraryAliquot> poolAliquots = new HashSet<>();
+    Map<LibraryAliquot, String> poolOrderAliquots = new HashMap<>();
+    List<ValidationError> errors = new LinkedList<>();
+
+    for(PoolElement pe: pool.getPoolContents()){
+      poolAliquots.add(pe.getPoolableElementView().getAliquot());
+    }
+
+    for(OrderLibraryAliquot ola: poolOrders.stream().flatMap(poolOrder -> poolOrder.getOrderLibraryAliquots().stream()).collect(Collectors.toSet())){
+      poolOrderAliquots.put(ola.getAliquot(), ola.getPoolOrder().getAlias());
+    }
+
+    for(Map.Entry<LibraryAliquot, String> e: poolOrderAliquots.entrySet()){
+      if(!poolAliquots.contains(e.getKey())) {
+        String errorMessage = "Pool needs to contain library aliquot ";
+        errorMessage += e.getKey().getAlias();
+        errorMessage += " as specified by pool order ";
+        errorMessage += e.getValue();
+        errors.add(new ValidationError("poolElements", errorMessage));
+      }
+    }
+    return errors;
+  }
+
   private void validateChange(Pool pool, Pool beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
@@ -322,6 +346,11 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     validateVolumeUnits(pool.getVolume(), pool.getVolumeUnits(), errors);
     validateBarcodeUniqueness(pool, beforeChange, poolStore::getByBarcode, errors, "pool");
     if (strictPools && !pool.isMergeChild()) validateIndices(pool, beforeChange, errors);
+    //If this is a new pool, we don't have to worry about syncing to pool orders: either it's irrelevant, or a guarantee
+    List<PoolOrder> potentialPoolOrders = beforeChange == null? null: poolOrderService.getAllByPoolId(pool.getId());
+    if (potentialPoolOrders != null && potentialPoolOrders.size() != 0) {
+      errors.addAll(getMismatchesWithOrders(pool, potentialPoolOrders));
+    }
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
