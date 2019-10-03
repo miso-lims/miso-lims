@@ -88,8 +88,9 @@ public class HibernateSequencingContainerModelDao extends HibernateSaveDao<Seque
     return (long) currentSession().createCriteria(SequencerPartitionContainerImpl.class)
         .add(Restrictions.eq("model", containerModel))
         .createAlias("runPositions", "runPosition")
-        .createAlias("runPosition.position", "position")
-        .add(Restrictions.eq("position.instrumentModel", instrumentModel))
+        .createAlias("runPosition.run", "run")
+        .createAlias("run.sequencer", "sequencer")
+        .add(Restrictions.eq("sequencer.instrumentModel", instrumentModel))
         .setProjection(Projections.rowCount())
         .uniqueResult();
   }
