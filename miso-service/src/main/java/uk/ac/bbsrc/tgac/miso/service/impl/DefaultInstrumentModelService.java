@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
@@ -100,7 +101,7 @@ public class DefaultInstrumentModelService extends AbstractSaveService<Instrumen
   protected void collectValidationErrors(InstrumentModel object, InstrumentModel beforeChange, List<ValidationError> errors)
       throws IOException {
     if (object.getInstrumentType() == InstrumentType.SEQUENCER) {
-      if (object.getNumContainers() != 0) {
+      if (object.getNumContainers() < 1) {
         errors.add(new ValidationError("numContainers", "Should be 1 or greater for sequencer models"));
       }
     } else {
@@ -112,6 +113,9 @@ public class DefaultInstrumentModelService extends AbstractSaveService<Instrumen
       }
       if (object.getNumContainers() != 0) {
         errors.add(new ValidationError("numContainers", "Should be 0 for non-sequencer models"));
+      }
+      if (object.getDataManglingPolicy() != InstrumentDataManglingPolicy.NONE) {
+        errors.add(new ValidationError("dataManglingPolicy", "Should be 'normal' for non-sequencer models"));
       }
     }
     if (beforeChange != null) {

@@ -137,7 +137,22 @@ FormTarget.instrumentmodel = (function($) {
       getItemValue: function(item) {
         return item.value;
       },
-      initial: 'SEQUENCER'
+      initial: 'SEQUENCER',
+      onChange: function(newValue, form) {
+        if (newValue === 'SEQUENCER') {
+          form.updateField('dataManglingPolicy', {
+            source: Constants.dataManglingPolicies
+          });
+        } else {
+          form.updateField('dataManglingPolicy', {
+            source: [{
+              label: 'Normal',
+              value: 'NONE'
+            }],
+            value: 'NONE'
+          });
+        }
+      }
     }, {
       title: 'Instrument Type',
       data: 'instrumentType',
@@ -160,7 +175,10 @@ FormTarget.instrumentmodel = (function($) {
       type: 'dropdown',
       required: true,
       getSource: function() {
-        return Constants.dataManglingPolicies;
+        return object.instrumentType === 'SEQUENCER' ? Constants.dataManglingPolicies : [{
+          label: 'Normal',
+          value: 'NONE'
+        }];
       },
       getItemLabel: function(item) {
         return item.label;

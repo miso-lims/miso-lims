@@ -45,17 +45,27 @@ FormUtils = (function($) {
    *   getItemLabel: function(item) returning string; get the label for a dropdown option. If omitted and the item is a string, it is
    *       used as the label; otherwise, an error is thrown
    *   getItemValue: function(item) returning string; get the value for a dropdown option. If omitted, the item is used as the value
-   *   onChange: function(newValue, updateField); allows modifying other fields when a dropdown type field value is changed. updateField
-   *       is a function(dataProperty, options). options may include
+   *   onChange: function(newValue, formObject); allows modifying other fields when a dropdown type field value is changed. See Form
+   *       object below
+   *   makeControls: function(form) returning single or array of jQuery controls; required for special fields; set up special fields
+   *   trackChanges: optional boolean (default: true); whether changes to the field should be tracked. This only affects the warning that
+   *       appears when leaving a page with unsaved changes
+   * }
+   * 
+   * Form object: {
+   *   isChanged: function() returns true if the form has been modified by the user; false otherwise
+   *   markOtherChanges: function() marks the form as having been modified. This is automatic for the normal form fields, but is
+   *       necessary for other page elements
+   *   get: function(dataProperty) returns the field value
+   *   updateField: function(dataProperty, options). options may include
    *       * 'disabled' (boolean)
    *       * 'required' (boolean)
    *       * 'value' (string/number/boolean depending on field type)
    *       * 'source' (array of objects or strings)
    *       * 'label' (string)
    *       * 'link' (URL string)
-   *   makeControls: function(form) returning single or array of jQuery controls; required for special fields; set up special fields
-   *   trackChanges: optional boolean (default: true); whether changes to the field should be tracked. This only affects the warning that
-   *       appears when leaving a page with unsaved changes
+   *   save: function(postSaveCallback) save the form data. postSaveCallback is a function(data) where data is the object returned from
+   *       the save operation
    * }
    */
 

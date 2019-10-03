@@ -22,8 +22,8 @@ ListTarget.instrumentposition = {
           type: 'text',
           required: true
         }], function(output) {
-          if (!/^[-_\w]*$/g.test(output.alias)) {
-            Utils.showOkDialog('Error', ['Position alias must consist of letters, numbers and the symbols [ _- ]']);
+          if (!/^[-_\w]{1,10}$/g.test(output.alias)) {
+            Utils.showOkDialog('Error', ['Position alias must consist of 1-10 letters, numbers, and symbols [ _- ]']);
             return;
           }
           InstrumentModel.addInstrumentPosition(output.alias);
