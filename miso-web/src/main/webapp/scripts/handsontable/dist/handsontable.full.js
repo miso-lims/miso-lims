@@ -56541,7 +56541,7 @@ function (_BasePlugin) {
     key: "selectAdjacent",
     value: function selectAdjacent() {
       var cornersOfSelectedCells = this.getCornersOfSelectedCells();
-      var lastFilledInRowIndex = this.getIndexOfLastAdjacentFilledInRow(cornersOfSelectedCells);
+      var lastFilledInRowIndex = this.hot.table.rows.length - 1;
 
       if (lastFilledInRowIndex === -1 || lastFilledInRowIndex === void 0) {
         return false;
