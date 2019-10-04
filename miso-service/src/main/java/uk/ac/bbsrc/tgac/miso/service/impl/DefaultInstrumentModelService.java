@@ -103,6 +103,9 @@ public class DefaultInstrumentModelService extends AbstractSaveService<Instrumen
     if (object.getInstrumentType() == InstrumentType.SEQUENCER) {
       if (object.getNumContainers() < 1) {
         errors.add(new ValidationError("numContainers", "Should be 1 or greater for sequencer models"));
+      } else if (beforeChange != null && object.getNumContainers() < beforeChange.getNumContainers()
+          && instrumentModelStore.getMaxContainersUsed(beforeChange) > object.getNumContainers()) {
+            errors.add(new ValidationError("numContainers", "There are already runs with more containers on instruments of this model"));
       }
     } else {
       if (!object.getPositions().isEmpty()) {
@@ -119,10 +122,6 @@ public class DefaultInstrumentModelService extends AbstractSaveService<Instrumen
       }
     }
     if (beforeChange != null) {
-      if (object.getNumContainers() < beforeChange.getNumContainers()
-          && instrumentModelStore.getMaxContainersUsed(beforeChange) > object.getNumContainers()) {
-        errors.add(new ValidationError("numContainers", "There are already runs with more containers on instruments of this model"));
-      }
       Set<InstrumentPosition> removed = beforeChange.getPositions().stream()
           .filter(beforePos -> object.getPositions().stream().noneMatch(afterPos -> afterPos.getId() == beforePos.getId()))
           .collect(Collectors.toSet());

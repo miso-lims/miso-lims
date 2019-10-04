@@ -35,6 +35,7 @@ FormUtils = (function($) {
    *   maxLength: optional integer; maximum number of characters for text input
    *   regex: optional regex; validation regex for text input. Can be 'url', 'email', or an actual regex
    *   min: minimum value for int or decimal input
+   *   max: maximum value for int or decimal input
    *   precision: maximum precision (length, excluding the decimal) for decimal input
    *   scale: maximum scale (decimal places) for decimal input
    *   nullLabel: optional string; label for null value in dropdown. If not provided, and the field is not required, there will be no
@@ -552,15 +553,22 @@ FormUtils = (function($) {
     } else if (field.type === 'int') {
       control.attr('data-parsley-type', 'integer');
       if (field.hasOwnProperty('min')) {
-        control.attr('data-parsley-min', field.min);
+        if (field.hasOwnProperty('max')) {
+          control.attr('data-parsley-range', '[' + field.min + ',' + field.max + ']');
+        } else {
+          control.attr('data-parsley-min', field.min);
+        }
+      } else if (field.hasOwnProperty('max')) {
+        control.attr('data-parsley-max', field.min);
       }
     } else if (field.type === 'decimal') {
       var precision = field.precision || defaultDecimalPrecision;
       var scale = field.scale || defaultDecimalScale;
       control.attr('data-parsley-type', 'number');
       control.attr('data-parsley-maxlength', precision + 1);
-      var max = Math.pow(10, precision - scale) - Math.pow(0.1, scale);
-      var min = field.hasOwnProperty('min') ? field.min : max * -1;
+      var maxPossible = Math.pow(10, precision - scale) - Math.pow(0.1, scale);
+      var max = field.hasOwnProperty('max') ? field.max : maxPossible;
+      var min = field.hasOwnProperty('min') ? field.min : maxPossible * -1;
       control.attr('data-parsley-range', '[' + min + ', ' + max + ']')
       var pattern = '\\d{0,' + (precision - scale) + '}(?:\\.\\d{1,' + scale + '})?';
       control.attr('data-parsley-pattern', pattern);

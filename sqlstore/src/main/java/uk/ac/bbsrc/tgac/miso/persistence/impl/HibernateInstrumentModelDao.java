@@ -112,6 +112,10 @@ public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentMode
         .add(Restrictions.eq("instrumentModel", model))
         .list();
 
+    if (instruments.isEmpty()) {
+      return 0;
+    }
+
     @SuppressWarnings("unchecked")
     List<Run> runs = currentSession().createCriteria(Run.class)
         .add(Restrictions.in("sequencer", instruments))

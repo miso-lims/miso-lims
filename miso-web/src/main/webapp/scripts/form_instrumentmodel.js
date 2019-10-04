@@ -168,6 +168,7 @@ FormTarget.instrumentmodel = (function($) {
       data: 'numContainers',
       type: 'int',
       min: 0,
+      max: 127,
       required: true
     }, {
       title: 'Index Sequencing',
