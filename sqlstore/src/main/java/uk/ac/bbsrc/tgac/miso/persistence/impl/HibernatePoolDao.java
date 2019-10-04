@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -196,7 +197,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
     } else {
       if (pool.isDiscarded()) {
         getBoxStore().removeBoxableFromBox(pool);
-        pool.setVolume(0D);
+        pool.setVolume(BigDecimal.ZERO);
       }
 
       id = pool.getId();

@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.service.workflow.factory;
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.FactoryType.POSITIVE_DOUBLE;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
@@ -24,8 +25,8 @@ public class PositiveDoubleProgressStepFactory implements ProgressStepFactory {
   public ProgressStep create(String input, Set<InputType> inputTypes) throws IOException {
     PositiveDoubleProgressStep step = new PositiveDoubleProgressStep();
     try {
-      step.setInput(Double.parseDouble(input));
-      if (step.getInput() < 0) {
+      step.setInput(new BigDecimal(input));
+      if (step.getInput().compareTo(BigDecimal.ZERO) < 0) {
         return null;
       }
       return step;

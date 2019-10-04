@@ -45,10 +45,11 @@ public class BulkLibraryIT extends AbstractIT {
 
   private static final Set<String> editColumns = Sets.newHashSet(LibColumns.RECEIVE_DATE, LibColumns.SAMPLE_ALIAS,
       LibColumns.SAMPLE_LOCATION, LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE, LibColumns.DISTRIBUTED,
-      LibColumns.DISTRIBUTION_DATE, LibColumns.DISTRIBUTION_RECIPIENT);
+      LibColumns.DISTRIBUTION_DATE, LibColumns.DISTRIBUTION_RECIPIENT, LibColumns.INITIAL_VOLUME, LibColumns.PARENT_NG_USED,
+      LibColumns.PARENT_VOLUME_USED);
 
   private static final Set<String> propagateColumns = Sets.newHashSet(LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
-      LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE);
+      LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE, LibColumns.PARENT_NG_USED, LibColumns.PARENT_VOLUME_USED);
 
   private static final Set<String> receiptColumns = Sets.newHashSet(SamColumns.SAMPLE_TYPE,
       SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.SUBPROJECT, SamColumns.EXTERNAL_NAME,
@@ -801,8 +802,8 @@ public class BulkLibraryIT extends AbstractIT {
     testLibraryAttribute(LibColumns.SIZE, attributes, library, lib -> {
       return lib.getDnaSize() == null ? null : lib.getDnaSize().toString();
     });
-    testLibraryAttribute(LibColumns.VOLUME, attributes, library, lib -> lib.getVolume().toString());
-    testLibraryAttribute(LibColumns.CONCENTRATION, attributes, library, lib -> lib.getConcentration().toString());
+    testLibraryAttribute(LibColumns.VOLUME, attributes, library, lib -> LimsUtils.toNiceString(lib.getVolume()));
+    testLibraryAttribute(LibColumns.CONCENTRATION, attributes, library, lib -> LimsUtils.toNiceString(lib.getConcentration()));
     testLibraryAttribute(LibColumns.RECEIVE_DATE, attributes, library, lib -> {
       return lib.getReceivedDate() == null ? null : LimsUtils.formatDate(lib.getReceivedDate());
     });

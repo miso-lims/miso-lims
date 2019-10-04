@@ -73,7 +73,7 @@ HotTarget.libraryaliquot = {
               validator: HotUtils.validator.requiredAutocomplete
             }),
         HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false),
-        HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false),
+        HotUtils.makeColumnForDecimal('Conc.', true, 'concentration', 14, 10, false, false),
         {
           header: 'Conc. Units',
           data: 'concentrationUnits',
@@ -98,7 +98,7 @@ HotTarget.libraryaliquot = {
             obj['concentrationUnits'] = !!units ? units.name : null;
           }
         },
-        HotUtils.makeColumnForFloat('Volume', true, 'volume', false),
+        HotUtils.makeColumnForDecimal('Volume', true, 'volume', 14, 10, false, true),
         {
           header: 'Vol. Units',
           data: 'volumeUnits',
@@ -123,8 +123,8 @@ HotTarget.libraryaliquot = {
             obj['volumeUnits'] = !!units ? units.name : null;
           }
         },
-        HotUtils.makeColumnForFloat('Parent ng Used', true, 'ngUsed', false),
-        HotUtils.makeColumnForFloat('Parent Vol. Used', true, 'volumeUsed', false),
+        HotUtils.makeColumnForDecimal('Parent ng Used', true, 'ngUsed', 14, 10, false, false),
+        HotUtils.makeColumnForDecimal('Parent Vol. Used', true, 'volumeUsed', 14, 10, false, false),
         {
           header: 'Creation Date',
           data: 'creationDate',

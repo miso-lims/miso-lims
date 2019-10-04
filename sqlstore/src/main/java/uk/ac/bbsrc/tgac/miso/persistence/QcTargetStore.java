@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 import uk.ac.bbsrc.tgac.miso.core.data.QC;
@@ -16,5 +17,5 @@ public interface QcTargetStore {
 
   public long save(QC qc) throws IOException;
 
-  public void updateEntity(long id, QcCorrespondingField correspondingField, double value, String units) throws IOException;
+  public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units) throws IOException;
 }

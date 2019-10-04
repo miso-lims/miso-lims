@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -213,20 +214,20 @@ public class HibernateLibraryAliquotDaoTest extends AbstractDAOTest {
     ld.setCreator(user);
     ld.setLastModifier(user);
     ld.setLibrary(lib);
-    ld.setConcentration(12.5D);
+    ld.setConcentration(new BigDecimal("12.5"));
     ld.setCreationDate(new Date());
     ld.setCreationTime(new Date());
     ld.setName("nom de plume");
     Long newId = dao.save(ld);
     final LibraryAliquot saved = dao.get(newId);
     assertNotNull(saved);
-    assertEquals(Double.valueOf(12.5D), saved.getConcentration());
+    assertEquals(new BigDecimal("12.5"), saved.getConcentration());
   }
 
   @Test
   public void testSaveEdit() throws IOException {
     final LibraryAliquot oldLd = dao.get(1L);
-    oldLd.setConcentration(1.23D);
+    oldLd.setConcentration(new BigDecimal("1.23"));
     final Library lib = new LibraryImpl();
     lib.setId(1L);
     oldLd.setLibrary(lib);

@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 import org.hibernate.Session;
@@ -96,7 +97,7 @@ public class HibernatePoolQCDao implements PoolQcStore {
   }
 
   @Override
-  public void updateEntity(long id, QcCorrespondingField correspondingField, double value, String units) throws IOException {
+  public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units) throws IOException {
     Pool pool = getPool(id);
     correspondingField.updateField(pool, value, units);
     currentSession().update(pool);

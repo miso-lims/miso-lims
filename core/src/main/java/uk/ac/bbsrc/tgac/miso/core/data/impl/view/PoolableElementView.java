@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -56,21 +57,21 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private Long aliquotDnaSize;
 
-  private Double aliquotConcentration;
+  private BigDecimal aliquotConcentration;
 
   @Enumerated(EnumType.STRING)
   private ConcentrationUnit aliquotConcentrationUnits;
 
   private String aliquotBarcode;
 
-  private Double aliquotVolume;
+  private BigDecimal aliquotVolume;
 
   @Enumerated(EnumType.STRING)
   private VolumeUnit aliquotVolumeUnits;
 
-  private Double aliquotNgUsed;
+  private BigDecimal aliquotNgUsed;
 
-  private Double aliquotVolumeUsed;
+  private BigDecimal aliquotVolumeUsed;
 
   private Long preMigrationId;
 
@@ -268,11 +269,11 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     this.aliquotDnaSize = aliquotDnaSize;
   }
 
-  public Double getAliquotConcentration() {
+  public BigDecimal getAliquotConcentration() {
     return aliquotConcentration;
   }
 
-  public void setAliquotConcentration(Double aliquotConcentration) {
+  public void setAliquotConcentration(BigDecimal aliquotConcentration) {
     this.aliquotConcentration = aliquotConcentration;
   }
 
@@ -284,19 +285,19 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     this.aliquotConcentrationUnits = aliquotConcentrationUnits;
   }
 
-  public Double getAliquotNgUsed() {
+  public BigDecimal getAliquotNgUsed() {
     return aliquotNgUsed;
   }
 
-  public void setAliquotNgUsed(Double aliquotNmUsed) {
+  public void setAliquotNgUsed(BigDecimal aliquotNmUsed) {
     this.aliquotNgUsed = aliquotNmUsed;
   }
 
-  public Double getAliquotVolumeUsed() {
+  public BigDecimal getAliquotVolumeUsed() {
     return aliquotVolumeUsed;
   }
 
-  public void setAliquotVolumeUsed(Double aliquotVolumeUsed) {
+  public void setAliquotVolumeUsed(BigDecimal aliquotVolumeUsed) {
     this.aliquotVolumeUsed = aliquotVolumeUsed;
   }
 
@@ -548,11 +549,11 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     this.targetedSequencingId = targetedSequencingId;
   }
 
-  public Double getAliquotVolume() {
+  public BigDecimal getAliquotVolume() {
     return aliquotVolume;
   }
 
-  public void setAliquotVolume(Double aliquotVolume) {
+  public void setAliquotVolume(BigDecimal aliquotVolume) {
     this.aliquotVolume = aliquotVolume;
   }
 

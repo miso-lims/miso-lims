@@ -2,7 +2,12 @@
 
 Changes:
 
-
+  * Added sample and library fields for initial volume, parent volume used, and parent ng used.
+    Parent volume used will automatically be deducted from the parent's (current) volume on save
+  * Added field for initial slides to Slide samples (detailed sample). Value of slides consumed on
+    tissue piece children will automatically be deducted from the slides' (current) slide count on
+    save. This update will use the current slide count as initial slides, and set the current slide
+    count to (initial slides - discards - slides consumed by all children)
 
 # 0.2.192
 

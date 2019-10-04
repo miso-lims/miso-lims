@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.saveAndAssertSuccess;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +20,7 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage.LibraryAliquotColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPoolPage.Columns;
@@ -39,8 +41,6 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
   private static final Set<String> editColumns = Sets.newHashSet(Columns.DISTRIBUTED, Columns.DISTRIBUTION_DATE,
       Columns.DISTRIBUTION_RECIPIENT);
-
-  private static final double EPSILON = 0.000001;
 
   @Before
   public void setup() {
@@ -224,7 +224,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     assertLibraryAliquotAttributes(attrs, saved);
 
     LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
-    assertTrue("Expected library volume to be negative, received positive value", savedLib.getVolume() < 0);
+    assertTrue("Expected library volume to be negative, received positive value", savedLib.getVolume().compareTo(BigDecimal.ZERO) < 0);
   }
 
   @Test
@@ -246,7 +246,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     assertLibraryAliquotAttributes(attrs, saved);
 
     LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
-    assertTrue("Expected library volume to be negative, received positive value", savedLib.getVolume() > 0);
+    assertTrue("Expected library volume to be positive, received negative value", savedLib.getVolume().compareTo(BigDecimal.ZERO) > 0);
   }
 
   @Test
@@ -269,7 +269,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
     LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
     assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 89.9, savedLib.getVolume()),
-        compareDoubles(savedLib.getVolume(), 89.9));
+        compareDoubles(savedLib.getVolume(), "89.9"));
   }
 
   @Test
@@ -302,11 +302,11 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
     LibraryImpl savedLib0 = (LibraryImpl) getSession().get(LibraryImpl.class, saved0.getLibrary().getId());
     assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 87.66, savedLib0.getVolume()),
-        savedLib0.getVolume() == 87.66);
+        compareDoubles(savedLib0.getVolume(), "87.66"));
 
     LibraryImpl savedLib1 = (LibraryImpl) getSession().get(LibraryImpl.class, saved1.getLibrary().getId());
     assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", -10.2, savedLib1.getVolume()),
-        compareDoubles(savedLib1.getVolume(), -10.2));
+        compareDoubles(savedLib1.getVolume(), "-10.2"));
   }
 
   @Test
@@ -329,7 +329,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
     LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
     assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 49.8, savedLib.getVolume()),
-        compareDoubles(savedLib.getVolume(), 49.8));
+        compareDoubles(savedLib.getVolume(), "49.8"));
   }
 
   @Test
@@ -352,7 +352,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
     LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
     assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 67.6, savedLib.getVolume()),
-        compareDoubles(savedLib.getVolume(), 67.6));
+        compareDoubles(savedLib.getVolume(), "67.6"));
   }
 
   @Test
@@ -375,7 +375,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
     LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
     assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 87.8, savedLib.getVolume()),
-        compareDoubles(savedLib.getVolume(), 87.8));
+        compareDoubles(savedLib.getVolume(), "87.8"));
   }
 
   @Test
@@ -398,7 +398,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
     LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
     assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 100.0, savedLib.getVolume()),
-        compareDoubles(savedLib.getVolume(), 100.0));
+        compareDoubles(savedLib.getVolume(), "100.0"));
   }
 
   private long getSavedId(HandsOnTable table, int rowNum) {
@@ -425,12 +425,13 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     testLibraryAliquotAttribute(LibraryAliquotColumns.ID_BARCODE, attributes, aliquot, LibraryAliquot::getIdentificationBarcode);
     testLibraryAliquotAttribute(LibraryAliquotColumns.PARENT_ALIAS, attributes, aliquot,
         dil -> dil.getLibrary().getAlias());
-    testLibraryAliquotAttribute(LibraryAliquotColumns.CONCENTRATION, attributes, aliquot, dil -> dil.getConcentration().toString());
-    testLibraryAliquotAttribute(LibraryAliquotColumns.VOLUME, attributes, aliquot, dil -> dil.getVolume().toString());
+    testLibraryAliquotAttribute(LibraryAliquotColumns.CONCENTRATION, attributes, aliquot,
+        dil -> LimsUtils.toNiceString(dil.getConcentration()));
+    testLibraryAliquotAttribute(LibraryAliquotColumns.VOLUME, attributes, aliquot, dil -> LimsUtils.toNiceString(dil.getVolume()));
     testLibraryAliquotAttribute(LibraryAliquotColumns.CREATION_DATE, attributes, aliquot, dil -> dil.getCreationDate().toString());
-    testLibraryAliquotAttribute(LibraryAliquotColumns.NG_USED, attributes, aliquot, dil -> dil.getNgUsed().toString());
+    testLibraryAliquotAttribute(LibraryAliquotColumns.NG_USED, attributes, aliquot, dil -> LimsUtils.toNiceString(dil.getNgUsed()));
     testLibraryAliquotAttribute(LibraryAliquotColumns.VOLUME_USED, attributes, aliquot,
-        dil -> dil.getVolumeUsed() == null ? "" : dil.getVolumeUsed().toString());
+        dil -> dil.getVolumeUsed() == null ? "" : LimsUtils.toNiceString(dil.getVolumeUsed()));
     testLibraryAliquotAttribute(LibraryAliquotColumns.TARGETED_SEQUENCING, attributes, aliquot, dil -> {
       if (dil.getTargetedSequencing() == null) {
         return null;
@@ -459,7 +460,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     }
   }
 
-  private boolean compareDoubles(double d1, double d2) {
-    return (Math.abs(d1 - d2) <= EPSILON);
+  private boolean compareDoubles(BigDecimal d1, String d2) {
+    return d1.compareTo(new BigDecimal(d2)) == 0;
   }
 }

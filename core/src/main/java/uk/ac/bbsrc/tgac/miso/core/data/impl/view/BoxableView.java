@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -29,7 +30,7 @@ public class BoxableView implements Serializable {
   private String alias;
   private String identificationBarcode;
   private String locationBarcode;
-  private Double volume;
+  private BigDecimal volume;
   private boolean discarded;
   private boolean distributed;
   private Long boxId;
@@ -102,11 +103,11 @@ public class BoxableView implements Serializable {
     this.locationBarcode = locationBarcode;
   }
 
-  public Double getVolume() {
+  public BigDecimal getVolume() {
     return volume;
   }
 
-  public void setVolume(Double volume) {
+  public void setVolume(BigDecimal volume) {
     this.volume = volume;
   }
 
@@ -115,7 +116,7 @@ public class BoxableView implements Serializable {
   }
 
   public void setDiscarded(boolean discarded) {
-    if (discarded) setVolume(0D);
+    if (discarded) setVolume(BigDecimal.ZERO);
     this.discarded = discarded;
   }
 
@@ -124,7 +125,7 @@ public class BoxableView implements Serializable {
   }
 
   public void setDistributed(boolean distributed) {
-    if (distributed) setVolume(0D);
+    if (distributed) setVolume(BigDecimal.ZERO);
     this.distributed = distributed;
   }
 

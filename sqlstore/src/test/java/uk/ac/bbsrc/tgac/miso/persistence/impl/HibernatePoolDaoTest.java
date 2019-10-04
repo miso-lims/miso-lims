@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -50,7 +51,7 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     if (!expected.isDiscarded()) {
       assertEquals(expected.getVolume(), actual.getVolume());
     } else {
-      assertTrue(0.0 == actual.getVolume());
+      assertTrue(actual.getVolume().compareTo(BigDecimal.ZERO) == 0);
     }
     assertEquals(expected.getQcPassed(), actual.getQcPassed());
     assertEquals(expected.getDescription(), actual.getDescription());
@@ -64,7 +65,7 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     mockUser.setId(1L);
     mockUser.setLoginName("franklin");
 
-    rtn.setConcentration((double) counter);
+    rtn.setConcentration(new BigDecimal(counter));
     rtn.setName("Test Pool " + counter);
     rtn.setIdentificationBarcode("BOOP" + counter);
     rtn.setCreationTime(creationDate);
@@ -74,7 +75,7 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     rtn.setLastModifier(mockUser);
     rtn.setCreator(mockUser);
     rtn.setDiscarded(discarded);
-    rtn.setVolume(discarded ? 0.0 : counter);
+    rtn.setVolume(discarded ? BigDecimal.ZERO : new BigDecimal(counter));
     rtn.setQcPassed(false);
     rtn.setDescription("Description " + counter);
     for (int i = 0; i < notes; i++) {
@@ -115,14 +116,14 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
 
     dao.save(testPool);
 
-    testPool.setConcentration(5D);
+    testPool.setConcentration(new BigDecimal("5"));
     testPool.setName("Test Pool xxx");
     testPool.setIdentificationBarcode("Foob");
     testPool.setCreationTime(new Date());
     testPool.setPlatformType(PlatformType.IONTORRENT);
     testPool.setAlias("Alias changed");
     testPool.setDiscarded(true);
-    testPool.setVolume(10D);
+    testPool.setVolume(new BigDecimal("10"));
     testPool.setQcPassed(true);
     testPool.setDescription("Description changed");
 

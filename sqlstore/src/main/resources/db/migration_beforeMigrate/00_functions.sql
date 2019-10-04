@@ -14,5 +14,11 @@ BEGIN
     END IF;
 END//
 
+DROP FUNCTION IF EXISTS decimalToString//
+CREATE FUNCTION decimalToString(original DECIMAL(20,10)) RETURNS CHAR(21)
+BEGIN
+  RETURN CAST(original AS CHAR(21))+0;
+END//
+
 DELIMITER ;
 -- EndNoTest

@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.math.BigDecimal;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -83,7 +84,7 @@ public class SampleIdentityImpl extends DetailedSampleImpl implements SampleIden
     private String name;
     private String alias;
     private SampleClass rootSampleClass;
-    private Double volume;
+    private BigDecimal volume;
     private String description;
     private String sampleType;
     private Project project;
@@ -108,7 +109,7 @@ public class SampleIdentityImpl extends DetailedSampleImpl implements SampleIden
       return this;
     }
 
-    public IdentityBuilder volume(Double volume) {
+    public IdentityBuilder volume(BigDecimal volume) {
       this.volume = volume;
       return this;
     }
@@ -153,7 +154,6 @@ public class SampleIdentityImpl extends DetailedSampleImpl implements SampleIden
       checkArgument(!LimsUtils.isStringEmptyOrNull(sampleType), "Must provide a sampleType to create a Sample");
       checkArgument(!LimsUtils.isStringEmptyOrNull(scientificName), "Must provide a scientificName to create a Sample");
       checkArgument(rootSampleClass != null, "A root SampleClass must be provided to create an Identity Sample.");
-      log.debug("Create an Identity Sample.");
 
       SampleIdentityImpl i = new SampleIdentityImpl();
       i.setName(name);

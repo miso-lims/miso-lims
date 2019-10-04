@@ -4,22 +4,24 @@ public interface SampleSlide extends SampleTissueProcessing {
 
   public static final String SUBCATEGORY_NAME = "Slide";
 
-  Integer getSlides();
+  public Integer getInitialSlides();
 
-  void setSlides(Integer slides);
+  public void setInitialSlides(Integer initialSlides);
 
-  Integer getSlidesRemaining();
+  public Integer getSlides();
 
-  Integer getDiscards();
+  public void setSlides(Integer slides);
 
-  void setDiscards(Integer discards);
+  public Integer getDiscards();
 
-  Integer getThickness();
+  public void setDiscards(Integer discards);
 
-  void setThickness(Integer thickness);
+  public Integer getThickness();
 
-  Stain getStain();
+  public void setThickness(Integer thickness);
 
-  void setStain(Stain stain);
+  public Stain getStain();
+
+  public void setStain(Stain stain);
 
 }

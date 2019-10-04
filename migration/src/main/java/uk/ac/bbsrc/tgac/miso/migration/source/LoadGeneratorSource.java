@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.migration.source;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -394,7 +395,7 @@ public class LoadGeneratorSource implements MigrationSource {
     user.setId(5L);
     user.setFullName("load-test");
     ldi.setLibrary(library);
-    ldi.setConcentration(1D);
+    ldi.setConcentration(BigDecimal.ONE);
     ldi.setCreator(user);
     // preMigrationId is used to link Library Aliquots/PoolableElementViews to Pools before they are saved
     ldi.setPreMigrationId((long) aliquotNum);
@@ -434,7 +435,7 @@ public class LoadGeneratorSource implements MigrationSource {
       poolables.add(element);
     }
     p.setPoolElements(poolables);
-    p.setConcentration(2D);
+    p.setConcentration(new BigDecimal("2"));
     p.setPlatformType(PlatformType.ILLUMINA);
     return p;
   }

@@ -282,13 +282,35 @@ FormTarget.library = (function($) {
             });
           }
         }, {
+          title: 'Initial Volume',
+          data: 'initialVolume',
+          type: 'decimal',
+          precision: 14,
+          scale: 10
+        }, {
           title: 'Volume',
           data: 'volume',
-          type: 'decimal'
+          type: 'decimal',
+          precision: 14,
+          scale: 10
         }, FormUtils.makeUnitsField(object, 'volume'), {
+          title: 'Parent ng Used',
+          data: 'ngUsed',
+          type: 'decimal',
+          precision: 14,
+          scale: 10
+        }, {
+          title: 'Parent Volume Used',
+          data: 'volumeUsed',
+          type: 'decimal',
+          precision: 14,
+          scale: 10
+        }, {
           title: 'Concentration',
           data: 'concentration',
-          type: 'decimal'
+          type: 'decimal',
+          precision: 14,
+          scale: 10
         }, FormUtils.makeUnitsField(object, 'concentration')].concat(FormUtils.makeDistributionFields()).concat([{
           title: 'Location',
           data: 'locationBarcode',
@@ -411,7 +433,8 @@ FormTarget.library = (function($) {
     if (position === 1) {
       field.onChange = function(newValue, form) {
         var indexFamilyId = form.get('indexFamilyId');
-        if (!indexFamilyId) return;
+        if (!indexFamilyId)
+          return;
         var indexFamily = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(indexFamilyId), Constants.indexFamilies);
         if (indexFamily.uniqueDualIndex) {
           var index1 = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), indexFamily.indices);

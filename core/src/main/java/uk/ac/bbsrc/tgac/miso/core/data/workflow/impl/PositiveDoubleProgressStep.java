@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -11,13 +13,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStep;
 public class PositiveDoubleProgressStep extends AbstractProgressStep {
   private static final long serialVersionUID = 1L;
 
-  private double input;
+  private BigDecimal input;
 
-  public double getInput() {
+  public BigDecimal getInput() {
     return input;
   }
 
-  public void setInput(double input) {
+  public void setInput(BigDecimal input) {
     this.input = input;
   }
 
@@ -25,7 +27,7 @@ public class PositiveDoubleProgressStep extends AbstractProgressStep {
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + (int) input;
+    result = prime * result + ((input == null) ? 0 : input.hashCode());
     return result;
   }
 
@@ -35,7 +37,9 @@ public class PositiveDoubleProgressStep extends AbstractProgressStep {
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
     PositiveDoubleProgressStep other = (PositiveDoubleProgressStep) obj;
-    if (input != other.input) return false;
+    if (input == null) {
+      if (other.input != null) return false;
+    } else if (!input.equals(other.input)) return false;
     return true;
   }
 

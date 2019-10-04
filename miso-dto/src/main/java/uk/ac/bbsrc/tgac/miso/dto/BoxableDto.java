@@ -27,7 +27,7 @@ public class BoxableDto {
 
   private String name;
 
-  private Double volume;
+  private String volume;
 
   public String getAlias() {
     return alias;
@@ -61,7 +61,7 @@ public class BoxableDto {
     return name;
   }
 
-  public Double getVolume() {
+  public String getVolume() {
     return volume;
   }
 
@@ -97,7 +97,7 @@ public class BoxableDto {
     this.name = name;
   }
 
-  public void setVolume(Double volume) {
+  public void setVolume(String volume) {
     this.volume = volume;
   }
 

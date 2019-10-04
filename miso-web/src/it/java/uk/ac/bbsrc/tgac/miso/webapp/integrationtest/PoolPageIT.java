@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -207,7 +208,7 @@ public class PoolPageIT extends AbstractIT {
 
     Pool savedPool = (Pool) getSession().get(PoolImpl.class, 120004L);
     assertTrue(savedPool.isDiscarded());
-    assertEquals(new Double(0D), savedPool.getVolume());
+    assertEquals(0, savedPool.getVolume().compareTo(BigDecimal.ZERO));
   }
 
   @Test
@@ -331,12 +332,12 @@ public class PoolPageIT extends AbstractIT {
     assertAttribute(Field.ALIAS, expectedValues, pool.getAlias());
     assertAttribute(Field.DESCRIPTION, expectedValues, pool.getDescription());
     assertAttribute(Field.PLATFORM, expectedValues, pool.getPlatformType().getKey());
-    assertAttribute(Field.CONCENTRATION, expectedValues, nullOrToString(pool.getConcentration()));
+    assertAttribute(Field.CONCENTRATION, expectedValues, LimsUtils.toNiceString(pool.getConcentration()));
     assertAttribute(Field.CREATE_DATE, expectedValues, LimsUtils.formatDate(pool.getCreationDate()));
     String qcPassed = replaceIfNull(nullOrToString(pool.getQcPassed()), "Unknown");
     qcPassed = qcPassed.substring(0, 1).toUpperCase() + qcPassed.substring(1);
     assertAttribute(Field.QC_PASSED, expectedValues, qcPassed);
-    assertAttribute(Field.VOLUME, expectedValues, nullOrToString(pool.getVolume()));
+    assertAttribute(Field.VOLUME, expectedValues, LimsUtils.toNiceString(pool.getVolume()));
     assertAttribute(Field.DISCARDED, expectedValues, Boolean.toString(pool.isDiscarded()));
     assertAttribute(Field.LOCATION, expectedValues, pool.getLocationBarcode());
   }

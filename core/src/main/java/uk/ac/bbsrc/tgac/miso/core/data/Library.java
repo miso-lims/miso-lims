@@ -237,9 +237,9 @@ public interface Library
    */
   public void setPlatformType(String platformName);
 
-  public Double getConcentration();
+  public BigDecimal getConcentration();
 
-  public void setConcentration(Double concentration);
+  public void setConcentration(BigDecimal concentration);
 
   /**
    * Returns the qcPassed of this Library object.
@@ -309,6 +309,14 @@ public interface Library
    */
   public void setConcentrationUnits(ConcentrationUnit concentrationUnits);
 
+  public BigDecimal getInitialVolume();
+
+  public void setInitialVolume(BigDecimal initialVolume);
+
+  public BigDecimal getNgUsed();
+
+  public void setNgUsed(BigDecimal ngUsed);
+
   /**
    * Returns the volume units of this Library object.
    * 
@@ -334,5 +342,8 @@ public interface Library
   public DilutionFactor getSpikeInDilutionFactor();
 
   public void setSpikeInDilutionFactor(DilutionFactor dilutionFactor);
+
+  @Override
+  public Sample getParent();
 
 }

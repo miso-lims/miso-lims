@@ -72,7 +72,7 @@ HotTarget.qc = function(qcTarget) {
         header: 'Result',
         data: 'results',
         type: 'text',
-        validator: HotUtils.validator.requiredNumber,
+        validator: HotUtils.validator.decimal(16, 10, true).validator,
         include: true,
         depends: 'typeName',
         update: function(qc, flat, flatProperty, value, setReadOnly, setOptions, setData) {

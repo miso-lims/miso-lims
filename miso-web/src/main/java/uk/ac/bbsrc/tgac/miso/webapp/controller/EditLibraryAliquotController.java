@@ -362,11 +362,12 @@ public class EditLibraryAliquotController {
       dto.setPooledElements(Collections.singleton(Dtos.asDto(item, false)));
       dto.setPlatformType(item.getLibrary().getPlatformType().name());
       if (item.getVolumeUsed() != null) {
-        dto.setVolume(item.getVolumeUsed().toString());
+        dto.setVolume(LimsUtils.toNiceString(item.getVolumeUsed()));
+        dto.setVolumeUnits(item.getVolumeUnits());
       }
       dto.setBox(newBox);
       if (item.getConcentration() != null) {
-        dto.setConcentration(item.getConcentration().toString());
+        dto.setConcentration(LimsUtils.toNiceString(item.getConcentration()));
         dto.setConcentrationUnits(item.getConcentrationUnits());
       }
       return dto;

@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +20,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
-
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage.QcColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
@@ -160,12 +162,10 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
     SampleQC saved = (SampleQC) c.uniqueResult();
     assertQCAttributes(attrs, saved);
     
-    assertTrue(String.format("Expected volume to be updated to %f, instead got %f", Double.parseDouble("10.43"), saved.getSample().getVolume()),
-        saved.getSample().getVolume().equals(Double.parseDouble("10.43")));
-    assertTrue(
-        String.format("Expected volume units to be updated to %s, instead got %s", "&#181;L",
-            saved.getSample().getVolumeUnits().getUnits()),
-        saved.getSample().getVolumeUnits().getUnits().equals("&#181;L"));
+    assertEquals(String.format("Expected volume to be updated to %s, instead got %f", "10.43", saved.getSample().getVolume()), 0,
+        saved.getSample().getVolume().compareTo(new BigDecimal("10.43")));
+    assertEquals(String.format("Expected volume units to be updated to %s, instead got %s", VolumeUnit.MICROLITRES.getUnits(),
+        saved.getSample().getVolumeUnits().getUnits()), VolumeUnit.MICROLITRES, saved.getSample().getVolumeUnits());
   }
 
   @Test
@@ -194,14 +194,10 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
     SampleQC saved = (SampleQC) c.uniqueResult();
     assertQCAttributes(attrs, saved);
     
-    assertTrue(
-        String.format("Expected concentration to be updated to %f, instead got %f", Double.parseDouble("24.78"),
-            saved.getSample().getConcentration()),
-        saved.getSample().getConcentration().equals(Double.parseDouble("24.78")));
-    assertTrue(
-        String.format("Expected concentration units to be updated to %s, instead got %s", "nM",
-            saved.getSample().getConcentrationUnits().getUnits()),
-        saved.getSample().getConcentrationUnits().getUnits().equals("nM"));
+    assertEquals(String.format("Expected concentration to be updated to %s, instead got %f", "24.78", saved.getSample().getConcentration()),
+        0, saved.getSample().getConcentration().compareTo(new BigDecimal("24.78")));
+    assertEquals(String.format("Expected concentration units to be updated to %s, instead got %s", ConcentrationUnit.NANOMOLAR.getUnits(),
+        saved.getSample().getConcentrationUnits().getUnits()), ConcentrationUnit.NANOMOLAR, saved.getSample().getConcentrationUnits());
   }
   
   private void saveAndAssertSuccess(HandsOnTable table) {
@@ -234,7 +230,7 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
   private void assertQCAttributes(Map<String, String> attributes, SampleQC sampleQc) {
     testQCAttribute(QcColumns.DATE, attributes, sampleQc, qc -> qc.getDate().toString());
     testQCAttribute(QcColumns.TYPE, attributes, sampleQc, qc -> qc.getType().getName());
-    testQCAttribute(QcColumns.RESULT, attributes, sampleQc, qc -> qc.getResults().toString());
+    testQCAttribute(QcColumns.RESULT, attributes, sampleQc, qc -> LimsUtils.toNiceString(qc.getResults()));
     testQCAttribute(QcColumns.UNITS, attributes, sampleQc, qc -> qc.getType().getUnits());
   }
 

@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -95,7 +96,7 @@ public class LibraryAliquot extends AbstractBoxable
   @Temporal(TemporalType.TIMESTAMP)
   private Date creationTime;
 
-  private Double concentration;
+  private BigDecimal concentration;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = true)
@@ -144,9 +145,9 @@ public class LibraryAliquot extends AbstractBoxable
   @PrimaryKeyJoinColumn
   private LibraryAliquotBoxPosition boxPosition;
 
-  private Double ngUsed;
+  private BigDecimal ngUsed;
 
-  private Double volumeUsed;
+  private BigDecimal volumeUsed;
 
   @OneToMany(targetEntity = LibraryAliquotChangeLog.class, mappedBy = "libraryAliquot", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
@@ -227,11 +228,11 @@ public class LibraryAliquot extends AbstractBoxable
     this.creationDate = creationDate;
   }
 
-  public Double getConcentration() {
+  public BigDecimal getConcentration() {
     return this.concentration;
   }
 
-  public void setConcentration(Double concentration) {
+  public void setConcentration(BigDecimal concentration) {
     this.concentration = concentration;
   }
 
@@ -458,19 +459,21 @@ public class LibraryAliquot extends AbstractBoxable
         + (getLibrary() == null || getLibrary().getAlias() == null ? "" : " (" + getLibrary().getAlias() + ")");
   }
 
-  public Double getNgUsed() {
+  public BigDecimal getNgUsed() {
     return ngUsed;
   }
 
-  public void setNgUsed(Double ngUsed) {
+  public void setNgUsed(BigDecimal ngUsed) {
     this.ngUsed = ngUsed;
   }
 
-  public Double getVolumeUsed() {
+  @Override
+  public BigDecimal getVolumeUsed() {
     return volumeUsed;
   }
 
-  public void setVolumeUsed(Double volumeUsed) {
+  @Override
+  public void setVolumeUsed(BigDecimal volumeUsed) {
     this.volumeUsed = volumeUsed;
   }
 

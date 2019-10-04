@@ -157,13 +157,37 @@ FormTarget.sample = (function($) {
                     });
                   }
                 }, {
+                  title: 'Initial Volume',
+                  data: 'initialVolume',
+                  type: 'decimal',
+                  precision: 14,
+                  scale: 10
+                }, {
                   title: 'Volume',
                   data: 'volume',
-                  type: 'decimal'
+                  type: 'decimal',
+                  precision: 14,
+                  scale: 10
                 }, FormUtils.makeUnitsField(object, 'volume'), {
+                  title: 'Parent ng Used',
+                  data: 'ngUsed',
+                  type: 'decimal',
+                  precision: 14,
+                  scale: 10,
+                  include: config.detailedSample && (object.sampleCategory === 'Stock' || object.sampleCategory === 'Aliquot')
+                }, {
+                  title: 'Parent Volume Used',
+                  data: 'volumeUsed',
+                  type: 'decimal',
+                  precision: 14,
+                  scale: 10,
+                  include: config.detailedSample && (object.sampleCategory === 'Stock' || object.sampleCategory === 'Aliquot')
+                }, {
                   title: 'Concentration',
                   data: 'concentration',
-                  type: 'decimal'
+                  type: 'decimal',
+                  precision: 14,
+                  scale: 10
                 }, FormUtils.makeUnitsField(object, 'concentration')].concat(FormUtils.makeDistributionFields()).concat([{
               title: 'Location',
               data: 'locationBarcode',
@@ -361,9 +385,11 @@ FormTarget.sample = (function($) {
             title: 'Slide',
             include: config.detailedSample && object.sampleSubcategory === 'Slide',
             fields: [{
-              title: 'Slides Remaining',
-              data: 'slidesRemaining',
-              type: 'read-only'
+              title: 'Initial Slides',
+              data: 'initialSlides',
+              type: 'int',
+              min: 0,
+              required: true
             }, {
               title: 'Slides',
               data: 'slides',

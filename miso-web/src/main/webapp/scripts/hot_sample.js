@@ -560,6 +560,9 @@ HotTarget.sample = (function() {
           }),
 
           // Tissue Processing: Slides columns
+          HotUtils.makeColumnForInt('Initial Slides',
+              (config.pageMode === 'edit' && show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Slide'),
+              'initialSlides', HotUtils.validator.integer(true, 0)),
           HotUtils.makeColumnForInt('Slides', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Slide'),
               'slides', HotUtils.validator.integer(true, 0)),
           HotUtils.makeColumnForInt('Discards', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Slide'),
@@ -597,21 +600,24 @@ HotTarget.sample = (function() {
           },
 
           // Tissue Processing: Tissue Piece columns
-          HotUtils.makeAutocompleteColumnForConstantsList('Piece Type', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Tissue Piece'), 'tissuePieceTypeName', 'tissuePieceTypeId', 'id', 'name',
-              Constants.tissuePieceTypes, true, function(item, value) {
+          HotUtils.makeAutocompleteColumnForConstantsList('Piece Type',
+              (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Tissue Piece'), 'tissuePieceTypeName',
+              'tissuePieceTypeId', 'id', 'name', Constants.tissuePieceTypes, true, function(item, value) {
                 return item.name.toLowerCase() == value.toLowerCase() || item.abbreviation.toLowerCase() == value.toLowerCase();
               }, function(item) {
                 return item.name;
               }),
-          HotUtils.makeColumnForInt('Slides Consumed', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Tissue Piece'),
-              'slidesConsumed', HotUtils.validator.integer(true, 0)),
+          HotUtils.makeColumnForInt('Slides Consumed',
+              (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Tissue Piece'), 'slidesConsumed',
+              HotUtils.validator.integer(true, 0)),
 
           // Tissue Processing: Single Cell columns
-          HotUtils.makeColumnForDecimal('Initial Cell Conc.', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory
-              && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell')), 'initialCellConcentration', 14, 10, false, false),
+          HotUtils.makeColumnForDecimal('Initial Cell Conc.',
+              (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory
+                  .startsWith('Single Cell')), 'initialCellConcentration', 14, 10, false, false),
           HotUtils.makeColumnForText('Digestion',
-              (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell')),
-              'digestion', {
+              (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory
+                  .startsWith('Single Cell')), 'digestion', {
                 validator: HotUtils.validator.requiredTextNoSpecialChars
               }),
 
@@ -633,7 +639,11 @@ HotTarget.sample = (function() {
             },
             include: Constants.isDetailedSample && config.dnaseTreatable
           },
-          HotUtils.makeColumnForFloat('Volume', ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt), 'volume'),
+          HotUtils.makeColumnForDecimal('Initial Volume',
+              (config.pageMode === 'edit' && (show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt), 'initialVolume', 14, 10,
+              false, true),
+          HotUtils.makeColumnForDecimal('Volume', ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt), 'volume', 14, 10,
+              false, true),
           {
             header: 'Vol. Units',
             data: 'volumeUnits',
@@ -658,7 +668,12 @@ HotTarget.sample = (function() {
               obj['volumeUnits'] = !!units ? units.name : null;
             }
           },
-          HotUtils.makeColumnForFloat('Concentration', ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt), 'concentration'),
+          HotUtils.makeColumnForDecimal('Parent ng Used', ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt), 'ngUsed', 14,
+              10, false, false),
+          HotUtils.makeColumnForDecimal('Parent Vol. Used', ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt), 'volumeUsed',
+              14, 10, false, false),
+          HotUtils.makeColumnForDecimal('Concentration', ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt), 'concentration',
+              14, 10, false, false),
           {
             header: 'Conc. Units',
             data: 'concentrationUnits',

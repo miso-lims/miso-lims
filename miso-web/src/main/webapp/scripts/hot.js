@@ -35,7 +35,7 @@ var HotUtils = {
      */
     integer: function(required, min, max) {
       return function(value, callback) {
-        if (value === '') {
+        if (Utils.validation.isEmpty(value)) {
           return callback(!required);
         }
         if (!/^-?[0-9]*$/g.test(value)) {
@@ -48,6 +48,23 @@ var HotUtils = {
           return callback(false);
         }
         return callback(true);
+      };
+    },
+
+    /**
+     * Custom validator for decimals
+     */
+    decimal: function(precision, scale, allowNegative, required) {
+      var max = Math.pow(10, precision - scale) - Math.pow(0.1, scale);
+      var min = allowNegative ? max * -1 : 0;
+      var regex = new RegExp('^\\d{0,' + (precision - scale) + '}(?:\\.\\d{1,' + scale + '})?$');
+      return {
+        min: min,
+        max: max,
+        validator: function(value, callback) {
+          return callback((Utils.validation.isEmpty(value) && !required)
+              || (Handsontable.helper.isNumeric(value) && regex.test(value) && value >= min && value <= max));
+        }
       };
     },
 
@@ -1027,33 +1044,28 @@ var HotUtils = {
     };
   },
 
-  makeColumnForDecimal: function(headerName, include, property, precision, scale, required, allowNegative) {
-    var max = Math.pow(10, precision - scale) - Math.pow(0.1, scale);
-    var min = allowNegative ? max * -1 : 0;
-    var regex = new RegExp('^\\d{0,' + (precision - scale) + '}(?:\\.\\d{1,' + scale + '})?$');
-    var validator = function(value, callback) {
-      return callback((Utils.validation.isEmpty(value) && !required)
-          || (Handsontable.helper.isNumeric(value) && regex.test(value) && value > min && value < max));
+  makeColumnForDecimal: function(headerName, include, property, precision, scale, required, allowNegative, baseObj) {
+    var validation = HotUtils.validator.decimal(precision, scale, allowNegative, required);
+
+    var column = baseObj || {};
+    column.header = headerName;
+    column.data = property;
+    column.type = 'text';
+    column.include = include;
+    column.unpack = function(obj, flat, setCellMeta) {
+      flat[property] = Utils.valOrNull(obj[property]);
     };
-    return {
-      header: headerName,
-      data: property,
-      type: 'text',
-      include: include,
-      unpack: function(obj, flat, setCellMeta) {
-        flat[property] = Utils.valOrNull(obj[property]);
-      },
-      validator: validator,
-      pack: function(obj, flat, errorHandler) {
-        validator(flat[property], function(valid) {
-          if (!valid) {
-            errorHandler(headerName + ' must be a number between ' + min + ' and ' + max);
-          } else {
-            obj[property] = Utils.valOrNull(flat[property]);
-          }
-        });
-      }
+    column.validator = validation.validator;
+    column.pack = function(obj, flat, errorHandler) {
+      validation.validator(flat[property], function(valid) {
+        if (!valid) {
+          errorHandler(headerName + ' must be a number between ' + validation.min + ' and ' + validation.max);
+        } else {
+          obj[property] = Utils.valOrNull(flat[property]);
+        }
+      });
     };
+    return column;
   },
 
   makeColumnForInt: function(headerName, include, property, validator, baseObj) {

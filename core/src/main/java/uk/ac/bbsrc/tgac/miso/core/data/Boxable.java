@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.function.Supplier;
 
@@ -67,7 +68,7 @@ public interface Boxable extends Nameable, Barcodable, Distributable, Serializab
    * 
    * @return volume
    */
-  public Double getVolume();
+  public BigDecimal getVolume();
 
   /**
    * Returns whether or not the Implementor has been emptied
@@ -95,10 +96,9 @@ public interface Boxable extends Nameable, Barcodable, Distributable, Serializab
   /**
    * Sets the volume of the Implementor
    * 
-   * @param double
-   *          volume
+   * @param volume
    */
-  public void setVolume(Double volume);
+  public void setVolume(BigDecimal volume);
 
   public Long getPreMigrationId();
 

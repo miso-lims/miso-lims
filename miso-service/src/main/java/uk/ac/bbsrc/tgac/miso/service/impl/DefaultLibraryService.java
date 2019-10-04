@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -64,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
+import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -103,6 +106,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   private BoxService boxService;
   @Autowired
   private WorksetService worksetService;
+  @Autowired
+  private SampleStore sampleStore;
   @Autowired
   private FileAttachmentService fileAttachmentService;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
@@ -169,7 +174,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     }
     loadChildEntities(library);
     boxService.throwIfBoxPositionIsFilled(library);
-    library.setChangeDetails(authorizationManager.getCurrentUser());
+    User changeUser = authorizationManager.getCurrentUser();
+    library.setChangeDetails(changeUser);
     validateParentOrThrow(library);
 
     // pre-save field generation
@@ -182,9 +188,15 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     }
     if (library.getVolume() == null) {
       library.setVolumeUnits(null);
+    } else {
+      library.setInitialVolume(library.getVolume());
     }
+
+    LimsUtils.updateParentVolume(library, null, changeUser);
+
     validateChange(library, null);
     long savedId = save(library, true).getId();
+    sampleStore.update(library.getParent());
     boxService.updateBoxableLocation(library);
     return savedId;
   }
@@ -192,16 +204,20 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   @Override
   public long update(Library library) throws IOException {
     Library managed = get(library.getId());
-    managed.setChangeDetails(authorizationManager.getCurrentUser());
+    User changeUser = authorizationManager.getCurrentUser();
+    managed.setChangeDetails(changeUser);
     List<Index> originalIndices = new ArrayList<>(managed.getIndices());
     maybeRemoveFromBox(library);
     boxService.throwIfBoxPositionIsFilled(library);
+    library.setSample(sampleService.get(library.getSample().getId()));
+    LimsUtils.updateParentVolume(library, managed, changeUser);
     boolean validateAliasUniqueness = !managed.getAlias().equals(library.getAlias());
     validateChange(library, managed);
     applyChanges(managed, library);
     loadChildEntities(managed);
     makeChangeLogForIndices(originalIndices, managed.getIndices(), managed);
     Library saved = save(managed, validateAliasUniqueness);
+    sampleStore.update(library.getParent());
     boxService.updateBoxableLocation(library);
     return saved.getId();
   }
@@ -425,12 +441,15 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     target.setLowQuality(source.isLowQuality());
     target.setDiscarded(source.isDiscarded());
     target.setCreationDate(source.getCreationDate());
+    target.setInitialVolume(source.getInitialVolume());
     if (source.isDiscarded() || source.isDistributed()) {
-      target.setVolume(0.0);
+      target.setVolume(BigDecimal.ZERO);
     } else {
       target.setVolume(source.getVolume());
     }
     target.setVolumeUnits(target.getVolume() == null ? null : source.getVolumeUnits());
+    target.setVolumeUsed(source.getVolumeUsed());
+    target.setNgUsed(source.getNgUsed());
     target.setDnaSize(source.getDnaSize());
     target.setLibraryType(source.getLibraryType());
     target.setLibrarySelectionType(source.getLibrarySelectionType());

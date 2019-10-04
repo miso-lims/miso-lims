@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
@@ -9,11 +7,19 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 @JsonTypeName(value = SampleSlide.SUBCATEGORY_NAME)
 public class SampleSlideDto extends SampleTissueProcessingDto {
 
+  private Integer initialSlides;
   private Integer slides;
-  private Integer slidesRemaining;
   private Integer discards;
   private Integer thickness;
   private Long stainId;
+
+  public Integer getInitialSlides() {
+    return initialSlides;
+  }
+
+  public void setInitialSlides(Integer initialSlides) {
+    this.initialSlides = initialSlides;
+  }
 
   public Integer getSlides() {
     return slides;
@@ -21,18 +27,6 @@ public class SampleSlideDto extends SampleTissueProcessingDto {
 
   public void setSlides(Integer slides) {
     this.slides = slides;
-  }
-
-  public Integer getSlidesRemaining() {
-    return slidesRemaining;
-  }
-
-  public void setSlidesRemaining(Integer slidesRemaining) {
-    this.slidesRemaining = slidesRemaining;
-  }
-
-  public void setSlidesRemaining() {
-    this.slidesRemaining = getSlides() - getDiscards();
   }
 
   public Integer getDiscards() {

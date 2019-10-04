@@ -7,7 +7,7 @@ public class QcDto {
   private String entityAlias;
   private Long entityId;
   private Long id;
-  private Double results;
+  private String results;
   private QcTypeDto type;
   private String description;
 
@@ -31,7 +31,7 @@ public class QcDto {
     return id;
   }
 
-  public Double getResults() {
+  public String getResults() {
     return results;
   }
 
@@ -63,7 +63,7 @@ public class QcDto {
     this.id = id;
   }
 
-  public void setResults(Double results) {
+  public void setResults(String results) {
     this.results = results;
   }
 

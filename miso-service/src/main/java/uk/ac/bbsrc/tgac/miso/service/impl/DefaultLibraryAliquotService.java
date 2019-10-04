@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -43,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAliquotStore;
+import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -67,6 +69,8 @@ public class DefaultLibraryAliquotService
   private BoxService boxService;
   @Autowired
   private WorksetService worksetService;
+  @Autowired
+  private LibraryStore libraryStore;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
@@ -118,7 +122,8 @@ public class DefaultLibraryAliquotService
   @Override
   public long create(LibraryAliquot aliquot) throws IOException {
     loadChildEntities(aliquot);
-    aliquot.setCreator(authorizationManager.getCurrentUser());
+    User changeUser = authorizationManager.getCurrentUser();
+    aliquot.setCreator(changeUser);
     boxService.throwIfBoxPositionIsFilled(aliquot);
 
     if (aliquot.getConcentration() == null) {
@@ -128,10 +133,7 @@ public class DefaultLibraryAliquotService
       aliquot.setVolumeUnits(null);
     }
 
-    HierarchyEntity parent = aliquot.getParent();
-    if (aliquot.getVolumeUsed() != null && parent.getVolume() != null) {
-      parent.setVolume(parent.getVolume() - aliquot.getVolumeUsed());
-    }
+    LimsUtils.updateParentVolume(aliquot, null, changeUser);
 
     aliquot.setChangeDetails(authorizationManager.getCurrentUser());
 
@@ -139,7 +141,7 @@ public class DefaultLibraryAliquotService
     aliquot.setName(generateTemporaryName());
     validateChange(aliquot, null);
     long savedId = save(aliquot).getId();
-    updateParent(parent);
+    updateParent(aliquot.getParent());
     boxService.updateBoxableLocation(aliquot);
     return savedId;
   }
@@ -147,41 +149,29 @@ public class DefaultLibraryAliquotService
   private void updateParent(HierarchyEntity parent) throws IOException {
     try {
       if (parent instanceof LibraryAliquot) {
-        update((LibraryAliquot) parent);
+        libraryAliquotDao.save((LibraryAliquot) parent);
       } else {
-        libraryService.update((Library) parent);
+        libraryStore.save((Library) parent);
       }
     } catch (ValidationException e) {
-      List<ValidationError> newErrors = new ArrayList<>();
-      for (ValidationError error : e.getErrors()) {
-        newErrors.add(new ValidationError(String.format("Parent %s: %s", error.getProperty(), error.getMessage())));
-      }
-      throw new ValidationException(newErrors);
+      throw ValidationUtils.rewriteParentErrors(e);
     }
   }
 
   @Override
   public long update(LibraryAliquot aliquot) throws IOException {
     LibraryAliquot managed = get(aliquot.getId());
+    User changeUser = authorizationManager.getCurrentUser();
+    managed.setChangeDetails(changeUser);
     maybeRemoveFromBox(aliquot);
     boxService.throwIfBoxPositionIsFilled(aliquot);
 
     loadChildEntities(aliquot);
-    HierarchyEntity parent = aliquot.getParent();
-    if (parent.getVolume() != null) {
-      if (aliquot.getVolumeUsed() != null && managed.getVolumeUsed() != null) {
-        parent.setVolume(parent.getVolume() + managed.getVolumeUsed() - aliquot.getVolumeUsed());
-      } else if (managed.getVolumeUsed() != null) {
-        parent.setVolume(parent.getVolume() + managed.getVolumeUsed());
-      } else if (aliquot.getVolumeUsed() != null) {
-        parent.setVolume(parent.getVolume() - aliquot.getVolumeUsed());
-      }
-    }
+    LimsUtils.updateParentVolume(aliquot, managed, changeUser);
     validateChange(aliquot, managed);
     applyChanges(managed, aliquot);
-    managed.setChangeDetails(authorizationManager.getCurrentUser());
     LibraryAliquot saved = save(managed);
-    updateParent(parent);
+    updateParent(aliquot.getParent());
     boxService.updateBoxableLocation(aliquot);
     return saved.getId();
   }
@@ -255,7 +245,7 @@ public class DefaultLibraryAliquotService
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setDiscarded(source.isDiscarded());
     if (source.isDiscarded() || source.isDistributed()) {
-      target.setVolume(0.0);
+      target.setVolume(BigDecimal.ZERO);
     } else {
       target.setVolume(source.getVolume());
     }

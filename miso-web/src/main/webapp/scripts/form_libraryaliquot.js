@@ -107,11 +107,15 @@ FormTarget.libraryaliquot = (function($) {
         }, {
           title: 'Volume',
           data: 'volume',
-          type: 'decimal'
+          type: 'decimal',
+          precision: 14,
+          scale: 10
         }, FormUtils.makeUnitsField(object, 'volume'), {
           title: 'Concentration',
           data: 'concentration',
-          type: 'decimal'
+          type: 'decimal',
+          precision: 14,
+          scale: 10
         }, FormUtils.makeUnitsField(object, 'concentration'), FormUtils.makeBoxLocationField(), {
           title: 'Creation Date',
           data: 'creationDate',
@@ -136,11 +140,15 @@ FormTarget.libraryaliquot = (function($) {
         }, {
           title: 'Parent ng Used',
           data: 'ngUsed',
-          type: 'decimal'
+          type: 'decimal',
+          precision: 14,
+          scale: 10
         }, {
           title: 'Parent Volume Used',
           data: 'volumeUsed',
-          type: 'decimal'
+          type: 'decimal',
+          precision: 14,
+          scale: 10
         }].concat(FormUtils.makeDistributionFields())
       }, {
         title: 'Details',

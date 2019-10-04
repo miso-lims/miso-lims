@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -87,7 +88,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @Entity
 @Table(name = "Pool")
 public class PoolImpl extends AbstractBoxable implements Pool {
-  private static final int CONCENTRATION_LENGTH = 17;
   private static final int DESCRIPTION_LENGTH = 255;
   private static final int ID_BARCODE_LENGTH = 255;
   private static final int NAME_LENGTH = 255;
@@ -98,8 +98,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @OneToMany(targetEntity = PoolChangeLog.class, mappedBy = "pool", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
-  @Column(length = CONCENTRATION_LENGTH)
-  private Double concentration;
+  @Column
+  private BigDecimal concentration;
 
   @Temporal(TemporalType.DATE)
   private Date creationDate = new Date();
@@ -254,7 +254,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public Double getConcentration() {
+  public BigDecimal getConcentration() {
     return this.concentration;
   }
 
@@ -360,7 +360,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public void setConcentration(Double concentration) {
+  public void setConcentration(BigDecimal concentration) {
     this.concentration = concentration;
   }
 

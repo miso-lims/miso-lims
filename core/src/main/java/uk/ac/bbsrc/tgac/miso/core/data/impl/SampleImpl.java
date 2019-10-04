@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -66,7 +68,7 @@ public class SampleImpl extends AbstractSample {
     return changeLog;
   }
 
-  public void updateFromQc(QcCorrespondingField correspondingField, double value, String units) {
+  public void updateFromQc(QcCorrespondingField correspondingField, BigDecimal value, String units) {
     correspondingField.updateField(this, value, units);
   }
 

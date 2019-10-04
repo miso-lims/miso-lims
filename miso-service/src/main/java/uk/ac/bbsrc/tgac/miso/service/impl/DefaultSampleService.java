@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -247,7 +249,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   public long create(Sample sample) throws IOException {
     loadChildEntities(sample);
     boxService.throwIfBoxPositionIsFilled(sample);
-    sample.setChangeDetails(authorizationManager.getCurrentUser());
+    User changeUser = authorizationManager.getCurrentUser();
+    sample.setChangeDetails(changeUser);
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
       if (!isIdentitySample(sample)) {
@@ -288,11 +291,45 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     }
     if (sample.getVolume() == null) {
       sample.setVolumeUnits(null);
+    } else {
+      sample.setInitialVolume(sample.getVolume());
     }
+    if (isSampleSlide(sample)) {
+      ((SampleSlide) sample).setInitialSlides(((SampleSlide) sample).getSlides());
+    }
+    LimsUtils.updateParentVolume(sample, null, changeUser);
+    updateParentSlides(sample, null, changeUser);
     validateChange(sample, null);
     long savedId = save(sample, true).getId();
+    if (sample.getParent() != null) {
+      sampleStore.update(sample.getParent());
+    }
     boxService.updateBoxableLocation(sample);
     return savedId;
+  }
+
+  private void updateParentSlides(Sample child, Sample beforeChange, User changeUser) {
+    if (child.getParent() == null || !isSampleSlide(child.getParent()) || !isTissuePieceSample(child)) {
+      return;
+    }
+    SampleSlide parent = (SampleSlide) deproxify(child.getParent());
+    SampleTissuePiece childPiece = (SampleTissuePiece) child;
+    if (childPiece.getSlidesConsumed() == null) {
+      return;
+    }
+    if (beforeChange == null) {
+      updateParentSlides(parent, parent.getSlides() - childPiece.getSlidesConsumed(), changeUser);
+    } else {
+      SampleTissuePiece beforePiece = (SampleTissuePiece) beforeChange;
+      if (!childPiece.getSlidesConsumed().equals(beforePiece.getSlidesConsumed())) {
+        updateParentSlides(parent, parent.getSlides() + beforePiece.getSlidesConsumed() - childPiece.getSlidesConsumed(), changeUser);
+      }
+    }
+  }
+
+  private void updateParentSlides(SampleSlide parent, Integer value, User changeUser) {
+    parent.setChangeDetails(changeUser);
+    parent.setSlides(value);
   }
 
   /**
@@ -502,7 +539,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     parent.setProject(child.getProject());
     parent.setSampleType(child.getSampleType());
     parent.setScientificName(child.getScientificName());
-    parent.setVolume(0D);
+    parent.setVolume(BigDecimal.ZERO);
     parent.setVolumeUnits(VolumeUnit.MICROLITRES);
     parent.setSynthetic(true);
     if (child.getIdentityId() != null) parent.setIdentityId(child.getIdentityId());
@@ -595,7 +632,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
     Sample identitySample = new IdentityBuilder().project(sample.getProject())
         .sampleType(sample.getSampleType()).scientificName(sample.getScientificName()).name(generateTemporaryName())
-        .rootSampleClass(rootSampleClass).volume(0D).externalName(identity.getExternalName())
+        .rootSampleClass(rootSampleClass).volume(BigDecimal.ZERO).externalName(identity.getExternalName())
         .donorSex(identity.getDonorSex()).consentLevel(identity.getConsentLevel()).build();
     identitySample.setAlias(namingScheme.generateSampleAlias(identitySample));
 
@@ -679,10 +716,16 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   @Override
   public long update(Sample sample) throws IOException {
     Sample managed = get(sample.getId());
-    managed.setChangeDetails(authorizationManager.getCurrentUser());
+    User changeUser = authorizationManager.getCurrentUser();
+    managed.setChangeDetails(changeUser);
     boolean validateAliasUniqueness = !managed.getAlias().equals(sample.getAlias());
     maybeRemoveFromBox(sample);
     boxService.throwIfBoxPositionIsFilled(sample);
+    if (sample.getParent() != null) {
+      ((DetailedSample) sample).setParent((DetailedSample) get(sample.getParent().getId()));
+    }
+    LimsUtils.updateParentVolume(sample, managed, changeUser);
+    updateParentSlides(sample, managed, changeUser);
     validateChange(sample, managed);
     applyChanges(managed, sample);
     loadChildEntities(managed);
@@ -695,6 +738,9 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     }
 
     save(managed, validateAliasUniqueness);
+    if (sample.getParent() != null) {
+      sampleStore.update(sample.getParent());
+    }
     boxService.updateBoxableLocation(sample);
     return sample.getId();
   }
@@ -743,20 +789,21 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     target.setAlias(source.getAlias());
     target.setDescription(source.getDescription());
     target.setDiscarded(source.isDiscarded());
+    target.setInitialVolume(source.getInitialVolume());
     if (source.isDiscarded() || source.isDistributed()) {
-      target.setVolume(0.0);
+      target.setVolume(BigDecimal.ZERO);
     } else {
       target.setVolume(source.getVolume());
     }
     if (target.getVolume() == null) {
       target.setVolumeUnits(null);
-    } else if (!target.getVolume().equals(Double.valueOf(0.0)) || target.getVolumeUnits() != null) {
+    } else if (!target.getVolume().equals(BigDecimal.ZERO) || target.getVolumeUnits() != null) {
       target.setVolumeUnits(source.getVolumeUnits());
     }
     target.setConcentration(source.getConcentration());
     if (target.getConcentration() == null) {
       target.setConcentrationUnits(null);
-    } else if (!target.getConcentration().equals(Double.valueOf(0.0)) || target.getConcentrationUnits() != null) {
+    } else if (!target.getConcentration().equals(BigDecimal.ZERO) || target.getConcentrationUnits() != null) {
       target.setConcentrationUnits(source.getConcentrationUnits());
     }
     target.setLocationBarcode(source.getLocationBarcode());
@@ -778,6 +825,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       dTarget.setDetailedQcStatusNote(nullifyStringIfBlank(dSource.getDetailedQcStatusNote()));
       dTarget.setQcPassed(dSource.getQcPassed());
       dTarget.setSubproject(dSource.getSubproject());
+      dTarget.setVolumeUsed(dSource.getVolumeUsed());
+      dTarget.setNgUsed(dSource.getNgUsed());
       if (isIdentitySample(target)) {
         applyIdentityChanges((SampleIdentity) target, (SampleIdentity) source);
       } else if (isTissueSample(target)) {
@@ -841,6 +890,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   private void applyTissueProcessingChanges(SampleTissueProcessing target, SampleTissueProcessing source) {
     source = deproxify(source);
     if (source instanceof SampleSlide) {
+      ((SampleSlide) target).setInitialSlides(((SampleSlide) source).getInitialSlides());
       ((SampleSlide) target).setSlides(((SampleSlide) source).getSlides());
       ((SampleSlide) target).setDiscards(((SampleSlide) source).getDiscards());
       ((SampleSlide) target).setThickness(((SampleSlide) source).getThickness());

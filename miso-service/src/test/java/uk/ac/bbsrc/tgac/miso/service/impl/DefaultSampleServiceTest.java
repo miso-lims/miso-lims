@@ -5,6 +5,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasTemporaryName;
 import static uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils.generateTemporaryName;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -325,7 +326,7 @@ public class DefaultSampleServiceTest {
     assertTrue(LimsUtils.isTissueSample(partialChild));
 
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleStore, Mockito.times(2)).update(updatedCapture.capture());
+    Mockito.verify(sampleStore, Mockito.times(3)).update(updatedCapture.capture());
     // note: finalParent is not actually derived from partialParent because of mocked dao (above), but it should be the parent
     // linked to finalChild
     Sample finalParent = updatedCapture.getAllValues().get(0);
@@ -356,10 +357,10 @@ public class DefaultSampleServiceTest {
     mockValidRelationship(tissue.getSampleClass(), analyte.getSampleClass());
     sut.create(analyte);
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleStore, Mockito.times(2)).update(updatedCapture.capture());
+    Mockito.verify(sampleStore, Mockito.times(4)).update(updatedCapture.capture());
     Sample createdTissue = updatedCapture.getAllValues().get(0);
     assertTrue(LimsUtils.isTissueSample(createdTissue));
-    Sample createdAnalyte = updatedCapture.getAllValues().get(1);
+    Sample createdAnalyte = updatedCapture.getAllValues().get(2);
     assertTrue(LimsUtils.isStockSample(createdAnalyte));
   }
 
@@ -390,12 +391,12 @@ public class DefaultSampleServiceTest {
     mockValidRelationship(tissue.getSampleClass(), analyte.getSampleClass());
     sut.create(analyte);
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleStore, Mockito.times(3)).update(updatedCapture.capture());
+    Mockito.verify(sampleStore, Mockito.times(5)).update(updatedCapture.capture());
     Sample createdIdentity = updatedCapture.getAllValues().get(0);
     assertTrue(LimsUtils.isIdentitySample(createdIdentity));
     Sample createdTissue = updatedCapture.getAllValues().get(1);
     assertTrue(LimsUtils.isTissueSample(createdTissue));
-    Sample createdAnalyte = updatedCapture.getAllValues().get(2);
+    Sample createdAnalyte = updatedCapture.getAllValues().get(3);
     assertTrue(LimsUtils.isStockSample(createdAnalyte));
   }
 
@@ -413,7 +414,7 @@ public class DefaultSampleServiceTest {
     updated.setQcPassed(true);
     updated.setScientificName("newSciName");
     updated.setTaxonIdentifier("newTaxonId");
-    updated.setVolume(5.5D);
+    updated.setVolume(new BigDecimal("5.5"));
     updated.setVolumeUnits(VolumeUnit.MICROLITRES);
 
     // unmodifiable

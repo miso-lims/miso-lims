@@ -51,9 +51,12 @@ public class LibraryDto extends AbstractBoxableDto {
   private String index2Label;
   private Long indexFamilyId;
   private String indexFamilyName;
+  private String initialVolume;
   private String volume;
   @Enumerated(EnumType.STRING)
   private VolumeUnit volumeUnits;
+  private String volumeUsed;
+  private String ngUsed;
   private List<QcDto> qcs;
   private Integer dnaSize;
   private Long kitDescriptorId;
@@ -420,6 +423,30 @@ public class LibraryDto extends AbstractBoxableDto {
 
   public void setSpikeInDilutionFactor(String spikeInDilutionFactor) {
     this.spikeInDilutionFactor = spikeInDilutionFactor;
+  }
+
+  public String getInitialVolume() {
+    return initialVolume;
+  }
+
+  public void setInitialVolume(String initialVolume) {
+    this.initialVolume = initialVolume;
+  }
+
+  public String getVolumeUsed() {
+    return volumeUsed;
+  }
+
+  public void setVolumeUsed(String volumeUsed) {
+    this.volumeUsed = volumeUsed;
+  }
+
+  public String getNgUsed() {
+    return ngUsed;
+  }
+
+  public void setNgUsed(String ngUsed) {
+    this.ngUsed = ngUsed;
   }
 
 }

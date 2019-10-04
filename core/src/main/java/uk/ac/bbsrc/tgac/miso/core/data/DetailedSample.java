@@ -1,10 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 public interface DetailedSample extends Sample, GroupIdentifiable {
 
+  @Override
   public DetailedSample getParent();
 
   public void setParent(DetailedSample parent);
@@ -93,5 +95,9 @@ public interface DetailedSample extends Sample, GroupIdentifiable {
    * @param creationDate
    */
   void setCreationDate(Date creationDate);
+
+  public BigDecimal getNgUsed();
+
+  public void setNgUsed(BigDecimal ngUsed);
 
 }

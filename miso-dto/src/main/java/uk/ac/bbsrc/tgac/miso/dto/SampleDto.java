@@ -57,6 +57,7 @@ public class SampleDto extends AbstractBoxableDto {
   private String scientificName;
   private String taxonIdentifier;
   private Long rootSampleClassId;
+  private String initialVolume;
   private String volume;
   @Enumerated(EnumType.STRING)
   private VolumeUnit volumeUnits;
@@ -217,6 +218,14 @@ public class SampleDto extends AbstractBoxableDto {
 
   public void setRootSampleClassId(Long rootSampleClassId) {
     this.rootSampleClassId = rootSampleClassId;
+  }
+
+  public String getInitialVolume() {
+    return initialVolume;
+  }
+
+  public void setInitialVolume(String initialVolume) {
+    this.initialVolume = initialVolume;
   }
 
   public String getVolume() {
