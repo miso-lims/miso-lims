@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 import org.hibernate.Session;
@@ -63,7 +64,7 @@ public class HibernateContainerQcDao implements ContainerQcStore {
   }
 
   @Override
-  public void updateEntity(long id, QcCorrespondingField correspondingField, double value, String units) throws IOException {
+  public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units) throws IOException {
     SequencerPartitionContainer container = getSequencerPartitionContainer(id);
     correspondingField.updateField(container, value, units);
     currentSession().update(container);

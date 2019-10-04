@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -50,7 +51,7 @@ public class HibernatePoolQcDaoTest extends AbstractDAOTest {
     assertNotNull(qc);
     assertEquals(1L, qc.getId());
     assertEquals("admin", qc.getCreator().getLoginName());
-    assertEquals(Double.valueOf(12.3D), qc.getResults());
+    assertTrue(new BigDecimal("12.3").compareTo(qc.getResults()) == 0);
     Calendar cal = Calendar.getInstance(); 
     cal.set(2016, 2, 18, 0, 0, 0);
     Calendar qcCal = Calendar.getInstance();
@@ -99,7 +100,7 @@ public class HibernatePoolQcDaoTest extends AbstractDAOTest {
     mockUser.setId(1L);
 
     qc.setCreator(mockUser);
-    qc.setResults(99.99);
+    qc.setResults(new BigDecimal("99.99"));
     Pool pool = new PoolImpl();
     pool.setId(1L);
     qc.setPool(pool);

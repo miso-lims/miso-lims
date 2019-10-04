@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -72,6 +73,9 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
 
   @Temporal(TemporalType.DATE)
   private Date creationDate;
+
+  private BigDecimal volumeUsed;
+  private BigDecimal ngUsed;
 
   @Transient
   private Long identityId;
@@ -226,6 +230,26 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @Override
   public void setCreationDate(Date creationDate) {
     this.creationDate = creationDate;
+  }
+
+  @Override
+  public BigDecimal getVolumeUsed() {
+    return volumeUsed;
+  }
+
+  @Override
+  public void setVolumeUsed(BigDecimal ngUsed) {
+    this.volumeUsed = ngUsed;
+  }
+
+  @Override
+  public BigDecimal getNgUsed() {
+    return ngUsed;
+  }
+
+  @Override
+  public void setNgUsed(BigDecimal ngUsed) {
+    this.ngUsed = ngUsed;
   }
 
   @Override

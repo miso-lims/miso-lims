@@ -49,10 +49,13 @@ import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -64,12 +67,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
@@ -110,7 +113,7 @@ public class LimsUtils {
       nice = "0" + nice;
     }
     if (nice.endsWith(".")) {
-      nice = nice.substring(0, nice.length() - 1);
+      nice += "0";
     }
     return nice;
   }
@@ -262,8 +265,10 @@ public class LimsUtils {
     return sample instanceof SampleAliquotSingleCell;
   }
 
-  public static boolean isSampleSlide(DetailedSample sample) {
-    return sample instanceof SampleSlide || SampleSlide.SUBCATEGORY_NAME.equals(sample.getSampleClass().getSampleSubcategory());
+  public static boolean isSampleSlide(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
+    return sample instanceof SampleSlide
+        || SampleSlide.SUBCATEGORY_NAME.equals(((DetailedSample) sample).getSampleClass().getSampleSubcategory());
   }
 
   public static boolean isDetailedLibrary(Library library) {
@@ -459,17 +464,18 @@ public class LimsUtils {
     return Arrays.stream(sets).flatMap(Collection::stream).collect(Collectors.toSet());
   }
 
-  public static String makeVolumeAndConcentrationLabel(Double volume, Double concentration, VolumeUnit volumeUnits,
+  public static String makeVolumeAndConcentrationLabel(BigDecimal volume, BigDecimal concentration, VolumeUnit volumeUnits,
       ConcentrationUnit concentrationUnits) {
     String strVolumeUnits = (volumeUnits == null ? "" : volumeUnits.getUnits());
     String strConcentrationUnits = (concentrationUnits == null ? "" : concentrationUnits.getUnits());
-    if (volume != null && volume != 0 && concentration != null && concentration != 0) {
+    if (volume != null && volume.compareTo(BigDecimal.ZERO) != 0 && concentration != null
+        && concentration.compareTo(BigDecimal.ZERO) != 0) {
       return String.format("%.0f%s@%.0f%s", volume, strVolumeUnits, concentration, strConcentrationUnits);
     }
-    if (volume != null && volume != 0) {
+    if (volume != null && volume.compareTo(BigDecimal.ZERO) != 0) {
       return String.format("%.0f%s", volume, strVolumeUnits);
     }
-    if (concentration != null && concentration != 0) {
+    if (concentration != null && concentration.compareTo(BigDecimal.ZERO) != 0) {
       return String.format("%.0f%s", concentration, strConcentrationUnits);
     }
     return null;
@@ -519,4 +525,38 @@ public class LimsUtils {
     return (commonPrefix.length() > 0) ? commonPrefix.toString() : null;
 
   }
+
+  /**
+   * Update the volume of the entity's parent based on the entity's volumeUsed property
+   * 
+   * @param entity the child entity
+   * @param beforeChange the child entity before the current change; null if the child entity is just being created
+   */
+  public static void updateParentVolume(HierarchyEntity entity, HierarchyEntity beforeChange, User changeUser) {
+    HierarchyEntity parent = entity.getParent();
+    if (parent == null || parent.getVolume() == null) {
+      return;
+    }
+    if (beforeChange == null) {
+      if (entity.getVolumeUsed() != null) {
+        updateParentVolume(parent, parent.getVolume().subtract(entity.getVolumeUsed()), changeUser);
+      }
+    } else {
+      if (entity.getVolumeUsed() != null && beforeChange.getVolumeUsed() != null) {
+        if (entity.getVolumeUsed().compareTo(beforeChange.getVolumeUsed()) != 0) {
+          updateParentVolume(parent, parent.getVolume().add(beforeChange.getVolumeUsed()).subtract(entity.getVolumeUsed()), changeUser);
+        }
+      } else if (beforeChange.getVolumeUsed() != null) {
+        updateParentVolume(parent, parent.getVolume().add(beforeChange.getVolumeUsed()), changeUser);
+      } else if (entity.getVolumeUsed() != null) {
+        updateParentVolume(parent, parent.getVolume().subtract(entity.getVolumeUsed()), changeUser);
+      }
+    }
+  }
+
+  private static void updateParentVolume(HierarchyEntity parent, BigDecimal value, User changeUser) {
+    parent.setChangeDetails(changeUser);
+    parent.setVolume(value);
+  }
+
 }

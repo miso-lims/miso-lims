@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -189,7 +190,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   @Override
   public long create(Pool pool) throws IOException {
     if (pool.isDiscarded()) {
-      pool.setVolume(0.0);
+      pool.setVolume(BigDecimal.ZERO);
     }
     if (pool.getConcentration() == null) {
       pool.setConcentrationUnits(null);
@@ -222,7 +223,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   @Override
   public long update(Pool pool) throws IOException {
     if (pool.isDiscarded()) {
-      pool.setVolume(0.0);
+      pool.setVolume(BigDecimal.ZERO);
     }
     if (pool.getConcentration() == null) {
       pool.setConcentrationUnits(null);
@@ -243,7 +244,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     managed.setDiscarded(pool.isDiscarded());
     managed.setCreationDate(pool.getCreationDate());
     if (pool.isDiscarded() || pool.isDistributed()) {
-      managed.setVolume(0.0);
+      managed.setVolume(BigDecimal.ZERO);
     } else {
       managed.setVolume(pool.getVolume());
     }

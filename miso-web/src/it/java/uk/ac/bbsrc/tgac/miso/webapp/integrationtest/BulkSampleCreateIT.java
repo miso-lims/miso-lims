@@ -60,19 +60,22 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
   // columns specific to creating gDNA stocks
   private static final Set<String> gDnaStockColumns = Sets.newHashSet(SamColumns.STR_STATUS, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
-      SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
+      SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.PARENT_NG_USED, SamColumns.PARENT_VOLUME_USED);
 
   // columns specific to creating RNA stocks
   private static final Set<String> rnaStockColumns = Sets.newHashSet(SamColumns.STR_STATUS, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
-      SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.DNASE_TREATED);
+      SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.DNASE_TREATED, SamColumns.PARENT_NG_USED,
+      SamColumns.PARENT_VOLUME_USED);
 
   private static final Set<String> singleCellStockColumns = Sets.newHashSet(SamColumns.TARGET_CELL_RECOVERERY, SamColumns.CELL_VIABILITY,
-      SamColumns.LOADING_CELL_CONC);
+      SamColumns.LOADING_CELL_CONC, SamColumns.PARENT_NG_USED, SamColumns.PARENT_VOLUME_USED);
 
   // columns specific to creating aliquots
-  private static final Set<String> aliquotColumns = Sets.newHashSet(SamColumns.PURPOSE);
+  private static final Set<String> aliquotColumns = Sets.newHashSet(SamColumns.PURPOSE, SamColumns.PARENT_NG_USED,
+      SamColumns.PARENT_VOLUME_USED);
 
-  private static final Set<String> singleCellAliquotColumns = Sets.newHashSet(SamColumns.INPUT_INTO_LIBRARY);
+  private static final Set<String> singleCellAliquotColumns = Sets.newHashSet(SamColumns.INPUT_INTO_LIBRARY, SamColumns.PARENT_NG_USED,
+      SamColumns.PARENT_VOLUME_USED);
 
   @Before
   public void setup() {

@@ -191,7 +191,7 @@ HotTarget.libraryTemplate = (function() {
                 });
               }
             }
-          }, HotUtils.makeColumnForFloat('Default Volume', true, 'defaultVolume', false)];
+          }, HotUtils.makeColumnForDecimal('Default Volume', true, 'defaultVolume', 14, 10, false, false)];
     },
 
     getBulkActions: function(config) {

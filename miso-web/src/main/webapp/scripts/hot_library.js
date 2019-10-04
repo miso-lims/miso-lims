@@ -670,29 +670,9 @@ HotTarget.library = (function() {
           },
           HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
           HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false),
-          {
-            header: 'Volume',
-            data: 'volume',
-            type: 'text',
-            include: config.showVolume,
-            unpack: function(obj, flat, setCellMeta) {
-              flat['volume'] = Utils.valOrNull(obj['volume']);
-            },
-            validator: HotUtils.validator.optionalNumber,
-            pack: function(obj, flat, errorHandler) {
-              var output;
-              if (Utils.validation.isEmpty(flat['volume'])) {
-                output = null;
-              } else {
-                var result = parseFloat(flat['volume']);
-                if (isNaN(result)) {
-                  errorHandler('Volume' + ' is not a number.');
-                  return;
-                }
-                output = result;
-              }
-              obj['volume'] = output;
-            },
+          HotUtils.makeColumnForDecimal('Initial Volume', config.pageMode === 'edit' && config.showVolume, 'initialVolume', 14, 10, false,
+              true),
+          HotUtils.makeColumnForDecimal('Volume', config.showVolume, 'volume', 14, 10, false, true, {
             depends: 'templateAlias',
             update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               var projectId = getProjectId(lib, flat, config);
@@ -703,7 +683,7 @@ HotTarget.library = (function() {
                 setData(null);
               }
             }
-          },
+          }),
           {
             header: 'Vol. Units',
             data: 'volumeUnits',
@@ -728,7 +708,10 @@ HotTarget.library = (function() {
               obj['volumeUnits'] = !!units ? units.name : null;
             }
           },
-          HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false),
+          HotUtils.makeColumnForDecimal('Parent ng Used', config.showVolume && !config.isLibraryReceipt, 'ngUsed', 14, 10, false, false),
+          HotUtils.makeColumnForDecimal('Parent Vol. Used', config.showVolume && !config.isLibraryReceipt, 'volumeUsed', 14, 10, false,
+              false),
+          HotUtils.makeColumnForDecimal('Conc.', true, 'concentration', 14, 10, false, false),
           {
             header: 'Conc. Units',
             data: 'concentrationUnits',

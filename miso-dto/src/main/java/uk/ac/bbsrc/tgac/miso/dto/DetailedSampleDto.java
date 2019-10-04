@@ -27,6 +27,8 @@ public class DetailedSampleDto extends SampleDto {
   private String effectiveGroupId;
   private String effectiveGroupIdSample;
   private String creationDate;
+  private String volumeUsed;
+  private String ngUsed;
 
   public Long getParentId() {
     return parentId;
@@ -211,6 +213,22 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setSampleSubcategory(String sampleSubcategory) {
     this.sampleSubcategory = sampleSubcategory;
+  }
+
+  public String getVolumeUsed() {
+    return volumeUsed;
+  }
+
+  public void setVolumeUsed(String volumeUsed) {
+    this.volumeUsed = volumeUsed;
+  }
+
+  public String getNgUsed() {
+    return ngUsed;
+  }
+
+  public void setNgUsed(String ngUsed) {
+    this.ngUsed = ngUsed;
   }
 
 }

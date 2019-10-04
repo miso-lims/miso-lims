@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage.QcColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
@@ -158,12 +162,10 @@ public class BulkLibraryQCIT extends AbstractIT {
     LibraryQC saved = (LibraryQC) c.uniqueResult();
     assertQCAttributes(attrs, saved);
     
-    assertTrue(String.format("Expected volume to be updated to %f, instead got %f", Double.parseDouble("10.43"), saved.getLibrary().getVolume()),
-        saved.getLibrary().getVolume().equals(Double.parseDouble("10.43")));
-    assertTrue(
-        String.format("Expected volume units to be updated to %s, instead got %s", "&#181;L",
-            saved.getLibrary().getVolumeUnits().getUnits()),
-        saved.getLibrary().getVolumeUnits().getUnits().equals("&#181;L"));
+    assertEquals(String.format("Expected volume to be updated to %s, instead got %f", "10.43", saved.getLibrary().getVolume()), 0,
+        saved.getLibrary().getVolume().compareTo(new BigDecimal("10.43")));
+    assertEquals(String.format("Expected volume units to be updated to %s, instead got %s", VolumeUnit.MICROLITRES.getUnits(),
+        saved.getLibrary().getVolumeUnits().getUnits()), VolumeUnit.MICROLITRES, saved.getLibrary().getVolumeUnits());
   }
 
   @Test
@@ -192,14 +194,11 @@ public class BulkLibraryQCIT extends AbstractIT {
     LibraryQC saved = (LibraryQC) c.uniqueResult();
     assertQCAttributes(attrs, saved);
     
-    assertTrue(
-        String.format("Expected concentration to be updated to %f, instead got %f", Double.parseDouble("24.78"),
-            saved.getLibrary().getConcentration()),
-        saved.getLibrary().getConcentration().equals(Double.parseDouble("24.78")));
-    assertTrue(
-        String.format("Expected concentration units to be updated to %s, instead got %s", "nM",
-            saved.getLibrary().getConcentrationUnits().getUnits()),
-        saved.getLibrary().getConcentrationUnits().getUnits().equals("nM"));
+    assertEquals(
+        String.format("Expected concentration to be updated to %s, instead got %f", "24.78", saved.getLibrary().getConcentration()), 0,
+        saved.getLibrary().getConcentration().compareTo(new BigDecimal("24.78")));
+    assertEquals(String.format("Expected concentration units to be updated to %s, instead got %s", ConcentrationUnit.NANOMOLAR.getUnits(),
+        saved.getLibrary().getConcentrationUnits().getUnits()), ConcentrationUnit.NANOMOLAR, saved.getLibrary().getConcentrationUnits());
   }
   
   private void saveAndAssertSuccess(HandsOnTable table) {
@@ -232,7 +231,7 @@ public class BulkLibraryQCIT extends AbstractIT {
   private void assertQCAttributes(Map<String, String> attributes, LibraryQC libraryQc) {
     testQCAttribute(QcColumns.DATE, attributes, libraryQc, qc -> qc.getDate().toString());
     testQCAttribute(QcColumns.TYPE, attributes, libraryQc, qc -> qc.getType().getName());
-    testQCAttribute(QcColumns.RESULT, attributes, libraryQc, qc -> qc.getResults().toString());
+    testQCAttribute(QcColumns.RESULT, attributes, libraryQc, qc -> LimsUtils.toNiceString(qc.getResults()));
     testQCAttribute(QcColumns.UNITS, attributes, libraryQc, qc -> qc.getType().getUnits());
   }
 

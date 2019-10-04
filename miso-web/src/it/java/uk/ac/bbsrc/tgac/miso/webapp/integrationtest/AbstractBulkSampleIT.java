@@ -14,22 +14,22 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissuePieceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissuePieceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
@@ -153,9 +153,9 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertAnalyteAttributes(Map<String, String> attributes, DetailedSample sample) {
-    assertEntityAttribute(SamColumns.VOLUME, attributes, sample, s -> s.getVolume() == null ? "" : s.getVolume().toString());
+    assertEntityAttribute(SamColumns.VOLUME, attributes, sample, s -> s.getVolume() == null ? "" : LimsUtils.toNiceString(s.getVolume()));
     assertEntityAttribute(SamColumns.CONCENTRATION, attributes, sample,
-        s -> s.getConcentration() == null ? "" : s.getConcentration().toString());
+        s -> s.getConcentration() == null ? "" : LimsUtils.toNiceString(s.getConcentration()));
   }
 
   protected void assertStockAttributes(Map<String, String> attributes, SampleStock sample) {

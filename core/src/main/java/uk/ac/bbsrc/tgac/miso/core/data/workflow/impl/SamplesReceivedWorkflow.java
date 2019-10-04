@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -276,7 +277,7 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
       concStep = step;
     }
 
-    public double getConcentration() {
+    public BigDecimal getConcentration() {
       return concStep.getInput();
     }
 
@@ -318,7 +319,7 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
       volumeStep = step;
     }
 
-    public double getVolume() {
+    public BigDecimal getVolume() {
       return volumeStep.getInput();
     }
 
@@ -681,7 +682,7 @@ public class SamplesReceivedWorkflow extends AbstractWorkflow {
       qcStep = step;
     }
     
-    public double getQCValue() {
+    public BigDecimal getQCValue() {
       return qcStep.getInput();
     }
   }

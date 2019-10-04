@@ -41,7 +41,6 @@ public class SamplePage extends FormPage<SamplePage.Field> {
     LAB(By.id("sampleForm_lab")), //
     TISSUE_MATERIAL(By.id("sampleForm_tissueMaterial")), //
     REGION(By.id("sampleForm_region")), //
-    SLIDES_REMAINING(By.id("sampleForm_slidesRemaining")), //
     SLIDES(By.id("sampleForm_slides")), //
     DISCARDS(By.id("sampleForm_discards")), //
     THICKNESS(By.id("sampleForm_thickness")), //

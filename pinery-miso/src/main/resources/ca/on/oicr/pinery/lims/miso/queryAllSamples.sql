@@ -51,7 +51,7 @@ SELECT s.alias NAME
         ,s.scientificName organism
         ,subp.alias subproject
         ,it.alias institute
-        ,slide.slides slides
+        ,slide.initialSlides slides
         ,slide.discards discards
         ,stain.name stain
         ,piece.slidesConsumed slides_consumed

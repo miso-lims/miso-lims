@@ -275,7 +275,8 @@ public class PoolRestController extends RestController {
           .allMatch(view -> view.getAliquotVolumeUsed() != null)) {
         pool.setVolume(pool.getPoolContents().stream()
             .map(PoolElement::getPoolableElementView)
-            .mapToDouble(PoolableElementView::getAliquotVolumeUsed).sum());
+            .map(PoolableElementView::getAliquotVolumeUsed)
+            .reduce(BigDecimal.ZERO, (result, item) -> result.add(item)));
       }
       return pool;
     }, poolService, this::makePoolDto);

@@ -48,6 +48,7 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String SECONDARY_ID = "Secondary ID";
     public static final String TISSUE_MATERIAL = "Material";
     public static final String REGION = "Region";
+    public static final String INITIAL_SLIDES = "Initial Slides";
     public static final String SLIDES = "Slides";
     public static final String DISCARDS = "Discards";
     public static final String THICKNESS = "Thickness";
@@ -55,8 +56,11 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String PIECE_TYPE = "Piece Type";
     public static final String SLIDES_CONSUMED = "Slides Consumed";
     public static final String STR_STATUS = "STR Status";
+    public static final String INITIAL_VOLUME = "Initial Volume";
     public static final String VOLUME = "Volume";
     public static final String VOLUME_UNITS = "Vol. Units";
+    public static final String PARENT_NG_USED = "Parent ng Used";
+    public static final String PARENT_VOLUME_USED = "Parent Vol. Used";
     public static final String CONCENTRATION = "Concentration";
     public static final String CONCENTRATION_UNITS = "Conc. Units";
     public static final String QC_STATUS = "QC Status";

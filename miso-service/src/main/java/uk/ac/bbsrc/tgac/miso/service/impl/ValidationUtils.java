@@ -9,9 +9,9 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -31,17 +31,6 @@ public class ValidationUtils {
     throw new IllegalStateException("Static util class not intended for instantiation");
   }
 
-  public static Map<String, Integer> adjustNameLength(Map<String, Integer> input, NamingScheme scheme) {
-    return adjustLength(input, "name", scheme.nameLengthAdjustment());
-  }
-
-  public static Map<String, Integer> adjustLength(Map<String, Integer> input, String name, Integer validationLength) {
-    if (validationLength != null) {
-      input.put(name, input.containsKey(name) ? Math.min(input.get(name), validationLength) : validationLength);
-    }
-    return input;
-  }
-
   public static <T extends Barcodable> void validateBarcodeUniqueness(T barcodable, T beforeChange,
       WhineyFunction<String, T> lookupByBarcode,
       Collection<ValidationError> errors, String typeLabel) throws IOException {
@@ -59,14 +48,14 @@ public class ValidationUtils {
     }
   }
 
-  public static void validateConcentrationUnits(Double concentration, ConcentrationUnit units, Collection<ValidationError> errors) {
-    if (concentration != null && concentration > 0D && units == null) {
+  public static void validateConcentrationUnits(BigDecimal concentration, ConcentrationUnit units, Collection<ValidationError> errors) {
+    if (concentration != null && concentration.compareTo(BigDecimal.ZERO) > 0 && units == null) {
       errors.add(new ValidationError("concentrationUnits", "Concentration units must be specified"));
     }
   }
 
-  public static void validateVolumeUnits(Double volume, VolumeUnit units, Collection<ValidationError> errors) {
-    if (volume != null && volume > 0D && units == null) {
+  public static void validateVolumeUnits(BigDecimal volume, VolumeUnit units, Collection<ValidationError> errors) {
+    if (volume != null && volume.compareTo(BigDecimal.ZERO) > 0 && units == null) {
       errors.add(new ValidationError("volumeUnits", "Volume units must be specified"));
     }
   }
@@ -144,6 +133,12 @@ public class ValidationUtils {
         throw new ValidationException(new ValidationError(property, "Invalid item ID: " + childEntity.getId()));
       }
     }
+  }
+
+  public static ValidationException rewriteParentErrors(ValidationException original) {
+    return new ValidationException(original.getErrors().stream()
+        .map(err -> new ValidationError(String.format("Parent %s: %s", err.getProperty(), err.getMessage())))
+        .collect(Collectors.toList()));
   }
 
 }

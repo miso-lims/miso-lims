@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl.util;
 
 import static org.junit.Assert.*;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -82,7 +83,7 @@ public class TimeShiftingInterceptorTest extends AbstractDAOTest {
     UserImpl user = new UserImpl();
     user.setId(1L);
     user.setFullName("me");
-    ldi.setConcentration(0D);
+    ldi.setConcentration(BigDecimal.ZERO);
     ldi.setLibrary((Library) session.get(LibraryImpl.class, 1L));
     Date date = formatter.parse("2017-02-13", Locale.CANADA);
     ldi.setCreationDate(date);

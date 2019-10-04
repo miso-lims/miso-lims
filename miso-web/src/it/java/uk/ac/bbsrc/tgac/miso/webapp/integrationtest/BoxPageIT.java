@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.assertFieldValues;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -277,7 +278,7 @@ public class BoxPageIT extends AbstractIT {
 
     LibraryAliquot boxable = (LibraryAliquot) getSession().get(LibraryAliquot.class, 504L);
     assertTrue("check that boxable is discarded", boxable.isDiscarded());
-    assertTrue("check that boxable volume is null", boxable.getVolume().equals(Double.valueOf(0D)));
+    assertEquals("check that boxable volume is null", 0, boxable.getVolume().compareTo(BigDecimal.ZERO));
     assertEquals("check that boxable location is empty", "EMPTY", BoxUtils.makeLocationLabel(boxable));
   }
 

@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 import org.hibernate.Session;
@@ -73,7 +74,7 @@ public class HibernateSampleQcDao implements SampleQcStore {
   }
 
   @Override
-  public void updateEntity(long id, QcCorrespondingField correspondingField, double value, String units) throws IOException {
+  public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units) throws IOException {
     SampleImpl sample = getSample(id);
     sample.updateFromQc(correspondingField, value, units);
     currentSession().update(sample);

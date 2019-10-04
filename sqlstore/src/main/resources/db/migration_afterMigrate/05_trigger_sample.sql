@@ -19,8 +19,9 @@ FOR EACH ROW
     CASE WHEN NEW.scientificName <> OLD.scientificName THEN CONCAT('scientific name: ', OLD.scientificName, ' → ', NEW.scientificName) END,
     CASE WHEN (NEW.taxonIdentifier IS NULL) <> (OLD.taxonIdentifier IS NULL) OR NEW.taxonIdentifier <> OLD.taxonIdentifier THEN CONCAT('taxon: ', COALESCE(OLD.taxonIdentifier, 'n/a'), ' → ', COALESCE(NEW.taxonIdentifier, 'n/a')) END,
     CASE WHEN NEW.discarded <> OLD.discarded THEN CONCAT('discarded: ', IF(OLD.discarded = 0, 'No', 'Yes'), ' → ', IF(NEW.discarded = 0, 'No', 'Yes')) END,
-    CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN CONCAT('concentration: ', COALESCE(OLD.concentration, 'n/a'), ' → ', COALESCE(NEW.concentration, 'n/a')) END, 
-    CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(OLD.volume, 'n/a'), ' → ', COALESCE(NEW.volume, 'n/a')) END,
+    CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN CONCAT('concentration: ', COALESCE(decimalToString(OLD.concentration), 'n/a'), ' → ', COALESCE(decimalToString(NEW.concentration), 'n/a')) END, 
+    CASE WHEN (NEW.initialVolume IS NULL) <> (OLD.initialVolume IS NULL) OR NEW.initialVolume <> OLD.initialVolume THEN CONCAT('initial volume: ', COALESCE(decimalToString(OLD.initialVolume), 'n/a'), ' → ', COALESCE(decimalToString(NEW.initialVolume), 'n/a')) END,
+    CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(decimalToString(OLD.volume), 'n/a'), ' → ', COALESCE(decimalToString(NEW.volume), 'n/a')) END,
     CASE WHEN (NEW.concentrationUnits IS NULL) <> (OLD.concentrationUnits IS NULL) OR NEW.concentrationUnits <> OLD.concentrationUnits THEN CONCAT('concentration units: ', COALESCE(OLD.concentrationUnits, 'n/a'), ' → ', COALESCE(NEW.concentrationUnits, 'n/a')) END,
     CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT('volume units: ', COALESCE(OLD.volumeUnits, 'n/a'), ' → ', COALESCE(NEW.volumeUnits, 'n/a')) END,
     CASE WHEN NEW.distributed <> OLD.distributed THEN CONCAT('distributed: ', IF(OLD.distributed = 0, 'No', 'Yes'), ' → ', IF(NEW.distributed = 0, 'No', 'Yes')) END,
@@ -43,6 +44,7 @@ FOR EACH ROW
         CASE WHEN (NEW.taxonIdentifier IS NULL) <> (OLD.taxonIdentifier IS NULL) OR NEW.taxonIdentifier <> OLD.taxonIdentifier THEN 'taxonIdentifier' END,
         CASE WHEN NEW.discarded <> OLD.discarded THEN 'discarded' END,
         CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN 'concentration' END,
+        CASE WHEN (NEW.initialVolume IS NULL) <> (OLD.initialVolume IS NULL) OR NEW.initialVolume <> OLD.initialVolume THEN 'initial volume' END,
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN 'volume' END,
         CASE WHEN (NEW.concentrationUnits IS NULL) <> (OLD.concentrationUnits IS NULL) OR NEW.concentrationUnits <> OLD.concentrationUnits THEN CONCAT(NEW.name, ' concentrationUnits') END,
         CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT(NEW.name, ' volumeUnits') END,
@@ -72,7 +74,9 @@ FOR EACH ROW
      CASE WHEN (NEW.detailedQcStatusNote IS NULL) <> (OLD.detailedQcStatusNote IS NULL) OR NEW.detailedQcStatusNote <> OLD.detailedQcStatusNote THEN CONCAT('QC Status Note: ', COALESCE(OLD.detailedQcStatusNote, 'n/a'), ' → ', COALESCE(NEW.detailedQcStatusNote, 'n/a')) END,
      CASE WHEN NEW.sampleClassId <> OLD.sampleClassId THEN CONCAT('class: ', (SELECT alias FROM SampleClass WHERE sampleClassId = OLD.sampleClassId), ' → ', (SELECT alias FROM SampleClass WHERE sampleClassId = NEW.sampleClassId)) END,
      CASE WHEN (NEW.subprojectId IS NULL) <> (OLD.subprojectId IS NULL) OR NEW.subprojectId <> OLD.subprojectId THEN CONCAT('subproject: ', COALESCE((SELECT alias FROM Subproject WHERE subprojectId = OLD.subprojectId), 'n/a'), ' → ', COALESCE((SELECT alias FROM Subproject WHERE subprojectId = NEW.subprojectId), 'n/a')) END,
-    CASE WHEN (NEW.creationDate IS NULL) <> (OLD.creationDate IS NULL) OR NEW.creationDate <> OLD.creationDate THEN CONCAT('creationDate: ', COALESCE(OLD.creationDate, 'n/a'), ' → ', COALESCE(NEW.creationDate, 'n/a')) END);
+     CASE WHEN (NEW.volumeUsed IS NULL) <> (OLD.volumeUsed IS NULL) OR NEW.volumeUsed <> OLD.volumeUsed THEN CONCAT('volume used: ', COALESCE(decimalToString(OLD.volumeUsed), 'n/a'), ' → ', COALESCE(decimalToString(NEW.volumeUsed), 'n/a')) END,
+     CASE WHEN (NEW.ngUsed IS NULL) <> (OLD.ngUsed IS NULL) OR NEW.ngUsed <> OLD.ngUsed THEN CONCAT('ng used: ', COALESCE(decimalToString(OLD.ngUsed), 'n/a'), ' → ', COALESCE(decimalToString(NEW.ngUsed), 'n/a')) END,
+     CASE WHEN (NEW.creationDate IS NULL) <> (OLD.creationDate IS NULL) OR NEW.creationDate <> OLD.creationDate THEN CONCAT('creationDate: ', COALESCE(OLD.creationDate, 'n/a'), ' → ', COALESCE(NEW.creationDate, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) 
     SELECT
@@ -86,6 +90,8 @@ FOR EACH ROW
         CASE WHEN (NEW.detailedQcStatusNote IS NULL) <> (OLD.detailedQcStatusNote IS NULL) OR NEW.detailedQcStatusNote <> OLD.detailedQcStatusNote THEN 'detailedQcStatusNote' END,
         CASE WHEN NEW.sampleClassId <> OLD.sampleClassId THEN 'sampleClassId' END,
         CASE WHEN (NEW.subprojectId IS NULL) <> (OLD.subprojectId IS NULL) OR NEW.subprojectId <> OLD.subprojectId THEN 'subprojectId' END,
+        CASE WHEN (NEW.volumeUsed IS NULL) <> (OLD.volumeUsed IS NULL) OR NEW.volumeUsed <> OLD.volumeUsed THEN 'volume used' END,
+        CASE WHEN (NEW.ngUsed IS NULL) <> (OLD.ngUsed IS NULL) OR NEW.ngUsed <> OLD.ngUsed THEN 'ng used' END,
         CASE WHEN (NEW.creationDate IS NULL) <> (OLD.creationDate IS NULL) OR NEW.creationDate <> OLD.creationDate THEN 'creationDate' END
       ), ''),
       lastModifier,
@@ -253,7 +259,7 @@ FOR EACH ROW
   BEGIN
 	DECLARE log_message varchar(500) CHARACTER SET utf8;
     SET log_message = CONCAT_WS(', ',
-      CASE WHEN (NEW.initialCellConcentration IS NULL) <> (OLD.initialCellConcentration IS NULL) OR NEW.initialCellConcentration <> OLD.initialCellConcentration THEN CONCAT('initial cell concentration: ', COALESCE(OLD.initialCellConcentration, 'n/a'), ' → ', COALESCE(NEW.initialCellConcentration, 'n/a')) END,
+      CASE WHEN (NEW.initialCellConcentration IS NULL) <> (OLD.initialCellConcentration IS NULL) OR NEW.initialCellConcentration <> OLD.initialCellConcentration THEN CONCAT('initial cell concentration: ', COALESCE(decimalToString(OLD.initialCellConcentration), 'n/a'), ' → ', COALESCE(decimalToString(NEW.initialCellConcentration), 'n/a')) END,
       CASE WHEN NEW.digestion <> OLD.digestion THEN CONCAT('digestion: ', OLD.digestion, ' → ', NEW.digestion) END);
     IF log_message IS NOT NULL AND log_message <> '' THEN
       INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
@@ -276,9 +282,9 @@ FOR EACH ROW
   BEGIN
 	DECLARE log_message varchar(500) CHARACTER SET utf8;
     SET log_message = CONCAT_WS(', ',
-      CASE WHEN (NEW.targetCellRecovery IS NULL) <> (OLD.targetCellRecovery IS NULL) OR NEW.targetCellRecovery <> OLD.targetCellRecovery THEN CONCAT('target cell recovery: ', COALESCE(OLD.targetCellRecovery, 'n/a'), ' → ', COALESCE(NEW.targetCellRecovery, 'n/a')) END,
-      CASE WHEN (NEW.cellViability IS NULL) <> (OLD.cellViability IS NULL) OR NEW.cellViability <> OLD.cellViability THEN CONCAT('cell viability: ', COALESCE(OLD.cellViability, 'n/a'), ' → ', COALESCE(NEW.cellViability, 'n/a')) END,
-      CASE WHEN (NEW.loadingCellConcentration IS NULL) <> (OLD.loadingCellConcentration IS NULL) OR NEW.loadingCellConcentration <> OLD.loadingCellConcentration THEN CONCAT('loading cell concentration: ', COALESCE(OLD.loadingCellConcentration, 'n/a'), ' → ', COALESCE(NEW.loadingCellConcentration, 'n/a')) END);
+      CASE WHEN (NEW.targetCellRecovery IS NULL) <> (OLD.targetCellRecovery IS NULL) OR NEW.targetCellRecovery <> OLD.targetCellRecovery THEN CONCAT('target cell recovery: ', COALESCE(decimalToString(OLD.targetCellRecovery), 'n/a'), ' → ', COALESCE(decimalToString(NEW.targetCellRecovery), 'n/a')) END,
+      CASE WHEN (NEW.cellViability IS NULL) <> (OLD.cellViability IS NULL) OR NEW.cellViability <> OLD.cellViability THEN CONCAT('cell viability: ', COALESCE(decimalToString(OLD.cellViability), 'n/a'), ' → ', COALESCE(decimalToString(NEW.cellViability), 'n/a')) END,
+      CASE WHEN (NEW.loadingCellConcentration IS NULL) <> (OLD.loadingCellConcentration IS NULL) OR NEW.loadingCellConcentration <> OLD.loadingCellConcentration THEN CONCAT('loading cell concentration: ', COALESCE(decimalToString(OLD.loadingCellConcentration), 'n/a'), ' → ', COALESCE(decimalToString(NEW.loadingCellConcentration), 'n/a')) END);
     IF log_message IS NOT NULL AND log_message <> '' THEN
       INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
       SELECT
@@ -301,7 +307,7 @@ FOR EACH ROW
   BEGIN
     DECLARE log_message varchar(500) CHARACTER SET utf8;
     SET log_message = CONCAT_WS(', ',
-      CASE WHEN (NEW.inputIntoLibrary IS NULL) <> (OLD.inputIntoLibrary IS NULL) OR NEW.inputIntoLibrary <> OLD.inputIntoLibrary THEN CONCAT('input into library: ', COALESCE(OLD.inputIntoLibrary, 'n/a'), ' → ', COALESCE(NEW.inputIntoLibrary, 'n/a')) END);
+      CASE WHEN (NEW.inputIntoLibrary IS NULL) <> (OLD.inputIntoLibrary IS NULL) OR NEW.inputIntoLibrary <> OLD.inputIntoLibrary THEN CONCAT('input into library: ', COALESCE(decimalToString(OLD.inputIntoLibrary), 'n/a'), ' → ', COALESCE(decimalToString(NEW.inputIntoLibrary), 'n/a')) END);
     IF log_message IS NOT NULL AND log_message <> '' THEN
       INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
       SELECT

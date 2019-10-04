@@ -44,8 +44,11 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String KIT_DESCRIPTOR = "Kit";
     public static final String QC_PASSED = "QC Passed?";
     public static final String SIZE = "Size (bp)";
+    public static final String INITIAL_VOLUME = "Initial Volume";
     public static final String VOLUME = "Volume";
     public static final String VOLUME_UNITS = "Vol. Units";
+    public static final String PARENT_NG_USED = "Parent ng Used";
+    public static final String PARENT_VOLUME_USED = "Parent Vol. Used";
     public static final String CONCENTRATION = "Conc.";
     public static final String CONCENTRATION_UNITS = "Conc. Units";
     public static final String CREATION_DATE = "Date of creation";

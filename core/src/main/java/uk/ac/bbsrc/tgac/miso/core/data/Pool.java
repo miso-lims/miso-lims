@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
@@ -89,16 +90,16 @@ public interface Pool
   /**
    * Returns the concentration of this Pool object.
    * 
-   * @return Double concentration.
+   * @return concentration.
    */
-  public Double getConcentration();
+  public BigDecimal getConcentration();
 
   /**
    * Sets the concentration of this Pool object.
    * 
-   * @param concentration concentration.
+   * @param concentration
    */
-  public void setConcentration(Double concentration);
+  public void setConcentration(BigDecimal concentration);
 
   /**
    * Returns the platformType of this Platform object.

@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -21,7 +22,7 @@ public abstract class AbstractBoxable implements Boxable {
   @Column(name = "discarded")
   private boolean discarded;
   @Column(nullable = true)
-  private Double volume;
+  private BigDecimal volume;
 
   private boolean distributed;
   @Temporal(TemporalType.DATE)
@@ -29,12 +30,12 @@ public abstract class AbstractBoxable implements Boxable {
   private String distributionRecipient;
 
   @Override
-  public Double getVolume() {
+  public BigDecimal getVolume() {
     return volume;
   }
 
   @Override
-  public void setVolume(Double volume) {
+  public void setVolume(BigDecimal volume) {
     this.volume = volume;
   }
 
@@ -45,7 +46,7 @@ public abstract class AbstractBoxable implements Boxable {
 
   @Override
   public void setDiscarded(boolean discarded) {
-    if (discarded) volume = 0.0;
+    if (discarded) volume = BigDecimal.ZERO;
     this.discarded = discarded;
   }
 

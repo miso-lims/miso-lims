@@ -526,9 +526,9 @@ INSERT INTO SampleTissueProcessing(sampleId) VALUES
 (3),(4),(5),
 (4443), (4444);
 
-INSERT INTO `SampleSlide` (sampleId, slides) VALUES
-(3, 15),
-(4443, 3);
+INSERT INTO `SampleSlide` (sampleId, initialSlides, slides) VALUES
+(3, 15, 15),
+(4443, 3, 3);
 
 INSERT INTO `SampleTissuePiece` (sampleId, tissuePieceType, slidesConsumed) VALUES
 (5, 1, 10),

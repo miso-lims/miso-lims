@@ -108,6 +108,7 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder> implement
   public List<PoolOrder> getAllByPoolId(long poolId) {
     Criteria criteria = currentSession().createCriteria(PoolOrder.class);
     criteria.add(Restrictions.eq(FIELD_POOL, poolId));
+    @SuppressWarnings("unchecked")
     List<PoolOrder> list = criteria.list();
     return list;
   }

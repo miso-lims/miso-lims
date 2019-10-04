@@ -182,7 +182,7 @@ HotTarget.pool = (function() {
         pack: function(pool, flat, errorHandler) {
           pool.creationDate = flat.creationDate;
         }
-      }, HotUtils.makeColumnForFloat('Concentration', true, 'concentration', false), {
+      }, HotUtils.makeColumnForDecimal('Concentration', true, 'concentration', 14, 10, false, false), {
         header: 'Conc. Units',
         data: 'concentrationUnits',
         type: 'dropdown',
@@ -205,7 +205,7 @@ HotTarget.pool = (function() {
           });
           obj['concentrationUnits'] = !!units ? units.name : null;
         }
-      }, HotUtils.makeColumnForFloat('Volume', true, 'volume', false), {
+      }, HotUtils.makeColumnForDecimal('Volume', true, 'volume', 14, 10, false, true), {
         header: 'Vol. Units',
         data: 'volumeUnits',
         type: 'dropdown',
@@ -275,135 +275,105 @@ HotTarget.pool = (function() {
             var errors = [];
             return errors;
           }),
-          HotUtils.spreadsheetAction('/miso/rest/pools/contents/spreadsheet', Constants.libraryAliquotSpreadsheets, function(aliquots, spreadsheet) {
+          HotUtils.spreadsheetAction('/miso/rest/pools/contents/spreadsheet', Constants.libraryAliquotSpreadsheets, function(aliquots,
+              spreadsheet) {
             var errors = [];
             return errors;
           }, 'Download Contents'),
           {
-           name: "Create Samplesheet",
-           action: function(pools) {
-             var platformTypes = Utils.array.deduplicateString(
-               pools.map(function(pool) {
-                 return pool.platformType;
-               })
-             );
-             if (platformTypes.length > 1) {
-               Utils.showOkDialog("Error", [
-                 "Cannot create a sample sheet from pools for different platforms."
-               ]);
-               return;
-             }
-             if (platformTypes[0] != "ILLUMINA") {
-               Utils.showOkDialog("Error", [
-                 "Can only create sample sheets for Illumina sequencers."
-               ]);
-               return;
-             }
-             var instrumentModels = Constants.instrumentModels.filter(function(model) {
-               return (
-                 model.instrumentType == "SEQUENCER" &&
-                 model.platformType == platformTypes[0] &&
-                 model.active
-               );
-             });
-             if (instrumentModels.length == 0) {
-               Utils.showOkDialog("Error", [
-                 "No instruments are available for these pools.",
-                 "Please add a sequencer first."
-               ]);
-               return;
-             }
-             function showCreateDialog(modelId) {
-               Utils.showDialog(
-                 "Create Samplesheet",
-                 "Download",
-                 [
-                   {
-                     property: "experimentType",
-                     label: "Type",
-                     required: true,
-                     type: "select",
-                     getLabel: function(type) {
-                       return type.description;
-                     },
-                     values: Constants.illuminaExperimentTypes
-                   },
-                   {
-                     property: "sequencingParameters",
-                     label: "Sequencing Parameters",
-                     required: true,
-                     type: "select",
-                     getLabel: Utils.array.getName,
-                     values: Constants.sequencingParameters.filter(function(param) {
-                         return param.instrumentModelId == modelId;
-                       })
-                   },
-                   {
-                     property: 'genomeFolder',
-                     type: 'text',
-                     label: 'Genome Folder',
-                     value: Constants.genomeFolder,
-                     required: true
-                   },
-                   {
-                     property: 'customRead1Primer',
-                     type: 'text',
-                     label: 'Custom Read 1 Primer Well',
-                     required: false
-                   },
-                   {
-                     property: 'customIndexPrimer',
-                     type: 'text',
-                     label: 'Custom Index Primer Well',
-                     required: false
-                   },
-                   {
-                     property: 'customRead2Primer',
-                     type: 'text',
-                     label: 'Custom Read 2 Primer Well',
-                     required: false
-                   },
-                   {
-                     property: "pools",
-                     label: "Lanes Configuration",
-                     required: true,
-                     type: "order",
-                     getLabel: Utils.array.getAlias,
-                     values: pools
-                   }
-                 ],
-                 function(result) {
-                   Utils.ajaxDownloadWithDialog(
-                     "/miso/rest/pools/samplesheet",
-                     {
-                       customRead1Primer: result.customRead1Primer,
-                       customIndexPrimer: result.customIndexPrimer,
-                       customRead2Primer: result.customRead2Primer,
-                       experimentType: result.experimentType.name,
-                       genomeFolder: result.genomeFolder,
-                       sequencingParametersId: result.sequencingParameters.id,
-                       poolIds: result.pools.map(Utils.array.getId)
-                     }
-                   );
-                 },
-                 null
-               );
-             }
-             Utils.showWizardDialog("Create Samplesheet", Constants.instrumentModels.filter(function(p) {
-               return p.platformType === platformTypes[0] && p.instrumentType === 'SEQUENCER' && p.active;
-             }).sort(Utils.sorting.standardSort('alias')).map(function(instrumentModel) {
-               return {
-                 name: instrumentModel.alias,
-                 handler: function() {
-                   showCreateDialog(instrumentModel.id);
-                 }
-               }
-             }));
-           }
+            name: "Create Samplesheet",
+            action: function(pools) {
+              var platformTypes = Utils.array.deduplicateString(pools.map(function(pool) {
+                return pool.platformType;
+              }));
+              if (platformTypes.length > 1) {
+                Utils.showOkDialog("Error", ["Cannot create a sample sheet from pools for different platforms."]);
+                return;
+              }
+              if (platformTypes[0] != "ILLUMINA") {
+                Utils.showOkDialog("Error", ["Can only create sample sheets for Illumina sequencers."]);
+                return;
+              }
+              var instrumentModels = Constants.instrumentModels.filter(function(model) {
+                return (model.instrumentType == "SEQUENCER" && model.platformType == platformTypes[0] && model.active);
+              });
+              if (instrumentModels.length == 0) {
+                Utils.showOkDialog("Error", ["No instruments are available for these pools.", "Please add a sequencer first."]);
+                return;
+              }
+              function showCreateDialog(modelId) {
+                Utils.showDialog("Create Samplesheet", "Download", [{
+                  property: "experimentType",
+                  label: "Type",
+                  required: true,
+                  type: "select",
+                  getLabel: function(type) {
+                    return type.description;
+                  },
+                  values: Constants.illuminaExperimentTypes
+                }, {
+                  property: "sequencingParameters",
+                  label: "Sequencing Parameters",
+                  required: true,
+                  type: "select",
+                  getLabel: Utils.array.getName,
+                  values: Constants.sequencingParameters.filter(function(param) {
+                    return param.instrumentModelId == modelId;
+                  })
+                }, {
+                  property: 'genomeFolder',
+                  type: 'text',
+                  label: 'Genome Folder',
+                  value: Constants.genomeFolder,
+                  required: true
+                }, {
+                  property: 'customRead1Primer',
+                  type: 'text',
+                  label: 'Custom Read 1 Primer Well',
+                  required: false
+                }, {
+                  property: 'customIndexPrimer',
+                  type: 'text',
+                  label: 'Custom Index Primer Well',
+                  required: false
+                }, {
+                  property: 'customRead2Primer',
+                  type: 'text',
+                  label: 'Custom Read 2 Primer Well',
+                  required: false
+                }, {
+                  property: "pools",
+                  label: "Lanes Configuration",
+                  required: true,
+                  type: "order",
+                  getLabel: Utils.array.getAlias,
+                  values: pools
+                }], function(result) {
+                  Utils.ajaxDownloadWithDialog("/miso/rest/pools/samplesheet", {
+                    customRead1Primer: result.customRead1Primer,
+                    customIndexPrimer: result.customIndexPrimer,
+                    customRead2Primer: result.customRead2Primer,
+                    experimentType: result.experimentType.name,
+                    genomeFolder: result.genomeFolder,
+                    sequencingParametersId: result.sequencingParameters.id,
+                    poolIds: result.pools.map(Utils.array.getId)
+                  });
+                }, null);
+              }
+              Utils.showWizardDialog("Create Samplesheet", Constants.instrumentModels.filter(function(p) {
+                return p.platformType === platformTypes[0] && p.instrumentType === 'SEQUENCER' && p.active;
+              }).sort(Utils.sorting.standardSort('alias')).map(function(instrumentModel) {
+                return {
+                  name: instrumentModel.alias,
+                  handler: function() {
+                    showCreateDialog(instrumentModel.id);
+                  }
+                }
+              }));
+            }
           },
           HotUtils.makeParents(Urls.rest.pools.parents, HotUtils.relationCategoriesForDetailed().concat(
-              [HotUtils.relations.library(), HotUtils.relations.libraryAliquot()]))
-      ].concat(HotUtils.makeQcActions("Pool"));
+              [HotUtils.relations.library(), HotUtils.relations.libraryAliquot()]))].concat(HotUtils.makeQcActions("Pool"));
     },
 
     confirmSave: function(flatObjects, isCreate, config, table) {
@@ -490,12 +460,12 @@ HotTarget.pool = (function() {
     },
 
     headerWarnings: function(config, data) {
-        if(data.length == 1 && data[0].mergeChild){
-            var mergeChildDto = data[0];
-            if(mergeChildDto.duplicateIndices || mergeChildDto.nearDuplicateIndices){
-                return "Merged pool will contain duplicate or near duplicate indices. Functionality will be limited on save."
-            }
+      if (data.length == 1 && data[0].mergeChild) {
+        var mergeChildDto = data[0];
+        if (mergeChildDto.duplicateIndices || mergeChildDto.nearDuplicateIndices) {
+          return "Merged pool will contain duplicate or near duplicate indices. Functionality will be limited on save."
         }
+      }
     }
 
   }

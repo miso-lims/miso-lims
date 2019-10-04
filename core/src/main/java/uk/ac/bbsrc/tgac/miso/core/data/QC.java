@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -67,7 +68,7 @@ public abstract class QC implements Serializable, Comparable<QC> {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long qcId = QC.UNSAVED_ID;
 
-  private Double results;
+  private BigDecimal results;
 
   @ManyToOne
   @JoinColumn(name = "type")
@@ -124,7 +125,7 @@ public abstract class QC implements Serializable, Comparable<QC> {
     return lastModified;
   }
 
-  public Double getResults() {
+  public BigDecimal getResults() {
     return results;
   }
 
@@ -168,7 +169,7 @@ public abstract class QC implements Serializable, Comparable<QC> {
     this.lastModified = lastModified;
   }
 
-  public void setResults(Double results) {
+  public void setResults(BigDecimal results) {
     this.results = results;
   }
 

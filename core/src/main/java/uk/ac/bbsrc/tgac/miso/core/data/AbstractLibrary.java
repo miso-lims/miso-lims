@@ -113,10 +113,15 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Column(nullable = false)
   private boolean paired;
 
-  private Double concentration;
+  private BigDecimal concentration;
 
   @Enumerated(EnumType.STRING)
   private ConcentrationUnit concentrationUnits;
+
+  private BigDecimal initialVolume;
+  private BigDecimal volumeUsed;
+  private BigDecimal ngUsed;
+
   @Enumerated(EnumType.STRING)
   private VolumeUnit volumeUnits;
 
@@ -429,12 +434,12 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public Double getConcentration() {
+  public BigDecimal getConcentration() {
     return concentration;
   }
 
   @Override
-  public void setConcentration(Double concentration) {
+  public void setConcentration(BigDecimal concentration) {
     this.concentration = concentration;
   }
 
@@ -690,6 +695,36 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
+  public BigDecimal getInitialVolume() {
+    return initialVolume;
+  }
+
+  @Override
+  public void setInitialVolume(BigDecimal initialVolume) {
+    this.initialVolume = initialVolume;
+  }
+
+  @Override
+  public BigDecimal getVolumeUsed() {
+    return volumeUsed;
+  }
+
+  @Override
+  public void setVolumeUsed(BigDecimal volumeUsed) {
+    this.volumeUsed = volumeUsed;
+  }
+
+  @Override
+  public BigDecimal getNgUsed() {
+    return ngUsed;
+  }
+
+  @Override
+  public void setNgUsed(BigDecimal ngUsed) {
+    this.ngUsed = ngUsed;
+  }
+
+  @Override
   public VolumeUnit getVolumeUnits() {
     return volumeUnits;
   }
@@ -755,7 +790,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public HierarchyEntity getParent() {
+  public Sample getParent() {
     return getSample();
   }
 

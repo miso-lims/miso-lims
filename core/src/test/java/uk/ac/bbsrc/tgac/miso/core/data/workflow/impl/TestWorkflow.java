@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -77,7 +78,7 @@ public class TestWorkflow extends AbstractWorkflow {
     if (!isComplete()) throw new IllegalStateException("Workflow is not complete");
 
     Pool pool = step1.getInput();
-    pool.setConcentration((double) step0.getInput());
+    pool.setConcentration(new BigDecimal(step0.getInput()));
 
     workflowExecutor.update(pool);
   }

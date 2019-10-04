@@ -1,24 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming.validation;
 
-import java.io.IOException;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
-import uk.ac.bbsrc.tgac.miso.core.service.ListService;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueTypeService;
 
@@ -36,7 +25,7 @@ public class OicrLibraryAliasValidator extends RegexValidator {
   private LibraryDesignCodeService libraryDesignCodeService;
 
   private boolean lookupsSuccessful;
-  private Pattern pattern = null;
+  private final Pattern pattern = null;
 
   public OicrLibraryAliasValidator() {
     super("", false, false, null);

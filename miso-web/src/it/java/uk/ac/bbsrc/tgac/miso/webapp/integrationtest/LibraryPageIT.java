@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -22,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LibraryPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LibraryPage.Field;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.dialog.AddNoteDialog;
@@ -251,7 +253,7 @@ public class LibraryPageIT extends AbstractIT {
 
     DetailedLibrary lib = (DetailedLibrary) getSession().get(LibraryImpl.class, 110004L);
     assertTrue(lib.isDiscarded());
-    assertEquals(new Double(0D), lib.getVolume());
+    assertEquals(0, lib.getVolume().compareTo(BigDecimal.ZERO));
   }
 
   @Test
@@ -409,11 +411,11 @@ public class LibraryPageIT extends AbstractIT {
     assertAttribute(Field.QC_PASSED, expectedValues, qcPassed);
     assertAttribute(Field.LOW_QUALITY, expectedValues, Boolean.toString(lib.isLowQuality()));
     assertAttribute(Field.SIZE, expectedValues, nullOrToString(lib.getDnaSize()));
-    assertAttribute(Field.VOLUME, expectedValues, nullOrToString(lib.getVolume()));
+    assertAttribute(Field.VOLUME, expectedValues, LimsUtils.toNiceString(lib.getVolume()));
     assertAttribute(Field.DISCARDED, expectedValues, Boolean.toString(lib.isDiscarded()));
     assertAttribute(Field.LOCATION, expectedValues, lib.getLocationBarcode());
     assertAttribute(Field.KIT, expectedValues, nullOrGet(lib.getKitDescriptor(), KitDescriptor::getName));
-    assertAttribute(Field.CONCENTRATION, expectedValues, nullOrToString(lib.getConcentration()));
+    assertAttribute(Field.CONCENTRATION, expectedValues, LimsUtils.toNiceString(lib.getConcentration()));
     assertAttribute(Field.ARCHIVED, expectedValues, lib.getArchived().toString());
   }
 

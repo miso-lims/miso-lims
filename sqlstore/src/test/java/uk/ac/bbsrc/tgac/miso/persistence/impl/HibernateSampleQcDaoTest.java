@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import org.hibernate.SessionFactory;
@@ -80,11 +81,11 @@ public class HibernateSampleQcDaoTest extends AbstractDAOTest {
   @Test
   public void testSaveEdit() throws IOException {
     SampleQC sampleQC = dao.get(1L);
-    sampleQC.setResults(5.0);
+    sampleQC.setResults(new BigDecimal("5.0"));
 
     assertEquals(1L, dao.save(sampleQC));
     SampleQC savedSampleQC = dao.get(1L);
-    assertTrue(savedSampleQC.getResults() == 5.0);
+    assertTrue(savedSampleQC.getResults().compareTo(new BigDecimal("5.0")) == 0);
   }
 
   @Test

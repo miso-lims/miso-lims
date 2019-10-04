@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -52,8 +53,6 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
@@ -76,8 +75,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   private static final long serialVersionUID = 1L;
-
-  protected static final Logger log = LoggerFactory.getLogger(AbstractSample.class);
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -115,9 +112,10 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private Boolean qcPassed;
   private String identificationBarcode;
   private String locationBarcode;
+  private BigDecimal initialVolume;
   @Enumerated(EnumType.STRING)
   private VolumeUnit volumeUnits;
-  private Double concentration;
+  private BigDecimal concentration;
   @Enumerated(EnumType.STRING)
   private ConcentrationUnit concentrationUnits;
 
@@ -504,6 +502,28 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
+  public BigDecimal getInitialVolume() {
+    return initialVolume;
+  }
+
+  @Override
+  public void setInitialVolume(BigDecimal initialVolume) {
+    this.initialVolume = initialVolume;
+  }
+
+  @Override
+  public BigDecimal getVolumeUsed() {
+    return null;
+  }
+
+  @Override
+  public void setVolumeUsed(BigDecimal volumeUsed) {
+    if (volumeUsed != null) {
+      throw new IllegalArgumentException("volumeUsed not intended to be set on plain sample");
+    }
+  }
+
+  @Override
   public VolumeUnit getVolumeUnits() {
     return volumeUnits;
   }
@@ -524,12 +544,12 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public Double getConcentration() {
+  public BigDecimal getConcentration() {
     return concentration;
   }
 
   @Override
-  public void setConcentration(Double concentration) {
+  public void setConcentration(BigDecimal concentration) {
     this.concentration = concentration;
   }
 
@@ -559,7 +579,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public HierarchyEntity getParent() {
+  public Sample getParent() {
     return null;
   }
 

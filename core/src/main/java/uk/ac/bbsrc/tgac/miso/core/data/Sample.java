@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 
@@ -239,6 +240,10 @@ public interface Sample
 
   public void setBoxPosition(SampleBoxPosition boxPosition);
 
+  public BigDecimal getInitialVolume();
+
+  public void setInitialVolume(BigDecimal initialVolume);
+
   /**
    * Returns the volume units of this Sample object.
    * 
@@ -270,15 +275,18 @@ public interface Sample
   /**
    * Returns the concentration of this Sample object.
    * 
-   * @return Double concentration.
+   * @return concentration.
    */
-  public Double getConcentration();
+  public BigDecimal getConcentration();
 
   /**
    * Sets the concentration of this Sample object.
    * 
-   * @param Double Concentration.
+   * @param concentration.
    */
-  public void setConcentration(Double concentration);
+  public void setConcentration(BigDecimal concentration);
+
+  @Override
+  public Sample getParent();
 
 }
