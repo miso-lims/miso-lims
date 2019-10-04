@@ -12,6 +12,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
@@ -52,7 +54,7 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
     }
     for (DetailedSample parent = detailed.getParent(); parent != null; parent = parent.getParent()) {
       if (isAliquotSample(parent)) {
-          continue;
+        continue;
       }
       if (isTissueSample(parent)) {
         if (isTissueSample(detailed)) {
@@ -102,10 +104,20 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
 
   private String addSiblingTag(String parentAlias, DetailedSample sample) throws IOException {
     SampleClass sc = sample.getSampleClass();
-    if (sc == null || sc.getSuffix() == null) {
-      throw new InvalidParameterException("Unexpected null SampleClass or suffix");
+    if (sc == null) {
+      throw new InvalidParameterException("Unexpected null SampleClass");
     }
-    String partialAlias = parentAlias + SEPARATOR + sc.getSuffix();
+    final String suffix;
+    if (SampleTissueProcessing.CATEGORY_NAME.equals(sc.getSampleCategory())
+        && SampleTissuePiece.SUBCATEGORY_NAME.equals(sc.getSampleSubcategory())) {
+      suffix = ((SampleTissuePiece) sample).getTissuePieceType().getAbbreviation();
+    } else {
+      suffix = sc.getSuffix();
+    }
+    if (suffix == null) {
+      throw new InvalidParameterException("Unexpected null suffix");
+    }
+    String partialAlias = parentAlias + SEPARATOR + suffix;
     if (sample.getSiblingNumber() == null) {
       if (siblingNumberGenerator == null) {
         throw new IllegalStateException("No SiblingNumberGenerator configured");
