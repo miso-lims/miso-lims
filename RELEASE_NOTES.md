@@ -5,6 +5,7 @@ Changes:
   * Added interface for administrators to add, edit, and delete dropdown options
     sequencing container models
   * Order configuration in Illumina sample sheets (some instruments are picky)
+  * Fixed migration error in detailed sample Docker Compose demo
 
 # 0.2.191
 

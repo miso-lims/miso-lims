@@ -28,9 +28,10 @@ Install required dependencies:
 Download and extract the `.docker` directory from Github into `miso-lims-compose`.
 
 ```
+mkdir miso-lims-compose
 wget https://github.com/miso-lims/miso-lims/archive/master.zip
 unzip master.zip 'miso-lims-master/.docker/*'
-mv miso-lims-master/.docker miso-lims-compose
+mv miso-lims-master/.docker/* miso-lims-compose
 rm -r master.zip miso-lims-master/
 ```
 
