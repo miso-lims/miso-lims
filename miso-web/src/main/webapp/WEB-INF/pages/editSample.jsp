@@ -37,7 +37,7 @@
 <div id="maincontent">
 <div id="contentcolumn">
 
-<input type="hidden" id="sampleCategory" name="sampleCategory" value="${sampleId eq 0 ? 'new' : sampleCategory}"/>
+<input type="hidden" id="sampleCategory" name="sampleCategory" value="${sampleCategory}"/>
 <h1>
   Edit Sample
   <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
@@ -143,7 +143,7 @@
 <miso:attachments item="${sample}" projectId="${sample.project.id}"/>
 <miso:qcs id="list_qc" item="${sample}"/>
 
-<c:if test="${ !detailedSample or detailedSample and sampleCategory eq 'Aliquot' }">
+<c:if test="${ !detailedSample or sampleCategory eq 'Aliquot' }">
   <miso:list-section id="list_library" name="Libraries" target="library" items="${sampleLibraries}"/>
 </c:if>
 

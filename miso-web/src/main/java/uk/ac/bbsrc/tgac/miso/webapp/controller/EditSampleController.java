@@ -36,8 +36,6 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
@@ -110,8 +108,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
 @RequestMapping("/sample")
 @SessionAttributes("sample")
 public class EditSampleController {
-
-  private static final Logger log = LoggerFactory.getLogger(EditSampleController.class);
 
   private final ObjectMapper mapper = new ObjectMapper();
 
@@ -252,6 +248,8 @@ public class EditSampleController {
       model.put("nextSample", adjacentSamples.get("nextSample"));
     }
 
+    model.put("sampleCategory",
+        LimsUtils.isDetailedSample(sample) ? ((DetailedSample) sample).getSampleClass().getSampleCategory() : "plain");
     model.put("sampleLibraries", sample.getLibraries().stream().map(lib -> Dtos.asDto(lib, false)).collect(Collectors.toList()));
     Set<Pool> pools = sample.getLibraries().stream()
         .flatMap(WhineyFunction.flatRethrow(library -> poolService.listByLibraryId(library.getId())))
