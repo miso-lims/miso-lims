@@ -27,6 +27,7 @@ Changes:
     * targeted sequencings
     * sequencing parameters
   * Add link in library aliquot alias in lists
+  * Fixed confirm password error on Create/Edit User page
 
 Upgrade notes:
 
@@ -41,7 +42,6 @@ Upgrade notes:
    (LCM Tube, Slide, Single Cell, Single Cell DNA (stock), Single Cell DNA
    (aliquot). This information has been moved to the `sampleSubcategory` column
    allow them to be renamed.
-
 
 # 0.2.190
 
@@ -62,6 +62,10 @@ Upgrade notes:
 	  as necessary. Single-ended and symmetric paired-end parameters will be
 	  upgraded automatically. These are often used for 10X runs.
 
+BAD:
+
+  * Confirm password field shows an error and prevents changing passwords and creating new users
+
 # 0.2.189
 
 Changes:
@@ -72,6 +76,9 @@ Changes:
   * Improve performance of downloading `/miso/constants.js`
   * Fix error on Edit Library page when 'No indices' is selected
 
+BAD:
+
+  * Confirm password field shows an error and prevents changing passwords and creating new users
 
 # 0.2.188
 
@@ -84,6 +91,9 @@ Changes:
   * Check duplicate indices for fake (10X) families
   * Allow toolbar buttons to wrap when full
 
+BAD:
+
+  * Confirm password field shows an error and prevents changing passwords and creating new users
 
 # 0.2.187
 
@@ -92,6 +102,9 @@ Changes:
   * Fix clear button index distance page
   * Display index collisions in pool orders
 
+BAD:
+
+  * Confirm password field shows an error and prevents changing passwords and creating new users
 
 # 0.2.186
 
@@ -126,6 +139,10 @@ Upgrade Notes:
       indices warning. Default is `2`.
     * `miso.pools.warning.index.mismatches.message`: the custom error message shown when near-duplicate
       indices are detected. Default is `Near-Duplicate Indices`.
+
+BAD:
+
+* Confirm password field shows an error and prevents changing passwords and creating new users
 
 # 0.2.185:
 
