@@ -50,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.User;
+import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
@@ -470,15 +471,29 @@ public class LimsUtils {
     String strConcentrationUnits = (concentrationUnits == null ? "" : concentrationUnits.getUnits());
     if (volume != null && volume.compareTo(BigDecimal.ZERO) != 0 && concentration != null
         && concentration.compareTo(BigDecimal.ZERO) != 0) {
-      return String.format("%.0f%s@%.0f%s", volume, strVolumeUnits, concentration, strConcentrationUnits);
+      return String.format(makeFormatString(volume) + "@" + makeFormatString(concentration), volume, strVolumeUnits, concentration,
+          strConcentrationUnits);
     }
     if (volume != null && volume.compareTo(BigDecimal.ZERO) != 0) {
-      return String.format("%.0f%s", volume, strVolumeUnits);
+      return String.format(makeFormatString(volume), volume, strVolumeUnits);
     }
     if (concentration != null && concentration.compareTo(BigDecimal.ZERO) != 0) {
-      return String.format("%.0f%s", concentration, strConcentrationUnits);
+      return String.format(makeFormatString(concentration), concentration, strConcentrationUnits);
     }
     return null;
+  }
+
+  @VisibleForTesting
+  protected static String makeFormatString(BigDecimal value) {
+    return "%." + getDecimalPlacesToDisplay(value) + "f%s";
+  }
+
+  @VisibleForTesting
+  protected static int getDecimalPlacesToDisplay(BigDecimal value) {
+    if (value == null) {
+      return 0;
+    }
+    return value.abs().compareTo(BigDecimal.TEN) >= 0 ? 0 : 1;
   }
 
   public static String joinWithConjunction(Collection<String> words, String conjunction) {
