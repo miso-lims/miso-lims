@@ -6,6 +6,7 @@ Changes:
     * sequencing container models
     * instrument models
   * Order configuration in Illumina sample sheets (some instruments are picky)
+  * Fixed migration error in detailed sample Docker Compose demo
 
 # 0.2.191
 

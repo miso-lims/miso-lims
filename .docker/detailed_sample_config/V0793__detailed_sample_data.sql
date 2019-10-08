@@ -9,8 +9,15 @@ INSERT INTO `SampleValidRelationship` (`sampleValidRelationshipId`, `parentId`, 
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`, `defaultSciName`) VALUES (1,'Unknown',NULL),(2,'Human hg19 random','Homo sapiens'),(3,'Human hg19','Homo sapiens'),(4,'Human hg18 random','Homo sapiens'),(5,'Human hg18','Homo sapiens'),(6,'Mouse mm9','Mus musculus'),(7,'Rat rn4','Rattus norvegicus'),(8,'E. coli DH10B',NULL),(9,'phiX174',NULL),(10,'C. elegans ce6',NULL),(11,'C. pygerythrus',NULL),(12,'Vaccinia JX-594 (OICR)',NULL),(13,'P. falciparum',NULL),(14,'R. sphaeroides',NULL),(15,'S. aureus',NULL),(16,'de novo assembly',NULL),(17,'Special – Look in description',NULL),(18,'Maraba Virus',NULL),(19,'Human hg38','Homo sapiens'),(20,'Mouse mm10','Mus musculus');
 INSERT INTO `LibraryDesignCode` (`libraryDesignCodeId`, `code`, `description`, `targetedSequencingRequired`) VALUES (1,'AS','ATAC-Seq',0),(2,'CH','ChIP-Seq',0),(3,'EX','Exome',1),(4,'MR','mRNA',0),(5,'SM','smRNA',0),(6,'TS','Targeted Sequencing',1),(7,'WG','Whole Genome',0),(8,'WT','Whole Transcriptome',0),(16,'TR','Total RNA',0),(17,'BS','Bisulphite Sequencing',1),(18,'NN','Unknown',0),(19,'CT','ctDNA',1),(20,'CM','cfMEDIP',0),(21,'SC','Single Cell',0);
 INSERT INTO `LibraryDesign` (`libraryDesignId`, `name`, `sampleClassId`, `librarySelectionType`, `libraryStrategyType`, `libraryDesignCodeId`) VALUES (1,'WG',15,3,1,7),(2,'TS (Hybrid Selection)',15,7,5,6),(3,'TS (PCR)',15,3,5,6),(4,'EX',15,7,20,3),(6,'WT',21,11,19,8),(7,'MR',21,11,19,4),(8,'CH',15,10,8,2),(9,'AS',15,7,15,1),(10,'WG',16,3,1,7),(11,'TS (Hybrid Selection)',16,7,5,6),(12,'TS (PCR)',16,3,5,6),(13,'EX',16,7,20,3),(14,'MR',19,11,19,4),(15,'SM',18,20,19,5),(16,'WT',20,11,19,8),(17,'TR',17,11,19,16),(18,'BS',15,7,20,17),(19,'NN (Unknown)',15,4,15,18),(20,'CT',15,7,20,19),(21,'CM',15,3,1,20),(22,'AS',26,7,15,1),(23,'BS',26,7,20,17),(24,'CH',26,10,8,2),(25,'CM',26,3,1,20),(26,'CT',26,7,20,19),(27,'EX',26,7,20,3),(28,'MR',26,11,19,4),(29,'NN (Unknown)',26,4,15,18),(30,'SM',26,20,19,5),(31,'TR',26,11,19,16),(32,'TS (Hybrid Selection)',26,7,5,6),(33,'TS (PCR)',26,3,5,6),(34,'WG',26,3,1,7),(35,'WT',26,11,19,8),(37,'Single Cell',29,1,19,21),(38,'Single Cell CNV',29,2,1,21),(39,'MR',17,11,19,4),(40,'WT',17,11,19,8),(41,'SM',17,20,19,5);
-CALL addKitDescriptor('Agilent SureSelect XT HS', 1, 'None', 1, 'LIBRARY', 'ILLUMINA', 'n/a');
-CALL addTargetedSequencing('Agilent SureSelect Human All Exon V6', 'Human all exon V6', 'Agilent SureSelect XT HS', 0);
-CALL addInstrument('NB000000', 'ILLUMINA', 'Illumina NextSeq 500', 'NB000000', '2015-01-07', NULL, NULL);
-CALL addSequencingParameters('Mid 2x151', 'ILLUMINA', 'Illumina NextSeq 500', 151, 1, 'NS_MID');
-
+INSERT INTO KitDescriptor(name, version, manufacturer, partNumber, kitType, platformType, description, lastModifier, creator, created, lastModified) VALUES
+('Agilent SureSelect XT HS', 1, 'None', 1, 'LIBRARY', 'ILLUMINA', 'n/a', 1, 1, NOW(), NOW());
+INSERT INTO TargetedSequencing(alias, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+('Agilent SureSelect Human All Exon V6', 'Human all exon V6', 1, NOW(), 1, NOW());
+INSERT INTO TargetedSequencing_KitDescriptor(targetedSequencingId, kitDescriptorId) VALUES (
+  (SELECT targetedSequencingId FROM TargetedSequencing WHERE alias = 'Agilent SureSelect Human All Exon V6'),
+  (SELECT kitDescriptorId FROM KitDescriptor WHERE name = 'Agilent SureSelect XT HS')
+);
+INSERT INTO Instrument (name, instrumentModelId, serialNumber, dateCommissioned) VALUES
+('NB000000', (SELECT instrumentModelId FROM InstrumentModel WHERE alias = 'Illumina NextSeq 500'), 'NB000000', CURDATE());
+INSERT INTO SequencingParameters(name, instrumentModelId, readLength, chemistry, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+('Mid 2x151', (SELECT instrumentModelId FROM InstrumentModel WHERE alias = 'Illumina NextSeq 500'), 151, 'NS_MID', 1, NOW(), 1, NOW());
