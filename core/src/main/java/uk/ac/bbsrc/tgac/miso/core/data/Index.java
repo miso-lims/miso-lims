@@ -70,6 +70,10 @@ public class Index implements Nameable, Serializable {
    */
   public static int checkMismatches(String sequence1, String sequence2) {
     int minLength = Math.min(sequence1.length(), sequence2.length());
+    int maxLength = Math.max(sequence1.length(), sequence2.length());
+    if (minLength == 0 && maxLength > 0) {
+      return maxLength;
+    }
     int mismatches = minLength;
     for (int i = 0; i < minLength; i++) {
       if (sequence1.charAt(i) == sequence2.charAt(i)) {

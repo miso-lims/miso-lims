@@ -838,6 +838,7 @@ INSERT INTO Pool_LibraryAliquot (poolId, aliquotId) VALUES
 (501, 504),
 (702, 702),
 (801, 200001),
+(801, 200002),
 (802, 801),
 (802, 802),
 (803, 803),

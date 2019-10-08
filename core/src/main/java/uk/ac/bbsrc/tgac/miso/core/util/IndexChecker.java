@@ -108,6 +108,7 @@ public class IndexChecker {
     List<List<Index>> indices = getIndexSequences(aliquots);
     return getIndexSequencesWithTooFewMismatches(indices, warningMismatches);
   }
+
   private static Set<String> getIndexSequencesWithTooFewMismatches(List<List<Index>> indices, int mismatchesThreshold) {
     Set<String> nearMatchSequences = new HashSet<>();
     // Real sequence → name the front end expects

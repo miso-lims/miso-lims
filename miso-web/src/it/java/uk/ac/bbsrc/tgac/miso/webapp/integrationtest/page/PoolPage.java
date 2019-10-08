@@ -31,7 +31,7 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     DISTRIBUTION_RECIPIENT(By.id("poolForm_distributionRecipient")), //
     LOCATION(By.id("poolForm_boxPosition")), //
     
-    WARNINGS(By.className("big")); //
+    WARNINGS(By.id("warnings")); //
 
     private final By selector;
     private final By labelSelector;

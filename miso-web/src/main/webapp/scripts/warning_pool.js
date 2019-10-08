@@ -53,7 +53,7 @@ WarningTarget.pool = {
           tableMessage: Constants.warningMessages.nearDuplicateIndices,
           tileMessage: Constants.warningMessages.nearDuplicateIndices
         }, {
-          include: pool.hasEmptySequence,
+          include: pool.hasEmptySequence && (!pool.pooledElements || pool.pooledElements.length > 1),
           headerMessage: 'This pool contains at least one library with no index!',
           tableMessage: Constants.warningMessages.missingIndex,
           tileMessage: Constants.warningMessages.missingIndex
