@@ -85,7 +85,8 @@ Urls = (function() {
   var containerModelRestBase = restBase + '/containermodels';
   rest.containerModels = {
     create: containerModelRestBase,
-    update: idUrlFunction(containerModelRestBase)
+    update: idUrlFunction(containerModelRestBase),
+    search: containerModelRestBase + '/search'
   };
 
   // Detailed QC Statuses
@@ -127,6 +128,20 @@ Urls = (function() {
   ui.instruments = {
     edit: idUrlFunction(instrumentUiBase)
   }
+
+  // Instrument Models
+  var instrumentModelUiBase = baseUrl + '/instrumentmodel';
+  ui.instrumentModels = {
+    create: instrumentModelUiBase + '/new',
+    edit: idUrlFunction(instrumentModelUiBase)
+  };
+
+  var instrumentModelRestBase = restBase + '/instrumentmodels';
+  rest.instrumentModels = {
+    create: instrumentModelRestBase,
+    datatable: instrumentModelRestBase + '/dt',
+    update: idUrlFunction(instrumentModelRestBase)
+  };
 
   // Kit Descriptors
   var kitDescriptorUiBase = baseUrl + '/kitdescriptor';

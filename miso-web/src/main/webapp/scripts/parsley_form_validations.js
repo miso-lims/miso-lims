@@ -69,7 +69,7 @@ var Validate = Validate || {
     jQuery(formSelector + ' .bs-callout-warning').removeClass('hidden');
 
     if (!restError || !restError.data || restError.dataFormat !== 'validation') {
-      Validate.displayError(formSelector, 'GENERAL', 'Something has gone terribly wrong. Please report this to your MISO administrator.');
+      Validate.displayError(formId, 'GENERAL', 'Something has gone terribly wrong. Please report this to your MISO administrator.');
     } else {
       jQuery.each(restError.data, function(key, value) {
         Validate.displayError(formId, key, value);

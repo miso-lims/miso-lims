@@ -11,8 +11,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
@@ -38,10 +36,7 @@ public class SequencingContainerModel implements Deletable, Serializable, Barcod
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
 
-  @ManyToMany
-  @JoinTable(name = "SequencingContainerModel_InstrumentModel",
-      joinColumns = { @JoinColumn(name = "sequencingContainerModelId", nullable = false) },
-      inverseJoinColumns = { @JoinColumn(name = "instrumentModelId", nullable = false) })
+  @ManyToMany(mappedBy = "containerModels")
   private List<InstrumentModel> instrumentModels;
 
   private int partitionCount;

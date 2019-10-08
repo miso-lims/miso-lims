@@ -5,17 +5,58 @@ ListTarget.containermodel = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.containermodel.getBulkActions(config);
-    if (config.isAdmin) {
-      actions.push(ListUtils.createBulkDeleteAction('Container Models', 'containermodels', function(model) {
-        var platform = Utils.array.findUniqueOrThrow(Utils.array.namePredicate(model.platformType), Constants.platformTypes);
-        return model.alias + ' (' + platform.key + ')';
-      }));
+    if (config.isInstrumentModelPage) {
+      return !config.isAdmin ? [] : [{
+        name: 'Remove',
+        action: function(items) {
+          InstrumentModel.removeContainerModels(items.map(Utils.array.getId));
+        }
+      }];
+    } else {
+      var actions = HotTarget.containermodel.getBulkActions(config);
+      if (config.isAdmin) {
+        actions.push(ListUtils.createBulkDeleteAction('Container Models', 'containermodels', function(model) {
+          var platform = Utils.array.findUniqueOrThrow(Utils.array.namePredicate(model.platformType), Constants.platformTypes);
+          return model.alias + ' (' + platform.key + ')';
+        }));
+      }
+      return actions;
     }
-    return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Container Models', 'containermodel')] : [];
+    if (config.isInstrumentModelPage) {
+      return !config.isAdmin ? [] : [{
+        name: 'Add',
+        handler: function() {
+          Utils.showDialog('Add Container Model', 'Search', [{
+            label: 'Alias or Barcode',
+            type: 'text',
+            property: 'query',
+            required: true
+          }], function(output) {
+            Utils.ajaxWithDialog('Searching...', 'GET', Urls.rest.containerModels.search + '?' + jQuery.param({
+              platformType: jQuery('#instrumentModelForm_platformType').val(),
+              q: output.query
+            }), null, function(models, textStatus, xhr) {
+              if (!models || !models.length) {
+                Utils.showOkDialog('Add Container Model', ['No container models found.']);
+                return;
+              }
+              Utils.showWizardDialog('Add Container Model', models.map(function(model) {
+                return {
+                  name: model.alias,
+                  handler: function() {
+                    InstrumentModel.addContainerModel(model);
+                  }
+                }
+              }));
+            });
+          });
+        }
+      }];
+    } else {
+      return config.isAdmin ? [ListUtils.createStaticAddAction('Container Models', 'containermodel')] : [];
+    }
   },
   createColumns: function(config, projectId) {
     return [{

@@ -35,6 +35,7 @@ FormUtils = (function($) {
    *   maxLength: optional integer; maximum number of characters for text input
    *   regex: optional regex; validation regex for text input. Can be 'url', 'email', or an actual regex
    *   min: minimum value for int or decimal input
+   *   max: maximum value for int or decimal input
    *   precision: maximum precision (length, excluding the decimal) for decimal input
    *   scale: maximum scale (decimal places) for decimal input
    *   nullLabel: optional string; label for null value in dropdown. If not provided, and the field is not required, there will be no
@@ -45,17 +46,27 @@ FormUtils = (function($) {
    *   getItemLabel: function(item) returning string; get the label for a dropdown option. If omitted and the item is a string, it is
    *       used as the label; otherwise, an error is thrown
    *   getItemValue: function(item) returning string; get the value for a dropdown option. If omitted, the item is used as the value
-   *   onChange: function(newValue, updateField); allows modifying other fields when a dropdown type field value is changed. updateField
-   *       is a function(dataProperty, options). options may include
+   *   onChange: function(newValue, formObject); allows modifying other fields when a dropdown type field value is changed. See Form
+   *       object below
+   *   makeControls: function(form) returning single or array of jQuery controls; required for special fields; set up special fields
+   *   trackChanges: optional boolean (default: true); whether changes to the field should be tracked. This only affects the warning that
+   *       appears when leaving a page with unsaved changes
+   * }
+   * 
+   * Form object: {
+   *   isChanged: function() returns true if the form has been modified by the user; false otherwise
+   *   markOtherChanges: function() marks the form as having been modified. This is automatic for the normal form fields, but is
+   *       necessary for other page elements
+   *   get: function(dataProperty) returns the field value
+   *   updateField: function(dataProperty, options). options may include
    *       * 'disabled' (boolean)
    *       * 'required' (boolean)
    *       * 'value' (string/number/boolean depending on field type)
    *       * 'source' (array of objects or strings)
    *       * 'label' (string)
    *       * 'link' (URL string)
-   *   makeControls: function(form) returning single or array of jQuery controls; required for special fields; set up special fields
-   *   trackChanges: optional boolean (default: true); whether changes to the field should be tracked. This only affects the warning that
-   *       appears when leaving a page with unsaved changes
+   *   save: function(postSaveCallback) save the form data. postSaveCallback is a function(data) where data is the object returned from
+   *       the save operation
    * }
    */
 
@@ -542,15 +553,22 @@ FormUtils = (function($) {
     } else if (field.type === 'int') {
       control.attr('data-parsley-type', 'integer');
       if (field.hasOwnProperty('min')) {
-        control.attr('data-parsley-min', field.min);
+        if (field.hasOwnProperty('max')) {
+          control.attr('data-parsley-range', '[' + field.min + ',' + field.max + ']');
+        } else {
+          control.attr('data-parsley-min', field.min);
+        }
+      } else if (field.hasOwnProperty('max')) {
+        control.attr('data-parsley-max', field.min);
       }
     } else if (field.type === 'decimal') {
       var precision = field.precision || defaultDecimalPrecision;
       var scale = field.scale || defaultDecimalScale;
       control.attr('data-parsley-type', 'number');
       control.attr('data-parsley-maxlength', precision + 1);
-      var max = Math.pow(10, precision - scale) - Math.pow(0.1, scale);
-      var min = field.hasOwnProperty('min') ? field.min : max * -1;
+      var maxPossible = Math.pow(10, precision - scale) - Math.pow(0.1, scale);
+      var max = field.hasOwnProperty('max') ? field.max : maxPossible;
+      var min = field.hasOwnProperty('min') ? field.min : maxPossible * -1;
       control.attr('data-parsley-range', '[' + min + ', ' + max + ']')
       var pattern = '\\d{0,' + (precision - scale) + '}(?:\\.\\d{1,' + scale + '})?';
       control.attr('data-parsley-pattern', pattern);

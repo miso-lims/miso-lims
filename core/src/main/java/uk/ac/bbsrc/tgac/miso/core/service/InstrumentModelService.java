@@ -1,20 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.core.service;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
-import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface InstrumentModelService extends ProviderService<InstrumentModel> {
-
-  Collection<InstrumentModel> list() throws IOException;
+public interface InstrumentModelService extends DeleterService<InstrumentModel>, ListService<InstrumentModel>,
+    PaginatedDataSource<InstrumentModel>, SaveService<InstrumentModel> {
 
   Set<PlatformType> listActivePlatformTypes() throws IOException;
 
-  Collection<String> listDistinctPlatformTypeNames() throws IOException;
-
-  InstrumentPosition getInstrumentPosition(long positionId) throws IOException;
 }

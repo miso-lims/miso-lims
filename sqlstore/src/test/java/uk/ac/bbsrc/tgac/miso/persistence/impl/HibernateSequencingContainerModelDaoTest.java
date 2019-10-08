@@ -144,4 +144,13 @@ public class HibernateSequencingContainerModelDaoTest extends AbstractDAOTest {
     assertEquals(4, dao.getUsage(model));
   }
 
+  @Test
+  public void testGetUsagePlatform() throws Exception {
+    SequencingContainerModel containerModel = (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, 1L);
+    assertNotNull(containerModel);
+    InstrumentModel instrumentModel = (InstrumentModel) currentSession().get(InstrumentModel.class, 16L);
+    assertNotNull(instrumentModel);
+    assertEquals(4, dao.getUsage(containerModel, instrumentModel));
+  }
+
 }

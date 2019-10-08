@@ -3,64 +3,52 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import java.util.List;
 
 public class InstrumentModelDto {
-  private boolean active;
-  private String description;
 
   private long id;
-
   private String alias;
-
-  private int numContainers;
-
+  private String description;
+  private Integer numContainers;
   private String platformType;
-
   private String instrumentType;
-
-  private List<String> positions;
-
-  public String getDescription() {
-    return description;
-  }
+  private String dataManglingPolicy;
+  private List<InstrumentPositionDto> positions;
+  private List<SequencingContainerModelDto> containerModels;
+  private boolean active;
 
   public long getId() {
     return id;
-  }
-
-  public String getAlias() {
-    return alias;
-  }
-
-
-  public int getNumContainers() {
-    return numContainers;
-  }
-
-  public String getPlatformType() {
-    return platformType;
-  }
-
-  public boolean isActive() {
-    return active;
-  }
-
-  public void setActive(boolean active) {
-    this.active = active;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
   }
 
   public void setId(long id) {
     this.id = id;
   }
 
+  public String getAlias() {
+    return alias;
+  }
+
   public void setAlias(String alias) {
     this.alias = alias;
   }
 
-  public void setNumContainers(int numContainers) {
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public Integer getNumContainers() {
+    return numContainers;
+  }
+
+  public void setNumContainers(Integer numContainers) {
     this.numContainers = numContainers;
+  }
+
+  public String getPlatformType() {
+    return platformType;
   }
 
   public void setPlatformType(String platformType) {
@@ -75,12 +63,36 @@ public class InstrumentModelDto {
     this.instrumentType = instrumentType;
   }
 
-  public List<String> getPositions() {
+  public String getDataManglingPolicy() {
+    return dataManglingPolicy;
+  }
+
+  public void setDataManglingPolicy(String dataManglingPolicy) {
+    this.dataManglingPolicy = dataManglingPolicy;
+  }
+
+  public List<InstrumentPositionDto> getPositions() {
     return positions;
   }
 
-  public void setPositions(List<String> positions) {
+  public void setPositions(List<InstrumentPositionDto> positions) {
     this.positions = positions;
+  }
+
+  public List<SequencingContainerModelDto> getContainerModels() {
+    return containerModels;
+  }
+
+  public void setContainerModels(List<SequencingContainerModelDto> containerModels) {
+    this.containerModels = containerModels;
+  }
+
+  public boolean isActive() {
+    return active;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
   }
 
 }

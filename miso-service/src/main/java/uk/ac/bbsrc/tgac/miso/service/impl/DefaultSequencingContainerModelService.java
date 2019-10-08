@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
@@ -112,6 +113,16 @@ public class DefaultSequencingContainerModelService extends AbstractSaveService<
       result.addError(ValidationError.forDeletionUsage(object, usage, "sequencing " + Pluralizer.containers(usage)));
     }
     return result;
+  }
+
+  @Override
+  public List<SequencingContainerModel> find(PlatformType platform, String search) throws IOException {
+    return containerModelDao.find(platform, search);
+  }
+
+  @Override
+  public long getUsage(SequencingContainerModel containerModel, InstrumentModel instrumentModel) throws IOException {
+    return containerModelDao.getUsage(containerModel, instrumentModel);
   }
 
 }

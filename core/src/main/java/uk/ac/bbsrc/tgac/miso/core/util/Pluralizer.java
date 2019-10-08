@@ -26,6 +26,10 @@ public class Pluralizer {
     return pluralize(count, "freezer", "freezers");
   }
 
+  public static final String instruments(long count) {
+    return pluralize(count, "instrument", "instruments");
+  }
+
   public static final String labs(long count) {
     return pluralize(count, "lab", "labs");
   }
