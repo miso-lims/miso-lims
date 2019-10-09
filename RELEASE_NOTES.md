@@ -12,6 +12,7 @@ Changes:
   * Made the following items deletable
     * Sequencer Runs
     * Projects
+    * Arrays
 
 # 0.2.192
 

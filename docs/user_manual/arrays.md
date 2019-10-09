@@ -64,3 +64,13 @@ as described above, and then click the Remove Sample button to do so.
 
 {% include userman-toplink.md %}
 
+
+{% assign sub = sub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Deleting Arrays" %}
+
+To delete arrays, go to the Arrays list page, select the arrays that you wish to delete, and click the "Delete" button
+in the toolbar at the top of the table. An array can only be deleted by its creator or a MISO administrator, and only
+if is not attached to any array runs.
+
+{% include userman-toplink.md %}
+

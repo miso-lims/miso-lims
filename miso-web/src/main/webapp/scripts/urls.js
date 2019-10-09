@@ -21,7 +21,13 @@ Urls = (function() {
   // Arrays
   var arrayUiBase = baseUrl + '/array';
   ui.arrays = {
+    create: arrayUiBase + '/new',
     edit: idUrlFunction(arrayUiBase)
+  };
+
+  var arrayRestBase = restBase + '/arrays';
+  rest.arrays = {
+    datatable: arrayRestBase + '/dt'
   };
 
   // Array Models
@@ -346,9 +352,9 @@ Urls = (function() {
   var runRestBase = restBase + '/runs';
   rest.runs = {
     datatable: runRestBase + '/dt',
-    projectDatatable: idUrlFunction(runRestBase + '/dt/project/'),
+    projectDatatable: idUrlFunction(runRestBase + '/dt/project'),
     sequencerDatatable: idUrlFunction(runRestBase + '/dt/sequencer'),
-    platformDatatable: idUrlFunction(runRestBase + '/dt/platform/')
+    platformDatatable: idUrlFunction(runRestBase + '/dt/platform')
   };
 
   // Samples

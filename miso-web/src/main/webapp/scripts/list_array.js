@@ -24,16 +24,18 @@
 ListTarget.array = {
   name: "Arrays",
   createUrl: function(config, projectId) {
-    return '/miso/rest/arrays/dt';
+    return Urls.rest.arrays.datatable;
   },
   createBulkActions: function(config, projectId) {
-    return [];
+    return [ListUtils.createBulkDeleteAction("Arrays", "arrays", function(array) {
+      return array.alias;
+    })];
   },
   createStaticActions: function(config, projectId) {
     return [{
       name: 'Add',
       handler: function() {
-        window.location = '/miso/array/new';
+        window.location = Urls.ui.arrays.create;
       }
     }];
   },

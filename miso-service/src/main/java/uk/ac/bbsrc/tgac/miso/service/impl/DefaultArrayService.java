@@ -18,11 +18,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.ArrayStore;
 
 @Service
@@ -33,14 +37,21 @@ public class DefaultArrayService implements ArrayService {
   private AuthorizationManager authorizationManager;
 
   @Autowired
+  private DeletionStore deletionStore;
+
+  @Autowired
   private ArrayStore arrayStore;
   
+  @Autowired
+  private ArrayRunService arrayRunService;
+
   @Autowired
   private ArrayModelService arrayModelService;
 
   @Autowired
   private SampleService sampleService;
 
+  @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
   }
@@ -198,6 +209,33 @@ public class DefaultArrayService implements ArrayService {
   @Override
   public List<Array> getArraysBySearch(String search) throws IOException {
     return arrayStore.getArraysBySearch(search);
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public void authorizeDeletion(Array object) throws IOException {
+    authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
+  @Override
+  public ValidationResult validateDeletion(Array object) throws IOException {
+    ValidationResult result = new ValidationResult();
+    int usage = arrayRunService.listByArrayId(object.getId()).size();
+    if (usage > 0) {
+      result.addError(new ValidationError(String.format("Array %s is used in %d array %s",
+          object.getAlias(), usage, Pluralizer.runs(usage))));
+    }
+    return result;
+  }
+
+  @Override
+  public void beforeDelete(Array object) throws IOException {
+    object.getSamples().clear();
+    update(object);
   }
 
 }
