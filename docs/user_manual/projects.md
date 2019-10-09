@@ -183,3 +183,14 @@ then click the "Delete" button in the toolbar at the top of the table.
 
 {% include userman-toplink.md %}
 
+
+
+{% assign sub = sub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Deleting Projects" %}
+
+To delete projects, go to the Projects list page, select the projects that you wish to delete, and click the "Delete"
+button in the toolbar at the top of the table. A project can only be deleted by its creator or a MISO administrator,
+and only if it does not contain any samples.
+
+{% include userman-toplink.md %}
+
