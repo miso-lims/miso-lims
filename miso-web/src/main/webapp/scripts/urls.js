@@ -129,6 +129,11 @@ Urls = (function() {
     edit: idUrlFunction(instrumentUiBase)
   }
 
+  var instrumentRestBase = restBase + '/instruments';
+  rest.instruments = {
+    list: instrumentRestBase
+  };
+
   // Instrument Models
   var instrumentModelUiBase = baseUrl + '/instrumentmodel';
   ui.instrumentModels = {
@@ -333,7 +338,16 @@ Urls = (function() {
   // Runs
   var runUiBase = baseUrl + '/run'
   ui.runs = {
+    create: idUrlFunction(runUiBase + '/new'),
     edit: idUrlFunction(runUiBase)
+  };
+
+  var runRestBase = restBase + '/runs';
+  rest.runs = {
+    datatable: runRestBase + '/dt',
+    projectDatatable: idUrlFunction(runRestBase + '/dt/project/'),
+    sequencerDatatable: idUrlFunction(runRestBase + '/dt/sequencer'),
+    platformDatatable: idUrlFunction(runRestBase + '/dt/platform/')
   };
 
   // Samples

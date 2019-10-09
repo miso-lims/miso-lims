@@ -128,4 +128,9 @@ public class IlluminaRun extends Run {
     return "";
   }
 
+  @Override
+  public String getDeleteType() {
+    return "Illumina Run";
+  }
+
 }

@@ -76,7 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 @Table(name = "Run")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Run
-    implements Comparable<Run>, Nameable, ChangeLoggable, Aliasable, Attachable, Serializable {
+    implements Comparable<Run>, Nameable, ChangeLoggable, Deletable, Aliasable, Attachable, Serializable {
   private static final long serialVersionUID = 1L;
 
   /** Field PREFIX */
@@ -91,6 +91,7 @@ public abstract class Run
 
   @OneToMany(targetEntity = RunChangeLog.class, mappedBy = "run", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLogs = new ArrayList<>();
+
   @Temporal(TemporalType.DATE)
   private Date completionDate;
 
@@ -428,6 +429,11 @@ public abstract class Run
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias();
   }
 
 }

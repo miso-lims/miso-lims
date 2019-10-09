@@ -41,4 +41,9 @@ public class LS454Run extends Run {
     return PlatformType.LS454;
   }
 
+  @Override
+  public String getDeleteType() {
+    return "LS454 Run";
+  }
+
 }

@@ -19,4 +19,9 @@ public class IonTorrentRun extends Run {
     return PlatformType.IONTORRENT;
   }
 
+  @Override
+  public String getDeleteType() {
+    return "Ion Torrent Run";
+  }
+
 }

@@ -42,4 +42,9 @@ public class PacBioRun extends Run {
     return PlatformType.PACBIO;
   }
 
+  @Override
+  public String getDeleteType() {
+    return "PacBio Run";
+  }
+
 }
