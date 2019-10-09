@@ -466,4 +466,11 @@ public class RunRestController extends RestController {
     }), runService, Dtos::asDto);
   }
 
+  @PostMapping(value = "/bulk-delete")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete("Run", ids, runService);
+  }
+
 }

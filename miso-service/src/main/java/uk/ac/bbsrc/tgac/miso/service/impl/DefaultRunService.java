@@ -57,16 +57,18 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
-import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -101,6 +103,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
+  private DeletionStore deletionStore;
+  @Autowired
   private RunStore runDao;
   @Autowired
   private ChangeLogService changeLogService;
@@ -118,6 +122,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   private PoolService poolService;
   @Autowired
   private SequencingContainerModelService containerModelService;
+  @Autowired
+  private FileAttachmentService fileAttachmentService;
 
   @Override
   public List<Run> list() throws IOException {
@@ -774,6 +780,31 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   public List<Run> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
       throws IOException {
     return runDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public void authorizeDeletion(Run object) throws IOException {
+    authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
+  @Override
+  public void beforeDelete(Run object) throws IOException {
+    fileAttachmentService.beforeDelete(object);
+  }
+
+  @Override
+  public void afterDelete(Run object) throws IOException {
+    fileAttachmentService.afterDelete(object);
   }
 
 }

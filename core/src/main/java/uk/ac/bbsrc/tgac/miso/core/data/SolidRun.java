@@ -33,4 +33,9 @@ public class SolidRun extends Run {
     return PlatformType.SOLID;
   }
 
+  @Override
+  public String getDeleteType() {
+    return "Solid Run";
+  }
+
 }

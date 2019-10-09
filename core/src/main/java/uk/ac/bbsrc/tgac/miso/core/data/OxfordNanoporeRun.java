@@ -63,4 +63,9 @@ public class OxfordNanoporeRun extends Run {
     return true;
   }
 
+  @Override
+  public String getDeleteType() {
+    return "Oxford Nanopore Run";
+  }
+
 }

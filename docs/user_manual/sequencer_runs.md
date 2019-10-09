@@ -164,8 +164,8 @@ about Run Scanner, see the [Related Software - Run Scanner](related_software#run
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Deleting Runs" %}
 
-Sequencer runs can only be deleted from MISO by direct database access. If you need to delete a run, you should discuss
-this with your MISO administrator.
+To delete runs, go to the Runs list page, select the runs that you wish to delete, and click the "Delete" button in the
+toolbar at the top of the table. A run can only be deleted by its creator or a MISO administrator.
 
 {% include userman-toplink.md %}
 

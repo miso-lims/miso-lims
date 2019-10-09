@@ -10,7 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface RunService extends ListService<Run>, SaveService<Run>, PaginatedDataSource<Run>, NoteService<Run> {
+public interface RunService extends DeleterService<Run>, ListService<Run>, SaveService<Run>, PaginatedDataSource<Run>, NoteService<Run> {
 
   int count() throws IOException;
 

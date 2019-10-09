@@ -9,6 +9,8 @@ Changes:
     save. This update will use the current slide count as initial slides, and set the current slide
     count to (initial slides - discards - slides consumed by all children)
   * Show 1 decimal place on labels for volume/concentration values less than 10
+  * Made the following items deletable
+    * Sequencer Runs
 
 # 0.2.192
 

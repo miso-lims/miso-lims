@@ -25,18 +25,20 @@ ListTarget.run = {
   name: "Runs",
   createUrl: function(config, projectId) {
     if (projectId) {
-      return "/miso/rest/runs/dt/project/" + projectId;
+      return Urls.rest.runs.projectDatatable(projectId);
     } else if (config.sequencer) {
-      return "/miso/rest/runs/dt/sequencer/" + config.sequencer;
+      return Urls.rest.runs.sequencerDatatable(config.sequencer);
     } else if (config.platformType) {
-      return "/miso/rest/runs/dt/platform/" + config.platformType;
+      return Urls.rest.runs.platformDatatable(config.platformType);
     } else {
-      return "/miso/rest/runs/dt";
+      return Urls.rest.runs.datatable;
     }
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    return [];
+    return [ListUtils.createBulkDeleteAction("Runs", "runs", function(run) {
+      return run.alias;
+    })];
   },
   createStaticActions: function(config, projectId) {
     if (!projectId && config.platformType) {
@@ -45,7 +47,7 @@ ListTarget.run = {
       return [{
         name: "Add " + platformKey + " Run",
         handler: function() {
-          Utils.ajaxWithDialog('Getting Sequencer', 'Get', '/miso/rest/instruments', null, function(instruments) {
+          Utils.ajaxWithDialog('Getting Sequencer', 'Get', Urls.rest.instruments.list, null, function(instruments) {
             var allowedModels = Constants.instrumentModels.filter(function(model) {
               return model.platformType === config.platformType && model.instrumentType === 'SEQUENCER';
             }).map(function(model) {
@@ -57,7 +59,7 @@ ListTarget.run = {
               return {
                 name: sequencer.name + " (" + sequencer.instrumentModelAlias + ")",
                 handler: function() {
-                  window.location = '/miso/run/new/' + sequencer.id;
+                  window.location = Urls.ui.runs.create(sequencer.id);
                 }
               };
 
@@ -119,7 +121,6 @@ ListTarget.run = {
   },
   searchTermSelector: function(searchTerms) {
     return [searchTerms['id'], searchTerms['runstatus'], searchTerms['created'], searchTerms['changed'], searchTerms['creator'],
-        searchTerms['changedby'], searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'],
-        searchTerms['parameters']]
+        searchTerms['changedby'], searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['parameters']]
   }
 };
