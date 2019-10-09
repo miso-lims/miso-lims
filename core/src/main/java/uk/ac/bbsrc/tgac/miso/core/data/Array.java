@@ -33,7 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ArrayChangeLog;
 
 @Entity
-public class Array implements Serializable, Aliasable, ChangeLoggable {
+public class Array implements Serializable, Aliasable, ChangeLoggable, Deletable {
 
   private static final long serialVersionUID = 1L;
 
@@ -237,6 +237,16 @@ public class Array implements Serializable, Aliasable, ChangeLoggable {
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Array";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias();
   }
 
 }

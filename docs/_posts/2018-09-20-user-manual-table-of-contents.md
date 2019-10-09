@@ -625,6 +625,8 @@ biweekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Adding a Sample to an Array" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Removing a Sample from an Array" %}
+{% assign sub = sub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub section-title=section-title title="Deleting Arrays" %}
 
 
 {% assign section = section | plus: 1 %}

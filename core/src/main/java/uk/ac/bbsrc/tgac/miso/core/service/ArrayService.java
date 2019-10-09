@@ -7,7 +7,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface ArrayService extends PaginatedDataSource<Array>, SaveService<Array> {
+public interface ArrayService extends DeleterService<Array>, PaginatedDataSource<Array>, SaveService<Array> {
 
   public List<Sample> getArrayableSamplesBySearch(String search) throws IOException;
 
