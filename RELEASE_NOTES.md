@@ -13,6 +13,7 @@ Changes:
     * Sequencer Runs
     * Projects
     * Arrays
+    * Array Runs
 
 # 0.2.192
 

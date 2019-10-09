@@ -63,8 +63,8 @@ public class ListTablesIT extends AbstractIT {
       Columns.DESCRIPTION, Columns.PROGRESS);
   private static final Set<String> arraysColumns = Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.SERIAL_NUMBER,
       Columns.LAST_MODIFIED);
-  private static final Set<String> arrayRunsColumns = Sets.newHashSet(Columns.ID, Columns.ALIAS, Columns.STATUS, Columns.START_DATE,
-      Columns.END_DATE, Columns.LAST_MODIFIED);
+  private static final Set<String> arrayRunsColumns = Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.STATUS,
+      Columns.START_DATE, Columns.END_DATE, Columns.LAST_MODIFIED);
   private static final Set<String> worksetsColumns = Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.ITEMS,
       Columns.DESCRIPTION, Columns.LAST_MODIFIED);
   private static final Set<String> storageLocationsColumns = Sets.newHashSet(Columns.FREEZER_NAME, Columns.IDENTIFICATION_BARCODE,

@@ -44,3 +44,13 @@ would like, then click the "Save" button at the top right. If an array has been 
 samples are listed in the Samples section below. Under that is another list containing the array run's change log.
 
 {% include userman-toplink.md %}
+
+
+{% assign sub = sub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Deleting Array Runs" %}
+
+To delete array runs, go to the Array Runs list page, select the array runs that you wish to delete, and click the
+"Delete" button in the toolbar at the top of the table. An array run can only be deleted by its creator or a MISO
+administrator.
+
+{% include userman-toplink.md %}

@@ -20,6 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.ArrayRunStore;
 
@@ -33,6 +34,9 @@ public class DefaultArrayRunService implements ArrayRunService {
   private AuthorizationManager authorizationManager;
   
   @Autowired
+  private DeletionStore deletionStore;
+
+  @Autowired
   private ArrayRunStore arrayRunStore;
 
   @Autowired
@@ -41,6 +45,7 @@ public class DefaultArrayRunService implements ArrayRunService {
   @Autowired
   private InstrumentService instrumentService;
 
+  @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
   }
@@ -206,6 +211,16 @@ public class DefaultArrayRunService implements ArrayRunService {
     to.setHealth(from.getHealth());
     to.setStartDate(from.getStartDate());
     to.setCompletionDate(from.getCompletionDate());
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public void authorizeDeletion(ArrayRun object) throws IOException {
+    authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
   }
 
 }
