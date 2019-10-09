@@ -11,6 +11,7 @@ Changes:
   * Show 1 decimal place on labels for volume/concentration values less than 10
   * Made the following items deletable
     * Sequencer Runs
+    * Projects
 
 # 0.2.192
 

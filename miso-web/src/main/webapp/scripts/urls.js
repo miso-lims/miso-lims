@@ -311,6 +311,7 @@ Urls = (function() {
   // Projects
   var projectUiBase = baseUrl + '/project';
   ui.projects = {
+    create: projectUiBase + '/new',
     edit: idUrlFunction(projectUiBase)
   };
 

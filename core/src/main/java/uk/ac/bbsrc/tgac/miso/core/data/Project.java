@@ -38,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Project extends Comparable<Project>, Nameable, Serializable, Attachable, ChangeLoggable {
+public interface Project extends Comparable<Project>, Deletable, Nameable, Serializable, Attachable, ChangeLoggable {
 
   /** Field PREFIX */
   public static final String PREFIX = "PRO";

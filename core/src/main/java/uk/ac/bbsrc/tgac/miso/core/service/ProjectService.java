@@ -28,7 +28,7 @@ import java.util.Collection;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 
-public interface ProjectService extends ListService<Project>, SaveService<Project> {
+public interface ProjectService extends DeleterService<Project>, ListService<Project>, SaveService<Project> {
 
 
   // GETS

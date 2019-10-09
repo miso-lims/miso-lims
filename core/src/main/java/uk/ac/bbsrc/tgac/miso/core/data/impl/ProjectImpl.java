@@ -119,9 +119,8 @@ public class ProjectImpl implements Project {
   @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.LAZY, mappedBy = "project")
   private Collection<Sample> samples = new HashSet<>();
 
-  @OneToMany(targetEntity = StudyImpl.class, fetch = FetchType.LAZY, mappedBy = "project")
+  @OneToMany(targetEntity = StudyImpl.class, fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE)
   private Collection<Study> studies = new HashSet<>();
-
 
   @Enumerated(EnumType.STRING)
   private ProgressType progress;
@@ -385,6 +384,22 @@ public class ProjectImpl implements Project {
   @Override
   public void setLastModified(Date lastModified) {
     this.lastModified = lastModified;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Project";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    if (getAlias() == null) {
+      return getShortName();
+    } else if (getShortName() == null) {
+      return getAlias();
+    } else {
+      return getAlias() + " (" + getShortName() + ")";
+    }
   }
 
 }

@@ -37,13 +37,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.persistence.ReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TargetedSequencingStore;
@@ -63,6 +69,14 @@ public class DefaultProjectService implements ProjectService {
   private NamingScheme namingScheme;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private DeletionStore deletionStore;
+  @Autowired
+  private FileAttachmentService fileAttachmentService;
+  @Autowired
+  private SampleService sampleService;
+  @Autowired
+  private LibraryTemplateService libraryTemplateService;
 
   @Override
   public Project get(long projectId) throws IOException {
@@ -160,6 +174,50 @@ public class DefaultProjectService implements ProjectService {
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public void authorizeDeletion(Project object) throws IOException {
+    authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
+  @Override
+  public uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult validateDeletion(Project object) throws IOException {
+    uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult result = new uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult();
+
+    long samples = sampleService.count(PaginationFilter.project(object.getId()));
+    if (samples > 0L) {
+      result.addError(new ValidationError(String.format("Project %s contains %d samples",
+          object.getShortName() == null ? object.getAlias() : object.getShortName(), samples)));
+    }
+
+    return result;
+  }
+
+  @Override
+  public void beforeDelete(Project object) throws IOException {
+    fileAttachmentService.beforeDelete(object);
+
+    List<LibraryTemplate> templates = libraryTemplateService.listLibraryTemplatesForProject(object.getId());
+    for (LibraryTemplate template : templates) {
+      template.getProjects().removeIf(templateProject -> templateProject.getId() == object.getId());
+      libraryTemplateService.update(template);
+    }
+  }
+
+  @Override
+  public void afterDelete(Project object) throws IOException {
+    fileAttachmentService.afterDelete(object);
   }
 
 }

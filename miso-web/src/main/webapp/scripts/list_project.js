@@ -28,13 +28,21 @@ ListTarget.project = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    return [];
+    return [ListUtils.createBulkDeleteAction("Projects", "projects", function(project) {
+      if (!project.alias) {
+        return project.shortName;
+      } else if (!project.shortName) {
+        return project.alias;
+      } else {
+        return project.alias + ' (' + project.shortName + ")";
+      }
+    })];
   },
   createStaticActions: function(config, projectId) {
     return [{
       "name": "Add",
       "handler": function() {
-        window.location.href = '/miso/project/new';
+        window.location.href = Urls.ui.projects.create;
       }
     }];
   },
