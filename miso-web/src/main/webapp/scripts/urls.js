@@ -40,7 +40,14 @@ Urls = (function() {
   // Array Runs
   var arrayRunUiBase = baseUrl + '/arrayrun';
   ui.arrayRuns = {
+    create: arrayRunUiBase + '/new',
     edit: idUrlFunction(arrayRunUiBase)
+  };
+
+  var arrayRunRestBase = restBase + '/arrayruns';
+  rest.arrayRuns = {
+    datatable: arrayRunRestBase + '/dt',
+    projectDatatable: idUrlFunction(arrayRunRestBase + '/dt/project')
   };
 
   // Attachment Categories

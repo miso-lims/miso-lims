@@ -24,16 +24,18 @@
 ListTarget.arrayrun = {
   name: 'Array Runs',
   createUrl: function(config, projectId) {
-    return '/miso/rest/arrayruns/dt' + (projectId ? '/project/' + projectId : '');
+    return projectId ? Urls.rest.arrayRuns.projectDatatable(projectId) : Urls.rest.arrayRuns.datatable;
   },
   createBulkActions: function(config, projectId) {
-    return [];
+    return [ListUtils.createBulkDeleteAction("Array Runs", "arrayruns", function(run) {
+      return run.alias;
+    })];
   },
   createStaticActions: function(config, projectId) {
     return [{
       name: 'Add',
       handler: function() {
-        window.location = '/miso/arrayrun/new';
+        window.location = Urls.ui.arrayRuns.create;
       }
     }];
   },

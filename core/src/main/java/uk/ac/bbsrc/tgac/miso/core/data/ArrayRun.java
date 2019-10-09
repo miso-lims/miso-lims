@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ArrayRunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 
 @Entity
-public class ArrayRun implements Serializable, Aliasable, ChangeLoggable {
+public class ArrayRun implements Serializable, Aliasable, ChangeLoggable, Deletable {
 
   private static final long serialVersionUID = 1L;
 
@@ -214,6 +214,16 @@ public class ArrayRun implements Serializable, Aliasable, ChangeLoggable {
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Array Run";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias();
   }
 
 }
