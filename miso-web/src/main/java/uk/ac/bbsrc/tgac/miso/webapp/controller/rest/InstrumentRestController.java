@@ -109,4 +109,11 @@ public class InstrumentRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.instrumentType(instrumentType));
   }
 
+  @PostMapping(value = "/bulk-delete")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete("Instrument", ids, instrumentService);
+  }
+
 }

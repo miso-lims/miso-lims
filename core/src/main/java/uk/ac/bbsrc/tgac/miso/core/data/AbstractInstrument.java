@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -185,7 +186,7 @@ public abstract class AbstractInstrument implements Instrument {
     this.runs = runs;
   }
 
-  @OneToMany(targetEntity = ServiceRecord.class, mappedBy = "instrument")
+  @OneToMany(targetEntity = ServiceRecord.class, mappedBy = "instrument", cascade = CascadeType.REMOVE)
   private Set<ServiceRecord> serviceRecords = new HashSet<>();
 
   @Override
@@ -292,6 +293,16 @@ public abstract class AbstractInstrument implements Instrument {
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Instrument";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName() + " (" + getInstrumentModel().getAlias() + ")";
   }
 
 }

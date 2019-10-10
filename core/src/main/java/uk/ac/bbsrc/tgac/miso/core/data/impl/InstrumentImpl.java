@@ -52,4 +52,5 @@ public class InstrumentImpl extends AbstractInstrument implements Serializable {
     setInstrumentModel(null);
     setName(null);
   }
+
 }

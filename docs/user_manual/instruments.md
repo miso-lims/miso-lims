@@ -129,3 +129,14 @@ To delete service records, first select the records that you wish to delete on t
 
 {% include userman-toplink.md %}
 
+
+
+{% assign sub = sub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Deleting Instruments" %}
+
+To delete instruments, go to the Instruments list page, select the instruments that you wish to delete, and click the
+"Delete" button in the toolbar at the top of the table. An instrument can only be deleted by a MISO administrator, and
+only if it does not have any sequencing runs or array runs.
+
+{% include userman-toplink.md %}
+

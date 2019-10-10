@@ -16,7 +16,10 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.InstrumentStore;
 
 @Transactional(rollbackFor = Exception.class)
@@ -25,6 +28,8 @@ public class DefaultInstrumentService implements InstrumentService {
 
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private DeletionStore deletionStore;
   @Autowired
   private InstrumentStore instrumentDao;
 
@@ -125,6 +130,30 @@ public class DefaultInstrumentService implements InstrumentService {
   public List<Instrument> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
       PaginationFilter... filter) throws IOException {
     return instrumentDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public ValidationResult validateDeletion(Instrument object) throws IOException {
+    ValidationResult result = new ValidationResult();
+    long runUsage = instrumentDao.getUsageByRuns(object);
+    if (runUsage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, runUsage, "sequencer " + Pluralizer.runs(runUsage)));
+    }
+    long arrayRunUsage = instrumentDao.getUsageByArrayRuns(object);
+    if (arrayRunUsage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, arrayRunUsage, "array " + Pluralizer.runs(arrayRunUsage)));
+    }
+    return result;
   }
 
 }

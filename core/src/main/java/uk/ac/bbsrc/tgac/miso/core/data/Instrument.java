@@ -27,7 +27,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
-public interface Instrument extends Nameable, Serializable {
+public interface Instrument extends Deletable, Nameable, Serializable {
 
   public void setName(String name);
 
