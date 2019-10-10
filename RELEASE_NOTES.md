@@ -10,7 +10,7 @@ Changes:
   * Improved performance of bulk entry forms
   * Changed LCM tube to be a more generic _Tissue Piece_ that can have a type; by default, _LCM Tube_.
   * Automatically update `/miso/constants.js` every 15 minutes
-
+  * Fixed missing Libraries table on Edit Sample page
 
 # 0.2.191
 
