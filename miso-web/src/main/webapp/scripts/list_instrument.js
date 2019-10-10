@@ -25,21 +25,23 @@ ListTarget.instrument = {
   name: "Instruments",
   createUrl: function(config, projectId) {
     if (config.instrumentType) {
-      return "/miso/rest/instruments/dt/instrument-type/" + config.instrumentType;
+      return Urls.rest.instruments.instrumentTypeDatatable(config.instrumentType);
     } else {
-      return "/miso/rest/instruments/dt";
+      return Urls.rest.instruments.datatable;
     }
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    return [];
+    return !config.isAdmin ? [] : [ListUtils.createBulkDeleteAction("Instruments", "instruments", function(instrument) {
+      return instrument.name + ' (' + instrument.instrumentModelAlias + ')';
+    })];
   },
   createStaticActions: function(config, projectId) {
     if (config.isAdmin) {
       return [{
         "name": "Add",
         "handler": function() {
-          window.location = '/miso/instrument/new';
+          window.location = Urls.ui.instruments.create;
         }
       }];
     } else {

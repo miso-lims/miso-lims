@@ -14,6 +14,7 @@ Changes:
     * Projects
     * Arrays
     * Array Runs
+    * Instruments
 
 # 0.2.192
 

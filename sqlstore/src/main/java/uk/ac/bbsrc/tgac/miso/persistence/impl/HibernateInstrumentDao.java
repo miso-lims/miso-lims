@@ -36,7 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -177,6 +179,20 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   @Override
   public void restrictPaginationByInstrumentType(Criteria criteria, InstrumentType type, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("instrumentModel.instrumentType", type));
+  }
+
+  @Override
+  public long getUsageByRuns(Instrument instrument) throws IOException {
+    return (long) currentSession().createCriteria(Run.class)
+        .add(Restrictions.eq("sequencer", instrument))
+        .setProjection(Projections.rowCount()).uniqueResult();
+  }
+
+  @Override
+  public long getUsageByArrayRuns(Instrument instrument) throws IOException {
+    return (long) currentSession().createCriteria(ArrayRun.class)
+        .add(Restrictions.eq("instrument", instrument))
+        .setProjection(Projections.rowCount()).uniqueResult();
   }
 
 }

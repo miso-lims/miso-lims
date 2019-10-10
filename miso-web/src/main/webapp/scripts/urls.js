@@ -139,11 +139,14 @@ Urls = (function() {
   // Instruments
   var instrumentUiBase = baseUrl + '/instrument';
   ui.instruments = {
+    create: instrumentUiBase + '/new',
     edit: idUrlFunction(instrumentUiBase)
   }
 
   var instrumentRestBase = restBase + '/instruments';
   rest.instruments = {
+    datatable: instrumentRestBase + '/dt',
+    instrumentTypeDatatable: idUrlFunction(instrumentRestBase + '/dt/instrument-type'),
     list: instrumentRestBase
   };
 
