@@ -11,6 +11,7 @@ Changes:
   * Changed LCM tube to be a more generic _Tissue Piece_ that can have a type; by default, _LCM Tube_.
   * Automatically update `/miso/constants.js` every 15 minutes
   * Fixed missing Libraries table on Edit Sample page
+  * Fixed Javascript error on library index 2 autocomplete for unique dual indices in bulk form
 
 # 0.2.191
 

@@ -75,21 +75,21 @@ HotTarget.library = (function() {
           }
         } else if (flatProperty === 'index' + (n - 1) + 'Label' && !Utils.validation.isEmpty(value)) {
           if (indexFamily && indexFamily.uniqueDualIndex) {
-            var indexName = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
+            var selectedIndex1 = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
               return index.position == n - 1;
             }).find(function(index) {
               return index.label == value || index.sequence == value;
-            }).name;
-            if (indexName) {
+            });
+            if (selectedIndex1) {
               var dualIndex = (Utils.array.maybeGetProperty(indexFamily, 'indices') || []).filter(function(index) {
                 return index.position == n;
               }).find(function(index) {
-                return index.name == indexName;
+                return index.name == selectedIndex1.name;
               });
               if (dualIndex) {
                 setData(dualIndex.label);
               } else {
-                Utils.showOkDialog('Error', ['There is no dual index for index \'' + indexName + '\'',
+                Utils.showOkDialog('Error', ['There is no dual index for index \'' + selectedIndex1.name + '\'',
                     'Perhaps an index family is incorrectly marked as having unique dual indices']);
               }
             }
