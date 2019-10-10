@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -482,6 +483,7 @@ public class MenuController implements ServletContextAware {
     }
   }
 
+  @Scheduled(fixedDelay = 900_000)
   public synchronized void refreshConstants() {
     final ScheduledFuture<?> current = future;
     if (current != null && !current.isDone()) {
