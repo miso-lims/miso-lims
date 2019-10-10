@@ -9,6 +9,8 @@ Changes:
   * Fixed migration error in detailed sample Docker Compose demo
   * Improved performance of bulk entry forms
   * Changed LCM tube to be a more generic _Tissue Piece_ that can have a type; by default, _LCM Tube_.
+  * Automatically update `/miso/constants.js` every 15 minutes
+
 
 # 0.2.191
 
@@ -45,6 +47,9 @@ Upgrade notes:
    (aliquot). This information has been moved to the `sampleSubcategory` column
    allow them to be renamed.
 
+BAD:
+  * `/miso/constants.js` did not automatically reload
+
 # 0.2.190
 
 Changes:
@@ -67,6 +72,7 @@ Upgrade notes:
 BAD:
 
   * Confirm password field shows an error and prevents changing passwords and creating new users
+  * `/miso/constants.js` did not automatically reload
 
 # 0.2.189
 
@@ -81,6 +87,7 @@ Changes:
 BAD:
 
   * Confirm password field shows an error and prevents changing passwords and creating new users
+  * `/miso/constants.js` did not automatically reload
 
 # 0.2.188
 
