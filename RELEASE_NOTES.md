@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 0.2.192
+
+Changes:
+
   * Added interface for administrators to add, edit, and delete dropdown options
     * sequencing container models
     * instrument models
@@ -14,6 +20,16 @@ Changes:
   * Fixed Javascript error on library index 2 autocomplete for unique dual indices in bulk form
   * Don't show missing index warnings on pools containing only one library
   * Fixed missing index being considered a duplicate of any index
+  * Show pool orders on the Edit Pool page
+  * Prevent changes to a pool that would cause it to no longer match the requirements of a pool
+    order to which is is already linked
+
+Upgrade notes:
+
+ * Some sample classes had special names that gave them different behaviour
+   (LCM Tube, Slide, Single Cell, Single Cell DNA (stock), Single Cell DNA
+   (aliquot). This information has been moved to the `sampleSubcategory` column
+   allow them to be renamed.
 
 # 0.2.191
 
@@ -42,16 +58,9 @@ Upgrade notes:
     `miso.fiscalYearStartMonth` to your `miso.properties` file, and set the value to
     the month number (1-12) of the start of your fiscal year.
 
-
-Upgrade notes:
-
- * Some sample classes had special names that gave them different behaviour
-   (LCM Tube, Slide, Single Cell, Single Cell DNA (stock), Single Cell DNA
-   (aliquot). This information has been moved to the `sampleSubcategory` column
-   allow them to be renamed.
-
-BAD:
+Known issues:
   * `/miso/constants.js` did not automatically reload
+  * Detailed sample demo Docker image failed Flyway migration from a fresh database
 
 # 0.2.190
 
@@ -72,10 +81,11 @@ Upgrade notes:
 	  as necessary. Single-ended and symmetric paired-end parameters will be
 	  upgraded automatically. These are often used for 10X runs.
 
-BAD:
+Known issues:
 
   * Confirm password field shows an error and prevents changing passwords and creating new users
   * `/miso/constants.js` did not automatically reload
+  * Detailed sample demo Docker image failed Flyway migration from a fresh database
 
 # 0.2.189
 
@@ -87,7 +97,7 @@ Changes:
   * Improve performance of downloading `/miso/constants.js`
   * Fix error on Edit Library page when 'No indices' is selected
 
-BAD:
+Known issues:
 
   * Confirm password field shows an error and prevents changing passwords and creating new users
   * `/miso/constants.js` did not automatically reload
@@ -103,7 +113,7 @@ Changes:
   * Check duplicate indices for fake (10X) families
   * Allow toolbar buttons to wrap when full
 
-BAD:
+Known issues:
 
   * Confirm password field shows an error and prevents changing passwords and creating new users
 
@@ -114,7 +124,7 @@ Changes:
   * Fix clear button index distance page
   * Display index collisions in pool orders
 
-BAD:
+Known issues:
 
   * Confirm password field shows an error and prevents changing passwords and creating new users
 
@@ -152,7 +162,7 @@ Upgrade Notes:
     * `miso.pools.warning.index.mismatches.message`: the custom error message shown when near-duplicate
       indices are detected. Default is `Near-Duplicate Indices`.
 
-BAD:
+Known issues:
 
 * Confirm password field shows an error and prevents changing passwords and creating new users
 

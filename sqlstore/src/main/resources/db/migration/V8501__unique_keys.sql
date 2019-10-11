@@ -1,2 +1,0 @@
-ALTER TABLE SequencingContainerModel ADD CONSTRAINT uk_sequencingContainerModel_platform_alias UNIQUE (platformType, alias);
-ALTER TABLE SequencingContainerModel ADD CONSTRAINT uk_sequencingContainerModel_platform_barcode UNIQUE (platformType, identificationBarcode);

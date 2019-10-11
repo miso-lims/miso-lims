@@ -1,3 +1,15 @@
+-- sample_class_alias
+ALTER TABLE SampleClass ADD COLUMN sampleSubcategory varchar(50);
+
+UPDATE SampleClass SET sampleSubcategory = alias WHERE alias IN ('LCM Tube', 'Slide', 'Single Cell');
+UPDATE SampleClass SET sampleSubcategory = 'Single Cell (stock)' WHERE alias = 'Single Cell DNA (stock)';
+UPDATE SampleClass SET sampleSubcategory = 'Single Cell (aliquot)' WHERE alias = 'Single Cell DNA (aliquot)';
+
+-- unique_keys
+ALTER TABLE SequencingContainerModel ADD CONSTRAINT uk_sequencingContainerModel_platform_alias UNIQUE (platformType, alias);
+ALTER TABLE SequencingContainerModel ADD CONSTRAINT uk_sequencingContainerModel_platform_barcode UNIQUE (platformType, identificationBarcode);
+
+-- tissue_piece
 CREATE TABLE TissuePieceType (
   tissuePieceTypeId bigint(20) PRIMARY KEY AUTO_INCREMENT,
   abbreviation varchar(500) NOT NULL,
@@ -20,3 +32,4 @@ ALTER TABLE SampleTissuePiece MODIFY tissuePieceType bigint(20) NOT NULL;
 ALTER TABLE SampleTissuePiece ADD CONSTRAINT tissuePieceType_tissuePieceTypeId FOREIGN KEY(tissuePieceType) REFERENCES TissuePieceType(tissuePieceTypeId);
 
 DROP TRIGGER IF EXISTS SampleLCMTubeChange;
+
